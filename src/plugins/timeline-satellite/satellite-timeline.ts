@@ -37,9 +37,8 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
 
-  bottomIconElementName = 'menu-satellite-timeline';
+
   bottomIconImg = viewTimelinePng;
-  bottomIconLabel = 'Satellite Timeline';
   bottomIconCallback: () => void = () => {
     if (!this.verifySensorSelected()) {
       return;
@@ -58,12 +57,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     this.resizeCanvas_();
   };
 
-  helpTitle = 'Satellite Timeline';
-  helpBody = `The Satellite Timeline plugin shows the times when a sensor has visiblity of various satellites. The timeline is color-coded to show the quality of the
-    pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to select that satellite and change the time to that pass.`;
-
   sideMenuElementName = 'satellite-timeline-menu';
-  sideMenuTitle: string = 'Satellite Timeline';
   sideMenuElementHtml = keepTrackApi.html`
     <div class="row"></div>
     <div class="row" style="margin: 0;">

@@ -10,15 +10,15 @@ import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
-  protected dependencies_: string[];
-  isRequireSensorSelected: boolean = true;
+  dependencies_ = [];
+  isRequireSensorSelected = true;
 
   bottomIconCallback: () => void = () => {
     this.getSensorInfo();
     this.checkIfLinesVisible_(keepTrackApi.getLineManager());
   };
 
-  bottomIconElementName = 'sensor-info-icon';
+
   bottomIconLabel = 'Sensor Info';
   bottomIconImg = radioTowerPng;
   isIconDisabledOnLoad = true;
@@ -94,30 +94,6 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
   private isSunLineVisible_ = false;
   private isMonnLineVisible_ = false;
-
-  helpTitle = 'Sensor Info';
-  helpBody = keepTrackApi.html`
-    Sensor Info provides information about the currently selected sensor.
-    The information is based on publicly available data and may not always be 100% accurate.
-    If you have public data on additional sensors or corrections to existing sensor information please contact me at <a href="mailto:theodore.kruczek@gmail.com">theodore.kruczek@gmail.com</a>.
-    <br><br>
-    The information provided includes:
-    <ul style="margin-left: 40px;">
-      <li>
-        Sensor Name
-      </li>
-      <li>
-        Sensor Owner
-      </li>
-      <li>
-        Sensor Type
-      </li>
-      <li>
-        Sensor Field of View
-      </li>
-    </ul>
-    <br>
-    Additionally, lines can be quickly created from the sensor to the sun or moon from this menu.`;
 
   addHtml(): void {
     super.addHtml();

@@ -24,8 +24,6 @@ import { standardPluginSuite } from './generic-tests';
  *- addJs(): adds JS to the application by registering a callback with the KeepTrack API
  *- addHtml(): adds HTML to the application by registering a callback with the KeepTrack API
  *
- *Fields:
- *- lastLongAudioTime: a number that tracks the last time a long audio clip was played
  */
 
 describe('SatelliteViewPlugin_class', () => {

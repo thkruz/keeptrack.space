@@ -3,14 +3,14 @@
  *
  * catalogManagerInstance.ts is the primary interface between sat-cruncher and the main application.
  * It manages all interaction with the satellite catalogue.
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
- * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
+ * under the MIT License. Please reference https://keeptrack.space/license/thingsinspace.txt
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -174,7 +174,7 @@ export class CatalogManager {
    * If the object number does not exist in the `sccIndex` and `isExtensiveSearch` is true, it performs an extensive search in the `satData`.
    * If the object number is found in the `satData`, it returns the index as the ID. If not found, it returns null.
    */
-  sccNum2Id(a5Num: string | number, isExtensiveSearch: boolean = true): number | null {
+  sccNum2Id(a5Num: string | number, isExtensiveSearch = true): number | null {
     // For backwards compatibility, this method accepts a number or string as the a5Num parameter.
     if (typeof a5Num === 'number') {
       a5Num = a5Num.toString().padStart(5, '0');

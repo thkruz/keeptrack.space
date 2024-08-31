@@ -17,7 +17,7 @@ import { SatInfoBox } from './sat-info-box';
  * This is the class that manages the selection of objects.
  */
 export class SelectSatManager extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   lastCssStyle = '';
   selectedSat = -1;
   private readonly noSatObj_ = <DetailedSatellite>(<unknown>{

@@ -3,7 +3,7 @@
  *
  * stringPad.ts contains the StringPad class, which provides utility methods for
  * padding strings with leading or trailing characters.
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek

@@ -3,14 +3,14 @@
  *
  * main.js is the primary javascript file for keeptrack.space. It manages all user
  * interaction with the application.
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
- * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
+ * under the MIT License. Please reference https://keeptrack.space/license/thingsinspace.txt
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -418,7 +418,7 @@ theodore.kruczek at gmail dot com.
     const renderer = keepTrackApi.getRenderer();
     const camera = keepTrackApi.getMainCamera();
 
-    camera.draw(keepTrackApi.getPlugin(SelectSatManager).getSelectedSat(), renderer.sensorPos);
+    camera.draw(keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat(), renderer.sensorPos);
     renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
 
     if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {

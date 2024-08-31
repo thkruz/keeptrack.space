@@ -17,7 +17,7 @@ import { TimeMachine } from '../time-machine/time-machine';
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -44,11 +44,9 @@ declare module '@app/interfaces' {
 }
 
 export class SettingsMenuPlugin extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   bottomIconElementName: string = 'settings-menu-icon';
   bottomIconImg = settingsPng;
-  bottomIconLabel: string = 'Settings Menu';
-
   sideMenuElementName: string = 'settings-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="settings-menu" class="side-menu-parent start-hidden text-select">
@@ -332,9 +330,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = 'Settings Menu';
-  helpBody = keepTrackApi.html`The Settings menu allows you to configure the application.`;
-
   isNotColorPickerInitialSetup = false;
 
   addHtml(): void {
@@ -343,9 +338,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.constructor.name,
       cb: () => {
-        getEl('settings-form').addEventListener('change', SettingsMenuPlugin.onFormChange);
-        getEl('settings-form').addEventListener('submit', SettingsMenuPlugin.onSubmit);
-        getEl('settings-reset').addEventListener('click', SettingsMenuPlugin.resetToDefaults);
+        getEl('settings-form').addEventListener('change', SettingsMenuPlugin.onFormChange_);
+        getEl('settings-form').addEventListener('submit', SettingsMenuPlugin.onSubmit_);
+        getEl('settings-reset').addEventListener('click', SettingsMenuPlugin.resetToDefaults_);
 
         const colorPalette = [
           rgbCss([1.0, 0.0, 0.0, 1.0]), // Red
@@ -370,49 +365,49 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
           initialColor: rgbCss(settingsManager.colors?.payload || [0.2, 1.0, 0.0, 0.5]),
           palette: colorPalette,
           onColorSelected() {
-            that.onColorSelected(this, 'payload');
+            that.onColorSelected_(this, 'payload');
           },
         });
         (<any>$('#settings-color-rocketBody')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.rocketBody || [0.2, 0.4, 1.0, 1]),
           palette: colorPalette,
           onColorSelected() {
-            that.onColorSelected(this, 'rocketBody');
+            that.onColorSelected_(this, 'rocketBody');
           },
         });
         (<any>$('#settings-color-debris')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.debris || [0.5, 0.5, 0.5, 1]),
           palette: colorPalette,
           onColorSelected() {
-            that.onColorSelected(this, 'debris');
+            that.onColorSelected_(this, 'debris');
           },
         });
         (<any>$('#settings-color-inview')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.inFOV || [0.85, 0.5, 0.0, 1.0]),
           palette: colorPalette,
           onColorSelected() {
-            that.onColorSelected(this, 'inview');
+            that.onColorSelected_(this, 'inview');
           },
         });
         (<any>$('#settings-color-missile')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.missile || [1.0, 1.0, 0.0, 1.0]),
           palette: colorPalette,
           onColorSelected() {
-            that.onColorSelected(this, 'missile');
+            that.onColorSelected_(this, 'missile');
           },
         });
         (<any>$('#settings-color-missileInview')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.missileInview || [1.0, 0.0, 0.0, 1.0]),
           palette: colorPalette,
           onColorSelected() {
-            that.onColorSelected(this, 'missileInview');
+            that.onColorSelected_(this, 'missileInview');
           },
         });
         (<any>$('#settings-color-special')).colorPick({
           initialColor: rgbCss(settingsManager.colors?.pink || [1.0, 0.0, 0.6, 1.0]),
           palette: colorPalette,
           onColorSelected() {
-            that.onColorSelected(this, 'pink');
+            that.onColorSelected_(this, 'pink');
           },
         });
         this.isNotColorPickerInitialSetup = true;
@@ -429,85 +424,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
         SettingsMenuPlugin.syncOnLoad();
       },
     });
-  }
-
-  onColorSelected(context: any, colorStr: string) {
-    if (typeof context === 'undefined' || context === null) {
-      throw new Error('context is undefined');
-    }
-    if (typeof colorStr === 'undefined' || colorStr === null) {
-      throw new Error('colorStr is undefined');
-    }
-
-    context.element.css('cssText', `background-color: ${context.color} !important; color: ${context.color};`);
-    if (this.isNotColorPickerInitialSetup) {
-      settingsManager.colors[colorStr] = parseRgba(context.color);
-      LegendManager.legendColorsChange();
-      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MANAGER_COLORS, JSON.stringify(settingsManager.colors));
-    }
-  }
-
-  static onFormChange(e: any, isDMChecked?: boolean, isSLMChecked?: boolean) {
-    if (typeof e === 'undefined' || e === null) {
-      throw new Error('e is undefined');
-    }
-
-    switch (e.target?.id) {
-      case 'settings-notionalSats':
-      case 'settings-leoSats':
-      case 'settings-starlinkSats':
-      case 'settings-heoSats':
-      case 'settings-meoSats':
-      case 'settings-geoSats':
-      case 'settings-showPayloads':
-      case 'settings-showRocketBodies':
-      case 'settings-showDebris':
-      case 'settings-showAgencies':
-      case 'settings-drawOrbits':
-      case 'settings-drawTrailingOrbits':
-      case 'settings-drawEcf':
-      case 'settings-isDrawInCoverageLines':
-      case 'settings-drawSun':
-      case 'settings-drawBlackEarth':
-      case 'settings-drawAtmosphere':
-      case 'settings-drawAurora':
-      case 'settings-drawMilkyWay':
-      case 'settings-graySkybox':
-      case 'settings-eciOnHover':
-      case 'settings-hos':
-      case 'settings-confidence-levels':
-      case 'settings-demo-mode':
-      case 'settings-sat-label-mode':
-      case 'settings-freeze-drag':
-      case 'settings-time-machine-toasts':
-      case 'settings-snp':
-        if ((<HTMLInputElement>getEl(e.target.id)).checked) {
-          // Play sound for enabling option
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
-        } else {
-          // Play sound for disabling option
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
-        }
-        break;
-      default:
-        break;
-    }
-
-    isDMChecked ??= (<HTMLInputElement>getEl('settings-demo-mode')).checked;
-    isSLMChecked ??= (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
-
-    if (isSLMChecked && (<HTMLElement>e.target).id === 'settings-demo-mode') {
-      (<HTMLInputElement>getEl('settings-sat-label-mode')).checked = false;
-      getEl('settings-demo-mode').classList.remove('lever:after');
-    }
-
-    if (isDMChecked && (<HTMLElement>e.target).id === 'settings-sat-label-mode') {
-      (<HTMLInputElement>getEl('settings-demo-mode')).checked = false;
-      getEl('settings-sat-label-mode').classList.remove('lever:after');
-    }
   }
 
   static syncOnLoad() {
@@ -572,7 +488,86 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
   }
 
-  static resetToDefaults() {
+  private onColorSelected_(context: any, colorStr: string) {
+    if (typeof context === 'undefined' || context === null) {
+      throw new Error('context is undefined');
+    }
+    if (typeof colorStr === 'undefined' || colorStr === null) {
+      throw new Error('colorStr is undefined');
+    }
+
+    context.element.css('cssText', `background-color: ${context.color} !important; color: ${context.color};`);
+    if (this.isNotColorPickerInitialSetup) {
+      settingsManager.colors[colorStr] = parseRgba(context.color);
+      LegendManager.legendColorsChange();
+      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
+      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MANAGER_COLORS, JSON.stringify(settingsManager.colors));
+    }
+  }
+
+  private static onFormChange_(e: any, isDMChecked?: boolean, isSLMChecked?: boolean) {
+    if (typeof e === 'undefined' || e === null) {
+      throw new Error('e is undefined');
+    }
+
+    switch (e.target?.id) {
+      case 'settings-notionalSats':
+      case 'settings-leoSats':
+      case 'settings-starlinkSats':
+      case 'settings-heoSats':
+      case 'settings-meoSats':
+      case 'settings-geoSats':
+      case 'settings-showPayloads':
+      case 'settings-showRocketBodies':
+      case 'settings-showDebris':
+      case 'settings-showAgencies':
+      case 'settings-drawOrbits':
+      case 'settings-drawTrailingOrbits':
+      case 'settings-drawEcf':
+      case 'settings-isDrawInCoverageLines':
+      case 'settings-drawSun':
+      case 'settings-drawBlackEarth':
+      case 'settings-drawAtmosphere':
+      case 'settings-drawAurora':
+      case 'settings-drawMilkyWay':
+      case 'settings-graySkybox':
+      case 'settings-eciOnHover':
+      case 'settings-hos':
+      case 'settings-confidence-levels':
+      case 'settings-demo-mode':
+      case 'settings-sat-label-mode':
+      case 'settings-freeze-drag':
+      case 'settings-time-machine-toasts':
+      case 'settings-snp':
+        if ((<HTMLInputElement>getEl(e.target.id)).checked) {
+          // Play sound for enabling option
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+        } else {
+          // Play sound for disabling option
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+        }
+        break;
+      default:
+        break;
+    }
+
+    isDMChecked ??= (<HTMLInputElement>getEl('settings-demo-mode')).checked;
+    isSLMChecked ??= (<HTMLInputElement>getEl('settings-sat-label-mode')).checked;
+
+    if (isSLMChecked && (<HTMLElement>e.target).id === 'settings-demo-mode') {
+      (<HTMLInputElement>getEl('settings-sat-label-mode')).checked = false;
+      getEl('settings-demo-mode').classList.remove('lever:after');
+    }
+
+    if (isDMChecked && (<HTMLElement>e.target).id === 'settings-sat-label-mode') {
+      (<HTMLInputElement>getEl('settings-demo-mode')).checked = false;
+      getEl('settings-sat-label-mode').classList.remove('lever:after');
+    }
+  }
+
+  private static resetToDefaults_() {
     settingsManager.isShowLeoSats = true;
     settingsManager.isShowHeoSats = true;
     settingsManager.isShowMeoSats = true;
@@ -601,7 +596,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     SettingsMenuPlugin.syncOnLoad();
   }
 
-  static onSubmit(e: any) {
+  private static onSubmit_(e: any) {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
     }
@@ -726,4 +721,3 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 }
 
-export const settingsMenuPlugin = new SettingsMenuPlugin();

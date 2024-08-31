@@ -20,17 +20,9 @@ export class ShortTermFences extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconElementName = 'stf-bottom-icon';
-  bottomIconLabel = 'Short Term Fence';
   bottomIconImg = searchPng;
   isRequireSensorSelected = true;
-  // isIconDisabledOnLoad = true;
   isAddStfLinksOnce = false;
-
-  helpTitle = 'Short Term Fences (STF) Menu';
-  helpBody = keepTrackApi.html`The Short Term Fences (STF) Menu is used for visualizing sensor search boxes.
-  <br><br>
-  This is unlikely to be very helpful unless you own/operate a sensor with a search box functionality.`;
 
   sideMenuElementName = 'stf-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -110,7 +102,7 @@ export class ShortTermFences extends KeepTrackPlugin {
                   data-tooltip="Visualize Sensor Search Capability">Build Short Term Fence on this object...</div>
             `,
           );
-          getEl('stf-on-object-link').addEventListener('click', this.stfOnObjectLinkClick.bind(this));
+          getEl('stf-on-object-link').addEventListener('click', this.stfOnObjectLinkClick_.bind(this));
           this.isAddStfLinksOnce = true;
         }
       },
@@ -127,7 +119,7 @@ export class ShortTermFences extends KeepTrackPlugin {
         getEl('stfForm').addEventListener('submit', (e: Event) => {
           e.preventDefault();
           keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
-          this.onSubmit.bind(this)();
+          this.onSubmit_.bind(this)();
         });
         getEl('stf-remove-last').addEventListener('click', () => {
           keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
@@ -198,7 +190,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.resetSensor,
       cbName: 'shortTermFences',
-      cb: this.closeAndDisable.bind(this),
+      cb: this.closeAndDisable_.bind(this),
     });
 
     keepTrackApi.register({
@@ -206,7 +198,7 @@ export class ShortTermFences extends KeepTrackPlugin {
       cbName: 'shortTermFences',
       cb: (sensor: any, id: number): void => {
         if (sensor == null && id == null) {
-          this.closeAndDisable();
+          this.closeAndDisable_();
           slideOutLeft(getEl(this.sideMenuElementName), 1000);
         } else {
           this.setBottomIconToEnabled();
@@ -215,14 +207,14 @@ export class ShortTermFences extends KeepTrackPlugin {
     });
   }
 
-  closeAndDisable(): void {
+  private closeAndDisable_(): void {
     this.isMenuButtonActive = false;
     this.setBottomIconToUnselected();
     this.setBottomIconToDisabled();
     keepTrackApi.getUiManager().hideSideMenus();
   }
 
-  onSubmit() {
+  private onSubmit_() {
     if (!this.verifySensorSelected()) {
       return;
     }
@@ -283,7 +275,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     // keepTrackApi.getPlugin(SensorFov)?.enableFovView();
   }
 
-  stfOnObjectLinkClick() {
+  private stfOnObjectLinkClick_() {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     if (!this.verifySensorSelected()) {

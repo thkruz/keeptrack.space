@@ -24,8 +24,6 @@ export class SatellitePhotos extends KeepTrackPlugin {
   protected dependencies_: string[] = [SelectSatManager.name];
   discvrPhotos_: { imageUrl: string; lat: Degrees; lon: Degrees }[] = [];
 
-  bottomIconElementName = 'menu-sat-photos';
-  bottomIconLabel = 'Satellite Photos';
   bottomIconImg = photoManagerPng;
   sideMenuElementName: string = 'sat-photo-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -42,11 +40,6 @@ export class SatellitePhotos extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = 'Satellite Photos Menu';
-  helpBody = keepTrackApi.html`The Satellite Photos Menu is used for displaying live photos from select satellites.
-  <br><br>
-  Note - changes in the image API may cause the wrong satellite to be selected in KeepTrack.`;
-
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
@@ -55,20 +48,20 @@ export class SatellitePhotos extends KeepTrackPlugin {
       cb: () => {
         getEl('meteosat9-link').addEventListener('click', () => {
           // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
-          SatellitePhotos.loadPic(28912, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg');
+          SatellitePhotos.loadPic_(28912, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg');
         });
         getEl('meteosat11-link').addEventListener('click', () => {
           // Meteosat 11 provides 0 deg full earth images every 15 minutes
-          SatellitePhotos.loadPic(40732, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg');
+          SatellitePhotos.loadPic_(40732, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg');
         });
         getEl('himawari8-link').addEventListener('click', () => {
-          SatellitePhotos.himawari8();
+          SatellitePhotos.himawari8_();
         });
         getEl('goes16-link').addEventListener('click', () => {
-          SatellitePhotos.loadPic(41866, 'https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg');
+          SatellitePhotos.loadPic_(41866, 'https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg');
         });
         getEl('goes18-link').addEventListener('click', () => {
-          SatellitePhotos.loadPic(51850, 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg');
+          SatellitePhotos.loadPic_(51850, 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg');
         });
       },
     });
@@ -85,7 +78,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
   /**
    * Retrieves natural color images of Earth captured by the DSCOVR satellite and displays them using the DrawManager instance.
    */
-  initDISCOVR_(): void {
+  private initDISCOVR_(): void {
     const req = new XMLHttpRequest();
 
     req.open('GET', 'https://epic.gsfc.nasa.gov/api/natural', true);
@@ -115,7 +108,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
           getEl('sat-photo-menu-list').insertAdjacentHTML('beforeend', html);
           getEl(`discovr-link${i}`).addEventListener('click', () => {
-            SatellitePhotos.loadPic(-1, this.discvrPhotos_[i - 1].imageUrl);
+            SatellitePhotos.loadPic_(-1, this.discvrPhotos_[i - 1].imageUrl);
             keepTrackApi.getMainCamera().camSnap(lat2pitch(this.discvrPhotos_[i - 1].lat), lon2yaw(this.discvrPhotos_[i - 1].lon, keepTrackApi.getTimeManager().simulationTimeObj));
             keepTrackApi.getMainCamera().changeZoom(0.7);
           });
@@ -138,23 +131,23 @@ export class SatellitePhotos extends KeepTrackPlugin {
     req.send();
   }
 
-  static colorbox = (url: string): void => {
+  private static colorbox_(url: string): void {
     settingsManager.isPreventColorboxClose = true;
     setTimeout(() => {
       settingsManager.isPreventColorboxClose = false;
     }, 2000);
 
     openColorbox(url, { image: true });
-  };
+  }
 
-  static loadPic(satId: number, url: string): void {
+  private static loadPic_(satId: number, url: string): void {
     keepTrackApi.getUiManager().searchManager.hideResults();
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(satId));
     keepTrackApi.getMainCamera().changeZoom(0.7);
-    SatellitePhotos.colorbox(url);
+    SatellitePhotos.colorbox_(url);
   }
 
-  static himawari8(): void {
+  private static himawari8_(): void {
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(40267));
     keepTrackApi.getMainCamera().changeZoom(0.7);
 
@@ -184,4 +177,3 @@ export class SatellitePhotos extends KeepTrackPlugin {
   }
 }
 
-export const satellitePhotosPlugin = new SatellitePhotos();

@@ -4,7 +4,7 @@
  * reports.ts is a plugin for generating quick reports in text format of various
  * satellite and sensor data
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -53,8 +53,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   isRequireSatelliteSelected = true;
 
-  bottomIconElementName = 'menu-reports';
-  bottomIconLabel = 'Reports';
+
   bottomIconImg = analysisPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
@@ -82,9 +81,6 @@ export class ReportsPlugin extends KeepTrackPlugin {
     </div>
   </div>
   `;
-
-  helpTitle = 'Reports Menu';
-  helpBody = keepTrackApi.html`The Reports Menu is a collection of tools to help you analyze and understand the data you are viewing.`;
 
   dragOptions: clickDragOptions = {
     isDraggable: false,

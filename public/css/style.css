@@ -1056,6 +1056,7 @@ input:focus {
   height: var(--bottom-icon-height);
   padding: 5px;
   text-align: center;
+  cursor: pointer;
 }
 
 .bmenu-title {

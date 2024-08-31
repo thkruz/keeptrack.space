@@ -20,7 +20,7 @@ export class EcfPlot extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconElementName = 'ecf-plots-bottom-icon';
+
   bottomIconLabel = 'ECF Plots';
   bottomIconImg = scatterPlotPng3;
   bottomIconCallback = () => {

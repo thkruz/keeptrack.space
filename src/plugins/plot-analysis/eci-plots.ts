@@ -20,7 +20,7 @@ export class EciPlot extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconElementName = 'eci-plots-bottom-icon';
+
   bottomIconLabel = 'ECI Plots';
   bottomIconImg = scatterPlotPng2;
   bottomIconCallback = () => {

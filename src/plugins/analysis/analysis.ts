@@ -20,7 +20,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
  * analysis.ts is a plugin for viewing trend data on TLEs and calculating best
  * pass times.
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -41,9 +41,8 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   protected dependencies_: [];
-  bottomIconElementName = 'analysis-bottom-icon';
+  searchStrCache_: string = null;
   bottomIconImg = analysisPng;
-  bottomIconLabel = 'Analysis Menu';
   sideMenuElementName = 'analysis-menu';
   sideMenuElementHtml = keepTrackApi.html`
   <div id="analysis-menu" class="side-menu-parent start-hidden text-select">
@@ -166,21 +165,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
       </div>
     </div>
   </div>
-`;
-
-  helpTitle = 'Analysis Menu';
-  helpBody = keepTrackApi.html`The Analysis Menu provides a number of tools to help you analyze the data in the current view. The tools are:
-  <ul style="margin-left: 40px;">
-    <li>Export Official TLEs - Export real two line element sets.</li>
-    <li>Export 3LES - Export three line element sets.</li>
-    <li>Export KeepTrack TLEs - Export All KeepTrack two line element sets including analysts.</li>
-    <li>Export KeepTrack 3LES - Export All KeepTrack three line element sets including analysts.</li>
-    <li>Find Close Objects - Find objects that are close to each other.</li>
-    <li>Find Reentries - Find objects that are likely to reenter the atmosphere.</li>
-    <li>Best Passes - Find the best passes for a satellite based on the currently selected sensor.</li>
-  </ul>`;
-
-  searchStrCache_: string = null;
+  `;
 
   addHtml(): void {
     super.addHtml();
@@ -241,7 +226,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     });
   }
 
-  findCloseObjects() {
+  private findCloseObjects_() {
     if (this.searchStrCache_) {
       return this.searchStrCache_;
     }
@@ -415,7 +400,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     return satList;
   }
 
-  static findBestPass(sat: DetailedSatellite, sensors: DetailedSensor[]): lookanglesRow[] {
+  private static findBestPass_(sat: DetailedSatellite, sensors: DetailedSensor[]): lookanglesRow[] {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     // Check if there is a sensor
@@ -612,7 +597,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     return lookanglesTable;
   }
 
-  static findBestPasses(sats: string, sensor: DetailedSensor) {
+  private static findBestPasses_(sats: string, sensor: DetailedSensor) {
     sats = sats.replace(/ /gu, ',');
     const satArray = sats.split(',');
     const passes: lookanglesRow[] = [];
@@ -623,7 +608,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
           continue;
         }
         const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(satId));
-        const satPasses = AnalysisMenu.findBestPass(sat, [sensor]);
+        const satPasses = AnalysisMenu.findBestPass_(sat, [sensor]);
 
         for (const pass of satPasses) {
           passes.push(pass);
@@ -649,7 +634,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   }
 
   private findCsoBtnClick_() {
-    const searchStr = this.findCloseObjects();
+    const searchStr = this.findCloseObjects_();
 
     keepTrackApi.getUiManager().doSearch(searchStr);
   }
@@ -667,7 +652,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     if (!sensorManagerInstance.isSensorSelected()) {
       keepTrackApi.getUiManager().toast('You must select a sensor first!', ToastMsgType.critical);
     } else {
-      AnalysisMenu.findBestPasses(sats, sensorManagerInstance.getSensor());
+      AnalysisMenu.findBestPasses_(sats, sensorManagerInstance.getSensor());
     }
   }
 
@@ -684,4 +669,3 @@ export class AnalysisMenu extends KeepTrackPlugin {
   }
 }
 
-export const analysisMenuPlugin = new AnalysisMenu();

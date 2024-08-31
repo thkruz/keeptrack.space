@@ -57,24 +57,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   bottomIconElementName: string = 'info-overlay-icon';
   bottomIconImg = infoPng;
-  bottomIconLabel = 'Overlay';
-  helpBody: string = keepTrackApi.html`
-    <p>
-      The Watchlist Overlay shows the next pass time for each satellite in your watchlist. The overlay is updated every 10 seconds.
-    </p>
-    <p>
-      The overlay is color coded to show the time to the next pass. The colors are as follows:
-    </p>
-    <ul>
-      <li>Yellow - In View</li>
-      <li>Blue - Time to Next Pass is up to 30 minutes after the current time or 10 minutes before the current time</li>
-      <li>White - Any future pass not fitting the above requirements</li>
-    </ul>
-    <p>
-      Clicking on a satellite in the overlay will center the map on that satellite.
-    </p>`;
 
-  helpTitle: string = 'Watchlist Overlay';
   lastOverlayUpdateTime = 0;
   sideMenuElementHtml = keepTrackApi.html`
     <div id="info-overlay-menu" class="side-menu-parent start-hidden text-select">
@@ -83,7 +66,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   sideMenuElementName = 'info-overlay-menu';
 
-  isRequireSensorSelected: boolean = true;
+  isRequireSensorSelected = true;
 
   static uiManagerFinal() {
     getEl('info-overlay-content').addEventListener('click', (evt: Event) => {

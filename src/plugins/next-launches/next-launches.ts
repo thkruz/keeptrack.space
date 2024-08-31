@@ -31,7 +31,7 @@ export interface LaunchInfoObject {
 }
 
 export class NextLaunchesPlugin extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   bottomIconCallback: () => void = () => {
     if (!this.isMenuButtonActive) {
       return;
@@ -41,16 +41,12 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
   bottomIconElementName: string = 'menu-nextLaunch';
   bottomIconImg = calendar2Png;
-  bottomIconLabel: string = 'Next Launches';
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
     maxWidth: 650,
     minWidth: 450,
   };
-
-  helpTitle = 'Next Launches Menu';
-  helpBody = keepTrackApi.html`The Next Launches Menu pulls data from <a href="https://thespacedevs.com/" target="_blank">The Space Devs</a> to display upcoming launches.`;
 
   sideMenuElementName: string = 'nextLaunch-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

@@ -45,8 +45,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     maxWidth: 700,
   };
 
-  bottomIconElementName = 'sensor-list-icon';
-  bottomIconLabel = 'Sensors';
+
   bottomIconImg = radarPng;
 
   sideMenuElementName: string = 'sensor-list-menu';
@@ -67,36 +66,6 @@ export class SensorListPlugin extends KeepTrackPlugin {
     </div>`;
 
   isSensorLinksAdded = false;
-
-  helpTitle = 'Sensors Menu';
-  helpBody = keepTrackApi.html`The Sensors menu allows you to select a sensor for use in calculations and other menu's functions.
-  Sensors are in groups based on the networks they primarily support.
-  On the left side of the menu is the name of the sensor and on the right side is the country/organization that owns it.
-  <br><br>
-  Selecting an "All...Sensors" option will select all sensors in that group.
-  This is useful for visualizing the networks coverage, but currently does not work for all calculations.
-  If you are trying to calculate look angles for a network it is best to use the multi-site look angles tool or
-  to use look angles for each of the individual sensors in the network.
-  <br><br>
-  Sensors on this list include Mechanical and Phased Array Radars, in addition to Optical sensors:
-  <ul style="margin-left: 40px;">
-    <li>
-      Phased Array Radars typically are limited to Low Earth Orbit (LEO).
-    </li>
-    <li>
-      Mechanical Radars can be used for both LEO and Geostationary Orbit (GEO).
-    </li>
-    <li>
-      Optical sensors are typically used for GEO, but can also be used for LEO.
-    </li>
-    <li>
-      Optical sensors are limited to night time observations in clear skies, whereas radars can be used for both day and night.
-    </li>
-  </ul>
-  <br>
-  Sensor information is based on publicly available data and can be verified in the Sensor Info menu.
-  If you have public data on additional sensors or corrections to existing sensor information please contact me at
-  <a href="mailto:admin@keeptrack.space">admin@keeptrack.space</a>.`;
 
   addHtml(): void {
     super.addHtml();

@@ -13,8 +13,8 @@ import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class DopsPlugin extends KeepTrackPlugin {
-  protected dependencies_: string[];
-  bottomIconElementName = 'menu-dops';
+  dependencies_ = [];
+
   bottomIconLabel = 'View DOPs';
   bottomIconImg = gpsPng;
   bottomIconCallback = (): void => {

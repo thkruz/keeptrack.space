@@ -8,8 +8,8 @@ import { Line, LineColors } from './line';
 export class SensorToSatLine extends Line {
   sat: DetailedSatellite;
   sensor: DetailedSensor;
-  private isDrawFovOnly_: boolean = false;
-  private isDrawSelectedOnly_: boolean = false;
+  private isDrawFovOnly_ = false;
+  private isDrawSelectedOnly_ = false;
 
   constructor(sensor: DetailedSensor, sat: DetailedSatellite, color?: vec4) {
     super();

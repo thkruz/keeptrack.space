@@ -20,7 +20,7 @@ export class RicPlot extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconElementName = 'ric-plots-bottom-icon';
+
   bottomIconLabel = 'RIC Plot';
   bottomIconImg = scatterPlotPng4;
   isIconDisabledOnLoad = true;

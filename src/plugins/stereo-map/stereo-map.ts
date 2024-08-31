@@ -69,23 +69,13 @@ export class StereoMap extends KeepTrackPlugin {
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
 
-  bottomIconElementName = 'menu-map';
   bottomIconImg = mapPng;
-  bottomIconLabel = 'Stereo Map';
   bottomIconCallback: () => void = () => {
     if (!this.isMenuButtonActive) {
       return;
     }
     this.updateMap();
   };
-
-  helpTitle = 'Stereographic Map Menu';
-  helpBody = keepTrackApi.html`The Stereographic Map Menu is used for visualizing satellite ground traces in a stereographic projection.
-    <br/><br/>
-    You can click on a spot along the ground trace to change the time of the simulation to when the satellite reaches that spot.
-    <br/><br/>
-    The yellow dots indicate when the satellite is in view of the sensor. The red dots indicate when the satellite is not in view of the sensor. The dot closest to the satellite is the current time.
-  `;
 
   sideMenuElementName = 'map-menu';
   sideMenuElementHtml =
@@ -97,16 +87,6 @@ export class StereoMap extends KeepTrackPlugin {
     ` +
     StereoMap.generateMapLooks_(50)
     }</div>`;
-
-  static generateMapLooks_(count: number): string {
-    let html = '';
-
-    for (let i = 1; i <= count; i++) {
-      html += `<img id="map-look${i}" class="map-item map-look"/>`;
-    }
-
-    return html;
-  }
 
   addHtml(): void {
     super.addHtml();
@@ -134,7 +114,7 @@ export class StereoMap extends KeepTrackPlugin {
           if (!(<HTMLElement>evt.target).classList.contains('map-look')) {
             return;
           }
-          this.mapMenuClick(evt);
+          this.mapMenuClick_(evt);
         });
       },
     });
@@ -145,7 +125,7 @@ export class StereoMap extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherMessage,
       cbName: this.constructor.name,
-      cb: this.onCruncherMessage.bind(this),
+      cb: this.onCruncherMessage_.bind(this),
     });
 
     keepTrackApi.register({
@@ -195,7 +175,7 @@ export class StereoMap extends KeepTrackPlugin {
 
       this.updateSatPosition_();
       StereoMap.updateSensorPosition_();
-      this.drawEarthLayer();
+      this.drawEarthLayer_();
       this.drawGroundTrace_();
       this.addTextToMap_();
     } catch (e) {
@@ -203,7 +183,17 @@ export class StereoMap extends KeepTrackPlugin {
     }
   }
 
-  static getMapPoints_(now: Date, sat: DetailedSatellite, sensor: DetailedSensor): { lla: LlaVec3<Degrees, Kilometers>; inView: boolean; time: string } {
+  private static generateMapLooks_(count: number): string {
+    let html = '';
+
+    for (let i = 1; i <= count; i++) {
+      html += `<img id="map-look${i}" class="map-item map-look"/>`;
+    }
+
+    return html;
+  }
+
+  private static getMapPoints_(now: Date, sat: DetailedSatellite, sensor: DetailedSensor): { lla: LlaVec3<Degrees, Kilometers>; inView: boolean; time: string } {
     const time = dateFormat(now, 'isoDateTime', true);
 
     const { gmst } = calcGmst(now);
@@ -388,10 +378,10 @@ export class StereoMap extends KeepTrackPlugin {
       this.canvas_.style.height = `${settingsManager.mapHeight}px`;
     }
 
-    this.drawEarthLayer();
+    this.drawEarthLayer_();
   }
 
-  drawEarthLayer(): void {
+  private drawEarthLayer_(): void {
     const ctx = this.canvas_.getContext('2d');
 
     if (this.earthImg.src) {
@@ -404,7 +394,7 @@ export class StereoMap extends KeepTrackPlugin {
     }
   }
 
-  onCruncherMessage(): void {
+  private onCruncherMessage_(): void {
     if (this.isMenuButtonActive || this.isMapUpdateOverride_) {
       this.satCrunchNow_ = Date.now();
       if (this.satCrunchNow_ > settingsManager.lastMapUpdateTime + 30000 || this.isMapUpdateOverride_) {
@@ -419,7 +409,7 @@ export class StereoMap extends KeepTrackPlugin {
     }
   }
 
-  mapMenuClick(evt: any) {
+  private mapMenuClick_(evt: any) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     this.isMapUpdateOverride_ = true;

@@ -35,8 +35,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = true;
 
-  bottomIconElementName = 'menu-polar-plot';
-  bottomIconLabel = 'Polar Plot';
+
   bottomIconImg = analysisPng;
   bottomIconCallback: () => void = () => {
     this.updatePlot_();
@@ -53,9 +52,6 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     </div>
   </div>
   `;
-
-  helpTitle = 'Polar Plot Menu';
-  helpBody = keepTrackApi.html`The Polar Plot Menu is used to generate a 2D polar plot of the satellite's azimuth and elevation over time.`;
 
   dragOptions: clickDragOptions = {
     isDraggable: true,

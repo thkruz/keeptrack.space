@@ -7,8 +7,8 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
  * The main website now covers all of this functionality.
  */
 export class AboutMenu extends KeepTrackPlugin {
-  protected dependencies_: string[];
-  bottomIconElementName = 'menu-about-icon';
+  dependencies_ = [];
+
   bottomIconImg = aboutPng;
   bottomIconLabel = 'About Menu';
   sideMenuElementName = 'about-menu';

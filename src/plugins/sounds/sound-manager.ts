@@ -63,7 +63,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from './SoundNames';
 
 export class SoundManager extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   lastLongAudioTime = 0;
   isMute = false;
   private currentChatterClip_ = 0;
@@ -309,4 +309,3 @@ export class SoundManager extends KeepTrackPlugin {
   }
 }
 
-export const soundManagerPlugin = new SoundManager();

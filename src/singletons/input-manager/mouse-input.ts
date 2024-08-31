@@ -436,7 +436,7 @@ export class MouseInput {
 
     let clickSatObj: DetailedSatellite | MissileObject | null = null;
 
-    if (this.clickedSat === -1) {
+    if (this.clickedSat !== -1) {
       const obj = catalogManagerInstance.getObject(this.mouseSat);
 
       if ((obj instanceof DetailedSatellite) || (obj instanceof MissileObject)) {

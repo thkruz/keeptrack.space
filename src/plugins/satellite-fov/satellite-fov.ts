@@ -1,7 +1,7 @@
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -31,9 +31,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class SatelliteFov extends KeepTrackPlugin {
-  protected dependencies_ = [SelectSatManager.name];
-  bottomIconElementName = 'menu-sat-fov';
-  bottomIconLabel = 'Satellite FOV';
+  dependencies_ = [SelectSatManager.name];
   bottomIconImg = sensorOccupiedPng;
 
   dragOptions: clickDragOptions = {
@@ -41,11 +39,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     minWidth: 350,
   };
 
-  helpBody = keepTrackApi.html`
-    The Satellite Field of View plugin allows you to control the field of view of a satellite.`;
-
   sideMenuElementName: string = 'satellite-fov-menu';
-  sideMenuTitle: string = 'Satellite Field of View';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div>
     <div class="center">
@@ -166,11 +160,11 @@ export class SatelliteFov extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.constructor.name,
       cb: () => {
-        getEl('sat-fov-settings-form').addEventListener('change', this.handleFormChange.bind(this));
-        getEl('sat-fov-settings-form').addEventListener('submit', this.handleFormChange.bind(this));
+        getEl('sat-fov-settings-form').addEventListener('change', this.handleFormChange_.bind(this));
+        getEl('sat-fov-settings-form').addEventListener('submit', this.handleFormChange_.bind(this));
 
-        getEl('sat-fov-settings-default-form').addEventListener('change', this.handleDefaultFormChange.bind(this));
-        getEl('sat-fov-settings-default-form').addEventListener('submit', this.handleDefaultFormChange.bind(this));
+        getEl('sat-fov-settings-default-form').addEventListener('change', this.handleDefaultFormChange_.bind(this));
+        getEl('sat-fov-settings-default-form').addEventListener('submit', this.handleDefaultFormChange_.bind(this));
       },
     });
 
@@ -220,7 +214,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       event: KeepTrackApiEvents.ConeMeshUpdate,
       cbName: SatelliteFov.name,
       cb: () => {
-        this.updateListOfFovMeshes();
+        this.updateListOfFovMeshes_();
       },
     });
 
@@ -228,7 +222,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: SatelliteFov.name,
       cb: (sat: BaseObject) => {
-        this.updateListOfFovMeshes();
+        this.updateListOfFovMeshes_();
 
         if (sat?.isSatellite()) {
           this.isSettingsMenuEnabled_ = true;
@@ -239,7 +233,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     });
   }
 
-  private handleFormChange() {
+  private handleFormChange_() {
     const coneSettings = {
       fieldOfView: parseFloat((getEl('sat-fov-fov-angle') as HTMLInputElement).value) as Degrees,
       color: [
@@ -262,7 +256,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     }
   }
 
-  private handleDefaultFormChange() {
+  private handleDefaultFormChange_() {
     const fovAngle = parseFloat((getEl('sat-fov-default-fov-angle') as HTMLInputElement).value);
     const red = parseFloat((getEl('sat-fov-default-red') as HTMLInputElement).value);
     const green = parseFloat((getEl('sat-fov-default-green') as HTMLInputElement).value);
@@ -313,7 +307,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     keepTrackApi.getScene().coneFactory.editSettings(coneSettings);
   }
 
-  private updateListOfFovMeshes() {
+  private updateListOfFovMeshes_() {
     const meshes = keepTrackApi.getScene().coneFactory.meshes;
 
     if (meshes.length === 0) {

@@ -75,7 +75,7 @@ export class OrbitManager {
     this.currentInView_ = [];
   }
 
-  clearSelectOrbit(isSecondary: boolean = false): void {
+  clearSelectOrbit(isSecondary = false): void {
     const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
 
     if (isSecondary) {
@@ -257,7 +257,7 @@ export class OrbitManager {
     this.updateOrbitBuffer(satId);
   }
 
-  setSelectOrbit(satId: number, isSecondary: boolean = false): void {
+  setSelectOrbit(satId: number, isSecondary = false): void {
     if (isSecondary) {
       this.secondarySelectId_ = satId;
     } else {

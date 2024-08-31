@@ -29,14 +29,13 @@ export interface CollisionEvent {
 }
 
 export class Collissions extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   private readonly collisionDataSrc = './tle/SOCRATES.json';
   private selectSatIdOnCruncher_: number | null = null;
   private collisionList_ = <CollisionEvent[]>[];
 
   bottomIconElementName: string = 'menu-satellite-collision';
   bottomIconImg = collissionsPng;
-  bottomIconLabel: string = 'Collisions';
   sideMenuElementName: string = 'collisions-menu';
   sideMenuElementHtml = keepTrackApi.html`
   <div id="collisions-menu" class="side-menu-parent start-hidden text-select">
@@ -47,11 +46,6 @@ export class Collissions extends KeepTrackPlugin {
       </div>
     </div>
   </div>`;
-
-  helpTitle = 'Collisions Menu';
-  helpBody = keepTrackApi.html`The Collisions Menu shows satellites with a high probability of collision.
-  <br><br>
-  Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision.`;
 
   dragOptions: clickDragOptions = {
     isDraggable: true,

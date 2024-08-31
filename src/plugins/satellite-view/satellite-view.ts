@@ -1,7 +1,7 @@
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -38,10 +38,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  isRequireSatelliteSelected: boolean = true;
-
-  bottomIconElementName = 'menu-satview';
-  bottomIconLabel = 'Satellite View';
+  isRequireSatelliteSelected = true;
   bottomIconImg = sat3Png;
   isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
@@ -61,6 +58,4 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
       shake(getEl(this.bottomIconElementName));
     }
   };
-
-  lastLongAudioTime = 0;
 }

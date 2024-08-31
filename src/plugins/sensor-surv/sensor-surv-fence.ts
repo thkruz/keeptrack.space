@@ -1,7 +1,7 @@
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -36,7 +36,7 @@ declare module '@app/interfaces' {
 }
 
 export class SensorSurvFence extends KeepTrackPlugin {
-  protected dependencies_: string[] = [SensorListPlugin.name];
+  dependencies_: string[] = [SensorListPlugin.name];
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
       this.disableSurvView();
@@ -45,22 +45,10 @@ export class SensorSurvFence extends KeepTrackPlugin {
     }
   };
 
-  bottomIconElementName = 'menu-sensor-surv-fence';
-  bottomIconLabel = 'Sensor Fence';
   bottomIconImg = fencePng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
-
   isRequireSensorSelected = true;
-
-  disableSurvView() {
-    this.setBottomIconToUnselected(false);
-  }
-
-  private enableSurvView_() {
-    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
-    this.setBottomIconToSelected();
-  }
 
   addJs(): void {
     super.addJs();
@@ -93,5 +81,14 @@ export class SensorSurvFence extends KeepTrackPlugin {
         }
       },
     });
+  }
+
+  disableSurvView() {
+    this.setBottomIconToUnselected(false);
+  }
+
+  private enableSurvView_() {
+    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    this.setBottomIconToSelected();
   }
 }

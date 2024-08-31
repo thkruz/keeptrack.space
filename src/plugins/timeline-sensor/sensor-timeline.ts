@@ -28,18 +28,8 @@ export class SensorTimeline extends KeepTrackPlugin {
   private canvasStatic_: HTMLCanvasElement;
   private ctxStatic_: CanvasRenderingContext2D;
   private drawEvents_: { [key: string]: (mouseX: number, mouseY: number) => boolean } = {};
-  private allSensorLists_ = keepTrackApi.getSensorManager().getSensorList('ssn').concat(
-    keepTrackApi.getSensorManager().getSensorList('mw'),
-    keepTrackApi.getSensorManager().getSensorList('md'),
-    keepTrackApi.getSensorManager().getSensorList('leolabs'),
-    keepTrackApi.getSensorManager().getSensorList('esoc'),
-    keepTrackApi.getSensorManager().getSensorList('rus'),
-    keepTrackApi.getSensorManager().getSensorList('prc'),
-    keepTrackApi.getSensorManager().getSensorList('other'),
-  );
-  private enabledSensors_: DetailedSensor[] = this.allSensorLists_.filter((s) =>
-    keepTrackApi.getSensorManager().getSensorList('mw').includes(s),
-  );
+  private allSensorLists_ = [];
+  private enabledSensors_: DetailedSensor[] = [];
   private lengthOfLookAngles_ = 6 as Hours;
   private lengthOfBadPass_ = 120 as Seconds;
   private lengthOfAvgPass_ = 240 as Seconds;
@@ -48,9 +38,23 @@ export class SensorTimeline extends KeepTrackPlugin {
   constructor() {
     super();
 
+    this.allSensorLists_ = keepTrackApi.getSensorManager().getSensorList('ssn').concat(
+      keepTrackApi.getSensorManager().getSensorList('mw'),
+      keepTrackApi.getSensorManager().getSensorList('md'),
+      keepTrackApi.getSensorManager().getSensorList('leolabs'),
+      keepTrackApi.getSensorManager().getSensorList('esoc'),
+      keepTrackApi.getSensorManager().getSensorList('rus'),
+      keepTrackApi.getSensorManager().getSensorList('prc'),
+      keepTrackApi.getSensorManager().getSensorList('other'),
+    );
+
     // remove duplicates in sensorList
     this.allSensorLists_ = this.allSensorLists_.filter(
       (sensor, index, self) => index === self.findIndex((t) => t.uiName === sensor.uiName),
+    );
+
+    this.enabledSensors_ = this.allSensorLists_.filter((s) =>
+      keepTrackApi.getSensorManager().getSensorList('mw').includes(s),
     );
   }
 
@@ -58,9 +62,8 @@ export class SensorTimeline extends KeepTrackPlugin {
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
 
-  bottomIconElementName = 'menu-sensor-timeline';
+
   bottomIconImg = viewTimelinePng;
-  bottomIconLabel = 'Sensor Timeline';
   bottomIconCallback: () => void = () => {
     if (!this.isMenuButtonActive) {
       return;
@@ -69,12 +72,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     this.updateTimeline();
   };
 
-  helpTitle = 'Sensor Timeline';
-  helpBody = `The Sensor Timeline plugin shows the times when a satellite is in view of various sensors. The timeline is color-coded to show the quality of the
-    pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to change the sensor and time to that pass.`;
-
   sideMenuElementName = 'sensor-timeline-menu';
-  sideMenuTitle: string = 'Sensor Timeline';
   sideMenuElementHtml = keepTrackApi.html`
     <div class="row"></div>
     <div class="row" style="margin: 0;">

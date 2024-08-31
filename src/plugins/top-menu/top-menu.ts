@@ -12,7 +12,7 @@ import { errorManagerInstance } from '../../singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class TopMenu extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   static readonly SEARCH_RESULT_ID = 'search-results';
 
   addHtml = (): void => {

@@ -4,20 +4,20 @@
  * planetarium.ts is a plugin for showing the satellites above from the perspective
  * of a view on the earth.
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Affero General Public License as published by the Free Software
+ * terms of the GNU Affero General License as published by the Free Software
  * Foundation, either version 3 of the License, or (at your option) any later version.
  *
  * KeepTrack is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU Affero General Public License for more details.
+ * See the GNU Affero General License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with
+ * You should have received a copy of the GNU Affero General License along with
  * KeepTrack. If not, see <http://www.gnu.org/licenses/>.
  *
  * /////////////////////////////////////////////////////////////////////////////
@@ -30,7 +30,7 @@ import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class Screenshot extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   bottomIconCallback = () => {
     this.saveHiResPhoto('4k');
   };
@@ -38,9 +38,8 @@ export class Screenshot extends KeepTrackPlugin {
   // This is 'disabled' since it does not turn green after being clicked like other buttons.
   isIconDisabled = true;
 
-  bottomIconElementName = 'menu-screenshot';
+
   bottomIconImg = cameraPng;
-  bottomIconLabel = 'Take Photo';
   rmbCallback = (targetId: string): void => {
     switch (targetId) {
       case 'save-hd-rmb':
@@ -52,17 +51,18 @@ export class Screenshot extends KeepTrackPlugin {
       case 'save-8k-rmb':
         this.saveHiResPhoto('8k');
         break;
+      default:
+        break;
     }
   };
 
   rmbL1ElementName = 'save-rmb';
-  rmbL1Html = keepTrackApi.html`
-    <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Save Image &#x27A4;</a></li>
-  `;
+  rmbL1Html = keepTrackApi.html`<li class="rmb-menu-item" id="${this.rmbL1ElementName}"><a href="#">Save Image &#x27A4;</a></li>`;
 
   isRmbOnEarth = true;
   isRmbOffEarth = true;
   isRmbOnSat = true;
+  rmbMenuOrder = 20;
 
   rmbL2ElementName = 'save-rmb-menu';
   rmbL2Html = keepTrackApi.html`
@@ -86,6 +86,8 @@ export class Screenshot extends KeepTrackPlugin {
       case '8k':
         settingsManager.hiResWidth = 7680;
         settingsManager.hiResHeight = 4320;
+        break;
+      default:
         break;
     }
 
@@ -119,7 +121,7 @@ export class Screenshot extends KeepTrackPlugin {
    * Canvas is autoresized if queuedScreenshot_ is true at the start of the draw loop.
    * Screenshot is then taken at the end of the draw loop
    */
-  public takeScreenShot() {
+  takeScreenShot() {
     const link = document.createElement('a');
 
     link.download = 'keeptrack.png';
@@ -128,18 +130,21 @@ export class Screenshot extends KeepTrackPlugin {
     const n = d.getUTCFullYear();
     const copyrightStr = !settingsManager.copyrightOveride ? `©${n} KEEPTRACK.SPACE` : '';
 
-    link.href = Screenshot.watermarkedDataUrl(copyrightStr);
+    link.href = Screenshot.watermarkedDataUrl_(copyrightStr);
     link.click();
     this.queuedScreenshot_ = false;
   }
 
-  private static watermarkedDataUrl(text: string) {
+  private static watermarkedDataUrl_(text: string) {
     const canvas = keepTrackApi.getRenderer().domElement;
 
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
-    const cw = (tempCanvas.width = canvas.width);
-    const ch = (tempCanvas.height = canvas.height);
+    const cw = tempCanvas.width;
+    const ch = tempCanvas.height;
+
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
 
     tempCtx.drawImage(canvas, 0, 0);
     tempCtx.font = '24px nasalization';
@@ -149,7 +154,7 @@ export class Screenshot extends KeepTrackPlugin {
     tempCtx.fillStyle = 'white';
     tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
 
-    const { classificationstr, classificationColor } = Screenshot.calculateClassificationText();
+    const { classificationstr, classificationColor } = Screenshot.calculateClassificationText_();
 
     if (classificationstr !== '') {
       tempCtx.font = '24px nasalization';
@@ -170,7 +175,7 @@ export class Screenshot extends KeepTrackPlugin {
     return image;
   }
 
-  private static calculateClassificationText(): { classificationstr: string; classificationColor: string } {
+  private static calculateClassificationText_(): { classificationstr: string; classificationColor: string } {
     if (settingsManager.classificationStr === '') {
       return { classificationstr: '', classificationColor: '' };
     }
@@ -183,4 +188,3 @@ export class Screenshot extends KeepTrackPlugin {
   }
 }
 
-export const screenshotPlugin = new Screenshot();

@@ -4,7 +4,7 @@
  * watchlist.ts is a plugin for creating a list of satellites to actively monitor
  * and display on the globe.
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -45,7 +45,7 @@ interface UpdateWatchlistParams {
 }
 
 export class WatchlistPlugin extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   bottomIconCallback = () => {
     // The accounts for clicking the button again before the animation is done
     if (!this.isMenuButtonActive) {
@@ -57,17 +57,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
   bottomIconElementName: string = 'menu-watchlist';
   bottomIconImg = watchlistPng;
-  bottomIconLabel = 'Watchlist';
-  helpBody = keepTrackApi.html`
-  The Watchlist menu allows you to create a list of priority satellites to track.
-  This allows you to quickly retrieve the satellites you are most interested in.
-  The list is saved in your browser's local storage and will be available the next time you visit the site.
-  <br><br>
-  When satellites on the watchlist enter the selected sensor's field of view a notification will be displayed, a line will be drawn from the sensor to the satellite, and the satellite's number will be displayed on the globe.
-  <br><br>
-  The overlay feature relies on the watchlist being populated.`;
 
-  helpTitle = 'Watchlist Menu';
   isWatchlistChanged: boolean = null;
   sideMenuElementHtml = keepTrackApi.html`
     <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">

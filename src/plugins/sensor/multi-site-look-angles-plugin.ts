@@ -62,8 +62,6 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   };
 
 
-  bottomIconElementName = 'multi-site-look-angles-icon';
-  bottomIconLabel = 'Multi-Site Looks';
   bottomIconImg = multiSitePng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
@@ -74,19 +72,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     maxWidth: 750,
   };
 
-  helpTitle = 'Multi-Site Look Angles Menu';
-  helpBody = keepTrackApi.html`
-    The Multi-Site Look Angles menu allows you to calculate the range, azimuth, and elevation angles between a satellite and multiple sensors.
-    A satellite must first be selected before the menu can be used.
-    <br><br>
-    By default the menu will calculate the look angles for all sensors in the Space Surveillance Netowrk.
-    If you would like to calculate the look angles for additional sensors, you can export a csv file at the bottom of the menu.
-    The csv file will contain look angles for all sensors.
-    <br><br>
-    Clicking on a row in the table will select the sensor and change the simulation time to the time of the look angle.`;
-
   sideMenuElementName: string = 'multi-site-look-angles-menu';
-  sideMenuTitle: string = 'Multi-Sensor Look Angles';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div class="row"></div>
     <div class="row">

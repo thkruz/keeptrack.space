@@ -4,7 +4,7 @@
  * planetarium.ts is a plugin for showing the satellites above from the perspective
  * of a view on the earth.
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -35,9 +35,8 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
 
 export class Planetarium extends KeepTrackPlugin {
-  protected dependencies_: string[];
-  bottomIconElementName = 'menu-planetarium';
-  bottomIconLabel = 'Planetarium View';
+  dependencies_: string[];
+
   bottomIconImg = planetariumPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;

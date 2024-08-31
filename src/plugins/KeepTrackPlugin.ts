@@ -1,4 +1,5 @@
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { English } from '@app/localization/english';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import Module from 'module';
 import { BaseObject, Sensor } from 'ootk';
@@ -112,7 +113,7 @@ export abstract class KeepTrackPlugin {
   /**
    * Whether the side menu settings are open.
    */
-  isSideMenuSettingsOpen: boolean = false;
+  isSideMenuSettingsOpen = false;
   /**
    * The title of the help dialog.
    * @example 'Countries Menu'
@@ -128,7 +129,7 @@ export abstract class KeepTrackPlugin {
   /**
    * Whether the bottom icon is disabled by default.
    */
-  isIconDisabledOnLoad: boolean = false;
+  isIconDisabledOnLoad = false;
 
   /**
    * The image to use for the bottom icon.
@@ -150,12 +151,12 @@ export abstract class KeepTrackPlugin {
   /**
    * Whether the bottom icon is currently disabled.
    */
-  isIconDisabled: boolean = false;
+  isIconDisabled = false;
 
   /**
    * Whether the side menus must be hidden when the bottom icon is clicked.
    */
-  isForceHideSideMenus: boolean = false;
+  isForceHideSideMenus = false;
 
   /**
    * Level 1 Context Menu Html for Right Mouse Button
@@ -226,14 +227,10 @@ export abstract class KeepTrackPlugin {
     this.addHtml();
     this.addJs();
 
-    this.helpTitle = this.helpTitle || this.sideMenuTitle;
-
     if (this.helpTitle && this.helpBody) {
       this.registerHelp(this.helpTitle, this.helpBody);
-    } else if (this.helpTitle || this.helpBody) {
+    } else if (this.helpBody) {
       throw new Error(`${this.constructor.name} help title and body must both be defined.`);
-    } else if (this.sideMenuElementHtml) {
-      throw new Error(`${this.constructor.name} help is not defined!`);
     }
 
     keepTrackApi.loadedPlugins.push(this);
@@ -252,6 +249,17 @@ export abstract class KeepTrackPlugin {
     }
 
     this.sideMenuSettingsOptions.leftOffset = typeof this.sideMenuSettingsOptions.leftOffset === 'number' ? this.sideMenuSettingsOptions.leftOffset : null;
+
+    this.helpTitle = English.plugins[this.constructor.name]?.title ?? this.helpTitle ?? this.sideMenuTitle;
+    this.helpBody = English.plugins[this.constructor.name]?.helpBody ?? this.helpBody;
+    this.sideMenuTitle = English.plugins[this.constructor.name]?.title ?? this.sideMenuTitle;
+    this.bottomIconLabel = English.plugins[this.constructor.name]?.bottomIconLabel ?? this.bottomIconLabel;
+
+    if (this.bottomIconLabel) {
+      const bottomIconSlug = this.bottomIconLabel.toLowerCase().replace(' ', '-');
+
+      this.bottomIconElementName = this.bottomIconElementName ?? `${bottomIconSlug}-bottom-icon`;
+    }
 
     if (this.bottomIconElementName || this.bottomIconLabel) {
       if (!this.bottomIconElementName || !this.bottomIconLabel) {
@@ -355,17 +363,17 @@ export abstract class KeepTrackPlugin {
   /**
    * Whether the context menu opens when earth is clicked
    */
-  isRmbOnEarth: boolean = false;
+  isRmbOnEarth = false;
 
   /**
    * Whether the context menu opens when earth is not clicked (space)
    */
-  isRmbOffEarth: boolean = false;
+  isRmbOffEarth = false;
 
   /**
    * Whether the context menu opens when a satellite is clicked
    */
-  isRmbOnSat: boolean = false;
+  isRmbOnSat = false;
 
   private generateSideMenuHtml_() {
     const menuWidthStr = `${this.sideMenuSettingsOptions.width.toString()} px !important`;
@@ -561,7 +569,7 @@ export abstract class KeepTrackPlugin {
   /**
    * Requires the user to select a sensor before opening their bottom menu.
    */
-  isRequireSensorSelected: boolean = false;
+  isRequireSensorSelected = false;
 
   verifySensorSelected(isMakeToast = true): boolean {
     if (!keepTrackApi.getSensorManager().isSensorSelected()) {
@@ -579,7 +587,7 @@ export abstract class KeepTrackPlugin {
   /**
    * Requires the user to select a satellite before opening their bottom menu.
    */
-  isRequireSatelliteSelected: boolean = false;
+  isRequireSatelliteSelected = false;
 
   verifySatelliteSelected(): boolean {
     /*

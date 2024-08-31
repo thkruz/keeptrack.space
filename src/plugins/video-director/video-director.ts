@@ -9,7 +9,7 @@ import { SoundNames } from '../sounds/SoundNames';
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -36,15 +36,13 @@ declare module '@app/interfaces' {
 }
 
 export class VideoDirectorPlugin extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   isRotateL = true;
   isRotateR = false;
   isRotateU = false;
   isRotateD = false;
   bottomIconElementName: string = 'video-director-icon';
   bottomIconImg = settingsPng;
-  bottomIconLabel: string = 'Video Director';
-
   sideMenuElementName: string = 'video-director-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="video-director-menu" class="side-menu-parent start-hidden text-select">
@@ -155,9 +153,6 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = 'Settings Menu';
-  helpBody = keepTrackApi.html`The Settings menu allows you to configure the application.`;
-
   isNotColorPickerInitialSetup = false;
 
   addHtml(): void {
@@ -176,7 +171,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     });
   }
 
-  static onFormChange(e: any) {
+  private static onFormChange(e: any) {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
     }
@@ -267,7 +262,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     }
   }
 
-  static onSubmit(e: any) {
+  private static onSubmit(e: any) {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
     }
@@ -288,4 +283,3 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   }
 }
 
-export const videoDirectorPlugin = new VideoDirectorPlugin();

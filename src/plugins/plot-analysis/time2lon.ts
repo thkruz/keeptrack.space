@@ -18,7 +18,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconElementName = 'time2lon-plots-bottom-icon';
+
   bottomIconLabel = 'Time vs Lon Plot';
   bottomIconImg = linePlotPng;
   bottomIconCallback = () => {

@@ -4,7 +4,7 @@
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -1792,7 +1792,7 @@ export class ColorSchemeManager {
 
   }
 
-  private preValidateColorScheme_(isForceRecolor: boolean = false) {
+  private preValidateColorScheme_(isForceRecolor = false) {
     if (this.currentColorScheme === this.group || this.currentColorScheme === this.groupCountries) {
       const watchlistMenu = getEl('watchlist-menu');
       const watchlistTransform = watchlistMenu?.style.transform || '';

@@ -4,7 +4,7 @@
  * sensorManager.ts is the primary interface between the user interface and the
  * ground based sensors.
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek

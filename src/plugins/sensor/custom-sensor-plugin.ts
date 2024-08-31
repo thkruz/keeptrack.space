@@ -20,7 +20,7 @@ import { SoundNames } from '../sounds/SoundNames';
 import { SensorInfoPlugin } from './sensor-info-plugin';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
       const sensorManagerInstance = keepTrackApi.getSensorManager();
@@ -36,12 +36,10 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     }
   };
 
-  bottomIconElementName = 'custom-sensor-icon';
-  bottomIconLabel = 'Custom Sensor';
+
   bottomIconImg = customPng;
 
   sideMenuElementName: string = 'custom-sensor-menu';
-  sideMenuTitle: string = 'Custom Sensor';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div class="row">
         <form id="customSensor">
@@ -218,7 +216,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       case 'colors-default-rmb':
         break;
       default:
-        errorManagerInstance.info(`Unknown RMB target: ${targetId}`);
+        // errorManagerInstance.info(`Unknown RMB target: ${targetId}`);
         break;
     }
   };
@@ -226,17 +224,6 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   dragOptions: clickDragOptions = {
     isDraggable: true,
   };
-
-  helpTitle = 'Custom Sensor Menu';
-  helpBody = keepTrackApi.html`
-  This allows you to create a custom sensor for use in calculations and other menu's functions.
-  This can be a completely original sensor or a modification of an existing sensor.
-  <br><br>
-  After setting the latitude, longitude, and altitude of the sensor, you can set the sensor's field of view.
-  Selecting telescope will create a 360 degree field of view with an elevation mask of 10 degrees and unlimited range.
-  Deselecting the telescope option will allow you to set the field of view manually.
-  <br><br>
-  If you are trying to edit an existing sensor, you can select it from the sensor list first and the custom sensor will be updated with the selected sensor's information.`;
 
   addHtml(): void {
     super.addHtml();

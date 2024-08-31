@@ -6,10 +6,10 @@ import { Classification, ClassificationString } from '@app/static/classification
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class ClassificationBar extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   private classificationString_: ClassificationString;
-  private isClassificationContainerLoaded_: boolean = false;
-  private isExpanded_: boolean = false;
+  private isClassificationContainerLoaded_ = false;
+  private isExpanded_ = false;
 
   private readonly containerDomId = 'classification-container';
   private readonly textStringDomId = 'classification-string';

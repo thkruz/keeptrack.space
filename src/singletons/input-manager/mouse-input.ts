@@ -307,6 +307,10 @@ export class MouseInput {
         .concat([toggleTimeDOM, rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
+            // If the element is hiddeen ignore the click
+            if (el.style.display === 'none') {
+              return;
+            }
             this.rmbMenuActions(e);
           });
         });

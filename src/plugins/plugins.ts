@@ -196,7 +196,11 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
 
     for (const { init, enabled } of pluginList) {
       if (enabled) {
-        init();
+        try {
+          init();
+        } catch (e) {
+          errorManagerInstance.warn(`Error loading plugin:${e.message}`);
+        }
       }
     }
 

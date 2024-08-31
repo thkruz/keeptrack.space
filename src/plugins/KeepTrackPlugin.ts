@@ -459,6 +459,14 @@ export abstract class KeepTrackPlugin {
         const item = document.createElement('div');
 
         item.innerHTML = html;
+
+        // Trim empty child nodes
+        item.childNodes.forEach((child) => {
+          if (child.nodeType === 3 && child.textContent.trim() === '') {
+            item.removeChild(child);
+          }
+        });
+
         // Replace outer element with first child
         getEl(KeepTrackPlugin.rmbMenuL1ContainerId).appendChild(item.lastChild);
       },

@@ -75,7 +75,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thkruz/keeptrack.space"
+    "url": "git+https://github.com/thkruz/keeptrack.space.git"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",

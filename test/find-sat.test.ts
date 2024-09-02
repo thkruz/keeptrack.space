@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
@@ -84,7 +85,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = '';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 
   it('should find satellites with all inputs set to 1', () => {
@@ -156,7 +157,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'C';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 
   it('should find satellites with all inputs set to their maximum values', () => {
@@ -228,7 +229,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'C';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 
   it('should find satellites with random inputs', () => {
@@ -300,7 +301,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'D';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 
   it('should find satellites with only minimal inputs', () => {
@@ -312,7 +313,7 @@ describe('FindSatPlugin_class', () => {
 
     rangeInput.value = '50';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 
   it('should find satellites with only country code', () => {
@@ -324,7 +325,7 @@ describe('FindSatPlugin_class', () => {
 
     countryCodeInput.value = 'US';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 
   it('should find satellites with only bus', () => {
@@ -335,7 +336,7 @@ describe('FindSatPlugin_class', () => {
 
     busInput.value = 'A';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 
   it('should find satellites with only mandatory inputs and payload', () => {
@@ -356,7 +357,7 @@ describe('FindSatPlugin_class', () => {
 
     payloadInput.value = 'A';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 
   it('should find satellites with only mandatory inputs and shape', () => {
@@ -377,7 +378,7 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'A';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 
   it('should find satellites with only mandatory inputs and all optional inputs', () => {
@@ -416,6 +417,6 @@ describe('FindSatPlugin_class', () => {
 
     shapeInput.value = 'C';
 
-    plugin.findByLooksSubmit();
+    plugin['findByLooksSubmit_']();
   });
 });

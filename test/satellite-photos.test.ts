@@ -8,6 +8,9 @@ describe('SatellitePhotos_class', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let satellitePhotosPlugin: SatellitePhotos;
 
+  // eslint-disable-next-line no-console
+  console.debug(satellitePhotosPlugin);
+
   beforeEach(() => {
     setupDefaultHtml();
     satellitePhotosPlugin = new SatellitePhotos();
@@ -45,5 +48,3 @@ describe('SatellitePhotos_test_links', () => {
     });
   });
 });
-
-export const satellitePhotosPlugin = new SatellitePhotos();

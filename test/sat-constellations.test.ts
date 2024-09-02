@@ -9,6 +9,9 @@ describe('SatConstellations_class', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let satConstellationsPlugin: SatConstellations;
 
+  // eslint-disable-next-line no-console
+  console.debug(satConstellationsPlugin);
+
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {

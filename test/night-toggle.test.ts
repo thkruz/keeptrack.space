@@ -8,6 +8,9 @@ describe('NightToggle_class', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let nightToggle: NightToggle;
 
+  // eslint-disable-next-line no-console
+  console.debug(nightToggle);
+
   beforeAll(() => {
     setupDefaultHtml();
     nightToggle = new NightToggle();

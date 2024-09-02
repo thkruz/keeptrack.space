@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/singletons/camera';
 import { Moon } from '@app/singletons/draw-manager/moon';
@@ -26,14 +27,14 @@ describe('drawManager', () => {
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
     drawManagerInstance.isDrawOrbitsAbove = true;
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
-    drawManagerInstance.satLabelModeLastTime_ = -1000000000000000000;
+    drawManagerInstance['satLabelModeLastTime_'] = -1000000000000000000;
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
   });
 
   it('should calculate the moon\'s position', () => {
     const moon = new Moon();
     const date = new Date(2023, 1, 1);
-    const updateResults = () => moon.updateEciPosition_(date);
+    const updateResults = () => moon['updateEciPosition_'](date);
 
     expect(() => updateResults()).not.toThrow();
     expect(moon.position).toMatchSnapshot();

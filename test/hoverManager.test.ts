@@ -42,6 +42,9 @@ describe('code_snippet', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let catalogManagerInstance: CatalogManager;
 
+  // eslint-disable-next-line no-console
+  console.debug(catalogManagerInstance);
+
   beforeAll(() => {
     orbitManagerInstance = keepTrackApi.getOrbitManager();
     catalogManagerInstance = keepTrackApi.getCatalogManager();

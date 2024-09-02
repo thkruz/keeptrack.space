@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '@app/settings/settings';
 import { DotsManager } from '@app/singletons/dots-manager';
@@ -21,8 +22,8 @@ describe('drawManager', () => {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     colorSchemeManagerInstance.colorBuffer = new Uint8Array(4);
-    dotsManagerInstance.settings_ = <SettingsManager>{
-      ...dotsManagerInstance.settings_,
+    dotsManagerInstance['settings_'] = <SettingsManager>{
+      ...dotsManagerInstance['settings_'],
       satShader: {
         minSize: 1,
         maxSize: 1,

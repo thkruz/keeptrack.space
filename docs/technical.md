@@ -22,7 +22,7 @@
 # Main Files
 
 - index.html - Controls the structure of the front-end and loads all the CSS and JS files.
-- main.ts - Primary TS file that bootstraps all of the other files.
+- index.ts - Primary TS file that bootstraps all of the other files.
 - camera.ts - cameraManager is used to create cameraManager that serves as the interface from the UI and the webgl camera.
 - colorSchemeManager.ts - Handles the creation of color schemes for the dots.
   - colorManager/ruleSets - These files handle the ruleset for how to color dots when enabled.

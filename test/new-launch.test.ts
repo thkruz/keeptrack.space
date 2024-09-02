@@ -12,6 +12,9 @@ describe('NewLaunch_class', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let newLaunchPlugin: NewLaunch;
 
+  // eslint-disable-next-line no-console
+  console.debug(newLaunchPlugin);
+
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {

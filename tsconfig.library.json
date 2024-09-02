@@ -4,7 +4,9 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist" /* Redirect output structure to the directory. */
+    "outDir": "./lib", /* Redirect output structure to the directory. */
+    "declaration": true,
+    "declarationMap": true,
   },
   "include": [
     "src/**/*.ts",
@@ -21,7 +23,6 @@
     "test/**/*.png",
     "test/**/*.mp3",
     "test/**/*.jpg",
-    "public/analysis/js/analysis-tools.js"
   ],
   "exclude": [
     "node_modules/**/*",

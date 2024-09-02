@@ -80,6 +80,7 @@ coverage/
 # Build Folder
 dist
 embed
+lib
 
 # nyc Output
 .nyc_output

@@ -6,6 +6,7 @@ import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view'
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { UiManager } from '@app/singletons/uiManager';
+import i18next from 'i18next';
 import { mockCameraManager, mockUiManager } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
 

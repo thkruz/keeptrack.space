@@ -1,7 +1,7 @@
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
- * main.ts is a TypeScript implementation of the KeepTrack class. This is responsible for
+ * index.ts is a TypeScript implementation of the KeepTrack class. This is responsible for
  * initializing the website.
  * https://keeptrack.space
  *
@@ -26,15 +26,4 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrack } from './keeptrack';
-
-// Load the main website class
-const keepTrack = new KeepTrack(window.settingsOverride);
-
-// Expose to window for debugging
-window.keepTrack = keepTrack;
-
-// Initialize the website
-KeepTrack.initCss().then(() => {
-  keepTrack.init();
-});
+export { KeepTrack } from './keeptrack';

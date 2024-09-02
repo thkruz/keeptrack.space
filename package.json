@@ -22,8 +22,16 @@
   "publishConfig": {
     "access": "public"
   },
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "lib/assets"
+  ],
   "scripts": {
     "build": "node ./scripts/build.mjs production",
+    "build:lib": "node ./scripts/build-library.mjs library && tsc -p tsconfig.library.json --emitDeclarationOnly",
     "build:watch": "node ./scripts/build.mjs development --watch",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs -o ./docs/CHANGELOG.md",
     "cypress:open": "cypress open",

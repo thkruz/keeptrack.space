@@ -24,8 +24,25 @@
     "public/analysis/js/analysis-tools.js",
     "public/serviceWorker.js",
     "public/settings/settingsOverride.js",
-    "public/settings/settingsOverrideEmbed.js"
+    "public/settings/settingsOverrideEmbed.js",
+    "src/globabl.d.ts"
   ],
-  "exclude": ["node_modules/**/*", "dist/**/*", "src/admin/**/*", "embed/**/*", "lib/**/*", "coverage/**/*", "tsconfig.json", "src/tools/**/*", "src/plugins/startAnalytics.js"],
-  "filesGlob": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.png", "src/**/*.jpg", "!**/node_modules/**"]
+  "exclude": [
+    "node_modules/**/*",
+    "dist/**/*",
+    "src/admin/**/*",
+    "embed/**/*",
+    "lib/**/*",
+    "coverage/**/*",
+    "tsconfig.json",
+    "src/tools/**/*",
+    "src/plugins/startAnalytics.js"
+  ],
+  "filesGlob": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.png",
+    "src/**/*.jpg",
+    "!**/node_modules/**"
+  ]
 }

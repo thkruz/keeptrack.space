@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
@@ -20,7 +21,7 @@ describe('ShortTermFences_class', () => {
     const stf = new ShortTermFences();
 
     websiteInit(stf);
-    expect(() => stf.closeAndDisable()).not.toThrow();
+    expect(() => stf['closeAndDisable']()).not.toThrow();
   });
 
   // test stfFormOnSubmit static method
@@ -29,10 +30,10 @@ describe('ShortTermFences_class', () => {
       const stf = new ShortTermFences();
 
       websiteInit(stf);
-      expect(() => stf.onSubmit()).not.toThrow();
+      expect(() => stf['onSubmit']()).not.toThrow();
 
       keepTrackApi.getSensorManager().setCurrentSensor(null);
-      expect(() => stf.onSubmit()).not.toThrow();
+      expect(() => stf['onSubmit']()).not.toThrow();
     });
   });
 
@@ -42,14 +43,14 @@ describe('ShortTermFences_class', () => {
       const stf = new ShortTermFences();
 
       websiteInit(stf);
-      expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
+      expect(() => stf['stfOnObjectLinkClick']()).not.toThrow();
 
       keepTrackApi.getSensorManager().setCurrentSensor(null);
-      expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
+      expect(() => stf['stfOnObjectLinkClick_']()).not.toThrow();
 
       keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
       keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
-      expect(() => stf.stfOnObjectLinkClick()).not.toThrow();
+      expect(() => stf['stfOnObjectLinkClick']()).not.toThrow();
     });
   });
 

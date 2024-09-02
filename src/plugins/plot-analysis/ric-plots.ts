@@ -5,6 +5,7 @@ import { SatMathApi } from '@app/singletons/sat-math-api';
 import scatterPlotPng4 from '@public/img/icons/scatter-plot4.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
+import i18next from 'i18next';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -26,12 +27,12 @@ export class RicPlot extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
     if (this.selectSatManager_.selectedSat === -1) {
-      keepTrackApi.getUiManager().toast('Select a Satellite First!', ToastMsgType.critical);
+      keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.SelectSatelliteFirst'), ToastMsgType.critical);
 
       return;
     }
     if (!this.selectSatManager_.secondarySatObj) {
-      keepTrackApi.getUiManager().toast('Select a Secondary Satellite First!', ToastMsgType.critical);
+      keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.SelectSecondarySatellite'), ToastMsgType.critical);
 
       return;
     }

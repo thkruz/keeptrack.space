@@ -11,6 +11,7 @@ import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, TleLine2, ZoomValue, eci2lla } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -240,7 +241,7 @@ export class EditSat extends KeepTrackPlugin {
       return;
     }
     if (evt.target.error) {
-      errorManagerInstance.warn('Error while reading file!');
+      errorManagerInstance.warn(i18next.t('errorMsgs.EditSat.errorReadingFile'));
 
       return;
     }

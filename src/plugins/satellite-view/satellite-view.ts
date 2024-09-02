@@ -26,6 +26,7 @@ import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
 import { CameraType } from '@app/singletons/camera';
 import sat3Png from '@public/img/icons/sat3.png';
+import i18next from 'i18next';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -54,7 +55,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast('Select a Satellite First!', ToastMsgType.caution);
+      uiManagerInstance.toast(i18next.t('plugins.SelectSatelliteFirst'), ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
     }
   };

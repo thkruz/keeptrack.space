@@ -453,19 +453,26 @@ export class UiManager {
     const BottomIcons = getEl('bottom-icons');
 
     BottomIcons?.addEventListener('click', (evt: Event) => {
-      if ((<HTMLElement>evt.target).id === 'bottom-icons') {
+      const bottomIcons = getEl('bottom-icons');
+      let targetElement = <HTMLElement>evt.target;
+
+      while (targetElement && targetElement !== bottomIcons) {
+        if (targetElement.parentElement === bottomIcons) {
+          this.bottomIconPress(targetElement);
+
+          return;
+        }
+        targetElement = targetElement.parentElement;
+      }
+
+      if (targetElement === bottomIcons) {
         return;
       }
-      if ((<HTMLElement>evt.target).parentElement?.id === 'bottom-icons') {
-        this.bottomIconPress(<HTMLElement>evt.target);
-      } else {
-        const parentElement = (<HTMLElement>evt.target).parentElement;
 
-        if (!parentElement) {
-          errorManagerInstance.debug('parentElement is null');
-        } else {
-          this.bottomIconPress(parentElement);
-        }
+      if (!targetElement) {
+        errorManagerInstance.debug('targetElement is null');
+      } else {
+        this.bottomIconPress(targetElement);
       }
     });
     this.hideSideMenus = () => {

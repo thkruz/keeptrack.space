@@ -30,6 +30,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import analysisPng from '@public/img/icons/reports.png';
 
 
+import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -323,7 +324,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       win.history.replaceState(null, filename, `/${filename}.txt`);
     } else {
       // eslint-disable-next-line no-alert
-      alert('Please allow popups for this site');
+      alert(i18next.t('errorMsgs.Reports.popupBlocker'));
     }
   }
 
@@ -340,13 +341,13 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const sat = this.selectSatManager_.primarySatObj as DetailedSatellite;
 
     if (!sat) {
-      errorManagerInstance.warn('Select a satellite first!');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SelectSatelliteFirst'));
 
       return null;
     }
 
     if (!(sat instanceof DetailedSatellite)) {
-      errorManagerInstance.warn('Satellite is not DetailedSatellite!');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SatelliteNotDetailedSatellite'));
 
       return null;
     }
@@ -358,7 +359,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const sensorManager = keepTrackApi.getSensorManager();
 
     if (!sensorManager.isSensorSelected()) {
-      errorManagerInstance.warn('Select a sensor first!');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SelectSensorFirst'));
 
       return null;
     }

@@ -50,9 +50,11 @@ export const uiManagerInit = () => {
     'beforeend',
     keepTrackApi.html`
         <div id="menu-satChng" class="bmenu-item">
-          <img alt="satchng" src="" delayedsrc="${satChngPng}" />
+          <div class="bmenu-item-inner">
+            <div class="status-icon"></div>
+            <img alt="satchng" src="" delayedsrc="${satChngPng}" />
+          </div>
           <span class="bmenu-title">Satellite Changes</span>
-          <div class="status-icon"></div>
         </div>
         `,
   );

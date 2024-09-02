@@ -7,7 +7,7 @@ import { GroupType } from '@app/singletons/object-group';
 import { StringExtractor } from '@app/static/string-extractor';
 import flagPng from '@public/img/icons/flag.png';
 
-import { English } from '@app/localization/english';
+import { English } from '@app/locales/locales';
 import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

@@ -1,0 +1,248 @@
+{
+  "errorMsgs": {
+    "sensorGroupsApiEmpty": "Keine Sensorgruppen in der API gefunden, es wird auf die mitgelieferte Sensorgruppen-Datenbank zurückgegriffen.",
+    "SelectSensorFirst": "Wählen Sie zuerst einen Sensor aus!",
+    "SelectSatelliteFirst": "Wählen Sie zuerst einen Satelliten aus!",
+    "SelectSecondarySatellite": "Wählen Sie zuerst einen sekundären Satelliten aus!",
+    "SatelliteNotDetailedSatellite": "Satellit ist kein DetailedSatellite!",
+    "SensorNotFound": "Sensor nicht gefunden!",
+    "Breakup": {
+      "CannotCreateBreakupForNonCircularOrbits": "Für nicht-kreisförmige Umlaufbahnen kann kein Zerfall erstellt werden. Wir arbeiten an einer Lösung.",
+      "CannotCalcDirectionOfSatellite": "Die Richtung des Satelliten kann nicht berechnet werden. Versuchen Sie es später erneut.",
+      "ErrorCreatingBreakup": "Fehler beim Erstellen des Zerfalls!",
+      "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!"
+    },
+    "Collissions": {
+      "noCollisionsData": "Keine Kollisionsdaten gefunden!",
+      "errorProcessingCollisions": "Fehler bei der Verarbeitung der SOCRATES-Daten!"
+    },
+    "EditSat": {
+      "errorReadingFile": "Fehler beim Lesen der Datei!"
+    },
+    "Reports": {
+      "popupBlocker": "Bitte erlauben Sie Popups für diese Seite, um Berichte anzuzeigen."
+    },
+    "SensorManager": {
+      "errorUpdatingUi": "Fehler beim Aktualisieren des Sensor-UI-Stylings."
+    }
+  },
+  "hoverManager": {
+    "launched": "Gestartet",
+    "launchedPlanned": "Gestartet: Geplant",
+    "launchedUnknown": "Gestartet: Unbekannt"
+  },
+  "loadingScreenMsgs": {
+    "math": "Versuche zu rechnen...",
+    "science": "Wissenschaft wird lokalisiert...",
+    "science2": "Wissenschaft gefunden...",
+    "dots": "Zeichne Punkte im Weltraum...",
+    "satIntel": "Integriere Satelliten-Informationen...",
+    "painting": "Male die Erde...",
+    "coloring": "Färbe innerhalb der Linien...",
+    "elsets": "Lokalisiere ELSETs...",
+    "models": "Erstelle 3D-Modelle..."
+  },
+  "splashScreens": {
+    "1": "Satellitenmodelle erscheinen größer als sie in Wirklichkeit sind. Alles andere ist maßstabsgetreu.",
+    "2": "Drücken Sie die 'L'-Taste, um Satellitenumlaufbahnen ein-/auszuschalten.",
+    "3": "Drücken Sie die 'P'-Taste, um eine Polardarstellung des aktuellen Satelliten zu öffnen (Sie müssen zuerst einen Sensor auswählen!).",
+    "4": "Setzen Sie die Simulationszeit zurück, indem Sie die 'T'-Taste drücken.",
+    "5": "Beschleunigen Sie die Simulation, indem Sie die '>'-Taste drücken.",
+    "6": "Verlangsamen Sie die Simulation, indem Sie die '<'-Taste drücken.",
+    "7": "Durch Drücken der '/'-Taste wird die Simulationsgeschwindigkeit zwischen 1x und 0x umgeschaltet.",
+    "8": "Drücken Sie die 'V'-Taste, um den Ansichtsmodus zu ändern.",
+    "9": "Drücken Sie Shift+F1, um das Hilfemenü jederzeit zu öffnen.",
+    "10": "Drücken Sie die 'R'-Taste, um die automatische Rotation zu aktivieren.",
+    "11": "Durch Drücken von Shift + C bei ausgewähltem Satelliten wird dessen Sichtkegel ein-/ausgeschaltet.",
+    "12": "Die 'Home'-Taste dreht die Kamera zum aktuellen Sensor.",
+    "13": "Die '`' (Tilde)-Taste setzt die Kamera auf die Standardansicht zurück.",
+    "14": "Die 'M'-Taste zeigt die 2D-Kartenansicht des aktuellen Satelliten.",
+    "15": "Das Einstellungsmenü in der unteren Symbolleiste enthält viele Optionen zur Anpassung Ihrer Erfahrung.",
+    "16": "Viele der Menüs haben zusätzliche Einstellungen, die durch Klicken auf das Zahnrad-Symbol aufgerufen werden können.",
+    "17": "Fügen Sie Satelliten zur Beobachtungsliste hinzu, um Benachrichtigungen zu erhalten, wenn sie sich über dem aktuellen Sensor befinden.",
+    "18": "Rechtsklicken Sie auf den Globus, um das Kontextmenü mit weiteren Optionen zu öffnen.",
+    "19": "Drücken Sie die '+' oder '-' Tasten zum Vergrößern und Verkleinern.",
+    "20": "Drücken Sie 'F11', um den Vollbildmodus ein-/auszuschalten.",
+    "21": "Sie können in der Suchleiste oben rechts nach Satelliten anhand von Namen oder NORAD ID suchen.",
+    "22": "Ein neuer nomineller Start kann erstellt werden, indem Sie einen Satelliten auswählen und auf die Schaltfläche 'Neuer Start' im unteren Menü klicken."
+  },
+  "plugins": {
+    "SensorListPlugin": {
+      "bottomIconLabel": "Sensoren",
+      "title": "Sensorlistenmenü",
+      "helpBody": "Das Sensorenmenü ermöglicht es Ihnen, einen Sensor für Berechnungen und andere Menüfunktionen auszuwählen. Die Sensoren sind in Gruppen basierend auf den Netzwerken, die sie hauptsächlich unterstützen, eingeteilt. Auf der linken Seite des Menüs befindet sich der Name des Sensors und auf der rechten Seite das Land/die Organisation, dem/der er gehört. <br><br> Die Auswahl einer \"Alle...Sensoren\"-Option wählt alle Sensoren in dieser Gruppe aus. Dies ist nützlich, um die Netzwerkabdeckung zu visualisieren, funktioniert aber derzeit nicht für alle Berechnungen. Wenn Sie versuchen, Blickwinkel für ein Netzwerk zu berechnen, ist es am besten, das Multi-Site-Blickwinkel-Tool zu verwenden oder Blickwinkel für jeden einzelnen Sensor im Netzwerk zu berechnen. <br><br> Zu den Sensoren auf dieser Liste gehören mechanische und Phased-Array-Radare sowie optische Sensoren: <ul style=\"margin-left: 40px;\"> <li> Phased-Array-Radare sind typischerweise auf den niedrigen Erdorbit (LEO) beschränkt. </li> <li> Mechanische Radare können sowohl für LEO als auch für den geostationären Orbit (GEO) verwendet werden. </li> <li> Optische Sensoren werden typischerweise für GEO verwendet, können aber auch für LEO eingesetzt werden. </li> <li> Optische Sensoren sind auf nächtliche Beobachtungen bei klarem Himmel beschränkt, während Radare sowohl tagsüber als auch nachts eingesetzt werden können. </li> </ul> <br> Die Sensorinformationen basieren auf öffentlich zugänglichen Daten und können im Sensorinfo-Menü überprüft werden. Wenn Sie öffentliche Daten zu zusätzlichen Sensoren oder Korrekturen zu bestehenden Sensorinformationen haben, kontaktieren Sie mich bitte unter <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
+    },
+    "SensorInfoPlugin": {
+      "bottomIconLabel": "Sensorinfo",
+      "title": "Sensorinfo-Menü",
+      "helpBody": "Sensorinfo bietet Informationen über den aktuell ausgewählten Sensor. Die Informationen basieren auf öffentlich zugänglichen Daten und sind möglicherweise nicht immer 100% genau. Wenn Sie öffentliche Daten zu zusätzlichen Sensoren oder Korrekturen zu bestehenden Sensorinformationen haben, kontaktieren Sie mich bitte unter <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> Die bereitgestellten Informationen umfassen: <ul style=\"margin-left: 40px;\"> <li> Sensorname </li> <li> Sensoreigentümer </li> <li> Sensortyp </li> <li> Sichtfeld des Sensors </li> </ul> <br> Zusätzlich können von diesem Menü aus schnell Linien vom Sensor zur Sonne oder zum Mond erstellt werden."
+    },
+    "CustomSensorPlugin": {
+      "bottomIconLabel": "Benutzerdefinierter Sensor",
+      "title": "Menü für benutzerdefinierte Sensoren",
+      "helpBody": "Dies ermöglicht es Ihnen, einen benutzerdefinierten Sensor für Berechnungen und andere Menüfunktionen zu erstellen. Dies kann ein völlig origineller Sensor oder eine Modifikation eines bestehenden Sensors sein. <br><br> Nachdem Sie den Breitengrad, den Längengrad und die Höhe des Sensors festgelegt haben, können Sie das Sichtfeld des Sensors einstellen. Die Auswahl von 'Teleskop' erstellt ein 360-Grad-Sichtfeld mit einer Elevationsmaske von 10 Grad und unbegrenzter Reichweite. Wenn Sie die Teleskop-Option deaktivieren, können Sie das Sichtfeld manuell einstellen. <br><br> Wenn Sie versuchen, einen bestehenden Sensor zu bearbeiten, können Sie ihn zuerst aus der Sensorliste auswählen, und der benutzerdefinierte Sensor wird mit den Informationen des ausgewählten Sensors aktualisiert."
+    },
+    "LookAnglesPlugin": {
+      "bottomIconLabel": "Blickwinkel",
+      "title": "Blickwinkel-Menü",
+      "helpBody": "Das Blickwinkel-Menü ermöglicht es Ihnen, die Entfernung, den Azimut und die Elevationswinkel zwischen einem Sensor und einem Satelliten zu berechnen. Ein Satellit und ein Sensor müssen zuerst ausgewählt werden, bevor das Menü verwendet werden kann. <br><br> Die Option 'Nur Auf- und Untergangszeiten umschalten' berechnet nur die Auf- und Untergangszeiten des Satelliten. Dies ist nützlich, um schnell zu bestimmen, wann ein Satellit für einen Sensor sichtbar sein wird. <br><br> Der Suchbereich kann durch Ändern der Längen- und Intervalloptionen modifiziert werden."
+    },
+    "MultiSiteLookAnglesPlugin": {
+      "bottomIconLabel": "Multi-Standort-Blickwinkel",
+      "title": "Multi-Standort-Blickwinkel-Menü",
+      "helpBody": "Das Multi-Standort-Blickwinkel-Menü ermöglicht es Ihnen, die Entfernung, den Azimut und die Elevationswinkel zwischen einem Satelliten und mehreren Sensoren zu berechnen. Ein Satellit muss zuerst ausgewählt werden, bevor das Menü verwendet werden kann. <br><br> Standardmäßig berechnet das Menü die Blickwinkel für alle Sensoren im Space Surveillance Network. Wenn Sie die Blickwinkel für zusätzliche Sensoren berechnen möchten, können Sie am unteren Rand des Menüs eine CSV-Datei exportieren. Die CSV-Datei enthält Blickwinkel für alle Sensoren. <br><br> Durch Klicken auf eine Zeile in der Tabelle wird der Sensor ausgewählt und die Simulationszeit auf die Zeit des Blickwinkels geändert."
+    },
+    "SensorTimeline": {
+      "bottomIconLabel": "Sensor-Zeitachse",
+      "title": "Sensor-Zeitachsen-Menü",
+      "helpBody": "Das Sensor-Zeitachsen-Menü zeigt, wann eine Liste von Sensoren Sichtbarkeit zu einem Satelliten hat. Die Zeitachse ist farbcodiert, um die Qualität des Durchgangs anzuzeigen. Rot ist ein schlechter Durchgang, Gelb ist ein durchschnittlicher Durchgang und Grün ist ein guter Durchgang. Klicken Sie auf einen Durchgang, um den Sensor und die Zeit für diesen Durchgang zu ändern. <br><br> Die Zeitachse kann durch Ändern der Start- und Endzeit der Simulation modifiziert werden. Zusätzlich kann die Zeitachse durch Ändern der Längen- und Intervalloptionen modifiziert werden."
+    },
+    "SatelliteTimeline": {
+      "bottomIconLabel": "Satelliten-Zeitachse",
+      "title": "Satelliten-Zeitachsen-Menü",
+      "helpBody": "Das Satelliten-Zeitachsen-Menü zeigt, wann ein einzelner Sensor Sichtbarkeit zu einer Liste von Satelliten hat. Die Zeitachse ist farbcodiert, um die Qualität des Durchgangs anzuzeigen. Rot ist ein schlechter Durchgang, Gelb ist ein durchschnittlicher Durchgang und Grün ist ein guter Durchgang. Klicken Sie auf einen Durchgang, um den Satelliten und die Zeit für diesen Durchgang zu ändern. <br><br> Die Zeitachse kann durch Ändern der Start- und Endzeit der Simulation modifiziert werden. Zusätzlich kann die Zeitachse durch Ändern der Längen- und Intervalloptionen modifiziert werden."
+    },
+    "WatchlistPlugin": {
+      "bottomIconLabel": "Beobachtungsliste",
+      "title": "Beobachtungslisten-Menü",
+      "helpBody": "Das Beobachtungslisten-Menü ermöglicht es Ihnen, eine Liste von Prioritätssatelliten zu erstellen, die Sie verfolgen möchten. Dies ermöglicht es Ihnen, schnell auf die Satelliten zuzugreifen, die Sie am meisten interessieren. Die Liste wird im lokalen Speicher Ihres Browsers gespeichert und steht Ihnen beim nächsten Besuch der Website zur Verfügung. <br><br> Wenn Satelliten auf der Beobachtungsliste in das Sichtfeld des ausgewählten Sensors eintreten, wird eine Benachrichtigung angezeigt, eine Linie vom Sensor zum Satelliten gezogen und die Nummer des Satelliten auf dem Globus angezeigt. <br><br> Die Überlagerung-Funktion basiert darauf, dass die Beobachtungsliste gefüllt ist."
+    },
+    "WatchlistOverlay": {
+      "bottomIconLabel": "Überlagerung",
+      "title": "Überlagerung-Menü",
+      "helpBody": "<p> Das Beobachtungslisten-Überlagerung zeigt die nächste Durchgangszeit für jeden Satelliten in Ihrer Beobachtungsliste an. Das Überlagerung wird alle 10 Sekunden aktualisiert. </p> <p> Das Überlagerung ist farbcodiert, um die Zeit bis zum nächsten Durchgang anzuzeigen. Die Farben sind wie folgt: </p> <ul> <li>Gelb - In Sicht</li> <li>Blau - Zeit bis zum nächsten Durchgang beträgt bis zu 30 Minuten nach der aktuellen Zeit oder 10 Minuten vor der aktuellen Zeit</li> <li>Weiß - Jeder zukünftige Durchgang, der nicht die obigen Anforderungen erfüllt</li> </ul> <p> Durch Klicken auf einen Satelliten im Überlagerung wird die Karte auf diesen Satelliten zentriert. </p>"
+    },
+    "ReportsPlugin": {
+      "bottomIconLabel": "Berichte",
+      "title": "Berichte-Menü",
+      "helpBody": "Das Berichte-Menü ist eine Sammlung von Werkzeugen, die Ihnen helfen, die angezeigten Daten zu analysieren und zu verstehen."
+    },
+    "PolarPlotPlugin": {
+      "bottomIconLabel": "Polardiagramm",
+      "title": "Polardiagramm-Menü",
+      "helpBody": "Das Polardiagramm-Menü wird verwendet, um ein 2D-Polardiagramm des Azimuts und der Elevation des Satelliten im Zeitverlauf zu generieren."
+    },
+    "NextLaunchesPlugin": {
+      "bottomIconLabel": "Nächste Starts",
+      "title": "Menü für nächste Starts",
+      "helpBody": "Das Menü für nächste Starts ruft Daten von <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a> ab, um bevorstehende Starts anzuzeigen."
+    },
+    "FindSatPlugin": {
+      "bottomIconLabel": "Satellit finden",
+      "title": "Satellit-Suche-Menü",
+      "helpBody": "Das Satellit-Suche-Menü wird verwendet, um Satelliten anhand von Bahnparametern oder Satellitenmerkmalen zu finden. <br><br> Für die meisten Parameter geben Sie den Zielwert links und dann eine Fehlertoleranz rechts ein. Wenn Sie beispielsweise alle Satelliten in einer Inklination von 51-52 Grad finden möchten, können Sie 51,5 in das linke Feld und 0,5 in das rechte Feld eingeben. Die Suche findet dann alle Satelliten innerhalb dieser Inklinationen und zeigt sie in der Suchleiste an."
+    },
+    "ShortTermFences": {
+      "bottomIconLabel": "Kurzzeit-Zaun",
+      "title": "Kurzzeit-Zäune (STF) Menü",
+      "helpBody": "Das Kurzzeit-Zäune (STF) Menü wird verwendet, um Sensor-Suchboxen zu visualisieren. <br><br> Dies ist wahrscheinlich nicht sehr hilfreich, es sei denn, Sie besitzen/betreiben einen Sensor mit einer Suchbox-Funktionalität."
+    },
+    "Collissions": {
+      "bottomIconLabel": "Kollisionen",
+      "title": "Kollisionen-Menü",
+      "helpBody": "Das Kollisionen-Menü zeigt Satelliten mit einer hohen Kollisionswahrscheinlichkeit. <br><br> Durch Klicken auf eine Zeile werden die beiden an der Kollision beteiligten Satelliten ausgewählt und die Zeit auf den Zeitpunkt der Kollision geändert."
+    },
+    "TrackingImpactPredict": {
+      "bottomIconLabel": "Wiedereintritts-Vorhersage",
+      "title": "Tracking und Aufprallvorhersage-Menü",
+      "helpBody": "Das Tracking und Aufprallvorhersage (TIP) Menü zeigt die neuesten Tracking- und Aufprallvorhersage-Nachrichten für Satelliten an. Die Tabelle zeigt die folgenden Spalten:<br><br> <b>NORAD</b>: Die NORAD-Katalog-ID des Satelliten.<br><br> <b>Verfalldatum</b>: Das Datum des vorhergesagten Verfalls des Satelliten.<br><br> <b>Breitengrad</b>: Der Breitengrad des Satelliten.<br><br> <b>Längengrad</b>: Der Längengrad des Satelliten.<br><br> <b>Fenster (min)</b>: Das Zeitfenster in Minuten für die Vorhersage.<br><br> <b>Nächster Bericht</b>: Das Datum des nächsten Berichts.<br><br> <b>Hohes Interesse?</b>: Ob der Satellit von hohem Interesse ist.<br><br> Alle Daten für Wiedereintritte stammen aus den Tracking and Impact Prediction (TIP) Nachrichten, die vom US Space Command (USSPACECOM) bereitgestellt werden."
+    },
+    "Breakup": {
+      "bottomIconLabel": "Zerfall erstellen",
+      "title": "Zerfall-Menü",
+      "helpBody": "Das Zerfall-Menü ist ein Werkzeug zur Simulation des Zerfalls eines Satelliten. <br><br> Durch Duplizieren und Modifizieren der Umlaufbahn eines Satelliten können wir den Zerfall eines Satelliten modellieren. Nach Auswahl eines Satelliten und Öffnen des Menüs kann der Benutzer Folgendes auswählen: <ul style=\"margin-left: 40px;\"> <li>Inklinationsvariation</li> <li>RAAN-Variation</li> <li>Periodenvariation</li> <li>Anzahl der Zerfallsteile</li> </ul> Je größer die Variation, desto größer ist die Streuung im simulierten Zerfall. Die Standardvariationen reichen aus, um einen Zerfall mit angemessener Streuung zu simulieren."
+    },
+    "DebrisScreening": {
+      "bottomIconLabel": "Trümmer-Screening",
+      "title": "Trümmer-Screening-Menü",
+      "helpBody": "Das Trümmer-Screening-Menü wird verwendet, um eine Liste von Trümmerobjekten zu generieren, die möglicherweise von einem Satelliten gesehen werden können. Die Liste wird durch Berechnung der Bahnparameter der Trümmerobjekte und Vergleich mit den Bahnparametern des Satelliten erstellt. Der Benutzer kann wählen, ob die Liste mit dem TLE oder dem SGP4-Propagator generiert werden soll. Der Benutzer kann auch die Liste nach der Größe des Trümmerobjekts und der Magnitude des Trümmerobjekts filtern. Der Benutzer kann auch die Liste nach der Größe des Trümmerobjekts und der Magnitude des Trümmerobjekts filtern. Der Benutzer kann auch wählen, ob die Liste mit dem TLE oder dem SGP4-Propagator generiert werden soll. Der Benutzer kann auch die Liste nach der Größe des Trümmerobjekts und der Magnitude des Trümmerobjekts filtern."
+    },
+    "EditSat": {
+      "bottomIconLabel": "Satellit bearbeiten",
+      "title": "Satellit bearbeiten Menü",
+      "helpBody": "Das Menü 'Satellit bearbeiten' wird verwendet, um die Satellitendaten zu bearbeiten. <br><br> <ul> <li> Satellit SCC# - Eine eindeutige Nummer, die jedem Satelliten von der US Space Force zugewiesen wird. </li> <li> Epochenjahr - Das Jahr der letzten Bahnaktualisierung des Satelliten. </li> <li> Epochentag - Der Tag des Jahres der letzten Bahnaktualisierung des Satelliten. </li> <li> Inklination - Der Winkel zwischen der Bahnebene des Satelliten und der Äquatorebene. </li> <li> Rektaszension - Der Winkel zwischen dem aufsteigenden Knoten und der Position des Satelliten zum Zeitpunkt der letzten Bahnaktualisierung. </li> <li> Exzentrizität - Das Maß, um das die Umlaufbahn des Satelliten von einem perfekten Kreis abweicht. </li> <li> Argument des Perigäums - Der Winkel zwischen dem aufsteigenden Knoten und dem erdnächsten Punkt des Satelliten. </li> <li> Mittlere Anomalie - Der Winkel zwischen der Position des Satelliten zum Zeitpunkt der letzten Bahnaktualisierung und dem erdnächsten Punkt des Satelliten. </li> <li> Mittlere Bewegung - Die Geschwindigkeit, mit der sich die mittlere Anomalie des Satelliten ändert. </li> </ul>"
+    },
+    "NewLaunch": {
+      "bottomIconLabel": "Neuer Start",
+      "title": "Neuer Start Menü",
+      "helpBody": "Das Menü 'Neuer Start' wird verwendet, um fiktive Orbitalmissionen zu generieren, indem bestehende Satelliten mit ähnlichen Parametern modifiziert werden. <br><br> Nach Auswahl eines Satelliten können Sie einen Startort und einen Nord/Süd-Azimut auswählen. Der ausgewählte Satellit wird modifiziert, um ihn mit dem Startort in Einklang zu bringen. Die Uhr wird dann auf 00:00:00 geändert, um die relative Zeit nach dem Start darzustellen. Dies kann hilfreich sein, um die Sensorabdeckung relativ zur Startzeit zu berechnen. Die Beziehung des Objekts zu anderen Orbitalobjekten wird nicht korrekt sein."
+    },
+    "Missile": {
+      "bottomIconLabel": "Rakete",
+      "title": "Raketen-Menü",
+      "helpBody": "Das Raketen-Menü wird verwendet, um fiktive Raketenstarts zwischen Ländern zu generieren. <br><br> Bei U-Boot-gestützten Raketen ist der Startpunkt ein benutzerdefinierter Breiten- und Längengrad. Bei landgestützten Raketen ist der Startpunkt ein fester Breiten- und Längengrad, der auf öffentlich zugänglichen Berichten basiert. <br><br> Zusätzlich zu benutzerdefinierten Raketen sind einige vordefinierte Szenarien mit Hunderten von Raketen verfügbar. <br><br> Alle Raketenstarts sind fiktiv und sollen keine realen Ereignisse darstellen. Die Startflugbahnen basieren alle auf dem gleichen ballistischen Modell, verwenden aber unterschiedliche Mindest- und Höchstreichweiten."
+    },
+    "StereoMap": {
+      "bottomIconLabel": "Stereokarte",
+      "title": "Stereografisches Karten-Menü",
+      "helpBody": "Das Stereografische Karten-Menü wird verwendet, um Satellitenbodenspuren in einer stereografischen Projektion zu visualisieren. <br/><br/> Sie können auf einen Punkt entlang der Bodenspur klicken, um die Zeit der Simulation zu ändern, wenn der Satellit diesen Punkt erreicht. <br/><br/> Die gelben Punkte zeigen an, wann der Satellit im Sichtfeld des Sensors ist. Die roten Punkte zeigen an, wann der Satellit nicht im Sichtfeld des Sensors ist. Der Punkt, der dem Satelliten am nächsten ist, ist die aktuelle Zeit."
+    },
+    "SensorFov": {
+      "bottomIconLabel": "Sensor-Sichtfeld"
+    },
+    "SensorFence": {
+      "bottomIconLabel": "Sensor-Zaun"
+    },
+    "SatelliteViewPlugin": {
+      "bottomIconLabel": "Satellitenansicht"
+    },
+    "SatelliteFov": {
+      "bottomIconLabel": "Satelliten-Sichtfeld",
+      "title": "Satelliten-Sichtfeld-Menü",
+      "helpBody": "Das Satelliten-Sichtfeld-Plugin ermöglicht es Ihnen, das Sichtfeld eines Satelliten zu steuern."
+    },
+    "Planetarium": {
+      "bottomIconLabel": "Planetariumsansicht"
+    },
+    "NightToggle": {
+      "bottomIconLabel": "Nachtumschaltung"
+    },
+    "SatConstellations": {
+      "bottomIconLabel": "Konstellationen",
+      "title": "Konstellationen-Menü",
+      "helpBody": "Das Konstellationen-Menü ermöglicht es Ihnen, Gruppen von Satelliten anzuzeigen. <br><br> Für einige Konstellationen werden fiktive Uplinks/Downlinks und/oder Crosslinks zwischen Satelliten in der Konstellation gezeichnet."
+    },
+    "CountriesMenu": {
+      "bottomIconLabel": "Länder",
+      "title": "Länder-Menü",
+      "helpBody": "Das Länder-Menü ermöglicht es Ihnen, die Satelliten nach Herkunftsland zu filtern."
+    },
+    "ColorMenu": {
+      "bottomIconLabel": "Farbschemata",
+      "title": "Farbschema-Menü",
+      "helpBody": "Das Farben-Menü ist ein Ort, an dem Sie das Farbthema ändern können, das zum Rendern der Objekte verwendet wird. <br><br> Die verschiedenen Themen können die Farben basierend auf den Umlaufbahnen der Objekte, den Eigenschaften der Objekte oder der Beziehung der Objekte zur Sonne und/oder Erde ändern."
+    },
+    "Screenshot": {
+      "bottomIconLabel": "Foto machen"
+    },
+    "LaunchCalendar": {
+      "bottomIconLabel": "Startkalender"
+    },
+    "TimeMachine": {
+      "bottomIconLabel": "Zeitmaschine"
+    },
+    "SatellitePhotos": {
+      "bottomIconLabel": "Satellitenfotos",
+      "title": "Satellitenfotos-Menü",
+      "helpBody": "Das Satellitenfotos-Menü wird verwendet, um Live-Fotos von ausgewählten Satelliten anzuzeigen. <br><br> Hinweis - Änderungen in der Bild-API können dazu führen, dass der falsche Satellit in KeepTrack ausgewählt wird."
+    },
+    "ScreenRecorder": {
+      "bottomIconLabel": "Video aufnehmen"
+    },
+    "AnalysisMenu": {
+      "bottomIconLabel": "Analyse",
+      "title": "Analyse-Menü",
+      "helpBody": "Das Analyse-Menü bietet eine Reihe von Werkzeugen, die Ihnen helfen, die Daten in der aktuellen Ansicht zu analysieren. Die Werkzeuge sind: <ul style=\"margin-left: 40px;\"> <li>Offizielle TLEs exportieren - Exportieren Sie echte Two-Line Element Sets.</li> <li>3LES exportieren - Exportieren Sie Three-Line Element Sets.</li> <li>KeepTrack TLEs exportieren - Exportieren Sie alle KeepTrack Two-Line Element Sets einschließlich Analysten.</li> <li>KeepTrack 3LES exportieren - Exportieren Sie alle KeepTrack Three-Line Element Sets einschließlich Analysten.</li> <li>Nahe Objekte finden - Finden Sie Objekte, die sich nahe beieinander befinden.</li> <li>Wiedereintritte finden - Finden Sie Objekte, die wahrscheinlich wieder in die Atmosphäre eintreten werden.</li> <li>Beste Durchgänge - Finden Sie die besten Durchgänge für einen Satelliten basierend auf dem aktuell ausgewählten Sensor.</li> </ul>"
+    },
+    "SettingsMenuPlugin": {
+      "bottomIconLabel": "Einstellungen",
+      "title": "Einstellungen-Menü",
+      "helpBody": "Das Einstellungen-Menü ermöglicht es Ihnen, die Anwendung zu konfigurieren."
+    },
+    "VideoDirectorPlugin": {
+      "bottomIconLabel": "Video-Direktor",
+      "title": "Video-Direktor-Menü",
+      "helpBody": "Das Video-Direktor-Menü wird verwendet, um die Kamera und Objekte in der Szene zu manipulieren, um ein Video zu erstellen."
+    }
+  }
+}

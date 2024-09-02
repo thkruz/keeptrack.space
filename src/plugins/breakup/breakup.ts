@@ -10,6 +10,7 @@ import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -40,7 +41,7 @@ export class Breakup extends KeepTrackPlugin {
     const sat = obj as DetailedSatellite;
 
     if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
-      errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
+      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
       this.closeSideMenu();
       this.setBottomIconToDisabled();
 
@@ -159,7 +160,7 @@ export class Breakup extends KeepTrackPlugin {
         } else if ((sat as DetailedSatellite)?.apogee - (sat as DetailedSatellite)?.perigee > this.maxDifApogeeVsPerigee_) {
           if (this.isMenuButtonActive) {
             this.closeSideMenu();
-            errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
+            errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
           }
           this.setBottomIconToUnselected();
           this.setBottomIconToDisabled();
@@ -202,7 +203,7 @@ export class Breakup extends KeepTrackPlugin {
     const upOrDown = SatMath.getDirection(mainsat, simulationTimeObj);
 
     if (upOrDown === 'Error') {
-      errorManagerInstance.warn('Cannot calculate direction of satellite. Try again later.');
+      errorManagerInstance.warn(i18next.t('plugins.CannotCalcDirectionOfSatellite'));
     }
 
     const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
@@ -212,7 +213,7 @@ export class Breakup extends KeepTrackPlugin {
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
     if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
-      errorManagerInstance.warn('Cannot create a breakup for non-circular orbits. Working on a fix.');
+      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
 
       return;
     }
@@ -275,7 +276,7 @@ export class Breakup extends KeepTrackPlugin {
          */
         iTLEs = new OrbitFinder(sat, launchLat, launchLon, <'N' | 'S'>upOrDown, new Date(simulationTimeObj.getTime() + 1), newAlt as Kilometers, rascOffset).rotateOrbitToLatLon();
         if (iTLEs[0] === 'Error') {
-          errorManagerInstance.error(new Error(iTLEs[1]), 'breakup.ts', 'Error creating breakup!');
+          errorManagerInstance.error(new Error(iTLEs[1]), 'breakup.ts', i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
 
           return;
         }
@@ -335,7 +336,7 @@ export class Breakup extends KeepTrackPlugin {
             },
           });
         } catch (e) {
-          errorManagerInstance.error(e, 'breakup.ts', 'Error creating breakup!');
+          errorManagerInstance.error(e, 'breakup.ts', i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
 
           return;
         }
@@ -351,7 +352,7 @@ export class Breakup extends KeepTrackPlugin {
           });
           orbitManagerInstance.changeOrbitBufferData(satId, iTle1, iTle2);
         } else {
-          errorManagerInstance.warn('Breakup Generator Failed');
+          errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.BreakupGeneratorFailed'));
         }
       }
     }

@@ -287,8 +287,8 @@ export const uiManagerFinal = (plugins: any): void => {
   };
 
   getEl('bottom-icons-container').addEventListener(
-    'mousewheel',
-    (event: any) => {
+    'wheel',
+    (event: WheelEvent) => {
       event.preventDefault();
       wheel(event.currentTarget, event.deltaY);
     },

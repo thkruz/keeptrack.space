@@ -38,6 +38,7 @@ import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import i18next from 'i18next';
 import { DEG2RAD, DetailedSensor, GreenwichMeanSiderealTime, ZoomValue, spaceObjType2Str } from 'ootk';
 import { sensorGroups } from '../../catalogs/sensor-groups';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -137,7 +138,7 @@ export class SensorManager {
     const sensorId = catalogManagerInstance.getSensorFromSensorName(sensor.name);
 
     if (!sensorId) {
-      errorManagerInstance.warn('Sensor not found');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SensorNotFound'));
 
       return;
     }
@@ -159,7 +160,7 @@ export class SensorManager {
         lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 1);
         break;
       default:
-        errorManagerInstance.warn('Sensor not found');
+        errorManagerInstance.warn(i18next.t('errorMsgs.SensorNotFound'));
         break;
     }
   }
@@ -488,7 +489,7 @@ export class SensorManager {
         (getEl('reset-sensor-button') as HTMLButtonElement).disabled = true;
       }
     } catch (error) {
-      errorManagerInstance.warn('Error updating sensor UI styling');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SensorManager.errorUpdatingUi'));
     }
   }
 
@@ -518,7 +519,7 @@ export class SensorManager {
     const sensor = sensors[0];
 
     if (!sensor) {
-      throw new Error('Sensor not found');
+      throw new Error(i18next.t('errorMsgs.SensorNotFound'));
     }
 
     const { gmst } = SatMath.calculateTimeVariables(now);

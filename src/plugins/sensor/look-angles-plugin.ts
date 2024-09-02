@@ -4,7 +4,7 @@ import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
-import { English } from '@app/localization/english';
+import { English } from '@app/locales/locales';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SensorMath, TearrData, TearrType } from '@app/static/sensor-math';
 import lookanglesPng from '@public/img/icons/lookangles.png';

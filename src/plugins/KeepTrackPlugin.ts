@@ -1,6 +1,7 @@
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
-import { English } from '@app/localization/english';
+import { English } from '@app/locales/locales';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
+import i18next from 'i18next';
 import Module from 'module';
 import { BaseObject, Sensor } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -513,13 +514,15 @@ export abstract class KeepTrackPlugin {
           button.classList.add('bmenu-item-disabled');
         }
         button.innerHTML = `
+          <div class="bmenu-item-inner">
+            <div class="status-icon"></div>
             <img
               alt="${this.constructor.name}"
               src=""
               delayedsrc="${icon}"
             />
-            <span class="bmenu-title">${this.bottomIconLabel}</span>
-            <div class="status-icon"></div>
+          </div>
+          <span class="bmenu-title">${this.bottomIconLabel}</span>
           `;
         getEl(KeepTrackPlugin.bottomIconsContainerId).appendChild(button);
       },
@@ -574,7 +577,7 @@ export abstract class KeepTrackPlugin {
   verifySensorSelected(isMakeToast = true): boolean {
     if (!keepTrackApi.getSensorManager().isSensorSelected()) {
       if (isMakeToast) {
-        errorManagerInstance.warn('Select a Sensor First!', true);
+        errorManagerInstance.warn(i18next.t('errorMsgs.SelectSensorFirst'), true);
         shake(getEl(this.bottomIconElementName));
       }
 
@@ -595,7 +598,7 @@ export abstract class KeepTrackPlugin {
      * if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
      */
     if (!(keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1)) {
-      errorManagerInstance.warn('Select a Satellite First!', true);
+      errorManagerInstance.warn(i18next.t('errorMsgs.SelectSatelliteFirst'), true);
       shake(getEl(this.bottomIconElementName));
 
       return false;

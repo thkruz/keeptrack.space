@@ -65,7 +65,7 @@ describe('SatelliteViewPlugin_class', () => {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'menu-satview');
-    expect(uiManagerInstance.toast).toHaveBeenCalledWith('Select a Satellite First!', ToastMsgType.serious, true);
+    expect(uiManagerInstance.toast).toHaveBeenCalledWith(i18next.t('plugins.SelectSatelliteFirst'), ToastMsgType.serious, true);
   });
 
   // Tests that a toast message is not displayed when a satellite is selected and trying to activate Satellite Camera Mode

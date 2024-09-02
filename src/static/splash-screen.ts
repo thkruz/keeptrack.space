@@ -1,18 +1,19 @@
+import i18next from 'i18next';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { MobileManager } from '../singletons/mobileManager';
 
 export abstract class SplashScreen {
   static readonly msg = {
-    math: 'Attempting to Math...',
-    science: 'Locating Science...',
-    science2: 'Found Science...',
-    dots: 'Drawing Dots in Space...',
-    satIntel: 'Integrating Satellite Intel...',
-    painting: 'Painting the Earth...',
-    coloring: 'Coloring Inside the Lines..',
-    elsets: 'Locating ELSETs...',
-    models: 'Building 3D Models...',
+    math: i18next.t('loadingScreenMsgs.math'),
+    science: i18next.t('loadingScreenMsgs.science'),
+    science2: i18next.t('loadingScreenMsgs.science2'),
+    dots: i18next.t('loadingScreenMsgs.dots'),
+    satIntel: i18next.t('loadingScreenMsgs.satIntel'),
+    painting: i18next.t('loadingScreenMsgs.painting'),
+    coloring: i18next.t('loadingScreenMsgs.coloring'),
+    elsets: i18next.t('loadingScreenMsgs.elsets'),
+    models: i18next.t('loadingScreenMsgs.models'),
   };
 
   static readonly textElId = 'loader-text';
@@ -37,33 +38,11 @@ export abstract class SplashScreen {
   }
 
   static showHint(): string {
-    return SplashScreen.randomHintText_[Math.floor(Math.random() * SplashScreen.randomHintText_.length)];
-  }
+    const messageCount = Object.keys(i18next.t('splashScreens', { returnObjects: true })).length;
+    const randomIndex = Math.floor(Math.random() * messageCount) + 1;
 
-  static readonly randomHintText_ = [
-    'Satellite models appear bigger than they really are. Everything else is to scale.',
-    'Press the \'L\' key to toggle satellite orbits on/off.',
-    'Press the \'P\' key to open a polar plot of the current satellite (You need to pick a sensor first!).',
-    'Reset the simulation time by pressing the \'T\' key.',
-    'Speed up the simulation by pressing the \'>\' key.',
-    'Slow down the simulation by pressing the \'<\' key.',
-    'Pressing the \'/\' key will toggle the simulation speed between 1x and 0x.',
-    'Press the \'V\' key to change the view mode.',
-    'Press Shift+F1 to open the help menu at any time.',
-    'Press the \'R\' key to enable auto-rotation.',
-    'Pressing Shift + C when a satellite is selected will toggle its visibility cone on/off.',
-    'The \'Home\' key will rotate the camera to the current sensor.',
-    'The \'`\' (tilda) key will reset the camera to the default view.',
-    'The \'M\' key will show the 2D map view of the current satellite.',
-    'The settings menu located in the bottom toolbar contains many options to customize your experience.',
-    'Many of the menus have additional settings that can be accessed by clicking the gear icon.',
-    'Add satellites to the watchlist to get notifications when they are overhead of the current sensor.',
-    'Right click on the globe to open the context menu with more options.',
-    'Press \'+\' or \'-\' keys to zoom in and out.',
-    'Press \'F11\' to toggle on/off the fullscreen mode.',
-    'You can search for satellites by name or NORAD ID in the search bar at the top right.',
-    'A new launch nominal can be created by selecting a satellite and clicking the \'New Launch\' button in the bottom menu.',
-  ];
+    return i18next.t(`splashScreens.${randomIndex}`);
+  }
 
   static hideSplashScreen() {
     // Don't wait if we are running Jest

@@ -1,4 +1,5 @@
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import i18next from 'i18next';
 
 export interface SensorGroup {
   name: string;
@@ -14,7 +15,7 @@ export const fetchSensorGroups = async (): Promise<SensorGroup[]> => {
   let sensorGroupsApi = await fetch('https://api.keeptrack.space/v1/sensor-groups').then((response) => response.json());
 
   if (sensorGroupsApi.length === 0) {
-    errorManagerInstance.warn('No sensor groups found in the API, reverting to the included sensor groups database.');
+    errorManagerInstance.warn(i18next.t('errors.sensorGroupsApiEmpty'));
     sensorGroupsApi = sensorGroups;
   }
 

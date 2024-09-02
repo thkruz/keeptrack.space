@@ -48,7 +48,7 @@
     "version:major": "npm version major && npm run changelog",
     "version:minor": "npm version minor && npm run changelog",
     "version:patch": "npm version patch && npm run changelog",
-    "prepare": "husky install"
+    "husky": "husky install"
   },
   "chromium-args": "--enable-threaded-compositing",
   "nyc": {

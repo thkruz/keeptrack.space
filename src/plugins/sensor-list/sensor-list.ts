@@ -69,6 +69,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
+
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.constructor.name,

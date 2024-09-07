@@ -90,7 +90,6 @@ export class StereoMap extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    import('./stereo-map.css');
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,

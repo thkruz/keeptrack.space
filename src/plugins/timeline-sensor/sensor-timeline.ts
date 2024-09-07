@@ -140,7 +140,6 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    import('./sensor-timeline.css');
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,

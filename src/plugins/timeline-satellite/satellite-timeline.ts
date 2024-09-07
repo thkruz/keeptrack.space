@@ -114,7 +114,6 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    import('./satellite-timeline.css');
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,

@@ -66,11 +66,6 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
   launchList = [];
 
-  addHtml(): void {
-    super.addHtml();
-    import('./next-launches.css').then((resp) => resp);
-  }
-
   addJs(): void {
     super.addJs();
     keepTrackApi.register({

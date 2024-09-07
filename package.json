@@ -27,7 +27,7 @@
   "types": "lib/index.d.ts",
   "files": [
     "lib",
-    "lib/assets"
+    "lib/workers"
   ],
   "scripts": {
     "build": "node ./scripts/build.mjs production",
@@ -139,6 +139,7 @@
     "webgl-lint": "^1.11.3",
     "webgl-mock": "^0.1.7",
     "webpack": "^5.93.0",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
     "webpackbar": "^5.0.2",
     "worker-loader": "^3.0.8"

@@ -28,13 +28,6 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
 
-declare module '@app/interfaces' {
-  interface UserSettings {
-    isSatOverflyModeOn: boolean;
-    isShowSurvFence: boolean;
-  }
-}
-
 export class SensorSurvFence extends KeepTrackPlugin {
   dependencies_: string[] = [SensorListPlugin.name];
   bottomIconCallback = () => {

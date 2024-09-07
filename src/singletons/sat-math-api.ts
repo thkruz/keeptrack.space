@@ -4,7 +4,7 @@
  * sat-math-api.ts contains the `SatMathApi` singleton class, which provides a
  * wrapper around the `SatMath` class. It is used to provide a more convenient
  * interface for the `SatMath` class.
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek

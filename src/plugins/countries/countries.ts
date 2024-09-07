@@ -7,72 +7,38 @@ import { GroupType } from '@app/singletons/object-group';
 import { StringExtractor } from '@app/static/string-extractor';
 import flagPng from '@public/img/icons/flag.png';
 
+import { Localization } from '@app/locales/locales';
 import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class CountriesMenu extends KeepTrackPlugin {
-  protected dependencies_: string[];
-  bottomIconElementName = 'menu-countries-icon';
+  dependencies_ = [];
+
   bottomIconImg = flagPng;
-  bottomIconLabel = 'Countries';
   sideMenuElementHtml = keepTrackApi.html`
     <div id="countries-menu" class="side-menu-parent start-hidden text-select">
       <div id="country-menu" class="side-menu">
-        <ul>
-          <h5 class="center-align">Countries</h5>
-          <li class="divider"></li>
-          <li class="menu-selectable country-option" data-group="Argentina">Argentina</li>
-          <li class="menu-selectable country-option" data-group="Austria">Austria</li>
-          <li class="menu-selectable country-option" data-group="Australia">Australia</li>
-          <li class="menu-selectable country-option" data-group="Belgium">Belgium</li>
-          <li class="menu-selectable country-option" data-group="Brazil">Brazil</li>
-          <li class="menu-selectable country-option" data-group="Canada">Canada</li>
-          <li class="menu-selectable country-option" data-group="China">China</li>
-          <li class="menu-selectable country-option" data-group="Colombia">Colombia</li>
-          <li class="menu-selectable country-option" data-group="Denmark">Denmark</li>
-          <li class="menu-selectable country-option" data-group="Egypt">Egypt</li>
-          <li class="menu-selectable country-option" data-group="Finland">Finland</li>
-          <li class="menu-selectable country-option" data-group="France">France</li>
-          <li class="menu-selectable country-option" data-group="Germany">Germany</li>
-          <li class="menu-selectable country-option" data-group="Hong Kong">Hong Kong</li>
-          <li class="menu-selectable country-option" data-group="Hungary">Hungary</li>
-          <li class="menu-selectable country-option" data-group="India">India</li>
-          <li class="menu-selectable country-option" data-group="Indonesia">Indonesia</li>
-          <li class="menu-selectable country-option" data-group="Iran">Iran</li>
-          <li class="menu-selectable country-option" data-group="Ireland">Ireland</li>
-          <li class="menu-selectable country-option" data-group="Italy">Italy</li>
-          <li class="menu-selectable country-option" data-group="Israel">Israel</li>
-          <li class="menu-selectable country-option" data-group="Japan">Japan</li>
-          <li class="menu-selectable country-option" data-group="North Korea">North Korea</li>
-          <li class="menu-selectable country-option" data-group="South Korea">South Korea</li>
-          <li class="menu-selectable country-option" data-group="Mexico">Mexico</li>
-          <li class="menu-selectable country-option" data-group="Norway">Norway</li>
-          <li class="menu-selectable country-option" data-group="New Zealand">New Zealand</li>
-          <li class="menu-selectable country-option" data-group="Philippines">Philippines</li>
-          <li class="menu-selectable country-option" data-group="Poland">Poland</li>
-          <li class="menu-selectable country-option" data-group="Russia">Russia</li>
-          <li class="menu-selectable country-option" data-group="Saudi Arabia">Saudi Arabia</li>
-          <li class="menu-selectable country-option" data-group="Singapore">Singapore</li>
-          <li class="menu-selectable country-option" data-group="Spain">Spain</li>
-          <li class="menu-selectable country-option" data-group="Sweden">Sweden</li>
-          <li class="menu-selectable country-option" data-group="Switzerland">Switzerland</li>
-          <li class="menu-selectable country-option" data-group="Thailand">Thailand</li>
-          <li class="menu-selectable country-option" data-group="Turkey">Turkey</li>
-          <li class="menu-selectable country-option" data-group="United Kingdom">United Kingdom</li>
-          <li class="menu-selectable country-option" data-group="United States">United States</li>
-          <li class="menu-selectable country-option" data-group="Venezuela">Venezuela</li>
-          <li class="menu-selectable country-option" data-group="Vietnam">Vietnam</li>
-          <li class="menu-selectable country-option" data-group="South Africa">South Africa</li>
+        <ul id="country-list">
         </ul>
       </div>
     </div>
     `;
 
   sideMenuElementName = 'countries-menu';
-  helpTitle = 'Countries Menu';
-  helpBody = keepTrackApi.html`The Countries Menu allows you to filter the satellites by country of origin.`;
+
+  addHtml(): void {
+    super.addHtml();
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.onCruncherReady,
+      cbName: this.constructor.name,
+      cb: () => {
+        getEl('country-list').innerHTML = CountriesMenu.generateCountryList_();
+      },
+    });
+  }
 
   addJs() {
     super.addJs();
@@ -93,6 +59,33 @@ export class CountriesMenu extends KeepTrackPlugin {
         clickAndDragWidth(getEl(this.sideMenuElementName));
       },
     });
+  }
+
+  private static generateCountryList_(): string {
+    const header = keepTrackApi.html`
+    <h5 class="center-align">${Localization.plugins.CountriesMenu.bottomIconLabel}</h5>
+    <li class="divider"></li>
+    <br/>`;
+
+    const countryList = [];
+
+    keepTrackApi.getCatalogManager().getSats().forEach((sat) => {
+      if (sat.country && !countryList.includes(sat.country)) {
+        countryList.push(sat.country);
+      }
+    });
+
+    countryList.sort((a, b) => a.localeCompare(b));
+
+    return `${countryList.reduce((acc, country) => {
+      const countryCode = StringExtractor.getCountryCode(country);
+
+      if (countryCode === '') {
+        return acc;
+      }
+
+      return `${acc}<li class="menu-selectable country-option" data-group="${country}">${country}</li>`;
+    }, header)}<br/>`;
   }
 
   private static countryMenuClick_(groupName: string): void {
@@ -148,5 +141,3 @@ export class CountriesMenu extends KeepTrackPlugin {
     uiManagerInstance.hideSideMenus();
   }
 }
-
-export const countriesMenuPlugin = new CountriesMenu();

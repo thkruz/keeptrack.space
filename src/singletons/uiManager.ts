@@ -2,14 +2,14 @@
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
- * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
+ * under the MIT License. Please reference https://keeptrack.space/license/thingsinspace.txt
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -453,19 +453,26 @@ export class UiManager {
     const BottomIcons = getEl('bottom-icons');
 
     BottomIcons?.addEventListener('click', (evt: Event) => {
-      if ((<HTMLElement>evt.target).id === 'bottom-icons') {
+      const bottomIcons = getEl('bottom-icons');
+      let targetElement = <HTMLElement>evt.target;
+
+      while (targetElement && targetElement !== bottomIcons) {
+        if (targetElement.parentElement === bottomIcons) {
+          this.bottomIconPress(targetElement);
+
+          return;
+        }
+        targetElement = targetElement.parentElement;
+      }
+
+      if (targetElement === bottomIcons) {
         return;
       }
-      if ((<HTMLElement>evt.target).parentElement?.id === 'bottom-icons') {
-        this.bottomIconPress(<HTMLElement>evt.target);
-      } else {
-        const parentElement = (<HTMLElement>evt.target).parentElement;
 
-        if (!parentElement) {
-          errorManagerInstance.debug('parentElement is null');
-        } else {
-          this.bottomIconPress(parentElement);
-        }
+      if (!targetElement) {
+        errorManagerInstance.debug('targetElement is null');
+      } else {
+        this.bottomIconPress(targetElement);
       }
     });
     this.hideSideMenus = () => {

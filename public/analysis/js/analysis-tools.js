@@ -4,7 +4,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  *
  * (c) 2016-2023, Theodore Kruczek
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * All code is Copyright © 2016-2023 by Theodore Kruczek. All rights reserved.
  * No part of this web site may be reproduced, published, distributed, displayed,

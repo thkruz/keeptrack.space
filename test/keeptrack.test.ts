@@ -102,7 +102,7 @@ describe('code_snippet', () => {
       const keepTrack = new KeepTrack(<any>settingsOverride);
 
       KeepTrack.initCss();
-      keepTrack.init();
+      keepTrack.run();
     };
 
     expect(initializationTest).not.toThrow();
@@ -118,7 +118,7 @@ describe('code_snippet', () => {
 
     const keepTrack = new KeepTrack(<any>settingsOverride);
 
-    keepTrack.init().then(() => {
+    keepTrack.run().then(() => {
       /*
        * const error = new Error('Test error');
        * expect(getEl('loader-text')?.innerHTML).toEqual(error.message);
@@ -131,7 +131,7 @@ describe('code_snippet', () => {
     const keepTrack = new KeepTrack(<any>settingsOverride);
     const drawManagerInstance = keepTrackApi.getRenderer();
 
-    keepTrack.init().then(() => {
+    keepTrack.run().then(() => {
       drawManagerInstance.update = jest.fn();
       keepTrackApi.getMainCamera().draw = jest.fn();
       settingsManager.cruncherReady = true;
@@ -145,7 +145,7 @@ describe('code_snippet', () => {
   it('test_isPreventDefaultHtml_disabled', () => {
     const keepTrack = new KeepTrack(<any>{ isPreventDefaultHtml: false });
     const initializationTest = () => {
-      keepTrack.init();
+      keepTrack.run();
     };
 
     expect(initializationTest).not.toThrow();

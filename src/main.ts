@@ -3,14 +3,14 @@
  *
  * main.ts is a TypeScript implementation of the KeepTrack class. This is responsible for
  * initializing the website.
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
- * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
+ * under the MIT License. Please reference https://keeptrack.space/license/thingsinspace.txt
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -28,20 +28,15 @@
 
 import { KeepTrack } from './keeptrack';
 
-declare global {
-  interface Window {
-    keepTrack: KeepTrack;
-  }
-}
-
 // Load the main website class
 const keepTrack = new KeepTrack(window.settingsOverride);
-// Expose to window for debugging
 
+keepTrack.init();
+
+// Expose to window for debugging
 window.keepTrack = keepTrack;
+
 // Initialize the website
 KeepTrack.initCss().then(() => {
-  keepTrack.init();
+  keepTrack.run();
 });
-
-export default keepTrack;

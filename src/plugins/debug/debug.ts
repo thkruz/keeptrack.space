@@ -15,10 +15,10 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class DebugMenuPlugin extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   isErudaVisible = false;
   bottomIconImg = debugPng;
-  bottomIconElementName = 'menu-debug';
+
   bottomIconLabel = 'Debug';
 
   dragOptions: clickDragOptions = {

@@ -37,221 +37,14 @@ export interface SearchSatParams {
 }
 
 export class FindSatPlugin extends KeepTrackPlugin {
-  protected dependencies_: string[];
-  private lastResults = <DetailedSatellite[]>[];
+  dependencies_: string[];
+  private lastResults_ = <DetailedSatellite[]>[];
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
     minWidth: 500,
     maxWidth: 700,
   };
-
-  public static checkAz(posAll: DetailedSatellite[], min: number, max: number) {
-    return posAll.filter((pos) => {
-      if (!pos.isSatellite() && !pos.isMissile()) {
-        return false;
-      }
-
-      const rae = eci2rae(
-        keepTrackApi.getTimeManager().simulationTimeObj,
-        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
-        keepTrackApi.getSensorManager().currentSensors[0],
-      );
-
-
-      return rae.az >= min && rae.az <= max;
-    });
-  }
-
-  public static checkEl(posAll: DetailedSatellite[], min: number, max: number) {
-    return posAll.filter((pos) => {
-      if (!pos.isSatellite() && !pos.isMissile()) {
-        return false;
-      }
-
-      const rae = eci2rae(
-        keepTrackApi.getTimeManager().simulationTimeObj,
-        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
-        keepTrackApi.getSensorManager().currentSensors[0],
-      );
-
-
-      return rae.el >= min && rae.el <= max;
-    });
-  }
-
-  public static checkInview(posAll: DetailedSatellite[]) {
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-
-
-    return posAll.filter((pos) => dotsManagerInstance.inViewData[pos.id] === 1);
-  }
-
-  public static checkObjtype(posAll: DetailedSatellite[], objtype: number) {
-    return posAll.filter((pos) => pos.type === objtype);
-  }
-
-  public static checkRange(posAll: DetailedSatellite[], min: number, max: number) {
-    return posAll.filter((pos) => {
-      if (!pos.isSatellite() && !pos.isMissile()) {
-        return false;
-      }
-
-      const rae = eci2rae(
-        keepTrackApi.getTimeManager().simulationTimeObj,
-        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
-        keepTrackApi.getSensorManager().currentSensors[0],
-      );
-
-
-      return rae.rng >= min && rae.rng <= max;
-    });
-  }
-
-  public static limitPossibles(possibles: DetailedSatellite[], limit: number): DetailedSatellite[] {
-    const uiManagerInstance = keepTrackApi.getUiManager();
-
-    if (possibles.length >= limit) {
-      uiManagerInstance.toast(`Too many results, limited to ${limit}`, ToastMsgType.serious);
-    }
-    possibles = possibles.slice(0, limit);
-
-    return possibles;
-  }
-
-  public static searchSats(searchParams: SearchSatParams): DetailedSatellite[] {
-    let {
-      az,
-      el,
-      rng,
-      countryCode,
-      inc,
-      azMarg,
-      elMarg,
-      rngMarg,
-      incMarg,
-      period,
-      periodMarg,
-      rcs,
-      rcsMarg,
-      objType,
-      raan: rightAscension,
-      raanMarg: rightAscensionMarg,
-      argPe,
-      argPeMarg,
-      bus,
-      shape,
-      payload,
-    } = searchParams;
-
-    const isValidAz = !isNaN(az) && isFinite(az);
-    const isValidEl = !isNaN(el) && isFinite(el);
-    const isValidRange = !isNaN(rng) && isFinite(rng);
-    const isValidInc = !isNaN(inc) && isFinite(inc);
-    const isValidRaan = !isNaN(rightAscension) && isFinite(rightAscension);
-    const isValidArgPe = !isNaN(argPe) && isFinite(argPe);
-    const isValidPeriod = !isNaN(period) && isFinite(period);
-    const isValidRcs = !isNaN(rcs) && isFinite(rcs);
-    const isSpecificCountry = countryCode !== 'All';
-    const isSpecificBus = bus !== 'All';
-    const isSpecificShape = shape !== 'All';
-    const isSpecificPayload = payload !== 'All';
-
-    azMarg = !isNaN(azMarg) && isFinite(azMarg) ? azMarg : (5 as Degrees);
-    elMarg = !isNaN(elMarg) && isFinite(elMarg) ? elMarg : (5 as Degrees);
-    rngMarg = !isNaN(rngMarg) && isFinite(rngMarg) ? rngMarg : (200 as Kilometers);
-    incMarg = !isNaN(incMarg) && isFinite(incMarg) ? incMarg : (1 as Degrees);
-    periodMarg = !isNaN(periodMarg) && isFinite(periodMarg) ? periodMarg : (0.5 as Minutes);
-    rcsMarg = !isNaN(rcsMarg) && isFinite(rcsMarg) ? rcsMarg : rcs / 10;
-    rightAscensionMarg = !isNaN(rightAscensionMarg) && isFinite(rightAscensionMarg) ? rightAscensionMarg : (1 as Degrees);
-    argPeMarg = !isNaN(argPeMarg) && isFinite(argPeMarg) ? argPeMarg : (1 as Degrees);
-
-    if (
-      !isValidEl &&
-      !isValidRange &&
-      !isValidAz &&
-      !isValidInc &&
-      !isValidPeriod &&
-      !isValidRcs &&
-      !isValidArgPe &&
-      !isValidRaan &&
-      !isSpecificCountry &&
-      !isSpecificBus &&
-      !isSpecificShape &&
-      !isSpecificPayload
-    ) {
-      throw new Error('No Search Criteria Entered');
-    }
-
-    let res = keepTrackApi.getCatalogManager().getSats();
-
-    res = !isValidInc && !isValidPeriod && (isValidAz || isValidEl || isValidRange) ? FindSatPlugin.checkInview(res) : res;
-
-    res = objType !== 0 ? FindSatPlugin.checkObjtype(res, objType) : res;
-
-    if (isValidAz) {
-      res = FindSatPlugin.checkAz(res, az - azMarg, az + azMarg);
-    }
-    if (isValidEl) {
-      res = FindSatPlugin.checkEl(res, el - elMarg, el + elMarg);
-    }
-    if (isValidRange) {
-      res = FindSatPlugin.checkRange(res, rng - rngMarg, rng + rngMarg);
-    }
-    if (isValidInc) {
-      res = FindSatPlugin.checkInc(res, (inc - incMarg) as Degrees, (inc + incMarg) as Degrees);
-    }
-    if (isValidRaan) {
-      res = FindSatPlugin.checkRightAscension(res, (rightAscension - rightAscensionMarg) as Degrees, (rightAscension + rightAscensionMarg) as Degrees);
-    }
-    if (isValidArgPe) {
-      res = FindSatPlugin.checkArgPe(res, (argPe - argPeMarg) as Degrees, (argPe + argPeMarg) as Degrees);
-    }
-    if (isValidPeriod) {
-      res = FindSatPlugin.checkPeriod(res, (period - periodMarg) as Minutes, (period + periodMarg) as Minutes);
-    }
-    if (isValidRcs) {
-      res = FindSatPlugin.checkRcs(res, rcs - rcsMarg, rcs + rcsMarg);
-    }
-    if (countryCode !== 'All') {
-      let country = countryCode.split('|').map((code) => countryMapList[code]);
-      // Remove duplicates and undefined
-
-      country = country.filter((item, index) => item && country.indexOf(item) === index);
-      res = res.filter((obj: BaseObject) => country.includes((obj as DetailedSatellite).country));
-    }
-    if (bus !== 'All') {
-      res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).bus === bus);
-    }
-    if (shape !== 'All') {
-      res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).shape === shape);
-    }
-
-    if (payload !== 'All') {
-      res = res.filter(
-        (obj: BaseObject) =>
-          (obj as DetailedSatellite).payload
-            ?.split(' ')[0]
-            ?.split('-')[0]
-            ?.replace(/[^a-zA-Z]/gu, '') === payload,
-      );
-    }
-
-    res = FindSatPlugin.limitPossibles(res, settingsManager.searchLimit);
-
-    let result = '';
-
-    res.forEach((obj: BaseObject, i: number) => {
-      result += i < res.length - 1 ? `${(obj as DetailedSatellite).sccNum},` : `${(obj as DetailedSatellite).sccNum}`;
-    });
-
-    (<HTMLInputElement>getEl('search')).value = result;
-    const uiManagerInstance = keepTrackApi.getUiManager();
-
-    uiManagerInstance.doSearch((<HTMLInputElement>getEl('search')).value);
-
-    return res;
-  }
 
   sideMenuElementName: string = 'findByLooks-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -397,87 +190,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  bottomIconElementName: string = 'menu-find-sat';
   bottomIconImg = findSatPng;
-  bottomIconLabel: string = 'Find Satellite';
-
-  helpTitle = 'Find Satellite Menu';
-
-  helpBody = keepTrackApi.html`The Find Satellite Menu is used for finding satellites by orbital parameters or satellite characteristics.
-<br><br>
-For most parameters, you type in the target value on the left and then a margin of error on the right.
-For example, if you wanted to find all satellites in a 51-52 degree inclination, you can type 51.5 in the left box and 0.5 in the right box.
-The search will then find all satellites within those inclinations and display them in the search bar.
-`;
-
-  public async findByLooksSubmit() {
-    const uiManagerInstance = keepTrackApi.getUiManager();
-
-    const az = parseFloat((<HTMLInputElement>getEl('fbl-azimuth')).value);
-    const el = parseFloat((<HTMLInputElement>getEl('fbl-elevation')).value);
-    const rng = parseFloat((<HTMLInputElement>getEl('fbl-range')).value);
-    const inc = parseFloat((<HTMLInputElement>getEl('fbl-inc')).value);
-    const period = parseFloat((<HTMLInputElement>getEl('fbl-period')).value);
-    const rcs = parseFloat((<HTMLInputElement>getEl('fbl-rcs')).value);
-    const azMarg = parseFloat((<HTMLInputElement>getEl('fbl-azimuth-margin')).value);
-    const elMarg = parseFloat((<HTMLInputElement>getEl('fbl-elevation-margin')).value);
-    const rngMarg = parseFloat((<HTMLInputElement>getEl('fbl-range-margin')).value);
-    const incMarg = parseFloat((<HTMLInputElement>getEl('fbl-inc-margin')).value);
-    const periodMarg = parseFloat((<HTMLInputElement>getEl('fbl-period-margin')).value);
-    const rcsMarg = parseFloat((<HTMLInputElement>getEl('fbl-rcs-margin')).value);
-    const objType = parseInt((<HTMLInputElement>getEl('fbl-type')).value);
-    const raan = parseFloat((<HTMLInputElement>getEl('fbl-raan')).value);
-    const raanMarg = parseFloat((<HTMLInputElement>getEl('fbl-raan-margin')).value);
-    const argPe = parseFloat((<HTMLInputElement>getEl('fbl-argPe')).value);
-    const argPeMarg = parseFloat((<HTMLInputElement>getEl('fbl-argPe-margin')).value);
-    const countryCode = (<HTMLInputElement>getEl('fbl-country')).value;
-    const bus = (<HTMLInputElement>getEl('fbl-bus')).value;
-    const payload = (<HTMLInputElement>getEl('fbl-payload')).value;
-    const shape = (<HTMLInputElement>getEl('fbl-shape')).value;
-
-    (<HTMLInputElement>getEl('search')).value = ''; // Reset the search first
-    try {
-      const searchParams = {
-        az,
-        el,
-        rng,
-        inc,
-        azMarg,
-        elMarg,
-        rngMarg,
-        incMarg,
-        period,
-        periodMarg,
-        rcs,
-        rcsMarg,
-        objType,
-        raan,
-        raanMarg,
-        argPe,
-        argPeMarg,
-        countryCode,
-        bus,
-        payload,
-        shape,
-      };
-
-      this.lastResults = FindSatPlugin.searchSats(searchParams as SearchSatParams);
-      if (this.lastResults.length === 0) {
-        uiManagerInstance.toast('No Satellites Found', ToastMsgType.critical);
-      }
-    } catch (e) {
-      if (e.message === 'No Search Criteria Entered') {
-        uiManagerInstance.toast('No Search Criteria Entered', ToastMsgType.critical);
-      }
-    }
-  }
 
   addJs(): void {
     super.addJs();
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: 'findSat',
+      cbName: this.constructor.name,
       cb: () => {
         getEl('fbl-error').addEventListener('click', () => {
           getEl('fbl-error').style.display = 'none';
@@ -486,23 +206,24 @@ The search will then find all satellites within those inclinations and display t
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'findSat',
-      cb: this.uiManagerFinal.bind(this),
+      cbName: this.constructor.name,
+      cb: this.uiManagerFinal_.bind(this),
     });
   }
 
-  public printLastResults() {
-    errorManagerInstance.info(this.lastResults.map((sat) => sat.name).join('\n'));
+  printLastResults() {
+    errorManagerInstance.info(this.lastResults_.map((sat) => sat.name).join('\n'));
   }
 
-  public uiManagerFinal() {
+  private uiManagerFinal_() {
     const satData = keepTrackApi.getCatalogManager().objectCache;
 
     getEl('findByLooks-form').addEventListener('submit', (e: Event) => {
       e.preventDefault();
       showLoading(() => {
-        this.findByLooksSubmit();
-        hideLoading();
+        this.findByLooksSubmit_().then(() => {
+          hideLoading();
+        });
       });
     });
 
@@ -546,23 +267,294 @@ The search will then find all satellites within those inclinations and display t
       });
   }
 
-  private static checkArgPe(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
+  private findByLooksSubmit_(): Promise<void> {
+    return new Promise(() => {
+      const uiManagerInstance = keepTrackApi.getUiManager();
+
+      const az = parseFloat((<HTMLInputElement>getEl('fbl-azimuth')).value);
+      const el = parseFloat((<HTMLInputElement>getEl('fbl-elevation')).value);
+      const rng = parseFloat((<HTMLInputElement>getEl('fbl-range')).value);
+      const inc = parseFloat((<HTMLInputElement>getEl('fbl-inc')).value);
+      const period = parseFloat((<HTMLInputElement>getEl('fbl-period')).value);
+      const rcs = parseFloat((<HTMLInputElement>getEl('fbl-rcs')).value);
+      const azMarg = parseFloat((<HTMLInputElement>getEl('fbl-azimuth-margin')).value);
+      const elMarg = parseFloat((<HTMLInputElement>getEl('fbl-elevation-margin')).value);
+      const rngMarg = parseFloat((<HTMLInputElement>getEl('fbl-range-margin')).value);
+      const incMarg = parseFloat((<HTMLInputElement>getEl('fbl-inc-margin')).value);
+      const periodMarg = parseFloat((<HTMLInputElement>getEl('fbl-period-margin')).value);
+      const rcsMarg = parseFloat((<HTMLInputElement>getEl('fbl-rcs-margin')).value);
+      const objType = parseInt((<HTMLInputElement>getEl('fbl-type')).value);
+      const raan = parseFloat((<HTMLInputElement>getEl('fbl-raan')).value);
+      const raanMarg = parseFloat((<HTMLInputElement>getEl('fbl-raan-margin')).value);
+      const argPe = parseFloat((<HTMLInputElement>getEl('fbl-argPe')).value);
+      const argPeMarg = parseFloat((<HTMLInputElement>getEl('fbl-argPe-margin')).value);
+      const countryCode = (<HTMLInputElement>getEl('fbl-country')).value;
+      const bus = (<HTMLInputElement>getEl('fbl-bus')).value;
+      const payload = (<HTMLInputElement>getEl('fbl-payload')).value;
+      const shape = (<HTMLInputElement>getEl('fbl-shape')).value;
+
+      (<HTMLInputElement>getEl('search')).value = ''; // Reset the search first
+      try {
+        const searchParams = {
+          az,
+          el,
+          rng,
+          inc,
+          azMarg,
+          elMarg,
+          rngMarg,
+          incMarg,
+          period,
+          periodMarg,
+          rcs,
+          rcsMarg,
+          objType,
+          raan,
+          raanMarg,
+          argPe,
+          argPeMarg,
+          countryCode,
+          bus,
+          payload,
+          shape,
+        };
+
+        this.lastResults_ = FindSatPlugin.searchSats_(searchParams as SearchSatParams);
+        if (this.lastResults_.length === 0) {
+          uiManagerInstance.toast('No Satellites Found', ToastMsgType.critical);
+        }
+      } catch (e) {
+        if (e.message === 'No Search Criteria Entered') {
+          uiManagerInstance.toast('No Search Criteria Entered', ToastMsgType.critical);
+        }
+      }
+    });
+  }
+
+  private static checkAz_(posAll: DetailedSatellite[], min: number, max: number) {
+    return posAll.filter((pos) => {
+      if (!pos.isSatellite() && !pos.isMissile()) {
+        return false;
+      }
+
+      const rae = eci2rae(
+        keepTrackApi.getTimeManager().simulationTimeObj,
+        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
+        keepTrackApi.getSensorManager().currentSensors[0],
+      );
+
+
+      return rae.az >= min && rae.az <= max;
+    });
+  }
+
+  private static checkEl_(posAll: DetailedSatellite[], min: number, max: number) {
+    return posAll.filter((pos) => {
+      if (!pos.isSatellite() && !pos.isMissile()) {
+        return false;
+      }
+
+      const rae = eci2rae(
+        keepTrackApi.getTimeManager().simulationTimeObj,
+        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
+        keepTrackApi.getSensorManager().currentSensors[0],
+      );
+
+
+      return rae.el >= min && rae.el <= max;
+    });
+  }
+
+  private static checkInview_(posAll: DetailedSatellite[]) {
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
+
+
+    return posAll.filter((pos) => dotsManagerInstance.inViewData[pos.id] === 1);
+  }
+
+  private static checkObjtype_(posAll: DetailedSatellite[], objtype: number) {
+    return posAll.filter((pos) => pos.type === objtype);
+  }
+
+  private static checkRange_(posAll: DetailedSatellite[], min: number, max: number) {
+    return posAll.filter((pos) => {
+      if (!pos.isSatellite() && !pos.isMissile()) {
+        return false;
+      }
+
+      const rae = eci2rae(
+        keepTrackApi.getTimeManager().simulationTimeObj,
+        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
+        keepTrackApi.getSensorManager().currentSensors[0],
+      );
+
+
+      return rae.rng >= min && rae.rng <= max;
+    });
+  }
+
+  private static limitPossibles_(possibles: DetailedSatellite[], limit: number): DetailedSatellite[] {
+    const uiManagerInstance = keepTrackApi.getUiManager();
+
+    if (possibles.length >= limit) {
+      uiManagerInstance.toast(`Too many results, limited to ${limit}`, ToastMsgType.serious);
+    }
+    possibles = possibles.slice(0, limit);
+
+    return possibles;
+  }
+
+  private static searchSats_(searchParams: SearchSatParams): DetailedSatellite[] {
+    let {
+      az,
+      el,
+      rng,
+      countryCode,
+      inc,
+      azMarg,
+      elMarg,
+      rngMarg,
+      incMarg,
+      period,
+      periodMarg,
+      rcs,
+      rcsMarg,
+      objType,
+      raan: rightAscension,
+      raanMarg: rightAscensionMarg,
+      argPe,
+      argPeMarg,
+      bus,
+      shape,
+      payload,
+    } = searchParams;
+
+    const isValidAz = !isNaN(az) && isFinite(az);
+    const isValidEl = !isNaN(el) && isFinite(el);
+    const isValidRange = !isNaN(rng) && isFinite(rng);
+    const isValidInc = !isNaN(inc) && isFinite(inc);
+    const isValidRaan = !isNaN(rightAscension) && isFinite(rightAscension);
+    const isValidArgPe = !isNaN(argPe) && isFinite(argPe);
+    const isValidPeriod = !isNaN(period) && isFinite(period);
+    const isValidRcs = !isNaN(rcs) && isFinite(rcs);
+    const isSpecificCountry = countryCode !== 'All';
+    const isSpecificBus = bus !== 'All';
+    const isSpecificShape = shape !== 'All';
+    const isSpecificPayload = payload !== 'All';
+
+    azMarg = !isNaN(azMarg) && isFinite(azMarg) ? azMarg : (5 as Degrees);
+    elMarg = !isNaN(elMarg) && isFinite(elMarg) ? elMarg : (5 as Degrees);
+    rngMarg = !isNaN(rngMarg) && isFinite(rngMarg) ? rngMarg : (200 as Kilometers);
+    incMarg = !isNaN(incMarg) && isFinite(incMarg) ? incMarg : (1 as Degrees);
+    periodMarg = !isNaN(periodMarg) && isFinite(periodMarg) ? periodMarg : (0.5 as Minutes);
+    rcsMarg = !isNaN(rcsMarg) && isFinite(rcsMarg) ? rcsMarg : rcs / 10;
+    rightAscensionMarg = !isNaN(rightAscensionMarg) && isFinite(rightAscensionMarg) ? rightAscensionMarg : (1 as Degrees);
+    argPeMarg = !isNaN(argPeMarg) && isFinite(argPeMarg) ? argPeMarg : (1 as Degrees);
+
+    if (
+      !isValidEl &&
+      !isValidRange &&
+      !isValidAz &&
+      !isValidInc &&
+      !isValidPeriod &&
+      !isValidRcs &&
+      !isValidArgPe &&
+      !isValidRaan &&
+      !isSpecificCountry &&
+      !isSpecificBus &&
+      !isSpecificShape &&
+      !isSpecificPayload
+    ) {
+      throw new Error('No Search Criteria Entered');
+    }
+
+    let res = keepTrackApi.getCatalogManager().getSats();
+
+    res = !isValidInc && !isValidPeriod && (isValidAz || isValidEl || isValidRange) ? FindSatPlugin.checkInview_(res) : res;
+
+    res = objType !== 0 ? FindSatPlugin.checkObjtype_(res, objType) : res;
+
+    if (isValidAz) {
+      res = FindSatPlugin.checkAz_(res, az - azMarg, az + azMarg);
+    }
+    if (isValidEl) {
+      res = FindSatPlugin.checkEl_(res, el - elMarg, el + elMarg);
+    }
+    if (isValidRange) {
+      res = FindSatPlugin.checkRange_(res, rng - rngMarg, rng + rngMarg);
+    }
+    if (isValidInc) {
+      res = FindSatPlugin.checkInc_(res, (inc - incMarg) as Degrees, (inc + incMarg) as Degrees);
+    }
+    if (isValidRaan) {
+      res = FindSatPlugin.checkRightAscension_(res, (rightAscension - rightAscensionMarg) as Degrees, (rightAscension + rightAscensionMarg) as Degrees);
+    }
+    if (isValidArgPe) {
+      res = FindSatPlugin.checkArgPe_(res, (argPe - argPeMarg) as Degrees, (argPe + argPeMarg) as Degrees);
+    }
+    if (isValidPeriod) {
+      res = FindSatPlugin.checkPeriod_(res, (period - periodMarg) as Minutes, (period + periodMarg) as Minutes);
+    }
+    if (isValidRcs) {
+      res = FindSatPlugin.checkRcs_(res, rcs - rcsMarg, rcs + rcsMarg);
+    }
+    if (countryCode !== 'All') {
+      let country = countryCode.split('|').map((code) => countryMapList[code]);
+      // Remove duplicates and undefined
+
+      country = country.filter((item, index) => item && country.indexOf(item) === index);
+      res = res.filter((obj: BaseObject) => country.includes((obj as DetailedSatellite).country));
+    }
+    if (bus !== 'All') {
+      res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).bus === bus);
+    }
+    if (shape !== 'All') {
+      res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).shape === shape);
+    }
+
+    if (payload !== 'All') {
+      res = res.filter(
+        (obj: BaseObject) =>
+          (obj as DetailedSatellite).payload
+            ?.split(' ')[0]
+            ?.split('-')[0]
+            ?.replace(/[^a-zA-Z]/gu, '') === payload,
+      );
+    }
+
+    res = FindSatPlugin.limitPossibles_(res, settingsManager.searchLimit);
+
+    let result = '';
+
+    res.forEach((obj: BaseObject, i: number) => {
+      result += i < res.length - 1 ? `${(obj as DetailedSatellite).sccNum},` : `${(obj as DetailedSatellite).sccNum}`;
+    });
+
+    (<HTMLInputElement>getEl('search')).value = result;
+    const uiManagerInstance = keepTrackApi.getUiManager();
+
+    uiManagerInstance.doSearch((<HTMLInputElement>getEl('search')).value);
+
+    return res;
+  }
+
+  private static checkArgPe_(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
     return possibles.filter((possible) => possible.argOfPerigee < max && possible.argOfPerigee > min);
   }
 
-  private static checkInc(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
+  private static checkInc_(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
     return possibles.filter((possible) => possible.inclination < max && possible.inclination > min);
   }
 
-  private static checkPeriod(possibles: DetailedSatellite[], minPeriod: Minutes, maxPeriod: Minutes) {
+  private static checkPeriod_(possibles: DetailedSatellite[], minPeriod: Minutes, maxPeriod: Minutes) {
     return possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
   }
 
-  private static checkRightAscension(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
+  private static checkRightAscension_(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {
     return possibles.filter((possible) => possible.rightAscension < max && possible.rightAscension > min);
   }
 
-  private static checkRcs(possibles: DetailedSatellite[], minRcs: number, maxRcs: number) {
+  private static checkRcs_(possibles: DetailedSatellite[], minRcs: number, maxRcs: number) {
     return possibles.filter((possible) => possible.rcs > minRcs && possible.rcs < maxRcs);
   }
 }

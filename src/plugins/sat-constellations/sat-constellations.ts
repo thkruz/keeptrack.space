@@ -11,10 +11,9 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatConstellations extends KeepTrackPlugin {
-  protected dependencies_: string[] = [SelectSatManager.name];
+  dependencies_: string[] = [SelectSatManager.name];
   bottomIconImg = satChngPng;
   bottomIconElementName: string = 'menu-constellations';
-  bottomIconLabel: string = 'Constellations';
   sideMenuElementName: string = 'constellations-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="constellations-menu" class="side-menu-parent start-hidden text-select">
@@ -39,11 +38,6 @@ export class SatConstellations extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = 'Constellations Menu';
-  helpBody = keepTrackApi.html`The Constellations menu allows you to view groups of satellites.
-  <br><br>
-  For some constellations, notional uplink/downlinks and/or crosslinks will be drawn between satellites in the constellation.`;
-
   dragOptions: clickDragOptions = {
     isDraggable: true,
   };
@@ -59,14 +53,14 @@ export class SatConstellations extends KeepTrackPlugin {
           .querySelectorAll('li')
           .forEach((element) => {
             element.addEventListener('click', (evt: Event) => {
-              SatConstellations.constellationMenuClick((evt.target as HTMLElement).dataset.group);
+              SatConstellations.constellationMenuClick_((evt.target as HTMLElement).dataset.group);
             });
           });
       },
     });
   }
 
-  static constellationMenuClick(groupName: string) {
+  private static constellationMenuClick_(groupName: string) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const groupManagerInstance = keepTrackApi.getGroupsManager();
@@ -206,5 +200,3 @@ export class SatConstellations extends KeepTrackPlugin {
     uiManagerInstance.hideSideMenus();
   }
 }
-
-export const satConstellationsPlugin = new SatConstellations();

@@ -1,7 +1,7 @@
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * astronomy.ts is a plugin for showing the stars above from the perspective
  * of a view on the earth.
@@ -35,8 +35,8 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Planetarium } from '../planetarium/planetarium';
 
 export class Astronomy extends KeepTrackPlugin {
-  protected dependencies_: string[];
-  bottomIconElementName = 'menu-astronomy';
+  dependencies_ = [];
+
   bottomIconLabel = 'Astronomy View';
   bottomIconImg = constellationPng;
   isIconDisabledOnLoad = true;

@@ -27,6 +27,7 @@ import { WebGLRenderer } from '../../src/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './apiMocks';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
+  document.body.innerHTML = '<div id="keeptrack-root"></div>';
   const settingsManager = new SettingsManager();
 
   settingsManager.isShowSplashScreen = true;
@@ -61,7 +62,8 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   };
   keepTrackApi.unregisterAllEvents();
   keepTrackApi.unregisterAllPlugins();
-  document.body.innerHTML = '<div id="keeptrack-root"></div>';
+  // eslint-disable-next-line dot-notation
+  KeepTrack['setContainerElement']();
   setupDefaultHtml();
 
   clearAllCallbacks();

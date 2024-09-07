@@ -35,5 +35,11 @@
     "test/**/*",
     "src/plugins/startAnalytics.js"
   ],
-  "filesGlob": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.png", "src/**/*.jpg", "!**/node_modules/**"]
+  "filesGlob": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.png",
+    "src/**/*.jpg",
+    "!**/node_modules/**"
+  ]
 }

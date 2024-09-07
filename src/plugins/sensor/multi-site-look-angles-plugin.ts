@@ -1,3 +1,4 @@
+import { sensors } from '@app/catalogs/sensors';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
@@ -9,6 +10,7 @@ import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import multiSitePng from '@public/img/icons/multi-site.png';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, MINUTES_PER_DAY, SatelliteRecord, Seconds, TAU } from 'ootk';
+import { sensorGroups } from '../../catalogs/sensor-groups';
 import { KeepTrackPlugin, SideMenuSettingsOptions, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -17,32 +19,35 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
   // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
-  private sensorList_ = keepTrackApi.getSensorManager().sensorListSsn.concat(
-    keepTrackApi.getSensorManager().sensorListMw,
-    keepTrackApi.getSensorManager().sensorListMda,
-    keepTrackApi.getSensorManager().sensorListLeoLabs,
-    keepTrackApi.getSensorManager().sensorListEsoc,
-    keepTrackApi.getSensorManager().sensorListRus,
-    keepTrackApi.getSensorManager().sensorListPrc,
-    keepTrackApi.getSensorManager().sensorListOther,
-  );
+  private sensorList_: DetailedSensor[] = [];
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = false;
 
   // Settings
   private lengthOfLookAngles_ = 1; // Days
   private angleCalculationInterval_ = <Seconds>30;
-  private disabledSensors_: DetailedSensor[] = this.sensorList_.filter((s) =>
-    !keepTrackApi.getSensorManager().sensorListMw.includes(s),
-  );
+  private disabledSensors_: DetailedSensor[] = [];
 
   constructor() {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    this.sensorList_ = sensorGroups.map((group) => group.list).flat().map((sensor) => {
+      if (sensors[sensor] instanceof DetailedSensor) {
+        return sensors[sensor];
+      }
+      console.error(`Sensor ${sensor} not found in sensor catalog`);
+
+      return null;
+    }).filter((sensor) => sensor !== null);
 
     // remove duplicates in sensorList
-    this.sensorList_ = this.sensorList_.filter(
-      (sensor, index, self) => index === self.findIndex((t) => t.uiName === sensor.uiName),
+    this.sensorList_ = this.sensorList_.filter((sensor, index, self) =>
+      index === self.findIndex((s) => s.objName === sensor.objName),
+    );
+
+    // Default to only the MW sensors being enabled
+    this.disabledSensors_ = this.sensorList_.filter((sensor) =>
+      !sensorGroups.find((group) => group.name === 'mw')?.list.includes(sensor.objName),
     );
   }
 
@@ -57,8 +62,6 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   };
 
 
-  bottomIconElementName = 'multi-site-look-angles-icon';
-  bottomIconLabel = 'Multi-Site Looks';
   bottomIconImg = multiSitePng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
@@ -69,19 +72,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     maxWidth: 750,
   };
 
-  helpTitle = 'Multi-Site Look Angles Menu';
-  helpBody = keepTrackApi.html`
-    The Multi-Site Look Angles menu allows you to calculate the range, azimuth, and elevation angles between a satellite and multiple sensors.
-    A satellite must first be selected before the menu can be used.
-    <br><br>
-    By default the menu will calculate the look angles for all sensors in the Space Surveillance Netowrk.
-    If you would like to calculate the look angles for additional sensors, you can export a csv file at the bottom of the menu.
-    The csv file will contain look angles for all sensors.
-    <br><br>
-    Clicking on a row in the table will select the sensor and change the simulation time to the time of the look angle.`;
-
   sideMenuElementName: string = 'multi-site-look-angles-menu';
-  sideMenuTitle: string = 'Multi-Sensor Look Angles';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div class="row"></div>
     <div class="row">

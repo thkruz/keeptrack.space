@@ -12,8 +12,8 @@ import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 export class DateTimeManager extends KeepTrackPlugin {
   dependencies_ = [TopMenu.name];
   isEditTimeOpen = false;
-  divContainerId = 'datetime';
-  dateTimeInputTbId = 'datetime-input-tb';
+  private dateTimeContainerId_ = 'datetime';
+  private dateTimeInputTbId_ = 'datetime-input-tb';
 
   init(): void {
     super.init();
@@ -49,7 +49,7 @@ export class DateTimeManager extends KeepTrackPlugin {
 
   updateDateTime(date: Date) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
-    const dateTimeInputTbDOM = $(`#${this.dateTimeInputTbId}`);
+    const dateTimeInputTbDOM = $(`#${this.dateTimeInputTbId_}`);
     // TODO: remove this check when jest is fixed
 
     if (dateTimeInputTbDOM && !isThisNode()) {
@@ -64,7 +64,7 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     if (!this.isEditTimeOpen) {
       const datetimeInput = getEl('datetime-input');
-      const datetimeInputTb = getEl(this.dateTimeInputTbId);
+      const datetimeInputTb = getEl(this.dateTimeInputTbId_);
 
       if (datetimeInput && datetimeInputTb) {
         datetimeInput.style.display = 'block';
@@ -82,11 +82,11 @@ export class DateTimeManager extends KeepTrackPlugin {
       keepTrackApi.html`
           <div id="nav-mobile">
             <div id="jday"></div>
-            <div id="${this.divContainerId}">
+            <div id="${this.dateTimeContainerId_}">
               <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>
               <div id="datetime-input">
                 <form id="datetime-input-form">
-                  <input type="text" id="${this.dateTimeInputTbId}" readonly="true" />
+                  <input type="text" id="${this.dateTimeInputTbId_}" readonly="true" />
                 </form>
               </div>
             </div>
@@ -156,7 +156,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     let selectedDate: Date;
 
     if (!jestOverride) {
-      selectedDate = $(`#${this.dateTimeInputTbId}`).datepicker('getDate');
+      selectedDate = $(`#${this.dateTimeInputTbId_}`).datepicker('getDate');
     } else {
       selectedDate = jestOverride;
     }

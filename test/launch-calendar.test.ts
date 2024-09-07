@@ -24,6 +24,7 @@ describe('launch_calendar_plugin', () => {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
     jest.advanceTimersByTime(4000);
-    expect(() => launchCalendarPlugin.closeColorbox_()).not.toThrow();
+    // eslint-disable-next-line dot-notation
+    expect(() => launchCalendarPlugin['closeColorbox_']()).not.toThrow();
   });
 });

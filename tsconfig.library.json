@@ -1,0 +1,46 @@
+/**
+ * This is the tsconfig extension that only applies to webpack.
+ */
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./lib", /* Redirect output structure to the directory. */
+    "declaration": true,
+    "declarationMap": true,
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.png",
+    "src/**/*.mp3",
+    "src/**/*.jpg",
+    "test/**/*.ts",
+    "test/**/*.tsx",
+    "test/**/*.js",
+    "test/**/*.jsx",
+    "test/**/*.png",
+    "test/**/*.mp3",
+    "test/**/*.jpg",
+  ],
+  "exclude": [
+    "node_modules/**/*",
+    "dist/**/*",
+    "src/admin/**/*",
+    "embed/**/*",
+    "lib/**/*",
+    "coverage/**/*",
+    "tsconfig.json",
+    "src/tools/**/*",
+    "test/**/*",
+    "src/plugins/startAnalytics.js"
+  ],
+  "filesGlob": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.png",
+    "src/**/*.jpg",
+    "!**/node_modules/**"
+  ]
+}

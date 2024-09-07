@@ -5,6 +5,7 @@ import './collisions.css';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
+import i18next from 'i18next';
 import { keepTrackApi } from '../../keepTrackApi';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -29,14 +30,13 @@ export interface CollisionEvent {
 }
 
 export class Collissions extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   private readonly collisionDataSrc = './tle/SOCRATES.json';
   private selectSatIdOnCruncher_: number | null = null;
   private collisionList_ = <CollisionEvent[]>[];
 
   bottomIconElementName: string = 'menu-satellite-collision';
   bottomIconImg = collissionsPng;
-  bottomIconLabel: string = 'Collisions';
   sideMenuElementName: string = 'collisions-menu';
   sideMenuElementHtml = keepTrackApi.html`
   <div id="collisions-menu" class="side-menu-parent start-hidden text-select">
@@ -47,11 +47,6 @@ export class Collissions extends KeepTrackPlugin {
       </div>
     </div>
   </div>`;
-
-  helpTitle = 'Collisions Menu';
-  helpBody = keepTrackApi.html`The Collisions Menu shows satellites with a high probability of collision.
-  <br><br>
-  Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision.`;
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
@@ -115,7 +110,7 @@ export class Collissions extends KeepTrackPlugin {
           this.createTable_();
 
           if (this.collisionList_.length === 0) {
-            errorManagerInstance.warn('No collisions data found!');
+            errorManagerInstance.warn(i18next.t('errorMsgs.Collissions.noCollisionsData'));
           }
         });
       });
@@ -147,7 +142,7 @@ export class Collissions extends KeepTrackPlugin {
 
       this.createBody_(tbl);
     } catch (e) {
-      errorManagerInstance.warn('Error processing SOCRATES data!');
+      errorManagerInstance.warn(i18next.t('errorMsgs.Collissions.errorProcessingCollisions'));
     }
   }
 

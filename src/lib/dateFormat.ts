@@ -3,7 +3,7 @@
  *
  * dateFormat.ts is a standalone library that accepts a date, a mask, or a date
  * and a mask, and returns a formatted version of the given date.
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2007-2009 Steven Levithan <stevenlevithan.com>
@@ -205,7 +205,7 @@ const pad = function (num: number, length: number): string {
  * @returns A formatted string representing the date according to the specified mask.
  * @throws SyntaxError if the provided date is invalid.
  */
-export const dateFormat = function (date: string | Date, mask: string, utc: boolean = false) {
+export const dateFormat = function (date: string | Date, mask: string, utc = false) {
   if (typeof date === 'string' && !(/\d/u).test(date)) {
     mask = date;
     date = null;

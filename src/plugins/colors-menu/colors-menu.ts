@@ -10,10 +10,9 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class ColorMenu extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   bottomIconImg = colorsPng;
   bottomIconElementName: string = 'menu-color-scheme';
-  bottomIconLabel: string = 'Color Schemes';
   sideMenuElementName: string = 'color-scheme-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
@@ -38,16 +37,8 @@ export class ColorMenu extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  helpTitle = 'Colors Menu';
-
-  helpBody = keepTrackApi.html`The Colors Menu is a place to change the color theme used to render the objects.
-<br><br>
-The various themes can change the colors based on the objects' orbits, objects' characteristics, or the objects' relation to sun and/or earth.
-`;
-
   rmbL1ElementName = 'colors-rmb';
-  rmbL1Html = keepTrackApi.html`
-  <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Color Scheme &#x27A4;</a></li>`;
+  rmbL1Html = keepTrackApi.html`<li class="rmb-menu-item" id="${this.rmbL1ElementName}"><a href="#">Color Scheme &#x27A4;</a></li>`;
 
   isRmbOnEarth = true;
   isRmbOffEarth = true;
@@ -232,4 +223,3 @@ The various themes can change the colors based on the objects' orbits, objects' 
   };
 }
 
-export const colorMenuPlugin = new ColorMenu();

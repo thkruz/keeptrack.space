@@ -1,6 +1,6 @@
 {
   "name": "keeptrack.space",
-  "version": "10.0.2",
+  "version": "10.1.0-2",
   "type": "module",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
@@ -22,14 +22,22 @@
   "publishConfig": {
     "access": "public"
   },
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "lib/workers"
+  ],
   "scripts": {
     "build": "node ./scripts/build.mjs production",
+    "build:lib": "node ./scripts/build-library.mjs library && tsc -p tsconfig.library.json --emitDeclarationOnly",
     "build:watch": "node ./scripts/build.mjs development --watch",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs -o ./docs/CHANGELOG.md",
     "cypress:open": "cypress open",
     "lcov": "node ./scripts/openLcov.mjs",
     "lint": "eslint . --ignore-path .gitignore --ext js,ts,tsx",
-    "createtest": "npx ts-node ./scripts/create-test-file.ts",
+    "createtest": "npx tsx ./scripts/create-test-file.ts",
     "start": "npx serve ./dist -l 8080",
     "start:ci": "npx serve ./dist -l 8080",
     "start:ci2": "http-server --entry-file=dist/index.html",
@@ -37,10 +45,11 @@
     "test:unit": "jest --coverage",
     "test:e2e-ci": "cypress run",
     "test:watch": "jest --coverage --watchAll",
+    "prepublishOnly": "npm run build:lib",
     "version:major": "npm version major && npm run changelog",
     "version:minor": "npm version minor && npm run changelog",
     "version:patch": "npm version patch && npm run changelog",
-    "prepare": "husky install"
+    "husky": "husky install"
   },
   "chromium-args": "--enable-threaded-compositing",
   "nyc": {
@@ -67,7 +76,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thkruz/keeptrack.space"
+    "url": "git+https://github.com/thkruz/keeptrack.space.git"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
@@ -117,6 +126,7 @@
     "mini-css-extract-plugin": "^2.7.6",
     "mkdirp": "^3.0.1",
     "opener": "^1.5.2",
+    "papaparse": "^5.4.1",
     "prettier-plugin-organize-imports": "^3.2.3",
     "retire": "^4.3.1",
     "serve": "^14.2.1",
@@ -124,10 +134,12 @@
     "style-loader": "^3.3.4",
     "ts-jest": "^29.1.1",
     "ts-loader": "^9.4.4",
+    "tsx": "^4.19.0",
     "typescript": "^5.2.2",
     "webgl-lint": "^1.11.3",
     "webgl-mock": "^0.1.7",
     "webpack": "^5.93.0",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
     "webpackbar": "^5.0.2",
     "worker-loader": "^3.0.8"
@@ -136,7 +148,6 @@
     "@analytics/google-analytics": "^1.0.7",
     "@materializecss/materialize": "^1.2.2",
     "analytics": "^0.8.14",
-    "axios": "^1.7.4",
     "draggabilly": "^3.0.0",
     "draggy": "^1.6.6",
     "echarts": "^5.4.3",
@@ -146,17 +157,15 @@
     "file-saver": "^2.0.5",
     "gl-matrix": "^3.4.3",
     "gremlins.js": "^2.2.0",
+    "i18next": "^23.14.0",
+    "i18next-browser-languagedetector": "^8.0.0",
     "jquery": "^3.7.1",
     "jquery-ui-bundle": "^1.12.1-migrate",
     "material-icons": "^1.13.12",
-    "meeusjs": "^1.0.4",
     "new-github-issue-url": "^1.0.0",
-    "node-fetch": "^3.3.2",
     "numeric": "^1.2.6",
     "ootk": "^4.0.2",
-    "papaparse": "^5.4.1",
     "resizable": "^1.2.1",
-    "ts-node": "^10.9.1",
     "urlon": "^3.1.0",
     "uuid": "^9.0.1",
     "webgl-obj-loader": "^2.0.8"

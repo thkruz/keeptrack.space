@@ -8,8 +8,8 @@ describe('DebrisScreening_class', () => {
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
-      AutoInit: () => {},
-    };
+      AutoInit: () => { },
+    } as any;
     // debrisScreeningPlugin = new DebrisScreening();
   });
 
@@ -23,8 +23,8 @@ describe('DebrisScreening_form', () => {
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
-      AutoInit: () => {},
-    };
+      AutoInit: () => { },
+    } as any;
     debrisScreeningPlugin = new DebrisScreening();
   });
 

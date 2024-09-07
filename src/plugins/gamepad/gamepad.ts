@@ -379,4 +379,3 @@ export class GamepadPlugin {
   }
 }
 
-export const gamepadPluginInstance = new GamepadPlugin();

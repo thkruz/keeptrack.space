@@ -11,6 +11,7 @@ import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, TleLine2, ZoomValue, eci2lla } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -28,39 +29,6 @@ export class EditSat extends KeepTrackPlugin {
   isRequireSatelliteSelected = true;
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
-
-  helpTitle = 'Edit Satellite Menu';
-  helpBody = keepTrackApi.html`The Edit Satellite Menu is used to edit the satellite data.
-    <br><br>
-    <ul>
-       <li>
-           Satellite SCC# - A unique number assigned to each satellite by the US Space Force.
-       </li>
-         <li>
-            Epoch Year - The year of the satellite's last orbital update.
-        </li>
-        <li>
-            Epoch Day - The day of the year of the satellite's last orbital update.
-        </li>
-        <li>
-            Inclination - The angle between the satellite's orbital plane and the equatorial plane.
-        </li>
-        <li>
-            Right Ascension - The angle between the ascending node and the satellite's position at the time of the last orbital update.
-        </li>
-        <li>
-            Eccentricity - The amount by which the satellite's orbit deviates from a perfect circle.
-        </li>
-        <li>
-            Argument of Perigee - The angle between the ascending node and the satellite's closest point to the earth.
-        </li>
-        <li>
-            Mean Anomaly - The angle between the satellite's position at the time of the last orbital update and the satellite's closest point to the earth.
-        </li>
-        <li>
-            Mean Motion - The rate at which the satellite's mean anomaly changes.
-        </li>
-    </ul>`;
 
   sideMenuElementName = 'editSat-menu';
   sideMenuElementHtml = keepTrackApi.html`
@@ -131,9 +99,8 @@ export class EditSat extends KeepTrackPlugin {
     </div>
     `;
 
-  bottomIconElementName = 'editSat-icon';
+
   bottomIconImg = editPng;
-  bottomIconLabel = 'Edit Satellite';
   bottomIconCallback: () => void = (): void => {
     if (!this.isMenuButtonActive) {
       return;
@@ -274,7 +241,7 @@ export class EditSat extends KeepTrackPlugin {
       return;
     }
     if (evt.target.error) {
-      errorManagerInstance.warn('Error while reading file!');
+      errorManagerInstance.warn(i18next.t('errorMsgs.EditSat.errorReadingFile'));
 
       return;
     }

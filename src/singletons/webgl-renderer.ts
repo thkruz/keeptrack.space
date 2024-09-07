@@ -87,7 +87,7 @@ export class WebGLRenderer {
     return { vw, vh };
   }
 
-  private isAltCanvasSize_: boolean = false;
+  private isAltCanvasSize_ = false;
 
   render(scene: Scene, camera: Camera): void {
     if (this.isContextLost_) {
@@ -452,7 +452,7 @@ export class WebGLRenderer {
     return screenPos;
   }
 
-  resizeCanvas(isForcedResize: boolean = false) {
+  resizeCanvas(isForcedResize = false) {
     const gl = this.gl;
 
     if (!gl.canvas) {
@@ -537,6 +537,10 @@ export class WebGLRenderer {
    * Update the primary selected satellite
    */
   private updatePrimarySatellite_() {
+    if (!this.selectSatManager_) {
+      return;
+    }
+
     // If this.selectedSat_.selectedSat has changed then select it
     if (this.selectSatManager_?.selectedSat !== this.selectSatManager_?.lastSelectedSat()) {
       console.error('selectedSat has changed');

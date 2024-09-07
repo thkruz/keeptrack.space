@@ -307,6 +307,10 @@ export class MouseInput {
         .concat([toggleTimeDOM, rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
+            // If the element is hiddeen ignore the click
+            if (el.style.display === 'none') {
+              return;
+            }
             this.rmbMenuActions(e);
           });
         });
@@ -432,7 +436,7 @@ export class MouseInput {
 
     let clickSatObj: DetailedSatellite | MissileObject | null = null;
 
-    if (this.clickedSat === -1) {
+    if (this.clickedSat !== -1) {
       const obj = catalogManagerInstance.getObject(this.mouseSat);
 
       if ((obj instanceof DetailedSatellite) || (obj instanceof MissileObject)) {

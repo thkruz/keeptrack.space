@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
+import i18next from 'i18next';
 import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
 import { SensorMath } from '../static/sensor-math';
@@ -237,21 +238,21 @@ export class HoverManager {
 
   private static getLaunchYear(sat: DetailedSatellite) {
     if (sat.type === SpaceObjectType.NOTIONAL) {
-      return 'Launched: Planned';
+      return i18next.t('hoverManager.launchedPlanned');
     }
     if (sat.source === CatalogSource.VIMPEL) {
-      return 'Launched: Unknown';
+      return i18next.t('hoverManager.launchedUnknown');
     }
 
     const launchYear = parseInt(sat.intlDes.slice(2, 4));
 
     if (launchYear < 57) {
-      return `Launched: 20${launchYear}`;
+      return `${i18next.t('hoverManager.launched')}: 20${launchYear}`;
     } else if (launchYear >= 57 && launchYear < 100) {
-      return `Launched: 19${launchYear}`;
+      return `${i18next.t('hoverManager.launched')}: 19${launchYear}`;
     }
 
-    return 'Launched: Unknown';
+    return i18next.t('hoverManager.launchedUnknown');
 
   }
 

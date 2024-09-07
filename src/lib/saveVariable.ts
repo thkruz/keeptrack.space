@@ -5,14 +5,14 @@
  * and an array of objects as a text file and a CSV file respectively. The file also imports
  * saveAs function from file-saver library and errorManagerInstance singleton from
  * errorManager.ts file.
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
- * under the MIT License. Please reference http://keeptrack.space/license/thingsinspace.txt
+ * under the MIT License. Please reference https://keeptrack.space/license/thingsinspace.txt
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software

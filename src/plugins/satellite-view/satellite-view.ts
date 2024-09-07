@@ -1,7 +1,7 @@
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -26,6 +26,7 @@ import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
 import { CameraType } from '@app/singletons/camera';
 import sat3Png from '@public/img/icons/sat3.png';
+import i18next from 'i18next';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -38,10 +39,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  isRequireSatelliteSelected: boolean = true;
-
-  bottomIconElementName = 'menu-satview';
-  bottomIconLabel = 'Satellite View';
+  isRequireSatelliteSelected = true;
   bottomIconImg = sat3Png;
   isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
@@ -57,10 +55,8 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast('Select a Satellite First!', ToastMsgType.caution);
+      uiManagerInstance.toast(i18next.t('plugins.SelectSatelliteFirst'), ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
     }
   };
-
-  lastLongAudioTime = 0;
 }

@@ -4,7 +4,7 @@
  * sensorManager.ts is the primary interface between the user interface and the
  * ground based sensors.
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -24,22 +24,23 @@
  */
 
 import { sensors } from '@app/catalogs/sensors';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { openColorbox } from '@app/lib/colorbox';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
 import { getEl, setInnerHtml } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
 import { SatMath } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import i18next from 'i18next';
 import { DEG2RAD, DetailedSensor, GreenwichMeanSiderealTime, ZoomValue, spaceObjType2Str } from 'ootk';
+import { sensorGroups } from '../../catalogs/sensor-groups';
 import { keepTrackApi } from '../../keepTrackApi';
 import { Astronomy } from '../astronomy/astronomy';
 import { Planetarium } from '../planetarium/planetarium';
@@ -53,6 +54,16 @@ export class SensorManager {
 
   getSensor(): DetailedSensor | null {
     return this.currentSensors[0] ?? null;
+  }
+
+  getSensorList(list: string) {
+    for (const sensorGroup in sensorGroups) {
+      if (sensorGroups[sensorGroup].name === list) {
+        return sensorGroups[sensorGroup].list.map((sensor) => sensors[sensor]);
+      }
+    }
+
+    return [];
   }
 
   getSensorById(sensorId: number): DetailedSensor | null {
@@ -108,19 +119,6 @@ export class SensorManager {
    * and still require a primary sensor to be selected
    */
   secondarySensors = <DetailedSensor[]>[];
-  sensorListUS = [
-    sensors.CODSFS,
-    sensors.BLEAFB,
-    sensors.CAVSFS,
-    sensors.CLRSFS,
-    sensors.EGLAFB,
-    sensors.RAFFYL,
-    sensors.PITSB,
-    sensors.MITMIL,
-    sensors.KWAJALT,
-    sensors.RAFASC,
-    sensors.COBRADANE,
-  ];
 
   sensorTitle = '';
   /**
@@ -140,7 +138,7 @@ export class SensorManager {
     const sensorId = catalogManagerInstance.getSensorFromSensorName(sensor.name);
 
     if (!sensorId) {
-      errorManagerInstance.warn('Sensor not found');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SensorNotFound'));
 
       return;
     }
@@ -162,7 +160,7 @@ export class SensorManager {
         lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 1);
         break;
       default:
-        errorManagerInstance.warn('Sensor not found');
+        errorManagerInstance.warn(i18next.t('errorMsgs.SensorNotFound'));
         break;
     }
   }
@@ -322,68 +320,6 @@ export class SensorManager {
     return null;
   }
 
-  sensorListMw = Object.values(sensors).filter((sensor: DetailedSensor) =>
-    [sensors.BLEAFB, sensors.CODSFS, sensors.CAVSFS, sensors.CLRSFS, sensors.RAFFYL, sensors.PITSB].includes(sensor),
-  );
-  sensorListRus = Object.values(sensors).filter((sensor: DetailedSensor) =>
-    [
-      sensors.OLED,
-      sensors.OLEV,
-      sensors.PEC,
-      sensors.MISD,
-      sensors.MISV,
-      sensors.LEKV,
-      sensors.ARMV,
-      sensors.KALV,
-      sensors.BARV,
-      sensors.YENV,
-      sensors.ORSV,
-      sensors.STO,
-      sensors.NAK,
-    ].includes(sensor),
-  );
-  sensorListPrc = Object.values(sensors).filter((sensor: DetailedSensor) => [sensors.SHD, sensors.HEI, sensors.ZHE, sensors.XIN, sensors.PMO].includes(sensor));
-  sensorListLeoLabs = Object.values(sensors).filter((sensor: DetailedSensor) =>
-    [sensors.LEOCRSR, sensors.LEOAZORES, sensors.LEOKSR, sensors.LEOPFISR, sensors.LEOMSR].includes(sensor),
-  );
-  sensorListEsoc = Object.values(sensors).filter((sensor: DetailedSensor) =>
-    [
-      sensors.GRV,
-      sensors.TIR,
-      sensors.GES,
-      sensors.NRC,
-      sensors.PDM,
-      sensors.TRO,
-      sensors.SDT,
-      sensors.ZimLAT,
-      sensors.ZimSMART,
-      sensors.Tromso,
-      sensors.Kiruna,
-      sensors.Sodankyla,
-      sensors.Svalbard,
-    ].includes(sensor),
-  );
-  sensorListOther = Object.values(sensors).filter((sensor: DetailedSensor) => [sensors.ROC, sensors.MLS, sensors.PO, sensors.LSO, sensors.MAY].includes(sensor));
-  sensorListMda = Object.values(sensors).filter((sensor: DetailedSensor) =>
-    [sensors.COBRADANE, sensors.HARTPY, sensors.QTRTPY, sensors.KURTPY, sensors.SHATPY, sensors.KCSTPY, sensors.SBXRDR].includes(sensor),
-  );
-  sensorListSsn = Object.values(sensors).filter((sensor) => [
-    sensors.EGLAFB,
-    sensors.KWAJSPF,
-    sensors.GEODDSDGC,
-    sensors.GEODDSMAU,
-    sensors.GEODDSSOC,
-    sensors.KWAJALT,
-    sensors.KWAJMMW,
-    sensors.KWAJALC,
-    sensors.KWAJTDX,
-    sensors.MITMIL,
-    sensors.RAFASC,
-    sensors.GLBII,
-    sensors.HOLCBAND,
-    sensors.HOLSST,
-  ].includes(sensor));
-
   setSensor(selectedSensor: DetailedSensor | string | null, sensorId?: number): void {
     if (!selectedSensor) {
       selectedSensor = SensorManager.getSensorFromsensorId(sensorId);
@@ -402,28 +338,6 @@ export class SensorManager {
       // No sensor selected
       this.sensorTitle = '';
       this.currentSensors = [];
-    } else if (selectedSensor === 'SSN') {
-      this.sensorTitle = 'All Space Surveillance Network Sensors';
-      this.currentSensors = this.sensorListSsn;
-      SensorManager.updateSensorUiStyling(this.currentSensors);
-    } else if (selectedSensor === 'NATO-MW') {
-      this.sensorTitle = 'All Missile Warning Sensors';
-      this.currentSensors = this.sensorListMw;
-    } else if (selectedSensor === 'RUS-ALL') {
-      this.sensorTitle = 'All Russian Sensors';
-      this.currentSensors = this.sensorListRus;
-    } else if (selectedSensor === 'PRC-ALL') {
-      this.sensorTitle = 'All Chinese Sensors';
-      this.currentSensors = this.sensorListPrc;
-    } else if (selectedSensor === 'LEO-LABS') {
-      this.sensorTitle = 'All LEO Labs Sensors';
-      this.currentSensors = this.sensorListLeoLabs;
-    } else if (selectedSensor === 'ESOC-ALL') {
-      this.sensorTitle = 'All ESOC Sensors';
-      this.currentSensors = this.sensorListEsoc;
-    } else if (selectedSensor === 'MD-ALL') {
-      this.sensorTitle = 'All Missile Defense Agency Sensors';
-      this.currentSensors = this.sensorListMda;
     } else if ((<DetailedSensor>selectedSensor)?.name === 'Custom Sensor') {
       this.currentSensors = [<DetailedSensor>selectedSensor];
 
@@ -450,41 +364,60 @@ export class SensorManager {
 
       this.sensorTitle = this.currentSensors[0].name;
     } else {
+      let isSensorFound = false;
+
+      for (const sensorGroup of sensorGroups) {
+        if (sensorGroup.name === selectedSensor) {
+          this.sensorTitle = sensorGroup.header;
+          this.currentSensors = sensorGroup.list.map((sensor) => {
+            if (sensors[sensor] instanceof DetailedSensor) {
+              return sensors[sensor];
+            }
+
+            return null;
+          }).filter((sensor) => sensor !== null) as DetailedSensor[];
+          isSensorFound = true;
+          break;
+        }
+      }
+
       // Look through all known sensors
-      for (const sensor in sensors) {
-        /*
-         * TODO: Require explicit sensor selection!
-         * If this is the sensor we selected
-         */
-        const isMatchString = typeof selectedSensor === 'string' && sensors[sensor].objName === selectedSensor;
-        const isMatchObj = typeof selectedSensor !== 'string' && sensors[sensor] === selectedSensor;
-        const isMatchsensorId = typeof sensorId !== 'undefined' && sensors[sensor].sensorId === sensorId;
+      if (!isSensorFound) {
+        for (const sensor in sensors) {
+          /*
+           * TODO: Require explicit sensor selection!
+           * If this is the sensor we selected
+           */
+          const isMatchString = typeof selectedSensor === 'string' && sensors[sensor].objName === selectedSensor;
+          const isMatchObj = typeof selectedSensor !== 'string' && sensors[sensor] === selectedSensor;
+          const isMatchsensorId = typeof sensorId !== 'undefined' && sensors[sensor].sensorId === sensorId;
 
-        if (isMatchString || isMatchObj || isMatchsensorId) {
-          this.currentSensors = [sensors[sensor]];
+          if (isMatchString || isMatchObj || isMatchsensorId) {
+            this.currentSensors = [sensors[sensor]];
 
-          // TODO: This should all be in the sensor plugin instead
-          const sensorInfoTitleDom = getEl('sensor-info-title', true);
+            // TODO: This should all be in the sensor plugin instead
+            const sensorInfoTitleDom = getEl('sensor-info-title', true);
 
-          if (sensorInfoTitleDom) {
-            sensorInfoTitleDom.innerHTML = `<a href=''>${this.currentSensors[0].name}</a>`;
-            const url = this.currentSensors[0].url;
+            if (sensorInfoTitleDom) {
+              sensorInfoTitleDom.innerHTML = `<a href=''>${this.currentSensors[0].name}</a>`;
+              const url = this.currentSensors[0].url;
 
-            if (url && url.length > 0) {
-              sensorInfoTitleDom.addEventListener('click', () => {
-                openColorbox(url);
-              });
+              if (url && url.length > 0) {
+                sensorInfoTitleDom.addEventListener('click', () => {
+                  openColorbox(url);
+                });
+              }
+
+              if (this.currentSensors[0].type) {
+                setInnerHtml('sensor-type', spaceObjType2Str(this.currentSensors[0].type));
+              } else {
+                setInnerHtml('sensor-type', 'Unknown Sensor');
+              }
+              setInnerHtml('sensor-country', this.currentSensors[0].country);
             }
 
-            if (this.currentSensors[0].type) {
-              setInnerHtml('sensor-type', spaceObjType2Str(this.currentSensors[0].type));
-            } else {
-              setInnerHtml('sensor-type', 'Unknown Sensor');
-            }
-            setInnerHtml('sensor-country', this.currentSensors[0].country);
+            this.sensorTitle = this.currentSensors[0].name;
           }
-
-          this.sensorTitle = this.currentSensors[0].name;
         }
       }
     }
@@ -556,7 +489,7 @@ export class SensorManager {
         (getEl('reset-sensor-button') as HTMLButtonElement).disabled = true;
       }
     } catch (error) {
-      errorManagerInstance.warn('Error updating sensor UI styling');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SensorManager.errorUpdatingUi'));
     }
   }
 
@@ -586,7 +519,7 @@ export class SensorManager {
     const sensor = sensors[0];
 
     if (!sensor) {
-      throw new Error('Sensor not found');
+      throw new Error(i18next.t('errorMsgs.SensorNotFound'));
     }
 
     const { gmst } = SatMath.calculateTimeVariables(now);

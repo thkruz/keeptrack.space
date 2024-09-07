@@ -1,7 +1,7 @@
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -30,7 +30,7 @@ import { SensorListPlugin } from '../sensor-list/sensor-list';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 
 export class SensorFov extends KeepTrackPlugin {
-  protected dependencies_: string[] = [SensorListPlugin.name];
+  dependencies_: string[] = [SensorListPlugin.name];
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
       this.disableFovView();
@@ -39,8 +39,7 @@ export class SensorFov extends KeepTrackPlugin {
     }
   };
 
-  bottomIconElementName = 'menu-sensor-fov';
-  bottomIconLabel = 'Sensor FOV';
+
   bottomIconImg = fovPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
@@ -87,7 +86,7 @@ export class SensorFov extends KeepTrackPlugin {
     this.setBottomIconToUnselected(false);
   }
 
-  public enableFovView() {
+  enableFovView() {
     keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
 
     this.setBottomIconToSelected();

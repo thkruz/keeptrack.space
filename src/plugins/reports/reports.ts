@@ -4,7 +4,7 @@
  * reports.ts is a plugin for generating quick reports in text format of various
  * satellite and sensor data
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -30,6 +30,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import analysisPng from '@public/img/icons/reports.png';
 
 
+import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -53,8 +54,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   isRequireSatelliteSelected = true;
 
-  bottomIconElementName = 'menu-reports';
-  bottomIconLabel = 'Reports';
+
   bottomIconImg = analysisPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
@@ -82,9 +82,6 @@ export class ReportsPlugin extends KeepTrackPlugin {
     </div>
   </div>
   `;
-
-  helpTitle = 'Reports Menu';
-  helpBody = keepTrackApi.html`The Reports Menu is a collection of tools to help you analyze and understand the data you are viewing.`;
 
   dragOptions: clickDragOptions = {
     isDraggable: false,
@@ -327,7 +324,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       win.history.replaceState(null, filename, `/${filename}.txt`);
     } else {
       // eslint-disable-next-line no-alert
-      alert('Please allow popups for this site');
+      alert(i18next.t('errorMsgs.Reports.popupBlocker'));
     }
   }
 
@@ -344,13 +341,13 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const sat = this.selectSatManager_.primarySatObj as DetailedSatellite;
 
     if (!sat) {
-      errorManagerInstance.warn('Select a satellite first!');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SelectSatelliteFirst'));
 
       return null;
     }
 
     if (!(sat instanceof DetailedSatellite)) {
-      errorManagerInstance.warn('Satellite is not DetailedSatellite!');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SatelliteNotDetailedSatellite'));
 
       return null;
     }
@@ -362,7 +359,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const sensorManager = keepTrackApi.getSensorManager();
 
     if (!sensorManager.isSensorSelected()) {
-      errorManagerInstance.warn('Select a sensor first!');
+      errorManagerInstance.warn(i18next.t('errorMsgs.SelectSensorFirst'));
 
       return null;
     }

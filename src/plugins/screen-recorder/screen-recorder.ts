@@ -6,39 +6,38 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { StreamManager } from './stream-manager';
 
 export class ScreenRecorder extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   static readonly FILE_NAME = 'keeptrack.webm';
 
   bottomIconCallback = () => {
-    if (this.isCompatibilityIssue) {
+    if (this.isCompatibilityIssue_) {
       errorManagerInstance.warn('Recording unavailable due to compatibility issues!');
       this.shakeBottomIcon();
 
       return;
     }
 
-    if (this.streamManagerInstance.isVideoRecording) {
-      this.streamManagerInstance.stop();
+    if (this.streamManagerInstance_.isVideoRecording) {
+      this.streamManagerInstance_.stop();
     } else {
       try {
         this.setBottomIconToSelected();
-        this.streamManagerInstance.start();
-        this.streamManagerInstance.isVideoRecording = true;
+        this.streamManagerInstance_.start();
+        this.streamManagerInstance_.isVideoRecording = true;
       } catch (e) {
         errorManagerInstance.warn('Compatibility Error with Recording!');
-        this.streamManagerInstance.isVideoRecording = false;
+        this.streamManagerInstance_.isVideoRecording = false;
         this.setBottomIconToDisabled();
         this.shakeBottomIcon();
-        this.isCompatibilityIssue = true;
+        this.isCompatibilityIssue_ = true;
       }
     }
   };
 
-  bottomIconElementName = 'menu-record';
+
   bottomIconImg = recorderPng;
-  bottomIconLabel = 'Record Video';
-  isCompatibilityIssue = false;
-  streamManagerInstance: StreamManager;
+  private isCompatibilityIssue_ = false;
+  private streamManagerInstance_: StreamManager;
 
   addJs(): void {
     super.addJs();
@@ -48,7 +47,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
       cbName: this.constructor.name,
       cb: () => {
         try {
-          this.streamManagerInstance = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop.bind(this), this.onMinorError.bind(this), this.onError.bind(this));
+          this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));
         } catch (e) {
           console.warn(e);
         }
@@ -57,25 +56,24 @@ export class ScreenRecorder extends KeepTrackPlugin {
   }
 
   getRecorderObject(): StreamManager {
-    return this.streamManagerInstance;
+    return this.streamManagerInstance_;
   }
 
-  onError(): void {
+  private onError_(): void {
     this.setBottomIconToDisabled();
     this.isIconDisabled = true;
-    this.streamManagerInstance.isVideoRecording = false;
+    this.streamManagerInstance_.isVideoRecording = false;
     this.shakeBottomIcon();
-    this.isCompatibilityIssue = true;
+    this.isCompatibilityIssue_ = true;
   }
 
-  onMinorError(): void {
+  private onMinorError_(): void {
     this.setBottomIconToUnselected();
   }
 
-  onStop(): void {
-    this.streamManagerInstance.save(ScreenRecorder.FILE_NAME);
+  private onStop_(): void {
+    this.streamManagerInstance_.save(ScreenRecorder.FILE_NAME);
     this.setBottomIconToUnselected();
   }
 }
 
-export const screenRecorderPlugin = new ScreenRecorder();

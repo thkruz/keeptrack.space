@@ -6,9 +6,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class NightToggle extends KeepTrackPlugin {
-  protected dependencies_: string[];
-  bottomIconElementName = 'menu-day-night';
-  bottomIconLabel = 'Night Toggle';
+  dependencies_ = [];
   bottomIconImg = dayNightPng;
 
   addJs() {

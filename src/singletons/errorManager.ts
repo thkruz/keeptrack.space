@@ -1,5 +1,5 @@
 import { ToastMsgType } from '@app/interfaces';
-import { Options } from 'new-github-issue-url';
+import githubIssueUrl, { Options } from 'new-github-issue-url';
 import { keepTrackApi } from '../keepTrackApi';
 import { isThisNode } from '../static/isThisNode';
 
@@ -16,13 +16,7 @@ export class ErrorManager {
   constructor() {
     // hostname is not localhost
     if (!isThisNode() && window.location.hostname !== 'localhost') {
-      import('new-github-issue-url')
-        .then((mod) => {
-          this.newGithubIssueUrl_ = mod.default;
-        })
-        .catch(() => {
-          this.newGithubIssueUrl_ = () => '';
-        });
+      this.newGithubIssueUrl_ = githubIssueUrl;
     } else {
       this.newGithubIssueUrl_ = () => '';
       if (isThisNode()) {
@@ -81,6 +75,8 @@ ${e.stack}`,
     if (!isHideFromConsole) {
       // eslint-disable-next-line no-console
       console.warn(msg);
+      // eslint-disable-next-line no-console
+      console.trace();
     }
   }
 
@@ -93,6 +89,8 @@ ${e.stack}`,
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
       console.info(msg);
+      // eslint-disable-next-line no-console
+      console.trace();
     }
   }
 
@@ -105,6 +103,8 @@ ${e.stack}`,
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
       console.log(msg);
+      // eslint-disable-next-line no-console
+      console.trace();
     }
   }
 
@@ -119,6 +119,8 @@ ${e.stack}`,
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
       console.debug(msg);
+      // eslint-disable-next-line no-console
+      console.trace();
     }
   }
 }

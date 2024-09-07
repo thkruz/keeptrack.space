@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { Breakup } from '@app/plugins/breakup/breakup';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import * as OrbitFinderFile from '@app/singletons/orbit-finder';
@@ -27,7 +28,7 @@ describe('Breakup_class', () => {
             rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
           }) as any,
       );
-      expect(() => breakupPlugin.onSubmit_()).not.toThrow();
+      expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
     });
   });
 });

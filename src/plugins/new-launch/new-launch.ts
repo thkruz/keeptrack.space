@@ -40,8 +40,7 @@ export class NewLaunch extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('nl-inc')).value = StringPad.pad0(sat.inclination.toFixed(4), 8);
   };
 
-  bottomIconElementName = 'menu-new-launch';
-  bottomIconLabel = 'New Launch';
+
   bottomIconImg = rocketPng;
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
@@ -129,20 +128,11 @@ export class NewLaunch extends KeepTrackPlugin {
   </div>
   `;
 
-  helpTitle = 'New Launch Menu';
-  helpBody = keepTrackApi.html`The New Launch Menu is used for generating notional orbital launches by modifying existing satellites with similar parameters.
-    <br><br>
-    After selecting a satellite, you can select a launch location and a north/south azimuth.
-    The selected satellite will be modified to align it with the launch site.
-    The clock is then changed to 00:00:00 to represent relative time after the launch.
-    This can be helpful in calculating sensor coverage relative to launch time.
-    The objects relationship with other orbital objects will be incorrect.`;
-
   dragOptions: clickDragOptions = {
     isDraggable: true,
   };
 
-  isDoingCalculations: boolean = false;
+  isDoingCalculations = false;
   submitCallback: () => void = () => {
     if (this.isDoingCalculations) {
       return;

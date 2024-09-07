@@ -2,7 +2,7 @@ import { keepTrackContainer } from '@app/container';
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { soundManagerPlugin } from '@app/plugins/sounds/sound-manager';
+import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { setupMinimumHtml } from './environment/standard-env';
@@ -44,6 +44,7 @@ describe('TopMenu_class', () => {
 
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     const soundIcon = getEl('sound-icon') as HTMLImageElement;
+    const soundManagerPlugin = new SoundManager();
 
     keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerPlugin);
     const soundManager = keepTrackApi.getSoundManager();

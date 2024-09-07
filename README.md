@@ -106,7 +106,7 @@ The main draw loop (drawManager.ts) has been optimized to reduce memory leaks an
 
 Any modifications to a satellite require that information to be passed to the positionCruncher webworker to ensure the UI calculations match the dot on the screen. Most calculations utilize a brute-force method of guess and check (lookangle times, missile trajectories, etc). Optimizing the loop for those calculations is critcal to keeping the project responsive. One trick to improve performance is that satSet creates a dictionary of index -> Norad ID number and index -> COSPAR number to allow rapid lookup of satellite data.
 
-There are Typescript files for generating TLE.json that are not included, but http://keeptrack.space/tle/TLE2.json can be referenced for an up-to-date catalog.
+There are Typescript files for generating TLE.json that are not included, but https://keeptrack.space/tle/TLE2.json can be referenced for an up-to-date catalog.
 
 # Release Notes
 

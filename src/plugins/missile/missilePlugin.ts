@@ -10,7 +10,7 @@ import missilePng from '@public/img/icons/missile.png';
 
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 
-import { helpBodyTextMissile, helpTitleTextMissile } from './help';
+import { Localization } from '@app/locales/locales';
 import { missileManager, missileManager as missileManagerInstance } from './missileManager';
 
 let isMissileMenuOpen = false;
@@ -495,12 +495,14 @@ export const uiManagerInit = (): void => {
     'beforeend',
     keepTrackApi.html`
         <div id="menu-missile" class="bmenu-item">
-          <img
-            alt="missile"
-            src="" delayedsrc=${missilePng}
-          />
+          <div class="bmenu-item-inner">
+            <div class="status-icon"></div>
+            <img
+              alt="missile"
+              src="" delayedsrc=${missilePng}
+            />
+          </div>
           <span class="bmenu-title">Missile</span>
-          <div class="status-icon"></div>
         </div>
         `,
   );
@@ -571,7 +573,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isMissileMenuOpen) {
-    adviceManagerInstance.showAdvice(helpTitleTextMissile, helpBodyTextMissile);
+    adviceManagerInstance.showAdvice(Localization.plugins.Missile.title, Localization.plugins.Missile.helpBody);
 
     return true;
   }

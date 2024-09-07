@@ -3,7 +3,7 @@
  *
  * launch-calendar.ts is a plugin for viewing the launch calendar on Gunter's Space Page.
  *
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek
@@ -30,10 +30,9 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import calendarPng from '@public/img/icons/calendar.png';
 
 export class LaunchCalendar extends KeepTrackPlugin {
-  protected dependencies_: string[];
-  bottomIconElementName = 'menu-launches';
+  dependencies_ = [];
   bottomIconImg = calendarPng;
-  bottomIconLabel = 'Launch Calendar';
+  isForceHideSideMenus = true;
 
   bottomIconCallback = () => {
     if (this.isMenuButtonActive) {
@@ -49,8 +48,6 @@ export class LaunchCalendar extends KeepTrackPlugin {
     }
   };
 
-  isForceHideSideMenus = true;
-
   private closeColorbox_() {
     if (this.isMenuButtonActive) {
       this.isMenuButtonActive = false;
@@ -59,4 +56,3 @@ export class LaunchCalendar extends KeepTrackPlugin {
   }
 }
 
-export const launchCalendarPlugin = new LaunchCalendar();

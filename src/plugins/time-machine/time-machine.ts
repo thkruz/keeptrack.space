@@ -1,6 +1,5 @@
 import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import type { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { LegendManager } from '@app/static/legend-manager';
@@ -9,7 +8,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class TimeMachine extends KeepTrackPlugin {
   static readonly TIME_BETWEEN_SATELLITES = 10000;
-  protected dependencies_: string[];
+  dependencies_ = [];
 
   bottomIconCallback = () => {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
@@ -19,7 +18,7 @@ export class TimeMachine extends KeepTrackPlugin {
     if (this.isMenuButtonActive) {
       LegendManager.change('timeMachine');
       keepTrackApi.getUiManager().searchManager.hideResults();
-      getEl('menu-time-machine').classList.add('bmenu-item-selected');
+      this.setBottomIconToSelected();
       this.historyOfSatellitesPlay();
     } else {
       this.isTimeMachineRunning = false;
@@ -27,12 +26,11 @@ export class TimeMachine extends KeepTrackPlugin {
       settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
       groupManagerInstance.clearSelect();
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true); // force color recalc
-
-      getEl('menu-time-machine').classList.remove('bmenu-item-selected');
+      this.setBottomIconToUnselected();
     }
   };
 
-  bottomIconElementName = 'menu-time-machine';
+
   bottomIconImg = timeMachinePng;
   bottomIconLabel = 'Time Machine';
   historyOfSatellitesRunCount = 0;
@@ -131,4 +129,3 @@ export class TimeMachine extends KeepTrackPlugin {
   }
 }
 
-export const timeMachinePlugin = new TimeMachine();

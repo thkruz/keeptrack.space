@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { GroupsManager } from '@app/singletons/groups-manager';
@@ -41,7 +42,7 @@ describe('CountriesMenu_class', () => {
     groupManagerInstance.selectGroup = jest.fn();
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
 
-    CountriesMenu.groupSelected_('Argentina');
+    CountriesMenu['groupSelected_']('Argentina');
     expect(groupManagerInstance.selectGroup).toHaveBeenCalled();
     expect(uiManagerInstance.searchManager.doSearch).toHaveBeenCalled();
   });
@@ -65,7 +66,7 @@ describe('CountriesMenu_class', () => {
       createGroupByCountry_: jest.fn(),
     } as unknown as ObjectGroup;
     keepTrackApi.getCatalogManager().getObject = () => defaultSat;
-    CountriesMenu.groupSelected_('Argentina');
+    CountriesMenu['groupSelected_']('Argentina');
     // expect(uiManagerInstance.searchManager.fillResultBox).toHaveBeenCalled();
     expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).toHaveBeenCalledWith(-1);
   });
@@ -79,7 +80,7 @@ describe('CountriesMenu_class', () => {
     groupManagerInstance.groupList = [] as unknown as Record<string, ObjectGroup>;
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
 
-    CountriesMenu.countryMenuClick_('Argentina');
+    CountriesMenu['countryMenuClick_']('Argentina');
     expect(groupManagerInstance.createGroup).toHaveBeenCalled();
   });
 });

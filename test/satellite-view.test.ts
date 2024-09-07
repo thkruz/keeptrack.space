@@ -6,6 +6,7 @@ import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view'
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { UiManager } from '@app/singletons/uiManager';
+import i18next from 'i18next';
 import { mockCameraManager, mockUiManager } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
 
@@ -24,8 +25,6 @@ import { standardPluginSuite } from './generic-tests';
  *- addJs(): adds JS to the application by registering a callback with the KeepTrack API
  *- addHtml(): adds HTML to the application by registering a callback with the KeepTrack API
  *
- *Fields:
- *- lastLongAudioTime: a number that tracks the last time a long audio clip was played
  */
 
 describe('SatelliteViewPlugin_class', () => {
@@ -67,7 +66,7 @@ describe('SatelliteViewPlugin_class', () => {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'menu-satview');
-    expect(uiManagerInstance.toast).toHaveBeenCalledWith('Select a Satellite First!', ToastMsgType.serious, true);
+    expect(uiManagerInstance.toast).toHaveBeenCalledWith(i18next.t('plugins.SelectSatelliteFirst'), ToastMsgType.serious, true);
   });
 
   // Tests that a toast message is not displayed when a satellite is selected and trying to activate Satellite Camera Mode

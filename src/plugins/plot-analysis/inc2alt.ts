@@ -17,7 +17,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconElementName = 'inc2alt-plots-bottom-icon';
+
   bottomIconLabel = 'Inc vs Alt Plot';
   bottomIconImg = scatterPlotPng;
   bottomIconCallback = () => {

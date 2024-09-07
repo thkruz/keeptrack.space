@@ -177,13 +177,13 @@ export class CatalogLoader {
    *  This function will load the catalog, additional catalogs, and merge them together.
    *
    *  Primary Catalogs
-   *  1. TLE.json - this contains extended object information including launch location and RCS.
-   *  2. TLEdebris.json - this contains all non-payload data from TLE.json
+   *  1. tle.json - this contains extended object information including launch location and RCS.
+   *  2. tleDebris.json - this contains all non-payload data from TLE.json
    *  Secondary Catalogs
    *  1. extra.json - this contains supplemental information about the catalog in json format.
    *  2. TLE.txt - this contains a local ASCII TLE file.
    *  3. externalTLEs - this contains an external TLE file.
-   *  4. jsc-orbits.json - this contains JSC Vimpel TLE data.
+   *  4. vimpel.json - this contains JSC Vimpel TLE data.
    *
    *  The catalog is loaded in the above order appending/overwriting the information each step of the way.
    *
@@ -205,7 +205,7 @@ export class CatalogLoader {
 
       if (settingsManager.externalTLEsOnly) {
         // Load our database for the extra information - the satellites will be filtered out
-        await fetch(`${settingsManager.installDirectory}tle/TLE2.json`)
+        await fetch(settingsManager.dataSources.tle)
           .then((response) => response.json())
           .then((data) => CatalogLoader.parse({
             keepTrackTle: data,
@@ -216,7 +216,7 @@ export class CatalogLoader {
           });
       } else if (settingsManager.isUseDebrisCatalog) {
         // Load the debris catalog
-        await fetch(`${settingsManager.installDirectory}tle/TLEdebris.json`)
+        await fetch(settingsManager.dataSources.tleDebris)
           .then((response) => response.json())
           .then((data) => CatalogLoader.parse({
             keepTrackTle: data,
@@ -229,7 +229,7 @@ export class CatalogLoader {
           });
       } else {
         // Load the primary catalog
-        await fetch(`${settingsManager.installDirectory}tle/TLE2.json`)
+        await fetch(settingsManager.dataSources.tle)
           .then((response) => response.json())
           .then((data) => CatalogLoader.parse({
             keepTrackTle: data,
@@ -542,18 +542,18 @@ export class CatalogLoader {
    */
   // eslint-disable-next-line require-await
   private static async getJscCatalog_(settingsManager: SettingsManager): Promise<JsSat[]> {
-    return fetch(`${settingsManager.installDirectory}tle/jsc-orbits.json`)
+    return fetch(settingsManager.dataSources.vimpel)
       .then((response) => {
         if (response.ok) {
           return response.json();
         }
-        errorManagerInstance.warn('Error loading jsc-orbits.json');
+        errorManagerInstance.warn('Error loading vimpel.json');
 
         return [];
 
       })
       .catch(() => {
-        errorManagerInstance.warn('Error loading jsc-orbits.json');
+        errorManagerInstance.warn('Error loading vimpel.json');
       });
   }
 

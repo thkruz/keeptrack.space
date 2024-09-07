@@ -3,7 +3,7 @@
  *
  * satMath.ts an expansion library for the Orbital Object Toolkit (OOTK)
  * providing tailored functions for calculating orbital data.
- * http://keeptrack.space
+ * https://keeptrack.space
  *
  * @Copyright (C) 2016-2024 Theodore Kruczek
  * @Copyright (C) 2020-2024 Heather Kruczek

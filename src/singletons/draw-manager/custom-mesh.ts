@@ -5,7 +5,7 @@ import { mat4 } from 'gl-matrix';
 
 export abstract class CustomMesh {
   id: number = 0;
-  protected isLoaded_: boolean = false;
+  protected isLoaded_ = false;
   protected program_: WebGLProgram;
   protected vao_: WebGLVertexArrayObject;
   protected vertices_: Float32Array;

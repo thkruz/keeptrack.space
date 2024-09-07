@@ -10,6 +10,9 @@ describe('CustomSensorPlugin_class', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let customSensorPlugin: CustomSensorPlugin;
 
+  // eslint-disable-next-line no-console
+  console.debug(customSensorPlugin);
+
   beforeEach(() => {
     setupStandardEnvironment([TopMenu, DateTimeManager, SensorInfoPlugin, SensorListPlugin]);
     customSensorPlugin = new CustomSensorPlugin();

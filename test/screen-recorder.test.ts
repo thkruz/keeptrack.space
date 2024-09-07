@@ -1,3 +1,4 @@
+/* eslint-disable dot-notation */
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ScreenRecorder } from '@app/plugins/screen-recorder/screen-recorder';
@@ -19,14 +20,14 @@ describe('ScreenRecorder_class', () => {
   test('ScreenRecorder_stop_video', () => {
     websiteInit(screenRecorderPlugin);
 
-    screenRecorderPlugin.streamManagerInstance.isVideoRecording = true;
-    screenRecorderPlugin.streamManagerInstance.mediaRecorder_ = {
-      stop: () => {},
+    screenRecorderPlugin['streamManagerInstance_'].isVideoRecording = true;
+    screenRecorderPlugin['streamManagerInstance_']['mediaRecorder_'] = {
+      stop: () => { },
     } as any;
-    screenRecorderPlugin.streamManagerInstance.stream_ = {
+    screenRecorderPlugin['streamManagerInstance_']['stream_'] = {
       getTracks: () => [],
     } as any;
-    screenRecorderPlugin.streamManagerInstance.save = () => {};
+    screenRecorderPlugin['streamManagerInstance_'].save = () => { };
 
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
@@ -35,7 +36,7 @@ describe('ScreenRecorder_class', () => {
   test('ScreenRecorder_error_checking', () => {
     websiteInit(screenRecorderPlugin);
 
-    screenRecorderPlugin.streamManagerInstance.start = () => {
+    screenRecorderPlugin['streamManagerInstance_'].start = () => {
       throw new Error('test');
     };
 

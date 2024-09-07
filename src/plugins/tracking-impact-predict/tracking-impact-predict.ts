@@ -27,14 +27,12 @@ export interface TipMsg {
 }
 
 export class TrackingImpactPredict extends KeepTrackPlugin {
-  protected dependencies_: string[];
+  dependencies_ = [];
   private readonly tipDataSrc = './data/tip.json';
   private selectSatIdOnCruncher_: number | null = null;
   private tipList_ = <TipMsg[]>[];
 
-  bottomIconElementName: string = 'menu-satellite-tip';
   bottomIconImg = sputnickPng;
-  bottomIconLabel: string = 'Reentry Prediction';
   sideMenuElementName: string = 'tip-menu';
   sideMenuElementHtml = keepTrackApi.html`
   <div id="tip-menu" class="side-menu-parent start-hidden text-select">
@@ -45,20 +43,6 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
       </div>
     </div>
   </div>`;
-
-  helpTitle = 'Tracking and Impact Prediction';
-  helpBody = keepTrackApi.html`The Tracking and Impact Prediction (tip) menu displays the latest tracking and impact prediction messages for satellites.
-  The table shows the following columns:<br><br>
-  <b>NORAD</b>: The NORAD catalog ID of the satellite.<br><br>
-  <b>Decay Date</b>: The date of the predicted decay of the satellite.<br><br>
-  <b>Latitude</b>: The latitude of the satellite.<br><br>
-  <b>Longitude</b>: The longitude of the satellite.<br><br>
-  <b>Window (min)</b>: The time window in minutes for the prediction.<br><br>
-  <b>Next Report</b>: The date of the next report.<br><br>
-  <b>High Interest?</b>: Whether the satellite is of high interest.<br><br>
-
-  All data for reentries is sourced from the Tracking and Impact Prediction (TIP) messages provided by the US Space Command (USSPACECOM).
-  `;
 
   dragOptions: clickDragOptions = {
     isDraggable: true,

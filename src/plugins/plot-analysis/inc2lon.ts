@@ -17,7 +17,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconElementName = 'inc2lon-plots-bottom-icon';
+
   bottomIconLabel = 'Inc Vs Lon Plot';
   bottomIconImg = scatterPlotPng;
   bottomIconCallback = () => {

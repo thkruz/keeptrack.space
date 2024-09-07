@@ -80,6 +80,7 @@ coverage/
 # Build Folder
 dist
 embed
+lib
 
 # nyc Output
 .nyc_output
@@ -114,3 +115,5 @@ src/tools
 
 # Notes
 **/leolabs.json
+
+stats.json

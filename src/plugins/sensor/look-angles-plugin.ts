@@ -4,6 +4,7 @@ import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
+import { Localization } from '@app/locales/locales';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SensorMath, TearrData, TearrType } from '@app/static/sensor-math';
 import lookanglesPng from '@public/img/icons/lookangles.png';
@@ -37,11 +38,10 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
    */
   private lastlooksArray_: TearrData[];
 
-  isRequireSatelliteSelected: boolean = true;
-  isRequireSensorSelected: boolean = true;
+  isRequireSatelliteSelected = true;
+  isRequireSensorSelected = true;
 
-  bottomIconElementName = 'look-angles-icon';
-  bottomIconLabel = 'Look Angles';
+
   bottomIconImg = lookanglesPng;
   bottomIconCallback: () => void = () => {
     this.refreshSideMenuData_();
@@ -56,18 +56,10 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     maxWidth: 600,
   };
 
-  helpTitle = 'Look Angles Menu';
-  helpBody = keepTrackApi.html`
-    The Look Angles menu allows you to calculate the range, azimuth, and elevation angles between a sensor and a satellite.
-    A satellite and sensor must first be selected before the menu can be used.
-    <br><br>
-    The toggle only rise and set times will only calculate the rise and set times of the satellite.
-    This is useful for quickly determining when a satellite will be visible to a sensor.
-    <br><br>
-    The search range can be modified by changing the length and interval options.`;
+  helpTitle = Localization.plugins.LookAnglesPlugin.title;
+  helpBody = Localization.plugins.LookAnglesPlugin.helpBody;
 
   sideMenuElementName: string = 'look-angles-menu';
-  sideMenuTitle: string = 'Sensor Look Angles';
   sideMenuElementHtml: string = keepTrackApi.html`
     <div class="row"></div>
     <div class="row">
@@ -304,19 +296,22 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tdR.setAttribute('style', 'text-decoration: underline');
 
     for (const lookAngleRow of lookAngleData) {
-      LookAnglesPlugin.populateSideMenuRow_(tbl, tdT, lookAngleRow, timeManagerInstance, tdE, tdA, tdR, tdType);
+      LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, lookAngleRow, timeManagerInstance, tdE, tdA, tdR, tdType });
     }
   }
 
   private static populateSideMenuRow_(
-    tbl: HTMLTableElement,
-    tdT: HTMLTableCellElement,
-    lookAngleRow: TearrData,
-    timeManagerInstance: TimeManager,
-    tdE: HTMLTableCellElement,
-    tdA: HTMLTableCellElement,
-    tdR: HTMLTableCellElement,
-    tdType: HTMLTableCellElement,
+    { tbl, tdT, lookAngleRow, timeManagerInstance, tdE, tdA, tdR, tdType }:
+      {
+        tbl: HTMLTableElement;
+        tdT: HTMLTableCellElement;
+        lookAngleRow: TearrData;
+        timeManagerInstance: TimeManager;
+        tdE: HTMLTableCellElement;
+        tdA: HTMLTableCellElement;
+        tdR: HTMLTableCellElement;
+        tdType: HTMLTableCellElement;
+      },
   ) {
     if (tbl.rows.length > 0) {
       const tr = tbl.insertRow();

@@ -26,8 +26,8 @@ export const LineColors = {
 export abstract class Line {
   private vertBuf_: WebGLBuffer;
   protected color_: vec4;
-  protected isDraw_: boolean = true;
-  isGarbage: boolean = false;
+  protected isDraw_ = true;
+  isGarbage = false;
 
   constructor() {
     const gl = keepTrackApi.getRenderer().gl;

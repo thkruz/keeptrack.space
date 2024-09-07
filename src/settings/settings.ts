@@ -28,6 +28,7 @@ import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
 import { ClassificationString } from '../static/classification';
 import { isThisNode } from '../static/isThisNode';
+import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 
 export class SettingsManager {
@@ -88,6 +89,8 @@ export class SettingsManager {
 
   colors: ColorSchemeColorMap;
 
+  /** Ensures no html is injected into the page */
+  isPreventDefaultHtml = false;
   /**
    * Delay before advancing in Time Machine mode
    */
@@ -518,6 +521,18 @@ export class SettingsManager {
    */
   hoverColor = <[number, number, number, number]>[1.0, 1.0, 0.0, 1.0]; // Yellow
   installDirectory = '';
+  dataSources = {
+    /**
+     * This is where the TLEs are loaded from
+     *
+     * It was previously: ${settingsManager.installDirectory}tle/TLE2.json`
+     *
+     * It can be loaded from a local file or a remote source
+     */
+    tle: 'https://storage.keeptrack.space/data/tle.json',
+    tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
+    vimpel: 'https://storage.keeptrack.space/data/vimpel.json',
+  };
   /**
    * Determines whether or not to hide the propogation rate text on the GUI.
    */
@@ -993,7 +1008,12 @@ export class SettingsManager {
    * Indicates whether to show confidence levels when hovering over an object.
    */
   isShowConfidenceLevels = true;
-  divContainer: HTMLDivElement;
+  /**
+   * The container root element for the application
+   * NOTE: This is for initializing it, but keepTrackApi will be reerenced throughout
+   * the application when looking for the container root element
+   */
+  containerRoot: HTMLDivElement;
   /**
    * The initial zoom level for the camera.
    * 0 = earth and 1 = max distance from earth
@@ -1144,7 +1164,7 @@ export class SettingsManager {
     }
   }
 
-  init(settingsOverride?: any) {
+  init(settingsOverride?: SettingsManagerOverride) {
     this.pTime = [];
 
     this.checkIfIframe_();
@@ -1392,10 +1412,7 @@ export class SettingsManager {
                 SettingsPresets.loadPresetDebris(this);
                 break;
               case 'dark-clouds':
-                // load ./darkClouds.ts and then run it
-                import('./presets/darkClouds').then((module) => {
-                  module.darkClouds();
-                });
+                darkClouds();
                 break;
               case 'million-year':
                 SettingsPresets.loadPresetMillionYear(this);
@@ -1737,5 +1754,12 @@ export class SettingsManager {
     this.currentColorScheme = val;
   }
 }
+
+// Create a type based on the parameters of SettingsManager (ignore methods)
+export type SettingsManagerOverride = Partial<Omit<SettingsManager,
+  'exportSettingsToJSON' | 'loadOverridesFromUrl_' | 'loadLastMapTexture_' | 'setEmbedOverrides_' | 'setMobileSettings_' | 'setInstallDirectory_' | 'setColorSettings_' |
+  'checkIfIframe_' | 'initParseFromGETVariables_' | 'loadOverrides_' | 'setMobileSettings_' | 'setEmbedOverrides_' | 'loadLastMapTexture_' | 'setColorSettings_'>>;
+
+// Export the settings manager instance
 
 export const settingsManager = new SettingsManager();

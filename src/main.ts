@@ -31,10 +31,12 @@ import { KeepTrack } from './keeptrack';
 // Load the main website class
 const keepTrack = new KeepTrack(window.settingsOverride);
 
+keepTrack.init();
+
 // Expose to window for debugging
 window.keepTrack = keepTrack;
 
 // Initialize the website
 KeepTrack.initCss().then(() => {
-  keepTrack.init();
+  keepTrack.run();
 });

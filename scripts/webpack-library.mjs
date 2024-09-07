@@ -1,19 +1,23 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import webpack from 'webpack';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = `${path.dirname(__filename)}/../`;
 
 export const webpackLibraryConfig = {
   mode: 'production',
-  entry: './src/index.ts', // Adjust this to your library's entry point
+  entry: {
+    index: './src/index.ts',
+  },
   output: {
     path: path.resolve(__dirname, 'lib'),
-    filename: 'index.js',
+    filename: '[name].js',
     library: {
       type: 'module',
     },
     clean: true,
+    publicPath: 'auto',
   },
   externals: {
     /*
@@ -27,6 +31,9 @@ export const webpackLibraryConfig = {
       '@app': `${__dirname}/src`,
       '@public': `${__dirname}/public`,
       '@css': `${__dirname}/public/css`,
+    },
+    fallback: {
+      worker: false,
     },
   },
   module: {
@@ -42,8 +49,7 @@ export const webpackLibraryConfig = {
         type: 'asset/inline',
       },
       {
-        test: /\.(?:woff2|woff|ttf|eot)$/iu,
-        include: [/src/u, /public/u],
+        test: /\.(?:woff2?|eot|ttf|otf)$/iu,
         type: 'asset/inline',
       },
       {
@@ -55,6 +61,10 @@ export const webpackLibraryConfig = {
         test: /\.worker\.(?:js|ts)$/iu,
         use: {
           loader: 'worker-loader',
+          options: {
+            filename: '[name].worker.js',
+            publicPath: '/',
+          },
         },
       },
       {
@@ -74,6 +84,13 @@ export const webpackLibraryConfig = {
       '$': 'jquery',
       'jQuery': 'jquery',
       'windows.jQuery': 'jquery',
+    }),
+    new webpack.optimize.LimitChunkCountPlugin({
+      maxChunks: 1,
+    }),
+    new BundleAnalyzerPlugin(),
+    new webpack.DefinePlugin({
+      'self.__webpack_public_path__': 'window.location.origin + "/"',
     }),
   ],
   optimization: {

@@ -10,7 +10,7 @@ const opts: InitOptions = {
   },
   // lng: 'de',
   fallbackLng: 'en',
-  debug: true,
+  debug: false,
   resources: {
     de: {
       translation: de,
@@ -26,7 +26,7 @@ const opts: InitOptions = {
 
 i18next.use(LanguageDetector).init(opts);
 
-interface LocaleInformation {
+export interface LocaleInformation {
   plugins: {
     [pluginName: string]: {
       bottomIconLabel?: string;
@@ -36,7 +36,12 @@ interface LocaleInformation {
   };
 }
 
-export const English: LocaleInformation = {
+/**
+ * This function is mainly for reloading the localization object
+ * during testing
+ * @returns localization object
+ */
+export const loadLocalization = () => ({
   plugins: {
     SensorListPlugin: {
       bottomIconLabel: i18next.t('plugins.SensorListPlugin.bottomIconLabel'),
@@ -151,7 +156,7 @@ export const English: LocaleInformation = {
     SensorFov: {
       bottomIconLabel: i18next.t('plugins.SensorFov.bottomIconLabel'),
     },
-    SensorFence: {
+    SensorSurvFence: {
       bottomIconLabel: i18next.t('plugins.SensorFence.bottomIconLabel'),
     },
     SatelliteViewPlugin: {
@@ -216,4 +221,6 @@ export const English: LocaleInformation = {
       helpBody: i18next.t('plugins.VideoDirectorPlugin.helpBody'),
     },
   },
-};
+});
+
+export const Localization: LocaleInformation = loadLocalization();

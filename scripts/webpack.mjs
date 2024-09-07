@@ -105,6 +105,12 @@ export const generateConfig = (env, isWatch) => {
 
   webpackConfig.push(webWorkerConfig);
 
+  // Modify the resolve configuration to handle web worker imports
+  baseConfig.resolve.fallback = {
+    ...baseConfig.resolve.fallback,
+    worker: false,
+  };
+
   return webpackConfig;
 };
 
@@ -157,9 +163,10 @@ const getBaseConfig = (dirName) => ({
         },
       },
       {
-        test: /\.worker\.js$/iu,
-        include: [/src/u],
-        use: { loader: 'worker-loader' },
+        test: /\.worker\.(?:js|ts)$/iu,
+        use: {
+          loader: 'worker-loader',
+        },
       },
       {
         test: /\.tsx?$/u,

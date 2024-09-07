@@ -45,11 +45,9 @@ import { keepTrackContainer } from './container';
 import { KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl, hideEl } from './lib/get-el';
-import { getUnique } from './lib/get-unique';
-import { saveCsv, saveVariable } from './lib/saveVariable';
 import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from './plugins/sensor/sensorManager';
-import { settingsManager } from './settings/settings';
+import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
 import { VERSION_DATE } from './settings/versionDate.js';
 import { Camera } from './singletons/camera';
@@ -70,7 +68,6 @@ import { UiManager } from './singletons/uiManager';
 import { WebGLRenderer } from './singletons/webgl-renderer';
 import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
-import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
 import { SplashScreen } from './static/splash-screen';
 
@@ -79,12 +76,10 @@ export class KeepTrack {
   private static splashScreenImgList_ = [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, missionControlJpg, issJpg, rocket3Jpg];
 
   private isShowFPS = false;
-  public isReady = false;
+  isReady = false;
   private isUpdateTimeThrottle_: boolean;
   private lastGameLoopTimestamp_ = <Milliseconds>0;
-  public api = {
-    SatMath,
-  };
+  private settingsOverride_: SettingsManagerOverride;
 
   colorManager: ColorSchemeManager;
   demoManager: DemoManager;
@@ -102,7 +97,7 @@ export class KeepTrack {
   mainCameraInstance: Camera;
 
   constructor(
-    settingsOverride = {
+    settingsOverride: SettingsManagerOverride = {
       isPreventDefaultHtml: false,
       isShowSplashScreen: true,
     },
@@ -111,8 +106,15 @@ export class KeepTrack {
       throw new Error('KeepTrack is already started');
     }
 
-    settingsManager.init(settingsOverride);
-    if (!settingsOverride.isPreventDefaultHtml) {
+    this.settingsOverride_ = settingsOverride;
+  }
+
+  init() {
+    settingsManager.init(this.settingsOverride_);
+
+    KeepTrack.setContainerElement();
+
+    if (!this.settingsOverride_.isPreventDefaultHtml) {
       import(/* webpackMode: "eager" */ '@css/loading-screen.css');
       KeepTrack.getDefaultBodyHtml();
 
@@ -204,17 +206,6 @@ export class KeepTrack {
   }
 
   static getDefaultBodyHtml(): void {
-    const containerDom = settingsManager.divContainer ?? document.getElementById('keeptrack-root');
-
-    if (!containerDom) {
-      throw new Error('Failed to find container');
-    }
-
-    // If no current shadow DOM, create one - this is mainly for testing
-    if (!keepTrackApi.containerRoot) {
-      keepTrackApi.containerRoot = containerDom as unknown as HTMLDivElement;
-    }
-
     SplashScreen.initLoadingScreen(keepTrackApi.containerRoot);
 
     keepTrackApi.containerRoot.id = 'keeptrack-root';
@@ -267,12 +258,26 @@ export class KeepTrack {
     }
   }
 
+  private static setContainerElement() {
+    // User provides the container using the settingsManager
+    const containerDom = settingsManager.containerRoot ?? document.getElementById('keeptrack-root');
+
+    if (!containerDom) {
+      throw new Error('Failed to find container');
+    }
+
+    // If no current shadow DOM, create one - this is mainly for testing
+    if (!keepTrackApi.containerRoot) {
+      keepTrackApi.containerRoot = containerDom as unknown as HTMLDivElement;
+    }
+  }
+
   private static getFps_(dt: Milliseconds): number {
     return 1000 / dt;
   }
 
   /* istanbul ignore next */
-  public static async initCss(): Promise<void> {
+  static async initCss(): Promise<void> {
     try {
       if (!isThisNode()) {
         KeepTrack.printLogoToConsole_();
@@ -439,7 +444,7 @@ theodore.kruczek at gmail dot com.
     keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, dt);
   }
 
-  public async init(): Promise<void> {
+  async run(): Promise<void> {
     try {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
@@ -630,24 +635,8 @@ theodore.kruczek at gmail dot com.
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme); // avoid recalculating ALL colors
     }
   }
+
+  // Make the api available
+  api = keepTrackApi;
 }
 
-/**
- * Add some methods to the window object so that we can call them from the console
- *
- * NOTE: Only applies to the browser
- */
-declare global {
-  interface Window {
-    getUnique: typeof getUnique;
-    saveCsv: typeof saveCsv;
-    saveVariable: typeof saveVariable;
-  }
-}
-
-if (!isThisNode()) {
-  window.getUnique = getUnique;
-  window.saveCsv = saveCsv;
-  window.saveVariable = saveVariable;
-  window.keepTrackApi = keepTrackApi;
-}

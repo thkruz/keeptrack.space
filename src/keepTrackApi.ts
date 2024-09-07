@@ -3,6 +3,7 @@ import { AnalyticsInstance } from 'analytics';
 import { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
 import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
+import { saveCsv, saveVariable } from './lib/saveVariable';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import type { SensorManager } from './plugins/sensor/sensorManager';
 import { SoundNames } from './plugins/sounds/SoundNames';
@@ -294,6 +295,9 @@ export class KeepTrackApi {
   getHoverManager = () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager);
   getMainCamera = () => keepTrackContainer.get<Camera>(Singletons.MainCamera);
   getMeshManager = () => keepTrackContainer.get<MeshManager>(Singletons.MeshManager);
+
+  saveCsv = saveCsv;
+  saveVariable = saveVariable;
 }
 
 export const keepTrackApi = new KeepTrackApi();

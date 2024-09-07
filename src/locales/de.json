@@ -177,7 +177,7 @@
       "title": "Stereografisches Karten-Menü",
       "helpBody": "Das Stereografische Karten-Menü wird verwendet, um Satellitenbodenspuren in einer stereografischen Projektion zu visualisieren. <br/><br/> Sie können auf einen Punkt entlang der Bodenspur klicken, um die Zeit der Simulation zu ändern, wenn der Satellit diesen Punkt erreicht. <br/><br/> Die gelben Punkte zeigen an, wann der Satellit im Sichtfeld des Sensors ist. Die roten Punkte zeigen an, wann der Satellit nicht im Sichtfeld des Sensors ist. Der Punkt, der dem Satelliten am nächsten ist, ist die aktuelle Zeit."
     },
-    "SensorFov": {
+    "SensorSurvFence": {
       "bottomIconLabel": "Sensor-Sichtfeld"
     },
     "SensorFence": {

@@ -324,7 +324,7 @@ export class CatalogManager {
         }
         /* istanbul ignore next */
         try {
-          this.satCruncher = new Worker(`${settingsManager.installDirectory}js/positionCruncher.js`);
+          this.satCruncher = new Worker('./js/positionCruncher.js');
         } catch (error) {
           // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
           if (window.location.href.startsWith('file://')) {

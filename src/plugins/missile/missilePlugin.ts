@@ -10,7 +10,7 @@ import missilePng from '@public/img/icons/missile.png';
 
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 
-import { English } from '@app/locales/locales';
+import { Localization } from '@app/locales/locales';
 import { missileManager, missileManager as missileManagerInstance } from './missileManager';
 
 let isMissileMenuOpen = false;
@@ -573,7 +573,7 @@ export const init = (): void => {
 
 export const onHelpMenuClick = (): boolean => {
   if (isMissileMenuOpen) {
-    adviceManagerInstance.showAdvice(English.plugins.Missile.title, English.plugins.Missile.helpBody);
+    adviceManagerInstance.showAdvice(Localization.plugins.Missile.title, Localization.plugins.Missile.helpBody);
 
     return true;
   }

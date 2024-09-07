@@ -4,7 +4,7 @@ import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
-import { English } from '@app/locales/locales';
+import { Localization } from '@app/locales/locales';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SensorMath, TearrData, TearrType } from '@app/static/sensor-math';
 import lookanglesPng from '@public/img/icons/lookangles.png';
@@ -56,8 +56,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     maxWidth: 600,
   };
 
-  helpTitle = English.plugins.LookAnglesPlugin.title;
-  helpBody = English.plugins.LookAnglesPlugin.helpBody;
+  helpTitle = Localization.plugins.LookAnglesPlugin.title;
+  helpBody = Localization.plugins.LookAnglesPlugin.helpBody;
 
   sideMenuElementName: string = 'look-angles-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

@@ -1,5 +1,5 @@
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
-import { English } from '@app/locales/locales';
+import { Localization } from '@app/locales/locales';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import i18next from 'i18next';
 import Module from 'module';
@@ -251,10 +251,10 @@ export abstract class KeepTrackPlugin {
 
     this.sideMenuSettingsOptions.leftOffset = typeof this.sideMenuSettingsOptions.leftOffset === 'number' ? this.sideMenuSettingsOptions.leftOffset : null;
 
-    this.helpTitle = English.plugins[this.constructor.name]?.title ?? this.helpTitle ?? this.sideMenuTitle;
-    this.helpBody = English.plugins[this.constructor.name]?.helpBody ?? this.helpBody;
-    this.sideMenuTitle = English.plugins[this.constructor.name]?.title ?? this.sideMenuTitle;
-    this.bottomIconLabel = English.plugins[this.constructor.name]?.bottomIconLabel ?? this.bottomIconLabel;
+    this.helpTitle = Localization.plugins[this.constructor.name]?.title ?? this.helpTitle ?? this.sideMenuTitle;
+    this.helpBody = Localization.plugins[this.constructor.name]?.helpBody ?? this.helpBody;
+    this.sideMenuTitle = Localization.plugins[this.constructor.name]?.title ?? this.sideMenuTitle;
+    this.bottomIconLabel = Localization.plugins[this.constructor.name]?.bottomIconLabel ?? this.bottomIconLabel;
 
     if (this.bottomIconLabel) {
       const bottomIconSlug = this.bottomIconLabel.toLowerCase().replace(' ', '-');

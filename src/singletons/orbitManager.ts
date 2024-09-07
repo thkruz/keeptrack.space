@@ -223,7 +223,7 @@ export class OrbitManager {
         throw new Error('Your browser does not support web workers.');
       }
       try {
-        this.orbitWorker = new Worker(`${settingsManager.installDirectory}js/orbitCruncher.js`);
+        this.orbitWorker = new Worker('./js/orbitCruncher.js');
       } catch (error) {
         // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
         if (window.location.href.startsWith('file://')) {

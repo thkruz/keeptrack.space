@@ -180,7 +180,7 @@
     "SensorFov": {
       "bottomIconLabel": "Campo de Visión del Sensor"
     },
-    "SensorFence": {
+    "SensorSurvFence": {
       "bottomIconLabel": "Cerca del Sensor"
     },
     "SatelliteViewPlugin": {

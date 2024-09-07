@@ -1,5 +1,5 @@
 import { ToastMsgType } from '@app/interfaces';
-import { Options } from 'new-github-issue-url';
+import githubIssueUrl, { Options } from 'new-github-issue-url';
 import { keepTrackApi } from '../keepTrackApi';
 import { isThisNode } from '../static/isThisNode';
 
@@ -16,13 +16,7 @@ export class ErrorManager {
   constructor() {
     // hostname is not localhost
     if (!isThisNode() && window.location.hostname !== 'localhost') {
-      import('new-github-issue-url')
-        .then((mod) => {
-          this.newGithubIssueUrl_ = mod.default;
-        })
-        .catch(() => {
-          this.newGithubIssueUrl_ = () => '';
-        });
+      this.newGithubIssueUrl_ = githubIssueUrl;
     } else {
       this.newGithubIssueUrl_ = () => '';
       if (isThisNode()) {

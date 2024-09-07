@@ -7,7 +7,7 @@ import { GroupType } from '@app/singletons/object-group';
 import { StringExtractor } from '@app/static/string-extractor';
 import flagPng from '@public/img/icons/flag.png';
 
-import { English } from '@app/locales/locales';
+import { Localization } from '@app/locales/locales';
 import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -63,7 +63,7 @@ export class CountriesMenu extends KeepTrackPlugin {
 
   private static generateCountryList_(): string {
     const header = keepTrackApi.html`
-    <h5 class="center-align">${English.plugins.CountriesMenu.bottomIconLabel}</h5>
+    <h5 class="center-align">${Localization.plugins.CountriesMenu.bottomIconLabel}</h5>
     <li class="divider"></li>
     <br/>`;
 

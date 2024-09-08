@@ -157,7 +157,7 @@ export const loadLocalization = () => ({
       bottomIconLabel: i18next.t('plugins.SensorFov.bottomIconLabel'),
     },
     SensorSurvFence: {
-      bottomIconLabel: i18next.t('plugins.SensorFence.bottomIconLabel'),
+      bottomIconLabel: i18next.t('plugins.SensorSurvFence.bottomIconLabel'),
     },
     SatelliteViewPlugin: {
       bottomIconLabel: i18next.t('plugins.SatelliteViewPlugin.bottomIconLabel'),

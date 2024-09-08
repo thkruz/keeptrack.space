@@ -44,6 +44,7 @@ declare module '@app/interfaces' {
 }
 
 export class SettingsMenuPlugin extends KeepTrackPlugin {
+  readonly id = 'SettingsMenuPlugin';
   dependencies_ = [];
   bottomIconElementName: string = 'settings-menu-icon';
   bottomIconImg = settingsPng;
@@ -336,7 +337,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('settings-form').addEventListener('change', SettingsMenuPlugin.onFormChange_);
         getEl('settings-form').addEventListener('submit', SettingsMenuPlugin.onSubmit_);
@@ -419,7 +420,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         SettingsMenuPlugin.syncOnLoad();
       },

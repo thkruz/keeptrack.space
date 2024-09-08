@@ -21,6 +21,7 @@ import './sensor-list.css';
 // TODO: Add a search bar and filter for sensors
 
 export class SensorListPlugin extends KeepTrackPlugin {
+  readonly id = 'SensorListPlugin';
   dependencies_: string[] = [DateTimeManager.name];
   private sensorGroups_: SensorGroup[] = sensorGroups;
 
@@ -72,7 +73,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('nav-mobile')?.insertAdjacentHTML(
           'beforeend',
@@ -88,7 +89,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {
           keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
@@ -122,7 +123,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
@@ -169,7 +170,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         if (settingsManager.isMobileModeEnabled) {
           return;
@@ -202,7 +203,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
           SensorListPlugin.reloadLastSensor_();

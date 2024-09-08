@@ -27,6 +27,7 @@ export interface TipMsg {
 }
 
 export class TrackingImpactPredict extends KeepTrackPlugin {
+  readonly id = 'TrackingImpactPredict';
   dependencies_ = [];
   private readonly tipDataSrc = './data/tip.json';
   private selectSatIdOnCruncher_: number | null = null;
@@ -61,13 +62,13 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.uiManagerFinal_.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         if (this.selectSatIdOnCruncher_ !== null) {
           // If selectedSatManager is loaded, set the selected sat to the one that was just added

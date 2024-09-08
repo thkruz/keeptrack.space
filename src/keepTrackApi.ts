@@ -209,8 +209,8 @@ export class KeepTrackApi {
    * @returns The plugin with the specified name, or null if not found.
    */
   getPluginByName<T extends KeepTrackPlugin>(pluginName: string): T | null {
-    if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin.constructor.name === pluginName)) {
-      return this.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin.constructor.name === pluginName) as T;
+    if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin.id === pluginName)) {
+      return this.loadedPlugins.find((plugin: KeepTrackPlugin) => plugin.id === pluginName) as T;
     }
 
     return null;

@@ -7,6 +7,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
  * The main website now covers all of this functionality.
  */
 export class AboutMenu extends KeepTrackPlugin {
+  readonly id = 'AboutMenu';
   dependencies_ = [];
 
   bottomIconImg = aboutPng;

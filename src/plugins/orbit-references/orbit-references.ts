@@ -10,6 +10,7 @@ import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class OrbitReferences extends KeepTrackPlugin {
+  readonly id = 'OrbitReferences';
   dependencies_: string[] = [SatInfoBox.name, SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -26,7 +27,7 @@ export class OrbitReferences extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj?: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {

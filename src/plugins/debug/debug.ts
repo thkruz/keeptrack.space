@@ -15,6 +15,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class DebugMenuPlugin extends KeepTrackPlugin {
+  readonly id = 'DebugMenuPlugin';
   dependencies_ = [];
   isErudaVisible = false;
   bottomIconImg = debugPng;
@@ -93,7 +94,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (): void => {
         getEl('debug-console')?.addEventListener('click', () => {
           if (this.isErudaVisible) {
@@ -151,7 +152,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateLoop,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (): void => {
         if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) {
           return;

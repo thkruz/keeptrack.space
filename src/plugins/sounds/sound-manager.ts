@@ -63,6 +63,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from './SoundNames';
 
 export class SoundManager extends KeepTrackPlugin {
+  readonly id = 'SoundManager';
   dependencies_ = [];
   lastLongAudioTime = 0;
   isMute = false;
@@ -153,7 +154,7 @@ export class SoundManager extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         this.voices = speechSynthesis.getVoices();
       },

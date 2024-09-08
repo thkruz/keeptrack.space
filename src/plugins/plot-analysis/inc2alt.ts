@@ -9,6 +9,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Inc2AltPlots extends KeepTrackPlugin {
+  readonly id = 'Inc2AltPlots';
   dependencies_: string[] = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 

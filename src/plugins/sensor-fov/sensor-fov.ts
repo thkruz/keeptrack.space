@@ -30,6 +30,7 @@ import { SensorListPlugin } from '../sensor-list/sensor-list';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 
 export class SensorFov extends KeepTrackPlugin {
+  readonly id = 'SensorFov';
   dependencies_: string[] = [SensorListPlugin.name];
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
@@ -50,7 +51,7 @@ export class SensorFov extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sensor: Sensor | string): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
@@ -66,7 +67,7 @@ export class SensorFov extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sensor: Sensor): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
@@ -82,7 +83,7 @@ export class SensorFov extends KeepTrackPlugin {
   }
 
   disableFovView() {
-    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.constructor.name);
+    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.id);
     this.setBottomIconToUnselected(false);
   }
 

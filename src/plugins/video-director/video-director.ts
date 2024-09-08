@@ -36,6 +36,7 @@ declare module '@app/interfaces' {
 }
 
 export class VideoDirectorPlugin extends KeepTrackPlugin {
+  readonly id = 'VideoDirectorPlugin';
   dependencies_ = [];
   isRotateL = true;
   isRotateR = false;
@@ -159,7 +160,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('video-director-form').addEventListener('change', VideoDirectorPlugin.onFormChange);
         getEl('video-director-form').addEventListener('submit', VideoDirectorPlugin.onSubmit);

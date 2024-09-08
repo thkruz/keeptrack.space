@@ -10,6 +10,7 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class ColorMenu extends KeepTrackPlugin {
+  readonly id = 'ColorMenu';
   dependencies_ = [];
   bottomIconImg = colorsPng;
   bottomIconElementName: string = 'menu-color-scheme';
@@ -100,7 +101,7 @@ export class ColorMenu extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('colors-menu')
           .querySelectorAll('li')

@@ -29,6 +29,7 @@ import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
 
 export class SensorSurvFence extends KeepTrackPlugin {
+  readonly id = 'SensorSurvFence';
   dependencies_: string[] = [SensorListPlugin.name];
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
@@ -53,7 +54,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sensor: Sensor | string): void => {
         if (sensor) {
           this.setBottomIconToEnabled();
@@ -65,7 +66,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sensor: Sensor): void => {
         if (sensor) {
           this.setBottomIconToEnabled();

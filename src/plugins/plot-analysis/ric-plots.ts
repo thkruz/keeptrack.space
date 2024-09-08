@@ -13,6 +13,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 type EChartsOption = echarts.EChartsOption;
 
 export class RicPlot extends KeepTrackPlugin {
+  readonly id = 'RicPlot';
   dependencies_: string[] = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -65,7 +66,7 @@ export class RicPlot extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSecondarySat,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         if (!obj || this.selectSatManager_.selectedSat === -1) {
           if (this.isMenuButtonActive) {
@@ -80,7 +81,7 @@ export class RicPlot extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         if (!obj || this.selectSatManager_.secondarySat === -1) {
           if (this.isMenuButtonActive) {

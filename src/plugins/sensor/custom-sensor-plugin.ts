@@ -20,6 +20,7 @@ import { SoundNames } from '../sounds/SoundNames';
 import { SensorInfoPlugin } from './sensor-info-plugin';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
+  readonly id = 'CustomSensorPlugin';
   dependencies_ = [];
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
@@ -230,7 +231,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         CustomSensorPlugin.httpsCheck_();
         CustomSensorPlugin.addCustomSensorFormSubmitListener();

@@ -22,6 +22,7 @@ interface SatellitePasses {
 }
 
 export class SatelliteTimeline extends KeepTrackPlugin {
+  readonly id = 'SatelliteTimeline';
   dependencies_ = [SelectSatManager.name];
   private canvas_: HTMLCanvasElement;
   private ctx_: CanvasRenderingContext2D;
@@ -117,7 +118,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
@@ -157,7 +158,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {
           return;
@@ -178,13 +179,13 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.onWatchlistUpdated_.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.resize,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.resizeCanvas_.bind(this),
     });
   }

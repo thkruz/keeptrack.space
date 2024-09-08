@@ -30,7 +30,7 @@ describe('CountriesMenu_class', () => {
   it('test_plugin_name_set_correctly', () => {
     const countriesMenu = new CountriesMenu();
 
-    expect(countriesMenu.constructor.name).toBe(CountriesMenu.name);
+    expect(countriesMenu.id).toBe(CountriesMenu.name);
   });
 
   // Tests that groupSelected selects group and populates searchDOM

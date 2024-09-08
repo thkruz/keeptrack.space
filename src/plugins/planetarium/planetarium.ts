@@ -35,6 +35,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
 
 export class Planetarium extends KeepTrackPlugin {
+  readonly id = 'Planetarium';
   dependencies_: string[];
 
   bottomIconImg = planetariumPng;
@@ -95,7 +96,7 @@ export class Planetarium extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sensor: Sensor | string): void => {
         if (sensor) {
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');

@@ -17,6 +17,7 @@ import { SatInfoBox } from './sat-info-box';
  * This is the class that manages the selection of objects.
  */
 export class SelectSatManager extends KeepTrackPlugin {
+  readonly id = 'SelectSatManager';
   dependencies_ = [];
   lastCssStyle = '';
   selectedSat = -1;
@@ -39,7 +40,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateLoop,
-      cbName: SelectSatManager.constructor.name,
+      cbName: this.id,
       cb: this.checkIfSelectSatVisible.bind(this),
     });
   }

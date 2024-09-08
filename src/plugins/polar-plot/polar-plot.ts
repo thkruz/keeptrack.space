@@ -12,6 +12,7 @@ import { SoundNames } from '../sounds/SoundNames';
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 
 export class PolarPlotPlugin extends KeepTrackPlugin {
+  readonly id = 'PolarPlotPlugin';
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
   passStartTime_: Date;
@@ -64,7 +65,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('polar-plot-save').addEventListener('click', () => {
           const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
@@ -84,7 +85,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         if (this.isMenuButtonActive) {
           this.updatePlot_();
@@ -94,7 +95,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');

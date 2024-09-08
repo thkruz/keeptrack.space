@@ -145,7 +145,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
     expect(toggleButton).toBeDefined();
 
     if (plugin.isIconDisabled || plugin.isRequireSatelliteSelected) {
-      if (plugin.constructor.name !== 'Screenshot') {
+      if (plugin.id !== 'Screenshot') {
         expect(toggleButton.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeTruthy();
       }
       expect(toggleButton.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();

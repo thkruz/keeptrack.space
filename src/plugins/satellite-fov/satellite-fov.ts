@@ -31,6 +31,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class SatelliteFov extends KeepTrackPlugin {
+  readonly id = 'SatelliteFov';
   dependencies_ = [SelectSatManager.name];
   bottomIconImg = sensorOccupiedPng;
 
@@ -158,7 +159,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('sat-fov-settings-form').addEventListener('change', this.handleFormChange_.bind(this));
         getEl('sat-fov-settings-form').addEventListener('submit', this.handleFormChange_.bind(this));
@@ -170,7 +171,7 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('reset-sat-fov-cones-button').addEventListener('click', () => {
           keepTrackApi.getScene().coneFactory.clear();

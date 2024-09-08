@@ -45,6 +45,7 @@ interface UpdateWatchlistParams {
 }
 
 export class WatchlistPlugin extends KeepTrackPlugin {
+  readonly id = 'WatchlistPlugin';
   dependencies_ = [];
   bottomIconCallback = () => {
     // The accounts for clicking the button again before the animation is done
@@ -103,13 +104,13 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.uiManagerFinal_.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.onCruncherReady_.bind(this),
     });
   }

@@ -12,6 +12,7 @@ import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class LookAnglesPlugin extends KeepTrackPlugin {
+  readonly id = 'LookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -113,7 +114,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('look-angles-length').addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
@@ -135,7 +136,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         this.checkIfCanBeEnabled_(obj);
       },
@@ -143,7 +144,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.resetSensor,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         this.checkIfCanBeEnabled_(null);
       },
@@ -154,7 +155,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         this.refreshSideMenuData_();
       },

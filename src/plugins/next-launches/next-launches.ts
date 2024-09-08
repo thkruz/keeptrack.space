@@ -31,6 +31,7 @@ export interface LaunchInfoObject {
 }
 
 export class NextLaunchesPlugin extends KeepTrackPlugin {
+  readonly id = 'NextLaunchesPlugin';
   dependencies_ = [];
   bottomIconCallback: () => void = () => {
     if (!this.isMenuButtonActive) {
@@ -70,7 +71,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('export-launch-info').addEventListener('click', () => {
           keepTrackApi.getSoundManager().play(SoundNames.EXPORT);

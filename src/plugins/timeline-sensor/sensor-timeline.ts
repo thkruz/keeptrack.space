@@ -22,6 +22,7 @@ interface SensorPasses {
 }
 
 export class SensorTimeline extends KeepTrackPlugin {
+  readonly id = 'SensorTimeline';
   dependencies_ = [SelectSatManager.name];
   private canvas_: HTMLCanvasElement;
   private ctx_: CanvasRenderingContext2D;
@@ -143,7 +144,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
@@ -183,7 +184,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {
           return;

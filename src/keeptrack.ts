@@ -39,7 +39,6 @@ import thuleJpg from '@public/img/wallpaper/thule.jpg';
 import 'material-icons/iconfont/material-icons.css';
 
 import eruda from 'eruda';
-import erudaFps from 'eruda-fps';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
 import { KeepTrackApiEvents, Singletons } from './interfaces';
@@ -559,7 +558,6 @@ theodore.kruczek at gmail dot com.
             useShadowDom: false,
             tool: ['console', 'elements'],
           });
-          eruda.add(erudaFps);
           const erudaEntryButtonDoms = keepTrackApi.containerRoot.querySelectorAll('eruda-entry-btn');
 
           if (erudaEntryButtonDoms.length > 0) {

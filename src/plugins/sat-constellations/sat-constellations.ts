@@ -11,6 +11,7 @@ import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatConstellations extends KeepTrackPlugin {
+  readonly id = 'SatConstellations';
   dependencies_: string[] = [SelectSatManager.name];
   bottomIconImg = satChngPng;
   bottomIconElementName: string = 'menu-constellations';

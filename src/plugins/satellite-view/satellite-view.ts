@@ -31,6 +31,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
+  readonly id = 'SatelliteViewPlugin';
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 

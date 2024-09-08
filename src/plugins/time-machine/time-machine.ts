@@ -7,6 +7,7 @@ import timeMachinePng from '@public/img/icons/time-machine.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class TimeMachine extends KeepTrackPlugin {
+  readonly id = 'TimeMachine';
   static readonly TIME_BETWEEN_SATELLITES = 10000;
   dependencies_ = [];
 

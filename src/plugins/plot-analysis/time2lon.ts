@@ -10,6 +10,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Time2LonPlots extends KeepTrackPlugin {
+  readonly id = 'Time2LonPlots';
   dependencies_: string[] = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 

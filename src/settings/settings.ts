@@ -1229,15 +1229,16 @@ export class SettingsManager {
 
     this.colors = {} as ColorSchemeColorMap;
     try {
-      const jsonString = PersistenceManager.getInstance().getItem(StorageKey.THIS_COLORS);
+      const jsonString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DOT_COLORS);
 
       if (jsonString) {
         this.colors = JSON.parse(jsonString);
       }
     } catch {
+      // eslint-disable-next-line no-console
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (this.colors == null || this.colors.length === 0 || this.colors.version !== '1.3.3') {
+    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.3.3') {
       this.colors = {
         version: '1.3.3',
         length: 0,
@@ -1332,7 +1333,7 @@ export class SettingsManager {
         starlinkNot: [0.8, 0.0, 0.0, 0.8],
       };
 
-      PersistenceManager.getInstance().saveItem(StorageKey.THIS_COLORS, JSON.stringify(this.colors));
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));
     }
   }
 

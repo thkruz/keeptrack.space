@@ -32,8 +32,6 @@ import { SensorMath } from './static/sensor-math';
 declare global {
   interface Window {
     settingsManager: SettingsManager;
-    jQuery: unknown;
-    $: unknown;
     gremlins: unknown;
     randomizer: unknown;
     // eslint-disable-next-line no-use-before-define

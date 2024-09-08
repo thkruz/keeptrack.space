@@ -10,8 +10,8 @@
   }
 
   #ui-datepicker-div {
-    top: var(--top-menu-height) !important; /* Override jquery-ui */
-    left: 0px !important; /* Override jquery-ui */
+    top: var(--top-menu-height) !important;
+    left: 0px !important;
     border-radius: 0px;
     bottom: unset;
     width: fit-content;

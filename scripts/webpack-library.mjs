@@ -80,11 +80,6 @@ export const webpackLibraryConfig = {
     ],
   },
   plugins: [
-    new webpack.ProvidePlugin({
-      '$': 'jquery',
-      'jQuery': 'jquery',
-      'windows.jQuery': 'jquery',
-    }),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),

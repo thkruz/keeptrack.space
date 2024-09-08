@@ -1,5 +1,48 @@
 {
+  "time": {
+    "days": {
+      "0": "Domingo",
+      "1": "Lunes",
+      "2": "Martes",
+      "3": "Miércoles",
+      "4": "Jueves",
+      "5": "Viernes",
+      "6": "Sábado"
+    },
+    "days-short": {
+      "0": "Dom",
+      "1": "Lun",
+      "2": "Mar",
+      "3": "Mié",
+      "4": "Jue",
+      "5": "Vie",
+      "6": "Sáb"
+    },
+    "months": {
+      "1": "Enero",
+      "2": "Febrero",
+      "3": "Marzo",
+      "4": "Abril",
+      "5": "Mayo",
+      "6": "Junio",
+      "7": "Julio",
+      "8": "Agosto",
+      "9": "Septiembre",
+      "10": "Octubre",
+      "11": "Noviembre",
+      "12": "Diciembre"
+    },
+    "calendar": {
+      "time": "Hora",
+      "hour": "Hora",
+      "minute": "Minuto",
+      "second": "Segundo",
+      "now": "Ahora",
+      "done": "Hecho"
+    }
+  },
   "errorMsgs": {
+    "catalogNotFullyInitialized": "El catálogo no se ha inicializado completamente todavía. Por favor, espere unos segundos e intente de nuevo.",
     "sensorGroupsApiEmpty": "No se encontraron grupos de sensores en la API, volviendo a la base de datos de grupos de sensores incluida.",
     "SelectSensorFirst": "¡Seleccione un sensor primero!",
     "SelectSatelliteFirst": "¡Seleccione un satélite primero!",

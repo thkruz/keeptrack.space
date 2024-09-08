@@ -21,6 +21,7 @@ interface DiscvrResponse {
 }
 
 export class SatellitePhotos extends KeepTrackPlugin {
+  readonly id = 'SatellitePhotos';
   protected dependencies_: string[] = [SelectSatManager.name];
   discvrPhotos_: { imageUrl: string; lat: Degrees; lon: Degrees }[] = [];
 
@@ -44,7 +45,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('meteosat9-link').addEventListener('click', () => {
           // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
@@ -68,7 +69,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onKeepTrackReady,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         this.initDISCOVR_();
       },

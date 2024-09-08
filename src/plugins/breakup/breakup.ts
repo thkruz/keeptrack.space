@@ -16,6 +16,7 @@ import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Breakup extends KeepTrackPlugin {
+  readonly id = 'Breakup';
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -138,7 +139,7 @@ export class Breakup extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('breakup').addEventListener('submit', (e: Event) => {
           e.preventDefault();
@@ -149,7 +150,7 @@ export class Breakup extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sat: BaseObject) => {
         if (!sat?.isSatellite()) {
           if (this.isMenuButtonActive) {

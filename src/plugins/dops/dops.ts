@@ -13,6 +13,7 @@ import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class DopsPlugin extends KeepTrackPlugin {
+  readonly id = 'DopsPlugin';
   dependencies_ = [];
 
   bottomIconLabel = 'View DOPs';
@@ -142,7 +143,7 @@ export class DopsPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('dops-form').addEventListener('submit', (e: Event) => {
           e.preventDefault();

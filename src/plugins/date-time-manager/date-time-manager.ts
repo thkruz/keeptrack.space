@@ -10,6 +10,7 @@ import { TopMenu } from '../top-menu/top-menu';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 
 export class DateTimeManager extends KeepTrackPlugin {
+  readonly id = 'DateTimeManager';
   dependencies_ = [TopMenu.name];
   isEditTimeOpen = false;
   private dateTimeContainerId_ = 'datetime';
@@ -20,25 +21,25 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.uiManagerInit.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.uiManagerFinal.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateDateTime,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.updateDateTime.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateSelectBox,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
 

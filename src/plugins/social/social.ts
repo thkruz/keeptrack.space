@@ -6,12 +6,13 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 
 export class SocialMedia extends KeepTrackPlugin {
+  readonly id = 'SocialMedia';
   dependencies_ = [TopMenu.name];
   addHtml() {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: SocialMedia.uiManagerFinal_,
     });
   }

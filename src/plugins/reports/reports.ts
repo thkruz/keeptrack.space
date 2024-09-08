@@ -44,6 +44,7 @@ interface ReportData {
 }
 
 export class ReportsPlugin extends KeepTrackPlugin {
+  readonly id = 'ReportsPlugin';
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -92,7 +93,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('aer-report-btn').addEventListener('click', () => this.generateAzElRng_());
         getEl('coes-report-btn').addEventListener('click', () => this.generateClasicalOrbElJ2000_());
@@ -103,7 +104,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         if (obj?.isSatellite()) {
           getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');

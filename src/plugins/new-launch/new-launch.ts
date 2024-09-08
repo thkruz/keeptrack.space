@@ -18,6 +18,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class NewLaunch extends KeepTrackPlugin {
+  readonly id = 'NewLaunch';
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -268,7 +269,7 @@ export class NewLaunch extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl(`${this.sideMenuElementName}-form`).addEventListener('change', () => {
           const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
@@ -283,7 +284,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         if (obj?.isSatellite()) {
           const sat = obj as DetailedSatellite;

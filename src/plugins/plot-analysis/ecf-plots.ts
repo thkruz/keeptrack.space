@@ -12,6 +12,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 type EChartsOption = echarts.EChartsOption;
 
 export class EcfPlot extends KeepTrackPlugin {
+  readonly id = 'EcfPlot';
   dependencies_: string[] = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -61,7 +62,7 @@ export class EcfPlot extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sat: BaseObject) => {
         // This runs no matter what
         if (sat) {

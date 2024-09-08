@@ -49,6 +49,7 @@ interface GroundTracePoint {
 }
 
 export class StereoMap extends KeepTrackPlugin {
+  readonly id = 'StereoMap';
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -93,7 +94,7 @@ export class StereoMap extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         this.canvas_ = <HTMLCanvasElement>getEl('map-2d');
 
@@ -123,13 +124,13 @@ export class StereoMap extends KeepTrackPlugin {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.onCruncherMessage_.bind(this),
     });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {
           return;

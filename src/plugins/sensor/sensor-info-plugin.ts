@@ -10,6 +10,7 @@ import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
+  readonly id = 'SensorInfoPlugin';
   dependencies_ = [];
   isRequireSensorSelected = true;
 
@@ -99,7 +100,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         this.addSensorToSunBtnListener_();
         this.addSensorToMoonBtnListener();
@@ -108,7 +109,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onLineAdded,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (lineManager: LineManager) => {
         this.checkIfLinesVisible_(lineManager);
       },

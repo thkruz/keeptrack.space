@@ -40,6 +40,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
  */
 
 export class AnalysisMenu extends KeepTrackPlugin {
+  readonly id = 'AnalysisMenu';
   protected dependencies_: [];
   searchStrCache_: string = null;
   bottomIconImg = analysisPng;
@@ -219,7 +220,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (sensor: DetailedSensor | string) => {
         AnalysisMenu.setSensor_(sensor);
       },

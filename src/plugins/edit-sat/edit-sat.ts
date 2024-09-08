@@ -18,6 +18,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class EditSat extends KeepTrackPlugin {
+  readonly id = 'EditSat';
   dependencies_ = [SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -174,7 +175,7 @@ export class EditSat extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         if (!obj) {
           if (this.isMenuButtonActive) {

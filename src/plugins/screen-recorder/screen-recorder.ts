@@ -6,6 +6,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { StreamManager } from './stream-manager';
 
 export class ScreenRecorder extends KeepTrackPlugin {
+  readonly id = 'ScreenRecorder';
   dependencies_ = [];
   static readonly FILE_NAME = 'keeptrack.webm';
 
@@ -44,7 +45,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerOnReady,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         try {
           this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));

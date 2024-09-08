@@ -6,6 +6,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class NightToggle extends KeepTrackPlugin {
+  readonly id = 'NightToggle';
   dependencies_ = [];
   bottomIconImg = dayNightPng;
 
@@ -14,7 +15,7 @@ export class NightToggle extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.nightToggle,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture): void => {
         if (!this.isMenuButtonActive) {
           gl.bindTexture(gl.TEXTURE_2D, nightTexture);

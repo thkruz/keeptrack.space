@@ -37,6 +37,7 @@ export interface SearchSatParams {
 }
 
 export class FindSatPlugin extends KeepTrackPlugin {
+  readonly id = 'FindSatPlugin';
   dependencies_: string[];
   private lastResults_ = <DetailedSatellite[]>[];
 
@@ -197,7 +198,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('fbl-error').addEventListener('click', () => {
           getEl('fbl-error').style.display = 'none';
@@ -206,7 +207,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     });
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: this.uiManagerFinal_.bind(this),
     });
   }

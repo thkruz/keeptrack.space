@@ -12,6 +12,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class ShortTermFences extends KeepTrackPlugin {
+  readonly id = 'ShortTermFences';
   dependencies_: string[] = [SatInfoBox.name, SelectSatManager.name];
   private selectSatManager_: SelectSatManager;
 
@@ -84,7 +85,7 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
@@ -114,7 +115,7 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.constructor.name,
+      cbName: this.id,
       cb: () => {
         getEl('stfForm').addEventListener('submit', (e: Event) => {
           e.preventDefault();

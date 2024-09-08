@@ -54,8 +54,7 @@
     top: auto !important;
   }
   .ui-timepicker-div dl dd div {
-    width: 60px !important;
-    margin-left: -35px !important;
+    width: 150px !important;
   }
 
   #datetime-text {

@@ -1,3 +1,4 @@
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
@@ -7,14 +8,17 @@ export class Calendar {
   private calendarDate: Date;
   private simulationDate: Date | null;
   private isVisible: boolean = false;
+  private timerUntilEnabled: number | null = 10000;
+  private isCalendarEnabled: boolean = false;
 
   constructor(containerId: string) {
     this.containerId = containerId;
     this.calendarDate = new Date();
     this.simulationDate = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
 
-    this.render(this.calendarDate);
-    this.attachEvents();
+    setTimeout(() => {
+      this.isCalendarEnabled = true;
+    }, this.timerUntilEnabled);
   }
 
   private render(date?: Date): void {
@@ -216,7 +220,7 @@ export class Calendar {
   }
 
   private renderDayHeaders(): string {
-    const daysOfWeek = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
     return daysOfWeek.map((day, index) =>
@@ -255,9 +259,15 @@ export class Calendar {
 
           const jday = this.getUTCDayOfYear(new Date(this.calendarDate.getUTCFullYear(), this.calendarDate.getUTCMonth(), dayCount));
 
+          const dayCountPadded = dayCount.toString().padStart(2, '0');
+          const jdayPadded = jday.toString().padStart(3, '0');
+
           row += `
             <td class="${classes}" data-handler="selectDay" data-event="click" data-month="${this.calendarDate.getUTCMonth()}" data-year="${this.calendarDate.getUTCFullYear()}">
-              <a class="ui-state-default${isToday ? ' ui-state-highlight' : ''}${isSelected ? ' ui-state-active' : ''}" href="#">${jday}</a>
+              <a class="ui-state-default${isToday ? ' ui-state-highlight' : ''}${isSelected ? ' ui-state-active' : ''}" href="#">
+                <span class="ui-datepicker-cal-day">${dayCountPadded}</span>
+                <span class="ui-datepicker-jday">${jdayPadded}</span>
+              </a>
             </td>
           `;
           dayCount++;
@@ -410,22 +420,32 @@ export class Calendar {
 
   private selectDay(event: Event): void {
     const target = event.target as HTMLElement;
+    let dayOfYear = -1;
 
-    if (target.tagName === 'A') {
-      const dayOfYear = parseInt(target.innerText);
-
-      const selectedDate = this.getUTCDateFromDayOfYear(this.calendarDate.getUTCFullYear(), dayOfYear);
-
-      selectedDate.setUTCHours(this.simulationDate.getUTCHours());
-      selectedDate.setUTCMinutes(this.simulationDate.getUTCMinutes());
-      selectedDate.setUTCSeconds(this.simulationDate.getUTCSeconds());
-
-      this.simulationDate = new Date(selectedDate);
-
-      this.datetimeInputFormChange();
-      this.render();
-      this.attachEvents();
+    if (target.classList.contains('ui-datepicker-cal-day')) {
+      // If we pick the calendar day, find the parent, then get the second span (class === ui-datepicker-jday)
+      dayOfYear = parseInt((target.parentElement?.querySelector('.ui-datepicker-jday') as HTMLElement)?.innerText ?? '-1');
+    } else if (target.tagName === 'A') {
+      dayOfYear = parseInt((target.querySelector('.ui-datepicker-jday') as HTMLElement)?.innerText ?? '-1');
+    } else if (target.classList.contains('ui-datepicker-jday')) {
+      dayOfYear = parseInt(target.innerText);
     }
+
+    if (dayOfYear === -1) {
+      return;
+    }
+
+    const selectedDate = this.getUTCDateFromDayOfYear(this.calendarDate.getUTCFullYear(), dayOfYear);
+
+    selectedDate.setUTCHours(this.simulationDate.getUTCHours());
+    selectedDate.setUTCMinutes(this.simulationDate.getUTCMinutes());
+    selectedDate.setUTCSeconds(this.simulationDate.getUTCSeconds());
+
+    this.simulationDate = new Date(selectedDate);
+
+    this.datetimeInputFormChange();
+    this.render();
+    this.attachEvents();
   }
 
   private setToNow(): void {
@@ -437,6 +457,12 @@ export class Calendar {
   }
 
   toggleDatePicker(): void {
+    if (!this.isCalendarEnabled) {
+      keepTrackApi.getUiManager().toast('Catalog has not fully initialized yet. Please wait a few seconds and try again.', ToastMsgType.caution, true);
+
+      return;
+    }
+
     this.isVisible = !this.isVisible;
     const datepicker = document.getElementById('ui-datepicker-div');
 
@@ -446,6 +472,12 @@ export class Calendar {
   }
 
   showDatePicker(): void {
+    if (!this.isCalendarEnabled) {
+      keepTrackApi.getUiManager().toast('Catalog has not fully initialized yet. Please wait a few seconds and try again.', ToastMsgType.caution, true);
+
+      return;
+    }
+
     this.isVisible = true;
     const datepicker = document.getElementById('ui-datepicker-div');
 

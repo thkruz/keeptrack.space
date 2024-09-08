@@ -298,12 +298,12 @@ export class KeepTrack {
         import(/* webpackMode: "eager" */ '@css/colorPick.css').catch(() => {
           // This is intentional
         });
-        import(/* webpackMode: "eager" */ '@css/jquery-ui.min.css').catch(() => {
-          // This is intentional
-        });
-        import(/* webpackMode: "eager" */ '@css/jquery-ui-timepicker-addon.css').catch(() => {
-          // This is intentional
-        });
+        // import(/* webpackMode: "eager" */ '@css/jquery-ui.min.css').catch(() => {
+        //   // This is intentional
+        // });
+        // import(/* webpackMode: "eager" */ '@css/jquery-ui-timepicker-addon.css').catch(() => {
+        //   // This is intentional
+        // });
         import(/* webpackMode: "eager" */ '@css/style.css')
           .then(
             await import(/* webpackMode: "eager" */ '@css/responsive-sm.css').catch(() => {

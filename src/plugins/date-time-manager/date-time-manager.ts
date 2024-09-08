@@ -4,10 +4,9 @@ import { getEl } from '@app/lib/get-el';
 import { getDayOfYear } from '@app/lib/transforms';
 import { isThisNode } from '@app/static/isThisNode';
 import { UrlManager } from '@app/static/url-manager';
-import $ from 'jquery';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
-import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
+import { Calendar } from './calendar';
 
 export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';
@@ -15,6 +14,7 @@ export class DateTimeManager extends KeepTrackPlugin {
   isEditTimeOpen = false;
   private dateTimeContainerId_ = 'datetime';
   private dateTimeInputTbId_ = 'datetime-input-tb';
+  private calendarObject_: Calendar;
 
   init(): void {
     super.init();
@@ -50,18 +50,22 @@ export class DateTimeManager extends KeepTrackPlugin {
 
   updateDateTime(date: Date) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
-    const dateTimeInputTbDOM = $(`#${this.dateTimeInputTbId_}`);
-    // TODO: remove this check when jest is fixed
+    const dateTimeInputTb = document.getElementById(this.dateTimeInputTbId_) as HTMLInputElement;
 
-    if (dateTimeInputTbDOM && !isThisNode()) {
-      dateTimeInputTbDOM.datepicker('setDate', date);
+    if (dateTimeInputTb && !isThisNode()) {
+      dateTimeInputTb.value = date.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
     }
+
     timeManagerInstance.synchronize();
     UrlManager.updateURL();
   }
 
   datetimeTextClick(): void {
-    keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(keepTrackApi.getTimeManager().simulationTimeObj));
+    const simulationDateObj = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
+
+    keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, simulationDateObj);
+    this.calendarObject_.setDate(simulationDateObj);
+    this.calendarObject_.toggleDatePicker();
 
     if (!this.isEditTimeOpen) {
       const datetimeInput = getEl('datetime-input');
@@ -69,9 +73,10 @@ export class DateTimeManager extends KeepTrackPlugin {
 
       if (datetimeInput && datetimeInputTb) {
         datetimeInput.style.display = 'block';
-        datetimeInputTb.focus();
+        (datetimeInputTb as HTMLInputElement).focus();
         this.isEditTimeOpen = true;
       }
+
     }
   }
 
@@ -81,18 +86,17 @@ export class DateTimeManager extends KeepTrackPlugin {
     NavWrapper?.insertAdjacentHTML(
       'afterbegin',
       keepTrackApi.html`
-          <div id="nav-mobile">
-            <div id="jday"></div>
-            <div id="${this.dateTimeContainerId_}">
-              <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>
-              <div id="datetime-input">
-                <form id="datetime-input-form">
-                  <input type="text" id="${this.dateTimeInputTbId_}" readonly="true" />
-                </form>
-              </div>
+        <div id="nav-mobile">
+          <div id="jday"></div>
+          <div id="${this.dateTimeContainerId_}">
+            <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>
+            <div id="datetime-input">
+              <form id="datetime-input-form">
+                <input type="text" id="${this.dateTimeInputTbId_}" readonly="true" />
+              </form>
             </div>
-        </div>
-          `,
+          </div>
+        </div>`,
     );
   }
 
@@ -101,44 +105,20 @@ export class DateTimeManager extends KeepTrackPlugin {
       return;
     }
 
-    getEl('datetime-text').addEventListener('click', this.datetimeTextClick.bind(this));
+    this.calendarObject_ = new Calendar('datetime-input-form');
 
-    $('#datetime-input-form').on('change', (e: Event) => {
-      this.datetimeInputFormChange();
-      e.preventDefault();
-    });
+    document.getElementById('datetime-text')?.addEventListener('click', this.datetimeTextClick.bind(this));
 
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const that = this;
-    // Initialize the date/time picker
+    const datetimeInputTb = document.getElementById(this.dateTimeInputTbId_);
 
-    // TODO: remove this check when jest is fixed
-    if (isThisNode()) {
-      return;
-    }
-
-    (<any>$('#datetime-input-tb'))
-      .datetimepicker({
-        dateFormat: 'yy-mm-dd',
-        timeFormat: 'HH:mm:ss',
-        timezone: '+0000',
-        gotoCurrent: true,
-        addSliderAccess: true,
-        /*
-         * minDate: -14, // No more than 7 days in the past
-         * maxDate: 14, // or 7 days in the future to make sure ELSETs are valid
-         */
-        sliderAccessArgs: { touchonly: false },
-      })
-      .on('change.dp', () => {
-        // This code gets called when the done button is pressed or the time sliders are closed
-        if (that.isEditTimeOpen) {
-          getEl('datetime-input').style.display = 'none';
+    if (datetimeInputTb && !isThisNode()) {
+      datetimeInputTb.addEventListener('change', () => {
+        if (this.isEditTimeOpen) {
+          document.getElementById('datetime-input')!.style.display = 'none';
           setTimeout(() => {
-            that.isEditTimeOpen = false;
+            this.isEditTimeOpen = false;
           }, 500);
 
-          // TODO: Migrate to watchlist.ts
           try {
             const uiManagerInstance = keepTrackApi.getUiManager();
 
@@ -148,37 +128,6 @@ export class DateTimeManager extends KeepTrackPlugin {
           }
         }
       });
-  }
-
-  datetimeInputFormChange(jestOverride?: Date) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
-    let selectedDate: Date;
-
-    if (!jestOverride) {
-      selectedDate = $(`#${this.dateTimeInputTbId_}`).datepicker('getDate');
-    } else {
-      selectedDate = jestOverride;
-    }
-    const today = new Date();
-    const jday = getDayOfYear(timeManagerInstance.simulationTimeObj);
-
-    getEl('jday').innerHTML = jday.toString();
-    timeManagerInstance.changeStaticOffset(selectedDate.getTime() - today.getTime());
-    colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
-    timeManagerInstance.calculateSimulationTime();
-    // Reset last update times when going backwards in time
-    timeManagerInstance.lastBoxUpdateTime = timeManagerInstance.realTime;
-
-    // TODO: Migrate to watchlist.ts
-    try {
-      (<WatchlistOverlay>keepTrackApi.getPlugin(WatchlistOverlay)).lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;
-      const uiManagerInstance = keepTrackApi.getUiManager();
-
-      uiManagerInstance.updateNextPassOverlay(true);
-    } catch {
-      // Ignore
     }
   }
 }

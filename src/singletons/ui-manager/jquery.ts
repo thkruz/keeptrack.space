@@ -1,7 +1,4 @@
-import 'jquery-ui-bundle';
 import '@app/lib/external/colorPick.js';
-import '@app/lib/external/jquery-ui-slideraccess.js';
-import '@app/lib/external/jquery-ui-timepicker.js';
 
 /**
  * This file exists primarily to avoid prettier changing the import order

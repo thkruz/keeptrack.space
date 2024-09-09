@@ -198,10 +198,13 @@ export class Scene {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.gpuPicking);
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    // Clear the godrays Frame Buffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.godrays);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    if (!settingsManager.isDisableGodrays) {
+      // Clear the godrays Frame Buffer
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.godrays);
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    }
 
     // Switch back to the canvas
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -220,11 +223,18 @@ export class Scene {
       await this.earth.init(settingsManager, this.gl_);
       keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
       await this.sun.init(this.gl_);
-      await keepTrackApi.getScene().godrays?.init(this.gl_, this.sun);
+
+      if (!settingsManager.isDisableGodrays) {
+        await keepTrackApi.getScene().godrays?.init(this.gl_, this.sun);
+      }
+
       if (!settingsManager.isDisableMoon) {
         await this.moon.init(this.gl_);
       }
-      await this.searchBox.init(this.gl_);
+
+      if (!settingsManager.isDisableSearchBox) {
+        await this.searchBox.init(this.gl_);
+      }
       if (!settingsManager.isDisableSkybox) {
         await this.skybox.init(settingsManager, this.gl_);
       }

@@ -995,6 +995,7 @@ export class SettingsManager {
   isDisableGodrays = false;
   isDisableSkybox = false;
   isDisableMoon = false;
+  isDisableSearchBox = false;
   isDisableAsyncReadPixels = false;
   /**
    * Use 16K textures for the Milky Way

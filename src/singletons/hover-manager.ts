@@ -8,6 +8,7 @@ import { SensorMath } from '../static/sensor-math';
 import { StringExtractor } from '../static/string-extractor';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
+import { country2flagIcon } from '@app/catalogs/countries';
 
 export class HoverManager {
   /** The id of the object currently being hovered */
@@ -207,7 +208,14 @@ export class HoverManager {
         color = 'gray';
       }
 
-      this.satHoverBoxNode1.innerHTML = keepTrackApi.html`<span>${sat.name}</span><span style='color:${color};'> (${confidenceScoreString.toString()})</span>`;
+      this.satHoverBoxNode1.innerHTML = keepTrackApi.html`
+        <span id="hoverbox-fi"></span>
+        <span>${sat.name}</span>
+        <span style='color:${color};'> (${confidenceScoreString.toString()})</span>
+      `;
+
+      getEl('hoverbox-fi').classList.value = `fi ${country2flagIcon(sat.country)}`;
+
       if (sat.sccNum) {
         this.satHoverBoxNode2.textContent = `NORAD: ${sat.sccNum}`;
       } else {

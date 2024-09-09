@@ -150,6 +150,7 @@
     "echarts-gl": "^2.0.9",
     "eruda": "^2.5.0",
     "file-saver": "^2.0.5",
+    "flag-icons": "^7.2.3",
     "gl-matrix": "^3.4.3",
     "gremlins.js": "^2.2.0",
     "i18next": "^23.14.0",

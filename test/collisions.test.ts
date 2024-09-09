@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
-const socratesFileData = readFileSync('./public/tle/SOCRATES.json', 'utf8');
+const socratesFileData = JSON.parse(readFileSync('./public/tle/SOCRATES.json', 'utf8'));
 
 describe('CollissionsPlugin_class', () => {
   let satConstellationsPlugin: Collissions;

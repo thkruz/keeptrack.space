@@ -75,8 +75,10 @@ ${e.stack}`,
     if (!isHideFromConsole) {
       // eslint-disable-next-line no-console
       console.warn(msg);
-      // eslint-disable-next-line no-console
-      console.trace();
+      if (!isThisNode()) {
+        // eslint-disable-next-line no-console
+        console.trace();
+      }
     }
   }
 
@@ -89,8 +91,10 @@ ${e.stack}`,
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
       console.info(msg);
-      // eslint-disable-next-line no-console
-      console.trace();
+      if (!isThisNode()) {
+        // eslint-disable-next-line no-console
+        console.trace();
+      }
     }
   }
 
@@ -103,8 +107,10 @@ ${e.stack}`,
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
       console.log(msg);
-      // eslint-disable-next-line no-console
-      console.trace();
+      if (!isThisNode()) {
+        // eslint-disable-next-line no-console
+        console.trace();
+      }
     }
   }
 
@@ -119,8 +125,10 @@ ${e.stack}`,
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
       console.debug(msg);
-      // eslint-disable-next-line no-console
-      console.trace();
+      if (!isThisNode()) {
+        // eslint-disable-next-line no-console
+        console.trace();
+      }
     }
   }
 }

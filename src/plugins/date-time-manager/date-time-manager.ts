@@ -14,7 +14,7 @@ export class DateTimeManager extends KeepTrackPlugin {
   isEditTimeOpen = false;
   private dateTimeContainerId_ = 'datetime';
   private dateTimeInputTbId_ = 'datetime-input-tb';
-  private calendarObject_: Calendar;
+  calendar: Calendar;
 
   init(): void {
     super.init();
@@ -64,8 +64,8 @@ export class DateTimeManager extends KeepTrackPlugin {
     const simulationDateObj = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
 
     keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, simulationDateObj);
-    this.calendarObject_.setDate(simulationDateObj);
-    this.calendarObject_.toggleDatePicker();
+    this.calendar.setDate(simulationDateObj);
+    this.calendar.toggleDatePicker();
 
     if (!this.isEditTimeOpen) {
       const datetimeInput = getEl('datetime-input');
@@ -105,7 +105,7 @@ export class DateTimeManager extends KeepTrackPlugin {
       return;
     }
 
-    this.calendarObject_ = new Calendar('datetime-input-form');
+    this.calendar = new Calendar('datetime-input-form');
 
     document.getElementById('datetime-text')?.addEventListener('click', this.datetimeTextClick.bind(this));
 

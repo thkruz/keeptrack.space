@@ -272,6 +272,9 @@
     "ScreenRecorder": {
       "bottomIconLabel": "Record Video"
     },
+    "Astronomy": {
+      "bottomIconLabel": "Astronomy"
+    },
     "AnalysisMenu": {
       "bottomIconLabel": "Analysis",
       "title": "Analysis Menu",

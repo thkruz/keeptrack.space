@@ -290,12 +290,10 @@ export class NewLaunch extends KeepTrackPlugin {
           const sat = obj as DetailedSatellite;
 
           (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
-          this.isIconDisabled = false;
+          this.setBottomIconToEnabled();
           this.preValidate_(sat);
         } else {
-          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
-          this.isIconDisabled = true;
+          this.setBottomIconToDisabled();
         }
       },
     });

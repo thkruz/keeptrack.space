@@ -9,7 +9,7 @@ import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('ShortTermFences_class', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     keepTrackApi.containerRoot.innerHTML = '';
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
   });
@@ -21,7 +21,15 @@ describe('ShortTermFences_class', () => {
     const stf = new ShortTermFences();
 
     websiteInit(stf);
-    expect(() => stf['closeAndDisable']()).not.toThrow();
+    expect(() => stf['closeAndDisable_']()).not.toThrow();
+  });
+
+  it('should be able to handle setSensor', () => {
+    const stf = new ShortTermFences();
+
+    websiteInit(stf);
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 1)).not.toThrow();
   });
 
   // test stfFormOnSubmit static method
@@ -30,10 +38,10 @@ describe('ShortTermFences_class', () => {
       const stf = new ShortTermFences();
 
       websiteInit(stf);
-      expect(() => stf['onSubmit']()).not.toThrow();
+      expect(() => stf['onSubmit_']()).not.toThrow();
 
       keepTrackApi.getSensorManager().setCurrentSensor(null);
-      expect(() => stf['onSubmit']()).not.toThrow();
+      expect(() => stf['onSubmit_']()).not.toThrow();
     });
   });
 
@@ -43,22 +51,14 @@ describe('ShortTermFences_class', () => {
       const stf = new ShortTermFences();
 
       websiteInit(stf);
-      expect(() => stf['stfOnObjectLinkClick']()).not.toThrow();
+      expect(() => stf['stfOnObjectLinkClick_']()).not.toThrow();
 
       keepTrackApi.getSensorManager().setCurrentSensor(null);
       expect(() => stf['stfOnObjectLinkClick_']()).not.toThrow();
 
       keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
       keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
-      expect(() => stf['stfOnObjectLinkClick']()).not.toThrow();
+      expect(() => stf['stfOnObjectLinkClick_']()).not.toThrow();
     });
-  });
-
-  it('should be able to handle setSensor', () => {
-    const stf = new ShortTermFences();
-
-    websiteInit(stf);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 1)).not.toThrow();
   });
 });

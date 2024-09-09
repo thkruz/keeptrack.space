@@ -205,6 +205,9 @@ export const loadLocalization = () => ({
     ScreenRecorder: {
       bottomIconLabel: i18next.t('plugins.ScreenRecorder.bottomIconLabel'),
     },
+    Astronomy: {
+      bottomIconLabel: i18next.t('plugins.Astronomy.bottomIconLabel'),
+    },
     AnalysisMenu: {
       bottomIconLabel: i18next.t('plugins.AnalysisMenu.bottomIconLabel'),
       title: i18next.t('plugins.AnalysisMenu.title'),

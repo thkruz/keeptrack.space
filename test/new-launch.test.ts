@@ -5,22 +5,17 @@ import { NewLaunch } from '@app/plugins/new-launch/new-launch';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
-import { setupDefaultHtml } from './environment/standard-env';
+import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('NewLaunch_class', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let newLaunchPlugin: NewLaunch;
 
-  // eslint-disable-next-line no-console
-  console.debug(newLaunchPlugin);
-
   beforeEach(() => {
-    setupDefaultHtml();
-    window.M = {
-      AutoInit: () => { },
-    } as any;
+    keepTrackApi.containerRoot.innerHTML = '';
+    setupStandardEnvironment([SelectSatManager]);
     newLaunchPlugin = new NewLaunch();
+    newLaunchPlugin.init();
   });
 
   standardPluginSuite(NewLaunch, 'NewLaunch');
@@ -31,14 +26,13 @@ describe('NewLaunch_form', () => {
   let newLaunchPlugin: NewLaunch;
 
   beforeEach(() => {
-    setupDefaultHtml();
-    window.M = {
-      AutoInit: () => { },
-    } as any;
+    keepTrackApi.containerRoot.innerHTML = '';
+    setupStandardEnvironment([SelectSatManager]);
     newLaunchPlugin = new NewLaunch();
   });
 
   it('should have a form and buttons', () => {
+    websiteInit(newLaunchPlugin);
     expect(getEl(`${newLaunchPlugin.sideMenuElementName}-form`)).toBeDefined();
   });
 

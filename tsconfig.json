@@ -21,7 +21,6 @@
     "test/**/*.png",
     "test/**/*.mp3",
     "test/**/*.jpg",
-    "public/analysis/js/analysis-tools.js",
     "public/serviceWorker.js",
     "public/settings/settingsOverride.js",
     "public/settings/settingsOverrideEmbed.js",

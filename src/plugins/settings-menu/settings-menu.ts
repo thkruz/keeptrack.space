@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { ColorPick } from '@app/lib/color-pick';
 import { getEl } from '@app/lib/get-el';
-import { rgbCss } from '@app/lib/rgbCss';
-import settingsPng from '@public/img/icons/settings.png';
-
 import { parseRgba } from '@app/lib/rgba';
+import { rgbCss } from '@app/lib/rgbCss';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
 import { OrbitCruncherType, OrbitDrawTypes } from '@app/webworker/orbitCruncher';
-import $ from 'jquery'; // TODO: Remove Color Picker
+import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 import { TimeMachine } from '../time-machine/time-machine';
@@ -344,72 +343,89 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
         getEl('settings-reset').addEventListener('click', SettingsMenuPlugin.resetToDefaults_);
 
         const colorPalette = [
+          // Reds
           rgbCss([1.0, 0.0, 0.0, 1.0]), // Red
-          rgbCss([1.0, 0.75, 0.0, 1.0]), // Orange
-          rgbCss([0.85, 0.5, 0.0, 1.0]), // Dark Orange
-          rgbCss([1.0, 1.0, 0.0, 1.0]), // Yellow
-          rgbCss([0, 1, 0, 1]), // Green
-          rgbCss([0.2, 1.0, 0.0, 0.5]), // Mint
-          rgbCss([0.2, 1.0, 1.0, 1.0]), // Bright Green
-          rgbCss([0, 0, 1, 1]), // Royal Blue
-          rgbCss([0.2, 0.4, 1.0, 1]), // Dark Blue
-          rgbCss([0.64, 0.0, 0.64, 1.0]), // Purple
+          rgbCss([1.0, 0.4, 0.4, 1.0]), // Light Red
           rgbCss([1.0, 0.0, 0.6, 1.0]), // Pink
-          rgbCss([0.5, 0.5, 0.5, 1]), // Gray
-          rgbCss([1, 1, 1, 1]), // White
+          rgbCss([1.0, 0.75, 0.8, 1.0]), // Light Pink
+          rgbCss([1.0, 0.0, 1.0, 1.0]), // Magenta
+
+          // Oranges
+          rgbCss([1.0, 0.65, 0.0, 1.0]), // Orange
+          rgbCss([0.85, 0.5, 0.0, 1.0]), // Dark Orange
+          rgbCss([1.0, 0.8, 0.6, 1.0]), // Peach
+
+          // Yellows
+          rgbCss([1.0, 1.0, 0.0, 1.0]), // Yellow
+          rgbCss([0.8, 0.4, 0.0, 1.0]), // Dark Yellow
+
+          // Greens
+          rgbCss([0.4, 0.8, 0.0, 1.0]), // Chartreuse
+          rgbCss([0.0, 1.0, 0.0, 1.0]), // Lime Green
+          rgbCss([0.2, 1.0, 0.0, 0.5]), // Dark Green (with transparency)
+          rgbCss([0.5, 1.0, 0.5, 1.0]), // Mint Green
+          rgbCss([0.6, 0.8, 0.2, 1.0]), // Olive Green
+
+          // Cyans
+          rgbCss([0.0, 1.0, 1.0, 1.0]), // Cyan
+          rgbCss([0.0, 0.8, 0.8, 1.0]), // Light Blue
+          rgbCss([0.0, 0.5, 0.5, 1.0]), // Teal
+          rgbCss([0.0, 0.2, 0.4, 1.0]), // Dark Teal
+
+          // Blues
+          rgbCss([0.2, 0.4, 1.0, 1.0]), // Dark Blue
+          rgbCss([0.0, 0.0, 0.5, 1.0]), // Navy Blue
+
+          // Purples
+          rgbCss([0.5, 0.0, 1.0, 1.0]), // Purple
+          rgbCss([0.5, 0.0, 0.5, 1.0]), // Dark Purple
+          rgbCss([0.8, 0.2, 0.8, 1.0]), // Violet
+
+          // Browns
+          rgbCss([0.5, 0.25, 0.0, 1.0]), // Brown
+          rgbCss([0.6, 0.4, 0.2, 1.0]), // Tan
+          rgbCss([0.9, 0.9, 0.5, 1.0]), // Beige
+
+          // Grays
+          rgbCss([0.9, 0.9, 0.9, 1.0]), // Light Gray
+          rgbCss([0.5, 0.5, 0.5, 1.0]), // Gray
+          rgbCss([0.1, 0.1, 0.1, 1.0]), // Dark Gray
         ];
 
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const that = this;
-
-        (<any>$('#settings-color-payload')).colorPick({
+        ColorPick.initColorPick('#settings-color-payload', {
           initialColor: rgbCss(settingsManager.colors?.payload || [0.2, 1.0, 0.0, 0.5]),
           palette: colorPalette,
-          onColorSelected() {
-            that.onColorSelected_(this, 'payload');
-          },
+          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'payload'),
         });
-        (<any>$('#settings-color-rocketBody')).colorPick({
+        ColorPick.initColorPick('#settings-color-rocketBody', {
           initialColor: rgbCss(settingsManager.colors?.rocketBody || [0.2, 0.4, 1.0, 1]),
           palette: colorPalette,
-          onColorSelected() {
-            that.onColorSelected_(this, 'rocketBody');
-          },
+          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'rocketBody'),
         });
-        (<any>$('#settings-color-debris')).colorPick({
+        ColorPick.initColorPick('#settings-color-debris', {
           initialColor: rgbCss(settingsManager.colors?.debris || [0.5, 0.5, 0.5, 1]),
           palette: colorPalette,
-          onColorSelected() {
-            that.onColorSelected_(this, 'debris');
-          },
+          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'debris'),
         });
-        (<any>$('#settings-color-inview')).colorPick({
+        ColorPick.initColorPick('#settings-color-inview', {
           initialColor: rgbCss(settingsManager.colors?.inFOV || [0.85, 0.5, 0.0, 1.0]),
           palette: colorPalette,
-          onColorSelected() {
-            that.onColorSelected_(this, 'inview');
-          },
+          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'inview'),
         });
-        (<any>$('#settings-color-missile')).colorPick({
+        ColorPick.initColorPick('#settings-color-missile', {
           initialColor: rgbCss(settingsManager.colors?.missile || [1.0, 1.0, 0.0, 1.0]),
           palette: colorPalette,
-          onColorSelected() {
-            that.onColorSelected_(this, 'missile');
-          },
+          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'missile'),
         });
-        (<any>$('#settings-color-missileInview')).colorPick({
+        ColorPick.initColorPick('#settings-color-missileInview', {
           initialColor: rgbCss(settingsManager.colors?.missileInview || [1.0, 0.0, 0.0, 1.0]),
           palette: colorPalette,
-          onColorSelected() {
-            that.onColorSelected_(this, 'missileInview');
-          },
+          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'missileInview'),
         });
-        (<any>$('#settings-color-special')).colorPick({
+        ColorPick.initColorPick('#settings-color-special', {
           initialColor: rgbCss(settingsManager.colors?.pink || [1.0, 0.0, 0.6, 1.0]),
           palette: colorPalette,
-          onColorSelected() {
-            that.onColorSelected_(this, 'pink');
-          },
+          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'pink'),
         });
         this.isNotColorPickerInitialSetup = true;
       },
@@ -489,7 +505,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
   }
 
-  private onColorSelected_(context: any, colorStr: string) {
+  private onColorSelected_(context: ColorPick, colorStr: string) {
     if (typeof context === 'undefined' || context === null) {
       throw new Error('context is undefined');
     }
@@ -497,7 +513,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       throw new Error('colorStr is undefined');
     }
 
-    context.element.css('cssText', `background-color: ${context.color} !important; color: ${context.color};`);
+    context.element.style.cssText = `background-color: ${context.color} !important; color: ${context.color};`;
     if (this.isNotColorPickerInitialSetup) {
       settingsManager.colors[colorStr] = parseRgba(context.color);
       LegendManager.legendColorsChange();

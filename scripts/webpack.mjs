@@ -4,7 +4,6 @@ import { readdirSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import webpack from 'webpack';
 import WebpackBar from 'webpackbar';
 
 /**
@@ -78,11 +77,6 @@ export const generateConfig = (env, isWatch) => {
   const exampleConfig = getMainConfig(baseConfig, dirName, 'dist', '../../');
 
   exampleConfig.plugins = [
-    new webpack.ProvidePlugin({
-      '$': 'jquery',
-      'jQuery': 'jquery',
-      'windows.jQuery': 'jquery',
-    }),
     new CleanTerminalPlugin({
       beforeCompile: true,
     }),
@@ -217,11 +211,6 @@ const getNonEmbedConfig = (baseConfig, env) => {
     topLevelAwait: true,
   };
   baseConfig.plugins.push(
-    new webpack.ProvidePlugin({
-      '$': 'jquery',
-      'jQuery': 'jquery',
-      'windows.jQuery': 'jquery',
-    }),
     new CleanTerminalPlugin({
       beforeCompile: true,
     }),

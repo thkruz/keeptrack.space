@@ -1,11 +1,10 @@
 import { errorManagerInstance } from './errorManager';
 
 export enum StorageKey {
-  COLOR_PICK_RECENT_ITEMS = 'colorPickRecentItems',
   CURRENT_SENSOR = 'keepTrack-currentSensor',
   SETTINGS_MANAGER_COLORS = 'settingsManager-colors',
   WATCHLIST_LIST = 'keepTrack-watchlistList',
-  THIS_COLORS = 'this-colors',
+  SETTINGS_DOT_COLORS = 'keepTrack-settings-dotColors',
   IS_ADVICE_ENABLED = 'isAdviceEnabled',
   LAST_MAP = 'keepTrack-earthTexture',
   COLOR_SCHEME = 'keepTrack-colorScheme',

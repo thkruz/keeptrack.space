@@ -28,7 +28,6 @@
 import { ColorRuleSet, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
-import { loadJquery } from '@app/singletons/ui-manager/jquery';
 import '@materializecss/materialize';
 import { BaseObject, DetailedSatellite, MILLISECONDS_PER_SECOND, Milliseconds } from 'ootk';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
@@ -281,7 +280,6 @@ export class UiManager {
     if (this.isInitialized_) {
       throw new Error('UiManager already initialized');
     }
-    loadJquery();
 
     this.searchManager = new SearchManager(this);
 

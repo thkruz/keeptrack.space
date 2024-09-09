@@ -157,7 +157,7 @@ export const loadLocalization = () => ({
       bottomIconLabel: i18next.t('plugins.SensorFov.bottomIconLabel'),
     },
     SensorSurvFence: {
-      bottomIconLabel: i18next.t('plugins.SensorFence.bottomIconLabel'),
+      bottomIconLabel: i18next.t('plugins.SensorSurvFence.bottomIconLabel'),
     },
     SatelliteViewPlugin: {
       bottomIconLabel: i18next.t('plugins.SatelliteViewPlugin.bottomIconLabel'),
@@ -204,6 +204,9 @@ export const loadLocalization = () => ({
     },
     ScreenRecorder: {
       bottomIconLabel: i18next.t('plugins.ScreenRecorder.bottomIconLabel'),
+    },
+    Astronomy: {
+      bottomIconLabel: i18next.t('plugins.Astronomy.bottomIconLabel'),
     },
     AnalysisMenu: {
       bottomIconLabel: i18next.t('plugins.AnalysisMenu.bottomIconLabel'),

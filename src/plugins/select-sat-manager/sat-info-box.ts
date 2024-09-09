@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
+import { country2flagIcon } from '@app/catalogs/countries';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
@@ -652,6 +653,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     const isHasAltName = (obj as DetailedSatellite)?.altName && (obj as DetailedSatellite).altName !== '';
 
     getEl('sat-info-title-name').innerHTML = obj.name;
+    getEl('sat-infobox-fi').classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
     getEl('sat-alt-name').innerHTML = isHasAltName ? (obj as DetailedSatellite).altName : 'N/A';
 
     const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
@@ -905,6 +907,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             <span id="sat-info-title-name">
               This is a title
             </span>
+            <span id="sat-infobox-fi" class="fi"></span>
           </div>
           ${getEl('search') ? SatInfoBox.createSearchLinks_() : ''}
           <div id="draw-line-links">

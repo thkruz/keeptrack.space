@@ -1,11 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SettingsManager } from '@app/settings/settings';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface JQuery<HTMLElement> {
-  effect: any;
-}
-
 interface HTMLDivElement {
   addClass: (classStr: string) => void;
   removeClass: (classStr: string) => void;
@@ -38,14 +33,4 @@ declare global {
     settingsOverride: any;
   }
   let settingsManager: SettingsManager;
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  interface JQuery<HTMLElement> {
-    datapicker: any;
-    datepicker: any;
-  }
-}
-
-interface JQueryStatic {
-  colorbox: any;
 }

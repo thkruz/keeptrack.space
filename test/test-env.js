@@ -2,7 +2,6 @@ import 'webgl-mock';
 
 import { settingsManager } from '@app/settings/settings';
 import fs from 'fs';
-import $ from 'jquery';
 import { JSDOM } from 'jsdom';
 import path from 'path';
 
@@ -110,26 +109,6 @@ window.HTMLMediaElement.prototype.pause = () => {
 window.HTMLMediaElement.prototype.addTextTrack = () => {
   /* do nothing */
 };
-
-global.jQuery = $;
-global.$ = $;
-window.jQuery = $;
-
-$.fn.replace = (input, output) => $.fn.toString().replace(input, output);
-
-$.datepicker = jest.fn();
-$.fn.datepicker = jest.fn();
-$.fn.colorPick = jest.fn();
-$.fn.effect = jest.fn();
-$.fn.resizable = jest.fn();
-// $.fn.tooltip = jest.fn();
-$.fn.fadeIn = jest.fn((time, cb) => {
-  if (typeof cb !== 'undefined') {
-    return cb();
-  }
-
-  return true;
-});
 
 global.document.canvas.addEventListener = () => true;
 

@@ -17,7 +17,7 @@ describe('NextLaunches_class', () => {
       writable: true, // possibility to override
     });
 
-    jest.spyOn(window.history, 'replaceState').mockImplementation(() => {});
+    jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
   });
   beforeEach(() => {
     keepTrackApi.containerRoot.innerHTML = '';
@@ -26,7 +26,7 @@ describe('NextLaunches_class', () => {
     // eslint-disable-next-line require-await
     global.fetch = jest.fn().mockImplementation(async () => ({
       json: () => ({
-        results: readFileSync('./test/environment/lldev.json', 'utf8'),
+        results: JSON.parse(readFileSync('./test/environment/lldev.json', 'utf8')),
       }),
     }));
   });

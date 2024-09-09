@@ -52,7 +52,7 @@ describe('SatelliteViewPlugin_class', () => {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     expect(registerSpy).toHaveBeenCalled();
-    expect(getEl('bottom-icons').innerHTML).toContain('menu-satview');
+    expect(getEl('bottom-icons').innerHTML).toContain('satellite-view-bottom-icon');
   });
 
   // Tests that a toast message is displayed when no satellite is selected and trying to activate Satellite Camera Mode
@@ -65,8 +65,8 @@ describe('SatelliteViewPlugin_class', () => {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'menu-satview');
-    expect(uiManagerInstance.toast).toHaveBeenCalledWith(i18next.t('plugins.SelectSatelliteFirst'), ToastMsgType.serious, true);
+    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    expect(uiManagerInstance.toast).toHaveBeenCalledWith(i18next.t('errorMsgs.SelectSatelliteFirst'), ToastMsgType.serious, true);
   });
 
   // Tests that a toast message is not displayed when a satellite is selected and trying to activate Satellite Camera Mode
@@ -79,7 +79,7 @@ describe('SatelliteViewPlugin_class', () => {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'menu-satview');
+    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
 
@@ -95,7 +95,7 @@ describe('SatelliteViewPlugin_class', () => {
     const tempMockCamera = { ...mockCameraManager, cameraType: CameraType.SATELLITE } as Camera;
 
     keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, tempMockCamera);
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'menu-satview');
+    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
 });

@@ -23,14 +23,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { LegendManager } from '@app/static/legend-manager';
 import planetariumPng from '@public/img/icons/planetarium.png';
-import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
 
@@ -39,6 +37,7 @@ export class Planetarium extends KeepTrackPlugin {
   dependencies_: string[];
 
   bottomIconImg = planetariumPng;
+  isRequireSensorSelected = true;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   bottomIconCallback = (): void => {
@@ -91,21 +90,4 @@ export class Planetarium extends KeepTrackPlugin {
        */
     }
   };
-
-  addJs(): void {
-    super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: this.id,
-      cb: (sensor: Sensor | string): void => {
-        if (sensor) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
-          this.isIconDisabled = false;
-        } else {
-          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
-          this.isIconDisabled = true;
-        }
-      },
-    });
-  }
 }

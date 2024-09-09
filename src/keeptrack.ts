@@ -39,7 +39,6 @@ import thuleJpg from '@public/img/wallpaper/thule.jpg';
 import 'material-icons/iconfont/material-icons.css';
 
 import eruda from 'eruda';
-import erudaFps from 'eruda-fps';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
 import { KeepTrackApiEvents, Singletons } from './interfaces';
@@ -293,15 +292,6 @@ export class KeepTrack {
           // This is intentional
         });
         import(/* webpackMode: "eager" */ '@css/materialize-local.css').catch(() => {
-          // This is intentional
-        });
-        import(/* webpackMode: "eager" */ '@css/colorPick.css').catch(() => {
-          // This is intentional
-        });
-        import(/* webpackMode: "eager" */ '@css/jquery-ui.min.css').catch(() => {
-          // This is intentional
-        });
-        import(/* webpackMode: "eager" */ '@css/jquery-ui-timepicker-addon.css').catch(() => {
           // This is intentional
         });
         import(/* webpackMode: "eager" */ '@css/style.css')
@@ -559,7 +549,6 @@ theodore.kruczek at gmail dot com.
             useShadowDom: false,
             tool: ['console', 'elements'],
           });
-          eruda.add(erudaFps);
           const erudaEntryButtonDoms = keepTrackApi.containerRoot.querySelectorAll('eruda-entry-btn');
 
           if (erudaEntryButtonDoms.length > 0) {

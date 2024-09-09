@@ -41,6 +41,7 @@ export class MobileManager {
           settingsManager.isDisableGodrays = true;
           settingsManager.isDisableSkybox = true;
           settingsManager.isDisableMoon = true;
+          settingsManager.isDisableSearchBox = true;
 
           settingsManager.isDisableAsyncReadPixels = true;
 

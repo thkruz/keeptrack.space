@@ -71,6 +71,10 @@ export class Earth {
    * This is run once per frame to render the earth in godrays buffer.
    */
   drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLFramebuffer): void {
+    if (settingsManager.isDisableGodrays) {
+      return;
+    }
+
     const gl = this.gl_;
     // Change to the earth shader
 

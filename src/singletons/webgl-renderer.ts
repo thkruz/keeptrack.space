@@ -158,7 +158,7 @@ export class WebGLRenderer {
       : this.domElement.getContext('webgl2', {
         alpha: false,
         premultipliedAlpha: false,
-        desynchronized: true, // Desynchronized Fixed Jitter on Old Computer
+        desynchronized: false, // Setting to true causes flickering on mobile devices
         antialias: true,
         powerPreference: 'high-performance',
         preserveDrawingBuffer: true,

@@ -3253,7 +3253,7 @@ input:focus {
   background: var(--colorTertiaryDarken2);
   cursor: default;
   bottom: 0px;
-  height: 30%;
+  height: 60%;
   padding: 0px 10px;
   width: 100%;
   border: 5px solid var(--colorTertiaryDarken3);

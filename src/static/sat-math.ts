@@ -22,6 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { keepTrackApi } from '@app/keepTrackApi';
 import { vec3 } from 'gl-matrix';
 import numeric from 'numeric';
 import {
@@ -46,6 +47,7 @@ import {
   eci2ecf,
   eci2lla,
   eci2rae,
+  getDayOfYear,
 } from 'ootk';
 import { EciArr3 } from '../interfaces';
 import { DISTANCE_TO_SUN, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '../lib/constants';
@@ -404,6 +406,77 @@ export abstract class SatMath {
     }
 
     return <Kilometers>alt;
+  }
+
+  static estimateRcsUsingHistoricalData(satInput: DetailedSatellite): number | null {
+    const historicRcs = [];
+    const catalogManager = keepTrackApi.getCatalogManager();
+    const objectCache = catalogManager.objectCache;
+
+    for (const obj of objectCache) {
+      if (!obj.isSatellite()) {
+        continue;
+      }
+
+      const sat = obj as DetailedSatellite;
+
+      if (sat.bus === satInput.bus && sat.bus !== 'Unknown' && sat.rcs > 0) {
+        historicRcs.push(sat.rcs);
+        continue;
+      }
+
+      if (typeof sat.name !== 'string') {
+        continue;
+      }
+
+      const name = sat.name.toLowerCase().split(' ')[0];
+      const satName = satInput.name.toLowerCase().split(' ')[0];
+      const minLength = Math.min(name.length, satName.length);
+      const maxLength = Math.max(name.length, satName.length);
+      let matchCount = 0;
+
+      for (let i = 0; i < minLength; i++) {
+        if (name[i] === satName[i]) {
+          matchCount++;
+        }
+      }
+
+      if (matchCount / maxLength > 0.85 && sat.rcs > 0) {
+        historicRcs.push(sat.rcs);
+      }
+    }
+
+    if (historicRcs.length === 0) {
+      return null;
+    }
+
+    return historicRcs.map((rcs_) => rcs_).reduce((a, b) => a + b, 0) / historicRcs.length;
+  }
+
+  static calcElsetAge(sat: DetailedSatellite, nowInput: Date, outputUnits: 'days' | 'hours' | 'minutes' | 'seconds' = 'days'): number {
+    // Get jday including a decimal representing the time of day
+    const jday = getDayOfYear(nowInput) + (nowInput.getUTCHours() + nowInput.getUTCMinutes() / 60 + nowInput.getUTCSeconds() / 3600) / 24;
+    const now = nowInput.getUTCFullYear().toString().slice(2, 4);
+    let daysold: number;
+
+    if (sat.tle1.substring(18, 20) === now) {
+      daysold = jday - parseFloat(sat.tle1.substring(20, 42));
+    } else {
+      daysold = jday + parseInt(now) * 365 - (parseInt(sat.tle1.substring(18, 20)) * 365 + parseFloat(sat.tle1.substring(20, 42)));
+    }
+
+    switch (outputUnits) {
+      case 'days':
+        return daysold;
+      case 'hours':
+        return daysold * 24;
+      case 'minutes':
+        return daysold * 24 * 60;
+      case 'seconds':
+        return daysold * 24 * 60 * 60;
+      default:
+        return daysold;
+    }
   }
 
   /**

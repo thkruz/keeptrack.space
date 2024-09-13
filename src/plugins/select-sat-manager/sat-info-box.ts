@@ -6,7 +6,6 @@ import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { getDayOfYear } from '@app/lib/transforms';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
@@ -558,24 +557,12 @@ export class SatInfoBox extends KeepTrackPlugin {
       periodDom.dataset.delay = '50';
       periodDom.dataset.tooltip = `Mean Motion: ${(MINUTES_PER_DAY / sat.period).toFixed(2)}`;
 
-      // TODO: Error checking on Iframe
-      let now: Date | number | string = new Date();
-      const jday = getDayOfYear(now);
-
-      now = now.getUTCFullYear();
-      now = now.toString().substr(2, 2);
-      let daysold: number;
-
-      if (sat.tle1.substr(18, 2) === now) {
-        daysold = jday - parseInt(sat.tle1.substr(20, 3));
-      } else {
-        daysold = jday + parseInt(now) * 365 - (parseInt(sat.tle1.substr(18, 2)) * 365 + parseInt(sat.tle1.substr(20, 3)));
-      }
-
+      const now: Date | number | string = new Date();
+      const daysold = SatMath.calcElsetAge(sat, now);
       const elsetAgeDom = getEl('sat-elset-age');
 
       if (elsetAgeDom) {
-        elsetAgeDom.innerHTML = `${daysold} Days`;
+        elsetAgeDom.innerHTML = `${daysold.toFixed(2)} Days`;
       }
 
       SatInfoBox.updateConfidenceDom_(sat);
@@ -1119,54 +1106,12 @@ export class SatInfoBox extends KeepTrackPlugin {
   private static updateRcsData_(sat: DetailedSatellite) {
     const satRcsEl = getEl('sat-rcs');
 
-    // TODO: Fix performance of historical RCS
-    // eslint-disable-next-line no-constant-condition
-    if (false && (sat.rcs === null || typeof sat.rcs === 'undefined')) {
-      const historicRcs = keepTrackApi
-        .getCatalogManager()
-        .objectCache.filter((obj) => {
-          if (!obj.isSatellite()) {
-            return false;
-          }
+    if ((sat.rcs === null || typeof sat.rcs === 'undefined')) {
+      const estRcs = SatMath.estimateRcsUsingHistoricalData(sat);
 
-          const sat = obj as DetailedSatellite;
-
-          if (typeof sat.name !== 'string') {
-            return false;
-          }
-          /*
-           * If 85% of the characters in satellite's name matches then include it
-           * Only use the first word of the name
-           * character must be in the same order
-           */
-          const name = sat.name.toLowerCase().split(' ')[0];
-          let satName = 'Unknown';
-
-          if (sat.name) {
-            satName = sat.name.toLowerCase().split(' ')[0];
-          }
-          const nameLength = name.length;
-          const satNameLength = satName.length;
-          const minLength = Math.min(nameLength, satNameLength);
-          const maxLength = Math.max(nameLength, satNameLength);
-          let matchCount = 0;
-
-          for (let i = 0; i < minLength; i++) {
-            if (name[i] === satName[i]) {
-              matchCount++;
-            }
-          }
-
-          return matchCount / maxLength > 0.85;
-        })
-        .map((sat_) => (sat_ as DetailedSatellite).rcs)
-        .filter((rcs) => rcs > 0);
-
-      if (historicRcs.length > 0) {
-        const rcs = historicRcs.map((rcs_) => rcs_).reduce((a, b) => a + b, 0) / historicRcs.length;
-
-        satRcsEl.innerHTML = `H-Est ${rcs.toFixed(4)} m<sup>2</sup>`;
-        satRcsEl.setAttribute('data-tooltip', `${SatMath.mag2db(rcs).toFixed(2)} dBsm (Historical Estimate)`);
+      if (estRcs !== null) {
+        satRcsEl.innerHTML = `H-Est ${estRcs.toFixed(4)} m<sup>2</sup>`;
+        satRcsEl.setAttribute('data-tooltip', `${SatMath.mag2db(estRcs).toFixed(2)} dBsm (Historical Estimate)`);
       } else if (sat.length && sat.diameter && sat.span && sat.shape) {
         const rcs = SatMath.estimateRcs(parseFloat(sat.length), parseFloat(sat.diameter), parseFloat(sat.span), sat.shape);
 

@@ -5,6 +5,8 @@ import './tracking-impact-predict.css';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
+import { SatMath } from '@app/static/sat-math';
+import { RAD2DEG } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -29,7 +31,7 @@ export interface TipMsg {
 export class TrackingImpactPredict extends KeepTrackPlugin {
   readonly id = 'TrackingImpactPredict';
   dependencies_ = [];
-  private readonly tipDataSrc = './data/tip.json';
+  private readonly tipDataSrc = 'https://storage.keeptrack.space/data/tip.json';
   private selectSatIdOnCruncher_: number | null = null;
   private tipList_ = <TipMsg[]>[];
 
@@ -39,16 +41,17 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   <div id="tip-menu" class="side-menu-parent start-hidden text-select">
     <div id="tip-content" class="side-menu">
       <div class="row">
-        <h5 class="center-align">Tracking and Impact Messages</h5>
+        <h5 class="center-align">Recent and Upcoming Reentry Predictions</h5>
         <table id="tip-table" class="center-align"></table>
+        <sub class="center-align">*Tracking and Impact Prediction (TIP) messages provided by the US Space Command (USSPACECOM).</sub>
       </div>
     </div>
   </div>`;
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
-    minWidth: 700,
-    maxWidth: 850,
+    minWidth: 1200,
+    maxWidth: 1500,
   };
 
   bottomIconCallback: () => void = () => {
@@ -136,7 +139,6 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
 
     const now = new Date();
-
     const decayEpoch = new Date(Date.UTC(
       parseInt(this.tipList_[row].DECAY_EPOCH.substring(0, 4)), // year
       parseInt(this.tipList_[row].DECAY_EPOCH.substring(5, 7)) - 1, // month (0-based)
@@ -160,6 +162,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
       const tbl = <HTMLTableElement>getEl('tip-table'); // Identify the table to update
 
       tbl.innerHTML = ''; // Clear the table from old object data
+      tbl.classList.add('centered');
 
       TrackingImpactPredict.createHeaders_(tbl);
 
@@ -177,7 +180,11 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
   private static createHeaders_(tbl: HTMLTableElement) {
     const tr = tbl.insertRow();
-    const names = ['NORAD', 'Decay Date', 'Latitude', 'Longitude', 'Window (min)', 'Next Report', 'High Interest?'];
+    const names = [
+      'NORAD', 'Decay Date', 'Latitude', 'Longitude', 'Window (min)',
+      'Next Report (hrs)', 'Reentry Angle (deg)', 'RCS (m^2)', 'ELSET Age (hrs)',
+      'Dry Mass (kg)', 'Volume (m^3)',
+    ];
 
     for (const name of names) {
       const column = tr.insertCell();
@@ -195,16 +202,83 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     tr.setAttribute('class', 'tip-object link');
     tr.setAttribute('data-row', i.toString());
 
+    const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(this.tipList_[i].NORAD_CAT_ID));
+    let rcs = 'Reentered';
+    let age = 'Reentered';
+    let volume = 'Reentered';
+    let gammaDegrees = 'Reentered';
+
+    if (sat) {
+      // Get Flight path angle at terminal point
+      const decayEpochDate = new Date(this.tipList_[i].DECAY_EPOCH);
+      const nu = sat.toClassicalElements(decayEpochDate).trueAnomaly;
+      const sinNu = Math.sin(nu);
+      const gamma = Math.atan((sat.eccentricity * sinNu) / (1 + sat.eccentricity * Math.cos(nu)));
+
+      gammaDegrees = `${Math.abs(gamma * RAD2DEG).toFixed(2)}°`;
+
+      if (sat?.rcs) {
+        rcs = `${sat.rcs}`;
+      } else {
+        const rcsEst = SatMath.estimateRcsUsingHistoricalData(sat);
+
+        rcs = rcsEst ? `${rcsEst.toFixed(2)}` : 'Unknown';
+      }
+
+      age = sat ? `${SatMath.calcElsetAge(sat, new Date(), 'hours').toFixed(2)}` : 'Unknown';
+
+      // remove any non-numeric characters from the length, diameter, and span
+      const span = sat?.span ? parseFloat(sat.span.replace(/[^0-9.]/gu, '')) : -1;
+      const length = sat?.length ? parseFloat(sat.length.replace(/[^0-9.]/gu, '')) : -1;
+      const diameter = sat?.diameter ? parseFloat(sat.diameter.replace(/[^0-9.]/gu, '')) : -1;
+
+      volume = span !== -1 && length !== -1 && diameter !== -1 ? `${((Math.PI / 6) * span * length * diameter).toFixed(2)}` : 'Unknown';
+    }
+
     // Populate the table with the data
     TrackingImpactPredict.createCell_(tr, this.tipList_[i].NORAD_CAT_ID);
     TrackingImpactPredict.createCell_(tr, this.tipList_[i].DECAY_EPOCH);
-    TrackingImpactPredict.createCell_(tr, this.tipList_[i].LAT);
-    TrackingImpactPredict.createCell_(tr, this.tipList_[i].LON);
+    TrackingImpactPredict.createCell_(tr, this.lat2degrees_(this.tipList_[i].LAT));
+    TrackingImpactPredict.createCell_(tr, this.lon2degrees_(this.tipList_[i].LON));
     TrackingImpactPredict.createCell_(tr, this.tipList_[i].WINDOW);
     TrackingImpactPredict.createCell_(tr, this.tipList_[i].NEXT_REPORT);
-    TrackingImpactPredict.createCell_(tr, this.tipList_[i].HIGH_INTEREST);
+    TrackingImpactPredict.createCell_(tr, gammaDegrees);
+    TrackingImpactPredict.createCell_(tr, rcs);
+    TrackingImpactPredict.createCell_(tr, age);
+    TrackingImpactPredict.createCell_(tr, sat?.dryMass ? sat.dryMass : 'Reentered');
+    TrackingImpactPredict.createCell_(tr, volume);
 
     return tr;
+  }
+
+  private lon2degrees_(lon: string): string {
+    // Convert longitude from 0-360 to -180-180 and add E or W
+    let lonDeg = parseFloat(lon);
+    let direction = 'E';
+
+    if (lonDeg > 180) {
+      lonDeg -= 360;
+    }
+
+    if (lonDeg < 0) {
+      direction = 'W';
+      lonDeg = Math.abs(lonDeg);
+    }
+
+    return `${lonDeg.toFixed(2)}° ${direction}`;
+  }
+
+  private lat2degrees_(lat: string): string {
+    // Add N or S to latitude
+    let latDeg = parseFloat(lat);
+    let direction = 'N';
+
+    if (latDeg < 0) {
+      direction = 'S';
+      latDeg = Math.abs(latDeg);
+    }
+
+    return `${latDeg.toFixed(2)}° ${direction}`;
   }
 
   private static createCell_(tr: HTMLTableRowElement, text: string): void {

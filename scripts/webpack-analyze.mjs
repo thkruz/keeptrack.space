@@ -4,6 +4,7 @@ import { readdirSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 import WebpackBar from 'webpackbar';
 
 /**
@@ -192,6 +193,7 @@ const getBaseConfig = (dirName) => ({
   ignoreWarnings: [/asset size limit/u, /combined asset size exceeds the recommended limit/u],
   stats: 'errors-warnings',
   plugins: [
+    new BundleAnalyzerPlugin(),
     new WebpackBar({
       fancy: true,
       profile: true,

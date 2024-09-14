@@ -96,10 +96,10 @@ export class ShortTermFences extends KeepTrackPlugin {
         showEl('stf-on-object-link');
 
         if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
-          getEl('sat-info-top-links').insertAdjacentHTML(
+          getEl('actions-section').insertAdjacentHTML(
             'beforeend',
             keepTrackApi.html`
-            <div id="stf-on-object-link" class="link sat-infobox-links" data-position="top" data-delay="50"
+            <div id="stf-on-object-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                   data-tooltip="Visualize Sensor Search Capability">Build Short Term Fence on this object...</div>
             `,
           );

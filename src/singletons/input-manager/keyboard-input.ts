@@ -18,6 +18,16 @@ export class KeyboardInput {
 
     const uiManagerInstance = keepTrackApi.getUiManager();
 
+    window.addEventListener('blur', () => {
+      this.isCtrlPressed = false;
+      this.releaseShiftKey(keepTrackApi.getMainCamera());
+    });
+
+    window.addEventListener('focus', () => {
+      this.isCtrlPressed = false;
+      this.releaseShiftKey(keepTrackApi.getMainCamera());
+    });
+
     window.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.ctrlKey === true || e.metaKey === true) {
         this.isCtrlPressed = true;

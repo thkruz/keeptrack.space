@@ -147,12 +147,12 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Save build folder
-        uses: actions/upload-artifact@v3.1.3
-        with:
-          name: build
-          if-no-files-found: error
-          path: dist
+      # - name: Save build folder
+      #   uses: actions/upload-artifact@v3.1.3
+      #   with:
+      #     name: build
+      #     if-no-files-found: error
+      #     path: dist
   trufflehog:
     needs: build
     name: TruffleHog

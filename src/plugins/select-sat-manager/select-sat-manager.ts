@@ -124,7 +124,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.SPECIAL:
         case SpaceObjectType.NOTIONAL:
         case SpaceObjectType.UNKNOWN:
-          showEl('search-links');
+          showEl('actions-section');
           showEl('draw-line-links');
           this.selectSatObject_(obj as DetailedSatellite);
           break;
@@ -139,7 +139,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.STAR:
           return; // Do nothing
         case SpaceObjectType.BALLISTIC_MISSILE:
-          hideEl('search-links');
+          hideEl('actions-section');
           hideEl('draw-line-links');
           this.selectSatObject_(obj as MissileObject);
           break;

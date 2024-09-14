@@ -1,11 +1,6 @@
-#sat-infobox {
-  z-index: 1;
-}
-
 #sat-info-title {
-  margin-bottom: 5px;
   font-size: 22px !important;
-  padding: 5px 0 !important;
+  height: 25px;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -29,25 +24,20 @@
 }
 
 .sat-info-section-header {
+  height: 25px;
   font-size: 18px;
   text-align: center;
   background: var(--colorTertiaryDarken1);
-  margin: 0px -10px 5px;
-  padding: 2px 0;
-  width: calc(100% + 20px);
-  color: var(--colorSecondary);
+  color: var(--colorWhite);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
 
 #sat-infobox a {
   color: white;
-}
-
-.sat-infobox-links {
-  font-size: 12px;
-  margin: 5px 0px;
-  padding: 2px 10px;
-  display: flex;
-  justify-content: center;
 }
 
 .sat-info-row {
@@ -56,7 +46,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -81,4 +71,83 @@
   font-size: 12px;
   color: white;
   float: left;
+}
+
+.sat-infobox-links {
+  font-size: small;
+  padding: 2px 10px;
+  color: var(--colorSecondaryLighten2);
+}
+
+.section-collapse {
+  cursor: pointer;
+  color: var(--colorSecondary);
+  width: 25px;
+  height: 25px;
+}
+
+.section-collapse:hover {
+  background-color: var(--colorSecondary);
+  color: white;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.section-collapse:active {
+  background-color: var(--colorSecondaryDarken1);
+  color: white;
+}
+
+#search-links {
+  margin-top: 5px;
+}
+
+#actions-section,
+#launch-section,
+#sat-identifier-data,
+#orbital-section,
+#secondary-sat-info,
+#sensor-sat-info,
+#sat-mission-data {
+  transition: max-height 0.5s ease-in-out;
+  max-height: 1000px;
+  /* Set this to a value larger than the content's height */
+  overflow: hidden;
+  margin: 5px 0px;
+}
+
+#actions-section.collapsed,
+#launch-section.collapsed,
+#sat-identifier-data.collapsed,
+#orbital-section.collapsed,
+#secondary-sat-info.collapsed,
+#sensor-sat-info.collapsed,
+#sat-mission-data.collapsed {
+  max-height: 25px;
+  transition: max-height 0.25s ease-in-out;
+  margin: 5px 0px;
+}
+
+#sat-infobox {
+  display: none;
+  position: absolute;
+  background: var(--colorTertiaryDarken2);
+  cursor: default;
+  bottom: 0px;
+  height: 60%;
+  width: 100%;
+  border: 5px solid var(--colorTertiaryDarken3);
+  overflow: auto;
+  z-index: 1;
+}
+
+.sat-infobox-fullsize {
+  padding: 0 10px 0px 10px !important;
+}
+
+.sat-info-value {
+  float: right;
+  width: 45%;
+  min-height: 20px;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }

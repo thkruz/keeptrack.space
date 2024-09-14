@@ -135,10 +135,10 @@ export class SensorListPlugin extends KeepTrackPlugin {
         showEl('sensors-in-fov-link');
 
         if (keepTrackApi.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
-          getEl('sat-info-top-links').insertAdjacentHTML(
+          getEl('actions-section').insertAdjacentHTML(
             'beforeend',
             keepTrackApi.html`
-                  <div id="sensors-in-fov-link" class="link sat-infobox-links" data-position="top" data-delay="50"
+                  <div id="sensors-in-fov-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                         data-tooltip="Visualize Sensor Coverage">Show All Sensors with FOV...</div>
                 `,
           );

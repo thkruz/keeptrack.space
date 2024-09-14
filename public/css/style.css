@@ -893,7 +893,7 @@ fieldset {
 
 a {
   text-decoration: none;
-  color: #92cbff !important;
+  color: var(--colorSecondaryLighten2) !important;
 }
 
 ul li {
@@ -3238,27 +3238,7 @@ input:focus {
   display: none !important;
 }
 
-.sat-infobox-links {
-  display: none;
-  text-align: center;
-}
 
-.sat-info-row {
-  justify-content: space-between;
-}
-
-#sat-infobox {
-  display: none;
-  position: absolute;
-  background: var(--colorTertiaryDarken2);
-  cursor: default;
-  bottom: 0px;
-  height: 60%;
-  padding: 0px 10px;
-  width: 100%;
-  border: 5px solid var(--colorTertiaryDarken3);
-  overflow: auto;
-}
 
 #menu-launches,
 #menu-record,
@@ -3268,16 +3248,6 @@ input:focus {
   display: none;
 }
 
-.sat-infobox-fullsize {
-  padding: 0 10px 0px 10px !important;
-}
-.sat-info-value {
-  float: right;
-  width: 45%;
-  min-height: 20px;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
 #footer-toggle-wrapper {
   width: 100%;
   z-index: 1;

@@ -4,7 +4,8 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "module": "commonjs",
   },
   "include": [
     "src/**/*.ts",

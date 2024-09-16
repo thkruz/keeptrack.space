@@ -299,8 +299,9 @@ export class SettingsPresets {
   }
 
   static loadPresetOutreach(settings: SettingsManager) {
+    console.log(settings);
     settings.satShader.minSize = 30.0;
-    settings.limitSats = '25544';
+    settings.limitSats = '60550,60534,60552,60537';
     settings.disableAllPlugins();
     settings.isDisableStars = true;
     settings.maxAnalystSats = 1;
@@ -320,13 +321,24 @@ export class SettingsPresets {
     settings.isDisableLaunchSites = true;
     settings.isLoadLastSensor = false;
     settings.isEnableJscCatalog = false;
+    // SATELIOT
+    settings.isDrawSun = true;
+    settings.isDisableMoon = false;
+    settings.isDrawAurora = true;
+    settings.isShowRocketBodies = true;
+
+    settings.plugins.nightToggle = true;
+
     settings.onLoadCb = () => {
       const groupManagerInstance = keepTrackApi.getGroupsManager();
-      const sccNumGroup = groupManagerInstance.createGroup(9, [25544]);
+      const sccNumGroup = groupManagerInstance.createGroup(9, [60550, 60534, 60552, 60537]);
 
       groupManagerInstance.selectGroup(sccNumGroup);
       sccNumGroup.updateOrbits();
       keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
+
+      // hide nav-footer
+      getEl('nav-footer').style.display = 'none';
     };
   }
 

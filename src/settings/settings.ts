@@ -531,6 +531,8 @@ export class SettingsManager {
      */
     tle: 'https://storage.keeptrack.space/data/tle.json',
     tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
+    // tle: 'tle/TLE.txt',
+    // tleDebris: 'tle/TLEdebris.json',
     vimpel: 'https://storage.keeptrack.space/data/vimpel.json',
   };
   /**

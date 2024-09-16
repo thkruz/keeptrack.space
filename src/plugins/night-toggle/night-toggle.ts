@@ -3,7 +3,6 @@ import { keepTrackApi } from '@app/keepTrackApi';
 
 import dayNightPng from '@public/img/icons/day-night.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SoundNames } from '../sounds/SoundNames';
 
 export class NightToggle extends KeepTrackPlugin {
   readonly id = 'NightToggle';
@@ -29,10 +28,12 @@ export class NightToggle extends KeepTrackPlugin {
       key: 'N',
       callback: () => {
         if (!this.isMenuButtonActive) {
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+          // SATELIOT
+          // keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
           this.setBottomIconToSelected();
         } else {
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+          // SATELIOT
+          // keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
           this.setBottomIconToUnselected();
         }
       },

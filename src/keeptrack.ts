@@ -210,7 +210,9 @@ export class KeepTrack {
     keepTrackApi.containerRoot.id = 'keeptrack-root';
     keepTrackApi.containerRoot.innerHTML += keepTrackApi.html`
       <header>
-        <div id="keeptrack-header"></div>
+        <div id="keeptrack-header">
+            <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot">
+        </div>
       </header>
       <main>
         <div id="rmb-wrapper"></div>
@@ -233,9 +235,7 @@ export class KeepTrack {
           <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
           <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
           <div id="demo-logo" class="logo-font start-hidden">
-            <a href="https://keeptrack.space" target="_blank" style="color: white !important;">
-            Powered by KeepTrack.space
-            </a>
+
           </div>
         </figcaption>
       </main>
@@ -372,14 +372,7 @@ export class KeepTrack {
 
   private static printLogoToConsole_() {
 
-    console.log(`
- ____    _  _____ _____ _     ___ ___ _____ 
-/ ___|  / \|_   _| ____| |   |_ _/ _ \_   _|
-\___ \ / _ \ | | |  _| | |    | | | | || |  
- ___) / ___ \| | | |___| |___ | | |_| || |  
-|____/_/   \_\_| |_____|_____|___\___/ |_|  
-
-`);
+    console.log("Sateliot");
   }
 
   private static showErrorCode(error: Error & { lineNumber: number }): void {

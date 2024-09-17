@@ -33,10 +33,11 @@ export abstract class SplashScreen {
           </div>
           <span id="loader-text">Downloading Science...</span>
         </div>
-        <div id="loading-hint">Hint: ${this.showHint()}</div>
       </div>`;
   }
 
+  // Original hint html
+  // <div id="loading-hint">Hint: ${this.showHint()}</div>
   static showHint(): string {
     const messageCount = Object.keys(i18next.t('splashScreens', { returnObjects: true })).length;
     const randomIndex = Math.floor(Math.random() * messageCount) + 1;

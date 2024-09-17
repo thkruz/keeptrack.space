@@ -299,7 +299,6 @@ export class SettingsPresets {
   }
 
   static loadPresetOutreach(settings: SettingsManager) {
-    console.log(settings);
     settings.satShader.minSize = 30.0;
     settings.limitSats = '60550,60534,60552,60537';
     settings.disableAllPlugins();
@@ -327,6 +326,11 @@ export class SettingsPresets {
     settings.isDrawAurora = true;
     settings.isShowRocketBodies = true;
     settings.plugins.nightToggle = true;
+    settings.maxZoomDistance = <Kilometers>65000;
+    settings.zFar = 300000;
+    settings.minDistanceFromSatellite = <Kilometers>4;
+    // only load the 3D model of a s6u satellite
+    settings.meshListOverride = ['s6u'];
 
     settings.onLoadCb = () => {
       const groupManagerInstance = keepTrackApi.getGroupsManager();

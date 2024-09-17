@@ -326,7 +326,6 @@ export class SettingsPresets {
     settings.isDisableMoon = false;
     settings.isDrawAurora = true;
     settings.isShowRocketBodies = true;
-
     settings.plugins.nightToggle = true;
 
     settings.onLoadCb = () => {
@@ -337,7 +336,7 @@ export class SettingsPresets {
       sccNumGroup.updateOrbits();
       keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
 
-      // hide nav-footer
+      // SATELIOT hide nav-footer
       getEl('nav-footer').style.display = 'none';
     };
   }

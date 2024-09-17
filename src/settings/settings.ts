@@ -1186,6 +1186,10 @@ export class SettingsManager {
 
     this.initParseFromGETVariables_(params);
 
+    // SATELIOT
+    console.log("Force preset outreach");
+    SettingsPresets.loadPresetOutreach(this);
+
     // If No UI Reduce Overhead
     if (this.disableUI) {
       // LEAVE AT LEAST ONE TO PREVENT ERRORS

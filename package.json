@@ -30,6 +30,7 @@
     "lib/workers"
   ],
   "scripts": {
+    "dev": "node ./scripts/build.mjs development",
     "build": "node ./scripts/build.mjs production",
     "build:lib": "node ./scripts/build-library.mjs library && tsc -p tsconfig.library.json --emitDeclarationOnly",
     "build:watch": "node ./scripts/build.mjs development --watch",

@@ -213,6 +213,9 @@ export class KeepTrack {
         <div id="keeptrack-header">
             <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot">
         </div>
+        <div id="bottom-map-icon">
+          <img id="sateliot-map-icon" src="/img/2d-map-grey.png" alt="Change to 2D visualization" title="Switch to 2D Map View">
+        </div>
       </header>
       <main>
         <div id="rmb-wrapper"></div>

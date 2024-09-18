@@ -3923,5 +3923,16 @@ nav a.sidenav-trigger i {
   left: 10px;
   width: 20vw;
   height: auto;
-  z-index: 100;
+  z-index: 500;
+}
+
+#sateliot-map-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 6vw;
+  height: auto;
+  cursor: pointer;
+  z-index: 500;
+
 }

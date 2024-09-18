@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sateliot Satellites - 2D Map</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css" />
+
+    <style>
+        /* El mapa debe tener una altura para que sea visible */
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Contenedor del mapa -->
+    <div id="map">
+        <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot">
+
+        <a href="/">
+            <img id="sateliot-map-icon" src="/img/3d-map-grey.png" alt="Change to 3D visualization"
+                title="Switch to 2D Map View">
+        </a>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="/leaflet.js"></script>
+    <script src="/L.Terminator.js"></script>
+
+
+    <!-- Satellite.js para manejar los TLEs -->
+    <script src="https://unpkg.com/satellite.js/dist/satellite.min.js"></script>
+
+    <!-- Archivo principal JavaScript -->
+    <script src="/2d-map.js"></script>
+
+
+</body>
+
+</html>

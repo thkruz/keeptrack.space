@@ -365,19 +365,22 @@ export class SettingsPresets {
     // only load the 3D model of a s6u satellite
     // settings.meshListOverride = ['s6u'];
 
+
     settings.onLoadCb = () => {
-      // const groupManagerInstance = keepTrackApi.getGroupsManager();
-      // // const sateliotGroup = groupManagerInstance.createGroup(4, /SATELIOT/u, 'Sateliot');
-      // const sateliotGroup = groupManagerInstance.createGroup(10, [60550, 60534, 60552, 60537]);
-
-      // groupManagerInstance.selectGroup(sateliotGroup);
-      // sateliotGroup.updateOrbits();
-      // keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
-
       keepTrackApi.getUiManager().searchManager.doSearch('60550,60534,60552,60537');
 
       // SATELIOT hide nav-footer
       getEl('nav-footer').style.display = 'none';
+
+      // Select the Sateliot satellites
+      const mapIcon = document.getElementById('sateliot-map-icon');
+
+      // Add event listener to the map icon
+      mapIcon.addEventListener('click', () => {
+        window.location.href = './2d-map.html';  // Redirigir al visualizador 2D
+      });
+
+
     };
   }
 

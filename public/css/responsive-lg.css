@@ -14,9 +14,11 @@
   #demo-logo {
     font-size: 5vh;
   }
+
   #fullscreen-icon {
     display: none;
   }
+
   #menu-launches,
   #menu-record,
   #menu-color-scheme,
@@ -25,9 +27,10 @@
     display: block;
   }
 
-  .top-menu-icons > a {
+  .top-menu-icons>a {
     padding: 0px 10px;
   }
+
   .search-icon-search-on {
     transition: 1s;
   }
@@ -36,10 +39,12 @@
     width: 25px;
     height: 25px;
   }
+
   #search-close {
     padding: 0px 6.25%;
     font-size: 24px;
   }
+
   /* TODO: Account for the bottom bar being minimized */
   #search-results {
     min-height: fit-content;
@@ -55,22 +60,28 @@
     bottom: var(--bottom-menu-top);
     max-height: calc(100% - var(--top-menu-height) - max(var(--bottom-menu-top), var(--search-box-bottom) + var(--bottom-menu-top)) + 3px);
     border-width: 0px 0px 5px 5px;
-    border-style: solid;
-    border-color: var(--colorTertiaryDarken3);
+
+    /* SATELIOT */
+    /* border-style: solid; */
+    /* border-color: var(--colorTertiaryDarken3); */
   }
+
   .github-share-down {
     transition: 1s;
     top: 50px !important;
   }
+
   .twitter-share-down {
     transition: 1s;
     top: 100px !important;
   }
+
   .reddit-share-down {
     transition: 1s;
     border-bottom-right-radius: 10px;
     top: 150px !important;
   }
+
   .share-icons {
     position: absolute;
     left: 0px;
@@ -80,10 +91,12 @@
     padding: 9px;
     background: var(--colorTertiaryDarken2) !important;
   }
+
   .share-up {
     transition: 1s;
     top: 0px !important;
   }
+
   #time-machine-menu {
     padding-left: 35px;
     color: white;
@@ -106,31 +119,38 @@
   ::-webkit-scrollbar {
     display: none;
   }
+
   .search-slide-down {
     width: 334px;
   }
+
   .search-slide-up {
     width: 0px;
   }
+
   #legend-hover-menu {
     top: var(--top-menu-height);
     padding: 5px;
   }
+
   .Square-Box {
     width: 25px;
     height: 25px;
   }
+
   #sat-infobox {
     bottom: var(--bottom-menu-height);
     margin-top: 25px;
     right: 0px;
     width: 355px;
   }
+
   .satinfo-fixed:after {
     content: '';
     height: calc(var(--bottom-menu-height) + 15px);
     display: block;
   }
+
   /* .sat-infobox-fullsize {} */
   .sat-info-value {
     float: right;
@@ -138,6 +158,7 @@
     padding: 0px 25px;
     text-align: center;
   }
+
   .truncate-search {
     width: 200px;
   }

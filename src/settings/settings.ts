@@ -531,10 +531,11 @@ export class SettingsManager {
      */
     tle: 'https://storage.keeptrack.space/data/tle.json',
     tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
-    // tle: 'tle/TLE.txt',
-    // tleDebris: 'tle/TLEdebris.json',
     vimpel: 'https://storage.keeptrack.space/data/vimpel.json',
   };
+
+
+
   /**
    * Determines whether or not to hide the propogation rate text on the GUI.
    */
@@ -1187,8 +1188,8 @@ export class SettingsManager {
     this.initParseFromGETVariables_(params);
 
     // SATELIOT
-    console.log("Force preset outreach");
-    SettingsPresets.loadPresetOutreach(this);
+    console.log("Force preset Sateliot");
+    SettingsPresets.loadPresetSateliot(this);
 
     // If No UI Reduce Overhead
     if (this.disableUI) {

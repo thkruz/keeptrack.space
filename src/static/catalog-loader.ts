@@ -152,7 +152,28 @@ export class CatalogLoader {
       if (settingsManager.limitSats === '') {
         CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
       } else {
-        CatalogLoader.processLimitedSats_(limitSatsArray, resp, i, catalogManagerInstance, tempObjData);
+        console.log("limitSatsArray", limitSatsArray);
+
+        // CatalogLoader.processLimitedSats_(limitSatsArray, resp, i, catalogManagerInstance, tempObjData);
+        CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
+
+        let outputObjData: BaseObject[] = [];
+        // bucle of tempObjData
+        for (let i = 0; i < tempObjData.length; i++) {
+          if (tempObjData[i].isSatellite()) {
+            const sat = tempObjData[i] as DetailedSatellite;
+            // if sat is in limitSatsArray then push to outputObjData
+            if (limitSatsArray.includes(sat.sccNum)) {
+              outputObjData.push(sat);
+            }
+          }
+        }
+
+        // update tempObjData
+        tempObjData = outputObjData;
+
+        // order by name
+        tempObjData.sort((a, b) => (a.name > b.name ? 1 : -1));
       }
     }
 
@@ -997,57 +1018,62 @@ export class CatalogLoader {
     }
   }
 
-  private static processLimitedSats_(limitSatsArray: string[], resp: KeepTrackTLEFile[], i: number, catalogManagerInstance: CatalogManager, tempObjData: any[]) {
-    let newId = 0;
+  // private static processLimitedSats_(limitSatsArray: string[], resp: KeepTrackTLEFile[], i: number, catalogManagerInstance: CatalogManager, tempObjData: any[]) {
+  // 
+  // Code commented by Sateliot to keep the original code
+  // 
+  // let newId = 0;
 
-    for (const limitSat of limitSatsArray) {
-      if (resp[i].sccNum === limitSat) {
-        const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
+  // for (const limitSat of limitSatsArray) {
 
-        resp[i].intlDes = intlDes;
-        resp[i].id = newId;
-        newId++;
-        catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
-        catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
-        resp[i].active = true;
-        const source = Tle.classification(resp[i].TLE1);
+  //   if (resp[i].sccNum === limitSat) {
+  //     console.log('Stat found:', limitSat);
+  //     const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
 
-        switch (source) {
-          case 'U':
-            resp[i].source = CatalogSource.USSF;
-            break;
-          case 'C':
-            resp[i].source = CatalogSource.CELESTRAK;
-            break;
-          case 'M':
-            resp[i].source = CatalogSource.UNIV_OF_MICH;
-            break;
-          case 'N':
-            resp[i].source = CatalogSource.NUSPACE;
-            break;
-          case 'P':
-            resp[i].source = CatalogSource.CALPOLY;
-            break;
-          case 'V':
-            resp[i].source = CatalogSource.VIMPEL;
-            break;
-          default:
-            // Default to USSF for now
-            resp[i].source = CatalogSource.USSF;
-        }
+  //     resp[i].intlDes = intlDes;
+  //     resp[i].id = newId;
+  //     newId++;
+  //     catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
+  //     catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
+  //     resp[i].active = true;
+  //     const source = Tle.classification(resp[i].TLE1);
 
-        const satellite = new DetailedSatellite({
-          id: tempObjData.length,
-          tle1: resp[i].TLE1,
-          tle2: resp[i].TLE2,
-          rcs: parseFloat(resp[i].rcs) as any,
-          ...resp[i],
-        });
+  //     switch (source) {
+  //       case 'U':
+  //         resp[i].source = CatalogSource.USSF;
+  //         break;
+  //       case 'C':
+  //         resp[i].source = CatalogSource.CELESTRAK;
+  //         break;
+  //       case 'M':
+  //         resp[i].source = CatalogSource.UNIV_OF_MICH;
+  //         break;
+  //       case 'N':
+  //         resp[i].source = CatalogSource.NUSPACE;
+  //         break;
+  //       case 'P':
+  //         resp[i].source = CatalogSource.CALPOLY;
+  //         break;
+  //       case 'V':
+  //         resp[i].source = CatalogSource.VIMPEL;
+  //         break;
+  //       default:
+  //         // Default to USSF for now
+  //         resp[i].source = CatalogSource.USSF;
+  //     }
 
-        tempObjData.push(satellite);
-      }
-    }
-  }
+  //     const satellite = new DetailedSatellite({
+  //       id: tempObjData.length,
+  //       tle1: resp[i].TLE1,
+  //       tle2: resp[i].TLE2,
+  //       rcs: parseFloat(resp[i].rcs) as any,
+  //       ...resp[i],
+  //     });
+
+  //     tempObjData.push(satellite);
+  //   }
+  // }
+  // }
 
   private static sortByScc_(catalog: AsciiTleSat[] | ExtraSat[]) {
     catalog.sort((a: { SCC: string }, b: { SCC: string }) => {

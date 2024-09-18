@@ -248,6 +248,7 @@ export class SettingsPresets {
     settings.maxOribtsDisplayedDesktopAll = 100000;
     settings.maxOribtsDisplayed = 100000;
     settings.searchLimit = 100000;
+
     settings.onLoadCb = () => {
       const groupManagerInstance = keepTrackApi.getGroupsManager();
       const allSats = groupManagerInstance.createGroup(0, null);
@@ -300,6 +301,38 @@ export class SettingsPresets {
 
   static loadPresetOutreach(settings: SettingsManager) {
     settings.satShader.minSize = 30.0;
+    settings.limitSats = '25544';
+    settings.disableAllPlugins();
+    settings.isDisableStars = true;
+    settings.maxAnalystSats = 1;
+    settings.maxMissiles = 1;
+    settings.maxFieldOfViewMarkers = 1;
+    settings.noMeshManager = false;
+    settings.isLoadLastMap = false;
+    settings.isShowRocketBodies = true;
+    settings.isShowDebris = true;
+    settings.isShowPayloads = true;
+    settings.isShowAgencies = false;
+    settings.nasaImages = true;
+    settings.isAllowRightClick = false;
+    settings.isDisableSelectSat = false;
+    settings.isDisableSensors = true;
+    settings.isDisableControlSites = true;
+    settings.isDisableLaunchSites = true;
+    settings.isLoadLastSensor = false;
+    settings.isEnableJscCatalog = false;
+    settings.onLoadCb = () => {
+      const groupManagerInstance = keepTrackApi.getGroupsManager();
+      const sccNumGroup = groupManagerInstance.createGroup(9, [25544]);
+
+      groupManagerInstance.selectGroup(sccNumGroup);
+      sccNumGroup.updateOrbits();
+      keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
+    };
+  }
+
+  static loadPresetSateliot(settings: SettingsManager) {
+    settings.satShader.minSize = 30.0;
     settings.limitSats = '60550,60534,60552,60537';
     settings.disableAllPlugins();
     settings.isDisableStars = true;
@@ -330,15 +363,18 @@ export class SettingsPresets {
     settings.zFar = 300000;
     settings.minDistanceFromSatellite = <Kilometers>4;
     // only load the 3D model of a s6u satellite
-    settings.meshListOverride = ['s6u'];
+    // settings.meshListOverride = ['s6u'];
 
     settings.onLoadCb = () => {
-      const groupManagerInstance = keepTrackApi.getGroupsManager();
-      const sccNumGroup = groupManagerInstance.createGroup(9, [60550, 60534, 60552, 60537]);
+      // const groupManagerInstance = keepTrackApi.getGroupsManager();
+      // // const sateliotGroup = groupManagerInstance.createGroup(4, /SATELIOT/u, 'Sateliot');
+      // const sateliotGroup = groupManagerInstance.createGroup(10, [60550, 60534, 60552, 60537]);
 
-      groupManagerInstance.selectGroup(sccNumGroup);
-      sccNumGroup.updateOrbits();
-      keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
+      // groupManagerInstance.selectGroup(sateliotGroup);
+      // sateliotGroup.updateOrbits();
+      // keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
+
+      keepTrackApi.getUiManager().searchManager.doSearch('60550,60534,60552,60537');
 
       // SATELIOT hide nav-footer
       getEl('nav-footer').style.display = 'none';

@@ -30,6 +30,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
     // Show error if satellite is not a Payload in GEO
     if (
       !selectedSat ||
+      selectedSat.id === -1 ||
       !selectedSat.isSatellite() ||
       !this.satsWithChannels_.includes((selectedSat as DetailedSatellite).sccNum)
     ) {
@@ -61,6 +62,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
       cb: (obj: BaseObject) => {
         if (
           !obj ||
+          obj.id === -1 ||
           !obj.isSatellite() ||
           !this.satsWithChannels_.includes((obj as DetailedSatellite).sccNum)
         ) {

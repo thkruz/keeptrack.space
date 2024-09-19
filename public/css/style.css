@@ -3924,15 +3924,22 @@ nav a.sidenav-trigger i {
   width: 20vw;
   height: auto;
   z-index: 500;
+
 }
 
 #sateliot-map-icon {
   position: absolute;
-  bottom: 10px;
+  bottom: 30px;
   right: 10px;
-  width: 6vw;
+  width: 4vw;
   height: auto;
   cursor: pointer;
-  z-index: 500;
+  z-index: 100;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
 
+#sateliot-map-icon:hover {
+  transform: translateY(-10px);
 }

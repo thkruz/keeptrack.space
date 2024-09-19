@@ -23,6 +23,7 @@ export abstract class SplashScreen {
    * @param rootDom The root DOM element to which the loading screen will be appended.
    */
   static initLoadingScreen(rootDom: HTMLElement) {
+
     rootDom.innerHTML += keepTrackApi.html`
       <div id="loading-screen" class="valign-wrapper full-loader">
         <div id="logo-inner-container" class="valign">
@@ -46,6 +47,7 @@ export abstract class SplashScreen {
   }
 
   static hideSplashScreen() {
+
     // Don't wait if we are running Jest
     if (keepTrackApi.getScene().earth.isUseHiRes && keepTrackApi.getScene().earth.isHiResReady !== true) {
       setTimeout(() => {

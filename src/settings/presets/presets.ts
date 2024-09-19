@@ -363,14 +363,15 @@ export class SettingsPresets {
     settings.zFar = 300000;
     settings.minDistanceFromSatellite = <Kilometers>4;
     // only load the 3D model of a s6u satellite
-    // settings.meshListOverride = ['s6u'];
+    settings.meshListOverride = ['s6u'];
+    settings.plugins.satelliteFov = true;
 
 
     settings.onLoadCb = () => {
       keepTrackApi.getUiManager().searchManager.doSearch('60550,60534,60552,60537');
 
       // SATELIOT hide nav-footer
-      getEl('nav-footer').style.display = 'none';
+      // getEl('nav-footer').style.display = 'none';
 
       // Select the Sateliot satellites
       const mapIcon = document.getElementById('sateliot-map-icon');

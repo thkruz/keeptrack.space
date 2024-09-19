@@ -515,6 +515,15 @@ export class SearchManager {
 
     const satData = catalogManagerInstance.objectCache;
 
+    // SATELIOT
+    // order results by name
+    results.sort((a, b) => {
+      const objA = satData[a.id];
+      const objB = satData[b.id];
+
+      return objA.name.localeCompare(objB.name);
+    });
+
     getEl('search-results').innerHTML = results.reduce((html, result) => {
       const obj = <DetailedSatellite | MissileObject>satData[result.id];
 
@@ -542,7 +551,9 @@ export class SearchManager {
         html += sat.altName.substring(result.strIndex + result.patlen);
       } else {
         // If not, just write the name
-        html += obj.name;
+        // html += obj.name;
+        const name = obj.name.charAt(0).toUpperCase() + obj.name.slice(1).replace(/_/g, ' ').toLowerCase();
+        html += name;
       }
       html += '</div>';
       html += '<div class="search-result-scc">';
@@ -557,8 +568,8 @@ export class SearchManager {
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
-            html += sat.sccNum.substring(0, result.strIndex);
-            html += '<span class="search-hilight">';
+            // html += '<span class="search-hilight">';
+            html += '<em>NORAD Id:&nbsp;&nbsp;</em><span class="search-hilight">';
             html += sat.sccNum.substring(result.strIndex, result.strIndex + result.patlen);
             html += '</span>';
             html += sat.sccNum.substring(result.strIndex + result.patlen);

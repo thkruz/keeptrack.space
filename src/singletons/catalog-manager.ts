@@ -43,6 +43,7 @@ import { UrlManager } from '../static/url-manager';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
 import { errorManagerInstance } from './errorManager';
+import { showEl } from '@app/lib/get-el';
 
 declare module '@app/interfaces' {
   interface SatCruncherMessageData {
@@ -579,6 +580,8 @@ export class CatalogManager {
   }
 
   private onCruncherReady_() {
+    // Hide the bottom map icon if we are in 2D mode
+    showEl('bottom-map-icon');
     SplashScreen.hideSplashScreen();
 
     const stars = this.objectCache.filter((sat) => sat?.type === SpaceObjectType.STAR);

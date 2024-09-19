@@ -28,7 +28,6 @@ import sensorOccupiedPng from '@public/img/icons/sensor_occupied.png';
 import { BaseObject, Degrees } from 'ootk';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
 
 export class SatelliteFov extends KeepTrackPlugin {
   readonly id = 'SatelliteFov';
@@ -175,7 +174,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       cb: () => {
         getEl('reset-sat-fov-cones-button').addEventListener('click', () => {
           keepTrackApi.getScene().coneFactory.clear();
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+          // keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
           getEl('reset-sat-fov-cones-button').setAttribute('disabled', 'true');
         });
       },
@@ -200,10 +199,10 @@ export class SatelliteFov extends KeepTrackPlugin {
             const cone = coneFactory.checkCacheForMesh_(currentSat);
 
             if (cone) {
-              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+              // keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
               coneFactory.remove(cone.id);
             } else {
-              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+              // keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
               coneFactory.generateMesh(currentSat);
             }
           }
@@ -352,7 +351,7 @@ export class SatelliteFov extends KeepTrackPlugin {
         const id = parseInt((e.target as HTMLElement).dataset.id, 10);
 
         keepTrackApi.getScene().coneFactory.removeByObjectId(id);
-        keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+        // keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
       });
     });
 

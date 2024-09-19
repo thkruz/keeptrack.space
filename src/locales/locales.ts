@@ -133,6 +133,11 @@ export const loadLocalization = () => ({
       title: i18next.t('plugins.DebrisScreening.title'),
       helpBody: i18next.t('plugins.DebrisScreening.helpBody'),
     },
+    TransponderChannelData: {
+      bottomIconLabel: i18next.t('plugins.TransponderChannelData.bottomIconLabel'),
+      title: i18next.t('plugins.TransponderChannelData.title'),
+      helpBody: i18next.t('plugins.TransponderChannelData.helpBody'),
+    },
     EditSat: {
       bottomIconLabel: i18next.t('plugins.EditSat.bottomIconLabel'),
       title: i18next.t('plugins.EditSat.title'),

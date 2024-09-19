@@ -74,6 +74,7 @@ const settingsOverride = {
     polarPlot: true,
     timeline: true,
     timelineAlt: true,
+    transponderChannelData: true,
   },
   /*
    * searchLimit: 150,

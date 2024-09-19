@@ -25,7 +25,6 @@ import { EditSat } from './edit-sat/edit-sat';
 import { GamepadPlugin } from './gamepad/gamepad';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
 import { NewLaunch } from './new-launch/new-launch';
-import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
 import { OrbitReferences } from './orbit-references/orbit-references';
 import { Planetarium } from './planetarium/planetarium';
@@ -40,6 +39,7 @@ import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact
  */
 import googleAnalytics from '@analytics/google-analytics';
 import createAnalytics from 'analytics';
+import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { PolarPlotPlugin } from './polar-plot/polar-plot';
 import { ReportsPlugin } from './reports/reports';
 import { SatConstellations } from './sat-constellations/sat-constellations';
@@ -64,11 +64,13 @@ import { StereoMap } from './stereo-map/stereo-map';
 import { TimeMachine } from './time-machine/time-machine';
 import { SatelliteTimeline } from './timeline-satellite/satellite-timeline';
 import { SensorTimeline } from './timeline-sensor/sensor-timeline';
+import { TransponderChannelData } from './transponder-channel-data/transponder-channel-data';
 import { VideoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 
 export type KeepTrackPlugins = {
+  transponderChannelData?: boolean;
   videoDirector?: boolean;
   debrisScreening?: boolean;
   satInfoboxCore?: boolean;
@@ -157,6 +159,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new TrackingImpactPredict().init(), enabled: plugins.trackingImpactPredict },
       { init: () => new Breakup().init(), enabled: plugins.breakup },
       { init: () => new DebrisScreening().init(), enabled: plugins.debrisScreening },
+      { init: () => new TransponderChannelData().init(), enabled: plugins.transponderChannelData },
       { init: () => new EditSat().init(), enabled: plugins.editSat },
       { init: () => new NewLaunch().init(), enabled: plugins.newLaunch },
       { init: () => missile.init(), enabled: plugins.missile },

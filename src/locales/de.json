@@ -200,6 +200,11 @@
       "title": "Trümmer-Screening-Menü",
       "helpBody": "Das Trümmer-Screening-Menü wird verwendet, um eine Liste von Trümmerobjekten zu generieren, die möglicherweise von einem Satelliten gesehen werden können. Die Liste wird durch Berechnung der Bahnparameter der Trümmerobjekte und Vergleich mit den Bahnparametern des Satelliten erstellt. Der Benutzer kann wählen, ob die Liste mit dem TLE oder dem SGP4-Propagator generiert werden soll. Der Benutzer kann auch die Liste nach der Größe des Trümmerobjekts und der Magnitude des Trümmerobjekts filtern. Der Benutzer kann auch die Liste nach der Größe des Trümmerobjekts und der Magnitude des Trümmerobjekts filtern. Der Benutzer kann auch wählen, ob die Liste mit dem TLE oder dem SGP4-Propagator generiert werden soll. Der Benutzer kann auch die Liste nach der Größe des Trümmerobjekts und der Magnitude des Trümmerobjekts filtern."
     },
+    "TransponderChannelData": {
+      "bottomIconLabel": "Transponder- und Kanalinformationen",
+      "title": "Satelliten-Transponder- und Kanalinformationen",
+      "helpBody": "<p>Diese Tabelle enthält technische Details zu Satellitenkanälen, einschließlich TV-, Radio- und anderen Kommunikationsdiensten:</p><ul><li><strong>Satellit:</strong> Name des Satelliten, der den Kanal überträgt</li><li><strong>TV-Kanal:</strong> Name des TV-/Radiokanals oder Kommunikationsdienstes</li><li><strong>Ausleuchtzone:</strong> Richtung des Satellitenbeams (z.B. Westhemisphäre)</li><li><strong>Freq:</strong> Transponderfrequenz und Polarisation (z.B. 3840 V)</li><li><strong>System:</strong> Übertragungssystem (z.B. DVB-S2 8PSK)</li><li><strong>SRFEC:</strong> Symbolrate und FEC-Verhältnis (z.B. 30000 3/4)</li><li><strong>Video:</strong> Video-/Datenkompressionsformat (z.B. MPEG-4/HD)</li><li><strong>Sprache:</strong> Verfügbare Audio-/Kommunikationssprachen (z.B. Eng, Chi)</li><li><strong>Verschlüsselung:</strong> Verwendetes Verschlüsselungssystem (z.B. PowerVu)</li></ul><p>Diese Informationen sind nützlich für Satellitenkommunikationsfachleute, Techniker, Enthusiasten und jeden, der Satellitenempfangsgeräte einrichtet oder Probleme damit behebt.</p>"
+    },
     "EditSat": {
       "bottomIconLabel": "Satellit bearbeiten",
       "title": "Satellit bearbeiten Menü",

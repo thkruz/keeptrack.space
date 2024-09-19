@@ -1,0 +1,150 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { errorManagerInstance } from '@app/singletons/errorManager';
+import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
+import { BaseObject, DetailedSatellite } from 'ootk';
+import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+
+interface ChannelInfo {
+  satellite: string;
+  tvchannel: string;
+  beam: string;
+  freq: string;
+  system: string;
+  SRFEC: string;
+  video: string;
+  lang: string;
+  encryption: string;
+}
+
+export class TransponderChannelData extends KeepTrackPlugin {
+  readonly id = 'TransponderChannelData';
+  dependencies_ = [];
+  // eslint-disable-next-line max-len
+  private readonly satsWithChannels_: string[] = ['39508', '41588', '40424', '25924', '37393', '43039', '35942', '39078', '42934', '44479', '32794', '39237', '28868', '31102', '39127', '43450', '38107', '40982', '36745', '37810', '44186', '40272', '40941', '35696', '37933', '42942', '29055', '31306', '33436', '37775', '39285', '38778', '40364', '36581', '32299', '39079', '43632', '36592', '41029', '56757', '43463', '41238', '32019', '28943', '37677', '39157', '39017', '44067', '52255', '33051', '49125', '42907', '28935', '42967', '33207', '36499', '39008', '39233', '43700', '54259', '40425', '41589', '42741', '38992', '39773', '41382', '39020', '44334', '40875', '41310', '45985', '45986', '41191', '39612', '39613', '29236', '32951', '33376', '46114', '54243', '54244', '54026', '54741', '54742', '27445', '42814', '37264', '43228', '43633', '54048', '54225', '28358', '36097', '37238', '37834', '38356', '38740', '38749', '38098', '38867', '40271', '41581', '41748', '40874', '42818', '41747', '42950', '44476', '26824', '41903', '41471', '29272', '38331', '37749', '39728', '29349', '42984', '37265', '42691', '41034', '35362', '40147', '52904', '38014', '36830', '52817', '33373', '35873', '38342', '28526', '36032', '33749', '44048', '40146', '32252', '35756', '37779', '37826', '36831', '36516', '42432', '43488', '43175', '42709', '55970', '55971', '37809', '53961', '52933', '37748', '38087', '38652', '39172', '34941', '39460', '41380', '28945', '37606', '32768', '38991', '40733', '41904', '49055', '33274', '14787', '41944', '34111', '41036', '37602', '43611', '28786', '39500', '41552', '32487', '36033', '40613', '39481', '33056', '39522', '47306', '50212', '32767', '38332', '40345', '39022', '44307'];
+  bottomIconCallback: () => void = () => {
+    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+
+    // Show error if satellite is not a Payload in GEO
+    if (
+      !selectedSat ||
+      !selectedSat.isSatellite() ||
+      !this.satsWithChannels_.includes((selectedSat as DetailedSatellite).sccNum)
+    ) {
+      errorManagerInstance.warn('Satellite does not have channel information');
+
+      return;
+    }
+
+    if (!this.isMenuButtonActive) {
+      return;
+    }
+
+
+    this.showTable();
+    this.lastLoadedSat_ = selectedSat.id;
+  };
+
+  private lastLoadedSat_ = -1;
+
+  addJs(): void {
+    super.addJs();
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.selectSatData,
+      cbName: this.id,
+      cb: (obj: BaseObject) => {
+        if (
+          !obj ||
+          !obj.isSatellite() ||
+          !this.satsWithChannels_.includes((obj as DetailedSatellite).sccNum)
+        ) {
+          if (this.isMenuButtonActive) {
+            this.closeSideMenu();
+          }
+          this.setBottomIconToDisabled();
+        } else {
+          // It is a satellite with channel information
+          this.setBottomIconToEnabled();
+
+          // If it is open, update the table
+          if (this.isMenuButtonActive && this.lastLoadedSat_ !== obj.id) {
+            this.showTable();
+            this.lastLoadedSat_ = obj.id;
+          }
+        }
+      },
+    });
+  }
+
+  bottomIconElementName: string = 'menu-transponderChannelData';
+  bottomIconImg = transponderChannelDataPng;
+
+  dragOptions: clickDragOptions = {
+    isDraggable: false,
+    maxWidth: 1000,
+    minWidth: 1000,
+  };
+
+  sideMenuElementName: string = 'transponderChannelData-menu';
+  sideMenuElementHtml: string = keepTrackApi.html`
+  <div id="transponderChannelData-menu" class="side-menu-parent start-hidden text-select">
+    <div id="transponderChannelData-content" class="side-menu">
+      <div class="row">
+        <h5 class="center-align">Satellite Frequencies</h5>
+        <table id="transponderChannelData-table" class="center-align striped-light centered"></table>
+      </div>
+      <div class="row">
+        <center>
+          <button id="export-launch-info" class="btn btn-ui waves-effect waves-light">Export Launch Info &#9658;</button>
+        </center>
+      </div>
+    </div>
+  </div>`;
+
+  isRequireSatelliteSelected: boolean = true;
+
+  showTable() {
+    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+
+    fetch(`https://api.keeptrack.space/v1/channel/${selectedSat.name}`)
+      .then(async (resp) => {
+        const data = await resp.json() as ChannelInfo[];
+
+        const tbl: HTMLTableElement = <HTMLTableElement>getEl('transponderChannelData-table');
+
+        if (!tbl) {
+          return;
+        }
+
+        tbl.innerHTML = '';
+        // Add a header row
+        const header = tbl.createTHead();
+        const headerRow = header.insertRow();
+
+        Object.keys(data[0]).forEach((key) => {
+          const th = document.createElement('th');
+          const h3 = document.createElement('h3');
+
+          h3.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+          h3.style.textAlign = 'left';
+          th.appendChild(h3);
+          headerRow.appendChild(th);
+        });
+        // Loop through the data and create a table row for each item
+        data.forEach((info) => {
+          const row = tbl.insertRow();
+
+          Object.values(info).forEach((val) => {
+            const cell = row.insertCell();
+
+            cell.textContent = val;
+
+          });
+        });
+      })
+      .catch(() => errorManagerInstance.warn(`Failed to fetch channel info for ${selectedSat.name}`));
+  }
+}

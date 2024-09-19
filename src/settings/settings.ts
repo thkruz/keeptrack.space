@@ -85,6 +85,7 @@ export class SettingsManager {
     polarPlot: true,
     timeline: true,
     timelineAlt: true,
+    transponderChannelData: true,
   };
 
   colors: ColorSchemeColorMap;
@@ -1026,6 +1027,8 @@ export class SettingsManager {
    * When set to `false`, the system may use internal or other sources of TLE data.
    */
   externalTLEsOnly = false;
+  positionCruncher: Worker = null;
+  orbitCruncher: Worker = null;
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);

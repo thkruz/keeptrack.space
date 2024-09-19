@@ -200,6 +200,11 @@
       "title": "Menú de Detección de Escombros",
       "helpBody": "El menú de Detección de Escombros se usa para generar una lista de objetos de escombros que potencialmente podrían ser vistos por un satélite. La lista se genera calculando los parámetros orbitales de los objetos de escombros y comparándolos con los parámetros orbitales del satélite. El usuario puede elegir generar la lista usando el propagador TLE o SGP4. El usuario también puede elegir filtrar la lista por el tamaño del objeto de escombros y la magnitud del objeto de escombros. El usuario también puede elegir filtrar la lista por el tamaño del objeto de escombros y la magnitud del objeto de escombros. El usuario también puede elegir generar la lista usando el propagador TLE o SGP4. El usuario también puede elegir filtrar la lista por el tamaño del objeto de escombros y la magnitud del objeto de escombros."
     },
+    "TransponderChannelData": {
+      "bottomIconLabel": "Información de Transpondedor y Canal",
+      "title": "Información de Transpondedor y Canal de Satélite",
+      "helpBody": "<p>Esta tabla contiene detalles técnicos de canales satelitales, incluyendo servicios de TV, radio y otras comunicaciones:</p><ul><li><strong>satélite:</strong> Nombre del satélite que transmite el canal</li><li><strong>tvcanal:</strong> Nombre del canal de TV/radio o servicio de comunicación</li><li><strong>haz:</strong> Dirección del haz del satélite (ej., Hemi oeste)</li><li><strong>freq:</strong> Frecuencia y polaridad del transpondedor (ej., 3840 V)</li><li><strong>sistema:</strong> Sistema de transmisión (ej., DVB-S2 8PSK)</li><li><strong>SRFEC:</strong> Tasa de símbolo y relación FEC (ej., 30000 3/4)</li><li><strong>video:</strong> Formato de compresión de video/datos (ej., MPEG-4/HD)</li><li><strong>idioma:</strong> Idiomas de audio/comunicación disponibles (ej., Ing, Chi)</li><li><strong>encriptación:</strong> Sistema de encriptación utilizado (ej., PowerVu)</li></ul><p>Esta información es útil para profesionales de comunicación satelital, técnicos, entusiastas y cualquier persona que configure o solucione problemas de equipos de recepción satelital.</p>"
+    },
     "EditSat": {
       "bottomIconLabel": "Editar Satélite",
       "title": "Menú de Edición de Satélite",

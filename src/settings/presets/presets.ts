@@ -371,7 +371,7 @@ export class SettingsPresets {
       keepTrackApi.getUiManager().searchManager.doSearch('60550,60534,60552,60537');
 
       // SATELIOT hide nav-footer
-      // getEl('nav-footer').style.display = 'none';
+      getEl('nav-footer').style.display = 'none';
 
       // Select the Sateliot satellites
       const mapIcon = document.getElementById('sateliot-map-icon');
@@ -382,6 +382,20 @@ export class SettingsPresets {
       });
 
 
+      // SATELIOT
+      // Enable the FOV for all satellites
+      const allSats = keepTrackApi.getCatalogManager().getActiveSats();
+      allSats.forEach((currentSat) => {
+        if (currentSat) {
+          const coneFactory = keepTrackApi.getScene().coneFactory;
+          const cone = coneFactory.checkCacheForMesh_(currentSat);
+          if (cone) {
+            coneFactory.remove(cone.id);
+          } else {
+            coneFactory.generateMesh(currentSat);
+          }
+        }
+      });
     };
   }
 

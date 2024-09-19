@@ -7,7 +7,9 @@ import { CustomMeshFactory } from './custom-mesh-factory';
 
 export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
   private defaultConeSettings_: ConeSettings = {
-    fieldOfView: 3 as Degrees,
+    // SATELIOT
+    // fieldOfView: 3 as Degrees,
+    fieldOfView: 60 as Degrees,
     color: [0.2, 1.0, 1.0, 0.15],
   };
 

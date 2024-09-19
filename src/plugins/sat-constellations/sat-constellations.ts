@@ -13,6 +13,9 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
   dependencies_: string[] = [SelectSatManager.name];
+
+  private additionalConstellations_ = [];
+
   bottomIconImg = satChngPng;
   bottomIconElementName: string = 'menu-constellations';
   sideMenuElementName: string = 'constellations-menu';
@@ -50,18 +53,32 @@ export class SatConstellations extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'constellations',
       cb: () => {
+        // Add additional constellations
+        getEl('constellations-menu').querySelector('ul').insertAdjacentHTML(
+          'beforeend',
+          this.additionalConstellations_
+            .map((constellation) => `<li class="menu-selectable" data-group="${constellation.groupSlug}">${constellation.groupName}</li>`)
+            .join(''),
+        );
+
         getEl('constellation-menu')
           .querySelectorAll('li')
           .forEach((element) => {
             element.addEventListener('click', (evt: Event) => {
-              SatConstellations.constellationMenuClick_((evt.target as HTMLElement).dataset.group);
+              this.constellationMenuClick_((evt.target as HTMLElement).dataset.group);
             });
           });
       },
     });
   }
 
-  private static constellationMenuClick_(groupName: string) {
+  addConstellation(groupName: string, groupType: GroupType, groupValue: number[] | RegExp) {
+    const groupSlug = groupName.replace(/\s+/gu, '-').toLowerCase();
+
+    this.additionalConstellations_.push({ groupName, groupType, groupValue, groupSlug });
+  }
+
+  private constellationMenuClick_(groupName: string) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const groupManagerInstance = keepTrackApi.getGroupsManager();
@@ -164,7 +181,17 @@ export class SatConstellations extends KeepTrackPlugin {
         }
         break;
       default:
-        throw new Error(`Unknown group name: ${groupName}`);
+        if (!groupManagerInstance.groupList[groupName]) {
+          const constellation = this.additionalConstellations_.find((constellation) => constellation.groupSlug === groupName);
+
+          if (constellation) {
+            groupManagerInstance.createGroup(constellation.groupType, constellation.groupValue, groupName);
+          }
+        }
+
+        if (!groupManagerInstance.groupList[groupName]) {
+          throw new Error(`Unknown group name: ${groupName}`);
+        }
     }
     SatConstellations.groupSelected(groupName);
   }

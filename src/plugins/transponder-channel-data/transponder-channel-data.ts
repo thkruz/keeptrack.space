@@ -47,6 +47,9 @@ export class TransponderChannelData extends KeepTrackPlugin {
     this.lastLoadedSat_ = selectedSat.id;
   };
 
+  isIconDisabledOnLoad = true;
+  isIconDisabled = true;
+
   private lastLoadedSat_ = -1;
 
   addJs(): void {
@@ -103,8 +106,6 @@ export class TransponderChannelData extends KeepTrackPlugin {
       </div>
     </div>
   </div>`;
-
-  isRequireSatelliteSelected: boolean = true;
 
   showTable() {
     const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;

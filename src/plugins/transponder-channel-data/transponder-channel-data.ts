@@ -2,9 +2,11 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import { GroupType } from '@app/singletons/object-group';
 import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 interface ChannelInfo {
@@ -52,6 +54,18 @@ export class TransponderChannelData extends KeepTrackPlugin {
   isIconDisabled = true;
 
   private lastLoadedSat_ = -1;
+
+  addHtml(): void {
+    super.addHtml();
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerInit,
+      cbName: this.id,
+      cb: () => {
+        keepTrackApi.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_.map((sccNum) => parseInt(sccNum)));
+      },
+    });
+  }
 
   addJs(): void {
     super.addJs();

@@ -364,7 +364,7 @@ export class SettingsPresets {
     settings.zFar = 300000;
     settings.minDistanceFromSatellite = <Kilometers>4;
     // only load the 3D model of a sateliot satellite
-    settings.meshListOverride = ['sateliotsat'];
+    settings.meshListOverride = ['sateliotsat2'];
     settings.plugins.satelliteFov = true;
     const SATELIOT_FOV_ANGLE = 52.32;
 

@@ -132,7 +132,8 @@ export class MeshManager {
     spacebee2gen: null,
     spacebee3gen: null,
     starlink: null,
-    sateliotsat: null
+    sateliotsat: null,
+    sateliotsat2: null,
   };
 
   private mvMatrix_: mat4;
@@ -314,14 +315,15 @@ export class MeshManager {
 
     // SATELIOT
     // Force sateliot sat
-    sat.bus = 'sateliotsat';
+    sat.bus = 'sateliotsat2';
 
     switch (sat.bus) {
       case 'sateliotsat':
         this.currentMeshObject.model = this.models.sateliotsat;
-
         return;
-
+      case 'sateliotsat2':
+        this.currentMeshObject.model = this.models.sateliotsat2;
+        return;
       case 'Cubesat 0.25U':
         if (sat.intlDes.startsWith('2018')) {
           this.currentMeshObject.model = this.models.spacebee1gen;

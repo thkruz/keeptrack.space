@@ -132,6 +132,8 @@ export class MeshManager {
     spacebee2gen: null,
     spacebee3gen: null,
     starlink: null,
+    sateliotsat: null,
+    sateliotsat2: null,
   };
 
   private mvMatrix_: mat4;
@@ -272,6 +274,7 @@ export class MeshManager {
    * This is intentionally complex to reduce object creation and GC
    * Splitting it into subfunctions would not be optimal
    */
+  // eslint-disable-next-line complexity
   getSatelliteModel(sat: DetailedSatellite) {
     if (this.checkIfNameKnown(sat.name)) {
       this.currentMeshObject.isRotationStable = true;
@@ -309,6 +312,20 @@ export class MeshManager {
       this.currentMeshObject.model = this.models.dsp;
 
       return;
+    }
+
+    switch (sat.payload) {
+      case 'Platform-3':
+      case 'Sateliot-1':
+      case 'Sateliot-2':
+      case 'Sateliot-3':
+      case 'Sateliot-4':
+        this.currentMeshObject.model = this.models.sateliotsat2;
+
+        return;
+      default:
+        // Do Nothing
+        break;
     }
 
     switch (sat.bus) {

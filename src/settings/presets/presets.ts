@@ -3,9 +3,9 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
+import { ConeSettings } from '@app/singletons/draw-manager/cone-mesh';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
-import { ConeSettings } from '@app/singletons/draw-manager/cone-mesh';
 
 export class SettingsPresets {
   static loadPresetMillionYear(settings: SettingsManager) {
@@ -363,8 +363,8 @@ export class SettingsPresets {
     settings.maxZoomDistance = <Kilometers>65000;
     settings.zFar = 300000;
     settings.minDistanceFromSatellite = <Kilometers>4;
-    // only load the 3D model of a s6u satellite
-    settings.meshListOverride = ['s6u'];
+    // only load the 3D model of a sateliot satellite
+    settings.meshListOverride = ['sateliotsat'];
     settings.plugins.satelliteFov = true;
     const SATELIOT_FOV_ANGLE = 52.32;
 

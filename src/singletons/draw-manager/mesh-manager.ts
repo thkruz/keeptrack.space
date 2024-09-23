@@ -317,6 +317,9 @@ export class MeshManager {
     switch (sat.payload) {
       case 'Platform-3':
       case 'Sateliot-1':
+        this.currentMeshObject.model = this.models.sateliotsat;
+
+        return;
       case 'Sateliot-2':
       case 'Sateliot-3':
       case 'Sateliot-4':
@@ -329,6 +332,11 @@ export class MeshManager {
     }
 
     switch (sat.bus) {
+      case 'sateliotsat':
+        this.currentMeshObject.model = this.models.sateliotsat;
+
+        return;
+
       case 'Cubesat 0.25U':
         if (sat.intlDes.startsWith('2018')) {
           this.currentMeshObject.model = this.models.spacebee1gen;

@@ -95,7 +95,7 @@ function getOrbitCoordinatesUpToNow(tleLine1, tleLine2) {
 
     // Simular la órbita completa hasta el tiempo actual
     const now = new Date();  // Momento actual
-    const secondsInThePast = 90 * 60;  // Tiempo de la órbita en segundos (una órbita completa típica es 90 minutos)
+    const secondsInThePast = 45 * 60;  // Tiempo de la órbita en segundos (una órbita completa típica es 90 minutos. La mitad, 45 minutos)
 
     // Generar un punto cada 10 segundos
     const step = 10;  // 10 segundos por punto
@@ -112,6 +112,30 @@ function getOrbitCoordinatesUpToNow(tleLine1, tleLine2) {
     return positions.reverse();  // Invertir para tener la posición más reciente al final
 }
 
+// Función para obtener las coordenadas de la órbita desde el tiempo actual
+function getOrbitCoordinatesFromNow(tleLine1, tleLine2) {
+    const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+    const positions = [];
+
+    // Simular la órbita completa desde el tiempo actual
+    const now = new Date();  // Momento actual
+    const secondsInTheFuture = 90 * 60;  // Tiempo de la órbita en segundos (una órbita completa típica es 90 minutos)
+
+    // Generar un punto cada 10 segundos
+    const step = 10;  // 10 segundos por punto
+
+    for (let i = 0; i <= secondsInTheFuture; i += step) {
+        const time = new Date(now.getTime() + i * 1000);  // Avanzar en segundos
+        const positionAndVelocity = satellite.propagate(satrec, time);
+        const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, satellite.gstime(time));
+        const longitude = satellite.degreesLong(positionGd.longitude);
+        const latitude = satellite.degreesLat(positionGd.latitude);
+        positions.push([latitude, longitude]);
+    }
+
+    return positions;
+}
+
 // Función para obtener la posición actual de un satélite
 function getCurrentPosition(tleLine1, tleLine2) {
     const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
@@ -126,7 +150,9 @@ function getCurrentPosition(tleLine1, tleLine2) {
 // Función para dibujar la órbita completa hasta el momento actual
 function drawSatelliteOrbit(satellite, orbitPolylines, marker) {
     // Obtener la órbita completa hasta el momento actual
-    const orbitCoordinates = getOrbitCoordinatesUpToNow(satellite.TLE1, satellite.TLE2);
+    const orbitCoordinatesPast = getOrbitCoordinatesUpToNow(satellite.TLE1, satellite.TLE2);
+    const orbitCoordinatesFuture = getOrbitCoordinatesFromNow(satellite.TLE1, satellite.TLE2);
+    const orbitCoordinates = orbitCoordinatesPast.concat(orbitCoordinatesFuture);
 
     // Detectar si el satélite cruza el meridiano de 180 grados
     const segments = detectMeridianCross(orbitCoordinates);

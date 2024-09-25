@@ -375,14 +375,16 @@ export class SettingsPresets {
       // SATELIOT hide nav-footer
       getEl('nav-footer').style.display = 'none';
 
-      // Select the Sateliot satellites
-      const mapIcon = document.getElementById('sateliot-map-icon');
-
-      // Add event listener to the map icon
+      const mapIcon = document.getElementById('map-2d-icon');
       mapIcon.addEventListener('click', () => {
         window.location.href = './2d-map.html';  // Redirigir al visualizador 2D
       });
 
+
+      const githubIcon = document.getElementById('sateliot-github-icon');
+      githubIcon.addEventListener('click', () => {
+        window.location.href = 'https://github.com/Sateliot/sateliot.keeptrack';  // Redirigir al visualizador 2D
+      });
 
       // SATELIOT
       // Enable the FOV for all satellites

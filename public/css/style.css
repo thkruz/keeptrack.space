@@ -3927,11 +3927,11 @@ nav a.sidenav-trigger i {
 
 }
 
-#sateliot-map-icon {
+#map-2d-icon {
   position: absolute;
   bottom: 30px;
   right: 10px;
-  width: 4vw;
+  width: 50px;
   height: auto;
   cursor: pointer;
   z-index: 100;
@@ -3940,6 +3940,23 @@ nav a.sidenav-trigger i {
   transition: transform 0.3s ease;
 }
 
-#sateliot-map-icon:hover {
+.moveup:hover {
   transform: translateY(-10px);
+}
+
+#sateliot-github-icon {
+  position: absolute;
+  bottom: 100px;
+  right: 10px;
+  width: 50px;
+  height: auto;
+  cursor: pointer;
+  z-index: 100;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
+#sateliot-github-icon img {
+  filter: sepia(1) saturate(5) brightness(0.7);
 }

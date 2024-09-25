@@ -9,6 +9,8 @@
  ErrorDocument 404 /res/error.html?error=404
  ErrorDocument 500 /res/error.html?error=500
 
+ RewriteRule ^2d-map/?$ /2d-map.html [L]
+
 <ifModule mod_headers.c>
   Header set Connection keep-alive
 </ifModule>

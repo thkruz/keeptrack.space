@@ -2,21 +2,23 @@
 
 This project is a customized version of [keeptrack.space](https://github.com/thkruz/keeptrack.space/), an astrodynamics tool designed to make learning about orbital mechanics and satellite operations more accessible to non-engineers. The modifications focus on integrating specific functionalities for Sateliot satellites.
 
-## Features
-
-- Visualizes satellite orbits using real-time and historical TLE (Two-Line Elements) data.
-- Fetches and updates TLE data from [Celestrak](https://celestrak.com/) based on the last file modification time (within 24 hours).
-- Provides a user-friendly interface for tracking Sateliot satellites.
-
 ## Project Overview
 
-This project extends the capabilities of the original keeptrack.space project by focusing on the Sateliot satellite constellation. It offers the same robust features for visualizing satellite orbits while incorporating customized elements specific to Sateliot's satellites.
+This project extends the capabilities of the original keeptrack.space project by focusing on the Sateliot satellite constellation. It offers the different features for visualizing satellite orbits while incorporating customized elements specific to Sateliot's satellites.
 
 ### Key Modifications
 
 - **Sateliot Satellites Integration**: The project tracks Sateliot's satellite constellation using NORAD IDs.
-- **Optimized Data Fetching**: Implements logic to fetch TLE data only if the local data is older than 24 hours, reducing redundant API requests to Celestrak.
+- **Optimized Data Fetching**: Modify the loading process for the "limiSats" feature to avoid unexpected behavior.
 - **Sateliot Branding**: The Sateliot logo and other visual elements are included or modified in the interface for visual branding.
+- **Clean Visualization**: Certain elements of the interface are hidden to maintain a clean visualization of the satellite orbits.
+- **Custom Preset**: A new preset for Sateliot satellites is created and enforced on startup.
+- **Sound Disabling**: Sounds in various parts of the interface are disabled to provide a more focused user experience.
+- **Customized Search Results**: The search results interface is customized to provide a better user experience.
+- **Customized 3D Model Loading**: Only the Sateliot OBJ model is loaded to optimize performance.
+- **Offset Distance Modification**: The default value of offsetDistance in the ConeMesh class is modified
+- **2D Visualization**: A 2D visualization of satellite orbits is included for a different perspective on the data.
+
 
 ## Getting Started
 

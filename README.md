@@ -79,3 +79,7 @@ The following data sources are used:
 ## Credits
 
 This project is based on the original keeptrack.space by Theodore Kruczek.
+
+## License
+
+KeepTrack.Space is licensed under the GNU Affero General Public License. This means you can freely use, modify, and distribute it, provided you adhere to the terms of the license. For more details, see the original full license in https://github.com/thkruz/keeptrack.space/blob/main/LICENSE.

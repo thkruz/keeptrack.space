@@ -1,12 +1,12 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, setInnerHtml } from '@app/lib/get-el';
+import { getEl, hideEl, setInnerHtml, showEl } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { ConeSettings } from '@app/singletons/draw-manager/cone-mesh';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import { slideInDown, slideOutUp } from '../../lib/slide';
 import { SettingsManager } from '../settings';
-
 export class SettingsPresets {
   static loadPresetMillionYear(settings: SettingsManager) {
     settings.maxZoomDistance = <Kilometers>200000;
@@ -368,12 +368,34 @@ export class SettingsPresets {
     settings.plugins.satelliteFov = true;
     const SATELIOT_FOV_ANGLE = 52.32;
 
+    settings.plugins.satInfoboxCore = true;
+    settings.plugins.topMenu = false;
+    settings.plugins.settingsMenu = false;
+    settings.plugins.soundManager = false;
+
+    // detect if is a mobile device checking the screen width
+    const isMobile = window.innerWidth < 1024;
+    if (isMobile) {
+      console.log('isMobile');
+      settings.maxZoomDistance = <Kilometers>150000;
+      settings.zFar = 300000;
+    }
+    // detect if is a tablet device checking the screen width
+    const isTablet = window.innerWidth < 1024 && window.innerWidth > 768;
+    if (isTablet) {
+      console.log('isTablet');
+      settings.maxZoomDistance = <Kilometers>100000;
+      settings.zFar = 300000;
+    }
+
 
     settings.onLoadCb = () => {
       keepTrackApi.getUiManager().searchManager.doSearch('60550,60534,60552,60537');
 
-      // SATELIOT hide nav-footer
-      getEl('nav-footer').style.display = 'none';
+      hideEl('nav-footer');
+      hideEl('nav-wrapper');
+      showEl('sateliot-logo');
+      showEl('toggle-search-icon');
 
       const mapIcon = document.getElementById('map-2d-icon');
       mapIcon.addEventListener('click', () => {
@@ -404,7 +426,19 @@ export class SettingsPresets {
           }
         }
       });
-    };
+
+      // open/close results
+      getEl('toggle-search-icon').addEventListener('click', () => {
+        // const searchResults = getEl('search-results');
+        let searchManagerInstance = keepTrackApi.getUiManager().searchManager;
+        searchManagerInstance.isSearchOpen = !searchManagerInstance.isSearchOpen;
+        if (searchManagerInstance.isSearchOpen) {
+          slideOutUp(getEl('search-results'), 1000);
+        } else {
+          slideInDown(getEl('search-results'), 1000);
+        }
+      });
+    }
   }
 
   static loadPresetFacSat2(settings: SettingsManager) {

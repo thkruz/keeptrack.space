@@ -356,13 +356,22 @@ ul {
   width: 100%;
   /* background: var(--colorTertiaryDarken2) !important; */
   z-index: 1;
-  top: var(--top-menu-height);
+  /* SATELIOT */
+  /* top: var(--top-menu-height); */
+  top: 59px;
   bottom: 250px;
   max-height: 20%;
   /* border-width: 0px 0px 5px 0px; */
   /* padding-top: 10px; */
   /* border-style: solid; */
   /* border-color: var(--colorTertiaryDarken3); */
+}
+
+/* si la pantalla es menor a 1024px  y mayor a 768px */
+@media (max-width: 1024px) and (min-width: 768px) {
+  #search-results {
+    margin-top: 58px;
+  }
 }
 
 .search-result {
@@ -374,15 +383,19 @@ ul {
   align-items: center;
   /* SATELIOT */
   background-color: rgba(0, 0, 0, 1);
+  float: right;
+  width: 100%;
 }
 
 .search-result:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: #333333 !important;
   cursor: pointer;
 }
 
 .truncate-search {
-  width: 280px;
+  /* SATELIOT */
+  /* width: 150px; */
+  width: 100px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3783,6 +3796,14 @@ nav {
   line-height: 50px;
 }
 
+/* SATELIOT */
+@media (max-width: 1024px) {
+  nav {
+    background-color: #000;
+    height: 59px;
+  }
+}
+
 #legend-hover-menu {
   display: none;
   padding: 10px;
@@ -3917,15 +3938,40 @@ nav a.sidenav-trigger i {
   z-index: 11;
 }
 
-#sateliot-logo {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 20vw;
-  height: auto;
-  z-index: 500;
+/* SATELIOT */
+@media (min-width: 1024px) {
+  #sateliot-logo {
+    position: relative;
+    top: 10px;
+    left: 10px;
+    width: auto;
+    height: 15vh;
+    z-index: 500;
+  }
 
 }
+
+
+@media (max-width: 1024px) {
+  #sateliot-logo {
+    position: relative;
+    margin: 0 auto;
+    display: block;
+    left: 0;
+    right: 0;
+  }
+}
+
+
+#keeptrack-header>nav {
+  display: none;
+}
+
+#keeptrack-header {
+  background-color: black;
+  height: 59px;
+}
+
 
 #map-2d-icon {
   position: absolute;
@@ -3960,3 +4006,21 @@ nav a.sidenav-trigger i {
 #sateliot-github-icon img {
   filter: sepia(1) saturate(5) brightness(0.7);
 }
+
+#toggle-search-icon {
+  display: block;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  z-index: 500;
+}
+
+/* 
+@media (min-width: 1024px) {
+  #toggle-search-icon {
+    display: none;
+  }
+} */

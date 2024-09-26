@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
@@ -12,7 +12,9 @@ export class MobileManager {
       if (!keepTrackApi.isInitialized) {
         if (MobileManager.checkIfMobileDevice()) {
           if (!settingsManager.isMobileModeEnabled) {
-            keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.', ToastMsgType.normal);
+            /* SATELIOT */
+            // keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.', ToastMsgType.normal);
+            console.log('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.');
           }
           settingsManager.isMobileModeEnabled = true;
 

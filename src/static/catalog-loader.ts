@@ -155,7 +155,12 @@ export class CatalogLoader {
         // SATELIOT
         // CatalogLoader.processLimitedSats_(limitSatsArray, resp, i, catalogManagerInstance, tempObjData);
         CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
-
+        // Rewrite manufacturer for SATELIOT satellites
+        tempObjData.forEach((sat) => {
+          if (sat.name.includes('SATELIOT')) {
+            sat['manufacturer'] = 'Allen Space';
+          }
+        });
       }
     }
 

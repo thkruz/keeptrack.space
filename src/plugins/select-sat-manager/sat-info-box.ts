@@ -454,6 +454,9 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private addListenerToCollapseElement_(collapseEl: HTMLElement, section: HTMLElement, isCollapsedRef: { value: boolean }): void {
+    if (!collapseEl || !section) {
+      return;
+    }
     collapseEl.addEventListener('click', () => {
       section.classList.toggle('collapsed');
       collapseEl.classList.toggle('collapse-closed');
@@ -469,6 +472,8 @@ export class SatInfoBox extends KeepTrackPlugin {
 
   hide(): void {
     hideEl(SatInfoBox.containerId_);
+    /* SATELIOT */
+    showEl('bottom-map-icon');
     this.isVisible_ = false;
   }
 
@@ -477,6 +482,8 @@ export class SatInfoBox extends KeepTrackPlugin {
       return;
     }
     showEl(SatInfoBox.containerId_);
+    /* SATELIOT */
+    hideEl('bottom-map-icon');
     this.isVisible_ = true;
   }
 
@@ -1075,6 +1082,14 @@ export class SatInfoBox extends KeepTrackPlugin {
       </div>
     `,
     );
+
+    // SATELIOT 
+    // delete the actions section
+    const actionsSection = document.getElementById('actions-section');
+    if (actionsSection) {
+      actionsSection.remove();
+    }
+
 
     // Create a Sat Info Box Initializing Script
     if (!settingsManager.isMobileModeEnabled) {

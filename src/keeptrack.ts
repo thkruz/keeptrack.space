@@ -210,8 +210,8 @@ export class KeepTrack {
     keepTrackApi.containerRoot.innerHTML += keepTrackApi.html`
       <header>
         <div id="keeptrack-header">
-            <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot" class="start-hidden">
-            <img id="toggle-search-icon" src="/img/stack-grey.png" alt="Toggle Search" class="icon start-hidden">
+          <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot" class="start-hidden">
+          <img id="toggle-search-icon" src="/img/stack-grey.png" alt="Toggle Search" class="icon start-hidden">
         </div>
 
       </header>

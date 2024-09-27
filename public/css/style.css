@@ -370,7 +370,7 @@ ul {
 /* si la pantalla es menor a 1024px  y mayor a 768px */
 @media (max-width: 1024px) and (min-width: 768px) {
   #search-results {
-    margin-top: 58px;
+    margin-top: 0px;
   }
 }
 
@@ -3942,10 +3942,10 @@ nav a.sidenav-trigger i {
 @media (min-width: 1024px) {
   #sateliot-logo {
     position: relative;
-    top: 10px;
-    left: 10px;
+    top: -20px;
+    /* left: 10px; */
     width: auto;
-    height: 15vh;
+    height: 100px;
     z-index: 500;
   }
 
@@ -3959,6 +3959,7 @@ nav a.sidenav-trigger i {
     display: block;
     left: 0;
     right: 0;
+    height: 60px;
   }
 }
 
@@ -3976,6 +3977,19 @@ nav a.sidenav-trigger i {
 #map-2d-icon {
   position: absolute;
   bottom: 30px;
+  right: 10px;
+  width: 50px;
+  height: auto;
+  cursor: pointer;
+  z-index: 100;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
+#restore-view-icon {
+  position: absolute;
+  bottom: 170px;
   right: 10px;
   width: 50px;
   height: auto;
@@ -4008,7 +4022,7 @@ nav a.sidenav-trigger i {
 }
 
 #toggle-search-icon {
-  display: block;
+  display: none;
   position: absolute;
   top: 10px;
   right: 10px;

@@ -157,8 +157,9 @@ export class CatalogLoader {
         CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
         // Rewrite manufacturer for SATELIOT satellites
         tempObjData.forEach((sat) => {
+          console.log("Manufacturer fix for SATELIOT rewrite. To be deleted after fix in TLE.json");
           if (sat.name.includes('SATELIOT')) {
-            sat['manufacturer'] = 'Allen Space';
+            sat['manufacturer'] = 'Alen Space';
           }
         });
       }
@@ -739,6 +740,8 @@ export class CatalogLoader {
           rcs,
         });
 
+        // tempObjData.push(satellite);
+
         if (settingsManager.limitSats === '') {
           tempObjData.push(satellite);
         } else {
@@ -748,8 +751,6 @@ export class CatalogLoader {
             tempObjData.push(satellite);
           }
         }
-        settingsManager.limitSats === '' &&
-          tempObjData.push(satellite);
       } catch (e) {
         errorManagerInstance.log(e);
       }

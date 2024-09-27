@@ -133,15 +133,11 @@
   background: var(--colorTertiaryDarken2);
   cursor: default;
   bottom: 0px;
-  height: 60%;
+  height: 30%;
   width: 100%;
   border: 5px solid var(--colorTertiaryDarken3);
   overflow: auto;
   z-index: 1;
-}
-
-.sat-infobox-fullsize {
-  padding: 0 10px 0px 10px !important;
 }
 
 .sat-info-value {

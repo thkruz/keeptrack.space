@@ -73,7 +73,7 @@ export class MobileManager {
           settingsManager.maxAnalystSats = 1;
           settingsManager.maxFieldOfViewMarkers = 1;
           settingsManager.maxMissiles = 1;
-          settingsManager.minDistanceFromSatellite = <Kilometers>50;
+          settingsManager.minDistanceFromSatellite = <Kilometers>25;
           settingsManager.isLoadLastSensor = false;
         } else {
           settingsManager.maxOribtsDisplayed = settingsManager.maxOribtsDisplayedDesktop;

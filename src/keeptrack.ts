@@ -211,9 +211,7 @@ export class KeepTrack {
     keepTrackApi.containerRoot.innerHTML += keepTrackApi.html`
       <header>
         <div id="keeptrack-header">
-          <a href="https://sateliot.com" target="_blank" rel="noopener noreferrer">
-            <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot" class="start-hidden">
-          </a>
+          <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot" class="start-hidden">
           <img id="toggle-search-icon" src="/img/stack-grey.png" alt="Toggle Search" class="icon start-hidden">
         </div>
 

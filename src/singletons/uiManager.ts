@@ -243,14 +243,12 @@ export class UiManager {
   footerToggle() {
     if (this.isFooterVisible_) {
       this.isFooterVisible_ = false;
-      getEl('sat-infobox')?.classList.add('sat-infobox-fullsize');
       getEl('nav-footer')?.classList.add('footer-slide-trans');
       getEl('nav-footer')?.classList.remove('footer-slide-up');
       getEl('nav-footer')?.classList.add('footer-slide-down');
       setInnerHtml('nav-footer-toggle', '&#x25B2;');
     } else {
       this.isFooterVisible_ = true;
-      getEl('sat-infobox')?.classList.remove('sat-infobox-fullsize');
       getEl('nav-footer')?.classList.add('footer-slide-trans');
       getEl('nav-footer')?.classList.remove('footer-slide-down');
       getEl('nav-footer')?.classList.add('footer-slide-up');

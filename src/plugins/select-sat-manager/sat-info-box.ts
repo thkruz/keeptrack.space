@@ -1171,8 +1171,11 @@ export class SatInfoBox extends KeepTrackPlugin {
         satRcsEl.innerHTML = 'Unknown';
         satRcsEl.setAttribute('data-tooltip', 'Unknown');
       }
-    } else {
+    } else if (!isNaN(sat.rcs)) {
       satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
+    } else {
+      satRcsEl.innerHTML = 'Unknown';
+      satRcsEl.setAttribute('data-tooltip', 'Unknown');
       // satRcsEl.setAttribute('data-tooltip', `${SatMath.mag2db(sat.rcs).toFixed(2)} dBsm`);
     }
   }

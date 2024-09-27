@@ -110,9 +110,6 @@ jobs:
       # Unit Tests
       - name: Test
         run: npm test
-      # Code Coverage
-      - name: Code Coverage
-        run: node ./node_modules/.bin/codecov
   build:
     needs: [eslint, unit-tests]
     name: Build

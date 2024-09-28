@@ -5,6 +5,7 @@
   --bottom-icon-width: 100px;
   --bottom-icon-img-size: 40px;
   --search-box-bottom: 0px;
+  --nav-bar-height: 35px;
   /** The combination of title bar and classification bar */
   --top-menu-height: calc(var(--nav-bar-height) + var(--classification-bar-height));
   /** The height of the classification bar */

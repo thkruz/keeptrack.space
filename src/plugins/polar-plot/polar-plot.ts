@@ -120,6 +120,10 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
           return;
         }
 
+        if (!keepTrackApi.getSensorManager().isSensorSelected()) {
+          return;
+        }
+
         if (!this.isMenuButtonActive) {
           this.openSideMenu();
           this.setBottomIconToSelected();

@@ -6,10 +6,6 @@
     border-color: #ffffff !important;
 }
 
-label {
-    color: #ffffff !important;
-}
-
 .switch label input[type='checkbox']:checked+.lever:after {
     background-color: rgb(255, 255, 255) !important;
 }
@@ -65,6 +61,36 @@ textarea.materialize-textarea {
 .toast {
     border-radius: 0px !important;
     min-height: 4.25rem !important;
+}
+
+.select-wrapper input.select-dropdown {
+    height: 2rem !important;
+    line-height: 2rem !important;
+}
+
+.input-field {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.input-field.col label {
+    padding-top: 0px;
+}
+
+input:not([type]):focus:not([readonly])+label, input[type='text']:not(.browser-default):focus:not([readonly])+label, input[type='password']:not(.browser-default):focus:not([readonly])+label, input[type='email']:not(.browser-default):focus:not([readonly])+label, input[type='url']:not(.browser-default):focus:not([readonly])+label, input[type='time']:not(.browser-default):focus:not([readonly])+label, input[type='date']:not(.browser-default):focus:not([readonly])+label, input[type='datetime']:not(.browser-default):focus:not([readonly])+label, input[type='datetime-local']:not(.browser-default):focus:not([readonly])+label, input[type='tel']:not(.browser-default):focus:not([readonly])+label, input[type='number']:not(.browser-default):focus:not([readonly])+label, input[type='search']:not(.browser-default):focus:not([readonly])+label, textarea.materialize-textarea:focus:not([readonly])+label {
+    color: var(--color-dark-text-accent);
+}
+
+input:not([type]):disabled+label, input:not([type])[readonly='readonly']+label, input[type='text']:not(.browser-default):disabled+label, input[type='text']:not(.browser-default)[readonly='readonly']+label, input[type='password']:not(.browser-default):disabled+label, input[type='password']:not(.browser-default)[readonly='readonly']+label, input[type='email']:not(.browser-default):disabled+label, input[type='email']:not(.browser-default)[readonly='readonly']+label, input[type='url']:not(.browser-default):disabled+label, input[type='url']:not(.browser-default)[readonly='readonly']+label, input[type='time']:not(.browser-default):disabled+label, input[type='time']:not(.browser-default)[readonly='readonly']+label, input[type='date']:not(.browser-default):disabled+label, input[type='date']:not(.browser-default)[readonly='readonly']+label, input[type='datetime']:not(.browser-default):disabled+label, input[type='datetime']:not(.browser-default)[readonly='readonly']+label, input[type='datetime-local']:not(.browser-default):disabled+label, input[type='datetime-local']:not(.browser-default)[readonly='readonly']+label, input[type='tel']:not(.browser-default):disabled+label, input[type='tel']:not(.browser-default)[readonly='readonly']+label, input[type='number']:not(.browser-default):disabled+label, input[type='number']:not(.browser-default)[readonly='readonly']+label, input[type='search']:not(.browser-default):disabled+label, input[type='search']:not(.browser-default)[readonly='readonly']+label, textarea.materialize-textarea:disabled+label, textarea.materialize-textarea[readonly='readonly']+label {
+    color: var(--color-dark-subtext)
+}
+
+input:not([type]):disabled, input:not([type])[readonly='readonly'], input[type='text']:not(.browser-default):disabled, input[type='text']:not(.browser-default)[readonly='readonly'], input[type='password']:not(.browser-default):disabled, input[type='password']:not(.browser-default)[readonly='readonly'], input[type='email']:not(.browser-default):disabled, input[type='email']:not(.browser-default)[readonly='readonly'], input[type='url']:not(.browser-default):disabled, input[type='url']:not(.browser-default)[readonly='readonly'], input[type='time']:not(.browser-default):disabled, input[type='time']:not(.browser-default)[readonly='readonly'], input[type='date']:not(.browser-default):disabled, input[type='date']:not(.browser-default)[readonly='readonly'], input[type='datetime']:not(.browser-default):disabled, input[type='datetime']:not(.browser-default)[readonly='readonly'], input[type='datetime-local']:not(.browser-default):disabled, input[type='datetime-local']:not(.browser-default)[readonly='readonly'], input[type='tel']:not(.browser-default):disabled, input[type='tel']:not(.browser-default)[readonly='readonly'], input[type='number']:not(.browser-default):disabled, input[type='number']:not(.browser-default)[readonly='readonly'], input[type='search']:not(.browser-default):disabled, input[type='search']:not(.browser-default)[readonly='readonly'], textarea.materialize-textarea:disabled, textarea.materialize-textarea[readonly='readonly'] {
+    color: var(--color-dark-subtext)
+}
+
+.input-field>label {
+    color: var(--color-dark-subtext);
 }
 
 @media only screen and (min-width: 601px) {

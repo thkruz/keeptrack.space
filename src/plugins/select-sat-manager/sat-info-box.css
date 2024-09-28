@@ -6,6 +6,7 @@
   flex-wrap: nowrap;
   justify-content: space-around;
   align-items: center;
+  padding-bottom: 5px;
 }
 
 #sat-add-watchlist,
@@ -27,13 +28,14 @@
   height: 25px;
   font-size: 18px;
   text-align: center;
-  background: var(--colorTertiaryDarken1);
+  background: var(--colorTertiaryDarken3);
   color: var(--colorWhite);
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: row;
   flex-wrap: nowrap;
+  margin-bottom: 5px;
 }
 
 #sat-infobox a {
@@ -95,6 +97,7 @@
 .section-collapse:active {
   background-color: var(--colorSecondaryDarken1);
   color: white;
+  scale: 0.9;
 }
 
 #search-links {

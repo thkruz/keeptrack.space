@@ -32,40 +32,60 @@ export class ShortTermFences extends KeepTrackPlugin {
       <div class="row">
         <h5 class="center-align">Short Term Fence</h5>
         <form id="stfForm">
-          <div id="stf-az-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Azimuth Point in degrees (ex: 50)">
-            <input id="stf-az" type="text" value="50" />
-            <label for="stf-az" class="active">Center Azimuth</label>
+          <div class="row">
+            <div id="stf-az-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Azimuth Point in degrees (ex: 50)">
+              <input id="stf-az" type="text" value="50" />
+              <label for="stf-az" class="active">Center Azimuth</label>
+            </div>
           </div>
-          <div id="stf-azExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Azimuth in degrees (ex: 4)">
-            <input id="stf-azExt" type="text" value="4" />
-            <label for="stf-azExt" class="active">Azimuth Extent (deg)</label>
+          <div class="row">
+            <div id="stf-azExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Azimuth in degrees (ex: 4)">
+              <input id="stf-azExt" type="text" value="4" />
+              <label for="stf-azExt" class="active">Azimuth Extent (deg)</label>
+            </div>
           </div>
-          <div id="stf-azExtKm-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Azimuth in kilometers (ex: 120)">
-            <input id="stf-azExtKm" type="text" value="4" disabled/>
-            <label for="stf-azExtKm" class="active">Azimuth Extent (km)</label>
+          <div class="row">
+            <div id="stf-azExtKm-div" class=" input-field col s12" data-position="top" data-delay="50" 
+            data-tooltip="Total Extent Outside of Center Azimuth in kilometers (ex: 120)">
+              <input id="stf-azExtKm" type="text" value="4" disabled/>
+              <label for="stf-azExtKm" class="active">Azimuth Extent (km)</label>
+            </div>
           </div>
-          <div id="stf-el-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Elevation Point in degrees (ex: 20)">
-            <input id="stf-el" type="text" value="20" />
-            <label for="stf-el" class="active">Center Elevation</label>
+          <div class="row">
+            <div id="stf-el-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Elevation Point in degrees (ex: 20)">
+              <input id="stf-el" type="text" value="20" />
+              <label for="stf-el" class="active">Center Elevation</label>
+            </div>
           </div>
-          <div id="stf-elExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Elevation in degrees (ex: 4)">
-            <input id="stf-elExt" type="text" value="4" />
-            <label for="stf-elExt" class="active">Elevation Extent (deg)</label>
+          <div class="row">
+            <div id="stf-elExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Elevation in degrees (ex: 4)">
+              <input id="stf-elExt" type="text" value="4" />
+              <label for="stf-elExt" class="active">Elevation Extent (deg)</label>
+            </div>
           </div>
-          <div id="stf-elExtKm-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Elevation in kilometers (ex: 120)">
-            <input id="stf-elExtKm" type="text" value="4" disabled/>
-            <label for="stf-elExtKm" class="active">Elevation Extent (km)</label>
+          <div class="row">
+            <div id="stf-elExtKm-div" class=" input-field col s12" data-position="top" data-delay="50" 
+            data-tooltip="Total Extent Outside of Center Elevation in kilometers (ex: 120)">
+              <input id="stf-elExtKm" type="text" value="4" disabled/>
+              <label for="stf-elExtKm" class="active">Elevation Extent (km)</label>
+            </div>
           </div>
-          <div id="stf-rng-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Range Point in kilometers (ex: 1000)">
-            <input id="stf-rng" type="text" value="1000" />
-            <label for="stf-rng" class="active">Center Range</label>
+          <div class="row">
+            <div id="stf-rng-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Search Center Range Point in kilometers (ex: 1000)">
+              <input id="stf-rng" type="text" value="1000" />
+              <label for="stf-rng" class="active">Center Range</label>
+            </div>
           </div>
-          <div id="stf-rngExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Range in kilometers (ex: 100)">
-            <input id="stf-rngExt" type="text" value="100" />
-            <label for="stf-rngExt" class="active">Range Extent</label>
+          <div class="row">
+            <div id="stf-rngExt-div" class=" input-field col s12" data-position="top" data-delay="50" data-tooltip="Total Extent Outside of Center Range in kilometers (ex: 100)">
+              <input id="stf-rngExt" type="text" value="100" />
+              <label for="stf-rngExt" class="active">Range Extent</label>
+            </div>
           </div>
-          <div class="center-align">
-            <button id="stf-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create New STF &#9658;</button>
+          <div class="row">
+            <div class="center-align">
+              <button id="stf-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create New STF &#9658;</button>
+            </div>
           </div>
         </form>
         <br>

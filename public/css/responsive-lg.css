@@ -61,6 +61,8 @@
     border-width: 0px 0px 5px 5px;
     border-style: solid;
     border-color: var(--colorTertiaryDarken3);
+    border-top: 5px solid var(--colorTertiaryDarken3);
+    padding-top: 0px;
   }
 
   .github-share-down {
@@ -118,7 +120,7 @@
   }
 
   .search-slide-down {
-    width: 334px;
+    width: 355px; /* This should match the #search-results */
   }
 
   .search-slide-up {

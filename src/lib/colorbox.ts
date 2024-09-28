@@ -106,8 +106,6 @@ export const createColorbox = () => {
   const img = document.createElement('img');
 
   img.id = 'colorbox-img';
-  img.style.width = '100%';
-  img.style.height = '100%';
   img.style.objectFit = 'cover';
   getEl('colorbox-container')?.appendChild(img);
   isColorBoxReady = true;
@@ -124,7 +122,6 @@ const setupIframeColorbox_ = (url: string) => {
 
     return;
   }
-  colorboxContainerDom.style.width = '100%';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'block';
   // Catch failures to load
   (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {

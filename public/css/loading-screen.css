@@ -1,10 +1,9 @@
 :root {
   --colorTertiary: #4a4a4a !important;
-  --colorTertiaryDarken1: #3a3a3a !important;
-  --colorTertiaryDarken2: #2f2f2f !important;
-  --colorTertiaryDarken3: #1f1f1f !important;
-  --colorTertiaryDarken4: #0f0f0f !important;
+  --colorTertiaryDarken2: #1f1f1f !important;
+  --colorTertiaryDarken3: #3a3a3a !important;
   --color-dark-text-accent: #dd382f !important;
+  --color-dark-subtext: #6b6b6b !important;
   --color-primary: #ba160c !important; /* International Orange Engineering */
   --statusKTDarkStandby: #ff2827; /* Brighter version of International Orange Engineering for icons */
   --color-primary-light: #e01a0e !important; /* Lighter shade of International Orange Engineering */

@@ -375,6 +375,7 @@ export class SettingsPresets {
 
     // detect if is a mobile device checking the screen width
     const isMobile = window.innerWidth < 1024;
+
     if (isMobile) {
       console.log('isMobile');
       settings.maxZoomDistance = <Kilometers>150000;
@@ -382,12 +383,14 @@ export class SettingsPresets {
     }
     // detect if is a tablet device checking the screen width
     const isTablet = window.innerWidth < 1024 && window.innerWidth > 768;
+
     if (isTablet) {
       console.log('isTablet');
       settings.maxZoomDistance = <Kilometers>100000;
       settings.zFar = 300000;
     }
 
+    // const defaultCamera = keepTrackApi.getMainCamera();
 
     settings.onLoadCb = () => {
       keepTrackApi.getUiManager().searchManager.doSearch('60550,60534,60552,60537');
@@ -398,30 +401,35 @@ export class SettingsPresets {
       showEl('toggle-search-icon');
 
       const mapIcon = document.getElementById('map-2d-icon');
+
       mapIcon.addEventListener('click', () => {
-        window.location.href = './2d-map.html';  // Redirigir al visualizador 2D
+        window.location.href = './2d-map.html'; // Redirigir al visualizador 2D
       });
 
 
       const githubIcon = document.getElementById('sateliot-github-icon');
+
       githubIcon.addEventListener('click', () => {
-        window.location.href = 'https://github.com/Sateliot/sateliot.keeptrack';  // Redirigir al visualizador 2D
+        window.location.href = 'https://github.com/Sateliot/sateliot.keeptrack'; // Redirigir al visualizador 2D
       });
 
       // SATELIOT
       // Enable the FOV for all satellites
       const allSats = keepTrackApi.getCatalogManager().getActiveSats();
+
       allSats.forEach((currentSat) => {
         if (currentSat) {
           const coneFactory = keepTrackApi.getScene().coneFactory;
           const cone = coneFactory.checkCacheForMesh_(currentSat);
+
           if (cone) {
             coneFactory.remove(cone.id);
           } else {
             const coneSettings = {
               fieldOfView: SATELIOT_FOV_ANGLE as Degrees,
-              color: [0.2, 1.0, 1.0, 0.15]
+              color: [0.2, 1.0, 1.0, 0.15],
             } as ConeSettings;
+
             coneFactory.generateMesh(currentSat, coneSettings);
           }
         }
@@ -430,7 +438,8 @@ export class SettingsPresets {
       // open/close results
       getEl('toggle-search-icon').addEventListener('click', () => {
         // const searchResults = getEl('search-results');
-        let searchManagerInstance = keepTrackApi.getUiManager().searchManager;
+        const searchManagerInstance = keepTrackApi.getUiManager().searchManager;
+
         searchManagerInstance.isSearchOpen = !searchManagerInstance.isSearchOpen;
         if (searchManagerInstance.isSearchOpen) {
           slideOutUp(getEl('search-results'), 1000);
@@ -438,7 +447,13 @@ export class SettingsPresets {
           slideInDown(getEl('search-results'), 1000);
         }
       });
-    }
+
+      // restore the view
+      getEl('restore-view-icon').addEventListener('click', () => {
+        console.log('restore view');
+        // TODO: restore the view
+      });
+    };
   }
 
   static loadPresetFacSat2(settings: SettingsManager) {

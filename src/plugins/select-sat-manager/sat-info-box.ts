@@ -1086,6 +1086,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     // SATELIOT 
     // delete the actions section
     const actionsSection = document.getElementById('actions-section');
+
     if (actionsSection) {
       actionsSection.remove();
     }

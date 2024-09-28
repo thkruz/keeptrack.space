@@ -552,7 +552,8 @@ export class SearchManager {
       } else {
         // If not, just write the name
         // html += obj.name;
-        const name = obj.name.charAt(0).toUpperCase() + obj.name.slice(1).replace(/_/g, ' ').toLowerCase();
+        const name = obj.name.charAt(0).toUpperCase() + obj.name.slice(1).replace(/_/gu, ' ').toLowerCase();
+
         html += name;
       }
       html += '</div>';

@@ -371,6 +371,16 @@ export class SettingsManager {
    */
   cameraMovementSpeedMin = 0.005;
   /**
+   * The distance the a satellites fov cone is drawn away from the earth.
+   *
+   * This is used to prevent the cone from clipping into the earth.
+   *
+   * You can adjust this value to make the cone appear closer or further away from the earth.
+   *
+   * Negative values will cause the cone to clip into the earth, but that may be desired for some use cases.
+   */
+  coneDistanceFromEarth = 15 as Kilometers;
+  /**
    * Used for disabling the copyright text on screenshots and the map.
    */
   copyrightOveride = false;

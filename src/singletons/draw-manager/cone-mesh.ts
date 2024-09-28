@@ -31,7 +31,7 @@ export class ConeMesh extends CustomMesh {
   color: [number, number, number, number] = [0.2, 1.0, 1.0, 1.0];
   range: Kilometers = 0 as Kilometers;
   pos: vec3 = vec3.create();
-  offsetDistance: number = (RADIUS_OF_EARTH + 80) as Kilometers;
+  offsetDistance: number = (RADIUS_OF_EARTH + settingsManager.coneDistanceFromEarth) as Kilometers;
   obj: BaseObject;
 
 

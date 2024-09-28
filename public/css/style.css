@@ -1,22 +1,4 @@
-@media (max-width: 1023px) {
-  :root {
-    /** The height of the navigation bar */
-    --nav-bar-height: 50px;
-  }
-}
-
 :root {
-  /* --colorPrimary: rgb(163, 30, 20);
-  --colorSecondary: rgb(255, 72, 77);
-  --colorTertiary: rgb(140, 63, 68);
-  --colorTertiaryLighten1: rgb(152, 102, 102);
-  --colorTertiaryLighten2: rgb(156, 120, 125);
-  --colorTertiaryLighten3: rgb(189, 178, 168);
-  --colorTertiaryLighten4: rgb(212, 217, 222);
-  --colorTertiaryDarken1: rgb(101, 11, 31);
-  --colorTertiaryDarken2: rgb(94, 18, 33);
-  --colorTertiaryDarken3: rgb(86, 15, 25);
-  --colorTertiaryDarken4: rgb(38, 13, 18); */
   --bottom-menu-height: 100px;
   --bottom-menu-top: 0px;
   --bottom-icon-height: 75px;
@@ -338,7 +320,7 @@ ul {
 
 .search-hilight {
   font-weight: bold;
-  color: var(--colorSecondary);
+  color: var(--color-dark-text-accent);
 }
 
 #search-results {
@@ -892,7 +874,7 @@ fieldset {
 
 a {
   text-decoration: none;
-  color: var(--colorSecondaryLighten2) !important;
+  color: var(--color-dark-text-accent) !important;
 }
 
 ul li {
@@ -1265,7 +1247,7 @@ input:focus {
 }
 
 .dark-blue-badge {
-  color: var(--colorSecondary) !important;
+  color: var(--color-dark-text-accent) !important;
   font-weight: bold;
 }
 
@@ -1320,7 +1302,7 @@ input:focus {
 
 .help-header-sel:hover {
   cursor: pointer;
-  color: var(--colorSecondary);
+  color: var(--color-dark-text-accent);
 }
 
 #help-close {
@@ -1332,7 +1314,7 @@ input:focus {
 
 #help-close:hover {
   cursor: pointer;
-  color: var(--colorSecondary);
+  color: var(--color-dark-text-accent);
 }
 
 #help-text {
@@ -2583,7 +2565,7 @@ a.ui-button:focus {
 a.ui-button:active,
 .ui-button:active,
 .ui-button.ui-state-active:hover {
-  border: 1px solid var(--colorSecondary);
+  border: 1px solid var(--color-dark-text-accent);
   background: rgba(77, 172, 255, 0.15);
   border-radius: 3px;
 }

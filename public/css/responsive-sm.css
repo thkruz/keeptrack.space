@@ -7,12 +7,15 @@
     width: 280px;
     min-width: 265px;
   }
+
   #lookanglesmultisite-menu {
     width: 450px;
   }
+
   #dops-menu {
     width: 400px;
   }
+
   #menu-satellite-collision,
   #FindSatPlugin-bottom-icon {
     display: inline;
@@ -21,6 +24,7 @@
   .sat-info-value {
     width: 65%;
   }
+
   footer {
     margin-top: -100px;
     position: absolute;
@@ -28,28 +32,34 @@
     height: 120px;
     width: 100%;
   }
+
   #bottom-icons-container {
     width: 100%;
     height: 120px;
   }
+
   #footer-toggle-wrapper {
     width: 100%;
     /* bottom: 120px; */
     z-index: 1;
     position: relative;
   }
+
   .footer-slide-down {
     bottom: -115px !important;
     height: 120px !important;
     top: auto !important;
   }
+
   .footer-slide-trans {
     transition: 1s;
   }
+
   .footer-slide-up {
     bottom: 0px !important;
     top: auto !important;
   }
+
   .ui-timepicker-div dl dd div {
     width: 150px !important;
   }
@@ -57,22 +67,26 @@
   #datetime-text {
     border-width: 0px 0px 0px 1px;
     border-style: solid;
-    border-color: var(--colorSecondary);
+    border-color: var(--color-dark-text-accent);
     padding: 0px 10px 0px 10px;
     vertical-align: bottom;
   }
+
   #jday {
     display: block;
   }
+
   #toast-container {
     min-width: 0px;
     right: 5%;
   }
+
   .sat-infobox-links {
     display: block;
     justify-content: flex-start;
     text-align: unset;
   }
+
   #sat-infobox {
     bottom: var(--bottom-menu-height);
     width: 70%;

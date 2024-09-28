@@ -314,9 +314,9 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     // Clear the events list
     this.drawEvents_ = {};
 
-    const leftOffset = this.canvas_.width * 0.1;
+    const leftOffset = this.canvas_.width * 0.15;
     const topOffset = 0;
-    const width = this.canvas_.width * 0.8;
+    const width = this.canvas_.width * 0.75;
     const height = this.canvas_.height * 0.75;
     const timeManager = keepTrackApi.getTimeManager();
     const startTime = timeManager.simulationTimeObj.getTime();
@@ -325,7 +325,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     // clear canvas
     this.ctx_.reset();
 
-    this.ctx_.fillStyle = 'rgb(31, 51, 71)';
+    this.ctx_.fillStyle = 'rgb(58, 58, 58)'; // #3a3a3a
     this.ctx_.fillRect(leftOffset, topOffset, width, height - 15);
 
     const yStep = height / (satellitePasses.length + 1);

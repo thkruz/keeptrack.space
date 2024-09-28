@@ -8,11 +8,13 @@
   #demo-logo {
     font-size: 3vh;
   }
+
   #datetime-input {
     position: absolute;
     bottom: 10px;
     display: none;
   }
+
   #datetime-input-tb {
     color: white;
     font-family: 'Open Sans', sans-serif;
@@ -21,10 +23,12 @@
     height: 0px !important;
     margin: 0 0 55px 0 !important;
   }
+
   #datetime-input-tb:focus,
   input:focus {
     outline: none;
   }
+
   #datetime-title {
     position: absolute;
     left: 20px;
@@ -37,11 +41,12 @@
     font-weight: bold;
     font-size: 12px;
   }
+
   #sensor-selected-container {
     padding: 0px 10px 0px 10px;
     border-width: 0px 0px 0px 1px;
     border-style: solid;
-    border-color: var(--colorSecondary);
+    border-color: var(--color-dark-text-accent);
   }
 
   #share-icon {
@@ -53,15 +58,18 @@
     top: 0px;
     display: inline-flex;
   }
+
   #search {
     height: 16px;
     margin: 0;
     padding-top: 5px;
   }
+
   #ui-datepicker-div {
     position: relative !important;
     border-radius: 0px;
   }
+
   #time-machine-menu {
     padding-left: 35px;
     color: white;
@@ -76,9 +84,11 @@
     border-style: solid;
     border-color: var(--colorTertiaryDarken3);
   }
+
   #obfit-menu {
     width: 500px;
   }
+
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
@@ -93,6 +103,7 @@
     border-style: solid;
     border-color: var(--colorTertiaryDarken3);
   }
+
   .side-menu {
     position: absolute;
     background: var(--colorTertiaryDarken2);
@@ -110,41 +121,51 @@
   #about-menu {
     width: 375px;
   }
+
   #multi-site-look-angles-menu {
     width: 450px;
   }
+
   #findByLooks .row {
     margin: 0px;
   }
+
   #findByLooks .row div input {
     height: 2.5rem;
     margin: 0px;
   }
+
   #dops-menu {
     width: 400px;
   }
+
   #menu-satellite-collision,
   #FindSatPlugin-bottom-icon {
     display: inline;
   }
+
   #footer-toggle-wrapper {
     width: 50%;
     left: 25%;
     z-index: 1;
     position: relative;
   }
+
   .footer-slide-down {
     bottom: calc(-1 * var(--bottom-menu-height) + 5px) !important;
     height: var(--bottom-menu-height) !important;
     top: auto !important;
   }
+
   .footer-slide-trans {
     transition: 1s;
   }
+
   .footer-slide-up {
     bottom: 0px !important;
     top: auto !important;
   }
+
   footer {
     margin-top: -100px;
     position: absolute;
@@ -152,18 +173,22 @@
     height: 120px;
     width: 100%;
   }
+
   #social {
     display: block;
     margin-top: -75px;
     margin-right: 90px;
   }
+
   #menu-space-stations,
   #menu-launches {
     display: inline;
   }
+
   #fastCompSettings {
     display: block;
   }
+
   #mobile-warning {
     display: none;
   }

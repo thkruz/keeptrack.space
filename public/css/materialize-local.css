@@ -10,7 +10,7 @@ label {
     color: #ffffff !important;
 }
 
-.switch label input[type='checkbox']:checked + .lever:after {
+.switch label input[type='checkbox']:checked+.lever:after {
     background-color: rgb(255, 255, 255) !important;
 }
 
@@ -36,25 +36,29 @@ textarea.materialize-textarea {
 .btn,
 .btn-large,
 .btn-small {
-    background-color: var(--colorPrimary);
+    background-color: var(--color-primary);
 }
 
 .btn:hover,
 .btn-large:hover,
 .btn-small:hover {
-    background-color: rgb(0, 165, 244);
+    background-color: var(--color-primary-light);
 }
 
 .btn:focus,
 .btn-large:focus,
 .btn-small:focus,
 .btn-floating:focus {
-    background-color: rgb(0, 115, 214);
+    background-color: var(--color-primary-dark);
 }
 
-.dropdown-content li > a,
-.dropdown-content li > span {
-    color: var(--colorPrimary) !important;
+.switch label input[type='checkbox']:checked+.lever {
+    background-color: var(--color-primary) !important;
+}
+
+.dropdown-content li>a,
+.dropdown-content li>span {
+    color: var(--color-primary) !important;
     font-size: 14px !important;
 }
 
@@ -64,6 +68,7 @@ textarea.materialize-textarea {
 }
 
 @media only screen and (min-width: 601px) {
+
     nav,
     nav .nav-wrapper i,
     nav a.sidenav-trigger,

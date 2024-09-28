@@ -76,18 +76,18 @@
 .sat-infobox-links {
   font-size: small;
   padding: 2px 10px;
-  color: var(--colorSecondaryLighten2);
+  color: var(--color-dark-text-accent);
 }
 
 .section-collapse {
   cursor: pointer;
-  color: var(--colorSecondary);
+  color: var(--color-dark-text-accent);
   width: 25px;
   height: 25px;
 }
 
 .section-collapse:hover {
-  background-color: var(--colorSecondary);
+  background-color: var(--color-dark-text-accent);
   color: white;
   transition: background-color 0.3s ease, color 0.3s ease;
 }

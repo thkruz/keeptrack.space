@@ -1,13 +1,13 @@
 :root {
-  --colorTertiary: rgb(40, 63, 88);
-  --colorTertiaryLighten1: rgb(82, 102, 122);
-  --colorTertiaryLighten2: rgb(126, 140, 155);
-  --colorTertiaryLighten3: rgb(169, 178, 188);
-  --colorTertiaryLighten4: rgb(212, 217, 222);
-  --colorTertiaryDarken1: rgb(31, 51, 71);
-  --colorTertiaryDarken2: rgb(24, 38, 53);
-  --colorTertiaryDarken3: rgb(16, 25, 35);
-  --colorTertiaryDarken4: rgb(8, 13, 18);
+  --colorTertiary: #4a4a4a !important;
+  --colorTertiaryDarken1: #3a3a3a !important;
+  --colorTertiaryDarken2: #2f2f2f !important;
+  --colorTertiaryDarken3: #1f1f1f !important;
+  --colorTertiaryDarken4: #0f0f0f !important;
+  --color-dark-text-accent: #dd382f !important;
+  --color-primary: #ba160c !important; /* International Orange Engineering */
+  --color-primary-light: #e01a0e !important; /* Lighter shade of International Orange Engineering */
+  --color-primary-dark: #860f08 !important; /* Darker shade of International Orange Engineering */
 }
 
 #keeptrack-root {
@@ -18,7 +18,7 @@
   background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
   background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
   background: linear-gradient(45deg, var(--colorTertiaryDarken2), var(--colorTertiaryDarken2));
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
 }
 
 .ui-icon-minus {
@@ -34,7 +34,8 @@
 }
 
 #canvas-holder {
-  display: none; /* Display none till loading is complete main.js -227 */
+  display: none;
+  /* Display none till loading is complete main.js -227 */
 }
 
 #loading-screen {
@@ -75,10 +76,13 @@
   background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
   background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
   background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
-  -moz-background-clip: padding; /* Firefox 3.6 */
-  -webkit-background-clip: padding; /* Safari 4? Chrome 6? */
-  background-clip: padding-box; /* Firefox 4, Safari 5, Opera 10, IE 9 */
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='var(--colorTertiaryDarken2)', endColorstr='#4096ee', GradientType=1);
+  -moz-background-clip: padding;
+  /* Firefox 3.6 */
+  -webkit-background-clip: padding;
+  /* Safari 4? Chrome 6? */
+  background-clip: padding-box;
+  /* Firefox 4, Safari 5, Opera 10, IE 9 */
 }
 
 #logo-inner-container {
@@ -149,6 +153,7 @@
   #logo-text {
     font-size: 3em;
   }
+
   #logo-text-version {
     font-size: 3em;
   }

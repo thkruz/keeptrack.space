@@ -477,7 +477,11 @@ export class MouseInput {
         keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
         break;
       case 'reset-camera-rmb':
-        keepTrackApi.getMainCamera().resetCamera();
+        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat !== -1) {
+          keepTrackApi.getMainCamera().resetRotation();
+        } else {
+          keepTrackApi.getMainCamera().reset();
+        }
         break;
       case 'clear-lines-rmb':
         lineManagerInstance.clear();

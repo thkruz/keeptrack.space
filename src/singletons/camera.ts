@@ -282,6 +282,14 @@ export class Camera {
     this.screenDragPoint = [0, 0];
   }
 
+  resetRotation() {
+    if (this.cameraType !== CameraType.FPS) {
+      this.isPanReset = true;
+    }
+    this.isLocalRotateReset = true;
+    this.ftsRotateReset = true;
+  }
+
   get zoomTarget(): number {
     return this.zoomTarget_;
   }
@@ -300,14 +308,6 @@ export class Camera {
 
   zoomOut(): void {
     this.zoomWheel(100);
-  }
-
-  resetCamera() {
-    if (this.cameraType !== CameraType.FPS) {
-      this.isPanReset = true;
-    }
-    this.isLocalRotateReset = true;
-    this.ftsRotateReset = true;
   }
 
   /**

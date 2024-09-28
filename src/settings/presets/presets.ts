@@ -360,7 +360,7 @@ export class SettingsPresets {
     settings.isDrawAurora = true;
     settings.isShowRocketBodies = true;
     settings.plugins.nightToggle = true;
-    settings.maxZoomDistance = <Kilometers>65000;
+    settings.maxZoomDistance = <Kilometers>70000;
     settings.zFar = 300000;
     settings.minDistanceFromSatellite = <Kilometers>4;
     // only load the 3D model of a sateliot satellite
@@ -372,6 +372,7 @@ export class SettingsPresets {
     settings.plugins.topMenu = false;
     settings.plugins.settingsMenu = false;
     settings.plugins.soundManager = false;
+    settings.plugins.polarPlot = true;
 
     // detect if is a mobile device checking the screen width
     const isMobile = window.innerWidth < 1024;
@@ -387,6 +388,8 @@ export class SettingsPresets {
       settings.maxZoomDistance = <Kilometers>100000;
       settings.zFar = 300000;
     }
+
+    const defaultCamera = keepTrackApi.getMainCamera();
 
 
     settings.onLoadCb = () => {
@@ -437,6 +440,13 @@ export class SettingsPresets {
         } else {
           slideInDown(getEl('search-results'), 1000);
         }
+      });
+
+      // restore the view
+      getEl('restore-view-icon').addEventListener('click', () => {
+        console.log('restore view');
+        // TODO: restore the view
+
       });
     }
   }

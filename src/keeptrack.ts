@@ -211,8 +211,8 @@ export class KeepTrack {
     keepTrackApi.containerRoot.innerHTML += keepTrackApi.html`
       <header>
         <div id="keeptrack-header">
-            <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot" class="start-hidden">
-            <img id="toggle-search-icon" src="/img/stack-grey.png" alt="Toggle Search" class="icon start-hidden">
+          <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot" class="start-hidden">
+          <img id="toggle-search-icon" src="/img/stack-grey.png" alt="Toggle Search" class="icon start-hidden">
         </div>
 
       </header>
@@ -242,6 +242,7 @@ export class KeepTrack {
           </div>
         </figcaption>
         <div id="bottom-map-icon">
+          <img class="sateliot-icon moveup" id="restore-view-icon" src="/img/reset.png" alt="Restore the View" title="Go to Sateliot GitHub">
           <img class="sateliot-icon moveup" id="sateliot-github-icon" src="/img/github-mark.png" alt="Go to Sateliot GitHub project https://github.com/Sateliot/sateliot.keeptrack" title="Go to Sateliot GitHub">
           <img class="sateliot-icon moveup" id="map-2d-icon" src="/img/2d-map-grey.png" alt="Change to 2D visualization" title="Switch to 2D Map View">
         </div>

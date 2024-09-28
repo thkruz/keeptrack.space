@@ -42,8 +42,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
   dragOptions: clickDragOptions = {
     isDraggable: true,
-    minWidth: 500,
-    maxWidth: 700,
+    minWidth: 550,
+    maxWidth: 800,
   };
 
 

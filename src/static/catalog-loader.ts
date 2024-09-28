@@ -998,15 +998,11 @@ export class CatalogLoader {
   }
 
   private static processLimitedSats_(limitSatsArray: string[], resp: KeepTrackTLEFile[], i: number, catalogManagerInstance: CatalogManager, tempObjData: any[]) {
-    let newId = 0;
-
     for (const limitSat of limitSatsArray) {
       if (resp[i].sccNum === limitSat) {
         const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
 
         resp[i].intlDes = intlDes;
-        resp[i].id = newId;
-        newId++;
         catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
         catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
         resp[i].active = true;
@@ -1036,12 +1032,19 @@ export class CatalogLoader {
             resp[i].source = CatalogSource.USSF;
         }
 
+        let rcs: number | null;
+
+        rcs = resp[i].rcs === 'LARGE' ? 5 : rcs;
+        rcs = resp[i].rcs === 'MEDIUM' ? 0.5 : rcs;
+        rcs = resp[i].rcs === 'SMALL' ? 0.05 : rcs;
+        rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : rcs ?? null;
+
         const satellite = new DetailedSatellite({
           id: tempObjData.length,
           tle1: resp[i].TLE1,
           tle2: resp[i].TLE2,
-          rcs: parseFloat(resp[i].rcs) as any,
           ...resp[i],
+          rcs,
         });
 
         tempObjData.push(satellite);

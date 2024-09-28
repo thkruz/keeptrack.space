@@ -41,6 +41,10 @@ input:-webkit-autofill {
   font-size: 16px;
 }
 
+.pointable {
+  cursor: pointer;
+}
+
 a,
 .link {
   cursor: pointer;

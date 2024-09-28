@@ -764,13 +764,13 @@ export class SatInfoBox extends KeepTrackPlugin {
       satVehicleDom.innerHTML = satLvString;
 
       if (satLvString.includes('http')) {
-        satVehicleDom.classList.add('menu-selectable');
+        satVehicleDom.classList.add('pointable');
         satVehicleDom.addEventListener('click', (e) => {
           e.preventDefault();
           openColorbox((<HTMLAnchorElement>satVehicleDom.firstChild).href);
         });
       } else {
-        satVehicleDom.classList.remove('menu-selectable');
+        satVehicleDom.classList.remove('pointable');
       }
     }
 
@@ -845,7 +845,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             <div class="sat-info-row">
               <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Space Lift Vehicle That Launched Object">Rocket</div>
-              <div class="sat-info-value menu-selectable" id="sat-vehicle">VEHICLE</div>
+              <div class="sat-info-value pointable" id="sat-vehicle">VEHICLE</div>
             </div>
             <div class="sat-info-row sat-only-info">
               <div class="sat-info-key" data-position="top" data-delay="50"

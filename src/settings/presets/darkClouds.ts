@@ -4,8 +4,9 @@ import { keepTrackApi } from '../../keepTrackApi';
 import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
 import { lat2pitch, lon2yaw } from '../../lib/transforms';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
+import { SettingsManager } from '../settings';
 
-export const darkClouds = () => {
+export const darkClouds = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>0; // NOTE: 0 will make the geosynchronous satellites more apparent
   const DEFAULT_LONGITUDE = <Degrees>20;
   const DELAY_BEFORE_ROTATING = 1000; // ms - NOTE: Number should be at least 1000 or it will fail to fire the event

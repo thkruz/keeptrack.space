@@ -1417,7 +1417,8 @@ export class SettingsManager {
                 SettingsPresets.loadPresetDebris(this);
                 break;
               case 'dark-clouds':
-                darkClouds();
+                darkClouds(settingsManager);
+                break;
                 break;
               case 'million-year':
                 SettingsPresets.loadPresetMillionYear(this);

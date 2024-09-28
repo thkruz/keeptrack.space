@@ -6,6 +6,7 @@
   --colorTertiaryDarken4: #0f0f0f !important;
   --color-dark-text-accent: #dd382f !important;
   --color-primary: #ba160c !important; /* International Orange Engineering */
+  --statusKTDarkStandby: #ff2827; /* Brighter version of International Orange Engineering for icons */
   --color-primary-light: #e01a0e !important; /* Lighter shade of International Orange Engineering */
   --color-primary-dark: #860f08 !important; /* Darker shade of International Orange Engineering */
 }

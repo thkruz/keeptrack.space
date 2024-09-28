@@ -1046,11 +1046,28 @@ input:focus {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kTtIw1AUhv+mFUUqDmYQcchQnSyILxylikWwUNoKrTqY3PQFTRqSFBdHwbXg4GOx6uDirKuDqyAIPkBcXZwUXaTEc5NCixgvHO7Hf+//c+65gNCoMM0KjQOabpupeEzK5lal7leEIVJNIyQzy0ikFzPwXV/3CPD9Lsqz/O/9ufrUvMWAgEQ8xwzTJt4gntm0Dc77xCIrySrxOfGYSQ0SP3Jd8fiNc9FlgWeKZiY1TywSS8UOVjqYlUyNeIo4omo65QtZj1XOW5y1So21+uQvDOf1lTTXqYYRxxISSEKCghrKqMBGlHadFAspOo/5+Idcf5JcCrnKYORYQBUaZNcP/ge/Z2sVJie8pHAM6HpxnI8RoHsXaNYd5/vYcZonQPAZuNLb/moDmP0kvd7WIkdA/zZwcd3WlD3gcgcYfDJkU3alIJVQKADvZ/RNOWDgFuhd8+bWOsfpA5ChWS3fAAeHwGiRstd93t3TObd/77Tm9wOOiHKymlTPuAAAAAZiS0dEAM4AowCKeTVkwgAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB+cMFAw5A0OJiTcAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAB20lEQVRYw+2WvU4bURCFv7m2NpUlaiSngcLF2hLOG0BHYb9ACoqkg44+ovcjWIKCF7ALOvIGBuKlSBGaIFEjucoK30kRW4p8Z9e7xJKR4ml35tzZM2d+YGP/u0kZ5zjRuqR0BQ5RdlTYBhDlCeFB4UojBvdNeVxpAns3uj31nCl8Kgjarzi+3Lbl6Z8TaN1oRz2XQK0kuxNxfBy3ZZjn5PI+Nkd6rJ7BKx4HqKln0Bzp8asYmP35YCVCc3SzmJCsmr94vmf8+cRBTyoMtyJ+ADyn7OqUjofTrJiqo2FpomolMPWcWUAifPURR99Cld8Bd3Gi5y7lQpX9xXLMMD8vZSBOtC6/+Gk9Pv4gB0Uob4302kgCfcf7xRYNRCgpXYtCH3FUtOYz30kRbGdQcmg49coMl/umPDroFcRe5ImdILDCsLTyrRgDO0hgPl7/trnay5gVY2G7dS+jUANK0KvPKbtlga0YC9sZo+khoG5Kp2wCZoyBHWoAroK2gtM40XqZtT2bikuxwwQic/7XXMpF4br+8a0VwXZWDwv0g2BlvzXS6zwm4kTrWVNQoG/NkrUvo7Wv48w5MG7LEOFkBVfnSd5V9LZPsjkTVUfDEmbeUVp1NJY9/ibO8o1t7Ddz5991OpoAtwAAAABJRU5ErkJggg==');
 }
 
-.bmenu-item img {
+.bmenu-item .bmenu-item-inner img {
   width: var(--bottom-icon-img-size);
   height: auto;
   margin: 0 auto;
   display: block;
+}
+
+.bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-item-inner * {
+  /* Convert blue to engineering red */
+  filter: hue-rotate(163deg) brightness(0.7) saturate(4);
+}
+
+.bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help):hover .bmenu-item-inner * {
+  filter: hue-rotate(163deg) brightness(0.62) saturate(2.8);
+}
+
+.bmenu-item .bmenu-item-inner * {
+  scale: 0.9;
+}
+
+#custom-sensor-menu-settings-btn:active {
+  scale: 0.8;
 }
 
 .bmenu-title {
@@ -1061,9 +1078,6 @@ input:focus {
   text-align: center;
 }
 
-.bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help):hover * {
-  filter: brightness(3);
-}
 
 .bmenu-item-selected img {
   filter: hue-rotate(275deg) brightness(1.2);
@@ -3514,7 +3528,7 @@ a.ui-button:active,
   /* Use half of the width (120/2 = 60), to center the tooltip */
   overflow: visible;
 
-  background-color: #1f3347;
+  background-color: var(--colorTertiaryDarken2);
   text-align: center;
   padding: 5px;
   border-width: 5px;
@@ -3557,6 +3571,7 @@ a.ui-button:active,
 /* Large Cellphones or Smaller */
 .material-tooltip {
   display: none !important;
+  background-color: #323232;
 }
 
 

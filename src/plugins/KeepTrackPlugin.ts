@@ -314,7 +314,7 @@ export abstract class KeepTrackPlugin {
             keepTrackApi.getSoundManager().play(SoundNames.CLICK);
             if (this.isSideMenuSettingsOpen) {
               this.closeSettingsMenu();
-              getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkStandby)';
+              getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusKTDarkStandby)';
             } else {
               this.openSettingsMenu();
               getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkNormal)';
@@ -383,7 +383,7 @@ export abstract class KeepTrackPlugin {
     const downloadIconHtml = this.downloadIconCb ? keepTrackApi.html`
       <button id="${this.sideMenuElementName}-download-btn";
         class="center-align btn btn-ui waves-effect waves-light"
-        style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--statusDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
+        style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--statusKTDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
         type="button">
         <i class="material-icons" style="font-size: 2em;height: 30px;width: 30px;display: flex;justify-content: center;align-items: center;">
           file_download
@@ -393,7 +393,7 @@ export abstract class KeepTrackPlugin {
     const settingsIconHtml = keepTrackApi.html`
       <button id="${this.sideMenuElementName}-settings-btn"
         class="center-align btn btn-ui waves-effect waves-light"
-        style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--statusDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
+        style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--statusKTDarkStandby); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
         type="button">
         <i class="material-icons" style="font-size: 2em;height: 30px;width: 30px;display: flex;justify-content: center;align-items: center;">
           settings
@@ -766,7 +766,7 @@ export abstract class KeepTrackPlugin {
 
   closeSettingsMenu() {
     this.isSideMenuSettingsOpen = false;
-    getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusDarkStandby)';
+    getEl(`${this.sideMenuElementName}-settings-btn`).style.color = 'var(--statusKTDarkStandby)';
     slideOutLeft(getEl(`${this.sideMenuElementName}-settings`), 1500, null, -300);
   }
 

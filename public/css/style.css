@@ -144,66 +144,6 @@ ul {
   user-select: none;
 }
 
-#no-webgl {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  text-align: center;
-  margin-top: 20px;
-  display: none;
-}
-
-.SFusrbtndiv {
-  text-align: center !important;
-}
-
-#SFusrdlg_gry {
-  display: none;
-}
-
-#SFusrpne0 {
-  margin: 25px !important;
-}
-
-#SFctr button {
-  background: var(--colorPrimary) !important;
-
-  border: none !important;
-  border-radius: 2px !important;
-  height: 36px !important;
-  line-height: 36px !important;
-  padding: 0 16px !important;
-  text-transform: uppercase !important;
-
-  font-size: 14px !important;
-  outline: 0 !important;
-
-  -webkit-box-shadow:
-    0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12),
-    0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
-  box-shadow:
-    0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12),
-    0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
-
-  position: relative !important;
-  cursor: pointer !important;
-  display: inline-block !important;
-  overflow: hidden !important;
-  -webkit-user-select: none !important;
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
-  user-select: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-  vertical-align: middle !important;
-  z-index: 1 !important;
-  -webkit-transition: 0.3s ease-out !important;
-  transition: 0.3s ease-out !important;
-}
-
 #classification-container {
   text-align: center;
   background: var(--classificationColor);

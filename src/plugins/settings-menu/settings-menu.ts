@@ -608,7 +608,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isSatLabelModeOn = true;
     settingsManager.isFreezePropRateOnDrag = false;
     settingsManager.isDisableTimeMachineToasts = false;
-    settingsManager.searchLimit = 150;
+    settingsManager.searchLimit = 600;
     SettingsMenuPlugin.preserveSettings();
     SettingsMenuPlugin.syncOnLoad();
   }

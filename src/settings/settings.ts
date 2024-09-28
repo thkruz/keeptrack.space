@@ -30,6 +30,7 @@ import { ClassificationString } from '../static/classification';
 import { isThisNode } from '../static/isThisNode';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
+import { sateliot } from './presets/sateliot';
 
 export class SettingsManager {
   classificationStr = '' as ClassificationString;
@@ -1419,6 +1420,8 @@ export class SettingsManager {
               case 'dark-clouds':
                 darkClouds(settingsManager);
                 break;
+              case 'sateliot':
+                sateliot(settingsManager);
                 break;
               case 'million-year':
                 SettingsPresets.loadPresetMillionYear(this);

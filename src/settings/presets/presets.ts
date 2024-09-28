@@ -394,6 +394,7 @@ export class SettingsPresets {
 
     settings.onLoadCb = () => {
       keepTrackApi.getUiManager().searchManager.doSearch('60550,60534,60552,60537');
+      keepTrackApi.getMainCamera().lookAtLatLon(41.38160380932027 as Degrees, 2.1420305583779276 as Degrees, 0.67); // Look at HQ
 
       hideEl('nav-footer');
       hideEl('nav-wrapper');
@@ -451,7 +452,8 @@ export class SettingsPresets {
       // restore the view
       getEl('restore-view-icon').addEventListener('click', () => {
         console.log('restore view');
-        // TODO: restore the view
+        keepTrackApi.getMainCamera().reset();
+        keepTrackApi.getMainCamera().lookAtLatLon(41.38160380932027 as Degrees, 2.1420305583779276 as Degrees, 0.67);
       });
     };
   }

@@ -157,6 +157,7 @@ export class CatalogLoader {
         CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
         // Rewrite manufacturer for SATELIOT satellites
         tempObjData.forEach((sat) => {
+          console.log('Manufacturer fix for SATELIOT rewrite. To be deleted after fix in TLE.json');
           if (sat.name.includes('SATELIOT')) {
             (sat as DetailedSatellite).manufacturer = 'Allen Space';
           }
@@ -738,6 +739,8 @@ export class CatalogLoader {
           ...resp[i],
           rcs,
         });
+
+        // tempObjData.push(satellite);
 
         if (settingsManager.limitSats === '') {
           tempObjData.push(satellite);

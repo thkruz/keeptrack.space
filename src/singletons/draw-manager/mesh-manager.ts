@@ -313,9 +313,19 @@ export class MeshManager {
       return;
     }
 
-    // SATELIOT
-    // Force sateliot sat
-    sat.bus = 'sateliotsat';
+    switch (sat.payload) {
+      case 'Platform-3':
+      case 'Sateliot-1':
+      case 'Sateliot-2':
+      case 'Sateliot-3':
+      case 'Sateliot-4':
+        this.currentMeshObject.model = this.models.sateliotsat;
+
+        return;
+      default:
+        // Do Nothing
+        break;
+    }
 
     switch (sat.bus) {
       case 'sateliotsat':

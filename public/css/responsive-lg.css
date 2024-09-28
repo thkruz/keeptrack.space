@@ -140,7 +140,8 @@
     margin-top: 25px;
     right: 0px;
     width: 355px;
-    height: 60%;
+    height: fit-content;
+    max-height: 60%;
   }
 
   .satinfo-fixed:after {

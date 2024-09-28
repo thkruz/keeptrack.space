@@ -1083,7 +1083,8 @@ export class SatInfoBox extends KeepTrackPlugin {
       });
 
       draggie.on('dragStart', () => {
-        getEl(SatInfoBox.containerId_).style.height = '600px';
+        getEl(SatInfoBox.containerId_).style.height = 'fit-content';
+        getEl(SatInfoBox.containerId_).style.maxHeight = '80%';
         document.documentElement.style.setProperty('--search-box-bottom', '0px');
         getEl(SatInfoBox.containerId_).classList.remove('satinfo-fixed');
       });

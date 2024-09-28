@@ -223,6 +223,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   };
 
   dragOptions: clickDragOptions = {
+    minWidth: 350,
     isDraggable: true,
   };
 

@@ -1191,7 +1191,30 @@ export class SatInfoBox extends KeepTrackPlugin {
       keepTrackApi.containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
         (<HTMLElement>el).style.display = 'flex';
       });
-      getEl('sat-user').innerHTML = sat?.owner && sat?.owner !== '' ? sat?.owner : 'Unknown';
+      let satUserDom = getEl('sat-user');
+      const satUserString = StringExtractor.extractUserUrl(sat?.owner); // Replace with link if available
+
+      satUserDom.innerHTML = satUserString;
+      const tempEl = satUserDom.cloneNode(true);
+
+      satUserDom.parentNode.replaceChild(tempEl, satUserDom);
+      satUserDom = tempEl as HTMLElement;
+
+      if (satUserString.includes('http')) {
+        satUserDom.classList.add('pointable');
+        satUserDom.addEventListener('click', (e) => {
+          e.preventDefault();
+          const href = (<HTMLAnchorElement>satUserDom.firstChild).href;
+
+          if (href.includes('http')) {
+            openColorbox(href);
+          }
+        });
+      } else {
+        satUserDom.classList.remove('pointable');
+      }
+
+
       getEl('sat-purpose').innerHTML = sat?.purpose && sat?.purpose !== '' ? sat?.purpose : 'Unknown';
       getEl('sat-contractor').innerHTML = sat?.manufacturer && sat?.manufacturer !== '' ? sat?.manufacturer : 'Unknown';
       // Update with other mass options

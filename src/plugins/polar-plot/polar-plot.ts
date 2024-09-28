@@ -269,7 +269,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
   private drawOrbitLine_(): void {
     this.ctx_.beginPath();
-    this.ctx_.strokeStyle = 'rgb(255, 255, 255)';
+    this.ctx_.strokeStyle = 'rgb(255, 40, 39)';
     this.ctx_.lineWidth = 2;
 
     const dataLength = this.plotData_.length;
@@ -294,8 +294,8 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.drawPolarAxes_();
 
     this.ctx_.font = `${this.canvasSize_ * this.fontRatio_}px serif`;
-    this.ctx_.strokeStyle = 'rgb(77, 172, 255)';
-    this.ctx_.fillStyle = 'rgb(77, 172, 255)';
+    this.ctx_.strokeStyle = 'rgb(255, 255, 255)';
+    this.ctx_.fillStyle = 'rgb(255, 255, 255)';
     this.ctx_.lineWidth = 1;
 
     this.labelAzimuthAxis_();

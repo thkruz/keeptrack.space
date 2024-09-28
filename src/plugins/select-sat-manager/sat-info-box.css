@@ -28,7 +28,7 @@
   height: 25px;
   font-size: 18px;
   text-align: center;
-  background: var(--colorTertiaryDarken3);
+  background: var(--color-dark-border);
   color: var(--colorWhite);
   display: flex;
   justify-content: center;
@@ -133,12 +133,12 @@
 #sat-infobox {
   display: none;
   position: absolute;
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   cursor: default;
   bottom: 0px;
   height: 30%;
   width: 100%;
-  border: 5px solid var(--colorTertiaryDarken3);
+  border: 5px solid var(--color-dark-border);
   overflow: auto;
   z-index: 1;
 }

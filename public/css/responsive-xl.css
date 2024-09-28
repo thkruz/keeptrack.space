@@ -73,7 +73,7 @@
   #time-machine-menu {
     padding-left: 35px;
     color: white;
-    background: var(--colorTertiaryDarken2);
+    background: var(--color-dark-background);
     width: 300px;
     top: 25px;
     right: 0px;
@@ -82,7 +82,7 @@
     overflow: auto;
     border-width: 0px 0px 5px 5px;
     border-style: solid;
-    border-color: var(--colorTertiaryDarken3);
+    border-color: var(--color-dark-border);
   }
 
   #obfit-menu {
@@ -92,7 +92,7 @@
   #legend-hover-menu {
     padding-left: 35px;
     color: white;
-    background: var(--colorTertiaryDarken2);
+    background: var(--color-dark-background);
     width: 300px;
     top: var(--top-menu-height);
     right: 0px;
@@ -101,12 +101,12 @@
     overflow: auto;
     border-width: 0px 0px 5px 5px;
     border-style: solid;
-    border-color: var(--colorTertiaryDarken3);
+    border-color: var(--color-dark-border);
   }
 
   .side-menu {
     position: absolute;
-    background: var(--colorTertiaryDarken2);
+    background: var(--color-dark-background);
     color: white;
     width: 100%;
     height: 100%;
@@ -114,7 +114,7 @@
     overflow-y: auto;
     z-index: 10;
     /* border-width: 0px 5px 0px 0px; */
-    border-color: var(--colorTertiaryDarken3);
+    border-color: var(--color-dark-border);
     border-style: solid;
   }
 

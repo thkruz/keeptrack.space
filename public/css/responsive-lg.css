@@ -53,15 +53,15 @@
     position: absolute;
     right: 0px;
     width: 355px;
-    background: var(--colorTertiaryDarken2) !important;
+    background: var(--color-dark-background) !important;
     z-index: 1;
     top: var(--top-menu-height);
     bottom: var(--bottom-menu-top);
     max-height: calc(100% - var(--top-menu-height) - max(var(--bottom-menu-top), var(--search-box-bottom) + var(--bottom-menu-top)) + 3px);
     border-width: 0px 0px 5px 5px;
     border-style: solid;
-    border-color: var(--colorTertiaryDarken3);
-    border-top: 5px solid var(--colorTertiaryDarken3);
+    border-color: var(--color-dark-border);
+    border-top: 5px solid var(--color-dark-border);
     padding-top: 0px;
   }
 
@@ -88,7 +88,7 @@
     width: 50px;
     height: 50px;
     padding: 9px;
-    background: var(--colorTertiaryDarken2) !important;
+    background: var(--color-dark-background) !important;
   }
 
   .share-up {
@@ -99,7 +99,7 @@
   #time-machine-menu {
     padding-left: 35px;
     color: white;
-    background: var(--colorTertiaryDarken2);
+    background: var(--color-dark-background);
     top: 50px;
     right: 0px;
     z-index: 100;
@@ -108,7 +108,7 @@
     width: 100%;
     border-width: 0px 0px 5px 0px;
     border-style: solid;
-    border-color: var(--colorTertiaryDarken3);
+    border-color: var(--color-dark-border);
   }
 
   #obfit-menu {
@@ -120,7 +120,8 @@
   }
 
   .search-slide-down {
-    width: 355px; /* This should match the #search-results */
+    width: 355px;
+    /* This should match the #search-results */
   }
 
   .search-slide-up {

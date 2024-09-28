@@ -32,8 +32,8 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  box-shadow: 0 0 0 30px var(--colorTertiaryDarken2) inset !important;
-  -webkit-box-shadow: 0 0 0 30px var(--colorTertiaryDarken2) inset !important;
+  box-shadow: 0 0 0 30px var(--color-dark-background) inset !important;
+  -webkit-box-shadow: 0 0 0 30px var(--color-dark-background) inset !important;
 }
 
 input:-webkit-autofill {
@@ -68,7 +68,7 @@ a,
 }
 
 #nav-wrapper {
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   z-index: 3;
   display: flex;
   flex-direction: row;
@@ -85,7 +85,7 @@ a,
   width: 40px;
   margin: 0px auto;
   margin-top: -20px;
-  background: var(--colorTertiaryDarken3);
+  background: var(--color-dark-border);
   cursor: pointer;
   text-align: center;
   font-size: 12px;
@@ -108,7 +108,7 @@ footer {
   top: 0px;
   /* Make sure its drawn on top of the container for the slider button */
   z-index: 2;
-  background-color: var(--colorTertiaryDarken3) !important;
+  background-color: var(--color-dark-border) !important;
 }
 
 ul {
@@ -204,12 +204,12 @@ ul {
 
 .right-btn-menu {
   display: none;
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   color: white;
   position: absolute;
   width: 165px;
   border-radius: 0px;
-  border: 5px solid var(--colorTertiaryDarken3);
+  border: 5px solid var(--color-dark-border);
   z-index: 10;
   /*Prevent fighting with the slide down button on mobile */
 }
@@ -243,14 +243,14 @@ ul {
 
 #sat-hoverbox {
   display: flex;
-  background: var(--colorTertiaryDarken2) !important;
+  background: var(--color-dark-background) !important;
   cursor: default;
   color: white;
   position: absolute;
   text-align: center;
   padding: 10px;
   border-radius: 0px;
-  border: 5px solid var(--colorTertiaryDarken3);
+  border: 5px solid var(--color-dark-border);
   pointer-events: none;
   z-index: 0;
   flex-direction: column;
@@ -276,7 +276,7 @@ ul {
   position: absolute;
   width: 100%;
   height: fit-content;
-  background: var(--colorTertiaryDarken2) !important;
+  background: var(--color-dark-background) !important;
   z-index: 1;
   top: var(--top-menu-height);
   bottom: 250px;
@@ -284,7 +284,7 @@ ul {
   border-width: 0px 0px 5px 0px;
   padding-top: 10px;
   border-style: solid;
-  border-color: var(--colorTertiaryDarken3);
+  border-color: var(--color-dark-border);
 }
 
 .search-result {
@@ -318,7 +318,7 @@ ul {
 }
 
 .menu-item:hover .menu-title {
-  color: var(--colorTertiaryDarken2);
+  color: var(--color-dark-background);
 }
 
 .menu-title {
@@ -622,7 +622,7 @@ ul {
 }
 
 #editor-menu {
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   color: white;
   overflow: auto;
 }
@@ -684,7 +684,7 @@ ul {
 }
 
 .side-menu-row-header {
-  background: var(--colorTertiaryDarken3);
+  background: var(--color-dark-border);
   margin: 0px -5px;
   padding: 5px;
 }
@@ -702,13 +702,13 @@ ul {
   left: 0px;
   transition: all 1s ease-in-out;
   transform: translateX(-100%);
-  background: var(--colorTertiaryDarken2);
-  border-top: solid 5px var(--colorTertiaryDarken3)
+  background: var(--color-dark-background);
+  border-top: solid 5px var(--color-dark-border)
 }
 
 .divider {
   padding: 2px !important;
-  background-color: var(--colorTertiaryDarken2);
+  background-color: var(--color-dark-background);
 }
 
 input[type='checkbox'].css-checkbox {
@@ -831,13 +831,13 @@ ul li {
 }
 
 #colorbox {
-  border: 10px solid var(--colorTertiaryDarken2);
+  border: 10px solid var(--color-dark-background);
   z-index: 10;
   box-sizing: content-box;
 }
 
 #colorbox-header {
-  background: var(--colorTertiaryDarken3);
+  background: var(--color-dark-border);
   width: 100%;
   height: 34px;
   display: flex;
@@ -965,7 +965,7 @@ input:focus {
 }
 
 #ui-datepicker-div {
-  border: 5px solid var(--colorTertiaryDarken3);
+  border: 5px solid var(--color-dark-border);
   top: 50px;
   left: 0px;
   width: 100%;
@@ -988,7 +988,7 @@ input:focus {
   display: flex;
   font-weight: bold;
   color: var(--color-primary);
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   border: 1px solid rgba(0, 0, 0, 0);
   height: 45px;
   width: 45px;
@@ -1030,7 +1030,7 @@ input:focus {
   grid-template-columns: minmax(var(--bottom-icon-width), max-content) repeat(auto-fill, var(--bottom-icon-width));
   justify-content: center;
   row-gap: 0px;
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   padding-top: 10px;
   z-index: 11;
 }
@@ -1260,11 +1260,11 @@ input:focus {
   position: relative;
   inset: 10%;
   z-index: 99;
-  border: 5px solid var(--colorTertiaryDarken3);
+  border: 5px solid var(--color-dark-border);
   text-align: center;
   padding: 10px;
   overflow: auto;
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
 }
 
 #help-outer-container {
@@ -1316,7 +1316,7 @@ input:focus {
 
 /* *********** Calendar CSS *********** */
 .ui-widget-content {
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   border: 1px solid var(--colorTertiary);
   font-family: 'Open Sans', sans-serif;
   color: var(--colorWhite);
@@ -2286,7 +2286,7 @@ button.ui-button::-moz-focus-inner {
 }
 
 .ui-slider .ui-slider-handle {
-  background-color: var(--colorTertiaryDarken2);
+  background-color: var(--color-dark-background);
   border: 2px solid var(--color-primary);
   width: 16px;
   /* Larger circle size */
@@ -3404,8 +3404,8 @@ a.ui-button:active,
   padding: 15px;
   font-family: 'Open Sans', sans-serif;
   width: fit-content;
-  background: var(--colorTertiaryDarken2);
-  border: 5px solid var(--colorTertiaryDarken3);
+  background: var(--color-dark-background);
+  border: 5px solid var(--color-dark-border);
   /* Grid of 4 divs wide */
   display: grid !important;
   grid-template-columns: repeat(6, 1fr);
@@ -3512,7 +3512,7 @@ a.ui-button:active,
   width: 95%;
   height: 95%;
   margin: auto;
-  border-color: var(--colorTertiaryDarken3);
+  border-color: var(--color-dark-border);
   border-width: 10px;
   border-style: solid;
   border-radius: 5px;
@@ -3556,11 +3556,11 @@ a.ui-button:active,
   /* Use half of the width (120/2 = 60), to center the tooltip */
   overflow: visible;
 
-  background-color: var(--colorTertiaryDarken2);
+  background-color: var(--color-dark-background);
   text-align: center;
   padding: 5px;
   border-width: 5px;
-  border-color: var(--colorTertiaryDarken3);
+  border-color: var(--color-dark-border);
   border-style: solid;
   color: #ffffff;
   content: attr(data-tooltip);
@@ -3637,9 +3637,9 @@ a.ui-button:active,
   position: relative;
   height: 100%;
   border-width: 0px 5px 0px 0px;
-  border-color: var(--colorTertiaryDarken3);
+  border-color: var(--color-dark-border);
   border-style: solid;
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   color: white;
   width: 100%;
   top: 0px;
@@ -3658,9 +3658,9 @@ a.ui-button:active,
   position: relative;
   height: 100%;
   border-width: 0px 5px 0px 0px;
-  border-color: var(--colorTertiaryDarken3);
+  border-color: var(--color-dark-border);
   border-style: solid;
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   color: white;
   width: 100%;
   top: 0px;
@@ -3679,9 +3679,9 @@ a.ui-button:active,
   height: 25px;
   margin: 3px;
   display: block;
-  border-left: solid 5px var(--colorTertiaryDarken3) !important;
+  border-left: solid 5px var(--color-dark-border) !important;
   border-radius: 0;
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   font-size: 16px;
   color: #f5f5f5;
   outline: none;
@@ -3699,8 +3699,8 @@ a.ui-button:active,
 }
 
 #search-holder input:-webkit-autofill {
-  box-shadow: 0 0 0px 1000px var(--colorTertiaryDarken3) inset;
-  background-color: var(--colorTertiaryDarken2) !important;
+  box-shadow: 0 0 0px 1000px var(--color-dark-border) inset;
+  background-color: var(--color-dark-background) !important;
   -webkit-text-fill-color: white !important;
   color: white !important;
 }
@@ -3749,7 +3749,7 @@ a.ui-button:active,
 
 nav {
   color: #fff;
-  background-color: var(--colorTertiaryDarken2);
+  background-color: var(--color-dark-background);
   width: 100%;
   height: 50px;
   line-height: 50px;
@@ -3759,7 +3759,7 @@ nav {
   display: none;
   padding: 10px;
   color: white;
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   top: var(--top-menu-height);
   z-index: 100;
   position: fixed;
@@ -3767,7 +3767,7 @@ nav {
   width: 100%;
   border-width: 0px 0px 5px 0px;
   border-style: solid;
-  border-color: var(--colorTertiaryDarken3);
+  border-color: var(--color-dark-border);
 }
 
 #legend-hover-menu li {
@@ -3797,7 +3797,7 @@ nav a.sidenav-trigger i {
   width: 800px;
   left: 0;
   margin: 0;
-  border-top: 3px solid var(--colorTertiaryDarken3);
+  border-top: 3px solid var(--color-dark-border);
   border-left: 0;
   border-right: 0;
   border-bottom: 0;

@@ -26,6 +26,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   pointer-events: none;
 }
+
 #orbit-btn {
   display: block;
   background: red;
@@ -39,6 +40,7 @@
   border-radius: 5px;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
 #countries-btn {
   display: block;
   background: green;
@@ -118,12 +120,12 @@
 
 .right-btn-menu {
   display: none;
-  background: var(--colorTertiaryDarken2);
+  background: var(--color-dark-background);
   color: white;
   position: absolute;
   width: 165px;
   border-radius: 0px;
-  border: 5px solid var(--colorTertiaryDarken3);
+  border: 5px solid var(--color-dark-border);
   z-index: 10;
   /*Prevent fighting with the slide down button on mobile */
 }
@@ -186,6 +188,7 @@ ul li {
     min-width: 100%;
     top: 50px;
   }
+
   .toast {
     width: 100%;
     border-radius: 0;

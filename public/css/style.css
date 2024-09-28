@@ -221,7 +221,7 @@ ul {
 }
 
 .right-btn-menu ul li:hover {
-  background-color: var(--colorSecondaryDarken1);
+  background-color: var(--color-primary);
 }
 
 .right-btn-menu ul li:hover a {
@@ -230,7 +230,7 @@ ul {
 }
 
 .rmb-menu-item:hover {
-  background-color: var(--colorPrimaryDarken3) !important;
+  background-color: var(--color-primary-dark) !important;
 }
 
 .rmb-menu-item a {
@@ -271,6 +271,7 @@ ul {
   overflow-y: auto;
   position: absolute;
   width: 100%;
+  height: fit-content;
   background: var(--colorTertiaryDarken2) !important;
   z-index: 1;
   top: var(--top-menu-height);
@@ -961,7 +962,7 @@ input:focus {
 .ui-datepicker-calendar tbody tr td a {
   display: flex;
   font-weight: bold;
-  color: var(--colorSecondaryDarken1);
+  color: var(--color-primary);
   background: var(--colorTertiaryDarken2);
   border: 1px solid rgba(0, 0, 0, 0);
   height: 45px;
@@ -1337,7 +1338,7 @@ input:focus {
 
 .ui-slider-handle {
   border-radius: 10px !important;
-  background: var(--colorPrimary);
+  background: var(--color-primary);
   border: 2px solid white;
 }
 
@@ -2241,7 +2242,7 @@ button.ui-button::-moz-focus-inner {
 
 .ui-slider .ui-slider-handle {
   background-color: var(--colorTertiaryDarken2);
-  border: 2px solid var(--colorSecondaryDarken1);
+  border: 2px solid var(--color-primary);
   width: 16px;
   /* Larger circle size */
   height: 16px;
@@ -2276,7 +2277,7 @@ button.ui-button::-moz-focus-inner {
 
 .ui-slider-horizontal {
   height: 0px;
-  border: 2px solid var(--colorSecondaryDarken1) !important
+  border: 2px solid var(--color-primary) !important
 }
 
 .ui-slider-horizontal .ui-slider-handle {

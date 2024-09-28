@@ -324,7 +324,7 @@ export class SatelliteFov extends KeepTrackPlugin {
         let nameSpan = '';
 
         if (currentSat && mesh.obj.id === currentSat.id) {
-          nameSpan = keepTrackApi.html`<span style="color: var(--statusDarkStandby);">${mesh.obj.name}</span>`;
+          nameSpan = keepTrackApi.html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>`;
         } else {
           nameSpan = keepTrackApi.html`<span>${mesh.obj.name}</span>`;
         }

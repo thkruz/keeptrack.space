@@ -168,7 +168,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
       this.createBody_(tbl);
     } catch (e) {
-      errorManagerInstance.warn('Error processing SOCRATES data!');
+      errorManagerInstance.warn('Error processing reentry data!');
     }
   }
 
@@ -211,11 +211,22 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     if (sat) {
       // Get Flight path angle at terminal point
       const decayEpochDate = new Date(this.tipList_[i].DECAY_EPOCH);
-      const nu = sat.toClassicalElements(decayEpochDate).trueAnomaly;
-      const sinNu = Math.sin(nu);
-      const gamma = Math.atan((sat.eccentricity * sinNu) / (1 + sat.eccentricity * Math.cos(nu)));
+      let nu: number | null = null;
 
-      gammaDegrees = `${Math.abs(gamma * RAD2DEG).toFixed(2)}°`;
+      try {
+        nu = sat.toClassicalElements(decayEpochDate)?.trueAnomaly;
+      } catch {
+        // This is expected to fail for some satellites since they are rentries
+      }
+
+      if (nu !== null) {
+        const sinNu = Math.sin(nu);
+        const gamma = Math.atan((sat.eccentricity * sinNu) / (1 + sat.eccentricity * Math.cos(nu)));
+
+        gammaDegrees = `${Math.abs(gamma * RAD2DEG).toFixed(2)}°`;
+      } else {
+        gammaDegrees = 'Unknown';
+      }
 
       if (sat?.rcs) {
         rcs = `${sat.rcs}`;

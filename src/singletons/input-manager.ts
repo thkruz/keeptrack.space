@@ -290,7 +290,7 @@ export class InputManager {
           <ul class='dropdown-contents'>
             <li id="earth-blue-rmb"><a href="#">Blue Map</a></li>
             <li id="earth-nasa-rmb"><a href="#">NASA Map</a></li>
-            <li id="earth-trusat-rmb"><a href="#">TruSat Map</a></li>
+            <li id="earth-brown-rmb"><a href="#">Brown Earth Map</a></li>
             <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
             <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
             <li id="earth-vec-rmb"><a href="#">Vector Image Map</a></li>

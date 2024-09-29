@@ -110,7 +110,6 @@ export interface Colors {
   sunlight80: rgbaArray;
   sunlightInview: rgbaArray;
   transparent: rgbaArray;
-  trusat: rgbaArray;
   umbral: rgbaArray;
   unknown: rgbaArray;
   version: string;

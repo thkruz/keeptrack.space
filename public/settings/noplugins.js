@@ -54,7 +54,6 @@ const settingsOverride = {
      * payload: [0.2, 1.0, 0.0, 0.5],
      * rocketBody: [0.2, 0.4, 1.0, 1],
      * unknown: [0.5, 0.5, 0.5, 0.85],
-     * trusat: [1.0, 0.0, 0.6, 1.0],
      * analyst: [1.0, 1.0, 1.0, 0.8],
      * missile: [1.0, 1.0, 0.0, 1.0],
      * missileInview: [1.0, 0.0, 0.0, 1.0],

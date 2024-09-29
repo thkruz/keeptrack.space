@@ -245,7 +245,7 @@ export class Earth {
     if (settings.nasaImages) {
       src = `${settings.installDirectory}textures/mercator-tex.jpg`;
     }
-    if (settings.trusatImages) {
+    if (settings.brownEarthImages) {
       src = `${settings.installDirectory}textures/trusatvector-4096.jpg`;
     }
     if (settings.blueImages) {

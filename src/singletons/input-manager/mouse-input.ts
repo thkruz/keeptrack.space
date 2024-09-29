@@ -95,8 +95,8 @@ export class MouseInput {
     if (settingsManager.nasaImages) {
       getEl('earth-nasa-rmb').style.display = 'none';
     }
-    if (settingsManager.trusatImages) {
-      getEl('earth-trusat-rmb').style.display = 'none';
+    if (settingsManager.brownEarthImages) {
+      getEl('earth-brown-rmb').style.display = 'none';
     }
     if (settingsManager.blueImages) {
       getEl('earth-blue-rmb').style.display = 'none';
@@ -524,10 +524,10 @@ export class MouseInput {
         MouseInput.saveMapToLocalStorage('nasa');
         keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         break;
-      case 'earth-trusat-rmb':
+      case 'earth-brown-rmb':
         MouseInput.resetCurrentEarthTexture();
-        settingsManager.trusatImages = true;
-        MouseInput.saveMapToLocalStorage('trusat');
+        settingsManager.brownEarthImages = true;
+        MouseInput.saveMapToLocalStorage('brown');
         keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         break;
       case 'earth-low-rmb':
@@ -610,7 +610,7 @@ export class MouseInput {
   private static resetCurrentEarthTexture() {
     settingsManager.blueImages = false;
     settingsManager.nasaImages = false;
-    settingsManager.trusatImages = false;
+    settingsManager.brownEarthImages = false;
     settingsManager.lowresImages = false;
     settingsManager.hiresImages = false;
     settingsManager.hiresNoCloudsImages = false;

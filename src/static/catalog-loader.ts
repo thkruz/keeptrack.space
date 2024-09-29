@@ -794,8 +794,6 @@ export class CatalogLoader {
   }
 
   private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempObjData: BaseObject[], catalogManagerInstance: CatalogManager) {
-    settingsManager.isExtraSatellitesAdded = true;
-
     if (typeof element.ON === 'undefined') {
       element.ON = 'Unknown';
     }
@@ -900,8 +898,6 @@ export class CatalogLoader {
         tempSatData[i].TLE2 = element.TLE2;
         tempSatData[i].source = CatalogSource.EXTRA_JSON;
       } else {
-        settingsManager.isExtraSatellitesAdded = true;
-
         const intlDes = CatalogLoader.parseIntlDes_(element.TLE1);
         const extrasSatInfo = {
           static: false,
@@ -961,8 +957,6 @@ export class CatalogLoader {
 
         if (isVimpel) {
           const altId = element.TLE1.substring(9, 17).trim();
-
-          settingsManager.isExtraSatellitesAdded = true;
           const jsSatInfo = {
             static: false,
             missile: false,

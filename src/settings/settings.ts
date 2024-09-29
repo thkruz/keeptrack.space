@@ -333,8 +333,6 @@ export class SettingsManager {
     maxrange: null,
   };
 
-  trusatMode = null;
-  isExtraSatellitesAdded = null;
   altMsgNum = null;
   altLoadMsgs = false;
   /**
@@ -914,7 +912,7 @@ export class SettingsManager {
    */
   startWithOrbitsDisplayed = false;
   tleSource = '';
-  trusatImages = false;
+  brownEarthImages = false;
   /**
    * How many draw calls to wait before updating orbit overlay if last draw time was greater than 50ms
    */
@@ -1293,7 +1291,6 @@ export class SettingsManager {
         debris: [0.5, 0.5, 0.5, 1],
         unknown: [0.5, 0.5, 0.5, 0.85],
         pink: [1.0, 0.0, 0.6, 1.0],
-        trusat: [1.0, 0.0, 0.6, 1.0],
         analyst: [1.0, 1.0, 1.0, 0.8],
         missile: [1.0, 1.0, 0.0, 1.0],
         missileInview: [1.0, 0.0, 0.0, 1.0],
@@ -1591,8 +1588,8 @@ export class SettingsManager {
         case 'low':
           this.lowresImages = true;
           break;
-        case 'trusat':
-          this.trusatImages = true;
+        case 'brown':
+          this.brownEarthImages = true;
           break;
         case 'high':
           this.hiresImages = true;
@@ -1618,7 +1615,7 @@ export class SettingsManager {
       !this.blueImages &&
       !this.nasaImages &&
       !this.lowresImages &&
-      !this.trusatImages &&
+      !this.brownEarthImages &&
       !this.hiresImages &&
       !this.hiresNoCloudsImages &&
       !this.vectorImages &&

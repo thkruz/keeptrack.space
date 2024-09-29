@@ -1087,6 +1087,8 @@ export class SatInfoBox extends KeepTrackPlugin {
         getEl(SatInfoBox.containerId_).style.maxHeight = '80%';
         document.documentElement.style.setProperty('--search-box-bottom', '0px');
         getEl(SatInfoBox.containerId_).classList.remove('satinfo-fixed');
+
+        getEl('search-results').style.maxHeight = '80%';
       });
     }
 
@@ -1096,6 +1098,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     satInfobox.addEventListener('mousedown', (e: any) => {
       if (e.button === 2) {
         SatInfoBox.resetMenuLocation(satInfobox);
+        getEl('search-results').style.maxHeight = '';
       }
     });
   }

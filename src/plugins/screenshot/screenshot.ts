@@ -27,6 +27,7 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
+import logoPng from '@public/img/kts-text-logo.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class Screenshot extends KeepTrackPlugin {
@@ -35,6 +36,13 @@ export class Screenshot extends KeepTrackPlugin {
   bottomIconCallback = () => {
     this.saveHiResPhoto('4k');
   };
+
+  logo: HTMLImageElement;
+  constructor() {
+    super();
+    this.logo = new Image();
+    this.logo.src = logoPng;
+  }
 
   // This is 'disabled' since it does not turn green after being clicked like other buttons.
   isIconDisabled = true;
@@ -127,33 +135,28 @@ export class Screenshot extends KeepTrackPlugin {
 
     link.download = 'keeptrack.png';
 
-    const d = new Date();
-    const n = d.getUTCFullYear();
-    const copyrightStr = !settingsManager.copyrightOveride ? `©${n} KEEPTRACK.SPACE` : '';
-
-    link.href = Screenshot.watermarkedDataUrl_(copyrightStr);
+    link.href = this.watermarkedDataUrl_();
     link.click();
     this.queuedScreenshot_ = false;
   }
 
-  private static watermarkedDataUrl_(text: string) {
+  private watermarkedDataUrl_() {
     const canvas = keepTrackApi.getRenderer().domElement;
 
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     const cw = tempCanvas.width;
     const ch = tempCanvas.height;
+    const logoWidth = 200;
+    const logoHeight = 200;
+    const logoX = canvas.width - logoWidth - 50;
+    const logoY = canvas.height - logoHeight - 50;
 
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
 
     tempCtx.drawImage(canvas, 0, 0);
-    tempCtx.font = '24px nasalization';
-    let textWidth = tempCtx.measureText(text).width;
-
-    tempCtx.globalAlpha = 1.0;
-    tempCtx.fillStyle = 'white';
-    tempCtx.fillText(text, cw - textWidth - 30, ch - 30);
+    tempCtx.drawImage(this.logo, logoX, logoY, logoWidth, logoHeight);
 
     const { classificationstr, classificationColor } = Screenshot.calculateClassificationText_();
 
@@ -163,7 +166,8 @@ export class Screenshot extends KeepTrackPlugin {
 
       tempCtx.fillStyle = classificationColor;
 
-      textWidth = tempCtx.measureText(classificationstr).width;
+      const textWidth = tempCtx.measureText(classificationstr).width;
+
       tempCtx.fillText(classificationstr, cw / 2 - textWidth, ch - 20);
       tempCtx.fillText(classificationstr, cw / 2 - textWidth, 34);
     }

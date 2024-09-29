@@ -258,12 +258,12 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     this.lastlooksArray_ = looksArray;
 
     // Populate the Side Menu
-    LookAnglesPlugin.populateSideMenuTable_(looksArray, timeManagerInstance);
+    this.populateSideMenuTable_(looksArray, timeManagerInstance);
 
     return looksArray;
   }
 
-  private static populateSideMenuTable_(lookAngleData: TearrData[], timeManagerInstance: TimeManager) {
+  private populateSideMenuTable_(lookAngleData: TearrData[], timeManagerInstance: TimeManager) {
     const tbl = <HTMLTableElement>getEl('looks'); // Identify the table to update
 
     tbl.innerHTML = ''; // Clear the table from old object data
@@ -298,6 +298,15 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     for (const lookAngleRow of lookAngleData) {
       LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, lookAngleRow, timeManagerInstance, tdE, tdA, tdR, tdType });
+    }
+
+    if (lookAngleData.length === 0) {
+      const tr = tbl.insertRow();
+      const td = tr.insertCell();
+      const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
+
+      td.colSpan = 4;
+      td.appendChild(document.createTextNode(`Satellite is not visible for the next ${searchLength} hours.`));
     }
   }
 

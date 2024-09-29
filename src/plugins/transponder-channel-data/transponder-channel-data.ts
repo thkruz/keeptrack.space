@@ -8,6 +8,7 @@ import { BaseObject, DetailedSatellite } from 'ootk';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { saveCsv } from '@app/lib/saveVariable';
 
 interface ChannelInfo {
   satellite: string;
@@ -54,6 +55,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
   isIconDisabled = true;
 
   private lastLoadedSat_ = -1;
+  dataCache: ChannelInfo[];
 
   addHtml(): void {
     super.addHtml();
@@ -63,6 +65,20 @@ export class TransponderChannelData extends KeepTrackPlugin {
       cbName: this.id,
       cb: () => {
         keepTrackApi.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_.map((sccNum) => parseInt(sccNum)));
+      },
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: this.id,
+      cb: () => {
+        const exportLaunchInfo = getEl('export-channel-info');
+
+        if (exportLaunchInfo) {
+          exportLaunchInfo.addEventListener('click', () => {
+            this.exportData();
+          });
+        }
       },
     });
   }
@@ -117,7 +133,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
       </div>
       <div class="row">
         <center>
-          <button id="export-launch-info" class="btn btn-ui waves-effect waves-light">Export Launch Info &#9658;</button>
+          <button id="export-channel-info" class="btn btn-ui waves-effect waves-light">Export Channel Info &#9658;</button>
         </center>
       </div>
     </div>
@@ -129,6 +145,8 @@ export class TransponderChannelData extends KeepTrackPlugin {
     fetch(`https://api.keeptrack.space/v1/channel/${selectedSat.name}`)
       .then(async (resp) => {
         const data = await resp.json() as ChannelInfo[];
+
+        this.dataCache = data;
 
         const tbl: HTMLTableElement = <HTMLTableElement>getEl('transponderChannelData-table');
 
@@ -163,5 +181,19 @@ export class TransponderChannelData extends KeepTrackPlugin {
         });
       })
       .catch(() => errorManagerInstance.warn(`Failed to fetch channel info for ${selectedSat.name}`));
+  }
+
+  exportData() {
+    const data = this.dataCache.map((info) => {
+      const obj: Record<string, unknown> = {};
+
+      Object.keys(info).forEach((key) => {
+        obj[key] = info[key];
+      });
+
+      return obj;
+    });
+
+    saveCsv(data, 'channel-info.csv');
   }
 }

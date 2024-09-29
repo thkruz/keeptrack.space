@@ -258,10 +258,16 @@ export class NewLaunch extends KeepTrackPlugin {
       },
       validationFunc: (data: any) => typeof data.satPos !== 'undefined',
       error: () => {
+        if (!this.isDoingCalculations) {
+          // If we are not doing calculations, then it must have finished already.
+          return;
+        }
+
         this.isDoingCalculations = false;
         hideLoading();
         uiManagerInstance.toast('Cruncher failed to meet requirement after multiple tries! Is this launch even possible?', ToastMsgType.critical);
       },
+      maxRetries: 50,
     });
   };
 

@@ -68,9 +68,14 @@ textarea.materialize-textarea {
     line-height: 2rem !important;
 }
 
+.row {
+    margin-bottom: 1rem;
+}
+
 .input-field {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+    margin-top: 1rem 0 0 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
 .input-field.col label {

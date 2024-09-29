@@ -169,21 +169,25 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
             const sensorButton = document.createElement('button');
 
-            sensorButton.classList.add('btn', 'btn-ui', 'waves-effect', 'waves-light');
+            sensorButton.classList.add('btn', 'darken-3', 'btn-ui', 'waves-effect', 'waves-light');
             if (this.disabledSensors_.includes(sensor)) {
-              sensorButton.classList.add('btn-red');
+              sensorButton.classList.add('red');
+            } else {
+              sensorButton.classList.add('green');
             }
 
             allSensors.push(sensor);
 
             sensorButton.innerText = sensor.uiName ?? sensor.shortName ?? sensor.objName;
             sensorButton.addEventListener('click', () => {
-              if (sensorButton.classList.contains('btn-red')) {
-                sensorButton.classList.remove('btn-red');
+              if (sensorButton.classList.contains('red')) {
+                sensorButton.classList.remove('red');
+                sensorButton.classList.add('green');
                 this.disabledSensors_.splice(this.disabledSensors_.indexOf(sensor), 1);
                 keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
               } else {
-                sensorButton.classList.add('btn-red');
+                sensorButton.classList.add('red');
+                sensorButton.classList.remove('green');
                 this.disabledSensors_.push(sensor);
                 keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
               }
@@ -259,7 +263,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     // eslint-disable-next-line no-unused-expressions
     isResetToDefault ? sensorManagerInstance.setCurrentSensor(null) : sensorManagerInstance.setCurrentSensor(tempSensor);
 
-    MultiSiteLookAnglesPlugin.populateMultiSiteTable_(multiSiteArray);
+    this.populateMultiSiteTable_(multiSiteArray);
   }
 
   private static propagateMultiSite_(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): TearrData {
@@ -286,7 +290,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   }
 
-  private static populateMultiSiteTable_(multiSiteArray: TearrData[]) {
+  private populateMultiSiteTable_(multiSiteArray: TearrData[]) {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const staticSet = keepTrackApi.getCatalogManager().staticSet;
 
@@ -340,6 +344,15 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());
         sensorManagerInstance.setSensor(sensor, sensor.sensorId);
       });
+    }
+
+    if (multiSiteArray.length === 0) {
+      const tr = tbl.insertRow();
+      const td = tr.insertCell();
+      const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
+
+      td.colSpan = 4;
+      td.appendChild(document.createTextNode(`Satellite is not visible for the next ${searchLength} hours.`));
     }
   }
 }

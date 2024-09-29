@@ -138,8 +138,7 @@
     bottom: var(--bottom-menu-height);
     margin-top: 25px;
     right: 0px;
-    width: 355px;
-    height: fit-content;
+    width: 355px;    
     max-height: 60%;
   }
 

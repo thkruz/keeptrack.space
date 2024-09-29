@@ -166,7 +166,7 @@ ul li {
 }
 
 .right-btn-menu ul li:hover {
-  background-color: var(--colorSecondaryDarken1);
+  background-color: var(--color-primary-dark);
 }
 
 .right-btn-menu ul li:hover a {

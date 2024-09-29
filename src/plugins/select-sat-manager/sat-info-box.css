@@ -95,7 +95,7 @@
 }
 
 .section-collapse:active {
-  background-color: var(--colorSecondaryDarken1);
+  background-color: var(--color-primary-dark);
   color: white;
   scale: 0.9;
 }
@@ -136,7 +136,8 @@
   background: var(--color-dark-background);
   cursor: default;
   bottom: 0px;
-  height: 30%;
+  height: fit-content;
+  max-height: 30%;
   width: 100%;
   border: 5px solid var(--color-dark-border);
   overflow: auto;

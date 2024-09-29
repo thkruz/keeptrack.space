@@ -259,7 +259,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     // eslint-disable-next-line no-unused-expressions
     isResetToDefault ? sensorManagerInstance.setCurrentSensor(null) : sensorManagerInstance.setCurrentSensor(tempSensor);
 
-    MultiSiteLookAnglesPlugin.populateMultiSiteTable_(multiSiteArray);
+    this.populateMultiSiteTable_(multiSiteArray);
   }
 
   private static propagateMultiSite_(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): TearrData {
@@ -286,7 +286,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   }
 
-  private static populateMultiSiteTable_(multiSiteArray: TearrData[]) {
+  private populateMultiSiteTable_(multiSiteArray: TearrData[]) {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const staticSet = keepTrackApi.getCatalogManager().staticSet;
 
@@ -340,6 +340,15 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());
         sensorManagerInstance.setSensor(sensor, sensor.sensorId);
       });
+    }
+
+    if (multiSiteArray.length === 0) {
+      const tr = tbl.insertRow();
+      const td = tr.insertCell();
+      const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
+
+      td.colSpan = 4;
+      td.appendChild(document.createTextNode(`Satellite is not visible for the next ${searchLength} hours.`));
     }
   }
 }

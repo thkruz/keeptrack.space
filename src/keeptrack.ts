@@ -218,8 +218,12 @@ export class KeepTrack {
       </header>
       <main>
         <div id="rmb-wrapper"></div>
-
         <div id="canvas-holder">
+          <div id="demo-logo">
+            <a href="https://keeptrack.space" target="_blank">
+              <img src="${logoPng}" alt="Keep Track">
+            </a>
+          </div>
           <canvas id="keeptrack-canvas"></canvas>
           <div id="ui-wrapper">
             <div id="sat-hoverbox">
@@ -235,12 +239,7 @@ export class KeepTrack {
         </div>
         <figcaption id="info-overlays">
           <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
-          <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
-          <div id="demo-logo" class="logo-font start-hidden">
-            <a href="https://keeptrack.space" target="_blank" style="color: white !important;">
-            Powered by KeepTrack.space
-            </a>
-          </div>
+          <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>          
         </figcaption>
       </main>
       <footer id="nav-footer" class="page-footer resizable">

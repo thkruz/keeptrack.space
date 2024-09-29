@@ -2,7 +2,7 @@
   #sat-infobox {
     width: 50%;
     right: 0px;
-    border: 5px solid var(--colorTertiaryDarken3);
+    border: 5px solid var(--color-dark-border);
   }
 
   .search-slide-down {
@@ -16,6 +16,7 @@
     bottom: unset;
     width: fit-content;
   }
+
   .ui-timepicker-div dl {
     text-align: center !important;
   }

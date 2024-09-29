@@ -1,6 +1,7 @@
 import { BaseObject, SpaceObjectType } from 'ootk';
 import { countryCodeList, countryMapList, launchSiteMap } from '../catalogs/countries';
 import { rocketUrls } from '../catalogs/rocket-urls';
+import { userUrls } from '../catalogs/user-urls';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 export abstract class StringExtractor {
@@ -66,8 +67,25 @@ export abstract class StringExtractor {
     }
 
     return `${LV}`;
+  }
 
+  static extractUserUrl(user: string): string {
+    if (!user || user === '') {
+      return 'Unknown';
+    }
 
+    // TODO: Move this to the backend
+    if (user === 'STIOT') {
+      user = 'Sateliot';
+    }
+
+    const userUrl = userUrls.filter((url) => url.user === user);
+
+    if (userUrl.length > 0) {
+      return `<a class="iframe" href="${userUrl[0].url}">${user}</a>`;
+    }
+
+    return user;
   }
 
   public static getCountryCode(country?: string) {

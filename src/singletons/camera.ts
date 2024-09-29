@@ -229,6 +229,67 @@ export class Camera {
     });
   }
 
+  reset(isHardReset = false) {
+    if (isHardReset) {
+      this.zoomLevel_ = 0.6925;
+    }
+    this.zoomTarget = 0.6925;
+    this.isAutoPitchYawToTarget = !!isHardReset;
+    this.cameraType = CameraType.DEFAULT;
+    this.isDragging = false;
+    this.isLocalRotateReset = !!isHardReset;
+    this.isLocalRotateOverride = false;
+    this.isPanReset = false;
+    this.isScreenPan = false;
+    this.isWorldPan = false;
+    this.isZoomIn = false;
+    this.localRotateCurrent = {
+      pitch: <Radians>0,
+      roll: <Radians>0,
+      yaw: <Radians>0,
+    };
+    this.localRotateDif = {
+      pitch: <Radians>0,
+      roll: <Radians>0,
+      yaw: <Radians>0,
+    };
+    this.localRotateSpeed = {
+      pitch: 0,
+      roll: 0,
+      yaw: 0,
+    };
+    this.localRotateStartPosition = {
+      pitch: 0,
+      roll: 0,
+      yaw: 0,
+    };
+    this.panCurrent = {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
+    this.panSpeed = {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
+    this.panStartPosition = {
+      x: 0,
+      y: 0,
+      z: 0,
+    };
+    this.position = <vec3>[0, 0, 0];
+    this.screenDragPoint = [0, 0];
+  }
+
+  resetRotation() {
+    if (this.cameraType !== CameraType.FPS) {
+      this.isPanReset = true;
+    }
+    this.isLocalRotateReset = true;
+    this.ftsRotateReset = true;
+  }
+
   get zoomTarget(): number {
     return this.zoomTarget_;
   }
@@ -247,14 +308,6 @@ export class Camera {
 
   zoomOut(): void {
     this.zoomWheel(100);
-  }
-
-  resetCamera() {
-    if (this.cameraType !== CameraType.FPS) {
-      this.isPanReset = true;
-    }
-    this.isLocalRotateReset = true;
-    this.ftsRotateReset = true;
   }
 
   /**

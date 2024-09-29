@@ -216,7 +216,7 @@ export class KeyboardInput {
          */
         break;
       case '`':
-        keepTrackApi.getMainCamera().resetCamera();
+        keepTrackApi.getMainCamera().resetRotation();
         break;
       case 't':
         uiManagerInstance.toast('Time Set to Real Time', ToastMsgType.normal);

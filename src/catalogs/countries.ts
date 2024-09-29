@@ -445,7 +445,7 @@ export const countryMapList = {
   'GI': 'Gibraltar',
   'GL': 'Greenland',
   'GR': 'Greece',
-  '': 'GRD  Grenada',
+  'GRD': 'Grenada',
   'GT': 'Guatemala',
   'GU': 'Guam',
   'GUF': 'French Guiana',

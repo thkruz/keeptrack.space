@@ -17,12 +17,17 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
   }
 
   const colorboxDom = getEl('colorbox-div');
+  const colorboxHeader = getEl('colorbox-header');
 
   if (!colorboxDom) {
     return;
   }
 
-  const handleClick = () => {
+  const handleClick = (event: MouseEvent) => {
+    if (event.target === colorboxHeader) {
+      return;
+    }
+
     closeColorbox();
     if (options.callback) {
       options.callback();
@@ -75,15 +80,32 @@ export const createColorbox = () => {
 
   colorboxContainer.id = 'colorbox-container';
   colorboxDiv.appendChild(colorboxContainer);
+
+  const headerDiv = document.createElement('div');
+
+  headerDiv.id = 'colorbox-header';
+  const openButton = document.createElement('button');
+
+  openButton.id = 'colorbox-open-button';
+  openButton.innerHTML = '<i class="material-icons" alt="Open in new tab">open_in_new</i>';
+  openButton.onclick = () => {
+    const iframe = <HTMLIFrameElement>getEl('colorbox-iframe');
+
+    if (iframe?.src) {
+      window.open(iframe.src, '_blank');
+    }
+  };
+  headerDiv.appendChild(openButton);
+  colorboxContainer.appendChild(headerDiv);
+
   const colorboxIframe = document.createElement('iframe');
 
   colorboxIframe.id = 'colorbox-iframe';
   colorboxContainer.appendChild(colorboxIframe);
+
   const img = document.createElement('img');
 
   img.id = 'colorbox-img';
-  img.style.width = '100%';
-  img.style.height = '100%';
   img.style.objectFit = 'cover';
   getEl('colorbox-container')?.appendChild(img);
   isColorBoxReady = true;
@@ -100,7 +122,6 @@ const setupIframeColorbox_ = (url: string) => {
 
     return;
   }
-  colorboxContainerDom.style.width = '100%';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'block';
   // Catch failures to load
   (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {

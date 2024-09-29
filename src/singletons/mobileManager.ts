@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
-import { getEl } from '../lib/get-el';
+import { hideEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
 
 export class MobileManager {
@@ -30,13 +30,15 @@ export class MobileManager {
           settingsManager.maxLabels = settingsManager.mobileMaxLabels;
 
           // Disable desktop only plugins
+          const cachePlugins = { ...settingsManager.plugins };
+
           Object.keys(settingsManager.plugins).forEach((key) => {
             settingsManager.plugins[key] = false;
           });
-          settingsManager.plugins.satInfoboxCore = true;
-          settingsManager.plugins.topMenu = true;
-          settingsManager.plugins.datetime = true;
-          settingsManager.plugins.soundManager = true;
+          settingsManager.plugins.satInfoboxCore = cachePlugins.satInfoboxCore;
+          settingsManager.plugins.topMenu = cachePlugins.topMenu;
+          settingsManager.plugins.datetime = cachePlugins.datetime;
+          settingsManager.plugins.soundManager = cachePlugins.soundManager;
 
           settingsManager.isDisableGodrays = true;
           settingsManager.isDisableSkybox = true;
@@ -66,7 +68,7 @@ export class MobileManager {
             event: KeepTrackApiEvents.uiManagerFinal,
             cbName: 'MobileManager.uiManagerFinal',
             cb: () => {
-              getEl('tutorial-btn').style.display = 'none';
+              hideEl('tutorial-btn');
             },
           });
 

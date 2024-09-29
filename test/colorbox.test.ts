@@ -40,6 +40,7 @@ describe('openColorbox_function', () => {
     KeepTrack.getDefaultBodyHtml();
     keepTrackApi.containerRoot.innerHTML = `
         <div id="colorbox-container" style="display:none;"></div>
+        <div id="colorbox-header"></div>
         <div id="colorbox-div" style="display:block;"></div>
         <div id="colorbox-iframe" style="display:none;"></div>
         <div id="colorbox-img" style="display:none;"></div>
@@ -110,9 +111,6 @@ describe('openColorbox_function', () => {
     openColorbox('https://www.example.com', { image: false });
     jest.advanceTimersByTime(2000);
 
-    const colorboxContainer = <HTMLElement>getEl('colorbox-container');
-
-    expect(colorboxContainer.style.width).toBe('100%');
     const colorboxIframe = <HTMLIFrameElement>getEl('colorbox-iframe');
 
     expect(colorboxIframe.style.display).toBe('block');

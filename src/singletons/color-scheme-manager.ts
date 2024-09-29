@@ -797,7 +797,6 @@ export class ColorSchemeManager {
       sunlightInview: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
       rcsXSmall: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
       rcsXXSmall: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
-      trusat: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
       version: '0',
       notional: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
     };
@@ -1973,7 +1972,6 @@ export interface ColorSchemeColorMap {
   debris: [number, number, number, number];
   notional: [number, number, number, number];
   unknown: [number, number, number, number];
-  trusat: [number, number, number, number];
   analyst: [number, number, number, number];
   transparent: [number, number, number, number];
   sunlightInview: [number, number, number, number];

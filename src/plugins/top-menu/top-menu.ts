@@ -2,7 +2,7 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
-import fullscreenIconPng from '@public/img/fullscreen-icon.png';
+import fullscreenIconPng from '@public/img/icons/fullscreen-icon.png';
 import findPng from '@public/img/icons/find.png';
 import helpPng from '@public/img/icons/help.png';
 import layersIconPng from '@public/img/icons/layers-icon.png';

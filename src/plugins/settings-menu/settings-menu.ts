@@ -254,65 +254,77 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
           </div>
           <div class="row light-blue darken-3" style="height:4px; display:block;"></div>
-          <div id="settings-colors">
+          <div id="settings-colors" class="row">
             <h5 class="center-align">Color Settings</h5>
-            <div class="input-field col s6">
-              <center>
-                <p>Payload</p>
-                <button id="settings-color-payload" class="btn waves-effect waves-light"></button>
-              </center>
+            <div class="row">
+              <div class="input-field col s6">
+                <center>
+                  <p>Payload</p>
+                  <button id="settings-color-payload" class="btn waves-effect waves-light"></button>
+                </center>
+              </div>
+              <div class="input-field col s6">
+                <center>
+                  <p>Rocket Body</p>
+                  <button id="settings-color-rocketBody" class="btn waves-effect waves-light"></button>
+                </center>
+              </div>
             </div>
-            <div class="input-field col s6">
-              <center>
-                <p>Rocket Body</p>
-                <button id="settings-color-rocketBody" class="btn waves-effect waves-light"></button>
-              </center>
+            <div class="row">
+              <div class="input-field col s6">
+                <center>
+                  <p>Debris</p>
+                  <button id="settings-color-debris" class="btn waves-effect waves-light"></button>
+                </center>
+              </div>
+              <div class="input-field col s6">
+                <center>
+                  <p>In View</p>
+                  <button id="settings-color-inview" class="btn waves-effect waves-light"></button>
+                </center>
+              </div>
             </div>
-            <div class="input-field col s6">
-              <center>
-                <p>Debris</p>
-                <button id="settings-color-debris" class="btn waves-effect waves-light"></button>
-              </center>
+            <div class="row">
+              <div class="input-field col s6">
+                <center>
+                  <p>Missile</p>
+                  <button id="settings-color-missile" class="btn waves-effect waves-light"></button>
+                </center>
+              </div>
+              <div class="input-field col s6">
+                <center>
+                  <p>Missile (FOV)</p>
+                  <button id="settings-color-missileInview" class="btn waves-effect waves-light"></button>
+                </center>
+              </div>
             </div>
-            <div class="input-field col s6">
-              <center>
-                <p>In View</p>
-                <button id="settings-color-inview" class="btn waves-effect waves-light"></button>
-              </center>
-            </div>
-            <div class="input-field col s6">
-              <center>
-                <p>Missile</p>
-                <button id="settings-color-missile" class="btn waves-effect waves-light"></button>
-              </center>
-            </div>
-            <div class="input-field col s6">
-              <center>
-                <p>Missile (FOV)</p>
-                <button id="settings-color-missileInview" class="btn waves-effect waves-light"></button>
-              </center>
-            </div>
-            <div class="input-field col s6">
-              <center>
-                <p>Special Sats</p>
-                <button id="settings-color-special" class="btn waves-effect waves-light"></button>
-              </center>
+            <div class="row">
+              <div class="input-field col s6">
+                <center>
+                  <p>Special Sats</p>
+                  <button id="settings-color-special" class="btn waves-effect waves-light"></button>
+                </center>
+              </div>
             </div>
           </div>
-          <div class="row"></div>
-          <div id="settings-opt">
-            <h5 class="center-align">Settings Overrides</h5>
-            <div class="input-field col s12">
-              <input value="150" id="maxSearchSats" type="text" data-position="top" data-delay="50" data-tooltip="Maximum satellites to display in search" />
-              <label for="maxSearchSats" class="active">Maximum Satellites in Search</label>
+          <div id="settings-opt" class="row">
+            <div class="row">
+              <h5 class="center-align">Settings Overrides</h5>
             </div>
-            <div class="input-field col s12">
-              <input value="30" id="satFieldOfView" type="text" data-position="top" data-delay="50" data-tooltip="What is the satellite's field of view in degrees" />
-              <label for="satFieldOfView" class="active">Satellite Field of View</label>
+            <div class="row">
+              <div class="input-field col s12">
+                <input value="150" id="maxSearchSats" type="text" data-position="top" data-delay="50" data-tooltip="Maximum satellites to display in search" />
+                <label for="maxSearchSats" class="active">Maximum Satellites in Search</label>
+              </div>
             </div>
-            <div class="row"></div>
+            <div class="row">
+              <div class="input-field col s12">
+                <input value="30" id="satFieldOfView" type="text" data-position="top" data-delay="50" data-tooltip="What is the satellite's field of view in degrees" />
+                <label for="satFieldOfView" class="active">Satellite Field of View</label>
+              </div>
+            </div>
           </div>
-          <div id="fastCompSettings">
+          <div id="fastCompSettings" class="row">
             <h5 class="center-align">Fast CPU Required</h5>
             <div class="switch row">
               <label>
@@ -322,9 +334,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
           </div>
-          <!-- <div id="settings-lowperf" class="row center">
-            <button class="red btn waves-effect waves-light" onclick="uiManagerInstance.startLowPerf();">Low End PC Version &#9658;</button>
-          </div> -->
         </form>
       </div>
     </div>
@@ -608,7 +617,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isSatLabelModeOn = true;
     settingsManager.isFreezePropRateOnDrag = false;
     settingsManager.isDisableTimeMachineToasts = false;
-    settingsManager.searchLimit = 150;
+    settingsManager.searchLimit = 600;
     SettingsMenuPlugin.preserveSettings();
     SettingsMenuPlugin.syncOnLoad();
   }

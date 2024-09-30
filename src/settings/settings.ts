@@ -535,7 +535,6 @@ export class SettingsManager {
   };
 
 
-
   /**
    * Determines whether or not to hide the propogation rate text on the GUI.
    */
@@ -1188,7 +1187,7 @@ export class SettingsManager {
     this.initParseFromGETVariables_(params);
 
     // SATELIOT
-    console.log("Force preset Sateliot");
+    console.log('Force preset Sateliot');
     SettingsPresets.loadPresetSateliot(this);
 
     // If No UI Reduce Overhead

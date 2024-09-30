@@ -1,7 +1,7 @@
-// Configurar el mapa de Leaflet
-const map = L.map('map').setView([0, 0], 2); // Coordenadas iniciales [lat, lon] y nivel de zoom 2
+// Set up the Leaflet map
+const map = L.map('map').setView([0, 0], 2); // Initial coordinates [lat, lon] and zoom level 2
 
-// Capas de mapa base
+// Base map layers
 const openStreetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
@@ -14,32 +14,31 @@ const esriSatellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/s
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 });
 
-// Añadir el mapa base predeterminado
+// Add the default base map
 openStreetMap.addTo(map);
 
-// Crear un control de capas para permitir la selección del mapa base
+// Create a layer control to allow base map selection
 const baseMaps = {
     "OpenStreetMap": openStreetMap,
     "Satellite Map": satelliteMap,
     "Esri Satellite": esriSatellite
 };
 
-// Añadir el control de capas al mapa
+// Add the layer control to the map
 L.control.layers(baseMaps).addTo(map);
 
-// Añade la capa del terminador solar 
+// Add the solar terminator layer
 L.terminator().addTo(map);
 
-
-// Definir el icono personalizado del satélite
+// Define the custom satellite icon
 const satelliteIcon = L.icon({
-    iconUrl: 'img/satellite-icon.png',  // Ruta a la imagen del satélite
-    iconSize: [32, 32],  // Tamaño del icono (ajusta según sea necesario)
-    iconAnchor: [16, 16],  // El punto en el icono que corresponderá a la posición del satélite (centro en este caso)
-    popupAnchor: [0, -16]  // Donde aparecerá el popup en relación con el icono
+    iconUrl: 'img/satellite-icon.png',  // Path to the satellite image
+    iconSize: [32, 32],  // Icon size (adjust as needed)
+    iconAnchor: [16, 16],  // The point on the icon that will correspond to the satellite's position (center in this case)
+    popupAnchor: [0, -16]  // Where the popup will appear relative to the icon
 });
 
-// Lista de NORAD de los satélites de Sateliot
+// List of NORAD IDs for Sateliot satellites
 const sateliotSatellites = [
     { norad: 60550, color: '#FF6B00' },
     { norad: 60534, color: '#00A7E1' },
@@ -47,18 +46,18 @@ const sateliotSatellites = [
     { norad: 60537, color: '#9D9D9C' }
 ];
 
-// Función para cargar los TLE desde el archivo JSON
+// Function to load TLE data from a JSON file
 async function getTLEData() {
     const response = await fetch('https://storage.keeptrack.space/data/tle.json');
     const tleData = await response.json();
 
-    // Filtrar los satélites que tienen los NORAD que estamos buscando
+    // Filter the satellites that have the NORAD IDs we are looking for
     return tleData.filter(satellite =>
         sateliotSatellites.some(sat => parseInt(satellite.TLE2.split(' ')[1]) === sat.norad)
     );
 }
 
-// Función para detectar cruces del meridiano de 180 grados
+// Function to detect 180-degree meridian crossings
 function detectMeridianCross(coordinates) {
     const segments = [];
     let currentSegment = [];
@@ -67,19 +66,19 @@ function detectMeridianCross(coordinates) {
         const [lat1, lon1] = coordinates[i];
         const [lat2, lon2] = coordinates[i + 1];
 
-        // Añadir el punto actual al segmento
+        // Add the current point to the segment
         currentSegment.push([lat1, lon1]);
 
-        // Detectar cruce del meridiano de 180 grados
+        // Detect 180-degree meridian crossing
         if (Math.abs(lon1 - lon2) > 180) {
-            // Finalizar el segmento actual
+            // End the current segment
             segments.push(currentSegment);
-            // Iniciar un nuevo segmento
+            // Start a new segment
             currentSegment = [];
         }
     }
 
-    // Añadir el último segmento si no está vacío
+    // Add the last segment if it's not empty
     if (currentSegment.length > 0) {
         currentSegment.push(coordinates[coordinates.length - 1]);
         segments.push(currentSegment);
@@ -88,20 +87,20 @@ function detectMeridianCross(coordinates) {
     return segments;
 }
 
-// Función para obtener las coordenadas de la órbita completa hasta el tiempo actual
+// Function to get the full orbit coordinates up to the current time
 function getOrbitCoordinatesUpToNow(tleLine1, tleLine2) {
     const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
     const positions = [];
 
-    // Simular la órbita completa hasta el tiempo actual
-    const now = new Date();  // Momento actual
-    const secondsInThePast = 45 * 60;  // Tiempo de la órbita en segundos (una órbita completa típica es 90 minutos. La mitad, 45 minutos)
+    // Simulate the full orbit up to the current time
+    const now = new Date();  // Current time
+    const secondsInThePast = 45 * 60;  // Orbit time in seconds (a typical full orbit is 90 minutes. Half, 45 minutes)
 
-    // Generar un punto cada 10 segundos
-    const step = 10;  // 10 segundos por punto
+    // Generate a point every 10 seconds
+    const step = 10;  // 10 seconds per point
 
     for (let i = 0; i <= secondsInThePast; i += step) {
-        const time = new Date(now.getTime() - i * 1000);  // Retroceder en segundos
+        const time = new Date(now.getTime() - i * 1000);  // Go back in seconds
         const positionAndVelocity = satellite.propagate(satrec, time);
         const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, satellite.gstime(time));
         const longitude = satellite.degreesLong(positionGd.longitude);
@@ -109,23 +108,23 @@ function getOrbitCoordinatesUpToNow(tleLine1, tleLine2) {
         positions.push([latitude, longitude]);
     }
 
-    return positions.reverse();  // Invertir para tener la posición más reciente al final
+    return positions.reverse();  // Reverse to have the most recent position at the end
 }
 
-// Función para obtener las coordenadas de la órbita desde el tiempo actual
+// Function to get the orbit coordinates from the current time
 function getOrbitCoordinatesFromNow(tleLine1, tleLine2) {
     const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
     const positions = [];
 
-    // Simular la órbita completa desde el tiempo actual
-    const now = new Date();  // Momento actual
-    const secondsInTheFuture = 90 * 60;  // Tiempo de la órbita en segundos (una órbita completa típica es 90 minutos)
+    // Simulate the full orbit from the current time
+    const now = new Date();  // Current time
+    const secondsInTheFuture = 90 * 60;  // Orbit time in seconds (a typical full orbit is 90 minutes)
 
-    // Generar un punto cada 10 segundos
-    const step = 10;  // 10 segundos por punto
+    // Generate a point every 10 seconds
+    const step = 10;  // 10 seconds per point
 
     for (let i = 0; i <= secondsInTheFuture; i += step) {
-        const time = new Date(now.getTime() + i * 1000);  // Avanzar en segundos
+        const time = new Date(now.getTime() + i * 1000);  // Go forward in seconds
         const positionAndVelocity = satellite.propagate(satrec, time);
         const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, satellite.gstime(time));
         const longitude = satellite.degreesLong(positionGd.longitude);
@@ -136,7 +135,7 @@ function getOrbitCoordinatesFromNow(tleLine1, tleLine2) {
     return positions;
 }
 
-// Función para obtener la posición actual de un satélite
+// Function to get the current position of a satellite
 function getCurrentPosition(tleLine1, tleLine2) {
     const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
     const time = new Date();
@@ -147,52 +146,50 @@ function getCurrentPosition(tleLine1, tleLine2) {
     return [latitude, longitude];
 }
 
-// Función para dibujar la órbita completa hasta el momento actual
+// Function to draw the full orbit up to the current time
 function drawSatelliteOrbit(satellite, orbitPolylines, marker) {
-    // Obtener la órbita completa hasta el momento actual
+    // Get the full orbit up to the current time
     const orbitCoordinatesPast = getOrbitCoordinatesUpToNow(satellite.TLE1, satellite.TLE2);
     const orbitCoordinatesFuture = getOrbitCoordinatesFromNow(satellite.TLE1, satellite.TLE2);
     const orbitCoordinates = orbitCoordinatesPast.concat(orbitCoordinatesFuture);
 
-    // Detectar si el satélite cruza el meridiano de 180 grados
+    // Detect if the satellite crosses the 180-degree meridian
     const segments = detectMeridianCross(orbitCoordinates);
 
-    // Limpiar las líneas previas
+    // Clear previous orbit lines
     orbitPolylines.forEach(polyline => polyline.remove());
 
     satelite_color = sateliotSatellites.find(sat => parseInt(satellite.TLE2.split(' ')[1]) === sat.norad).color;
 
-
-    // Dibujar cada segmento de la órbita
+    // Draw each orbit segment
     segments.forEach(segment => {
         const polyline = L.polyline(segment, { color: satelite_color }).addTo(map);
         orbitPolylines.push(polyline);
     });
 
-    // Actualizar la posición actual del satélite
+    // Update the satellite's current position
     const currentPosition = getCurrentPosition(satellite.TLE1, satellite.TLE2);
     marker.setLatLng(currentPosition);
 }
 
-// Función principal para cargar y dibujar los satélites de Sateliot
+// Main function to load and draw Sateliot satellites
 async function loadSateliotSatellites() {
     const sateliotSatellites = await getTLEData();
 
-    // Para cada satélite, crear la órbita y actualizar la posición periódicamente
+    // For each satellite, create the orbit and periodically update the position
     sateliotSatellites.forEach(satellite => {
-        // Lista para almacenar las líneas de la órbita
+        // List to store the orbit lines
         const orbitPolylines = [];
 
-        // Crear un marcador para la posición actual del satélite
+        // Create a marker for the satellite's current position
         const currentPosition = getCurrentPosition(satellite.TLE1, satellite.TLE2);
         // const marker = L.marker(currentPosition).addTo(map).bindPopup(`<b>${satellite.name}</b>`);
         const marker = L.marker(currentPosition, { icon: satelliteIcon }).addTo(map).bindPopup(`<b>${satellite.name}</b>`);
 
-
-        // Actualizar la posición del satélite cada segundo y dibujar la órbita completa hasta el momento actual
+        // Update the satellite's position every second and draw the full orbit up to the current time
         setInterval(() => {
             drawSatelliteOrbit(satellite, orbitPolylines, marker);
-        }, 1000); // Actualización cada 1000ms (1 segundo)
+        }, 1000); // Update every 1000ms (1 second)
     });
 }
 
@@ -201,7 +198,5 @@ setInterval(() => {
     terminator.addTo(map);
 }, 60000);
 
-// Llamar a la función principal para cargar y dibujar los satélites de Sateliot
+// Load the Sateliot satellites
 loadSateliotSatellites();
-
-

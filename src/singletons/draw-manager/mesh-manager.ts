@@ -273,6 +273,7 @@ export class MeshManager {
    * This is intentionally complex to reduce object creation and GC
    * Splitting it into subfunctions would not be optimal
    */
+  // eslint-disable-next-line complexity
   getSatelliteModel(sat: DetailedSatellite) {
     if (this.checkIfNameKnown(sat.name)) {
       this.currentMeshObject.isRotationStable = true;
@@ -329,6 +330,7 @@ export class MeshManager {
     switch (sat.bus) {
       case 'sateliotsat':
         this.currentMeshObject.model = this.models.sateliotsat;
+
         return;
       case 'Cubesat 0.25U':
         if (sat.intlDes.startsWith('2018')) {

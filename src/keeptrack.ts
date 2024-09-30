@@ -29,7 +29,6 @@
 /* eslint-disable no-unreachable */
 
 import issJpg from '@public/img/wallpaper/iss.jpg';
-// import missionControlJpg from '@public/img/wallpaper/mission-control.jpg';
 import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
 import rocketJpg from '@public/img/wallpaper/rocket.jpg';
 import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
@@ -72,7 +71,7 @@ import { SplashScreen } from './static/splash-screen';
 
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
-  private static splashScreenImgList_ = [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, /*missionControlJpg, */issJpg, rocket3Jpg];
+  private static splashScreenImgList_ = [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg];
 
   private isShowFPS = false;
   isReady = false;
@@ -242,7 +241,7 @@ export class KeepTrack {
           </div>
         </figcaption>
         <div id="bottom-map-icon">
-          <img class="sateliot-icon moveup" id="restore-view-icon" src="/img/reset.png" alt="Restore the View" title="Go to Sateliot GitHub">
+          <img class="sateliot-icon moveup" id="restore-view-icon" src="/img/reset.png" alt="Restore the View" title="Restore the View">
           <img class="sateliot-icon moveup" id="sateliot-github-icon" src="/img/github-mark.png" alt="Go to Sateliot GitHub project https://github.com/Sateliot/sateliot.keeptrack" title="Go to Sateliot GitHub">
           <img class="sateliot-icon moveup" id="map-2d-icon" src="/img/2d-map-grey.png" alt="Change to 2D visualization" title="Switch to 2D Map View">
         </div>
@@ -380,7 +379,7 @@ export class KeepTrack {
 
   private static printLogoToConsole_() {
 
-    console.log("Sateliot");
+    console.log('Sateliot');
   }
 
   private static showErrorCode(error: Error & { lineNumber: number }): void {

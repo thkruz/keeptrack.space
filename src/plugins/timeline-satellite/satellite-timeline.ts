@@ -160,20 +160,18 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.id,
       cb: (sat: BaseObject) => {
-        if (!this.isMenuButtonActive) {
-          return;
-        }
-
-        if (sat) {
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-          this.canvas_.style.display = 'block';
-        }
-
         if (!sat && keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0) {
           this.setBottomIconToDisabled();
         } else if (this.verifySensorSelected(false)) {
           this.setBottomIconToEnabled();
+        }
+
+        if (this.isMenuButtonActive) {
+          if (sat) {
+            this.ctxStatic_.reset();
+            this.updateTimeline();
+            this.canvas_.style.display = 'block';
+          }
         }
       },
     });

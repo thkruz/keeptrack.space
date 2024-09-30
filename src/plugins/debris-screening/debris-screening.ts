@@ -5,14 +5,14 @@ import { showLoading } from '@app/lib/showLoading';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import aboutPng from '@public/img/icons/about.png';
-import { BaseObject, DetailedSatellite, EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
+import { DetailedSatellite, EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class DebrisScreening extends KeepTrackPlugin {
   readonly id = 'DebrisScreening';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
@@ -114,6 +114,7 @@ export class DebrisScreening extends KeepTrackPlugin {
   </div>
 `;
 
+  isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
@@ -136,18 +137,6 @@ export class DebrisScreening extends KeepTrackPlugin {
           e.preventDefault();
           showLoading(() => DebrisScreening.onClearVisClick());
         });
-      },
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject): void => {
-        if (sat) {
-          this.setBottomIconToEnabled();
-        } else {
-          this.setBottomIconToDisabled();
-        }
       },
     });
   }
@@ -221,7 +210,6 @@ export class DebrisScreening extends KeepTrackPlugin {
         const ric = CoordinateTransforms.sat2ric({ position: satSv.position, velocity: satSv.velocity }, { position: sat2Sv.position, velocity: sat2Sv.velocity });
 
         if (Math.abs(ric.position[0]) < uVal && Math.abs(ric.position[1]) < vVal && Math.abs(ric.position[2]) < wVal) {
-          console.log(`${sat2.sccNum} at ${new Date(now)}`);
           searchList.push(sat2.sccNum);
           // Remove from possible sats
           possibleSats.splice(idx, 1);

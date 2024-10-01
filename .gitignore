@@ -73,6 +73,7 @@ public/tle/TLEAltNemo*
 classfd.tle
 public/audio/samples
 public/img/wallpaper/.archive
+public/img/*.xcf
 
 # Jest Coverage
 coverage/

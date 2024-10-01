@@ -189,6 +189,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     <div id="earth-rmb-menu"></div>
     <div id="dops-rmb"></div>
     <div id="dops-rmb-menu"></div>
+    <div id="camera-control-widget"></div>
     `;
 
   inputManagerInstance.init();

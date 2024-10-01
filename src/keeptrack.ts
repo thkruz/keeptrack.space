@@ -54,6 +54,7 @@ import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
 import { VERSION_DATE } from './settings/versionDate.js';
 import { Camera } from './singletons/camera';
+import { CameraControlWidget } from './singletons/camera-control-widget';
 import { CatalogManager } from './singletons/catalog-manager';
 import { ColorSchemeManager } from './singletons/color-scheme-manager';
 import { DemoManager } from './singletons/demo-mode';
@@ -167,6 +168,10 @@ export class KeepTrack {
     keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
     const mainCameraInstance = new Camera();
 
+    const cameraControlWidget = new CameraControlWidget();
+
+    console.log(cameraControlWidget);
+
     keepTrackContainer.registerSingleton(Singletons.MainCamera, mainCameraInstance);
     const hoverManagerInstance = new HoverManager();
 
@@ -239,7 +244,7 @@ export class KeepTrack {
         </div>
         <figcaption id="info-overlays">
           <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
-          <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>          
+          <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
         </figcaption>
       </main>
       <footer id="nav-footer" class="page-footer resizable">

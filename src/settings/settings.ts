@@ -1038,6 +1038,8 @@ export class SettingsManager {
   externalTLEsOnly = false;
   positionCruncher: Worker = null;
   orbitCruncher: Worker = null;
+  /** Enables the camera widget */
+  drawCameraWidget = true;
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
@@ -1094,6 +1096,12 @@ export class SettingsManager {
 
     if (drawOrbitsString !== null) {
       this.isDrawOrbits = drawOrbitsString === 'true';
+    }
+
+    const drawCameraWidgetString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET);
+
+    if (drawCameraWidgetString !== null) {
+      this.drawCameraWidget = drawCameraWidgetString === 'true';
     }
     const drawTrailingOrbitsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS);
 

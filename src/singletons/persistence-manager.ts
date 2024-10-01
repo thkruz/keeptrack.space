@@ -17,6 +17,7 @@ export enum StorageKey {
   SETTINGS_ROCKET_BODIES = 'keepTrack-settings-rocketBodies',
   SETTINGS_DEBRIS = 'keepTrack-settings-debris',
   SETTINGS_AGENCIES = 'keepTrack-settings-agencies',
+  SETTINGS_DRAW_CAMERA_WIDGET = 'keepTrack-settings-drawCameraWidget',
   SETTINGS_DRAW_ORBITS = 'keepTrack-settings-drawOrbits',
   SETTINGS_DRAW_ECF = 'keepTrack-settings-drawECF',
   SETTINGS_DRAW_IN_COVERAGE_LINES = 'keepTrack-settings-drawInCoverageLines',

@@ -55,7 +55,6 @@ export enum CameraType {
 }
 
 export class Camera {
-  private camYawTarget_ = <Radians>0;
   private chaseSpeed_ = 0.0005;
   private earthCenteredPitch_ = <Radians>0;
   private earthCenteredYaw_ = <Radians>0;
@@ -125,6 +124,7 @@ export class Camera {
    * It is the overall yaw of the camera?
    */
   camYaw = <Radians>0;
+  camYawTarget = <Radians>0;
   camYawSpeed = 0;
   camZoomSnappedOnSat = false;
   cameraType: CameraType = CameraType.DEFAULT;
@@ -336,9 +336,9 @@ export class Camera {
   camSnap(pitch: Radians, yaw: Radians): void {
     // this.isPanReset = true
     this.camPitchTarget = pitch;
-    this.camYawTarget_ = normalizeAngle(yaw);
+    this.camYawTarget = normalizeAngle(yaw);
     this.earthCenteredPitch_ = pitch;
-    this.earthCenteredYaw_ = this.camYawTarget_; // Use the normalized yaw
+    this.earthCenteredYaw_ = this.camYawTarget; // Use the normalized yaw
     // if (this.earthCenteredYaw_ < 0) this.earthCenteredYaw_ = <Radians>(this.earthCenteredYaw_ + TAU);
     this.isAutoPitchYawToTarget = true;
   }
@@ -1373,7 +1373,7 @@ export class Camera {
       Number.isNaN(this.camPitch) ||
       Number.isNaN(this.camYaw) ||
       Number.isNaN(this.camPitchTarget) ||
-      Number.isNaN(this.camYawTarget_) ||
+      Number.isNaN(this.camYawTarget) ||
       Number.isNaN(this.zoomLevel_) ||
       Number.isNaN(this.zoomTarget_)
     ) {
@@ -1381,7 +1381,7 @@ export class Camera {
         errorManagerInstance.debug(`camPitch: ${this.camPitch}`);
         errorManagerInstance.debug(`camYaw: ${this.camYaw}`);
         errorManagerInstance.debug(`camPitchTarget: ${this.camPitchTarget}`);
-        errorManagerInstance.debug(`camYawTarget: ${this.camYawTarget_}`);
+        errorManagerInstance.debug(`camYawTarget: ${this.camYawTarget}`);
         errorManagerInstance.debug(`zoomLevel: ${this.zoomLevel_}`);
         errorManagerInstance.debug(`_zoomTarget: ${this.zoomTarget_}`);
         errorManagerInstance.debug(`this.settings_.cameraMovementSpeed: ${this.settings_.cameraMovementSpeed}`);
@@ -1392,7 +1392,7 @@ export class Camera {
       this.camYaw = <Radians>0.5;
       this.zoomLevel_ = 0.5;
       this.camPitchTarget = <Radians>0;
-      this.camYawTarget_ = <Radians>0;
+      this.camYawTarget = <Radians>0;
       this.zoomTarget = 0.5;
     }
 
@@ -1439,7 +1439,7 @@ export class Camera {
     if (this.isAutoPitchYawToTarget) {
       this.camPitch = <Radians>(this.camPitch + (this.camPitchTarget - this.camPitch) * this.chaseSpeed_ * dt);
 
-      this.yawErr_ = normalizeAngle(<Radians>(this.camYawTarget_ - this.camYaw));
+      this.yawErr_ = normalizeAngle(<Radians>(this.camYawTarget - this.camYaw));
       this.camYaw = <Radians>(this.camYaw + this.yawErr_ * this.chaseSpeed_ * dt);
     }
   }

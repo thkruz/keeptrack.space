@@ -134,6 +134,13 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
             <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Disable this to hide the camera widget">
+                <input id="settings-drawCameraWidget" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Camera Widget
+              </label>
+            </div>
+            <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Disable this to hide orbit lines">
                 <input id="settings-drawOrbits" type="checkbox" checked/>
                 <span class="lever"></span>
@@ -464,6 +471,12 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('settings-showDebris')).checked = settingsManager.isShowDebris;
     (<HTMLInputElement>getEl('settings-showAgencies')).checked = settingsManager.isShowAgencies;
     (<HTMLInputElement>getEl('settings-drawOrbits')).checked = settingsManager.isDrawOrbits;
+    (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked = settingsManager.drawCameraWidget;
+    if (!settingsManager.drawCameraWidget) {
+      getEl('camera-control-widget').style.display = 'none';
+    } else {
+      getEl('camera-control-widget').style.display = 'block';
+    }
     (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked = settingsManager.isDrawTrailingOrbits;
     (<HTMLInputElement>getEl('settings-drawEcf')).checked = settingsManager.isOrbitCruncherInEcf;
     (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked = settingsManager.isDrawInCoverageLines;
@@ -494,6 +507,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ROCKET_BODIES, settingsManager.isShowRocketBodies.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEBRIS, settingsManager.isShowDebris.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_AGENCIES, settingsManager.isShowAgencies.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, settingsManager.isDrawOrbits.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, settingsManager.isDrawTrailingOrbits.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ECF, settingsManager.isOrbitCruncherInEcf.toString());
@@ -550,6 +564,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-showDebris':
       case 'settings-showAgencies':
       case 'settings-drawOrbits':
+      case 'settings-drawCameraWidget':
       case 'settings-drawTrailingOrbits':
       case 'settings-drawEcf':
       case 'settings-isDrawInCoverageLines':
@@ -594,6 +609,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 
   private static resetToDefaults_() {
+    keepTrackApi.getSoundManager().play(SoundNames.BUTTON_CLICK);
     settingsManager.isShowLeoSats = true;
     settingsManager.isShowHeoSats = true;
     settingsManager.isShowMeoSats = true;
@@ -603,6 +619,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isShowDebris = true;
     settingsManager.isShowAgencies = false;
     settingsManager.isDrawOrbits = true;
+    settingsManager.drawCameraWidget = true;
     settingsManager.isDrawTrailingOrbits = false;
     settingsManager.isOrbitCruncherInEcf = false;
     settingsManager.isDrawInCoverageLines = true;
@@ -652,6 +669,17 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     const isBlackEarthChanged = settingsManager.isBlackEarth !== (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
     const isDrawAtmosphereChanged = settingsManager.isDrawAtmosphere !== (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
     const isDrawAuroraChanged = settingsManager.isDrawAurora !== (<HTMLInputElement>getEl('settings-drawAurora')).checked;
+
+    settingsManager.drawCameraWidget = (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked;
+    const ccWidgetCanvas = getEl('camera-control-widget');
+
+    if (ccWidgetCanvas) {
+      if (settingsManager.drawCameraWidget) {
+        ccWidgetCanvas.style.display = 'block';
+      } else {
+        ccWidgetCanvas.style.display = 'none';
+      }
+    }
 
     settingsManager.isBlackEarth = (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
     settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;

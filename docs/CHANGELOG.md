@@ -2,6 +2,145 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.2.0
+
+>  
+
+- Sateliot
+- fix: :bug: fix debris screening menu being available without a satellite selected
+- feature: new sateliot satellite model
+- feat: :sparkles: add localization for spanish and german
+- feat: :sparkles: add collapsable sections in the sat-infobox
+- feature: created a new satellite model based on a s6u with solar pannels.
+- refactor: :fire: remove jquery!
+- fix: :bug: fix styling issues with sat-infobox and search drop down
+- feat: :sparkles: update new calendar component
+- refactor: :fire: remove unused fonts
+- feat: :lipstick: new ui
+- feat: :heavy_minus_sign: remove jquery-ui-bundle dependencies for calendar
+- refactor: :lipstick: update styling for new theme
+- refactor: :recycle: rename css variables to match home page
+- feat: :sparkles: add flags
+- feat: :sparkles: add new camera widget in eci coordinates
+- refactor: :bug: fix class name error caused by minification
+- build: :green_heart: fix build hanging
+- feat: :sparkles: expand features of tip plugin and fix bug with fetch source
+- test: :white_check_mark: update tests to match new plugin architecture
+- fix: :bug: fix type in .gitignore
+- build: :fire: remove old deployment pipeline
+- feat: :sparkles: add geo satellite transponder info
+- fix: :lipstick: fix ui issues caused by input-field not having margin
+- feat: :globe_with_meridians: add localization to calendar for es and de
+- feat: :sparkles: add sateliot preset
+- fix: :lipstick: fix stf menu ui
+- refactor: :wastebasket: remove deprecated style code
+- refactor: :recycle: migrate to storage.keeptrack.space
+- feat: :sparkles: add camera reset function
+- feat: :sparkles: add tv satellites to constellations plugin
+- feat: :sparkles: add colorbox header
+- feat: :sparkles: add links to satellite owner websites
+- build: :construction_worker: remove codecov from cicd
+- refactor: :recycle: remove deprecated settings and names
+- feat: :sparkles: add new logo always on
+- fix: :bug: fix export function of transponders plugin
+- refactor: :lipstick: more color updates
+- fix: :bug: fix flickering on mobile
+- feat: :sparkles: update screenshot to use new logo instead of text
+- feat: :sparkles: add clear message when no lookangles correctly displayed
+- feat: :sparkles: add different logic for rotation reset vs full camera reset
+- fix: :bug: fix bug caused by satellite that propagates into the earth
+- fix: :bug: fix bug where satellite timeline only visible if watchlist sats
+- refactor: :lipstick: more changes to ui color
+- fix: :bug: fix color of buttons in multi-site lookangles settings
+- fix: :bug: fix bug where some plugins reenable in mobile mode
+- fix: :bug: fix bug in processLimitedSats_ that caused duplicated ids
+- refactor: :recycle: refactor the satellite cone mesh distance from earth to settings
+- build: :construction_worker: remove unnecessary artifacts
+- fix: :lipstick: fix collapsing sat-infobox on mobile
+- fix: :lipstick: fix duplicate shadow effect
+- fix: :bug: fix bug with shift being tracked as down after window loses focus
+- fix: :bug: fix missing id parameters
+- build: :heavy_minus_sign: remove old dependencies
+- feat: :sparkles: add new splash screens
+- fix: :bug: fix new launch showing error even when it works
+- refactor: :lipstick: change color of polar plot to match new theme
+- feat: :lipstick: shrink sat-info-box when multiple menus are collapsed
+- fix: :bug: fix dark-clouds preset
+- refactor: :children_crossing: increase zoom speed
+- fix: :bug: fix bug where no references availalbe for historical RCS est
+- fix: :bug: fix transponder menu being enabled incorrectly
+- refactor: :heavy_minus_sign: remove unused dependencies
+- test: :white_check_mark: fix colorbox test
+- fix: :bug: fix sensor-list side menu size
+- refactor: :recycle: change default search size
+- feat: :lipstick: add iss flag
+- fix: :bug: fix bug where polar plot could be opened without a sensor selected
+- ci: :green_heart: switch trufflehog action
+- fix: :bug: fix create sensor from context menu not working
+- fix: :bug: fix search bar being clipped when sat-infobox moved
+- fix: :lock: fix security issue in dependencies
+- fix: :bug: fix unknown countries showing up as Grenada
+- refactor: :recycle: allow closer zoom on satellite models
+- fix: :ambulance: fix error when no satellite selected
+- fix: :bug: fix typo in locales.ts
+- feat: :sparkles: update logo image
+- fix: :lipstick: fix custom sensor plugin menu width
+- fix: :lipstick: fix missing nav-bar-height on mobile
+- feat: :sparkles: update logos
+- refactor: :lock: fix security issue with dependencies
+
+#### v10.2.0-0
+
+#### v10.1.0
+
+>  
+
+- feat: :sparkles: add localization for spanish and german
+- refactor: :fire: remove jquery!
+- feat: :sparkles: update new calendar component
+- refactor: :fire: remove unused fonts
+- feat: :heavy_minus_sign: remove jquery-ui-bundle dependencies for calendar
+- feat: :sparkles: add flags
+- refactor: :bug: fix class name error caused by minification
+- feat: :sparkles: expand features of tip plugin and fix bug with fetch source
+- test: :white_check_mark: update tests to match new plugin architecture
+- fix: :bug: fix type in .gitignore
+- build: :fire: remove old deployment pipeline
+- feat: :globe_with_meridians: add localization to calendar for es and de
+- refactor: :recycle: migrate to storage.keeptrack.space
+- fix: :bug: fix flickering on mobile
+- fix: :bug: fix missing id parameters
+- refactor: :heavy_minus_sign: remove unused dependencies
+- fix: :bug: fix typo in locales.ts
+- refactor: :lock: fix security issue with dependencies
+
+#### v10.1.0-2
+
+>  
+
+- build: :heavy_minus_sign: remove old dependencies
+
+#### v10.1.0-1
+
+>  
+
+- fix: :bug: disable husky
+
+#### v10.1.0-0
+
+>  
+
+- refactor: :recycle: abstract text from plugins
+- feat: :construction: first attempt at providing localization
+- refactor: :recycle: refactor data out of sensorList and multisiteLookangles
+- feat: :sparkles: add ability to push to npm again
+- docs: :memo: update changelog
+- fix: :bug: fix missing rmb items
+- fix: :goal_net: add try/catch for bad plugins
+- fix: :rotating_light: fix linter errors with package.json
+- fix: :bug: fix rmb events firing twice
+- fix: :bug: fix getSensorList logic
+
 #### v10.0.2
 
 >  

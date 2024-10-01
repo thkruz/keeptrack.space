@@ -1,5 +1,3 @@
-/* required styles */
-
 .leaflet-pane,
 .leaflet-tile,
 .leaflet-marker-icon,
@@ -424,13 +422,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
 }
 
 .leaflet-control-layers-toggle {
-    background-image: url(images/layers.png);
+    /* background-image: url(images/layers.png); */
+    background-image: url(../img/leaflet-layers.png);
     width: 36px;
     height: 36px;
 }
 
 .leaflet-retina .leaflet-control-layers-toggle {
-    background-image: url(images/layers-2x.png);
+    /* background-image: url(images/layers-2x.png); */
+    background-image: url(../img/leaflet-layers.png);
     background-size: 26px 26px;
 }
 

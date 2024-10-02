@@ -364,6 +364,171 @@ export class SettingsPresets {
     settings.minDistanceFromSatellite = <Kilometers>4;
     // only load the 3D model of a sateliot satellite
     settings.meshListOverride = ['sateliotsat'];
+    settings.meshOverride = 'sateliotsat';
+    settings.plugins.satelliteFov = true;
+    const SATELIOT_FOV_ANGLE = 52.32;
+
+    settings.plugins.satInfoboxCore = true;
+    settings.plugins.settingsMenu = false;
+    settings.plugins.soundManager = false;
+    settings.plugins.polarPlot = true;
+    settings.plugins.topMenu = true;
+    settings.plugins.datetime = true;
+    settings.isDrawLess = true;
+    settings.isDrawSun = false;
+
+    // detect if is a mobile device checking the screen width
+    const isMobile = window.innerWidth < 1024;
+
+    if (isMobile) {
+      console.log('isMobile');
+      settings.maxZoomDistance = <Kilometers>150000;
+      settings.zFar = 300000;
+    }
+    // detect if is a tablet device checking the screen width
+    const isTablet = window.innerWidth < 1024 && window.innerWidth > 768;
+
+    if (isTablet) {
+      console.log('isTablet');
+      settings.maxZoomDistance = <Kilometers>100000;
+      settings.zFar = 300000;
+    }
+
+    // const defaultCamera = keepTrackApi.getMainCamera();
+
+    settings.onLoadCb = () => {
+      keepTrackApi.getUiManager().searchManager.doSearch('60550,60534,60552,60537');
+      keepTrackApi.getMainCamera().lookAtLatLon(41.38160380932027 as Degrees, 2.1420305583779276 as Degrees, 0.67); // Look at HQ
+
+      hideEl('nav-footer');
+      // hideEl('nav-wrapper');
+      hideEl('nav-mobile2');
+      showEl('sateliot-logo');
+      showEl('toggle-search-icon');
+
+      const mapIcon = document.getElementById('map-2d-icon');
+
+      mapIcon.addEventListener('click', () => {
+        window.location.href = './2d-map.html';
+      });
+
+
+      const githubIcon = document.getElementById('sateliot-github-icon');
+
+      githubIcon.addEventListener('click', () => {
+        window.location.href = 'https://github.com/Sateliot/sateliot.keeptrack';
+      });
+
+      // SATELIOT
+      // Enable the FOV for all satellites
+      const allSats = keepTrackApi.getCatalogManager().getActiveSats();
+
+      allSats.forEach((currentSat) => {
+        if (currentSat) {
+          const coneFactory = keepTrackApi.getScene().coneFactory;
+          const cone = coneFactory.checkCacheForMesh_(currentSat);
+
+          if (cone) {
+            coneFactory.remove(cone.id);
+          } else {
+            const coneSettings = {
+              fieldOfView: SATELIOT_FOV_ANGLE as Degrees,
+              color: [0.2, 1.0, 1.0, 0.15],
+            } as ConeSettings;
+
+            coneFactory.generateMesh(currentSat, coneSettings);
+          }
+        }
+      });
+
+      // open/close results
+      getEl('toggle-search-icon')?.addEventListener('click', () => {
+        const searchManagerInstance = keepTrackApi.getUiManager().searchManager;
+
+        searchManagerInstance.isSearchOpen = !searchManagerInstance.isSearchOpen;
+        if (searchManagerInstance.isSearchOpen) {
+          slideOutUp(getEl('search-results'), 1000);
+        } else {
+          slideInDown(getEl('search-results'), 1000);
+        }
+      });
+
+      // restore the view
+      getEl('restore-view-icon').addEventListener('click', () => {
+        console.log('restore view');
+        keepTrackApi.getMainCamera().reset();
+        keepTrackApi.getMainCamera().lookAtLatLon(41.38160380932027 as Degrees, 2.1420305583779276 as Degrees, 0.67);
+      });
+
+      getEl('raan').addEventListener('load', () => {
+        getEl('raan').getElementsByClassName('sat-info-key')[0].innerHTML = 'RAAN';
+      });
+
+      getEl('age-of-elset').addEventListener('load', () => {
+        getEl('age-of-elset').style.display = 'none';
+      });
+
+      getEl('lift-mass').addEventListener('load', () => {
+        getEl('lift-mass').style.display = 'none';
+      });
+
+      getEl('dry-mass').addEventListener('load', () => {
+        getEl('dry-mass').style.display = 'none';
+      });
+
+      getEl('life-expectancy').addEventListener('load', () => {
+        getEl('life-expectancy').getElementsByClassName('sat-info-value')[0].innerHTML = '5 years';
+      });
+
+      getEl('payload').addEventListener('load', () => {
+        getEl('payload').getElementsByClassName('sat-info-value')[0].innerHTML = 'NTN 5G IoT';
+      });
+
+      getEl('motor').addEventListener('load', () => {
+        getEl('motor').getElementsByClassName('sat-info-key')[0].innerHTML = 'Thruster';
+        getEl('motor').getElementsByClassName('sat-info-value')[0].innerHTML = 'Electric';
+      });
+
+      getEl('power').addEventListener('load', () => {
+        getEl('power').style.display = 'none';
+      });
+    };
+  }
+
+  static loadPresetSateliotOps(settings: SettingsManager) {
+    console.log("SateliotOpsCenter");
+
+    settings.satShader.minSize = 30.0;
+    settings.limitSats = '60550,60534,60552,60537';
+    settings.disableAllPlugins();
+    settings.isDisableStars = true;
+    settings.maxAnalystSats = 1;
+    settings.maxMissiles = 1;
+    settings.maxFieldOfViewMarkers = 1;
+    settings.noMeshManager = false;
+    settings.isLoadLastMap = false;
+    settings.isShowRocketBodies = true;
+    settings.isShowDebris = true;
+    settings.isShowPayloads = true;
+    settings.isShowAgencies = false;
+    settings.nasaImages = true;
+    settings.isAllowRightClick = false;
+    settings.isDisableSelectSat = false;
+    settings.isDisableSensors = true;
+    settings.isDisableControlSites = true;
+    settings.isDisableLaunchSites = true;
+    settings.isLoadLastSensor = false;
+    settings.isEnableJscCatalog = false;
+    settings.isDrawSun = true;
+    settings.isDisableMoon = false;
+    settings.isDrawAurora = true;
+    settings.isShowRocketBodies = true;
+    settings.plugins.nightToggle = true;
+    settings.maxZoomDistance = <Kilometers>70000;
+    settings.zFar = 300000;
+    settings.minDistanceFromSatellite = <Kilometers>4;
+    // only load the 3D model of a sateliot satellite
+    settings.meshListOverride = ['sateliotsat'];
     settings.plugins.satelliteFov = true;
     const SATELIOT_FOV_ANGLE = 52.32;
 
@@ -372,6 +537,8 @@ export class SettingsPresets {
     settings.plugins.settingsMenu = false;
     settings.plugins.soundManager = false;
     settings.plugins.polarPlot = true;
+    settings.isDrawLess = true;
+    settings.isDrawSun = false;
 
     // detect if is a mobile device checking the screen width
     const isMobile = window.innerWidth < 1024;
@@ -454,6 +621,26 @@ export class SettingsPresets {
         keepTrackApi.getMainCamera().reset();
         keepTrackApi.getMainCamera().lookAtLatLon(41.38160380932027 as Degrees, 2.1420305583779276 as Degrees, 0.67);
       });
+
+      getEl('raan').addEventListener('load', () => {
+        getEl('raan').getElementsByClassName('sat-info-key')[0].innerHTML = 'RAAN';
+      });
+
+      // getEl('age-of-elset');
+      // getEl('lift-mass'); // TODO calculate in the future
+      // getEl('dry-mass'); // TODO calculate in the future
+      // getEl('life-expectancy'); // TODO calculate in the future
+
+      getEl('payload').addEventListener('load', () => {
+        getEl('payload').getElementsByClassName('sat-info-value')[0].innerHTML = 'TREVO';
+      });
+
+      getEl('motor').addEventListener('load', () => {
+        getEl('motor').getElementsByClassName('sat-info-key')[0].innerHTML = 'Thruster';
+        getEl('motor').getElementsByClassName('sat-info-value')[0].innerHTML = 'Enpulsion NANO';
+      });
+
+      // getEl('power'); // TODO calculate in the future
     };
   }
 

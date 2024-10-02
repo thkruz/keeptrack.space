@@ -493,6 +493,10 @@ export class SatInfoBox extends KeepTrackPlugin {
       return;
     }
 
+    // TODO: SEGUIR POR AQUÍ!!!
+    // crear una nueva función que si el preset es el de sateliot muestre una información,
+    //   si es el sateliotOps muestre otra y si no, el valor por defecto
+
     this.updateOrbitData_(sat);
   }
 
@@ -1022,7 +1026,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             </div>
             <div class="sat-info-value" id="sat-eccentricity">x.xx</div>
           </div>
-          <div class="sat-info-row sat-only-info">
+          <div id="raan" class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Where it Rises Above the Equator">
               Right Asc.
@@ -1071,7 +1075,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             </div>
             <div class="sat-info-value" id="sat-velocity">xxx km/s</div>
           </div>
-          <div class="sat-info-row sat-only-info">
+          <div id="age-of-elset" class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Time Since Official Orbit Calculated (Older ELSETs are Less Accuarate Usually)">
               Age of ELSET
@@ -1323,7 +1327,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               NO DATA
             </div>
           </div>
-          <div class="sat-info-row sat-only-info">
+          <div id="lift-mass" class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Mass at Lift Off">
               Lift Mass
@@ -1332,7 +1336,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               NO DATA
             </div>
           </div>
-          <div class="sat-info-row sat-only-info">
+          <div id="dry-mass" class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50" data-tooltip="Unfueled Mass">
               Dry Mass
             </div>
@@ -1340,7 +1344,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               NO DATA
             </div>
           </div>
-          <div class="sat-info-row sat-only-info">
+          <div id="life-expectancy" class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="How Long the Satellite was Expected to be Operational">
               Life Expectancy
@@ -1358,7 +1362,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               NO DATA
             </div>
           </div>
-          <div class="sat-info-row sat-only-info">
+          <div id="payload" class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Primary Payload">
               Payload
@@ -1367,7 +1371,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               NO DATA
             </div>
           </div>
-          <div class="sat-info-row sat-only-info">
+          <div id="motor" class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Primary Motor">
               Motor
@@ -1412,7 +1416,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               NO DATA
             </div>
           </div>
-          <div class="sat-info-row sat-only-info">
+          <div id="power" class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Power of the Satellite">
               Power

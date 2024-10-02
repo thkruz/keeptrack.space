@@ -71,7 +71,8 @@
   #datetime-text {
     border-width: 0px 0px 0px 1px;
     border-style: solid;
-    border-color: var(--colorSecondary);
+    /* border-color: var(--colorSecondary); */
+    border-color: #FF6B00;
     padding: 0px 10px 0px 10px;
     vertical-align: bottom;
   }

@@ -81,7 +81,8 @@ a,
 }
 
 #nav-wrapper {
-  background: var(--colorTertiaryDarken3);
+  /* background: var(--colorTertiaryDarken3); */
+  background-color: rgba(0, 0, 0);
   z-index: 3;
   display: flex;
   flex-direction: row;
@@ -197,12 +198,10 @@ ul {
   font-size: 14px !important;
   outline: 0 !important;
 
-  -webkit-box-shadow:
-    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12),
     0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
-  box-shadow:
-    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12),
     0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
 
@@ -491,8 +490,7 @@ ul {
   border-width: 2px;
   border-style: solid;
   border-radius: 15px;
-  box-shadow:
-    0 0px 6px 0 rgba(0, 0, 0, 0.2),
+  box-shadow: 0 0px 6px 0 rgba(0, 0, 0, 0.2),
     0 0px 8px 0 rgba(0, 0, 0, 0.19);
   margin-right: 35px;
 }
@@ -872,8 +870,7 @@ fieldset {
   box-sizing: border-box;
   color: var(--colorWhite);
   background: rgba(0, 0, 0, 0);
-  font-family:
-    Open Sans,
+  font-family: Open Sans,
     Verdana,
     sans-serif;
   -webkit-transition: all 0.1s ease-in-out;
@@ -3942,7 +3939,7 @@ nav a.sidenav-trigger i {
 @media (min-width: 1024px) {
   #sateliot-logo {
     position: relative;
-    top: -20px;
+    /* top: -20px; */
     /* left: 10px; */
     width: auto;
     height: 100px;
@@ -3965,11 +3962,13 @@ nav a.sidenav-trigger i {
 
 
 #keeptrack-header>nav {
-  display: none;
+  /* display: none; */
+  display: block;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 #keeptrack-header {
-  background-color: black;
+  /* background-color: black; */
   height: 59px;
 }
 
@@ -4024,7 +4023,7 @@ nav a.sidenav-trigger i {
 #toggle-search-icon {
   display: none;
   position: absolute;
-  top: 10px;
+  top: 15px;
   right: 10px;
   width: 30px;
   height: 30px;

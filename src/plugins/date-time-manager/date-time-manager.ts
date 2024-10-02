@@ -87,6 +87,10 @@ export class DateTimeManager extends KeepTrackPlugin {
       'afterbegin',
       keepTrackApi.html`
         <div id="nav-mobile">
+                  <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot" class="start-hidden">
+                  <img id="toggle-search-icon" src="/img/stack-grey.png" alt="Toggle Search" class="icon start-hidden">
+
+          <img id="toggle-search-icon" src="/img/stack-grey.png" alt="Toggle Search" class="icon start-hidden">
           <div id="jday"></div>
           <div id="${this.dateTimeContainerId_}">
             <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>
@@ -107,7 +111,8 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     this.calendar = new Calendar('datetime-input-form');
 
-    document.getElementById('datetime-text')?.addEventListener('click', this.datetimeTextClick.bind(this));
+    // SATELIOT - Commented out to avoid the click event on the datetime-text
+    // document.getElementById('datetime-text')?.addEventListener('click', this.datetimeTextClick.bind(this));
 
     const datetimeInputTb = document.getElementById(this.dateTimeInputTbId_);
 

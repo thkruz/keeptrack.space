@@ -233,7 +233,7 @@ export class TimeManager {
       }
 
       // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
-      this.dateDOM.textContent = this.timeTextStr;
+      this.dateDOM.textContent = this.timeTextStr + ' (UTC)';
 
       // Load the current JDAY
       const jday = getDayOfYear(this.simulationTimeObj);

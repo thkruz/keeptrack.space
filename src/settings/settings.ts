@@ -1187,8 +1187,8 @@ export class SettingsManager {
     this.initParseFromGETVariables_(params);
 
     // SATELIOT
-    console.log('Force preset Sateliot');
-    SettingsPresets.loadPresetSateliot(this);
+    // console.log('Force preset Sateliot');
+    // SettingsPresets.loadPresetSateliot(this);
 
     // If No UI Reduce Overhead
     if (this.disableUI) {
@@ -1399,6 +1399,11 @@ export class SettingsManager {
    * critical settings. Other variables are checked later during catalogManagerInstance.init
    */
   private initParseFromGETVariables_(params: string[]) {
+    if (params.length === 0 || params[0] === '') {
+      console.log('No URL Params. Loading Sateliot Preset');
+      SettingsPresets.loadPresetSateliot(this);
+      return;
+    }
     if (!this.disableUI) {
       for (const param of params) {
         const key = param.split('=')[0];
@@ -1407,6 +1412,9 @@ export class SettingsManager {
         switch (key) {
           case 'preset':
             switch (val) {
+              case '':
+                SettingsPresets.loadPresetSateliot(this);
+                break;
               case 'ops-center':
                 SettingsPresets.loadPresetOpsCenter(this);
                 break;
@@ -1436,6 +1444,12 @@ export class SettingsManager {
                 break;
               case 'starlink':
                 SettingsPresets.loadPresetStarlink(this);
+                break;
+              case 'sateliot':
+                SettingsPresets.loadPresetSateliot(this);
+                break;
+              case 'sateliot-ops':
+                SettingsPresets.loadPresetSateliotOps(this);
                 break;
               default:
                 break;

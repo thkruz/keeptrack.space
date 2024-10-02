@@ -21,8 +21,6 @@ export abstract class UrlManager {
   }
 
   static updateURL() {
-    // SATELIOT - Disable URL update
-    // return
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);

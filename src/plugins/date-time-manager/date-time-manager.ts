@@ -87,10 +87,10 @@ export class DateTimeManager extends KeepTrackPlugin {
       'afterbegin',
       keepTrackApi.html`
         <div id="nav-mobile">
-                  <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot" class="start-hidden">
-                  <img id="toggle-search-icon" src="/img/stack-grey.png" alt="Toggle Search" class="icon start-hidden">
-
+          <!-- SATELIOT -->
+	        <img id="sateliot-logo" src="/img/textLogoSateliot.png" alt="Sateliot" class="start-hidden">
           <img id="toggle-search-icon" src="/img/stack-grey.png" alt="Toggle Search" class="icon start-hidden">
+	        <!-- END SATELIOT -->
           <div id="jday"></div>
           <div id="${this.dateTimeContainerId_}">
             <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>

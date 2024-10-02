@@ -1029,6 +1029,12 @@ export class SettingsManager {
    */
   externalTLEsOnly = false;
 
+
+  /* SATELIOT SETTINGS */
+  forceSateliotPresets = true;
+  isShowSateliot = false;
+  isShowSateliotOps = false;
+
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
 
@@ -1183,12 +1189,43 @@ export class SettingsManager {
     this.loadPersistedSettings();
 
     const params = this.loadOverridesFromUrl_();
-
+    params['search'] = '60550,60534,60552,60537';
+    console.log("Params: ", params);
     this.initParseFromGETVariables_(params);
 
-    // SATELIOT
-    // console.log('Force preset Sateliot');
-    // SettingsPresets.loadPresetSateliot(this);
+    settingsManager.forceSateliotPresets = true;
+    settingsManager.isShowSateliot = true;
+    settingsManager.isShowSateliotOps = false;
+    SettingsPresets.loadPresetSateliot(this);
+
+    // SATELIOT - custom url params
+    // if (this.forceSateliotPresets) {
+    //   for (const param of params) {
+    //     const key = param.split('=')[0];
+    //     const val = param.split('=')[1];
+    //     switch (key) {
+    //       case 'preset':
+    //         switch (val) {
+    //           case 'sateliot':
+    //             settingsManager.isShowSateliot = true;
+    //             settingsManager.isShowSateliotOps = false;
+    //             break;
+    //           case 'sateliot-ops':
+    //             settingsManager.isShowSateliot = false;
+    //             settingsManager.isShowSateliotOps = true;
+    //             break;
+    //         }
+    //     }
+    //   }
+    //   if (settingsManager.isShowSateliotOps) {
+    //     SettingsPresets.loadPresetSateliotOps(this);
+    //   } else {
+    //     // default to sateliot
+    //     settingsManager.isShowSateliot = true;
+    //     settingsManager.isShowSateliotOps = false;
+    //     SettingsPresets.loadPresetSateliot(this);
+    //   }
+    // }
 
     // If No UI Reduce Overhead
     if (this.disableUI) {
@@ -1399,11 +1436,6 @@ export class SettingsManager {
    * critical settings. Other variables are checked later during catalogManagerInstance.init
    */
   private initParseFromGETVariables_(params: string[]) {
-    if (params.length === 0 || params[0] === '') {
-      console.log('No URL Params. Loading Sateliot Preset');
-      SettingsPresets.loadPresetSateliot(this);
-      return;
-    }
     if (!this.disableUI) {
       for (const param of params) {
         const key = param.split('=')[0];
@@ -1444,12 +1476,6 @@ export class SettingsManager {
                 break;
               case 'starlink':
                 SettingsPresets.loadPresetStarlink(this);
-                break;
-              case 'sateliot':
-                SettingsPresets.loadPresetSateliot(this);
-                break;
-              case 'sateliot-ops':
-                SettingsPresets.loadPresetSateliotOps(this);
                 break;
               default:
                 break;

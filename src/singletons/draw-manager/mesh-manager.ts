@@ -327,7 +327,6 @@ export class MeshManager {
         break;
     }
 
-    console.log("SAT BUS: ", sat.bus);
     switch (sat.bus) {
       case 'sateliotsat':
         this.currentMeshObject.model = this.models.sateliotsat;
@@ -518,7 +517,6 @@ export class MeshManager {
   }
 
   private updateModel_(selectedDate: Date, obj: BaseObject) {
-    console.log("ENRTAAAA");
     try {
       this.currentMeshObject.id = typeof obj?.id !== 'undefined' ? obj.id : -1;
 

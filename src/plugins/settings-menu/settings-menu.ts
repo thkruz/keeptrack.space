@@ -460,40 +460,64 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 
   static syncOnLoad() {
-    (<HTMLInputElement>getEl('settings-notionalSats')).checked = settingsManager.isShowNotionalSats;
-    (<HTMLInputElement>getEl('settings-leoSats')).checked = settingsManager.isShowLeoSats;
-    (<HTMLInputElement>getEl('settings-starlinkSats')).checked = settingsManager.isShowStarlinkSats;
-    (<HTMLInputElement>getEl('settings-heoSats')).checked = settingsManager.isShowHeoSats;
-    (<HTMLInputElement>getEl('settings-meoSats')).checked = settingsManager.isShowMeoSats;
-    (<HTMLInputElement>getEl('settings-geoSats')).checked = settingsManager.isShowGeoSats;
-    (<HTMLInputElement>getEl('settings-showPayloads')).checked = settingsManager.isShowPayloads;
-    (<HTMLInputElement>getEl('settings-showRocketBodies')).checked = settingsManager.isShowRocketBodies;
-    (<HTMLInputElement>getEl('settings-showDebris')).checked = settingsManager.isShowDebris;
-    (<HTMLInputElement>getEl('settings-showAgencies')).checked = settingsManager.isShowAgencies;
-    (<HTMLInputElement>getEl('settings-drawOrbits')).checked = settingsManager.isDrawOrbits;
-    (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked = settingsManager.drawCameraWidget;
-    if (!settingsManager.drawCameraWidget) {
-      getEl('camera-control-widget').style.display = 'none';
-    } else {
-      getEl('camera-control-widget').style.display = 'block';
+    const drawCameraWidgetEl = <HTMLInputElement>getEl('settings-drawCameraWidget');
+
+    if (drawCameraWidgetEl) {
+      drawCameraWidgetEl.checked = settingsManager.drawCameraWidget;
+      const cameraControlWidgetEl = getEl('camera-control-widget');
+
+      if (cameraControlWidgetEl) {
+        cameraControlWidgetEl.style.display = settingsManager.drawCameraWidget ? 'block' : 'none';
+      }
     }
-    (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked = settingsManager.isDrawTrailingOrbits;
-    (<HTMLInputElement>getEl('settings-drawEcf')).checked = settingsManager.isOrbitCruncherInEcf;
-    (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked = settingsManager.isDrawInCoverageLines;
-    (<HTMLInputElement>getEl('settings-drawSun')).checked = settingsManager.isDrawSun;
-    (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked = settingsManager.isBlackEarth;
-    (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked = settingsManager.isDrawAtmosphere;
-    (<HTMLInputElement>getEl('settings-drawAurora')).checked = settingsManager.isDrawAurora;
-    (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked = settingsManager.isDrawMilkyWay;
-    (<HTMLInputElement>getEl('settings-graySkybox')).checked = settingsManager.isGraySkybox;
-    (<HTMLInputElement>getEl('settings-eciOnHover')).checked = settingsManager.isEciOnHover;
-    (<HTMLInputElement>getEl('settings-hos')).checked = settingsManager.colors.transparent[3] === 0;
-    (<HTMLInputElement>getEl('settings-confidence-levels')).checked = settingsManager.isShowConfidenceLevels;
-    (<HTMLInputElement>getEl('settings-demo-mode')).checked = settingsManager.isDemoModeOn;
-    (<HTMLInputElement>getEl('settings-sat-label-mode')).checked = settingsManager.isSatLabelModeOn;
-    (<HTMLInputElement>getEl('settings-freeze-drag')).checked = settingsManager.isFreezePropRateOnDrag;
-    (<HTMLInputElement>getEl('settings-time-machine-toasts')).checked = settingsManager.isDisableTimeMachineToasts;
-    (<HTMLInputElement>getEl('maxSearchSats')).value = settingsManager.searchLimit.toString();
+
+    const settingsElements = [
+      { id: 'settings-notionalSats', setting: 'isShowNotionalSats' },
+      { id: 'settings-leoSats', setting: 'isShowLeoSats' },
+      { id: 'settings-starlinkSats', setting: 'isShowStarlinkSats' },
+      { id: 'settings-heoSats', setting: 'isShowHeoSats' },
+      { id: 'settings-meoSats', setting: 'isShowMeoSats' },
+      { id: 'settings-geoSats', setting: 'isShowGeoSats' },
+      { id: 'settings-showPayloads', setting: 'isShowPayloads' },
+      { id: 'settings-showRocketBodies', setting: 'isShowRocketBodies' },
+      { id: 'settings-showDebris', setting: 'isShowDebris' },
+      { id: 'settings-showAgencies', setting: 'isShowAgencies' },
+      { id: 'settings-drawOrbits', setting: 'isDrawOrbits' },
+      { id: 'settings-drawTrailingOrbits', setting: 'isDrawTrailingOrbits' },
+      { id: 'settings-drawEcf', setting: 'isOrbitCruncherInEcf' },
+      { id: 'settings-isDrawInCoverageLines', setting: 'isDrawInCoverageLines' },
+      { id: 'settings-drawSun', setting: 'isDrawSun' },
+      { id: 'settings-drawBlackEarth', setting: 'isBlackEarth' },
+      { id: 'settings-drawAtmosphere', setting: 'isDrawAtmosphere' },
+      { id: 'settings-drawAurora', setting: 'isDrawAurora' },
+      { id: 'settings-drawMilkyWay', setting: 'isDrawMilkyWay' },
+      { id: 'settings-graySkybox', setting: 'isGraySkybox' },
+      { id: 'settings-eciOnHover', setting: 'isEciOnHover' },
+      { id: 'settings-hos', setting: 'colors.transparent[3] === 0' },
+      { id: 'settings-confidence-levels', setting: 'isShowConfidenceLevels' },
+      { id: 'settings-demo-mode', setting: 'isDemoModeOn' },
+      { id: 'settings-sat-label-mode', setting: 'isSatLabelModeOn' },
+      { id: 'settings-freeze-drag', setting: 'isFreezePropRateOnDrag' },
+      { id: 'settings-time-machine-toasts', setting: 'isDisableTimeMachineToasts' },
+    ];
+
+    settingsElements.forEach(({ id, setting }) => {
+      const element = <HTMLInputElement>getEl(id);
+
+      if (element) {
+        if (setting.includes('colors.transparent')) {
+          element.checked = settingsManager.colors.transparent[3] === 0;
+    } else {
+          element.checked = settingsManager[setting];
+        }
+      }
+    });
+
+    const maxSearchSatsEl = <HTMLInputElement>getEl('maxSearchSats');
+
+    if (maxSearchSatsEl) {
+      maxSearchSatsEl.value = settingsManager.searchLimit.toString();
+    }
     // (<HTMLInputElement>getEl('satFieldOfView')).value = settingsManager.selectedSatFOV.toString();
   }
 

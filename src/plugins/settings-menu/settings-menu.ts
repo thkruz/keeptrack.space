@@ -507,7 +507,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       if (element) {
         if (setting.includes('colors.transparent')) {
           element.checked = settingsManager.colors.transparent[3] === 0;
-    } else {
+        } else {
           element.checked = settingsManager[setting];
         }
       }
@@ -648,7 +648,10 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isOrbitCruncherInEcf = false;
     settingsManager.isDrawInCoverageLines = true;
     settingsManager.isDrawSun = true;
-    settingsManager.isBlackEarth = false;
+    if (settingsManager.isBlackEarth) {
+      settingsManager.isBlackEarth = false;
+      keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+    }
     settingsManager.isDrawAtmosphere = true;
     settingsManager.isDrawAurora = true;
     settingsManager.isDrawMilkyWay = true;

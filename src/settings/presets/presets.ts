@@ -1,7 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/lib/get-el';
-import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
@@ -355,14 +354,20 @@ export class SettingsPresets {
     getEl('restore-view-icon').addEventListener('click', () => {
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
       setTimeout(() => {
-        // (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
-        keepTrackApi.getMainCamera().zoomTarget = 0.67; // Reset Zoom to Default
-        keepTrackApi.getMainCamera().camSnap(lat2pitch(0 as Degrees), lon2yaw(0 as Degrees, new Date())); // Reset Camera to Default
-      }, 1000);
+        // keepTrackApi.getMainCamera().zoomTarget = 0.67; // Reset Zoom to Default
+        // keepTrackApi.getMainCamera().camSnap(lat2pitch(0 as Degrees), lon2yaw(0 as Degrees, new Date())); // Reset Camera to Default
+        // keepTrackApi.getMainCamera().camSnap(lat2pitch(41.38160380932027 as Degrees), lon2yaw(2.1420305583779276 as Degrees, new Date())); // Reset Camera to Default
+        const zoom = 0.67;
+        // const lat = 41.38160380932027 as Degrees;
+        // const lon = 2.1420305583779276 as Degrees;
+        const lat = 10 as Degrees;
+        const lon = 0 as Degrees;
+        keepTrackApi.getMainCamera().lookAtLatLon(lat, lon, zoom, new Date()); // Reset Camera to Default
+      }, 100);
       setTimeout(() => {
         keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
         keepTrackApi.getMainCamera().autoRotate(true); // Start Rotating Camera
-      }, 3000);
+      }, 5000);
     });
   }
 

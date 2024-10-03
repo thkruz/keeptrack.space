@@ -530,6 +530,7 @@ export class SettingsManager {
      * It can be loaded from a local file or a remote source
      */
     tle: 'https://storage.keeptrack.space/data/tle.json',
+    loscalStoragekey: 'tleData',
     tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
     vimpel: 'https://storage.keeptrack.space/data/vimpel.json',
   };
@@ -1193,39 +1194,39 @@ export class SettingsManager {
     console.log("Params: ", params);
     this.initParseFromGETVariables_(params);
 
-    settingsManager.forceSateliotPresets = true;
-    settingsManager.isShowSateliot = true;
-    settingsManager.isShowSateliotOps = false;
-    SettingsPresets.loadPresetSateliot(this);
+    // settingsManager.forceSateliotPresets = true;
+    // settingsManager.isShowSateliot = true;
+    // settingsManager.isShowSateliotOps = false;
+    // SettingsPresets.loadPresetSateliot(this);
 
     // SATELIOT - custom url params
-    // if (this.forceSateliotPresets) {
-    //   for (const param of params) {
-    //     const key = param.split('=')[0];
-    //     const val = param.split('=')[1];
-    //     switch (key) {
-    //       case 'preset':
-    //         switch (val) {
-    //           case 'sateliot':
-    //             settingsManager.isShowSateliot = true;
-    //             settingsManager.isShowSateliotOps = false;
-    //             break;
-    //           case 'sateliot-ops':
-    //             settingsManager.isShowSateliot = false;
-    //             settingsManager.isShowSateliotOps = true;
-    //             break;
-    //         }
-    //     }
-    //   }
-    //   if (settingsManager.isShowSateliotOps) {
-    //     SettingsPresets.loadPresetSateliotOps(this);
-    //   } else {
-    //     // default to sateliot
-    //     settingsManager.isShowSateliot = true;
-    //     settingsManager.isShowSateliotOps = false;
-    //     SettingsPresets.loadPresetSateliot(this);
-    //   }
-    // }
+    if (this.forceSateliotPresets) {
+      for (const param of params) {
+        const key = param.split('=')[0];
+        const val = param.split('=')[1];
+        switch (key) {
+          case 'preset':
+            switch (val) {
+              case 'sateliot':
+                settingsManager.isShowSateliot = true;
+                settingsManager.isShowSateliotOps = false;
+                break;
+              case 'sateliot-ops':
+                settingsManager.isShowSateliot = false;
+                settingsManager.isShowSateliotOps = true;
+                break;
+            }
+        }
+      }
+      if (settingsManager.isShowSateliotOps) {
+        SettingsPresets.loadPresetSateliotOps(this);
+      } else {
+        // default to sateliot
+        settingsManager.isShowSateliot = true;
+        settingsManager.isShowSateliotOps = false;
+        SettingsPresets.loadPresetSateliot(this);
+      }
+    }
 
     // If No UI Reduce Overhead
     if (this.disableUI) {

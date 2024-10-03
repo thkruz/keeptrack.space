@@ -21,8 +21,10 @@ import {
   TleLine1,
   TleLine2,
 } from 'ootk';
+
+import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { keepTrackApi } from '../keepTrackApi';
-import { SettingsManager } from '../settings/settings';
+import { settingsManager, SettingsManager } from '../settings/settings';
 
 interface JsSat {
   TLE1: string;
@@ -228,19 +230,33 @@ export class CatalogLoader {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
       } else {
-        // Load the primary catalog
-        await fetch(settingsManager.dataSources.tle)
-          .then((response) => response.json())
-          .then((data) => CatalogLoader.parse({
-            keepTrackTle: data,
+
+        // use cached file
+        let tleData = await this.loadTleData();
+        if (tleData) {
+          await CatalogLoader.parse({
+            keepTrackTle: tleData, // Pass the TLE data here
             keepTrackExtra: extraSats,
             keepTrackAscii: asciiCatalog,
             externalCatalog,
-            vimpelCatalog: jsCatalog,
-          }))
-          .catch((error) => {
-            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+            vimpelCatalog: jsCatalog
           });
+        } else {
+          console.error('No TLE data available for parsing.');
+        }
+        // Load the primary catalog
+        // await fetch(settingsManager.dataSources.tle)
+        //   .then((response) => response.json())
+        //   .then((data) => CatalogLoader.parse({
+        //     keepTrackTle: data,
+        //     keepTrackExtra: extraSats,
+        //     keepTrackAscii: asciiCatalog,
+        //     externalCatalog,
+        //     vimpelCatalog: jsCatalog,
+        //   }))
+        //   .catch((error) => {
+        //     errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+        //   });
       }
     } catch (e) {
       errorManagerInstance.warn('Failed to load TLE catalog(s)!');
@@ -1063,5 +1079,95 @@ export class CatalogLoader {
 
       return 0;
     });
+  }
+
+  private static async fetchTleData(): Promise<any> {
+    try {
+      const response = await fetch(settingsManager.dataSources.tle);
+      if (!response.ok) {
+        throw new Error(`Error fetching TLE data: ${response.statusText}`);
+      }
+
+      const tledata = await response.json();
+      return tledata; // Return the TLE data instead of void
+    } catch (error) {
+      console.error('Failed to fetch and update TLE data:', error);
+      return null; // Return null on error
+    }
+  }
+
+  private static async loadTleData(): Promise<any> {
+    try {
+      // Retrieve cached data
+      let strCachedData = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_CACHED_TLE);
+      let data = strCachedData ? JSON.parse(strCachedData) : {}; // Parse only if strCachedData exists
+
+      // Check if cached data is empty
+      if (Object.keys(data).length === 0) {
+        console.log('WARNING: No cached TLE data found, fetching for the first time.');
+        const jsondata = await this.fetchTleData(); // Get the data for the first time
+
+        if (jsondata) {
+          // Filter limitSats data to reduce the number of elements to be stored
+          const jsonDataFiltered = this.filterLimitSats(jsondata);
+
+          const strdata = JSON.stringify(jsonDataFiltered);
+          PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CACHED_TLE, strdata);
+          PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CACHED_TLE_TIMESTAMP, Date.now().toString());
+          data = jsondata; // Store the new data
+        }
+        return data; // Return the newly obtained data
+
+      } else {
+        const duration = 24 * 60 * 60 * 1000; // 24 hours
+
+        let ts = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_CACHED_TLE_TIMESTAMP);
+        let timestamp = ts ? parseInt(ts) : 0; // Default to 0 if no timestamp exists
+        const now = Date.now();
+
+        // Check if an update is needed
+        if (now - timestamp > duration) {
+          const jsondata = await this.fetchTleData(); // Update the data
+
+          // Save the new data to the cache if it's not null
+          if (jsondata) {
+
+            // Filter limitSats data to reduce the number of elements to be stored
+            const jsonDataFiltered = this.filterLimitSats(jsondata);
+
+            const strdata = JSON.stringify(jsonDataFiltered);
+            PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CACHED_TLE, strdata);
+            PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CACHED_TLE_TIMESTAMP, Date.now().toString());
+            data = jsonDataFiltered; // Store the updated data
+          }
+        }
+        return data; // Return the cached data
+      }
+    } catch (error) {
+      console.error('Error loading TLE data:', error);
+      return null; // Return null in case of an error
+    }
+  }
+
+  // Filter limitSats data to reduce the number of elements to be stored
+  private static filterLimitSats(jsondata: any): string[] {
+    const settingsManager: SettingsManager = window.settingsManager;
+    if (settingsManager.limitSats === '') {
+      return jsondata;
+    } else {
+      let limitSatsArray = settingsManager.limitSats.split(',');
+      let outputJsonData = [];
+
+      for (let i = 0; i < jsondata.length; i++) {
+        for (let j = 0; j < limitSatsArray.length; j++) {
+          // check if the noradid number is in TLE1 or TLE2
+          const noradid = ' ' + limitSatsArray[j] + ' ';
+          if (jsondata[i].TLE1.includes(noradid) || jsondata[i].TLE2.includes(noradid)) {
+            outputJsonData.push(jsondata[i]);
+          }
+        }
+      }
+      return outputJsonData;
+    }
   }
 }

@@ -36,6 +36,8 @@ export enum StorageKey {
   SETTINGS_DRAW_SUN = 'keepTrack-settings-drawSun',
   SETTINGS_NOTIONAL_SATS = 'keepTrack-settings-notionalSats',
   SETTINGS_CONFIDENCE_LEVELS = 'keepTrack-settings-confidenceLevels',
+  SETTINGS_CACHED_TLE = 'keepTrack-settings-cached-tle',
+  SETTINGS_CACHED_TLE_TIMESTAMP = 'keepTrack-settings-cached-tle-timestamp',
 }
 export class PersistenceManager {
   private readonly storage_: Storage;
@@ -86,8 +88,9 @@ export class PersistenceManager {
     PersistenceManager.verifyKey_(key);
     try {
       this.storage_.setItem(key, value);
-    } catch {
+    } catch (e) {
       errorManagerInstance.debug(`Failed to save to local storage: ${key}=${value}`);
+      errorManagerInstance.info(e);
     }
   }
 

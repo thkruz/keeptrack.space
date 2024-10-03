@@ -1,6 +1,7 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/lib/get-el';
+import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { ConeSettings } from '@app/singletons/draw-manager/cone-mesh';
@@ -349,12 +350,18 @@ export class SettingsPresets {
   }
 
   static _showRestoreViewIcon() {
-    // restore the view
+
     getEl('restore-view-icon').addEventListener('click', () => {
-      console.log('restore view');
-      keepTrackApi.getMainCamera().reset();
-      // keepTrackApi.getMainCamera().lookAtLatLon(41.38160380932027 as Degrees, 2.1420305583779276 as Degrees, 0.67);
-      keepTrackApi.getMainCamera().autoRotate(true);
+      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
+      setTimeout(() => {
+        // (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
+        keepTrackApi.getMainCamera().zoomTarget = 0.67; // Reset Zoom to Default
+        keepTrackApi.getMainCamera().camSnap(lat2pitch(0 as Degrees), lon2yaw(0 as Degrees, new Date())); // Reset Camera to Default
+      }, 1000);
+      setTimeout(() => {
+        keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
+        keepTrackApi.getMainCamera().autoRotate(true); // Start Rotating Camera
+      }, 3000);
     });
   }
 

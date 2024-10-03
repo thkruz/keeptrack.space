@@ -2,6 +2,7 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/lib/get-el';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
+import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { ConeSettings } from '@app/singletons/draw-manager/cone-mesh';
@@ -365,6 +366,17 @@ export class SettingsPresets {
     });
   }
 
+  static _showDayNightViewICon() {
+    // get toggle night plugin label
+    let label = keepTrackApi.getPlugin(NightToggle).bottomIconLabel;
+    label = label.replace(/\s+/g, '-').toLowerCase() + '-bottom-icon';
+
+
+    getEl('daynight-view-icon').addEventListener('click', () => {
+      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, label);
+    });
+  }
+
   static _showFovSatelliteFOVCones(angle) {
     const allSats = keepTrackApi.getCatalogManager().getActiveSats();
 
@@ -475,6 +487,8 @@ export class SettingsPresets {
       this._showGitHubIcon();
 
       this._showRestoreViewIcon();
+
+      this._showDayNightViewICon();
 
       this._showFovSatelliteFOVCones(SATELIOT_FOV_ANGLE);
 

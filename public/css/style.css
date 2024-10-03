@@ -3999,6 +3999,19 @@ nav a.sidenav-trigger i {
   transition: transform 0.3s ease;
 }
 
+#daynight-view-icon {
+  position: absolute;
+  bottom: 240px;
+  right: 10px;
+  width: 50px;
+  height: auto;
+  cursor: pointer;
+  z-index: 100;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease;
+}
+
 .moveup:hover {
   transform: translateY(-10px);
 }

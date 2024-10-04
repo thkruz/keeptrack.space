@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.2.1
+
+>  
+
+- fix: :bug: add error checking for non-xbox controllers
+- fix: :bug: add verification that elements are found before accessing
+- docs: :memo: update changelog
+- fix: :bug: fix black earth not loading
+- test: :white_check_mark: update test environment
+
 #### v10.2.0
 
 >  

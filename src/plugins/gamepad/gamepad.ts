@@ -2,6 +2,7 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/singletons/camera';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -54,12 +55,32 @@ export class GamepadPlugin {
       return;
     } // No controller anymore - give up
 
+    if (!this.validateController(controller)) {
+      return;
+    }
+
     this.currentController = controller;
     this.updateZoom_();
     this.updateLeftStick_();
     this.updateRightStick_();
     this.updateButtons_();
   }
+
+  private validateController(controller: Gamepad): boolean {
+    if (controller.buttons.length < 17) {
+      errorManagerInstance.warn('This gamepad is not supported. Please open an issue on GitHub with the gamepad model to get it added.');
+
+      return false;
+    }
+    if (controller.axes.length < 4) {
+      errorManagerInstance.warn('This gamepad is not supported. Please open an issue on GitHub with the gamepad model to get it added.');
+
+      return false;
+    }
+
+    return true;
+  }
+
 
   private updateButtons_(): void {
     const buttons = this.currentController.buttons;

@@ -428,6 +428,9 @@ export class Earth {
     img.onload = () => {
       if (!this.settings_.isBlackEarth) {
         GlUtils.bindImageToTexture(this.gl_, this.textureDay_, img);
+      } else {
+        // Delete the texture
+        this.textureDay_ = null;
       }
 
       this.isDayTextureReady_ = true;
@@ -443,6 +446,9 @@ export class Earth {
     img.onload = () => {
       if (!this.settings_.isBlackEarth) {
         GlUtils.bindImageToTexture(this.gl_, this.textureNight_, img);
+      } else {
+        // Delete the texture
+        this.textureNight_ = null;
       }
 
       this.isNightTextureReady_ = true;
@@ -476,16 +482,16 @@ export class Earth {
   }
 
   private initTextures_(): void {
-    if (!this.textureDay_) {
+    if (!this.textureDay_ || this.settings_.isBlackEarth) {
       this.initTextureDay_();
     }
-    if (!this.textureNight_) {
+    if (!this.textureNight_ || this.settings_.isBlackEarth) {
       this.initTextureNight_();
     }
-    if (!this.textureBump_) {
+    if (!this.textureBump_ || this.settings_.isBlackEarth) {
       this.initTextureBump_();
     }
-    if (!this.textureSpec_) {
+    if (!this.textureSpec_ || this.settings_.isBlackEarth) {
       this.initTextureSpec_();
     }
   }

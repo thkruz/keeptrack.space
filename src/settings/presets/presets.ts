@@ -378,7 +378,7 @@ export class SettingsPresets {
 
 
     getEl('daynight-view-icon').addEventListener('click', () => {
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, label);
+      keepTrackApi.getPlugin(NightToggle).isNightMode = !keepTrackApi.getPlugin(NightToggle).isNightMode;
     });
   }
 

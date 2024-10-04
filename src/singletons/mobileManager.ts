@@ -1,7 +1,6 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { hideEl } from '@app/lib/get-el';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
-import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
 
 export class MobileManager {
@@ -24,21 +23,27 @@ export class MobileManager {
           settingsManager.cameraMovementSpeedMin = 0.0025;
           settingsManager.zoomSpeed = 0.025;
 
-          if (settingsManager.isUseHigherFOVonMobile) {
-            settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
-          } else {
-            settingsManager.fieldOfView = 0.6;
-          }
-          settingsManager.maxLabels = settingsManager.mobileMaxLabels;
+          // if (settingsManager.isUseHigherFOVonMobile) {
+          //   settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+          // } else {
+          //   settingsManager.fieldOfView = 0.6;
+          // }
+          // settingsManager.maxLabels = settingsManager.mobileMaxLabels;
 
           // Disable desktop only plugins
-          Object.keys(settingsManager.plugins).forEach((key) => {
-            settingsManager.plugins[key] = false;
-          });
-          settingsManager.plugins.satInfoboxCore = true;
+          // Object.keys(settingsManager.plugins).forEach((key) => {
+          //   settingsManager.plugins[key] = false;
+          // });
+
+          console.log("Disable Info Box in Mobile");
+          settingsManager.plugins.satInfoboxCore = false;
           settingsManager.plugins.topMenu = true;
           settingsManager.plugins.datetime = true;
-          settingsManager.plugins.soundManager = true;
+          settingsManager.plugins.soundManager = false;
+
+          // hide datetime
+          hideEl('datetime');
+          console.log("Seguir por aquí");
 
           settingsManager.isDisableGodrays = true;
           settingsManager.isDisableSkybox = true;
@@ -47,35 +52,19 @@ export class MobileManager {
 
           settingsManager.isDisableAsyncReadPixels = true;
 
-          settingsManager.satShader.minSize = 8;
-          settingsManager.satShader.maxAllowedSize = 45;
-          settingsManager.pickingDotSize = '32.0';
-          settingsManager.satShader.maxSize = 70;
+          // settingsManager.satShader.minSize = 8;
+          // settingsManager.satShader.maxAllowedSize = 45;
+          // settingsManager.pickingDotSize = '32.0';
+          // settingsManager.satShader.maxSize = 70;
 
           settingsManager.isDisableStars = true;
           settingsManager.isDisableLaunchSites = true;
           settingsManager.isDisableControlSites = true;
 
-          keepTrackApi.register({
-            event: KeepTrackApiEvents.selectSatData,
-            cbName: 'MobileManager.selectSatData',
-            cb: () => {
-              keepTrackApi.getUiManager().searchManager.closeSearch();
-            },
-          });
-
-          keepTrackApi.register({
-            event: KeepTrackApiEvents.uiManagerFinal,
-            cbName: 'MobileManager.uiManagerFinal',
-            cb: () => {
-              getEl('tutorial-btn').style.display = 'none';
-            },
-          });
-
           settingsManager.maxAnalystSats = 1;
           settingsManager.maxFieldOfViewMarkers = 1;
           settingsManager.maxMissiles = 1;
-          settingsManager.minDistanceFromSatellite = <Kilometers>50;
+          settingsManager.minDistanceFromSatellite = <Kilometers>4;
           settingsManager.isLoadLastSensor = false;
         } else {
           settingsManager.maxOribtsDisplayed = settingsManager.maxOribtsDisplayedDesktop;

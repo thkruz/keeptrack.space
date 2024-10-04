@@ -91,6 +91,12 @@ a,
   height: var(--nav-bar-height);
 }
 
+@media (orientation: landscape) {
+  #nav-wrapper {
+    height: 59px;
+  }
+}
+
 #nav-footer-toggle {
   display: block;
   border-top-left-radius: 12px;
@@ -366,12 +372,36 @@ ul {
   /* border-color: var(--colorTertiaryDarken3); */
 }
 
-/* si la pantalla es menor a 1024px  y mayor a 768px */
-@media (max-width: 1024px) and (min-width: 768px) {
+@media (max-width: 768px) and (orientation: landscape) {
+  .search-result-scc {
+    display: none;
+  }
+
+  #toggle-search-icon {
+    display: none !important;
+  }
+
   #search-results {
-    margin-top: 0px;
+    bottom: 0px;
+    width: min-content;
+  }
+
+  #sateliot-logo-container {
+    width: 100%;
+  }
+
+  #sateliot-logo {}
+}
+
+
+
+@media (orientation : portrait) {
+  #search-results {
+    bottom: 0px;
   }
 }
+
+
 
 .search-result {
   padding: 6px 10px;
@@ -990,8 +1020,7 @@ input:focus {
 
 #datetime-text {
   font-family: 'Roboto Mono', monospace;
-  font-size: 20px;
-  cursor: pointer;
+  font-size: 1.3 em;
   border-width: 0px;
 }
 
@@ -1005,6 +1034,7 @@ input:focus {
   font-size: 20px;
   font-family: 'Roboto Mono', monospace;
   margin-left: 10px;
+  width: 100%;
 }
 
 #nav-mobile2 {
@@ -1017,11 +1047,6 @@ input:focus {
 
 #nav-mobile2 a:hover {
   filter: brightness(3);
-}
-
-#sensor-selected-container:hover,
-#datetime-text:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 #sensor-selected-container {

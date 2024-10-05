@@ -33,7 +33,7 @@ export class ConeMesh extends CustomMesh {
   pos: vec3 = vec3.create();
   // SATELIOT
   // offsetDistance: number = (RADIUS_OF_EARTH + 80) as Kilometers;
-  offsetDistance: number = (RADIUS_OF_EARTH - 80) as Kilometers;
+  offsetDistance: number = (RADIUS_OF_EARTH + 10) as Kilometers;
   obj: BaseObject;
 
 

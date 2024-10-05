@@ -43,7 +43,6 @@ export class MobileManager {
 
           // hide datetime
           hideEl('datetime');
-          console.log("Seguir por aquí");
 
           settingsManager.isDisableGodrays = true;
           settingsManager.isDisableSkybox = true;

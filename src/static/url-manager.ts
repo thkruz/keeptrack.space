@@ -151,7 +151,12 @@ export abstract class UrlManager {
 
       return;
     }
-    timeManagerInstance.changeStaticOffset(Number(val) - Date.now());
+
+    uiManagerInstance.toast('Simulation time will be updated once catalog finishes processing!', ToastMsgType.normal, true);
+    setTimeout(() => {
+      uiManagerInstance.toast('Simulation time updated!', ToastMsgType.normal, true);
+      timeManagerInstance.changeStaticOffset(Number(val) - Date.now());
+    }, 10000);
   }
 
   private static handleRateParam_(val: string) {

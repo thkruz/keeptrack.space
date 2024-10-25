@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.2.2
+
+>  
+
+- fix: :zap: improve orbit finder algorithm for breakups
+- fix: :bug: fix linter and tests
+- docs: :memo: update CHANGELOG
+
 #### v10.2.1
 
 >  

@@ -18,7 +18,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class Breakup extends KeepTrackPlugin {
   readonly id = 'Breakup';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
@@ -69,8 +69,9 @@ export class Breakup extends KeepTrackPlugin {
           <div class="input-field col s12">
             <select id="hc-inc">
               <option value="0">0 Degrees</option>
+              <option value="0.05" selected>0.05 Degrees</option>
               <option value="0.1">0.1 Degrees</option>
-              <option value="0.2" selected>0.2 Degrees</option>
+              <option value="0.2">0.2 Degrees</option>
               <option value="0.3">0.3 Degrees</option>
               <option value="0.4">0.4 Degrees</option>
               <option value="0.5">0.5 Degrees</option>
@@ -85,10 +86,12 @@ export class Breakup extends KeepTrackPlugin {
           <div class="input-field col s12">
             <select id="hc-per">
               <option value="0">0 Percent</option>
+              <option value="0.025" selected>0.25 Percent</option>
               <option value="0.005">0.5 Percent</option>
+              <option value="0.075">0.75 Percent</option>
               <option value="0.01">1 Percent</option>
               <option value="0.015">1.5 Percent</option>
-              <option value="0.02" selected>2 Percent</option>
+              <option value="0.02">2 Percent</option>
               <option value="0.025">2.5 Percent</option>
               <option value="0.03">3 Percent</option>
               <option value="0.035">3.5 Percent</option>
@@ -101,8 +104,9 @@ export class Breakup extends KeepTrackPlugin {
           <div class="input-field col s12">
             <select id="hc-raan">
             <option value="0">0 Degrees</option>
+              <option value="0.05" selected>0.05 Degrees</option>
               <option value="0.1">0.1 Degrees</option>
-              <option value="0.2" selected>0.2 Degrees</option>
+              <option value="0.2">0.2 Degrees</option>
               <option value="0.3">0.3 Degrees</option>
               <option value="0.4">0.4 Degrees</option>
               <option value="0.5">0.5 Degrees</option>
@@ -116,12 +120,14 @@ export class Breakup extends KeepTrackPlugin {
           </div>
           <div class="input-field col s12">
             <select id="hc-count">
+              <option value="5">5</option>
               <option value="10">10</option>
               <option value="25" selected>25</option>
               <option value="50">50</option>
               <option value="100">100</option>
-              <option value="200">200</option>
+              <option value="200">250</option>
               <option value="500">500</option>
+              <option value="750">750</option>
               <option value="1000">1000</option>
             </select>
             <label>Pieces</label>
@@ -187,6 +193,7 @@ export class Breakup extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('hc-scc')).value = (obj as DetailedSatellite).sccNum;
   }
 
+  // eslint-disable-next-line max-statements
   private onSubmit_(): void {
     const { simulationTimeObj } = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -219,16 +226,22 @@ export class Breakup extends KeepTrackPlugin {
       return;
     }
 
-    const alt = mainsat.apogee - mainsat.perigee < 300 ? 0 : lla.alt; // Ignore argument of perigee for round orbits OPTIMIZE
+    const alt = mainsat.apogee - mainsat.perigee < 1000 ? 0 : lla.alt; // Ignore argument of perigee for round orbits OPTIMIZE
     const tles = new OrbitFinder(mainsat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt as Kilometers).rotateOrbitToLatLon();
     const tle1 = tles[0];
     const tle2 = tles[1];
+
+    if (tle1 === 'Error') {
+      errorManagerInstance.error(new Error(tle2), 'breakup.ts', i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
+
+      return;
+    }
 
     const newSat = new DetailedSatellite({
       ...mainsat,
       ...{
         id: satId,
-        tle1: tle1 as TleLine1,
+        tle1,
         tle2: tle2 as TleLine2,
         active: true,
       },
@@ -314,7 +327,7 @@ export class Breakup extends KeepTrackPlugin {
         const a5Num = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
         const satId = catalogManagerInstance.sccNum2Id(a5Num);
 
-        iTle1 = `1 ${a5Num}${iTle1.substring(7)}`;
+        iTle1 = `1 ${a5Num}${iTle1.substring(7)}` as TleLine1;
         iTle2 = `2 ${a5Num} ${incStr} ${iTle2.substring(17, 52)}${meanmoStr}${iTle2.substring(63)}`;
 
         if (iTle1.length !== 69) {
@@ -331,7 +344,7 @@ export class Breakup extends KeepTrackPlugin {
             ...catalogManagerInstance.objectCache[satId],
             ...{
               id: satId,
-              tle1: iTle1 as TleLine1,
+              tle1: iTle1,
               tle2: iTle2 as TleLine2,
               active: true,
             },

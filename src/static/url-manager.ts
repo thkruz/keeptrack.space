@@ -155,7 +155,7 @@ export abstract class UrlManager {
     uiManagerInstance.toast('Simulation time will be updated once catalog finishes processing!', ToastMsgType.normal, true);
     setTimeout(() => {
       uiManagerInstance.toast('Simulation time updated!', ToastMsgType.normal, true);
-    timeManagerInstance.changeStaticOffset(Number(val) - Date.now());
+      timeManagerInstance.changeStaticOffset(Number(val) - Date.now());
     }, 10000);
   }
 

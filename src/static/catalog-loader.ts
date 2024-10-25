@@ -8,10 +8,8 @@ import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCrunche
 import {
   BaseObject,
   CatalogSource,
-  Degrees,
   DetailedSatellite,
   DetailedSensor,
-  Kilometers,
   LandObject,
   Marker,
   Sensor,

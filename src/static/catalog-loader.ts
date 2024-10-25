@@ -576,9 +576,9 @@ export class CatalogLoader {
           };
         } else if (obj.isMissile()) {
           data = {
-            latList: (obj as MissileObject).latList as Degrees[],
-            lonList: (obj as MissileObject).lonList as Degrees[],
-            altList: (obj as MissileObject).altList as Kilometers[],
+            latList: (obj as MissileObject).latList,
+            lonList: (obj as MissileObject).lonList,
+            altList: (obj as MissileObject).altList,
           };
         } else if (obj.isStar()) {
           data.ra = (obj as Star).ra;

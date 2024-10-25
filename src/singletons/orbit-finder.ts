@@ -1,12 +1,5 @@
-import { Degrees, DetailedSatellite, EciVec3, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2, eci2lla } from 'ootk';
-import { StringPad } from '../lib/stringPad';
+import { Degrees, DetailedSatellite, EciVec3, Kilometers, Sgp4, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { SatMath } from '../static/sat-math';
-
-enum PropagationOptions {
-  MeanAnomaly = 1,
-  RightAscensionOfAscendingNode = 2,
-  ArgumentOfPerigee = 3,
-}
 
 enum PropagationResults {
   Near = 0,
@@ -15,389 +8,477 @@ enum PropagationResults {
   Far = 3,
 }
 
+interface OrbitParameters {
+  meanAnomaly: number;
+  argOfPerigee: number;
+  raan: number;
+  altitude: number;
+  latitude: number;
+  longitude: number;
+}
+
 export class OrbitFinder {
   static readonly MAX_LAT_ERROR = <Degrees>0.1;
   static readonly MAX_LON_ERROR = <Degrees>0.1;
-  static readonly MAX_ALT_ERROR = <Kilometers>30;
-  intl: string;
-  epochyr: string;
-  epochday: string;
-  meanmo: string;
-  inc: string;
-  ecen: string;
-  TLE1Ending: string;
-  newMeana: string;
-  newArgPer: string;
-  goalAlt: number;
-  raanOffset: number;
-  lastLat: number;
-  currentDirection: 'N' | 'S';
-  sat: DetailedSatellite;
-  goalDirection: string;
-  goalLon: number;
-  goalLat: number;
-  now: Date;
-  argPerCalcResults: PropagationResults;
-  meanACalcResults: PropagationResults;
-  raanCalcResults: PropagationResults;
-  argPer: string;
+  static readonly MAX_ALT_ERROR = <Kilometers>10;
 
-  constructor(sat: DetailedSatellite, goalLat: Degrees, goalLon: Degrees, goalDirection: 'N' | 'S', now: Date, goalAlt?: Kilometers, raanOffset?: number) {
+  static readonly MAX_ITERATIONS = 1000;
+  static readonly COARSE_STEP = 1.0; // degrees
+  static readonly FINE_STEP = 0.1; // degrees
+
+  private readonly sat: DetailedSatellite;
+  private readonly goalParams: OrbitParameters;
+  private readonly now: Date;
+  private readonly goalDirection: 'N' | 'S';
+  private currentParams: OrbitParameters;
+  private lastLatitude: number | null = null;
+  private currentDirection: 'N' | 'S' | null = null;
+
+  constructor(
+    sat: DetailedSatellite,
+    goalLat: Degrees,
+    goalLon: Degrees,
+    goalDirection: 'N' | 'S',
+    now: Date,
+    goalAlt?: Kilometers,
+    raanOffset: number = 0,
+  ) {
     this.sat = sat;
     this.now = now;
-    this.goalLat = goalLat;
-    this.goalLon = goalLon;
     this.goalDirection = goalDirection;
-    this.newMeana = null;
-    this.newArgPer = null;
-    this.goalAlt = goalAlt || null;
-    this.raanOffset = raanOffset || 0;
-    this.lastLat = null;
-    this.currentDirection = null;
-    this.argPerCalcResults = null;
-    this.meanACalcResults = null;
-    this.raanCalcResults = null;
+    this.goalParams = {
+      meanAnomaly: 0,
+      argOfPerigee: sat.argOfPerigee,
+      raan: sat.rightAscension + raanOffset,
+      altitude: goalAlt || 0,
+      latitude: goalLat,
+      longitude: goalLon,
+    };
+    this.currentParams = this.getCurrentOrbitParams();
   }
 
-  /**
-   * Rotates a satellite's orbit to a given latitude and longitude at a given time, and returns the new orbit's RAAN and argument of perigee.
-   * @param sat The satellite object.
-   * @param goalLat The desired latitude in degrees.
-   * @param goalLon The desired longitude in degrees.
-   * @param goalDirection The desired direction of the satellite's movement ('N' for north or 'S' for south).
-   * @param now The current time.
-   * @param goalAlt The desired altitude in kilometers (optional, defaults to the satellite's current altitude).
-   * @param raanOffset The desired RAAN offset in degrees (optional, defaults to 0).
-   * @returns An array containing the new RAAN and argument of perigee in degrees.
-   */
-  rotateOrbitToLatLon(): [string, string] {
-    this.parseTle();
+  private getCurrentOrbitParams(): OrbitParameters {
+    const { m, gmst } = SatMath.calculateTimeVariables(this.now, this.sat.satrec);
+    const positionEci = <EciVec3>Sgp4.propagate(this.sat.satrec, m).position;
+    const { lat, lon, alt } = eci2lla(positionEci, gmst);
 
-    this.meanACalcResults = this.meanACalcLoop(this.now, this.goalDirection);
-    if (this.meanACalcResults !== PropagationResults.Success) {
-      return ['Error', 'Failed to find a solution for Mean Anomaly'];
-    }
-
-    if (this.goalAlt > 0) {
-      const argPerCalcResults = this.argPerCalcLoop();
-
-      if (argPerCalcResults !== PropagationResults.Success) {
-        return ['Error', 'Failed to find a solution for Argument of Perigee'];
-      }
-    }
-
-    this.raanCalcResults = this.raanCalcLoop(this.raanOffset, this.now);
-    if (this.raanCalcResults !== PropagationResults.Success) {
-      return ['Error', 'Failed to find a solution for Right Ascension of Ascending Node'];
-    }
-
-    return [this.sat.tle1, this.sat.tle2];
+    return {
+      meanAnomaly: this.sat.meanAnomaly,
+      argOfPerigee: this.sat.argOfPerigee,
+      raan: this.sat.rightAscension,
+      altitude: alt,
+      latitude: lat,
+      longitude: lon,
+    };
   }
 
-  private argPerCalcLoop(): PropagationResults {
-    this.meanACalcResults = PropagationResults.Near;
-    for (let offset = 0; offset < 360 * 10; offset += 1) {
-      // Start with this.argPer - 10 degrees
-      let posVal = parseFloat(this.argPer) * 10 - 100 + offset;
+  private determineDirection(newLat: number): 'N' | 'S' | null {
+    if (this.lastLatitude === null) {
+      console.error(`Initial latitude: ${newLat}`);
+      this.lastLatitude = newLat;
 
-      if (posVal > 360 * 10) {
-        posVal -= 360 * 10;
-      }
-      this.argPerCalcResults = this.argPerCalc(posVal.toString(), this.now);
-
-      // Found it
-      if (this.argPerCalcResults === PropagationResults.Success) {
-        if (this.meanACalcResults === PropagationResults.Success) {
-          if (this.currentDirection === this.goalDirection) {
-            break;
-          }
-        }
-      }
-
-      // Really far away
-      if (this.argPerCalcResults === PropagationResults.Far) {
-        offset += 49;
-      }
-
-      // Broke
-      if (this.argPerCalcResults === PropagationResults.Error) {
-        return PropagationResults.Error;
-      }
-
-      this.meanACalcResults = this.meanACalcLoop2();
-      if (this.meanACalcResults === PropagationResults.Success) {
-        if (this.currentDirection !== this.goalDirection) {
-          offset += 20;
-        } else if (this.argPerCalcResults === PropagationResults.Success) {
-          break;
-        }
-      }
-      offset = this.meanACalcResults === PropagationResults.Far ? offset + 100 : offset;
-      if (this.meanACalcResults === PropagationResults.Error) {
-        return PropagationResults.Error;
-      }
+      return null;
     }
 
-    return this.argPerCalcResults;
-  }
-
-  private meanACalcLoop2(): PropagationResults {
-    for (let posVal = 0; posVal < 520 * 10; posVal += 1) {
-      this.meanACalcResults = this.meanACalc(posVal, this.now);
-      if (this.meanACalcResults === PropagationResults.Success) {
-        if (this.currentDirection !== this.goalDirection) {
-          posVal += 20;
-        } else {
-          break;
-        }
-      }
-      posVal = this.meanACalcResults === PropagationResults.Far ? posVal + 100 : posVal;
-      if (this.meanACalcResults === PropagationResults.Error) {
-        return PropagationResults.Error;
-      }
+    if (this.currentDirection && Math.abs(newLat - this.lastLatitude) < 0.01) {
+      return this.currentDirection; // Maintain current direction if change is negligible
     }
 
-    return this.meanACalcResults;
+    const direction = newLat > this.lastLatitude ? 'N' : 'S';
+
+    console.warn(`Current latitude: ${this.lastLatitude} - New latitude: ${newLat} - Direction: ${direction}`);
+
+    this.lastLatitude = newLat;
+
+    console.warn(`New direction: ${direction}`);
+
+    return direction;
   }
 
-  /** Parse some values used in creating new TLEs */
-  private parseTle() {
-    this.intl = this.sat.tle1.substring(9, 17);
-    this.epochyr = this.sat.tle1.substring(18, 20);
-    this.epochday = this.sat.tle1.substring(20, 32);
-    this.meanmo = this.sat.tle2.substring(52, 63);
-    this.argPer = StringPad.pad0(this.sat.argOfPerigee.toFixed(4), 8);
-    this.inc = StringPad.pad0(this.sat.inclination.toFixed(4), 8);
-    this.ecen = this.sat.eccentricity.toFixed(7).substring(2, 9);
-    /*
-     * Disregarding the first and second derivatives of mean motion
-     * Just keep whatever was in the original TLE
-     */
-    this.TLE1Ending = this.sat.tle1.substring(32, 71);
+  private isCorrectDirection(): boolean {
+    console.log(`Current direction: ${this.currentDirection} - Goal direction: ${this.goalDirection}`);
+
+    return this.currentDirection === this.goalDirection;
   }
 
-  /** Rotate Mean Anomaly 0.1 Degree at a Time for Up To 520 Degrees */
-  private meanACalcLoop(now: Date, goalDirection: string) {
-    let result = PropagationResults.Near;
+  private updateOrbit(newParams: Partial<OrbitParameters>): boolean {
+    // Create new TLE with updated parameters
+    const tle1 = this.generateTle1();
+    const tle2 = this.generateTle2(newParams);
 
-    for (let posVal = 0; posVal < 520 * 10; posVal += 1) {
-      result = this.meanACalc(posVal, now);
+    const satrec = Sgp4.createSatrec(tle1, tle2);
+
+    if (!satrec) {
+      throw new Error('Invalid orbit parameters');
+    }
+
+    // Update current parameters and check direction
+    const { m, gmst } = SatMath.calculateTimeVariables(this.now, satrec);
+    const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+    const { lat, lon, alt } = eci2lla(positionEci, gmst);
+
+    // Update direction
+    const newDirection = this.determineDirection(lat);
+
+    if (newDirection !== null) {
+      this.currentDirection = newDirection;
+    }
+
+    // Update current parameters
+    this.currentParams = {
+      ...this.currentParams,
+      ...newParams,
+      latitude: lat,
+      longitude: lon,
+      altitude: alt,
+    };
+
+    return this.isCorrectDirection();
+  }
+
+  private meanACalcLoop(direction: 'N' | 'S'): PropagationResults {
+    // Start searching from different points based on desired direction
+    const startVal = direction === 'N' ? 0 : 180;
+    const endVal = direction === 'N' ? 360 : 540; // For 'S', search beyond 360 to handle wrap-around
+
+    for (let posVal = startVal * 10; posVal < endVal * 10; posVal += 1) {
+      const normalizedVal = posVal % (360 * 10); // Normalize to 0-360 range
+      const result = this.meanACalc(normalizedVal, this.now);
+
       if (result === PropagationResults.Success) {
-        if (this.currentDirection !== goalDirection) {
-          /*
-           * Move 2 Degrees ahead in the orbit to prevent being close on the next lattiude check
-           * This happens when the goal latitude is near the poles
-           */
-          posVal += 20;
+        if (this.currentDirection !== direction) {
+          posVal += 20; // Skip ahead if direction is wrong
         } else {
-          break; // Stop changing the Mean Anomaly
+          return PropagationResults.Success;
         }
       }
+
       if (result === PropagationResults.Far) {
         posVal += 100;
       }
-    }
 
-    return result;
-  }
-
-  private raanCalcLoop(raanOffset: number, now: Date) {
-    let raanCalcResults = PropagationResults.Near;
-
-    for (let posVal = 0; posVal < 520 * 100; posVal += 1) {
-      // 520 degress in 0.01 increments TODO More precise?
-      raanCalcResults = this.raanCalc(posVal, raanOffset, now);
-      if (raanCalcResults === PropagationResults.Success) {
-        break;
-      }
-      if (raanCalcResults === PropagationResults.Far) {
-        posVal += 10 * 100;
+      if (result === PropagationResults.Error) {
+        return PropagationResults.Error;
       }
     }
 
-    return raanCalcResults;
+    return PropagationResults.Near;
   }
 
-  /**
-   * Rotating the mean anomaly adjusts the latitude (and longitude) of the satellite.
-   * @param {number} meana - This is the mean anomaly (where it is along the orbital plane)
-   * @returns {PropagationResults} This number tells the main loop what to do next
-   */
   private meanACalc(meana: number, now: Date): PropagationResults {
-    const sat = this.sat;
-
-    let satrec = sat.satrec || Sgp4.createSatrec(sat.tle1, sat.tle2); // perform and store sat init calcs
-
     meana /= 10;
-    const meanaStr = StringPad.pad0(meana.toFixed(4), 8);
+    meana %= 360; // Normalize to 0-360 range
 
-    const raan = StringPad.pad0(sat.rightAscension.toFixed(4), 8);
+    const tle1 = this.generateTle1();
+    const tle2 = this.generateTle2({ meanAnomaly: meana });
 
-    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0(sat.argOfPerigee.toFixed(4), 8);
+    const satrec = Sgp4.createSatrec(tle1, tle2);
 
-    const _TLE1Ending = sat.tle1.substring(32, 71);
-    const tle1 = `1 ${sat.sccNum}U ${this.intl} ${this.epochyr}${this.epochday}${_TLE1Ending}`; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    const tle2 = `2 ${sat.sccNum} ${this.inc} ${raan} ${this.ecen} ${argPe} ${meanaStr} ${this.meanmo}    10`;
-
-    satrec = Sgp4.createSatrec(tle1, tle2);
-    const results = this.getOrbitByLatLonPropagate(now, satrec, PropagationOptions.MeanAnomaly);
-
-    if (results === PropagationResults.Success) {
-      sat.tle1 = tle1 as TleLine1;
-      sat.tle2 = tle2 as TleLine2;
-      this.newMeana = meanaStr;
-    }
-
-    return results;
-  }
-
-  private getOrbitByLatLonPropagate(nowIn: Date, satrec: SatelliteRecord, type: PropagationOptions): PropagationResults {
-    const { m, gmst } = SatMath.calculateTimeVariables(nowIn, satrec);
-    const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
-
-    if (isNaN(positionEci.x) || isNaN(positionEci.y) || isNaN(positionEci.z)) {
+    if (!satrec) {
       return PropagationResults.Error;
     }
-    const gpos = eci2lla(positionEci, gmst);
 
-    const { lat: latDeg, lon: lonDeg, alt } = gpos;
-    // Set it the first time
+    const { m, gmst } = SatMath.calculateTimeVariables(now, satrec);
+    const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+    const { lat } = eci2lla(positionEci, gmst);
 
-    this.lastLat = this.lastLat ? this.lastLat : latDeg;
-
-    if (type === PropagationOptions.MeanAnomaly) {
-      if (latDeg === this.lastLat) {
-        return 0; // Not enough movement, skip this
+    // Update direction
+    if (this.lastLatitude !== null) {
+      if (Math.abs(lat - this.lastLatitude) > 0.001) {
+        this.currentDirection = lat > this.lastLatitude ? 'N' : 'S';
       }
+    }
+    this.lastLatitude = lat;
 
-      if (latDeg > this.lastLat) {
-        this.currentDirection = 'N';
+    // Check if we're at the target latitude with correct direction
+    if (Math.abs(lat - this.goalParams.latitude) <= OrbitFinder.MAX_LAT_ERROR) {
+      if (this.currentDirection === this.goalDirection) {
+        this.currentParams.meanAnomaly = meana;
+
+        return PropagationResults.Success;
       }
-      if (latDeg < this.lastLat) {
-        this.currentDirection = 'S';
-      }
-
-      this.lastLat = latDeg;
     }
 
-    if (type === PropagationOptions.MeanAnomaly && latDeg > this.goalLat - OrbitFinder.MAX_LAT_ERROR && latDeg < this.goalLat + OrbitFinder.MAX_LAT_ERROR) {
-      /*
-       * Debugging Code:
-       * const distance = Math.sqrt(
-       *   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
-       * );
-       * console.log('Distance from Origin: ' + distance);
-       */
-      return PropagationResults.Success;
-    }
-
-    if (type === PropagationOptions.RightAscensionOfAscendingNode && lonDeg > this.goalLon - OrbitFinder.MAX_LON_ERROR && lonDeg < this.goalLon + OrbitFinder.MAX_LON_ERROR) {
-      /*
-       * Debugging Code:
-       * const distance = Math.sqrt(
-       *   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
-       * );
-       * console.log('Distance from Origin: ' + distance);
-       */
-      return PropagationResults.Success;
-    }
-
-    if (type === PropagationOptions.ArgumentOfPerigee && alt > this.goalAlt - OrbitFinder.MAX_ALT_ERROR && alt < this.goalAlt + OrbitFinder.MAX_ALT_ERROR) {
-      /*
-       * Debugging Code:
-       * const distance = Math.sqrt(
-       *   Math.pow(positionEci.x - initialPosition.x, 2) + Math.pow(positionEci.y - initialPosition.y, 2) + Math.pow(positionEci.z - initialPosition.z, 2)
-       * );
-       * console.log('Distance from Origin: ' + distance);
-       */
-      return PropagationResults.Success;
-    }
-
-    // If current latitude greater than 11 degrees off rotate meanA faster
-    if (type === PropagationOptions.MeanAnomaly && !(latDeg > this.goalLat - 11 && latDeg < this.goalLat + 11)) {
-      return PropagationResults.Far;
-    }
-
-    // If current longitude greater than 11 degrees off rotate raan faster
-    if (type === PropagationOptions.RightAscensionOfAscendingNode && !(lonDeg > this.goalLon - 11 && lonDeg < this.goalLon + 11)) {
-      return PropagationResults.Far;
-    }
-
-    // If current altitude greater than 100 km off rotate augPerigee faster
-    if (type === PropagationOptions.ArgumentOfPerigee && (alt < this.goalAlt - 100 || alt > this.goalAlt + 100)) {
+    // Check if we're far from target
+    if (Math.abs(lat - this.goalParams.latitude) > 11) {
       return PropagationResults.Far;
     }
 
     return PropagationResults.Near;
   }
 
-  /**
-   * Rotating the mean anomaly adjusts the latitude (and longitude) of the satellite.
-   * @param {number} raan - This is the right ascension of the ascending node (where it rises above the equator relative to a specific star)
-   * @param {number} raanOffsetIn - This allows the main thread to send a guess of the raan
-   * @returns {PropagationResults} This number tells the main loop what to do next
-   */
-  private raanCalc(raan: number, raanOffsetIn: number, now: Date): PropagationResults {
-    const origRaan = raan;
+  private linearSearchRaan(): number {
+    let bestValue = this.currentParams.raan;
+    let bestError = Infinity;
 
-    raan /= 100;
-    raan = raan > 360 ? raan - 360 : raan;
+    // Initial coarse search
+    for (let raan = 0; raan < 360; raan += 5) {
+      // Don't check direction for RAAN adjustments
+      this.updateOrbit({ raan });
+      const error = Math.abs(this.calculateError('raan'));
 
-    const raanStr = StringPad.pad0(raan.toFixed(4), 8);
+      if (error < Math.abs(bestError)) {
+        bestError = error;
+        bestValue = raan;
+      }
 
-    // If we adjusted argPe use the new one - otherwise use the old one
-    const argPe = this.newArgPer ? StringPad.pad0((parseFloat(this.newArgPer) / 10).toFixed(4), 8) : StringPad.pad0(this.sat.argOfPerigee.toFixed(4), 8);
+      if (error < OrbitFinder.MAX_LON_ERROR) {
+        // Fine tune around best value
+        for (let fineRaan = bestValue - 5; fineRaan <= bestValue + 5; fineRaan += 0.1) {
+          const normalizedRaan = ((fineRaan % 360) + 360) % 360;
 
-    const tle1 = `1 ${this.sat.sccNum}U ${this.intl} ${this.epochyr}${this.epochday}${this.TLE1Ending}`; // M' and M'' are both set to 0 to put the object in a perfect stable orbit
-    const tle2 = `2 ${this.sat.sccNum} ${this.inc} ${raanStr} ${this.ecen} ${argPe} ${this.newMeana} ${this.meanmo}    10`;
+          this.updateOrbit({ raan: normalizedRaan });
+          const fineError = Math.abs(this.calculateError('raan'));
 
-    const satrec = Sgp4.createSatrec(tle1, tle2);
-    const results = this.getOrbitByLatLonPropagate(now, satrec, PropagationOptions.RightAscensionOfAscendingNode);
+          if (fineError < error) {
+            bestValue = normalizedRaan;
+            bestError = fineError;
+          }
+        }
 
-    // If we have a good guess of the raan, we can use it, but need to apply the offset to the original raan
-    if (results === PropagationResults.Success) {
-      raan = origRaan / 100 + raanOffsetIn;
-      raan = raan > 360 ? raan - 360 : raan;
-      raan = raan < 0 ? raan + 360 : raan;
-
-      const _raanStr = StringPad.pad0(raan.toFixed(4), 8);
-
-      const _TLE2 = `2 ${this.sat.sccNum} ${this.inc} ${_raanStr} ${this.ecen} ${argPe} ${this.newMeana} ${this.meanmo}    10`;
-
-      this.sat.tle1 = tle1 as TleLine1;
-      this.sat.tle2 = _TLE2 as TleLine2;
+        return bestValue;
+      }
     }
 
-    return results;
+    return bestValue;
   }
 
-  /**
-   * We need to adjust the argument of perigee to align a HEO orbit with the desired launch location
-   * @param {string} argPe - This is the guess for the argument of perigee (where the lowest part of the orbital plane is)
-   * @returns {PropagationResults} This number tells the main loop what to do next
-   */
-  argPerCalc(argPe: string, now: Date): PropagationResults {
-    const meana = this.newMeana;
-    const raan = StringPad.pad0(this.sat.rightAscension.toFixed(4), 8);
+  private normalizeAngleDifference(angle1: number, angle2: number): number {
+    const diff = (angle1 - angle2) % 360;
 
-    argPe = StringPad.pad0((parseFloat(argPe) / 10).toFixed(4), 8);
 
-    // Create the new TLEs
-    const tle1 = (`1 ${this.sat.sccNum}U ${this.intl} ${this.epochyr}${this.epochday}${this.TLE1Ending}`) as TleLine1;
-    const tle2 = (`2 ${this.sat.sccNum} ${this.inc} ${raan} ${this.ecen} ${argPe} ${meana} ${this.meanmo}    10`) as TleLine2;
-
-    // Calculate the orbit
-    const satrec = Sgp4.createSatrec(tle1, tle2);
-
-    // Check the orbit
-    const results = this.getOrbitByLatLonPropagate(now, satrec, PropagationOptions.ArgumentOfPerigee);
-
-    if (results === PropagationResults.Success) {
-      this.sat.tle1 = tle1;
-      this.sat.tle2 = tle2;
-      this.newArgPer = argPe;
+    if (diff > 180) {
+      return diff - 360;
+    } else if (diff < -180) {
+      return diff + 360;
     }
 
-    return results;
+    return diff;
+
+  }
+
+  private calculateError(param: keyof OrbitParameters): number {
+    switch (param) {
+      case 'meanAnomaly':
+        return this.currentParams.latitude - this.goalParams.latitude;
+      case 'raan':
+        // Handle longitude wrapping at ±180°
+        return this.normalizeAngleDifference(
+          this.currentParams.longitude,
+          this.goalParams.longitude,
+        );
+      case 'argOfPerigee':
+        console.warn(`Current altitude: ${this.currentParams.altitude} - Goal altitude: ${this.goalParams.altitude}`);
+
+        return this.currentParams.altitude - this.goalParams.altitude;
+      default:
+        return 0;
+    }
+  }
+
+
+  private updateOrbitWithoutDirectionCheck(newParams: Partial<OrbitParameters>): void {
+    // Create new TLE with updated parameters
+    const tle1 = this.generateTle1();
+    const tle2 = this.generateTle2(newParams);
+
+    const satrec = Sgp4.createSatrec(tle1, tle2);
+
+    if (!satrec) {
+      throw new Error('Invalid orbit parameters');
+    }
+
+    // Update current parameters without direction check
+    const { m, gmst } = SatMath.calculateTimeVariables(this.now, satrec);
+    const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+    const { lat, lon, alt } = eci2lla(positionEci, gmst);
+
+    // Update current parameters
+    this.currentParams = {
+      ...this.currentParams,
+      ...newParams,
+      latitude: lat,
+      longitude: lon,
+      altitude: alt,
+    };
+  }
+
+  rotateOrbitToLatLon(): [TleLine1, TleLine2] | ['Error', string] {
+    try {
+      if (this.goalParams.altitude > 0) {
+        // 1. Find original perigee position
+        const perigeeParams = this.findPerigeePosition();
+
+        console.log('Original perigee position:', perigeeParams);
+
+        // 2. Move new satellite to perigee without direction check
+        this.updateOrbitWithoutDirectionCheck({
+          meanAnomaly: 0,
+        });
+        console.log('Positioned at initial perigee:', this.currentParams);
+
+        // 3. Rotate argument of perigee to match original latitude
+        let bestArgPerigee = this.currentParams.argOfPerigee;
+        let bestLatError = Infinity;
+
+        // Search for arg perigee that puts perigee at original latitude
+        for (let argPer = 0; argPer < 360; argPer += 1) {
+          this.updateOrbitWithoutDirectionCheck({
+            meanAnomaly: 0,
+            argOfPerigee: argPer,
+          });
+
+          const latError = Math.abs(this.currentParams.latitude - perigeeParams.latitude);
+
+          if (latError < bestLatError) {
+            bestLatError = latError;
+            bestArgPerigee = argPer;
+            console.log(`New best arg perigee: ${argPer} with lat error ${latError}`);
+          }
+
+          if (latError <= OrbitFinder.MAX_LAT_ERROR) {
+            break;
+          }
+        }
+
+        // Apply best found arg perigee
+        this.updateOrbitWithoutDirectionCheck({
+          meanAnomaly: 0,
+          argOfPerigee: bestArgPerigee,
+        });
+
+        console.log('After arg perigee adjustment:', this.currentParams);
+
+        // 4. Now find the correct mean anomaly for target position
+        this.lastLatitude = null;
+        this.currentDirection = null;
+
+        const finalMeanAResult = this.meanACalcLoop(this.goalDirection);
+
+        if (finalMeanAResult !== PropagationResults.Success) {
+          return ['Error', 'Failed to find final target position'];
+        }
+
+        // 5. Adjust RAAN for longitude
+        const successfulDirection = this.currentDirection;
+        const newRaan = this.linearSearchRaan();
+
+        // 6. Final combined update
+        this.currentDirection = successfulDirection;
+        const finalSuccess = this.updateOrbit({
+          meanAnomaly: this.currentParams.meanAnomaly,
+          raan: newRaan,
+          argOfPerigee: bestArgPerigee,
+        });
+
+        if (!finalSuccess) {
+          return ['Error', 'Final position adjustment failed'];
+        }
+
+        // Verify final position
+        console.log('Final position:', this.currentParams);
+        console.log(`Target altitude: ${this.goalParams.altitude}, Current altitude: ${this.currentParams.altitude}`);
+
+      } else {
+        // Original logic for circular orbits
+        const result = this.meanACalcLoop(this.goalDirection);
+
+        if (result !== PropagationResults.Success) {
+          return ['Error', `Failed to find solution with ${this.goalDirection}bound direction`];
+        }
+
+        const meanAnomalySuccess = this.updateOrbit({
+          meanAnomaly: this.currentParams.meanAnomaly,
+        });
+
+        if (!meanAnomalySuccess) {
+          return ['Error', 'Mean anomaly adjustment resulted in incorrect direction'];
+        }
+
+        const successfulDirection = this.currentDirection;
+        const newRaan = this.linearSearchRaan();
+
+        this.currentDirection = successfulDirection;
+        const combinedSuccess = this.updateOrbit({
+          meanAnomaly: this.currentParams.meanAnomaly,
+          raan: newRaan,
+        });
+
+        if (!combinedSuccess) {
+          return ['Error', 'Combined mean anomaly and RAAN adjustment failed'];
+        }
+      }
+
+      return [
+        this.generateTle1(),
+        this.generateTle2(this.currentParams),
+      ];
+
+    } catch (error) {
+      console.error('Error in rotateOrbitToLatLon:', error);
+
+      return ['Error', error.message];
+    }
+  }
+
+  private findPerigeePosition(): OrbitParameters {
+    let lowestAltitude = Infinity;
+    let perigeeParams: OrbitParameters | null = null;
+
+    // More granular search through mean anomaly
+    for (let meanA = 0; meanA < 360; meanA += 0.5) {
+      const tle1 = this.generateTle1();
+      const tle2 = this.generateTle2({ meanAnomaly: meanA });
+      const satrec = Sgp4.createSatrec(tle1, tle2);
+
+      if (!satrec) {
+        continue;
+      }
+
+      const { m, gmst } = SatMath.calculateTimeVariables(this.now, satrec);
+      const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
+      const { lat, lon, alt } = eci2lla(positionEci, gmst);
+
+      if (alt < lowestAltitude) {
+        lowestAltitude = alt;
+        perigeeParams = {
+          meanAnomaly: meanA,
+          argOfPerigee: this.currentParams.argOfPerigee,
+          raan: this.currentParams.raan,
+          altitude: alt,
+          latitude: lat,
+          longitude: lon,
+        };
+      }
+    }
+
+    if (!perigeeParams) {
+      throw new Error('Failed to find perigee position');
+    }
+
+    console.log(`Found perigee at altitude ${perigeeParams.altitude} km`);
+
+    return perigeeParams;
+  }
+
+  private generateTle1(): TleLine1 {
+    return `1 ${this.sat.sccNum}U ${this.sat.tle1.substring(9, 17)} ${this.sat.tle1.substring(18, 32)}${this.sat.tle1.substring(32, 71)}` as TleLine1;
+  }
+
+  private generateTle2(newParams: Partial<OrbitParameters>): TleLine2 {
+    // Merge provided parameters with current parameters
+    const mergedParams = {
+      ...this.currentParams, // Use current parameters as base
+      ...newParams, // Override with any provided parameters
+    };
+
+    const inc = this.sat.inclination.toFixed(4).padStart(8, '0');
+    const raan = mergedParams.raan.toFixed(4).padStart(8, '0');
+    const ecc = this.sat.eccentricity.toFixed(7).substring(2, 9);
+    const argPer = mergedParams.argOfPerigee.toFixed(4).padStart(8, '0');
+    const meanA = mergedParams.meanAnomaly.toFixed(4).padStart(8, '0');
+    const meanMo = this.sat.tle2.substring(52, 63);
+
+    return `2 ${this.sat.sccNum} ${inc} ${raan} ${ecc} ${argPer} ${meanA} ${meanMo}    10` as TleLine2;
   }
 }

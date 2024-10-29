@@ -53,6 +53,7 @@
       "CannotCreateBreakupForNonCircularOrbits": "Cannot create a breakup for non-circular orbits. Working on a fix.",
       "CannotCalcDirectionOfSatellite": "Cannot calculate direction of satellite. Try again later.",
       "ErrorCreatingBreakup": "Error creating breakup!",
+      "InvalidStartNum": "Invalid satellite starting number! Defaulting to 90000!",
       "BreakupGeneratorFailed": "Breakup Generator Failed!"
     },
     "Collissions": {

@@ -67,8 +67,14 @@ export class Breakup extends KeepTrackPlugin {
             <label for="disabled" class="active">Satellite SCC#</label>
           </div>
           <div class="input-field col s12">
+            <input id="hc-startNum" type="text" value="90000" />
+            <label for="hc-startNum" class="active">Initial Satellite Number</label>
+          </div>
+          <div class="input-field col s12">
             <select id="hc-inc">
               <option value="0">0 Degrees</option>
+              <option value="0.005">0.005 Degrees</option>
+              <option value="0.025">0.025 Degrees</option>
               <option value="0.05" selected>0.05 Degrees</option>
               <option value="0.1">0.1 Degrees</option>
               <option value="0.2">0.2 Degrees</option>
@@ -85,25 +91,28 @@ export class Breakup extends KeepTrackPlugin {
           </div>
           <div class="input-field col s12">
             <select id="hc-per">
-              <option value="0">0 Percent</option>
-              <option value="0.025" selected>0.25 Percent</option>
-              <option value="0.005">0.5 Percent</option>
-              <option value="0.075">0.75 Percent</option>
-              <option value="0.01">1 Percent</option>
-              <option value="0.015">1.5 Percent</option>
-              <option value="0.02">2 Percent</option>
-              <option value="0.025">2.5 Percent</option>
-              <option value="0.03">3 Percent</option>
-              <option value="0.035">3.5 Percent</option>
-              <option value="0.04">4 Percent</option>
-              <option value="0.045">4.5 Percent</option>
-              <option value="0.05">5 Percent</option>
+              <option value="0">0 Minutes</option>
+              <option value="0.1" selected>0.1 Minutes</option>
+              <option value="0.15">0.15 Minutes</option>
+              <option value="0.25">0.25 Minutes</option>
+              <option value="0.3">0.3 Minutes</option>
+              <option value="0.5">0.5 Minutes</option>
+              <option value="0.75">0.75 Minutes</option>
+              <option value="1">1 Minute</option>
+              <option value="1.5">1.5 Minutes</option>
+              <option value="2">2 Minutes</option>
+              <option value="2.5">2.5 Minutes</option>
+              <option value="3">3 Minutes</option>
+              <option value="4">4 Minutes</option>
+              <option value="5">5 Minutes</option>
             </select>
             <label>Period Variation</label>
           </div>
           <div class="input-field col s12">
             <select id="hc-raan">
             <option value="0">0 Degrees</option>
+              <option value="0.005">0.005 Degrees</option>
+              <option value="0.025">0.025 Degrees</option>
               <option value="0.05" selected>0.05 Degrees</option>
               <option value="0.1">0.1 Degrees</option>
               <option value="0.2">0.2 Degrees</option>
@@ -198,7 +207,7 @@ export class Breakup extends KeepTrackPlugin {
     const { simulationTimeObj } = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    const { satId, breakupCount, rascVariation, incVariation, meanmoVariation } = Breakup.getFormData_(catalogManagerInstance);
+    const { satId, breakupCount, rascVariation, incVariation, meanmoVariation, startNum } = Breakup.getFormData_(catalogManagerInstance);
     const mainsat = catalogManagerInstance.getSat(satId);
     const origsat = mainsat;
 
@@ -226,7 +235,7 @@ export class Breakup extends KeepTrackPlugin {
       return;
     }
 
-    const alt = mainsat.apogee - mainsat.perigee < 1000 ? 0 : lla.alt; // Ignore argument of perigee for round orbits OPTIMIZE
+    const alt = mainsat.apogee - mainsat.perigee < 300 ? 0 : lla.alt; // Ignore argument of perigee for round orbits OPTIMIZE
     const tles = new OrbitFinder(mainsat, launchLat, launchLon, <'N' | 'S'>upOrDown, simulationTimeObj, alt as Kilometers).rotateOrbitToLatLon();
     const tle1 = tles[0];
     const tle2 = tles[1];
@@ -270,7 +279,7 @@ export class Breakup extends KeepTrackPlugin {
       if (i >= breakupCount) {
         break;
       }
-      const a5Num = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
+      const a5Num = Tle.convert6DigitToA5((startNum + i).toString());
       const id = catalogManagerInstance.sccNum2Id(a5Num);
 
       catalogManagerInstance.getObject(id); // TODO: This may be unnecessary needs tested
@@ -317,14 +326,14 @@ export class Breakup extends KeepTrackPlugin {
         // Mean Motion
         let meanmo = parseFloat(iTle2.substring(52, 62));
 
-        meanmo = meanmo + Math.random() * meanmoVariation * 2 - meanmoVariation;
+        meanmo = meanmo + (Math.random() * meanmoVariation * 2) - meanmoVariation;
         const meanmoStr = meanmo.toFixed(8).padStart(11, '0');
 
         if (meanmoStr.length !== 11) {
           throw new Error(`meanmo length is not 11 - ${meanmoStr} - ${iTle2}`);
         }
 
-        const a5Num = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString());
+        const a5Num = Tle.convert6DigitToA5((startNum + i).toString());
         const satId = catalogManagerInstance.sccNum2Id(a5Num);
 
         iTle1 = `1 ${a5Num}${iTle1.substring(7)}` as TleLine1;
@@ -344,6 +353,7 @@ export class Breakup extends KeepTrackPlugin {
             ...catalogManagerInstance.objectCache[satId],
             ...{
               id: satId,
+              name: `Breakup Piece ${i + 1}`,
               tle1: iTle1,
               tle2: iTle2 as TleLine2,
               active: true,
@@ -374,17 +384,24 @@ export class Breakup extends KeepTrackPlugin {
     if (breakupCount > settingsManager.searchLimit) {
       settingsManager.searchLimit = breakupCount;
     }
-    keepTrackApi.getUiManager().doSearch(`${mainsat.sccNum},Analyst`);
+    keepTrackApi.getUiManager().doSearch(`${mainsat.sccNum},Breakup Piece`);
   }
 
   private static getFormData_(catalogManagerInstance: CatalogManager) {
     const satId = catalogManagerInstance.sccNum2Id((<HTMLInputElement>getEl('hc-scc')).value);
-    const meanmoVariation = parseFloat((<HTMLInputElement>getEl('hc-per')).value);
+    const periodVariation = parseFloat((<HTMLInputElement>getEl('hc-per')).value);
     const incVariation = parseFloat((<HTMLInputElement>getEl('hc-inc')).value);
     const rascVariation = parseFloat((<HTMLInputElement>getEl('hc-raan')).value);
     const breakupCount = parseInt((<HTMLInputElement>getEl('hc-count')).value);
+    let startNum = parseInt((<HTMLInputElement>getEl('hc-startNum')).value);
 
+    if (isNaN(startNum)) {
+      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.InvalidStartNum'));
+      startNum = 90000;
+    }
 
-    return { satId, breakupCount, rascVariation, incVariation, meanmoVariation };
+    const meanmoVariation = periodVariation / 1440;
+
+    return { satId, breakupCount, rascVariation, incVariation, meanmoVariation, startNum };
   }
 }

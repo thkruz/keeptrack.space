@@ -1,7 +1,8 @@
+import { EditSat } from '@app/plugins/edit-sat/edit-sat';
 import { getEl } from '../lib/get-el';
 
 export abstract class UiValidation {
-  private static allowedCodes = [
+  private static readonly allowedCodes = [
     'Delete',
     'Backspace',
     'Tab',
@@ -18,7 +19,7 @@ export abstract class UiValidation {
     'ArrowDown',
   ];
 
-  private static numberCodes = [
+  private static readonly numberCodes = [
     'Numpad1',
     'Numpad2',
     'Numpad3',
@@ -49,15 +50,18 @@ export abstract class UiValidation {
     getEl('editSat')
       ?.querySelectorAll('input')
       .forEach((el: HTMLInputElement) => {
+        if (el.id === `${EditSat.elementPrefix}-country`) {
+          return;
+        }
         el.addEventListener('keydown', UiValidation.validateNumOnly_);
       });
-    getEl('es-ecen')?.addEventListener('keydown', UiValidation.allowPeriod_);
-    getEl('es-day')?.addEventListener('keyup', UiValidation.esDay366_);
-    getEl('es-inc')?.addEventListener('keyup', UiValidation.esInc180_);
-    getEl('es-rasc')?.addEventListener('keyup', UiValidation.esRasc360_);
-    getEl('es-meanmo')?.addEventListener('keyup', UiValidation.esMeanmo18_);
-    getEl('es-argPe')?.addEventListener('keyup', UiValidation.esArgPe360_);
-    getEl('es-meana')?.addEventListener('keyup', UiValidation.esMeana360_);
+    getEl(`${EditSat.elementPrefix}-ecen`)?.addEventListener('keydown', UiValidation.allowPeriod_);
+    getEl(`${EditSat.elementPrefix}-day`)?.addEventListener('keyup', UiValidation.esDay366_);
+    getEl(`${EditSat.elementPrefix}-inc`)?.addEventListener('keyup', UiValidation.esInc180_);
+    getEl(`${EditSat.elementPrefix}-rasc`)?.addEventListener('keyup', UiValidation.esRasc360_);
+    getEl(`${EditSat.elementPrefix}-meanmo`)?.addEventListener('keyup', UiValidation.esMeanmo18_);
+    getEl(`${EditSat.elementPrefix}-argPe`)?.addEventListener('keyup', UiValidation.esArgPe360_);
+    getEl(`${EditSat.elementPrefix}-meana`)?.addEventListener('keyup', UiValidation.esMeana360_);
     getEl('ms-lat')?.addEventListener('keyup', UiValidation.msLat90_);
     getEl('ms-lon')?.addEventListener('keyup', UiValidation.msLon180_);
   }
@@ -69,56 +73,56 @@ export abstract class UiValidation {
   }
 
   private static esArgPe360_(): void {
-    if (parseInt((<HTMLInputElement>getEl('es-argPe')).value) < 0) {
-      (<HTMLInputElement>getEl('es-argPe')).value = '000.0000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value) < 0) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = '000.0000';
     }
-    if (parseInt((<HTMLInputElement>getEl('es-argPe')).value) > 360) {
-      (<HTMLInputElement>getEl('es-argPe')).value = '360.0000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value) > 360) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-argPe`)).value = '360.0000';
     }
   }
 
   private static esDay366_() {
-    if (parseInt((<HTMLInputElement>getEl('es-day')).value) < 0) {
-      (<HTMLInputElement>getEl('es-day')).value = '000.00000000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value) < 0) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = '000.00000000';
     }
-    if (parseInt((<HTMLInputElement>getEl('es-day')).value) >= 367) {
-      (<HTMLInputElement>getEl('es-day')).value = '366.00000000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value) >= 367) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value = '366.00000000';
     }
   }
 
   private static esInc180_(): void {
-    if (parseInt((<HTMLInputElement>getEl('es-inc')).value) < 0) {
-      (<HTMLInputElement>getEl('es-inc')).value = '000.0000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value) < 0) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = '000.0000';
     }
-    if (parseInt((<HTMLInputElement>getEl('es-inc')).value) > 180) {
-      (<HTMLInputElement>getEl('es-inc')).value = '180.0000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value) > 180) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value = '180.0000';
     }
   }
 
   private static esMeana360_(): void {
-    if (parseInt((<HTMLInputElement>getEl('es-meana')).value) < 0) {
-      (<HTMLInputElement>getEl('es-meana')).value = '000.0000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value) < 0) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = '000.0000';
     }
-    if (parseInt((<HTMLInputElement>getEl('es-meana')).value) > 360) {
-      (<HTMLInputElement>getEl('es-meana')).value = '360.0000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value) > 360) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meana`)).value = '360.0000';
     }
   }
 
   private static esMeanmo18_(): void {
-    if (parseInt((<HTMLInputElement>getEl('es-meanmo')).value) < 0) {
-      (<HTMLInputElement>getEl('es-meanmo')).value = '00.00000000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value) < 0) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = '00.00000000';
     }
-    if (parseInt((<HTMLInputElement>getEl('es-meanmo')).value) > 18) {
-      (<HTMLInputElement>getEl('es-meanmo')).value = '18.00000000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value) > 18) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value = '18.00000000';
     }
   }
 
   private static esRasc360_(): void {
-    if (parseInt((<HTMLInputElement>getEl('es-rasc')).value) < 0) {
-      (<HTMLInputElement>getEl('es-rasc')).value = '000.0000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value) < 0) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = '000.0000';
     }
-    if (parseInt((<HTMLInputElement>getEl('es-rasc')).value) > 360) {
-      (<HTMLInputElement>getEl('es-rasc')).value = '360.0000';
+    if (parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value) > 360) {
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-rasc`)).value = '360.0000';
     }
   }
 

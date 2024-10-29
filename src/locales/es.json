@@ -53,6 +53,7 @@
       "CannotCreateBreakupForNonCircularOrbits": "No se puede crear una ruptura para órbitas no circulares. Estamos trabajando en una solución.",
       "CannotCalcDirectionOfSatellite": "No se puede calcular la dirección del satélite. Intente de nuevo más tarde.",
       "ErrorCreatingBreakup": "¡Error al crear la ruptura!",
+      "InvalidStartNum": "¡Número de inicio de satélite inválido! ¡Restableciendo a 90000!",
       "BreakupGeneratorFailed": "¡El generador de ruptura falló!"
     },
     "Collissions": {

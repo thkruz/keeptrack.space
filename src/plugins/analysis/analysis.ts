@@ -252,7 +252,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     let searchStr = '';
 
     for (let i = 0; i < csoListUniqueArr.length; i++) {
-      if (i == csoListUniqueArr.length - 1) {
+      if (i === csoListUniqueArr.length - 1) {
         searchStr += csoListUniqueArr[i];
       } else {
         searchStr += `${csoListUniqueArr[i]},`;
@@ -347,7 +347,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
       for (j = Math.max(0, i - 200); j < satList.length; j++) {
         const sat2 = satList[j]; // Get the second satellite
 
-        if (sat1 == sat2) {
+        if (sat1 === sat2) {
           continue;
         } // Skip the same satellite
         const pos2 = sat2.position; // Get the second satellite's position
@@ -405,7 +405,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     // Check if there is a sensor
-    if (sensors.length <= 0 || !sensors[0] || typeof sensors[0].minAz === 'undefined') {
+    if (sensors.length <= 0 || typeof sensors[0]?.minAz === 'undefined') {
       keepTrackApi.getUiManager().toast('Sensor\'s format incorrect. Did you select a sensor first?', ToastMsgType.critical);
 
       return [];
@@ -469,7 +469,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
             stop3 = aer.el <= 3.5;
 
             // Skip pass if satellite is in track right now
-            if (sTime == null) {
+            if (sTime === null) {
               return {
                 sortTime: null,
                 SATELLITE_ID: null,
@@ -605,7 +605,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
     for (const satId of satArray) {
       try {
-        if (typeof satId === 'undefined' || satId == null || satId === '' || satId === ' ') {
+        if (typeof satId === 'undefined' || satId === null || satId === '' || satId === ' ') {
           continue;
         }
         const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(satId));

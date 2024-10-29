@@ -806,7 +806,7 @@ export class CatalogLoader {
       static: false,
       missile: false,
       active: true,
-      name: element.ON,
+      name: parseInt(sccNum) >= 90000 && parseInt(sccNum) <= 99999 ? `Analyst ${sccNum}` : element.ON,
       type: element.OT,
       country: 'Unknown',
       rocket: 'Unknown',

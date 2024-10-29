@@ -53,6 +53,7 @@
       "CannotCreateBreakupForNonCircularOrbits": "Für nicht-kreisförmige Umlaufbahnen kann kein Zerfall erstellt werden. Wir arbeiten an einer Lösung.",
       "CannotCalcDirectionOfSatellite": "Die Richtung des Satelliten kann nicht berechnet werden. Versuchen Sie es später erneut.",
       "ErrorCreatingBreakup": "Fehler beim Erstellen des Zerfalls!",
+      "InvalidStartNum": "Ungültige Satellitenstartnummer! Standardmäßig auf 90000 gesetzt!",
       "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!"
     },
     "Collissions": {

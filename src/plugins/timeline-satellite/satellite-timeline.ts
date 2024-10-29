@@ -313,9 +313,9 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     this.drawEvents_ = {};
 
     const leftOffset = this.canvas_.width * 0.15;
-    const topOffset = 0;
+    const topOffset = 0; // Canvas is already offset from the top
     const width = this.canvas_.width * 0.75;
-    const height = this.canvas_.height * 0.75;
+    const height = this.canvas_.height * 0.85;
     const timeManager = keepTrackApi.getTimeManager();
     const startTime = timeManager.simulationTimeObj.getTime();
     const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000; // 24 hours from now

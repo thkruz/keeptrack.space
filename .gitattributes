@@ -1,6 +1,5 @@
 # Force the following filetypes to have unix eols, so Windows does not break them
 *.* text eol=lf
-
 ## GITATTRIBUTES FOR WEB PROJECTS
 #
 # These settings are for any web project.
@@ -119,12 +118,12 @@ Procfile          text
 *.ico             binary
 *.jng             binary
 *.jp2             binary
-*.jpg             binary
-*.jpeg            binary
+*.jpg filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
 *.jpx             binary
 *.jxr             binary
 *.pdf             binary
-*.png             binary
+*.png filter=lfs diff=lfs merge=lfs -text
 *.psb             binary
 *.psd             binary
 # SVG treated as an asset (binary) by default.
@@ -183,6 +182,4 @@ Procfile          text
 *.*rc             text
 # Ignore files (like .npmignore or .gitignore)
 *.*ignore         text
-*.png filter=lfs diff=lfs merge=lfs -text
-*.jpg filter=lfs diff=lfs merge=lfs -text
 *.xcf filter=lfs diff=lfs merge=lfs -text

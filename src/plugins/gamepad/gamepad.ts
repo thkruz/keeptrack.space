@@ -13,6 +13,7 @@ export class GamepadPlugin {
   deadzone = 0.55;
   buttonsPressedHistory: number[] = [];
   buttonsPressed: boolean[] = [];
+  previouslyReportedGamepads = [];
 
   init(): void {
     window.addEventListener('gamepadconnected', (e: GamepadEvent) => {
@@ -68,12 +69,19 @@ export class GamepadPlugin {
 
   private validateController(controller: Gamepad): boolean {
     if (controller.buttons.length < 17) {
-      errorManagerInstance.warn('This gamepad is not supported. Please open an issue on GitHub with the gamepad model to get it added.');
+      // Check if this gamepad has already been reported
+      if (!this.previouslyReportedGamepads.includes(controller.id)) {
+        errorManagerInstance.warn('This gamepad is not supported. Please open an issue on GitHub with the gamepad model to get it added.');
+        this.previouslyReportedGamepads.push(controller.id);
+      }
 
       return false;
     }
     if (controller.axes.length < 4) {
-      errorManagerInstance.warn('This gamepad is not supported. Please open an issue on GitHub with the gamepad model to get it added.');
+      if (!this.previouslyReportedGamepads.includes(controller.id)) {
+        errorManagerInstance.warn('This gamepad is not supported. Please open an issue on GitHub with the gamepad model to get it added.');
+        this.previouslyReportedGamepads.push(controller.id);
+      }
 
       return false;
     }

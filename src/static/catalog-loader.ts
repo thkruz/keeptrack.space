@@ -236,8 +236,21 @@ export class CatalogLoader {
             externalCatalog,
             vimpelCatalog: jsCatalog,
           }))
-          .catch((error) => {
-            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+          .catch(async (error) => {
+            if (error.message === 'Failed to fetch') {
+              errorManagerInstance.warn('Failed to download latest catalog! Using offline catalog which may be out of date!');
+              await fetch(`${settingsManager.installDirectory}tle/tle.json`)
+                .then((response) => response.json())
+                .then((data) => CatalogLoader.parse({
+                  keepTrackTle: data,
+                  keepTrackExtra: extraSats,
+                  keepTrackAscii: asciiCatalog,
+                  externalCatalog,
+                  vimpelCatalog: jsCatalog,
+                }));
+            } else {
+              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+            }
           });
       }
     } catch (e) {

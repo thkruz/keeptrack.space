@@ -12,7 +12,7 @@ import { TimeManager } from '@app/singletons/time-manager';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import i18next from 'i18next';
-import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, TleLine2, ZoomValue, eci2lla } from 'ootk';
+import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from 'ootk';
 import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -20,7 +20,7 @@ import { SoundNames } from '../sounds/SoundNames';
 export class EditSat extends KeepTrackPlugin {
   readonly id = 'EditSat';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
@@ -41,6 +41,10 @@ export class EditSat extends KeepTrackPlugin {
             <div class="input-field col s12">
               <input disabled value="AAAAA" id="${EditSat.elementPrefix}-scc" type="text" maxlength="5" />
               <label for="disabled" class="active">Satellite SCC#</label>
+            </div>
+            <div class="input-field col s12">
+              <input placeholder="Unknown" id="${EditSat.elementPrefix}-country" type="text" />
+              <label for="${EditSat.elementPrefix}-country" class="active">Country</label>
             </div>
             <div class="input-field col s12">
               <input placeholder="AA" id="${EditSat.elementPrefix}-year" type="text" maxlength="2" />
@@ -182,12 +186,14 @@ export class EditSat extends KeepTrackPlugin {
             this.closeSideMenu();
           }
           this.setBottomIconToDisabled();
+        } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
+          this.populateSideMenu_();
         }
       },
     });
   }
 
-  static elementPrefix = 'es';
+  static readonly elementPrefix = 'es';
 
   isRmbOnSat = true;
   rmbMenuOrder = 2;
@@ -289,6 +295,7 @@ export class EditSat extends KeepTrackPlugin {
     const sat = obj as DetailedSatellite;
 
     (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
+    (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-country`)).value = sat.country;
 
     const inc = sat.inclination.toFixed(4).padStart(8, '0');
 
@@ -389,6 +396,7 @@ export class EditSat extends KeepTrackPlugin {
       const sat = obj2 as DetailedSatellite;
 
       (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value = sat.sccNum;
+      (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-country`)).value = sat.country;
 
       const inc = sat.inclination.toFixed(4).padStart(8, '0');
 
@@ -431,6 +439,7 @@ export class EditSat extends KeepTrackPlugin {
     }
 
     const sat = obj as DetailedSatellite;
+    const country = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-country`)).value;
     const intl = sat.tle1.substr(9, 8);
     const inc = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-inc`)).value;
     const meanmo = <StringifiedNumber>(<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value;
@@ -442,8 +451,8 @@ export class EditSat extends KeepTrackPlugin {
     const epochday = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-day`)).value;
 
     const { tle1: tle1_, tle2: tle2_ } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
-    const tle1 = tle1_ as TleLine1;
-    const tle2 = tle2_ as TleLine2;
+    const tle1 = tle1_;
+    const tle2 = tle2_;
 
     let satrec: SatelliteRecord;
 
@@ -468,6 +477,7 @@ export class EditSat extends KeepTrackPlugin {
       orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
       sat.active = true;
       sat.editTle(tle1, tle2);
+      sat.country = country;
       keepTrackApi.getMainCamera().zoomTarget = ZoomValue.GEO;
     } else {
       keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', ToastMsgType.caution, true);

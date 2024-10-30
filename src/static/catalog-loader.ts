@@ -236,8 +236,21 @@ export class CatalogLoader {
             externalCatalog,
             vimpelCatalog: jsCatalog,
           }))
-          .catch((error) => {
-            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+          .catch(async (error) => {
+            if (error.message === 'Failed to fetch') {
+              errorManagerInstance.warn('Failed to download latest catalog! Using offline catalog which may be out of date!');
+              await fetch(`${settingsManager.installDirectory}tle/tle.json`)
+                .then((response) => response.json())
+                .then((data) => CatalogLoader.parse({
+                  keepTrackTle: data,
+                  keepTrackExtra: extraSats,
+                  keepTrackAscii: asciiCatalog,
+                  externalCatalog,
+                  vimpelCatalog: jsCatalog,
+                }));
+            } else {
+              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+            }
           });
       }
     } catch (e) {
@@ -779,19 +792,21 @@ export class CatalogLoader {
     }
   }
 
-  private static processAsciiCatalogKnown_(catalogManagerInstance: CatalogManager, element: AsciiTleSat, tempSatData: any[]) {
+  private static processAsciiCatalogKnown_(catalogManagerInstance: CatalogManager, element: AsciiTleSat, tempSatData: DetailedSatellite[]) {
     const i = catalogManagerInstance.sccIndex[`${element.SCC}`];
 
     tempSatData[i].tle1 = element.TLE1;
     tempSatData[i].tle2 = element.TLE2;
     tempSatData[i].name = element.ON || tempSatData[i].name || 'Unknown';
-    tempSatData[i].isExternal = true;
     tempSatData[i].source = settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT;
-
     tempSatData[i].altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
+
+    const satellite = new DetailedSatellite(tempSatData[i]);
+
+    tempSatData[i] = satellite;
   }
 
-  private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempObjData: BaseObject[], catalogManagerInstance: CatalogManager) {
+  private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempSatData: BaseObject[], catalogManagerInstance: CatalogManager) {
     if (typeof element.ON === 'undefined') {
       element.ON = 'Unknown';
     }
@@ -804,7 +819,7 @@ export class CatalogLoader {
       static: false,
       missile: false,
       active: true,
-      name: element.ON,
+      name: parseInt(sccNum) >= 90000 && parseInt(sccNum) <= 99999 ? `Analyst ${sccNum}` : element.ON,
       type: element.OT,
       country: 'Unknown',
       rocket: 'Unknown',
@@ -815,12 +830,11 @@ export class CatalogLoader {
       source: settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT,
       intlDes,
       typ: 'sat', // TODO: What is this?
-      id: tempObjData.length,
-      isExternal: true,
+      id: tempSatData.length,
     };
 
-    catalogManagerInstance.sccIndex[`${sccNum.toString()}`] = tempObjData.length;
-    catalogManagerInstance.cosparIndex[`${intlDes}`] = tempObjData.length;
+    catalogManagerInstance.sccIndex[`${sccNum.toString()}`] = tempSatData.length;
+    catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
     const satellite = new DetailedSatellite({
       tle1: asciiSatInfo.tle1,
@@ -828,10 +842,10 @@ export class CatalogLoader {
       ...asciiSatInfo,
     });
 
-    satellite.id = tempObjData.length;
+    satellite.id = tempSatData.length;
     satellite.altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
 
-    tempObjData.push(satellite);
+    tempSatData.push(satellite);
   }
 
   private static processAsciiCatalog_(asciiCatalog: AsciiTleSat[], catalogManagerInstance: CatalogManager, tempSatData: any[]) {

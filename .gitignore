@@ -101,7 +101,6 @@ public/analysis/sathist/*.json
 # Extended TLE
 public/tle/tle4.js
 public/tle/*.bak
-public/tle/TLE.json
 public/tle/TLEold.json
 
 # Custom Builds

@@ -25,7 +25,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   isRequireSensorSelected = false;
 
   // Settings
-  private lengthOfLookAngles_ = 1; // Days
+  private lengthOfLookAngles_ = 2; // Days
   private angleCalculationInterval_ = <Seconds>30;
   private disabledSensors_: DetailedSensor[] = [];
 

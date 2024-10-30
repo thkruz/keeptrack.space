@@ -18,13 +18,13 @@ interface OrbitParameters {
 }
 
 export class OrbitFinder {
-  static readonly MAX_LAT_ERROR = <Degrees>0.1;
-  static readonly MAX_LON_ERROR = <Degrees>0.1;
+  static readonly MAX_LAT_ERROR = <Degrees>0.025;
+  static readonly MAX_LON_ERROR = <Degrees>0.025;
   static readonly MAX_ALT_ERROR = <Kilometers>10;
 
-  static readonly MAX_ITERATIONS = 1000;
+  static readonly MAX_ITERATIONS = 5000;
   static readonly COARSE_STEP = 1.0; // degrees
-  static readonly FINE_STEP = 0.1; // degrees
+  static readonly FINE_STEP = 0.005; // degrees
 
   private readonly sat: DetailedSatellite;
   private readonly goalParams: OrbitParameters;
@@ -141,7 +141,7 @@ export class OrbitFinder {
     const startVal = direction === 'N' ? 0 : 180;
     const endVal = direction === 'N' ? 360 : 540; // For 'S', search beyond 360 to handle wrap-around
 
-    for (let posVal = startVal * 10; posVal < endVal * 10; posVal += 1) {
+    for (let posVal = startVal * 10; posVal < endVal * 10; posVal += 0.25) {
       const normalizedVal = posVal % (360 * 10); // Normalize to 0-360 range
       const result = this.meanACalc(normalizedVal, this.now);
 
@@ -212,7 +212,7 @@ export class OrbitFinder {
     let bestError = Infinity;
 
     // Initial coarse search
-    for (let raan = 0; raan < 360; raan += 5) {
+    for (let raan = 0; raan < 360; raan += OrbitFinder.COARSE_STEP) {
       // Don't check direction for RAAN adjustments
       this.updateOrbit({ raan });
       const error = Math.abs(this.calculateError('raan'));
@@ -224,7 +224,7 @@ export class OrbitFinder {
 
       if (error < OrbitFinder.MAX_LON_ERROR) {
         // Fine tune around best value
-        for (let fineRaan = bestValue - 5; fineRaan <= bestValue + 5; fineRaan += 0.1) {
+        for (let fineRaan = bestValue - 5; fineRaan <= bestValue + 5; fineRaan += OrbitFinder.FINE_STEP) {
           const normalizedRaan = ((fineRaan % 360) + 360) % 360;
 
           this.updateOrbit({ raan: normalizedRaan });
@@ -322,7 +322,7 @@ export class OrbitFinder {
         let bestLatError = Infinity;
 
         // Search for arg perigee that puts perigee at original latitude
-        for (let argPer = 0; argPer < 360; argPer += 1) {
+        for (let argPer = 0; argPer < 360; argPer += 0.25) {
           this.updateOrbitWithoutDirectionCheck({
             meanAnomaly: 0,
             argOfPerigee: argPer,
@@ -426,7 +426,7 @@ export class OrbitFinder {
     let perigeeParams: OrbitParameters | null = null;
 
     // More granular search through mean anomaly
-    for (let meanA = 0; meanA < 360; meanA += 0.5) {
+    for (let meanA = 0; meanA < 360; meanA += 0.05) {
       const tle1 = this.generateTle1();
       const tle2 = this.generateTle2({ meanAnomaly: meanA });
       const satrec = Sgp4.createSatrec(tle1, tle2);

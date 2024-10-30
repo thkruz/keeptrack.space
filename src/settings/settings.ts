@@ -1544,6 +1544,9 @@ export class SettingsManager {
             this.smallImages = false;
             this.isDrawMilkyWay = true;
             break;
+          case 'hires-milky-way':
+            this.hiresMilkWay = true;
+            break;
           case 'vec':
             this.vectorImages = true;
             break;

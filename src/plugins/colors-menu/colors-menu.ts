@@ -8,6 +8,7 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import colorsPng from '@public/img/icons/colors.png';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 
 export class ColorMenu extends KeepTrackPlugin {
   readonly id = 'ColorMenu';
@@ -87,8 +88,13 @@ export class ColorMenu extends KeepTrackPlugin {
         ColorMenu.colorsMenuClick('elset-age');
         break;
       case 'colors-default-rmb':
-      default:
         ColorMenu.colorsMenuClick('default');
+        break;
+      default:
+        if (targetId.includes('colors-')) {
+          errorManagerInstance.info(`Color scheme not found: ${targetId}`);
+          ColorMenu.colorsMenuClick(targetId.slice(7).replace('-rmb', ''));
+        }
         break;
     }
   };

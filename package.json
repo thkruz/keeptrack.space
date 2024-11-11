@@ -161,7 +161,7 @@
     "numeric": "^1.2.6",
     "ootk": "^4.0.2",
     "resizable": "^1.2.1",
-    "uuid": "^9.0.1",
+    "uuid": "^11.0.3",
     "webgl-obj-loader": "^2.0.8"
   }
 }

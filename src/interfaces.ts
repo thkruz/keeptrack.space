@@ -167,7 +167,7 @@ export interface SensorObjectCruncher {
 }
 
 export type lookanglesRow = {
-  sortTime: number;
+  START_DTG: number | string;
   SATELLITE_ID: string;
   PASS_SCORE: string;
   START_DATE: Date | string

@@ -229,6 +229,23 @@ export class CatalogLoader {
           .catch((error) => {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
+      } else if (settingsManager.isShowSateliotPhaseA) {
+        // Load phaseA.json file
+        const resp = await fetch(`${settingsManager.installDirectory}tle/phaseA.json`);
+        if (resp.ok) {
+          const data = await resp.json();
+          console.log('phaseA.json loaded. Data:', data);
+          await CatalogLoader.parse({
+            keepTrackTle: data,
+            keepTrackExtra: extraSats,
+            keepTrackAscii: asciiCatalog,
+            vimpelCatalog: jsCatalog,
+          });
+        } else {
+          errorManagerInstance.warn('Error loading phaseA.json');
+        }
+
+
       } else {
 
         // use cached file

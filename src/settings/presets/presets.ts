@@ -502,6 +502,90 @@ export class SettingsPresets {
     };
   }
 
+  static loadPresetSateliotNextMissionPhaseA(settings: SettingsManager) {
+    console.log("Sateliot PHASE A Preset");
+    settings.satShader.minSize = 30.0;
+    settings.limitSats = '99005,99006,99007,99008,99009,99010,99011,99012,99013,99014,99015,99016,99017,99018,99019,99020';
+    settings.disableAllPlugins();
+    settings.isDisableStars = true;
+    settings.maxAnalystSats = 1;
+    settings.maxMissiles = 1;
+    settings.maxFieldOfViewMarkers = 1;
+    settings.noMeshManager = false;
+    settings.isLoadLastMap = false;
+    settings.isShowRocketBodies = true;
+    settings.isShowDebris = true;
+    settings.isShowPayloads = true;
+    settings.isShowAgencies = false;
+    settings.nasaImages = true;
+    settings.isAllowRightClick = false;
+    settings.isDisableSelectSat = false;
+    settings.isDisableSensors = true;
+    settings.isDisableControlSites = true;
+    settings.isDisableLaunchSites = true;
+    settings.isLoadLastSensor = false;
+    settings.isEnableJscCatalog = false;
+    settings.isDrawSun = true;
+    settings.isDisableMoon = false;
+    settings.isDrawAurora = true;
+    settings.isShowRocketBodies = true;
+    settings.plugins.nightToggle = true;
+    settings.maxZoomDistance = <Kilometers>70000;
+    settings.zFar = 300000;
+    settings.minDistanceFromSatellite = <Kilometers>4;
+    // only load the 3D model of a sateliot satellite
+    settings.meshListOverride = ['sateliotsat'];
+    settings.plugins.satelliteFov = true;
+    const SATELIOT_FOV_ANGLE = 52.32;
+
+    settings.plugins.satInfoboxCore = true;
+    settings.plugins.settingsMenu = false;
+    settings.plugins.soundManager = false;
+    settings.plugins.topMenu = true;
+    settings.plugins.datetime = true;
+
+    // detect if is a mobile device checking the screen width
+    const isMobile = window.innerWidth < 1024;
+
+    if (isMobile) {
+      console.log('isMobile');
+      settings.maxZoomDistance = <Kilometers>150000;
+      settings.zFar = 300000;
+    }
+    // detect if is a tablet device checking the screen width
+    const isTablet = window.innerWidth < 1024 && window.innerWidth > 768;
+
+    if (isTablet) {
+      console.log('isTablet');
+      settings.maxZoomDistance = <Kilometers>100000;
+      settings.zFar = 300000;
+    }
+
+    settings.onLoadCb = () => {
+      hideEl('nav-footer');
+      // hideEl('nav-wrapper');
+      hideEl('nav-mobile2');
+      showEl('sateliot-logo');
+      showEl('toggle-search-icon');
+      hideEl('jday');
+
+      keepTrackApi.getUiManager().searchManager.doSearch(settings.limitSats);
+
+      this._show2DMapIcon();
+
+      this._showGitHubIcon();
+
+      this._showRestoreViewIcon();
+
+      this._showDayNightViewICon();
+
+      this._showFovSatelliteFOVCones(SATELIOT_FOV_ANGLE);
+
+      this._searchResultsManager();
+
+    };
+  }
+
   static loadPresetSateliotOps(settings: SettingsManager) {
     console.log("Sateliot Ops Preset");
     this.loadPresetSateliot(settings);

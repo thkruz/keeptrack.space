@@ -44,17 +44,131 @@ const satelliteIcon = L.icon({
     popupAnchor: [0, -16]  // Where the popup will appear relative to the icon
 });
 
+var sateliotSatellites = [];
+
 // List of NORAD IDs for Sateliot satellites
-const sateliotSatellites = [
+const sateliotSatellitesDefault = [
     { norad: 60550, color: '#FF6B00' },
     { norad: 60534, color: '#00A7E1' },
     { norad: 60552, color: '#1D1D1B' },
     { norad: 60537, color: '#9D9D9C' }
 ];
 
+// norad phaseA: 99005,99006,99007,99008,99009,99010,99011,99012,99013,99014,99015,99016,99017,99018,99019,99020
+const sateliotSatellitesPhaseA = [
+    { norad: 99005, color: '#FF6B00' },
+    { norad: 99006, color: '#00A7E1' },
+    { norad: 99007, color: '#1D1D1B' },
+    { norad: 99008, color: '#9D9D9C' },
+    { norad: 99009, color: '#FFAA00' },
+    { norad: 99010, color: '#007BA7' },
+    { norad: 99011, color: '#333333' },
+    { norad: 99012, color: '#B4B4B4' },
+    { norad: 99013, color: '#FF4500' },
+    { norad: 99014, color: '#0082C8' },
+    { norad: 99015, color: '#2F4F4F' },
+    { norad: 99016, color: '#C0C0C0' },
+    { norad: 99017, color: '#FF6347' },
+    { norad: 99018, color: '#40E0D0' },
+    { norad: 99019, color: '#4B0082' },
+    { norad: 99020, color: '#A9A9A9' }
+];
+
+
+// norad phaseB: 99001,99002,99003,99004,99005,99006,99007,99008,99009,99010,99011,99012,99013,99014,99015,99016,99017,99018,99019,99020,99021,99022,99023,99024,99025,99026,99027,99028,99029,99030,99031,99032,99033,99034,99035,99036,99037,99038,99039,99040,99041,99042,99043,99044,99045,99046,99047,99048,99049,99050,99051,99052,99053,99054,99055,99056,99057,99058,99059,99060,99061,99062,99063,99064
+const sateliotSatellitesPhaseB = [
+    { norad: 99001, color: '#FF6B00' },
+    { norad: 99002, color: '#00A7E1' },
+    { norad: 99003, color: '#1D1D1B' },
+    { norad: 99004, color: '#9D9D9C' },
+    { norad: 99005, color: '#FFAA00' },
+    { norad: 99006, color: '#007BA7' },
+    { norad: 99007, color: '#333333' },
+    { norad: 99008, color: '#B4B4B4' },
+    { norad: 99009, color: '#FF4500' },
+    { norad: 99010, color: '#0082C8' },
+    { norad: 99011, color: '#2F4F4F' },
+    { norad: 99012, color: '#C0C0C0' },
+    { norad: 99013, color: '#FF6347' },
+    { norad: 99014, color: '#40E0D0' },
+    { norad: 99015, color: '#4B0082' },
+    { norad: 99016, color: '#A9A9A9' },
+    { norad: 99017, color: '#FFD700' },
+    { norad: 99018, color: '#7FFF00' },
+    { norad: 99019, color: '#FF1493' },
+    { norad: 99020, color: '#8A2BE2' },
+    { norad: 99021, color: '#00FF7F' },
+    { norad: 99022, color: '#6495ED' },
+    { norad: 99023, color: '#DC143C' },
+    { norad: 99024, color: '#FFB6C1' },
+    { norad: 99025, color: '#4682B4' },
+    { norad: 99026, color: '#00CED1' },
+    { norad: 99027, color: '#32CD32' },
+    { norad: 99028, color: '#8B0000' },
+    { norad: 99029, color: '#FFA07A' },
+    { norad: 99030, color: '#20B2AA' },
+    { norad: 99031, color: '#556B2F' },
+    { norad: 99032, color: '#DA70D6' },
+    { norad: 99033, color: '#B22222' },
+    { norad: 99034, color: '#9ACD32' },
+    { norad: 99035, color: '#5F9EA0' },
+    { norad: 99036, color: '#7B68EE' },
+    { norad: 99037, color: '#48D1CC' },
+    { norad: 99038, color: '#F08080' },
+    { norad: 99039, color: '#F0E68C' },
+    { norad: 99040, color: '#FFDAB9' },
+    { norad: 99041, color: '#8B4513' },
+    { norad: 99042, color: '#D2691E' },
+    { norad: 99043, color: '#FFE4C4' },
+    { norad: 99044, color: '#00FA9A' },
+    { norad: 99045, color: '#ADFF2F' },
+    { norad: 99046, color: '#FF7F50' },
+    { norad: 99047, color: '#FF69B4' },
+    { norad: 99048, color: '#DB7093' },
+    { norad: 99049, color: '#E9967A' },
+    { norad: 99050, color: '#FF00FF' },
+    { norad: 99051, color: '#800080' },
+    { norad: 99052, color: '#BA55D3' },
+    { norad: 99053, color: '#9400D3' },
+    { norad: 99054, color: '#9932CC' },
+    { norad: 99055, color: '#8A2BE2' },
+    { norad: 99056, color: '#6A5ACD' },
+    { norad: 99057, color: '#4B0082' },
+    { norad: 99058, color: '#483D8B' },
+    { norad: 99059, color: '#2E8B57' },
+    { norad: 99060, color: '#66CDAA' },
+    { norad: 99061, color: '#98FB98' },
+    { norad: 99062, color: '#7CFC00' },
+    { norad: 99063, color: '#00FF00' },
+    { norad: 99064, color: '#32CD32' }
+];
+
+
+
 // Function to load TLE data from a JSON file
 async function getTLEData() {
-    const response = await fetch('https://storage.keeptrack.space/data/tle.json');
+
+    let response = null;
+    // get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // show url parameters
+    console.log('params', urlParams);
+
+    if (urlParams.has('preset') && urlParams.get('preset') === 'phaseA') {
+        console.log('phaseA');
+        response = await fetch('../tle/phaseA.json');
+        sateliotSatellites = sateliotSatellitesPhaseA;
+    } else if (urlParams.has('preset') && urlParams.get('preset') === 'phaseB') {
+        console.log('phaseB');
+        response = await fetch('../tle/phaseB.json');
+        sateliotSatellites = sateliotSatellitesPhaseB;
+    } else {
+        console.log('default');
+        response = await fetch('https://storage.keeptrack.space/data/tle.json');
+        sateliotSatellites = sateliotSatellitesDefault;
+    }
+
     const tleData = await response.json();
 
     // Filter the satellites that have the NORAD IDs we are looking for
@@ -126,7 +240,7 @@ function getOrbitCoordinatesUpToNow(tleLine1, tleLine2, secondsInThePast) {
         lastLongitude = longitude;
 
         // Slide longitudes in multiples of 360 degrees according to the orbit counter
-        longitude += orbitCount * 360;
+        longitude -= orbitCount * 360;
 
         positions.push([latitude, longitude]);
     }
@@ -165,7 +279,7 @@ function getOrbitCoordinatesFromNow(tleLine1, tleLine2, secondsInTheFuture) {
         lastLongitude = longitude;
 
         // slide longitudes in multiples of 360 degrees according to the orbit counter
-        longitude -= orbitCount * 360;
+        longitude += orbitCount * 360;
 
         positions.push([latitude, longitude]);
     }

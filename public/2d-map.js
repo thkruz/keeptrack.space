@@ -165,7 +165,8 @@ async function getTLEData() {
         sateliotSatellites = sateliotSatellitesPhaseB;
     } else {
         console.log('default');
-        response = await fetch('https://storage.keeptrack.space/data/tle.json');
+        // response = await fetch('https://storage.keeptrack.space/data/tle.json');
+        response = await fetch('../tle/sateliot.json');
         sateliotSatellites = sateliotSatellitesDefault;
     }
 
@@ -213,39 +214,37 @@ function getOrbitCoordinatesUpToNow(tleLine1, tleLine2, secondsInThePast) {
         console.log("TLE lines are undefined");
         return;
     }
-    const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
-    const positions = [];
+    var positions = [];
+    var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+    var now = new Date();
 
-    // Simulate the full orbit up to the current time
-    const now = new Date();  // Current time
-    // const secondsInThePast = 45 * 60;  // Orbit time in seconds (a typical full orbit is 90 minutes. Half, 45 minutes)
-
-    // Generate a point every 10 seconds
-    const step = 10;  // 10 seconds per point
     var lastLongitude = 0;
-    var orbitCount = 0;
+    var orbitCount = 0;  // Contador para controlar cuándo se completa una órbita
+
+    // ** Cambiar los pasos a cada 10 segundos en lugar de 1 minuto**
+    const step = 10;  // 10 seconds per point
 
     for (let i = 0; i <= secondsInThePast; i += step) {
-        var time = new Date(now.getTime() - i * 1000);  // Go back in seconds
+        var time = new Date(now.getTime() - i * 1000);  // Avanzar en intervalos de 10 segundos
         var positionAndVelocity = satellite.propagate(satrec, time);
         var positionGd = satellite.eciToGeodetic(positionAndVelocity.position, satellite.gstime(time));
         var longitude = satellite.degreesLong(positionGd.longitude);
         var latitude = satellite.degreesLat(positionGd.latitude);
 
         // If we cross the 180-degree meridian (from -180 to +180 or vice versa), increment the orbit counter
-        if (i > 0 && Math.abs(longitude - lastLongitude) > 180) {
+        let diff = Math.abs(longitude - lastLongitude);
+        if (i > 0 && diff > 180) {
             orbitCount++;
         }
 
         lastLongitude = longitude;
 
-        // Slide longitudes in multiples of 360 degrees according to the orbit counter
-        longitude -= orbitCount * 360;
+        // slide longitudes in multiples of 360 degrees according to the orbit counter
+        longitude += orbitCount * 360;
 
         positions.push([latitude, longitude]);
     }
-
-    return positions.reverse();  // Reverse to have the most recent position at the end
+    return positions.reverse();
 }
 
 // Function to get the full orbit coordinates from the current time
@@ -272,14 +271,15 @@ function getOrbitCoordinatesFromNow(tleLine1, tleLine2, secondsInTheFuture) {
         var latitude = satellite.degreesLat(positionGd.latitude);
 
         // If we cross the 180-degree meridian (from -180 to +180 or vice versa), increment the orbit counter
-        if (i > 0 && Math.abs(longitude - lastLongitude) > 180) {
+        let diff = Math.abs(longitude - lastLongitude);
+        if (i > 0 && diff > 180) {
             orbitCount++;
         }
 
         lastLongitude = longitude;
 
         // slide longitudes in multiples of 360 degrees according to the orbit counter
-        longitude += orbitCount * 360;
+        longitude -= orbitCount * 360;
 
         positions.push([latitude, longitude]);
     }
@@ -329,7 +329,6 @@ function drawSatelliteOrbit(satellite, orbitPolylines, segmentOrbit) {
         return;
     }
     const orbitCoordinates = orbitCoordinatesPast.concat(orbitCoordinatesFuture);
-
     // Get satellite color
     const satelite_color = sateliotSatellites.find(sat => parseInt(satellite.TLE2.split(' ')[1]) === sat.norad).color;
 
@@ -423,8 +422,8 @@ async function loadSateliotSatellites() {
 }
 
 setInterval(() => {
-    terminator.setTime(new Date(Date.now())); // Update the terminator with the current time UTC
-    terminator.addTo(map);
+    L.terminator.setTime(new Date(Date.now())); // Update the terminator with the current time UTC
+    L.terminator.addTo(map);
 }, 60000); // Update terminator every 60000ms (1 minute)
 
 // Load the Sateliot satellites

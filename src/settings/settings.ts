@@ -1036,6 +1036,7 @@ export class SettingsManager {
   isShowSateliot = false;
   isShowSateliotOps = false;
   isShowSateliotPhaseA = false;
+  isShowSateliotPhaseB = false;
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
@@ -1212,16 +1213,25 @@ export class SettingsManager {
                 settingsManager.isShowSateliot = true;
                 settingsManager.isShowSateliotOps = false;
                 settingsManager.isShowSateliotPhaseA = false;
+                settingsManager.isShowSateliotPhaseB = false;
                 break;
               case 'sateliot-ops':
                 settingsManager.isShowSateliot = false;
                 settingsManager.isShowSateliotOps = true;
                 settingsManager.isShowSateliotPhaseA = false;
+                settingsManager.isShowSateliotPhaseB = false;
                 break;
               case 'phaseA':
                 settingsManager.isShowSateliot = true;
                 settingsManager.isShowSateliotOps = false;
                 settingsManager.isShowSateliotPhaseA = true;
+                settingsManager.isShowSateliotPhaseB = false;
+                break;
+              case 'phaseB':
+                settingsManager.isShowSateliot = true;
+                settingsManager.isShowSateliotOps = false;
+                settingsManager.isShowSateliotPhaseA = false;
+                settingsManager.isShowSateliotPhaseB = true;
                 break;
             }
         }
@@ -1230,6 +1240,8 @@ export class SettingsManager {
         SettingsPresets.loadPresetSateliotOps(this);
       } else if (settingsManager.isShowSateliotPhaseA) {
         SettingsPresets.loadPresetSateliotNextMissionPhaseA(this);
+      } else if (settingsManager.isShowSateliotPhaseB) {
+        SettingsPresets.loadPresetSateliotNextMissionPhaseB(this);
       } else {
         // default to sateliot
         settingsManager.isShowSateliot = true;

@@ -55,9 +55,9 @@
 
   /* TODO: Account for the bottom bar being minimized */
   #search-results {
-    min-height: fit-content;
+    min-height: 0px !important;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: scroll;
     display: none;
     position: absolute;
     right: 0px;
@@ -73,6 +73,8 @@
     /* SATELIOT */
     /* border-style: solid; */
     /* border-color: var(--colorTertiaryDarken3); */
+
+    max-height: 300px;
   }
 
   .search-result {

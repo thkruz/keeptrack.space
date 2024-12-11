@@ -369,6 +369,9 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     return this.watchlistList.some(({ id: id_ }) => id_ === id);
   }
 
+  /**
+   * @returns An array of satellite ids in the watchlist.
+   */
   getSatellites() {
     return this.watchlistList.map(({
       id,
@@ -384,7 +387,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    */
   private onAddEvent_() {
     keepTrackApi.getSoundManager().play(SoundNames.CLICK);
-    const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(',');
+    const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(/[\s,]+/u);
 
     sats.forEach((satNum: string) => {
       const id = keepTrackApi.getCatalogManager().sccNum2Id(parseInt(satNum));

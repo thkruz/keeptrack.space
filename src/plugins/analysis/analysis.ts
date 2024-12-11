@@ -11,8 +11,9 @@ import { saveCsv } from '@app/lib/saveVariable';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
 import analysisPng from '@public/img/icons/analysis.png';
-import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MINUTES_PER_DAY, SatelliteRecord, TAU } from 'ootk';
+import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { WatchlistPlugin } from '../watchlist/watchlist';
 
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
@@ -164,6 +165,43 @@ export class AnalysisMenu extends KeepTrackPlugin {
           </div>
         </form>
       </div>
+      <h5 class="center-align">Satellite Overflight</h5>
+      <div class="divider"></div>
+      <div class="row"></div>
+      <div class="row">
+        <form id="analysis-overflight">
+          <div class="row">
+            <div class="input-field col s12">
+              <input value="41.888935617165025" id="analysis-of-lat" type="text" />
+              <label for="analysis-of-lat" class="active">Latitude</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <input value="2" id="analysis-of-lat-marg" type="text" />
+              <label for="analysis-of-lat-marg" class="active">Latitude Margin</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <input value="12.484747346796043" id="analysis-of-lon" type="text" />
+              <label for="analysis-of-lon" class="active">Longitude</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <input value="3" id="analysis-of-lon-marg" type="text" />
+              <label for="analysis-of-lon-marg" class="active">Longitude Margin</label>
+            </div>
+          </div>
+          <div class="row">
+            <center>
+              <button id="analysis-overflight-submit" class="btn btn-ui waves-effect waves-light" type="submit"
+                name="action">Generate Overflight Times &#9658;</button>
+            </center>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
   `;
@@ -178,6 +216,11 @@ export class AnalysisMenu extends KeepTrackPlugin {
         getEl('analysis-bpt')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           AnalysisMenu.analysisBptSumbit_();
+        });
+
+        getEl('analysis-overflight')?.addEventListener('submit', (e: Event) => {
+          e.preventDefault();
+          AnalysisMenu.findOverflight_();
         });
 
         getEl('findCsoBtn')?.addEventListener('click', () => {
@@ -471,7 +514,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
             // Skip pass if satellite is in track right now
             if (sTime === null) {
               return {
-                sortTime: null,
+                START_DTG: null,
                 SATELLITE_ID: null,
                 PASS_SCORE: null,
                 START_DATE: null,
@@ -514,7 +557,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
             // Last Line of Coverage
             return {
-              sortTime: sTime.getTime(),
+              START_DTG: sTime.getTime(),
               SATELLITE_ID: parseInt(satrecIn.satnum).toString(),
               PASS_SCORE: score.toFixed(1),
               START_DATE: sTime,
@@ -545,7 +588,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
       }
 
       return {
-        sortTime: null,
+        START_DTG: null,
         SATELLITE_ID: null,
         PASS_SCORE: null,
         START_DATE: null,
@@ -618,13 +661,11 @@ export class AnalysisMenu extends KeepTrackPlugin {
         console.debug(e);
       }
     }
-    passes.sort((a, b) => b.sortTime - a.sortTime);
+    passes.sort((a, b) => (b.START_DTG as number) - (a.START_DTG as number));
     passes.reverse();
-    passes.forEach((v) => {
-      delete v.sortTime;
-    });
 
     for (const pass of passes) {
+      pass.START_DTG = (<Date>pass.START_DATE).toISOString();
       pass.START_DATE = (<Date>pass.START_DATE).toISOString().split('T')[0];
       pass.START_TIME = (<Date>pass.START_TIME).toISOString().split('T')[1].split('.')[0];
       pass.STOP_DATE = (<Date>pass.STOP_DATE).toISOString().split('T')[0];
@@ -655,6 +696,54 @@ export class AnalysisMenu extends KeepTrackPlugin {
     } else {
       AnalysisMenu.findBestPasses_(sats, sensorManagerInstance.getSensor());
     }
+  }
+
+  private static findOverflight_() {
+    // Get lat, lon, lat margin, and lon margin
+    const lat = parseFloat((<HTMLInputElement>getEl('analysis-of-lat')).value);
+    const lon = parseFloat((<HTMLInputElement>getEl('analysis-of-lon')).value);
+    const latMargin = parseFloat((<HTMLInputElement>getEl('analysis-of-lat-marg')).value);
+    const lonMargin = parseFloat((<HTMLInputElement>getEl('analysis-of-lon-marg')).value);
+
+    // Get watchlist satellites
+    const idList = keepTrackApi.getPlugin(WatchlistPlugin).getSatellites();
+
+    // For each satellite loop through 72 hours at 30 second intervals
+    const durationInSeconds = 72 * 60 * 60;
+    const overflights = [];
+
+    for (const satId of idList) {
+      const sat = keepTrackApi.getCatalogManager().getSat(satId);
+      let time = this.getStartTime_();
+
+      for (let t = 0; t < durationInSeconds; t += 30) {
+        time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
+        const lla = sat.lla(time);
+
+        if (lla.lat > lat - latMargin && lla.lat < lat + latMargin && lla.lon > lon - lonMargin && lla.lon < lon + lonMargin) {
+          overflights.push({
+            START_DTG: time.toISOString(),
+            SATELLITE_ID: sat.sccNum,
+            LATITUDE: lla.lat,
+            LONGITUDE: lla.lon,
+          });
+        }
+      }
+    }
+
+    // sort overflights by time
+    overflights.sort((a, b) => new Date(a.START_DTG).getTime() - new Date(b.START_DTG).getTime());
+
+    saveCsv(overflights, 'overflights');
+  }
+
+  private static getStartTime_() {
+    const time = keepTrackApi.getTimeManager().getOffsetTimeObj(0);
+
+    time.setMilliseconds(0);
+    time.setSeconds(0);
+
+    return time;
   }
 
   private static setSensor_(sensor: DetailedSensor | string): void {

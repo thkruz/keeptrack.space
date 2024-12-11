@@ -23,6 +23,7 @@
  */
 
 import { BaseObject, CatalogSource, Degrees, DetailedSatellite, Minutes, SpaceObjectType } from 'ootk';
+import { SatMath } from './sat-math';
 
 /**
  * The CatalogSearch class provides static methods for filtering and searching through an array of satellite data.
@@ -112,29 +113,68 @@ export class CatalogSearch {
       minRaan += 360;
     }
 
+    const now = new Date();
+    const normalizedSatRaan = this.normalizeRaan(sat, now);
+
     return satData
       .filter((s) => {
+        // Skip static objects
         if (s.isStatic()) {
           return false;
         }
+
+        // Check inclination bounds
         if (s.inclination < minInclination || s.inclination > maxInclination) {
           return false;
         }
-        if (sat.rightAscension > 360 - RAAN_MARGIN || sat.rightAscension < RAAN_MARGIN) {
-          if (s.rightAscension > maxRaan && s.rightAscension < minRaan) {
-            return false;
-          }
-        } else if (s.rightAscension < minRaan || s.rightAscension > maxRaan) {
-          return false;
-        }
+
+        // Check period bounds
         if (s.period < minPeriod || s.period > maxPeriod) {
           return false;
         }
 
-        return true;
+        const normalizedSearchRaan = this.normalizeRaan(s, now);
+
+        // Handle RAAN wraparound case
+        if (normalizedSatRaan > 360 - RAAN_MARGIN || normalizedSatRaan < RAAN_MARGIN) {
+          return normalizedSearchRaan > minRaan || normalizedSearchRaan < maxRaan;
+        }
+
+        // Check RAAN bounds (normal case)
+        return !(normalizedSearchRaan < minRaan || normalizedSearchRaan > maxRaan);
       })
       .map((s) => s.id);
   }
+
+  // Normalize the RAAN based on nodal precession
+  static normalizeRaan(sat: DetailedSatellite, now: Date): number {
+    const precessionRate = this.getNodalPrecessionRate(sat);
+    const daysSinceEpoch = SatMath.calcElsetAge(sat, now);
+    let normalizedRaan = sat.rightAscension + (precessionRate * daysSinceEpoch);
+
+    // Ensure RAAN stays within 0-360 range
+    normalizedRaan = ((normalizedRaan % 360) + 360) % 360;
+
+    return normalizedRaan;
+  }
+
+  // Calculate nodal precession rate (degrees per day)
+  static getNodalPrecessionRate(s: DetailedSatellite): number {
+    const Re = 6378137; // Earth radius in meters
+    const J2 = 1.082626680e-3; // Earth's second dynamic form factor
+    const period = s.period * 60; // Convert period from minutes to seconds
+    const omega = (2 * Math.PI) / period; // Angular velocity in rad/s
+    const a = s.semiMajorAxis * 1000; // Convert semi-major axis from km to meters
+    const e = s.eccentricity;
+    const i = s.inclination * Math.PI / 180; // Convert inclination to radians
+
+    // Calculate precession rate in rad/s
+    const omegaP = (-3 / 2) * (Re / a) ** 2 / (1 - e * e) ** 2 * J2 * omega * Math.cos(i);
+
+    // Convert to degrees per day
+    return omegaP * (180 / Math.PI) * 86400;
+  }
+
 
   /**
    * This method is used to find the reentry objects from the given satellite data.

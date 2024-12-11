@@ -8,39 +8,32 @@ export class Classification {
     let backgroundColor: string;
     let color: string;
 
-    switch (classification) {
-      case 'Top Secret//SCI':
-        backgroundColor = '#fce93a';
-        color = 'black';
-        break;
-      case 'Top Secret':
-        backgroundColor = '#ff8c00';
-        color = 'black';
-        break;
-      case 'Secret':
-        backgroundColor = '#ff0000';
-        color = 'white';
-        break;
-      case 'Confidential':
-        backgroundColor = '#0033a0';
-        color = 'white';
-        break;
-      case 'CUI':
-        backgroundColor = '#512b85';
-        color = 'white';
-        break;
-      case 'Unclassified':
-        backgroundColor = '#007a33';
-        color = 'white';
-        break;
-      default:
-        throw new Error(`Invalid classification: ${classification}`);
+    if (classification.startsWith('Top Secret//SCI')) {
+      backgroundColor = '#fce93a';
+      color = 'black';
+    } else if (classification.startsWith('Top Secret')) {
+      backgroundColor = '#ff8c00';
+      color = 'black';
+    } else if (classification.startsWith('Secret')) {
+      backgroundColor = '#ff0000';
+      color = 'white';
+    } else if (classification.startsWith('Confidential')) {
+      backgroundColor = '#0033a0';
+      color = 'white';
+    } else if (classification.startsWith('CUI')) {
+      backgroundColor = '#512b85';
+      color = 'white';
+    } else if (classification.startsWith('Unclassified')) {
+      backgroundColor = '#007a33';
+      color = 'white';
+    } else {
+      throw new Error(`Invalid classification: ${classification}`);
     }
 
     return { backgroundColor, color };
   }
 
   static isValidClassification(classification: string): boolean {
-    return ['Unclassified', 'Confidential', 'CUI', 'Secret', 'Top Secret', 'Top Secret//SCI'].includes(classification);
+    return ['Unclassified', 'Confidential', 'CUI', 'Secret', 'Top Secret', 'Top Secret//SCI'].some((validClassification) => classification.startsWith(validClassification));
   }
 }

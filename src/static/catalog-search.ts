@@ -23,6 +23,7 @@
  */
 
 import { BaseObject, CatalogSource, Degrees, DetailedSatellite, Minutes, SpaceObjectType } from 'ootk';
+import { SatMath } from './sat-math';
 
 /**
  * The CatalogSearch class provides static methods for filtering and searching through an array of satellite data.
@@ -112,6 +113,9 @@ export class CatalogSearch {
       minRaan += 360;
     }
 
+    const now = new Date();
+    const normalizedSatRaan = this.normalizeRaan(sat, now);
+
     return satData
       .filter((s) => {
         // Skip static objects
@@ -129,25 +133,46 @@ export class CatalogSearch {
           return false;
         }
 
+        const normalizedSearchRaan = this.normalizeRaan(s, now);
+
         // Handle RAAN wraparound case
-        if (sat.rightAscension > 360 - RAAN_MARGIN || sat.rightAscension < RAAN_MARGIN) {
-          return s.rightAscension > minRaan || s.rightAscension < maxRaan;
+        if (normalizedSatRaan > 360 - RAAN_MARGIN || normalizedSatRaan < RAAN_MARGIN) {
+          return normalizedSearchRaan > minRaan || normalizedSearchRaan < maxRaan;
         }
 
         // Check RAAN bounds (normal case)
-        return !(s.rightAscension < minRaan || s.rightAscension > maxRaan);
+        return !(normalizedSearchRaan < minRaan || normalizedSearchRaan > maxRaan);
       })
       .map((s) => s.id);
   }
 
+  // Normalize the RAAN based on nodal precession
+  static normalizeRaan(sat: DetailedSatellite, now: Date): number {
+    const precessionRate = this.getNodalPrecessionRate(sat);
+    const daysSinceEpoch = SatMath.calcElsetAge(sat, now);
+    let normalizedRaan = sat.rightAscension + (precessionRate * daysSinceEpoch);
+
+    // Ensure RAAN stays within 0-360 range
+    normalizedRaan = ((normalizedRaan % 360) + 360) % 360;
+
+    return normalizedRaan;
+  }
+
   // Calculate nodal precession rate (degrees per day)
   static getNodalPrecessionRate(s: DetailedSatellite): number {
-    const n = 360 / (s.period * 60); // Mean motion in degrees per minute
-    const Re = 6378.137; // Earth radius in km
-    const a = ((s.period * 60 * Math.sqrt(398600.4418 / (4 * Math.PI * Math.PI))) / 60) ** (1 / 3); // Semi-major axis in km
+    const Re = 6378137; // Earth radius in meters
+    const J2 = 1.082626680e-3; // Earth's second dynamic form factor
+    const period = s.period * 60; // Convert period from minutes to seconds
+    const omega = (2 * Math.PI) / period; // Angular velocity in rad/s
+    const a = s.semiMajorAxis * 1000; // Convert semi-major axis from km to meters
+    const e = s.eccentricity;
+    const i = s.inclination * Math.PI / 180; // Convert inclination to radians
 
+    // Calculate precession rate in rad/s
+    const omegaP = (-3 / 2) * (Re / a) ** 2 / (1 - e * e) ** 2 * J2 * omega * Math.cos(i);
 
-    return -9.95 * Math.cos(s.inclination * Math.PI / 180) * (Re / a) ** 3.5 * n; // degrees per day
+    // Convert to degrees per day
+    return omegaP * (180 / Math.PI) * 86400;
   }
 
 

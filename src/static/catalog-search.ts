@@ -114,27 +114,42 @@ export class CatalogSearch {
 
     return satData
       .filter((s) => {
+        // Skip static objects
         if (s.isStatic()) {
           return false;
         }
+
+        // Check inclination bounds
         if (s.inclination < minInclination || s.inclination > maxInclination) {
           return false;
         }
-        if (sat.rightAscension > 360 - RAAN_MARGIN || sat.rightAscension < RAAN_MARGIN) {
-          if (s.rightAscension > maxRaan && s.rightAscension < minRaan) {
-            return false;
-          }
-        } else if (s.rightAscension < minRaan || s.rightAscension > maxRaan) {
-          return false;
-        }
+
+        // Check period bounds
         if (s.period < minPeriod || s.period > maxPeriod) {
           return false;
         }
 
-        return true;
+        // Handle RAAN wraparound case
+        if (sat.rightAscension > 360 - RAAN_MARGIN || sat.rightAscension < RAAN_MARGIN) {
+          return s.rightAscension > minRaan || s.rightAscension < maxRaan;
+        }
+
+        // Check RAAN bounds (normal case)
+        return !(s.rightAscension < minRaan || s.rightAscension > maxRaan);
       })
       .map((s) => s.id);
   }
+
+  // Calculate nodal precession rate (degrees per day)
+  static getNodalPrecessionRate(s: DetailedSatellite): number {
+    const n = 360 / (s.period * 60); // Mean motion in degrees per minute
+    const Re = 6378.137; // Earth radius in km
+    const a = ((s.period * 60 * Math.sqrt(398600.4418 / (4 * Math.PI * Math.PI))) / 60) ** (1 / 3); // Semi-major axis in km
+
+
+    return -9.95 * Math.cos(s.inclination * Math.PI / 180) * (Re / a) ** 3.5 * n; // degrees per day
+  }
+
 
   /**
    * This method is used to find the reentry objects from the given satellite data.

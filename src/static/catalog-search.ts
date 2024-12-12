@@ -104,7 +104,7 @@ export class CatalogSearch {
     const maxInclination = sat.inclination + INC_MARGIN;
     const minInclination = sat.inclination - INC_MARGIN;
 
-    const now = new Date(2021, 6, 22, 12);
+    const now = new Date();
     const normalizedSatRaan = SatMath.normalizeRaan(sat, now);
     let maxRaan = normalizedSatRaan + RAAN_MARGIN;
     let minRaan = normalizedSatRaan - RAAN_MARGIN;

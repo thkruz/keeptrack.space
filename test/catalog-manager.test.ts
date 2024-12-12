@@ -75,6 +75,12 @@ describe('calcSatrec', () => {
 
     selectSataManagerInstance.selectedSat = defaultSat.id;
     catalogManagerInstance.objectCache = [defaultSat, matchSat, nonmatchSat, nonmatchSat2, nonmatchSat3, nonmatchSat4];
+
+    // mock new Date() with new Date(2021, 6, 22, 12);
+    const mockDate = new Date(2021, 6, 22, 12);
+
+    jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
+
     const satData = CatalogSearch.findObjsByOrbit(catalogManagerInstance.objectCache as DetailedSatellite[], defaultSat);
 
     expect(satData).toStrictEqual([0, 1]);

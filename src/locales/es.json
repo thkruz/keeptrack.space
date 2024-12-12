@@ -283,6 +283,11 @@
       "title": "Menú de Análisis",
       "helpBody": "El Menú de Análisis proporciona una serie de herramientas para ayudarte a analizar los datos en la vista actual. Las herramientas son: <ul style=\"margin-left: 40px;\"> <li>Exportar TLEs Oficiales - Exportar conjuntos de elementos de dos líneas reales.</li> <li>Exportar 3LES - Exportar conjuntos de elementos de tres líneas.</li> <li>Exportar TLEs de KeepTrack - Exportar todos los conjuntos de elementos de dos líneas de KeepTrack, incluyendo analistas.</li> <li>Exportar 3LES de KeepTrack - Exportar todos los conjuntos de elementos de tres líneas de KeepTrack, incluyendo analistas.</li> <li>Encontrar Objetos Cercanos - Encontrar objetos que están cerca unos de otros.</li> <li>Encontrar Reentradas - Encontrar objetos que probablemente reentren en la atmósfera.</li> <li>Mejores Pases - Encontrar los mejores pases para un satélite basado en el sensor actualmente seleccionado.</li> </ul>"
     },
+    "Calculator": {
+      "bottomIconLabel": "Transformaciones de Marco de Referencia",
+      "title": "Menú de Transformaciones de Marco de Referencia",
+      "helpBody": "El Menú de Transformaciones de Marco de Referencia se usa para convertir entre diferentes marcos de referencia. <br><br> El menú te permite convertir entre los siguientes marcos de referencia: <ul style=\"margin-left: 40px;\"> <li> ECI - Inercial Centrado en la Tierra </li> <li> ECEF - Fijo a la Tierra Centrado en la Tierra </li> <li> Geodésico </li> <li> Topocéntrico </li> </ul>"
+    },
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Configuración",
       "title": "Menú de Configuración",

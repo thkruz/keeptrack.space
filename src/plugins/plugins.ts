@@ -68,6 +68,7 @@ import { TransponderChannelData } from './transponder-channel-data/transponder-c
 import { VideoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
+import { Calculator } from './calculator/calculator';
 
 export type KeepTrackPlugins = {
   transponderChannelData?: boolean;
@@ -126,6 +127,7 @@ export type KeepTrackPlugins = {
   polarPlot?: boolean;
   timeline?: boolean;
   timelineAlt?: boolean;
+  calculator?: boolean;
 };
 
 // Register all core modules
@@ -181,6 +183,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new SatellitePhotos().init(), enabled: plugins.photoManager },
       { init: () => new ScreenRecorder().init(), enabled: plugins.screenRecorder },
       { init: () => new AnalysisMenu().init(), enabled: plugins.analysis },
+      { init: () => new Calculator().init(), enabled: plugins.calculator },
       /*
        * { plugin: eciPlotsPlugin, enabled: plugins.plotAnalysis },
        * { plugin: ecfPlotsPlugin, enabled: plugins.plotAnalysis },

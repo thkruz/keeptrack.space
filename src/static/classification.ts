@@ -34,6 +34,10 @@ export class Classification {
   }
 
   static isValidClassification(classification: string): boolean {
+    if (!classification || classification === '') {
+      return false;
+    }
+
     return ['Unclassified', 'Confidential', 'CUI', 'Secret', 'Top Secret', 'Top Secret//SCI'].some((validClassification) => classification.startsWith(validClassification));
   }
 }

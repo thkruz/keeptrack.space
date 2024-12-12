@@ -837,4 +837,67 @@ export abstract class SatMath {
 
     return <Degrees>(inc * RAD2DEG);
   }
+
+
+  /**
+   * Normalizes the Right Ascension of the Ascending Node (RAAN) for a given satellite.
+   *
+   * This function calculates the normalized RAAN by accounting for the nodal precession rate
+   * and the number of days since the satellite's epoch. The resulting RAAN is adjusted to
+   * ensure it stays within the 0-360 degree range.
+   *
+   * @param sat - The detailed satellite object containing its orbital parameters.
+   * @param now - The current date used to calculate the number of days since the satellite's epoch.
+   * @returns The normalized RAAN value within the 0-360 degree range.
+   */
+  static normalizeRaan(sat: DetailedSatellite, now: Date): number {
+    const precessionRate = this.getNodalPrecessionRate(sat);
+    const daysSinceEpoch = SatMath.calcElsetAge(sat, now);
+    let normalizedRaan = sat.rightAscension + (precessionRate * daysSinceEpoch);
+
+    // Ensure RAAN stays within 0-360 range
+    normalizedRaan = ((normalizedRaan % 360) + 360) % 360;
+
+    return normalizedRaan;
+  }
+
+  /**
+   * Calculates the nodal precession rate of a satellite.
+   *
+   * @param {DetailedSatellite} s - The satellite object containing its orbital parameters.
+   * @returns {number} The nodal precession rate in degrees per day.
+   *
+   * @remarks
+   * The nodal precession rate is influenced by the Earth's oblateness (J2), the satellite's
+   * semi-major axis, eccentricity, inclination, and orbital period. This function converts
+   * the inclination from degrees to radians and the semi-major axis from kilometers to meters
+   * before performing the calculation.
+   *
+   * @example
+   * ```typescript
+   * const satellite = {
+   *   period: 90, // in minutes
+   *   semiMajorAxis: 7000, // in kilometers
+   *   eccentricity: 0.001,
+   *   inclination: 98.7 // in degrees
+   * };
+   * const precessionRate = getNodalPrecessionRate(satellite);
+   * console.log(precessionRate); // Output: nodal precession rate in degrees per day
+   * ```
+   */
+  static getNodalPrecessionRate(s: DetailedSatellite): number {
+    const Re = 6378137; // Earth radius in meters
+    const J2 = 1.082626680e-3; // Earth's second dynamic form factor
+    const period = s.period * 60; // Convert period from minutes to seconds
+    const omega = (2 * Math.PI) / period; // Angular velocity in rad/s
+    const a = s.semiMajorAxis * 1000; // Convert semi-major axis from km to meters
+    const e = s.eccentricity;
+    const i = s.inclination * Math.PI / 180; // Convert inclination to radians
+
+    // Calculate precession rate in rad/s
+    const omegaP = (-3 / 2) * (Re / a) ** 2 / (1 - e * e) ** 2 * J2 * omega * Math.cos(i);
+
+    // Convert to degrees per day
+    return omegaP * (180 / Math.PI) * 86400;
+  }
 }

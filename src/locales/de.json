@@ -283,6 +283,11 @@
       "title": "Analyse-Menü",
       "helpBody": "Das Analyse-Menü bietet eine Reihe von Werkzeugen, die Ihnen helfen, die Daten in der aktuellen Ansicht zu analysieren. Die Werkzeuge sind: <ul style=\"margin-left: 40px;\"> <li>Offizielle TLEs exportieren - Exportieren Sie echte Two-Line Element Sets.</li> <li>3LES exportieren - Exportieren Sie Three-Line Element Sets.</li> <li>KeepTrack TLEs exportieren - Exportieren Sie alle KeepTrack Two-Line Element Sets einschließlich Analysten.</li> <li>KeepTrack 3LES exportieren - Exportieren Sie alle KeepTrack Three-Line Element Sets einschließlich Analysten.</li> <li>Nahe Objekte finden - Finden Sie Objekte, die sich nahe beieinander befinden.</li> <li>Wiedereintritte finden - Finden Sie Objekte, die wahrscheinlich wieder in die Atmosphäre eintreten werden.</li> <li>Beste Durchgänge - Finden Sie die besten Durchgänge für einen Satelliten basierend auf dem aktuell ausgewählten Sensor.</li> </ul>"
     },
+    "Calculator": {
+      "bottomIconLabel": "Referenzrahmen-Transformationen",
+      "title": "Referenzrahmen-Transformationen-Menü",
+      "helpBody": "Das Referenzrahmen-Transformationen-Menü wird verwendet, um zwischen verschiedenen Referenzrahmen zu konvertieren. <br><br> Das Menü ermöglicht es Ihnen, zwischen den folgenden Referenzrahmen zu konvertieren: <ul style=\"margin-left: 40px;\"> <li> ECI - Erdzentriert Inertial </li> <li> ECEF - Erdzentriert Erd-Fest </li> <li> Geodätisch </li> <li> Topozentrisch </li> </ul>"
+    },
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Einstellungen",
       "title": "Einstellungen-Menü",

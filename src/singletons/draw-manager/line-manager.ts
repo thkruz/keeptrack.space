@@ -2,7 +2,7 @@
 /* eslint-disable complexity */
 /* eslint-disable camelcase */
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
-import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
+import { BaseObject, DetailedSatellite, DetailedSensor, RaeVec3 } from 'ootk';
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BufferAttribute } from '@app/static/buffer-attribute';
@@ -19,6 +19,7 @@ import { SatToRefLine } from './line-manager/sat-to-ref-line';
 import { SatToSunLine } from './line-manager/sat-to-sun-line';
 import { SensorScanHorizonLine } from './line-manager/sensor-scan-horizon-line';
 import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
+import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
 
@@ -107,6 +108,14 @@ export class LineManager {
     }
 
     this.add(new SensorScanHorizonLine(sensor, face, faces, color));
+  }
+
+  createSensorToRae(sensor: DetailedSensor | null, rae: RaeVec3, color?: vec4): void {
+    if (!sensor) {
+      return;
+    }
+
+    this.add(new SensorToRaeLine(sensor, rae, color));
   }
 
   createSensorToSat(sensor: DetailedSensor | null, sat: DetailedSatellite | MissileObject | null, color?: vec4): void {

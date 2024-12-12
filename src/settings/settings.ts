@@ -87,6 +87,7 @@ export class SettingsManager {
     timeline: true,
     timelineAlt: true,
     transponderChannelData: true,
+    calculator: true,
   };
 
   colors: ColorSchemeColorMap;

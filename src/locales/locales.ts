@@ -228,6 +228,11 @@ export const loadLocalization = () => ({
       title: i18next.t('plugins.VideoDirectorPlugin.title'),
       helpBody: i18next.t('plugins.VideoDirectorPlugin.helpBody'),
     },
+    Calculator: {
+      bottomIconLabel: i18next.t('plugins.Calculator.bottomIconLabel'),
+      title: i18next.t('plugins.Calculator.title'),
+      helpBody: i18next.t('plugins.Calculator.helpBody'),
+    },
   },
 });
 

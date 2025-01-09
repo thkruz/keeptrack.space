@@ -700,8 +700,6 @@ export class CatalogLoader {
     const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
 
     resp[i].intlDes = intlDes;
-    catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = i;
-    catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = i;
     resp[i].active = true;
     if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
       resp[i].id = tempObjData.length;
@@ -733,6 +731,8 @@ export class CatalogLoader {
       rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : rcs ?? null;
 
       // Never fail just because of one bad satellite
+      let isAddedToCatalog = false;
+
       try {
         const satellite = new DetailedSatellite({
           id: tempObjData.length,
@@ -743,8 +743,14 @@ export class CatalogLoader {
         });
 
         tempObjData.push(satellite);
+        isAddedToCatalog = true;
       } catch (e) {
         errorManagerInstance.log(e);
+      }
+
+      if (isAddedToCatalog) {
+        catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = tempObjData.length - 1;
+        catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = tempObjData.length - 1;
       }
     }
 

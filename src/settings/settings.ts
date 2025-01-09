@@ -1039,8 +1039,8 @@ export class SettingsManager {
   externalTLEsOnly = false;
   positionCruncher: Worker = null;
   orbitCruncher: Worker = null;
-  /** Enables the camera widget */
-  drawCameraWidget = true;
+  /** Disables the camera widget by default */
+  drawCameraWidget = false;
 
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);

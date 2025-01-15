@@ -255,9 +255,9 @@ export class HoverManager {
     const launchYear = parseInt(sat.intlDes.slice(2, 4));
 
     if (launchYear < 57) {
-      return `${i18next.t('hoverManager.launched')}: 20${launchYear}`;
+      return `${i18next.t('hoverManager.launched')}: 20${launchYear.toString().padStart(2, '0')}`;
     } else if (launchYear >= 57 && launchYear < 100) {
-      return `${i18next.t('hoverManager.launched')}: 19${launchYear}`;
+      return `${i18next.t('hoverManager.launched')}: 19${launchYear.toString().padStart(2, '0')}`;
     }
 
     return i18next.t('hoverManager.launchedUnknown');

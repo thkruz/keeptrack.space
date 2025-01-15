@@ -12,6 +12,7 @@ import {
   DetailedSensor,
   LandObject,
   Marker,
+  PayloadStatus,
   Sensor,
   SpaceObjectType,
   Star,
@@ -106,7 +107,7 @@ export interface KeepTrackTLEFile {
   /** Shape of the object */
   shape?: string;
   /** Current status of the object */
-  status?: string;
+  status?: PayloadStatus;
   /** Type of the object */
   type?: SpaceObjectType;
   /** Visual magnitude of the object */

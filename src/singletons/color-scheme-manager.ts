@@ -265,28 +265,46 @@ export class ColorSchemeManager {
       daysold = (jday + parseInt(year) * 365 - (parseInt(sat.tle1.substr(18, 2)) * 365 + parseInt(sat.tle1.substr(20, 3)))) as Days;
     }
 
-    if (daysold < 3 && this.objectTypeFlags.ageNew) {
+    if (daysold < 5 && this.objectTypeFlags.age1) {
       return {
-        color: this.colorTheme.ageNew,
+        color: this.colorTheme.age1,
         pickable: Pickable.Yes,
       };
     }
 
-    if (daysold >= 3 && daysold < 14 && this.objectTypeFlags.ageMed) {
+    if (daysold >= 5 && daysold < 10 && this.objectTypeFlags.age2) {
       return {
-        color: this.colorTheme.ageMed,
+        color: this.colorTheme.age2,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 14 && daysold < 60 && this.objectTypeFlags.ageOld) {
+    if (daysold >= 10 && daysold < 15 && this.objectTypeFlags.age3) {
       return {
-        color: this.colorTheme.ageOld,
+        color: this.colorTheme.age3,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 60 && this.objectTypeFlags.ageLost) {
+    if (daysold >= 15 && daysold < 20 && this.objectTypeFlags.age4) {
       return {
-        color: this.colorTheme.ageLost,
+        color: this.colorTheme.age4,
+        pickable: Pickable.Yes,
+      };
+    }
+    if (daysold >= 20 && daysold < 25 && this.objectTypeFlags.age5) {
+      return {
+        color: this.colorTheme.age5,
+        pickable: Pickable.Yes,
+      };
+    }
+    if (daysold >= 25 && daysold < 30 && this.objectTypeFlags.age6) {
+      return {
+        color: this.colorTheme.age6,
+        pickable: Pickable.Yes,
+      };
+    }
+    if (daysold >= 30 && this.objectTypeFlags.age7) {
+      return {
+        color: this.colorTheme.age7,
         pickable: Pickable.Yes,
       };
     }
@@ -766,10 +784,13 @@ export class ColorSchemeManager {
       rcsMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       rcsLarge: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       rcsUnknown: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      ageNew: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      ageMed: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      ageOld: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
-      ageLost: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      age1: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      age2: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      age3: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      age4: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      age5: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      age6: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
+      age7: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       countryUS: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       countryPRC: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
       countryCIS: [0.0, 0.0, 1.0, 1.0] as rgbaArray,
@@ -1226,10 +1247,13 @@ export class ColorSchemeManager {
     this.objectTypeFlags.velocitySlow = true;
     this.objectTypeFlags.velocityMed = true;
     this.objectTypeFlags.velocityFast = true;
-    this.objectTypeFlags.ageNew = true;
-    this.objectTypeFlags.ageMed = true;
-    this.objectTypeFlags.ageOld = true;
-    this.objectTypeFlags.ageLost = true;
+    this.objectTypeFlags.age1 = true;
+    this.objectTypeFlags.age2 = true;
+    this.objectTypeFlags.age3 = true;
+    this.objectTypeFlags.age4 = true;
+    this.objectTypeFlags.age5 = true;
+    this.objectTypeFlags.age6 = true;
+    this.objectTypeFlags.age7 = true;
     this.objectTypeFlags.starlink = true;
     this.objectTypeFlags.starlinkNot = true;
   }
@@ -1951,10 +1975,13 @@ export interface ColorSchemeColorMap {
   countryCIS: [number, number, number, number];
   countryPRC: [number, number, number, number];
   countryOther: [number, number, number, number];
-  ageNew: [number, number, number, number];
-  ageMed: [number, number, number, number];
-  ageOld: [number, number, number, number];
-  ageLost: [number, number, number, number];
+  age1: [number, number, number, number];
+  age2: [number, number, number, number];
+  age3: [number, number, number, number];
+  age4: [number, number, number, number];
+  age5: [number, number, number, number];
+  age6: [number, number, number, number];
+  age7: [number, number, number, number];
   satSmall: [number, number, number, number];
   densityPayload: [number, number, number, number];
   densityHi: [number, number, number, number];

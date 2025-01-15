@@ -1066,8 +1066,8 @@ export class SatInfoBox extends KeepTrackPlugin {
           </div>
           <div class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50"
-              data-tooltip="Time Since Official Orbit Calculated (Older ELSETs are Less Accuarate Usually)">
-              Age of ELSET
+              data-tooltip="Time Since Official Orbit Calculated (Older GPs are Less Accuarate Usually)">
+              Age of GP
             </div>
             <div class="sat-info-value" id="sat-elset-age">xxx.xxxx</div>
           </div>

@@ -212,7 +212,7 @@ export class UiManager {
         this.toast('Color Scheme Changed to Deep Space', ToastMsgType.normal, false);
         break;
       case 'ageOfElset':
-        this.toast('Color Scheme Changed to Elset Age', ToastMsgType.normal, false);
+        this.toast('Color Scheme Changed to GP Age', ToastMsgType.normal, false);
         break;
       case 'rcs':
         this.toast('Color Scheme Changed to Radar Cross Section', ToastMsgType.normal, false);

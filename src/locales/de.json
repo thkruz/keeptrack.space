@@ -83,7 +83,7 @@
     "satIntel": "Integriere Satelliten-Informationen...",
     "painting": "Male die Erde...",
     "coloring": "Färbe innerhalb der Linien...",
-    "elsets": "Lokalisiere ELSETs...",
+    "elsets": "Lokalisiere GPs...",
     "models": "Erstelle 3D-Modelle..."
   },
   "splashScreens": {
@@ -189,7 +189,7 @@
     "TrackingImpactPredict": {
       "bottomIconLabel": "Wiedereintrittsvorhersage",
       "title": "Menü für Verfolgung und Einschlagsvorhersage",
-      "helpBody": "Das Menü für Verfolgung und Einschlagsvorhersage (TIP) zeigt die neuesten Nachrichten zur Verfolgung und Einschlagsvorhersage für Satelliten an. Die Tabelle zeigt die folgenden Spalten:<br><br> <b>NORAD</b>: Die NORAD-Katalog-ID des Satelliten.<br><br> <b>Zerfallsdatum</b>: Das Datum des vorhergesagten Zerfalls des Satelliten.<br><br> <b>Breitengrad</b>: Der Breitengrad des Satelliten zum Zeitpunkt des Zerfalls.<br><br> <b>Längengrad</b>: Der Längengrad des Satelliten zum Zeitpunkt des Zerfalls.<br><br> <b>Fenster (min)</b>: Das Zeitfenster in Minuten für die Vorhersage.<br><br> <b>Nächster Bericht (Std)</b>: Die Zeit in Stunden bis zum nächsten Bericht.<br><br> <b>Wiedereintrittswinkel (deg)</b>: Der Wiedereintrittswinkel des Satelliten in Grad.<br><br> <b>RCS (m²)</b>: Der Radarquerschnitt des Satelliten in Quadratmetern.<br><br> <b>ELSET-Alter (Std)</b>: Das Alter des neuesten Elementsatzes in Stunden.<br><br> <b>Trockenmasse (kg)</b>: Die Trockenmasse des Satelliten in Kilogramm.<br><br> <b>Volumen (m³)</b>: Das geschätzte Volumen des Satelliten in Kubikmetern.<br><br>"
+      "helpBody": "Das Menü für Verfolgung und Einschlagsvorhersage (TIP) zeigt die neuesten Nachrichten zur Verfolgung und Einschlagsvorhersage für Satelliten an. Die Tabelle zeigt die folgenden Spalten:<br><br> <b>NORAD</b>: Die NORAD-Katalog-ID des Satelliten.<br><br> <b>Zerfallsdatum</b>: Das Datum des vorhergesagten Zerfalls des Satelliten.<br><br> <b>Breitengrad</b>: Der Breitengrad des Satelliten zum Zeitpunkt des Zerfalls.<br><br> <b>Längengrad</b>: Der Längengrad des Satelliten zum Zeitpunkt des Zerfalls.<br><br> <b>Fenster (min)</b>: Das Zeitfenster in Minuten für die Vorhersage.<br><br> <b>Nächster Bericht (Std)</b>: Die Zeit in Stunden bis zum nächsten Bericht.<br><br> <b>Wiedereintrittswinkel (deg)</b>: Der Wiedereintrittswinkel des Satelliten in Grad.<br><br> <b>RCS (m²)</b>: Der Radarquerschnitt des Satelliten in Quadratmetern.<br><br> <b>GP-Alter (Std)</b>: Das Alter des neuesten Elementsatzes in Stunden.<br><br> <b>Trockenmasse (kg)</b>: Die Trockenmasse des Satelliten in Kilogramm.<br><br> <b>Volumen (m³)</b>: Das geschätzte Volumen des Satelliten in Kubikmetern.<br><br>"
     },
     "Breakup": {
       "bottomIconLabel": "Zerfall erstellen",

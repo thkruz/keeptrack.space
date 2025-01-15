@@ -83,7 +83,7 @@
     "satIntel": "Integrating Satellite Intel...",
     "painting": "Painting the Earth...",
     "coloring": "Coloring Inside the Lines..",
-    "elsets": "Locating ELSETs...",
+    "elsets": "Locating GPs...",
     "models": "Building 3D Models..."
   },
   "splashScreens": {
@@ -189,7 +189,7 @@
     "TrackingImpactPredict": {
       "bottomIconLabel": "Reentry Prediction",
       "title": "Tracking and Impact Prediction Menu",
-      "helpBody": "The Tracking and Impact Prediction (TIP) menu displays the latest tracking and impact prediction messages for satellites. The table shows the following columns:<br><br> <b>NORAD</b>: The NORAD catalog ID of the satellite.<br><br> <b>Decay Date</b>: The date of the predicted decay of the satellite.<br><br> <b>Latitude</b>: The latitude of the satellite at decay time.<br><br> <b>Longitude</b>: The longitude of the satellite at decay time.<br><br> <b>Window (min)</b>: The time window in minutes for the prediction.<br><br> <b>Next Report (hrs)</b>: The time in hours until the next report.<br><br> <b>Reentry Angle (deg)</b>: The reentry angle of the satellite in degrees.<br><br> <b>RCS (m²)</b>: The Radar Cross Section of the satellite in square meters.<br><br> <b>ELSET Age (hrs)</b>: The age of the latest element set in hours.<br><br> <b>Dry Mass (kg)</b>: The dry mass of the satellite in kilograms.<br><br> <b>Volume (m³)</b>: The estimated volume of the satellite in cubic meters.<br><br>"
+      "helpBody": "The Tracking and Impact Prediction (TIP) menu displays the latest tracking and impact prediction messages for satellites. The table shows the following columns:<br><br> <b>NORAD</b>: The NORAD catalog ID of the satellite.<br><br> <b>Decay Date</b>: The date of the predicted decay of the satellite.<br><br> <b>Latitude</b>: The latitude of the satellite at decay time.<br><br> <b>Longitude</b>: The longitude of the satellite at decay time.<br><br> <b>Window (min)</b>: The time window in minutes for the prediction.<br><br> <b>Next Report (hrs)</b>: The time in hours until the next report.<br><br> <b>Reentry Angle (deg)</b>: The reentry angle of the satellite in degrees.<br><br> <b>RCS (m²)</b>: The Radar Cross Section of the satellite in square meters.<br><br> <b>GP Age (hrs)</b>: The age of the latest element set in hours.<br><br> <b>Dry Mass (kg)</b>: The dry mass of the satellite in kilograms.<br><br> <b>Volume (m³)</b>: The estimated volume of the satellite in cubic meters.<br><br>"
     },
     "Breakup": {
       "bottomIconLabel": "Create Breakup",

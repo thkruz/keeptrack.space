@@ -220,31 +220,31 @@ export const ageOfElsetDiv = keepTrackApi.html`
 <ul id="legend-list-ageOfElset">
   <li>
     <div class="Square-Box legend-age1-box"></div>
-    Less Than 5 Days
+    Less Than 0.5 Days
   </li>
   <li>
     <div class="Square-Box legend-age2-box"></div>
-    Between 5 and 10 Days
+    Between 0.5 and 1 Days
   </li>
   <li>
     <div class="Square-Box legend-age3-box"></div>
-    Between 10 and 15 Days
+    Between 1 and 1.5 Days
   </li>
   <li>
     <div class="Square-Box legend-age4-box"></div>
-    Between 15 and 20 Days
+    Between 1.5 and 2 Days
   </li>
   <li>
     <div class="Square-Box legend-age5-box"></div>
-    Between 20 and 25 Days
+    Between 2 and 2.5 Days
   </li>
   <li>
     <div class="Square-Box legend-age6-box"></div>
-    Between 25 and 30 Days
+    Between 2.5 and 3 Days
   </li>
   <li>
     <div class="Square-Box legend-age7-box"></div>
-    More Than 30 Days
+    More Than 3 Days
   </li>
 </ul>
 `.trim();

@@ -258,51 +258,52 @@ export class ColorSchemeManager {
 
     let daysold: Days;
     const sat = obj as DetailedSatellite;
+    const epochYear = sat.tle1.substring(18, 20);
 
-    if (sat.tle1.substr(18, 2) === year) {
-      daysold = (jday - parseInt(sat.tle1.substr(20, 3))) as Days;
+    if (epochYear === year) {
+      daysold = (jday - parseFloat(sat.tle1.substring(20, 28))) as Days;
     } else {
-      daysold = (jday + parseInt(year) * 365 - (parseInt(sat.tle1.substr(18, 2)) * 365 + parseInt(sat.tle1.substr(20, 3)))) as Days;
+      daysold = (jday + parseInt(year) * 365 - (parseInt(epochYear) * 365 + parseFloat(sat.tle1.substring(20, 28)))) as Days;
     }
 
-    if (daysold < 5 && this.objectTypeFlags.age1) {
+    if (daysold < 0.5 && this.objectTypeFlags.age1) {
       return {
         color: this.colorTheme.age1,
         pickable: Pickable.Yes,
       };
     }
 
-    if (daysold >= 5 && daysold < 10 && this.objectTypeFlags.age2) {
+    if (daysold >= 0.5 && daysold < 1.0 && this.objectTypeFlags.age2) {
       return {
         color: this.colorTheme.age2,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 10 && daysold < 15 && this.objectTypeFlags.age3) {
+    if (daysold >= 1.0 && daysold < 1.5 && this.objectTypeFlags.age3) {
       return {
         color: this.colorTheme.age3,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 15 && daysold < 20 && this.objectTypeFlags.age4) {
+    if (daysold >= 1.5 && daysold < 2.0 && this.objectTypeFlags.age4) {
       return {
         color: this.colorTheme.age4,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 20 && daysold < 25 && this.objectTypeFlags.age5) {
+    if (daysold >= 2.0 && daysold < 2.5 && this.objectTypeFlags.age5) {
       return {
         color: this.colorTheme.age5,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 25 && daysold < 30 && this.objectTypeFlags.age6) {
+    if (daysold >= 2.5 && daysold < 3.0 && this.objectTypeFlags.age6) {
       return {
         color: this.colorTheme.age6,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 30 && this.objectTypeFlags.age7) {
+    if (daysold >= 3.0 && this.objectTypeFlags.age7) {
       return {
         color: this.colorTheme.age7,
         pickable: Pickable.Yes,

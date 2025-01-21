@@ -1260,9 +1260,9 @@ export class SettingsManager {
       // eslint-disable-next-line no-console
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.3.3') {
+    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.1') {
       this.colors = {
-        version: '1.3.3',
+        version: '1.4.1',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
         sunlight100: [1.0, 1.0, 1.0, 0.7],
@@ -1333,12 +1333,13 @@ export class SettingsManager {
         rcsLarge: [0, 1.0, 0, 0.6],
         rcsUnknown: [1.0, 1.0, 0, 0.6],
         age1: [0, 1.0, 0, 0.9],
-        age2: [0, 1.0, 0, 0.9],
-        age3: [0, 1.0, 0, 0.9],
-        age4: [0, 1.0, 0, 0.9],
-        age5: [0, 1.0, 0, 0.9],
-        age6: [0, 1.0, 0, 0.9],
-        age7: [0, 1.0, 0, 0.9],
+        age2: [0.6, 0.996, 0, 0.9],
+        age3: [0.8, 1.0, 0, 0.9],
+        age4: [1.0, 1.0, 0, 0.9],
+        age5: [1.0, 0.8, 0.0, 0.9],
+        age6: [1.0, 0.6, 0.0, 0.9],
+        age7: [1.0, 0.0, 0.0, 0.9],
+        lostobjects: [0.2, 1.0, 0.0, 0.65],
         satLEO: [0.2, 1.0, 0.0, 0.65],
         satGEO: [0.2, 1.0, 0.0, 0.65],
         inGroup: [1.0, 0.0, 0.0, 1.0],

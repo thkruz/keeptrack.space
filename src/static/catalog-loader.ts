@@ -724,6 +724,17 @@ export class CatalogLoader {
           resp[i].source = CatalogSource.USSF;
       }
 
+      /*
+       * Embed a confidence level into the 64th character of the TLE1
+       * All 9s is the default value
+       * TODO: Generate a better confidence level system
+       */
+      if (resp[i].source === CatalogSource.USSF) {
+        resp[i].TLE1 = `${resp[i].TLE1.substring(0, 64)}9${resp[i].TLE1.substring(65)}` as TleLine1;
+      } else {
+        resp[i].TLE1 = `${resp[i].TLE1.substring(0, 64)}5${resp[i].TLE1.substring(65)}` as TleLine1;
+      }
+
       let rcs: number;
 
       rcs = resp[i].rcs === 'LARGE' ? 5 : rcs;

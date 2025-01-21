@@ -542,7 +542,7 @@ export class SettingsManager {
      */
     tle: 'https://storage.keeptrack.space/data/tle.json',
     tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
-    vimpel: 'https://storage.keeptrack.space/data/vimpel.json',
+    vimpel: 'https://r2.keeptrack.space/vimpel.json',
   };
   /**
    * Determines whether or not to hide the propogation rate text on the GUI.

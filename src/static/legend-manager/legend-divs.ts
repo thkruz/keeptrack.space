@@ -219,20 +219,32 @@ export const neighborsDiv = keepTrackApi.html`
 export const ageOfElsetDiv = keepTrackApi.html`
 <ul id="legend-list-ageOfElset">
   <li>
-    <div class="Square-Box legend-ageNew-box"></div>
-    Less Than 3 Days
+    <div class="Square-Box legend-age1-box"></div>
+    Less Than 0.5 Days
   </li>
   <li>
-    <div class="Square-Box legend-ageMed-box"></div>
-    Less Than 14 Days
+    <div class="Square-Box legend-age2-box"></div>
+    Between 0.5 and 1 Days
   </li>
   <li>
-    <div class="Square-Box legend-ageOld-box"></div>
-    Less Than 60 Days
+    <div class="Square-Box legend-age3-box"></div>
+    Between 1 and 1.5 Days
   </li>
   <li>
-    <div class="Square-Box legend-ageLost-box"></div>
-    More Than 60 Days
+    <div class="Square-Box legend-age4-box"></div>
+    Between 1.5 and 2 Days
+  </li>
+  <li>
+    <div class="Square-Box legend-age5-box"></div>
+    Between 2 and 2.5 Days
+  </li>
+  <li>
+    <div class="Square-Box legend-age6-box"></div>
+    Between 2.5 and 3 Days
+  </li>
+  <li>
+    <div class="Square-Box legend-age7-box"></div>
+    More Than 3 Days
   </li>
 </ul>
 `.trim();

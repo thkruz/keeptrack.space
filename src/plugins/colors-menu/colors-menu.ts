@@ -33,7 +33,7 @@ export class ColorMenu extends KeepTrackPlugin {
         <li class="menu-selectable" data-color="countries">Countries</li>
         <li class="menu-selectable" data-color="near-earth">Near Earth</li>
         <li class="menu-selectable" data-color="deep-space">Deep Space</li>
-        <li class="menu-selectable" data-color="elset-age">Elset Age</li>
+        <li class="menu-selectable" data-color="elset-age">GP Age</li>
         <li class="menu-selectable" data-color="lost-objects">Lost Objects</li>
       </ul>
     </div>
@@ -57,7 +57,7 @@ export class ColorMenu extends KeepTrackPlugin {
     <li id="colors-country-rmb"><a href="#">Country</a></li>
     <li id="colors-confidence-rmb"><a href="#">Confidence Level</a></li>
     <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
-    <li id="colors-ageOfElset-rmb"><a href="#">Age of Elset</a></li>
+    <li id="colors-ageOfElset-rmb"><a href="#">Age of GP</a></li>
   </ul>`;
 
   // eslint-disable-next-line class-methods-use-this

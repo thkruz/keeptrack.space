@@ -542,7 +542,7 @@ export class SettingsManager {
      */
     tle: 'https://storage.keeptrack.space/data/tle.json',
     tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
-    vimpel: 'https://storage.keeptrack.space/data/vimpel.json',
+    vimpel: 'https://r2.keeptrack.space/vimpel.json',
   };
   /**
    * Determines whether or not to hide the propogation rate text on the GUI.
@@ -1260,9 +1260,9 @@ export class SettingsManager {
       // eslint-disable-next-line no-console
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.3.3') {
+    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.1') {
       this.colors = {
-        version: '1.3.3',
+        version: '1.4.1',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
         sunlight100: [1.0, 1.0, 1.0, 0.7],
@@ -1332,10 +1332,13 @@ export class SettingsManager {
         rcsMed: [0.2, 0.4, 1.0, 1],
         rcsLarge: [0, 1.0, 0, 0.6],
         rcsUnknown: [1.0, 1.0, 0, 0.6],
-        ageNew: [0, 1.0, 0, 0.9],
-        ageMed: [1.0, 1.0, 0.0, 0.9],
-        ageOld: [1.0, 0.6, 0, 0.9],
-        ageLost: [1.0, 0.0, 0, 0.9],
+        age1: [0, 1.0, 0, 0.9],
+        age2: [0.6, 0.996, 0, 0.9],
+        age3: [0.8, 1.0, 0, 0.9],
+        age4: [1.0, 1.0, 0, 0.9],
+        age5: [1.0, 0.8, 0.0, 0.9],
+        age6: [1.0, 0.6, 0.0, 0.9],
+        age7: [1.0, 0.0, 0.0, 0.9],
         lostobjects: [0.2, 1.0, 0.0, 0.65],
         satLEO: [0.2, 1.0, 0.0, 0.65],
         satGEO: [0.2, 1.0, 0.0, 0.65],

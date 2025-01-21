@@ -56,10 +56,13 @@ export type rgbaArray = [number, number, number, number];
 
 export interface Colors {
   notional: rgbaArray;
-  ageLost: rgbaArray;
-  ageMed: rgbaArray;
-  ageNew: rgbaArray;
-  ageOld: rgbaArray;
+  age1: rgbaArray;
+  age2: rgbaArray;
+  age3: rgbaArray;
+  age4: rgbaArray;
+  age5: rgbaArray;
+  age6: rgbaArray;
+  age7: rgbaArray;
   analyst: rgbaArray;
   countryCIS: rgbaArray;
   countryOther: rgbaArray;
@@ -222,10 +225,13 @@ export interface SensorGeolocation {
 }
 
 export interface ObjectTypeFlags {
-  ageLost: boolean;
-  ageMed: boolean;
-  ageNew: boolean;
-  ageOld: boolean;
+  age1: boolean;
+  age2: boolean;
+  age3: boolean;
+  age4: boolean;
+  age5: boolean;
+  age6: boolean;
+  age7: boolean;
   countryCIS: boolean;
   countryOther: boolean;
   countryPRC: boolean;

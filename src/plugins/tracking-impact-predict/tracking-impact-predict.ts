@@ -182,7 +182,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     const tr = tbl.insertRow();
     const names = [
       'NORAD', 'Decay Date', 'Latitude', 'Longitude', 'Window (min)',
-      'Next Report (hrs)', 'Reentry Angle (deg)', 'RCS (m^2)', 'ELSET Age (hrs)',
+      'Next Report (hrs)', 'Reentry Angle (deg)', 'RCS (m^2)', 'GP Age (hrs)',
       'Dry Mass (kg)', 'Volume (m^3)',
     ];
 

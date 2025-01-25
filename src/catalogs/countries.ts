@@ -660,15 +660,15 @@ export const launchSiteMap = {
     sitec: 'United States',
   },
   AFWTR: {
-    site: 'Vandenberg AFB',
+    site: 'Vandenberg SFB',
     sitec: 'United States',
   },
   CAS: {
-    site: 'Canary Islands',
+    site: 'Canaries Airspace',
     sitec: 'United States',
   },
   FRGUI: {
-    site: 'French Guiana',
+    site: 'Kourou',
     sitec: 'French Guiana',
   },
   HGSTR: {
@@ -676,7 +676,7 @@ export const launchSiteMap = {
     sitec: 'Algeria',
   },
   KSCUT: {
-    site: 'Uchinoura Space Center',
+    site: 'Uchinoura SC',
     sitec: 'Japan',
   },
   KYMTR: {
@@ -688,7 +688,7 @@ export const launchSiteMap = {
     sitec: 'Russia',
   },
   WSC: {
-    site: 'Wenchang SLC',
+    site: 'Wenchang SC',
     sitec: 'China',
   },
   SNMLP: {
@@ -724,23 +724,23 @@ export const launchSiteMap = {
     sitec: 'United States',
   },
   SEAL: {
-    site: 'Sea Launch Odyssey',
+    site: 'Sea Launch Platform',
     sitec: 'Russia',
   },
   KWAJ: {
-    site: 'Kwajalein',
+    site: 'Kwajalein Atoll',
     sitec: 'United States',
   },
   ERAS: {
-    site: 'Pegasus East',
+    site: 'Eastern Range Airspace',
     sitec: 'United States',
   },
   JSC: {
-    site: 'Jiuquan SLC',
+    site: 'Jiuquan SC',
     sitec: 'China',
   },
   SVOB: {
-    site: 'Svobodny',
+    site: 'Svobodny LC',
     sitec: 'Russia',
   },
   TSC: {
@@ -748,15 +748,19 @@ export const launchSiteMap = {
     sitec: 'China',
   },
   WRAS: {
-    site: 'Pegasus West',
+    site: 'Western Range Airspace',
     sitec: 'United States',
   },
   XSC: {
     site: 'Xichang SC',
     sitec: 'China',
   },
+  XICLF: {
+    site: 'Xichang Launch Facility',
+    sitec: 'China',
+  },
   YAVNE: {
-    site: 'Yavne',
+    site: 'Yavne Launch Facility',
     sitec: 'Israel',
   },
   OREN: {
@@ -768,7 +772,7 @@ export const launchSiteMap = {
     sitec: 'Russia',
   },
   KODAK: {
-    site: 'Kodiak Island',
+    site: 'Kodiak LC',
     sitec: 'United States',
   },
   SEM: {
@@ -776,7 +780,7 @@ export const launchSiteMap = {
     sitec: 'Iran',
   },
   YUN: {
-    site: 'Sohae SLS',
+    site: 'Yunsong LS',
     sitec: 'North Korea',
   },
   TNGH: {
@@ -784,7 +788,7 @@ export const launchSiteMap = {
     sitec: 'North Korea',
   },
   NSC: {
-    site: 'Naro Space Center',
+    site: 'Naro SC',
     sitec: 'South Korea',
   },
   RLLC: {
@@ -796,7 +800,47 @@ export const launchSiteMap = {
     sitec: 'Scotland',
   },
   ALC: {
-    site: 'Alcântara Launch Center',
+    site: 'Alcântara LC',
     sitec: 'Brazil',
+  },
+  TYMSC: {
+    site: 'Tyuratam MSC',
+    sitec: 'Kazakhstan',
+  },
+  PLMSC: {
+    site: 'Plesetsk MSC',
+    sitec: 'Russia',
+  },
+  DLS: {
+    site: 'Dombarovsky LS',
+    sitec: 'Russia',
+  },
+  RLLB: {
+    site: 'Rocket Lab Launch Base',
+    sitec: 'New Zealand',
+  },
+  YSLA: {
+    site: 'Yellow Sea Launch Area',
+    sitec: 'China',
+  },
+  SMTS: {
+    site: 'Shahrud Missile Test Site',
+    sitec: 'Iran',
+  },
+  JJSLA: {
+    site: 'Jeju Island Sea Launch Area',
+    sitec: 'South Korea',
+  },
+  SCSLA: {
+    site: 'South China Sea Launch Area',
+    sitec: 'China',
+  },
+  SEMLS: {
+    site: 'Semnan SLS',
+    sitec: 'Iran',
+  },
+  SUBL: {
+    site: 'Submarine LP',
+    sitec: 'Russia',
   },
 };

@@ -843,4 +843,24 @@ export const launchSiteMap = {
     site: 'Submarine LP',
     sitec: 'Russia',
   },
+  KYMSC: {
+    site: 'Kapustin Yar MSC',
+    sitec: 'Russia',
+  },
+  SRILR: {
+    site: 'Satish Dhawan SC',
+    sitec: 'India',
+  },
+  SVOBO: {
+    site: 'Svobodnyy LC',
+    sitec: 'Russia',
+  },
+  TAISC: {
+    site: 'Taiyuan SLC',
+    sitec: 'China',
+  },
+  TANSC: {
+    site: 'Tanegashima SC',
+    sitec: 'Japan',
+  },
 };

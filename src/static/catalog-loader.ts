@@ -704,25 +704,7 @@ export class CatalogLoader {
     resp[i].active = true;
     if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
       resp[i].id = tempObjData.length;
-      const source = Tle.classification(resp[i].TLE1);
-
-      switch (source) {
-        case 'U':
-          resp[i].source = CatalogSource.USSF;
-          break;
-        case 'C':
-          resp[i].source = CatalogSource.CELESTRAK;
-          break;
-        case 'M':
-          resp[i].source = CatalogSource.UNIV_OF_MICH;
-          break;
-        case 'V':
-          resp[i].source = CatalogSource.VIMPEL;
-          break;
-        default:
-          // Default to USSF for now
-          resp[i].source = CatalogSource.USSF;
-      }
+      resp[i].source = CatalogSource.CELESTRAK;
 
       /*
        * Embed a confidence level into the 64th character of the TLE1
@@ -1030,31 +1012,7 @@ export class CatalogLoader {
         catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
         catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
         resp[i].active = true;
-        const source = Tle.classification(resp[i].TLE1);
-
-        switch (source) {
-          case 'U':
-            resp[i].source = CatalogSource.USSF;
-            break;
-          case 'C':
-            resp[i].source = CatalogSource.CELESTRAK;
-            break;
-          case 'M':
-            resp[i].source = CatalogSource.UNIV_OF_MICH;
-            break;
-          case 'N':
-            resp[i].source = CatalogSource.NUSPACE;
-            break;
-          case 'P':
-            resp[i].source = CatalogSource.CALPOLY;
-            break;
-          case 'V':
-            resp[i].source = CatalogSource.VIMPEL;
-            break;
-          default:
-            // Default to USSF for now
-            resp[i].source = CatalogSource.USSF;
-        }
+        resp[i].source = CatalogSource.CELESTRAK;
 
         let rcs: number | null;
 

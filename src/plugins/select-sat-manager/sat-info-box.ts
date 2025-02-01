@@ -19,7 +19,7 @@ import { StringExtractor } from '@app/static/string-extractor';
 import addPng from '@public/img/icons/add.png';
 import removePng from '@public/img/icons/remove.png';
 import Draggabilly from 'draggabilly';
-import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, RfSensor, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
+import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, PayloadStatus, RfSensor, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from '../missile/missileManager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -669,7 +669,12 @@ export class SatInfoBox extends KeepTrackPlugin {
     const isHasAltName = (obj as DetailedSatellite)?.altName && (obj as DetailedSatellite).altName !== '';
 
     getEl('sat-info-title-name').innerHTML = obj.name;
-    getEl('sat-infobox-fi').classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
+
+    if (obj.isSatellite() && (obj as DetailedSatellite).sccNum5 === '25544') {
+      getEl('sat-infobox-fi').classList.value = 'fi fi-iss';
+    } else {
+      getEl('sat-infobox-fi').classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
+    }
     getEl('sat-alt-name').innerHTML = isHasAltName ? (obj as DetailedSatellite).altName : 'N/A';
 
     const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
@@ -688,6 +693,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
 
     SatInfoBox.updateSatType_(obj);
+    SatInfoBox.updateSatStatus_(obj);
 
     /*
      * TODO:
@@ -714,7 +720,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       }
 
       getEl('sat-altid').innerHTML = sat.altId || 'N/A';
-      getEl('sat-source').innerHTML = sat.source || CatalogSource.USSF;
+      getEl('sat-source').innerHTML = sat.source || CatalogSource.CELESTRAK;
       SatInfoBox.updateRcsData_(sat);
     }
   };
@@ -828,6 +834,11 @@ export class SatInfoBox extends KeepTrackPlugin {
               <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Type of Object">Type</div>
               <div class="sat-info-value" id="sat-type">PAYLOAD</div>
+            </div>
+            <div class="sat-info-row">
+              <div class="sat-info-key" data-position="top" data-delay="50"
+                data-tooltip="Type of Object">Status</div>
+              <div class="sat-info-value" id="sat-status">STATUS</div>
             </div>
             <div class="sat-info-row sat-only-info">
               <div class="sat-info-key" data-position="top" data-delay="50"
@@ -1154,6 +1165,41 @@ export class SatInfoBox extends KeepTrackPlugin {
         if (obj.isMissile()) {
           getEl('sat-type').innerHTML = 'Ballistic Missile';
         }
+    }
+  }
+
+  private static updateSatStatus_(obj: BaseObject) {
+    if (obj.type !== SpaceObjectType.PAYLOAD) {
+      getEl('sat-status').parentElement.style.display = 'none';
+
+      return;
+    }
+    getEl('sat-status').parentElement.style.display = 'flex';
+
+    const sat = obj as DetailedSatellite;
+
+    switch (sat.status) {
+      case PayloadStatus.OPERATIONAL:
+        getEl('sat-status').innerHTML = 'Operational';
+        break;
+      case PayloadStatus.NONOPERATIONAL:
+        getEl('sat-status').innerHTML = 'Non-Operational';
+        break;
+      case PayloadStatus.PARTIALLY_OPERATIONAL:
+        getEl('sat-status').innerHTML = 'Partially Operational';
+        break;
+      case PayloadStatus.EXTENDED_MISSION:
+        getEl('sat-status').innerHTML = 'Extended Mission';
+        break;
+      case PayloadStatus.BACKUP_STANDBY:
+        getEl('sat-status').innerHTML = 'Backup Standby';
+        break;
+      case PayloadStatus.SPARE:
+        getEl('sat-status').innerHTML = 'Spare';
+        break;
+      case PayloadStatus.UNKNOWN:
+      default:
+        getEl('sat-status').innerHTML = 'Unknown';
     }
   }
 

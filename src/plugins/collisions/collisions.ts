@@ -10,29 +10,28 @@ import { keepTrackApi } from '../../keepTrackApi';
 import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
+//  Updated to match KeepTrack API v2
 export interface CollisionEvent {
-  sat1: string;
-  sat1Name: string;
-  sat1Status: string;
-  sat2: string;
-  sat2Name: string;
-  sat2Status: string;
-  /** Number of Days */
-  sat1AgeOfTLE: number;
-  /** Number of Days */
-  sat2AgeOfTLE: number;
-  /** ISO Date format */
-  toca: string;
-  minRng: number;
-  dilutionThreshold: number;
-  relSpeed: number;
-  maxProb: number;
+  ID: number;
+  SAT1: number;
+  SAT1_NAME: string;
+  SAT1_STATUS: string;
+  SAT2: number;
+  SAT2_NAME: string;
+  SAT2_STATUS: string;
+  SAT1_AGE_OF_TLE: number;
+  SAT2_AGE_OF_TLE: number;
+  TOCA: string;
+  MIN_RNG: number;
+  DILUTION_THRESHOLD: number;
+  REL_SPEED: number;
+  MAX_PROB: number;
 }
 
 export class Collissions extends KeepTrackPlugin {
   readonly id = 'Collissions';
   dependencies_ = [];
-  private readonly collisionDataSrc = './tle/SOCRATES.json';
+  private readonly collisionDataSrc = 'https://api.keeptrack.space/v2/socrates/latest';
   private selectSatIdOnCruncher_: number | null = null;
   private collisionList_ = <CollisionEvent[]>[];
 
@@ -85,9 +84,9 @@ export class Collissions extends KeepTrackPlugin {
   }
 
   private uiManagerFinal_() {
-    getEl(this.sideMenuElementName).addEventListener('click', (evt: any) => {
+    getEl(this.sideMenuElementName).addEventListener('click', (evt: MouseEvent) => {
       showLoading(() => {
-        const el = <HTMLElement>evt.target.parentElement;
+        const el = (<HTMLElement>evt.target).parentElement;
 
         if (!el.classList.contains('collisions-object')) {
           return;
@@ -121,11 +120,11 @@ export class Collissions extends KeepTrackPlugin {
   private eventClicked_(row: number) {
     const now = new Date();
 
-    keepTrackApi.getTimeManager().changeStaticOffset(new Date(this.collisionList_[row].toca).getTime() - now.getTime() - 1000 * 30);
+    keepTrackApi.getTimeManager().changeStaticOffset(new Date(this.collisionList_[row].TOCA).getTime() - now.getTime() - 1000 * 30);
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
-    const sat1 = this.collisionList_[row].sat1.padStart(5, '0');
-    const sat2 = this.collisionList_[row].sat2.padStart(5, '0');
+    const sat1 = this.collisionList_[row].SAT1.toString().padStart(5, '0');
+    const sat2 = this.collisionList_[row].SAT2.toString().padStart(5, '0');
 
     keepTrackApi.getUiManager().doSearch(`${sat1},${sat2}`);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -173,12 +172,12 @@ export class Collissions extends KeepTrackPlugin {
     tr.setAttribute('data-row', i.toString());
 
     // Populate the table with the data
-    Collissions.createCell_(tr, this.collisionList_[i].toca.slice(0, 19).replace('T', ' '));
-    Collissions.createCell_(tr, this.collisionList_[i].sat1);
-    Collissions.createCell_(tr, this.collisionList_[i].sat2);
-    Collissions.createCell_(tr, this.collisionList_[i].maxProb.toFixed(3));
-    Collissions.createCell_(tr, this.collisionList_[i].minRng.toString());
-    Collissions.createCell_(tr, this.collisionList_[i].relSpeed.toFixed(2));
+    Collissions.createCell_(tr, this.collisionList_[i].TOCA.slice(0, 19).replace('T', ' '));
+    Collissions.createCell_(tr, this.collisionList_[i].SAT1.toString());
+    Collissions.createCell_(tr, this.collisionList_[i].SAT2.toString());
+    Collissions.createCell_(tr, this.collisionList_[i].MAX_PROB.toFixed(3));
+    Collissions.createCell_(tr, this.collisionList_[i].MIN_RNG.toString());
+    Collissions.createCell_(tr, this.collisionList_[i].REL_SPEED.toFixed(2));
 
     return tr;
   }

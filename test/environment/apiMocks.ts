@@ -58,7 +58,7 @@ export const defaultSat: DetailedSatellite = new DetailedSatellite({
   },
   static: false,
   sensorId: null,
-  source: CatalogSource.USSF,
+  source: CatalogSource.CELESTRAK,
 });
 
 export const defaultMisl = new MissileObject({

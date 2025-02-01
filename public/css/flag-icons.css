@@ -2,6 +2,10 @@
     background-image: url(../flags/tbd.png);
 }
 
+.fi-cis {
+    background-image: url(../flags/cis.svg);
+}
+
 .fi-nato {
     background-image: url(../flags/nato.png);
 }

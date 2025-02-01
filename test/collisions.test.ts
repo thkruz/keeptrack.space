@@ -35,19 +35,20 @@ describe('CollissionsPlugin_class', () => {
     getEl('collisions-menu').click();
     satConstellationsPlugin['collisionList_'] = [
       {
-        toca: '2021-01-01T00:00:00.000Z',
-        sat1: '25544',
-        sat1Name: 'ISS (ZARYA)',
-        sat1Status: 'active',
-        sat2: '00005',
-        sat2Name: 'VANGUARD 1',
-        sat2Status: 'inactive',
-        sat1AgeOfTLE: 1,
-        sat2AgeOfTLE: 2,
-        minRng: 3,
-        dilutionThreshold: 4,
-        relSpeed: 5,
-        maxProb: 6,
+        ID: 1,
+        SAT1: 25544,
+        SAT1_NAME: 'ISS (ZARYA)',
+        SAT1_STATUS: 'active',
+        SAT2: 5,
+        SAT2_NAME: 'VANGUARD 1',
+        SAT2_STATUS: 'inactive',
+        SAT1_AGE_OF_TLE: 1,
+        SAT2_AGE_OF_TLE: 2,
+        TOCA: '2021-01-01T00:00:00.000Z',
+        MIN_RNG: 3,
+        DILUTION_THRESHOLD: 4,
+        REL_SPEED: 5,
+        MAX_PROB: 6,
       } as CollisionEvent,
     ];
     satConstellationsPlugin['eventClicked_'](0);

@@ -195,6 +195,9 @@ export class CameraControlWidget {
   }
 
   private draw() {
+    if (!settingsManager.drawCameraWidget) {
+      return;
+    }
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     const camera = keepTrackApi.getMainCamera();

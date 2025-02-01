@@ -90,6 +90,37 @@ export class SettingsManager {
     calculator: true,
   };
 
+  static preserveSettings() {
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_STARLINK_SATS, settingsManager.isShowStarlinkSats.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HEO_SATS, settingsManager.isShowHeoSats.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MEO_SATS, settingsManager.isShowMeoSats.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GEO_SATS, settingsManager.isShowGeoSats.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_PAYLOADS, settingsManager.isShowPayloads.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ROCKET_BODIES, settingsManager.isShowRocketBodies.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEBRIS, settingsManager.isShowDebris.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_AGENCIES, settingsManager.isShowAgencies.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, settingsManager.isDrawOrbits.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, settingsManager.isDrawTrailingOrbits.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ECF, settingsManager.isOrbitCruncherInEcf.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, settingsManager.isDrawInCoverageLines.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_SUN, settingsManager.isDrawSun.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH, settingsManager.isBlackEarth.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE, settingsManager.isDrawAtmosphere.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_AURORA, settingsManager.isDrawAurora.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_MILKY_WAY, settingsManager.isDrawMilkyWay.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HOS, settingsManager.colors.transparent[3] === 0 ? 'true' : 'false');
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEMO_MODE, settingsManager.isDemoModeOn.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE, settingsManager.isSatLabelModeOn.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, settingsManager.isDisableTimeMachineToasts.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
+  }
+
   colors: ColorSchemeColorMap;
 
   /** Ensures no html is injected into the page */
@@ -1198,8 +1229,8 @@ export class SettingsManager {
      * Load Order:
      * URL Params > Local Storage > Default
      */
-    this.loadOverrides_(settingsOverride);
     this.loadPersistedSettings();
+    this.loadOverrides_(settingsOverride);
 
     const params = this.loadOverridesFromUrl_();
 
@@ -1469,7 +1500,7 @@ export class SettingsManager {
             this.externalTLEs = decodeURIComponent(val);
             break;
           case 'jsc':
-            this.isEnableJscCatalog = true;
+            this.isEnableJscCatalog = val === 'true';
             break;
           case 'sat':
             keepTrackApi.register({

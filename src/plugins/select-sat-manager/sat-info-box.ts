@@ -669,7 +669,12 @@ export class SatInfoBox extends KeepTrackPlugin {
     const isHasAltName = (obj as DetailedSatellite)?.altName && (obj as DetailedSatellite).altName !== '';
 
     getEl('sat-info-title-name').innerHTML = obj.name;
-    getEl('sat-infobox-fi').classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
+
+    if (obj.isSatellite() && (obj as DetailedSatellite).sccNum5 === '25544') {
+      getEl('sat-infobox-fi').classList.value = 'fi fi-iss';
+    } else {
+      getEl('sat-infobox-fi').classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
+    }
     getEl('sat-alt-name').innerHTML = isHasAltName ? (obj as DetailedSatellite).altName : 'N/A';
 
     const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);

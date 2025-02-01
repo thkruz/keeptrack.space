@@ -12,6 +12,7 @@ import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 import { TimeMachine } from '../time-machine/time-machine';
+import { SettingsManager } from '@app/settings/settings';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -356,7 +357,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       cb: () => {
         getEl('settings-form').addEventListener('change', SettingsMenuPlugin.onFormChange_);
         getEl('settings-form').addEventListener('submit', SettingsMenuPlugin.onSubmit_);
-        getEl('settings-reset').addEventListener('click', SettingsMenuPlugin.resetToDefaults_);
+        getEl('settings-reset').addEventListener('click', SettingsMenuPlugin.resetToDefaults);
 
         const colorPalette = [
           // Reds
@@ -521,37 +522,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     // (<HTMLInputElement>getEl('satFieldOfView')).value = settingsManager.selectedSatFOV.toString();
   }
 
-  static preserveSettings() {
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_STARLINK_SATS, settingsManager.isShowStarlinkSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HEO_SATS, settingsManager.isShowHeoSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MEO_SATS, settingsManager.isShowMeoSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GEO_SATS, settingsManager.isShowGeoSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_PAYLOADS, settingsManager.isShowPayloads.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ROCKET_BODIES, settingsManager.isShowRocketBodies.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEBRIS, settingsManager.isShowDebris.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_AGENCIES, settingsManager.isShowAgencies.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, settingsManager.isDrawOrbits.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, settingsManager.isDrawTrailingOrbits.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ECF, settingsManager.isOrbitCruncherInEcf.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, settingsManager.isDrawInCoverageLines.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_SUN, settingsManager.isDrawSun.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH, settingsManager.isBlackEarth.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE, settingsManager.isDrawAtmosphere.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_AURORA, settingsManager.isDrawAurora.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_MILKY_WAY, settingsManager.isDrawMilkyWay.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HOS, settingsManager.colors.transparent[3] === 0 ? 'true' : 'false');
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEMO_MODE, settingsManager.isDemoModeOn.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE, settingsManager.isSatLabelModeOn.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, settingsManager.isDisableTimeMachineToasts.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
-  }
-
   private onColorSelected_(context: ColorPick, colorStr: string) {
     if (typeof context === 'undefined' || context === null) {
       throw new Error('context is undefined');
@@ -632,7 +602,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
   }
 
-  private static resetToDefaults_() {
+  static resetToDefaults() {
     keepTrackApi.getSoundManager().play(SoundNames.BUTTON_CLICK);
     settingsManager.isShowLeoSats = true;
     settingsManager.isShowHeoSats = true;
@@ -643,7 +613,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isShowDebris = true;
     settingsManager.isShowAgencies = false;
     settingsManager.isDrawOrbits = true;
-    settingsManager.drawCameraWidget = true;
+    settingsManager.drawCameraWidget = false;
     settingsManager.isDrawTrailingOrbits = false;
     settingsManager.isOrbitCruncherInEcf = false;
     settingsManager.isDrawInCoverageLines = true;
@@ -662,7 +632,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isFreezePropRateOnDrag = false;
     settingsManager.isDisableTimeMachineToasts = false;
     settingsManager.searchLimit = 600;
-    SettingsMenuPlugin.preserveSettings();
+    SettingsManager.preserveSettings();
     SettingsMenuPlugin.syncOnLoad();
   }
 
@@ -798,7 +768,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
 
-    SettingsMenuPlugin.preserveSettings();
+    SettingsManager.preserveSettings();
   }
 }
 

@@ -711,7 +711,7 @@ export class CatalogLoader {
        * All 9s is the default value
        * TODO: Generate a better confidence level system
        */
-      if (resp[i].source === CatalogSource.USSF) {
+      if (resp[i].source === CatalogSource.CELESTRAK) {
         resp[i].TLE1 = `${resp[i].TLE1.substring(0, 64)}9${resp[i].TLE1.substring(65)}` as TleLine1;
       } else {
         resp[i].TLE1 = `${resp[i].TLE1.substring(0, 64)}5${resp[i].TLE1.substring(65)}` as TleLine1;

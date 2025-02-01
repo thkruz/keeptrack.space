@@ -364,7 +364,7 @@ export const country2flagIcon = (country: string): string => {
   if (countryCode) {
     const codes = countryCode.split('|').map((code: string) => countryFlagIconMap[code] ?? code.toLowerCase());
 
-    return codes.map((code) => `fi-${code.toLowerCase()}`).join(' ');
+    return `fi-${codes[0].toLowerCase()}`;
   }
 
   console.warn(`Country code not found for ${country}`);

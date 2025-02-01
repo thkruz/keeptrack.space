@@ -1,5 +1,4 @@
 /* eslint-disable max-lines */
-import { getEl } from '@app/lib/get-el';
 import { StringPad } from '@app/lib/stringPad';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
@@ -48,9 +47,9 @@ interface AsciiTleSat {
 
 export interface KeepTrackTLEFile {
   /** First TLE line */
-  TLE1: TleLine1;
+  tle1: TleLine1;
   /** Second TLE line */
-  TLE2: TleLine2;
+  tle2: TleLine2;
   /** Satellite Bus */
   bus?: string;
   /** Lift vehicle configuration */
@@ -131,14 +130,12 @@ export interface KeepTrackTLEFile {
 }
 
 export class CatalogLoader {
-  static filterTLEDatabase(resp: KeepTrackTLEFile[], limitSatsArray?: string[], extraSats?: ExtraSat[], asciiCatalog?: AsciiTleSat[] | void, jsCatalog?: JsSat[]): void {
+  static filterTLEDatabase(resp: KeepTrackTLEFile[], extraSats?: ExtraSat[], asciiCatalog?: AsciiTleSat[] | void, jsCatalog?: JsSat[]): void {
     let tempObjData: BaseObject[] = [];
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     catalogManagerInstance.sccIndex = <{ [key: string]: number }>{};
     catalogManagerInstance.cosparIndex = <{ [key: string]: number }>{};
-
-    CatalogLoader.checkForLimitSats_(limitSatsArray);
 
     const notionalSatNum = 400000; // Start at 400,000 to avoid conflicts with real satellites
 
@@ -148,11 +145,7 @@ export class CatalogLoader {
       // Check if first digit is a letter
       resp[i].sccNum = Tle.convertA5to6Digit(resp[i]?.sccNum);
 
-      if (settingsManager.limitSats === '') {
-        CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
-      } else {
-        CatalogLoader.processLimitedSats_(limitSatsArray, resp, i, catalogManagerInstance, tempObjData);
-      }
+      CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
     }
 
     if (extraSats?.length > 0) {
@@ -194,6 +187,15 @@ export class CatalogLoader {
     const settingsManager: SettingsManager = window.settingsManager;
 
     try {
+
+      if (settingsManager.dataSources.tle === 'https://api.keeptrack.space/v2/sats' || settingsManager.dataSources.tle === 'http://localhost:8787/v2/sats') {
+        if (!settingsManager.limitSats) {
+          CatalogLoader.setupGetVariables();
+        }
+        settingsManager.dataSources.tle = `${settingsManager.dataSources.tle}/${settingsManager.limitSats}`;
+        settingsManager.dataSources.tle = settingsManager.dataSources.tle.replace(/\/$/u, '');
+      }
+
       const {
         extraSats,
         asciiCatalog,
@@ -283,7 +285,6 @@ export class CatalogLoader {
   }): Promise<void> {
     await Promise.all([extraSats, asciiCatalog, externalCatalog, jsCatalog]).then(([extraSats, asciiCatalog, externalCatalog, jsCatalog]) => {
       asciiCatalog = externalCatalog || asciiCatalog;
-      const limitSatsArray = !settingsManager.limitSats ? CatalogLoader.setupGetVariables() : settingsManager.limitSats.split(',');
 
       // Make sure everyone agrees on what time it is
       keepTrackApi.getTimeManager().synchronize();
@@ -292,7 +293,7 @@ export class CatalogLoader {
        * Filter TLEs
        * Sets catalogManagerInstance.satData internally to reduce memory usage
        */
-      CatalogLoader.filterTLEDatabase(resp, limitSatsArray, extraSats, asciiCatalog, jsCatalog);
+      CatalogLoader.filterTLEDatabase(resp, extraSats, asciiCatalog, jsCatalog);
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
@@ -328,8 +329,6 @@ export class CatalogLoader {
       switch (key) {
         case 'limitSats':
           settingsManager.limitSats = val;
-          (<HTMLInputElement>getEl('limitSats')).value = val;
-          getEl('limitSats-Label').classList.add('active');
           limitSatsArray = val.split(',');
           break;
         case 'future use':
@@ -398,17 +397,6 @@ export class CatalogLoader {
   }
 
   /**
-   * Checks if there are any limit sats and sets the settingsManager accordingly.
-   * @param limitSatsArray - An array of limit sats.
-   */
-  private static checkForLimitSats_(limitSatsArray: string[]) {
-    if (typeof limitSatsArray === 'undefined' || limitSatsArray.length === 0 || limitSatsArray[0] === null) {
-      // If there are no limits then just process like normal
-      settingsManager.limitSats = '';
-    }
-  }
-
-  /**
    * Removes any extra lines and \r characters from the given string array.
    * @param content - The string array to be cleaned.
    */
@@ -430,11 +418,11 @@ export class CatalogLoader {
    * TODO: This should be done by the catalog-manager itself
    */
   private static addSccNum_(resp: KeepTrackTLEFile[], i: number) {
-    resp[i].sccNum = StringPad.pad0(resp[i].TLE1.substring(2, 7).trim(), 5);
+    resp[i].sccNum = StringPad.pad0(resp[i].tle1.substring(2, 7).trim(), 5);
     // Also update TLE1
-    resp[i].TLE1 = <TleLine1>(resp[i].TLE1.substring(0, 2) + resp[i].sccNum + resp[i].TLE1.substring(7));
+    resp[i].tle1 = <TleLine1>(resp[i].tle1.substring(0, 2) + resp[i].sccNum + resp[i].tle1.substring(7));
     // Also update TLE2
-    resp[i].TLE2 = <TleLine2>(resp[i].TLE2.substring(0, 2) + resp[i].sccNum + resp[i].TLE2.substring(7));
+    resp[i].tle2 = <TleLine2>(resp[i].tle2.substring(0, 2) + resp[i].sccNum + resp[i].tle2.substring(7));
   }
 
   /**
@@ -698,7 +686,7 @@ export class CatalogLoader {
       return;
     }
 
-    const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
+    const intlDes = CatalogLoader.parseIntlDes_(resp[i].tle1);
 
     resp[i].intlDes = intlDes;
     resp[i].active = true;
@@ -712,9 +700,9 @@ export class CatalogLoader {
        * TODO: Generate a better confidence level system
        */
       if (resp[i].source === CatalogSource.CELESTRAK) {
-        resp[i].TLE1 = `${resp[i].TLE1.substring(0, 64)}9${resp[i].TLE1.substring(65)}` as TleLine1;
+        resp[i].tle1 = `${resp[i].tle1.substring(0, 64)}9${resp[i].tle1.substring(65)}` as TleLine1;
       } else {
-        resp[i].TLE1 = `${resp[i].TLE1.substring(0, 64)}5${resp[i].TLE1.substring(65)}` as TleLine1;
+        resp[i].tle1 = `${resp[i].tle1.substring(0, 64)}5${resp[i].tle1.substring(65)}` as TleLine1;
       }
 
       let rcs: number;
@@ -730,8 +718,8 @@ export class CatalogLoader {
       try {
         const satellite = new DetailedSatellite({
           id: tempObjData.length,
-          tle1: resp[i].TLE1,
-          tle2: resp[i].TLE2,
+          tle1: resp[i].tle1,
+          tle2: resp[i].tle2,
           ...resp[i],
           rcs,
         });
@@ -752,8 +740,8 @@ export class CatalogLoader {
       const notionalDebris = new DetailedSatellite({
         id: 0,
         name: `${resp[i].name} (1cm Notional)`,
-        tle1: resp[i].TLE1,
-        tle2: resp[i].TLE2,
+        tle1: resp[i].tle1,
+        tle2: resp[i].tle2,
         sccNum: '',
         type: SpaceObjectType.NOTIONAL,
         source: 'Notional',
@@ -999,37 +987,6 @@ export class CatalogLoader {
         } else {
           errorManagerInstance.debug('Skipping non-Vimpel satellite in JSC Vimpel catalog');
         }
-      }
-    }
-  }
-
-  private static processLimitedSats_(limitSatsArray: string[], resp: KeepTrackTLEFile[], i: number, catalogManagerInstance: CatalogManager, tempObjData: any[]) {
-    for (const limitSat of limitSatsArray) {
-      if (resp[i].sccNum === limitSat) {
-        const intlDes = CatalogLoader.parseIntlDes_(resp[i].TLE1);
-
-        resp[i].intlDes = intlDes;
-        catalogManagerInstance.sccIndex[`${resp[i].sccNum}`] = resp[i].id;
-        catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = resp[i].id;
-        resp[i].active = true;
-        resp[i].source = CatalogSource.CELESTRAK;
-
-        let rcs: number | null;
-
-        rcs = resp[i].rcs === 'LARGE' ? 5 : rcs;
-        rcs = resp[i].rcs === 'MEDIUM' ? 0.5 : rcs;
-        rcs = resp[i].rcs === 'SMALL' ? 0.05 : rcs;
-        rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : rcs ?? null;
-
-        const satellite = new DetailedSatellite({
-          id: tempObjData.length,
-          tle1: resp[i].TLE1,
-          tle2: resp[i].TLE2,
-          ...resp[i],
-          rcs,
-        });
-
-        tempObjData.push(satellite);
       }
     }
   }

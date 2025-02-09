@@ -943,7 +943,6 @@ export class SettingsManager {
    * Automatically display all of the orbits
    */
   startWithOrbitsDisplayed = false;
-  tleSource = '';
   brownEarthImages = false;
   /**
    * How many draw calls to wait before updating orbit overlay if last draw time was greater than 50ms
@@ -1446,6 +1445,7 @@ export class SettingsManager {
    * This is an initial parse of the GET variables to determine
    * critical settings. Other variables are checked later during catalogManagerInstance.init
    */
+  // eslint-disable-next-line complexity
   private initParseFromGETVariables_(params: string[]) {
     if (!this.disableUI) {
       for (const param of params) {
@@ -1494,6 +1494,9 @@ export class SettingsManager {
             break;
           case 'external-only':
             this.externalTLEsOnly = true;
+            break;
+          case 'gp':
+            this.dataSources.tle = decodeURIComponent(val);
             break;
           case 'tle':
             // Decode from UTF-8
@@ -1587,10 +1590,6 @@ export class SettingsManager {
             break;
           case 'political':
             this.politicalImages = true;
-            break;
-          case 'retro':
-            this.retro = true;
-            this.tleSource = 'tle/retro.json';
             break;
           case 'offline':
             this.offline = true;

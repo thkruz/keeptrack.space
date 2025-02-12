@@ -335,14 +335,35 @@ export class SettingsPresets {
 
   static _show2DMapIcon() {
     const mapIcon = document.getElementById('map-2d-icon');
+    showEl('map-2d-icon');
 
     mapIcon.addEventListener('click', () => {
       window.location.href = './2d-map.html';
     });
   }
 
+  static _showConstellation4Icon() {
+    const constellation4Icon = document.getElementById('constellation-4-icon');
+    showEl('constellation-4-icon');
+
+    constellation4Icon.addEventListener('click', () => {
+      window.location.href = './?preset=sateliot';
+    });
+  }
+
+
+  static _showConstellation64Icon() {
+    const constellation4Icon = document.getElementById('constellation-64-icon');
+    showEl('constellation-64-icon');
+
+    constellation4Icon.addEventListener('click', () => {
+      window.location.href = './?preset=phaseB';
+    });
+  }
+
   static _showGitHubIcon() {
     const githubIcon = document.getElementById('sateliot-github-icon');
+    showEl('sateliot-github-icon');
 
     githubIcon.addEventListener('click', () => {
       window.location.href = 'https://github.com/Sateliot/sateliot.keeptrack';
@@ -484,10 +505,15 @@ export class SettingsPresets {
       showEl('sateliot-logo');
       showEl('toggle-search-icon');
       hideEl('jday');
+      hideEl('constellation-4-icon');
+      hideEl('constellation-64-icon');
+      hideEl('map-2d-icon');
 
       keepTrackApi.getUiManager().searchManager.doSearch(settings.limitSats);
 
-      this._show2DMapIcon();
+      // this._show2DMapIcon(); // Disabled for
+
+      this._showConstellation64Icon();
 
       this._showGitHubIcon();
 
@@ -571,7 +597,7 @@ export class SettingsPresets {
 
       keepTrackApi.getUiManager().searchManager.doSearch(settings.limitSats);
 
-      this._show2DMapIcon();
+      // this._show2DMapIcon(); // Disabled for MWC
 
       this._showGitHubIcon();
 
@@ -654,10 +680,15 @@ export class SettingsPresets {
       showEl('sateliot-logo');
       showEl('toggle-search-icon');
       hideEl('jday');
+      hideEl('constellation-4-icon');
+      hideEl('constellation-64-icon');
+      hideEl('map-2d-icon');
 
       keepTrackApi.getUiManager().searchManager.doSearch(settings.limitSats);
 
-      this._show2DMapIcon();
+      // this._show2DMapIcon(); // Disabled for MWC
+
+      this._showConstellation4Icon();
 
       this._showGitHubIcon();
 

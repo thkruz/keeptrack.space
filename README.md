@@ -54,6 +54,20 @@ You also need:
    npm start
    ```
 
+### Development
+
+To run the project in development mode:
+```bash
+npm run build:watch
+```
+
+In other terminal, start the application:
+```bash
+npm run start
+```
+
+This mode detects changes in the source files and automatically rebuilds the project.
+
 ### Runing with Docker
 
 1. Build the Docker image:

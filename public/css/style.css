@@ -4006,8 +4006,34 @@ nav a.sidenav-trigger i {
   height: auto;
   cursor: pointer;
   z-index: 100;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
+  /* border-radius: 50%; */
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  transition: transform 0.3s ease;
+}
+
+#constellation-4-icon {
+  position: absolute;
+  bottom: 30px;
+  right: 10px;
+  width: 50px;
+  height: auto;
+  cursor: pointer;
+  z-index: 100;
+  /* border-radius: 50%; */
+  /* background-color: rgba(0, 0, 0, 0.5); */
+  transition: transform 0.3s ease;
+}
+
+#constellation-64-icon {
+  position: absolute;
+  bottom: 30px;
+  right: 10px;
+  width: 50px;
+  height: auto;
+  cursor: pointer;
+  z-index: 100;
+  /* border-radius: 50%; */
+  /* background-color: rgba(0, 0, 0, 0.5); */
   transition: transform 0.3s ease;
 }
 
@@ -4019,8 +4045,8 @@ nav a.sidenav-trigger i {
   height: auto;
   cursor: pointer;
   z-index: 100;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
+  /* border-radius: 50%; */
+  /* background-color: rgba(0, 0, 0, 0.5); */
   transition: transform 0.3s ease;
 }
 
@@ -4032,8 +4058,8 @@ nav a.sidenav-trigger i {
   height: auto;
   cursor: pointer;
   z-index: 100;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
+  /* border-radius: 50%; */
+  /* background-color: rgba(0, 0, 0, 0.5); */
   transition: transform 0.3s ease;
 }
 
@@ -4049,8 +4075,8 @@ nav a.sidenav-trigger i {
   height: auto;
   cursor: pointer;
   z-index: 100;
-  border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.5);
+  /* border-radius: 50%; */
+  /* background-color: rgba(0, 0, 0, 0.5); */
   transition: transform 0.3s ease;
 }
 

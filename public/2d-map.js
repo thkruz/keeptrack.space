@@ -44,8 +44,9 @@ const satelliteIcon = L.icon({
     popupAnchor: [0, -16]  // Where the popup will appear relative to the icon
 });
 
-// List of NORAD IDs for Sateliot satellites
-const sateliotSatellites = [
+// Satellite configuration
+var sateliotSatellites = [];
+const sateliotSatellitesDefault = [
     { norad: 60550, color: '#FF6B00' },
     { norad: 60534, color: '#00A7E1' },
     { norad: 60552, color: '#1D1D1B' },
@@ -54,16 +55,49 @@ const sateliotSatellites = [
 
 // Function to load TLE data from a JSON file
 async function getTLEData() {
-    const response = await fetch('https://storage.keeptrack.space/data/tle.json');
+    const response = await fetch('../tle/sateliot.json');
     const tleData = await response.json();
-
-    // Filter the satellites that have the NORAD IDs we are looking for
     return tleData.filter(satellite =>
-        sateliotSatellites.some(sat => parseInt(satellite.TLE2.split(' ')[1]) === sat.norad)
+        sateliotSatellitesDefault.some(sat => parseInt(satellite.TLE2.split(' ')[1]) === sat.norad)
     );
 }
 
-// Function to detect 180-degree meridian crossings
+// Function to normalize longitude to ensure smooth progression
+function normalizeLongitude(longitude, lastLongitude) {
+    if (longitude - lastLongitude > 180) {
+        longitude -= 360; // Adjust crossing the 180° E -> W
+    } else if (longitude - lastLongitude < -180) {
+        longitude += 360; // Adjust crossing the 180° W -> E
+    }
+    return longitude;
+}
+
+// Function to get the full orbit coordinates from the current time
+function getOrbitCoordinates(tleLine1, tleLine2, timeArray) {
+    const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+    let lastLongitude = null;
+    const orbitCoordinates = [];
+
+    timeArray.forEach(time => {
+        const positionAndVelocity = satellite.propagate(satrec, time);
+        if (!positionAndVelocity.position) return;
+
+        const gmst = satellite.gstime(time);
+        const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, gmst);
+        let longitude = satellite.degreesLong(positionGd.longitude);
+        const latitude = satellite.degreesLat(positionGd.latitude);
+
+        if (lastLongitude !== null) {
+            longitude = normalizeLongitude(longitude, lastLongitude);
+        }
+        lastLongitude = longitude;
+        orbitCoordinates.push([latitude, longitude]);
+    });
+
+    return orbitCoordinates;
+}
+
+// Function to detect 180-degree meridian crossings and segment the orbit
 function detectMeridianCross(coordinates) {
     const segments = [];
     let currentSegment = [];
@@ -72,246 +106,75 @@ function detectMeridianCross(coordinates) {
         const [lat1, lon1] = coordinates[i];
         const [lat2, lon2] = coordinates[i + 1];
 
-        // Add the current point to the segment
         currentSegment.push([lat1, lon1]);
 
-        // Detect 180-degree meridian crossing
         if (Math.abs(lon1 - lon2) > 180) {
-            // End the current segment
             segments.push(currentSegment);
-            // Start a new segment
             currentSegment = [];
         }
     }
 
-    // Add the last segment if it's not empty
-    if (currentSegment.length > 0) {
-        currentSegment.push(coordinates[coordinates.length - 1]);
-        segments.push(currentSegment);
-    }
+    currentSegment.push(coordinates[coordinates.length - 1]);
+    segments.push(currentSegment);
 
     return segments;
 }
 
-// Function to get the full orbit coordinates up to the current time
-function getOrbitCoordinatesUpToNow(tleLine1, tleLine2, secondsInThePast) {
-    if (tleLine1 === undefined || tleLine2 === undefined) {
-        console.log("TLE lines are undefined");
-        return;
-    }
-    const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
-    const positions = [];
+// Function to draw the satellite orbit
+function drawSatelliteOrbit(satellite, segmentOrbit) {
+    const secondsInThePast = 45 * 60; // Orbit time in seconds
+    const secondsInTheFuture = 90 * 60; // Orbit time in seconds
+    const step = 10; // Time step in seconds
+    const timeArray = Array.from({ length: secondsInThePast / step }, (_, i) =>
+        new Date(new Date().getTime() - i * step * 1000)
+    );
 
-    // Simulate the full orbit up to the current time
-    const now = new Date();  // Current time
-    // const secondsInThePast = 45 * 60;  // Orbit time in seconds (a typical full orbit is 90 minutes. Half, 45 minutes)
+    const timeArrayFuture = Array.from({ length: secondsInTheFuture / step }, (_, i) =>
+        new Date(new Date().getTime() + i * step * 1000)
+    );
 
-    // Generate a point every 10 seconds
-    const step = 10;  // 10 seconds per point
-    var lastLongitude = 0;
-    var orbitCount = 0;
+    // merge past and future time arrays
+    timeArray.push(...timeArrayFuture);
 
-    for (let i = 0; i <= secondsInThePast; i += step) {
-        var time = new Date(now.getTime() - i * 1000);  // Go back in seconds
-        var positionAndVelocity = satellite.propagate(satrec, time);
-        var positionGd = satellite.eciToGeodetic(positionAndVelocity.position, satellite.gstime(time));
-        var longitude = satellite.degreesLong(positionGd.longitude);
-        var latitude = satellite.degreesLat(positionGd.latitude);
+    // order by time
+    timeArray.sort((a, b) => a - b);
 
-        // If we cross the 180-degree meridian (from -180 to +180 or vice versa), increment the orbit counter
-        if (i > 0 && Math.abs(longitude - lastLongitude) > 180) {
-            orbitCount++;
-        }
-
-        lastLongitude = longitude;
-
-        // Slide longitudes in multiples of 360 degrees according to the orbit counter
-        longitude += orbitCount * 360;
-
-        positions.push([latitude, longitude]);
-    }
-
-    return positions.reverse();  // Reverse to have the most recent position at the end
-}
-
-// Function to get the full orbit coordinates from the current time
-function getOrbitCoordinatesFromNow(tleLine1, tleLine2, secondsInTheFuture) {
-    if (tleLine1 === undefined || tleLine2 === undefined) {
-        console.log("TLE lines are undefined");
-        return;
-    }
-    var positions = [];
-    var satrec = satellite.twoline2satrec(tleLine1, tleLine2);
-    var now = new Date();
-
-    var lastLongitude = 0;
-    var orbitCount = 0;  // Contador para controlar cuándo se completa una órbita
-
-    // ** Cambiar los pasos a cada 10 segundos en lugar de 1 minuto**
-    const step = 10;  // 10 seconds per point
-
-    for (let i = 0; i <= secondsInTheFuture; i += step) {
-        var time = new Date(now.getTime() + i * 1000);  // Avanzar en intervalos de 10 segundos
-        var positionAndVelocity = satellite.propagate(satrec, time);
-        var positionGd = satellite.eciToGeodetic(positionAndVelocity.position, satellite.gstime(time));
-        var longitude = satellite.degreesLong(positionGd.longitude);
-        var latitude = satellite.degreesLat(positionGd.latitude);
-
-        // If we cross the 180-degree meridian (from -180 to +180 or vice versa), increment the orbit counter
-        if (i > 0 && Math.abs(longitude - lastLongitude) > 180) {
-            orbitCount++;
-        }
-
-        lastLongitude = longitude;
-
-        // slide longitudes in multiples of 360 degrees according to the orbit counter
-        longitude -= orbitCount * 360;
-
-        positions.push([latitude, longitude]);
-    }
-    return positions;
-}
-
-
-// Function to get the current position of a satellite
-function getCurrentPosition(tleLine1, tleLine2) {
-    const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
-    const time = new Date();
-    const positionAndVelocity = satellite.propagate(satrec, time);
-    const positionGd = satellite.eciToGeodetic(positionAndVelocity.position, satellite.gstime(time));
-    const longitude = satellite.degreesLong(positionGd.longitude);
-    const latitude = satellite.degreesLat(positionGd.latitude);
-    return [latitude, longitude];
-}
-
-// Function to clear the old orbits
-function clearOrbits() {
-    // Remove old orbit polylines
-    orbitPolylines.forEach(polyline => {
-        map.removeLayer(polyline);
-    });
-    orbitPolylines = [];  // Clear the list after removing
-
-    // Remove old decorators
-    orbitDecorators.forEach(decorator => {
-        map.removeLayer(decorator);
-    });
-    orbitDecorators = [];  // Clear the list after removing
-}
-
-// Function to draw the full orbit up to the current time
-function drawSatelliteOrbit(satellite, orbitPolylines, segmentOrbit) {
-
-    // Get the full orbit up to the current time
-    const secondsInThePast = 45 * 60;  // Orbit time in seconds (a typical full orbit is 90 minutes. Half, 45 minutes)
-    const secondsInTheFuture = 90 * 60;  // Orbit time in seconds (a typical full orbit is 90 minutes)
-    // seconds in the future to draw the orbit for 24 hours
-    // const secondsInTheFuture = 24 * 60 * 60;
-
-    const orbitCoordinatesPast = getOrbitCoordinatesUpToNow(satellite.TLE1, satellite.TLE2, secondsInThePast);
-    const orbitCoordinatesFuture = getOrbitCoordinatesFromNow(satellite.TLE1, satellite.TLE2, secondsInTheFuture);
-    if (orbitCoordinatesPast === undefined || orbitCoordinatesFuture === undefined) {
-        console.log("Error getting orbit coordinates");
-        return;
-    }
-    const orbitCoordinates = orbitCoordinatesPast.concat(orbitCoordinatesFuture);
-
-    // Get satellite color
-    const satelite_color = sateliotSatellites.find(sat => parseInt(satellite.TLE2.split(' ')[1]) === sat.norad).color;
+    const orbitCoordinates = getOrbitCoordinates(satellite.TLE1, satellite.TLE2, timeArray);
+    const sateliteColor = sateliotSatellitesDefault.find(sat => parseInt(satellite.TLE2.split(' ')[1]) === sat.norad).color;
 
     if (segmentOrbit) {
-        // If segmentation is enabled, detect 180-degree meridian crossing and segment the orbit
         const segments = detectMeridianCross(orbitCoordinates);
-        // Draw each segment of the orbit
         segments.forEach(segment => {
-            polyline = L.polyline(segment, { color: satelite_color }).addTo(map);
+            const polyline = L.polyline(segment, { color: sateliteColor }).addTo(map);
             orbitPolylines.push(polyline);
         });
     } else {
-        // If segmentation is disabled, draw the orbit as a continuous line
-        polyline = L.polyline(orbitCoordinates, { color: satelite_color }).addTo(map);
+        const polyline = L.polyline(orbitCoordinates, { color: sateliteColor }).addTo(map);
         orbitPolylines.push(polyline);
     }
-
-    // Add arrows or symbols to show direction of movement
-    const decorator = L.polylineDecorator(polyline, {
-        patterns: [
-            {
-                offset: 25, // Starting point
-                repeat: 200, // Space between arrows
-                symbol: L.Symbol.arrowHead({
-                    pixelSize: 10, // Size of the arrow
-                    polygon: false,
-                    pathOptions: { stroke: true, color: satelite_color, weight: 2 }
-                })
-            }
-        ]
-    }).addTo(map);
-
-    orbitDecorators.push(decorator);  // Store the decorator to remove later
-
-}
-
-function updateSatellitePosition(satellite, marker) {
-    const currentPosition = getCurrentPosition(satellite.TLE1, satellite.TLE2);
-    marker.setLatLng(currentPosition);
-}
-
-// Function to add a marker to the map
-function addMarker(marker) {
-    allMarkers.push(marker);  // Almacenar el marcador en la lista
-}
-
-// Function to remove all markers from the map
-function removeAllMarkers() {
-    allMarkers.forEach(marker => {
-        map.removeLayer(marker);  // Eliminar cada marcador del mapa
-    });
-    allMarkers = [];  // Vaciar la lista después de eliminar los marcadores
 }
 
 // Main function to load and draw Sateliot satellites
 async function loadSateliotSatellites() {
     const sateliotSatellites = await getTLEData();
 
-    // Draw the orbits on load the application
     sateliotSatellites.forEach(satellite => {
-        drawSatelliteOrbit(satellite, orbitPolylines, segmentOrbit);
-
-        var currentPosition = getCurrentPosition(satellite.TLE1, satellite.TLE2);
-        var marker = L.marker(currentPosition, { icon: satelliteIcon }).addTo(map).bindPopup(`<b>${satellite.name}</b>`);
-        addMarker(marker);
-        updateSatellitePosition(satellite, marker);
-
+        drawSatelliteOrbit(satellite, segmentOrbit);
+        const currentPosition = getOrbitCoordinates(satellite.TLE1, satellite.TLE2, [new Date()])[0];
+        const marker = L.marker(currentPosition, { icon: satelliteIcon }).addTo(map);
+        allMarkers.push(marker);
     });
 
-    // Update satellite position periodically
-    setInterval(() => {
-        removeAllMarkers();
-        sateliotSatellites.forEach(satellite => {
-            var currentPosition = getCurrentPosition(satellite.TLE1, satellite.TLE2);
-            var marker = L.marker(currentPosition, { icon: satelliteIcon }).addTo(map).bindPopup(`<b>${satellite.name}</b>`);
-            addMarker(marker);
-            updateSatellitePosition(satellite, marker);
-        });
-    }, 1000);
-
-
-    // Update the orbits periodically
     setInterval(() => {
         clearOrbits();
-        sateliotSatellites.forEach(satellite => {
-            drawSatelliteOrbit(satellite, orbitPolylines, segmentOrbit);
-        });
-    }, 300000); // Update every 300000ms (5 minutes)
-    // }, 5000); // Update every 5000ms (5 seconds)
-
+        sateliotSatellites.forEach(satellite => drawSatelliteOrbit(satellite, segmentOrbit));
+    }, 300000);
 }
 
-setInterval(() => {
-    terminator.setTime(new Date(Date.now())); // Update the terminator with the current time UTC
-    terminator.addTo(map);
-}, 60000); // Update terminator every 60000ms (1 minute)
+function clearOrbits() {
+    orbitPolylines.forEach(polyline => map.removeLayer(polyline));
+    orbitPolylines = [];
+}
 
 // Load the Sateliot satellites
 loadSateliotSatellites();

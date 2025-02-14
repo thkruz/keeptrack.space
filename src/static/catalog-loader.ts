@@ -229,7 +229,7 @@ export class CatalogLoader {
           .catch((error) => {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
-      } else if (settingsManager.isShowSateliotPhaseA) {
+      } else if (settingsManager.loadPhaseAJsonFile) {
         // Load phaseA.json file
         const resp = await fetch(`${settingsManager.installDirectory}tle/phaseA.json`);
         if (resp.ok) {
@@ -245,7 +245,7 @@ export class CatalogLoader {
           errorManagerInstance.warn('Error loading phaseA.json');
         }
 
-      } else if (settingsManager.isShowSateliotPhaseB) {
+      } else if (settingsManager.loadPhaseBJsonFile) {
         // Load phaseA.json file
         const resp = await fetch(`${settingsManager.installDirectory}tle/phaseB.json`);
         if (resp.ok) {

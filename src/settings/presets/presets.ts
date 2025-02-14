@@ -347,7 +347,7 @@ export class SettingsPresets {
     showEl('constellation-4-icon');
 
     constellation4Icon.addEventListener('click', () => {
-      window.location.href = './?preset=sateliot';
+      window.location.href = './?preset=sateliot-4';
     });
   }
 
@@ -357,7 +357,7 @@ export class SettingsPresets {
     showEl('constellation-64-icon');
 
     constellation4Icon.addEventListener('click', () => {
-      window.location.href = './?preset=phaseB';
+      window.location.href = './?preset=sateliot-64';
     });
   }
 
@@ -511,11 +511,10 @@ export class SettingsPresets {
 
       keepTrackApi.getUiManager().searchManager.doSearch(settings.limitSats);
 
-      // this._show2DMapIcon(); // Disabled for
+      // this._show2DMapIcon(); // Disabled for MWC
 
-      this._showConstellation64Icon();
-
-      this._showGitHubIcon();
+      // this._showConstellation64Icon(); // Disabled for MWC
+      // this._showGitHubIcon(); // Disable for MWC
 
       this._showRestoreViewIcon();
 
@@ -528,10 +527,10 @@ export class SettingsPresets {
     };
   }
 
-  static loadPresetSateliotNextMissionPhaseA(settings: SettingsManager) {
-    console.log("Sateliot PHASE A Preset");
+  static loadPresetSateliot4(settings: SettingsManager) {
+    console.log("Sateliot Preset 4");
     settings.satShader.minSize = 30.0;
-    settings.limitSats = '99005,99006,99007,99008,99009,99010,99011,99012,99013,99014,99015,99016,99017,99018,99019,99020';
+    settings.limitSats = '60550,60534,60552,60537';
     settings.disableAllPlugins();
     settings.isDisableStars = true;
     settings.maxAnalystSats = 1;
@@ -594,11 +593,15 @@ export class SettingsPresets {
       showEl('sateliot-logo');
       showEl('toggle-search-icon');
       hideEl('jday');
+      hideEl('constellation-4-icon');
+      // showEl('constellation-64-icon');
+      hideEl('map-2d-icon');
 
       keepTrackApi.getUiManager().searchManager.doSearch(settings.limitSats);
 
       // this._show2DMapIcon(); // Disabled for MWC
 
+      this._showConstellation64Icon();
       this._showGitHubIcon();
 
       this._showRestoreViewIcon();
@@ -612,10 +615,8 @@ export class SettingsPresets {
     };
   }
 
-
-
-  static loadPresetSateliotNextMissionPhaseB(settings: SettingsManager) {
-    console.log("Sateliot PHASE A Preset");
+  static loadPresetSateliot64(settings: SettingsManager) {
+    console.log("Sateliot Preset 64");
     settings.satShader.minSize = 30.0;
     settings.limitSats = '99001,99002,99003,99004,99005,99006,99007,99008,99009,99010,99011,99012,99013,99014,99015,99016,99017,99018,99019,99020,99021,99022,99023,99024,99025,99026,99027,99028,99029,99030,99031,99032,99033,99034,99035,99036,99037,99038,99039,99040,99041,99042,99043,99044,99045,99046,99047,99048,99049,99050,99051,99052,99053,99054,99055,99056,99057,99058,99059,99060,99061,99062,99063,99064';
     settings.disableAllPlugins();
@@ -680,7 +681,7 @@ export class SettingsPresets {
       showEl('sateliot-logo');
       showEl('toggle-search-icon');
       hideEl('jday');
-      hideEl('constellation-4-icon');
+      // showEl('constellation-4-icon');
       hideEl('constellation-64-icon');
       hideEl('map-2d-icon');
 

@@ -486,19 +486,18 @@ export class SatInfoBox extends KeepTrackPlugin {
     hideEl('bottom-map-icon');
 
     /* SATELIOT - Filter information*/
-    if (settingsManager.isShowSateliot) {
-      getEl('raan').getElementsByClassName('sat-info-key')[0].innerHTML = 'RAAN';
-      getEl('age-of-elset').style.display = 'none';
-      getEl('lift-mass').style.display = 'none';
-      getEl('dry-mass').style.display = 'none';
-      getEl('life-expectancy').getElementsByClassName('sat-info-value')[0].innerHTML = '5 years';
-      getEl('payload').getElementsByClassName('sat-info-value')[0].innerHTML = 'NTN 5G IoT';
-      getEl('motor').getElementsByClassName('sat-info-key')[0].innerHTML = 'Thruster';
-      getEl('motor').getElementsByClassName('sat-info-value')[0].innerHTML = 'Electric';
-      getEl('power').style.display = 'none';
-    }
+    getEl('raan').getElementsByClassName('sat-info-key')[0].innerHTML = 'RAAN';
+    getEl('age-of-elset').style.display = 'none';
+    getEl('lift-mass').style.display = 'none';
+    getEl('dry-mass').style.display = 'none';
+    getEl('life-expectancy').getElementsByClassName('sat-info-value')[0].innerHTML = '5 years';
+    getEl('payload').getElementsByClassName('sat-info-value')[0].innerHTML = 'NTN 5G IoT';
+    getEl('motor').getElementsByClassName('sat-info-key')[0].innerHTML = 'Thruster';
+    getEl('motor').getElementsByClassName('sat-info-value')[0].innerHTML = 'Electric';
+    getEl('power').style.display = 'none';
 
-    if (settingsManager.isShowSateliotOps) {
+
+    if (settingsManager.showOpsData) {
       getEl('raan').getElementsByClassName('sat-info-key')[0].innerHTML = 'RAAN';
       getEl('payload').getElementsByClassName('sat-info-value')[0].innerHTML = 'TREVO';
       getEl('motor').getElementsByClassName('sat-info-key')[0].innerHTML = 'Thruster';

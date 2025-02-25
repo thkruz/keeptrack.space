@@ -92,7 +92,9 @@ export class SettingsManager {
     timelineAlt: true,
     transponderChannelData: true,
     calculator: true,
+    createSat: true,
   };
+
 
   static preserveSettings() {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
@@ -1137,7 +1139,7 @@ export class SettingsManager {
   externalTLEsOnly = false;
   positionCruncher: Worker = null;
   orbitCruncher: Worker = null;
-  /** Disables the camera widget by default */
+  /** Enables the camera widget */
   drawCameraWidget = false;
 
   loadPersistedSettings() {

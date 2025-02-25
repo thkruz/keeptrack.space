@@ -74,6 +74,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.rmbMenuActions]: [string, number];
   [KeepTrackApiEvents.rightBtnMenuAdd]: [];
   [KeepTrackApiEvents.updateDateTime]: [Date];
+  [KeepTrackApiEvents.updatePropRate]: [number];
   [KeepTrackApiEvents.uiManagerFinal]: [];
   [KeepTrackApiEvents.resetSensor]: [];
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string, number];

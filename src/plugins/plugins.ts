@@ -40,6 +40,7 @@ import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact
 import googleAnalytics from '@analytics/google-analytics';
 import createAnalytics from 'analytics';
 import { Calculator } from './calculator/calculator';
+import { CreateSat } from './create-sat/create-sat';
 import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { EcfPlot } from './plot-analysis/ecf-plots';
@@ -79,64 +80,65 @@ import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 
 export type KeepTrackPlugins = {
-  transponderChannelData: boolean;
-  videoDirector: boolean;
-  debrisScreening: boolean;
-  satInfoboxCore: boolean;
-  findSat: boolean;
-  collisions: boolean;
-  satelliteFov: boolean;
-  nightToggle: boolean;
-  countries: boolean;
-  screenRecorder: boolean;
-  aboutManager: boolean;
-  settingsMenu: boolean;
-  graphicsMenu: boolean
-  soundManager: boolean;
-  analysis: boolean;
-  astronomy: boolean;
-  breakup: boolean;
-  catalogLoader: boolean;
-  classificationBar: boolean;
-  collissions: boolean;
-  trackingImpactPredict: boolean;
-  colorsMenu: boolean;
-  constellations: boolean;
-  countriesMenu: boolean;
-  datetime: boolean;
-  debug: boolean;
-  dops: boolean;
-  editSat: boolean;
-  gamepad: boolean;
-  initialOrbit: boolean;
-  launchCalendar: boolean;
-  missile: boolean;
-  newLaunch: boolean;
-  nextLaunch: boolean;
-  orbitReferences: boolean;
-  photoManager: boolean;
-  planetarium: boolean;
-  plotAnalysis: boolean;
-  satChanges: boolean;
-  satelliteView: boolean;
-  scenarioCreator: boolean;
-  screenshot: boolean;
-  sensor: boolean;
-  sensorFov: boolean;
-  sensorSurv: boolean;
-  shortTermFences: boolean;
-  social: boolean;
-  sounds: boolean;
-  stereoMap: boolean;
-  timeMachine: boolean;
-  topMenu: boolean;
-  updateSelectBox: boolean;
-  watchlist: boolean;
-  reports: boolean;
-  polarPlot: boolean;
-  timeline: boolean;
-  timelineAlt: boolean;
-  calculator: boolean;
+  transponderChannelData?: boolean;
+  videoDirector?: boolean;
+  debrisScreening?: boolean;
+  satInfoboxCore?: boolean;
+  findSat?: boolean;
+  collisions?: boolean;
+  satelliteFov?: boolean;
+  nightToggle?: boolean;
+  countries?: boolean;
+  screenRecorder?: boolean;
+  aboutManager?: boolean;
+  settingsMenu?: boolean;
+  soundManager?: boolean;
+  analysis?: boolean;
+  astronomy?: boolean;
+  breakup?: boolean;
+  catalogLoader?: boolean;
+  classificationBar?: boolean;
+  collissions?: boolean;
+  trackingImpactPredict?: boolean;
+  colorsMenu?: boolean;
+  constellations?: boolean;
+  countriesMenu?: boolean;
+  datetime?: boolean;
+  debug?: boolean;
+  dops?: boolean;
+  editSat?: boolean;
+  gamepad?: boolean;
+  initialOrbit?: boolean;
+  launchCalendar?: boolean;
+  missile?: boolean;
+  newLaunch?: boolean;
+  nextLaunch?: boolean;
+  orbitReferences?: boolean;
+  photoManager?: boolean;
+  planetarium?: boolean;
+  plotAnalysis?: boolean;
+  satChanges?: boolean;
+  satelliteView?: boolean;
+  scenarioCreator?: boolean;
+  screenshot?: boolean;
+  sensor?: boolean;
+  sensorFov?: boolean;
+  sensorSurv?: boolean;
+  shortTermFences?: boolean;
+  social?: boolean;
+  sounds?: boolean;
+  stereoMap?: boolean;
+  timeMachine?: boolean;
+  topMenu?: boolean;
+  updateSelectBox?: boolean;
+  watchlist?: boolean;
+  reports?: boolean;
+  polarPlot?: boolean;
+  graphicsMenu?: boolean;
+  timeline?: boolean;
+  timelineAlt?: boolean;
+  calculator?: boolean;
+  createSat?: boolean;
 };
 
 // Register all core modules
@@ -197,15 +199,15 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new EcfPlot().init(), enabled: plugins.plotAnalysis },
       { init: () => new RicPlot().init(), enabled: plugins.plotAnalysis },
       { init: () => new Time2LonPlots().init(), enabled: plugins.plotAnalysis },
+      { init: () => new Lat2LonPlots().init(), enabled: plugins.plotAnalysis },
       { init: () => new Inc2AltPlots().init(), enabled: plugins.plotAnalysis },
       { init: () => new Inc2LonPlots().init(), enabled: plugins.plotAnalysis },
-      { init: () => new Lat2LonPlots().init(), enabled: plugins.plotAnalysis },
-      // { plugin: aboutMenuPlugin, enabled: plugins.aboutManager },
       { init: () => new SettingsMenuPlugin().init(), enabled: plugins.settingsMenu },
       { init: () => new GraphicsMenuPlugin().init(), enabled: plugins.graphicsMenu },
       { init: () => new SoundManager().init(), enabled: plugins.soundManager },
       { init: () => new GamepadPlugin().init(), enabled: plugins.gamepad },
       { init: () => new VideoDirectorPlugin().init(), enabled: plugins.videoDirector },
+      { init: () => new CreateSat().init(), enabled: plugins.createSat },
     ];
 
     for (const { init, enabled } of pluginList) {

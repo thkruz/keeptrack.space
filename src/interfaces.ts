@@ -359,6 +359,7 @@ export enum KeepTrackApiEvents {
    */
   rightBtnMenuAdd = 'rightBtnMenuAdd',
   updateDateTime = 'updateDateTime',
+  updatePropRate = 'updatePropRate',
   uiManagerFinal = 'uiManagerFinal',
   resetSensor = 'resetSensor',
   /**

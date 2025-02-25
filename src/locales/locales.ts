@@ -4,6 +4,7 @@ import de from './de.json';
 import en from './en.json';
 import es from './es.json';
 
+
 const opts: InitOptions = {
   interpolation: {
     escapeValue: false,
@@ -232,6 +233,11 @@ export const loadLocalization = () => ({
       bottomIconLabel: i18next.t('plugins.Calculator.bottomIconLabel'),
       title: i18next.t('plugins.Calculator.title'),
       helpBody: i18next.t('plugins.Calculator.helpBody'),
+    },
+    CreateSat: {
+      bottomIconLabel: i18next.t('plugins.CreateSat.bottomIconLabel'),
+      title: i18next.t('plugins.CreateSat.title'),
+      helpBody: i18next.t('plugins.CreateSat.helpBody'),
     },
   },
 });

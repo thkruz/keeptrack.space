@@ -91,8 +91,8 @@
     "2": "Press the 'L' key to toggle satellite orbits on/off.",
     "3": "Press the 'P' key to open a polar plot of the current satellite (You need to pick a sensor first!).",
     "4": "Reset the simulation time by pressing the 'T' key.",
-    "5": "Speed up the simulation by pressing the '>' key.",
-    "6": "Slow down the simulation by pressing the '<' key.",
+    "5": "Advance the simulation time by pressing the '>' or '=' key.",
+    "6": "Move back the simulation time by pressing the '<' or ')' key.",
     "7": "Pressing the '/' key will toggle the simulation speed between 1x and 0x.",
     "8": "Press the 'V' key to change the view mode.",
     "9": "Press Shift+F1 to open the help menu at any time.",
@@ -108,7 +108,14 @@
     "19": "Press '+' or '-' keys to zoom in and out.",
     "20": "Press 'F11' to toggle on/off the fullscreen mode.",
     "21": "You can search for satellites by name or NORAD ID in the search bar at the top right.",
-    "22": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu."
+    "22": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu.",
+    "23": "Press the 'N' key to toggle night.",
+    "24": "Press the 'I' key to hide/display contextual information about a satellite.",
+    "25": "Press the 'B' key to hide/display the menu.",
+    "26": "Speed up the simulation by pressing the Shift + ';' key.",
+    "27": "Slow down the simulation by pressing the ',' key.",
+    "28": "Set an object as Secondary to see its relative distance with primary object.",
+    "29": "Switch an object between Primary/Secondary with the '[' key."
   },
   "plugins": {
     "SensorListPlugin": {
@@ -281,15 +288,15 @@
     "Astronomy": {
       "bottomIconLabel": "Astronomy"
     },
-    "AnalysisMenu": {
-      "bottomIconLabel": "Analysis",
-      "title": "Analysis Menu",
-      "helpBody": "The Analysis Menu provides a number of tools to help you analyze the data in the current view. The tools are: <ul style=\"margin-left: 40px;\"> <li>Export Official TLEs - Export real two line element sets.</li> <li>Export 3LES - Export three line element sets.</li> <li>Export KeepTrack TLEs - Export All KeepTrack two line element sets including analysts.</li> <li>Export KeepTrack 3LES - Export All KeepTrack three line element sets including analysts.</li> <li>Find Close Objects - Find objects that are close to each other.</li> <li>Find Reentries - Find objects that are likely to reenter the atmosphere.</li> <li>Best Passes - Find the best passes for a satellite based on the currently selected sensor.</li> </ul>"
-    },
     "Calculator": {
       "bottomIconLabel": "Reference Frame Transforms",
       "title": "Reference Frame Transforms Menu",
       "helpBody": "The Reference Frame Transforms Menu is used to convert between different reference frames. <br><br> The menu allows you to convert between the following reference frames: <ul style=\"margin-left: 40px;\"> <li> ECI - Earth Centered Inertial </li> <li> ECEF - Earth Centered Earth Fixed </li> <li> Geodetic </li> <li> Topocentric </li> </ul>"
+    },
+    "AnalysisMenu": {
+      "bottomIconLabel": "Analysis",
+      "title": "Analysis Menu",
+      "helpBody": "The Analysis Menu provides a number of tools to help you analyze the data in the current view. The tools are: <ul style=\"margin-left: 40px;\"> <li>Export Official TLEs - Export real two line element sets.</li> <li>Export 3LES - Export three line element sets.</li> <li>Export KeepTrack TLEs - Export All KeepTrack two line element sets including analysts.</li> <li>Export KeepTrack 3LES - Export All KeepTrack three line element sets including analysts.</li> <li>Find Close Objects - Find objects that are close to each other.</li> <li>Find Reentries - Find objects that are likely to reenter the atmosphere.</li> <li>Best Passes - Find the best passes for a satellite based on the currently selected sensor.</li> </ul>"
     },
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Settings",
@@ -300,6 +307,11 @@
       "bottomIconLabel": "Video Director",
       "title": "Video Director Menu",
       "helpBody": "The Video Director Menu is used to manipulate the camera and objects in the scene to create a video."
+    },
+    "CreateSat": {
+      "bottomIconLabel": "Create Satellite",
+      "title": "Create Satellite",
+      "helpBody": "The Create Satellite menu is used to create a satellite from its keplerian elements"
     }
   }
 }

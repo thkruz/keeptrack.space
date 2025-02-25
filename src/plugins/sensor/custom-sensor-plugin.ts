@@ -213,6 +213,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       case 'colors-country-rmb':
       case 'colors-velocity-rmb':
       case 'colors-ageOfElset-rmb':
+      case 'colors-dataSource-rmb':
       case 'colors-default-rmb':
         break;
       default:

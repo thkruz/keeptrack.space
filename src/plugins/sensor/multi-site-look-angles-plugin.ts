@@ -6,10 +6,13 @@ import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
+import { SatMath, SunStatus } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import multiSitePng from '@public/img/icons/multi-site.png';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, MINUTES_PER_DAY, SatelliteRecord, Seconds, TAU } from 'ootk';
+import {
+  BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Kilometers, lla2eci, MINUTES_PER_DAY, Radians, SatelliteRecord, Seconds,
+  SpaceObjectType, Sun, TAU,
+} from 'ootk';
 import { sensorGroups } from '../../catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -18,16 +21,16 @@ import { SensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
   // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
-  private sensorList_: DetailedSensor[] = [];
+  private readonly sensorList_: DetailedSensor[] = [];
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = false;
 
   // Settings
-  private lengthOfLookAngles_ = 2; // Days
-  private angleCalculationInterval_ = <Seconds>30;
-  private disabledSensors_: DetailedSensor[] = [];
+  private readonly lengthOfLookAngles_ = 1; // Days
+  private readonly angleCalculationInterval_ = <Seconds>30;
+  private readonly disabledSensors_: DetailedSensor[] = [];
 
   constructor() {
     super();
@@ -46,9 +49,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       index === self.findIndex((s) => s.objName === sensor.objName),
     );
 
-    // Default to only the MW sensors being enabled
+    // Default to only the ALD sensors being enabled
     this.disabledSensors_ = this.sensorList_.filter((sensor) =>
-      !sensorGroups.find((group) => group.name === 'mw')?.list.includes(sensor.objName),
+      !sensorGroups.find((group) => group.name === 'ald')?.list.includes(sensor.objName),
     );
   }
 
@@ -93,6 +96,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       az: look.az.toFixed(2),
       el: look.el.toFixed(2),
       rng: look.rng.toFixed(2),
+      visible: look.visible,
     }));
 
     saveCsv(exportData, `multisite-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
@@ -218,9 +222,11 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     if (!sensors) {
       sensors = [];
       for (const sensorName in staticSet) {
-        const sensor = staticSet[sensorName];
+        if (staticSet[sensorName] instanceof DetailedSensor) {
+          const sensor = staticSet[sensorName];
 
-        sensors.push(sensor);
+          sensors.push(sensor);
+        }
       }
     }
 
@@ -238,6 +244,12 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       if (sensor.maxRng < sat.perigee && (!sensor.maxRng2 || sensor.maxRng2 < sat.perigee)) {
         continue;
       }
+      // Station Lat Lon Alt vector for further ECI transformation
+      const lla = {
+        lat: (sensor.lat * DEG2RAD) as Radians,
+        lon: (sensor.lon * DEG2RAD) as Radians,
+        alt: sensor.alt,
+      };
 
       SensorManager.updateSensorUiStyling([sensor]);
       let offset = 0;
@@ -247,12 +259,39 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         offset = i * 1000; // Offset in seconds (msec * 1000)
         const now = timeManagerInstance.getOffsetTimeObj(offset);
         const multiSitePass = MultiSiteLookAnglesPlugin.propagateMultiSite_(now, sat.satrec, sensor);
+        let canStationObserve = true;
 
         if (multiSitePass.time !== '') {
+          /*
+           * Check visibility and add to multiSitePass
+           * TODO: ADD if visibility from SUN
+           */
+          if (sensor.type === SpaceObjectType.OPTICAL) {
+            const { gmst } = calcGmst(now);
+            const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+            const sensorPos = lla2eci(lla, gmst);
+
+            sensor.position = sensorPos;
+            const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
+            const satInSun = SatMath.calculateIsInSun(sat, sunPos);
+            // / Station is at night or penumbra
+
+            /*
+             * For optical sensors: check if the station is in darkness (umbral/penumbral)
+             * and the satellite is in sunlight - this means the satellite is visible
+             */
+            canStationObserve = (stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) &&
+              satInSun === SunStatus.SUN;
+          }
+          multiSitePass.visible = canStationObserve;
           multiSiteArray.push(multiSitePass); // Update the table with looks for this 5 second chunk and then increase table counter by 1
 
           // Jump 3/4th to the next orbit
-          i += orbitalPeriod * 60 * 0.75; // NOSONAR
+          if (sat.semiMajorAxis > 30000) {
+            i += orbitalPeriod * 60 * 0.1;
+          } else {
+            i += orbitalPeriod * 60 * 0.75;
+          }
         }
       }
     }
@@ -318,6 +357,10 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
     tdS.appendChild(document.createTextNode('Sensor'));
     tdS.setAttribute('style', 'text-decoration: underline');
+    let tdV = tr.insertCell();
+
+    tdV.appendChild(document.createTextNode('Visible'));
+    tdV.setAttribute('style', 'text-decoration: underline');
 
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
@@ -339,6 +382,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       tdR.appendChild(document.createTextNode(entry.rng.toFixed(0)));
       tdS = tr.insertCell();
       tdS.appendChild(document.createTextNode(sensor.uiName ?? sensor.shortName ?? sensor.objName ?? ''));
+      // Add visibility from sensor
+      tdV = tr.insertCell();
+      tdV.appendChild(document.createTextNode(entry.visible.toString()));
       // TODO: Future feature
       tr.addEventListener('click', () => {
         timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());

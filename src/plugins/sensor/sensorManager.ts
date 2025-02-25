@@ -34,12 +34,12 @@ import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
-import { SatMath } from '@app/static/sat-math';
+import { SatMath, SunStatus } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import i18next from 'i18next';
-import { DEG2RAD, DetailedSensor, GreenwichMeanSiderealTime, ZoomValue, spaceObjType2Str } from 'ootk';
+import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Kilometers, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from 'ootk';
 import { sensorGroups } from '../../catalogs/sensor-groups';
 import { keepTrackApi } from '../../keepTrackApi';
 import { Astronomy } from '../astronomy/astronomy';
@@ -512,6 +512,56 @@ export class SensorManager {
 
   getAllSensors(): DetailedSensor[] {
     return Object.values(sensors);
+  }
+
+  private sensorSunStatus_(now: Date, sensor?: DetailedSensor): { sunStatus: SunStatus } {
+    if (!sensor) {
+      throw new Error(i18next.t('errorMsgs.SensorNotFound'));
+    }
+    // Station Lat Lon Alt vector for further ECI transformation
+    const lla = {
+      lat: (sensor.lat * DEG2RAD) as Radians,
+      lon: (sensor.lon * DEG2RAD) as Radians,
+      alt: (sensor.alt) as Kilometers,
+    };
+    const { gmst } = calcGmst(now);
+    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const sensorPos = lla2eci(lla, gmst);
+
+    sensor.position = sensorPos;
+    const sunStatus = SatMath.calculateIsInSun(sensor, sunPos);
+
+
+    return {
+      sunStatus,
+    };
+  }
+
+  private canStationObserve_(now: Date, sensor: DetailedSensor): boolean {
+    if (sensor.type !== SpaceObjectType.OPTICAL) {
+      return true;
+    }
+    const status = this.sensorSunStatus_(now, sensor).sunStatus;
+
+    if ((status === SunStatus.UMBRAL) || (status === SunStatus.PENUMBRAL)) {
+      return true;
+    }
+
+    return true;
+  }
+
+  public canStationsObserve(now: Date, sensors: DetailedSensor[]): boolean {
+    let canObserve = false;
+
+    // Check if at least 1 station can observe
+    for (const sensor of sensors) {
+      canObserve = this.canStationObserve_(now, sensor);
+      if (canObserve) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {

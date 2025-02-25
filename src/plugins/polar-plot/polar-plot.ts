@@ -14,11 +14,11 @@ interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 export class PolarPlotPlugin extends KeepTrackPlugin {
   readonly id = 'PolarPlotPlugin';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
   passStartTime_: Date;
   passStopTime_: Date;
 
-  private plotDuration_ = 3;
+  private readonly plotDuration_ = 3;
 
   constructor() {
     super();
@@ -30,7 +30,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   private centerY_: number;
   private distanceUnit_: number;
   private canvasSize_: number;
-  private fontRatio_ = 0.03;
+  private readonly fontRatio_ = 0.03;
   private plotData_: PolarPlotData = [];
 
   isRequireSatelliteSelected = true;
@@ -203,7 +203,8 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.ctx_.fillStyle = 'rgb(255, 255, 255)';
     this.ctx_.textAlign = 'center';
     this.ctx_.textBaseline = 'top';
-    this.ctx_.fillText(`Satellite ${(<DetailedSatellite>this.selectSatManager_.getSelectedSat()).sccNum}: ` +
+    this.ctx_.fillText(`${keepTrackApi.getSensorManager().getSensor().name} | ` +
+      `Satellite ${(<DetailedSatellite>this.selectSatManager_.getSelectedSat()).sccNum} | ` +
       `${this.passStartTime_.toISOString().slice(11, 19)} - ${this.passStopTime_.toISOString().slice(11, 19)}`, this.centerX_, 0);
   }
 

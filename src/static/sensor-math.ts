@@ -42,6 +42,7 @@ export type TearrData = {
   alt?: Kilometers;
   lat?: Degrees;
   lon?: Degrees;
+  visible?: boolean;
 };
 
 export class SensorMath {
@@ -224,7 +225,7 @@ export class SensorMath {
     }
 
     // Calculate Distance
-    const distanceApart = SatMath.distance(hoverSat.position, secondaryObj.position).toFixed(0);
+    const distanceApart = SatMath.distance(hoverSat.position, secondaryObj.position).toFixed(2);
 
     // Calculate if same beam
     let sameBeamStr = '';
@@ -248,6 +249,26 @@ export class SensorMath {
     }
 
     return `<br />Range: ${distanceApart} km${sameBeamStr}`;
+  }
+
+  static velocityString(hoverSat: BaseObject, secondaryObj?: DetailedSensor | DetailedSatellite): string {
+    // Sanity Check
+    if (!hoverSat || !secondaryObj) {
+      return '';
+    }
+
+    // Validate Objects
+    if (!secondaryObj || !hoverSat) {
+      return '';
+    }
+    if (secondaryObj.type === SpaceObjectType.STAR || hoverSat.type === SpaceObjectType.STAR) {
+      return '';
+    }
+
+    // Calculate Velocities
+    const velApart = SatMath.velocity(hoverSat.velocity, secondaryObj.velocity).toFixed(3);
+
+    return `<br />Relative velocity: ${velApart} km/s`;
   }
 
   static getSunTimes(sat: DetailedSatellite, sensors?: DetailedSensor[], searchLength = 2, interval = 30) {

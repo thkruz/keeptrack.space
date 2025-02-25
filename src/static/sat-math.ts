@@ -30,9 +30,11 @@ import {
   DEG2RAD,
   Degrees,
   DetailedSatellite,
+  DetailedSensor,
   EciVec3,
   GreenwichMeanSiderealTime,
   Kilometers,
+  KilometersPerSecond,
   MILLISECONDS_TO_DAYS,
   MINUTES_PER_DAY,
   RAD2DEG,
@@ -41,6 +43,8 @@ import {
   SatelliteRecord,
   Sensor,
   Sgp4,
+  SpaceObjectType,
+  StateVectorSgp4,
   TAU,
   ecf2eci,
   ecfRad2rae,
@@ -172,12 +176,37 @@ export abstract class SatMath {
    * @param sunECI The position of the sun in ECI coordinates.
    * @returns A value indicating whether the satellite is in the sun's shadow (umbra), in the penumbra, or in sunlight.
    */
-  static calculateIsInSun(obj: BaseObject, sunECI: EciVec3): SunStatus {
-    if (!obj || typeof obj.position === 'undefined') {
-      return SunStatus.UNKNOWN;
+  static calculateIsInSun(obj: BaseObject | StateVectorSgp4, sunECI: EciVec3): SunStatus {
+
+    if (obj instanceof BaseObject) {
+      if (!obj || typeof obj.position === 'undefined') {
+        return SunStatus.UNKNOWN;
+      }
+      if (!sunECI) {
+        return SunStatus.UNKNOWN;
+      }
+
+      var x = obj.position.x
+      var y = obj.position.y
+      var z = obj.position.z
+
     }
-    if (!sunECI) {
-      return SunStatus.UNKNOWN;
+    else if ((typeof obj.position === 'boolean' || (
+      obj.position &&
+      typeof obj.position.x === 'number' &&
+      typeof obj.position.y === 'number' &&
+      typeof obj.position.z === 'number'
+    )) &&
+      (typeof obj.velocity === 'boolean' || (
+        obj.velocity &&
+        typeof obj.velocity.x === 'number' &&
+        typeof obj.velocity.y === 'number' &&
+        typeof obj.velocity.z === 'number'
+      )) && typeof obj.position != 'boolean') {
+
+      var x = obj.position.x
+      var y = obj.position.y
+      var z = obj.position.z
     }
 
     /*
@@ -189,7 +218,7 @@ export abstract class SatMath {
      * var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
      * var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
      */
-    const semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt((-obj.position.x) ** 2 + (-obj.position.y) ** 2 + (-obj.position.z) ** 2)) * RAD2DEG;
+    const semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt((-x) ** 2 + (-y) ** 2 + (-z) ** 2)) * RAD2DEG;
 
     /*
      * Position needs to be relative to satellite NOT ECI
@@ -200,14 +229,14 @@ export abstract class SatMath {
      * var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
      */
     const semiDiamSun =
-      Math.asin(RADIUS_OF_SUN / Math.sqrt((-obj.position.x + sunECI.x) ** 2 + (-obj.position.y + sunECI.y) ** 2 + (-obj.position.z + sunECI.z) ** 2)) * RAD2DEG;
+      Math.asin(RADIUS_OF_SUN / Math.sqrt((-x + sunECI.x) ** 2 + (-y + sunECI.y) ** 2 + (-z + sunECI.z) ** 2)) * RAD2DEG;
 
     // Angle between earth and sun
     const theta =
       Math.acos(
-        <number>numeric.dot([-obj.position.x, -obj.position.y, -obj.position.z], [-obj.position.x + sunECI.x, -obj.position.y + sunECI.y, -obj.position.z + sunECI.z]) /
-        (Math.sqrt((-obj.position.x) ** 2 + (-obj.position.y) ** 2 + (-obj.position.z) ** 2) *
-          Math.sqrt((-obj.position.x + sunECI.x) ** 2 + (-obj.position.y + sunECI.y) ** 2 + (-obj.position.z + sunECI.z) ** 2)),
+        <number>numeric.dot([-x, -y, -z], [-x + sunECI.x, -y + sunECI.y, -z + sunECI.z]) /
+        (Math.sqrt((-x) ** 2 + (-y) ** 2 + (-z) ** 2) *
+          Math.sqrt((-x + sunECI.x) ** 2 + (-y + sunECI.y) ** 2 + (-z + sunECI.z) ** 2)),
       ) * RAD2DEG;
 
     if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
@@ -341,6 +370,17 @@ export abstract class SatMath {
   static distance(obj1: EciVec3, obj2: EciVec3): Kilometers {
     return <Kilometers>Math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2 + (obj1.z - obj2.z) ** 2);
   }
+
+  /**
+ * Calculates the velocity between two objects in ECI coordinates.
+ * @param obj1 The first object's ECI coordinates.
+ * @param obj2 The second object's ECI coordinates.
+ * @returns The velocity between the two objects in kilometers/s.
+ */
+  static velocity(obj1: EciVec3, obj2: EciVec3): KilometersPerSecond {
+    return <KilometersPerSecond>Math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2 + (obj1.z - obj2.z) ** 2);
+  }
+
 
   /**
    * Finds the closest approach time between two satellites based on their positions and velocities.
@@ -521,6 +561,36 @@ export abstract class SatMath {
     const el = Math.asin(rcrossv[2] / rcrossvmag) * RAD2DEG;
 
     return { az, el };
+  }
+
+  /**
+ * Calculates the angle between 2 satellites and the Sun
+ * @param sat1 The first satellite object.
+ * @param sat2 The second satellite object.
+ * @param sunVec The sun ECI vector.
+ * @returns The sun angle in rad.
+ * @throws An error if either satellite's position or velocity is undefined.
+ */
+  static getAngleBetweenSatellitesAndSun(sat1: DetailedSatellite, sat2: DetailedSatellite, sunVec: EciVec3): number {
+    const { position: pos1 } = sat1;
+    const { position: pos2 } = sat2;
+
+    // Check if positions are identical
+    if (pos1.x === pos2.x && pos1.y === pos2.y && pos1.z === pos2.z) {
+      return NaN;
+    }
+    // Sanity checks
+    if (typeof pos1 === 'undefined') {
+      throw new Error('Sat1 position is undefined');
+    }
+    if (typeof pos2 === 'undefined') {
+      throw new Error('Sat2 position is undefined');
+    }
+
+    // Compute sat to sun vectors
+    const sat2ToSun = vec3.fromValues(sunVec.x - pos2.x, sunVec.y - pos2.y, sunVec.z - pos2.z);
+    const sat2ToSat1 = vec3.fromValues(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
+    return vec3.angle(sat2ToSun, sat2ToSat1);
   }
 
   /**
@@ -900,4 +970,31 @@ export abstract class SatMath {
     // Convert to degrees per day
     return omegaP * (180 / Math.PI) * 86400;
   }
+  /**
+ * Calculates the angle between 2 satellites and the Sun
+ * @param hoverSat The first satellite object.
+ * @param secondaryObj The second satellite object.
+ * @returns The sun angle in deg.
+ */
+  static sunAngle(hoverSat: BaseObject, secondaryObj?: DetailedSensor | DetailedSatellite): number {
+    // Sanity Check
+    if (!hoverSat || !secondaryObj) {
+      return NaN;
+    }
+
+    // Validate Objects
+    if (!secondaryObj || !hoverSat) {
+      return NaN;
+    }
+    if (secondaryObj.type === SpaceObjectType.STAR || hoverSat.type === SpaceObjectType.STAR) {
+      return NaN;
+    }
+
+    // Calculate Velocities
+    const sunEci = keepTrackApi.getScene().sun.eci;
+    const angle = this.getAngleBetweenSatellitesAndSun(hoverSat as DetailedSatellite, secondaryObj as DetailedSatellite, sunEci);
+    return angle * RAD2DEG;
+  }
+
+
 }

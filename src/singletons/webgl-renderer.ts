@@ -332,6 +332,8 @@ export class WebGLRenderer {
           this.satHoverMiniDOM_.id = `sat-minibox-${i}`;
           if (sat.source === CatalogSource.VIMPEL) {
             this.satHoverMiniDOM_.textContent = `JSC${sat.altId}`;
+          } else if (sat.source === CatalogSource.ALDORIA) {
+            this.satHoverMiniDOM_.textContent = `ALD${sat.sccNum}`;
           } else {
             this.satHoverMiniDOM_.textContent = sat.sccNum;
           }

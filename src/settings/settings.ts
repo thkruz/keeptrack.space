@@ -1191,8 +1191,8 @@ export class SettingsManager {
     this.loadPersistedSettings();
 
     const params = this.loadOverridesFromUrl_();
-    params['search'] = '60550,60534,60552,60537';
-    console.log("Params: ", params);
+    // params['search'] = '60550,60534,60552,60537';
+    // console.log("Params: ", params);
     this.initParseFromGETVariables_(params);
 
     // settingsManager.forceSateliotPresets = true;
@@ -1201,29 +1201,33 @@ export class SettingsManager {
     // SettingsPresets.loadPresetSateliot(this);
 
     // SATELIOT - custom url params
-    if (this.forceSateliotPresets) {
-      for (const param of params) {
-        const key = param.split('=')[0];
-        const val = param.split('=')[1];
-        switch (key) {
-          case 'preset':
-            switch (val) {
-              case 'sateliot':
-                settingsManager.showOpsData = false;
-                break;
-              case 'sateliot-ops':
-                settingsManager.showOpsData = true;
-                break;
-              case 'sateliot-4':
-                // settingsManager.loadPhaseAJsonFile = true;
-                break;
-              case 'sateliot-64':
-                settingsManager.loadPhaseBJsonFile = true;
-                break;
-            }
-        }
-      }
-    }
+    // if (this.forceSateliotPresets) {
+    //   for (const param of params) {
+    //     const key = param.split('=')[0];
+    //     const val = param.split('=')[1];
+    //     switch (key) {
+    //       case 'preset':
+    //         switch (val) {
+    //           case 'sateliot':
+    //             settingsManager.showOpsData = false;
+    //             break;
+    //           case 'sateliot-ops':
+    //             settingsManager.showOpsData = true;
+    //             break;
+    //           case 'sateliot-4':
+    //             // settingsManager.loadPhaseAJsonFile = true;
+    //             break;
+    //           case 'sateliot-64':
+    //             settingsManager.loadPhaseBJsonFile = true;
+    //             break;
+    //         }
+    //         break;
+    //       default:
+    //         settingsManager.showOpsData = false;
+    //         break;
+    //     }
+    //   }
+    // }
 
     // If No UI Reduce Overhead
     if (this.disableUI) {
@@ -1435,6 +1439,12 @@ export class SettingsManager {
    */
   private initParseFromGETVariables_(params: string[]) {
     if (!this.disableUI) {
+      // if params == [''] then there are no params
+      if (params.length === 1 && params[0] === '') {
+        SettingsPresets.loadPresetSateliot(this);
+        settingsManager.showOpsData = false;
+        return;
+      }
       for (const param of params) {
         const key = param.split('=')[0];
         const val = param.split('=')[1];
@@ -1444,12 +1454,14 @@ export class SettingsManager {
             switch (val) {
               case 'sateliot-ops':
                 SettingsPresets.loadPresetSateliotOps(this);
+                settingsManager.showOpsData = true;
                 break;
               case 'sateliot-4':
                 SettingsPresets.loadPresetSateliot4(this);
                 break;
               case 'sateliot-64':
                 SettingsPresets.loadPresetSateliot64(this);
+                settingsManager.loadPhaseBJsonFile = true;
                 break;
               case 'ops-center':
                 SettingsPresets.loadPresetOpsCenter(this);
@@ -1483,6 +1495,7 @@ export class SettingsManager {
                 break;
               default:
                 SettingsPresets.loadPresetSateliot(this);
+                settingsManager.showOpsData = false;
                 break;
             }
             break;

@@ -490,7 +490,8 @@ export class CatalogLoader {
       asciiCatalog = CatalogLoader.getAsciiCatalog_(settingsManager);
     }
     if (settingsManager.isEnableJscCatalog) {
-      jsCatalog = CatalogLoader.getJscCatalog_(settingsManager);
+      // jsCatalog = CatalogLoader.getJscCatalog_(settingsManager);
+      jsCatalog = null;
     }
     if (settingsManager.externalTLEs) {
       externalCatalog = CatalogLoader.getExternalCatalog_(settingsManager);
@@ -588,21 +589,21 @@ export class CatalogLoader {
    * @returns A promise that resolves to an array of JsSat objects.
    */
   // eslint-disable-next-line require-await
-  private static async getJscCatalog_(settingsManager: SettingsManager): Promise<JsSat[]> {
-    return fetch(settingsManager.dataSources.vimpel)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        errorManagerInstance.warn('Error loading vimpel.json');
+  // private static async getJscCatalog_(settingsManager: SettingsManager): Promise<JsSat[]> {
+  //   return fetch(settingsManager.dataSources.vimpel)
+  //     .then((response) => {
+  //       if (response.ok) {
+  //         return response.json();
+  //       }
+  //       errorManagerInstance.warn('Error loading vimpel.json');
 
-        return [];
+  //       return [];
 
-      })
-      .catch(() => {
-        errorManagerInstance.warn('Error loading vimpel.json');
-      });
-  }
+  //     })
+  //     .catch(() => {
+  //       errorManagerInstance.warn('Error loading vimpel.json');
+  //     });
+  // }
 
   /**
    * Consolidate the satData into a string to send to satCruncher
@@ -753,9 +754,9 @@ export class CatalogLoader {
         case 'M':
           resp[i].source = CatalogSource.UNIV_OF_MICH;
           break;
-        case 'V':
-          resp[i].source = CatalogSource.VIMPEL;
-          break;
+        // case 'V':
+        //   resp[i].source = CatalogSource.VIMPEL;
+        //   break;
         default:
           // Default to USSF for now
           resp[i].source = CatalogSource.USSF;

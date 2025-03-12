@@ -46,7 +46,7 @@ export class Moon {
   /** The model view matrix. */
   private modelViewMatrix_ = <mat4>null;
   /** The normal matrix. */
-  private normalMatrix_ = mat3.create();
+  private readonly normalMatrix_ = mat3.create();
 
   /** The position of the moon in WebGL coordinates. */
   position = [0, 0, 0] as vec3;
@@ -161,7 +161,7 @@ export class Moon {
   }
 
   /** The shaders for the moon. */
-  private shaders_ = {
+  private readonly shaders_ = {
     frag: keepTrackApi.glsl`
       uniform sampler2D sampler;
       uniform vec3 sunPos;
@@ -173,24 +173,25 @@ export class Moon {
       out vec4 fragColor;
 
       void main(void) {
-          // sun is shining opposite of its direction from the center of the earth
-          vec3 lightDirection = sunPos - vec3(0.0,0.0,0.0);
+        // Don't draw the back of the sphere
+        if (v_dist > 1.0) {
+          discard;
+        }
 
-          // Normalize this to a max of 1.0
-          lightDirection = normalize(lightDirection);
+        // sun is shining opposite of its direction from the center of the earth
+        vec3 lightDirection = sunPos - vec3(0.0,0.0,0.0);
 
-          // Smooth the light across the sphere
-          float lightFrommoon = max(dot(v_normal, lightDirection), 0.0)  * 1.0;
+        // Normalize this to a max of 1.0
+        lightDirection = normalize(lightDirection);
 
-          // Calculate the color by merging the texture with the light
-          vec3 litTexColor = texture(sampler, v_texcoord).rgb * (vec3(0.0025, 0.0025, 0.0025) + lightFrommoon);
+        // Smooth the light across the sphere
+        float lightFrommoon = max(dot(v_normal, lightDirection), 0.0)  * 1.0;
 
-          // Don't draw the back of the sphere
-          if (v_dist > 1.0) {
-            discard;
-          }
+        // Calculate the color by merging the texture with the light
+        vec3 litTexColor = texture(sampler, v_texcoord).rgb * (vec3(0.0025, 0.0025, 0.0025) + lightFrommoon);
 
-          fragColor = vec4(litTexColor, 1.0);
+
+        fragColor = vec4(litTexColor, 1.0);
       }
       `,
     vert: keepTrackApi.glsl`

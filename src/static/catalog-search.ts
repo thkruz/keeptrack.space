@@ -273,13 +273,13 @@ export class CatalogSearch {
         }
       }
 
-      const tleYear = sat?.tle1?.substring(9, 11) || '-1';
+      const launchYear = sat?.launchDate?.slice(2, 4) ?? sat?.tle1.slice(9, 11) ?? '-1';
 
       if (yr >= 57 && yr < 100) {
-        return parseInt(tleYear) <= yr && parseInt(tleYear) >= 57;
+        return parseInt(launchYear) <= yr && parseInt(launchYear) >= 57;
       }
 
-      return parseInt(tleYear) <= yr || parseInt(tleYear) >= 57;
+      return parseInt(launchYear) <= yr || parseInt(launchYear) >= 57;
 
     });
   }

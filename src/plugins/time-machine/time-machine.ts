@@ -83,7 +83,7 @@ export class TimeMachine extends KeepTrackPlugin {
 
     groupManagerInstance.selectGroup(yearGroup);
     yearGroup.updateOrbits();
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.group, true); // force color recalc
+    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.group, false); // force color recalc
 
     if (!settingsManager.isDisableTimeMachineToasts) {
       if (year >= 57 && year < 100) {

@@ -102,7 +102,7 @@ ${e.stack}`,
     if (this.ALLOW_LOG) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(msg, ToastMsgType.normal, true);
+      uiManagerInstance.toast(msg, ToastMsgType.standby, true);
     }
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console

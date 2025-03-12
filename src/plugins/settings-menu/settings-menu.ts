@@ -5,6 +5,7 @@ import { ColorPick } from '@app/lib/color-pick';
 import { getEl } from '@app/lib/get-el';
 import { parseRgba } from '@app/lib/rgba';
 import { rgbCss } from '@app/lib/rgbCss';
+import { SettingsManager } from '@app/settings/settings';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
 import { OrbitCruncherType, OrbitDrawTypes } from '@app/webworker/orbitCruncher';
@@ -12,15 +13,14 @@ import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 import { TimeMachine } from '../time-machine/time-machine';
-import { SettingsManager } from '@app/settings/settings';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software

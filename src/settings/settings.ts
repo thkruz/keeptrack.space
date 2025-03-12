@@ -31,6 +31,7 @@ import { isThisNode } from '../static/isThisNode';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 import { sateliot } from './presets/sateliot';
+import { starTalk } from './presets/startalk';
 
 export class SettingsManager {
   classificationStr = '' as ClassificationString;
@@ -1469,6 +1470,9 @@ export class SettingsManager {
                 break;
               case 'dark-clouds':
                 darkClouds(settingsManager);
+                break;
+              case 'startalk':
+                starTalk(settingsManager);
                 break;
               case 'sateliot':
                 sateliot(settingsManager);

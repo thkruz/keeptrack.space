@@ -643,7 +643,7 @@ export class SettingsManager {
    * Determines whether or not to show the satellite labels.
    */
   isSatLabelModeOn = true;
-  isShowLogo = false;
+  isShowLogo = true;
   /**
    * Flag for using the debris catalog instead of the full catalog
    *

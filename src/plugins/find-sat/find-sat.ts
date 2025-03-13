@@ -10,7 +10,7 @@ import findSatPng from '@public/img/icons/find2.png';
 import { countryCodeList, countryMapList, countryNameList } from '@app/catalogs/countries';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, eci2rae } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export interface SearchSatParams {
   argPe: Degrees;
@@ -41,7 +41,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   dependencies_: string[];
   private lastResults_ = <DetailedSatellite[]>[];
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 500,
     maxWidth: 700,

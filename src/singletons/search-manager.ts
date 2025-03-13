@@ -488,7 +488,7 @@ export class SearchManager {
         if (!(obj as MissileObject).active) {
           return false;
         } // Skip inactive missiles.
-        if ((obj as DetailedSatellite).country == 'ANALSAT' && !obj.active) {
+        if ((obj as DetailedSatellite).country === 'ANALSAT' && !obj.active) {
           return false;
         } // Skip Fake Analyst satellites
         if (!obj.name) {

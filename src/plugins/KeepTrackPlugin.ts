@@ -13,12 +13,13 @@ import { errorManagerInstance } from '../singletons/errorManager';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
 import { SoundNames } from './sounds/SoundNames';
 
-export interface clickDragOptions {
+export interface ClickDragOptions {
   leftOffset?: number;
   isDraggable?: boolean;
   minWidth?: number;
   maxWidth?: number;
   attachedElement?: HTMLElement;
+  callback?: () => void;
 }
 
 export interface SideMenuSettingsOptions {
@@ -197,7 +198,7 @@ export abstract class KeepTrackPlugin {
   /**
    * Determins if the side menu is adjustable by clicking and dragging.
    */
-  dragOptions: clickDragOptions;
+  dragOptions: ClickDragOptions;
 
   /**
    * Creates a new instance of the KeepTrackPlugin class.
@@ -421,6 +422,26 @@ export abstract class KeepTrackPlugin {
 
 
     return sideMenuHtmlWrapped;
+  }
+
+  resizeCanvas(canvasId: string, isForceWidescreen?: boolean): void {
+    isForceWidescreen ??= false;
+    const canvas = getEl(canvasId) as HTMLCanvasElement;
+    const sideMenuDOM = getEl(this.sideMenuElementName);
+
+    if (isForceWidescreen) {
+      sideMenuDOM.style.width = `${window.innerWidth}px`;
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+    } else {
+      canvas.width = window.innerWidth;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.height = window.innerHeight - 100;
+      canvas.style.height = `${window.innerHeight - 100}px`;
+    }
   }
 
   /**
@@ -793,7 +814,7 @@ export abstract class KeepTrackPlugin {
     });
   }
 
-  registerClickAndDragOptions(opts?: clickDragOptions): void {
+  registerClickAndDragOptions(opts?: ClickDragOptions): void {
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,

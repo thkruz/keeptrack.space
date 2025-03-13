@@ -7,7 +7,7 @@ import { SatConstellationString } from '@app/singletons/catalog-manager/satLinkM
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { GroupType } from '@app/singletons/object-group';
 import satChngPng from '@public/img/icons/satchng.png';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatConstellations extends KeepTrackPlugin {
@@ -42,7 +42,7 @@ export class SatConstellations extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
   };
 

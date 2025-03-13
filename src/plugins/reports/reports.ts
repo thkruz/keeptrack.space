@@ -32,7 +32,7 @@ import analysisPng from '@public/img/icons/reports.png';
 
 import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 interface ReportData {
@@ -84,7 +84,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   </div>
   `;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: false,
     minWidth: 320,
   };

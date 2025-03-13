@@ -26,7 +26,7 @@ import { getEl } from '@app/lib/get-el';
 import removePng from '@public/img/icons/remove.png';
 import sensorOccupiedPng from '@public/img/icons/sensor_occupied.png';
 import { BaseObject, Degrees } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
@@ -35,7 +35,7 @@ export class SatelliteFov extends KeepTrackPlugin {
   dependencies_ = [SelectSatManager.name];
   bottomIconImg = sensorOccupiedPng;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: false,
     minWidth: 350,
   };

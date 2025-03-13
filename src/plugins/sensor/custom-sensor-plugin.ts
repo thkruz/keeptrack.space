@@ -12,7 +12,7 @@ import customPng from '@public/img/icons/custom.png';
 import removePng from '@public/img/icons/remove.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
 import { Astronomy } from '../astronomy/astronomy';
-import { KeepTrackPlugin, SideMenuSettingsOptions, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
 import { Planetarium } from '../planetarium/planetarium';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
@@ -221,7 +221,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     }
   };
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     minWidth: 350,
     isDraggable: true,
   };

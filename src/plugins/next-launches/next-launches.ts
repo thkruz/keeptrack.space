@@ -7,7 +7,7 @@ import { saveCsv } from '@app/lib/saveVariable';
 import { truncateString } from '@app/lib/truncate-string';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import calendar2Png from '@public/img/icons/calendar2.png';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
 export interface LaunchInfoObject {
@@ -43,7 +43,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
   bottomIconElementName: string = 'menu-nextLaunch';
   bottomIconImg = calendar2Png;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     maxWidth: 650,
     minWidth: 450,

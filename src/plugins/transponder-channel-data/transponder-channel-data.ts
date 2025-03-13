@@ -1,14 +1,14 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { saveCsv } from '@app/lib/saveVariable';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { GroupType } from '@app/singletons/object-group';
 import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
 import { BaseObject, DetailedSatellite } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { saveCsv } from '@app/lib/saveVariable';
 
 interface ChannelInfo {
   satellite: string;
@@ -117,7 +117,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
   bottomIconElementName: string = 'menu-transponderChannelData';
   bottomIconImg = transponderChannelDataPng;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: false,
     maxWidth: 1000,
     minWidth: 1000,

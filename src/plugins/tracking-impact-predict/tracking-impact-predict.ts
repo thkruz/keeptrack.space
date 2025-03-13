@@ -8,7 +8,7 @@ import { showLoading } from '@app/lib/showLoading';
 import { SatMath } from '@app/static/sat-math';
 import { RAD2DEG } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export interface TipMsg {
@@ -48,7 +48,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 1200,
     maxWidth: 1500,

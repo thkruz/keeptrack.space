@@ -7,7 +7,7 @@ import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import i18next from 'i18next';
 import { keepTrackApi } from '../../keepTrackApi';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 //  Updated to match KeepTrack API v2
@@ -48,7 +48,7 @@ export class Collissions extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 540,
     maxWidth: 650,

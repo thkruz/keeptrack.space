@@ -9,7 +9,7 @@ import { LegendManager } from '@app/static/legend-manager';
 import radarPng from '@public/img/icons/radar.png';
 import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { Planetarium } from '../planetarium/planetarium';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
@@ -40,7 +40,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
   };
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 550,
     maxWidth: 800,

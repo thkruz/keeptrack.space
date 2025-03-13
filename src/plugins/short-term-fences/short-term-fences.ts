@@ -6,7 +6,7 @@ import searchPng from '@public/img/icons/search.png';
 
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -25,7 +25,7 @@ export class ShortTermFences extends KeepTrackPlugin {
   isRequireSensorSelected = true;
   isAddStfLinksOnce = false;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     minWidth: 600,
     maxWidth: 1000,
     isDraggable: true,
@@ -47,7 +47,7 @@ export class ShortTermFences extends KeepTrackPlugin {
               <input id="stf-azExt" type="text" value="4" />
               <label for="stf-azExt" class="active">Azimuth Extent (deg)</label>
             </div>
-            <div id="stf-azExtKm-div" class=" input-field col s4" data-position="top" data-delay="50" 
+            <div id="stf-azExtKm-div" class=" input-field col s4" data-position="top" data-delay="50"
             data-tooltip="Total Extent Outside of Center Azimuth in kilometers (ex: 120)">
               <input id="stf-azExtKm" type="text" value="4" disabled/>
               <label for="stf-azExtKm" class="active">Azimuth Extent (km)</label>
@@ -62,7 +62,7 @@ export class ShortTermFences extends KeepTrackPlugin {
               <input id="stf-elExt" type="text" value="4" />
               <label for="stf-elExt" class="active">Elevation Extent (deg)</label>
             </div>
-            <div id="stf-elExtKm-div" class=" input-field col s4" data-position="top" data-delay="50" 
+            <div id="stf-elExtKm-div" class=" input-field col s4" data-position="top" data-delay="50"
               data-tooltip="Total Extent Outside of Center Elevation in kilometers (ex: 120)">
               <input id="stf-elExtKm" type="text" value="4" disabled/>
               <label for="stf-elExtKm" class="active">Elevation Extent (km)</label>

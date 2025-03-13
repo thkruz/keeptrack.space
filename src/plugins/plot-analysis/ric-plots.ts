@@ -7,7 +7,7 @@ import * as echarts from 'echarts';
 import 'echarts-gl';
 import i18next from 'i18next';
 import { BaseObject, DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 type EChartsOption = echarts.EChartsOption;
@@ -15,17 +15,19 @@ type EChartsOption = echarts.EChartsOption;
 export class RicPlot extends KeepTrackPlugin {
   readonly id = 'RicPlot';
   dependencies_: string[] = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
+  isIconDisabled = true;
+  isIconDisabledOnLoad = true;
+
 
   bottomIconLabel = 'RIC Plot';
   bottomIconImg = scatterPlotPng4;
-  isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
     if (this.selectSatManager_.selectedSat === -1) {
       keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.SelectSatelliteFirst'), ToastMsgType.critical);
@@ -55,11 +57,20 @@ export class RicPlot extends KeepTrackPlugin {
 
   sideMenuElementName = 'ric-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
-  <div id="ric-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal plot-analysis-menu-maximized">
+  <div id="ric-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
     <div id="plot-analysis-content" class="side-menu">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
     </div>
   </div>`;
+
+  dragOptions: ClickDragOptions = {
+    isDraggable: true,
+    minWidth: 800,
+    maxWidth: 4096,
+    callback: () => {
+      this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
+    },
+  };
 
   addHtml(): void {
     super.addHtml();
@@ -125,6 +136,7 @@ export class RicPlot extends KeepTrackPlugin {
         formatter: (params) => {
           const data = params.value;
           const color = params.color;
+
           // Create a small circle to show the color of the satellite
 
           return `
@@ -133,6 +145,7 @@ export class RicPlot extends KeepTrackPlugin {
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-bottom: 5px;"></div>
                 <div style="font-weight: bold;"> ${params.seriesName}</div>
               </div>
+              <div>${data[3]}</div>
               <div>${X_AXIS}: ${data[0].toFixed(2)} km</div>
               <div>${Y_AXIS}: ${data[1].toFixed(2)} km</div>
               <div>${Z_AXIS}: ${data[2].toFixed(2)} km</div>
@@ -183,7 +196,7 @@ export class RicPlot extends KeepTrackPlugin {
           itemStyle: {
             opacity: 1 - idx / sat.value.length, // opacity by time
           },
-          value: [item[app.fieldIndices[app.config.xAxis3D]], item[app.fieldIndices[app.config.yAxis3D]], item[app.fieldIndices[app.config.zAxis3D]]],
+          value: [item[app.fieldIndices[app.config.xAxis3D]], item[app.fieldIndices[app.config.yAxis3D]], item[app.fieldIndices[app.config.zAxis3D]], item[3]],
         })),
         symbolSize: 12,
         itemStyle: {
@@ -248,8 +261,24 @@ export class RicPlot extends KeepTrackPlugin {
     const satP = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
     const satS = this.selectSatManager_.secondarySatObj;
 
-    data.push({ name: satP.name, value: [[0, 0, 0]] });
-    data.push({ name: satS.name, value: SatMathApi.getRicOfCurrentOrbit(satS, satP, NUMBER_OF_POINTS, NUMBER_OF_ORBITS).map((point) => [point.x, point.y, point.z]) });
+    // Time management
+    const now = keepTrackApi.getTimeManager().simulationTimeObj.getTime();
+    const timeData: Date[] = [];
+
+    for (let i = 0; i < NUMBER_OF_POINTS * NUMBER_OF_ORBITS; i++) {
+      const date = new Date(now + satS.period * 60 * i / (NUMBER_OF_POINTS * NUMBER_OF_ORBITS) * 1000);
+
+      timeData.push(date);
+    }
+    data.push({
+      name: satP.name,
+      value: [[0, 0, 0, timeData[0].toISOString()]],
+    });
+    data.push({
+      name: satS.name,
+      value: SatMathApi.getRicOfCurrentOrbit(satS, satP, NUMBER_OF_POINTS, NUMBER_OF_ORBITS)
+        .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+    });
 
     return data;
   }

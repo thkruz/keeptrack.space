@@ -39,7 +39,16 @@ import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact
  */
 import googleAnalytics from '@analytics/google-analytics';
 import createAnalytics from 'analytics';
+import { Calculator } from './calculator/calculator';
+import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
+import { EcfPlot } from './plot-analysis/ecf-plots';
+import { EciPlot } from './plot-analysis/eci-plots';
+import { Inc2AltPlots } from './plot-analysis/inc2alt';
+import { Inc2LonPlots } from './plot-analysis/inc2lon';
+import { Lat2LonPlots } from './plot-analysis/lat2lon';
+import { RicPlot } from './plot-analysis/ric-plots';
+import { Time2LonPlots } from './plot-analysis/time2lon';
 import { PolarPlotPlugin } from './polar-plot/polar-plot';
 import { ReportsPlugin } from './reports/reports';
 import { SatConstellations } from './sat-constellations/sat-constellations';
@@ -68,8 +77,6 @@ import { TransponderChannelData } from './transponder-channel-data/transponder-c
 import { VideoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
-import { Calculator } from './calculator/calculator';
-import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
 
 export type KeepTrackPlugins = {
   transponderChannelData: boolean;
@@ -186,15 +193,14 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new ScreenRecorder().init(), enabled: plugins.screenRecorder },
       { init: () => new AnalysisMenu().init(), enabled: plugins.analysis },
       { init: () => new Calculator().init(), enabled: plugins.calculator },
-      /*
-       * { plugin: eciPlotsPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: ecfPlotsPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: ricPlotPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: time2LonPlotsPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: inc2AltPlotPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: inc2LonPlotPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: aboutMenuPlugin, enabled: plugins.aboutManager },
-       */
+      { init: () => new EciPlot().init(), enabled: plugins.plotAnalysis },
+      { init: () => new EcfPlot().init(), enabled: plugins.plotAnalysis },
+      { init: () => new RicPlot().init(), enabled: plugins.plotAnalysis },
+      { init: () => new Time2LonPlots().init(), enabled: plugins.plotAnalysis },
+      { init: () => new Inc2AltPlots().init(), enabled: plugins.plotAnalysis },
+      { init: () => new Inc2LonPlots().init(), enabled: plugins.plotAnalysis },
+      { init: () => new Lat2LonPlots().init(), enabled: plugins.plotAnalysis },
+      // { plugin: aboutMenuPlugin, enabled: plugins.aboutManager },
       { init: () => new SettingsMenuPlugin().init(), enabled: plugins.settingsMenu },
       { init: () => new GraphicsMenuPlugin().init(), enabled: plugins.graphicsMenu },
       { init: () => new SoundManager().init(), enabled: plugins.soundManager },

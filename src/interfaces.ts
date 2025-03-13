@@ -48,7 +48,7 @@ export type EChartsData = {
   name: string;
   satId?: number;
   country?: string;
-  value?: [number, number, number][];
+  value?: [number, number, number, string?, string?][];
   data?: [number, number, number?][];
 }[];
 

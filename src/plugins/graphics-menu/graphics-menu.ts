@@ -95,6 +95,48 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
             data-tooltip="The decay of the godrays illumination.">
             <label for="${this.formPrefix_}-godrays-illumination-decay">Godrays Illumination Decay</label>
           </div>
+          <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Draw the Sun">
+                <input id="settings-drawSun" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw the Sun
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Hides Earth Textures">
+                <input id="settings-drawBlackEarth" type="checkbox"/>
+                <span class="lever"></span>
+                Draw Black Earth
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide the Atmosphere">
+                <input id="settings-drawAtmosphere" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw Atmosphere
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide the Aurora">
+                <input id="settings-drawAurora" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw Aurora
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Change the Skybox to Gray">
+                <input id="settings-graySkybox" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw Gray Background
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Draw Milky Way in Background">
+                <input id="settings-drawMilkyWay" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw the Milky Way
+              </label>
+            </div>
         </form>
       </div>
     </div>
@@ -126,6 +168,16 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
       (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.MEDIUM.toString();
       (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).dispatchEvent(new Event('change'));
       this.updateGodrays_(GodraySamples.MEDIUM);
+
+      settingsManager.isDrawSun = true;
+      if (settingsManager.isBlackEarth) {
+        settingsManager.isBlackEarth = false;
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+      }
+      settingsManager.isDrawAtmosphere = true;
+      settingsManager.isDrawAurora = true;
+      settingsManager.isDrawMilkyWay = true;
+      settingsManager.isGraySkybox = false;
     });
 
     SettingsManager.preserveSettings();
@@ -134,9 +186,75 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
 
   private onFormChange_(e: Event): void {
     e.preventDefault();
-    const godraysQuality = parseInt((<HTMLSelectElement>getEl(`${this.formPrefix_}-godrays-quality`)).value, 10);
 
-    showLoading(() => this.updateGodrays_(godraysQuality));
+    const targetElement = <HTMLElement>e.target;
+
+    switch (targetElement?.id) {
+      case 'settings-drawSun':
+      case 'settings-drawBlackEarth':
+      case 'settings-drawAtmosphere':
+      case 'settings-drawAurora':
+      case 'settings-drawMilkyWay':
+      case 'settings-graySkybox':
+        if ((<HTMLInputElement>getEl(targetElement?.id)).checked) {
+          // Play sound for enabling option
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+        } else {
+          // Play sound for disabling option
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+        }
+        break;
+      case `${this.formPrefix_}-godrays-samples`:
+      case `${this.formPrefix_}-godrays-decay`:
+      case `${this.formPrefix_}-godrays-exposure`:
+      case `${this.formPrefix_}-godrays-density`:
+      case `${this.formPrefix_}-godrays-weight`:
+      case `${this.formPrefix_}-godrays-illumination-decay`:
+        {
+          const godraysQuality = parseInt((<HTMLSelectElement>getEl(`${this.formPrefix_}-godrays-quality`)).value, 10);
+
+          showLoading(() => this.updateGodrays_(godraysQuality));
+        }
+        break;
+      default:
+        break;
+    }
+
+    settingsManager.isDrawSun = (<HTMLInputElement>getEl('settings-drawSun')).checked;
+    if (settingsManager.isDrawSun) {
+      keepTrackApi.getScene().drawTimeArray = Array(150).fill(16);
+    }
+    const isBlackEarthChanged = settingsManager.isBlackEarth !== (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
+    const isDrawAtmosphereChanged = settingsManager.isDrawAtmosphere !== (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
+    const isDrawAuroraChanged = settingsManager.isDrawAurora !== (<HTMLInputElement>getEl('settings-drawAurora')).checked;
+
+    settingsManager.isBlackEarth = (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
+    settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
+    settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
+    if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
+      keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+    }
+
+    // Must come after the above checks
+    const isDrawMilkyWayChanged = settingsManager.isDrawMilkyWay !== (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
+    const isGraySkyboxChanged = settingsManager.isGraySkybox !== (<HTMLInputElement>getEl('settings-graySkybox')).checked;
+
+    if (isGraySkyboxChanged) {
+      (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked = false;
+    }
+
+    if (isDrawMilkyWayChanged) {
+      (<HTMLInputElement>getEl('settings-graySkybox')).checked = false;
+    }
+
+    settingsManager.isDrawMilkyWay = (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
+    settingsManager.isGraySkybox = (<HTMLInputElement>getEl('settings-graySkybox')).checked;
+
+    if (isDrawMilkyWayChanged || isGraySkyboxChanged) {
+      keepTrackApi.getScene().skybox.init(settingsManager, keepTrackApi.getRenderer().gl);
+    }
+
+    SettingsManager.preserveSettings();
   }
 
   private updateGodrays_(godraysQuality: GodraySamples): void {
@@ -204,7 +322,6 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
       settingsManager.godraysWeight = godraysWeight;
       settingsManager.godraysIlluminationDecay = godraysIlluminationDecay;
     } else {
-      settingsManager.sizeOfSun = 0.9;
       settingsManager.godraysDecay = 0.983;
       settingsManager.godraysDensity = 1.8;
       settingsManager.godraysWeight = 0.085;
@@ -231,12 +348,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
       settingsManager.godraysIlluminationDecay = 0.6;
     }
 
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES, settingsManager.godraysSamples.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY, settingsManager.godraysDecay.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE, settingsManager.godraysExposure.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY, settingsManager.godraysDensity.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT, settingsManager.godraysWeight.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY, settingsManager.godraysIlluminationDecay.toString());
+    SettingsManager.preserveSettings();
   }
 
   private syncOnLoad_() {
@@ -248,6 +360,27 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-density`)).value = settingsManager.godraysDensity.toString();
     (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-weight`)).value = settingsManager.godraysWeight.toString();
     (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-illumination-decay`)).value = settingsManager.godraysIlluminationDecay.toString();
+
+    const settingsElements = [
+      { id: 'settings-drawSun', setting: 'isDrawSun' },
+      { id: 'settings-drawBlackEarth', setting: 'isBlackEarth' },
+      { id: 'settings-drawAtmosphere', setting: 'isDrawAtmosphere' },
+      { id: 'settings-drawAurora', setting: 'isDrawAurora' },
+      { id: 'settings-drawMilkyWay', setting: 'isDrawMilkyWay' },
+      { id: 'settings-graySkybox', setting: 'isGraySkybox' },
+    ];
+
+    settingsElements.forEach(({ id, setting }) => {
+      const element = <HTMLInputElement>getEl(id);
+
+      if (element) {
+        if (setting.includes('colors.transparent')) {
+          element.checked = settingsManager.colors.transparent[3] === 0;
+        } else {
+          element.checked = settingsManager[setting];
+        }
+      }
+    });
   }
 
   private loadGodraySettings_() {

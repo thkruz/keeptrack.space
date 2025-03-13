@@ -170,48 +170,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Draw the Sun">
-                <input id="settings-drawSun" type="checkbox" checked/>
-                <span class="lever"></span>
-                Draw the Sun
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Hides Earth Textures">
-                <input id="settings-drawBlackEarth" type="checkbox"/>
-                <span class="lever"></span>
-                Draw Black Earth
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide the Atmosphere">
-                <input id="settings-drawAtmosphere" type="checkbox" checked/>
-                <span class="lever"></span>
-                Draw Atmosphere
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide the Aurora">
-                <input id="settings-drawAurora" type="checkbox" checked/>
-                <span class="lever"></span>
-                Draw Aurora
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Change the Skybox to Gray">
-                <input id="settings-graySkybox" type="checkbox" checked/>
-                <span class="lever"></span>
-                Draw Gray Background
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Draw Milky Way in Background">
-                <input id="settings-drawMilkyWay" type="checkbox" checked/>
-                <span class="lever"></span>
-                Draw the Milky Way
-              </label>
-            </div>
-            <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Display ECI Coordinates on Hover">
                 <input id="settings-eciOnHover" type="checkbox"/>
                 <span class="lever"></span>
@@ -487,12 +445,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       { id: 'settings-drawTrailingOrbits', setting: 'isDrawTrailingOrbits' },
       { id: 'settings-drawEcf', setting: 'isOrbitCruncherInEcf' },
       { id: 'settings-isDrawInCoverageLines', setting: 'isDrawInCoverageLines' },
-      { id: 'settings-drawSun', setting: 'isDrawSun' },
-      { id: 'settings-drawBlackEarth', setting: 'isBlackEarth' },
-      { id: 'settings-drawAtmosphere', setting: 'isDrawAtmosphere' },
-      { id: 'settings-drawAurora', setting: 'isDrawAurora' },
-      { id: 'settings-drawMilkyWay', setting: 'isDrawMilkyWay' },
-      { id: 'settings-graySkybox', setting: 'isGraySkybox' },
       { id: 'settings-eciOnHover', setting: 'isEciOnHover' },
       { id: 'settings-hos', setting: 'colors.transparent[3] === 0' },
       { id: 'settings-confidence-levels', setting: 'isShowConfidenceLevels' },
@@ -519,7 +471,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     if (maxSearchSatsEl) {
       maxSearchSatsEl.value = settingsManager.searchLimit.toString();
     }
-    // (<HTMLInputElement>getEl('satFieldOfView')).value = settingsManager.selectedSatFOV.toString();
   }
 
   private onColorSelected_(context: ColorPick, colorStr: string) {
@@ -617,15 +568,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDrawTrailingOrbits = false;
     settingsManager.isOrbitCruncherInEcf = false;
     settingsManager.isDrawInCoverageLines = true;
-    settingsManager.isDrawSun = true;
-    if (settingsManager.isBlackEarth) {
-      settingsManager.isBlackEarth = false;
-      keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-    }
-    settingsManager.isDrawAtmosphere = true;
-    settingsManager.isDrawAurora = true;
-    settingsManager.isDrawMilkyWay = true;
-    settingsManager.isGraySkybox = false;
     settingsManager.isEciOnHover = false;
     settingsManager.isDemoModeOn = false;
     settingsManager.isSatLabelModeOn = true;
@@ -659,14 +601,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isShowAgencies = (<HTMLInputElement>getEl('settings-showAgencies')).checked;
     settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
-    settingsManager.isDrawSun = (<HTMLInputElement>getEl('settings-drawSun')).checked;
-    if (settingsManager.isDrawSun) {
-      keepTrackApi.getScene().drawTimeArray = Array(150).fill(16);
-    }
-    const isBlackEarthChanged = settingsManager.isBlackEarth !== (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
-    const isDrawAtmosphereChanged = settingsManager.isDrawAtmosphere !== (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
-    const isDrawAuroraChanged = settingsManager.isDrawAurora !== (<HTMLInputElement>getEl('settings-drawAurora')).checked;
-
     settingsManager.drawCameraWidget = (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked;
     const ccWidgetCanvas = getEl('camera-control-widget');
 
@@ -676,13 +610,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       } else {
         ccWidgetCanvas.style.display = 'none';
       }
-    }
-
-    settingsManager.isBlackEarth = (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
-    settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
-    settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
-    if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
-      keepTrackApi.getScene().earth.reloadEarthHiResTextures();
     }
 
     const isDrawOrbitsChanged = settingsManager.isDrawOrbits !== (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
@@ -707,17 +634,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       }
     }
     // Must come after the above checks
-
-    const isDrawMilkyWayChanged = settingsManager.isDrawMilkyWay !== (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
-    const isGraySkyboxChanged = settingsManager.isGraySkybox !== (<HTMLInputElement>getEl('settings-graySkybox')).checked;
-
-    settingsManager.isDrawMilkyWay = (<HTMLInputElement>getEl('settings-drawMilkyWay')).checked;
-    settingsManager.isGraySkybox = (<HTMLInputElement>getEl('settings-graySkybox')).checked;
-
-    if (isDrawMilkyWayChanged || isGraySkyboxChanged) {
-      keepTrackApi.getScene().skybox.init(settingsManager, keepTrackApi.getRenderer().gl);
-    }
-
     settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
     const isHOSChecked = (<HTMLInputElement>getEl('settings-hos')).checked;
 

@@ -54,8 +54,8 @@
   "jestrunner.codeLens": ["run", "debug", "coverage"],
   "jestrunner.runOptions": ["-o --coverage"],
   "sonarlint.connectedMode.project": {
-    "connectionId": "thkruz",
-    "projectKey": "thkruz_keeptrack.space"
+    "connectionId": "http-localhost-9000",
+    "projectKey": "keeptrack"
   },
   "task.autoDetect": "off",
   "editor.rulers": [180]

@@ -1,7 +1,7 @@
 /**
  * Highest classification of the data used by the program.
  */
-export type ClassificationString = '' | 'Unclassified' | 'CUI' | 'Confidential' | 'Secret' | 'Top Secret' | 'Top Secret//SCI';
+export type ClassificationString = '' | 'Unclassified' | 'CUI' | 'Confidential' | 'Secret' | 'Top Secret' | 'Top Secret//SCI' | 'ALDORIA CONFIDENTIAL';
 
 export class Classification {
   static getColors(classification: ClassificationString) {

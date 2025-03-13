@@ -355,6 +355,10 @@ export const countryFlagIconMap = {
 };
 
 export const country2flagIcon = (country: string): string => {
+  if (!country || country === '') {
+    return 'fi-unknown';
+  }
+
   // Get the country code from the list
   const countryCode = countryCodeList[country] ?? countryCodeList[countryMapList[country]] ?? country;
 

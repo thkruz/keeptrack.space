@@ -267,6 +267,7 @@ export class KeyboardInput {
         break;
       case '<':
         timeManagerInstance.calculateSimulationTime();
+        // TODO: Create a setting for how much to move back/forward
         timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 60000 * 60); // Move back 1 Hour
         settingsManager.isPropRateChange = true;
         keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));

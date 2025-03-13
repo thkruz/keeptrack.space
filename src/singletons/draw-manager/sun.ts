@@ -3,8 +3,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -19,8 +19,9 @@
  *
  * /////////////////////////////////////////////////////////////////////////////
  */
+/* eslint-disable camelcase */
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BufferAttribute } from '@app/static/buffer-attribute';
+import { GlUtils } from '@app/static/gl-utils';
 import { GLSL3 } from '@app/static/material';
 import { Mesh } from '@app/static/mesh';
 import { SatMath } from '@app/static/sat-math';
@@ -46,7 +47,7 @@ export class Sun {
   /** The model view matrix. */
   private modelViewMatrix_: mat4;
   /** The normal matrix. */
-  private normalMatrix_ = mat3.create();
+  private readonly normalMatrix_ = mat3.create();
 
   /** The position of the sun in ECI coordinates. */
   eci: EciVec3;
@@ -69,6 +70,9 @@ export class Sun {
 
     this.setUniforms_(earthLightDirection);
 
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
+
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
@@ -84,27 +88,17 @@ export class Sun {
       radius: this.DRAW_RADIUS,
       widthSegments: this.NUM_WIDTH_SEGS,
       heightSegments: this.NUM_HEIGHT_SEGS,
-      isSkipTexture: true,
-      attributes: {
-        position: new BufferAttribute({
-          location: 0,
-          vertices: 3,
-          stride: Float32Array.BYTES_PER_ELEMENT * 6,
-          offset: 0,
-        }),
-        normal: new BufferAttribute({
-          location: 1,
-          vertices: 3,
-          stride: Float32Array.BYTES_PER_ELEMENT * 6,
-          offset: Float32Array.BYTES_PER_ELEMENT * 3,
-        }),
-      },
     });
+    const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun-1024.jpg`);
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
-        lightDirection: <WebGLUniformLocation>null,
-        sunDistance: <WebGLUniformLocation>null,
+        u_sampler: <WebGLUniformLocation>null,
+        u_lightDirection: <WebGLUniformLocation>null,
+        u_sizeOfSun: <WebGLUniformLocation>null,
+        u_sunDistance: <WebGLUniformLocation>null,
+        u_isTexture: <WebGLUniformLocation>null,
       },
+      map: texture,
       vertexShader: this.shaders_.vert,
       fragmentShader: this.shaders_.frag,
       glslVersion: GLSL3,
@@ -118,12 +112,9 @@ export class Sun {
         viewMatrix: true,
         cameraPosition: true,
       },
-      disabledAttributes: {
-        uv: true,
-      },
     });
-    this.mesh.geometry.initVao(this.mesh.program);
 
+    this.mesh.geometry.initVao(this.mesh.program);
     this.isLoaded_ = true;
   }
 
@@ -155,8 +146,11 @@ export class Sun {
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
-    gl.uniform3fv(this.mesh.material.uniforms.lightDirection, earthLightDirection);
-    gl.uniform1f(this.mesh.material.uniforms.sunDistance, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
+    gl.uniform3fv(this.mesh.material.uniforms.u_sizeOfSun, [settingsManager.sizeOfSun, settingsManager.sizeOfSun, settingsManager.sizeOfSun]);
+    gl.uniform3fv(this.mesh.material.uniforms.u_lightDirection, earthLightDirection);
+    gl.uniform1f(this.mesh.material.uniforms.u_sunDistance, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
+    gl.uniform1i(this.mesh.material.uniforms.u_sampler, 0);
+    gl.uniform1i(this.mesh.material.uniforms.u_isTexture, settingsManager.isUseSunTexture ? 1 : 0);
   }
 
   /**
@@ -164,40 +158,55 @@ export class Sun {
    *
    * NOTE: Keep these at the bottom of the file to ensure proper syntax highlighting.
    */
-  private shaders_ = {
+  private readonly shaders_ = {
     frag: keepTrackApi.glsl`
-        uniform vec3 lightDirection;
+        uniform bool u_isTexture;
+        uniform vec3 u_lightDirection;
+        uniform sampler2D u_sampler;
 
         in vec3 v_normal;
-        in float v_dist2;
+        in float v_dist;
+        in vec2 v_texcoord;
 
         out vec4 fragColor;
 
         void main(void) {
             // Hide the Back Side of the Sphere to prevent duplicate suns
-            if (v_dist2 > 1.0) {
+            if (v_dist > 1.0) {
             discard;
             }
 
-            float a = max(dot(v_normal, -lightDirection), 0.1);
-            // Set colors
-            float r = 1.0 * a;
-            float g = 1.0 * a;
-            float b = 0.9 * a;
-            fragColor = vec4(vec3(r,g,b), a);
+            if (u_isTexture) {
+              fragColor = texture(u_sampler, v_texcoord);
+            } else {
+              // Improved sun appearance with smoother gradient
+              float a = max(dot(v_normal, -u_lightDirection), 0.1);
+              
+              // Apply a more realistic falloff using pow() for solar limb darkening
+              a = pow(a, 0.005); // Softer falloff
+
+              float r = 0.9 * a;
+              float g = 0.8 * a;
+              float b = 0.65 * a;
+              fragColor = vec4(vec3(r,g,b), a);
+            }
         }`,
     vert: keepTrackApi.glsl`
-        uniform float sunDistance;
+        uniform vec3 u_sizeOfSun;
+        uniform float u_sunDistance;
 
+        out vec2 v_texcoord;
         out vec3 v_normal;
-        out float v_dist2;
+        out float v_dist;
 
         void main(void) {
-            vec4 worldPosition = modelViewMatrix * vec4(position / 1.6, 1.0);
-            v_dist2 = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) / sunDistance;
-            v_normal = normalMatrix * normal;
-
+            vec4 worldPosition = modelViewMatrix * vec4(position * u_sizeOfSun, 1.0);
             gl_Position = projectionMatrix * worldPosition;
+            
+            v_dist = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) / u_sunDistance;
+            
+            v_texcoord = uv;
+            v_normal = normalMatrix * normal;
         }`,
   };
 }

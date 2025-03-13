@@ -2,8 +2,8 @@
 /**
  * // /////////////////////////////////////////////////////////////////////////////
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -28,15 +28,17 @@ import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
 import { ClassificationString } from '../static/classification';
 import { isThisNode } from '../static/isThisNode';
+import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 import { sateliot } from './presets/sateliot';
 import { starTalk } from './presets/startalk';
+import type { KeepTrackPlugins } from '@app/plugins/plugins';
 
 export class SettingsManager {
   classificationStr = '' as ClassificationString;
   // This controls which of the built-in plugins are loaded
-  plugins = {
+  plugins = <KeepTrackPlugins>{
     debug: false,
     satInfoboxCore: true,
     aboutManager: false,
@@ -74,6 +76,7 @@ export class SettingsManager {
     watchlist: true,
     sensor: true,
     settingsMenu: true,
+    graphicsMenu: true,
     datetime: true,
     social: true,
     topMenu: true,
@@ -90,6 +93,13 @@ export class SettingsManager {
     transponderChannelData: true,
     calculator: true,
   };
+  godraysDecay = 0.983;
+  godraysExposure = 0.5;
+  godraysDensity = 1.8;
+  godraysWeight = 0.085;
+  godraysIlluminationDecay = 3.0;
+  sizeOfSun = 0.65;
+  isUseSunTexture = false;
 
   static preserveSettings() {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
@@ -299,6 +309,11 @@ export class SettingsManager {
    * Determines whether or not to draw the sun in the application.
    */
   isDrawSun = true;
+  /**
+   * Determines how many draw commands are used for sun illumination
+   * This should be a GodraySamples value (16, 32, 64, 128)
+   */
+  godraysSamples = 32;
   /**
    * Draw Lines from Sensors to Satellites When in FOV
    */
@@ -1552,6 +1567,9 @@ export class SettingsManager {
             break;
           case 'console':
             this.isEnableConsole = true;
+            break;
+          case 'godrays':
+            this.godraysSamples = GetVariables.godrays(val);
             break;
           case 'smallImages':
             this.smallImages = true;

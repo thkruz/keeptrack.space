@@ -69,70 +69,72 @@ import { VideoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 import { Calculator } from './calculator/calculator';
+import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
 
 export type KeepTrackPlugins = {
-  transponderChannelData?: boolean;
-  videoDirector?: boolean;
-  debrisScreening?: boolean;
-  satInfoboxCore?: boolean;
-  findSat?: boolean;
-  collisions?: boolean;
-  satelliteFov?: boolean;
-  nightToggle?: boolean;
-  countries?: boolean;
-  screenRecorder?: boolean;
-  aboutManager?: boolean;
-  settingsMenu?: boolean;
-  soundManager?: boolean;
-  analysis?: boolean;
-  astronomy?: boolean;
-  breakup?: boolean;
-  catalogLoader?: boolean;
-  classificationBar?: boolean;
-  collissions?: boolean;
-  trackingImpactPredict?: boolean;
-  colorsMenu?: boolean;
-  constellations?: boolean;
-  countriesMenu?: boolean;
-  datetime?: boolean;
-  debug?: boolean;
-  dops?: boolean;
-  editSat?: boolean;
-  gamepad?: boolean;
-  initialOrbit?: boolean;
-  launchCalendar?: boolean;
-  missile?: boolean;
-  newLaunch?: boolean;
-  nextLaunch?: boolean;
-  orbitReferences?: boolean;
-  photoManager?: boolean;
-  planetarium?: boolean;
-  plotAnalysis?: boolean;
-  satChanges?: boolean;
-  satelliteView?: boolean;
-  scenarioCreator?: boolean;
-  screenshot?: boolean;
-  sensor?: boolean;
-  sensorFov?: boolean;
-  sensorSurv?: boolean;
-  shortTermFences?: boolean;
-  social?: boolean;
-  sounds?: boolean;
-  stereoMap?: boolean;
-  timeMachine?: boolean;
-  topMenu?: boolean;
-  updateSelectBox?: boolean;
-  watchlist?: boolean;
-  reports?: boolean;
-  polarPlot?: boolean;
-  timeline?: boolean;
-  timelineAlt?: boolean;
-  calculator?: boolean;
+  transponderChannelData: boolean;
+  videoDirector: boolean;
+  debrisScreening: boolean;
+  satInfoboxCore: boolean;
+  findSat: boolean;
+  collisions: boolean;
+  satelliteFov: boolean;
+  nightToggle: boolean;
+  countries: boolean;
+  screenRecorder: boolean;
+  aboutManager: boolean;
+  settingsMenu: boolean;
+  graphicsMenu: boolean
+  soundManager: boolean;
+  analysis: boolean;
+  astronomy: boolean;
+  breakup: boolean;
+  catalogLoader: boolean;
+  classificationBar: boolean;
+  collissions: boolean;
+  trackingImpactPredict: boolean;
+  colorsMenu: boolean;
+  constellations: boolean;
+  countriesMenu: boolean;
+  datetime: boolean;
+  debug: boolean;
+  dops: boolean;
+  editSat: boolean;
+  gamepad: boolean;
+  initialOrbit: boolean;
+  launchCalendar: boolean;
+  missile: boolean;
+  newLaunch: boolean;
+  nextLaunch: boolean;
+  orbitReferences: boolean;
+  photoManager: boolean;
+  planetarium: boolean;
+  plotAnalysis: boolean;
+  satChanges: boolean;
+  satelliteView: boolean;
+  scenarioCreator: boolean;
+  screenshot: boolean;
+  sensor: boolean;
+  sensorFov: boolean;
+  sensorSurv: boolean;
+  shortTermFences: boolean;
+  social: boolean;
+  sounds: boolean;
+  stereoMap: boolean;
+  timeMachine: boolean;
+  topMenu: boolean;
+  updateSelectBox: boolean;
+  watchlist: boolean;
+  reports: boolean;
+  polarPlot: boolean;
+  timeline: boolean;
+  timelineAlt: boolean;
+  calculator: boolean;
 };
 
 // Register all core modules
 export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugins): void => {
-  plugins ??= {};
+  plugins ??= <KeepTrackPlugins>{};
   try {
     const pluginList = [
       { init: () => new DebugMenuPlugin().init(), enabled: plugins.debug },
@@ -194,6 +196,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
        * { plugin: aboutMenuPlugin, enabled: plugins.aboutManager },
        */
       { init: () => new SettingsMenuPlugin().init(), enabled: plugins.settingsMenu },
+      { init: () => new GraphicsMenuPlugin().init(), enabled: plugins.graphicsMenu },
       { init: () => new SoundManager().init(), enabled: plugins.soundManager },
       { init: () => new GamepadPlugin().init(), enabled: plugins.gamepad },
       { init: () => new VideoDirectorPlugin().init(), enabled: plugins.videoDirector },

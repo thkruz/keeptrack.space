@@ -38,6 +38,7 @@ export class Scene {
     gpuPicking: null as WebGLFramebuffer,
     godrays: null as WebGLFramebuffer,
   };
+  updateVisualsBasedOnPerformanceTime_ = 0;
 
   constructor(params: SceneParams) {
     this.gl_ = params.gl;
@@ -89,32 +90,16 @@ export class Scene {
     if (this.drawTimeArray.length > 150) {
       this.drawTimeArray.shift();
     }
-    this.averageDrawTime = this.drawTimeArray.reduce((a, b) => a + b) / this.drawTimeArray.length;
+    this.averageDrawTime = this.drawTimeArray.reduce((a, b) => a + b, 0) / this.drawTimeArray.length;
 
-    if (
-      (!settingsManager.isDisableMoon ||
-        settingsManager.isDrawSun ||
-        settingsManager.isDrawAurora ||
-        settingsManager.isDrawMilkyWay) &&
-      !KeepTrack.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
-      keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling some visual effects in settings.', ToastMsgType.caution);
-      settingsManager.isDisableMoon = true;
-      settingsManager.isDrawSun = false;
-      settingsManager.isDrawAurora = false;
-      settingsManager.isDrawMilkyWay = false;
-      // console.error('FPS: ', 1000 / this.averageDrawTime);
-      try {
-        SettingsMenuPlugin?.syncOnLoad();
-      } catch (error) {
-        errorManagerInstance.log(error);
-      }
-    }
+    this.updateVisualsBasedOnPerformance_();
 
     if (!settingsManager.isDrawLess) {
       if (settingsManager.isDrawSun) {
+        const fb = settingsManager.isDisableGodrays ? null : this.frameBuffers.godrays;
 
         // Draw the Sun to the Godrays Frame Buffer
-        this.sun.draw(this.earth.lightDirection, this.frameBuffers.godrays);
+        this.sun.draw(this.earth.lightDirection, fb);
 
         // Draw a black earth mesh on top of the sun in the godrays frame buffer
         this.earth.drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
@@ -135,16 +120,6 @@ export class Scene {
 
       this.skybox.render(renderer.postProcessingManager.curBuffer);
 
-      // eslint-disable-next-line multiline-comment-style
-      // Apply two pass gaussian blur to the godrays to smooth them out
-      // postProcessingManager.programs.gaussian.uniformValues.radius = 2.0;
-      // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 1.0, y: 0.0 };
-      // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, postProcessingManager.secBuffer);
-      // postProcessingManager.switchFrameBuffer();
-      // postProcessingManager.programs.gaussian.uniformValues.dir = { x: 0.0, y: 1.0 };
-      // // After second pass apply the results to the canvas
-      // postProcessingManager.doPostProcessing(gl, postProcessingManager.programs.gaussian, postProcessingManager.curBuffer, null);
-
       // Draw the moon
       if (!settingsManager.isDisableMoon) {
         this.moon.draw(this.sun.position);
@@ -154,6 +129,58 @@ export class Scene {
     }
 
     renderer.postProcessingManager.curBuffer = null;
+  }
+
+  private updateVisualsBasedOnPerformance_() {
+    if ((!settingsManager.isDisableMoon ||
+      !settingsManager.isDisableGodrays ||
+      settingsManager.isDrawSun ||
+      settingsManager.isDrawAurora ||
+      settingsManager.isDrawMilkyWay) &&
+      Date.now() - this.updateVisualsBasedOnPerformanceTime_ > 10000 && // Only check every 10 seconds
+      !KeepTrack.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
+      let isSettingsLeftToDisable = true;
+
+      while (isSettingsLeftToDisable) {
+        if (!settingsManager.isDisableGodrays) {
+          settingsManager.isDisableGodrays = true;
+          settingsManager.sizeOfSun = 1.65;
+          settingsManager.isUseSunTexture = true;
+          keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling Godrays.', ToastMsgType.caution);
+          break;
+        }
+        if (settingsManager.isDrawAurora) {
+          settingsManager.isDrawAurora = false;
+          keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling Aurora.', ToastMsgType.caution);
+          break;
+        }
+        if (!settingsManager.isDisableMoon) {
+          settingsManager.isDisableMoon = true;
+          keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling Moon.', ToastMsgType.caution);
+          break;
+        }
+        if (settingsManager.isDrawMilkyWay) {
+          settingsManager.isDrawMilkyWay = false;
+          keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling Milky Way.', ToastMsgType.caution);
+          break;
+        }
+        if (settingsManager.isDrawSun) {
+          settingsManager.isDrawSun = false;
+          keepTrackApi.getUiManager().toast('Your computer is struggling! Disabling Sun.', ToastMsgType.caution);
+          break;
+        }
+        isSettingsLeftToDisable = false;
+      }
+
+      // Create a timer that has to expire before the next performance check
+      this.updateVisualsBasedOnPerformanceTime_ = Date.now();
+
+      try {
+        SettingsMenuPlugin?.syncOnLoad();
+      } catch (error) {
+        errorManagerInstance.log(error);
+      }
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -219,7 +246,6 @@ export class Scene {
 
   async loadScene(): Promise<void> {
     try {
-      // await tools.init();
       await this.earth.init(settingsManager, this.gl_);
       keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
       await this.sun.init(this.gl_);
@@ -238,9 +264,9 @@ export class Scene {
       if (!settingsManager.isDisableSkybox) {
         await this.skybox.init(settingsManager, this.gl_);
       }
-      // await sceneManager.cone.init();
     } catch (error) {
-      console.debug(error);
+      errorManagerInstance.log(error);
+      console.error(error); // Errors aren't showing as toast messages
     }
   }
 }

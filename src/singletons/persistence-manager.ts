@@ -37,6 +37,12 @@ export enum StorageKey {
   SETTINGS_DRAW_SUN = 'keepTrack-settings-drawSun',
   SETTINGS_NOTIONAL_SATS = 'keepTrack-settings-notionalSats',
   SETTINGS_CONFIDENCE_LEVELS = 'keepTrack-settings-confidenceLevels',
+  GRAPHICS_SETTINGS_GODRAYS_SAMPLES = 'keepTrack-graphicsSettings-godraysSamples',
+  GRAPHICS_SETTINGS_GODRAYS_DECAY = 'keepTrack-graphicsSettings-godraysDecay',
+  GRAPHICS_SETTINGS_GODRAYS_EXPOSURE = 'keepTrack-graphicsSettings-godraysExposure',
+  GRAPHICS_SETTINGS_GODRAYS_DENSITY = 'keepTrack-graphicsSettings-godraysDensity',
+  GRAPHICS_SETTINGS_GODRAYS_WEIGHT = 'keepTrack-graphicsSettings-godraysWeight',
+  GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY = 'keepTrack-graphicsSettings-godraysIlluminationDecay',
 }
 export class PersistenceManager {
   private readonly storage_: Storage;

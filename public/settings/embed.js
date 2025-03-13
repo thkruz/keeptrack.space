@@ -19,12 +19,6 @@
  */
 
 const settingsOverride = {
-  // /////////////////////////////////////////////////////////////////////////////
-  // NOTE: Tweak these settings for your own needs.
-  //       All colors are in RGBA format and must be between 0.0 and 1.0
-  //       Removing a color will cause it to be set to the default value.
-  // /////////////////////////////////////////////////////////////////////////////
-
   // installDirectory: '../',             // Directory where keepTrack is installed
 
   /*

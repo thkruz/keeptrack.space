@@ -14,9 +14,8 @@ import { saveAs } from 'file-saver';
 import i18next from 'i18next';
 
 
-
 export class CreateSat extends KeepTrackPlugin {
-  readonly id = 'CreateSat'
+  readonly id = 'CreateSat';
   dependencies_ = [SelectSatManager.name];
 
 
@@ -28,8 +27,7 @@ export class CreateSat extends KeepTrackPlugin {
   isIconDisabledOnLoad = false;
   isIconDisabled = false;
 
-
-  static readonly elementPrefix = 'cs'
+  static readonly elementPrefix = 'cs';
 
   bottomIconImg = editPng;
 
@@ -137,12 +135,12 @@ export class CreateSat extends KeepTrackPlugin {
         });
 
         getEl('createSat-submit').addEventListener('click', () => {
-          CreateSat.createSatSubmit()
+          CreateSat.createSatSubmit();
         });
 
-        getEl('createSat-save').addEventListener('click', CreateSat.exportTLE)
+        getEl('createSat-save').addEventListener('click', CreateSat.exportTLE);
 
-        this.populateSideMenu_()
+        this.populateSideMenu_();
       },
     });
   }
@@ -152,8 +150,8 @@ export class CreateSat extends KeepTrackPlugin {
     (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-scc`)).value = '90000';
     (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-country`)).value = 'France';
 
-    const default_inc = 0;
-    const inc = default_inc.toFixed(4).padStart(8, '0');
+    const defaultInc = 0;
+    const inc = defaultInc.toFixed(4).padStart(8, '0');
 
     const date = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
 
@@ -165,29 +163,29 @@ export class CreateSat extends KeepTrackPlugin {
     (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-day`)).value = day;
 
 
-    const defalut_rasc = 0;
-    const rasc = defalut_rasc.toFixed(1);
+    const defalutRasc = 0;
+    const rasc = defalutRasc.toFixed(1);
 
-    const default_ecc = 0;
-    const ecc = default_ecc.toFixed(1);
+    const defaultEcc = 0;
+    const ecc = defaultEcc.toFixed(1);
 
-    const default_ma = 0;
-    const ma = default_ma.toFixed(1);
+    const defaultMa = 0;
+    const ma = defaultMa.toFixed(1);
 
     (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-rasc`)).value = rasc;
     (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-ecen`)).value = ecc;
     (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-meana`)).value = ma;
 
-    const default_argPe = 0
-    const argPe = default_argPe.toFixed(1);
+    const defaultArgPe = 0;
+    const argPe = defaultArgPe.toFixed(1);
 
     (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-argPe`)).value = argPe;
 
-    const default_souce = 'Trust me Bro';
-    const default_name = 'New Satellite';
+    const defaultSouce = 'Trust me Bro';
+    const defaultName = 'New Satellite';
 
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-src`)).value = default_souce;
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-name`)).value = default_name;
+    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-src`)).value = defaultSouce;
+    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-name`)).value = defaultName;
   }
 
   private static createSatSubmit() {
@@ -219,7 +217,7 @@ export class CreateSat extends KeepTrackPlugin {
     const epochday = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-day`)).value;
     const source = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-src`)).value;
     const name = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-name`)).value;
-    const intl = `${epochyr}69B`
+    const intl = `${epochyr}69B`;
 
     const { tle1: tle1_, tle2: tle2_ } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
     const tle1 = tle1_;
@@ -249,11 +247,11 @@ export class CreateSat extends KeepTrackPlugin {
 
       const info: DetailedSatelliteParams = {
         id: satId,
-        country: country,
-        tle1: tle1,
-        tle2: tle2,
-        name: name
-      }
+        country,
+        tle1,
+        tle2,
+        name,
+      };
 
       // const newSat = new DetailedSatellite(info);
 
@@ -262,11 +260,11 @@ export class CreateSat extends KeepTrackPlugin {
         ...{
           position: pos,
           velocity: vel,
-          source: source
+          source,
         },
       });
 
-      console.log(newSat)
+      console.log(newSat);
 
       catalogManagerInstance.objectCache[satId] = newSat;
 
@@ -275,18 +273,16 @@ export class CreateSat extends KeepTrackPlugin {
           typ: CruncerMessageTypes.SAT_EDIT,
           active: true,
           id: satId,
-          tle1: tle1,
-          tle2: tle2,
+          tle1,
+          tle2,
         });
-      }
-      catch (e) {
+      } catch (e) {
         errorManagerInstance.error(e, 'create-sat.ts', 'Sat Cruncher message failed');
       }
 
       try {
         orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
-      }
-      catch (e) {
+      } catch (e) {
         errorManagerInstance.error(e, 'create-sat.ts', 'Changing orbit buffer data failed');
       }
 

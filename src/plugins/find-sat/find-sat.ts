@@ -307,7 +307,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     // Export data
     getEl('findByLooks-export')?.addEventListener('click', () => {
-      CatalogExporter.exportTle2Csv(this.lastResults_)
+      CatalogExporter.exportTle2Csv(this.lastResults_);
     });
   }
 
@@ -616,7 +616,10 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
   private static checkTleAge_(possibles: DetailedSatellite[], minTleAge: Hours) {
     const epochDayFloat = parseFloat(TimeManager.currentEpoch(new Date())[1]);
-    return possibles.filter((possible) => (epochDayFloat - parseFloat(possible.tle1.substring(20, 28))) * 24 as Hours <= minTleAge && (epochDayFloat - parseFloat(possible.tle1.substring(20, 28))) > 0);
+
+
+    return possibles.filter((possible) => (epochDayFloat - parseFloat(possible.tle1.substring(20, 28))) * 24 as Hours <= minTleAge &&
+      (epochDayFloat - parseFloat(possible.tle1.substring(20, 28))) > 0);
   }
 
   private static checkRightAscension_(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {

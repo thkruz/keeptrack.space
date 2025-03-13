@@ -73,7 +73,7 @@ import { SocialMedia } from './social/social';
 import { StereoMap } from './stereo-map/stereo-map';
 import { TimeMachine } from './time-machine/time-machine';
 import { SatelliteTimeline } from './timeline-satellite/satellite-timeline';
-import { SensorTimeline } from './timeline-sensor/sensor-timeline';
+import { SensorTimeline } from './timeline-sensor/SensorTimeline';
 import { TransponderChannelData } from './transponder-channel-data/transponder-channel-data';
 import { VideoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';

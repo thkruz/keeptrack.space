@@ -157,12 +157,12 @@ export abstract class SatMath {
 
       positionEci = <EciVec3>stateVector.position;
       if (!stateVector || !positionEci) {
-        console.error('No ECI position for', satrec.satnum, 'at', now);
+        errorManagerInstance.log(`No ECI position for ${satrec.satnum} at ${now}`);
 
         return <Kilometers>0;
       }
     } catch (e) {
-      console.error('Error propagating satrec at', now);
+      errorManagerInstance.log(`Error propagating satrec at ${now}`);
 
       return <Kilometers>0;
     }
@@ -177,21 +177,24 @@ export abstract class SatMath {
    * @returns A value indicating whether the satellite is in the sun's shadow (umbra), in the penumbra, or in sunlight.
    */
   static calculateIsInSun(obj: BaseObject | StateVectorSgp4, sunECI: EciVec3): SunStatus {
+    let x: Kilometers;
+    let y: Kilometers;
+    let z: Kilometers;
+
 
     if (obj instanceof BaseObject) {
-      if (!obj || typeof obj.position === 'undefined') {
+      if (!obj?.position) {
         return SunStatus.UNKNOWN;
       }
       if (!sunECI) {
         return SunStatus.UNKNOWN;
       }
 
-      var x = obj.position.x
-      var y = obj.position.y
-      var z = obj.position.z
+      x = obj.position.x;
+      y = obj.position.y;
+      z = obj.position.z;
 
-    }
-    else if ((typeof obj.position === 'boolean' || (
+    } else if ((typeof obj.position === 'boolean' || (
       obj.position &&
       typeof obj.position.x === 'number' &&
       typeof obj.position.y === 'number' &&
@@ -202,42 +205,39 @@ export abstract class SatMath {
         typeof obj.velocity.x === 'number' &&
         typeof obj.velocity.y === 'number' &&
         typeof obj.velocity.z === 'number'
-      )) && typeof obj.position != 'boolean') {
+      )) && typeof obj.position !== 'boolean') {
 
-      var x = obj.position.x
-      var y = obj.position.y
-      var z = obj.position.z
+      x = obj.position.x as Kilometers;
+      y = obj.position.y as Kilometers;
+      z = obj.position.z as Kilometers;
     }
 
     /*
      * NOTE: Code is mashed to save memory when used on the whole catalog
      * Position needs to be relative to satellite NOT ECI
-     * var distSatEarthX = Math.pow(-sat.position.x, 2);
-     * var distSatEarthY = Math.pow(-sat.position.y, 2);
-     * var distSatEarthZ = Math.pow(-sat.position.z, 2);
-     * var distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
-     * var semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
+     * const distSatEarthX = Math.pow(-sat.position.x, 2);
+     * const distSatEarthY = Math.pow(-sat.position.y, 2);
+     * const distSatEarthZ = Math.pow(-sat.position.z, 2);
+     * const distSatEarth = Math.sqrt(distSatEarthX + distSatEarthY + distSatEarthZ);
+     * const semiDiamEarth = Math.asin(RADIUS_OF_EARTH/distSatEarth) * RAD2DEG;
      */
     const semiDiamEarth = Math.asin(RADIUS_OF_EARTH / Math.sqrt((-x) ** 2 + (-y) ** 2 + (-z) ** 2)) * RAD2DEG;
 
     /*
      * Position needs to be relative to satellite NOT ECI
-     * var distSatSunX = Math.pow(-sat.position.x + sunECI.x, 2);
-     * var distSatSunY = Math.pow(-sat.position.y + sunECI.y, 2);
-     * var distSatSunZ = Math.pow(-sat.position.z + sunECI.z, 2);
-     * var distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
-     * var semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
+     * const distSatSunX = Math.pow(-sat.position.x + sunECI.x, 2);
+     * const distSatSunY = Math.pow(-sat.position.y + sunECI.y, 2);
+     * const distSatSunZ = Math.pow(-sat.position.z + sunECI.z, 2);
+     * const distSatSun = Math.sqrt(distSatSunX + distSatSunY + distSatSunZ);
+     * const semiDiamSun = Math.asin(RADIUS_OF_SUN/distSatSun) * RAD2DEG;
      */
     const semiDiamSun =
       Math.asin(RADIUS_OF_SUN / Math.sqrt((-x + sunECI.x) ** 2 + (-y + sunECI.y) ** 2 + (-z + sunECI.z) ** 2)) * RAD2DEG;
 
     // Angle between earth and sun
-    const theta =
-      Math.acos(
-        <number>numeric.dot([-x, -y, -z], [-x + sunECI.x, -y + sunECI.y, -z + sunECI.z]) /
-        (Math.sqrt((-x) ** 2 + (-y) ** 2 + (-z) ** 2) *
-          Math.sqrt((-x + sunECI.x) ** 2 + (-y + sunECI.y) ** 2 + (-z + sunECI.z) ** 2)),
-      ) * RAD2DEG;
+    const theta = Math.acos(
+      <number>numeric.dot([-x, -y, -z], [-x + sunECI.x, -y + sunECI.y, -z + sunECI.z]) /
+      (Math.sqrt((-x) ** 2 + (-y) ** 2 + (-z) ** 2) * Math.sqrt((-x + sunECI.x) ** 2 + (-y + sunECI.y) ** 2 + (-z + sunECI.z) ** 2))) * RAD2DEG;
 
     if (semiDiamEarth > semiDiamSun && theta < semiDiamEarth - semiDiamSun) {
       return SunStatus.UMBRAL;
@@ -372,11 +372,11 @@ export abstract class SatMath {
   }
 
   /**
- * Calculates the velocity between two objects in ECI coordinates.
- * @param obj1 The first object's ECI coordinates.
- * @param obj2 The second object's ECI coordinates.
- * @returns The velocity between the two objects in kilometers/s.
- */
+   * Calculates the velocity between two objects in ECI coordinates.
+   * @param obj1 The first object's ECI coordinates.
+   * @param obj2 The second object's ECI coordinates.
+   * @returns The velocity between the two objects in kilometers/s.
+   */
   static velocity(obj1: EciVec3, obj2: EciVec3): KilometersPerSecond {
     return <KilometersPerSecond>Math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2 + (obj1.z - obj2.z) ** 2);
   }
@@ -387,7 +387,8 @@ export abstract class SatMath {
    * @param sat1 The first satellite object.
    * @param sat2 The second satellite object.
    * @param propLength The length of time to propagate the satellite positions (in seconds). Defaults to 1 day (1440 * 60 seconds).
-   * @returns An object containing the offset time (in milliseconds), the distance between the satellites (in kilometers), and the relative position and velocity vectors in RIC coordinates.
+   * @returns An object containing the offset time (in milliseconds), the distance between the satellites (in kilometers), and the relative position and velocity vectors in RIC
+   * coordinates.
    */
   static findClosestApproachTime(
     sat1: DetailedSatellite,
@@ -564,13 +565,13 @@ export abstract class SatMath {
   }
 
   /**
- * Calculates the angle between 2 satellites and the Sun
- * @param sat1 The first satellite object.
- * @param sat2 The second satellite object.
- * @param sunVec The sun ECI vector.
- * @returns The sun angle in rad.
- * @throws An error if either satellite's position or velocity is undefined.
- */
+   * Calculates the angle between 2 satellites and the Sun
+   * @param sat1 The first satellite object.
+   * @param sat2 The second satellite object.
+   * @param sunVec The sun ECI vector.
+   * @returns The sun angle in rad.
+   * @throws An error if either satellite's position or velocity is undefined.
+   */
   static getAngleBetweenSatellitesAndSun(sat1: DetailedSatellite, sat2: DetailedSatellite, sunVec: EciVec3): number {
     const { position: pos1 } = sat1;
     const { position: pos2 } = sat2;
@@ -590,6 +591,7 @@ export abstract class SatMath {
     // Compute sat to sun vectors
     const sat2ToSun = vec3.fromValues(sunVec.x - pos2.x, sunVec.y - pos2.y, sunVec.z - pos2.z);
     const sat2ToSat1 = vec3.fromValues(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
+
     return vec3.angle(sat2ToSun, sat2ToSat1);
   }
 
@@ -635,7 +637,7 @@ export abstract class SatMath {
       }
     }
 
-    console.warn('Sat Direction Calculation Error - By Pole?');
+    errorManagerInstance.log('Sat Direction Calculation Error - By Pole?');
 
     return 'Error';
   }
@@ -908,7 +910,6 @@ export abstract class SatMath {
     return <Degrees>(inc * RAD2DEG);
   }
 
-
   /**
    * Normalizes the Right Ascension of the Ascending Node (RAAN) for a given satellite.
    *
@@ -971,11 +972,11 @@ export abstract class SatMath {
     return omegaP * (180 / Math.PI) * 86400;
   }
   /**
- * Calculates the angle between 2 satellites and the Sun
- * @param hoverSat The first satellite object.
- * @param secondaryObj The second satellite object.
- * @returns The sun angle in deg.
- */
+   * Calculates the angle between 2 satellites and the Sun
+   * @param hoverSat The first satellite object.
+   * @param secondaryObj The second satellite object.
+   * @returns The sun angle in deg.
+   */
   static sunAngle(hoverSat: BaseObject, secondaryObj?: DetailedSensor | DetailedSatellite): number {
     // Sanity Check
     if (!hoverSat || !secondaryObj) {
@@ -993,8 +994,7 @@ export abstract class SatMath {
     // Calculate Velocities
     const sunEci = keepTrackApi.getScene().sun.eci;
     const angle = this.getAngleBetweenSatellitesAndSun(hoverSat as DetailedSatellite, secondaryObj as DetailedSatellite, sunEci);
+
     return angle * RAD2DEG;
   }
-
-
 }

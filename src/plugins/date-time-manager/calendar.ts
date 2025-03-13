@@ -1,16 +1,17 @@
 import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import i18next from 'i18next';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 
 export class Calendar {
-  private containerId: string;
+  private readonly containerId: string;
   private calendarDate: Date;
   private simulationDate: Date | null;
   private propagationRate: number = 1;
   private isVisible: boolean = false;
-  private timerUntilEnabled: number | null = 10000;
+  private readonly timerUntilEnabled: number | null = 10000;
   private isCalendarEnabled: boolean = false;
 
   constructor(containerId: string) {
@@ -28,7 +29,7 @@ export class Calendar {
     const container = document.getElementById(this.containerId);
 
     if (!container) {
-      console.error(`Container with ID ${this.containerId} not found`);
+      errorManagerInstance.warn(`Container with ID ${this.containerId} not found`);
 
       return;
     }
@@ -111,7 +112,7 @@ export class Calendar {
       nowButton.addEventListener('click', this.setToNow.bind(this));
     }
     if (pauseButton) {
-      if (this.propagationRate == 0) {
+      if (this.propagationRate === 0) {
         pauseButton.addEventListener('click', this.playProp.bind(this));
       } else {
         pauseButton.addEventListener('click', this.pauseProp.bind(this));
@@ -195,11 +196,12 @@ export class Calendar {
     if (unit === 'rate') {
       currentValue = this.propagationRate;
       const updatedRate = (currentValue + change);
-      this.updatePropRate(updatedRate)
+
+      this.updatePropRate(updatedRate);
     }
 
     this.datetimeInputFormChange();
-    if (unit != 'rate') {
+    if (unit !== 'rate') {
       this.updateTimeInput();
     }
     this.render();
@@ -213,7 +215,7 @@ export class Calendar {
       const min = parseInt(slider.getAttribute('data-min') || '0');
       const max = parseInt(slider.getAttribute('data-max') || '59');
       const step = parseInt(slider.getAttribute('data-step') || '1');
-      const handle = slider.querySelector('.ui-slider-handle') as HTMLElement;
+      const handle: HTMLElement = slider.querySelector('.ui-slider-handle');
 
       const updateSliderPosition = (clientX: number) => {
         const rect = slider.getBoundingClientRect();
@@ -248,7 +250,7 @@ export class Calendar {
   private renderDayHeaders(): string {
     const daysOfWeek = [
       i18next.t('time.days-short.1'), i18next.t('time.days-short.2'), i18next.t('time.days-short.3'),
-      i18next.t('time.days-short.4'), i18next.t('time.days-short.5'), i18next.t('time.days-short.6'), i18next.t('time.days-short.0')
+      i18next.t('time.days-short.4'), i18next.t('time.days-short.5'), i18next.t('time.days-short.6'), i18next.t('time.days-short.0'),
     ];
 
 
@@ -361,19 +363,21 @@ export class Calendar {
     const seconds = this.simulationDate.getUTCSeconds();
     const propRate = this.propagationRate;
 
-    return `
+    return keepTrackApi.html`
       <div class="ui-timepicker-div">
         <dl>
           <dt class="ui_tpicker_time_label">${i18next.t('time.calendar.time')}</dt>
           <dd class="ui_tpicker_time">
-            <input id="calendar-time-input" class="ui_tpicker_time_input" value="${this.formatTime(hours, minutes, seconds)} | (x${propRate})" disabled>
+            <input id="calendar-time-input" class="ui_tpicker_time_input" value="${this.formatTime(hours, minutes, seconds)} | (x${propRate.toString()})" disabled>
           </dd>
           <dt class="ui_tpicker_hour_label">${i18next.t('time.calendar.hour')}</dt>
           <dd class="ui_tpicker_hour">
-            <div id="ui_tpicker_hour_slider" class="ui_tpicker_hour_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content" style="display: inline-block; width: 100px;" data-min="0" data-max="23" data-step="1">
-              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${(hours / 23) * 100}%;"></span>
+            <div id="ui_tpicker_hour_slider" class="ui_tpicker_hour_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+            style="display: inline-block; width: 100px;" data-min="0" data-max="23" data-step="1">
+              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${((hours / 23) * 100).toString()}%;"></span>
             </div>
-            <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar" style="margin-left: 10px; margin-right: 0px;">
+            <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar"
+            style="margin-left: 10px; margin-right: 0px;">
               <button data-icon="ui-icon-minus" data-step="-1" class="ui-widget ui-button-icon-only ui-controlgroup-item ui-button ui-corner-left" title="-" id="hour_decrease">
                 <span class="ui-button-icon ui-icon ui-icon-minus"></span>
                 <span class="ui-button-icon-space"> </span>-
@@ -386,10 +390,12 @@ export class Calendar {
           </dd>
           <dt class="ui_tpicker_minute_label">${i18next.t('time.calendar.minute')}</dt>
           <dd class="ui_tpicker_minute">
-            <div id="ui_tpicker_minute_slider" class="ui_tpicker_minute_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content" style="display: inline-block; width: 100px;" data-min="0" data-max="59" data-step="1">
-              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${(minutes / 59) * 100}%;"></span>
+            <div id="ui_tpicker_minute_slider" class="ui_tpicker_minute_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+            style="display: inline-block; width: 100px;" data-min="0" data-max="59" data-step="1">
+              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${((minutes / 59) * 100).toString()}%;"></span>
             </div>
-            <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar" style="margin-left: 10px; margin-right: 0px;">
+            <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar"
+            style="margin-left: 10px; margin-right: 0px;">
               <button data-icon="ui-icon-minus" data-step="-1" class="ui-widget ui-button-icon-only ui-controlgroup-item ui-button ui-corner-left" title="-" id="minute_decrease">
                 <span class="ui-button-icon ui-icon ui-icon-minus"></span>
                 <span class="ui-button-icon-space"> </span>-
@@ -402,10 +408,12 @@ export class Calendar {
           </dd>
           <dt class="ui_tpicker_second_label">${i18next.t('time.calendar.second')}</dt>
           <dd class="ui_tpicker_second">
-            <div id="ui_tpicker_second_slider" class="ui_tpicker_second_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content" style="display: inline-block; width: 100px;" data-min="0" data-max="59" data-step="1">
-              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${(seconds / 59) * 100}%;"></span>
+            <div id="ui_tpicker_second_slider" class="ui_tpicker_second_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+            style="display: inline-block; width: 100px;" data-min="0" data-max="59" data-step="1">
+              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${((seconds / 59) * 100).toString()}%;"></span>
             </div>
-            <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar" style="margin-left: 10px; margin-right: 0px;">
+            <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar"
+            style="margin-left: 10px; margin-right: 0px;">
               <button data-icon="ui-icon-minus" data-step="-1" class="ui-widget ui-button-icon-only ui-controlgroup-item ui-button ui-corner-left" title="-" id="second_decrease">
                 <span class="ui-button-icon ui-icon ui-icon-minus"></span>
                 <span class="ui-button-icon-space"> </span>-
@@ -418,10 +426,12 @@ export class Calendar {
           </dd>
           <dt class="ui_tpicker_proprate_label">${i18next.t('Propagation')}</dt>
           <dd class="ui_tpicker_proprate">
-            <div id="ui_tpicker_proprate_slider" class="ui_tpicker_proprate_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content" style="display: inline-block; width: 100px;" data-min="-100" data-max="100" data-step="1">
-              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${((propRate + 100) / 200) * 100}%;"></span>
+            <div id="ui_tpicker_proprate_slider" class="ui_tpicker_proprate_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
+            style="display: inline-block; width: 100px;" data-min="-100" data-max="100" data-step="1">
+              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${(((propRate + 100) / 200) * 100).toString()}%;"></span>
             </div>
-            <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar" style="margin-left: 10px; margin-right: 0px;">
+            <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar"
+            style="margin-left: 10px; margin-right: 0px;">
               <button data-icon="ui-icon-minus" data-step="-1" class="ui-widget ui-button-icon-only ui-controlgroup-item ui-button ui-corner-left" title="-" id="rate_decrease">
                 <span class="ui-button-icon ui-icon ui-icon-minus"></span>
                 <span class="ui-button-icon-space"> </span>-
@@ -476,10 +486,14 @@ export class Calendar {
     let dayOfYear = -1;
 
     if (target.classList.contains('ui-datepicker-cal-day')) {
+      const jdayElement: HTMLElement = target.parentElement?.querySelector('.ui-datepicker-jday');
+
       // If we pick the calendar day, find the parent, then get the second span (class === ui-datepicker-jday)
-      dayOfYear = parseInt((target.parentElement?.querySelector('.ui-datepicker-jday') as HTMLElement)?.innerText ?? '-1');
+      dayOfYear = parseInt((jdayElement)?.innerText ?? '-1');
     } else if (target.tagName === 'A') {
-      dayOfYear = parseInt((target.querySelector('.ui-datepicker-jday') as HTMLElement)?.innerText ?? '-1');
+      const jdayElement: HTMLElement = target.querySelector('.ui-datepicker-jday');
+
+      dayOfYear = parseInt((jdayElement)?.innerText ?? '-1');
     } else if (target.classList.contains('ui-datepicker-jday')) {
       dayOfYear = parseInt(target.innerText);
     }
@@ -504,20 +518,20 @@ export class Calendar {
   private setToNow(): void {
     this.calendarDate = new Date();
     this.simulationDate = new Date(this.calendarDate);
-    this.updatePropRate(1)
+    this.updatePropRate(1);
     this.datetimeInputFormChange();
     this.render();
     this.attachEvents();
   }
 
   private pauseProp(): void {
-    this.updatePropRate(0)
+    this.updatePropRate(0);
     this.render();
     this.attachEvents();
   }
 
   private playProp(): void {
-    this.updatePropRate(1)
+    this.updatePropRate(1);
     this.render();
     this.attachEvents();
   }
@@ -563,11 +577,12 @@ export class Calendar {
 
   private updatePropRate(propRate: number): void {
     const timeManagerInstance = keepTrackApi.getTimeManager();
+
     timeManagerInstance.calculateSimulationTime();
-    timeManagerInstance.changePropRate(propRate)
+    timeManagerInstance.changePropRate(propRate);
     settingsManager.isPropRateChange = true;
     this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, 200, -100);
-    this.propagationRate = propRate
+    this.propagationRate = propRate;
   }
 
   private updateHour(hour: number): void {
@@ -595,7 +610,7 @@ export class Calendar {
     const slider = document.getElementById(sliderId);
 
     if (slider) {
-      const handle = slider.querySelector('.ui-slider-handle') as HTMLElement;
+      const handle: HTMLElement = slider.querySelector('.ui-slider-handle');
 
       if (handle) {
         handle.style.left = `${((value - min) / range) * 100}%`;

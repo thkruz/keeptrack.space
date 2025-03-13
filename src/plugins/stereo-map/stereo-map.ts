@@ -51,7 +51,7 @@ interface GroundTracePoint {
 export class StereoMap extends KeepTrackPlugin {
   readonly id = 'StereoMap';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
@@ -59,12 +59,11 @@ export class StereoMap extends KeepTrackPlugin {
   }
 
   /** The size of half of the dot used in the stereo map. (See CSS) */
-
   private readonly halfDotSize_ = 6;
   private canvas_: HTMLCanvasElement;
   private satCrunchNow_ = 0;
   private isMapUpdateOverride_ = false;
-  private earthImg = new Image();
+  private readonly earthImg_ = new Image();
 
   isRequireSatelliteSelected = true;
   isIconDisabled = true;
@@ -79,15 +78,14 @@ export class StereoMap extends KeepTrackPlugin {
   };
 
   sideMenuElementName = 'map-menu';
-  sideMenuElementHtml =
-    `${keepTrackApi.html`
+  sideMenuElementHtml = keepTrackApi.html`
    <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
      <canvas id="map-2d"></canvas>
      <img id="map-sat" class="map-item map-look" src=${satellite2} width="40px" height="40px"/>
      <img id="map-sensor" class="map-item map-look start-hidden" src=${radar1} width="40px" height="40px"/>
-     ` +
-    StereoMap.generateMapLooks_(50)
-    }</div>`;
+     ${StereoMap.generateMapLooks_(50)}
+    </div>
+  `;
 
   addHtml(): void {
     super.addHtml();
@@ -198,11 +196,13 @@ export class StereoMap extends KeepTrackPlugin {
     let overallView: boolean = false;
     const { gmst } = calcGmst(now);
     const lla = eci2lla(sat.eci(now).position, gmst);
+
     for (const sensor of sensorList) {
       if (sensor.isSatInFov(sat, now)) {
         overallView = true;
       }
     }
+
     return { lla, overallView, time };
   }
 
@@ -330,18 +330,19 @@ export class StereoMap extends KeepTrackPlugin {
     let selectableIdx = 1;
 
     // Reset all sensor elements
-    document.querySelectorAll('[id^="map-sensor-"]').forEach(sensor => {
-      sensor.remove()
+    document.querySelectorAll('[id^="map-sensor-"]').forEach((sensor) => {
+      sensor.remove();
     });
     if (sensorManagerInstance.isSensorSelected()) {
-      for (let sensor of sensorManagerInstance.currentSensors) {
-        let map = {
+      for (const sensor of sensorManagerInstance.currentSensors) {
+        const map = {
           x: ((sensor.lon + 180) / 360) * settingsManager.mapWidth,
           y: settingsManager.mapHeight - ((sensor.lat + 90) / 180) * settingsManager.mapHeight,
         };
 
         // Add new sensor dynamically
         const newSensor = document.createElement('img');
+
         newSensor.id = `map-sensor-${selectableIdx}`;
         newSensor.className = 'map-item map-look start-hidden';
         newSensor.src = radar1;
@@ -349,7 +350,7 @@ export class StereoMap extends KeepTrackPlugin {
         newSensor.style.top = `${map.y - sensorDom.height / 2}px`;
         newSensor.style.width = `${sensorDom.width}px`;
         newSensor.style.height = `${sensorDom.height}px`;
-        getEl('map-menu').appendChild(newSensor)
+        getEl('map-menu').appendChild(newSensor);
         showEl(`map-sensor-${selectableIdx}`);
         selectableIdx++;
       }
@@ -402,12 +403,12 @@ export class StereoMap extends KeepTrackPlugin {
   private drawEarthLayer_(): void {
     const ctx = this.canvas_.getContext('2d');
 
-    if (this.earthImg.src) {
-      ctx.drawImage(this.earthImg, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
+    if (this.earthImg_.src) {
+      ctx.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
     } else {
-      this.earthImg.src = `${settingsManager.installDirectory}textures/earthmap4k.jpg`;
-      this.earthImg.onload = () => {
-        ctx.drawImage(this.earthImg, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
+      this.earthImg_.src = `${settingsManager.installDirectory}textures/earthmap4k.jpg`;
+      this.earthImg_.onload = () => {
+        ctx.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
       };
     }
   }
@@ -427,21 +428,21 @@ export class StereoMap extends KeepTrackPlugin {
     }
   }
 
-  private mapMenuClick_(evt: any) {
+  private mapMenuClick_(evt: Event) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     this.isMapUpdateOverride_ = true;
-    if (!evt.target?.dataset.time) {
+    if (!(<HTMLElement>evt.target)?.dataset.time) {
       return;
     }
-    let time = evt.target.dataset.time;
+    const time = (<HTMLElement>evt.target).dataset.time;
 
     if (time !== null) {
-      time = time.split(' ');
-      time = new Date(`${time[0]}T${time[1]}Z`);
+      const timeArr = time.split(' ');
+      const timeObj = new Date(`${timeArr[0]}T${timeArr[1]}Z`);
       const today = new Date(); // Need to know today for offset calculation
 
-      timeManagerInstance.changeStaticOffset(time.getTime() - today.getTime()); // Find the offset from today
+      timeManagerInstance.changeStaticOffset(timeObj.getTime() - today.getTime()); // Find the offset from today
     }
   }
 }

@@ -69,6 +69,7 @@ export abstract class KeepTrackPlugin {
 
   /**
    * The name of the bottom icon element to select.
+   * default: `${bottomIconSlug}-bottom-icon` (requires bottomIconLabel to be defined)
    * @example 'menu-day-night'
    */
   bottomIconElementName: string;

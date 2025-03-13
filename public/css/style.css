@@ -439,11 +439,15 @@ ul {
 }
 
 .legend-inFOV-box {
-  background: rgb(255, 92, 0);
+  background: rgb(255, 200, 0);
+}
+
+.legend-sensorCanObserve-box {
+  background: rgb(255, 30, 0);
 }
 
 .legend-inviewAlt-box {
-  background: rgb(255, 92, 0);
+  background: rgb(255, 200, 0);
 }
 
 .legend-starLow-box {
@@ -520,6 +524,25 @@ ul {
 
 .legend-satGEO-box {
   background: rgb(200, 200, 200);
+}
+.legend-sourceUssf-box {
+  background: rgb(11, 39, 131);
+}
+
+.legend-sourceAldoria-box {
+  background: rgb(15, 150, 71);
+}
+
+.legend-sourceVimpel-box {
+  background: rgb(204, 14, 14);
+}
+
+.legend-sourceCelestrak-box {
+  background: rgb(206, 219, 14);
+}
+
+.legend-sourcePrismnet-box {
+  background: rgba(168, 47, 199, 0.705);
 }
 
 #sensor-info-menu a {
@@ -680,7 +703,8 @@ ul {
 .plot-analysis-chart {
   width: 100%;
   height: 90%;
-  padding: 10px;
+  padding-bottom: 80px;
+  padding-top: 10px;
   margin: 0;
 }
 
@@ -1169,7 +1193,8 @@ input:focus {
 
 .ui_tpicker_hour,
 .ui_tpicker_minute,
-.ui_tpicker_second {
+.ui_tpicker_second,
+.ui_tpicker_proprate {
   display: flex;
   justify-content: space-around;
   align-items: center;
@@ -1919,6 +1944,10 @@ button.ui-button::-moz-focus-inner {
 
 .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
   float: left;
+}
+
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-pause {
+  float: none;
 }
 
 .ui-datepicker.ui-datepicker-multi {

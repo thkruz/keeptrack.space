@@ -135,6 +135,7 @@ const settingsOverride = {
     scenarioCreator: false,
     debrisScreening: false,
     videoDirector: false,
+    createSat: false,
   },
 };
 

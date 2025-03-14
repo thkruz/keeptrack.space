@@ -1,7 +1,7 @@
 /**
  * Highest classification of the data used by the program.
  */
-export type ClassificationString = '' | 'Unclassified' | 'CUI' | 'Confidential' | 'Secret' | 'Top Secret' | 'Top Secret//SCI' | 'ALDORIA CONFIDENTIAL';
+export type ClassificationString = '' | 'Unclassified' | 'CUI' | 'Confidential' | 'Secret' | 'Top Secret' | 'Top Secret//SCI';
 
 export class Classification {
   static getColors(classification: ClassificationString) {
@@ -17,7 +17,7 @@ export class Classification {
     } else if (classification.startsWith('Secret')) {
       backgroundColor = '#ff0000';
       color = 'white';
-    } else if (classification.startsWith('Confidential') || classification === 'ALDORIA CONFIDENTIAL') {
+    } else if (classification.startsWith('Confidential')) {
       backgroundColor = '#0033a0';
       color = 'white';
     } else if (classification.startsWith('CUI')) {
@@ -38,7 +38,6 @@ export class Classification {
       return false;
     }
 
-    return ['Unclassified', 'Confidential', 'CUI', 'Secret', 'Top Secret', 'Top Secret//SCI', 'ALDORIA CONFIDENTIAL']
-      .some((validClassification) => classification.startsWith(validClassification));
+    return ['Unclassified', 'Confidential', 'CUI', 'Secret', 'Top Secret', 'Top Secret//SCI'].some((validClassification) => classification.startsWith(validClassification));
   }
 }

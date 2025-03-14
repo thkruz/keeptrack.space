@@ -307,7 +307,6 @@ export class StereoMap extends KeepTrackPlugin {
           ctx.fillStyle = '#ff0000';
           break;
         case 'Confidential':
-        case 'ALDORIA CONFIDENTIAL':
           ctx.fillStyle = '#0033a0';
           break;
         case 'CUI':

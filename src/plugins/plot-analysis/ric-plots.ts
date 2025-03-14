@@ -25,7 +25,6 @@ export class RicPlot extends KeepTrackPlugin {
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
 
-
   bottomIconLabel = 'RIC Plot';
   bottomIconImg = scatterPlotPng4;
   bottomIconCallback = () => {

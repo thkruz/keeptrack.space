@@ -977,24 +977,19 @@ export abstract class SatMath {
    * @param secondaryObj The second satellite object.
    * @returns The sun angle in deg.
    */
-  static sunAngle(hoverSat: BaseObject, secondaryObj?: DetailedSensor | DetailedSatellite): number {
-    // Sanity Check
-    if (!hoverSat || !secondaryObj) {
-      return NaN;
-    }
-
+  static sunAngle(hoverSat: BaseObject, secondaryObj?: DetailedSensor | DetailedSatellite): Degrees {
     // Validate Objects
     if (!secondaryObj || !hoverSat) {
-      return NaN;
+      return NaN as Degrees;
     }
     if (secondaryObj.type === SpaceObjectType.STAR || hoverSat.type === SpaceObjectType.STAR) {
-      return NaN;
+      return NaN as Degrees;
     }
 
-    // Calculate Velocities
+    // Calculate Sun Angle
     const sunEci = keepTrackApi.getScene().sun.eci;
     const angle = this.getAngleBetweenSatellitesAndSun(hoverSat as DetailedSatellite, secondaryObj as DetailedSatellite, sunEci);
 
-    return angle * RAD2DEG;
+    return angle * RAD2DEG as Degrees;
   }
 }

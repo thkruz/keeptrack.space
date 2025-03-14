@@ -424,26 +424,6 @@ export abstract class KeepTrackPlugin {
     return sideMenuHtmlWrapped;
   }
 
-  resizeCanvas(canvasId: string, isForceWidescreen?: boolean): void {
-    isForceWidescreen ??= false;
-    const canvas = getEl(canvasId) as HTMLCanvasElement;
-    const sideMenuDOM = getEl(this.sideMenuElementName);
-
-    if (isForceWidescreen) {
-      sideMenuDOM.style.width = `${window.innerWidth}px`;
-
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.style.height = `${window.innerHeight}px`;
-    } else {
-      canvas.width = window.innerWidth;
-      canvas.style.width = `${window.innerWidth}px`;
-      canvas.height = window.innerHeight - 100;
-      canvas.style.height = `${window.innerHeight - 100}px`;
-    }
-  }
-
   /**
    * Adds the JS for the KeepTrackPlugin.
    * @throws {Error} If the JS has already been added.

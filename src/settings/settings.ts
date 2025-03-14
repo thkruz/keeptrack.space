@@ -95,7 +95,6 @@ export class SettingsManager {
     createSat: true,
   };
 
-
   static preserveSettings() {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_STARLINK_SATS, settingsManager.isShowStarlinkSats.toString());

@@ -1129,13 +1129,13 @@ export class Camera {
       this.camSnapToSat.radius = Math.sqrt(this.camSnapToSat.pos.x ** 2 + this.camSnapToSat.pos.y ** 2);
       this.camSnapToSat.yaw = <Radians>(Math.atan2(this.camSnapToSat.pos.y, this.camSnapToSat.pos.x) + TAU / 4);
       this.camSnapToSat.pitch = <Radians>Math.atan2(this.camSnapToSat.pos.z, this.camSnapToSat.radius);
-      if (!this.camSnapToSat.pitch) {
+      if (this.camSnapToSat.pitch === null || typeof this.camSnapToSat.pitch === 'undefined') {
         errorManagerInstance.info('Pitch Calculation Error');
         this.camSnapToSat.pitch = <Radians>0;
         this.camZoomSnappedOnSat = false;
         this.camAngleSnappedOnSat = false;
       }
-      if (!this.camSnapToSat.yaw) {
+      if (this.camSnapToSat.yaw === null || typeof this.camSnapToSat.yaw === 'undefined') {
         errorManagerInstance.info('Yaw Calculation Error');
         this.camSnapToSat.yaw = <Radians>0;
         this.camZoomSnappedOnSat = false;

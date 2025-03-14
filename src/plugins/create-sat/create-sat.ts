@@ -1,6 +1,12 @@
-
 import editPng from '@public/img/icons/edit.png';
-import { DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, SatelliteRecord, Sgp4 } from 'ootk';
+import {
+  DetailedSatellite,
+  DetailedSatelliteParams,
+  EciVec3,
+  FormatTle,
+  SatelliteRecord,
+  Sgp4,
+} from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -8,30 +14,50 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath, StringifiedNumber } from '@app/static/sat-math';
+import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
 import i18next from 'i18next';
 
+/**
+ * Interface for TLE input parameters
+ */
+interface TleInputParams {
+  scc: string;
+  inc: string;
+  meanmo: string;
+  rasc: string;
+  ecen: string;
+  argPe: string;
+  meana: string;
+  epochyr: string;
+  epochday: string;
+  source: string;
+  name: string;
+}
 
+/**
+ * CreateSat plugin for creating and editing satellites
+ */
 export class CreateSat extends KeepTrackPlugin {
   readonly id = 'CreateSat';
   dependencies_ = [SelectSatManager.name];
-
-
-  constructor() {
-    super();
-  }
 
   isRequireSatelliteSelected = false;
   isIconDisabledOnLoad = false;
   isIconDisabled = false;
 
   static readonly elementPrefix = 'cs';
-
   bottomIconImg = editPng;
-
   sideMenuElementName = 'createSat-menu';
+
+  constructor() {
+    super();
+  }
+
+  /**
+   * HTML template for the side menu
+   */
   sideMenuElementHtml = keepTrackApi.html`
     <div id="createSat-menu" class="side-menu-parent start-hidden text-select">
       <div id="createSat-content" class="side-menu">
@@ -39,7 +65,7 @@ export class CreateSat extends KeepTrackPlugin {
           <h5 class="center-align">Create Satellite</h5>
           <form id="createSat">
             <div class="input-field col s12">
-              <input value="AAAAA" id="${CreateSat.elementPrefix}-scc" type="text" maxlength="5" />
+              <input value="90000" id="${CreateSat.elementPrefix}-scc" type="text" maxlength="5" />
               <label for="${CreateSat.elementPrefix}-scc" class="active">Satellite SCC#</label>
             </div>
             <div class="input-field col s12">
@@ -82,12 +108,12 @@ export class CreateSat extends KeepTrackPlugin {
               <input placeholder="" id="${CreateSat.elementPrefix}-per" type="text" maxlength="11" />
               <label for="${CreateSat.elementPrefix}-per" class="active">Period</label>
             </div>
-            <div class="input-field col s13">
-              <input placeholder="" id="${CreateSat.elementPrefix}-src" type="text" maxlength="11" />
+            <div class="input-field col s12">
+              <input placeholder="" id="${CreateSat.elementPrefix}-src" type="text" maxlength="24" />
               <label for="${CreateSat.elementPrefix}-src" class="active">Data source</label>
             </div>
-            <div class="input-field col s14">
-              <input placeholder="" id="${CreateSat.elementPrefix}-name" type="text" maxlength="11" />
+            <div class="input-field col s12">
+              <input placeholder="" id="${CreateSat.elementPrefix}-name" type="text" maxlength="24" />
               <label for="${CreateSat.elementPrefix}-name" class="active">Satellite Name</label>
             </div>
             <div class="center-align row">
@@ -103,171 +129,236 @@ export class CreateSat extends KeepTrackPlugin {
         </div>
       </div>
     </div>
-    `;
+  `;
 
+  /**
+   * Add HTML and register events
+   */
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'createSat',
-      cb: () => {
-
-        getEl(`${CreateSat.elementPrefix}-per`).addEventListener('change', () => {
-          const per = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-per`)).value;
-
-          if (per === '') {
-            return;
-          }
-          const meanmo = 1440 / parseFloat(per);
-
-          (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-meanmo`)).value = meanmo.toFixed(8);
-        });
-
-        getEl(`${CreateSat.elementPrefix}-meanmo`).addEventListener('change', () => {
-          const meanmo = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-meanmo`)).value;
-
-          if (meanmo === '') {
-            return;
-          }
-          const per = (1440 / parseFloat(meanmo)).toFixed(8);
-
-          (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-per`)).value = per;
-        });
-
-        getEl('createSat-submit').addEventListener('click', () => {
-          CreateSat.createSatSubmit();
-        });
-
-        getEl('createSat-save').addEventListener('click', CreateSat.exportTLE);
-
-        this.populateSideMenu_();
-      },
+      cb: () => this.initializeEventListeners_(),
     });
   }
 
-  private populateSideMenu_() {
+  /**
+   * Initialize all event listeners for the UI
+   */
+  private initializeEventListeners_(): void {
+    // Period and mean motion converter
+    this.setupPeriodMeanMotionConverters_();
 
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-scc`)).value = '90000';
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-country`)).value = 'France';
+    // Submit and save buttons
+    getEl('createSat-submit').addEventListener('click', CreateSat.createSatSubmit_);
+    getEl('createSat-save').addEventListener('click', CreateSat.exportTLE_);
 
+    // Populate default values
+    this.populateSideMenu_();
+  }
+
+  /**
+   * Setup period and mean motion converter event listeners
+   */
+  private setupPeriodMeanMotionConverters_(): void {
+    // Period to Mean Motion conversion
+    getEl(`${CreateSat.elementPrefix}-per`).addEventListener('change', () => {
+      const perInput = getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement;
+      const per = perInput.value;
+
+      if (per === '') {
+        return;
+      }
+
+      try {
+        const meanmo = 1440 / parseFloat(per);
+
+        (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value = meanmo.toFixed(8);
+      } catch (error) {
+        errorManagerInstance.error(error as Error, 'create-sat.ts', 'Error converting period to mean motion');
+      }
+    });
+
+    // Mean Motion to Period conversion
+    getEl(`${CreateSat.elementPrefix}-meanmo`).addEventListener('change', () => {
+      const meanmoInput = getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement;
+      const meanmo = meanmoInput.value;
+
+      if (meanmo === '') {
+        return;
+      }
+
+      try {
+        const per = (1440 / parseFloat(meanmo)).toFixed(8);
+
+        (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = per;
+      } catch (error) {
+        errorManagerInstance.error(error as Error, 'create-sat.ts', 'Error converting mean motion to period');
+      }
+    });
+  }
+
+  /**
+   * Get all TLE input values from form
+   */
+  private static getTleInputs_(): TleInputParams {
+    return {
+      scc: (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value,
+      inc: (getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement).value,
+      meanmo: (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value,
+      rasc: (getEl(`${CreateSat.elementPrefix}-rasc`) as HTMLInputElement).value,
+      ecen: (getEl(`${CreateSat.elementPrefix}-ecen`) as HTMLInputElement).value,
+      argPe: (getEl(`${CreateSat.elementPrefix}-argPe`) as HTMLInputElement).value,
+      meana: (getEl(`${CreateSat.elementPrefix}-meana`) as HTMLInputElement).value,
+      epochyr: (getEl(`${CreateSat.elementPrefix}-year`) as HTMLInputElement).value,
+      epochday: (getEl(`${CreateSat.elementPrefix}-day`) as HTMLInputElement).value,
+      source: (getEl(`${CreateSat.elementPrefix}-src`) as HTMLInputElement).value,
+      name: (getEl(`${CreateSat.elementPrefix}-name`) as HTMLInputElement).value,
+    };
+  }
+
+  /**
+   * Populate the form with default values
+   */
+  private populateSideMenu_(): void {
+    // Set defaults for basic information
+    (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value = '90000';
+    (getEl(`${CreateSat.elementPrefix}-country`) as HTMLInputElement).value = 'France';
+
+    // Set default inclination
     const defaultInc = 0;
     const inc = defaultInc.toFixed(4).padStart(8, '0');
 
+    (getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement).value = inc;
+
+    // Set date-related values
     const date = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
-
     const year = date.getFullYear().toString().slice(2, 4);
-    const day = this.getUTCDayOfYear(date).toString();
+    const day = this.getUTCDayOfYear_(date).toString();
 
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-inc`)).value = inc;
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-year`)).value = year;
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-day`)).value = day;
+    (getEl(`${CreateSat.elementPrefix}-year`) as HTMLInputElement).value = year;
+    (getEl(`${CreateSat.elementPrefix}-day`) as HTMLInputElement).value = day;
 
+    // Set orbital parameters with reasonable defaults
+    (getEl(`${CreateSat.elementPrefix}-rasc`) as HTMLInputElement).value = '0.0';
+    (getEl(`${CreateSat.elementPrefix}-ecen`) as HTMLInputElement).value = '0.0';
+    (getEl(`${CreateSat.elementPrefix}-meana`) as HTMLInputElement).value = '0.0';
+    (getEl(`${CreateSat.elementPrefix}-argPe`) as HTMLInputElement).value = '0.0';
 
-    const defalutRasc = 0;
-    const rasc = defalutRasc.toFixed(1);
-
-    const defaultEcc = 0;
-    const ecc = defaultEcc.toFixed(1);
-
-    const defaultMa = 0;
-    const ma = defaultMa.toFixed(1);
-
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-rasc`)).value = rasc;
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-ecen`)).value = ecc;
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-meana`)).value = ma;
-
-    const defaultArgPe = 0;
-    const argPe = defaultArgPe.toFixed(1);
-
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-argPe`)).value = argPe;
-
-    const defaultSouce = 'Trust me Bro';
-    const defaultName = 'New Satellite';
-
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-src`)).value = defaultSouce;
-    (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-name`)).value = defaultName;
+    // Set metadata
+    (getEl(`${CreateSat.elementPrefix}-src`) as HTMLInputElement).value = 'User Created';
+    (getEl(`${CreateSat.elementPrefix}-name`) as HTMLInputElement).value = 'New Satellite';
   }
 
-  private static createSatSubmit() {
-
+  /**
+   * Create and submit a new satellite
+   */
+  private static createSatSubmit_(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-    getEl(`${CreateSat.elementPrefix}-error`).style.display = 'none';
-    // const scc = '90000'
-    const scc = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-scc`)).value;
-
-    const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const errorElement = getEl(`${CreateSat.elementPrefix}-error`);
 
-    const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
+    // Hide any previous error
+    errorElement.style.display = 'none';
 
-    if (!obj.isSatellite()) {
-      return;
-    }
-
-    const sat = obj as DetailedSatellite;
-    const country = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-country`)).value;
-    const inc = <StringifiedNumber>(<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-inc`)).value;
-    const meanmo = <StringifiedNumber>(<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-meanmo`)).value;
-    const rasc = <StringifiedNumber>(<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-rasc`)).value;
-    const ecen = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-ecen`)).value;
-    const argPe = <StringifiedNumber>(<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-argPe`)).value;
-    const meana = <StringifiedNumber>(<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-meana`)).value;
-    const epochyr = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-year`)).value;
-    const epochday = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-day`)).value;
-    const source = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-src`)).value;
-    const name = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-name`)).value;
-    const intl = `${epochyr}69B`;
-
-    const { tle1: tle1_, tle2: tle2_ } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
-    const tle1 = tle1_;
-    const tle2 = tle2_;
-
-    let satrec: SatelliteRecord;
+    // Get all input values
+    const inputParams = CreateSat.getTleInputs_();
 
     try {
-      satrec = Sgp4.createSatrec(tle1, tle2);
-    } catch (e) {
-      errorManagerInstance.error(e, 'edit-sat.ts', 'Error creating satellite record!');
+      // Convert SCC to internal ID
+      const satId = catalogManagerInstance.sccNum2Id(parseInt(inputParams.scc));
+      const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
 
-      return;
-    }
-
-    if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) > 1) {
-
-      if (tle1 === 'Error') {
-        errorManagerInstance.error(new Error(tle2), 'create-sat.ts', i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
+      if (!obj.isSatellite()) {
+        keepTrackApi.getUiManager().toast(
+          'Invalid satellite object',
+          ToastMsgType.error,
+          true,
+        );
 
         return;
       }
 
+      const sat = obj as DetailedSatellite;
+      const country = (getEl(`${CreateSat.elementPrefix}-country`) as HTMLInputElement).value;
+      const intl = `${inputParams.epochyr}69B`; // International designator
+
+      // Create TLE from parameters
+      const { tle1, tle2 } = FormatTle.createTle({
+        sat,
+        inc: inputParams.inc,
+        meanmo: inputParams.meanmo,
+        rasc: inputParams.rasc,
+        argPe: inputParams.argPe,
+        meana: inputParams.meana,
+        ecen: inputParams.ecen,
+        epochyr: inputParams.epochyr,
+        epochday: inputParams.epochday,
+        intl,
+        scc: inputParams.scc,
+      });
+
+      // Check if TLE generation failed
+      if (tle1 === 'Error') {
+        errorManagerInstance.error(
+          new Error(tle2),
+          'create-sat.ts',
+          i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'),
+        );
+
+        return;
+      }
+
+      // Create satellite record from TLE
+      let satrec: SatelliteRecord;
+
+      try {
+        satrec = Sgp4.createSatrec(tle1, tle2);
+      } catch (e) {
+        errorManagerInstance.error(e as Error, 'create-sat.ts', 'Error creating satellite record!');
+
+        return;
+      }
+
+      // Validate altitude is reasonable
+      if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) <= 1) {
+        keepTrackApi.getUiManager().toast(
+          'Failed to propagate satellite. Try different parameters or report this issue if parameters are correct.',
+          ToastMsgType.caution,
+          true,
+        );
+
+        return;
+      }
+
+      // Propagate satellite to get position and velocity
       const spg4vec = Sgp4.propagate(satrec, 0);
       const pos = spg4vec.position as EciVec3;
       const vel = spg4vec.velocity as EciVec3;
 
+      // Create new satellite object
       const info: DetailedSatelliteParams = {
         id: satId,
         country,
         tle1,
         tle2,
-        name,
+        name: inputParams.name,
       };
-
-      // const newSat = new DetailedSatellite(info);
 
       const newSat = new DetailedSatellite({
         ...info,
         ...{
           position: pos,
           velocity: vel,
-          source,
+          source: inputParams.source,
         },
       });
 
-      console.log(newSat);
-
+      // Add to catalog
       catalogManagerInstance.objectCache[satId] = newSat;
 
+      // Update satellite cruncher
       try {
         catalogManagerInstance.satCruncher.postMessage({
           typ: CruncerMessageTypes.SAT_EDIT,
@@ -277,45 +368,69 @@ export class CreateSat extends KeepTrackPlugin {
           tle2,
         });
       } catch (e) {
-        errorManagerInstance.error(e, 'create-sat.ts', 'Sat Cruncher message failed');
+        errorManagerInstance.error(e as Error, 'create-sat.ts', 'Sat Cruncher message failed');
       }
 
+      // Update orbit buffer
       try {
         orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
       } catch (e) {
-        errorManagerInstance.error(e, 'create-sat.ts', 'Changing orbit buffer data failed');
+        errorManagerInstance.error(e as Error, 'create-sat.ts', 'Changing orbit buffer data failed');
       }
 
-      keepTrackApi.getUiManager().doSearch(`${scc}`);
-    } else {
-      keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', ToastMsgType.caution, true);
+      // Search for the new satellite
+      keepTrackApi.getUiManager().doSearch(inputParams.scc);
+
+      // Show success message
+      keepTrackApi.getUiManager().toast(
+        `Satellite ${inputParams.name} (${inputParams.scc}) created successfully`,
+        ToastMsgType.normal,
+        true,
+      );
+
+    } catch (error) {
+      errorManagerInstance.error(error as Error, 'create-sat.ts', 'Failed to create satellite');
+      keepTrackApi.getUiManager().toast('Failed to create satellite', ToastMsgType.error, true);
     }
   }
 
-  private static exportTLE(e: Event) {
+  /**
+   * Export TLE to a file
+   */
+  private static exportTLE_(e: Event): void {
+    e.preventDefault();
+
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     try {
-      const scc = (<HTMLInputElement>getEl(`${CreateSat.elementPrefix}-scc`)).value;
+      const scc = (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value;
       const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
       const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as DetailedSatellite;
-      const sat2 = {
-        tle1: sat.tle1,
-        tle2: sat.tle2,
-      };
-      const variable = JSON.stringify(sat2);
-      const blob = new Blob([variable], {
+
+      if (!sat || !sat.tle1 || !sat.tle2) {
+        keepTrackApi.getUiManager().toast('No valid TLE to export', ToastMsgType.error, true);
+
+        return;
+      }
+
+      // Format TLE data
+      const tleText = `${sat.tle1}\n${sat.tle2}`;
+      const blob = new Blob([tleText], {
         type: 'text/plain;charset=utf-8',
       });
 
       saveAs(blob, `${scc}.tle`);
+      keepTrackApi.getUiManager().toast('TLE exported successfully', ToastMsgType.normal, true);
     } catch (error) {
-      // intentionally left blank
+      errorManagerInstance.error(error as Error, 'create-sat.ts', 'Failed to export TLE');
+      keepTrackApi.getUiManager().toast('Failed to export TLE', ToastMsgType.error, true);
     }
-    e.preventDefault();
   }
 
-  private isLeapYear(date: Date): boolean {
+  /**
+   * Check if a year is a leap year
+   */
+  private isLeapYear_(date: Date): boolean {
     const year = date.getUTCFullYear();
 
     if ((year & 3) !== 0) {
@@ -325,20 +440,24 @@ export class CreateSat extends KeepTrackPlugin {
     return year % 100 !== 0 || year % 400 === 0;
   }
 
-  private getUTCDayOfYear(doy: Date) {
-    const mn = doy.getUTCMonth();
-    const dn = doy.getUTCDate();
+  /**
+   * Get the day of year (1-366)
+   */
+  private getUTCDayOfYear_(date: Date): number {
+    const month = date.getUTCMonth();
+    const day = date.getUTCDate();
     const dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-    let dayInYear = 365;
-    let dayOfYear = dayCount[mn] + dn;
+    let dayOfYear = dayCount[month] + day;
 
-    if (mn > 1 && this.isLeapYear(doy)) {
+    // Adjust for leap year
+    if (month > 1 && this.isLeapYear_(date)) {
       dayOfYear++;
-      dayInYear++;
     }
 
-    return dayOfYear % dayInYear;
+    // Ensure value is between 1-366
+    const maxDays = this.isLeapYear_(date) ? 366 : 365;
+
+
+    return Math.min(dayOfYear, maxDays);
   }
-
-
 }

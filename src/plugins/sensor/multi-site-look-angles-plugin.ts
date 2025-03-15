@@ -6,12 +6,17 @@ import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath, SunStatus } from '@app/static/sat-math';
-import { TearrData } from '@app/static/sensor-math';
+import { SatMath } from '@app/static/sat-math';
+import { SensorMath, TearrData } from '@app/static/sensor-math';
 import multiSitePng from '@public/img/icons/multi-site.png';
 import {
-  BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Kilometers, lla2eci, MINUTES_PER_DAY, Radians, SatelliteRecord, Seconds,
-  SpaceObjectType, Sun, TAU,
+  BaseObject,
+  Degrees, DetailedSatellite, DetailedSensor,
+  Kilometers,
+  MINUTES_PER_DAY,
+  SatelliteRecord, Seconds,
+  SpaceObjectType,
+  TAU,
 } from 'ootk';
 import { sensorGroups } from '../../catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
@@ -49,9 +54,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       index === self.findIndex((s) => s.objName === sensor.objName),
     );
 
-    // Default to only the ALD sensors being enabled
+    // Default to only the MW sensors being enabled
     this.disabledSensors_ = this.sensorList_.filter((sensor) =>
-      !sensorGroups.find((group) => group.name === 'ald')?.list.includes(sensor.objName),
+      !sensorGroups.find((group) => group.name === 'mw')?.list.includes(sensor.objName),
     );
   }
 
@@ -244,12 +249,6 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       if (sensor.maxRng < sat.perigee && (!sensor.maxRng2 || sensor.maxRng2 < sat.perigee)) {
         continue;
       }
-      // Station Lat Lon Alt vector for further ECI transformation
-      const lla = {
-        lat: (sensor.lat * DEG2RAD) as Radians,
-        lon: (sensor.lon * DEG2RAD) as Radians,
-        alt: sensor.alt,
-      };
 
       SensorManager.updateSensorUiStyling([sensor]);
       let offset = 0;
@@ -262,26 +261,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         let canStationObserve = true;
 
         if (multiSitePass.time !== '') {
-          /*
-           * Check visibility and add to multiSitePass
-           * TODO: ADD if visibility from SUN
-           */
+          // Check visibility and add to multiSitePass
           if (sensor.type === SpaceObjectType.OPTICAL) {
-            const { gmst } = calcGmst(now);
-            const sunPos = Sun.position(EpochUTC.fromDateTime(now));
-            const sensorPos = lla2eci(lla, gmst);
-
-            sensor.position = sensorPos;
-            const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
-            const satInSun = SatMath.calculateIsInSun(sat, sunPos);
-            // / Station is at night or penumbra
-
-            /*
-             * For optical sensors: check if the station is in darkness (umbral/penumbral)
-             * and the satellite is in sunlight - this means the satellite is visible
-             */
-            canStationObserve = (stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) &&
-              satInSun === SunStatus.SUN;
+            canStationObserve = SensorMath.checkIfVisibleForOptical(sat, sensor, now);
           }
           multiSitePass.visible = canStationObserve;
           multiSiteArray.push(multiSitePass); // Update the table with looks for this 5 second chunk and then increase table counter by 1
@@ -360,7 +342,6 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     let tdV = tr.insertCell();
 
     tdV.appendChild(document.createTextNode('Visible'));
-    tdV.setAttribute('style', 'text-decoration: underline');
 
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
@@ -384,8 +365,12 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       tdS.appendChild(document.createTextNode(sensor.uiName ?? sensor.shortName ?? sensor.objName ?? ''));
       // Add visibility from sensor
       tdV = tr.insertCell();
-      tdV.appendChild(document.createTextNode(entry.visible.toString()));
-      // TODO: Future feature
+      tdV.appendChild(document.createTextNode(entry.visible ? 'Yes' : 'No'));
+      if (entry.visible) {
+        tdV.setAttribute('style', 'color: #2d7b31');
+      } else {
+        tdV.setAttribute('style', 'color: #c62828');
+      }
       tr.addEventListener('click', () => {
         timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());
         sensorManagerInstance.setSensor(sensor, sensor.sensorId);

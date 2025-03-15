@@ -8,20 +8,24 @@ import {
   DetailedSatellite,
   DetailedSensor,
   EciVec3,
+  EpochUTC,
   Kilometers,
   MINUTES_PER_DAY,
   RfSensor,
   SatelliteRecord,
   Sgp4,
   SpaceObjectType,
+  Sun,
   TAU,
+  calcGmst,
   ecfRad2rae,
   eci2ecf,
   eci2lla,
+  lla2eci,
 } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { dateFormat } from '../lib/dateFormat';
-import { SatMath } from './sat-math';
+import { SatMath, SunStatus } from './sat-math';
 
 export enum TearrType {
   RISE,
@@ -426,5 +430,18 @@ export class SensorMath {
     }
 
     return nextPassArray;
+  }
+
+  static checkIfVisibleForOptical(sat: DetailedSatellite, sensor: DetailedSensor, now: Date): boolean {
+    const { gmst } = calcGmst(now);
+    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const sensorPos = lla2eci(sensor.llaRad(), gmst);
+
+    sensor.position = sensorPos;
+    const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
+    const satInSun = SatMath.calculateIsInSun(sat, sunPos);
+
+    // For optical sensors: check if the station is in darkness (umbral/penumbral) and the satellite is in sunlight - this means the satellite is visible
+    return (stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) && satInSun === SunStatus.SUN;
   }
 }

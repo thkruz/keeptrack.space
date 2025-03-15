@@ -224,6 +224,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   </div>`;
 
   bottomIconImg = findSatPng;
+  private hasSearchBeenRun_ = false;
 
   addJs(): void {
     super.addJs();
@@ -307,11 +308,18 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     // Export data
     getEl('findByLooks-export')?.addEventListener('click', () => {
+      if (!this.hasSearchBeenRun_) {
+        errorManagerInstance.warn('Try finding satellites first!');
+
+        return;
+      }
       CatalogExporter.exportTle2Csv(this.lastResults_);
     });
   }
 
   private findByLooksSubmit_(): Promise<void> {
+    this.hasSearchBeenRun_ = true;
+
     return new Promise(() => {
       const uiManagerInstance = keepTrackApi.getUiManager();
 

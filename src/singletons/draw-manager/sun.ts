@@ -55,6 +55,7 @@ export class Sun {
   mesh: Mesh;
   /** The position of the sun in WebGL coordinates. */
   position = [0, 0, 0] as vec3;
+  sizeRandomFactor_ = 0.0;
 
   /**
    * This is run once per frame to render the sun.
@@ -146,7 +147,15 @@ export class Sun {
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
-    gl.uniform3fv(this.mesh.material.uniforms.u_sizeOfSun, [settingsManager.sizeOfSun, settingsManager.sizeOfSun, settingsManager.sizeOfSun]);
+    // Apply a random factor to the sun size (±0.1% per frame, clamped to ±5% total)
+
+    // Add a small random change (±0.25%)
+    this.sizeRandomFactor_ += (Math.random() - 0.5) * 0.005;
+    // Clamp to ±5% range
+    this.sizeRandomFactor_ = Math.max(0.85, Math.min(1.15, this.sizeRandomFactor_));
+    const adjustedSize = settingsManager.sizeOfSun * this.sizeRandomFactor_;
+
+    gl.uniform3fv(this.mesh.material.uniforms.u_sizeOfSun, [adjustedSize, adjustedSize, adjustedSize]);
     gl.uniform3fv(this.mesh.material.uniforms.u_lightDirection, earthLightDirection);
     gl.uniform1f(this.mesh.material.uniforms.u_sunDistance, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
     gl.uniform1i(this.mesh.material.uniforms.u_sampler, 0);
@@ -181,7 +190,7 @@ export class Sun {
             } else {
               // Improved sun appearance with smoother gradient
               float a = max(dot(v_normal, -u_lightDirection), 0.1);
-              
+
               // Apply a more realistic falloff using pow() for solar limb darkening
               a = pow(a, 0.005); // Softer falloff
 
@@ -202,9 +211,9 @@ export class Sun {
         void main(void) {
             vec4 worldPosition = modelViewMatrix * vec4(position * u_sizeOfSun, 1.0);
             gl_Position = projectionMatrix * worldPosition;
-            
+
             v_dist = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) / u_sunDistance;
-            
+
             v_texcoord = uv;
             v_normal = normalMatrix * normal;
         }`,

@@ -363,7 +363,6 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       tdR.appendChild(document.createTextNode(entry.rng.toFixed(0)));
       tdS = tr.insertCell();
       tdS.appendChild(document.createTextNode(sensor.uiName ?? sensor.shortName ?? sensor.objName ?? ''));
-      // Add visibility from sensor
       tdV = tr.insertCell();
       tdV.appendChild(document.createTextNode(entry.visible ? 'Yes' : 'No'));
       if (entry.visible) {

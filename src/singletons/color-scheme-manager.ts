@@ -260,15 +260,18 @@ export class ColorSchemeManager {
       };
     }
 
-    let daysold: Days;
     const sat = obj as DetailedSatellite;
-    const epochYear = sat.tle1.substring(18, 20);
+    const epochYearShort = parseInt(sat.tle1.substring(18, 20), 10);
+    const epochDay = parseFloat(sat.tle1.substring(20, 32));
+    const currentYearShort = parseInt(year, 10);
 
-    if (epochYear === year) {
-      daysold = (jday - parseFloat(sat.tle1.substring(20, 28))) as Days;
-    } else {
-      daysold = (jday + parseInt(year) * 365 - (parseInt(epochYear) * 365 + parseFloat(sat.tle1.substring(20, 28)))) as Days;
-    }
+    const epochYearFull = epochYearShort <= currentYearShort ? 2000 + epochYearShort : 1900 + epochYearShort;
+    const currentYearFull = 2000 + currentYearShort;
+
+    const epochJday = epochDay + (epochYearFull * 365);
+    const currentJday = jday + (currentYearFull * 365);
+
+    const daysold = (currentJday - epochJday) as Days;
 
     if (daysold < 0.5 && this.objectTypeFlags.age1) {
       return {

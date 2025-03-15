@@ -51,11 +51,10 @@ import {
   eci2ecf,
   eci2lla,
   eci2rae,
-  getDayOfYear,
 } from 'ootk';
 import { EciArr3 } from '../interfaces';
 import { DISTANCE_TO_SUN, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '../lib/constants';
-import { jday, lon2yaw } from '../lib/transforms';
+import { getDayOfYear, jday, lon2yaw } from '../lib/transforms';
 import { Sun } from '../singletons/draw-manager/sun';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { CoordinateTransforms } from './coordinate-transforms';
@@ -494,29 +493,38 @@ export abstract class SatMath {
     return historicRcs.map((rcs_) => rcs_).reduce((a, b) => a + b, 0) / historicRcs.length;
   }
 
-  static calcElsetAge(sat: DetailedSatellite, nowInput: Date, outputUnits: 'days' | 'hours' | 'minutes' | 'seconds' = 'days'): number {
-    // Get jday including a decimal representing the time of day
-    const jday = getDayOfYear(nowInput) + (nowInput.getUTCHours() + nowInput.getUTCMinutes() / 60 + nowInput.getUTCSeconds() / 3600) / 24;
-    const now = nowInput.getUTCFullYear().toString().slice(2, 4);
-    let daysold: number;
+  static calcElsetAge(
+    sat: DetailedSatellite,
+    nowInput: Date,
+    outputUnits: 'days' | 'hours' | 'minutes' | 'seconds' = 'days',
+  ): number {
+    const currentYearFull = nowInput.getUTCFullYear();
+    const currentYearShort = currentYearFull % 100;
 
-    if (sat.tle1.substring(18, 20) === now) {
-      daysold = jday - parseFloat(sat.tle1.substring(20, 42));
+    const epochYearShort = parseInt(sat.tle1.substring(18, 20), 10);
+    const epochDayOfYear = parseFloat(sat.tle1.substring(20, 32));
+
+    let epochYearFull: number;
+
+    if (epochYearShort <= currentYearShort) {
+      epochYearFull = 2000 + epochYearShort;
     } else {
-      daysold = jday + parseInt(now) * 365 - (parseInt(sat.tle1.substring(18, 20)) * 365 + parseFloat(sat.tle1.substring(20, 42)));
+      epochYearFull = 1900 + epochYearShort;
     }
 
+    const epochJday = epochDayOfYear + (epochYearFull * 365);
+    const currentJday = getDayOfYear() + (currentYearFull * 365);
+    const daysOld = (currentJday - epochJday);
+
     switch (outputUnits) {
-      case 'days':
-        return daysold;
       case 'hours':
-        return daysold * 24;
+        return daysOld * 24;
       case 'minutes':
-        return daysold * 24 * 60;
+        return daysOld * 1440;
       case 'seconds':
-        return daysold * 24 * 60 * 60;
+        return daysOld * 86400;
       default:
-        return daysold;
+        return daysOld;
     }
   }
 

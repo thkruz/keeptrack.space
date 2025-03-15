@@ -588,10 +588,12 @@ export class SatInfoBox extends KeepTrackPlugin {
 
       const now: Date | number | string = new Date();
       const daysold = SatMath.calcElsetAge(sat, now);
+      const age = daysold >= 1 ? daysold : daysold * 24;
+      const units = daysold >= 1 ? 'Days' : 'Hours';
       const elsetAgeDom = getEl('sat-elset-age');
 
       if (elsetAgeDom) {
-        elsetAgeDom.innerHTML = `${daysold.toFixed(2)} Days`;
+        elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
       }
 
       SatInfoBox.updateConfidenceDom_(sat);

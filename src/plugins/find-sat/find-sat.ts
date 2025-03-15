@@ -8,8 +8,8 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import findSatPng from '@public/img/icons/find2.png';
 
 import { countryCodeList, countryMapList, countryNameList } from '@app/catalogs/countries';
-import { TimeManager } from '@app/singletons/time-manager';
 import { CatalogExporter } from '@app/static/catalog-exporter';
+import { SatMath } from '@app/static/sat-math';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -554,7 +554,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       res = FindSatPlugin.checkPeriod_(res, (period - periodMarg) as Minutes, (period + periodMarg) as Minutes);
     }
     if (isValidTleAge) {
-      res = FindSatPlugin.checkTleAge_(res, (tleAge + tleAgeMarg) as Hours);
+      res = FindSatPlugin.checkTleAge_(res, (tleAge - tleAgeMarg) as Hours, (tleAge + tleAgeMarg) as Hours);
     }
     if (isValidRcs) {
       res = FindSatPlugin.checkRcs_(res, rcs - rcsMarg, rcs + rcsMarg);
@@ -614,12 +614,16 @@ export class FindSatPlugin extends KeepTrackPlugin {
     return possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
   }
 
-  private static checkTleAge_(possibles: DetailedSatellite[], minTleAge: Hours) {
-    const epochDayFloat = parseFloat(TimeManager.currentEpoch(new Date())[1]);
+  private static checkTleAge_(possibles: DetailedSatellite[], minTleAge_: Hours, maxTleAge: Hours) {
+    const minTleAge = minTleAge_ < 0 ? 0 : minTleAge_;
+    const now = new Date();
+
+    return possibles.filter((possible) => {
+      const ageHours = SatMath.calcElsetAge(possible, now, 'hours');
 
 
-    return possibles.filter((possible) => (epochDayFloat - parseFloat(possible.tle1.substring(20, 28))) * 24 as Hours <= minTleAge &&
-      (epochDayFloat - parseFloat(possible.tle1.substring(20, 28))) > 0);
+      return ageHours >= minTleAge && ageHours <= maxTleAge;
+    });
   }
 
   private static checkRightAscension_(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {

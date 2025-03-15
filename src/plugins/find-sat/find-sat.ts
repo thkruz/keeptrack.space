@@ -7,7 +7,7 @@ import { hideLoading, showLoading } from '@app/lib/showLoading';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import findSatPng from '@public/img/icons/find2.png';
 
-import { countryCodeList, countryMapList, countryNameList } from '@app/catalogs/countries';
+import { countryCodeList, countryNameList } from '@app/catalogs/countries';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { SatMath } from '@app/static/sat-math';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
@@ -568,7 +568,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       res = FindSatPlugin.checkRcs_(res, rcs - rcsMarg, rcs + rcsMarg);
     }
     if (countryCode !== 'All') {
-      let country = countryCode.split('|').map((code) => countryMapList[code]);
+      let country = countryCode.split('|');
       // Remove duplicates and undefined
 
       country = country.filter((item, index) => item && country.indexOf(item) === index);

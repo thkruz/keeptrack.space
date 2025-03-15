@@ -204,6 +204,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
           keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
         break;
+      case `${this.formPrefix_}-godrays-quality`:
       case `${this.formPrefix_}-godrays-samples`:
       case `${this.formPrefix_}-godrays-decay`:
       case `${this.formPrefix_}-godrays-exposure`:

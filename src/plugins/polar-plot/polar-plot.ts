@@ -201,11 +201,17 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   private drawTitle_(): void {
     this.ctx_.font = `${this.canvasSize_ * 0.035}px consolas`;
     this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-    this.ctx_.textAlign = 'center';
+    this.ctx_.textAlign = 'left';
     this.ctx_.textBaseline = 'top';
-    this.ctx_.fillText(`${keepTrackApi.getSensorManager().getSensor().name} | ` +
-      `Satellite ${(<DetailedSatellite>this.selectSatManager_.getSelectedSat()).sccNum} | ` +
-      `${this.passStartTime_.toISOString().slice(11, 19)} - ${this.passStopTime_.toISOString().slice(11, 19)}`, this.centerX_, 0);
+    const sensorName = keepTrackApi.getSensorManager().getSensor().name;
+    const satNum = (this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum;
+    const timeRange = `${this.passStartTime_.toISOString().slice(11, 19)} - ${this.passStopTime_.toISOString().slice(11, 19)}`;
+
+    this.ctx_.fillText(sensorName, 10, 10);
+    this.ctx_.fillText(`Satellite ${satNum}`, 10, this.canvasSize_ * 0.035 + 15);
+
+    this.ctx_.textAlign = 'center';
+    this.ctx_.fillText(timeRange, this.canvasSize_ / 2, this.canvasSize_ - 10 - (this.canvasSize_ * 0.035));
   }
 
   private setupCanvas_() {
@@ -221,7 +227,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.ctx_.imageSmoothingEnabled = true;
     this.centerX_ = this.ctx_.canvas.width / 2;
     this.centerY_ = this.ctx_.canvas.height / 2;
-    this.distanceUnit_ = this.canvasSize_ / (2.5 * 90);
+    this.distanceUnit_ = this.canvasSize_ / (2.5 * 90) * 0.9;
 
     this.ctx_.clearRect(0, 0, this.ctx_.canvas.width, this.ctx_.canvas.height);
   }
@@ -319,7 +325,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   private labelElevationAxis_() {
     this.ctx_.textAlign = 'center';
     this.ctx_.textBaseline = 'middle';
-    const diagDist = this.canvasSize_ / 700;
+    const diagDist = this.canvasSize_ / 700 * 0.91;
 
     this.ctx_.fillText('90°', this.centerX_ + 18 * diagDist, this.centerY_ - 12 * diagDist);
     this.ctx_.fillText('75°', this.centerX_ + 44 * diagDist, this.centerY_ - 44 * diagDist);

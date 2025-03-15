@@ -545,11 +545,11 @@ export class SensorManager {
     const status = this.sensorSunStatus_(now, sensor).sunStatus;
 
     return ((status === SunStatus.UMBRAL) || (status === SunStatus.PENUMBRAL));
-    }
+  }
 
   canStationsObserve(now: Date, sensors: DetailedSensor[]): boolean {
     return sensors.some((sensor) => this.canStationObserve_(now, sensor));
-      }
+  }
 
   calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {
     sensors = this.verifySensors(sensors);

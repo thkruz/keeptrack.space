@@ -514,7 +514,8 @@ export abstract class SatMath {
 
     const epochJday = epochDayOfYear + (epochYearFull * 365);
     const currentJday = getDayOfYear() + (currentYearFull * 365);
-    const daysOld = (currentJday - epochJday);
+    const currentTime = (nowInput.getUTCHours() * 3600 + nowInput.getUTCMinutes() * 60 + nowInput.getUTCSeconds()) / 86400;
+    const daysOld = (currentJday + currentTime) - epochJday;
 
     switch (outputUnits) {
       case 'hours':

@@ -216,7 +216,7 @@ export class ColorSchemeManager {
     obj: BaseObject,
     params: {
       jday: number;
-      year: string;
+      year: number;
     },
   ): ColorInformation {
     /*
@@ -229,13 +229,13 @@ export class ColorSchemeManager {
       const now = new Date();
 
       params = {
-        jday: getDayOfYear(now),
-        year: now.getUTCFullYear().toString().substr(2, 2),
+        jday: getDayOfYear(now) + ((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400),
+        year: parseInt(now.getUTCFullYear().toString().substr(2, 2), 10),
       };
     }
 
     const jday = params?.jday || 0;
-    const year = params?.year || '';
+    const currentYearShort = params?.year || 0;
 
     if (obj.isStar()) {
       return this.starColor_(obj as Star);
@@ -263,54 +263,52 @@ export class ColorSchemeManager {
     const sat = obj as DetailedSatellite;
     const epochYearShort = parseInt(sat.tle1.substring(18, 20), 10);
     const epochDay = parseFloat(sat.tle1.substring(20, 32));
-    const currentYearShort = parseInt(year, 10);
 
     const epochYearFull = epochYearShort <= currentYearShort ? 2000 + epochYearShort : 1900 + epochYearShort;
     const currentYearFull = 2000 + currentYearShort;
 
     const epochJday = epochDay + (epochYearFull * 365);
     const currentJday = jday + (currentYearFull * 365);
+    const daysOld = (currentJday) - epochJday as Days;
 
-    const daysold = (currentJday - epochJday) as Days;
-
-    if (daysold < 0.5 && this.objectTypeFlags.age1) {
+    if (daysOld < 0.5 && this.objectTypeFlags.age1) {
       return {
         color: this.colorTheme.age1,
         pickable: Pickable.Yes,
       };
     }
 
-    if (daysold >= 0.5 && daysold < 1.0 && this.objectTypeFlags.age2) {
+    if (daysOld >= 0.5 && daysOld < 1.0 && this.objectTypeFlags.age2) {
       return {
         color: this.colorTheme.age2,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 1.0 && daysold < 1.5 && this.objectTypeFlags.age3) {
+    if (daysOld >= 1.0 && daysOld < 1.5 && this.objectTypeFlags.age3) {
       return {
         color: this.colorTheme.age3,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 1.5 && daysold < 2.0 && this.objectTypeFlags.age4) {
+    if (daysOld >= 1.5 && daysOld < 2.0 && this.objectTypeFlags.age4) {
       return {
         color: this.colorTheme.age4,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 2.0 && daysold < 2.5 && this.objectTypeFlags.age5) {
+    if (daysOld >= 2.0 && daysOld < 2.5 && this.objectTypeFlags.age5) {
       return {
         color: this.colorTheme.age5,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 2.5 && daysold < 3.0 && this.objectTypeFlags.age6) {
+    if (daysOld >= 2.5 && daysOld < 3.0 && this.objectTypeFlags.age6) {
       return {
         color: this.colorTheme.age6,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 3.0 && this.objectTypeFlags.age7) {
+    if (daysOld >= 3.0 && this.objectTypeFlags.age7) {
       return {
         color: this.colorTheme.age7,
         pickable: Pickable.Yes,
@@ -1550,7 +1548,7 @@ export class ColorSchemeManager {
     lastDotToColor: number,
     satData: BaseObject[],
     satVel: any,
-    params: { year: string; jday: number; orbitDensity: any[]; orbitDensityMax: number },
+    params: { year: number; jday: number; orbitDensity: any[]; orbitDensityMax: number },
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       satData[i].totalVelocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
@@ -1571,7 +1569,7 @@ export class ColorSchemeManager {
     firstDotToColor: number,
     lastDotToColor: number,
     satData: BaseObject[],
-    params: { year: string; jday: number; orbitDensity: any[]; orbitDensityMax: number },
+    params: { year: number; jday: number; orbitDensity: any[]; orbitDensityMax: number },
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
@@ -1633,7 +1631,7 @@ export class ColorSchemeManager {
 
   private calculateParams_() {
     const params = {
-      year: '',
+      year: 0,
       jday: 0,
       orbitDensity: [] as number[][],
       orbitDensityMax: 0,
@@ -1642,8 +1640,8 @@ export class ColorSchemeManager {
     if (this.currentColorScheme === this.ageOfElset) {
       const now = new Date();
 
-      params.jday = getDayOfYear(now);
-      params.year = now.getUTCFullYear().toString().substr(2, 2);
+      params.jday = getDayOfYear(now) + ((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400);
+      params.year = parseInt(now.getUTCFullYear().toString().substr(2, 2), 10);
     }
 
     if (this.currentColorScheme === this.neighbors) {

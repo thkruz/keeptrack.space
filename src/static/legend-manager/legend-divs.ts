@@ -111,7 +111,7 @@ export const sunlightDiv = keepTrackApi.html`
   </li>
   <li>
     <div class="Square-Box legend-inFOV-box"></div>
-    Satellite In View
+    Satellite FOV
   </li>
 </ul>
 `.trim();
@@ -135,7 +135,7 @@ export const defaultSensorDiv = keepTrackApi.html`
   </li>
   <li>
     <div class="Square-Box legend-inFOV-box"></div>
-    Satellite In View
+    Satellite In FOV
   </li>
   <li>
     <div class="Square-Box legend-missile-box"></div>
@@ -245,6 +245,34 @@ export const ageOfElsetDiv = keepTrackApi.html`
   <li>
     <div class="Square-Box legend-age7-box"></div>
     More Than 3 Days
+  </li>
+</ul>
+`.trim();
+export const dataSourceDiv = keepTrackApi.html`
+<ul id="legend-list-dataSource">
+  <li>
+    <div class="Square-Box legend-sourceAldoria-box"></div>
+    Aldoria
+  </li>
+  <li>
+    <div class="Square-Box legend-sourceUssf-box"></div>
+    18 SDS
+  </li>
+  <li>
+    <div class="Square-Box legend-sourceCelestrak-box"></div>
+    Celestrak
+  </li>
+  <li>
+    <div class="Square-Box legend-sourcePrismnet-box"></div>
+    Prismnet
+  </li>
+  <li>
+    <div class="Square-Box legend-sourceVimpel-box"></div>
+    Vimpel
+  </li>
+  <li>
+    <div class="Square-Box legend-countryOther-box"></div>
+    Other
   </li>
 </ul>
 `.trim();

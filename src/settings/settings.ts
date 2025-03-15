@@ -1455,6 +1455,11 @@ export class SettingsManager {
         notional: [1, 0, 0, 0.8],
         starlink: [0.0, 0.8, 0.0, 0.8],
         starlinkNot: [0.8, 0.0, 0.0, 0.8],
+        sourceUssf: [0.2, 1.0, 1.0, 0.7],
+        sourceAldoria: [0.2, 0.4, 1.0, 1],
+        sourceCelestrak: [1.0, 0.4, 0.0, 0.65],
+        sourcePrismnet: [1.0, 1.0, 1.0, 0.8],
+        sourceVimpel: [1.0, 0, 0, 0.6],
       };
 
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));

@@ -116,6 +116,11 @@ export interface Colors {
   umbral: rgbaArray;
   unknown: rgbaArray;
   version: string;
+  sourceUssf: rgbaArray,
+  sourceAldoria: rgbaArray,
+  sourceCelestrak: rgbaArray,
+  sourcePrismnet: rgbaArray,
+  sourceVimpel: rgbaArray,
 }
 
 export interface SatCruncherMessageData {

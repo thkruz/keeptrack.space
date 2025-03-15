@@ -541,30 +541,17 @@ export class SensorManager {
     if (sensor.type !== SpaceObjectType.OPTICAL) {
       return true;
     }
+
     const status = this.sensorSunStatus_(now, sensor).sunStatus;
 
-    if ((status === SunStatus.UMBRAL) || (status === SunStatus.PENUMBRAL)) {
-      return true;
+    return ((status === SunStatus.UMBRAL) || (status === SunStatus.PENUMBRAL));
     }
 
-    return true;
-  }
-
-  public canStationsObserve(now: Date, sensors: DetailedSensor[]): boolean {
-    let canObserve = false;
-
-    // Check if at least 1 station can observe
-    for (const sensor of sensors) {
-      canObserve = this.canStationObserve_(now, sensor);
-      if (canObserve) {
-        return true;
+  canStationsObserve(now: Date, sensors: DetailedSensor[]): boolean {
+    return sensors.some((sensor) => this.canStationObserve_(now, sensor));
       }
-    }
 
-    return false;
-  }
-
-  public calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {
+  calculateSensorPos(now: Date, sensors?: DetailedSensor[]): { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } {
     sensors = this.verifySensors(sensors);
     const sensor = sensors[0];
 

@@ -35,6 +35,7 @@ export class ColorMenu extends KeepTrackPlugin {
         <li class="menu-selectable" data-color="deep-space">Deep Space</li>
         <li class="menu-selectable" data-color="elset-age">GP Age</li>
         <li class="menu-selectable" data-color="lost-objects">Lost Objects</li>
+        <li class="menu-selectable" data-color="data-source">Data Source</li>
       </ul>
     </div>
   </div>`;
@@ -58,6 +59,7 @@ export class ColorMenu extends KeepTrackPlugin {
     <li id="colors-confidence-rmb"><a href="#">Confidence Level</a></li>
     <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
     <li id="colors-ageOfElset-rmb"><a href="#">Age of GP</a></li>
+    <li id="colors-dataSource-rmb"><a href="#">Data Source</a></li>
   </ul>`;
 
   // eslint-disable-next-line class-methods-use-this
@@ -86,6 +88,9 @@ export class ColorMenu extends KeepTrackPlugin {
         break;
       case 'colors-ageOfElset-rmb':
         ColorMenu.colorsMenuClick('elset-age');
+        break;
+      case 'colors-dataSource-rmb':
+        ColorMenu.colorsMenuClick('data-source');
         break;
       case 'colors-default-rmb':
         ColorMenu.colorsMenuClick('default');
@@ -178,6 +183,11 @@ export class ColorMenu extends KeepTrackPlugin {
           colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.ageOfElset, true);
           uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
         });
+        break;
+      case 'data-source':
+        LegendManager.change('dataSource');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.dataSource, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
         break;
       case 'lost-objects':
         (<HTMLInputElement>getEl('search')).value = '';

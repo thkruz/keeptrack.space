@@ -44,7 +44,7 @@ describe('fadeIn_function', () => {
   // Tests that the function throws an error when the element is null
   it('test_element_null', () => {
     expect(() => {
-      fadeIn(<any>null);
+      fadeIn(null);
     }).not.toThrow();
   });
 
@@ -76,7 +76,7 @@ describe('fadeIn_function', () => {
     const el = document.createElement('div');
     const spy = jest.fn();
 
-    fadeIn(el, 'block', <any>null, spy);
+    fadeIn(el, 'block', null, spy);
     jest.advanceTimersByTime(999);
     expect(spy).not.toHaveBeenCalled();
     jest.advanceTimersByTime(1);
@@ -101,7 +101,8 @@ describe('fadeIn_function', () => {
  *Code Analysis
  *
  *Objective:
- *The objective of the 'fadeOut' function is to gradually fade out an HTML element by changing its opacity and then hide it by setting its display property to 'none'. The function also allows for a custom duration and a callback function to be executed after the fade out animation is complete.
+ *The objective of the 'fadeOut' function is to gradually fade out an HTML element by changing its opacity and then hide it by setting its display property to 'none'. The function
+ *also allows for a custom duration and a callback function to be executed after the fade out animation is complete.
  *
  *Inputs:
  *- el: an HTML element to be faded out
@@ -161,7 +162,7 @@ describe('fadeOut_function', () => {
   // Tests that a missing element does not throw an error
   it('test_missing_element_does_not_throw_error', () => {
     expect(() => {
-      fadeOut(<any>null);
+      fadeOut(null);
     }).not.toThrow();
   });
 

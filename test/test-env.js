@@ -76,24 +76,16 @@ window.M = {
   AutoInit: jest.fn(),
 };
 
-global.requestAnimationFrame = function (cb) {
+global.requestAnimationFrame = function requestAnimationFrame(cb) {
   return setTimeout(cb, 0);
 };
 
 global.console = {
-  log: jest.fn(), // console.log are ignored in tests
-  // log: console.log, // console.log are ignored in tests
-
-  // Keep native behaviour for other methods, use those to print out things in your own tests, not `console.log`
-  error: console.debug, // NOSONAR
-  // error: jest.fn(),
-  warn: console.warn, // NOSONAR
-  /*
-   * warn: jest.fn(),
-   * info: console.info,
-   */
+  // Ignore console.log() type statements during test
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
   info: jest.fn(),
-  // debug: console.debug,
   debug: jest.fn(),
 };
 

@@ -77,7 +77,7 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
   settingsManager.init();
   keepTrackApi.getColorSchemeManager().init();
   window.settingsManager = settingsManager;
-  (global as any).settingsManager = settingsManager;
+  (global as unknown as Global).settingsManager = settingsManager;
   // clearAllCallbacks();
   plugin.init();
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
@@ -86,7 +86,7 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
   keepTrackApi.getCatalogManager().satCruncher = {
     addEventListener: jest.fn(),
     postMessage: jest.fn(),
-  } as any;
+  } as unknown as Worker;
 };
 
 export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {

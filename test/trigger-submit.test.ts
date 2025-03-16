@@ -51,8 +51,8 @@ describe('triggerSubmit_function', () => {
     const data = { name: 'John Doe' };
     const event = new CustomEvent('customSubmit', { detail: data });
 
-    form.addEventListener('customSubmit', (e: any) => {
-      expect(e.detail).toEqual(data);
+    form.addEventListener('customSubmit', (e: Event) => {
+      expect((<CustomEvent>e).detail).toEqual(data);
     });
     form.dispatchEvent(event);
   });

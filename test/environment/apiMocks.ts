@@ -1,11 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck - This file is a mock file and does not need to be type-checked
+
 
 import { Operators } from '@app/catalogs/sensors';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { CatalogSource, DEG2RAD, Degrees, DetailedSatellite, Kilometers, Milliseconds, Sensor, Sgp4, SpaceObjectType, ZoomValue } from 'ootk';
-import { SensorObject } from '../../src/interfaces';
-declare const jest: any;
+import { PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from '@app/webworker/constants';
+import { CatalogSource, CommLink, Degrees, DetailedSatellite, Kilometers, Milliseconds, RfSensor, SpaceObjectType, TleLine1, TleLine2, ZoomValue } from 'ootk';
 
 const fakeTimeObj = new Date(2022, 0, 1);
 
@@ -21,9 +20,9 @@ export const defaultSat: DetailedSatellite = new DetailedSatellite({
   launchVehicle: 'Proton-K',
   name: 'ISS (ZARYA)',
   type: SpaceObjectType.PAYLOAD,
-  tle1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991',
-  tle2: '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053',
-  rcs: '99.0524',
+  tle1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991' as TleLine1,
+  tle2: '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053' as TleLine2,
+  rcs: 99.0524,
   owner: 'National Aeronautics and Space Administration (NASA)/Multinational',
   user: 'Government',
   purpose: 'Space Science',
@@ -33,31 +32,11 @@ export const defaultSat: DetailedSatellite = new DetailedSatellite({
   lifetime: 30,
   manufacturer: 'Boeing Satellite Systems (prime)/Multinational',
   mission: 'Final size of a Boeing 747; first component.',
-  inclination: 51.6423 * DEG2RAD,
-  lon: 168.5744,
-  perigee: 184,
-  apogee: 184.3976,
-  period: 313.3642,
-  meanMotion: 15.48839820294053,
-  semimajorAxis: 21203.40407588,
-  eccentricity: 0.00003453,
-  satrec: Sgp4.createSatrec('1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991', '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053'),
-  raan: 0,
-  argPe: 0,
-  inView: 1,
-  velocity: {
-    total: 0,
-    x: 0,
-    y: 0,
-    z: 0,
-  },
   position: {
-    x: 0,
-    y: 0,
-    z: 0,
+    x: 0 as Kilometers,
+    y: 0 as Kilometers,
+    z: 0 as Kilometers,
   },
-  static: false,
-  sensorId: null,
   source: CatalogSource.CELESTRAK,
 });
 
@@ -75,15 +54,14 @@ export const defaultMisl = new MissileObject({
   launchVehicle: 'Fake',
 });
 
-export const defaultSensor: SensorObject = new Sensor({
-  observerGd: { lat: 0.7287584767123405, lon: -1.2311404365114507, alt: 0.060966 },
+export const defaultSensor = new RfSensor({
   objName: 'CODSFS',
   shortName: 'COD',
   id: 3,
   name: 'Cape Cod SFS, Massachusetts',
   uiName: 'Cape Cod SFS',
   system: 'PAVE PAWS UEWR',
-  band: 'UHF',
+  freqBand: 'UHF',
   type: SpaceObjectType.PHASED_ARRAY_RADAR,
   lat: <Degrees>41.754785,
   lon: <Degrees>-70.539151,
@@ -94,10 +72,14 @@ export const defaultSensor: SensorObject = new Sensor({
   maxEl: <Degrees>85,
   minRng: <Kilometers>200,
   maxRng: <Kilometers>5556,
+  boresightAz: [<Degrees>47, <Degrees>167],
+  boresightEl: [<Degrees>20, <Degrees>20],
   changeObjectInterval: <Milliseconds>1000,
   beamwidth: <Degrees>2.0, // National Research Council 1979. Radiation Intensity of the PAVE PAWS Radar System. Washington, DC: The National Academies Press.
-  linkAehf: true,
-  linkWgs: true,
+  commLinks: [
+    CommLink.AEHF,
+    CommLink.WGS,
+  ],
   zoom: ZoomValue.LEO,
   url: 'https://www.radartutorial.eu/19.kartei/01.oth/karte004.en.html',
   country: 'United States',
@@ -107,39 +89,36 @@ export const defaultSensor: SensorObject = new Sensor({
 
 export const useMockWorkers = (): void => {
   class Worker {
-    url: any;
-    onmessage: (msg: any) => { data: object };
-    constructor(stringUrl: any) {
+    url: string;
+    onmessage: (msg: { data: PositionCruncherOutgoingMsg }) => { data: object };
+    constructor(stringUrl: string) {
       this.url = stringUrl;
-      this.onmessage = (msg: any) => {
-        console.debug(msg);
-
-        return {
-          data: {},
-        };
-      };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      this.onmessage = () => ({
+        data: {},
+      });
     }
 
-    postMessage(msg: any) {
-      if (msg.dat) {
+    postMessage(msg: { data: PositionCruncherIncomingMsg }) {
+      if (msg.data) {
         this.onmessage({
           data: {
-            extraData: JSON.stringify([defaultSat, defaultSensor]),
-            satPos: [0, 0, 0, 0, 0, 0],
-            satVel: [0, 0, 0, 0, 0, 0],
+            satPos: [0, 0, 0, 0, 0, 0] as unknown as Float32Array,
+            satVel: [0, 0, 0, 0, 0, 0] as unknown as Float32Array,
           },
         });
       }
       this.onmessage({
         data: {
-          satPos: [0, 0, 0, 0, 0, 0],
-          satVel: [0, 0, 0, 0, 0, 0],
+          satPos: [0, 0, 0, 0, 0, 0] as unknown as Float32Array,
+          satVel: [0, 0, 0, 0, 0, 0] as unknown as Float32Array,
         },
       });
     }
   }
 
-  (<any>window).Worker = Worker;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).Worker = Worker;
 };
 
 export const keepTrackApiStubs = {
@@ -169,7 +148,7 @@ export const keepTrackApiStubs = {
         socrates: 0,
       },
       showAdvice: jest.fn(),
-      adviceArray: <any[]>[],
+      adviceArray: [],
     },
     mainCamera: {
       camMatrix: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -277,7 +256,9 @@ export const keepTrackApiStubs = {
           loadHiResNight: jest.fn(),
           lightDirection: [0, 0, 0],
           draw: jest.fn(),
-          drawOcclusion: () => { }, // NOSONAR
+          drawOcclusion: () => {
+            // Do nothing
+          },
         },
         moon: {
           draw: jest.fn(),
@@ -422,7 +403,7 @@ export const keepTrackApiStubs = {
       degreesLat: (num: number) => num,
       getEciOfCurrentOrbit: () => [{ x: 0, y: 0, z: 0 }],
       getEcfOfCurrentOrbit: () => [{ x: 0, y: 0, z: 0 }],
-      getRicOfCurrentOrbit: () => [{ x: 0, y: 0, z: 0 }], // TODO: Update
+      getRicOfCurrentOrbit: () => [{ x: 0, y: 0, z: 0 }],
       getLlaOfCurrentOrbit: () => [{ lat: 0, lon: 0, alt: 0, time: new Date().getTime() }],
       currentEpoch: () => ['21', '150'],
       getOrbitByLatLon: () => ['1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991', '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053'],
@@ -498,7 +479,6 @@ export const keepTrackApiStubs = {
         addEventListener: jest.fn(),
         postMessage: jest.fn(),
         onmessage: jest.fn(),
-        addEventListener: jest.fn(),
       },
       getIdFromEci: jest.fn(),
       selectSat: jest.fn(),
@@ -617,6 +597,17 @@ export const keepTrackApiStubs = {
       getsensorinfo: jest.fn(),
       hideLoadingScreen: jest.fn(),
       legendHoverMenuClick: jest.fn(),
+      searchBox: {
+        hideResults: jest.fn(),
+        fillResultBox: jest.fn(),
+        doArraySearch: jest.fn(),
+        doSearch: jest.fn(),
+        getCurrentSearch: jest.fn(),
+        getLastResultGroup: jest.fn(),
+        isHovering: jest.fn(),
+        setHoverSat: jest.fn(),
+        isResultBoxOpen: jest.fn(),
+      },
       mobileManager: {
         fullscreenToggle: jest.fn(),
         checkMobileMode: jest.fn(),
@@ -632,7 +623,7 @@ export const keepTrackApiStubs = {
   },
 };
 
-keepTrackApiStubs.programs.uiManager.searchBox = keepTrackApiStubs.programs.searchBox;
+keepTrackApiStubs.programs.uiManager.searchBox = keepTrackApiStubs.programs.searchBox as unknown as typeof keepTrackApiStubs.programs.searchBox;
 
 keepTrackApiStubs.programs.groupsManager.Canada = keepTrackApiStubs.programs.groupsManager.SpaceStations;
 keepTrackApiStubs.programs.groupsManager.Japan = keepTrackApiStubs.programs.groupsManager.SpaceStations;

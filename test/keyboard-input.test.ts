@@ -8,7 +8,8 @@ import { Singletons } from '../src/interfaces';
  *Code Analysis
  *
  *Main functionalities:
- *The KeyboardInput class handles keyboard input events and provides methods to register callbacks for specific keys. It also interacts with other classes such as UiManager, CatalogManager, OrbitManager, TimeManager, and Camera to perform various actions based on the user's input.
+ *The KeyboardInput class handles keyboard input events and provides methods to register callbacks for specific keys. It also interacts with other classes such as UiManager,
+ *CatalogManager, OrbitManager, TimeManager, and Camera to perform various actions based on the user's input.
  *
  *Methods:
  *- init(): initializes the class and registers event listeners for keyboard input
@@ -69,7 +70,7 @@ describe('KeyboardInput_class', () => {
     keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
     const evt = { key: null };
 
-    keyboardInput.keyHandler(<any>evt);
+    keyboardInput.keyHandler(<KeyboardEvent>evt);
     expect(true).toBe(true);
   });
 
@@ -94,7 +95,9 @@ describe('KeyboardInput_class', () => {
     keyboardInput.init();
     keyboardInput.registerKeyEvent({
       key: 'R',
-      callback: () => console.log('R pressed'),
+      callback: () => {
+        // Do nothing
+      },
     });
     expect(keyboardInput.keyEvents.length).toBe(1);
   });

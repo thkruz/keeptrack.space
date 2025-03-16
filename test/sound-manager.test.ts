@@ -43,17 +43,20 @@ describe('Sound Manager', () => {
   it('should_be_able_to_speak', () => {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     // Mock SpeechSynthesisUtterance
-    global.SpeechSynthesisUtterance = jest.fn(() => ({
+    const mockSpeechUtterance = jest.fn(() => ({
       lang: 'en-US',
       pitch: 1,
       rate: 1,
       text: 'hello',
       voice: null,
       volume: 1,
-    })) as any;
+    }));
+
+    mockSpeechUtterance.prototype = {};
+    global.SpeechSynthesisUtterance = mockSpeechUtterance as unknown as typeof SpeechSynthesisUtterance;
     global.speechSynthesis = {
       speak: jest.fn(),
-    } as any;
+    } as unknown as SpeechSynthesis;
     expect(() => soundManagerPlugin.speak('hello')).not.toThrow();
   });
 });

@@ -7,7 +7,8 @@ import { disableConsoleErrors, enableConsoleErrors } from './environment/standar
 
 /**
  *Objective:
- *The objective of this code snippet is to provide functions for saving variables as text files and arrays of objects as CSV files. The code includes a function to handle circular references when saving variables as text files and uses the file-saver and papaparse libraries for saving files.
+ *The objective of this code snippet is to provide functions for saving variables as text files and arrays of objects as CSV files. The code includes a function to handle circular
+ *references when saving variables as text files and uses the file-saver and papaparse libraries for saving files.
  *
  *Inputs:
  *- variable: the variable to be saved as a text file

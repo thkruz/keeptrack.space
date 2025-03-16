@@ -17,7 +17,9 @@ describe('NextLaunches_class', () => {
       writable: true, // possibility to override
     });
 
-    jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
+    jest.spyOn(window.history, 'replaceState').mockImplementation(() => {
+      // Do nothing
+    });
   });
   beforeEach(() => {
     keepTrackApi.containerRoot.innerHTML = '';

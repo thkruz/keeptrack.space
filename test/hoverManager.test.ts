@@ -14,7 +14,8 @@ import { setupStandardEnvironment } from './environment/standard-env';
  *Code Analysis
  *
  *Objective:
- *The HoverManager class is responsible for managing the hover functionality in the KeepTrack application. It handles the display of information about a satellite or other space object when the user hovers over it with their mouse.
+ *The HoverManager class is responsible for managing the hover functionality in the KeepTrack application. It handles the display of information about a satellite or other space
+ *object when the user hovers over it with their mouse.
  *
  *Inputs:
  *- Various imported modules and classes from the KeepTrack application

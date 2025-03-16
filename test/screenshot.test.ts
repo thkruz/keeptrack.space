@@ -23,13 +23,13 @@ describe('Screenshot_class', () => {
       getContext: jest.fn(() => ({
         drawImage: jest.fn(),
         fillText: jest.fn(),
-        measureText: jest.fn(() => ({ width: 0 })) as any,
-      })) as any,
+        measureText: jest.fn(() => ({ width: 0 })),
+      })),
       toDataURL: jest.fn(() => 'data:image/png;base64,'),
       parentNode: {
         removeChild: jest.fn(),
       },
-    })) as any;
+    })) as unknown as typeof document.createElement;
     expect(() => screenshotPlugin.takeScreenShot()).not.toThrow();
   });
 });

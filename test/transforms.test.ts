@@ -157,7 +157,8 @@ describe('lon2yaw_function', () => {
  *Code Analysis
  *
  *Objective:
- *The objective of the "lat2pitch" function is to convert a given latitude value in degrees to its corresponding pitch value in radians, which is used in various applications such as 3D graphics and mapping.
+ *The objective of the "lat2pitch" function is to convert a given latitude value in degrees to its corresponding pitch value in radians, which is used in various applications
+ *such as 3D graphics and mapping.
  *
  *Inputs:
  *- "lat": a value representing the latitude in degrees.

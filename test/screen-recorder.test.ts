@@ -22,12 +22,16 @@ describe('ScreenRecorder_class', () => {
 
     screenRecorderPlugin['streamManagerInstance_'].isVideoRecording = true;
     screenRecorderPlugin['streamManagerInstance_']['mediaRecorder_'] = {
-      stop: () => { },
-    } as any;
+      stop: () => {
+        // Do nothing
+      },
+    } as unknown as MediaRecorder;
     screenRecorderPlugin['streamManagerInstance_']['stream_'] = {
       getTracks: () => [],
-    } as any;
-    screenRecorderPlugin['streamManagerInstance_'].save = () => { };
+    } as unknown as MediaStream;
+    screenRecorderPlugin['streamManagerInstance_'].save = () => {
+      // Do nothing
+    };
 
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });

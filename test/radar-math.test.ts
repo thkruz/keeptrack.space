@@ -5,7 +5,8 @@ import { DEG2RAD, Kilometers, Meters, Radians } from 'ootk';
 
 /**
  *Objective:
- *The 'minSignal' method of the 'RadarMath' class calculates the minimum detectable signal in dB for a given set of parameters, including the transmitted power, antenna gain, radar cross section, range, and frequency.
+ *The 'minSignal' method of the 'RadarMath' class calculates the minimum detectable signal in dB for a given set of parameters, including the transmitted power, antenna gain, radar
+ *cross section, range, and frequency.
  *
  *Inputs:
  *- pW: the transmitted power in watts, of type 'Watts'

@@ -27,7 +27,7 @@ describe('drawManager', () => {
       satShader: {
         minSize: 1,
         maxSize: 1,
-      } as any,
+      } as unknown as WebGLProgram,
     };
     expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer>null)).not.toThrow();
   });

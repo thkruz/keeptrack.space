@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import settingsPng from '@public/img/icons/settings.png';
+import videoSettingsPng from '@public/img/icons/video-settings.png';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
@@ -43,7 +43,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   isRotateU = false;
   isRotateD = false;
   bottomIconElementName: string = 'video-director-icon';
-  bottomIconImg = settingsPng;
+  bottomIconImg = videoSettingsPng;
   sideMenuElementName: string = 'video-director-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="video-director-menu" class="side-menu-parent start-hidden text-select">

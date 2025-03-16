@@ -1,4 +1,4 @@
-import editPng from '@public/img/icons/edit.png';
+import addSatellitePnng from '@public/img/icons/add-satellite.png';
 import {
   DetailedSatellite,
   DetailedSatelliteParams,
@@ -11,6 +11,7 @@ import { keepTrackApi } from '../../keepTrackApi';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
+import { countryCodeList, countryNameList } from '@app/catalogs/countries';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -24,6 +25,8 @@ import i18next from 'i18next';
  */
 interface TleInputParams {
   scc: string;
+  type: string;
+  country: string;
   inc: string;
   meanmo: string;
   rasc: string;
@@ -47,8 +50,8 @@ export class CreateSat extends KeepTrackPlugin {
   isIconDisabledOnLoad = false;
   isIconDisabled = false;
 
-  static readonly elementPrefix = 'cs';
-  bottomIconImg = editPng;
+  static readonly elementPrefix = 'createSat';
+  bottomIconImg = addSatellitePnng;
   sideMenuElementName = 'createSat-menu';
 
   constructor() {
@@ -69,8 +72,19 @@ export class CreateSat extends KeepTrackPlugin {
               <label for="${CreateSat.elementPrefix}-scc" class="active">Satellite SCC#</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="Unknown" id="${CreateSat.elementPrefix}-country" type="text" />
-              <label for="${CreateSat.elementPrefix}-country" class="active">Country</label>
+              <select value=1 id="${CreateSat.elementPrefix}-type" type="text">
+                <option value=1>Payload</option>
+                <option value=2>Rocket Body</option>
+                <option value=3>Debris</option>
+                <option value=4>Special</option>
+              </select>
+              <label for="${CreateSat.elementPrefix}-type">Object Type</label>
+            </div>
+            <div class="input-field col s12">
+              <select value="TBD" id="${CreateSat.elementPrefix}-country" type="text">
+                <option value="TBD">Unknown</option>
+              </select>
+              <label for="${CreateSat.elementPrefix}-country">Country</label>
             </div>
             <div class="input-field col s12">
               <input placeholder="AA" id="${CreateSat.elementPrefix}-year" type="text" maxlength="2" />
@@ -105,7 +119,7 @@ export class CreateSat extends KeepTrackPlugin {
               <label for="${CreateSat.elementPrefix}-meanmo" class="active">Mean Motion</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="" id="${CreateSat.elementPrefix}-per" type="text" maxlength="11" />
+              <input placeholder="AA.AAAA" id="${CreateSat.elementPrefix}-per" type="text" maxlength="11" />
               <label for="${CreateSat.elementPrefix}-per" class="active">Period</label>
             </div>
             <div class="input-field col s12">
@@ -139,20 +153,30 @@ export class CreateSat extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'createSat',
-      cb: () => this.initializeEventListeners_(),
+      cb: () => this.uiManagerFinal_(),
     });
   }
 
   /**
    * Initialize all event listeners for the UI
    */
-  private initializeEventListeners_(): void {
+  private uiManagerFinal_(): void {
     // Period and mean motion converter
     this.setupPeriodMeanMotionConverters_();
 
     // Submit and save buttons
     getEl('createSat-submit').addEventListener('click', CreateSat.createSatSubmit_);
     getEl('createSat-save').addEventListener('click', CreateSat.exportTLE_);
+
+    countryNameList.forEach((countryName: string) => {
+      let countryCode = countryCodeList[countryName];
+
+      if (typeof countryCode === 'string' && countryCode.includes('|')) {
+        countryCode = countryCode.split('|')[0];
+      }
+
+      getEl(`${CreateSat.elementPrefix}-country`).insertAdjacentHTML('beforeend', `<option value="${countryCode}">${countryName}</option>`);
+    });
 
     // Populate default values
     this.populateSideMenu_();
@@ -174,7 +198,7 @@ export class CreateSat extends KeepTrackPlugin {
       try {
         const meanmo = 1440 / parseFloat(per);
 
-        (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value = meanmo.toFixed(8);
+        (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value = meanmo.toFixed(4);
       } catch (error) {
         errorManagerInstance.error(error as Error, 'create-sat.ts', 'Error converting period to mean motion');
       }
@@ -190,7 +214,7 @@ export class CreateSat extends KeepTrackPlugin {
       }
 
       try {
-        const per = (1440 / parseFloat(meanmo)).toFixed(8);
+        const per = (1440 / parseFloat(meanmo)).toFixed(4);
 
         (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = per;
       } catch (error) {
@@ -205,6 +229,8 @@ export class CreateSat extends KeepTrackPlugin {
   private static getTleInputs_(): TleInputParams {
     return {
       scc: (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value,
+      type: (getEl(`${CreateSat.elementPrefix}-type`) as HTMLInputElement).value,
+      country: (getEl(`${CreateSat.elementPrefix}-country`) as HTMLInputElement).value,
       inc: (getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement).value,
       meanmo: (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value,
       rasc: (getEl(`${CreateSat.elementPrefix}-rasc`) as HTMLInputElement).value,
@@ -222,10 +248,6 @@ export class CreateSat extends KeepTrackPlugin {
    * Populate the form with default values
    */
   private populateSideMenu_(): void {
-    // Set defaults for basic information
-    (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value = '90000';
-    (getEl(`${CreateSat.elementPrefix}-country`) as HTMLInputElement).value = 'France';
-
     // Set default inclination
     const defaultInc = 0;
     const inc = defaultInc.toFixed(4).padStart(8, '0');
@@ -235,16 +257,21 @@ export class CreateSat extends KeepTrackPlugin {
     // Set date-related values
     const date = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
     const year = date.getFullYear().toString().slice(2, 4);
-    const day = this.getUTCDayOfYear_(date).toString();
+    const currentJday = this.getUTCDayOfYear_(date);
+    const currentTime = (date.getUTCHours() * 3600 + date.getUTCMinutes() * 60 + date.getUTCSeconds()) / 86400;
+    const day = (currentJday + currentTime).toFixed(8).padStart(12, '0');
+
 
     (getEl(`${CreateSat.elementPrefix}-year`) as HTMLInputElement).value = year;
     (getEl(`${CreateSat.elementPrefix}-day`) as HTMLInputElement).value = day;
 
     // Set orbital parameters with reasonable defaults
-    (getEl(`${CreateSat.elementPrefix}-rasc`) as HTMLInputElement).value = '0.0';
-    (getEl(`${CreateSat.elementPrefix}-ecen`) as HTMLInputElement).value = '0.0';
-    (getEl(`${CreateSat.elementPrefix}-meana`) as HTMLInputElement).value = '0.0';
-    (getEl(`${CreateSat.elementPrefix}-argPe`) as HTMLInputElement).value = '0.0';
+    (getEl(`${CreateSat.elementPrefix}-rasc`) as HTMLInputElement).value = '000.0000';
+    (getEl(`${CreateSat.elementPrefix}-ecen`) as HTMLInputElement).value = '0000000';
+    (getEl(`${CreateSat.elementPrefix}-meana`) as HTMLInputElement).value = '000.0000';
+    (getEl(`${CreateSat.elementPrefix}-argPe`) as HTMLInputElement).value = '000.0000';
+    (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value = '16.00000';
+    (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = '90.00000';
 
     // Set metadata
     (getEl(`${CreateSat.elementPrefix}-src`) as HTMLInputElement).value = 'User Created';
@@ -281,7 +308,8 @@ export class CreateSat extends KeepTrackPlugin {
       }
 
       const sat = obj as DetailedSatellite;
-      const country = (getEl(`${CreateSat.elementPrefix}-country`) as HTMLInputElement).value;
+      const country = inputParams.country;
+      const type = parseInt(inputParams.type);
       const intl = `${inputParams.epochyr}69B`; // International designator
 
       // Create TLE from parameters
@@ -340,6 +368,7 @@ export class CreateSat extends KeepTrackPlugin {
       // Create new satellite object
       const info: DetailedSatelliteParams = {
         id: satId,
+        type,
         country,
         tle1,
         tle2,

@@ -6,7 +6,7 @@ import { showLoading } from '@app/lib/showLoading';
 import { SettingsManager } from '@app/settings/settings';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import settingsPng from '@public/img/icons/settings.png';
+import displaySettingsPng from '@public/img/icons/display-settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
@@ -45,7 +45,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
   readonly id = 'GraphicsMenuPlugin';
   dependencies_ = [];
   bottomIconLabel = 'Graphics Menu';
-  bottomIconImg = settingsPng;
+  bottomIconImg = displaySettingsPng;
   private readonly formPrefix_ = 'gm';
   sideMenuElementName: string = 'graphics-menu';
   sideMenuElementHtml = keepTrackApi.html`

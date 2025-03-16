@@ -165,6 +165,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new Breakup().init(), enabled: plugins.breakup },
       { init: () => new DebrisScreening().init(), enabled: plugins.debrisScreening },
       { init: () => new TransponderChannelData().init(), enabled: plugins.transponderChannelData },
+      { init: () => new CreateSat().init(), enabled: plugins.createSat },
       { init: () => new EditSat().init(), enabled: plugins.editSat },
       { init: () => new NewLaunch().init(), enabled: plugins.newLaunch },
       { init: () => missile.init(), enabled: plugins.missile },
@@ -199,7 +200,6 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new SoundManager().init(), enabled: plugins.soundManager },
       { init: () => new GamepadPlugin().init(), enabled: plugins.gamepad },
       { init: () => new VideoDirectorPlugin().init(), enabled: plugins.videoDirector },
-      { init: () => new CreateSat().init(), enabled: plugins.createSat },
     ];
 
     for (const { init, enabled } of pluginList) {

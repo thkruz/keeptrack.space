@@ -5,7 +5,7 @@ import { getEl } from '@app/lib/get-el';
 import { getUnique } from '@app/lib/get-unique';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import findSatPng from '@public/img/icons/find2.png';
+import findSatPng from '@public/img/icons/database-search.png';
 
 import { countryCodeList, countryNameList } from '@app/catalogs/countries';
 import { CatalogExporter } from '@app/static/catalog-exporter';

@@ -6,14 +6,14 @@ import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { LegendManager } from '@app/static/legend-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import colorsPng from '@public/img/icons/colors.png';
+import palettePng from '@public/img/icons/palette.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class ColorMenu extends KeepTrackPlugin {
   readonly id = 'ColorMenu';
   dependencies_ = [];
-  bottomIconImg = colorsPng;
+  bottomIconImg = palettePng;
   bottomIconElementName: string = 'menu-color-scheme';
   sideMenuElementName: string = 'color-scheme-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

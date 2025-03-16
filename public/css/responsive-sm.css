@@ -1,6 +1,6 @@
 @media (min-width: 640px) {
   :root {
-    --bottom-icon-width: 105px;
+    --bottom-icon-width: 100px;
   }
 
   .side-menu-parent {

@@ -2,10 +2,10 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
-import fullscreenIconPng from '@public/img/icons/fullscreen-icon.png';
-import findPng from '@public/img/icons/find.png';
+import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
-import layersIconPng from '@public/img/icons/layers-icon.png';
+import layersPng from '@public/img/icons/layers.png';
+import searchPng from '@public/img/icons/search.png';
 import soundOffPng from '@public/img/icons/sound-off.png';
 import soundOnPng from '@public/img/icons/sound-on.png';
 import { errorManagerInstance } from '../../singletons/errorManager';
@@ -39,7 +39,7 @@ export class TopMenu extends KeepTrackPlugin {
                   <li>
                     <a id="legend-menu" class="top-menu-icons">
                       <div id="legend-icon" class="top-menu-icons">
-                        <img src=${layersIconPng} alt="" />
+                        <img src=${layersPng} alt="" />
                       </div>
                     </a>
                   </li>
@@ -51,13 +51,13 @@ export class TopMenu extends KeepTrackPlugin {
                     </a>
                   </li>
                   <li>
-                    <a id="fullscreen-icon" class="top-menu-icons"><img src=${fullscreenIconPng} alt="" /></a>
+                    <a id="fullscreen-icon" class="top-menu-icons"><img src=${fullscreenPng} alt="" /></a>
                   </li>
                   <li>
                     <a id="search-icon" class="top-menu-icons">
                       <img
                         alt="search-icon"
-                        src="" delayedsrc="${findPng}"
+                        src="" delayedsrc="${searchPng}"
                       />
                     </a>
                   </li>

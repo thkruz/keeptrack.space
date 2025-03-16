@@ -672,7 +672,7 @@ ul {
   color: white;
   max-width: 550px;
   padding-left: 20px;
-  top: 25px;
+  top: 80px;
   height: auto;
   overflow: auto;
   z-index: 10;
@@ -1055,7 +1055,7 @@ input:focus {
   display: grid;
   grid-template-columns: minmax(var(--bottom-icon-width), max-content) repeat(auto-fill, var(--bottom-icon-width));
   justify-content: center;
-  row-gap: 0px;
+  row-gap: 5px;
   background: var(--color-dark-background);
   padding-top: 10px;
   z-index: 11;
@@ -1068,8 +1068,7 @@ input:focus {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  padding-top: 10px;
-  height: fit-content;
+  height: 100%;
 }
 
 .bmenu-item-inner {
@@ -1079,7 +1078,6 @@ input:focus {
   justify-content: center;
   align-items: center;
   margin-bottom: 5px;
-  padding-right: 15px;
 }
 
 .bmenu-item .status-icon {

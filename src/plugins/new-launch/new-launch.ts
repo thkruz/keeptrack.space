@@ -4,7 +4,7 @@ import { getEl } from '@app/lib/get-el';
 import { hideLoading, showLoadingSticky } from '@app/lib/showLoading';
 import { StringPad } from '@app/lib/stringPad';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
-import rocketPng from '@public/img/icons/rocket.png';
+import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 
 import { SatMath } from '@app/static/sat-math';
 
@@ -42,7 +42,7 @@ export class NewLaunch extends KeepTrackPlugin {
   };
 
 
-  bottomIconImg = rocketPng;
+  bottomIconImg = rocketLaunchPng;
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;

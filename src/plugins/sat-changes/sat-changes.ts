@@ -51,7 +51,6 @@ export const uiManagerInit = () => {
     keepTrackApi.html`
         <div id="menu-satChng" class="bmenu-item">
           <div class="bmenu-item-inner">
-            <div class="status-icon"></div>
             <img alt="satchng" src="" delayedsrc="${satChngPng}" />
           </div>
           <span class="bmenu-title">Satellite Changes</span>

@@ -6,7 +6,7 @@ import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
-import radarPng from '@public/img/icons/radar.png';
+import sensorPng from '@public/img/icons/sensor.png';
 import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -47,7 +47,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   };
 
 
-  bottomIconImg = radarPng;
+  bottomIconImg = sensorPng;
 
   sideMenuElementName: string = 'sensor-list-menu';
   sideMenuElementHtml: string =

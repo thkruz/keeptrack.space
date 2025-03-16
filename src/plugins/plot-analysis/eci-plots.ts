@@ -2,7 +2,7 @@ import { EChartsData } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
-import scatterPlotPng2 from '@public/img/icons/scatter-plot2.png';
+import scatterPlot2Png from '@public/img/icons/scatter-plot2.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { DetailedSatellite } from 'ootk';
@@ -26,7 +26,7 @@ export class EciPlot extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
 
   bottomIconLabel = 'ECI Plots';
-  bottomIconImg = scatterPlotPng2;
+  bottomIconImg = scatterPlot2Png;
   bottomIconCallback = () => {
     if (this.isMenuButtonActive) {
       this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));

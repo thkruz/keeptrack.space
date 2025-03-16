@@ -16,8 +16,8 @@ import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import { SensorMath, TearrData } from '@app/static/sensor-math';
 import { StringExtractor } from '@app/static/string-extractor';
-import addPng from '@public/img/icons/add.png';
-import removePng from '@public/img/icons/remove.png';
+import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
+import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import Draggabilly from 'draggabilly';
 import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, PayloadStatus, RfSensor, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -939,8 +939,8 @@ export class SatInfoBox extends KeepTrackPlugin {
       <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
         <div id="sat-info-header">
           <div id="sat-info-title" class="center-text sat-info-section-header">
-            <img id="sat-add-watchlist" src="${addPng}"/>
-            <img id="sat-remove-watchlist" src="${removePng}"/>
+            <img id="sat-add-watchlist" src="${bookmarkAddPng}"/>
+            <img id="sat-remove-watchlist" src="${bookmarkRemovePng}"/>
             <span id="sat-info-title-name">
               This is a title
             </span>

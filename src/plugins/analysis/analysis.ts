@@ -35,7 +35,7 @@ import { getUnique } from '@app/lib/get-unique';
 import { saveCsv } from '@app/lib/saveVariable';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
-import analysisPng from '@public/img/icons/analysis.png';
+import folderCodePng from '@public/img/icons/folder-code.png';
 import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
@@ -44,7 +44,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
   protected dependencies_: [];
   searchStrCache_: string = null;
-  bottomIconImg = analysisPng;
+  bottomIconImg = folderCodePng;
   sideMenuElementName = 'analysis-menu';
   sideMenuElementHtml = keepTrackApi.html`
   <div id="analysis-menu" class="side-menu-parent start-hidden text-select">

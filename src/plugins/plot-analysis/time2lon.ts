@@ -2,7 +2,7 @@ import { EChartsData, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
-import linePlotPng from '@public/img/icons/line-plot.png';
+import waterfallPng from '@public/img/icons/waterfall.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { Degrees, DetailedSatellite, SpaceObjectType } from 'ootk';
@@ -20,7 +20,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
   }
 
   bottomIconLabel = 'Waterfall Diagram';
-  bottomIconImg = linePlotPng;
+  bottomIconImg = waterfallPng;
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
       return;

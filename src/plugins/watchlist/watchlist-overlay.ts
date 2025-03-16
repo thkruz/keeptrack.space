@@ -7,7 +7,7 @@ import { showLoading } from '@app/lib/showLoading';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import { SensorMath } from '@app/static/sensor-math';
-import infoPng from '@public/img/icons/info.png';
+import pictureInPicturePng from '@public/img/icons/picture-in-picture.png';
 import { DetailedSatellite, MILLISECONDS_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -57,7 +57,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   };
 
   bottomIconElementName: string = 'info-overlay-icon';
-  bottomIconImg = infoPng;
+  bottomIconImg = pictureInPicturePng;
 
   lastOverlayUpdateTime = 0;
   sideMenuElementHtml = keepTrackApi.html`

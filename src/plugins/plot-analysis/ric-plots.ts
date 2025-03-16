@@ -2,7 +2,7 @@ import { EChartsData, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
-import scatterPlotPng4 from '@public/img/icons/scatter-plot4.png';
+import scatterPlot3Png from '@public/img/icons/scatter-plot3.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import i18next from 'i18next';
@@ -26,7 +26,7 @@ export class RicPlot extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
 
   bottomIconLabel = 'RIC Plot';
-  bottomIconImg = scatterPlotPng4;
+  bottomIconImg = scatterPlot3Png;
   bottomIconCallback = () => {
     if (this.selectSatManager_.selectedSat === -1) {
       keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.SelectSatelliteFirst'), ToastMsgType.critical);

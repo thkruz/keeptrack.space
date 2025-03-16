@@ -6,7 +6,7 @@ import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
-import missilePng from '@public/img/icons/missile.png';
+import rocketPng from '@public/img/icons/rocket.png';
 
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 
@@ -496,10 +496,9 @@ export const uiManagerInit = (): void => {
     keepTrackApi.html`
         <div id="menu-missile" class="bmenu-item">
           <div class="bmenu-item-inner">
-            <div class="status-icon"></div>
             <img
               alt="missile"
-              src="" delayedsrc=${missilePng}
+              src="" delayedsrc=${rocketPng}
             />
           </div>
           <span class="bmenu-title">Missile</span>

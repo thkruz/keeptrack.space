@@ -2,7 +2,7 @@ import { EChartsData } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
-import scatterPlotPng3 from '@public/img/icons/scatter-plot3.png';
+import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { DetailedSatellite } from 'ootk';
@@ -26,7 +26,7 @@ export class EcfPlot extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
 
   bottomIconLabel = 'ECF Plots';
-  bottomIconImg = scatterPlotPng3;
+  bottomIconImg = scatterPlotPng;
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
       return;
@@ -220,8 +220,10 @@ export class EcfPlot extends KeepTrackPlugin {
 
       timeData.push(date);
     }
-    data.push({ name: curSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS)
-      .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]) });
+    data.push({
+      name: curSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS)
+        .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+    });
 
     const secSatObj = this.selectSatManager_.secondarySatObj;
 
@@ -233,8 +235,10 @@ export class EcfPlot extends KeepTrackPlugin {
 
         timeData.push(date);
       }
-      data.push({ name: secSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS)
-        .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]) });
+      data.push({
+        name: secSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS)
+          .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+      });
     }
 
     const lastSatId = this.selectSatManager_.lastSelectedSat();
@@ -247,8 +251,10 @@ export class EcfPlot extends KeepTrackPlugin {
 
         timeData.push(date);
       }
-      data.push({ name: lastSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS)
-        .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]) });
+      data.push({
+        name: lastSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS)
+          .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+      });
     }
 
     return data;

@@ -25,7 +25,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
 import { CameraType } from '@app/singletons/camera';
-import sat3Png from '@public/img/icons/sat3.png';
+import viewInAirPng from '@public/img/icons/view-in-air.png';
 import i18next from 'i18next';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -41,7 +41,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
   }
 
   isRequireSatelliteSelected = true;
-  bottomIconImg = sat3Png;
+  bottomIconImg = viewInAirPng;
   isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
     if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {

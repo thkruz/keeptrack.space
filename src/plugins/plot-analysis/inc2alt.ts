@@ -1,7 +1,7 @@
 import { EChartsData, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import scatterPlotPng from '@public/img/icons/scatter-plot.png';
+import waterfall2Png from '@public/img/icons/waterfall2.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { DetailedSatellite, SpaceObjectType } from 'ootk';
@@ -19,7 +19,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
   }
 
   bottomIconLabel = 'Inc vs Alt Plot';
-  bottomIconImg = scatterPlotPng;
+  bottomIconImg = waterfall2Png;
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
       return;

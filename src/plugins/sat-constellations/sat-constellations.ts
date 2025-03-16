@@ -6,7 +6,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SatConstellationString } from '@app/singletons/catalog-manager/satLinkManager';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { GroupType } from '@app/singletons/object-group';
-import satChngPng from '@public/img/icons/satchng.png';
+import categoryPng from '@public/img/icons/category.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -16,7 +16,7 @@ export class SatConstellations extends KeepTrackPlugin {
 
   private additionalConstellations_ = [];
 
-  bottomIconImg = satChngPng;
+  bottomIconImg = categoryPng;
   bottomIconElementName: string = 'menu-constellations';
   sideMenuElementName: string = 'constellations-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

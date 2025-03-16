@@ -8,8 +8,8 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { LegendManager } from '@app/static/legend-manager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import customPng from '@public/img/icons/custom.png';
-import removePng from '@public/img/icons/remove.png';
+import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
+import sensorAddPng from '@public/img/icons/sensor-add.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
 import { Astronomy } from '../astronomy/astronomy';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
@@ -38,7 +38,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   };
 
 
-  bottomIconImg = customPng;
+  bottomIconImg = sensorAddPng;
 
   sideMenuElementName: string = 'custom-sensor-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -374,7 +374,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           <div><strong>Range:</strong> ${sensor.minRng.toFixed(0)} km - ${sensor.maxRng.toFixed(0)} km</div>
         </div>
         <div class="col s2 m2 l2 center-align remove-icon" style="display: flex; align-items: center; height: 100%;">
-          <img class="remove-sensor" data-id="${sensor.objName}" src="${removePng}" style="cursor: pointer;"></img>
+          <img class="remove-sensor" data-id="${sensor.objName}" src="${bookmarkRemovePng}" style="cursor: pointer;"></img>
         </div>
       </div>
       <div class="divider"></div>

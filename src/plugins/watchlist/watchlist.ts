@@ -32,9 +32,9 @@ import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/senso
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { isThisNode } from '@app/static/isThisNode';
-import addPng from '@public/img/icons/add.png';
-import removePng from '@public/img/icons/remove.png';
-import watchlistPng from '@public/img/icons/watchlist.png';
+import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
+import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
+import bookmarksPng from '@public/img/icons/bookmarks.png';
 import saveAs from 'file-saver';
 import { CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -59,7 +59,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   };
 
   bottomIconElementName: string = 'menu-watchlist';
-  bottomIconImg = watchlistPng;
+  bottomIconImg = bookmarksPng;
 
   isWatchlistChanged: boolean = null;
   sideMenuElementHtml = keepTrackApi.html`
@@ -81,7 +81,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
               <img
                 id="watchlist-add"
                 class="watchlist-add"
-                src="" delayedsrc="${addPng}" style="cursor: pointer;"/>
+                src="" delayedsrc="${bookmarkAddPng}" style="cursor: pointer;"/>
             </div>
           </div>
           <div class="center-align row">
@@ -272,7 +272,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
              <span class="sat-name" data-sat-name="${sat.id || 'Unknown'}" style="cursor: pointer;">${sat.name || 'Unknown'}</span>
           </div>
           <div class="col s2 m2 l2 center-align remove-icon">
-            <img class="watchlist-remove" data-sat-id="${sat.id}" src="${removePng}" style="cursor: pointer;"></img>
+            <img class="watchlist-remove" data-sat-id="${sat.id}" src="${bookmarkRemovePng}" style="cursor: pointer;"></img>
           </div>
         </div>`;
       }

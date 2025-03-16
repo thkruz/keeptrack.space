@@ -7,7 +7,7 @@ import { showLoading } from '@app/lib/showLoading';
 import { Localization } from '@app/locales/locales';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SensorMath, TearrData, TearrType } from '@app/static/sensor-math';
-import lookanglesPng from '@public/img/icons/lookangles.png';
+import tableChartPng from '@public/img/icons/table-chart.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, SpaceObjectType } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -46,7 +46,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   isRequireSensorSelected = true;
 
 
-  bottomIconImg = lookanglesPng;
+  bottomIconImg = tableChartPng;
   bottomIconCallback: () => void = () => {
     this.refreshSideMenuData_();
   };

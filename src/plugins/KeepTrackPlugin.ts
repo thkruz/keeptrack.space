@@ -519,7 +519,6 @@ export abstract class KeepTrackPlugin {
         }
         button.innerHTML = `
           <div class="bmenu-item-inner">
-            <div class="status-icon"></div>
             <img
               alt="${this.id}"
               src=""

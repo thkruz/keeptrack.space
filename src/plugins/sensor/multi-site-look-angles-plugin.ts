@@ -8,7 +8,7 @@ import { showLoading } from '@app/lib/showLoading';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
 import { SensorMath, TearrData } from '@app/static/sensor-math';
-import multiSitePng from '@public/img/icons/multi-site.png';
+import tableRowsPng from '@public/img/icons/table-rows.png';
 import {
   BaseObject,
   Degrees, DetailedSatellite, DetailedSensor,
@@ -71,7 +71,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   };
 
 
-  bottomIconImg = multiSitePng;
+  bottomIconImg = tableRowsPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 

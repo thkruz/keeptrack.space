@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import analysisPng from '@public/img/icons/polar.png';
+import polarPlotPng from '@public/img/icons/polar-plot.png';
 
 
 import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from 'ootk';
@@ -37,7 +37,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   isRequireSensorSelected = true;
 
 
-  bottomIconImg = analysisPng;
+  bottomIconImg = polarPlotPng;
   bottomIconCallback: () => void = () => {
     this.updatePlot_();
   };

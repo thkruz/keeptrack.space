@@ -1,7 +1,7 @@
 import { EChartsData } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import scatterPlotPng from '@public/img/icons/scatter-plot.png';
+import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { DetailedSatellite, SpaceObjectType } from 'ootk';
@@ -24,7 +24,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
   }
 
   bottomIconLabel = 'Inc Vs Lon Plot';
-  bottomIconImg = scatterPlotPng;
+  bottomIconImg = barChart4BarsPng;
   bottomIconCallback = () => {
     const chartDom = getEl(this.plotCanvasId);
 

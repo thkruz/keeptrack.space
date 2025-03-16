@@ -2,7 +2,7 @@ import { EChartsData, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
-import linePlotPng from '@public/img/icons/scatter-plot4.png';
+import scatterPlot4Png from '@public/img/icons/scatter-plot4.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { Degrees, DetailedSatellite, SpaceObjectType } from 'ootk';
@@ -26,7 +26,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
 
 
   bottomIconLabel = 'Lat. vs Long. Plot';
-  bottomIconImg = linePlotPng;
+  bottomIconImg = scatterPlot4Png;
   bottomIconCallback = () => {
     const chartDom = getEl(this.plotCanvasId);
 

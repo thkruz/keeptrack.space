@@ -3,7 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import type { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { LegendManager } from '@app/static/legend-manager';
-import timeMachinePng from '@public/img/icons/time-machine.png';
+import historyPng from '@public/img/icons/history.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class TimeMachine extends KeepTrackPlugin {
@@ -32,7 +32,7 @@ export class TimeMachine extends KeepTrackPlugin {
   };
 
 
-  bottomIconImg = timeMachinePng;
+  bottomIconImg = historyPng;
   bottomIconLabel = 'Time Machine';
   historyOfSatellitesRunCount = 0;
   isTimeMachineRunning = false;

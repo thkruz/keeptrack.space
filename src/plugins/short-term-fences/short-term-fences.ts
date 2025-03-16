@@ -2,7 +2,7 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
-import searchPng from '@public/img/icons/search.png';
+import wifiFindPng from '@public/img/icons/wifi-find.png';
 
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
@@ -21,7 +21,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconImg = searchPng;
+  bottomIconImg = wifiFindPng;
   isRequireSensorSelected = true;
   isAddStfLinksOnce = false;
 

@@ -1233,10 +1233,10 @@ export class Camera {
         this.camYaw = <Radians>(this.camYaw + this.settings_.autoRotateSpeed * dt);
       }
       if (this.settings_.isAutoRotateU) {
-        this.camPitch = <Radians>(this.camPitch - (this.settings_.autoRotateSpeed / 2) * dt);
+        this.camPitch = <Radians>(this.camPitch + (this.settings_.autoRotateSpeed / 2) * dt);
       }
       if (this.settings_.isAutoRotateD) {
-        this.camPitch = <Radians>(this.camPitch + (this.settings_.autoRotateSpeed / 2) * dt);
+        this.camPitch = <Radians>(this.camPitch - (this.settings_.autoRotateSpeed / 2) * dt);
       }
     }
 

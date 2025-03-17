@@ -3,13 +3,17 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import de from './de.json';
 import en from './en.json';
 import es from './es.json';
+import ja from './ja.json';
+import ru from './ru.json';
+import ukUA from './uk-UA.json';
+import zh from './zh.json';
 
 
 const opts: InitOptions = {
   interpolation: {
     escapeValue: false,
   },
-  // lng: 'de',
+  lng: 'ukUA',
   fallbackLng: 'en',
   debug: false,
   resources: {
@@ -21,6 +25,18 @@ const opts: InitOptions = {
     },
     es: {
       translation: es,
+    },
+    ja: {
+      translation: ja,
+    },
+    ukUA: {
+      translation: ukUA,
+    },
+    ru: {
+      translation: ru,
+    },
+    zh: {
+      translation: zh,
     },
   },
 };
@@ -243,6 +259,46 @@ export const loadLocalization = () => ({
       bottomIconLabel: i18next.t('plugins.DopsPlugin.bottomIconLabel'),
       title: i18next.t('plugins.DopsPlugin.title'),
       helpBody: i18next.t('plugins.DopsPlugin.helpBody'),
+    },
+    EciPlot: {
+      bottomIconLabel: i18next.t('plugins.EciPlot.bottomIconLabel'),
+      title: i18next.t('plugins.EciPlot.title'),
+      helpBody: i18next.t('plugins.EciPlot.helpBody'),
+    },
+    EcfPlot: {
+      bottomIconLabel: i18next.t('plugins.EcfPlot.bottomIconLabel'),
+      title: i18next.t('plugins.EcfPlot.title'),
+      helpBody: i18next.t('plugins.EcfPlot.helpBody'),
+    },
+    RicPlot: {
+      bottomIconLabel: i18next.t('plugins.RicPlot.bottomIconLabel'),
+      title: i18next.t('plugins.RicPlot.title'),
+      helpBody: i18next.t('plugins.RicPlot.helpBody'),
+    },
+    Time2LonPlots: {
+      bottomIconLabel: i18next.t('plugins.Time2LonPlots.bottomIconLabel'),
+      title: i18next.t('plugins.Time2LonPlots.title'),
+      helpBody: i18next.t('plugins.Time2LonPlots.helpBody'),
+    },
+    Lat2LonPlots: {
+      bottomIconLabel: i18next.t('plugins.Lat2LonPlots.bottomIconLabel'),
+      title: i18next.t('plugins.Lat2LonPlots.title'),
+      helpBody: i18next.t('plugins.Lat2LonPlots.helpBody'),
+    },
+    Inc2AltPlots: {
+      bottomIconLabel: i18next.t('plugins.Inc2AltPlots.bottomIconLabel'),
+      title: i18next.t('plugins.Inc2AltPlots.title'),
+      helpBody: i18next.t('plugins.Inc2AltPlots.helpBody'),
+    },
+    Inc2LonPlots: {
+      bottomIconLabel: i18next.t('plugins.Inc2LonPlots.bottomIconLabel'),
+      title: i18next.t('plugins.Inc2LonPlots.title'),
+      helpBody: i18next.t('plugins.Inc2LonPlots.helpBody'),
+    },
+    GraphicsMenuPlugin: {
+      bottomIconLabel: i18next.t('plugins.GraphicsMenuPlugin.bottomIconLabel'),
+      title: i18next.t('plugins.GraphicsMenuPlugin.title'),
+      helpBody: i18next.t('plugins.GraphicsMenuPlugin.helpBody'),
     },
   },
 });

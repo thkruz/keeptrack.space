@@ -27,7 +27,6 @@ export class RicPlot extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
-  bottomIconLabel = 'RIC Plot';
   bottomIconImg = scatterPlot3Png;
   bottomIconCallback = () => {
     if (this.selectSatManager_.selectedSat === -1) {
@@ -49,12 +48,6 @@ export class RicPlot extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-ric';
   chart: echarts.ECharts;
-
-  helpTitle = 'RIC Plot Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-  The RIC Plot Menu is used for plotting the RIC position of a satellite over time.
-  </p>`;
 
   sideMenuElementName = 'ric-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

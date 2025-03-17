@@ -27,7 +27,6 @@ export class EcfPlot extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
-  bottomIconLabel = 'ECF Plots';
   bottomIconImg = scatterPlotPng;
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
@@ -39,13 +38,6 @@ export class EcfPlot extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-ecf';
   chart: echarts.ECharts;
-
-  helpTitle = 'ECF Plots Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-    The ECF Plots menu allows you to plot the position of a satellite in Earth Centered Fixed (ECF) coordinates.
-    This is useful for visualizing the position of a satellite in space.
-  </p>`;
 
   sideMenuElementName = 'ecf-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

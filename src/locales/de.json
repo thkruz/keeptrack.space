@@ -108,7 +108,14 @@
     "19": "Drücken Sie die '+' oder '-' Tasten zum Vergrößern und Verkleinern.",
     "20": "Drücken Sie 'F11', um den Vollbildmodus ein-/auszuschalten.",
     "21": "Sie können in der Suchleiste oben rechts nach Satelliten anhand von Namen oder NORAD ID suchen.",
-    "22": "Ein neuer nomineller Start kann erstellt werden, indem Sie einen Satelliten auswählen und auf die Schaltfläche 'Neuer Start' im unteren Menü klicken."
+    "22": "Ein neuer nomineller Start kann erstellt werden, indem Sie einen Satelliten auswählen und auf die Schaltfläche 'Neuer Start' im unteren Menü klicken.",
+    "23": "Drücken Sie die 'N'-Taste, um die Nachtansicht ein-/auszuschalten.",
+    "24": "Drücken Sie die 'I'-Taste, um kontextbezogene Informationen über einen Satelliten ein-/auszublenden.",
+    "25": "Drücken Sie die 'B'-Taste, um das Menü ein-/auszublenden.",
+    "26": "Beschleunigen Sie die Simulation, indem Sie die Shift + ';'-Taste drücken.",
+    "27": "Verlangsamen Sie die Simulation, indem Sie die ','-Taste drücken.",
+    "28": "Setzen Sie ein Objekt als Sekundärobjekt, um dessen relativen Abstand zum Primärobjekt zu sehen.",
+    "29": "Wechseln Sie ein Objekt zwischen Primär/Sekundär mit der '['-Taste."
   },
   "plugins": {
     "SensorListPlugin": {
@@ -216,7 +223,7 @@
       "title": "Neuer Start Menü",
       "helpBody": "Das Menü 'Neuer Start' wird verwendet, um fiktive Orbitalmissionen zu generieren, indem bestehende Satelliten mit ähnlichen Parametern modifiziert werden. <br><br> Nach Auswahl eines Satelliten können Sie einen Startort und einen Nord/Süd-Azimut auswählen. Der ausgewählte Satellit wird modifiziert, um ihn mit dem Startort in Einklang zu bringen. Die Uhr wird dann auf 00:00:00 geändert, um die relative Zeit nach dem Start darzustellen. Dies kann hilfreich sein, um die Sensorabdeckung relativ zur Startzeit zu berechnen. Die Beziehung des Objekts zu anderen Orbitalobjekten wird nicht korrekt sein."
     },
-    "Missile": {
+    "MissilePlugin": {
       "bottomIconLabel": "Rakete",
       "title": "Raketen-Menü",
       "helpBody": "Das Raketen-Menü wird verwendet, um fiktive Raketenstarts zwischen Ländern zu generieren. <br><br> Bei U-Boot-gestützten Raketen ist der Startpunkt ein benutzerdefinierter Breiten- und Längengrad. Bei landgestützten Raketen ist der Startpunkt ein fester Breiten- und Längengrad, der auf öffentlich zugänglichen Berichten basiert. <br><br> Zusätzlich zu benutzerdefinierten Raketen sind einige vordefinierte Szenarien mit Hunderten von Raketen verfügbar. <br><br> Alle Raketenstarts sind fiktiv und sollen keine realen Ereignisse darstellen. Die Startflugbahnen basieren alle auf dem gleichen ballistischen Modell, verwenden aber unterschiedliche Mindest- und Höchstreichweiten."
@@ -297,6 +304,56 @@
       "bottomIconLabel": "Video-Direktor",
       "title": "Video-Direktor-Menü",
       "helpBody": "Das Video-Direktor-Menü wird verwendet, um die Kamera und Objekte in der Szene zu manipulieren, um ein Video zu erstellen."
+    },
+    "CreateSat": {
+      "bottomIconLabel": "Satellit erstellen",
+      "title": "Satellit erstellen",
+      "helpBody": "Das Menü 'Satellit erstellen' wird verwendet, um einen Satelliten aus seinen Kepler-Elementen zu erstellen"
+    },
+    "DopsPlugin": {
+      "bottomIconLabel": "DOPs anzeigen",
+      "title": "Präzisionsverdünnungs-Menü",
+      "helpBody": "Das Präzisionsverdünnungs-Menü (DOP) wird verwendet, um DOP-Werte für einen Satelliten und Sensor zu berechnen. <br><br> Die DOP-Werte sind: <ul style=\"margin-left: 40px;\"> <li> GDOP - Geometrische Präzisionsverdünnung </li> <li> PDOP - Positions-Präzisionsverdünnung </li> <li> HDOP - Horizontale Präzisionsverdünnung </li> <li> VDOP - Vertikale Präzisionsverdünnung </li> <li> TDOP - Zeit-Präzisionsverdünnung </li> <li> NDOP - Satellitenzahl-Präzisionsverdünnung </li> </ul>"
+    },
+    "EciPlot": {
+      "bottomIconLabel": "ECI-Diagramm",
+      "title": "ECI-Diagramm-Menü",
+      "helpBody": "Das ECI-Diagramm-Menü wird verwendet, um die Position des Satelliten im erdzentrierten Inertialreferenzrahmen (ECI) darzustellen."
+    },
+    "EcfPlot": {
+      "bottomIconLabel": "ECF-Diagramm",
+      "title": "ECF-Diagramm-Menü",
+      "helpBody": "Das ECF-Diagramm-Menü wird verwendet, um die Position des Satelliten im erdfesten erdzentrierten Referenzrahmen (ECF) darzustellen."
+    },
+    "RicPlot": {
+      "bottomIconLabel": "RIC-Diagramm",
+      "title": "RIC-Diagramm-Menü",
+      "helpBody": "Das RIC-Diagramm-Menü wird verwendet, um die Position des Satelliten im Radial-, In-Track- und Cross-Track-Referenzrahmen (RIC) darzustellen."
+    },
+    "Time2LonPlots": {
+      "bottomIconLabel": "Kaskaden-Diagramm",
+      "title": "Kaskaden-Menü",
+      "helpBody": "Das Zeit-zu-Längengrad-Diagramm-Menü (Kaskade) wird verwendet, um den Längengrad des Satelliten im Zeitverlauf darzustellen."
+    },
+    "Lat2LonPlots": {
+      "bottomIconLabel": "Lat vs Lon-Diagramm",
+      "title": "Breitengrad-zu-Längengrad-Diagramm-Menü",
+      "helpBody": "Das Breitengrad-zu-Längengrad-Diagramm-Menü wird verwendet, um den Breitengrad gegen den Längengrad im GEO-Gürtel darzustellen."
+    },
+    "Inc2AltPlots": {
+      "bottomIconLabel": "Ink vs Höhe-Diagramm",
+      "title": "Inklination-zu-Höhe-Diagramm-Menü",
+      "helpBody": "Das Inklination-zu-Höhe-Diagramm-Menü wird verwendet, um die Inklination des Satelliten gegen seine Höhe darzustellen."
+    },
+    "Inc2LonPlots": {
+      "bottomIconLabel": "Ink vs Lon-Diagramm",
+      "title": "Inklination-zu-Längengrad-Diagramm-Menü",
+      "helpBody": "Das Ink-zu-Lon-Diagramm-Menü wird verwendet, um die Inklination gegen den Längengrad im GEO-Gürtel darzustellen."
+    },
+    "GraphicsMenuPlugin": {
+      "bottomIconLabel": "Grafikmenü",
+      "title": "Grafikmenü",
+      "helpBody": "Das Grafikmenü wird verwendet, um die Grafikeinstellungen der Anwendung zu ändern."
     }
   }
 }

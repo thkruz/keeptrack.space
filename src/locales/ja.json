@@ -1,121 +1,121 @@
 {
   "time": {
     "days": {
-      "0": "Sunday",
-      "1": "Monday",
-      "2": "Tuesday",
-      "3": "Wednesday",
-      "4": "Thursday",
-      "5": "Friday",
-      "6": "Saturday"
+      "0": "日曜日",
+      "1": "月曜日",
+      "2": "火曜日",
+      "3": "水曜日",
+      "4": "木曜日",
+      "5": "金曜日",
+      "6": "土曜日"
     },
     "days-short": {
-      "0": "Sun",
-      "1": "Mon",
-      "2": "Tue",
-      "3": "Wed",
-      "4": "Thu",
-      "5": "Fri",
-      "6": "Sat"
+      "0": "日",
+      "1": "月",
+      "2": "火",
+      "3": "水",
+      "4": "木",
+      "5": "金",
+      "6": "土"
     },
     "months": {
-      "1": "January",
-      "2": "February",
-      "3": "March",
-      "4": "April",
-      "5": "May",
-      "6": "June",
-      "7": "July",
-      "8": "August",
-      "9": "September",
-      "10": "October",
-      "11": "November",
-      "12": "December"
+      "1": "1月",
+      "2": "2月",
+      "3": "3月",
+      "4": "4月",
+      "5": "5月",
+      "6": "6月",
+      "7": "7月",
+      "8": "8月",
+      "9": "9月",
+      "10": "10月",
+      "11": "11月",
+      "12": "12月"
     },
     "calendar": {
-      "time": "Time",
-      "hour": "Hour",
-      "minute": "Minute",
-      "second": "Second",
-      "now": "Now",
-      "done": "Done"
+      "time": "時間",
+      "hour": "時",
+      "minute": "分",
+      "second": "秒",
+      "now": "現在",
+      "done": "完了"
     }
   },
   "errorMsgs": {
-    "catalogNotFullyInitialized": "Catalog has not fully initialized yet. Please wait a few seconds and try again.",
-    "sensorGroupsApiEmpty": "No sensor groups found in the API, reverting to the included sensor groups database.",
-    "SelectSensorFirst": "Select a sensor first!",
-    "SelectSatelliteFirst": "Select a satellite first!",
-    "SelectSecondarySatellite": "Select a secondary satellite first!",
-    "SatelliteNotDetailedSatellite": "Satellite is not DetailedSatellite!",
-    "SensorNotFound": "Sensor not found!",
+    "catalogNotFullyInitialized": "カタログはまだ完全に初期化されていません。数秒待ってから再試行してください。",
+    "sensorGroupsApiEmpty": "APIにセンサーグループが見つかりません。組み込みのセンサーグループデータベースに戻ります。",
+    "SelectSensorFirst": "最初にセンサーを選択してください！",
+    "SelectSatelliteFirst": "最初に衛星を選択してください！",
+    "SelectSecondarySatellite": "最初に二次衛星を選択してください！",
+    "SatelliteNotDetailedSatellite": "衛星は詳細な衛星ではありません！",
+    "SensorNotFound": "センサーが見つかりません！",
     "Breakup": {
-      "CannotCreateBreakupForNonCircularOrbits": "Cannot create a breakup for non-circular orbits. Working on a fix.",
-      "CannotCalcDirectionOfSatellite": "Cannot calculate direction of satellite. Try again later.",
-      "ErrorCreatingBreakup": "Error creating breakup!",
-      "InvalidStartNum": "Invalid satellite starting number! Defaulting to 90000!",
-      "BreakupGeneratorFailed": "Breakup Generator Failed!"
+      "CannotCreateBreakupForNonCircularOrbits": "非円形軌道では分裂を作成できません。修正中です。",
+      "CannotCalcDirectionOfSatellite": "衛星の方向を計算できません。後でやり直してください。",
+      "ErrorCreatingBreakup": "分裂の作成中にエラーが発生しました！",
+      "InvalidStartNum": "無効な衛星開始番号です！デフォルトで90000に設定します！",
+      "BreakupGeneratorFailed": "分裂ジェネレーターが失敗しました！"
     },
     "Collissions": {
-      "noCollisionsData": "No collision data found!",
-      "errorProcessingCollisions": "Error processing SOCRATES data!"
+      "noCollisionsData": "衝突データが見つかりません！",
+      "errorProcessingCollisions": "SOCRATESデータの処理中にエラーが発生しました！"
     },
     "EditSat": {
-      "errorReadingFile": "Error while reading file!"
+      "errorReadingFile": "ファイル読み込み中にエラーが発生しました！"
     },
     "Reports": {
-      "popupBlocker": "Please allow popups for this site to view reports."
+      "popupBlocker": "レポートを表示するには、このサイトのポップアップを許可してください。"
     },
     "SensorManager": {
-      "errorUpdatingUi": "Error updating sensor UI styling."
+      "errorUpdatingUi": "センサーUIスタイリングの更新中にエラーが発生しました。"
     }
   },
   "hoverManager": {
-    "launched": "Launched",
-    "launchedPlanned": "Launched: Planned",
-    "launchedUnknown": "Launched: Unknown"
+    "launched": "打ち上げ済み",
+    "launchedPlanned": "打ち上げ：予定",
+    "launchedUnknown": "打ち上げ：不明"
   },
   "loadingScreenMsgs": {
-    "math": "Attempting to Math...",
-    "science": "Locating Science...",
-    "science2": "Found Science...",
-    "dots": "Drawing Dots in Space...",
-    "satIntel": "Integrating Satellite Intel...",
-    "painting": "Painting the Earth...",
-    "coloring": "Coloring Inside the Lines..",
-    "elsets": "Locating GPs...",
-    "models": "Building 3D Models..."
+    "math": "計算中...",
+    "science": "科学を探索中...",
+    "science2": "科学を発見...",
+    "dots": "宇宙に点を描画中...",
+    "satIntel": "衛星情報を統合中...",
+    "painting": "地球を描画中...",
+    "coloring": "線の内側を着色中...",
+    "elsets": "GPを探索中...",
+    "models": "3Dモデルを構築中..."
   },
   "splashScreens": {
-    "1": "Satellite models appear bigger than they really are. Everything else is to scale.",
-    "2": "Press the 'L' key to toggle satellite orbits on/off.",
-    "3": "Press the 'P' key to open a polar plot of the current satellite (You need to pick a sensor first!).",
-    "4": "Reset the simulation time by pressing the 'T' key.",
-    "5": "Advance the simulation time by pressing the '>' or '=' key.",
-    "6": "Move back the simulation time by pressing the '<' or ')' key.",
-    "7": "Pressing the '/' key will toggle the simulation speed between 1x and 0x.",
-    "8": "Press the 'V' key to change the view mode.",
-    "9": "Press Shift+F1 to open the help menu at any time.",
-    "10": "Press the 'R' key to enable auto-rotation.",
-    "11": "Pressing Shift + C when a satellite is selected will toggle its visibility cone on/off.",
-    "12": "The 'Home' key will rotate the camera to the current sensor.",
-    "13": "The '`' (tilda) key will reset the camera to the default view.",
-    "14": "The 'M' key will show the 2D map view of the current satellite.",
-    "15": "The settings menu located in the bottom toolbar contains many options to customize your experience.",
-    "16": "Many of the menus have additional settings that can be accessed by clicking the gear icon.",
-    "17": "Add satellites to the watchlist to get notifications when they are overhead of the current sensor.",
-    "18": "Right click on the globe to open the context menu with more options.",
-    "19": "Press '+' or '-' keys to zoom in and out.",
-    "20": "Press 'F11' to toggle on/off the fullscreen mode.",
-    "21": "You can search for satellites by name or NORAD ID in the search bar at the top right.",
-    "22": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu.",
-    "23": "Press the 'N' key to toggle night.",
-    "24": "Press the 'I' key to hide/display contextual information about a satellite.",
-    "25": "Press the 'B' key to hide/display the menu.",
-    "26": "Speed up the simulation by pressing the Shift + ';' key.",
-    "27": "Slow down the simulation by pressing the ',' key.",
-    "28": "Set an object as Secondary to see its relative distance with primary object.",
-    "29": "Switch an object between Primary/Secondary with the '[' key."
+    "1": "衛星モデルは実際よりも大きく表示されています。他はすべて実寸です。",
+    "2": "'L'キーを押して衛星軌道の表示/非表示を切り替えます。",
+    "3": "'P'キーを押して現在の衛星の極座標プロットを開きます（最初にセンサーを選択する必要があります！）。",
+    "4": "'T'キーを押してシミュレーション時間をリセットします。",
+    "5": "'>'または'='キーを押してシミュレーション時間を進めます。",
+    "6": "'<'または')'キーを押してシミュレーション時間を戻します。",
+    "7": "'/'キーを押すとシミュレーション速度を1xと0xの間で切り替えます。",
+    "8": "'V'キーを押して表示モードを変更します。",
+    "9": "Shift+F1を押すといつでもヘルプメニューを開くことができます。",
+    "10": "'R'キーを押して自動回転を有効にします。",
+    "11": "衛星が選択されている時にShift + Cを押すと、視認コーンの表示/非表示を切り替えます。",
+    "12": "'Home'キーでカメラを現在のセンサーに向けて回転させます。",
+    "13": "'`'（チルダ）キーでカメラをデフォルトビューにリセットします。",
+    "14": "'M'キーで現在の衛星の2Dマップビューを表示します。",
+    "15": "下部ツールバーにある設定メニューには、体験をカスタマイズするための多くのオプションがあります。",
+    "16": "多くのメニューには、歯車アイコンをクリックしてアクセスできる追加設定があります。",
+    "17": "ウォッチリストに衛星を追加すると、現在のセンサーの上空にある時に通知を受け取ることができます。",
+    "18": "地球儀上で右クリックするとコンテキストメニューが開き、さらにオプションが表示されます。",
+    "19": "'+'または'-'キーでズームイン・アウトします。",
+    "20": "'F11'キーを押して全画面モードのオン/オフを切り替えます。",
+    "21": "右上の検索バーで衛星名またはNORAD IDで検索できます。",
+    "22": "衛星を選択して下部メニューの'新規打ち上げ'ボタンをクリックすると、新しい打ち上げ名目を作成できます。",
+    "23": "'N'キーを押して夜間表示を切り替えます。",
+    "24": "'I'キーを押して衛星に関する文脈情報の表示/非表示を切り替えます。",
+    "25": "'B'キーを押してメニューの表示/非表示を切り替えます。",
+    "26": "Shift + ';'キーを押してシミュレーション速度を上げます。",
+    "27": "','キーを押してシミュレーション速度を下げます。",
+    "28": "オブジェクトをセカンダリに設定すると、プライマリオブジェクトとの相対距離を確認できます。",
+    "29": "'['キーでオブジェクトをプライマリ/セカンダリ間で切り替えます。"
   },
   "plugins": {
     "SensorListPlugin": {

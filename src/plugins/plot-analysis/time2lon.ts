@@ -19,7 +19,6 @@ export class Time2LonPlots extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconLabel = 'Waterfall Diagram';
   bottomIconImg = waterfallPng;
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
@@ -32,12 +31,6 @@ export class Time2LonPlots extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-time2lon';
   chart: echarts.ECharts;
-
-  helpTitle = 'Waterfall Diagram Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-    The Waterfall Diagram Menu is used for plotting the time vs longitude in the GEO belt.
-  </p>`;
 
   sideMenuElementName = 'time2lon-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

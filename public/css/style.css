@@ -2,7 +2,7 @@
   --bottom-menu-height: 120px;
   --bottom-menu-top: 0px;
   --bottom-icon-height: 75px;
-  --bottom-icon-width: 100px;
+  --bottom-icon-width: 115px;
   --bottom-icon-img-size: 40px;
   --bottom-filter-width: 185px;
   --search-box-bottom: 0px;
@@ -1173,6 +1173,9 @@ input:focus {
   display: block;
   font-size: 11px;
   text-align: center;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  word-wrap: break-word;
 }
 
 .bmenu-filter-title {

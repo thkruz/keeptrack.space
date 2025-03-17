@@ -25,7 +25,6 @@ export class Lat2LonPlots extends KeepTrackPlugin {
   }
 
 
-  bottomIconLabel = 'Lat. vs Long. Plot';
   bottomIconImg = scatterPlot4Png;
   bottomIconCallback = () => {
     const chartDom = getEl(this.plotCanvasId);
@@ -35,12 +34,6 @@ export class Lat2LonPlots extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-lat2lon';
   chart: echarts.ECharts;
-
-  helpTitle = 'Latitude vs Longitude Plot Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-    The Latitude vs Longitude Plot Menu is used for plotting the latitude vs longitude in the GEO belt.
-  </p>`;
 
   sideMenuElementName = 'lat2lon-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

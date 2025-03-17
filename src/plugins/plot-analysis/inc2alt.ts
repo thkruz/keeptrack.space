@@ -18,7 +18,6 @@ export class Inc2AltPlots extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconLabel = 'Inc vs Alt Plot';
   bottomIconImg = waterfall2Png;
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
@@ -33,12 +32,6 @@ export class Inc2AltPlots extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-inc2alt';
   chart: echarts.ECharts;
-
-  helpTitle = 'Inc vs Alt Plot Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-  The Inc vs Alt Plot Menu is used for plotting the inclination vs altitude.
-  </p>`;
 
   sideMenuElementName = 'inc2alt-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

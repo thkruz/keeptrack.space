@@ -47,7 +47,6 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
-  bottomIconLabel = 'Graphics Menu';
   bottomIconImg = displaySettingsPng;
   private readonly formPrefix_ = 'gm';
   sideMenuElementName: string = 'graphics-menu';

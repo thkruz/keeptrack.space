@@ -27,7 +27,6 @@ export class EciPlot extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
-  bottomIconLabel = 'ECI Plots';
   bottomIconImg = scatterPlot2Png;
   bottomIconCallback = () => {
     if (this.isMenuButtonActive) {
@@ -37,13 +36,6 @@ export class EciPlot extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-eci';
   chart: echarts.ECharts;
-
-  helpTitle = 'ECI Plots Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-    The ECI Plots menu allows you to plot the position of a satellite in Earth Centered Inertial (ECI) coordinates.
-    This is useful for visualizing the position of a satellite in space.
-  </p>`;
 
   sideMenuElementName = 'eci-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

@@ -1,121 +1,121 @@
 {
   "time": {
     "days": {
-      "0": "Sunday",
-      "1": "Monday",
-      "2": "Tuesday",
-      "3": "Wednesday",
-      "4": "Thursday",
-      "5": "Friday",
-      "6": "Saturday"
+      "0": "Воскресенье",
+      "1": "Понедельник",
+      "2": "Вторник",
+      "3": "Среда",
+      "4": "Четверг",
+      "5": "Пятница",
+      "6": "Суббота"
     },
     "days-short": {
-      "0": "Sun",
-      "1": "Mon",
-      "2": "Tue",
-      "3": "Wed",
-      "4": "Thu",
-      "5": "Fri",
-      "6": "Sat"
+      "0": "Вс",
+      "1": "Пн",
+      "2": "Вт",
+      "3": "Ср",
+      "4": "Чт",
+      "5": "Пт",
+      "6": "Сб"
     },
     "months": {
-      "1": "January",
-      "2": "February",
-      "3": "March",
-      "4": "April",
-      "5": "May",
-      "6": "June",
-      "7": "July",
-      "8": "August",
-      "9": "September",
-      "10": "October",
-      "11": "November",
-      "12": "December"
+      "1": "Январь",
+      "2": "Февраль",
+      "3": "Март",
+      "4": "Апрель",
+      "5": "Май",
+      "6": "Июнь",
+      "7": "Июль",
+      "8": "Август",
+      "9": "Сентябрь",
+      "10": "Октябрь",
+      "11": "Ноябрь",
+      "12": "Декабрь"
     },
     "calendar": {
-      "time": "Time",
-      "hour": "Hour",
-      "minute": "Minute",
-      "second": "Second",
-      "now": "Now",
-      "done": "Done"
+      "time": "Время",
+      "hour": "Час",
+      "minute": "Минута",
+      "second": "Секунда",
+      "now": "Сейчас",
+      "done": "Готово"
     }
   },
   "errorMsgs": {
-    "catalogNotFullyInitialized": "Catalog has not fully initialized yet. Please wait a few seconds and try again.",
-    "sensorGroupsApiEmpty": "No sensor groups found in the API, reverting to the included sensor groups database.",
-    "SelectSensorFirst": "Select a sensor first!",
-    "SelectSatelliteFirst": "Select a satellite first!",
-    "SelectSecondarySatellite": "Select a secondary satellite first!",
-    "SatelliteNotDetailedSatellite": "Satellite is not DetailedSatellite!",
-    "SensorNotFound": "Sensor not found!",
+    "catalogNotFullyInitialized": "Каталог еще не полностью инициализирован. Подождите несколько секунд и попробуйте снова.",
+    "sensorGroupsApiEmpty": "В API не найдено групп датчиков, возврат к встроенной базе данных датчиков.",
+    "SelectSensorFirst": "Сначала выберите датчик!",
+    "SelectSatelliteFirst": "Сначала выберите спутник!",
+    "SelectSecondarySatellite": "Сначала выберите вторичный спутник!",
+    "SatelliteNotDetailedSatellite": "Спутник не является DetailedSatellite!",
+    "SensorNotFound": "Датчик не найден!",
     "Breakup": {
-      "CannotCreateBreakupForNonCircularOrbits": "Cannot create a breakup for non-circular orbits. Working on a fix.",
-      "CannotCalcDirectionOfSatellite": "Cannot calculate direction of satellite. Try again later.",
-      "ErrorCreatingBreakup": "Error creating breakup!",
-      "InvalidStartNum": "Invalid satellite starting number! Defaulting to 90000!",
-      "BreakupGeneratorFailed": "Breakup Generator Failed!"
+      "CannotCreateBreakupForNonCircularOrbits": "Невозможно создать разрушение для не-круговых орбит. Работаем над исправлением.",
+      "CannotCalcDirectionOfSatellite": "Невозможно вычислить направление спутника. Попробуйте позже.",
+      "ErrorCreatingBreakup": "Ошибка при создании разрушения!",
+      "InvalidStartNum": "Неверный начальный номер спутника! Установлено значение по умолчанию: 90000!",
+      "BreakupGeneratorFailed": "Генератор разрушений не удалось запустить!"
     },
     "Collissions": {
-      "noCollisionsData": "No collision data found!",
-      "errorProcessingCollisions": "Error processing SOCRATES data!"
+      "noCollisionsData": "Данные о столкновениях не найдены!",
+      "errorProcessingCollisions": "Ошибка обработки данных SOCRATES!"
     },
     "EditSat": {
-      "errorReadingFile": "Error while reading file!"
+      "errorReadingFile": "Ошибка при чтении файла!"
     },
     "Reports": {
-      "popupBlocker": "Please allow popups for this site to view reports."
+      "popupBlocker": "Разрешите всплывающие окна для просмотра отчетов."
     },
     "SensorManager": {
-      "errorUpdatingUi": "Error updating sensor UI styling."
+      "errorUpdatingUi": "Ошибка обновления интерфейса датчиков."
     }
   },
   "hoverManager": {
-    "launched": "Launched",
-    "launchedPlanned": "Launched: Planned",
-    "launchedUnknown": "Launched: Unknown"
+    "launched": "Запущен",
+    "launchedPlanned": "Запущен: Запланировано",
+    "launchedUnknown": "Запущен: Неизвестно"
   },
   "loadingScreenMsgs": {
-    "math": "Attempting to Math...",
-    "science": "Locating Science...",
-    "science2": "Found Science...",
-    "dots": "Drawing Dots in Space...",
-    "satIntel": "Integrating Satellite Intel...",
-    "painting": "Painting the Earth...",
-    "coloring": "Coloring Inside the Lines..",
-    "elsets": "Locating GPs...",
-    "models": "Building 3D Models..."
+    "math": "Попытка вычислений...",
+    "science": "Поиск науки...",
+    "science2": "Наука найдена...",
+    "dots": "Рисуем точки в космосе...",
+    "satIntel": "Интеграция спутниковых данных...",
+    "painting": "Рисуем Землю...",
+    "coloring": "Закрашиваем внутри линий...",
+    "elsets": "Поиск GPs...",
+    "models": "Создание 3D-моделей..."
   },
   "splashScreens": {
-    "1": "Satellite models appear bigger than they really are. Everything else is to scale.",
-    "2": "Press the 'L' key to toggle satellite orbits on/off.",
-    "3": "Press the 'P' key to open a polar plot of the current satellite (You need to pick a sensor first!).",
-    "4": "Reset the simulation time by pressing the 'T' key.",
-    "5": "Advance the simulation time by pressing the '>' or '=' key.",
-    "6": "Move back the simulation time by pressing the '<' or ')' key.",
-    "7": "Pressing the '/' key will toggle the simulation speed between 1x and 0x.",
-    "8": "Press the 'V' key to change the view mode.",
-    "9": "Press Shift+F1 to open the help menu at any time.",
-    "10": "Press the 'R' key to enable auto-rotation.",
-    "11": "Pressing Shift + C when a satellite is selected will toggle its visibility cone on/off.",
-    "12": "The 'Home' key will rotate the camera to the current sensor.",
-    "13": "The '`' (tilda) key will reset the camera to the default view.",
-    "14": "The 'M' key will show the 2D map view of the current satellite.",
-    "15": "The settings menu located in the bottom toolbar contains many options to customize your experience.",
-    "16": "Many of the menus have additional settings that can be accessed by clicking the gear icon.",
-    "17": "Add satellites to the watchlist to get notifications when they are overhead of the current sensor.",
-    "18": "Right click on the globe to open the context menu with more options.",
-    "19": "Press '+' or '-' keys to zoom in and out.",
-    "20": "Press 'F11' to toggle on/off the fullscreen mode.",
-    "21": "You can search for satellites by name or NORAD ID in the search bar at the top right.",
-    "22": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu.",
-    "23": "Press the 'N' key to toggle night.",
-    "24": "Press the 'I' key to hide/display contextual information about a satellite.",
-    "25": "Press the 'B' key to hide/display the menu.",
-    "26": "Speed up the simulation by pressing the Shift + ';' key.",
-    "27": "Slow down the simulation by pressing the ',' key.",
-    "28": "Set an object as Secondary to see its relative distance with primary object.",
-    "29": "Switch an object between Primary/Secondary with the '[' key."
+    "1": "Модели спутников выглядят больше, чем на самом деле. Все остальное масштабировано.",
+    "2": "Нажмите клавишу 'L', чтобы включить/выключить орбиты спутников.",
+    "3": "Нажмите клавишу 'P', чтобы открыть полярный график текущего спутника (Сначала выберите датчик!).",
+    "4": "Сбросить время симуляции можно, нажав клавишу 'T'.",
+    "5": "Продвинуть время симуляции можно, нажав клавишу '>' или '='.",
+    "6": "Отмотать время симуляции назад можно, нажав клавишу '<' или ')'.",
+    "7": "Нажатие клавиши '/' переключит скорость симуляции между 1x и 0x.",
+    "8": "Нажмите клавишу 'V', чтобы изменить режим просмотра.",
+    "9": "Нажмите Shift+F1, чтобы открыть меню помощи в любое время.",
+    "10": "Нажмите клавишу 'R', чтобы включить авто-вращение.",
+    "11": "Нажатие Shift + C при выборе спутника включит/выключит его конус видимости.",
+    "12": "Клавиша 'Home' повернет камеру к текущему датчику.",
+    "13": "Клавиша '`' (тильда) сбросит камеру в стандартный вид.",
+    "14": "Клавиша 'M' покажет 2D-карту текущего спутника.",
+    "15": "Меню настроек в нижней панели инструментов содержит множество параметров для настройки интерфейса.",
+    "16": "Многие меню имеют дополнительные настройки, доступные при нажатии значка шестеренки.",
+    "17": "Добавьте спутники в список наблюдения, чтобы получать уведомления, когда они окажутся над текущим датчиком.",
+    "18": "Щелкните правой кнопкой мыши по глобусу, чтобы открыть контекстное меню с дополнительными опциями.",
+    "19": "Нажимайте клавиши '+' или '-' для увеличения и уменьшения масштаба.",
+    "20": "Нажмите 'F11', чтобы включить/выключить полноэкранный режим.",
+    "21": "Вы можете искать спутники по имени или NORAD ID в строке поиска в правом верхнем углу.",
+    "22": "Новый запуск можно создать, выбрав спутник и нажав кнопку 'Новый запуск' в нижнем меню.",
+    "23": "Нажмите клавишу 'N', чтобы переключить режим ночи.",
+    "24": "Нажмите клавишу 'I', чтобы скрыть/показать контекстную информацию о спутнике.",
+    "25": "Нажмите клавишу 'B', чтобы скрыть/показать меню.",
+    "26": "Ускорьте симуляцию, нажав Shift + ';'.",
+    "27": "Замедлите симуляцию, нажав ','.",
+    "28": "Установите объект как вторичный, чтобы видеть его относительное расстояние с основным объектом.",
+    "29": "Переключайте объект между основным/вторичным с помощью клавиши '['."
   },
   "plugins": {
     "SensorListPlugin": {

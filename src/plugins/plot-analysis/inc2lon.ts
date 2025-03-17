@@ -23,7 +23,6 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-  bottomIconLabel = 'Inc Vs Lon Plot';
   bottomIconImg = barChart4BarsPng;
   bottomIconCallback = () => {
     const chartDom = getEl(this.plotCanvasId);
@@ -35,12 +34,6 @@ export class Inc2LonPlots extends KeepTrackPlugin {
 
   plotCanvasId = 'plot-analysis-chart-inc2lon';
   chart: echarts.ECharts;
-
-  helpTitle = 'Inc Vs Lon Plot Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-    The Inc Vs Lon Plot Menu is used for plotting the inclination vs longitude in the GEO belt.
-  </p>`;
 
   sideMenuElementName = 'inc2lon-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

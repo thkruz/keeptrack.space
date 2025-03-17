@@ -1,121 +1,121 @@
 {
   "time": {
     "days": {
-      "0": "Sunday",
-      "1": "Monday",
-      "2": "Tuesday",
-      "3": "Wednesday",
-      "4": "Thursday",
-      "5": "Friday",
-      "6": "Saturday"
+      "0": "星期日",
+      "1": "星期一",
+      "2": "星期二",
+      "3": "星期三",
+      "4": "星期四",
+      "5": "星期五",
+      "6": "星期六"
     },
     "days-short": {
-      "0": "Sun",
-      "1": "Mon",
-      "2": "Tue",
-      "3": "Wed",
-      "4": "Thu",
-      "5": "Fri",
-      "6": "Sat"
+      "0": "周日",
+      "1": "周一",
+      "2": "周二",
+      "3": "周三",
+      "4": "周四",
+      "5": "周五",
+      "6": "周六"
     },
     "months": {
-      "1": "January",
-      "2": "February",
-      "3": "March",
-      "4": "April",
-      "5": "May",
-      "6": "June",
-      "7": "July",
-      "8": "August",
-      "9": "September",
-      "10": "October",
-      "11": "November",
-      "12": "December"
+      "1": "一月",
+      "2": "二月",
+      "3": "三月",
+      "4": "四月",
+      "5": "五月",
+      "6": "六月",
+      "7": "七月",
+      "8": "八月",
+      "9": "九月",
+      "10": "十月",
+      "11": "十一月",
+      "12": "十二月"
     },
     "calendar": {
-      "time": "Time",
-      "hour": "Hour",
-      "minute": "Minute",
-      "second": "Second",
-      "now": "Now",
-      "done": "Done"
+      "time": "时间",
+      "hour": "小时",
+      "minute": "分钟",
+      "second": "秒",
+      "now": "现在",
+      "done": "完成"
     }
   },
   "errorMsgs": {
-    "catalogNotFullyInitialized": "Catalog has not fully initialized yet. Please wait a few seconds and try again.",
-    "sensorGroupsApiEmpty": "No sensor groups found in the API, reverting to the included sensor groups database.",
-    "SelectSensorFirst": "Select a sensor first!",
-    "SelectSatelliteFirst": "Select a satellite first!",
-    "SelectSecondarySatellite": "Select a secondary satellite first!",
-    "SatelliteNotDetailedSatellite": "Satellite is not DetailedSatellite!",
-    "SensorNotFound": "Sensor not found!",
+    "catalogNotFullyInitialized": "目录尚未完全初始化。请等待几秒钟再试。",
+    "sensorGroupsApiEmpty": "API中未找到传感器组，恢复使用内置的传感器组数据库。",
+    "SelectSensorFirst": "请先选择一个传感器！",
+    "SelectSatelliteFirst": "请先选择一个卫星！",
+    "SelectSecondarySatellite": "请先选择一个次要卫星！",
+    "SatelliteNotDetailedSatellite": "卫星不是详细卫星类型！",
+    "SensorNotFound": "未找到传感器！",
     "Breakup": {
-      "CannotCreateBreakupForNonCircularOrbits": "Cannot create a breakup for non-circular orbits. Working on a fix.",
-      "CannotCalcDirectionOfSatellite": "Cannot calculate direction of satellite. Try again later.",
-      "ErrorCreatingBreakup": "Error creating breakup!",
-      "InvalidStartNum": "Invalid satellite starting number! Defaulting to 90000!",
-      "BreakupGeneratorFailed": "Breakup Generator Failed!"
+      "CannotCreateBreakupForNonCircularOrbits": "无法为非圆形轨道创建解体。正在修复中。",
+      "CannotCalcDirectionOfSatellite": "无法计算卫星方向。请稍后再试。",
+      "ErrorCreatingBreakup": "创建解体时出错！",
+      "InvalidStartNum": "无效的卫星起始编号！默认为90000！",
+      "BreakupGeneratorFailed": "解体生成器失败！"
     },
     "Collissions": {
-      "noCollisionsData": "No collision data found!",
-      "errorProcessingCollisions": "Error processing SOCRATES data!"
+      "noCollisionsData": "未找到碰撞数据！",
+      "errorProcessingCollisions": "处理SOCRATES数据时出错！"
     },
     "EditSat": {
-      "errorReadingFile": "Error while reading file!"
+      "errorReadingFile": "读取文件时出错！"
     },
     "Reports": {
-      "popupBlocker": "Please allow popups for this site to view reports."
+      "popupBlocker": "请允许此网站的弹出窗口以查看报告。"
     },
     "SensorManager": {
-      "errorUpdatingUi": "Error updating sensor UI styling."
+      "errorUpdatingUi": "更新传感器UI样式时出错。"
     }
   },
   "hoverManager": {
-    "launched": "Launched",
-    "launchedPlanned": "Launched: Planned",
-    "launchedUnknown": "Launched: Unknown"
+    "launched": "已发射",
+    "launchedPlanned": "发射：计划中",
+    "launchedUnknown": "发射：未知"
   },
   "loadingScreenMsgs": {
-    "math": "Attempting to Math...",
-    "science": "Locating Science...",
-    "science2": "Found Science...",
-    "dots": "Drawing Dots in Space...",
-    "satIntel": "Integrating Satellite Intel...",
-    "painting": "Painting the Earth...",
-    "coloring": "Coloring Inside the Lines..",
-    "elsets": "Locating GPs...",
-    "models": "Building 3D Models..."
+    "math": "正在尝试数学计算...",
+    "science": "正在定位科学...",
+    "science2": "已找到科学...",
+    "dots": "正在太空中绘制点...",
+    "satIntel": "正在整合卫星情报...",
+    "painting": "正在绘制地球...",
+    "coloring": "正在线内着色...",
+    "elsets": "正在定位轨道参数...",
+    "models": "正在构建3D模型..."
   },
   "splashScreens": {
-    "1": "Satellite models appear bigger than they really are. Everything else is to scale.",
-    "2": "Press the 'L' key to toggle satellite orbits on/off.",
-    "3": "Press the 'P' key to open a polar plot of the current satellite (You need to pick a sensor first!).",
-    "4": "Reset the simulation time by pressing the 'T' key.",
-    "5": "Advance the simulation time by pressing the '>' or '=' key.",
-    "6": "Move back the simulation time by pressing the '<' or ')' key.",
-    "7": "Pressing the '/' key will toggle the simulation speed between 1x and 0x.",
-    "8": "Press the 'V' key to change the view mode.",
-    "9": "Press Shift+F1 to open the help menu at any time.",
-    "10": "Press the 'R' key to enable auto-rotation.",
-    "11": "Pressing Shift + C when a satellite is selected will toggle its visibility cone on/off.",
-    "12": "The 'Home' key will rotate the camera to the current sensor.",
-    "13": "The '`' (tilda) key will reset the camera to the default view.",
-    "14": "The 'M' key will show the 2D map view of the current satellite.",
-    "15": "The settings menu located in the bottom toolbar contains many options to customize your experience.",
-    "16": "Many of the menus have additional settings that can be accessed by clicking the gear icon.",
-    "17": "Add satellites to the watchlist to get notifications when they are overhead of the current sensor.",
-    "18": "Right click on the globe to open the context menu with more options.",
-    "19": "Press '+' or '-' keys to zoom in and out.",
-    "20": "Press 'F11' to toggle on/off the fullscreen mode.",
-    "21": "You can search for satellites by name or NORAD ID in the search bar at the top right.",
-    "22": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu.",
-    "23": "Press the 'N' key to toggle night.",
-    "24": "Press the 'I' key to hide/display contextual information about a satellite.",
-    "25": "Press the 'B' key to hide/display the menu.",
-    "26": "Speed up the simulation by pressing the Shift + ';' key.",
-    "27": "Slow down the simulation by pressing the ',' key.",
-    "28": "Set an object as Secondary to see its relative distance with primary object.",
-    "29": "Switch an object between Primary/Secondary with the '[' key."
+    "1": "卫星模型看起来比实际大小要大。其他一切都是按比例显示的。",
+    "2": "按\"L\"键切换卫星轨道显示/隐藏。",
+    "3": "按\"P\"键打开当前卫星的极地图（需要先选择一个传感器！）。",
+    "4": "按\"T\"键重置模拟时间。",
+    "5": "按\">\"或\"=\"键推进模拟时间。",
+    "6": "按\"<\"或\")\"键回退模拟时间。",
+    "7": "按\"/\"键在1x和0x之间切换模拟速度。",
+    "8": "按\"V\"键更改视图模式。",
+    "9": "随时按\"Shift+F1\"打开帮助菜单。",
+    "10": "按\"R\"键启用自动旋转。",
+    "11": "选中卫星后按\"Shift+C\"键切换其可见锥显示/隐藏。",
+    "12": "\"Home\"键将使摄像机旋转到当前传感器。",
+    "13": "\"`\"（波浪号）键将重置摄像机到默认视图。",
+    "14": "按\"M\"键显示当前卫星的2D地图视图。",
+    "15": "底部工具栏中的设置菜单包含许多自定义体验的选项。",
+    "16": "许多菜单有额外的设置，可以通过点击齿轮图标访问。",
+    "17": "将卫星添加到监视列表，当它们在当前传感器上方时收到通知。",
+    "18": "右键点击地球打开更多选项的上下文菜单。",
+    "19": "按\"+\"或\"-\"键放大和缩小。",
+    "20": "按\"F11\"切换全屏模式。",
+    "21": "您可以在右上角的搜索栏中按名称或NORAD ID搜索卫星。",
+    "22": "通过选择一个卫星并点击底部菜单中的\"新发射\"按钮，可以创建一个新的发射模型。",
+    "23": "按\"N\"键切换夜间模式。",
+    "24": "按\"I\"键隐藏/显示卫星的上下文信息。",
+    "25": "按\"B\"键隐藏/显示菜单。",
+    "26": "按Shift+\";\"键加快模拟速度。",
+    "27": "按\",\"键降低模拟速度。",
+    "28": "将一个物体设为次要对象，可以看到它与主要对象的相对距离。",
+    "29": "用\"[\"键在主要/次要对象之间切换。"
   },
   "plugins": {
     "SensorListPlugin": {

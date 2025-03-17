@@ -28,12 +28,15 @@ import { getEl } from '@app/lib/get-el';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 import calendarPng from '@public/img/icons/calendar.png';
+import { MenuMode } from '@app/interfaces';
 
 export class LaunchCalendar extends KeepTrackPlugin {
   readonly id = 'LaunchCalendar';
   dependencies_ = [];
   bottomIconImg = calendarPng;
   isForceHideSideMenus = true;
+
+  menuMode: MenuMode[] = [MenuMode.ALL];
 
   bottomIconCallback = () => {
     if (this.isMenuButtonActive) {

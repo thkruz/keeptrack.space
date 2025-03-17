@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
@@ -47,6 +47,7 @@ export class Screenshot extends KeepTrackPlugin {
   // This is 'disabled' since it does not turn green after being clicked like other buttons.
   isIconDisabled = true;
 
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = cameraPng;
   rmbCallback = (targetId: string): void => {

@@ -31,10 +31,13 @@ import { LegendManager } from '@app/static/legend-manager';
 import planetariumPng from '@public/img/icons/planetarium.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
+import { MenuMode } from '@app/interfaces';
 
 export class Planetarium extends KeepTrackPlugin {
   readonly id = 'Planetarium';
   dependencies_: string[];
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = planetariumPng;
   isRequireSensorSelected = true;

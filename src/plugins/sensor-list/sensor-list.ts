@@ -1,5 +1,5 @@
 import { sensors } from '@app/catalogs/sensors';
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { getClass } from '@app/lib/get-class';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
@@ -46,6 +46,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     maxWidth: 800,
   };
 
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = sensorPng;
 

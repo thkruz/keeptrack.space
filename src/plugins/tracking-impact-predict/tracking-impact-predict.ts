@@ -2,7 +2,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import sputnickPng from '@public/img/icons/sputnick.png';
 import './tracking-impact-predict.css';
 
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { SatMath } from '@app/static/sat-math';
@@ -31,7 +31,7 @@ export interface TipMsg {
 export class TrackingImpactPredict extends KeepTrackPlugin {
   readonly id = 'TrackingImpactPredict';
   dependencies_ = [];
-  private readonly tipDataSrc = 'https://storage.keeptrack.space/data/tip.json';
+  private readonly tipDataSrc = 'https://r2.keeptrack.space/spacetrack-tip.json';
   private selectSatIdOnCruncher_: number | null = null;
   private tipList_ = <TipMsg[]>[];
 
@@ -47,6 +47,8 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
       </div>
     </div>
   </div>`;
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   dragOptions: ClickDragOptions = {
     isDraggable: true,
@@ -85,12 +87,13 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
   private uiManagerFinal_() {
     getEl(this.sideMenuElementName).addEventListener('click', (evt: any) => {
-      showLoading(() => {
-        const el = <HTMLElement>evt.target.parentElement;
+      const el = <HTMLElement>evt.target.parentElement;
 
-        if (!el.classList.contains('tip-object')) {
-          return;
-        }
+      if (!el.classList.contains('tip-object')) {
+        return;
+      }
+
+      showLoading(() => {
         // Might be better code for this.
         const hiddenRow = el.dataset?.row;
 
@@ -104,18 +107,19 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   private parsetipData_() {
     if (this.tipList_.length === 0) {
       // Only generate the table if receiving the -1 argument for the first time
-      fetch(this.tipDataSrc).then((response) => {
-        response.json().then((tipList: TipMsg[]) => {
+      fetch(this.tipDataSrc)
+        .then((response) => response.json())
+        .then((tipList: TipMsg[]) => {
           this.setTipList_(tipList);
-
-
           this.createTable_();
 
           if (this.tipList_.length === 0) {
             errorManagerInstance.warn('No tip data found!');
           }
+        })
+        .catch(() => {
+          errorManagerInstance.warn('Error fetching reentry data!');
         });
-      });
     }
   }
 

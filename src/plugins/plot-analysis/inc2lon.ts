@@ -1,4 +1,4 @@
-import { EChartsData } from '@app/interfaces';
+import { EChartsData, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
@@ -30,6 +30,8 @@ export class Inc2LonPlots extends KeepTrackPlugin {
 
     this.createPlot(Inc2LonPlots.getPlotData(), chartDom);
   };
+
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
   plotCanvasId = 'plot-analysis-chart-inc2lon';
   chart: echarts.ECharts;

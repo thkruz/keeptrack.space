@@ -1,4 +1,4 @@
-import { EChartsData, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { EChartsData, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
@@ -24,6 +24,8 @@ export class RicPlot extends KeepTrackPlugin {
 
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
+
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
   bottomIconLabel = 'RIC Plot';
   bottomIconImg = scatterPlot3Png;

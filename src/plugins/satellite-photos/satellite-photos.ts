@@ -2,7 +2,7 @@ import { openColorbox } from '@app/lib/colorbox';
 import { getEl } from '@app/lib/get-el';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import photoManagerPng from '@public/img/icons/photoManager.png';
@@ -24,6 +24,8 @@ export class SatellitePhotos extends KeepTrackPlugin {
   readonly id = 'SatellitePhotos';
   protected dependencies_: string[] = [SelectSatManager.name];
   discvrPhotos_: { imageUrl: string; lat: Degrees; lon: Degrees }[] = [];
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = photoManagerPng;
   sideMenuElementName: string = 'sat-photo-menu';

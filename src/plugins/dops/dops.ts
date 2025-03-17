@@ -3,31 +3,35 @@ import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import gpsPng from '@public/img/icons/gps.png';
 
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import type { GroupsManager } from '@app/singletons/groups-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { DopMath } from '@app/static/dop-math';
 import { SatMath } from '@app/static/sat-math';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';
   dependencies_ = [];
 
-  bottomIconLabel = 'View DOPs';
+  menuMode: MenuMode[] = [MenuMode.EXPIREMENTAL, MenuMode.ALL];
+
   bottomIconImg = gpsPng;
   bottomIconCallback = (): void => {
-    if (!this.isMenuButtonActive) {
-      return;
+    if (this.isMenuButtonActive) {
+      showLoading(DopsPlugin.updateSideMenu);
     }
+  };
 
-    showLoading(DopsPlugin.updateSideMenu);
+  dragOptions: ClickDragOptions = {
+    isDraggable: true,
+    minWidth: 550,
+    maxWidth: 800,
   };
 
   helpTitle = 'Dilution of Precision (DOP) Menu';
-
   helpBody = keepTrackApi.html`The Dilution of Precision (DOP) Menu is used to calculate the Dilution of Precision (DOP) for a given location and elevation mask.
     <br><br>
     HDOP is the Horizontal Dilution of Precision. It is a measure of the accuracy of the horizontal position.
@@ -133,10 +137,11 @@ export class DopsPlugin extends KeepTrackPlugin {
           break;
         }
       }
+        break;
+      default:
+        break;
     }
   };
-
-  latLon: any;
 
   addJs(): void {
     super.addJs();
@@ -186,5 +191,3 @@ export class DopsPlugin extends KeepTrackPlugin {
     return gpsSatObjects;
   }
 }
-
-export const dopsPlugin = new DopsPlugin();

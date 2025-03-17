@@ -20,7 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
@@ -39,6 +39,8 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
+
+  menuMode: MenuMode[] = [MenuMode.ALL];
 
   isRequireSatelliteSelected = true;
   bottomIconImg = viewInAirPng;

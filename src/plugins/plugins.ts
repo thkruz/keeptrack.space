@@ -1,7 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CountriesMenu } from '@app/plugins/countries/countries';
 import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
-import * as missile from '@app/plugins/missile/missilePlugin';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
@@ -24,11 +23,12 @@ import { CreateSat } from './create-sat/create-sat';
 import { DateTimeManager } from './date-time-manager/date-time-manager';
 import { DebrisScreening } from './debris-screening/debris-screening';
 import { DebugMenuPlugin } from './debug/debug';
-import { dopsPlugin } from './dops/dops';
+import { DopsPlugin } from './dops/dops';
 import { EditSat } from './edit-sat/edit-sat';
 import { GamepadPlugin } from './gamepad/gamepad';
 import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
+import { MissilePlugin } from './missile/missile-plugin';
 import { NewLaunch } from './new-launch/new-launch';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
@@ -111,7 +111,6 @@ export type KeepTrackPlugins = {
   plotAnalysis?: boolean;
   satChanges?: boolean;
   satelliteView?: boolean;
-  scenarioCreator?: boolean;
   screenshot?: boolean;
   sensor?: boolean;
   sensorFov?: boolean;
@@ -168,7 +167,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new CreateSat().init(), enabled: plugins.createSat },
       { init: () => new EditSat().init(), enabled: plugins.editSat },
       { init: () => new NewLaunch().init(), enabled: plugins.newLaunch },
-      { init: () => missile.init(), enabled: plugins.missile },
+      { init: () => new MissilePlugin().init(), enabled: plugins.missile },
       { init: () => new StereoMap().init(), enabled: plugins.stereoMap },
       { init: () => new SensorFov().init(), enabled: plugins.sensorFov },
       { init: () => new SensorSurvFence().init(), enabled: plugins.sensorSurv },
@@ -177,7 +176,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new Planetarium().init(), enabled: plugins.planetarium },
       { init: () => new Astronomy().init(), enabled: plugins.astronomy },
       { init: () => new NightToggle().init(), enabled: plugins.nightToggle },
-      { init: () => dopsPlugin.init(), enabled: plugins.dops },
+      { init: () => new DopsPlugin().init(), enabled: plugins.dops },
       { init: () => new SatConstellations().init(), enabled: plugins.constellations },
       { init: () => new CountriesMenu().init(), enabled: plugins.countries },
       { init: () => new ColorMenu().init(), enabled: plugins.colorsMenu },
@@ -287,23 +286,28 @@ export const uiManagerFinal = (plugins: any): void => {
     keepTrackApi.analytics.page();
   }
 
-  const wheel = (dom: any, deltaY: number) => {
+  const wheel = (dom: EventTarget, deltaY: number) => {
+    const domEl = dom as HTMLElement;
     const step = 0.15;
-    const pos = dom.scrollTop;
+    const pos = domEl.scrollTop;
     const nextPos = pos + step * deltaY;
 
-    dom.scrollTop = nextPos;
+    domEl.scrollTop = nextPos;
   };
 
-  getEl('bottom-icons-container').addEventListener(
-    'wheel',
-    (event: WheelEvent) => {
-      event.preventDefault();
-      wheel(event.currentTarget, event.deltaY);
-    },
-    { passive: false },
-  );
+  ['bottom-icons', 'bottom-icons-filter'].forEach((divIdWithScroll) => {
+
+    getEl(divIdWithScroll).addEventListener(
+      'wheel',
+      (event: WheelEvent) => {
+        event.preventDefault(); // Prevent default scroll behavior
+        wheel(event.currentTarget, event.deltaY);
+      },
+      { passive: false }, // Must be false to allow preventDefault()
+    );
+  });
 };
 
+
 // Create common import for all plugins
-export { StreamManager as CanvasRecorder, catalogLoader, missile };
+export { StreamManager as CanvasRecorder, catalogLoader };

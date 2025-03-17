@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -14,6 +14,9 @@ export class ColorMenu extends KeepTrackPlugin {
   readonly id = 'ColorMenu';
   dependencies_ = [];
   bottomIconImg = palettePng;
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+
   bottomIconElementName: string = 'menu-color-scheme';
   sideMenuElementName: string = 'color-scheme-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -63,7 +66,7 @@ export class ColorMenu extends KeepTrackPlugin {
   </ul>`;
 
   // eslint-disable-next-line class-methods-use-this
-  rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
+  rmbCallback: (targetId: string | null, clickedSat?: number) => void = (targetId: string) => {
     switch (targetId) {
       case 'colors-confidence-rmb':
         ColorMenu.colorsMenuClick('confidence');
@@ -96,7 +99,7 @@ export class ColorMenu extends KeepTrackPlugin {
         ColorMenu.colorsMenuClick('default');
         break;
       default:
-        if (targetId.includes('colors-')) {
+        if (targetId?.includes('colors-')) {
           errorManagerInstance.info(`Color scheme not found: ${targetId}`);
           ColorMenu.colorsMenuClick(targetId.slice(7).replace('-rmb', ''));
         }

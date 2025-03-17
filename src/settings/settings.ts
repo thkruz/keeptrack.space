@@ -19,7 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, SensorGeolocation, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { KeepTrackPlugins } from '@app/plugins/plugins';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -37,14 +37,15 @@ import { starTalk } from './presets/startalk';
 
 export class SettingsManager {
   classificationStr = '' as ClassificationString;
+  menuMode: MenuMode = MenuMode.BASIC;
   // This controls which of the built-in plugins are loaded
   plugins = <KeepTrackPlugins>{
-    debug: false,
+    debug: true,
     satInfoboxCore: true,
     aboutManager: false,
     collisions: true,
     trackingImpactPredict: true,
-    dops: false,
+    dops: true,
     findSat: true,
     launchCalendar: true,
     newLaunch: true,
@@ -83,7 +84,6 @@ export class SettingsManager {
     classificationBar: true,
     soundManager: true,
     gamepad: true,
-    scenarioCreator: false,
     debrisScreening: true,
     videoDirector: true,
     reports: true,
@@ -1457,7 +1457,7 @@ export class SettingsManager {
         starlinkNot: [0.8, 0.0, 0.0, 0.8],
         sourceUssf: [0.2, 1.0, 1.0, 0.7],
         sourceAldoria: [0.2, 0.4, 1.0, 1],
-        sourceCelestrak: [1.0, 0.4, 0.0, 0.65],
+        sourceCelestrak: [1.0, 0.75, 0.0, 0.65],
         sourcePrismnet: [1.0, 1.0, 1.0, 0.8],
         sourceVimpel: [1.0, 0, 0, 0.6],
       };

@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
@@ -23,6 +23,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   /**
    * Flag to determine if the look angles should only show rise and set times
@@ -303,6 +305,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     const tdV = tr.insertCell();
 
     tdV.appendChild(document.createTextNode('Visible'));
+    tdV.setAttribute('style', 'text-decoration: underline');
 
     for (const entry of lookAngleData) {
       LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, entry, timeManagerInstance, tdE, tdA, tdR, tdType, tdV });

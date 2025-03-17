@@ -279,6 +279,14 @@ export enum Pickable {
   No = 0,
 }
 
+export enum MenuMode {
+  BASIC,
+  ADVANCED,
+  ANALYSIS,
+  EXPIREMENTAL,
+  ALL,
+}
+
 export type ColorInformation = {
   color: [number, number, number, number];
   marker?: boolean;
@@ -394,4 +402,5 @@ export enum KeepTrackApiEvents {
   canvasMouseDown = 'canvasMouseDown',
   touchStart = 'touchStart',
   ConeMeshUpdate = 'ConeMeshUpdate',
+  bottomMenuModeChange = 'bottomMenuModeChange',
 }

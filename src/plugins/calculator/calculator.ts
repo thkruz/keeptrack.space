@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import calculatorPng from '@public/img/icons/calculator.png';
 
@@ -20,6 +20,8 @@ export class Calculator extends KeepTrackPlugin {
   bottomIconImg = calculatorPng;
   currentMode: CalculatorMode = CalculatorMode.ITRF;
   sensorUsedInCalculation: DetailedSensor | null = null;
+
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
   sideMenuElementName = 'calculator-menu';
   private readonly itrfHtml = keepTrackApi.html`

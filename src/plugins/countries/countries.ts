@@ -1,7 +1,7 @@
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { GroupType } from '@app/singletons/object-group';
 import { StringExtractor } from '@app/static/string-extractor';
@@ -16,6 +16,8 @@ import { SoundNames } from '../sounds/SoundNames';
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
   dependencies_ = [];
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = flagPng;
   sideMenuElementHtml = keepTrackApi.html`

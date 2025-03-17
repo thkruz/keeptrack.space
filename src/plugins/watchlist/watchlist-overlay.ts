@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents, SatPassTimes, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, SatPassTimes, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
@@ -22,6 +22,8 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     super();
     this.watchlistPlugin_ = keepTrackApi.getPlugin(WatchlistPlugin);
   }
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   private readonly OVERLAY_CALC_LENGTH_IN_DAYS = 0.5;
   private infoOverlayDOMHtmlStrArr = [];

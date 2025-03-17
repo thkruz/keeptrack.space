@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
@@ -36,6 +36,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = true;
 
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ANALYSIS, MenuMode.ALL];
 
   bottomIconImg = polarPlotPng;
   bottomIconCallback: () => void = () => {

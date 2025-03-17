@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, lookanglesRow, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, lookanglesRow, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -44,6 +44,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
   protected dependencies_: [];
   searchStrCache_: string = null;
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
   bottomIconImg = folderCodePng;
   sideMenuElementName = 'analysis-menu';
   sideMenuElementHtml = keepTrackApi.html`

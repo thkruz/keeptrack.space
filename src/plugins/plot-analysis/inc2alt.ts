@@ -1,4 +1,4 @@
-import { EChartsData, GetSatType } from '@app/interfaces';
+import { EChartsData, GetSatType, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import waterfall2Png from '@public/img/icons/waterfall2.png';
@@ -28,6 +28,8 @@ export class Inc2AltPlots extends KeepTrackPlugin {
 
     this.createPlot(Inc2AltPlots.getPlotData(), chartDom);
   };
+
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
   plotCanvasId = 'plot-analysis-chart-inc2alt';
   chart: echarts.ECharts;

@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { dateFormat } from '@app/lib/dateFormat';
@@ -48,6 +48,8 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     maxWidth: 650,
     minWidth: 450,
   };
+
+  menuMode: MenuMode[] = [MenuMode.ALL];
 
   sideMenuElementName: string = 'nextLaunch-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

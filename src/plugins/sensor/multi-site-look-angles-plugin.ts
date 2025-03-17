@@ -1,5 +1,5 @@
 import { sensors } from '@app/catalogs/sensors';
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
@@ -31,6 +31,8 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   private readonly sensorList_: DetailedSensor[] = [];
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = false;
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   // Settings
   private readonly lengthOfLookAngles_ = 1; // Days
@@ -342,6 +344,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     let tdV = tr.insertCell();
 
     tdV.appendChild(document.createTextNode('Visible'));
+    tdV.setAttribute('style', 'text-decoration: underline');
 
     const timeManagerInstance = keepTrackApi.getTimeManager();
 

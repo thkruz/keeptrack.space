@@ -223,7 +223,7 @@
       "title": "New Launch Menu",
       "helpBody": "The New Launch Menu is used for generating notional orbital launches by modifying existing satellites with similar parameters. <br><br> After selecting a satellite, you can select a launch location and a north/south azimuth. The selected satellite will be modified to align it with the launch site. The clock is then changed to 00:00:00 to represent relative time after the launch. This can be helpful in calculating sensor coverage relative to launch time. The objects relationship with other orbital objects will be incorrect."
     },
-    "Missile": {
+    "MissilePlugin": {
       "bottomIconLabel": "Missile",
       "title": "Missile Menu",
       "helpBody": "The Missile Menu is used for generating notional missile launches between countries. <br><br> When you using submarine launched missiles, the launch point is a custom latitude and longitude. When you are using land based missiles, the launch point is a fix latitude and longitude based on open source reporting. <br><br> In addition to custom missiles, a few predefined scenarios involving hundreds of missiles are available. <br><br> All missile launches are notional and are not intended to represent real world events. The launch trajectories are all based on the same ballistic model, but use different minimum and maximum ranges."
@@ -312,6 +312,11 @@
       "bottomIconLabel": "Create Satellite",
       "title": "Create Satellite",
       "helpBody": "The Create Satellite menu is used to create a satellite from its keplerian elements"
+    },
+    "DopsPlugin": {
+      "bottomIconLabel": "View DOPs",
+      "title": "Dilution of Precision Menu",
+      "helpBody": "The Dilution of Precision (DOP) menu is used to calculate the DOP values for a satellite and sensor. <br><br> The DOP values are: <ul style=\"margin-left: 40px;\"> <li> GDOP - Geometric Dilution of Precision </li> <li> PDOP - Position Dilution of Precision </li> <li> HDOP - Horizontal Dilution of Precision </li> <li> VDOP - Vertical Dilution of Precision </li> <li> TDOP - Time Dilution of Precision </li> <li> NDOP - Number of Satellites Dilution of Precision </li> </ul>"
     }
   }
 }

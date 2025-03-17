@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -26,6 +26,8 @@ export class EditSat extends KeepTrackPlugin {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   isRequireSatelliteSelected = true;
   isIconDisabled = true;

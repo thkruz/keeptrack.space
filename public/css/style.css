@@ -1,9 +1,10 @@
 :root {
-  --bottom-menu-height: 100px;
+  --bottom-menu-height: 120px;
   --bottom-menu-top: 0px;
   --bottom-icon-height: 75px;
   --bottom-icon-width: 100px;
   --bottom-icon-img-size: 40px;
+  --bottom-filter-width: 185px;
   --search-box-bottom: 0px;
   --nav-bar-height: 35px;
   /** The combination of title bar and classification bar */
@@ -52,6 +53,10 @@ a,
 
 .link:hover {
   background: rgba(0, 0, 0, 0.2);
+}
+
+.eruda-icon-tool {
+  display: none !important;
 }
 
 #keeptrack-root {
@@ -1046,19 +1051,41 @@ input:focus {
 #bottom-icons-container {
   width: 100% !important;
   height: var(--bottom-menu-height);
-  overflow-x: hidden;
-  overflow-y: scroll;
+  overflow: hidden;
   text-align: left;
 }
 
+#bottom-icons-filter {
+  width: var(--bottom-filter-width);
+  height: var(--bottom-menu-height);
+  float: left;
+  display: flex;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  background: var(--color-dark-background);
+  z-index: 11;
+  position: absolute;
+  flex-direction: column;
+  align-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  overflow-y: scroll;
+}
+
 #bottom-icons {
+  width: calc(100% - var(--bottom-filter-width));
+  float: right;
   display: grid;
   grid-template-columns: minmax(var(--bottom-icon-width), max-content) repeat(auto-fill, var(--bottom-icon-width));
   justify-content: center;
   row-gap: 5px;
   background: var(--color-dark-background);
   padding-top: 10px;
+  padding-bottom: 10px;
   z-index: 11;
+  overflow-y: auto;
+  height: var(--bottom-menu-height);
 }
 
 .bmenu-item {
@@ -1070,6 +1097,19 @@ input:focus {
   flex-wrap: nowrap;
   height: 100%;
 }
+
+.bmenu-filter-item {
+  padding: 2px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+}
+
 
 .bmenu-item-inner {
   display: flex;
@@ -1099,36 +1139,49 @@ input:focus {
   display: block;
 }
 
+.bmenu-filter-item .bmenu-filter-item-inner img {
+  width: 25px;
+  height: auto;
+  margin: 0 auto;
+  display: block;
+  padding-bottom: 3px;
+}
+
 #github-share1 img,
 #legend-icon img,
 #tutorial-icon img,
 #search-icon img,
-.bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-item-inner * {
+.bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-item-inner *,
+.bmenu-filter-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-filter-item-inner * {
   /* Convert blue to engineering red */
   filter: hue-rotate(163deg) brightness(0.7) saturate(4);
 }
 
-.bmenu-item:hover {
+.bmenu-item:hover,
+.bmenu-filter-item:hover {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
 }
 
-.bmenu-item .bmenu-item-inner:active * {
+.bmenu-item .bmenu-item-inner:active *,
+.bmenu-filter-item .bmenu-filter-item-inner:active * {
   scale: 0.9;
-}
-
-#custom-sensor-menu-settings-btn:active {
-  scale: 0.8;
 }
 
 .bmenu-title {
   position: relative;
   display: block;
   font-size: 11px;
-  height: 100%;
   text-align: center;
 }
 
+.bmenu-filter-title {
+  position: relative;
+  display: block;
+  font-size: 11px;
+  text-align: center;
+  padding-left: 3px;
+}
 
 .bmenu-item-selected img {
   filter: hue-rotate(275deg) brightness(1.2);
@@ -1176,6 +1229,10 @@ input:focus {
 
 .bmenu-item-error .status-icon {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kTtIw1AUhv+mFUUqDmYQcchQnSyILxylikWwUNoKrTqY3PQFTRqSFBdHwbXg4GOx6uDirKuDqyAIPkBcXZwUXaTEc5NCixgvHO7Hf+//c+65gNCoMM0KjQOabpupeEzK5lal7leEIVJNIyQzy0ikFzPwXV/3CPD9Lsqz/O/9ufrUvMWAgEQ8xwzTJt4gntm0Dc77xCIrySrxOfGYSQ0SP3Jd8fiNc9FlgWeKZiY1TywSS8UOVjqYlUyNeIo4omo65QtZj1XOW5y1So21+uQvDOf1lTTXqYYRxxISSEKCghrKqMBGlHadFAspOo/5+Idcf5JcCrnKYORYQBUaZNcP/ge/Z2sVJie8pHAM6HpxnI8RoHsXaNYd5/vYcZonQPAZuNLb/moDmP0kvd7WIkdA/zZwcd3WlD3gcgcYfDJkU3alIJVQKADvZ/RNOWDgFuhd8+bWOsfpA5ChWS3fAAeHwGiRstd93t3TObd/77Tm9wOOiHKymlTPuAAAAAZiS0dEAM4AowCKeTVkwgAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB+cMFAw5JOaDPFwAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAA0UlEQVRYw+3WSw7DIAwEUKbppVi1R+vR0lWORbdVgj9jsKpKeImwo3kiJKWsWvXjwnmh1bqX1h45T8Mbx/H8XrpdNm3bKy1uZzZ6+1IUOun7AlkKwkxI+6cqCOllgdkKyixofVMUlPS6wCwFYwas/iEFI70tMKrg6IVnTkjBkd4nEFVw9sA7j1JwpvcLsArEXjCqLgUiPSfgTUaeF7BnS1Ug0/MCVsLA24LI/dJVCKSPCUhJgzdmSOCiEEwfFzgnzvyPtBRarfvIjHvmt37VX9QHmaFdkiJXncIAAAAASUVORK5CYII=');
+}
+
+#custom-sensor-menu-settings-btn:active {
+  scale: 0.8;
 }
 
 #down {

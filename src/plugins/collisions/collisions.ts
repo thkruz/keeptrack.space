@@ -2,7 +2,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import collissionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import i18next from 'i18next';
@@ -53,6 +53,8 @@ export class Collissions extends KeepTrackPlugin {
     minWidth: 540,
     maxWidth: 650,
   };
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {

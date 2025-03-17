@@ -20,7 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
@@ -34,6 +34,8 @@ export class SatelliteFov extends KeepTrackPlugin {
   readonly id = 'SatelliteFov';
   dependencies_ = [SelectSatManager.name];
   bottomIconImg = satelliteFovPng;
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   dragOptions: ClickDragOptions = {
     isDraggable: false,

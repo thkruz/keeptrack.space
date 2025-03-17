@@ -126,7 +126,6 @@ const settingsOverride = {
     classificationBar: false,
     soundManager: false,
     gamepad: false,
-    scenarioCreator: false,
     debrisScreening: false,
     videoDirector: false,
     createSat: false,

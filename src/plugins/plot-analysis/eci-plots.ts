@@ -1,4 +1,4 @@
-import { EChartsData } from '@app/interfaces';
+import { EChartsData, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
@@ -24,6 +24,8 @@ export class EciPlot extends KeepTrackPlugin {
   isRequireSatelliteSelected = true;
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
+
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
   bottomIconLabel = 'ECI Plots';
   bottomIconImg = scatterPlot2Png;

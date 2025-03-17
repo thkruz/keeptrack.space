@@ -31,10 +31,13 @@ import { LegendManager } from '@app/static/legend-manager';
 import constellationPng from '@public/img/icons/constellation.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Planetarium } from '../planetarium/planetarium';
+import { MenuMode } from '@app/interfaces';
 
 export class Astronomy extends KeepTrackPlugin {
   readonly id = 'Astronomy';
   dependencies_ = [];
+
+  menuMode: MenuMode[] = [MenuMode.ALL];
 
   bottomIconLabel = 'Astronomy View';
   bottomIconImg = constellationPng;

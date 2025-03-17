@@ -1,7 +1,7 @@
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatConstellationString } from '@app/singletons/catalog-manager/satLinkManager';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
@@ -15,6 +15,8 @@ export class SatConstellations extends KeepTrackPlugin {
   dependencies_: string[] = [SelectSatManager.name];
 
   private additionalConstellations_ = [];
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = categoryPng;
   bottomIconElementName: string = 'menu-constellations';

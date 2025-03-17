@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -44,6 +44,9 @@ export enum GodraySamples {
 export class GraphicsMenuPlugin extends KeepTrackPlugin {
   readonly id = 'GraphicsMenuPlugin';
   dependencies_ = [];
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
+
   bottomIconLabel = 'Graphics Menu';
   bottomIconImg = displaySettingsPng;
   private readonly formPrefix_ = 'gm';

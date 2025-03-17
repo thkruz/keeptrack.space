@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, Singletons } from '@app/interfaces';
 import { Localization } from '@app/locales/locales';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import i18next from 'i18next';
@@ -77,6 +77,7 @@ export abstract class KeepTrackPlugin {
 
   /**
    * The label of the bottom icon element.
+   * This should be set in the localization files! Not in the plugin itself.
    * @example 'Countries'
    */
   bottomIconLabel: string;
@@ -199,6 +200,7 @@ export abstract class KeepTrackPlugin {
    * Determins if the side menu is adjustable by clicking and dragging.
    */
   dragOptions: ClickDragOptions;
+  menuMode: MenuMode[] = [MenuMode.ALL];
 
   /**
    * Creates a new instance of the KeepTrackPlugin class.
@@ -453,7 +455,32 @@ export abstract class KeepTrackPlugin {
       this.registerRmbCallback(this.rmbCallback);
     }
 
+    if (this.bottomIconElementName) {
+      this.registerMenuMode();
+    }
+
     this.isJsAdded = true;
+  }
+
+  registerMenuMode(): void {
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.bottomMenuModeChange,
+      cbName: this.id,
+      cb: (): void => {
+        this.hideBottomIcon();
+        if (this.menuMode.includes(settingsManager.menuMode)) {
+          this.showBottomIcon();
+        }
+      },
+    });
+  }
+
+  showBottomIcon(): void {
+    getEl(this.bottomIconElementName).style.display = 'block';
+  }
+
+  hideBottomIcon(): void {
+    getEl(this.bottomIconElementName).style.display = 'none';
   }
 
   registerRmbCallback(callback: (targetId: string, clickedSatId?: number) => void): void {

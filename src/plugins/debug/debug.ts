@@ -2,7 +2,7 @@ import * as gremlins from 'gremlins.js';
 
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import debugPng from '@public/img/icons/debug.png';
 
@@ -18,8 +18,10 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   readonly id = 'DebugMenuPlugin';
   dependencies_ = [];
   isErudaVisible = false;
-  bottomIconImg = debugPng;
 
+  menuMode: MenuMode[] = [MenuMode.ALL];
+
+  bottomIconImg = debugPng;
   bottomIconLabel = 'Debug';
 
   dragOptions: ClickDragOptions = {

@@ -1,4 +1,4 @@
-import { ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { GroupType } from '@app/singletons/object-group';
@@ -36,6 +36,8 @@ export class TimeMachine extends KeepTrackPlugin {
   bottomIconLabel = 'Time Machine';
   historyOfSatellitesRunCount = 0;
   isTimeMachineRunning = false;
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   historyOfSatellitesPlay() {
     this.isTimeMachineRunning = true;

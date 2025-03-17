@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -60,6 +60,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
   bottomIconElementName: string = 'menu-watchlist';
   bottomIconImg = bookmarksPng;
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   isWatchlistChanged: boolean = null;
   sideMenuElementHtml = keepTrackApi.html`

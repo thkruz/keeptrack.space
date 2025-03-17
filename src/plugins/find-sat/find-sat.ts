@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { getUnique } from '@app/lib/get-unique';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
@@ -51,6 +51,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
     minWidth: 500,
     maxWidth: 700,
   };
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   sideMenuElementName: string = 'findByLooks-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

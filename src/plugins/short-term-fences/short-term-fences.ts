@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
@@ -30,6 +30,8 @@ export class ShortTermFences extends KeepTrackPlugin {
     maxWidth: 1000,
     isDraggable: true,
   };
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   sideMenuElementName = 'stf-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

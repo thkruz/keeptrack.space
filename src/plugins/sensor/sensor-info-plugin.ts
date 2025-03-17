@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { LineManager } from '@app/singletons/draw-manager/line-manager';
@@ -19,6 +19,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     this.checkIfLinesVisible_(keepTrackApi.getLineManager());
   };
 
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconLabel = 'Sensor Info';
   bottomIconImg = sensorInfoPng;

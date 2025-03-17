@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
@@ -38,6 +38,9 @@ declare module '@app/interfaces' {
 export class VideoDirectorPlugin extends KeepTrackPlugin {
   readonly id = 'VideoDirectorPlugin';
   dependencies_ = [];
+
+  menuMode: MenuMode[] = [MenuMode.EXPIREMENTAL, MenuMode.ALL];
+
   isRotateL = true;
   isRotateR = false;
   isRotateU = false;

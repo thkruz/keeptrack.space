@@ -149,10 +149,10 @@ export const loadLocalization = () => ({
       title: i18next.t('plugins.NewLaunch.title'),
       helpBody: i18next.t('plugins.NewLaunch.helpBody'),
     },
-    Missile: {
-      bottomIconLabel: i18next.t('plugins.Missile.bottomIconLabel'),
-      title: i18next.t('plugins.Missile.title'),
-      helpBody: i18next.t('plugins.Missile.helpBody'),
+    MissilePlugin: {
+      bottomIconLabel: i18next.t('plugins.MissilePlugin.bottomIconLabel'),
+      title: i18next.t('plugins.MissilePlugin.title'),
+      helpBody: i18next.t('plugins.MissilePlugin.helpBody'),
     },
     StereoMap: {
       bottomIconLabel: i18next.t('plugins.StereoMap.bottomIconLabel'),
@@ -238,6 +238,11 @@ export const loadLocalization = () => ({
       bottomIconLabel: i18next.t('plugins.CreateSat.bottomIconLabel'),
       title: i18next.t('plugins.CreateSat.title'),
       helpBody: i18next.t('plugins.CreateSat.helpBody'),
+    },
+    DopsPlugin: {
+      bottomIconLabel: i18next.t('plugins.DopsPlugin.bottomIconLabel'),
+      title: i18next.t('plugins.DopsPlugin.title'),
+      helpBody: i18next.t('plugins.DopsPlugin.helpBody'),
     },
   },
 });

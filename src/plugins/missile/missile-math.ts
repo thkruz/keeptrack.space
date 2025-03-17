@@ -6,7 +6,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { Kilometers, Meters, SpaceObjectType } from 'ootk';
-import { missileManager } from './missileManager';
+import { missileManager } from './missile-manager';
 
 export class Missile {
   static EarthMass = 5.9726 * 10 ** 24; // (kg)

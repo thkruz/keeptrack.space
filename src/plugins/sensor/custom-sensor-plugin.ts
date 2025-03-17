@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl } from '@app/lib/get-el';
 import { slideInRight } from '@app/lib/slide';
@@ -37,6 +37,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     }
   };
 
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = sensorAddPng;
 

@@ -6,7 +6,7 @@
 import { MissileParams, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
-import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missileData';
+import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
 
 import { jday } from '@app/lib/transforms';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
@@ -2970,8 +2970,9 @@ const missileManager = {
   missileArray,
   clearMissiles,
   createMissile: Missile,
-  MassRaidPre,
+  massRaidPre: MassRaidPre,
   getMissileTEARR,
 };
 
 export { missileManager };
+

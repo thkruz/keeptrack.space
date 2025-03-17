@@ -72,6 +72,7 @@ import { Scene } from './singletons/scene';
 import { TimeManager } from './singletons/time-manager';
 import { UiManager } from './singletons/uiManager';
 import { WebGLRenderer } from './singletons/webgl-renderer';
+import { BottomMenu } from './static/bottom-menu';
 import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
 import { SensorMath } from './static/sensor-math';
@@ -124,6 +125,13 @@ export class KeepTrack {
     if (!this.settingsOverride_.isPreventDefaultHtml) {
       import(/* webpackMode: "eager" */ '@css/loading-screen.css');
       KeepTrack.getDefaultBodyHtml();
+      BottomMenu.init();
+
+      keepTrackApi.register({
+        event: KeepTrackApiEvents.uiManagerFinal,
+        cbName: 'addBottomMenuFilterButtons',
+        cb: () => BottomMenu.addBottomMenuFilterButtons(),
+      });
 
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
         KeepTrack.loadSplashScreen_();
@@ -254,9 +262,6 @@ export class KeepTrack {
         <div id="footer-handle" class="ui-resizable-handle ui-resizable-n"></div>
         <div id="footer-toggle-wrapper">
           <div id="nav-footer-toggle">&#x25BC;</div>
-        </div>
-        <div id="bottom-icons-container">
-          <div id="bottom-icons"></div>
         </div>
       </footer>`;
 
@@ -558,17 +563,19 @@ theodore.kruczek at gmail dot com.
             autoScale: false,
             container: erudaDom,
             useShadowDom: false,
-            tool: ['console', 'elements'],
           });
           const erudaEntryButtonDoms = keepTrackApi.containerRoot.querySelectorAll('eruda-entry-btn');
 
           if (erudaEntryButtonDoms.length > 0) {
             hideEl(erudaEntryButtonDoms[0] as HTMLElement);
           }
-          erudaDom.style.top = 'var(--top-menu-height)';
-          erudaDom.style.height = '80%';
-          erudaDom.style.width = '60%';
-          erudaDom.style.left = '20%';
+
+          const erudaContainerDom = getEl('eruda-console').parentElement.parentElement;
+
+          erudaContainerDom.style.top = 'calc(var(--top-menu-height) + 30px)';
+          erudaContainerDom.style.height = '80%';
+          erudaContainerDom.style.width = '60%';
+          erudaContainerDom.style.left = '20%';
         }
       }
 

@@ -58,6 +58,8 @@ jspm_packages
 # Prettier
 .prettierignore
 
+# .github stuff
+.github/workflows/.*
 
 # Large Production Files
 public/social

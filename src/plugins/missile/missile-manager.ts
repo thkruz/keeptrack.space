@@ -14,10 +14,9 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, Degrees, EciVec3, Kilometers, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from 'ootk';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
-import { Missile as MissileClass } from './missile-math';
 
 let BurnRate: number, EarthMass: number, EarthRadius: number, FuelDensity: number, G: number, R: number, WarheadMass: number, h: number;
-const missileArray: MissileClass[] = [];
+const missileArray: MissileObject[] = [];
 
 let isMassRaidLoaded = false;
 

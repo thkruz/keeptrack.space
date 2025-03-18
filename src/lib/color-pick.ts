@@ -123,7 +123,7 @@ export class ColorPick {
     const target = event.target as HTMLInputElement;
     let hash = target.value;
 
-    if (hash.indexOf('#') !== 0) {
+    if (!hash.startsWith('#')) {
       hash = `#${hash}`;
     }
     if ((/(?:^#[0-9A-F]{6}$)|(?:^#[0-9A-F]{3}$)/iu).test(hash)) {
@@ -140,7 +140,7 @@ export class ColorPick {
     if (event) {
       const target = event.target as HTMLElement;
 
-      if (this.element.contains(target) || (document.getElementById('colorPick') && document.getElementById('colorPick')!.contains(target))) {
+      if (this.element.contains(target) || document.getElementById('colorPick')?.contains(target)) {
         return; // Don't hide if clicking inside the color picker or the element
       }
     }
@@ -156,7 +156,7 @@ export class ColorPick {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(settingsManager.colors));
   }
 
-  static defaults = {
+  static readonly defaults = {
     initialColor: '#3498db',
     allowRecent: false,
     recentMax: 5,

@@ -273,7 +273,7 @@ export const uiManagerFinal = (plugins: any): void => {
 
   // Only turn on analytics if on keeptrack.space ()
   if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
-    keepTrackApi.analytics = createAnalytics({
+    const analytics = createAnalytics({
       app: 'KeepTrack',
       version: 100,
       plugins: [
@@ -283,7 +283,10 @@ export const uiManagerFinal = (plugins: any): void => {
       ],
     });
 
-    keepTrackApi.analytics.page();
+    if (analytics) {
+      keepTrackApi.analytics = analytics;
+      keepTrackApi.analytics.page();
+    }
   }
 
   const wheel = (dom: EventTarget, deltaY: number) => {

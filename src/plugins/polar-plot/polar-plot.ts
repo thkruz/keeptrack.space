@@ -160,6 +160,15 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     const sensor = keepTrackApi.getSensorManager().getSensor();
     const sat = this.selectSatManager_.getSelectedSat() as DetailedSatellite;
+
+    if (!sensor?.isSensor()) {
+      return false;
+    }
+
+    if (!sat?.isSatellite()) {
+      return false;
+    }
+
     let isSomethingInView = false;
 
     if (sat.perigee > sensor.maxRng || sat.apogee < sensor.minRng) {

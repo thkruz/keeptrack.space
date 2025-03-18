@@ -166,15 +166,22 @@ const formats = {
  * - "quoted text": Any text enclosed in double quotes.
  * - 'quoted text': Any text enclosed in single quotes.
  */
+// Breaking down the regex into smaller parts to reduce complexity
+const dateToken = /d{1,4}|m{1,4}|yy(?:yy)?/gu;
 // eslint-disable-next-line prefer-named-capture-group
-const token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/gu;
+const timeToken = /([HhMsTt])\1?|[LloSZ]/gu;
+const quotedToken = /"[^"]*"|'[^']*'/gu;
+const token = new RegExp(`${dateToken.source}|${timeToken.source}|${quotedToken.source}`, 'gu');
 
 /**
  * A regular expression that matches any timezone information in a date string.
  *
  * This regular expression matches any of the following timezone formats:
- * - PMT, PDT, PST, PET, PEST, EDT, EST, CDT, CST, MDT, MST, ADT, AST, HDT, HST, AKDT, AKST, AWT, AWST, NT, IDLW, CET, CEST, WEST, WET, EET, EEST, MSK, IST, SGT, JST, KST, ACDT, ACST, AEDT, AEST, NZDT, NZST, or any of the following:
- *   - Pacific Standard Time, Pacific Daylight Time, Pacific Prevailing Time, Mountain Standard Time, Mountain Daylight Time, Mountain Prevailing Time, Central Standard Time, Central Daylight Time, Central Prevailing Time, Eastern Standard Time, Eastern Daylight Time, Eastern Prevailing Time, Atlantic Standard Time, Atlantic Daylight Time, Atlantic Prevailing Time, GMT, UTC, GMT-XXXX, or UTC+XXXX.
+ * - PMT, PDT, PST, PET, PEST, EDT, EST, CDT, CST, MDT, MST, ADT, AST, HDT, HST, AKDT, AKST, AWT, AWST, NT, IDLW, CET, CEST, WEST, WET, EET, EEST, MSK, IST, SGT, JST, KST, ACDT,
+ * ACST, AEDT, AEST, NZDT, NZST, or any of the following:
+ * - Pacific Standard Time, Pacific Daylight Time, Pacific Prevailing Time, Mountain Standard Time, Mountain Daylight Time, Mountain Prevailing Time, Central Standard Time, Central
+ * Daylight Time, Central Prevailing Time, Eastern Standard Time, Eastern Daylight Time, Eastern Prevailing Time, Atlantic Standard Time, Atlantic Daylight Time, Atlantic
+ * Prevailing Time, GMT, UTC, GMT-XXXX, or UTC+XXXX.
  *
  * This regular expression is used to remove any timezone information from a date string.
  */
@@ -193,9 +200,7 @@ const timezoneClip = /[^-+\dA-Z]/gu;
  * @param length - The desired length of the resulting string.
  * @returns A string representing the padded number.
  */
-const pad = function (num: number, length: number): string {
-  return String(num).padStart(length, '0');
-};
+const pad = (num: number, length: number): string => String(num).padStart(length, '0');
 
 /**
  * Formats a given date according to a specified mask.
@@ -205,7 +210,7 @@ const pad = function (num: number, length: number): string {
  * @returns A formatted string representing the date according to the specified mask.
  * @throws SyntaxError if the provided date is invalid.
  */
-export const dateFormat = function (date: string | Date, mask: string, utc = false) {
+export const dateFormat = (date: string | Date, mask: string, utc = false) => {
   if (typeof date === 'string' && !(/\d/u).test(date)) {
     mask = date;
     date = null;
@@ -222,7 +227,7 @@ export const dateFormat = function (date: string | Date, mask: string, utc = fal
 
   mask = String(formats.masks[mask] || mask || formats.masks.default);
 
-  if (mask.slice(0, 4) === 'UTC:') {
+  if (mask.startsWith('UTC:')) {
     mask = mask.slice(4);
     utc = true;
   }

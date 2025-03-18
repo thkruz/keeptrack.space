@@ -215,7 +215,6 @@ export class CatalogSearch {
     return satData.filter((sat) => {
       const tleYear = sat?.tle1?.substring(9, 11) || '-1';
 
-
       return parseInt(tleYear) === yr;
     });
   }
@@ -232,6 +231,8 @@ export class CatalogSearch {
    * @returns An array of DetailedSatellite instances representing the satellites that were launched in the given year or earlier.
    */
   static yearOrLess(satData: DetailedSatellite[], yr: number) {
+    console.error(satData, yr);
+
     return satData.filter((sat) => {
       if (sat.source === CatalogSource.VIMPEL) {
         return false;
@@ -273,7 +274,10 @@ export class CatalogSearch {
         }
       }
 
-      const launchYear = sat?.launchDate?.slice(2, 4) ?? sat?.tle1.slice(9, 11) ?? '-1';
+      const launchDate = sat?.launchDate !== '' ? sat?.launchDate : null;
+      const launchYear = launchDate?.slice(2, 4) ?? sat?.tle1.slice(9, 11) ?? '-1';
+
+      console.error(launchYear, yr);
 
       if (yr >= 57 && yr < 100) {
         return parseInt(launchYear) <= yr && parseInt(launchYear) >= 57;

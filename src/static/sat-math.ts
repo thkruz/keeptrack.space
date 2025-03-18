@@ -180,6 +180,10 @@ export abstract class SatMath {
     let y: Kilometers;
     let z: Kilometers;
 
+    if (!obj) {
+      return SunStatus.UNKNOWN;
+    }
+
 
     if (obj instanceof BaseObject) {
       if (!obj?.position) {

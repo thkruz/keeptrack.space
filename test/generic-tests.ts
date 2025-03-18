@@ -4,6 +4,7 @@ import { getEl } from '@app/lib/get-el';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from '@app/settings/settings';
+import { BottomMenu } from '@app/static/bottom-menu';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {
@@ -11,6 +12,7 @@ export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, plugin
 
   // Tests that init method can be called without errors
   test(`${pluginName}_init`, () => {
+    BottomMenu.createBottomMenu();
     standardPluginInit(Plugin);
   });
 
@@ -78,6 +80,7 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
   keepTrackApi.getColorSchemeManager().init();
   window.settingsManager = settingsManager;
   (global as unknown as Global).settingsManager = settingsManager;
+  BottomMenu.createBottomMenu();
   // clearAllCallbacks();
   plugin.init();
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);

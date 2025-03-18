@@ -13,11 +13,14 @@ export class BottomMenu {
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
       cbName: BottomMenu.name,
-      cb: () => {
-        const bottomMenuNode = document.createElement('div');
+      cb: BottomMenu.createBottomMenu,
+    });
+  }
+  static createBottomMenu(): void {
+    const bottomMenuNode = document.createElement('div');
 
-        bottomMenuNode.id = 'nav-footer';
-        bottomMenuNode.innerHTML = keepTrackApi.html`
+    bottomMenuNode.id = 'nav-footer';
+    bottomMenuNode.innerHTML = keepTrackApi.html`
           <div id="bottom-icons-container">
             <div id="bottom-icons-filter">
               <div id="menu-filter-basic" class="bmenu-filter-item bmenu-item-selected">
@@ -55,10 +58,9 @@ export class BottomMenu {
           </div>
         `;
 
-        getEl('nav-footer').appendChild(bottomMenuNode);
-      },
-    });
+    getEl('nav-footer').appendChild(bottomMenuNode);
   }
+
   private static deselectAllBottomMenuFilterButtons_() {
     const menuIds = [
       'menu-filter-basic', 'menu-filter-advanced', 'menu-filter-analysis',

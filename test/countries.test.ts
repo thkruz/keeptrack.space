@@ -15,10 +15,11 @@ describe('CountriesMenu_class', () => {
     setupDefaultHtml();
     const mockGroupsManager = new GroupsManager();
 
-    mockGroupsManager.groupList.Argentina = {
-      groupName: 'Argentina',
+    mockGroupsManager.groupList.F = {
+      groupName: 'F',
       ids: [],
       updateIsInGroup: jest.fn(),
+      updateOrbits: jest.fn(),
     } as unknown as ObjectGroup;
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, mockGroupsManager);
   });
@@ -38,13 +39,13 @@ describe('CountriesMenu_class', () => {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
     const uiManagerInstance = mockUiManager;
 
-    uiManagerInstance.searchManager.doSearch = jest.fn();
+    uiManagerInstance.searchManager.fillResultBox = jest.fn();
     groupManagerInstance.selectGroup = jest.fn();
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
 
-    CountriesMenu['groupSelected_']('Argentina');
+    CountriesMenu['groupSelected_']('F');
     expect(groupManagerInstance.selectGroup).toHaveBeenCalled();
-    expect(uiManagerInstance.searchManager.doSearch).toHaveBeenCalled();
+    expect(uiManagerInstance.searchManager.fillResultBox).toHaveBeenCalled();
   });
 
   // Tests that groupSelected fills result box and clears selected sat
@@ -66,7 +67,7 @@ describe('CountriesMenu_class', () => {
       createGroupByCountry_: jest.fn(),
     } as unknown as ObjectGroup;
     keepTrackApi.getCatalogManager().getObject = () => defaultSat;
-    CountriesMenu['groupSelected_']('Argentina');
+    CountriesMenu['groupSelected_']('F');
     // expect(uiManagerInstance.searchManager.fillResultBox).toHaveBeenCalled();
     expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).toHaveBeenCalledWith(-1);
   });
@@ -80,7 +81,7 @@ describe('CountriesMenu_class', () => {
     groupManagerInstance.groupList = [] as unknown as Record<string, ObjectGroup>;
     keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
 
-    CountriesMenu['countryMenuClick_']('Argentina');
+    CountriesMenu['countryMenuClick_']('F');
     expect(groupManagerInstance.createGroup).toHaveBeenCalled();
   });
 });

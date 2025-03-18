@@ -17,6 +17,7 @@ import { Scene } from '@app/singletons/scene';
 import { SearchManager } from '@app/singletons/search-manager';
 import { TimeManager } from '@app/singletons/time-manager';
 import { UiManager } from '@app/singletons/uiManager';
+import { BottomMenu } from '@app/static/bottom-menu';
 import { SensorMath } from '@app/static/sensor-math';
 import { mat4 } from 'gl-matrix';
 import { keepTrackContainer } from '../../src/container';
@@ -193,6 +194,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     <div id="camera-control-widget"></div>
     `;
 
+  BottomMenu.createBottomMenu();
   inputManagerInstance.init();
   catalogManagerInstance.staticSet = [defaultSensor];
 
@@ -260,6 +262,7 @@ export const setupMinimumHtml = () => {
     <div id="search"></div>
     <div id="search-icon"></div>
     <div id="search-results"></div>
+    <nav id="nav-footer"></nav>
   </div>`;
 };
 
@@ -378,6 +381,7 @@ export const mockCameraManager = <Camera>(<unknown>{
 export const setupDefaultHtml = () => {
   keepTrackApi.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
   KeepTrack.getDefaultBodyHtml();
+  BottomMenu.init();
   keepTrackApi.containerRoot.innerHTML += `
     <input id="search"></input>
     <div id="search-holder"></div>

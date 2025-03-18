@@ -49,6 +49,14 @@
     "SelectSecondarySatellite": "¡Seleccione un satélite secundario!",
     "SatelliteNotDetailedSatellite": "¡El satélite no es un DetailedSatellite!",
     "SensorNotFound": "¡Sensor no encontrado!",
+    "Scene": {
+      "disablingGodrays": "¡Tu computadora está teniendo problemas! Desactivando los rayos de luz.",
+      "disablingAurora": "¡Tu computadora está teniendo problemas! Desactivando la aurora.",
+      "disablingAtmosphere": "¡Tu computadora está teniendo problemas! Desactivando la atmósfera.",
+      "disablingMoon": "¡Tu computadora está teniendo problemas! Desactivando la luna.",
+      "disablingMilkyWay": "¡Tu computadora está teniendo problemas! Desactivando la Vía Láctea.",
+      "disablingSun": "¡Tu computadora está teniendo problemas! Desactivando el sol."
+    },
     "Breakup": {
       "CannotCreateBreakupForNonCircularOrbits": "No se puede crear una ruptura para órbitas no circulares. Estamos trabajando en una solución.",
       "CannotCalcDirectionOfSatellite": "No se puede calcular la dirección del satélite. Intente de nuevo más tarde.",

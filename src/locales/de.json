@@ -49,6 +49,14 @@
     "SelectSecondarySatellite": "Wählen Sie zuerst einen sekundären Satelliten aus!",
     "SatelliteNotDetailedSatellite": "Satellit ist kein DetailedSatellite!",
     "SensorNotFound": "Sensor nicht gefunden!",
+    "Scene": {
+      "disablingGodrays": "Ihr Computer hat Schwierigkeiten! Lichtstrahlen werden deaktiviert.",
+      "disablingAurora": "Ihr Computer hat Schwierigkeiten! Aurora wird deaktiviert.",
+      "disablingAtmosphere": "Ihr Computer hat Schwierigkeiten! Atmosphäre wird deaktiviert.",
+      "disablingMoon": "Ihr Computer hat Schwierigkeiten! Mond wird deaktiviert.",
+      "disablingMilkyWay": "Ihr Computer hat Schwierigkeiten! Milchstraße wird deaktiviert.",
+      "disablingSun": "Ihr Computer hat Schwierigkeiten! Sonne wird deaktiviert."
+    },
     "Breakup": {
       "CannotCreateBreakupForNonCircularOrbits": "Für nicht-kreisförmige Umlaufbahnen kann kein Zerfall erstellt werden. Wir arbeiten an einer Lösung.",
       "CannotCalcDirectionOfSatellite": "Die Richtung des Satelliten kann nicht berechnet werden. Versuchen Sie es später erneut.",

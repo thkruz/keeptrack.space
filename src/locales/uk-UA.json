@@ -49,6 +49,14 @@
     "SelectSecondarySatellite": "Спочатку виберіть вторинний супутник!",
     "SatelliteNotDetailedSatellite": "Супутник не є DetailedSatellite!",
     "SensorNotFound": "Сенсор не знайдено!",
+    "Scene": {
+      "disablingGodrays": "Ваш комп'ютер працює повільно! Вимикаємо сонячні промені.",
+      "disablingAurora": "Ваш комп'ютер працює повільно! Вимикаємо північне сяйво.",
+      "disablingAtmosphere": "Ваш комп'ютер працює повільно! Вимикаємо атмосферу.",
+      "disablingMoon": "Ваш комп'ютер працює повільно! Вимикаємо Місяць.",
+      "disablingMilkyWay": "Ваш комп'ютер працює повільно! Вимикаємо Чумацький Шлях.",
+      "disablingSun": "Ваш комп'ютер працює повільно! Вимикаємо Сонце."
+    },
     "Breakup": {
       "CannotCreateBreakupForNonCircularOrbits": "Неможливо створити руйнування для некругових орбіт. Працюємо над виправленням.",
       "CannotCalcDirectionOfSatellite": "Неможливо розрахувати напрямок супутника. Спробуйте пізніше.",

@@ -49,6 +49,14 @@
     "SelectSecondarySatellite": "请先选择一个次要卫星！",
     "SatelliteNotDetailedSatellite": "卫星不是详细卫星类型！",
     "SensorNotFound": "未找到传感器！",
+    "Scene": {
+      "disablingGodrays": "您的计算机运行困难！正在禁用上帝光线。",
+      "disablingAurora": "您的计算机运行困难！正在禁用极光。",
+      "disablingAtmosphere": "您的计算机运行困难！正在禁用大气层。",
+      "disablingMoon": "您的计算机运行困难！正在禁用月球。",
+      "disablingMilkyWay": "您的计算机运行困难！正在禁用银河系。",
+      "disablingSun": "您的计算机运行困难！正在禁用太阳。"
+    },
     "Breakup": {
       "CannotCreateBreakupForNonCircularOrbits": "无法为非圆形轨道创建解体。正在修复中。",
       "CannotCalcDirectionOfSatellite": "无法计算卫星方向。请稍后再试。",

@@ -13,7 +13,7 @@ const opts: InitOptions = {
   interpolation: {
     escapeValue: false,
   },
-  lng: 'ukUA',
+  // lng: 'ukUA',
   fallbackLng: 'en',
   debug: false,
   resources: {

@@ -1,16 +1,18 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { getUnique } from '@app/lib/get-unique';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import findSatPng from '@public/img/icons/find2.png';
+import findSatPng from '@public/img/icons/database-search.png';
 
-import { countryCodeList, countryMapList, countryNameList } from '@app/catalogs/countries';
-import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, eci2rae } from 'ootk';
+import { countryCodeList, countryNameList } from '@app/catalogs/countries';
+import { CatalogExporter } from '@app/static/catalog-exporter';
+import { SatMath } from '@app/static/sat-math';
+import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export interface SearchSatParams {
   argPe: Degrees;
@@ -27,6 +29,8 @@ export interface SearchSatParams {
   payload: string;
   period: Minutes;
   periodMarg: Minutes;
+  tleAge: Hours;
+  tleAgeMarg: Hours;
   raan: Degrees;
   raanMarg: Degrees;
   rcs: number;
@@ -34,6 +38,7 @@ export interface SearchSatParams {
   rng: Kilometers;
   rngMarg: Kilometers;
   shape: string;
+  source: string;
 }
 
 export class FindSatPlugin extends KeepTrackPlugin {
@@ -41,11 +46,13 @@ export class FindSatPlugin extends KeepTrackPlugin {
   dependencies_: string[];
   private lastResults_ = <DetailedSatellite[]>[];
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 500,
     maxWidth: 700,
   };
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   sideMenuElementName: string = 'findByLooks-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -95,6 +102,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
                 <option value='All'>All</option>
               </select>
               <label for="disabled">Shape</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12">
+              <select value=0 id="fbl-source" type="text">
+                <option value='All'>All</option>
+              </select>
+              <label for="disabled">Source</label>
             </div>
           </div>
           <div class="row">
@@ -149,6 +164,16 @@ export class FindSatPlugin extends KeepTrackPlugin {
           </div>
           <div class="row">
             <div class="input-field col s12 m6 l6">
+              <input placeholder="XX.X" id="fbl-tleAge" type="text">
+              <label for="fbl-tleAge "class="active">TLE Age (hours)</label>
+            </div>
+            <div class="input-field col s12 m6 l6">
+              <input value="1" placeholder="1" id="fbl-tleAge-margin" type="text">
+              <label for="fbl-tleAge-margin "class="active">Margin (hours)</label>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-field col s12 m6 l6">
               <input placeholder="XX.X" id="fbl-rcs" type="text">
               <!-- RCS in meters squared -->
               <label for="fbl-rcs "class="active">RCS (m<sup>2</sup>)</label>
@@ -178,10 +203,19 @@ export class FindSatPlugin extends KeepTrackPlugin {
               <label for="fbl-argPe-margin "class="active">Margin (deg)</label>
             </div>
           </div>
-          <div class="center-align">
+          <div class="row">
+          <center>
             <button id="findByLooks-submit" class="btn btn-ui waves-effect waves-light" type="submit"
               name="action">Find Satellite(s) &#9658;
+              </button>
+            </center>
+          </div>
+          <div class="row">
+          <center>
+          <button id="findByLooks-export" class="btn btn-ui waves-effect waves-light" type="button"
+            name="action">Export data &#9658;
             </button>
+          </center>
           </div>
         </form>
         <div class="row center-align" style="margin-top:20px;">
@@ -192,6 +226,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   </div>`;
 
   bottomIconImg = findSatPng;
+  private hasSearchBeenRun_ = false;
 
   addJs(): void {
     super.addJs();
@@ -246,6 +281,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
         getEl('fbl-shape').insertAdjacentHTML('beforeend', `<option value="${shape}">${shape}</option>`);
       });
 
+    getUnique(satData.filter((obj: BaseObject) => (obj as DetailedSatellite)?.source).map((obj) => (obj as DetailedSatellite).source))
+      // Sort using lower case
+      .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
+      .forEach((source) => {
+        getEl('fbl-source').insertAdjacentHTML('beforeend', `<option value="${source}">${source}</option>`);
+      });
     const payloadPartials = satData
       .filter((obj: BaseObject) => (obj as DetailedSatellite)?.payload)
       .map((obj) =>
@@ -266,9 +307,21 @@ export class FindSatPlugin extends KeepTrackPlugin {
           getEl('fbl-payload').insertAdjacentHTML('beforeend', `<option value="${payload}">${payload}</option>`);
         }
       });
+
+    // Export data
+    getEl('findByLooks-export')?.addEventListener('click', () => {
+      if (!this.hasSearchBeenRun_) {
+        errorManagerInstance.warn('Try finding satellites first!');
+
+        return;
+      }
+      CatalogExporter.exportTle2Csv(this.lastResults_);
+    });
   }
 
   private findByLooksSubmit_(): Promise<void> {
+    this.hasSearchBeenRun_ = true;
+
     return new Promise(() => {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
@@ -277,12 +330,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
       const rng = parseFloat((<HTMLInputElement>getEl('fbl-range')).value);
       const inc = parseFloat((<HTMLInputElement>getEl('fbl-inc')).value);
       const period = parseFloat((<HTMLInputElement>getEl('fbl-period')).value);
+      const tleAge = parseFloat((<HTMLInputElement>getEl('fbl-tleAge')).value);
       const rcs = parseFloat((<HTMLInputElement>getEl('fbl-rcs')).value);
       const azMarg = parseFloat((<HTMLInputElement>getEl('fbl-azimuth-margin')).value);
       const elMarg = parseFloat((<HTMLInputElement>getEl('fbl-elevation-margin')).value);
       const rngMarg = parseFloat((<HTMLInputElement>getEl('fbl-range-margin')).value);
       const incMarg = parseFloat((<HTMLInputElement>getEl('fbl-inc-margin')).value);
       const periodMarg = parseFloat((<HTMLInputElement>getEl('fbl-period-margin')).value);
+      const tleAgeMarg = parseFloat((<HTMLInputElement>getEl('fbl-tleAge-margin')).value);
       const rcsMarg = parseFloat((<HTMLInputElement>getEl('fbl-rcs-margin')).value);
       const objType = parseInt((<HTMLInputElement>getEl('fbl-type')).value);
       const raan = parseFloat((<HTMLInputElement>getEl('fbl-raan')).value);
@@ -293,6 +348,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       const bus = (<HTMLInputElement>getEl('fbl-bus')).value;
       const payload = (<HTMLInputElement>getEl('fbl-payload')).value;
       const shape = (<HTMLInputElement>getEl('fbl-shape')).value;
+      const source = (<HTMLInputElement>getEl('fbl-source')).value;
 
       (<HTMLInputElement>getEl('search')).value = ''; // Reset the search first
       try {
@@ -307,6 +363,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
           incMarg,
           period,
           periodMarg,
+          tleAge,
+          tleAgeMarg,
           rcs,
           rcsMarg,
           objType,
@@ -318,6 +376,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
           bus,
           payload,
           shape,
+          source,
         };
 
         this.lastResults_ = FindSatPlugin.searchSats_(searchParams as SearchSatParams);
@@ -418,6 +477,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
       incMarg,
       period,
       periodMarg,
+      tleAge,
+      tleAgeMarg,
       rcs,
       rcsMarg,
       objType,
@@ -428,6 +489,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       bus,
       shape,
       payload,
+      source,
     } = searchParams;
 
     const isValidAz = !isNaN(az) && isFinite(az);
@@ -437,10 +499,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const isValidRaan = !isNaN(rightAscension) && isFinite(rightAscension);
     const isValidArgPe = !isNaN(argPe) && isFinite(argPe);
     const isValidPeriod = !isNaN(period) && isFinite(period);
+    const isValidTleAge = !isNaN(tleAge) && isFinite(tleAge);
     const isValidRcs = !isNaN(rcs) && isFinite(rcs);
     const isSpecificCountry = countryCode !== 'All';
     const isSpecificBus = bus !== 'All';
     const isSpecificShape = shape !== 'All';
+    const isSpecificSource = source !== 'All';
     const isSpecificPayload = payload !== 'All';
 
     azMarg = !isNaN(azMarg) && isFinite(azMarg) ? azMarg : (5 as Degrees);
@@ -448,6 +512,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     rngMarg = !isNaN(rngMarg) && isFinite(rngMarg) ? rngMarg : (200 as Kilometers);
     incMarg = !isNaN(incMarg) && isFinite(incMarg) ? incMarg : (1 as Degrees);
     periodMarg = !isNaN(periodMarg) && isFinite(periodMarg) ? periodMarg : (0.5 as Minutes);
+    tleAgeMarg = !isNaN(tleAgeMarg) && isFinite(tleAgeMarg) ? tleAgeMarg : (1 as Hours);
     rcsMarg = !isNaN(rcsMarg) && isFinite(rcsMarg) ? rcsMarg : rcs / 10;
     rightAscensionMarg = !isNaN(rightAscensionMarg) && isFinite(rightAscensionMarg) ? rightAscensionMarg : (1 as Degrees);
     argPeMarg = !isNaN(argPeMarg) && isFinite(argPeMarg) ? argPeMarg : (1 as Degrees);
@@ -458,12 +523,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
       !isValidAz &&
       !isValidInc &&
       !isValidPeriod &&
+      !isValidTleAge &&
       !isValidRcs &&
       !isValidArgPe &&
       !isValidRaan &&
       !isSpecificCountry &&
       !isSpecificBus &&
       !isSpecificShape &&
+      !isSpecificSource &&
       !isSpecificPayload
     ) {
       throw new Error('No Search Criteria Entered');
@@ -471,7 +538,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     let res = keepTrackApi.getCatalogManager().getSats();
 
-    res = !isValidInc && !isValidPeriod && (isValidAz || isValidEl || isValidRange) ? FindSatPlugin.checkInview_(res) : res;
+    res = !isValidInc && !isValidPeriod && !isValidTleAge && (isValidAz || isValidEl || isValidRange) ? FindSatPlugin.checkInview_(res) : res;
 
     res = objType !== 0 ? FindSatPlugin.checkObjtype_(res, objType) : res;
 
@@ -496,11 +563,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
     if (isValidPeriod) {
       res = FindSatPlugin.checkPeriod_(res, (period - periodMarg) as Minutes, (period + periodMarg) as Minutes);
     }
+    if (isValidTleAge) {
+      res = FindSatPlugin.checkTleAge_(res, (tleAge - tleAgeMarg) as Hours, (tleAge + tleAgeMarg) as Hours);
+    }
     if (isValidRcs) {
       res = FindSatPlugin.checkRcs_(res, rcs - rcsMarg, rcs + rcsMarg);
     }
     if (countryCode !== 'All') {
-      let country = countryCode.split('|').map((code) => countryMapList[code]);
+      let country = countryCode.split('|');
       // Remove duplicates and undefined
 
       country = country.filter((item, index) => item && country.indexOf(item) === index);
@@ -511,6 +581,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
     }
     if (shape !== 'All') {
       res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).shape === shape);
+    }
+    if (source !== 'All') {
+      res = res.filter((obj: BaseObject) => (obj as DetailedSatellite).source === source);
     }
 
     if (payload !== 'All') {
@@ -549,6 +622,18 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
   private static checkPeriod_(possibles: DetailedSatellite[], minPeriod: Minutes, maxPeriod: Minutes) {
     return possibles.filter((possible) => possible.period > minPeriod && possible.period < maxPeriod);
+  }
+
+  private static checkTleAge_(possibles: DetailedSatellite[], minTleAge_: Hours, maxTleAge: Hours) {
+    const minTleAge = minTleAge_ < 0 ? 0 : minTleAge_;
+    const now = new Date();
+
+    return possibles.filter((possible) => {
+      const ageHours = SatMath.calcElsetAge(possible, now, 'hours');
+
+
+      return ageHours >= minTleAge && ageHours <= maxTleAge;
+    });
   }
 
   private static checkRightAscension_(possibles: DetailedSatellite[], min: Degrees, max: Degrees) {

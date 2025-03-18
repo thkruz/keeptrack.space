@@ -5,8 +5,8 @@
  * array of satellite data.
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -215,7 +215,6 @@ export class CatalogSearch {
     return satData.filter((sat) => {
       const tleYear = sat?.tle1?.substring(9, 11) || '-1';
 
-
       return parseInt(tleYear) === yr;
     });
   }
@@ -232,6 +231,8 @@ export class CatalogSearch {
    * @returns An array of DetailedSatellite instances representing the satellites that were launched in the given year or earlier.
    */
   static yearOrLess(satData: DetailedSatellite[], yr: number) {
+    console.error(satData, yr);
+
     return satData.filter((sat) => {
       if (sat.source === CatalogSource.VIMPEL) {
         return false;
@@ -273,13 +274,16 @@ export class CatalogSearch {
         }
       }
 
-      const tleYear = sat?.tle1?.substring(9, 11) || '-1';
+      const launchDate = sat?.launchDate !== '' ? sat?.launchDate : null;
+      const launchYear = launchDate?.slice(2, 4) ?? sat?.tle1.slice(9, 11) ?? '-1';
+
+      console.error(launchYear, yr);
 
       if (yr >= 57 && yr < 100) {
-        return parseInt(tleYear) <= yr && parseInt(tleYear) >= 57;
+        return parseInt(launchYear) <= yr && parseInt(launchYear) >= 57;
       }
 
-      return parseInt(tleYear) <= yr || parseInt(tleYear) >= 57;
+      return parseInt(launchYear) <= yr || parseInt(launchYear) >= 57;
 
     });
   }

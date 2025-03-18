@@ -1,7 +1,7 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import settingsPng from '@public/img/icons/settings.png';
+import videoSettingsPng from '@public/img/icons/video-settings.png';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
@@ -11,8 +11,8 @@ import { SoundNames } from '../sounds/SoundNames';
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -38,12 +38,15 @@ declare module '@app/interfaces' {
 export class VideoDirectorPlugin extends KeepTrackPlugin {
   readonly id = 'VideoDirectorPlugin';
   dependencies_ = [];
+
+  menuMode: MenuMode[] = [MenuMode.EXPIREMENTAL, MenuMode.ALL];
+
   isRotateL = true;
   isRotateR = false;
   isRotateU = false;
   isRotateD = false;
   bottomIconElementName: string = 'video-director-icon';
-  bottomIconImg = settingsPng;
+  bottomIconImg = videoSettingsPng;
   sideMenuElementName: string = 'video-director-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="video-director-menu" class="side-menu-parent start-hidden text-select">

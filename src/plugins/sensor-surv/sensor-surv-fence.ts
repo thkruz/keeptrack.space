@@ -3,8 +3,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -20,7 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fencePng from '@public/img/icons/fence.png';
 import { Sensor } from 'ootk';
@@ -38,6 +38,8 @@ export class SensorSurvFence extends KeepTrackPlugin {
       this.enableSurvView_();
     }
   };
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = fencePng;
   isIconDisabledOnLoad = true;

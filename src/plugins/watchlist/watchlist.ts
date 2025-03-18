@@ -6,8 +6,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -23,20 +23,22 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
+import { SettingsManager } from '@app/settings/settings';
 import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sat-line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { isThisNode } from '@app/static/isThisNode';
-import addPng from '@public/img/icons/add.png';
-import removePng from '@public/img/icons/remove.png';
-import watchlistPng from '@public/img/icons/watchlist.png';
+import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
+import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
+import bookmarksPng from '@public/img/icons/bookmarks.png';
 import saveAs from 'file-saver';
 import { CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 interface UpdateWatchlistParams {
@@ -57,7 +59,9 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   };
 
   bottomIconElementName: string = 'menu-watchlist';
-  bottomIconImg = watchlistPng;
+  bottomIconImg = bookmarksPng;
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   isWatchlistChanged: boolean = null;
   sideMenuElementHtml = keepTrackApi.html`
@@ -79,7 +83,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
               <img
                 id="watchlist-add"
                 class="watchlist-add"
-                src="" delayedsrc="${addPng}" style="cursor: pointer;"/>
+                src="" delayedsrc="${bookmarkAddPng}" style="cursor: pointer;"/>
             </div>
           </div>
           <div class="center-align row">
@@ -205,7 +209,11 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     // Remove button selected on watchlist menu
     getEl('watchlist-list').addEventListener('click', (evt: Event) => {
       keepTrackApi.getSoundManager().play(SoundNames.CLICK);
-      this.removeSat(parseInt((<HTMLElement>evt.target).dataset.satId));
+      if ((<HTMLElement>evt.target).classList.contains('sat-name')) {
+        this.selectSat(parseInt((<HTMLElement>evt.target).dataset.satName));
+      } else if ((<HTMLElement>evt.target).classList.contains('watchlist-remove')) {
+        this.removeSat(parseInt((<HTMLElement>evt.target).dataset.satId));
+      }
     });
 
     getEl('watchlist-save').addEventListener('click', (evt: Event) => {
@@ -236,7 +244,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @param isSkipSearch - A boolean indicating whether to skip the search operation.
    */
   updateWatchlist({ updateWatchlistList, isSkipSearch = false }: UpdateWatchlistParams = {}) {
-    const settingsManager: any = window.settingsManager;
+    const settingsManager: SettingsManager = window.settingsManager;
 
     if (typeof updateWatchlistList !== 'undefined') {
       this.watchlistList = updateWatchlistList;
@@ -245,8 +253,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     if (!this.watchlistList) {
       return;
     }
-    settingsManager.isThemesNeeded = true;
-    this.isWatchlistChanged = this.isWatchlistChanged != null;
+    // settingsManager.isThemesNeeded = true;
+    this.isWatchlistChanged = this.isWatchlistChanged !== null;
     let watchlistString = '';
     let watchlistListHTML = '';
     let sat: DetailedSatellite;
@@ -254,19 +262,19 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       sat = catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);
-      if (sat == null) {
+      if (sat === null) {
         this.watchlistList.splice(i, 1);
       } else {
         watchlistListHTML += `
         <div class="row">
           <div class="col s3 m3 l3">
-            ${sat.sccNum}
+             <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${sat.sccNum}</span>
           </div>
           <div class="col s7 m7 l7">
-            ${sat.name || 'Unknown'}
+             <span class="sat-name" data-sat-name="${sat.id || 'Unknown'}" style="cursor: pointer;">${sat.name || 'Unknown'}</span>
           </div>
           <div class="col s2 m2 l2 center-align remove-icon">
-            <img class="watchlist-remove" data-sat-id="${sat.id}" src="${removePng}" style="cursor: pointer;"></img>
+            <img class="watchlist-remove" data-sat-id="${sat.id}" src="${bookmarkRemovePng}" style="cursor: pointer;"></img>
           </div>
         </div>`;
       }
@@ -296,6 +304,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     }
 
     PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, JSON.stringify(saveWatchlist));
+  }
+
+  selectSat(id: number) {
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+
+    selectSatManagerInstance.selectSat(id);
   }
 
   /**
@@ -369,9 +383,6 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     return this.watchlistList.some(({ id: id_ }) => id_ === id);
   }
 
-  /**
-   * @returns An array of satellite ids in the watchlist.
-   */
   getSatellites() {
     return this.watchlistList.map(({
       id,
@@ -477,7 +488,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       if (sat !== null && sat.id > 0) {
         this.watchlistList.push({ id: sat.id, inView: false });
       } else {
-        errorManagerInstance.warn(`Sat ${obj} not found!`, true);
+        errorManagerInstance.warn(`Sat ${obj.id} not found!`, true);
       }
     }
     this.updateWatchlist();

@@ -6,8 +6,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, lookanglesRow, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, lookanglesRow, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -35,7 +35,7 @@ import { getUnique } from '@app/lib/get-unique';
 import { saveCsv } from '@app/lib/saveVariable';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
-import analysisPng from '@public/img/icons/analysis.png';
+import folderCodePng from '@public/img/icons/folder-code.png';
 import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
@@ -44,7 +44,8 @@ export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
   protected dependencies_: [];
   searchStrCache_: string = null;
-  bottomIconImg = analysisPng;
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
+  bottomIconImg = folderCodePng;
   sideMenuElementName = 'analysis-menu';
   sideMenuElementHtml = keepTrackApi.html`
   <div id="analysis-menu" class="side-menu-parent start-hidden text-select">

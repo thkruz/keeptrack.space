@@ -16,12 +16,12 @@ import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import { SensorMath, TearrData } from '@app/static/sensor-math';
 import { StringExtractor } from '@app/static/string-extractor';
-import addPng from '@public/img/icons/add.png';
-import removePng from '@public/img/icons/remove.png';
+import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
+import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import Draggabilly from 'draggabilly';
 import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, PayloadStatus, RfSensor, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { missileManager } from '../missile/missileManager';
+import { missileManager } from '../missile/missile-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { StereoMap } from '../stereo-map/stereo-map';
 import { WatchlistPlugin } from '../watchlist/watchlist';
@@ -588,10 +588,12 @@ export class SatInfoBox extends KeepTrackPlugin {
 
       const now: Date | number | string = new Date();
       const daysold = SatMath.calcElsetAge(sat, now);
+      const age = daysold >= 1 ? daysold : daysold * 24;
+      const units = daysold >= 1 ? 'Days' : 'Hours';
       const elsetAgeDom = getEl('sat-elset-age');
 
       if (elsetAgeDom) {
-        elsetAgeDom.innerHTML = `${daysold.toFixed(2)} Days`;
+        elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
       }
 
       SatInfoBox.updateConfidenceDom_(sat);
@@ -937,8 +939,8 @@ export class SatInfoBox extends KeepTrackPlugin {
       <div id="sat-infobox" class="text-select satinfo-fixed start-hidden">
         <div id="sat-info-header">
           <div id="sat-info-title" class="center-text sat-info-section-header">
-            <img id="sat-add-watchlist" src="${addPng}"/>
-            <img id="sat-remove-watchlist" src="${removePng}"/>
+            <img id="sat-add-watchlist" src="${bookmarkAddPng}"/>
+            <img id="sat-remove-watchlist" src="${bookmarkRemovePng}"/>
             <span id="sat-info-title-name">
               This is a title
             </span>

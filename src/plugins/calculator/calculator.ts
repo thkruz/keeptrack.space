@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import calculatorPng from '@public/img/icons/calculator.png';
 
@@ -6,7 +6,7 @@ import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
 import { Degrees, DetailedSensor, ecf2eci, eci2ecf, eci2rae, Kilometers, rae2eci, RaeVec3, Vector3D } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
 enum CalculatorMode {
   ITRF = 'ITRF',
@@ -20,6 +20,8 @@ export class Calculator extends KeepTrackPlugin {
   bottomIconImg = calculatorPng;
   currentMode: CalculatorMode = CalculatorMode.ITRF;
   sensorUsedInCalculation: DetailedSensor | null = null;
+
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
   sideMenuElementName = 'calculator-menu';
   private readonly itrfHtml = keepTrackApi.html`
@@ -303,7 +305,7 @@ export class Calculator extends KeepTrackPlugin {
 `;
 
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 350,
   };

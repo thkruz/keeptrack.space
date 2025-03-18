@@ -355,6 +355,10 @@ export const countryFlagIconMap = {
 };
 
 export const country2flagIcon = (country: string): string => {
+  if (!country || country === '') {
+    return 'fi-unknown';
+  }
+
   // Get the country code from the list
   const countryCode = countryCodeList[country] ?? countryCodeList[countryMapList[country]] ?? country;
 
@@ -426,6 +430,7 @@ export const countryMapList = {
   'D': 'Germany',
   'DAG': 'Dagestan',
   'DD': 'East Germany',
+  'DJ': 'Djibouti',
   'DK': 'Denmark',
   'DML': 'Queen Maud Land',
   'DR': 'Germany (Reich)',
@@ -451,6 +456,7 @@ export const countryMapList = {
   'GUF': 'French Guiana',
   'HK': 'China(Hong Kong)',
   'HKUK': 'Hong Kong',
+  'HR': 'Croatia',
   'HU': 'Hungary',
   'I': 'Italy',
   'I-ARAB': 'Arabsat',
@@ -509,6 +515,7 @@ export const countryMapList = {
   'NP': 'Nepal',
   'NZ': 'New Zealand',
   'NZRD': 'Ross Dep.',
+  'OM': 'Oman',
   'P': 'Portugal',
   'PAR': 'Panama',
   'PCZ': 'Canal Zone',
@@ -559,6 +566,7 @@ export const countryMapList = {
   'YE': 'Yemen',
   'ZA': 'South Africa',
   'ZR': 'Zaire',
+  'ZW': 'Zimbabwe',
   'ANALSAT': 'Analyst Satellite',
   'SAUD': 'Saudi Arabia',
   'AB': 'Saudi Arabia',
@@ -634,6 +642,7 @@ export const countryMapList = {
   'SES': 'Luxembourg',
   'SING': 'Singapore',
   'SKOR': 'South Korea',
+  'SN': 'Senegal',
   'SPN': 'Spain',
   'STCT': 'Singapore/Taiwan',
   'SWED': 'Sweden',

@@ -1,7 +1,7 @@
-import { EChartsData } from '@app/interfaces';
+import { EChartsData, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import scatterPlotPng from '@public/img/icons/scatter-plot.png';
+import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { DetailedSatellite, SpaceObjectType } from 'ootk';
@@ -11,35 +11,34 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class Inc2LonPlots extends KeepTrackPlugin {
   readonly id = 'Inc2LonPlots';
   dependencies_: string[] = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
+
+  private static readonly maxEccentricity_ = 0.1;
+  private static readonly minSatellitePeriod_ = 1240;
+  private static readonly maxSatellitePeriod_ = 1640;
+  private static readonly maxInclination_ = 17;
 
   constructor() {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-
-  bottomIconLabel = 'Inc Vs Lon Plot';
-  bottomIconImg = scatterPlotPng;
+  bottomIconImg = barChart4BarsPng;
   bottomIconCallback = () => {
     const chartDom = getEl(this.plotCanvasId);
 
     this.createPlot(Inc2LonPlots.getPlotData(), chartDom);
   };
 
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
+
   plotCanvasId = 'plot-analysis-chart-inc2lon';
   chart: echarts.ECharts;
-
-  helpTitle = 'Inc Vs Lon Plot Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-    The Inc Vs Lon Plot Menu is used for plotting the inclination vs longitude in the GEO belt.
-  </p>`;
 
   sideMenuElementName = 'inc2lon-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="inc2lon-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal plot-analysis-menu-maximized">
-    <div id="plot-analysis-content" class="side-menu">
+    <div id="plot-analysis-content" class="side-menu" style="height: 80%">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
     </div>
   </div>`;
@@ -68,7 +67,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     // Setup Chart
     this.chart.setOption({
       title: {
-        text: 'Inclination vs Longitude Scatter Plot',
+        text: 'GEO Inclination vs Longitude Scatter Plot',
         textStyle: {
           fontSize: 16,
           color: '#fff',
@@ -80,19 +79,37 @@ export class Inc2LonPlots extends KeepTrackPlugin {
           color: '#fff',
         },
       },
-      tooltip: {},
+      tooltip: {
+        formatter: (params) => {
+          const data = params.value;
+          const color = params.color;
+          const name = params.name;
+
+          return `
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+              <div style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: flex-end;">
+                <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-bottom: 5px;"></div>
+                <div style="font-weight: bold;"> ${name}</div>
+              </div>
+              <div><bold>Inclination:</bold> ${data[1].toFixed(3)}°</div>
+              <div><bold>Longitude:</bold> ${data[0].toFixed(3)}°</div>
+              <div><bold>Period:</bold> ${data[2].toFixed(2)} min</div>
+            </div>
+          `;
+        },
+      },
       xAxis: {
-        name: 'Longitude',
+        name: 'Longitude (°)',
         type: 'value',
         position: 'bottom',
       },
       yAxis: {
-        name: 'Inclination',
+        name: 'Inclination (°)',
         type: 'value',
         position: 'left',
       },
       zAxis: {
-        name: 'Period',
+        name: 'Period (min)',
         type: 'value',
       },
       dataZoom: [
@@ -161,7 +178,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       series: data.map((country) => ({
         type: 'scatter',
         name: country.name,
-        data: country.value.map((item: any) => ({
+        data: country.value.map((item) => ({
           name: item[3],
           id: item[4],
           value: [item[1], item[0], item[2]],
@@ -183,7 +200,10 @@ export class Inc2LonPlots extends KeepTrackPlugin {
   static getPlotData(): EChartsData {
     const china = [];
     const usa = [];
+    const france = [];
     const russia = [];
+    const india = [];
+    const japan = [];
     const other = [];
 
     keepTrackApi.getCatalogManager().objectCache.forEach((obj) => {
@@ -192,16 +212,17 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       }
       const sat = obj as DetailedSatellite;
 
-      if (sat.eccentricity > 0.1) {
+      // Only GEO objects
+      if (sat.eccentricity > Inc2LonPlots.maxEccentricity_) {
         return;
       }
-      if (sat.period < 1240) {
+      if (sat.period < Inc2LonPlots.minSatellitePeriod_) {
         return;
       }
-      if (sat.period > 1640) {
+      if (sat.period > Inc2LonPlots.maxSatellitePeriod_) {
         return;
       }
-      if (sat.inclination > 17) {
+      if (sat.inclination > Inc2LonPlots.maxInclination_) {
         return;
       }
 
@@ -210,23 +231,31 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       const lla = sat.lla(now);
 
       switch (sat.country) {
-        case 'United States of America':
-        case 'United States':
         case 'US':
           usa.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
 
           return;
-        case 'Russian Federation':
-        case 'CIS':
-        case 'Russia':
+        case 'RU':
+        case 'USSR':
           russia.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
 
           return;
-        case 'China':
-        case 'China, People\'s Republic of':
-        case 'Hong Kong Special Administrative Region, China':
-        case 'China (Republic)':
+        case 'F':
+          france.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
+
+          return;
+
+        case 'CN':
           china.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
+
+          return;
+        case 'IN':
+          india.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
+
+          return;
+
+        case 'J':
+          japan.push([sat.inclination, lla.lon, sat.period, sat.name, sat.id]);
 
           return;
         default:
@@ -236,12 +265,13 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     });
 
     return [
+      { name: 'France', value: france },
       { name: 'USA', value: usa },
       { name: 'Other', value: other },
       { name: 'Russia', value: russia },
       { name: 'China', value: china },
+      { name: 'India', value: india },
+      { name: 'Japan', value: japan },
     ] as EChartsData;
   }
 }
-
-export const inc2LonPlotPlugin = new Inc2LonPlots();

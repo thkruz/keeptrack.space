@@ -48,7 +48,7 @@ export type EChartsData = {
   name: string;
   satId?: number;
   country?: string;
-  value?: [number, number, number][];
+  value?: [number, number, number, string?, string?][];
   data?: [number, number, number?][];
 }[];
 
@@ -116,6 +116,11 @@ export interface Colors {
   umbral: rgbaArray;
   unknown: rgbaArray;
   version: string;
+  sourceUssf: rgbaArray,
+  sourceAldoria: rgbaArray,
+  sourceCelestrak: rgbaArray,
+  sourcePrismnet: rgbaArray,
+  sourceVimpel: rgbaArray,
 }
 
 export interface SatCruncherMessageData {
@@ -274,6 +279,14 @@ export enum Pickable {
   No = 0,
 }
 
+export enum MenuMode {
+  BASIC,
+  ADVANCED,
+  ANALYSIS,
+  EXPIREMENTAL,
+  ALL,
+}
+
 export type ColorInformation = {
   color: [number, number, number, number];
   marker?: boolean;
@@ -359,6 +372,7 @@ export enum KeepTrackApiEvents {
    */
   rightBtnMenuAdd = 'rightBtnMenuAdd',
   updateDateTime = 'updateDateTime',
+  updatePropRate = 'updatePropRate',
   uiManagerFinal = 'uiManagerFinal',
   resetSensor = 'resetSensor',
   /**
@@ -388,4 +402,5 @@ export enum KeepTrackApiEvents {
   canvasMouseDown = 'canvasMouseDown',
   touchStart = 'touchStart',
   ConeMeshUpdate = 'ConeMeshUpdate',
+  bottomMenuModeChange = 'bottomMenuModeChange',
 }

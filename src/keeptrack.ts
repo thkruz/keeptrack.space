@@ -5,8 +5,8 @@
  * interaction with the application.
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -30,6 +30,7 @@
 
 import logoPng from '@public/img/kts-text-logo.png';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
+import earthJpg from '@public/img/wallpaper/Earth.jpg';
 import issJpg from '@public/img/wallpaper/iss.jpg';
 import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
 import rocketJpg from '@public/img/wallpaper/rocket.jpg';
@@ -37,6 +38,7 @@ import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
 import rocket3Jpg from '@public/img/wallpaper/rocket3.jpg';
 import rocket4Jpg from '@public/img/wallpaper/rocket4.jpg';
 import satJpg from '@public/img/wallpaper/sat.jpg';
+import sat2Jpg from '@public/img/wallpaper/sat2.jpg';
 import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
 import thuleJpg from '@public/img/wallpaper/thule.jpg';
 
@@ -70,6 +72,7 @@ import { Scene } from './singletons/scene';
 import { TimeManager } from './singletons/time-manager';
 import { UiManager } from './singletons/uiManager';
 import { WebGLRenderer } from './singletons/webgl-renderer';
+import { BottomMenu } from './static/bottom-menu';
 import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
 import { SensorMath } from './static/sensor-math';
@@ -77,13 +80,14 @@ import { SplashScreen } from './static/splash-screen';
 
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
-  private static splashScreenImgList_ = [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg];
+  private static readonly splashScreenImgList_ =
+    [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
 
-  private isShowFPS = false;
+  private readonly isShowFPS = false;
   isReady = false;
   private isUpdateTimeThrottle_: boolean;
   private lastGameLoopTimestamp_ = <Milliseconds>0;
-  private settingsOverride_: SettingsManagerOverride;
+  private readonly settingsOverride_: SettingsManagerOverride;
 
   colorManager: ColorSchemeManager;
   demoManager: DemoManager;
@@ -121,6 +125,13 @@ export class KeepTrack {
     if (!this.settingsOverride_.isPreventDefaultHtml) {
       import(/* webpackMode: "eager" */ '@css/loading-screen.css');
       KeepTrack.getDefaultBodyHtml();
+      BottomMenu.init();
+
+      keepTrackApi.register({
+        event: KeepTrackApiEvents.uiManagerFinal,
+        cbName: 'addBottomMenuFilterButtons',
+        cb: () => BottomMenu.addBottomMenuFilterButtons(),
+      });
 
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
         KeepTrack.loadSplashScreen_();
@@ -224,7 +235,7 @@ export class KeepTrack {
       <main>
         <div id="rmb-wrapper"></div>
         <div id="canvas-holder">
-          <div id="demo-logo">
+          <div id="demo-logo" class="start-hidden">
             <a href="https://keeptrack.space" target="_blank">
               <img src="${logoPng}" alt="Keep Track">
             </a>
@@ -251,9 +262,6 @@ export class KeepTrack {
         <div id="footer-handle" class="ui-resizable-handle ui-resizable-n"></div>
         <div id="footer-toggle-wrapper">
           <div id="nav-footer-toggle">&#x25BC;</div>
-        </div>
-        <div id="bottom-icons-container">
-          <div id="bottom-icons"></div>
         </div>
       </footer>`;
 
@@ -555,17 +563,19 @@ theodore.kruczek at gmail dot com.
             autoScale: false,
             container: erudaDom,
             useShadowDom: false,
-            tool: ['console', 'elements'],
           });
           const erudaEntryButtonDoms = keepTrackApi.containerRoot.querySelectorAll('eruda-entry-btn');
 
           if (erudaEntryButtonDoms.length > 0) {
             hideEl(erudaEntryButtonDoms[0] as HTMLElement);
           }
-          erudaDom.style.top = 'var(--top-menu-height)';
-          erudaDom.style.height = '80%';
-          erudaDom.style.width = '60%';
-          erudaDom.style.left = '20%';
+
+          const erudaContainerDom = getEl('eruda-console').parentElement.parentElement;
+
+          erudaContainerDom.style.top = 'calc(var(--top-menu-height) + 30px)';
+          erudaContainerDom.style.height = '80%';
+          erudaContainerDom.style.width = '60%';
+          erudaContainerDom.style.left = '20%';
         }
       }
 

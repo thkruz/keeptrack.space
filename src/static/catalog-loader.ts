@@ -973,6 +973,7 @@ export class CatalogLoader {
             altId,
             intlDes: '',
             id: tempObjData.length,
+            srouce: CatalogSource.VIMPEL,
           };
 
           const satellite = new DetailedSatellite({

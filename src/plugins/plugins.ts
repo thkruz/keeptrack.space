@@ -1,45 +1,46 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CountriesMenu } from '@app/plugins/countries/countries';
 import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
-import * as missile from '@app/plugins/missile/missilePlugin';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import * as catalogLoader from '@app/static/catalog-loader';
 
+import googleAnalytics from '@analytics/google-analytics';
 import { KeepTrackApiEvents } from '@app/interfaces';
+import createAnalytics from 'analytics';
 import { KeepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { AnalysisMenu } from './analysis/analysis';
 import { Astronomy } from './astronomy/astronomy';
 import { Breakup } from './breakup/breakup';
+import { Calculator } from './calculator/calculator';
 import { ClassificationBar } from './classification-bar/classification-bar';
 import { Collissions } from './collisions/collisions';
 import { ColorMenu } from './colors-menu/colors-menu';
+import { CreateSat } from './create-sat/create-sat';
 import { DateTimeManager } from './date-time-manager/date-time-manager';
 import { DebrisScreening } from './debris-screening/debris-screening';
 import { DebugMenuPlugin } from './debug/debug';
-import { dopsPlugin } from './dops/dops';
+import { DopsPlugin } from './dops/dops';
 import { EditSat } from './edit-sat/edit-sat';
 import { GamepadPlugin } from './gamepad/gamepad';
+import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
+import { MissilePlugin } from './missile/missile-plugin';
 import { NewLaunch } from './new-launch/new-launch';
+import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
 import { OrbitReferences } from './orbit-references/orbit-references';
 import { Planetarium } from './planetarium/planetarium';
-import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact-predict';
-/*
- * import { ecfPlotsPlugin } from './plot-analysis/ecf-plots';
- * import { eciPlotsPlugin } from './plot-analysis/eci-plots';
- * import { inc2AltPlotPlugin } from './plot-analysis/inc2alt';
- * import { inc2LonPlotPlugin } from './plot-analysis/inc2lon';
- * import { ricPlotPlugin } from './plot-analysis/ric-plots';
- * import { time2LonPlotsPlugin } from './plot-analysis/time2lon';
- */
-import googleAnalytics from '@analytics/google-analytics';
-import createAnalytics from 'analytics';
-import { NextLaunchesPlugin } from './next-launches/next-launches';
+import { EcfPlot } from './plot-analysis/ecf-plots';
+import { EciPlot } from './plot-analysis/eci-plots';
+import { Inc2AltPlots } from './plot-analysis/inc2alt';
+import { Inc2LonPlots } from './plot-analysis/inc2lon';
+import { Lat2LonPlots } from './plot-analysis/lat2lon';
+import { RicPlot } from './plot-analysis/ric-plots';
+import { Time2LonPlots } from './plot-analysis/time2lon';
 import { PolarPlotPlugin } from './polar-plot/polar-plot';
 import { ReportsPlugin } from './reports/reports';
 import { SatConstellations } from './sat-constellations/sat-constellations';
@@ -64,11 +65,11 @@ import { StereoMap } from './stereo-map/stereo-map';
 import { TimeMachine } from './time-machine/time-machine';
 import { SatelliteTimeline } from './timeline-satellite/satellite-timeline';
 import { SensorTimeline } from './timeline-sensor/sensor-timeline';
+import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact-predict';
 import { TransponderChannelData } from './transponder-channel-data/transponder-channel-data';
 import { VideoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
-import { Calculator } from './calculator/calculator';
 
 export type KeepTrackPlugins = {
   transponderChannelData?: boolean;
@@ -110,7 +111,6 @@ export type KeepTrackPlugins = {
   plotAnalysis?: boolean;
   satChanges?: boolean;
   satelliteView?: boolean;
-  scenarioCreator?: boolean;
   screenshot?: boolean;
   sensor?: boolean;
   sensorFov?: boolean;
@@ -125,14 +125,16 @@ export type KeepTrackPlugins = {
   watchlist?: boolean;
   reports?: boolean;
   polarPlot?: boolean;
+  graphicsMenu?: boolean;
   timeline?: boolean;
   timelineAlt?: boolean;
   calculator?: boolean;
+  createSat?: boolean;
 };
 
 // Register all core modules
 export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugins): void => {
-  plugins ??= {};
+  plugins ??= <KeepTrackPlugins>{};
   try {
     const pluginList = [
       { init: () => new DebugMenuPlugin().init(), enabled: plugins.debug },
@@ -162,9 +164,10 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new Breakup().init(), enabled: plugins.breakup },
       { init: () => new DebrisScreening().init(), enabled: plugins.debrisScreening },
       { init: () => new TransponderChannelData().init(), enabled: plugins.transponderChannelData },
+      { init: () => new CreateSat().init(), enabled: plugins.createSat },
       { init: () => new EditSat().init(), enabled: plugins.editSat },
       { init: () => new NewLaunch().init(), enabled: plugins.newLaunch },
-      { init: () => missile.init(), enabled: plugins.missile },
+      { init: () => new MissilePlugin().init(), enabled: plugins.missile },
       { init: () => new StereoMap().init(), enabled: plugins.stereoMap },
       { init: () => new SensorFov().init(), enabled: plugins.sensorFov },
       { init: () => new SensorSurvFence().init(), enabled: plugins.sensorSurv },
@@ -173,7 +176,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new Planetarium().init(), enabled: plugins.planetarium },
       { init: () => new Astronomy().init(), enabled: plugins.astronomy },
       { init: () => new NightToggle().init(), enabled: plugins.nightToggle },
-      { init: () => dopsPlugin.init(), enabled: plugins.dops },
+      { init: () => new DopsPlugin().init(), enabled: plugins.dops },
       { init: () => new SatConstellations().init(), enabled: plugins.constellations },
       { init: () => new CountriesMenu().init(), enabled: plugins.countries },
       { init: () => new ColorMenu().init(), enabled: plugins.colorsMenu },
@@ -184,16 +187,15 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new ScreenRecorder().init(), enabled: plugins.screenRecorder },
       { init: () => new AnalysisMenu().init(), enabled: plugins.analysis },
       { init: () => new Calculator().init(), enabled: plugins.calculator },
-      /*
-       * { plugin: eciPlotsPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: ecfPlotsPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: ricPlotPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: time2LonPlotsPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: inc2AltPlotPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: inc2LonPlotPlugin, enabled: plugins.plotAnalysis },
-       * { plugin: aboutMenuPlugin, enabled: plugins.aboutManager },
-       */
+      { init: () => new EciPlot().init(), enabled: plugins.plotAnalysis },
+      { init: () => new EcfPlot().init(), enabled: plugins.plotAnalysis },
+      { init: () => new RicPlot().init(), enabled: plugins.plotAnalysis },
+      { init: () => new Time2LonPlots().init(), enabled: plugins.plotAnalysis },
+      { init: () => new Lat2LonPlots().init(), enabled: plugins.plotAnalysis },
+      { init: () => new Inc2AltPlots().init(), enabled: plugins.plotAnalysis },
+      { init: () => new Inc2LonPlots().init(), enabled: plugins.plotAnalysis },
       { init: () => new SettingsMenuPlugin().init(), enabled: plugins.settingsMenu },
+      { init: () => new GraphicsMenuPlugin().init(), enabled: plugins.graphicsMenu },
       { init: () => new SoundManager().init(), enabled: plugins.soundManager },
       { init: () => new GamepadPlugin().init(), enabled: plugins.gamepad },
       { init: () => new VideoDirectorPlugin().init(), enabled: plugins.videoDirector },
@@ -284,23 +286,28 @@ export const uiManagerFinal = (plugins: any): void => {
     keepTrackApi.analytics.page();
   }
 
-  const wheel = (dom: any, deltaY: number) => {
+  const wheel = (dom: EventTarget, deltaY: number) => {
+    const domEl = dom as HTMLElement;
     const step = 0.15;
-    const pos = dom.scrollTop;
+    const pos = domEl.scrollTop;
     const nextPos = pos + step * deltaY;
 
-    dom.scrollTop = nextPos;
+    domEl.scrollTop = nextPos;
   };
 
-  getEl('bottom-icons-container').addEventListener(
-    'wheel',
-    (event: WheelEvent) => {
-      event.preventDefault();
-      wheel(event.currentTarget, event.deltaY);
-    },
-    { passive: false },
-  );
+  ['bottom-icons', 'bottom-icons-filter'].forEach((divIdWithScroll) => {
+
+    getEl(divIdWithScroll).addEventListener(
+      'wheel',
+      (event: WheelEvent) => {
+        event.preventDefault(); // Prevent default scroll behavior
+        wheel(event.currentTarget, event.deltaY);
+      },
+      { passive: false }, // Must be false to allow preventDefault()
+    );
+  });
 };
 
+
 // Create common import for all plugins
-export { StreamManager as CanvasRecorder, catalogLoader, missile };
+export { StreamManager as CanvasRecorder, catalogLoader };

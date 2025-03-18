@@ -1,10 +1,10 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
-import aboutPng from '@public/img/icons/about.png';
+import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import { DetailedSatellite, EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -35,7 +35,9 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   formPrefix_ = 'ds';
 
-  bottomIconImg = aboutPng;
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
+
+  bottomIconImg = frameInspectPng;
   sideMenuElementName = 'debris-screening-menu';
   sideMenuElementHtml = keepTrackApi.html`
   <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select">

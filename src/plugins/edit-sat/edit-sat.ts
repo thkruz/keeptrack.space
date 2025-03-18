@@ -1,10 +1,10 @@
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { StringPad } from '@app/lib/stringPad';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import editPng from '@public/img/icons/edit.png';
+import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 
 import { OrbitFinder } from '@app/singletons/orbit-finder';
@@ -13,7 +13,7 @@ import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
@@ -26,6 +26,8 @@ export class EditSat extends KeepTrackPlugin {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   isRequireSatelliteSelected = true;
   isIconDisabled = true;
@@ -63,7 +65,7 @@ export class EditSat extends KeepTrackPlugin {
               <label for="${EditSat.elementPrefix}-rasc" class="active">Right Ascension</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AA.AAAAAAAA" id="${EditSat.elementPrefix}-ecen" type="text" maxlength="7" />
+              <input placeholder="AAAAAAA" id="${EditSat.elementPrefix}-ecen" type="text" maxlength="7" />
               <label for="${EditSat.elementPrefix}-ecen" class="active">Eccentricity</label>
             </div>
             <div class="input-field col s12">
@@ -75,7 +77,7 @@ export class EditSat extends KeepTrackPlugin {
               <label for="${EditSat.elementPrefix}-meana" class="active">Mean Anomaly</label>
             </div>
             <div class="input-field col s12">
-              <input placeholder="AAA.AAAA" id="${EditSat.elementPrefix}-meanmo" type="text" maxlength="11" />
+              <input placeholder="AA.AAAAA" id="${EditSat.elementPrefix}-meanmo" type="text" maxlength="11" />
               <label for="${EditSat.elementPrefix}-meanmo" class="active">Mean Motion</label>
             </div>
             <div class="input-field col s12">
@@ -105,7 +107,7 @@ export class EditSat extends KeepTrackPlugin {
     `;
 
 
-  bottomIconImg = editPng;
+  bottomIconImg = editSatellitePng;
   bottomIconCallback: () => void = (): void => {
     if (!this.isMenuButtonActive) {
       return;
@@ -113,7 +115,7 @@ export class EditSat extends KeepTrackPlugin {
     this.populateSideMenu_();
   };
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
   };
 
@@ -138,7 +140,7 @@ export class EditSat extends KeepTrackPlugin {
           }
           const meanmo = 1440 / parseFloat(per);
 
-          (<HTMLInputElement>getEl('es-meanmo')).value = meanmo.toFixed(8);
+          (<HTMLInputElement>getEl('es-meanmo')).value = meanmo.toFixed(4);
         });
 
         getEl(`${EditSat.elementPrefix}-meanmo`).addEventListener('change', () => {
@@ -147,7 +149,7 @@ export class EditSat extends KeepTrackPlugin {
           if (meanmo === '') {
             return;
           }
-          const per = (1440 / parseFloat(meanmo)).toFixed(8);
+          const per = (1440 / parseFloat(meanmo)).toFixed(4);
 
           (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = per;
         });

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
@@ -16,6 +17,7 @@ import { Scene } from '@app/singletons/scene';
 import { SearchManager } from '@app/singletons/search-manager';
 import { TimeManager } from '@app/singletons/time-manager';
 import { UiManager } from '@app/singletons/uiManager';
+import { BottomMenu } from '@app/static/bottom-menu';
 import { SensorMath } from '@app/static/sensor-math';
 import { mat4 } from 'gl-matrix';
 import { keepTrackContainer } from '../../src/container';
@@ -33,7 +35,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   settingsManager.isShowSplashScreen = true;
   settingsManager.init();
   window.settingsManager = settingsManager;
-  (global as any).settingsManager = settingsManager;
+  (global as unknown as Global).settingsManager = settingsManager;
   // Mock the Image class with a mock decode method and the ability to create new Image objects.
   // eslint-disable-next-line no-native-reassign, no-global-assign
   Image = jest.fn().mockImplementation(() => ({
@@ -107,7 +109,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     addEventListener: jest.fn(),
   } as unknown as Worker;
 
-  orbitManagerInstance.init(null as any, global.mocks.glMock);
+  orbitManagerInstance.init(null, global.mocks.glMock);
   keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
 
   const colorSchemeManagerInstance = new ColorSchemeManager();
@@ -139,12 +141,12 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     addEventListener: jest.fn(),
     postMessage: jest.fn(),
     terminate: jest.fn(),
-  } as any;
+  } as unknown as Worker;
 
   // Pretend webGl works
   renderer.gl = global.mocks.glMock;
   // Pretend we have a working canvas
-  renderer.domElement = <any>{ style: { cursor: 'default' } };
+  renderer.domElement = { style: { cursor: 'default' } } as unknown as HTMLCanvasElement;
 
   const inputManagerInstance = new InputManager();
   const groupManagerInstance = new GroupsManager();
@@ -192,6 +194,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     <div id="camera-control-widget"></div>
     `;
 
+  BottomMenu.createBottomMenu();
   inputManagerInstance.init();
   catalogManagerInstance.staticSet = [defaultSensor];
 
@@ -210,7 +213,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     Dropdown: {
       init: jest.fn(),
     },
-  } as any;
+  } as unknown as typeof window.M;
 
   dependencies?.forEach((Dependency) => {
     const instance = new Dependency();
@@ -259,6 +262,7 @@ export const setupMinimumHtml = () => {
     <div id="search"></div>
     <div id="search-icon"></div>
     <div id="search-results"></div>
+    <nav id="nav-footer"></nav>
   </div>`;
 };
 
@@ -377,6 +381,7 @@ export const mockCameraManager = <Camera>(<unknown>{
 export const setupDefaultHtml = () => {
   keepTrackApi.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
   KeepTrack.getDefaultBodyHtml();
+  BottomMenu.init();
   keepTrackApi.containerRoot.innerHTML += `
     <input id="search"></input>
     <div id="search-holder"></div>

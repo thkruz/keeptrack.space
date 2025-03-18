@@ -2,8 +2,8 @@
 /**
  * // /////////////////////////////////////////////////////////////////////////////
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -19,8 +19,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, SensorGeolocation, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import type { KeepTrackPlugins } from '@app/plugins/plugins';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-scheme-manager';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
@@ -28,20 +29,23 @@ import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
 import { ClassificationString } from '../static/classification';
 import { isThisNode } from '../static/isThisNode';
+import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 import { sateliot } from './presets/sateliot';
+import { starTalk } from './presets/startalk';
 
 export class SettingsManager {
   classificationStr = '' as ClassificationString;
+  menuMode: MenuMode = MenuMode.BASIC;
   // This controls which of the built-in plugins are loaded
-  plugins = {
-    debug: false,
+  plugins = <KeepTrackPlugins>{
+    debug: true,
     satInfoboxCore: true,
     aboutManager: false,
     collisions: true,
     trackingImpactPredict: true,
-    dops: false,
+    dops: true,
     findSat: true,
     launchCalendar: true,
     newLaunch: true,
@@ -73,13 +77,13 @@ export class SettingsManager {
     watchlist: true,
     sensor: true,
     settingsMenu: true,
+    graphicsMenu: true,
     datetime: true,
     social: true,
     topMenu: true,
     classificationBar: true,
     soundManager: true,
     gamepad: true,
-    scenarioCreator: false,
     debrisScreening: true,
     videoDirector: true,
     reports: true,
@@ -88,6 +92,7 @@ export class SettingsManager {
     timelineAlt: true,
     transponderChannelData: true,
     calculator: true,
+    createSat: true,
   };
 
   static preserveSettings() {
@@ -119,6 +124,12 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, settingsManager.isDisableTimeMachineToasts.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES, settingsManager.godraysSamples.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY, settingsManager.godraysDecay.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE, settingsManager.godraysExposure.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY, settingsManager.godraysDensity.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT, settingsManager.godraysWeight.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY, settingsManager.godraysIlluminationDecay.toString());
   }
 
   colors: ColorSchemeColorMap;
@@ -286,7 +297,7 @@ export class SettingsManager {
   /**
    * Callback function that is called when the settings are loaded.
    */
-  // eslint-disable-next-line class-methods-use-this
+  // eslint-disable-next-line no-empty-function
   onLoadCb = () => { };
   /**
    * Disables Toasts During Time Machine
@@ -298,6 +309,64 @@ export class SettingsManager {
    * Determines whether or not to draw the sun in the application.
    */
   isDrawSun = true;
+  /**
+   * Determines how many draw commands are used for sun illumination
+   * This should be a GodraySamples value (16, 32, 64, 128)
+   */
+  godraysSamples = 32;
+  /**
+   * The decay factor for the godray effect.
+   *
+   * This value controls how fast the godray intensity decreases with distance.
+   * Lower values result in shorter/less visible godrays, while higher values
+   * create longer/more prominent godrays.
+   *
+   * @default 0.983
+   */
+  godraysDecay = 0.983;
+  /**
+   * The exposure level for the godrays effect.
+   * Controls the brightness/intensity of the godray rendering.
+   * Higher values make godrays more pronounced.
+   * @default 0.6.
+   */
+  godraysExposure = 0.6;
+  /**
+   * The density of godrays effect.
+   * Controls the intensity and thickness of the light scattering effect.
+   * Higher values result in more pronounced godrays.
+   * @default 1.8
+   */
+  godraysDensity = 1.8;
+  /**
+   * The weight factor for the godray effect.
+   * Controls the intensity of the godray/light scattering effect.
+   * Higher values increase the visibility of godrays.
+   * @default 0.085
+   */
+  godraysWeight = 0.085;
+  /**
+   * Represents the rate at which the intensity of godrays (volumetric light scattering) diminishes
+   * with distance from the light source.
+   *
+   * Higher values make the godrays fade more quickly as they extend away from the light source.
+   * Lower values allow the godrays to extend further with less intensity reduction.
+   *
+   * @default 2.5
+   */
+  godraysIlluminationDecay = 2.5;
+  /**
+   * The size of the sun in the simulation, represented as a scale factor.
+   * A value of 0.9 indicates the sun is displayed at 90% of its default size.
+   */
+  sizeOfSun = 0.9;
+  /**
+   * Determines whether to use a sun texture.
+   * When set to true, the application will render the sun with a custom texture.
+   * When set to false, the application will use a default sun representation.
+   * @default false
+   */
+  isUseSunTexture = false;
   /**
    * Draw Lines from Sensors to Satellites When in FOV
    */
@@ -642,7 +711,7 @@ export class SettingsManager {
    * Determines whether or not to show the satellite labels.
    */
   isSatLabelModeOn = true;
-  isShowLogo = false;
+  isShowLogo = true;
   /**
    * Flag for using the debris catalog instead of the full catalog
    *
@@ -1069,7 +1138,7 @@ export class SettingsManager {
   externalTLEsOnly = false;
   positionCruncher: Worker = null;
   orbitCruncher: Worker = null;
-  /** Disables the camera widget by default */
+  /** Enables the camera widget */
   drawCameraWidget = false;
 
   loadPersistedSettings() {
@@ -1259,6 +1328,7 @@ export class SettingsManager {
      * Expose these to node if running in node
      */
     if (global) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (<any>global).settingsManager = this;
     }
   }
@@ -1385,6 +1455,11 @@ export class SettingsManager {
         notional: [1, 0, 0, 0.8],
         starlink: [0.0, 0.8, 0.0, 0.8],
         starlinkNot: [0.8, 0.0, 0.0, 0.8],
+        sourceUssf: [0.2, 1.0, 1.0, 0.7],
+        sourceAldoria: [0.2, 0.4, 1.0, 1],
+        sourceCelestrak: [1.0, 0.75, 0.0, 0.65],
+        sourcePrismnet: [1.0, 1.0, 1.0, 0.8],
+        sourceVimpel: [1.0, 0, 0, 0.6],
       };
 
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));
@@ -1470,6 +1545,9 @@ export class SettingsManager {
               case 'dark-clouds':
                 darkClouds(settingsManager);
                 break;
+              case 'startalk':
+                starTalk(settingsManager);
+                break;
               case 'sateliot':
                 sateliot(settingsManager);
                 break;
@@ -1548,6 +1626,9 @@ export class SettingsManager {
             break;
           case 'console':
             this.isEnableConsole = true;
+            break;
+          case 'godrays':
+            this.godraysSamples = GetVariables.godrays(val);
             break;
           case 'smallImages':
             this.smallImages = true;
@@ -1682,7 +1763,7 @@ export class SettingsManager {
 
     pageName = pageName[0].split('?').slice(0);
 
-    if (pageName[0] == 'embed.html') {
+    if (pageName[0] === 'embed.html') {
       this.disableUI = true;
       this.startWithOrbitsDisplayed = true;
       this.isAutoResizeCanvas = true;

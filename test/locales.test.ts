@@ -10,7 +10,7 @@ describe('Locales', () => {
      * this needs to be deep nested so the function might be plugins.SensorListPlugin.bottomIconLabel for example
      */
 
-    const flatMap = (obj: any, prefix: string = ''): string[] => Object.keys(obj).flatMap((key) => {
+    const flatMap = (obj: LocaleInformation, prefix: string = ''): string[] => Object.keys(obj).flatMap((key) => {
       const newPrefix = prefix ? `${prefix}.${key}` : key;
 
 
@@ -61,19 +61,19 @@ const validateLocalizationKeys = (localization: LocaleInformation, flatMapOfAllK
     if (splitKey.length === 1) {
       expect(() => localization[key]).not.toThrow();
       expect(() => localization[key]).not.toBe(key);
-      console.warn(localization[key]);
+      // console.warn(localization[key]);
     } else if (splitKey.length === 2) {
       expect(() => localization[splitKey[0]][splitKey[1]]).not.toThrow();
       expect(() => localization[splitKey[0]][splitKey[1]]).not.toBe(key);
-      console.warn(localization[splitKey[0]][splitKey[1]]);
+      // console.warn(localization[splitKey[0]][splitKey[1]]);
     } else if (splitKey.length === 3) {
       expect(() => localization[splitKey[0]][splitKey[1]][splitKey[2]]).not.toThrow();
       expect(() => localization[splitKey[0]][splitKey[1]][splitKey[2]]).not.toBe(key);
-      console.warn(localization[splitKey[0]][splitKey[1]][splitKey[2]]);
+      // console.warn(localization[splitKey[0]][splitKey[1]][splitKey[2]]);
     } else if (splitKey.length === 4) {
       expect(() => localization[splitKey[0]][splitKey[1]][splitKey[2]][splitKey[3]]).not.toThrow();
       expect(() => localization[splitKey[0]][splitKey[1]][splitKey[2]][splitKey[3]]).not.toBe(key);
-      console.warn(localization[splitKey[0]][splitKey[1]][splitKey[2]][splitKey[3]]);
+      // console.warn(localization[splitKey[0]][splitKey[1]][splitKey[2]][splitKey[3]]);
     }
   });
 };

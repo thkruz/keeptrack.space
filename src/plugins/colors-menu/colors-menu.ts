@@ -1,19 +1,22 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { LegendManager } from '@app/static/legend-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import colorsPng from '@public/img/icons/colors.png';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import palettePng from '@public/img/icons/palette.png';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 
 export class ColorMenu extends KeepTrackPlugin {
   readonly id = 'ColorMenu';
   dependencies_ = [];
-  bottomIconImg = colorsPng;
+  bottomIconImg = palettePng;
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+
   bottomIconElementName: string = 'menu-color-scheme';
   sideMenuElementName: string = 'color-scheme-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -35,6 +38,7 @@ export class ColorMenu extends KeepTrackPlugin {
         <li class="menu-selectable" data-color="deep-space">Deep Space</li>
         <li class="menu-selectable" data-color="elset-age">GP Age</li>
         <li class="menu-selectable" data-color="lost-objects">Lost Objects</li>
+        <li class="menu-selectable" data-color="data-source">Data Source</li>
       </ul>
     </div>
   </div>`;
@@ -58,10 +62,11 @@ export class ColorMenu extends KeepTrackPlugin {
     <li id="colors-confidence-rmb"><a href="#">Confidence Level</a></li>
     <li id="colors-velocity-rmb"><a href="#">Velocity</a></li>
     <li id="colors-ageOfElset-rmb"><a href="#">Age of GP</a></li>
+    <li id="colors-dataSource-rmb"><a href="#">Data Source</a></li>
   </ul>`;
 
   // eslint-disable-next-line class-methods-use-this
-  rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
+  rmbCallback: (targetId: string | null, clickedSat?: number) => void = (targetId: string) => {
     switch (targetId) {
       case 'colors-confidence-rmb':
         ColorMenu.colorsMenuClick('confidence');
@@ -87,11 +92,14 @@ export class ColorMenu extends KeepTrackPlugin {
       case 'colors-ageOfElset-rmb':
         ColorMenu.colorsMenuClick('elset-age');
         break;
+      case 'colors-dataSource-rmb':
+        ColorMenu.colorsMenuClick('data-source');
+        break;
       case 'colors-default-rmb':
         ColorMenu.colorsMenuClick('default');
         break;
       default:
-        if (targetId.includes('colors-')) {
+        if (targetId?.includes('colors-')) {
           errorManagerInstance.info(`Color scheme not found: ${targetId}`);
           ColorMenu.colorsMenuClick(targetId.slice(7).replace('-rmb', ''));
         }
@@ -99,7 +107,7 @@ export class ColorMenu extends KeepTrackPlugin {
     }
   };
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
   };
 
@@ -178,6 +186,11 @@ export class ColorMenu extends KeepTrackPlugin {
           colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.ageOfElset, true);
           uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
         });
+        break;
+      case 'data-source':
+        LegendManager.change('dataSource');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.dataSource, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
         break;
       case 'lost-objects':
         (<HTMLInputElement>getEl('search')).value = '';

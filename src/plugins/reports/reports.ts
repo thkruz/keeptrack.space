@@ -6,8 +6,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -32,7 +32,7 @@ import analysisPng from '@public/img/icons/reports.png';
 
 import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 interface ReportData {
@@ -55,6 +55,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   isRequireSatelliteSelected = true;
 
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
   bottomIconImg = analysisPng;
   isIconDisabledOnLoad = true;
@@ -84,7 +85,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   </div>
   `;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: false,
     minWidth: 320,
   };

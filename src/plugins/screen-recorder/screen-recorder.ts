@@ -1,7 +1,7 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import recorderPng from '@public/img/icons/video.png';
+import videocamPng from '@public/img/icons/videocam.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { StreamManager } from './stream-manager';
 
@@ -35,8 +35,9 @@ export class ScreenRecorder extends KeepTrackPlugin {
     }
   };
 
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
-  bottomIconImg = recorderPng;
+  bottomIconImg = videocamPng;
   private isCompatibilityIssue_ = false;
   private streamManagerInstance_: StreamManager;
 

@@ -8,7 +8,9 @@ import { getClass } from './../src/lib/get-class';
  *Code Analysis
  *
  *Objective:
- *The objective of the `getClass` function is to retrieve all the elements in the DOM that have a specific class name and return them as an array of HTMLElements. If no elements are found, it will return an empty array. If the function is being executed in a Jest environment, it will create an empty DIV element with the specified class name and return it as an array.
+ *The objective of the `getClass` function is to retrieve all the elements in the DOM that have a specific class name and return them as an array of HTMLElements. If no elements
+ *are found, it will return an empty array. If the function is being executed in a Jest environment, it will create an empty DIV element with the specified class name and return
+ *it as an array.
  *
  *Inputs:
  *- `id`: a string representing the class name of the elements to be retrieved.
@@ -26,7 +28,8 @@ import { getClass } from './../src/lib/get-class';
  *- An empty array if no elements are found or if the function is not being executed in a Jest environment.
  *
  *Additional aspects:
- *- If the function is being executed in a Jest environment, it will create an empty DIV element with the specified class name and append it to the document body. This is a hack and tests should provide the right environment instead.
+ *- If the function is being executed in a Jest environment, it will create an empty DIV element with the specified class name and append it to the document body. This is a hack
+ *and tests should provide the right environment instead.
  *- The function uses `Array.from` to convert the result of `document.getElementsByClassName` to an array of HTMLElements.
  */
 

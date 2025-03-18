@@ -5,8 +5,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -1129,13 +1129,13 @@ export class Camera {
       this.camSnapToSat.radius = Math.sqrt(this.camSnapToSat.pos.x ** 2 + this.camSnapToSat.pos.y ** 2);
       this.camSnapToSat.yaw = <Radians>(Math.atan2(this.camSnapToSat.pos.y, this.camSnapToSat.pos.x) + TAU / 4);
       this.camSnapToSat.pitch = <Radians>Math.atan2(this.camSnapToSat.pos.z, this.camSnapToSat.radius);
-      if (!this.camSnapToSat.pitch) {
+      if (this.camSnapToSat.pitch === null || typeof this.camSnapToSat.pitch === 'undefined') {
         errorManagerInstance.info('Pitch Calculation Error');
         this.camSnapToSat.pitch = <Radians>0;
         this.camZoomSnappedOnSat = false;
         this.camAngleSnappedOnSat = false;
       }
-      if (!this.camSnapToSat.yaw) {
+      if (this.camSnapToSat.yaw === null || typeof this.camSnapToSat.yaw === 'undefined') {
         errorManagerInstance.info('Yaw Calculation Error');
         this.camSnapToSat.yaw = <Radians>0;
         this.camZoomSnappedOnSat = false;
@@ -1233,10 +1233,10 @@ export class Camera {
         this.camYaw = <Radians>(this.camYaw + this.settings_.autoRotateSpeed * dt);
       }
       if (this.settings_.isAutoRotateU) {
-        this.camPitch = <Radians>(this.camPitch - (this.settings_.autoRotateSpeed / 2) * dt);
+        this.camPitch = <Radians>(this.camPitch + (this.settings_.autoRotateSpeed / 2) * dt);
       }
       if (this.settings_.isAutoRotateD) {
-        this.camPitch = <Radians>(this.camPitch + (this.settings_.autoRotateSpeed / 2) * dt);
+        this.camPitch = <Radians>(this.camPitch - (this.settings_.autoRotateSpeed / 2) * dt);
       }
     }
 

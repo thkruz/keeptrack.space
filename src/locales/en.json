@@ -49,6 +49,14 @@
     "SelectSecondarySatellite": "Select a secondary satellite first!",
     "SatelliteNotDetailedSatellite": "Satellite is not DetailedSatellite!",
     "SensorNotFound": "Sensor not found!",
+    "Scene": {
+      "disablingGodrays": "Your computer is struggling! Disabling Godrays.",
+      "disablingAurora": "Your computer is struggling! Disabling Aurora.",
+      "disablingAtmosphere": "Your computer is struggling! Disabling Atmosphere.",
+      "disablingMoon": "Your computer is struggling! Disabling Moon.",
+      "disablingMilkyWay": "Your computer is struggling! Disabling Milky Way.",
+      "disablingSun": "Your computer is struggling! Disabling Sun."
+    },
     "Breakup": {
       "CannotCreateBreakupForNonCircularOrbits": "Cannot create a breakup for non-circular orbits. Working on a fix.",
       "CannotCalcDirectionOfSatellite": "Cannot calculate direction of satellite. Try again later.",
@@ -91,8 +99,8 @@
     "2": "Press the 'L' key to toggle satellite orbits on/off.",
     "3": "Press the 'P' key to open a polar plot of the current satellite (You need to pick a sensor first!).",
     "4": "Reset the simulation time by pressing the 'T' key.",
-    "5": "Speed up the simulation by pressing the '>' key.",
-    "6": "Slow down the simulation by pressing the '<' key.",
+    "5": "Advance the simulation time by pressing the '>' or '=' key.",
+    "6": "Move back the simulation time by pressing the '<' or ')' key.",
     "7": "Pressing the '/' key will toggle the simulation speed between 1x and 0x.",
     "8": "Press the 'V' key to change the view mode.",
     "9": "Press Shift+F1 to open the help menu at any time.",
@@ -108,7 +116,14 @@
     "19": "Press '+' or '-' keys to zoom in and out.",
     "20": "Press 'F11' to toggle on/off the fullscreen mode.",
     "21": "You can search for satellites by name or NORAD ID in the search bar at the top right.",
-    "22": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu."
+    "22": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu.",
+    "23": "Press the 'N' key to toggle night.",
+    "24": "Press the 'I' key to hide/display contextual information about a satellite.",
+    "25": "Press the 'B' key to hide/display the menu.",
+    "26": "Speed up the simulation by pressing the Shift + ';' key.",
+    "27": "Slow down the simulation by pressing the ',' key.",
+    "28": "Set an object as Secondary to see its relative distance with primary object.",
+    "29": "Switch an object between Primary/Secondary with the '[' key."
   },
   "plugins": {
     "SensorListPlugin": {
@@ -216,7 +231,7 @@
       "title": "New Launch Menu",
       "helpBody": "The New Launch Menu is used for generating notional orbital launches by modifying existing satellites with similar parameters. <br><br> After selecting a satellite, you can select a launch location and a north/south azimuth. The selected satellite will be modified to align it with the launch site. The clock is then changed to 00:00:00 to represent relative time after the launch. This can be helpful in calculating sensor coverage relative to launch time. The objects relationship with other orbital objects will be incorrect."
     },
-    "Missile": {
+    "MissilePlugin": {
       "bottomIconLabel": "Missile",
       "title": "Missile Menu",
       "helpBody": "The Missile Menu is used for generating notional missile launches between countries. <br><br> When you using submarine launched missiles, the launch point is a custom latitude and longitude. When you are using land based missiles, the launch point is a fix latitude and longitude based on open source reporting. <br><br> In addition to custom missiles, a few predefined scenarios involving hundreds of missiles are available. <br><br> All missile launches are notional and are not intended to represent real world events. The launch trajectories are all based on the same ballistic model, but use different minimum and maximum ranges."
@@ -281,15 +296,15 @@
     "Astronomy": {
       "bottomIconLabel": "Astronomy"
     },
-    "AnalysisMenu": {
-      "bottomIconLabel": "Analysis",
-      "title": "Analysis Menu",
-      "helpBody": "The Analysis Menu provides a number of tools to help you analyze the data in the current view. The tools are: <ul style=\"margin-left: 40px;\"> <li>Export Official TLEs - Export real two line element sets.</li> <li>Export 3LES - Export three line element sets.</li> <li>Export KeepTrack TLEs - Export All KeepTrack two line element sets including analysts.</li> <li>Export KeepTrack 3LES - Export All KeepTrack three line element sets including analysts.</li> <li>Find Close Objects - Find objects that are close to each other.</li> <li>Find Reentries - Find objects that are likely to reenter the atmosphere.</li> <li>Best Passes - Find the best passes for a satellite based on the currently selected sensor.</li> </ul>"
-    },
     "Calculator": {
       "bottomIconLabel": "Reference Frame Transforms",
       "title": "Reference Frame Transforms Menu",
       "helpBody": "The Reference Frame Transforms Menu is used to convert between different reference frames. <br><br> The menu allows you to convert between the following reference frames: <ul style=\"margin-left: 40px;\"> <li> ECI - Earth Centered Inertial </li> <li> ECEF - Earth Centered Earth Fixed </li> <li> Geodetic </li> <li> Topocentric </li> </ul>"
+    },
+    "AnalysisMenu": {
+      "bottomIconLabel": "Analysis",
+      "title": "Analysis Menu",
+      "helpBody": "The Analysis Menu provides a number of tools to help you analyze the data in the current view. The tools are: <ul style=\"margin-left: 40px;\"> <li>Export Official TLEs - Export real two line element sets.</li> <li>Export 3LES - Export three line element sets.</li> <li>Export KeepTrack TLEs - Export All KeepTrack two line element sets including analysts.</li> <li>Export KeepTrack 3LES - Export All KeepTrack three line element sets including analysts.</li> <li>Find Close Objects - Find objects that are close to each other.</li> <li>Find Reentries - Find objects that are likely to reenter the atmosphere.</li> <li>Best Passes - Find the best passes for a satellite based on the currently selected sensor.</li> </ul>"
     },
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Settings",
@@ -300,6 +315,56 @@
       "bottomIconLabel": "Video Director",
       "title": "Video Director Menu",
       "helpBody": "The Video Director Menu is used to manipulate the camera and objects in the scene to create a video."
+    },
+    "CreateSat": {
+      "bottomIconLabel": "Create Satellite",
+      "title": "Create Satellite",
+      "helpBody": "The Create Satellite menu is used to create a satellite from its keplerian elements"
+    },
+    "DopsPlugin": {
+      "bottomIconLabel": "View DOPs",
+      "title": "Dilution of Precision Menu",
+      "helpBody": "The Dilution of Precision (DOP) menu is used to calculate the DOP values for a satellite and sensor. <br><br> The DOP values are: <ul style=\"margin-left: 40px;\"> <li> GDOP - Geometric Dilution of Precision </li> <li> PDOP - Position Dilution of Precision </li> <li> HDOP - Horizontal Dilution of Precision </li> <li> VDOP - Vertical Dilution of Precision </li> <li> TDOP - Time Dilution of Precision </li> <li> NDOP - Number of Satellites Dilution of Precision </li> </ul>"
+    },
+    "EciPlot": {
+      "bottomIconLabel": "ECI Plot",
+      "title": "ECI Plot Menu",
+      "helpBody": "The ECI Plot Menu is used to plot the satellite's position in the Earth Centered Inertial (ECI) reference frame."
+    },
+    "EcfPlot": {
+      "bottomIconLabel": "ECF Plot",
+      "title": "ECF Plot Menu",
+      "helpBody": "The ECF Plot Menu is used to plot the satellite's position in the Earth Centered Earth Fixed (ECF) reference frame."
+    },
+    "RicPlot": {
+      "bottomIconLabel": "RIC Plot",
+      "title": "RIC Plot Menu",
+      "helpBody": "The RIC Plot Menu is used to plot the satellite's position in the Radial, In-Track, and Cross-Track (RIC) reference frame."
+    },
+    "Time2LonPlots": {
+      "bottomIconLabel": "Waterfall Plot",
+      "title": "Waterfall Menu",
+      "helpBody": "The Time to Longitude (Waterfall) Plot Menu is used to plot the satellite's longitude over time."
+    },
+    "Lat2LonPlots": {
+      "bottomIconLabel": "Lat vs Lon Plot",
+      "title": "Latitude to Longitude Plot Menu",
+      "helpBody": "The Latitude vs Longitude Plot Menu is used for plotting the latitude vs longitude in the GEO belt."
+    },
+    "Inc2AltPlots": {
+      "bottomIconLabel": "Inc vs Alt Plot",
+      "title": "Inclination to Altitude Plot Menu",
+      "helpBody": "The Inclination to Altitude Plot Menu is used to plot the satellite's inclination against its altitude."
+    },
+    "Inc2LonPlots": {
+      "bottomIconLabel": "Inc Vs Lon Plot",
+      "title": "Inclination to Longitude Plot Menu",
+      "helpBody": "The Inc Vs Lon Plot Menu is used for plotting the inclination vs longitude in the GEO belt."
+    },
+    "GraphicsMenuPlugin": {
+      "bottomIconLabel": "Graphics Menu",
+      "title": "Graphics Menu",
+      "helpBody": "The Graphics Menu is used to change the graphics settings of the application."
     }
   }
 }

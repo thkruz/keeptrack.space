@@ -6,7 +6,8 @@ import { Kilometers, Vec3 } from 'ootk';
 
 /**
  *Main functionalities:
- *The OrbitMath class provides methods for calculating various orbital parameters from a given state vector. It also includes a method for converting a state vector to TLE (Two-Line Element) format, which is commonly used to describe the orbit of a satellite.
+ *The OrbitMath class provides methods for calculating various orbital parameters from a given state vector. It also includes a method for converting a state vector to TLE
+ *(Two-Line Element) format, which is commonly used to describe the orbit of a satellite.
  *
  *Methods:
  *- stateVector2Tle: Takes a state vector (position and velocity) and returns a TLE formatted string.

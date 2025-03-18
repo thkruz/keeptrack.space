@@ -6,8 +6,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -32,6 +32,7 @@ import { errorManagerInstance } from './errorManager';
 
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SunStatus } from '@app/static/sat-math';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Days, DetailedSatellite, SpaceObjectType, Star } from 'ootk';
@@ -106,6 +107,11 @@ export class ColorSchemeManager {
     densityOther: true,
     starlink: true,
     starlinkNot: true,
+    sourceUssf: true,
+    sourceAldoria: true,
+    sourceCelestrak: true,
+    sourcePrismnet: true,
+    sourceVimpel: true,
   };
 
   pickableBuffer: WebGLBuffer;
@@ -214,9 +220,9 @@ export class ColorSchemeManager {
 
   ageOfElset(
     obj: BaseObject,
-    params: {
-      jday: number;
-      year: string;
+    params?: {
+      jday?: number;
+      year?: number;
     },
   ): ColorInformation {
     /*
@@ -229,13 +235,13 @@ export class ColorSchemeManager {
       const now = new Date();
 
       params = {
-        jday: getDayOfYear(now),
-        year: now.getUTCFullYear().toString().substr(2, 2),
+        jday: getDayOfYear(now) + ((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400),
+        year: parseInt(now.getUTCFullYear().toString().substr(2, 2), 10),
       };
     }
 
     const jday = params?.jday || 0;
-    const year = params?.year || '';
+    const currentYearShort = params?.year || 0;
 
     if (obj.isStar()) {
       return this.starColor_(obj as Star);
@@ -260,54 +266,55 @@ export class ColorSchemeManager {
       };
     }
 
-    let daysold: Days;
     const sat = obj as DetailedSatellite;
-    const epochYear = sat.tle1.substring(18, 20);
+    const epochYearShort = parseInt(sat.tle1.substring(18, 20), 10);
+    const epochDay = parseFloat(sat.tle1.substring(20, 32));
 
-    if (epochYear === year) {
-      daysold = (jday - parseFloat(sat.tle1.substring(20, 28))) as Days;
-    } else {
-      daysold = (jday + parseInt(year) * 365 - (parseInt(epochYear) * 365 + parseFloat(sat.tle1.substring(20, 28)))) as Days;
-    }
+    const epochYearFull = epochYearShort <= currentYearShort ? 2000 + epochYearShort : 1900 + epochYearShort;
+    const currentYearFull = 2000 + currentYearShort;
 
-    if (daysold < 0.5 && this.objectTypeFlags.age1) {
+    const epochJday = epochDay + (epochYearFull * 365);
+    const currentJday = jday + (currentYearFull * 365);
+    const daysOld = (currentJday) - epochJday as Days;
+
+    if (daysOld < 0.5 && this.objectTypeFlags.age1) {
       return {
         color: this.colorTheme.age1,
         pickable: Pickable.Yes,
       };
     }
 
-    if (daysold >= 0.5 && daysold < 1.0 && this.objectTypeFlags.age2) {
+    if (daysOld >= 0.5 && daysOld < 1.0 && this.objectTypeFlags.age2) {
       return {
         color: this.colorTheme.age2,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 1.0 && daysold < 1.5 && this.objectTypeFlags.age3) {
+    if (daysOld >= 1.0 && daysOld < 1.5 && this.objectTypeFlags.age3) {
       return {
         color: this.colorTheme.age3,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 1.5 && daysold < 2.0 && this.objectTypeFlags.age4) {
+    if (daysOld >= 1.5 && daysOld < 2.0 && this.objectTypeFlags.age4) {
       return {
         color: this.colorTheme.age4,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 2.0 && daysold < 2.5 && this.objectTypeFlags.age5) {
+    if (daysOld >= 2.0 && daysOld < 2.5 && this.objectTypeFlags.age5) {
       return {
         color: this.colorTheme.age5,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 2.5 && daysold < 3.0 && this.objectTypeFlags.age6) {
+    if (daysOld >= 2.5 && daysOld < 3.0 && this.objectTypeFlags.age6) {
       return {
         color: this.colorTheme.age6,
         pickable: Pickable.Yes,
       };
     }
-    if (daysold >= 3.0 && this.objectTypeFlags.age7) {
+    if (daysOld >= 3.0 && this.objectTypeFlags.age7) {
       return {
         color: this.colorTheme.age7,
         pickable: Pickable.Yes,
@@ -318,6 +325,134 @@ export class ColorSchemeManager {
     return {
       color: this.colorTheme.deselected,
       pickable: Pickable.No,
+    };
+  }
+
+  dataSource(obj: BaseObject): ColorInformation {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
+
+    const checkFacility = this.checkFacility_(obj);
+
+    if (checkFacility) {
+      return checkFacility;
+    }
+
+    // Apply only for satellites
+    if (!obj.isSatellite()) {
+      if (obj.isMarker()) {
+        return this.getMarkerColor_();
+      }
+      if (obj.isSensor()) {
+        return {
+          color: this.colorTheme.sensor,
+          pickable: Pickable.Yes,
+        };
+      }
+      if (obj.isMissile()) {
+        return this.missileColor_(obj as MissileObject);
+      }
+      if (obj.isStar()) {
+        return this.starColor_(obj as Star);
+      }
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
+
+    // Check the source of the data
+    const sat = obj as DetailedSatellite;
+
+    if (sat.source) {
+      switch (sat.source) {
+        case 'USSF':
+          if (this.objectTypeFlags.sourceUssf === false) {
+            return {
+              color: this.colorTheme.deselected,
+              pickable: Pickable.No,
+            };
+          }
+          return {
+            color: this.colorTheme.sourceUssf,
+            pickable: Pickable.Yes,
+          };
+
+        case 'Aldoria':
+          if (this.objectTypeFlags.sourceAldoria === false) {
+            return {
+              color: this.colorTheme.deselected,
+              pickable: Pickable.No,
+            };
+          }
+          return {
+            color: this.colorTheme.sourceAldoria,
+            pickable: Pickable.Yes,
+          };
+
+        case 'Celestrak':
+          if (this.objectTypeFlags.sourceCelestrak === false) {
+            return {
+              color: this.colorTheme.deselected,
+              pickable: Pickable.No,
+            };
+          }
+          return {
+            color: this.colorTheme.sourceCelestrak,
+            pickable: Pickable.Yes,
+          };
+
+        case 'Prismnet':
+          if (this.objectTypeFlags.sourcePrismnet === false) {
+            return {
+              color: this.colorTheme.deselected,
+              pickable: Pickable.No,
+            };
+          }
+          return {
+            color: this.colorTheme.sourcePrismnet,
+            pickable: Pickable.Yes,
+          };
+
+
+        case 'JSC Vimpel':
+          if (this.objectTypeFlags.sourceVimpel === false) {
+            return {
+              color: this.colorTheme.deselected,
+              pickable: Pickable.No,
+            };
+          }
+          return {
+            color: this.colorTheme.sourceVimpel,
+            pickable: Pickable.Yes,
+          };
+
+        default:
+          if (this.objectTypeFlags.countryOther === false) {
+            return {
+              color: this.colorTheme.deselected,
+              pickable: Pickable.No,
+            };
+          }
+          return {
+            color: this.colorTheme.countryOther,
+            pickable: Pickable.Yes,
+          };
+      }
+    }
+    if (this.objectTypeFlags.countryOther === false) {
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
+    return {
+      color: this.colorTheme.countryOther,
+      pickable: Pickable.Yes,
     };
   }
 
@@ -825,6 +960,11 @@ export class ColorSchemeManager {
       rcsXXSmall: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
       version: '0',
       notional: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
+      sourceUssf: [1.0, 0.0, 0.0, 1.0] as rgbaArray,
+      sourceAldoria: [1.0, 0.0, 1.0, 1.0] as rgbaArray,
+      sourceCelestrak: [0.0, 1.0, 0.0, 1.0] as rgbaArray,
+      sourcePrismnet: [0.0, 0.0, 1.0, 0.5] as rgbaArray,
+      sourceVimpel: [0.0, 1.0, 1.0, 0.5] as rgbaArray,
     };
 
     this.resetObjectTypeFlags();
@@ -1006,7 +1146,10 @@ export class ColorSchemeManager {
 
   }
 
-  neighbors(obj: BaseObject, params: any): ColorInformation {
+  neighbors(obj: BaseObject, params?: {
+    orbitDensity?: number[][];
+    orbitDensityMax?: number;
+  }): ColorInformation {
     /*
      * NOSONAR
      * Hover and Select code might not pass params, so we will handle that here
@@ -1261,9 +1404,19 @@ export class ColorSchemeManager {
     this.objectTypeFlags.age7 = true;
     this.objectTypeFlags.starlink = true;
     this.objectTypeFlags.starlinkNot = true;
+    this.objectTypeFlags.sourceUssf = true;
+    this.objectTypeFlags.sourceAldoria = true;
+    this.objectTypeFlags.sourceCelestrak = true;
+    this.objectTypeFlags.sourcePrismnet = true;
+    this.objectTypeFlags.sourceVimpel = true;
   }
 
-  async setColorScheme(scheme: ((obj: BaseObject, params?: any) => ColorInformation) | null, isForceRecolor?: boolean) {
+  async setColorScheme(scheme: ((obj: BaseObject, params?: {
+    orbitDensity?: number[][];
+    orbitDensityMax?: number;
+    jday?: number;
+    year?: number;
+  }) => ColorInformation) | null, isForceRecolor?: boolean) {
     try {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
@@ -1277,7 +1430,7 @@ export class ColorSchemeManager {
       dotsManagerInstance.buffers.pickability = this.pickableBuffer;
     } catch (error) {
       // If we can't load the color scheme, just use the default
-      console.debug(error);
+      errorManagerInstance.log(error);
       settingsManager.setCurrentColorScheme(this.default);
       this.currentColorScheme = this.default;
       this.calculateColorBuffers(isForceRecolor);
@@ -1355,7 +1508,7 @@ export class ColorSchemeManager {
 
     // In FOV
     if (dotsManagerInstance.inViewData?.[obj.id] === 1 && dotsManagerInstance.inSunData[obj.id] > 0 && this.objectTypeFlags.inFOV === true) {
-      if (dotsManagerInstance.inSunData[obj.id] == 0) {
+      if (dotsManagerInstance.inSunData[obj.id] === 0) {
         if (this.objectTypeFlags.satLow === true) {
           return {
             color: this.colorTheme.umbral,
@@ -1380,7 +1533,7 @@ export class ColorSchemeManager {
     const sat = obj as DetailedSatellite;
 
     if (!dotsManagerInstance.inViewData?.[sat.id]) {
-      if (dotsManagerInstance.inSunData[sat.id] == 2 && this.objectTypeFlags.satHi === true) {
+      if (dotsManagerInstance.inSunData[sat.id] === SunStatus.SUN && this.objectTypeFlags.satHi === true) {
         if (sat.vmag !== null) {
           if (sat.vmag < 3) {
             return {
@@ -1426,14 +1579,14 @@ export class ColorSchemeManager {
         };
       }
 
-      if (dotsManagerInstance.inSunData[sat.id] == 1 && this.objectTypeFlags.satMed === true) {
+      if (dotsManagerInstance.inSunData[sat.id] === SunStatus.PENUMBRAL && this.objectTypeFlags.satMed === true) {
         return {
           color: this.colorTheme.penumbral,
           pickable: Pickable.Yes,
         };
       }
 
-      if (dotsManagerInstance.inSunData[sat.id] == 0 && this.objectTypeFlags.satLow === true) {
+      if (dotsManagerInstance.inSunData[sat.id] === SunStatus.UMBRAL && this.objectTypeFlags.satLow === true) {
         return {
           color: this.colorTheme.umbral,
           pickable: Pickable.No,
@@ -1453,7 +1606,10 @@ export class ColorSchemeManager {
     };
   }
 
-  updateColorScheme(scheme: (obj: BaseObject, params?: any) => ColorInformation) {
+  updateColorScheme(scheme: (obj: BaseObject, params?: {
+    orbitDensity: number[][];
+    orbitDensityMax: number;
+  }) => ColorInformation) {
     this.currentColorScheme = scheme;
   }
 
@@ -1546,8 +1702,8 @@ export class ColorSchemeManager {
     firstDotToColor: number,
     lastDotToColor: number,
     satData: BaseObject[],
-    satVel: any,
-    params: { year: string; jday: number; orbitDensity: any[]; orbitDensityMax: number },
+    satVel: Float32Array,
+    params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number },
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       satData[i].totalVelocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
@@ -1568,7 +1724,7 @@ export class ColorSchemeManager {
     firstDotToColor: number,
     lastDotToColor: number,
     satData: BaseObject[],
-    params: { year: string; jday: number; orbitDensity: any[]; orbitDensityMax: number },
+    params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number },
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
@@ -1630,7 +1786,7 @@ export class ColorSchemeManager {
 
   private calculateParams_() {
     const params = {
-      year: '',
+      year: 0,
       jday: 0,
       orbitDensity: [] as number[][],
       orbitDensityMax: 0,
@@ -1639,8 +1795,8 @@ export class ColorSchemeManager {
     if (this.currentColorScheme === this.ageOfElset) {
       const now = new Date();
 
-      params.jday = getDayOfYear(now);
-      params.year = now.getUTCFullYear().toString().substr(2, 2);
+      params.jday = getDayOfYear(now) + ((now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds()) / 86400);
+      params.year = parseInt(now.getUTCFullYear().toString().substr(2, 2), 10);
     }
 
     if (this.currentColorScheme === this.neighbors) {
@@ -1848,6 +2004,7 @@ export class ColorSchemeManager {
         case this.rcs:
         case this.countries:
         case this.ageOfElset:
+        case this.dataSource:
         case this.neighbors:
         case this.lostobjects:
         case this.leo:
@@ -2016,4 +2173,9 @@ export interface ColorSchemeColorMap {
   inGroup: [number, number, number, number];
   starlink: [number, number, number, number];
   starlinkNot: [number, number, number, number];
+  sourceUssf: [number, number, number, number],
+  sourceAldoria: [number, number, number, number],
+  sourceCelestrak: [number, number, number, number],
+  sourcePrismnet: [number, number, number, number],
+  sourceVimpel: [number, number, number, number],
 }

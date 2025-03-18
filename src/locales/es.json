@@ -49,6 +49,14 @@
     "SelectSecondarySatellite": "¡Seleccione un satélite secundario!",
     "SatelliteNotDetailedSatellite": "¡El satélite no es un DetailedSatellite!",
     "SensorNotFound": "¡Sensor no encontrado!",
+    "Scene": {
+      "disablingGodrays": "¡Tu computadora está teniendo problemas! Desactivando los rayos de luz.",
+      "disablingAurora": "¡Tu computadora está teniendo problemas! Desactivando la aurora.",
+      "disablingAtmosphere": "¡Tu computadora está teniendo problemas! Desactivando la atmósfera.",
+      "disablingMoon": "¡Tu computadora está teniendo problemas! Desactivando la luna.",
+      "disablingMilkyWay": "¡Tu computadora está teniendo problemas! Desactivando la Vía Láctea.",
+      "disablingSun": "¡Tu computadora está teniendo problemas! Desactivando el sol."
+    },
     "Breakup": {
       "CannotCreateBreakupForNonCircularOrbits": "No se puede crear una ruptura para órbitas no circulares. Estamos trabajando en una solución.",
       "CannotCalcDirectionOfSatellite": "No se puede calcular la dirección del satélite. Intente de nuevo más tarde.",
@@ -108,7 +116,14 @@
     "19": "Presiona las teclas '+' o '-' para acercar y alejar.",
     "20": "Presiona 'F11' para activar/desactivar el modo de pantalla completa.",
     "21": "Puedes buscar satélites por nombre o ID de NORAD en la barra de búsqueda en la parte superior derecha.",
-    "22": "Se puede crear un lanzamiento nominal nuevo seleccionando un satélite y haciendo clic en el botón 'Nuevo Lanzamiento' en el menú inferior."
+    "22": "Se puede crear un lanzamiento nominal nuevo seleccionando un satélite y haciendo clic en el botón 'Nuevo Lanzamiento' en el menú inferior.",
+    "23": "Presiona la tecla 'N' para activar/desactivar el modo nocturno.",
+    "24": "Presiona la tecla 'I' para ocultar/mostrar información contextual sobre un satélite.",
+    "25": "Presiona la tecla 'B' para ocultar/mostrar el menú.",
+    "26": "Acelera la simulación presionando la tecla Shift + ';'.",
+    "27": "Ralentiza la simulación presionando la tecla ','.",
+    "28": "Establece un objeto como Secundario para ver su distancia relativa con el objeto primario.",
+    "29": "Cambia un objeto entre Primario/Secundario con la tecla '['."
   },
   "plugins": {
     "SensorListPlugin": {
@@ -216,7 +231,7 @@
       "title": "Menú de Nuevo Lanzamiento",
       "helpBody": "El Menú de Nuevo Lanzamiento se usa para generar lanzamientos orbitales nocionales modificando satélites existentes con parámetros similares. <br><br> Después de seleccionar un satélite, puedes seleccionar una ubicación de lanzamiento y un azimut norte/sur. El satélite seleccionado será modificado para alinearlo con el sitio de lanzamiento. El reloj se cambia entonces a 00:00:00 para representar el tiempo relativo después del lanzamiento. Esto puede ser útil para calcular la cobertura del sensor relativa al tiempo de lanzamiento. La relación del objeto con otros objetos orbitales será incorrecta."
     },
-    "Missile": {
+    "MissilePlugin": {
       "bottomIconLabel": "Misil",
       "title": "Menú de Misiles",
       "helpBody": "El Menú de Misiles se usa para generar lanzamientos nocionales de misiles entre países. <br><br> Cuando usas misiles lanzados desde submarinos, el punto de lanzamiento es una latitud y longitud personalizadas. Cuando usas misiles basados en tierra, el punto de lanzamiento es una latitud y longitud fijas basadas en informes de fuentes abiertas. <br><br> Además de misiles personalizados, están disponibles algunos escenarios predefinidos que involucran cientos de misiles. <br><br> Todos los lanzamientos de misiles son nocionales y no pretenden representar eventos del mundo real. Las trayectorias de lanzamiento se basan todas en el mismo modelo balístico, pero usan diferentes rangos mínimos y máximos."
@@ -297,6 +312,56 @@
       "bottomIconLabel": "Director de Video",
       "title": "Menú de Director de Video",
       "helpBody": "El Menú de Director de Video se usa para manipular la cámara y los objetos en la escena para crear un video."
+    },
+    "CreateSat": {
+      "bottomIconLabel": "Crear Satélite",
+      "title": "Crear Satélite",
+      "helpBody": "El menú de Crear Satélite se utiliza para crear un satélite a partir de sus elementos keplerianos"
+    },
+    "DopsPlugin": {
+      "bottomIconLabel": "Ver DOPs",
+      "title": "Menú de Dilución de Precisión",
+      "helpBody": "El menú de Dilución de Precisión (DOP) se utiliza para calcular los valores DOP para un satélite y sensor. <br><br> Los valores DOP son: <ul style=\"margin-left: 40px;\"> <li> GDOP - Dilución de Precisión Geométrica </li> <li> PDOP - Dilución de Precisión de Posición </li> <li> HDOP - Dilución de Precisión Horizontal </li> <li> VDOP - Dilución de Precisión Vertical </li> <li> TDOP - Dilución de Precisión de Tiempo </li> <li> NDOP - Dilución de Precisión del Número de Satélites </li> </ul>"
+    },
+    "EciPlot": {
+      "bottomIconLabel": "Gráfico ECI",
+      "title": "Menú de Gráfico ECI",
+      "helpBody": "El Menú de Gráfico ECI se utiliza para graficar la posición del satélite en el marco de referencia Inercial Centrado en la Tierra (ECI)."
+    },
+    "EcfPlot": {
+      "bottomIconLabel": "Gráfico ECF",
+      "title": "Menú de Gráfico ECF",
+      "helpBody": "El Menú de Gráfico ECF se utiliza para graficar la posición del satélite en el marco de referencia Fijo a la Tierra Centrado en la Tierra (ECF)."
+    },
+    "RicPlot": {
+      "bottomIconLabel": "Gráfico RIC",
+      "title": "Menú de Gráfico RIC",
+      "helpBody": "El Menú de Gráfico RIC se utiliza para graficar la posición del satélite en el marco de referencia Radial, En-Pista y Transversal (RIC)."
+    },
+    "Time2LonPlots": {
+      "bottomIconLabel": "Gráfico de Cascada",
+      "title": "Menú de Cascada",
+      "helpBody": "El Menú de Gráfico de Tiempo a Longitud (Cascada) se utiliza para graficar la longitud del satélite a lo largo del tiempo."
+    },
+    "Lat2LonPlots": {
+      "bottomIconLabel": "Gráfico Lat vs Lon",
+      "title": "Menú de Gráfico de Latitud a Longitud",
+      "helpBody": "El Menú de Gráfico de Latitud vs Longitud se utiliza para graficar la latitud versus la longitud en el cinturón GEO."
+    },
+    "Inc2AltPlots": {
+      "bottomIconLabel": "Gráfico Inc vs Alt",
+      "title": "Menú de Gráfico de Inclinación a Altitud",
+      "helpBody": "El Menú de Gráfico de Inclinación a Altitud se utiliza para graficar la inclinación del satélite contra su altitud."
+    },
+    "Inc2LonPlots": {
+      "bottomIconLabel": "Gráfico Inc vs Lon",
+      "title": "Menú de Gráfico de Inclinación a Longitud",
+      "helpBody": "El Menú de Gráfico de Inc vs Lon se utiliza para graficar la inclinación versus la longitud en el cinturón GEO."
+    },
+    "GraphicsMenuPlugin": {
+      "bottomIconLabel": "Menú de Gráficos",
+      "title": "Menú de Gráficos",
+      "helpBody": "El Menú de Gráficos se utiliza para cambiar la configuración gráfica de la aplicación."
     }
   }
 }

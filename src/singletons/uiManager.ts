@@ -4,8 +4,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -445,36 +445,43 @@ export class UiManager {
 
     // Run any plugins code
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
-    this.bottomIconPress = (el: HTMLElement) => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, el.id);
-    const BottomIcons = getEl('bottom-icons');
 
-    BottomIcons?.addEventListener('click', (evt: Event) => {
-      const bottomIcons = getEl('bottom-icons');
-      let targetElement = <HTMLElement>evt.target;
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: 'uiManager',
+      cb: () => {
+        this.bottomIconPress = (el: HTMLElement) => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, el.id);
+        const BottomIcons = getEl('bottom-icons');
 
-      while (targetElement && targetElement !== bottomIcons) {
-        if (targetElement.parentElement === bottomIcons) {
-          this.bottomIconPress(targetElement);
+        BottomIcons?.addEventListener('click', (evt: Event) => {
+          const bottomIcons = getEl('bottom-icons');
+          let targetElement = <HTMLElement>evt.target;
 
-          return;
-        }
-        targetElement = targetElement.parentElement;
-      }
+          while (targetElement && targetElement !== bottomIcons) {
+            if (targetElement.parentElement === bottomIcons) {
+              this.bottomIconPress(targetElement);
 
-      if (targetElement === bottomIcons) {
-        return;
-      }
+              return;
+            }
+            targetElement = targetElement.parentElement;
+          }
 
-      if (!targetElement) {
-        errorManagerInstance.debug('targetElement is null');
-      } else {
-        this.bottomIconPress(targetElement);
-      }
+          if (targetElement === bottomIcons) {
+            return;
+          }
+
+          if (!targetElement) {
+            errorManagerInstance.debug('targetElement is null');
+          } else {
+            this.bottomIconPress(targetElement);
+          }
+        });
+        this.hideSideMenus = () => {
+          closeColorbox();
+          keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
+        };
+      },
     });
-    this.hideSideMenus = () => {
-      closeColorbox();
-      keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
-    };
   }
 
   toast(toastText: string, type: ToastMsgType, isLong = false) {

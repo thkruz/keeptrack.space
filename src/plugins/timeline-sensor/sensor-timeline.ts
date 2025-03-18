@@ -1,11 +1,17 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+/* eslint-disable max-statements */
+/* eslint-disable max-lines-per-function */
+/* eslint-disable max-lines */
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
-import { SatMath } from '@app/static/sat-math';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord, Seconds } from 'ootk';
+import { SatMath, SunStatus } from '@app/static/sat-math';
+import {
+  BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Hours, Kilometers, lla2eci, MILLISECONDS_PER_SECOND, Radians, SatelliteRecord,
+  Seconds, SpaceObjectType, Sun,
+} from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorManager } from '../sensor/sensorManager';
@@ -16,7 +22,7 @@ interface Pass {
   end: Date;
 }
 
-interface SensorPasses {
+interface ObservablePasses {
   sensor: DetailedSensor;
   passes: Pass[];
 }
@@ -29,12 +35,13 @@ export class SensorTimeline extends KeepTrackPlugin {
   private canvasStatic_: HTMLCanvasElement;
   private ctxStatic_: CanvasRenderingContext2D;
   private drawEvents_: { [key: string]: (mouseX: number, mouseY: number) => boolean } = {};
-  private allSensorLists_ = [];
-  private enabledSensors_: DetailedSensor[] = [];
-  private lengthOfLookAngles_ = 6 as Hours;
+  private readonly allSensorLists_ = [];
+  private readonly enabledSensors_: DetailedSensor[] = [];
+  private lengthOfLookAngles_ = 24 as Hours;
   private lengthOfBadPass_ = 120 as Seconds;
   private lengthOfAvgPass_ = 240 as Seconds;
   private angleCalculationInterval_ = <Seconds>30;
+  private detailedPlot = false;
 
   constructor() {
     super();
@@ -58,6 +65,8 @@ export class SensorTimeline extends KeepTrackPlugin {
       keepTrackApi.getSensorManager().getSensorList('mw').includes(s),
     );
   }
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   isRequireSatelliteSelected = true;
   isIconDisabled = true;
@@ -120,6 +129,14 @@ export class SensorTimeline extends KeepTrackPlugin {
         <label for="sensor-timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
       </div>
     </div>
+    <!-- Toggle Switch for Boolean Value -->
+    <div class="row">
+      <label for="sensor-timeline-toggle" class="btn btn-ui waves-effect waves-light">
+        <input type="checkbox" id="sensor-timeline-toggle" />
+        <span class="lever"></span>
+        Detailed Plot
+      </label>
+    </div>
     <div class="row" style="margin: 0 10px;">
       <div id="sensor-timeline-sensor-list">
       </div>
@@ -129,15 +146,52 @@ export class SensorTimeline extends KeepTrackPlugin {
     leftOffset: 0,
     zIndex: 10,
   };
+
   downloadIconCb = () => {
-    const canvas = document.getElementById('sensor-timeline-canvas') as HTMLCanvasElement;
-    const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+    // Get transits data
+    const passes = this.calculatePasses_();
+    const sensorData = passes[0];
+
+    // Convert the sensorData to CSV format
+    const csvData = this.convertSensorPassesToCSV(sensorData);
+
+    // Create a Blob with the CSV data
+    const blob = new Blob([csvData], { type: 'text/csv' });
+
+    // Create a link element
     const link = document.createElement('a');
 
-    link.href = image;
-    link.download = `sat-${(keepTrackApi.getPlugin(SelectSatManager).getSelectedSat() as DetailedSatellite).sccNum6}-timeline.png`;
+    // Create a URL for the Blob and set it as the href for the link
+    link.href = URL.createObjectURL(blob);
+
+    // Set the download attribute with a dynamically generated filename
+    link.download = `sat-${(keepTrackApi.getPlugin(SelectSatManager).getSelectedSat() as DetailedSatellite).sccNum6}-timeline.csv`;
+
+    // Simulate a click on the link to trigger the download
     link.click();
   };
+
+
+  // Function to convert SensorPasses array to CSV
+  convertSensorPassesToCSV = (sensorPassesArray: ObservablePasses[]) => {
+    // Start the CSV with a   header
+    const header = 'sensorId,sensorName,startTime,endTime';
+
+    // Flatten the sensorPasses array into rows for the CSV
+    const rows = sensorPassesArray.flatMap((sensorPass) => sensorPass.passes.map((pass) => {
+      const formattedStart = pass.start.toISOString(); // Convert Date to ISO string
+      const formattedEnd = pass.end.toISOString(); // Convert Date to ISO string
+
+
+      return `${sensorPass.sensor.sensorId},${sensorPass.sensor.objName},${formattedStart},${formattedEnd}`;
+    })).join('\n');
+
+    // Combine header and rows
+    const csvData = `${header}\n${rows}`;
+
+    return csvData;
+  };
+
 
   addHtml(): void {
     super.addHtml();
@@ -171,6 +225,12 @@ export class SensorTimeline extends KeepTrackPlugin {
 
         getEl('sensor-timeline-setting-avg-length').addEventListener('change', () => {
           this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-avg-length')).value) as Seconds;
+          this.ctxStatic_.reset();
+          this.updateTimeline();
+        });
+
+        getEl('sensor-timeline-toggle').addEventListener('change', () => {
+          this.detailedPlot = (<HTMLInputElement>getEl('sensor-timeline-toggle')).checked;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
@@ -209,9 +269,27 @@ export class SensorTimeline extends KeepTrackPlugin {
       }
 
       this.calculateSensors_();
-      const sensorPasses = this.calculatePasses_();
+      const passes = this.calculatePasses_();
 
-      this.drawTimeline_(sensorPasses);
+      if (this.detailedPlot === true) {
+
+        const ObservablePasses = passes[0];
+        const SatInFoVs = passes[1];
+        const SatInSuns = passes[2];
+        const StationInNights = passes[3];
+
+        /*
+         * console.log(ObservablePasses);
+         * console.log(SatInFoVs);
+         * console.log(SatInSuns);
+         * console.log(StationInNights);
+         */
+
+        this.drawDetailedTimeline_(ObservablePasses, SatInFoVs, SatInSuns, StationInNights);
+      } else if (this.detailedPlot === false) {
+        // console.log(passes[0]);
+        this.drawTimeline_(passes[0]);
+      }
     } catch (e) {
       errorManagerInstance.info(e);
     }
@@ -260,19 +338,42 @@ export class SensorTimeline extends KeepTrackPlugin {
     }
   }
 
-  private calculatePasses_(): SensorPasses[] {
-    const sensorPasses: SensorPasses[] = [];
+  //
+  // eslint-disable-next-line complexity
+  private calculatePasses_(): [ObservablePasses[], ObservablePasses[], ObservablePasses[], ObservablePasses[]] {
+    const AllObservablePasses: ObservablePasses[] = [];
+    const AllSatInFoVs: ObservablePasses[] = [];
+    const AllSatinSuns: ObservablePasses[] = [];
+    const AllSensorNights: ObservablePasses[] = [];
+
+
     const satellite = keepTrackApi.getPlugin(SelectSatManager).getSelectedSat() as DetailedSatellite;
 
     for (const sensor of this.enabledSensors_) {
-      const sensorPass: SensorPasses = {
+
+      console.log(`Sensor: ${sensor.name}`);
+
+      const ObservablePasses: ObservablePasses = {
+        sensor,
+        passes: [],
+      };
+      const SatInFoVs: ObservablePasses = {
+        sensor,
+        passes: [],
+      };
+      const SatinSuns: ObservablePasses = {
+        sensor,
+        passes: [],
+      };
+      const SensorNights: ObservablePasses = {
         sensor,
         passes: [],
       };
 
+
       // Skip if satellite is above the max range of the sensor
       if (sensor.maxRng < satellite.perigee && (!sensor.maxRng2 || sensor.maxRng2 < satellite.perigee)) {
-        sensorPasses.push(sensorPass); // Add empty pass to keep the order of the sensors
+        AllObservablePasses.push(ObservablePasses); // Add empty pass to keep the order of the sensors //!!//
         continue;
       }
 
@@ -280,46 +381,159 @@ export class SensorTimeline extends KeepTrackPlugin {
       let offset = 0;
 
       const durationInSeconds = this.lengthOfLookAngles_ * 60 * 60;
-      let isInView = false;
-      let isEnterView = false;
-      let isExitView = false;
-      let startTime = null;
 
+      let isObservable = false;
+      let isBecomeObservable = false;
+      let isBecomeUnobservable = false;
+
+      let startObservableTime = null;
+
+      // ---------------
+
+      let isInFoV = false;
+      let isEnterFov = false;
+      let isExitFov = false;
+      let startInFoVTime = null;
+
+      let isSatInSun = false;
+      let isSatEnterSun = false;
+      let isSatExitSun = false;
+      let startSunTime = null;
+
+      let isStationInNight = false;
+      let isStationEnterNight = false;
+      let isStationExitNight = false;
+      let startNightTime = null;
+
+      // ---------------
+
+      if (sensor.type !== SpaceObjectType.OPTICAL) {
+        SensorNights.passes.push({
+          start: keepTrackApi.getTimeManager().getOffsetTimeObj(0),
+          end: keepTrackApi.getTimeManager().getOffsetTimeObj((durationInSeconds - this.angleCalculationInterval_) * 1000),
+        });
+      }
 
       for (let i = 0; i < durationInSeconds; i += this.angleCalculationInterval_) {
         // 5second Looks
-        offset = i * 1000; // Offset in seconds (msec * 1000)
+        offset = i * 1000; // Offset in miliseconds (sec * 1000)
         const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
         const multiSitePass = SensorTimeline.propagateMultiSite(now, satellite.satrec, sensor);
+        const isObservableAtThisIter = SensorTimeline.checkObservable(now, satellite, sensor);
 
-        // Check if in FOV
-        if (multiSitePass.time && !isInView) {
-          startTime = new Date(multiSitePass.time);
-          isInView = true;
-          isEnterView = true;
+        // --------
+
+        const isStationInNightAtThisIter = SensorTimeline.checkStationInNight(now, sensor);
+        // console.log(isStationInNightAtThisIter)
+        const isSatInSunAtThisIter = SensorTimeline.checkSatinSun(now, satellite);
+
+        // --------
+
+
+        // Check if sat is Observable and enters the FoV
+        if (multiSitePass.time && !isObservable && isObservableAtThisIter) {
+          startObservableTime = now;
+          isObservable = true;
+          isBecomeObservable = true;
         }
 
-        if (!multiSitePass.time && isInView) {
-          isExitView = true;
-          isInView = false;
-          // Jump 3/4th to the next orbit
-          i += satellite.period * 60 * 0.75;
+        // Check if sat exits the FoV or becomes Unobservable
+        if ((!multiSitePass.time || !isObservableAtThisIter) && isObservable) {
+          isBecomeUnobservable = true;
+          isObservable = false;
+          /*
+           * This optimization no longer works becuase it assumes that there can only be one observable period per orbit
+           * which is only valid if the observability only depends on a single factor (such as FoV).
+           * if (!this.detailedPlot) {
+           *   if (satellite.semiMajorAxis > 30000) {
+           *     i += satellite.period * 60 * 0.5;
+           *   }
+           *   else{
+           *     i += satellite.period * 60 * 0.75; // NOSONAR
+           *   }
+           * }
+           */
         }
 
-        if ((isEnterView && isExitView) || (isEnterView && i === durationInSeconds - this.angleCalculationInterval_)) {
-          sensorPass.passes.push({
-            start: startTime,
+        // If sat enters and exits an observable period append it to the list
+        if ((isBecomeObservable && isBecomeUnobservable) || (isBecomeObservable && i === durationInSeconds - this.angleCalculationInterval_)) {
+          ObservablePasses.passes.push({
+            start: startObservableTime,
             end: now,
           });
-          isEnterView = false;
-          isExitView = false;
+          isBecomeObservable = false;
+          isBecomeUnobservable = false;
+        }
+
+        // -----------------------------------------------
+
+        if (multiSitePass.time && !isInFoV) {
+          startInFoVTime = now;
+          isInFoV = true;
+          isEnterFov = true;
+        }
+
+        if (!multiSitePass.time && isInFoV) {
+          isExitFov = true;
+          isInFoV = false;
+        }
+
+        if ((isEnterFov && isExitFov) || (isEnterFov && i === durationInSeconds - this.angleCalculationInterval_)) {
+          SatInFoVs.passes.push({
+            start: startInFoVTime,
+            end: now,
+          });
+          isEnterFov = false;
+          isExitFov = false;
+        }
+
+        if (sensor.type === SpaceObjectType.OPTICAL && this.detailedPlot) {
+          // Check if station in Night
+          if (isStationInNightAtThisIter && !isStationInNight) {
+            startNightTime = now;
+            isStationInNight = true;
+            isStationEnterNight = true;
+          }
+          if (!isStationInNightAtThisIter && isStationInNight) {
+            isStationExitNight = true;
+            isStationInNight = false;
+          }
+          if ((isStationEnterNight && isStationExitNight) || (isStationEnterNight && i === durationInSeconds - this.angleCalculationInterval_)) {
+            SensorNights.passes.push({
+              start: startNightTime,
+              end: now,
+            });
+            isStationEnterNight = false;
+            isStationExitNight = false;
+          }
+
+          // Check if sat in Sun
+          if (isSatInSunAtThisIter && !isSatInSun) {
+            startSunTime = now;
+            isSatInSun = true;
+            isSatEnterSun = true;
+          }
+          if (!isSatInSunAtThisIter && isSatInSun) {
+            isSatExitSun = true;
+            isSatInSun = false;
+          }
+          if ((isSatEnterSun && isSatExitSun) || (isSatEnterSun && i === durationInSeconds - this.angleCalculationInterval_)) {
+            SatinSuns.passes.push({
+              start: startSunTime,
+              end: now,
+            });
+            isSatEnterSun = false;
+            isSatExitSun = false;
+          }
         }
       }
-
-      sensorPasses.push(sensorPass);
+      AllObservablePasses.push(ObservablePasses);
+      AllSatInFoVs.push(SatInFoVs);
+      AllSatinSuns.push(SatinSuns);
+      AllSensorNights.push(SensorNights);
     }
 
-    return sensorPasses;
+    return [AllObservablePasses, AllSatInFoVs, AllSatinSuns, AllSensorNights];
   }
 
   static propagateMultiSite(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor) {
@@ -346,8 +560,80 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   }
 
-  private drawTimeline_(sensorPasses: SensorPasses[]): void {
-    // Clone the canvas element to remove all event listeners
+  static checkObservable(now: Date, satellite: DetailedSatellite, sensor: DetailedSensor) {
+
+
+    if (sensor.type !== SpaceObjectType.OPTICAL) {
+      console.log('non optical sensor');
+
+      return true;
+    } else if (sensor.type === SpaceObjectType.OPTICAL) {
+      console.log('optical sensor');
+    } else {
+      console.log('this fucking shit doesnt work');
+    }
+
+    const lla = {
+      lat: (sensor.lat * DEG2RAD) as Radians,
+      lon: (sensor.lon * DEG2RAD) as Radians,
+      alt: sensor.alt,
+    };
+
+    const { gmst } = calcGmst(now);
+    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const sensorPos = lla2eci(lla, gmst);
+
+    sensor.position = sensorPos;
+    const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
+    const satPos = SatMath.getEci(satellite, now);
+    const satInSun = SatMath.calculateIsInSun(satPos, sunPos);
+    // / Station is at night or penumbra
+
+    if (((stationInSun === SunStatus.UMBRAL) || (stationInSun === SunStatus.PENUMBRAL)) && (satInSun === SunStatus.SUN)) {
+      return true;
+    }
+
+    return false;
+
+  }
+
+  static checkStationInNight(now: Date, sensor: DetailedSensor) {
+    const lla = {
+      lat: (sensor.lat * DEG2RAD) as Radians,
+      lon: (sensor.lon * DEG2RAD) as Radians,
+      alt: sensor.alt,
+    };
+
+    const { gmst } = calcGmst(now);
+    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const sensorPos = lla2eci(lla, gmst);
+
+    sensor.position = sensorPos;
+    const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
+
+    if (stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) {
+      return true;
+    }
+
+    return false;
+
+
+  }
+
+  static checkSatinSun(now: Date, satellite: DetailedSatellite) {
+    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const satPos = SatMath.getEci(satellite, now);
+    const satInSun = SatMath.calculateIsInSun(satPos, sunPos);
+
+    if (satInSun === SunStatus.SUN) {
+      return true;
+    }
+
+    return false;
+
+  }
+
+  private drawDetailedTimeline_(ObservablePasses: ObservablePasses[], SatinFoVs: ObservablePasses[], SatinSuns: ObservablePasses[], StationInNights: ObservablePasses[]): void {
     const oldCanvas = this.canvas_;
     const newCanvas = oldCanvas.cloneNode(true) as HTMLCanvasElement;
 
@@ -361,10 +647,10 @@ export class SensorTimeline extends KeepTrackPlugin {
     const leftOffset = this.canvas_.width * 0.15;
     const topOffset = 0;
     const width = this.canvas_.width * 0.75;
-    const height = this.canvas_.height * 0.75;
+    const height = this.canvas_.height * 0.85;
     const timeManager = keepTrackApi.getTimeManager();
     const startTime = timeManager.simulationTimeObj.getTime();
-    const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000; // 24 hours from now
+    const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000;
 
     // clear canvas
     this.ctx_.reset();
@@ -372,7 +658,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     this.ctx_.fillStyle = 'rgb(58, 58, 58)'; // #3a3a3a
     this.ctx_.fillRect(leftOffset, topOffset, width, height - 15);
 
-    const yStep = height / (sensorPasses.length + 1);
+    const yStep = height / (ObservablePasses.length + 1);
     const xScale = (width) / (endTime - startTime);
 
     // Draw time axis
@@ -411,13 +697,13 @@ export class SensorTimeline extends KeepTrackPlugin {
     }
 
     // Draw passes for each sensor
-    sensorPasses.forEach((sensorPass, index) => {
+    ObservablePasses.forEach((sensorPass, index) => {
       const y = topOffset + (index + 1) * yStep;
 
       // Draw sensor name
       this.ctx_.fillStyle = 'rgb(255, 255, 255)';
       this.ctx_.font = '14px Consolas';
-      this.ctx_.fillText(sensorPass.sensor.uiName, leftOffset - 150, y + 5);
+      this.ctx_.fillText(sensorPass.sensor.uiName.concat(': can collect'), leftOffset - 165, y + 5);
 
       // Draw passes
       sensorPass.passes.forEach((pass) => {
@@ -447,23 +733,7 @@ export class SensorTimeline extends KeepTrackPlugin {
             // Calculate width of box based on text
             const text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime}`;
 
-            this.ctx_.font = '14px Consolas';
-
-            const boxWidth = this.ctx_.measureText(text).width;
-
-            // Draw tooltip box (first box is bigger to make a white border)
-            this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-            this.ctx_.fillRect(mouseX - boxWidth / 2 - 6, mouseY - 30, boxWidth + 12, 24);
-            // Draw tooltip box (second box is smaller to create a border effect)
-            this.ctx_.fillStyle = 'rgb(31, 51, 71)';
-            this.ctx_.fillRect(mouseX - boxWidth / 2 - 3, mouseY - 27, boxWidth + 6, 18);
-
-            // Draw tooltip text
-            this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-            this.ctx_.fillText(text, mouseX - boxWidth / 2, mouseY - 15);
-
-            // Make mouse cursor a pointer
-            this.canvas_.style.cursor = 'pointer';
+            this.drawTooltip_(text, mouseX, mouseY);
 
             return true;
           }
@@ -471,7 +741,7 @@ export class SensorTimeline extends KeepTrackPlugin {
           return false;
         };
 
-        this.drawEvents_[`${index}-${passStart}-${passEnd}`] = drawEvent;
+        this.drawEvents_[`${index} - ${passStart} - ${passEnd}`] = drawEvent;
 
         // Create an onclick event for each pass
         this.canvas_.addEventListener('click', (event) => {
@@ -508,23 +778,7 @@ export class SensorTimeline extends KeepTrackPlugin {
           if (mouseX >= leftOffset && mouseX <= leftOffset + width && mouseY >= y - 10 && mouseY <= y + 10) {
             const text = `${sensorPass.sensor.uiName}: No Passes`;
 
-            this.ctx_.font = '14px Consolas';
-
-            const boxWidth = this.ctx_.measureText(text).width;
-
-            // Draw tooltip box (first box is bigger to make a white border)
-            this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-            this.ctx_.fillRect(mouseX - boxWidth / 2 - 6, mouseY - 30, boxWidth + 12, 24);
-            // Draw tooltip box (second box is smaller to create a border effect)
-            this.ctx_.fillStyle = 'rgb(31, 51, 71)';
-            this.ctx_.fillRect(mouseX - boxWidth / 2 - 3, mouseY - 27, boxWidth + 6, 18);
-
-            // Draw tooltip text
-            this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-            this.ctx_.fillText(text, mouseX - boxWidth / 2, mouseY - 15);
-
-            // Make mouse cursor a pointer
-            this.canvas_.style.cursor = 'pointer';
+            this.drawTooltip_(text, mouseX, mouseY);
 
             return true;
           }
@@ -532,9 +786,299 @@ export class SensorTimeline extends KeepTrackPlugin {
           return false;
         };
 
-        this.drawEvents_[`${index}-${sensorPass.sensor.id}-no-passes`] = drawEvent;
+        this.drawEvents_[`${index} - ${sensorPass.sensor.id} - no - passes`] = drawEvent;
       }
     });
+
+    SatinFoVs.forEach((ObservablePeriod, index) => {
+      const y = 30 + topOffset + (index + 1) * yStep;
+
+      // Draw sensor name
+      this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+      this.ctx_.font = '14px Consolas';
+      this.ctx_.fillText(ObservablePeriod.sensor.uiName.concat(': sat in FoV'), leftOffset - 165, y + 5);
+
+      // Draw passes
+      ObservablePeriod.passes.forEach((pass) => {
+        const passStart = pass.start.getTime();
+        const passEnd = pass.end.getTime();
+        const x1 = leftOffset + (passStart - startTime) * xScale;
+        const x2 = leftOffset + (passEnd - startTime) * xScale;
+
+        this.ctx_.fillStyle = 'rgb(88, 209, 152)';
+
+
+        this.ctx_.fillRect(x1, y - 10, x2 - x1, 20);
+
+
+        const drawEvent = (mouseX: number, mouseY: number): boolean => {
+          if (mouseX >= x1 - 10 && mouseX <= x2 + 10 && mouseY >= y - 10 && mouseY <= y + 10) {
+            const startTime = new Date(passStart).toISOString().slice(11, 19);
+            const endTime = new Date(passEnd).toISOString().slice(11, 19);
+
+            // Calculate width of box based on text
+            const text = `${ObservablePeriod.sensor.uiName}: ${startTime} - ${endTime}`;
+
+            this.drawTooltip_(text, mouseX, mouseY);
+
+            return true;
+          }
+
+          return false;
+        };
+
+        this.drawEvents_[`${index} - ${passStart} - ${passEnd}`] = drawEvent;
+
+        // Create an onclick event for each pass
+        this.canvas_.addEventListener('click', (event) => {
+          const rect = this.canvas_.getBoundingClientRect();
+          const mouseX = event.clientX - rect.left;
+          const mouseY = event.clientY - rect.top;
+
+          // If the mouse is over a pass change the sensor
+          if (drawEvent(mouseX, mouseY)) {
+            const timeManagerInstance = keepTrackApi.getTimeManager();
+
+            keepTrackApi.getSensorManager().setSensor(ObservablePeriod.sensor);
+
+            timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
+            timeManagerInstance.calculateSimulationTime();
+            keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+
+            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+            const currentSatId = selectSatManagerInstance.selectedSat;
+
+            selectSatManagerInstance.selectSat(null);
+            selectSatManagerInstance.selectSat(currentSatId);
+          }
+        });
+
+      });
+
+      // If no passes draw a light gray bar to indicate no passes
+      if (ObservablePeriod.passes.length === 0) {
+        this.ctx_.fillStyle = 'rgba(200, 200, 200, 0.2)';
+        this.ctx_.fillRect(leftOffset, y - 10, width, 20);
+
+        const drawEvent = (mouseX: number, mouseY: number): boolean => {
+          if (mouseX >= leftOffset && mouseX <= leftOffset + width && mouseY >= y - 10 && mouseY <= y + 10) {
+            const text = `${ObservablePeriod.sensor.uiName}: No Passes`;
+
+            this.drawTooltip_(text, mouseX, mouseY);
+
+            return true;
+          }
+
+          return false;
+        };
+
+        this.drawEvents_[`${index} - ${ObservablePeriod.sensor.id} - no - passes`] = drawEvent;
+      }
+    });
+
+    StationInNights.forEach((ObservablePeriod, index) => {
+      const y = 60 + topOffset + (index + 1) * yStep;
+
+      // Draw sensor name
+      this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+      this.ctx_.font = '14px Consolas';
+      this.ctx_.fillText(ObservablePeriod.sensor.uiName.concat(': available'), leftOffset - 165, y + 5);
+
+      // Draw passes
+      ObservablePeriod.passes.forEach((pass) => {
+        const passStart = pass.start.getTime();
+        const passEnd = pass.end.getTime();
+        const x1 = leftOffset + (passStart - startTime) * xScale;
+        const x2 = leftOffset + (passEnd - startTime) * xScale;
+
+        this.ctx_.fillStyle = 'rgb(11, 80, 63)';
+
+
+        this.ctx_.fillRect(x1, y - 10, x2 - x1, 20);
+
+
+        const drawEvent = (mouseX: number, mouseY: number): boolean => {
+          if (mouseX >= x1 - 10 && mouseX <= x2 + 10 && mouseY >= y - 10 && mouseY <= y + 10) {
+            const startTime = new Date(passStart).toISOString().slice(11, 19);
+            const endTime = new Date(passEnd).toISOString().slice(11, 19);
+
+            // Calculate width of box based on text
+            const text = `${ObservablePeriod.sensor.uiName}: ${startTime} - ${endTime}`;
+
+            this.drawTooltip_(text, mouseX, mouseY);
+
+            return true;
+          }
+
+          return false;
+        };
+
+        this.drawEvents_[`${index} - ${passStart} - ${passEnd}`] = drawEvent;
+
+        // Create an onclick event for each pass
+        this.canvas_.addEventListener('click', (event) => {
+          const rect = this.canvas_.getBoundingClientRect();
+          const mouseX = event.clientX - rect.left;
+          const mouseY = event.clientY - rect.top;
+
+          // If the mouse is over a pass change the sensor
+          if (drawEvent(mouseX, mouseY)) {
+            const timeManagerInstance = keepTrackApi.getTimeManager();
+
+            keepTrackApi.getSensorManager().setSensor(ObservablePeriod.sensor);
+
+            timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
+            timeManagerInstance.calculateSimulationTime();
+            keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+
+            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+            const currentSatId = selectSatManagerInstance.selectedSat;
+
+            selectSatManagerInstance.selectSat(null);
+            selectSatManagerInstance.selectSat(currentSatId);
+          }
+        });
+
+      });
+
+      // If no passes draw a light gray bar to indicate no passes
+      if (ObservablePeriod.passes.length === 0) {
+        this.ctx_.fillStyle = 'rgba(200, 200, 200, 0.2)';
+        this.ctx_.fillRect(leftOffset, y - 10, width, 20);
+
+        const drawEvent = (mouseX: number, mouseY: number): boolean => {
+          if (mouseX >= leftOffset && mouseX <= leftOffset + width && mouseY >= y - 10 && mouseY <= y + 10) {
+            const text = `${ObservablePeriod.sensor.uiName}: No Passes`;
+
+            this.drawTooltip_(text, mouseX, mouseY);
+
+            return true;
+          }
+
+          return false;
+        };
+
+        this.drawEvents_[`${index} - ${ObservablePeriod.sensor.id} - no - passes`] = drawEvent;
+      }
+    });
+
+    // SatinSuns.forEach((ObservablePeriod, index) => {
+    const ObservablePeriod = SatinSuns[0];
+    const y = 90 + topOffset + SatinSuns.length * yStep;
+
+    // Draw sensor name
+    this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+    this.ctx_.font = '14px Consolas';
+    this.ctx_.fillText('Sat in Sun', leftOffset - 165, y + 5);
+
+    // Draw passes
+    ObservablePeriod.passes.forEach((pass) => {
+      const passStart = pass.start.getTime();
+      const passEnd = pass.end.getTime();
+      const x1 = leftOffset + (passStart - startTime) * xScale;
+      const x2 = leftOffset + (passEnd - startTime) * xScale;
+
+      this.ctx_.fillStyle = 'rgb(255, 238, 0)';
+      this.ctx_.fillRect(x1, y - 10, x2 - x1, 20);
+
+
+      const drawEvent = (mouseX: number, mouseY: number): boolean => {
+        if (mouseX >= x1 - 10 && mouseX <= x2 + 10 && mouseY >= y - 10 && mouseY <= y + 10) {
+          const startTime = new Date(passStart).toISOString().slice(11, 19);
+          const endTime = new Date(passEnd).toISOString().slice(11, 19);
+
+          // Calculate width of box based on text
+          const text = `${ObservablePeriod.sensor.uiName}: ${startTime} - ${endTime}`;
+
+          this.ctx_.font = '14px Consolas';
+
+          const boxWidth = this.ctx_.measureText(text).width;
+
+          // Draw tooltip box (first box is bigger to make a white border)
+          this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+          this.ctx_.fillRect(mouseX - boxWidth / 2 - 6, mouseY - 30, boxWidth + 12, 24);
+          // Draw tooltip box (second box is smaller to create a border effect)
+          this.ctx_.fillStyle = 'rgb(31, 51, 71)';
+          this.ctx_.fillRect(mouseX - boxWidth / 2 - 3, mouseY - 27, boxWidth + 6, 18);
+
+          // Draw tooltip text
+          this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+          this.ctx_.fillText(text, mouseX - boxWidth / 2, mouseY - 15);
+
+          // Make mouse cursor a pointer
+          this.canvas_.style.cursor = 'pointer';
+
+          return true;
+        }
+
+        return false;
+      };
+
+      this.drawEvents_[`${SatinSuns.length} - ${passStart} - ${passEnd}`] = drawEvent;
+
+      // Create an onclick event for each pass
+      this.canvas_.addEventListener('click', (event) => {
+        const rect = this.canvas_.getBoundingClientRect();
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+
+        // If the mouse is over a pass change the sensor
+        if (drawEvent(mouseX, mouseY)) {
+          const timeManagerInstance = keepTrackApi.getTimeManager();
+
+          keepTrackApi.getSensorManager().setSensor(ObservablePeriod.sensor);
+
+          timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
+          timeManagerInstance.calculateSimulationTime();
+          keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+
+          const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+          const currentSatId = selectSatManagerInstance.selectedSat;
+
+          selectSatManagerInstance.selectSat(null);
+          selectSatManagerInstance.selectSat(currentSatId);
+        }
+      });
+
+    });
+
+    // If no passes draw a light gray bar to indicate no passes
+    if (ObservablePeriod.passes.length === 0) {
+      this.ctx_.fillStyle = 'rgba(200, 200, 200, 0.2)';
+      this.ctx_.fillRect(leftOffset, y - 10, width, 20);
+
+      const drawEvent = (mouseX: number, mouseY: number): boolean => {
+        if (mouseX >= leftOffset && mouseX <= leftOffset + width && mouseY >= y - 10 && mouseY <= y + 10) {
+          const text = `${ObservablePeriod.sensor.uiName}: No Passes`;
+
+          this.ctx_.font = '14px Consolas';
+
+          const boxWidth = this.ctx_.measureText(text).width;
+
+          // Draw tooltip box (first box is bigger to make a white border)
+          this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+          this.ctx_.fillRect(mouseX - boxWidth / 2 - 6, mouseY - 30, boxWidth + 12, 24);
+          // Draw tooltip box (second box is smaller to create a border effect)
+          this.ctx_.fillStyle = 'rgb(31, 51, 71)';
+          this.ctx_.fillRect(mouseX - boxWidth / 2 - 3, mouseY - 27, boxWidth + 6, 18);
+
+          // Draw tooltip text
+          this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+          this.ctx_.fillText(text, mouseX - boxWidth / 2, mouseY - 15);
+
+          // Make mouse cursor a pointer
+          this.canvas_.style.cursor = 'pointer';
+
+          return true;
+        }
+
+        return false;
+      };
+
+      this.drawEvents_[`${SatinSuns.length} - ${ObservablePeriod.sensor.id} - no - passes`] = drawEvent;
+    }
+    // });
+
 
     // Add one mousemove event
     this.canvas_.addEventListener('mousemove', (event) => {
@@ -544,6 +1088,184 @@ export class SensorTimeline extends KeepTrackPlugin {
     // Save initial state as staticCtx_ so we can redraw the static elements without clearing the canvas
     this.ctxStatic_ = this.canvasStatic_.getContext('2d');
     this.ctxStatic_.drawImage(this.canvas_, 0, 0);
+  }
+
+  private drawTooltip_(text: string, mouseX: number, mouseY: number) {
+    this.ctx_.font = '14px Consolas';
+
+    const boxWidth = this.ctx_.measureText(text).width;
+
+    // Draw tooltip box (first box is bigger to make a white border)
+    this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+    this.ctx_.fillRect(mouseX - boxWidth / 2 - 6, mouseY - 30, boxWidth + 12, 24);
+    // Draw tooltip box (second box is smaller to create a border effect)
+    this.ctx_.fillStyle = 'rgb(31, 51, 71)';
+    this.ctx_.fillRect(mouseX - boxWidth / 2 - 3, mouseY - 27, boxWidth + 6, 18);
+
+    // Draw tooltip text
+    this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+    this.ctx_.fillText(text, mouseX - boxWidth / 2, mouseY - 15);
+
+    // Make mouse cursor a pointer
+    this.canvas_.style.cursor = 'pointer';
+  }
+
+  private drawTimeline_(ObservablePasses: ObservablePasses[]): void {
+    const oldCanvas = this.canvas_;
+    const newCanvas = oldCanvas.cloneNode(true) as HTMLCanvasElement;
+
+    oldCanvas.parentNode.replaceChild(newCanvas, oldCanvas);
+    this.canvas_ = newCanvas;
+    this.ctx_ = this.canvas_.getContext('2d');
+
+    // Clear the events list
+    this.drawEvents_ = {};
+
+    const leftOffset = this.canvas_.width * 0.15;
+    const topOffset = 0;
+    const width = this.canvas_.width * 0.75;
+    const height = this.canvas_.height * 0.75;
+    const timeManager = keepTrackApi.getTimeManager();
+    const startTime = timeManager.simulationTimeObj.getTime();
+    const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000;
+
+    // clear canvas
+    this.ctx_.reset();
+
+    this.ctx_.fillStyle = 'rgb(58, 58, 58)'; // #3a3a3a
+    this.ctx_.fillRect(leftOffset, topOffset, width, height - 15);
+
+    const yStep = height / (ObservablePasses.length + 1);
+    const xScale = (width) / (endTime - startTime);
+
+    // Draw time axis
+    this.ctx_.strokeStyle = 'rgb(255, 255, 255)';
+    this.ctx_.lineWidth = 5; // Increase line width to make it thicker
+    this.ctx_.beginPath();
+    this.ctx_.moveTo(leftOffset, topOffset + height - 20);
+    this.ctx_.lineTo(leftOffset + width, topOffset + height - 20);
+    this.ctx_.stroke();
+
+    // Draw hour markers
+    for (let i = 0; i <= this.lengthOfLookAngles_; i++) {
+      const x = leftOffset + ((i * 60 * 60 * 1000) * xScale);
+
+      this.ctx_.lineWidth = 5; // Increase line width to make it thicker
+      this.ctx_.beginPath();
+      this.ctx_.moveTo(x, topOffset + height - 25);
+      this.ctx_.lineTo(x, topOffset + height - 15);
+      this.ctx_.strokeStyle = 'rgb(255, 255, 255)';
+      this.ctx_.stroke();
+
+      // Extend a thin line to the top of the canvas
+      this.ctx_.lineWidth = 1;
+      this.ctx_.beginPath();
+      this.ctx_.moveTo(x, topOffset + height - 15);
+      this.ctx_.lineTo(x, topOffset);
+      this.ctx_.stroke();
+
+      let hour = timeManager.simulationTimeObj.getUTCHours();
+
+      hour = (hour + i) % 24;
+
+      this.ctx_.font = '14px Consolas';
+      this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+      this.ctx_.fillText(`${hour}h`, x - 10, topOffset + height);
+    }
+
+    // Draw passes for each sensor
+    ObservablePasses.forEach((sensorPass, index) => {
+      const y = topOffset + (index + 1) * yStep;
+
+      // Draw sensor name
+      this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+      this.ctx_.font = '14px Consolas';
+      this.ctx_.fillText(sensorPass.sensor.uiName, leftOffset - 150, y + 5);
+
+      // Draw passes
+      sensorPass.passes.forEach((pass) => {
+        const passStart = pass.start.getTime();
+        const passEnd = pass.end.getTime();
+        const x1 = leftOffset + (passStart - startTime) * xScale;
+        const x2 = leftOffset + (passEnd - startTime) * xScale;
+
+        const passLength = (passEnd - passStart) / MILLISECONDS_PER_SECOND;
+
+        if (passLength < this.lengthOfBadPass_) {
+          this.ctx_.fillStyle = 'rgb(255, 42, 4)';
+        } else if (passLength < this.lengthOfAvgPass_) {
+          this.ctx_.fillStyle = 'rgb(252, 232, 58)';
+        } else {
+          this.ctx_.fillStyle = 'rgb(86, 240, 0)';
+        }
+
+        this.ctx_.fillRect(x1, y - 10, x2 - x1, 20);
+
+
+        const drawEvent = (mouseX: number, mouseY: number): boolean => {
+          if (mouseX >= x1 - 10 && mouseX <= x2 + 10 && mouseY >= y - 10 && mouseY <= y + 10) {
+            const startTime = new Date(passStart).toISOString().slice(11, 19);
+            const endTime = new Date(passEnd).toISOString().slice(11, 19);
+
+            // Calculate width of box based on text
+            const text = `${sensorPass.sensor.uiName}: ${startTime} - ${endTime}`;
+
+            this.drawTooltip_(text, mouseX, mouseY);
+
+            return true;
+          }
+
+          return false;
+        };
+
+        this.drawEvents_[`${index} - ${passStart} - ${passEnd}`] = drawEvent;
+
+        // Create an onclick event for each pass
+        this.canvas_.addEventListener('click', (event) => {
+          const rect = this.canvas_.getBoundingClientRect();
+          const mouseX = event.clientX - rect.left;
+          const mouseY = event.clientY - rect.top;
+
+          // If the mouse is over a pass change the sensor
+          if (drawEvent(mouseX, mouseY)) {
+            const timeManagerInstance = keepTrackApi.getTimeManager();
+
+            keepTrackApi.getSensorManager().setSensor(sensorPass.sensor);
+
+            timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
+            timeManagerInstance.calculateSimulationTime();
+            keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+
+            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+            const currentSatId = selectSatManagerInstance.selectedSat;
+
+            selectSatManagerInstance.selectSat(null);
+            selectSatManagerInstance.selectSat(currentSatId);
+          }
+        });
+
+      });
+
+      // If no passes draw a light gray bar to indicate no passes
+      if (sensorPass.passes.length === 0) {
+        this.ctx_.fillStyle = 'rgba(200, 200, 200, 0.2)';
+        this.ctx_.fillRect(leftOffset, y - 10, width, 20);
+
+        const drawEvent = (mouseX: number, mouseY: number): boolean => {
+          if (mouseX >= leftOffset && mouseX <= leftOffset + width && mouseY >= y - 10 && mouseY <= y + 10) {
+            const text = `${sensorPass.sensor.uiName}: No Passes`;
+
+            this.drawTooltip_(text, mouseX, mouseY);
+
+            return true;
+          }
+
+          return false;
+        };
+
+        this.drawEvents_[`${index} - ${sensorPass.sensor.id} - no - passes`] = drawEvent;
+      }
+    });
   }
 
   private handleOnMouseMove_(event: MouseEvent): void {

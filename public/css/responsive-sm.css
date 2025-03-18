@@ -1,8 +1,4 @@
 @media (min-width: 640px) {
-  :root {
-    --bottom-icon-width: 105px;
-  }
-
   .side-menu-parent {
     width: 280px;
     min-width: 265px;
@@ -35,7 +31,7 @@
 
   #bottom-icons-container {
     width: 100%;
-    height: 120px;
+    height: var(--bottom-menu-height);
   }
 
   #footer-toggle-wrapper {
@@ -95,7 +91,7 @@
   }
 
   #polar-plot {
-    width: 100%;
+    width: 95%;
   }
 
   #sensor-timeline-sensor-list,

@@ -46,7 +46,6 @@ describe('plugins', () => {
       classificationBar: true,
       soundManager: true,
       gamepad: true,
-      scenarioCreator: false,
     });
   });
 });

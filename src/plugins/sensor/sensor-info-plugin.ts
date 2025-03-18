@@ -1,12 +1,12 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { LineManager } from '@app/singletons/draw-manager/line-manager';
 import { SensorToMoonLine } from '@app/singletons/draw-manager/line-manager/sensor-to-moon-line';
 import { SensorToSunLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sun-line';
-import radioTowerPng from '@public/img/icons/radio-tower.png';
+import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { RfSensor, SpaceObjectType } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
@@ -19,9 +19,10 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     this.checkIfLinesVisible_(keepTrackApi.getLineManager());
   };
 
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconLabel = 'Sensor Info';
-  bottomIconImg = radioTowerPng;
+  bottomIconImg = sensorInfoPng;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
@@ -89,7 +90,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     </div>
     </div>`;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
   };
 

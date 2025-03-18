@@ -8,20 +8,24 @@ import {
   DetailedSatellite,
   DetailedSensor,
   EciVec3,
+  EpochUTC,
   Kilometers,
   MINUTES_PER_DAY,
   RfSensor,
   SatelliteRecord,
   Sgp4,
   SpaceObjectType,
+  Sun,
   TAU,
+  calcGmst,
   ecfRad2rae,
   eci2ecf,
   eci2lla,
+  lla2eci,
 } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { dateFormat } from '../lib/dateFormat';
-import { SatMath } from './sat-math';
+import { SatMath, SunStatus } from './sat-math';
 
 export enum TearrType {
   RISE,
@@ -42,6 +46,7 @@ export type TearrData = {
   alt?: Kilometers;
   lat?: Degrees;
   lon?: Degrees;
+  visible?: boolean;
 };
 
 export class SensorMath {
@@ -224,7 +229,7 @@ export class SensorMath {
     }
 
     // Calculate Distance
-    const distanceApart = SatMath.distance(hoverSat.position, secondaryObj.position).toFixed(0);
+    const distanceApart = SatMath.distance(hoverSat.position, secondaryObj.position).toFixed(2);
 
     // Calculate if same beam
     let sameBeamStr = '';
@@ -248,6 +253,26 @@ export class SensorMath {
     }
 
     return `<br />Range: ${distanceApart} km${sameBeamStr}`;
+  }
+
+  static velocityString(hoverSat: BaseObject, secondaryObj?: DetailedSensor | DetailedSatellite): string {
+    // Sanity Check
+    if (!hoverSat || !secondaryObj) {
+      return '';
+    }
+
+    // Validate Objects
+    if (!secondaryObj || !hoverSat) {
+      return '';
+    }
+    if (secondaryObj.type === SpaceObjectType.STAR || hoverSat.type === SpaceObjectType.STAR) {
+      return '';
+    }
+
+    // Calculate Velocities
+    const velApart = SatMath.velocity(hoverSat.velocity, secondaryObj.velocity).toFixed(3);
+
+    return `<br />Relative velocity: ${velApart} km/s`;
   }
 
   static getSunTimes(sat: DetailedSatellite, sensors?: DetailedSensor[], searchLength = 2, interval = 30) {
@@ -405,5 +430,18 @@ export class SensorMath {
     }
 
     return nextPassArray;
+  }
+
+  static checkIfVisibleForOptical(sat: DetailedSatellite, sensor: DetailedSensor, now: Date): boolean {
+    const { gmst } = calcGmst(now);
+    const sunPos = Sun.position(EpochUTC.fromDateTime(now));
+    const sensorPos = lla2eci(sensor.llaRad(), gmst);
+
+    sensor.position = sensorPos;
+    const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
+    const satInSun = SatMath.calculateIsInSun(sat, sunPos);
+
+    // For optical sensors: check if the station is in darkness (umbral/penumbral) and the satellite is in sunlight - this means the satellite is visible
+    return (stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) && satInSun === SunStatus.SUN;
   }
 }

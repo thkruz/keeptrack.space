@@ -1,10 +1,10 @@
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { hideLoading, showLoadingSticky } from '@app/lib/showLoading';
 import { StringPad } from '@app/lib/stringPad';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
-import rocketPng from '@public/img/icons/rocket.png';
+import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 
 import { SatMath } from '@app/static/sat-math';
 
@@ -13,7 +13,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Degrees, DetailedSatellite, SatelliteRecord, Sgp4 } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
@@ -41,8 +41,9 @@ export class NewLaunch extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('nl-inc')).value = StringPad.pad0(sat.inclination.toFixed(4), 8);
   };
 
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
-  bottomIconImg = rocketPng;
+  bottomIconImg = rocketLaunchPng;
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
@@ -129,7 +130,7 @@ export class NewLaunch extends KeepTrackPlugin {
   </div>
   `;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
   };
 

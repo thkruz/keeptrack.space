@@ -2,12 +2,12 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import collissionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import i18next from 'i18next';
 import { keepTrackApi } from '../../keepTrackApi';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 //  Updated to match KeepTrack API v2
@@ -48,11 +48,13 @@ export class Collissions extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 540,
     maxWidth: 650,
   };
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {

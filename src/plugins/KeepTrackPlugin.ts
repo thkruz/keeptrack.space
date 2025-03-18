@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, Singletons } from '@app/interfaces';
 import { Localization } from '@app/locales/locales';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import i18next from 'i18next';
@@ -13,12 +13,13 @@ import { errorManagerInstance } from '../singletons/errorManager';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
 import { SoundNames } from './sounds/SoundNames';
 
-export interface clickDragOptions {
+export interface ClickDragOptions {
   leftOffset?: number;
   isDraggable?: boolean;
   minWidth?: number;
   maxWidth?: number;
   attachedElement?: HTMLElement;
+  callback?: () => void;
 }
 
 export interface SideMenuSettingsOptions {
@@ -69,12 +70,14 @@ export abstract class KeepTrackPlugin {
 
   /**
    * The name of the bottom icon element to select.
+   * default: `${bottomIconSlug}-bottom-icon` (requires bottomIconLabel to be defined)
    * @example 'menu-day-night'
    */
   bottomIconElementName: string;
 
   /**
    * The label of the bottom icon element.
+   * This should be set in the localization files! Not in the plugin itself.
    * @example 'Countries'
    */
   bottomIconLabel: string;
@@ -196,7 +199,8 @@ export abstract class KeepTrackPlugin {
   /**
    * Determins if the side menu is adjustable by clicking and dragging.
    */
-  dragOptions: clickDragOptions;
+  dragOptions: ClickDragOptions;
+  menuMode: MenuMode[] = [MenuMode.ALL];
 
   /**
    * Creates a new instance of the KeepTrackPlugin class.
@@ -451,7 +455,32 @@ export abstract class KeepTrackPlugin {
       this.registerRmbCallback(this.rmbCallback);
     }
 
+    if (this.bottomIconElementName) {
+      this.registerMenuMode();
+    }
+
     this.isJsAdded = true;
+  }
+
+  registerMenuMode(): void {
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.bottomMenuModeChange,
+      cbName: this.id,
+      cb: (): void => {
+        this.hideBottomIcon();
+        if (this.menuMode.includes(settingsManager.menuMode)) {
+          this.showBottomIcon();
+        }
+      },
+    });
+  }
+
+  showBottomIcon(): void {
+    getEl(this.bottomIconElementName).style.display = 'block';
+  }
+
+  hideBottomIcon(): void {
+    getEl(this.bottomIconElementName).style.display = 'none';
   }
 
   registerRmbCallback(callback: (targetId: string, clickedSatId?: number) => void): void {
@@ -517,7 +546,6 @@ export abstract class KeepTrackPlugin {
         }
         button.innerHTML = `
           <div class="bmenu-item-inner">
-            <div class="status-icon"></div>
             <img
               alt="${this.id}"
               src=""
@@ -792,7 +820,7 @@ export abstract class KeepTrackPlugin {
     });
   }
 
-  registerClickAndDragOptions(opts?: clickDragOptions): void {
+  registerClickAndDragOptions(opts?: ClickDragOptions): void {
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,

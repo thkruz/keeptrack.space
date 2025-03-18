@@ -1,11 +1,11 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import analysisPng from '@public/img/icons/polar.png';
+import polarPlotPng from '@public/img/icons/polar-plot.png';
 
 
 import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
@@ -14,11 +14,11 @@ interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 export class PolarPlotPlugin extends KeepTrackPlugin {
   readonly id = 'PolarPlotPlugin';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
   passStartTime_: Date;
   passStopTime_: Date;
 
-  private plotDuration_ = 3;
+  private readonly plotDuration_ = 3;
 
   constructor() {
     super();
@@ -30,14 +30,15 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   private centerY_: number;
   private distanceUnit_: number;
   private canvasSize_: number;
-  private fontRatio_ = 0.03;
+  private readonly fontRatio_ = 0.03;
   private plotData_: PolarPlotData = [];
 
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = true;
 
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ANALYSIS, MenuMode.ALL];
 
-  bottomIconImg = analysisPng;
+  bottomIconImg = polarPlotPng;
   bottomIconCallback: () => void = () => {
     this.updatePlot_();
   };
@@ -54,7 +55,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   </div>
   `;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 450,
     maxWidth: 1000,
@@ -201,10 +202,17 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   private drawTitle_(): void {
     this.ctx_.font = `${this.canvasSize_ * 0.035}px consolas`;
     this.ctx_.fillStyle = 'rgb(255, 255, 255)';
-    this.ctx_.textAlign = 'center';
+    this.ctx_.textAlign = 'left';
     this.ctx_.textBaseline = 'top';
-    this.ctx_.fillText(`Satellite ${(<DetailedSatellite>this.selectSatManager_.getSelectedSat()).sccNum}: ` +
-      `${this.passStartTime_.toISOString().slice(11, 19)} - ${this.passStopTime_.toISOString().slice(11, 19)}`, this.centerX_, 0);
+    const sensorName = keepTrackApi.getSensorManager().getSensor().name;
+    const satNum = (this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum;
+    const timeRange = `${this.passStartTime_.toISOString().slice(11, 19)} - ${this.passStopTime_.toISOString().slice(11, 19)}`;
+
+    this.ctx_.fillText(sensorName, 10, 10);
+    this.ctx_.fillText(`Satellite ${satNum}`, 10, this.canvasSize_ * 0.035 + 15);
+
+    this.ctx_.textAlign = 'center';
+    this.ctx_.fillText(timeRange, this.canvasSize_ / 2, this.canvasSize_ - 10 - (this.canvasSize_ * 0.035));
   }
 
   private setupCanvas_() {
@@ -220,7 +228,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.ctx_.imageSmoothingEnabled = true;
     this.centerX_ = this.ctx_.canvas.width / 2;
     this.centerY_ = this.ctx_.canvas.height / 2;
-    this.distanceUnit_ = this.canvasSize_ / (2.5 * 90);
+    this.distanceUnit_ = this.canvasSize_ / (2.5 * 90) * 0.9;
 
     this.ctx_.clearRect(0, 0, this.ctx_.canvas.width, this.ctx_.canvas.height);
   }
@@ -318,7 +326,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   private labelElevationAxis_() {
     this.ctx_.textAlign = 'center';
     this.ctx_.textBaseline = 'middle';
-    const diagDist = this.canvasSize_ / 700;
+    const diagDist = this.canvasSize_ / 700 * 0.91;
 
     this.ctx_.fillText('90°', this.centerX_ + 18 * diagDist, this.centerY_ - 12 * diagDist);
     this.ctx_.fillText('75°', this.centerX_ + 44 * diagDist, this.centerY_ - 44 * diagDist);

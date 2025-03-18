@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import type { ColorSchemeColorMap } from '@app/singletons/color-scheme-manager';
 import { keepTrackContainer } from '../src/container';
 import { Singletons } from '../src/interfaces';
 import { settingsManager } from '../src/settings/settings';
@@ -11,7 +12,9 @@ import { defaultSensor } from './environment/apiMocks';
  *Code Analysis
  *
  *Main functionalities:
- *The LegendManager class is responsible for managing the legend menu and updating the legend colors based on the selected menu option. It contains a list of menu options and corresponding HTML templates, as well as a list of CSS class selectors for legend items. The class provides methods for changing the legend menu, updating legend colors, and setting velocity colors.
+ *The LegendManager class is responsible for managing the legend menu and updating the legend colors based on the selected menu option. It contains a list of menu options and
+ *corresponding HTML templates, as well as a list of CSS class selectors for legend items. The class provides methods for changing the legend menu, updating legend colors, and
+ *setting velocity colors.
  *
  *Methods:
  *- change(menu: string): changes the legend menu to the specified option and updates the legend colors
@@ -226,9 +229,9 @@ describe('LegendManager_class', () => {
     velocityFastClass.classList.add('legend-velocityFast-box');
     legendHoverDom.appendChild(velocityFastClass);
     keepTrackApi.containerRoot.appendChild(legendHoverDom);
-    settingsManager.colors = <any>{
+    settingsManager.colors = {
       velocity: [1, 0, 0, 1],
-    };
+    } as unknown as ColorSchemeColorMap;
 
     // Act
     LegendManager.legendColorsChange();

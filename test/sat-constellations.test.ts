@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatConstellations } from '@app/plugins/sat-constellations/sat-constellations';
+import { GroupsManager } from '@app/singletons/groups-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { setupDefaultHtml, setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
@@ -15,8 +16,10 @@ describe('SatConstellations_class', () => {
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
-      AutoInit: () => { },
-    } as any;
+      AutoInit: () => {
+        // Do nothing
+      },
+    } as unknown as typeof window.M;
     satConstellationsPlugin = new SatConstellations();
   });
 
@@ -45,8 +48,10 @@ describe('SatConstellations_test_all_links', () => {
   beforeEach(() => {
     setupStandardEnvironment();
     window.M = {
-      AutoInit: () => { },
-    } as any;
+      AutoInit: () => {
+        // Do nothing
+      },
+    } as unknown as typeof window.M;
     satConstellationsPlugin = new SatConstellations();
     websiteInit(satConstellationsPlugin);
 
@@ -59,9 +64,11 @@ describe('SatConstellations_test_all_links', () => {
             objects: [0],
           };
         },
-        selectGroup: () => { },
+        selectGroup: () => {
+          // Do nothing
+        },
         groupList,
-      }) as any;
+      }) as unknown as GroupsManager;
   });
 
   links.forEach((element) => {

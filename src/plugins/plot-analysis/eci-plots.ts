@@ -1,12 +1,12 @@
-import { EChartsData, EciArr3, KeepTrackApiEvents } from '@app/interfaces';
+import { EChartsData, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
-import scatterPlotPng2 from '@public/img/icons/scatter-plot2.png';
+import scatterPlot2Png from '@public/img/icons/scatter-plot2.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { BaseObject, DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { DetailedSatellite } from 'ootk';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 type EChartsOption = echarts.EChartsOption;
@@ -14,77 +14,45 @@ type EChartsOption = echarts.EChartsOption;
 export class EciPlot extends KeepTrackPlugin {
   readonly id = 'EciPlot';
   dependencies_: string[] = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
+  isRequireSatelliteSelected = true;
+  isIconDisabled = true;
+  isIconDisabledOnLoad = true;
 
-  bottomIconLabel = 'ECI Plots';
-  bottomIconImg = scatterPlotPng2;
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
+
+  bottomIconImg = scatterPlot2Png;
   bottomIconCallback = () => {
-    if (!this.isMenuButtonActive) {
-      return;
+    if (this.isMenuButtonActive) {
+      this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
     }
-
-    this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
   };
 
   plotCanvasId = 'plot-analysis-chart-eci';
-  isRequireSatelliteSelected = true;
-  isIconDisabledOnLoad = true;
   chart: echarts.ECharts;
-
-  helpTitle = 'ECI Plots Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-    The ECI Plots menu allows you to plot the position of a satellite in Earth Centered Inertial (ECI) coordinates.
-    This is useful for visualizing the position of a satellite in space.
-  </p>`;
 
   sideMenuElementName = 'eci-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
-  <div id="eci-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal plot-analysis-menu-maximized">
+  <div id="eci-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
     <div id="plot-analysis-content" class="side-menu">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
     </div>
   </div>`;
 
-  dragOptions: clickDragOptions = {
-    minWidth: 500,
-    maxWidth: 1200,
+  dragOptions: ClickDragOptions = {
+    isDraggable: true,
+    minWidth: 800,
+    maxWidth: 4096,
+    callback: () => {
+      this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
+    },
   };
-
-  addHtml(): void {
-    super.addHtml();
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
-        // This runs no matter what
-        if (sat) {
-          this.setBottomIconToEnabled();
-        } else {
-          this.setBottomIconToDisabled();
-        }
-        if (!this.isMenuButtonActive) {
-          return;
-        }
-
-        // This runs if the menu is open
-        if (!sat) {
-          this.hideSideMenus();
-        } else {
-          const chartDom = getEl(this.plotCanvasId);
-
-          this.createPlot(this.getPlotData(), chartDom);
-        }
-      },
-    });
-  }
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
@@ -104,13 +72,14 @@ export class EciPlot extends KeepTrackPlugin {
     const app = EciPlot.updateAppObject_(X_AXIS, Y_AXIS, Z_AXIS);
 
     // Get the Data
-    const dataRange = data.reduce((range, sat) => {
-      const minDataX = sat.value.reduce((min: number, item: EciArr3) => Math.min(min, item[0]), Infinity);
-      const maxDataX = sat.value.reduce((max: number, item: EciArr3) => Math.max(max, item[0]), -Infinity);
-      const minDataY = sat.value.reduce((min: number, item: EciArr3) => Math.min(min, item[1]), Infinity);
-      const maxDataY = sat.value.reduce((max: number, item: EciArr3) => Math.max(max, item[1]), -Infinity);
-      const minDataZ = sat.value.reduce((min: number, item: EciArr3) => Math.min(min, item[2]), Infinity);
-      const maxDataZ = sat.value.reduce((max: number, item: EciArr3) => Math.max(max, item[2]), -Infinity);
+    const positionData = data.slice(0, 3);
+    const dataRange = positionData.reduce((range, sat) => {
+      const minDataX = sat.value.reduce((min: number, item) => Math.min(min, item[0]), Infinity);
+      const maxDataX = sat.value.reduce((max: number, item) => Math.max(max, item[0]), -Infinity);
+      const minDataY = sat.value.reduce((min: number, item) => Math.min(min, item[1]), Infinity);
+      const maxDataY = sat.value.reduce((max: number, item) => Math.max(max, item[1]), -Infinity);
+      const minDataZ = sat.value.reduce((min: number, item) => Math.min(min, item[2]), Infinity);
+      const maxDataZ = sat.value.reduce((max: number, item) => Math.max(max, item[2]), -Infinity);
       const minData = Math.round(Math.min(minDataX, minDataY, minDataZ) / 1000) * 1000;
       const maxData = Math.round(Math.max(maxDataX, maxDataY, maxDataZ) / 1000) * 1000;
       const _dataRange = Math.max(maxData, Math.abs(minData));
@@ -140,6 +109,7 @@ export class EciPlot extends KeepTrackPlugin {
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-bottom: 5px;"></div>
                 <div style="font-weight: bold;"> ${params.seriesName}</div>
               </div>
+              <div>${data[3]}</div>
               <div>X: ${data[0].toFixed(2)} km</div>
               <div>Y: ${data[1].toFixed(2)} km</div>
               <div>Z: ${data[2].toFixed(2)} km</div>
@@ -192,11 +162,11 @@ export class EciPlot extends KeepTrackPlugin {
         type: 'scatter3D',
         name: sat.name,
         dimensions: [app.config.xAxis3D, app.config.yAxis3D, app.config.zAxis3D],
-        data: sat.value.map((item: any, idx: number) => ({
+        data: sat.value.map((item, idx: number) => ({
           itemStyle: {
             opacity: 1 - idx / sat.value.length, // opacity by time
           },
-          value: [item[app.fieldIndices[app.config.xAxis3D]], item[app.fieldIndices[app.config.yAxis3D]], item[app.fieldIndices[app.config.zAxis3D]]],
+          value: [item[app.fieldIndices[app.config.xAxis3D]], item[app.fieldIndices[app.config.yAxis3D]], item[app.fieldIndices[app.config.zAxis3D]], item[3]],
         })),
         symbolSize: 12,
         // symbol: 'triangle',
@@ -254,14 +224,36 @@ export class EciPlot extends KeepTrackPlugin {
     const data = [] as EChartsData;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
+    // Time management
+    const now = keepTrackApi.getTimeManager().simulationTimeObj.getTime();
     const curSatObj = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
 
-    data.push({ name: curSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+    const timeData: Date[] = [];
+
+    for (let i = 0; i < NUMBER_OF_POINTS; i++) {
+      const date = new Date(now + curSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);
+
+      timeData.push(date);
+    }
+    data.push({
+      name: curSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS)
+        .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+    });
 
     const secSatObj = this.selectSatManager_.secondarySatObj;
 
     if (secSatObj) {
-      data.push({ name: secSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+      const timeData: Date[] = [];
+
+      for (let i = 0; i < NUMBER_OF_POINTS; i++) {
+        const date = new Date(now + secSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);
+
+        timeData.push(date);
+      }
+      data.push({
+        name: secSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS)
+          .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+      });
     }
 
     const lastSatId = this.selectSatManager_.lastSelectedSat();
@@ -269,11 +261,17 @@ export class EciPlot extends KeepTrackPlugin {
     if (lastSatId !== -1) {
       const lastSatObj = catalogManagerInstance.getObject(lastSatId) as DetailedSatellite;
 
-      data.push({ name: lastSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+      for (let i = 0; i < NUMBER_OF_POINTS; i++) {
+        const date = new Date(now + lastSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);
+
+        timeData.push(date);
+      }
+      data.push({
+        name: lastSatObj.name, value: SatMathApi.getEciOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS)
+          .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+      });
     }
 
     return data;
   }
 }
-
-export const eciPlotsPlugin = new EciPlot();

@@ -1,5 +1,4 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { isThisNode } from '@app/static/isThisNode';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from 'ootk';
@@ -14,103 +13,137 @@ test('keepTrackApi Unit Testing', () => {
   keepTrackApi.register({
     event: KeepTrackApiEvents.updateSelectBox,
     cbName: 'test',
-    cb: (sat: DetailedSatellite | MissileObject) => console.log(sat),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.onCruncherReady,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.onCruncherMessage,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.uiManagerInit,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.uiManagerOnReady,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.bottomMenuClick,
     cbName: 'test',
-    cb: (name) => console.log(name),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.hideSideMenus,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.nightToggle,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.orbitManagerInit,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.drawManagerLoadScene,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.drawOptionalScenery,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.updateLoop,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.rmbMenuActions,
     cbName: 'test',
-    cb: (str) => console.log(str),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.updateDateTime,
     cbName: 'test',
-    cb: (str) => console.log(str),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.uiManagerFinal,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.rightBtnMenuAdd,
     cbName: 'test',
-    cb: () => console.log('test'),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.selectSatData,
     cbName: 'test',
-    cb: (sat, satId) => console.log(`${sat} - ${satId}`),
+    cb: () => {
+      // Do nothing
+    },
   });
 
   keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, 'test' as unknown as DetailedSatellite);
@@ -138,10 +171,7 @@ test('keepTrackApi Unit Testing', () => {
 
 describe('keepTrackApi.html', () => {
   test('keepTrackApi.html Good HTML', () => {
-    expect(() => {
-      // eslint-disable-next-line no-unused-expressions
-      keepTrackApi.html`<div id="about-menu" class="side-menu-parent start-hidden text-select">`;
-    }).not.toThrow(Error);
+    expect(() => keepTrackApi.html`<div id="about-menu" class="side-menu-parent start-hidden text-select">`).not.toThrow(Error);
   });
 
   test('keepTrackApi.html Bad HTML', () => {

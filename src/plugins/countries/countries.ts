@@ -1,7 +1,7 @@
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { GroupType } from '@app/singletons/object-group';
 import { StringExtractor } from '@app/static/string-extractor';
@@ -16,6 +16,8 @@ import { SoundNames } from '../sounds/SoundNames';
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
   dependencies_ = [];
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = flagPng;
   sideMenuElementHtml = keepTrackApi.html`
@@ -68,40 +70,41 @@ export class CountriesMenu extends KeepTrackPlugin {
     <li class="divider"></li>
     <br/>`;
 
-    const countryList = [];
+    const countryCodeList = [];
 
     keepTrackApi.getCatalogManager().getSats().forEach((sat) => {
-      if (sat.country && !countryList.includes(sat.country)) {
-        countryList.push(sat.country);
+      if (sat.country && !countryCodeList.includes(sat.country) && sat.country !== 'ANALSAT') {
+        countryCodeList.push(sat.country);
       }
     });
 
-    countryList.sort((a, b) => a.localeCompare(b));
+    const countries = countryCodeList.map((countryCode) => {
+      const country = StringExtractor.extractCountry(countryCode);
 
-    return `${countryList.reduce((acc, country) => {
-      const countryCode = StringExtractor.getCountryCode(country);
+      return { country, countryCode };
+    }).sort((a, b) => a.country.localeCompare(b.country));
 
-      if (countryCode === '') {
+    return `${countries.reduce((acc, countryArr) => {
+      if (countryArr.countryCode === '') {
         return acc;
       }
 
-      return `${acc}<li class="menu-selectable country-option" data-group="${country}">${country}</li>`;
+      return `${acc}<li class="menu-selectable country-option" data-group="${countryArr.countryCode}">${countryArr.country}</li>`;
     }, header)}<br/>`;
   }
 
-  private static countryMenuClick_(groupName: string): void {
+  private static countryMenuClick_(countryCode: string): void {
     const groupManagerInstance = keepTrackApi.getGroupsManager();
-    const countryCode = StringExtractor.getCountryCode(groupName);
 
     if (countryCode === '') {
-      throw new Error('Unknown country group');
+      throw new Error('Unknown country code');
     }
 
-    if (!groupManagerInstance.groupList[groupName]) {
-      groupManagerInstance.createGroup(GroupType.COUNTRY, countryCode, groupName);
+    if (!groupManagerInstance.groupList[countryCode]) {
+      groupManagerInstance.createGroup(GroupType.COUNTRY, countryCode, countryCode);
     }
 
-    CountriesMenu.groupSelected_(groupName);
+    CountriesMenu.groupSelected_(countryCode);
   }
 
   private static groupSelected_(groupName: string): void {
@@ -119,18 +122,11 @@ export class CountriesMenu extends KeepTrackPlugin {
     }
     groupManagerInstance.selectGroup(groupManagerInstance.groupList[groupName]);
 
-    // Populate searchDOM with a search string separated by commas - minus the last one
-    if (groupManagerInstance.groupList[groupName].ids.length < settingsManager.searchLimit) {
-      uiManagerInstance.searchManager.doSearch(
-        groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1),
-      );
-    } else {
-      searchDOM.value = groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1);
-      uiManagerInstance.searchManager.fillResultBox(
-        groupManagerInstance.groupList[groupName].ids.map((id: number) => <SearchResult>{ id }),
-        catalogManagerInstance,
-      );
-    }
+    searchDOM.value = groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1);
+    uiManagerInstance.searchManager.fillResultBox(
+      groupManagerInstance.groupList[groupName].ids.map((id: number) => <SearchResult>{ id }),
+      catalogManagerInstance,
+    );
 
     // If a selectSat plugin exists, deselect the selected satellite
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);

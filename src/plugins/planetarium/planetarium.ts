@@ -6,8 +6,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -31,10 +31,13 @@ import { LegendManager } from '@app/static/legend-manager';
 import planetariumPng from '@public/img/icons/planetarium.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
+import { MenuMode } from '@app/interfaces';
 
 export class Planetarium extends KeepTrackPlugin {
   readonly id = 'Planetarium';
   dependencies_: string[];
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = planetariumPng;
   isRequireSensorSelected = true;

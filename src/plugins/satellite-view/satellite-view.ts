@@ -3,8 +3,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -20,12 +20,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
 import { CameraType } from '@app/singletons/camera';
-import sat3Png from '@public/img/icons/sat3.png';
+import viewInAirPng from '@public/img/icons/view-in-air.png';
 import i18next from 'i18next';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -40,8 +40,10 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
+  menuMode: MenuMode[] = [MenuMode.ALL];
+
   isRequireSatelliteSelected = true;
-  bottomIconImg = sat3Png;
+  bottomIconImg = viewInAirPng;
   isIconDisabledOnLoad = true;
   bottomIconCallback = () => {
     if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {

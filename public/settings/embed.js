@@ -1,8 +1,8 @@
 /**
  * // /////////////////////////////////////////////////////////////////////////////
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -19,12 +19,6 @@
  */
 
 const settingsOverride = {
-  // /////////////////////////////////////////////////////////////////////////////
-  // NOTE: Tweak these settings for your own needs.
-  //       All colors are in RGBA format and must be between 0.0 and 1.0
-  //       Removing a color will cause it to be set to the default value.
-  // /////////////////////////////////////////////////////////////////////////////
-
   // installDirectory: '../',             // Directory where keepTrack is installed
 
   /*
@@ -132,9 +126,9 @@ const settingsOverride = {
     classificationBar: false,
     soundManager: false,
     gamepad: false,
-    scenarioCreator: false,
     debrisScreening: false,
     videoDirector: false,
+    createSat: false,
   },
 };
 

@@ -1,13 +1,13 @@
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatConstellationString } from '@app/singletons/catalog-manager/satLinkManager';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { GroupType } from '@app/singletons/object-group';
-import satChngPng from '@public/img/icons/satchng.png';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import categoryPng from '@public/img/icons/category.png';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatConstellations extends KeepTrackPlugin {
@@ -16,7 +16,9 @@ export class SatConstellations extends KeepTrackPlugin {
 
   private additionalConstellations_ = [];
 
-  bottomIconImg = satChngPng;
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+
+  bottomIconImg = categoryPng;
   bottomIconElementName: string = 'menu-constellations';
   sideMenuElementName: string = 'constellations-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -42,7 +44,7 @@ export class SatConstellations extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
   };
 

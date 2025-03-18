@@ -1,6 +1,7 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { Camera } from '@app/singletons/camera';
 import { errorManagerInstance } from '../errorManager';
@@ -165,6 +166,7 @@ export class KeyboardInput {
         uiManagerInstance.toggleBottomMenu();
         this.releaseShiftKey(keepTrackApi.getMainCamera());
         break;
+      // Show - Hide orbits
       case 'L':
         settingsManager.isDrawOrbits = !settingsManager.isDrawOrbits;
         if (settingsManager.isDrawOrbits) {
@@ -173,6 +175,18 @@ export class KeyboardInput {
           uiManagerInstance.toast('Orbits Off', ToastMsgType.standby);
         }
         SettingsMenuPlugin.syncOnLoad();
+        break;
+      // Switch between ECI and ECF frames
+      case 'E':
+        if (this.isShiftPressed) {
+          settingsManager.isOrbitCruncherInEcf = !settingsManager.isOrbitCruncherInEcf;
+          if (settingsManager.isOrbitCruncherInEcf) {
+            uiManagerInstance.toast('Orbits displayed in ECF', ToastMsgType.normal);
+          } else {
+            uiManagerInstance.toast('Orbits displayed in ECI', ToastMsgType.standby);
+          }
+          SettingsMenuPlugin.syncOnLoad();
+        }
         break;
       default:
         break;
@@ -204,16 +218,10 @@ export class KeyboardInput {
 
     switch (evt.key) {
       case '}':
-        /*
-         * TODO: Implement
-         * keepTrackApi.getPlugin(SelectSatManager).selectNextSat();
-         */
+        keepTrackApi.getPlugin(SelectSatManager)?.selectNextSat();
         break;
       case '{':
-        /*
-         * TODO: Implement
-         * keepTrackApi.getPlugin(SelectSatManager).selectPrevSat();
-         */
+        keepTrackApi.getPlugin(SelectSatManager)?.selectPrevSat();
         break;
       case '`':
         keepTrackApi.getMainCamera().resetRotation();
@@ -259,13 +267,14 @@ export class KeyboardInput {
         break;
       case '<':
         timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 4000 * 60); // Move back 4 Minutes
+        // TODO: Create a setting for how much to move back/forward
+        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 60000 * 60); // Move back 1 Hour
         settingsManager.isPropRateChange = true;
         keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
         break;
       case '>':
         timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset + 4000 * 60); // Move forward 4 Minutes
+        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset + 60000 * 60); // Move forward 1 Hour
         settingsManager.isPropRateChange = true;
         keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
         break;

@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents, SatPassTimes, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, SatPassTimes, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
@@ -7,7 +7,7 @@ import { showLoading } from '@app/lib/showLoading';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import { SensorMath } from '@app/static/sensor-math';
-import infoPng from '@public/img/icons/info.png';
+import pictureInPicturePng from '@public/img/icons/picture-in-picture.png';
 import { DetailedSatellite, MILLISECONDS_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -22,6 +22,8 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     super();
     this.watchlistPlugin_ = keepTrackApi.getPlugin(WatchlistPlugin);
   }
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   private readonly OVERLAY_CALC_LENGTH_IN_DAYS = 0.5;
   private infoOverlayDOMHtmlStrArr = [];
@@ -57,7 +59,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   };
 
   bottomIconElementName: string = 'info-overlay-icon';
-  bottomIconImg = infoPng;
+  bottomIconImg = pictureInPicturePng;
 
   lastOverlayUpdateTime = 0;
   sideMenuElementHtml = keepTrackApi.html`

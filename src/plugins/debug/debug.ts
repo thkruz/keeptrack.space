@@ -2,7 +2,7 @@ import * as gremlins from 'gremlins.js';
 
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import debugPng from '@public/img/icons/debug.png';
 
@@ -10,7 +10,7 @@ import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
@@ -18,11 +18,13 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   readonly id = 'DebugMenuPlugin';
   dependencies_ = [];
   isErudaVisible = false;
-  bottomIconImg = debugPng;
 
+  menuMode: MenuMode[] = [MenuMode.ALL];
+
+  bottomIconImg = debugPng;
   bottomIconLabel = 'Debug';
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 300,
     maxWidth: 500,

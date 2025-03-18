@@ -2,7 +2,7 @@ import { EChartsData, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
-import linePlotPng from '@public/img/icons/line-plot.png';
+import waterfallPng from '@public/img/icons/waterfall.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { Degrees, DetailedSatellite, SpaceObjectType } from 'ootk';
@@ -12,17 +12,18 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class Time2LonPlots extends KeepTrackPlugin {
   readonly id = 'Time2LonPlots';
   dependencies_: string[] = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
-
-  bottomIconLabel = 'Time vs Lon Plot';
-  bottomIconImg = linePlotPng;
+  bottomIconImg = waterfallPng;
   bottomIconCallback = () => {
+    if (!this.isMenuButtonActive) {
+      return;
+    }
     const chartDom = getEl(this.plotCanvasId);
 
     this.createPlot(Time2LonPlots.getPlotData(), chartDom);
@@ -31,16 +32,10 @@ export class Time2LonPlots extends KeepTrackPlugin {
   plotCanvasId = 'plot-analysis-chart-time2lon';
   chart: echarts.ECharts;
 
-  helpTitle = 'Time Vs Lon Plot Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-    The Time vs Lon Plot Menu is used for plotting the time vs longitude in the GEO belt.
-  </p>`;
-
   sideMenuElementName = 'time2lon-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
   <div id="time2lon-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal plot-analysis-menu-maximized">
-    <div id="plot-analysis-content" class="side-menu">
+    <div id="plot-analysis-content" class="side-menu" style="height: 80%">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
     </div>
   </div>`;
@@ -75,14 +70,37 @@ export class Time2LonPlots extends KeepTrackPlugin {
           color: '#fff',
         },
       },
-      tooltip: {},
+      legend: {
+        show: true,
+        textStyle: {
+          color: '#fff',
+        },
+      },
+      tooltip: {
+        formatter: (params: { value: number[]; color: string; name: string; }) => {
+          const data = params.value;
+          const color = params.color;
+          const name = params.name;
+
+          return `
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+              <div style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: flex-end;">
+                <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-bottom: 5px;"></div>
+                <div style="font-weight: bold;"> ${name}</div>
+              </div>
+              <div><bold>Time from now:</bold> ${data[1].toFixed(2)} min</div>
+              <div><bold>Longitude:</bold> ${data[0].toFixed(3)}°</div>
+            </div>
+          `;
+        },
+      },
       xAxis: {
-        name: 'Longitude',
+        name: 'Longitude (°)',
         type: 'value',
         position: 'bottom',
       },
       yAxis: {
-        name: 'Time',
+        name: 'Time from now (min)',
         type: 'value',
         position: 'left',
       },
@@ -157,9 +175,12 @@ export class Time2LonPlots extends KeepTrackPlugin {
        */
       series: data.map((item) => ({
         type: 'line',
-        name: item.name,
-        data: item.data.map((dataPoint: any) => ({
-          name: item.country,
+        name: item.country,
+        data: item.data.map((dataPoint: {
+          0: number;
+          1: number;
+        }) => ({
+          name: item.name,
           id: item.satId,
           value: [dataPoint[1], dataPoint[0]],
         })),
@@ -194,6 +215,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
 
       let sat = obj as DetailedSatellite;
 
+      // Taking only GEO objects
       if (sat.eccentricity > 0.1) {
         return;
       }
@@ -203,21 +225,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
       if (sat.period > 1640) {
         return;
       }
-      switch (sat.country) {
-        case 'United States of America':
-        case 'United States':
-        case 'US':
-        case 'Russian Federation':
-        case 'CIS':
-        case 'Russia':
-        case 'China':
-        case 'China, People\'s Republic of':
-        case 'Hong Kong Special Administrative Region, China':
-        case 'China (Republic)':
-          break;
-        default:
-          return;
-      }
+
       sat = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
       const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 24);
       const plotData: [number, Degrees][] = [];
@@ -230,10 +238,53 @@ export class Time2LonPlots extends KeepTrackPlugin {
         }
         plotData.push([pointTime, point.lon]);
       });
+      let country = '';
+
+      switch (sat.country) {
+        case 'United States of America':
+        case 'United States':
+        case 'US':
+        case 'USA':
+          country = 'USA';
+          break;
+
+        case 'France':
+        case 'FR':
+          country = 'France';
+          break;
+
+        case 'Russian Federation':
+        case 'CIS':
+        case 'RU':
+        case 'SU':
+        case 'Russia':
+          country = 'Russia';
+          break;
+
+        case 'China':
+        case 'China, People\'s Republic of':
+        case 'Hong Kong Special Administrative Region, China':
+        case 'China (Republic)':
+        case 'PRC':
+        case 'CN':
+          country = 'China';
+          break;
+        case 'Japan':
+        case 'JPN':
+          country = 'Japan';
+          break;
+        case 'India':
+        case 'IND':
+          country = 'India';
+          break;
+        default:
+          country = 'Other';
+          break;
+      }
       data.push({
         name: sat.name,
         satId: sat.id,
-        country: sat.country,
+        country,
         data: plotData,
       });
     });
@@ -241,5 +292,3 @@ export class Time2LonPlots extends KeepTrackPlugin {
     return data;
   }
 }
-
-export const time2LonPlotsPlugin = new Time2LonPlots();

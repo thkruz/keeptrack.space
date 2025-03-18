@@ -1,10 +1,10 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import breakupPng from '@public/img/icons/breakup.png';
+import streamPng from '@public/img/icons/stream.png';
 
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
@@ -12,7 +12,7 @@ import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Breakup extends KeepTrackPlugin {
@@ -29,7 +29,9 @@ export class Breakup extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
-  bottomIconImg = breakupPng;
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+
+  bottomIconImg = streamPng;
   private readonly maxDifApogeeVsPerigee_ = 1000;
 
   bottomIconCallback = (): void => {
@@ -51,7 +53,7 @@ export class Breakup extends KeepTrackPlugin {
     this.updateSccNumInMenu_();
   };
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
   };
 

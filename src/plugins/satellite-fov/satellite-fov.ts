@@ -3,8 +3,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -20,22 +20,24 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import removePng from '@public/img/icons/remove.png';
-import sensorOccupiedPng from '@public/img/icons/sensor_occupied.png';
+import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
+import satelliteFovPng from '@public/img/icons/satellite-fov.png';
 import { BaseObject, Degrees } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
 export class SatelliteFov extends KeepTrackPlugin {
   readonly id = 'SatelliteFov';
   dependencies_ = [SelectSatManager.name];
-  bottomIconImg = sensorOccupiedPng;
+  bottomIconImg = satelliteFovPng;
 
-  dragOptions: clickDragOptions = {
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
+
+  dragOptions: ClickDragOptions = {
     isDraggable: false,
     minWidth: 350,
   };
@@ -338,7 +340,7 @@ export class SatelliteFov extends KeepTrackPlugin {
               ${nameSpan}
             </div>
             <div class="col s2 m2 l2 center-align remove-icon" style="display: flex; align-items: center; height: 100%;">
-              <img class="remove-sensor" data-id="${mesh.obj.id.toString()}" src="${removePng}" style="cursor: pointer;"></img>
+              <img class="remove-sensor" data-id="${mesh.obj.id.toString()}" src="${bookmarkRemovePng}" style="cursor: pointer;"></img>
             </div>
         </div>
         `;

@@ -1,6 +1,6 @@
-import { clickDragOptions } from '@app/plugins/KeepTrackPlugin';
+import { ClickDragOptions } from '@app/plugins/KeepTrackPlugin';
 
-export const clickAndDragWidth = (el: HTMLElement | null, options: clickDragOptions = {
+export const clickAndDragWidth = (el: HTMLElement | null, options: ClickDragOptions = {
   isDraggable: true,
 }): void => {
   if (!el) {
@@ -23,7 +23,7 @@ export const clickAndDragWidth = (el: HTMLElement | null, options: clickDragOpti
     // create new element on right edge
     const edgeEl = createElWidth_(el);
 
-    addEventsWidth_(edgeEl, el, width, minWidth, maxWidth, options.attachedElement, options.leftOffset);
+    addEventsWidth_(edgeEl, el, width, minWidth, maxWidth, options);
   }
 };
 
@@ -39,7 +39,8 @@ export const clickAndDragHeight = (el: HTMLElement, maxHeight?: number, callback
   addEventsHeight_(edgeEl, el, callback, maxHeight);
 };
 
-const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number, minWidth: number, maxWidth: number, attachedElement?: HTMLElement, leftOffset?: number) => {
+const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number, minWidth: number, maxWidth: number, options: ClickDragOptions) => {
+  const { attachedElement, leftOffset } = options;
   let startX: number;
   let startWidth: number;
 
@@ -63,6 +64,10 @@ const addEventsWidth_ = (edgeEl: HTMLDivElement, el: HTMLElement, width: number,
       right: '0px',
       position: 'absolute',
     } as CSSStyleDeclaration);
+
+    if (options.callback) {
+      options.callback();
+    }
   });
   edgeEl.addEventListener('mousemove', (e: MouseEvent) => {
     if (settingsManager.isDragging) {

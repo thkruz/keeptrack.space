@@ -6,8 +6,8 @@
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General License as published by the Free Software
@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
@@ -47,6 +47,7 @@ export class Screenshot extends KeepTrackPlugin {
   // This is 'disabled' since it does not turn green after being clicked like other buttons.
   isIconDisabled = true;
 
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = cameraPng;
   rmbCallback = (targetId: string): void => {

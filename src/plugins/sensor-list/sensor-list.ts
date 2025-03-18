@@ -1,15 +1,15 @@
 import { sensors } from '@app/catalogs/sensors';
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { getClass } from '@app/lib/get-class';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
-import radarPng from '@public/img/icons/radar.png';
+import sensorPng from '@public/img/icons/sensor.png';
 import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { Planetarium } from '../planetarium/planetarium';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
@@ -40,14 +40,15 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
   };
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 550,
     maxWidth: 800,
   };
 
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
-  bottomIconImg = radarPng;
+  bottomIconImg = sensorPng;
 
   sideMenuElementName: string = 'sensor-list-menu';
   sideMenuElementHtml: string =

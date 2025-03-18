@@ -74,6 +74,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.rmbMenuActions]: [string, number];
   [KeepTrackApiEvents.rightBtnMenuAdd]: [];
   [KeepTrackApiEvents.updateDateTime]: [Date];
+  [KeepTrackApiEvents.updatePropRate]: [number];
   [KeepTrackApiEvents.uiManagerFinal]: [];
   [KeepTrackApiEvents.resetSensor]: [];
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string, number];
@@ -97,6 +98,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.uiManagerOnReady]: [];
   [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
   [KeepTrackApiEvents.ConeMeshUpdate]: [];
+  [KeepTrackApiEvents.bottomMenuModeChange]: [];
 };
 
 interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {

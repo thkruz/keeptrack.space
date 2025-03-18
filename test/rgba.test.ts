@@ -68,7 +68,8 @@ describe('hex2rgba_function', () => {
  *Code Analysis
  *
  *Objective:
- *The objective of the parseRgba function is to parse a string in the format of rgba color and return an array of four numbers representing the red, green, blue, and alpha values of the color.
+ *The objective of the parseRgba function is to parse a string in the format of rgba color and return an array of four numbers representing the red, green, blue, and alpha values
+ *of the color.
  *
  *Inputs:
  *- str: a string in the format of rgba color (e.g. "rgba(255, 255, 255, 0.5)")

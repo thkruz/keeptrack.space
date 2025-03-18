@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
@@ -7,10 +7,13 @@ import { showLoading } from '@app/lib/showLoading';
 import { Localization } from '@app/locales/locales';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SensorMath, TearrData, TearrType } from '@app/static/sensor-math';
-import lookanglesPng from '@public/img/icons/lookangles.png';
-import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import tableChartPng from '@public/img/icons/table-chart.png';
+import { BaseObject, DetailedSatellite, DetailedSensor, SpaceObjectType } from 'ootk';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+
+type LookAngleData = TearrData & { canStationObserve: boolean };
+
 export class LookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'LookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
@@ -20,6 +23,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   /**
    * Flag to determine if the look angles should only show rise and set times
@@ -43,7 +48,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   isRequireSensorSelected = true;
 
 
-  bottomIconImg = lookanglesPng;
+  bottomIconImg = tableChartPng;
   bottomIconCallback: () => void = () => {
     this.refreshSideMenuData_();
   };
@@ -51,7 +56,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 400,
     maxWidth: 600,
@@ -212,14 +217,16 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
      */
     const lookanglesInterval = this.isRiseSetOnly_ ? 1 : this.angleCalculationInterval_;
 
-    const looksArray = <TearrData[]>[];
+    const looksArray = <LookAngleData[]>[];
     let offset = 0;
     let isMaxElFound = false;
 
     for (let i = 0; i < this.lengthOfLookAngles_ * 24 * 60 * 60; i += lookanglesInterval) {
       offset = i * 1000; // Offset in seconds (msec * 1000)
       const now = timeManagerInstance.getOffsetTimeObj(offset);
-      const looksPass = SensorMath.getTearData(now, sat.satrec, sensors, this.isRiseSetOnly_, isMaxElFound);
+      const tearrData = SensorMath.getTearData(now, sat.satrec, sensors, this.isRiseSetOnly_, isMaxElFound);
+      const canStationObserve = sensors[0].type === SpaceObjectType.OPTICAL ? SensorMath.checkIfVisibleForOptical(sat, sensors[0], now) : true;
+      const looksPass = { ...tearrData, canStationObserve };
 
       if (looksPass.time !== '') {
         // Update the table with looks for this 5 second chunk and then increase table counter by 1
@@ -263,7 +270,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     return looksArray;
   }
 
-  private populateSideMenuTable_(lookAngleData: TearrData[], timeManagerInstance: TimeManager) {
+  private populateSideMenuTable_(lookAngleData: LookAngleData[], timeManagerInstance: TimeManager) {
     const tbl = <HTMLTableElement>getEl('looks'); // Identify the table to update
 
     tbl.innerHTML = ''; // Clear the table from old object data
@@ -295,9 +302,13 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     tdR.appendChild(document.createTextNode('Rng'));
     tdR.setAttribute('style', 'text-decoration: underline');
+    const tdV = tr.insertCell();
 
-    for (const lookAngleRow of lookAngleData) {
-      LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, lookAngleRow, timeManagerInstance, tdE, tdA, tdR, tdType });
+    tdV.appendChild(document.createTextNode('Visible'));
+    tdV.setAttribute('style', 'text-decoration: underline');
+
+    for (const entry of lookAngleData) {
+      LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, entry, timeManagerInstance, tdE, tdA, tdR, tdType, tdV });
     }
 
     if (lookAngleData.length === 0) {
@@ -311,16 +322,17 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   }
 
   private static populateSideMenuRow_(
-    { tbl, tdT, lookAngleRow, timeManagerInstance, tdE, tdA, tdR, tdType }:
+    { tbl, tdT, entry, timeManagerInstance, tdE, tdA, tdR, tdType, tdV }:
       {
         tbl: HTMLTableElement;
         tdT: HTMLTableCellElement;
-        lookAngleRow: TearrData;
+        entry: LookAngleData;
         timeManagerInstance: TimeManager;
         tdE: HTMLTableCellElement;
         tdA: HTMLTableCellElement;
         tdR: HTMLTableCellElement;
         tdType: HTMLTableCellElement;
+        tdV: HTMLTableCellElement;
       },
   ) {
     if (tbl.rows.length > 0) {
@@ -329,26 +341,32 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       tr.setAttribute('class', 'link');
 
       tdT = tr.insertCell();
-      tdT.appendChild(document.createTextNode(dateFormat(lookAngleRow.time, 'isoDateTime', false)));
+      tdT.appendChild(document.createTextNode(dateFormat(entry.time, 'isoDateTime', false)));
 
       // Create click listener
-      tdT.addEventListener('click', () => {
-        timeManagerInstance.changeStaticOffset(new Date(`${dateFormat(lookAngleRow.time, 'isoDateTime', false)}z`).getTime() - timeManagerInstance.realTime);
-        timeManagerInstance.calculateSimulationTime();
+      tr.addEventListener('click', () => {
+        timeManagerInstance.changeStaticOffset(new Date(`${dateFormat(entry.time, 'isoDateTime', false)}z`).getTime() - timeManagerInstance.realTime);
         keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
       });
 
       if (tdType) {
         tdType = tr.insertCell();
-        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(lookAngleRow.type)));
+        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type)));
       }
 
       tdE = tr.insertCell();
-      tdE.appendChild(document.createTextNode(lookAngleRow.el.toFixed(1)));
+      tdE.appendChild(document.createTextNode(entry.el.toFixed(1)));
       tdA = tr.insertCell();
-      tdA.appendChild(document.createTextNode(lookAngleRow.az.toFixed(0)));
+      tdA.appendChild(document.createTextNode(entry.az.toFixed(0)));
       tdR = tr.insertCell();
-      tdR.appendChild(document.createTextNode(lookAngleRow.rng.toFixed(0)));
+      tdR.appendChild(document.createTextNode(entry.rng.toFixed(0)));
+      tdV = tr.insertCell();
+      tdV.appendChild(document.createTextNode(entry.canStationObserve ? 'Yes' : 'No'));
+      if (entry.canStationObserve) {
+        tdV.setAttribute('style', 'color: #2d7b31');
+      } else {
+        tdV.setAttribute('style', 'color: #c62828');
+      }
     }
   }
 

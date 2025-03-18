@@ -3,8 +3,14 @@
   "conventionalCommits.promptScopes": false,
   "editor.formatOnSave": true,
   "typescript.validate.enable": true,
-  "npm.exclude": ["**/dist/**", "**/src/admin", "**/src/admin/*"],
-  "eslint.workingDirectories": ["./"],
+  "npm.exclude": [
+    "**/dist/**",
+    "**/src/admin",
+    "**/src/admin/*"
+  ],
+  "eslint.workingDirectories": [
+    "./"
+  ],
   "typescript.tsdk": "./node_modules/typescript/lib",
   "git.enableCommitSigning": true,
   "files.exclude": {
@@ -31,7 +37,12 @@
     "editor.autoIndent": "advanced",
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "always",
@@ -41,22 +52,34 @@
   "files.eol": "\n",
   "terminal.integrated.profiles.windows": {
     "Testing": {
-      "path": ["D:\\Program Files\\Git\\bin\\bash.exe"],
+      "path": [
+        "D:\\Program Files\\Git\\bin\\bash.exe"
+      ],
       "icon": "beaker",
       "color": "terminal.ansiGreen"
     },
     "Build": {
-      "path": ["D:\\Program Files\\Git\\bin\\bash.exe"],
+      "path": [
+        "D:\\Program Files\\Git\\bin\\bash.exe"
+      ],
       "icon": "symbol-method",
       "color": "terminal.ansiBlue"
     }
   },
-  "jestrunner.codeLens": ["run", "debug", "coverage"],
-  "jestrunner.runOptions": ["-o --coverage"],
-  "sonarlint.connectedMode.project": {
-    "connectionId": "thkruz",
-    "projectKey": "thkruz_keeptrack.space"
-  },
+  "jestrunner.codeLens": [
+    "run",
+    "debug",
+    "coverage"
+  ],
+  "jestrunner.runOptions": [
+    "-o --coverage"
+  ],
   "task.autoDetect": "off",
-  "editor.rulers": [180]
+  "editor.rulers": [
+    180
+  ],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "http-localhost-9000",
+    "projectKey": "keeptrack"
+  }
 }

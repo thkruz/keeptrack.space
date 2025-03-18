@@ -1,12 +1,12 @@
-import { EChartsData, KeepTrackApiEvents } from '@app/interfaces';
+import { EChartsData, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SatMathApi } from '@app/singletons/sat-math-api';
-import scatterPlotPng3 from '@public/img/icons/scatter-plot3.png';
+import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { BaseObject, DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin, clickDragOptions } from '../KeepTrackPlugin';
+import { DetailedSatellite } from 'ootk';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 type EChartsOption = echarts.EChartsOption;
@@ -14,16 +14,20 @@ type EChartsOption = echarts.EChartsOption;
 export class EcfPlot extends KeepTrackPlugin {
   readonly id = 'EcfPlot';
   dependencies_: string[] = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
   }
 
+  isRequireSatelliteSelected = true;
+  isIconDisabled = true;
+  isIconDisabledOnLoad = true;
 
-  bottomIconLabel = 'ECF Plots';
-  bottomIconImg = scatterPlotPng3;
+  menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
+
+  bottomIconImg = scatterPlotPng;
   bottomIconCallback = () => {
     if (!this.isMenuButtonActive) {
       return;
@@ -33,56 +37,24 @@ export class EcfPlot extends KeepTrackPlugin {
   };
 
   plotCanvasId = 'plot-analysis-chart-ecf';
-  isRequireSatelliteSelected = true;
-  isIconDisabledOnLoad = true;
   chart: echarts.ECharts;
-
-  helpTitle = 'ECF Plots Menu';
-  helpBody = keepTrackApi.html`
-  <p>
-    The ECF Plots menu allows you to plot the position of a satellite in Earth Centered Fixed (ECF) coordinates.
-    This is useful for visualizing the position of a satellite in space.
-  </p>`;
 
   sideMenuElementName = 'ecf-plots-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
-  <div id="ecf-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal plot-analysis-menu-maximized">
+  <div id="ecf-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
     <div id="plot-analysis-content" class="side-menu">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
     </div>
   </div>`;
 
-  dragOptions: clickDragOptions = {
-    minWidth: 500,
-    maxWidth: 1200,
+  dragOptions: ClickDragOptions = {
+    isDraggable: true,
+    minWidth: 800,
+    maxWidth: 4096,
+    callback: () => {
+      this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
+    },
   };
-
-  addHtml(): void {
-    super.addHtml();
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
-        // This runs no matter what
-        if (sat) {
-          this.setBottomIconToEnabled();
-        } else {
-          this.setBottomIconToDisabled();
-        }
-        if (!this.isMenuButtonActive) {
-          return;
-        }
-
-        // This runs if the menu is open
-        if (!sat) {
-          this.hideSideMenus();
-        } else {
-          this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
-        }
-      },
-    });
-  }
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
     // Dont Load Anything if the Chart is Closed
@@ -122,6 +94,7 @@ export class EcfPlot extends KeepTrackPlugin {
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-bottom: 5px;"></div>
                 <div style="font-weight: bold;"> ${params.seriesName}</div>
               </div>
+              <div>${data[3]}</div>
               <div>X: ${data[0].toFixed(2)} km</div>
               <div>Y: ${data[1].toFixed(2)} km</div>
               <div>Z: ${data[2].toFixed(2)} km</div>
@@ -172,7 +145,7 @@ export class EcfPlot extends KeepTrackPlugin {
           itemStyle: {
             opacity: 1 - idx / sat.value.length, // opacity by time
           },
-          value: [item[app.fieldIndices[app.config.xAxis3D]], item[app.fieldIndices[app.config.yAxis3D]], item[app.fieldIndices[app.config.zAxis3D]]],
+          value: [item[app.fieldIndices[app.config.xAxis3D]], item[app.fieldIndices[app.config.yAxis3D]], item[app.fieldIndices[app.config.zAxis3D]], item[3]],
         })),
         symbolSize: 12,
         // symbol: 'triangle',
@@ -230,14 +203,36 @@ export class EcfPlot extends KeepTrackPlugin {
     const data = [] as EChartsData;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
+    // Time management
+    const now = keepTrackApi.getTimeManager().simulationTimeObj.getTime();
     const curSatObj = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
 
-    data.push({ name: curSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+    const timeData: Date[] = [];
+
+    for (let i = 0; i < NUMBER_OF_POINTS; i++) {
+      const date = new Date(now + curSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);
+
+      timeData.push(date);
+    }
+    data.push({
+      name: curSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(curSatObj, NUMBER_OF_POINTS)
+        .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+    });
 
     const secSatObj = this.selectSatManager_.secondarySatObj;
 
     if (secSatObj) {
-      data.push({ name: secSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+      const timeData: Date[] = [];
+
+      for (let i = 0; i < NUMBER_OF_POINTS; i++) {
+        const date = new Date(now + secSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);
+
+        timeData.push(date);
+      }
+      data.push({
+        name: secSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(secSatObj, NUMBER_OF_POINTS)
+          .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+      });
     }
 
     const lastSatId = this.selectSatManager_.lastSelectedSat();
@@ -245,11 +240,17 @@ export class EcfPlot extends KeepTrackPlugin {
     if (lastSatId !== -1) {
       const lastSatObj = catalogManagerInstance.getObject(lastSatId) as DetailedSatellite;
 
-      data.push({ name: lastSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS).map((point) => [point.x, point.y, point.z]) });
+      for (let i = 0; i < NUMBER_OF_POINTS; i++) {
+        const date = new Date(now + lastSatObj.period * 60 * i / (NUMBER_OF_POINTS) * 1000);
+
+        timeData.push(date);
+      }
+      data.push({
+        name: lastSatObj.name, value: SatMathApi.getEcfOfCurrentOrbit(lastSatObj, NUMBER_OF_POINTS)
+          .map((point: { x: number, y: number, z: number }, idx: number) => [point.x, point.y, point.z, timeData[idx].toISOString()]),
+      });
     }
 
     return data;
   }
 }
-
-export const ecfPlotsPlugin = new EcfPlot();

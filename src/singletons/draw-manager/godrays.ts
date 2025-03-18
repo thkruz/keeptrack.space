@@ -14,8 +14,8 @@ import { Sun } from './sun';
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2024 Theodore Kruczek
- * @Copyright (C) 2020-2024 Heather Kruczek
+ * @Copyright (C) 2016-2025 Theodore Kruczek
+ * @Copyright (C) 2020-2025 Heather Kruczek
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -63,6 +63,12 @@ export class Godrays {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
 
+    gl.uniform1i(this.mesh.material.uniforms.u_samples, settingsManager.godraysSamples ?? 32);
+    gl.uniform1f(this.mesh.material.uniforms.u_decay, settingsManager.godraysDecay ?? 0.985);
+    gl.uniform1f(this.mesh.material.uniforms.u_exposure, settingsManager.godraysExposure ?? 1.2);
+    gl.uniform1f(this.mesh.material.uniforms.u_density, settingsManager.godraysDensity ?? 1.05);
+    gl.uniform1f(this.mesh.material.uniforms.u_weight, settingsManager.godraysWeight ?? 0.075);
+    gl.uniform1f(this.mesh.material.uniforms.u_illuminationDecay, settingsManager.godraysIlluminationDecay ?? 1.0);
     gl.uniform2f(this.mesh.material.uniforms.u_sunPosition, screenPosition[0], screenPosition[1]);
     gl.uniform2f(this.mesh.material.uniforms.u_resolution, gl.canvas.width, gl.canvas.height);
 
@@ -96,9 +102,15 @@ export class Godrays {
     });
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
+        u_samples: settingsManager.godraysSamples ?? 32,
         u_sunPosition: <WebGLUniformLocation>null,
         u_sampler: <WebGLUniformLocation>null,
         u_resolution: <WebGLUniformLocation>null,
+        u_decay: <WebGLUniformLocation>null,
+        u_exposure: <WebGLUniformLocation>null,
+        u_density: <WebGLUniformLocation>null,
+        u_weight: <WebGLUniformLocation>null,
+        u_illuminationDecay: <WebGLUniformLocation>null,
       },
       map: gl.createTexture(),
       textureType: 'flat',
@@ -157,44 +169,95 @@ export class Godrays {
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer);
   }
 
-  private shaders_ = {
+  private readonly shaders_ = {
     frag: keepTrackApi.glsl`
+      uniform int u_samples;
+      uniform float u_decay;
+      uniform float u_exposure;
+      uniform float u_density;
+      uniform float u_weight;
+      uniform float u_illuminationDecay;
       uniform sampler2D u_sampler;
       uniform vec2 u_sunPosition;
+      uniform vec2 u_resolution;
 
       // the texCoords passed in from the vertex shader.
       in vec2 v_texCoord;
 
       out vec4 fragColor;
 
+      // Gaussian blur function
+      vec4 blur(sampler2D tex, vec2 uv, vec2 resolution) {
+        // Account for aspect ratio to prevent stretching
+        float aspectRatio = resolution.x / resolution.y;
+        vec2 blurSize = vec2(1.15 / resolution.x, 1.15 / resolution.y);
+        vec4 sum = vec4(0.0);
+        float totalWeight = 0.0;
+
+        // 9x9 kernel for strong blur
+        for (int x = -4; x <= 4; x++) {
+            for (int y = -4; y <= 4; y++) {
+                vec2 offset = vec2(float(x) * blurSize.x, float(y) * blurSize.y);
+                vec2 sampleCoord = clamp(uv + offset, 0.0, 1.0);
+                // Gaussian weight
+                float weight = exp(-dot(offset * vec2(1.0, aspectRatio), offset * vec2(1.0, aspectRatio)) * 0.5);
+                sum += texture(tex, sampleCoord) * weight;
+                totalWeight += weight;
+            }
+        }
+
+        return sum / totalWeight; // Normalize by actual total weight
+      }
+
       void main() {
-        float decay=0.99;
-        float exposure=1.25;
-        float density=1.05;
-        float weight=0.075;
-        float illuminationDecay = 1.0;
+        // Use uniforms if provided, otherwise use defaults
+        float decay = 0.983;          // Slightly less decay for more persistent rays
+        float exposure = 0.5;         // Increased exposure for brighter rays
+        float density = 1.8;         // Reduced density for smoother sampling
+        float weight = 0.085;         // Increased base weight
+        float illuminationDecay = 2.7;
+
+        // Override with uniforms if set
+        if (u_decay > 0.0) decay = u_decay;
+        if (u_exposure > 0.0) exposure = u_exposure;
+        if (u_density > 0.0) density = u_density;
+        if (u_weight > 0.0) weight = u_weight;
+        if (u_illuminationDecay > 0.0) illuminationDecay = u_illuminationDecay;
+
         vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);
         vec2 texCoord = v_texCoord;
 
-        /// samples will describe the rays quality, you can play with
-        const int samples = 45;
+        // Calculate vector from pixel to light source
+        vec2 deltaTexCoord = (texCoord - lightPositionOnScreen.xy);
 
-        vec2 deltaTexCoord = (v_texCoord - lightPositionOnScreen.xy);
-        deltaTexCoord *= 1.0 / float(samples) * density;
-        vec4 color = texture(u_sampler, texCoord.xy);
+        // Distance from current pixel to light source
+        float dist = length(deltaTexCoord);
 
-        for(int i= 0; i <= samples ; i++)
+        // Apply tapering based on distance
+        // Hardcoding 1.0 / float(u_samples) * density where density is 1.05 and samples are 128
+        deltaTexCoord *= 1.0 / float(u_samples) * density;
+
+        // Apply initial blur to reduce pixelation
+        vec4 color = blur(u_sampler, texCoord.xy, u_resolution);
+
+        for(int i= 0; i <= u_samples ; i++)
         {
-          // Calcualte the current sampling coord
+          // Calculate the current sampling coord
           texCoord -= deltaTexCoord;
-          // Sample the color from the texture at this texCoord
-          vec4 newColor = texture(u_sampler, texCoord);
+
+          // Break loop if off-screen
+          if (texCoord.x < 0.0 || texCoord.x > 1.0 || texCoord.y < 0.0 || texCoord.y > 1.0) {
+            break;
+          }
+
+          // Sample the color with blur from the texture at this texCoord
+          vec4 sampleColor = blur(u_sampler, texCoord, u_resolution);
 
           // Apply the illumination decay factor
-          newColor *= illuminationDecay * weight;
+          sampleColor *= illuminationDecay * weight;
 
           // Accumulate the color
-          color += newColor;
+          color += sampleColor;
 
           // Update the illumination decay factor
           illuminationDecay *= decay;

@@ -1,14 +1,14 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { saveCsv } from '@app/lib/saveVariable';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { GroupType } from '@app/singletons/object-group';
 import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
 import { BaseObject, DetailedSatellite } from 'ootk';
-import { clickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { saveCsv } from '@app/lib/saveVariable';
 
 interface ChannelInfo {
   satellite: string;
@@ -50,6 +50,8 @@ export class TransponderChannelData extends KeepTrackPlugin {
     this.showTable();
     this.lastLoadedSat_ = selectedSat.id;
   };
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
@@ -117,7 +119,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
   bottomIconElementName: string = 'menu-transponderChannelData';
   bottomIconImg = transponderChannelDataPng;
 
-  dragOptions: clickDragOptions = {
+  dragOptions: ClickDragOptions = {
     isDraggable: false,
     maxWidth: 1000,
     minWidth: 1000,
@@ -140,47 +142,70 @@ export class TransponderChannelData extends KeepTrackPlugin {
   </div>`;
 
   showTable() {
-    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+    const selectedObj = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+    let selectedSat: DetailedSatellite;
 
-    fetch(`https://api.keeptrack.space/v1/channel/${selectedSat.name}`)
+    if (selectedObj.isSatellite()) {
+      selectedSat = selectedObj as DetailedSatellite;
+    } else {
+      errorManagerInstance.warn('Selected object is not a satellite');
+    }
+
+    // First try with satellite name
+    fetch(`https://api.keeptrack.space/v3/channels/${selectedSat.name}`)
       .then(async (resp) => {
         const data = await resp.json() as ChannelInfo[];
 
-        this.dataCache = data;
-
-        const tbl: HTMLTableElement = <HTMLTableElement>getEl('transponderChannelData-table');
-
-        if (!tbl) {
-          return;
-        }
-
-        tbl.innerHTML = '';
-        // Add a header row
-        const header = tbl.createTHead();
-        const headerRow = header.insertRow();
-
-        Object.keys(data[0]).forEach((key) => {
-          const th = document.createElement('th');
-          const h3 = document.createElement('h3');
-
-          h3.textContent = key.charAt(0).toUpperCase() + key.slice(1);
-          h3.style.textAlign = 'left';
-          th.appendChild(h3);
-          headerRow.appendChild(th);
-        });
-        // Loop through the data and create a table row for each item
-        data.forEach((info) => {
-          const row = tbl.insertRow();
-
-          Object.values(info).forEach((val) => {
-            const cell = row.insertCell();
-
-            cell.textContent = val;
-
-          });
-        });
+        this.displayChannelData(data);
       })
-      .catch(() => errorManagerInstance.warn(`Failed to fetch channel info for ${selectedSat.name}`));
+      .catch(() => {
+        // If first request fails, try with altName
+        fetch(`https://api.keeptrack.space/v3/channels/${selectedSat.altName}`)
+          .then(async (resp) => {
+            const data = await resp.json() as ChannelInfo[];
+
+            this.displayChannelData(data);
+          })
+          .catch(() => errorManagerInstance.warn(
+            `Failed to fetch channel info for ${selectedSat.name} and ${selectedSat.altName}`,
+          ));
+      });
+  }
+
+  displayChannelData(data: ChannelInfo[]) {
+    this.dataCache = data;
+    const tbl: HTMLTableElement = <HTMLTableElement>getEl('transponderChannelData-table');
+
+    if (!tbl) {
+      return;
+    }
+
+    tbl.innerHTML = '';
+
+    // Add a header row
+    const header = tbl.createTHead();
+    const headerRow = header.insertRow();
+
+    Object.keys(data[0]).forEach((key) => {
+      const th = document.createElement('th');
+      const h3 = document.createElement('h3');
+
+      h3.textContent = key.charAt(0).toUpperCase() + key.slice(1);
+      h3.style.textAlign = 'left';
+      th.appendChild(h3);
+      headerRow.appendChild(th);
+    });
+
+    // Create table rows for each item
+    data.forEach((info) => {
+      const row = tbl.insertRow();
+
+      Object.values(info).forEach((val) => {
+        const cell = row.insertCell();
+
+        cell.textContent = val;
+      });
+    });
   }
 
   exportData() {

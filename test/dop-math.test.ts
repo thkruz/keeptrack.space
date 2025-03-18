@@ -96,7 +96,7 @@ describe('updateDopsTable_method', () => {
 
     keepTrackApi.containerRoot.innerHTML = '';
     disableConsoleErrors();
-    expect(() => DopMath.updateDopsTable([defaultSat as any])).toThrow();
+    expect(() => DopMath.updateDopsTable({ fake: 'bad data' } as unknown as DopList)).toThrow();
     enableConsoleErrors();
     keepTrackApi.containerRoot.innerHTML = temp;
   });

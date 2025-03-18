@@ -4,7 +4,8 @@ import { StringPad } from '@app/lib/stringPad';
 
 /**
  *Main functionalities:
- *The StringPad class provides static methods for padding strings with zeros or spaces. It can pad a string to a specified length, pad a string with spaces to a specified size, pad a string with zeros to a maximum length, and add trailing zeros to a string up to a maximum length.
+ *The StringPad class provides static methods for padding strings with zeros or spaces. It can pad a string to a specified length, pad a string with spaces to a specified size,
+ *pad a string with zeros to a maximum length, and add trailing zeros to a string up to a maximum length.
  *
  *Methods:
  *- pad(val: string, len = 2): pads the input string with zeros to a specified length (default is 2)

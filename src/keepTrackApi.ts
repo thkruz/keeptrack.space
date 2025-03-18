@@ -136,12 +136,32 @@ type rmbMenuItem = {
 
 export class KeepTrackApi {
   analytics: AnalyticsInstance = {
-    page: () => {
-      // Do nothing
+    identify: () => {
+      // do nothing
     },
     track: () => {
-      // Do nothing
+      // do nothing
     },
+    page: () => {
+      // do nothing
+    },
+    user: () => ({
+      anonymousId: '',
+      id: '',
+    }),
+    reset: () => {
+      // do nothing
+    },
+    ready: () => Promise.resolve(),
+    on: () => {
+      // do nothing
+    },
+    once: () => {
+      // do nothing
+    },
+    getState: () => ({
+      plugins: {},
+    }),
   } as unknown as AnalyticsInstance;
   /**
    * Unregisters all events in the KeepTrackApi. Used for testing.

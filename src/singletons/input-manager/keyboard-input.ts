@@ -316,11 +316,19 @@ export class KeyboardInput {
       }
 
       if (!settingsManager.disableUI) {
+        const datetimeTextElement = getEl('datetime-text');
+
+        if (!datetimeTextElement) {
+          errorManagerInstance.debug('Datetime text element not found');
+
+          return;
+        }
+
         if (!this.isCreateClockDOMOnce_) {
-          getEl('datetime-text').innerText = timeManagerInstance.timeTextStr;
+          datetimeTextElement.innerText = timeManagerInstance.timeTextStr;
           this.isCreateClockDOMOnce_ = true;
         } else {
-          getEl('datetime-text').childNodes[0].nodeValue = timeManagerInstance.timeTextStr;
+          datetimeTextElement.childNodes[0].nodeValue = timeManagerInstance.timeTextStr;
         }
       }
     }

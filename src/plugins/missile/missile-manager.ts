@@ -11,12 +11,13 @@ import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, gl
 import { jday } from '@app/lib/transforms';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { DEG2RAD, EciVec3, Kilometers, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from 'ootk';
+import { DEG2RAD, Degrees, EciVec3, Kilometers, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from 'ootk';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
+import { Missile as MissileClass } from './missile-math';
 
 let BurnRate: number, EarthMass: number, EarthRadius: number, FuelDensity: number, G: number, R: number, WarheadMass: number, h: number;
-const missileArray: any[] = [];
+const missileArray: MissileClass[] = [];
 
 let isMassRaidLoaded = false;
 
@@ -197,14 +198,14 @@ export const Missile = (
   TargetLatitude: number,
   TargetLongitude: number,
   NumberWarheads: number,
-  MissileObjectNum: any,
-  CurrentTime: any,
+  MissileObjectNum: number,
+  CurrentTime: number,
   MissileDesc: string,
   Length: number,
   Diameter: number,
   NewBurnRate: number,
   MaxMissileRange: number,
-  country: any,
+  country: string,
   minAltitude: number,
 ) => {
   const missileObj: MissileObject = <MissileObject>keepTrackApi.getCatalogManager().getObject(MissileObjectNum);
@@ -373,7 +374,7 @@ export const Missile = (
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
 
     for (let i = 0; i < EstDistanceList.length; i++) {
-      if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
+      if (EstDistanceList[i] <= Distance / 1000 && (EstDistanceList[i + 1] > Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
         LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
         break;
@@ -382,8 +383,8 @@ export const Missile = (
 
     let hListSum = 0;
 
-    for (let i = 0; i < hList.length; i++) {
-      hListSum += hList[i];
+    for (const h_ of hList) {
+      hListSum += h_;
     }
     hList.push(h + hListSum);
   }
@@ -416,7 +417,7 @@ export const Missile = (
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
 
     for (let i = 0; i < EstDistanceList.length; i++) {
-      if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
+      if (EstDistanceList[i] <= Distance / 1000 && (EstDistanceList[i + 1] > Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
         LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
         break;
@@ -425,8 +426,8 @@ export const Missile = (
 
     let hListSum = 0;
 
-    for (let i = 0; i < hList.length; i++) {
-      hListSum += hList[i];
+    for (const h_ of hList) {
+      hListSum += h_;
     }
     hList.push(h + hListSum);
   }
@@ -457,7 +458,7 @@ export const Missile = (
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
 
     for (let i = 0; i < EstDistanceList.length; i++) {
-      if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
+      if (EstDistanceList[i] <= Distance / 1000 && (EstDistanceList[i + 1] > Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
         LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
         break;
@@ -466,8 +467,8 @@ export const Missile = (
 
     let hListSum = 0;
 
-    for (let i = 0; i < hList.length; i++) {
-      hListSum += hList[i];
+    for (const h_ of hList) {
+      hListSum += h_;
     }
     hList.push(h + hListSum);
   }
@@ -499,7 +500,7 @@ export const Missile = (
     AltitudeList.push(Math.round((Altitude / 1000) * 1e2) / 1e2);
 
     for (let i = 0; i < EstDistanceList.length; i++) {
-      if (EstDistanceList[i] <= Distance / 1000 && !(EstDistanceList[i + 1] <= Distance / 1000)) {
+      if (EstDistanceList[i] <= Distance / 1000 && (EstDistanceList[i + 1] > Distance / 1000)) {
         LatList.push(Math.round(EstLatList[i] * 1e2) / 1e2);
         LongList.push(Math.round(EstLongList[i] * 1e2) / 1e2);
         break;
@@ -507,7 +508,7 @@ export const Missile = (
     }
   }
 
-  const MaxAltitude = AltitudeList.reduce((a, b) => Math.max(a, b));
+  const MaxAltitude = AltitudeList.reduce((a, b) => Math.max(a, b), 0);
 
   if (MaxAltitude < minAltitudeTrue) {
     // Try again with 25% increase to burn rate
@@ -624,7 +625,17 @@ export const smoothList_ = <T extends number>(list: T[], smoothingFactor: number
 export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
   const timeManagerInstance = keepTrackApi.getTimeManager();
 
-  const currentTEARR: any = {}; // Most current TEARR data that is set in satellite object and returned.
+  const currentTEARR = {
+    objName: '',
+    time: '',
+    alt: 0 as Kilometers,
+    lon: 0 as Degrees,
+    lat: 0 as Degrees,
+    az: 0 as Degrees,
+    el: 0 as Degrees,
+    rng: 0 as Kilometers,
+    inView: false,
+  }; // Most current TEARR data that is set in satellite object and returned.
   const now = timeManagerInstance.simulationTimeObj;
   let j = jday(
     now.getUTCFullYear(),
@@ -679,16 +690,16 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
     currentTEARR.lat = gpos.lat;
     positionEcf = eci2ecf({ x, y, z }, gmst);
     lookAngles = ecfRad2rae(sensor.llaRad(), positionEcf);
-    currentTEARR.az = lookAngles.az * RAD2DEG;
-    currentTEARR.el = lookAngles.el * RAD2DEG;
+    currentTEARR.az = lookAngles.az * RAD2DEG as Degrees;
+    currentTEARR.el = lookAngles.el * RAD2DEG as Degrees;
     currentTEARR.rng = lookAngles.rng;
   } catch (e) {
-    currentTEARR.alt = 0;
-    currentTEARR.lon = 0;
-    currentTEARR.lat = 0;
-    currentTEARR.az = 0;
-    currentTEARR.el = 0;
-    currentTEARR.rng = 0;
+    currentTEARR.alt = 0 as Kilometers;
+    currentTEARR.lon = 0 as Degrees;
+    currentTEARR.lat = 0 as Degrees;
+    currentTEARR.az = 0 as Degrees;
+    currentTEARR.el = 0 as Degrees;
+    currentTEARR.rng = 0 as Kilometers;
   }
 
   // Check if satellite is in field of view of a sensor.
@@ -728,7 +739,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
     currentTEARR.inView = false;
   }
 
-  const satInfoBoxCorePlugin = <SatInfoBox>keepTrackApi.getPlugin(SatInfoBox);
+  const satInfoBoxCorePlugin = keepTrackApi.getPlugin(SatInfoBox);
 
   if (satInfoBoxCorePlugin) {
     satInfoBoxCorePlugin.currentTEARR = currentTEARR;
@@ -2703,12 +2714,12 @@ export const calculateAngle_ = (
   let DistanceClosest = DistanceSteps[0];
   let oldDistanceClosest = Math.abs(DistanceSteps[0] - GoalDistance);
 
-  for (let i = 0; i < DistanceSteps.length; i++) {
-    const newDistanceClosest = Math.abs(DistanceSteps[i] - GoalDistance);
+  for (const distance_ of DistanceSteps) {
+    const newDistanceClosest = Math.abs(distance_ - GoalDistance);
 
     if (newDistanceClosest < oldDistanceClosest) {
       oldDistanceClosest = newDistanceClosest;
-      DistanceClosest = DistanceSteps[i];
+      DistanceClosest = distance_;
     }
   }
   for (let i = 0; i < Steps; i++) {
@@ -2944,9 +2955,9 @@ export const launchSimple_ = (
 
   let MaxAltitudeMax = 0;
 
-  for (let i = 0; i < MaxAltitude.length; i++) {
-    if (MaxAltitude[i] > MaxAltitudeMax) {
-      MaxAltitudeMax = MaxAltitude[i];
+  for (const alt_ of MaxAltitude) {
+    if (alt_ > MaxAltitudeMax) {
+      MaxAltitudeMax = alt_;
     }
   }
 

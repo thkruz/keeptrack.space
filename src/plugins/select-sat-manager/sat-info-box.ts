@@ -510,7 +510,11 @@ export class SatInfoBox extends KeepTrackPlugin {
     for (let i = 0; i < catalogManagerInstance.numSatellites; i++) {
       pos = catalogManagerInstance.getObject(i, GetSatType.POSITION_ONLY).position;
       if (pos.x < posXmax && pos.x > posXmin && pos.y < posYmax && pos.y > posYmin && pos.z < posZmax && pos.z > posZmin) {
-        SCCs.push(catalogManagerInstance.getSat(i, GetSatType.EXTRA_ONLY).sccNum);
+        const sat = catalogManagerInstance.getSat(i, GetSatType.EXTRA_ONLY);
+
+        if (sat) {
+          SCCs.push(sat.sccNum);
+        }
       }
     }
 

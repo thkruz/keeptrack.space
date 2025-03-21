@@ -61,7 +61,6 @@ export class MouseInput {
         timeManagerInstance.calculateSimulationTime();
         timeManagerInstance.lastPropRate = timeManagerInstance.propRate * 1;
         timeManagerInstance.changePropRate(0);
-        settingsManager.isPropRateChange = true;
       }
     }
 
@@ -195,7 +194,6 @@ export class MouseInput {
     if (settingsManager.isFreezePropRateOnDrag) {
       timeManagerInstance.calculateSimulationTime();
       timeManagerInstance.changePropRate(timeManagerInstance.lastPropRate);
-      settingsManager.isPropRateChange = true;
     }
 
     if (!settingsManager.disableUI) {

@@ -94,6 +94,8 @@ export class SettingsManager {
     calculator: true,
     createSat: true,
   };
+  changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
+  changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute
 
   static preserveSettings() {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
@@ -699,10 +701,6 @@ export class SettingsManager {
    * Determines whether the last map that was loaded should be loaded again on the next session.
    */
   isLoadLastMap = true;
-  /**
-   * Global flag for determining if propagation rate was just changed
-   */
-  isPropRateChange = false;
   /**
    * Global flag for determining if the application is resizing
    */

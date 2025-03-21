@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -8,7 +8,6 @@ import { errorManagerInstance } from '../errorManager';
 import { KeyEvent } from '../input-manager';
 
 export class KeyboardInput {
-  private isCreateClockDOMOnce_ = false;
   isCtrlPressed = false;
   isShiftPressed = false;
 
@@ -138,7 +137,6 @@ export class KeyboardInput {
       return;
     }
 
-    const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     if (uiManagerInstance.isCurrentlyTyping) {
@@ -146,17 +144,13 @@ export class KeyboardInput {
     }
 
     switch (evt.key.toUpperCase()) {
-      /*
-       * Open the search bar for faster searching
-       * TODO: What if it isn't available?
-       */
       case 'F':
         evt.preventDefault();
 
         if (this.isShiftPressed && !uiManagerInstance.searchManager.isSearchOpen) {
           uiManagerInstance.searchManager.toggleSearch();
           setTimeout(() => {
-            getEl('search').focus();
+            getEl('search')?.focus();
           }, 1000);
           this.releaseShiftKey(keepTrackApi.getMainCamera());
         }
@@ -200,18 +194,6 @@ export class KeyboardInput {
       case 'NumpadSubtract':
         keepTrackApi.getMainCamera().zoomOut();
         break;
-      case 'Equal':
-        timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset + 1000 * 60); // Move forward a Minute
-        settingsManager.isPropRateChange = true;
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
-        break;
-      case 'Minus':
-        timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 1000 * 60); // Move back a Minute
-        settingsManager.isPropRateChange = true;
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
-        break;
       default:
         break;
     }
@@ -223,70 +205,6 @@ export class KeyboardInput {
       case '{':
         keepTrackApi.getPlugin(SelectSatManager)?.selectPrevSat();
         break;
-      case '`':
-        keepTrackApi.getMainCamera().resetRotation();
-        break;
-      case 't':
-        uiManagerInstance.toast('Time Set to Real Time', ToastMsgType.normal);
-        timeManagerInstance.changeStaticOffset(0); // Reset to Current Time
-        settingsManager.isPropRateChange = true;
-        break;
-      case ',':
-        timeManagerInstance.calculateSimulationTime();
-        if (timeManagerInstance.propRate < 0.001 && timeManagerInstance.propRate > -0.001) {
-          timeManagerInstance.changePropRate(-0.001);
-        }
-
-        if (timeManagerInstance.propRate < -1000) {
-          timeManagerInstance.changePropRate(-1000);
-        }
-
-        if (timeManagerInstance.propRate < 0) {
-          timeManagerInstance.changePropRate(timeManagerInstance.propRate * 1.5);
-        } else {
-          timeManagerInstance.changePropRate((timeManagerInstance.propRate * 2) / 3);
-        }
-        settingsManager.isPropRateChange = true;
-        break;
-      case '.':
-        timeManagerInstance.calculateSimulationTime();
-        if (timeManagerInstance.propRate < 0.001 && timeManagerInstance.propRate > -0.001) {
-          timeManagerInstance.changePropRate(0.001);
-        }
-
-        if (timeManagerInstance.propRate > 1000) {
-          timeManagerInstance.changePropRate(1000);
-        }
-
-        if (timeManagerInstance.propRate < 0) {
-          timeManagerInstance.changePropRate((timeManagerInstance.propRate * 2) / 3);
-        } else {
-          timeManagerInstance.changePropRate(timeManagerInstance.propRate * 1.5);
-        }
-        settingsManager.isPropRateChange = true;
-        break;
-      case '<':
-        timeManagerInstance.calculateSimulationTime();
-        // TODO: Create a setting for how much to move back/forward
-        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset - 60000 * 60); // Move back 1 Hour
-        settingsManager.isPropRateChange = true;
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
-        break;
-      case '>':
-        timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.changeStaticOffset(timeManagerInstance.staticOffset + 60000 * 60); // Move forward 1 Hour
-        settingsManager.isPropRateChange = true;
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
-        break;
-      case '/':
-        if (timeManagerInstance.propRate === 1) {
-          timeManagerInstance.changePropRate(0);
-        } else {
-          timeManagerInstance.changePropRate(1);
-        }
-        timeManagerInstance.calculateSimulationTime();
-        settingsManager.isPropRateChange = true;
-        break;
       default:
         this.keyEvents
           .filter((event) => event.key === evt.key?.toUpperCase() && (!event.code || event.code === evt.code))
@@ -294,43 +212,6 @@ export class KeyboardInput {
             event.callback();
           });
         break;
-    }
-
-    if (settingsManager.isPropRateChange) {
-      // timeManagerInstance.calculateSimulationTime();
-      timeManagerInstance.synchronize();
-      if (settingsManager.isPropRateChange && !settingsManager.isAlwaysHidePropRate && timeManagerInstance.propRate0 !== timeManagerInstance.propRate) {
-        if (timeManagerInstance.propRate > 1.01 || timeManagerInstance.propRate < 0.99) {
-          if (timeManagerInstance.propRate < 10) {
-            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, ToastMsgType.standby);
-          }
-          if (timeManagerInstance.propRate >= 10 && timeManagerInstance.propRate < 60) {
-            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, ToastMsgType.caution);
-          }
-          if (timeManagerInstance.propRate >= 60) {
-            uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, ToastMsgType.serious);
-          }
-        } else {
-          uiManagerInstance.toast(`Propagation Speed: ${timeManagerInstance.propRate.toFixed(1)}x`, ToastMsgType.normal);
-        }
-      }
-
-      if (!settingsManager.disableUI) {
-        const datetimeTextElement = getEl('datetime-text');
-
-        if (!datetimeTextElement) {
-          errorManagerInstance.debug('Datetime text element not found');
-
-          return;
-        }
-
-        if (!this.isCreateClockDOMOnce_) {
-          datetimeTextElement.innerText = timeManagerInstance.timeTextStr;
-          this.isCreateClockDOMOnce_ = true;
-        } else {
-          datetimeTextElement.childNodes[0].nodeValue = timeManagerInstance.timeTextStr;
-        }
-      }
     }
   }
 

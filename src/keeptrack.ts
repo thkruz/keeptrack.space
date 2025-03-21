@@ -44,12 +44,12 @@ import thuleJpg from '@public/img/wallpaper/thule.jpg';
 
 import 'material-icons/iconfont/material-icons.css';
 
-import eruda from 'eruda';
+import eruda, { ErudaConsole } from 'eruda';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
 import { KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
-import { getEl, hideEl } from './lib/get-el';
+import { getEl } from './lib/get-el';
 import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from './plugins/sensor/sensorManager';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
@@ -563,12 +563,11 @@ theodore.kruczek at gmail dot com.
             autoScale: false,
             container: erudaDom,
             useShadowDom: false,
+            tool: ['console', 'elements', 'network', 'resources', 'storage', 'sources', 'info', 'snippets'],
           });
-          const erudaEntryButtonDoms = keepTrackApi.containerRoot.querySelectorAll('eruda-entry-btn');
+          const console = eruda.get('console') as ErudaConsole;
 
-          if (erudaEntryButtonDoms.length > 0) {
-            hideEl(erudaEntryButtonDoms[0] as HTMLElement);
-          }
+          console.config.set('catchGlobalErr', false);
 
           const erudaContainerDom = getEl('eruda-console').parentElement.parentElement;
 

@@ -28,6 +28,6 @@ export class SocialMedia extends KeepTrackPlugin {
             />
           </a>
           `;
-    getEl('nav-mobile2', true)?.insertBefore(githubShareElement, getEl('nav-mobile2').firstChild);
+    getEl('nav-mobile2', true)?.insertBefore(githubShareElement, getEl('nav-mobile2')?.firstChild ?? null);
   }
 }

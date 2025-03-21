@@ -36,7 +36,7 @@
     "block-scoped-var": "error",
     "block-spacing": "error",
     "brace-style": "error",
-    "callback-return": "error",
+    "callback-return": "off",
     "camelcase": "error",
     "capitalized-comments": "off",
     "class-methods-use-this": "off",

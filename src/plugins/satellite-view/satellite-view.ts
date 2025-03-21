@@ -33,7 +33,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class SatelliteViewPlugin extends KeepTrackPlugin {
   readonly id = 'SatelliteViewPlugin';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
@@ -58,7 +58,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(i18next.t('plugins.SelectSatelliteFirst'), ToastMsgType.caution);
+      uiManagerInstance.toast(i18next.t('errorMsgs.SelectSatelliteFirst'), ToastMsgType.serious, true);
       shake(getEl(this.bottomIconElementName));
     }
   };

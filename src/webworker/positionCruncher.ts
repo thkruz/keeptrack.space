@@ -231,7 +231,7 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
           // perform and store sat init calcs
           const satrec = Sgp4.createSatrec(satData[i].tle1, satData[i].tle2);
 
-          extraRec.isLowAlt = satrec.isimp === 1;
+          extraRec.isLowAlt = satrec.isimp;
           extraRec.inclination = <Radians>satrec.inclo;
           extraRec.eccentricity = satrec.ecco;
           extraRec.raan = <Radians>satrec.nodeo;

@@ -39,7 +39,7 @@ import { TearrData } from '@app/static/sensor-math';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import i18next from 'i18next';
-import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Kilometers, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from 'ootk';
+import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from 'ootk';
 import { sensorGroups } from '../../catalogs/sensor-groups';
 import { keepTrackApi } from '../../keepTrackApi';
 import { Astronomy } from '../astronomy/astronomy';
@@ -192,7 +192,13 @@ export class SensorManager {
 
     if (this.currentSensors.length === 0) {
       if (this.secondarySensors.length > 0) {
-        this.currentSensors = [this.secondarySensors.pop()];
+        const nextSecondarySensor = this.secondarySensors.pop();
+
+        if (nextSecondarySensor) {
+          this.currentSensors = [nextSecondarySensor];
+        } else {
+          this.resetSensorSelected();
+        }
       } else {
         this.resetSensorSelected();
       }
@@ -212,7 +218,13 @@ export class SensorManager {
 
     if (this.currentSensors.length === 0) {
       if (this.secondarySensors.length > 0) {
-        this.currentSensors = [this.secondarySensors.pop()];
+        const nextSecondarySensor = this.secondarySensors.pop();
+
+        if (nextSecondarySensor) {
+          this.currentSensors = [nextSecondarySensor];
+        } else {
+          this.resetSensorSelected();
+        }
       } else {
         this.resetSensorSelected();
       }
@@ -252,7 +264,7 @@ export class SensorManager {
     // Return to default settings with nothing 'inview'
     SensorManager.updateSensorUiStyling(null);
     this.setSensor(null); // Pass sensorId to identify which sensor the user clicked
-    if (settingsManager.currentColorScheme == colorSchemeManagerInstance.default) {
+    if (colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.default) {
       LegendManager.change('default');
     }
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -288,7 +300,7 @@ export class SensorManager {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
       dotsManagerInstance.resetSatInView();
-      colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
+      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
     }, 2000);
 
     keepTrackApi.runEvent(KeepTrackApiEvents.resetSensor);
@@ -301,9 +313,9 @@ export class SensorManager {
      */
     if (sensor === null) {
       this.currentSensors = [];
-    } else if (sensor[0] != null) {
+    } else if (sensor[0] !== null) {
       this.currentSensors = sensor;
-    } else if (sensor != null) {
+    } else if (sensor !== null) {
       throw new Error('SensorManager.setCurrentSensor: sensor is not an array');
     }
   }
@@ -334,7 +346,7 @@ export class SensorManager {
 
     PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
 
-    if (selectedSensor == null && sensorId == null) {
+    if (selectedSensor === null && sensorId === null) {
       // No sensor selected
       this.sensorTitle = '';
       this.currentSensors = [];
@@ -359,7 +371,9 @@ export class SensorManager {
         } else {
           setInnerHtml('sensor-type', 'Unknown Sensor');
         }
-        setInnerHtml('sensor-country', this.currentSensors[0].country);
+
+
+        setInnerHtml('sensor-country', this.currentSensors[0]?.country ?? '');
       }
 
       this.sensorTitle = this.currentSensors[0].name;
@@ -413,7 +427,7 @@ export class SensorManager {
               } else {
                 setInnerHtml('sensor-type', 'Unknown Sensor');
               }
-              setInnerHtml('sensor-country', this.currentSensors[0].country);
+              setInnerHtml('sensor-country', this.currentSensors[0].country ?? '');
             }
 
             this.sensorTitle = this.currentSensors[0].name;
@@ -423,7 +437,7 @@ export class SensorManager {
     }
 
     // Run any callbacks
-    keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, selectedSensor, sensorId);
+    keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, selectedSensor, sensorId ?? null);
 
     /*
      * TODO: Move this to top menu plugin
@@ -457,11 +471,11 @@ export class SensorManager {
         keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
       },
       validationFunc: (m: PositionCruncherOutgoingMsg) => {
-        if (selectedSensor && m.sensorMarkerArray?.length > 0) {
+        if (selectedSensor && (m.sensorMarkerArray?.length ?? -1) > 0) {
           return true;
         }
 
-        if (!selectedSensor && m.satInView?.length > 0) {
+        if (!selectedSensor && (m.satInView?.length ?? -1) > 0) {
           return true;
         }
 
@@ -495,7 +509,7 @@ export class SensorManager {
 
   verifySensors(sensors: DetailedSensor[] | undefined): DetailedSensor[] {
     // If no sensor passed to function then try to use the 'currentSensor'
-    if (typeof sensors === 'undefined' || sensors == null) {
+    if (typeof sensors === 'undefined' || sensors === null) {
       if (typeof this.currentSensors === 'undefined') {
         throw new Error('getTEARR requires a sensor or for a sensor to be currently selected.');
       } else {
@@ -522,7 +536,7 @@ export class SensorManager {
     const lla = {
       lat: (sensor.lat * DEG2RAD) as Radians,
       lon: (sensor.lon * DEG2RAD) as Radians,
-      alt: (sensor.alt) as Kilometers,
+      alt: sensor.alt,
     };
     const { gmst } = calcGmst(now);
     const sunPos = Sun.position(EpochUTC.fromDateTime(now));

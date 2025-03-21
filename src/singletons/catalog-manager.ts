@@ -29,7 +29,7 @@
 import { KeepTrackApiEvents, MissileParams } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, EciVec3, Kilometers, SatelliteRecord, Sgp4, SpaceObjectType, Tle, TleLine1, TleLine2 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, EciVec3, Kilometers, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
 import { sensors } from '../catalogs/sensors';
@@ -73,7 +73,11 @@ export class CatalogManager {
 
   analSatSet = <DetailedSatellite[]>[];
   cosparIndex: { [key: string]: number } = {};
-  fieldOfViewSet = [];
+  fieldOfViewSet = [] as {
+    static: boolean;
+    marker: boolean;
+    id: number;
+  }[];
   hoveringSat = -1;
   isLaunchSiteManagerLoaded = false;
   isSensorManagerLoaded = false;
@@ -87,7 +91,7 @@ export class CatalogManager {
   } = {};
 
   missileSats: number = 0;
-  missileSet = [];
+  missileSet = [] as MissileObject[];
   numSatellites: number = 0;
   numObjects: number = 0;
   orbitDensity: number[][] = [];
@@ -101,7 +105,8 @@ export class CatalogManager {
   sensorMarkerArray: number[] = [];
   starIndex1 = 0;
   starIndex2 = 0;
-  staticSet = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  staticSet = [] as any[];
   updateCruncherBuffers = (mData: SatCruncherMessageData): void => {
     keepTrackApi.getDotsManager().updateCruncherBuffers(mData);
 
@@ -207,7 +212,8 @@ export class CatalogManager {
     const sat = this.getObject(this.sccNum2Id(sccNum.toString().padStart(5, '0')));
 
     if (!sat?.isSatellite()) {
-      // throw new Error(`Object ${sccNum} is not a satellite!`);
+      errorManagerInstance.debug(`Object ${sccNum} is not a satellite!`);
+
       return null;
     }
 
@@ -237,15 +243,15 @@ export class CatalogManager {
    *
    */
   getObject(i: number | null | undefined, type: GetSatType = GetSatType.DEFAULT): BaseObject | null {
-    if (!(i > -1)) {
+    if (i === null || i <= -1) {
       errorManagerInstance.debug('getSat: i is null');
 
       return null;
     }
 
-    if (i == -1 || !this.objectCache || !this.objectCache[i]) {
+    if (i === -1 || !this.objectCache?.[i]) {
       if (!isThisNode() && i >= 0 && !this.objectCache[i]) {
-        console.warn(`Satellite ${i} not found`);
+        errorManagerInstance.debug(`Satellite ${i} not found`);
       }
 
       return null;
@@ -286,7 +292,7 @@ export class CatalogManager {
   getMissile(missileId: number): MissileObject | null {
     const missile = this.getObject(missileId);
 
-    if (!missile.isMissile()) {
+    if (!missile?.isMissile()) {
       return null;
     }
 
@@ -314,8 +320,8 @@ export class CatalogManager {
 
             this.satCruncher = new Worker(url);
           } catch (error) {
-            this.satCruncher = {} as any;
-            console.debug(error);
+            this.satCruncher = {} as Worker;
+            errorManagerInstance.debug(error);
           }
         }
       } else {
@@ -329,7 +335,8 @@ export class CatalogManager {
           // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
           if (window.location.href.startsWith('file://')) {
             throw new Error(
-              'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.',
+              'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other' +
+              'copies of chrome are running when you start it.',
             );
           } else {
             throw new Error(error);
@@ -389,13 +396,12 @@ export class CatalogManager {
       stars.forEach((star) => {
         this.staticSet.push({
           name: star.name,
-          static: true,
-          shortName: 'STAR',
+          isStatic: () => true,
           type: SpaceObjectType.STAR,
-          dec: star.dec,
-          ra: star.ra,
+          dec: star.dec as Radians,
+          ra: star.ra as Radians,
           vmag: star.vmag,
-        });
+        } as Star);
       });
       this.isStarManagerLoaded = true;
     } else {
@@ -421,7 +427,7 @@ export class CatalogManager {
         const launchSite = launchSites[launchSiteName];
 
         this.staticSet.push({
-          static: true,
+          isStatic: () => true,
           type: SpaceObjectType.LAUNCH_FACILITY,
           name: launchSite.name,
           lat: launchSite.lat,
@@ -462,7 +468,7 @@ export class CatalogManager {
         this.fieldOfViewSet.push(fieldOfViewMarker);
       }
     } else {
-      console.debug('settingsManager.maxFieldOfViewMarkers missing or broken!');
+      errorManagerInstance.debug('settingsManager.maxFieldOfViewMarkers missing or broken!');
     }
 
     // Initialize the satLinkMananger and then attach it to the object manager
@@ -472,7 +478,7 @@ export class CatalogManager {
       satLinkManager.init(controlSites);
       this.satLinkManager = satLinkManager;
     } catch (e) {
-      console.log('satLinkManager Failed to Initialize!');
+      errorManagerInstance.debug('satLinkManager Failed to Initialize!');
     }
   }
 
@@ -501,7 +507,7 @@ export class CatalogManager {
         country: 'ANALSAT',
         launchVehicle: 'Analyst Satellite',
         launchSite: 'ANALSAT',
-        sccNum: sccNum || tle1.substring(2, 7).trim().padStart(5, '0'),
+        sccNum: sccNum ?? tle1.substring(2, 7).trim().padStart(5, '0'),
         tle1: tle1 as TleLine1,
         tle2: tle2 as TleLine2,
         intlDes: tle1.substring(9, 17),

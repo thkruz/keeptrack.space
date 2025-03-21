@@ -67,8 +67,8 @@ export class SoundManager extends KeepTrackPlugin {
   dependencies_ = [];
   lastLongAudioTime = 0;
   isMute = false;
-  private currentChatterClip_ = 0;
-  voices = [];
+  private readonly currentChatterClip_ = 0;
+  voices: SpeechSynthesisVoice[] = [];
   nextChatter: ReturnType<typeof setTimeout>;
   private maxClickClip_ = 0;
 
@@ -188,7 +188,7 @@ export class SoundManager extends KeepTrackPlugin {
      * If a voice has been selected, find the voice and set the
      * utterance instance's voice attribute.
      */
-    msg.voice = this.voices.filter((voice) => voice.name == 'Google UK English Female')[0];
+    msg.voice = this.voices.filter((voice) => voice.name === 'Google UK English Female')[0];
 
     // Queue this utterance.
     window.speechSynthesis.speak(msg);
@@ -242,7 +242,7 @@ export class SoundManager extends KeepTrackPlugin {
     if (this.isMute) {
       return;
     } // Muted
-    if (getEl('loading-screen').classList.contains('fullscreen')) {
+    if (getEl('loading-screen')?.classList.contains('fullscreen')) {
       return;
     } // Not Ready Yet
 

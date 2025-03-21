@@ -44,12 +44,12 @@ import thuleJpg from '@public/img/wallpaper/thule.jpg';
 
 import 'material-icons/iconfont/material-icons.css';
 
-import eruda from 'eruda';
+import eruda, { ErudaConsole } from 'eruda';
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
 import { KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
-import { getEl, hideEl } from './lib/get-el';
+import { getEl } from './lib/get-el';
 import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from './plugins/sensor/sensorManager';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
@@ -218,13 +218,22 @@ export class KeepTrack {
       this.update_(dt); // Do any per frame calculations
       this.draw_(dt);
 
-      if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
-        keepTrackApi.getUiManager().updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, keepTrackApi.getPlugin(SelectSatManager).getSelectedSat());
+      if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -2 > -1) {
+        const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
+
+        if (selectedSatellite) {
+          keepTrackApi.getUiManager().
+            updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, selectedSatellite);
+        }
       }
     }
   }
 
   static getDefaultBodyHtml(): void {
+    if (!keepTrackApi.containerRoot) {
+      throw new Error('Container root is not set');
+    }
+
     SplashScreen.initLoadingScreen(keepTrackApi.containerRoot);
 
     keepTrackApi.containerRoot.id = 'keeptrack-root';
@@ -563,19 +572,20 @@ theodore.kruczek at gmail dot com.
             autoScale: false,
             container: erudaDom,
             useShadowDom: false,
+            tool: ['console', 'elements', 'network', 'resources', 'storage', 'sources', 'info', 'snippets'],
           });
-          const erudaEntryButtonDoms = keepTrackApi.containerRoot.querySelectorAll('eruda-entry-btn');
+          const console = eruda.get('console') as ErudaConsole;
 
-          if (erudaEntryButtonDoms.length > 0) {
-            hideEl(erudaEntryButtonDoms[0] as HTMLElement);
+          console.config.set('catchGlobalErr', false);
+
+          const erudaContainerDom = getEl('eruda-console')?.parentElement?.parentElement;
+
+          if (erudaContainerDom) {
+            erudaContainerDom.style.top = 'calc(var(--top-menu-height) + 30px)';
+            erudaContainerDom.style.height = '80%';
+            erudaContainerDom.style.width = '60%';
+            erudaContainerDom.style.left = '20%';
           }
-
-          const erudaContainerDom = getEl('eruda-console').parentElement.parentElement;
-
-          erudaContainerDom.style.top = 'calc(var(--top-menu-height) + 30px)';
-          erudaContainerDom.style.height = '80%';
-          erudaContainerDom.style.width = '60%';
-          erudaContainerDom.style.left = '20%';
         }
       }
 
@@ -593,6 +603,7 @@ theodore.kruczek at gmail dot com.
       window.addEventListener('resize', () => {
         keepTrackApi.runEvent(KeepTrackApiEvents.resize);
       });
+      keepTrackApi.runEvent(KeepTrackApiEvents.resize);
 
       keepTrackApi.isInitialized = true;
       keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
@@ -616,6 +627,7 @@ theodore.kruczek at gmail dot com.
 
     // Display it if that settings is enabled
     if (this.isShowFPS) {
+      // eslint-disable-next-line no-console
       console.log(KeepTrack.getFps_(renderer.dt));
     }
 

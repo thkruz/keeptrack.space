@@ -8,11 +8,15 @@ import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 export class Calendar {
   private readonly containerId: string;
   private calendarDate: Date;
-  private simulationDate: Date | null;
+  private simulationDate: Date;
   private propagationRate: number = 1;
   private isVisible: boolean = false;
-  private readonly timerUntilEnabled: number | null = 10000;
+  private readonly timerUntilEnabled: number = 10000;
   private isCalendarEnabled: boolean = false;
+
+  // PropRate Slider limits
+  private readonly propRateLimitMin = -20;
+  private readonly propRateLimitMax = 20;
 
   constructor(containerId: string) {
     this.containerId = containerId;
@@ -195,7 +199,7 @@ export class Calendar {
 
     if (unit === 'rate') {
       currentValue = this.propagationRate;
-      const updatedRate = (currentValue + change);
+      const updatedRate = Math.max(this.propRateLimitMin, Math.min(currentValue + change, this.propRateLimitMax));
 
       this.updatePropRate(updatedRate);
     }
@@ -215,7 +219,7 @@ export class Calendar {
       const min = parseInt(slider.getAttribute('data-min') || '0');
       const max = parseInt(slider.getAttribute('data-max') || '59');
       const step = parseInt(slider.getAttribute('data-step') || '1');
-      const handle: HTMLElement = slider.querySelector('.ui-slider-handle');
+      const handle: HTMLElement | null = slider.querySelector('.ui-slider-handle');
 
       const updateSliderPosition = (clientX: number) => {
         const rect = slider.getBoundingClientRect();
@@ -224,7 +228,9 @@ export class Calendar {
         percentage = Math.max(0, Math.min(1, percentage));
         const value = Math.round((percentage * (max - min) + min) / step) * step;
 
-        handle.style.left = `${percentage * 100}%`;
+        if (handle) {
+          handle.style.left = `${percentage * 100}%`;
+        }
         updateFunction(value);
       };
 
@@ -361,7 +367,9 @@ export class Calendar {
     const hours = this.simulationDate.getUTCHours();
     const minutes = this.simulationDate.getUTCMinutes();
     const seconds = this.simulationDate.getUTCSeconds();
-    const propRate = this.propagationRate;
+    const propRate = Math.max(this.propRateLimitMin, Math.min(this.propagationRate, this.propRateLimitMax));
+    const propRateRange = this.propRateLimitMax - this.propRateLimitMin;
+    const propagationPercentage = ((propRate - this.propRateLimitMin) / propRateRange) * 100;
 
     return keepTrackApi.html`
       <div class="ui-timepicker-div">
@@ -427,8 +435,8 @@ export class Calendar {
           <dt class="ui_tpicker_proprate_label">${i18next.t('Propagation')}</dt>
           <dd class="ui_tpicker_proprate">
             <div id="ui_tpicker_proprate_slider" class="ui_tpicker_proprate_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
-            style="display: inline-block; width: 100px;" data-min="-100" data-max="100" data-step="1">
-              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${(((propRate + 100) / 200) * 100).toString()}%;"></span>
+            style="display: inline-block; width: 100px;" data-min="${this.propRateLimitMin.toString()}" data-max="${this.propRateLimitMax.toString()}" data-step="1">
+              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${(propagationPercentage).toString()}%;"></span>
             </div>
             <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar"
             style="margin-left: 10px; margin-right: 0px;">
@@ -486,12 +494,12 @@ export class Calendar {
     let dayOfYear = -1;
 
     if (target.classList.contains('ui-datepicker-cal-day')) {
-      const jdayElement: HTMLElement = target.parentElement?.querySelector('.ui-datepicker-jday');
+      const jdayElement: HTMLElement | null | undefined = target.parentElement?.querySelector('.ui-datepicker-jday');
 
       // If we pick the calendar day, find the parent, then get the second span (class === ui-datepicker-jday)
       dayOfYear = parseInt((jdayElement)?.innerText ?? '-1');
     } else if (target.tagName === 'A') {
-      const jdayElement: HTMLElement = target.querySelector('.ui-datepicker-jday');
+      const jdayElement: HTMLElement | null = target.querySelector('.ui-datepicker-jday');
 
       dayOfYear = parseInt((jdayElement)?.innerText ?? '-1');
     } else if (target.classList.contains('ui-datepicker-jday')) {
@@ -515,7 +523,7 @@ export class Calendar {
     this.attachEvents();
   }
 
-  private setToNow(): void {
+  setToNow(): void {
     this.calendarDate = new Date();
     this.simulationDate = new Date(this.calendarDate);
     this.updatePropRate(1);
@@ -575,14 +583,15 @@ export class Calendar {
     }
   }
 
-  private updatePropRate(propRate: number): void {
+  updatePropRate(propRate: number): void {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
+    propRate = Math.max(this.propRateLimitMin, Math.min(propRate, this.propRateLimitMax));
     timeManagerInstance.calculateSimulationTime();
     timeManagerInstance.changePropRate(propRate);
-    settingsManager.isPropRateChange = true;
-    this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, 200, -100);
     this.propagationRate = propRate;
+    this.updateTimeInput();
+    this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, (this.propRateLimitMax - this.propRateLimitMin), this.propRateLimitMin);
   }
 
   private updateHour(hour: number): void {
@@ -610,7 +619,7 @@ export class Calendar {
     const slider = document.getElementById(sliderId);
 
     if (slider) {
-      const handle: HTMLElement = slider.querySelector('.ui-slider-handle');
+      const handle: HTMLElement | null = slider.querySelector('.ui-slider-handle');
 
       if (handle) {
         handle.style.left = `${((value - min) / range) * 100}%`;
@@ -622,11 +631,11 @@ export class Calendar {
     const timeInput = document.getElementById('calendar-time-input') as HTMLInputElement;
 
     if (timeInput) {
-      timeInput.value = this.formatTime(
+      timeInput.value = `${this.formatTime(
         this.simulationDate.getUTCHours(),
         this.simulationDate.getUTCMinutes(),
         this.simulationDate.getUTCSeconds(),
-      );
+      )} | (x${this.propagationRate.toString()})`;
     }
   }
 
@@ -652,18 +661,24 @@ export class Calendar {
     const today = new Date();
     const jday = this.getUTCDayOfYear(timeManagerInstance.simulationTimeObj);
 
-    getEl('jday').innerHTML = jday.toString();
+    const jdayElement = getEl('jday');
+
+    if (jdayElement) {
+      jdayElement.innerHTML = jday.toString();
+    }
     timeManagerInstance.changeStaticOffset(this.simulationDate.getTime() - today.getTime());
-    colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
+    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
     timeManagerInstance.calculateSimulationTime();
 
     timeManagerInstance.lastBoxUpdateTime = timeManagerInstance.realTime;
 
     try {
       const watchlistOverlay = keepTrackApi.getPlugin(WatchlistOverlay);
-
-      watchlistOverlay.lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;
       const uiManagerInstance = keepTrackApi.getUiManager();
+
+      if (watchlistOverlay) {
+        watchlistOverlay.lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;
+      }
 
       uiManagerInstance.updateNextPassOverlay(true);
     } catch {

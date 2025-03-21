@@ -42,7 +42,7 @@ import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 
 export class UiManager {
-  private static LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
+  private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
 
   private isFooterVisible_ = true;
   private isInitialized_ = false;
@@ -59,11 +59,11 @@ export class UiManager {
   lastNextPassCalcSatId = 0;
   lastNextPassCalcSensorShortName: string;
   lastToast: string;
-  lookAtLatLon: any;
   searchManager: SearchManager;
   updateInterval = 1000;
   updateNextPassOverlay: (arg0: boolean) => void;
   searchHoverSatId = -1;
+  isLegendMenuOpen = false;
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
@@ -85,7 +85,14 @@ export class UiManager {
     UiValidation.initUiValidation();
 
     setTimeout(() => {
-      document.querySelectorAll('img').forEach((img: any) => {
+      const imageElements = document.querySelectorAll('img') as unknown as {
+        src: string;
+        attributes: {
+          delayedsrc: { value: string };
+        };
+      }[];
+
+      imageElements.forEach((img) => {
         if (img.src && !img.src.includes('.svg') && !img.src.includes('.png') && !img.src.includes('.jpg')) {
           img.src = img.attributes.delayedsrc?.value;
         }
@@ -113,7 +120,7 @@ export class UiManager {
   }
 
   dismissAllToasts() {
-    this.activeToastList_.forEach((toast: any) => {
+    this.activeToastList_.forEach((toast) => {
       toast.dismiss();
     });
   }
@@ -231,7 +238,6 @@ export class UiManager {
         break;
       default:
         this.toast(`Color Scheme Changed to ${newScheme.name}`, ToastMsgType.normal, false);
-        console.debug(`${newScheme.name} missing from alert list!`);
         break;
     }
   }
@@ -297,18 +303,20 @@ export class UiManager {
   }
 
   initMenuController() {
-    getEl('legend-hover-menu')?.addEventListener('click', (e: any) => {
-      if (e.target.classList[1]) {
-        this.legendHoverMenuClick(e.target.classList[1]);
+    getEl('legend-hover-menu')?.addEventListener('click', (e: MouseEvent) => {
+      const hoverMenuItemClass = (e.target as HTMLElement)?.classList[1];
+
+      if (hoverMenuItemClass) {
+        this.legendHoverMenuClick(hoverMenuItemClass);
       }
     });
 
     getEl('legend-menu')?.addEventListener('click', () => {
-      if (settingsManager.legendMenuOpen) {
+      if (this.isLegendMenuOpen) {
         // Closing Legend Menu
         hideEl('legend-hover-menu');
         getEl('legend-icon')?.classList.remove('bmenu-item-selected');
-        settingsManager.legendMenuOpen = false;
+        this.isLegendMenuOpen = false;
       } else {
         // Opening Legend Menu
 
@@ -321,7 +329,7 @@ export class UiManager {
         showEl('legend-hover-menu');
         getEl('legend-icon')?.classList.add('bmenu-item-selected');
         this.searchManager.hideResults();
-        settingsManager.legendMenuOpen = true;
+        this.isLegendMenuOpen = true;
       }
     });
 
@@ -381,8 +389,6 @@ export class UiManager {
 
   legendHoverMenuClick(legendType: string) {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
-    console.log(this.isUiVisible);
     const slug = legendType.split('-')[1];
 
     if (slug.startsWith('velocity')) {
@@ -455,7 +461,7 @@ export class UiManager {
 
         BottomIcons?.addEventListener('click', (evt: Event) => {
           const bottomIcons = getEl('bottom-icons');
-          let targetElement = <HTMLElement>evt.target;
+          let targetElement = <HTMLElement | null>evt.target;
 
           while (targetElement && targetElement !== bottomIcons) {
             if (targetElement.parentElement === bottomIcons) {
@@ -490,13 +496,19 @@ export class UiManager {
     try {
       const toastMsg = this.makeToast_(toastText, type, isLong);
 
-      this.activeToastList_.push(toastMsg);
+      if (toastMsg) {
+        this.activeToastList_.push(toastMsg);
+      }
     } catch (e) {
       errorManagerInstance.debug('toast failed');
     }
   }
 
-  private activeToastList_: any[] = [];
+  private readonly activeToastList_ = [] as {
+    $el: NodeListOf<HTMLElement>;
+    timeRemaining: number;
+    dismiss: () => void;
+  }[];
 
   /**
    * Checks if enough time has elapsed and then calls all queued updateSelectBox callbacks

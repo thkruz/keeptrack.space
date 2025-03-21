@@ -1,9 +1,9 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { getDayOfYear } from '@app/lib/transforms';
 import { isThisNode } from '@app/static/isThisNode';
 import { UrlManager } from '@app/static/url-manager';
+import { getDayOfYear } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
@@ -12,8 +12,8 @@ export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';
   dependencies_ = [TopMenu.name];
   isEditTimeOpen = false;
-  private dateTimeContainerId_ = 'datetime';
-  private dateTimeInputTbId_ = 'datetime-input-tb';
+  private readonly dateTimeContainerId_ = 'datetime';
+  private readonly dateTimeInputTbId_ = 'datetime-input-tb';
   calendar: Calendar;
 
   init(): void {
@@ -114,7 +114,11 @@ export class DateTimeManager extends KeepTrackPlugin {
     if (datetimeInputTb && !isThisNode()) {
       datetimeInputTb.addEventListener('change', () => {
         if (this.isEditTimeOpen) {
-          document.getElementById('datetime-input')!.style.display = 'none';
+          const datetimeInputElement = document.getElementById('datetime-input');
+
+          if (!datetimeInputElement) {
+            datetimeInputElement.style.display = 'none';
+          }
           setTimeout(() => {
             this.isEditTimeOpen = false;
           }, 500);

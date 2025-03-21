@@ -287,7 +287,9 @@ export class Camera {
       this.isPanReset = true;
     }
     this.isLocalRotateReset = true;
-    this.ftsRotateReset = true;
+    if (this.cameraType === CameraType.FIXED_TO_SAT) {
+      this.ftsRotateReset = true;
+    }
   }
 
   get zoomTarget(): number {
@@ -693,38 +695,7 @@ export class Camera {
   init(settings: SettingsManager) {
     this.settings_ = settings;
 
-    const inputManager = keepTrackApi.getInputManager();
-    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-
-    keysDown.forEach((key) => {
-      inputManager.keyboard.registerKeyDownEvent({
-        key,
-        callback: this[`keyDown${key}_`].bind(this),
-      });
-    });
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
-      inputManager.keyboard.registerKeyDownEvent({
-        key: code.replace('Numpad', ''),
-        code,
-        callback: this[`keyDown${code}_`].bind(this),
-      });
-    });
-
-    const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-
-    keysUp.forEach((key) => {
-      inputManager.keyboard.registerKeyUpEvent({
-        key,
-        callback: this[`keyUp${key}_`].bind(this),
-      });
-    });
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
-      inputManager.keyboard.registerKeyUpEvent({
-        key: code.replace('Numpad', ''),
-        code,
-        callback: this[`keyUp${code}_`].bind(this),
-      });
-    });
+    this.registerKeyboardEvents_();
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
@@ -744,6 +715,45 @@ export class Camera {
       event: KeepTrackApiEvents.touchStart,
       cbName: 'mainCamera',
       cb: this.touchStart_.bind(this),
+    });
+  }
+
+  private registerKeyboardEvents_() {
+    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+
+    keysDown.forEach((key) => {
+      keyboardManager.registerKeyDownEvent({
+        key,
+        callback: this[`keyDown${key}_`].bind(this),
+      });
+    });
+    keysUp.forEach((key) => {
+      keyboardManager.registerKeyUpEvent({
+        key,
+        callback: this[`keyUp${key}_`].bind(this),
+      });
+    });
+
+    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
+      keyboardManager.registerKeyDownEvent({
+        key: code.replace('Numpad', ''),
+        code,
+        callback: this[`keyDown${code}_`].bind(this),
+      });
+    });
+    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
+      keyboardManager.registerKeyUpEvent({
+        key: code.replace('Numpad', ''),
+        code,
+        callback: this[`keyUp${code}_`].bind(this),
+      });
+    });
+
+    keyboardManager.registerKeyEvent({
+      key: '`',
+      callback: this.resetRotation.bind(this),
     });
   }
 

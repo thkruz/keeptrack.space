@@ -4,7 +4,7 @@ import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
-import { Localization } from '@app/locales/locales';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SensorMath, TearrData, TearrType } from '@app/static/sensor-math';
 import tableChartPng from '@public/img/icons/table-chart.png';
@@ -17,7 +17,7 @@ type LookAngleData = TearrData & { canStationObserve: boolean };
 export class LookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'LookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
@@ -61,9 +61,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     minWidth: 400,
     maxWidth: 600,
   };
-
-  helpTitle = Localization.plugins.LookAnglesPlugin.title;
-  helpBody = Localization.plugins.LookAnglesPlugin.helpBody;
 
   sideMenuElementName: string = 'look-angles-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -181,7 +178,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     }
   }
 
-  private refreshSideMenuData_ = (): void => {
+  private refreshSideMenuData_(): void {
     if (this.isMenuButtonActive) {
       showLoading(() => {
         const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
@@ -192,7 +189,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         this.getlookangles_(obj as DetailedSatellite);
       });
     }
-  };
+  }
 
   private getlookangles_(sat: DetailedSatellite, sensors?: DetailedSensor[]): TearrData[] {
     const timeManagerInstance = keepTrackApi.getTimeManager();
@@ -202,7 +199,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
       // Error Checking
       if (!sensorManagerInstance.isSensorSelected()) {
-        console.debug('satellite.getlookangles requires a sensor to be set!');
+        errorManagerInstance.debug('satellite.getlookangles requires a sensor to be set!');
 
         return [];
       }
@@ -384,7 +381,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   }
 
 
-  private settingsRisesetChange_(e: any, isRiseSetChecked?: boolean): void {
+  private settingsRisesetChange_(e: Event, isRiseSetChecked?: boolean): void {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
     }

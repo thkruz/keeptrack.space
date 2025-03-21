@@ -100,7 +100,7 @@ export class TimeMachine extends KeepTrackPlugin {
       }
     }
 
-    if (year == parseInt(new Date().getUTCFullYear().toString().slice(2, 4))) {
+    if (year === parseInt(new Date().getUTCFullYear().toString().slice(2, 4))) {
       if (settingsManager.loopTimeMachine) {
         setTimeout(() => {
           this.historyOfSatellitesPlay();
@@ -124,7 +124,7 @@ export class TimeMachine extends KeepTrackPlugin {
     if (!this.isMenuButtonActive) {
       return;
     }
-    settingsManager.colors.transparent = <[number, number, number, number]>orbitManagerInstance.tempTransColor;
+    settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
     this.isMenuButtonActive = false;
     this.isTimeMachineRunning = false;
     groupManagerInstance.clearSelect();

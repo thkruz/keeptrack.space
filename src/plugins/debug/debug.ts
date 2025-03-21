@@ -99,13 +99,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
       cbName: this.id,
       cb: (): void => {
         getEl('debug-console')?.addEventListener('click', () => {
-          if (this.isErudaVisible) {
-            eruda.hide();
-            this.isErudaVisible = false;
-          } else {
-            eruda.show();
-            this.isErudaVisible = true;
-          }
+          this.toggleEruda();
         });
 
         getEl('debug-gremlins')?.addEventListener('click', () => {
@@ -148,6 +142,16 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
   delayForCameraUpdates = <Milliseconds>1000;
   lastCameraUpdate = <Milliseconds>0;
+
+  toggleEruda() {
+    if (this.isErudaVisible) {
+      eruda.hide();
+      this.isErudaVisible = false;
+    } else {
+      eruda.show();
+      this.isErudaVisible = true;
+    }
+  }
 
   addJs(): void {
     super.addJs();

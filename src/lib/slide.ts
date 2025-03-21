@@ -1,7 +1,8 @@
-/* eslint-disable callback-return */
-export const slideOutLeft = (el: HTMLElement | null, duration: number, callback?: () => void, offset?: number): void => {
+import { errorManagerInstance } from '@app/singletons/errorManager';
+
+export const slideOutLeft = (el: HTMLElement | null, duration: number, callback?: (() => void) | null, offset?: number): void => {
   if (!el) {
-    console.warn('Element not found!');
+    errorManagerInstance.debug('Element not found!');
 
     return;
   }
@@ -23,7 +24,7 @@ export const slideOutLeft = (el: HTMLElement | null, duration: number, callback?
 
 export const slideInRight = (el: HTMLElement | null, duration: number, callback?: () => void): void => {
   if (!el) {
-    console.warn('Element not found!');
+    errorManagerInstance.debug('Element not found!');
 
     return;
   }
@@ -48,8 +49,10 @@ export const slideInRight = (el: HTMLElement | null, duration: number, callback?
  */
 
 export const slideOutUp = (el: HTMLElement, duration: number, callback?: () => void): void => {
-  if (el === null) {
-    throw new Error('Element not found!');
+  if (!el) {
+    errorManagerInstance.debug('Element not found!');
+
+    return;
   }
 
   if (el.style.display === 'none') {
@@ -65,8 +68,10 @@ export const slideOutUp = (el: HTMLElement, duration: number, callback?: () => v
 };
 
 export const slideInDown = (el: HTMLElement, duration: number, callback?: () => void): void => {
-  if (el === null) {
-    throw new Error('Element not found!');
+  if (!el) {
+    errorManagerInstance.debug('Element not found!');
+
+    return;
   }
 
   el.style.transform = 'translateY(-100%)';

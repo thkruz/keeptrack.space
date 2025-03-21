@@ -218,15 +218,15 @@ export type GeolocationPosition = {
 };
 
 export interface SensorGeolocation {
-  alt: Kilometers;
-  lat: Degrees;
-  lon: Degrees;
-  maxaz: Degrees;
-  maxel: Degrees;
-  maxrange: Kilometers;
-  minaz: Degrees;
-  minel: Degrees;
-  minrange: Kilometers;
+  alt: Kilometers | null;
+  lat: Degrees | null;
+  lon: Degrees | null;
+  maxaz: Degrees | null;
+  maxel: Degrees | null;
+  maxrange: Kilometers | null;
+  minaz: Degrees | null;
+  minel: Degrees | null;
+  minrange: Kilometers | null;
 }
 
 export interface ObjectTypeFlags {
@@ -298,7 +298,7 @@ export interface ColorRuleParams {
   satInView?: Int8Array;
 }
 
-export type ColorRuleSet = (obj: BaseObject, params?: any) => ColorInformation;
+export type ColorRuleSet = (obj: BaseObject, params?: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number }) => ColorInformation;
 
 /**
  ***********************************************************

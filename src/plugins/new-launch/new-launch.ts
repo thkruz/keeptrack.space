@@ -2,7 +2,6 @@ import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/int
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { hideLoading, showLoadingSticky } from '@app/lib/showLoading';
-import { StringPad } from '@app/lib/stringPad';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 
@@ -20,11 +19,16 @@ import { SoundNames } from '../sounds/SoundNames';
 export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';
   dependencies_ = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+
+    if (!selectSatManagerInstance) {
+      throw new Error('SelectSatManager not found');
+    }
+    this.selectSatManager_ = selectSatManagerInstance;
   }
 
   bottomIconCallback = () => {
@@ -38,7 +42,7 @@ export class NewLaunch extends KeepTrackPlugin {
     const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
-    (<HTMLInputElement>getEl('nl-inc')).value = StringPad.pad0(sat.inclination.toFixed(4), 8);
+    (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4).padStart(8, '0');
   };
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
@@ -154,7 +158,8 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const upOrDown = <'N' | 'S'>(<HTMLInputElement>getEl('nl-updown')).value;
     const launchFac = (<HTMLInputElement>getEl('nl-facility')).value;
-    let launchLat: Degrees, launchLon: Degrees;
+    let launchLat: Degrees | null = null;
+    let launchLon: Degrees | null = null;
 
     if (catalogManagerInstance.isLaunchSiteManagerLoaded) {
       for (const launchSite in catalogManagerInstance.launchSites) {
@@ -166,6 +171,13 @@ export class NewLaunch extends KeepTrackPlugin {
     } else {
       throw new Error('Launch Site Manager not loaded!');
     }
+
+    if (launchLat === null || launchLon === null) {
+      uiManagerInstance.toast(`Launch Site ${launchFac} not found!`, ToastMsgType.critical);
+
+      return;
+    }
+
     if (launchLon > 180) {
       // if West not East
       launchLon = (launchLon - 360) as Degrees; // Convert from 0-360 to -180-180
@@ -188,7 +200,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     timeManagerInstance.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
 
-    colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
+    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
 
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
@@ -243,7 +255,9 @@ export class NewLaunch extends KeepTrackPlugin {
 
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
-      orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
+      if (id) {
+        orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
+      }
     } else {
       uiManagerInstance.toast('Failed Altitude Test - Try a Different Satellite!', ToastMsgType.critical);
     }
@@ -278,7 +292,7 @@ export class NewLaunch extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl(`${this.sideMenuElementName}-form`).addEventListener('change', () => {
+        getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', () => {
           const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
           if (!sat.isSatellite()) {

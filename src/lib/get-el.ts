@@ -1,3 +1,4 @@
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { isThisNode } from '../static/isThisNode';
 
 /**
@@ -15,20 +16,9 @@ export const getEl = (id: string, isExpectedMissing = false): HTMLElement | null
   if (el) {
     return el;
   }
-  /*
-   * if (isThisNode()) {
-   *     // Create an empty DIV and send that back
-   *     // TODO - This is a hack. Tests should provide the right environment.
-   *     const _el = document.createElement('div');
-   *     _el.id = id;
-   *     document.body.appendChild(_el);
-   *     return <HTMLElement>(<unknown>_el);
-   * }
-   */
 
   // Return an empty div to avoid errors
   if (isThisNode() && !isExpectedMissing) {
-    // console.warn(document.body.innerHTML);
     throw new Error(`Element with id '${id}' not found!`);
   }
 
@@ -39,12 +29,12 @@ export const getEl = (id: string, isExpectedMissing = false): HTMLElement | null
 export const setInnerHtml = (id: string, html: string) => {
   const el = getEl(id);
 
-  if (!el && settingsManager.plugins.debug) {
-    console.error(`Element with id ${id} not found!`);
+  if (!el) {
+    errorManagerInstance.debug(`Element with id ${id} not found!`);
+
+    return;
   }
-  if (el) {
-    el.innerHTML = html;
-  }
+  el.innerHTML = html;
 };
 
 /**
@@ -87,5 +77,5 @@ export const hideEl = (id: string | HTMLElement) => {
     return;
   }
 
-  console.warn(`Element with id ${id} not found!`);
+  errorManagerInstance.debug(`Element with id ${id} not found!`);
 };

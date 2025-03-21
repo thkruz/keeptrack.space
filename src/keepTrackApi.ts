@@ -77,7 +77,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.updatePropRate]: [number];
   [KeepTrackApiEvents.uiManagerFinal]: [];
   [KeepTrackApiEvents.resetSensor]: [];
-  [KeepTrackApiEvents.setSensor]: [DetailedSensor | string, number];
+  [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
   [KeepTrackApiEvents.changeSensorMarkers]: [string];
   [KeepTrackApiEvents.resize]: [];
   [KeepTrackApiEvents.altCanvasResize]: [];
@@ -176,7 +176,7 @@ export class KeepTrackApi {
     this.loadedPlugins = [];
   }
 
-  containerRoot = <HTMLDivElement>null;
+  containerRoot = <HTMLDivElement | null>null;
   isInitialized = false;
   loadedPlugins = <KeepTrackPlugin[]>[];
   rmbMenuItems = <rmbMenuItem[]>[];
@@ -282,7 +282,7 @@ export class KeepTrackApi {
     // Add the callback
     this.events[params.event].push({
       cbName: params.cbName, cb: params.cb,
-      event: null,
+      event: <T><unknown>null,
     });
   }
 

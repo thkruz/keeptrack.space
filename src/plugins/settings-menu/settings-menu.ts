@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ColorPick } from '@app/lib/color-pick';
@@ -316,9 +315,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl('settings-form').addEventListener('change', SettingsMenuPlugin.onFormChange_);
-        getEl('settings-form').addEventListener('submit', SettingsMenuPlugin.onSubmit_);
-        getEl('settings-reset').addEventListener('click', SettingsMenuPlugin.resetToDefaults);
+        getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
+        getEl('settings-form')?.addEventListener('submit', SettingsMenuPlugin.onSubmit_);
+        getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.resetToDefaults);
 
         const colorPalette = [
           // Reds
@@ -495,12 +494,12 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
   }
 
-  private static onFormChange_(e: any, isDMChecked?: boolean, isSLMChecked?: boolean) {
+  private static onFormChange_(e: Event, isDMChecked?: boolean, isSLMChecked?: boolean) {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
     }
 
-    switch (e.target?.id) {
+    switch ((<HTMLElement>e.target)?.id) {
       case 'settings-notionalSats':
       case 'settings-leoSats':
       case 'settings-starlinkSats':
@@ -530,7 +529,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-freeze-drag':
       case 'settings-time-machine-toasts':
       case 'settings-snp':
-        if ((<HTMLInputElement>getEl(e.target.id)).checked) {
+        if ((<HTMLInputElement>getEl((<HTMLInputElement>e.target)?.id ?? ''))?.checked) {
           // Play sound for enabling option
           keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
@@ -547,12 +546,12 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     if (isSLMChecked && (<HTMLElement>e.target).id === 'settings-demo-mode') {
       (<HTMLInputElement>getEl('settings-sat-label-mode')).checked = false;
-      getEl('settings-demo-mode').classList.remove('lever:after');
+      getEl('settings-demo-mode')?.classList.remove('lever:after');
     }
 
     if (isDMChecked && (<HTMLElement>e.target).id === 'settings-sat-label-mode') {
       (<HTMLInputElement>getEl('settings-demo-mode')).checked = false;
-      getEl('settings-sat-label-mode').classList.remove('lever:after');
+      getEl('settings-sat-label-mode')?.classList.remove('lever:after');
     }
   }
 
@@ -582,7 +581,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     SettingsMenuPlugin.syncOnLoad();
   }
 
-  private static onSubmit_(e: any) {
+  private static onSubmit_(e: SubmitEvent) {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
     }
@@ -649,12 +648,14 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isFreezePropRateOnDrag = (<HTMLInputElement>getEl('settings-freeze-drag')).checked;
 
     settingsManager.isDisableTimeMachineToasts = (<HTMLInputElement>getEl('settings-time-machine-toasts')).checked;
+    const timeMachinePlugin = keepTrackApi.getPlugin(TimeMachine);
+
     /*
      * TODO: These settings buttons should be inside the plugins themselves
      * Stop Time Machine
      */
-    if (keepTrackApi.getPlugin(TimeMachine)) {
-      keepTrackApi.getPlugin(TimeMachine).isMenuButtonActive = false;
+    if (timeMachinePlugin) {
+      timeMachinePlugin.isMenuButtonActive = false;
     }
 
     /*

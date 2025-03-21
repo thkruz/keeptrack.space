@@ -1,12 +1,11 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { Milliseconds } from 'ootk';
+import { getDayOfYear, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
-import { StringPad } from '../lib/stringPad';
-import { getDayOfYear } from '../lib/transforms';
 import { DateTimeManager } from '../plugins/date-time-manager/date-time-manager';
 import { UrlManager } from '../static/url-manager';
+import { errorManagerInstance } from './errorManager';
 
 export class TimeManager {
   dateDOM = null;
@@ -56,13 +55,14 @@ export class TimeManager {
    * dynamicOffset = realTime - dynamicOffsetEpoch
    */
   private dynamicOffset_: number;
+  isCreateClockDOMOnce_ = false;
 
   static currentEpoch(currentDate: Date): [string, string] {
     const currentDateObj = new Date(currentDate);
-    const epochYear = currentDateObj.getUTCFullYear().toString().substr(2, 2);
+    const epochYear = currentDateObj.getUTCFullYear().toString().slice(2, 4);
     const epochDay = getDayOfYear(currentDateObj);
     const timeOfDay = (currentDateObj.getUTCHours() * 60 + currentDateObj.getUTCMinutes()) / 1440;
-    const epochDayStr = StringPad.pad0((epochDay + timeOfDay).toFixed(8), 12);
+    const epochDayStr = (epochDay + timeOfDay).toFixed(8).padStart(12, '0');
 
 
     return [epochYear, epochDayStr];
@@ -110,6 +110,41 @@ export class TimeManager {
       toggleTimeDOM.childNodes[0].textContent = 'Start Clock';
     } else {
       toggleTimeDOM.childNodes[0].textContent = 'Pause Clock';
+    }
+
+    const uiManagerInstance = keepTrackApi.getUiManager();
+
+    if (!settingsManager.isAlwaysHidePropRate && this.propRate0 !== this.propRate) {
+      if (this.propRate > 1.01 || this.propRate < 0.99) {
+        if (this.propRate < 10) {
+          uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.standby);
+        }
+        if (this.propRate >= 10 && this.propRate < 60) {
+          uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.caution);
+        }
+        if (this.propRate >= 60) {
+          uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.serious);
+        }
+      } else {
+        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.normal);
+      }
+
+      if (!settingsManager.disableUI) {
+        const datetimeTextElement = getEl('datetime-text', true);
+
+        if (!datetimeTextElement) {
+          errorManagerInstance.debug('Datetime text element not found');
+
+          return;
+        }
+
+        if (!this.isCreateClockDOMOnce_) {
+          datetimeTextElement.innerText = this.timeTextStr;
+          this.isCreateClockDOMOnce_ = true;
+        } else {
+          datetimeTextElement.childNodes[0].nodeValue = this.timeTextStr;
+        }
+      }
     }
 
     UrlManager.updateURL();
@@ -166,6 +201,137 @@ export class TimeManager {
     // Initialize
     this.calculateSimulationTime();
     this.setSelectedDate(this.simulationTimeObj);
+    this.initializeKeyboardBindings_();
+  }
+
+  private initializeKeyboardBindings_() {
+    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+
+    keyboardManager.registerKeyEvent({
+      key: 't',
+      callback: () => {
+        keepTrackApi.getUiManager().toast('Time Set to Real Time', ToastMsgType.normal);
+        this.changeStaticOffset(0); // Reset to Current Time
+      },
+    });
+
+    keyboardManager.registerKeyDownEvent({
+      key: ',',
+      callback: () => {
+        this.calculateSimulationTime();
+        let newPropRate = this.propRate;
+
+        if (this.propRate < 0.001 && this.propRate > -0.001) {
+          newPropRate = -0.001;
+        }
+
+        if (this.propRate < -1000) {
+          newPropRate = -1000;
+        }
+
+        if (newPropRate < 0) {
+          newPropRate = (this.propRate * 1.5);
+        } else {
+          newPropRate = ((this.propRate * 2) / 3);
+        }
+
+        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+
+        if (calendarInstance) {
+          calendarInstance.updatePropRate(newPropRate);
+        } else {
+          this.changePropRate(newPropRate);
+        }
+      },
+    });
+
+    keyboardManager.registerKeyDownEvent({
+      key: '.',
+      callback: () => {
+        this.calculateSimulationTime();
+        let newPropRate = this.propRate;
+
+        if (this.propRate < 0.001 && this.propRate > -0.001) {
+          newPropRate = 0.001;
+        }
+
+        if (this.propRate > 1000) {
+          newPropRate = 1000;
+        }
+
+        if (newPropRate > 0) {
+          newPropRate = (this.propRate * 1.5);
+        } else {
+          newPropRate = ((this.propRate * 2) / 3);
+        }
+
+        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+
+        if (calendarInstance) {
+          calendarInstance.updatePropRate(newPropRate);
+        } else {
+          this.changePropRate(newPropRate);
+        }
+      },
+    });
+
+    keyboardManager.registerKeyEvent({
+      key: '<',
+      callback: () => {
+        this.calculateSimulationTime();
+        this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountBig);
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+      },
+    });
+
+    keyboardManager.registerKeyEvent({
+      key: '>',
+      callback: () => {
+        this.calculateSimulationTime();
+        this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountBig);
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+      },
+    });
+
+    keyboardManager.registerKeyEvent({
+      key: '/',
+      callback: () => {
+        let newPropRate: number;
+
+        if (this.propRate === 1) {
+          newPropRate = 0;
+        } else {
+          newPropRate = 1;
+        }
+
+        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+
+        if (calendarInstance) {
+          calendarInstance.updatePropRate(newPropRate);
+        } else {
+          this.changePropRate(newPropRate);
+        }
+        this.calculateSimulationTime();
+      },
+    });
+
+    keyboardManager.registerKeyEvent({
+      key: 'Equal',
+      callback: () => {
+        this.calculateSimulationTime();
+        this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountSmall);
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+      },
+    });
+
+    keyboardManager.registerKeyEvent({
+      key: 'Minus',
+      callback: () => {
+        this.calculateSimulationTime();
+        this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall);
+        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+      },
+    });
   }
 
   setNow(realTime: Milliseconds) {
@@ -215,18 +381,17 @@ export class TimeManager {
           }
         }
         this.propRate0 = this.propRate;
-        settingsManager.isPropRateChange = false;
       }
 
       // Avoid race condition
-      if (this.dateDOM == null) {
+      if (!this.dateDOM) {
         try {
           this.dateDOM = getEl('datetime-text');
-          if (this.dateDOM == null) {
+          if (!this.dateDOM) {
             return;
           }
         } catch {
-          console.log('errors...');
+          errorManagerInstance.debug('Date DOM not found');
 
           return;
         }
@@ -244,13 +409,13 @@ export class TimeManager {
     // Passing datetimeInput eliminates needing jQuery in main module
     if (
       this.lastTime - this.simulationTimeObj.getTime() < 300 &&
-      ((<DateTimeManager>keepTrackApi.getPlugin(DateTimeManager))?.isEditTimeOpen || !settingsManager.cruncherReady || !keepTrackApi.getPlugin(DateTimeManager))
+      ((keepTrackApi.getPlugin(DateTimeManager))?.isEditTimeOpen || !settingsManager.cruncherReady || !keepTrackApi.getPlugin(DateTimeManager))
     ) {
       if (settingsManager.plugins.datetime) {
-        if (this.datetimeInputDOM == null) {
+        if (!this.datetimeInputDOM) {
           this.datetimeInputDOM = <HTMLInputElement>getEl('datetime-input-tb', true);
         }
-        if (this.datetimeInputDOM !== null) {
+        if (!this.datetimeInputDOM) {
           this.datetimeInputDOM.value = `${this.selectedDate.toISOString().slice(0, 10)} ${this.selectedDate.toISOString().slice(11, 19)}`;
         }
       }

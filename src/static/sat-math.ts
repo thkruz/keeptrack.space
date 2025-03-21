@@ -54,7 +54,7 @@ import {
 } from 'ootk';
 import { EciArr3 } from '../interfaces';
 import { DISTANCE_TO_SUN, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '../lib/constants';
-import { getDayOfYear, jday, lon2yaw } from '../lib/transforms';
+import { jday, lon2yaw } from '../lib/transforms';
 import { Sun } from '../singletons/draw-manager/sun';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { CoordinateTransforms } from './coordinate-transforms';
@@ -147,7 +147,10 @@ export abstract class SatMath {
    * @returns The altitude of the satellite in kilometers.
    */
   static altitudeCheck(satrec: SatelliteRecord, now: Date): Kilometers {
-    const { m, gmst } = SatMath.calculateTimeVariables(now, satrec);
+    const { m, gmst } = SatMath.calculateTimeVariables(now, satrec) as {
+      gmst: GreenwichMeanSiderealTime;
+      m: number;
+    };
 
     let positionEci: EciVec3;
 
@@ -213,6 +216,8 @@ export abstract class SatMath {
       x = obj.position.x as Kilometers;
       y = obj.position.y as Kilometers;
       z = obj.position.z as Kilometers;
+    } else {
+      return SunStatus.UNKNOWN;
     }
 
     /*
@@ -259,7 +264,7 @@ export abstract class SatMath {
    * @param satrec Optional satellite record to calculate the M variable.
    * @returns An object containing the GMST, M, and J variables.
    */
-  static calculateTimeVariables(now: Date, satrec?: SatelliteRecord): { gmst: GreenwichMeanSiderealTime; m: number; j: number } {
+  static calculateTimeVariables(now: Date, satrec?: SatelliteRecord): { gmst: GreenwichMeanSiderealTime; m: number | null; j: number } {
     const j =
       jday(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()) +
       now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
@@ -293,9 +298,9 @@ export abstract class SatMath {
    */
   static calculateVisMag(sat: DetailedSatellite, sensor: Sensor, propTime: Date, sun: Sun): number {
     let rae: {
-      az: Degrees;
-      el: Degrees;
-      rng: Kilometers;
+      az: Degrees | null;
+      el: Degrees | null;
+      rng: Kilometers | null;
     };
 
     if (sat.position.x > 0) {
@@ -305,6 +310,10 @@ export abstract class SatMath {
     }
 
     const distanceToSatellite = rae.rng; // This is in KM
+
+    if (!distanceToSatellite) {
+      throw new Error('Distance to satellite is null');
+    }
 
     const phaseAngle = Math.acos(
       <number>numeric.dot([-sat.position.x, -sat.position.y, -sat.position.z], [sat.position.x + sun.eci.x, -sat.position.y + sun.eci.y, -sat.position.z + sun.eci.z]) /
@@ -338,13 +347,14 @@ export abstract class SatMath {
    * @param rae An object containing the range, azimuth, and elevation of the satellite in RAE coordinates.
    * @returns A boolean indicating whether the satellite is within the field of view of the sensor.
    */
-  static checkIsInView(sensor: Sensor, rae: { rng: number; az: number; el: number }): boolean {
+  static checkIsInView(sensor: Sensor, rae: { rng: Kilometers; az: Degrees; el: Degrees }): boolean {
     const { az, el, rng } = rae;
 
     if (sensor.minAz > sensor.maxAz) {
       if (
         ((az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
-        ((az >= sensor.minAz2 || az <= sensor.maxAz2) && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
+        ((az >= (sensor.minAz2 as number) || az <= (sensor.maxAz2 as number)) && el >= (sensor.minEl2 as number) &&
+          el <= (sensor.maxEl2 as number) && rng <= (sensor.maxRng2 as number) && rng >= (sensor.minRng2 as number))
       ) {
         return true;
       }
@@ -354,7 +364,8 @@ export abstract class SatMath {
     }
     if (
       (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
-      (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
+      (az >= (sensor.minAz2 as number) && az <= (sensor.maxAz2 as number) && el >= (sensor.minEl2 as number) &&
+        el <= (sensor.maxEl2 as number) && rng <= (sensor.maxRng2 as number) && rng >= (sensor.minRng2 as number))
     ) {
       return true;
     }
@@ -407,9 +418,9 @@ export abstract class SatMath {
     propLength ??= 1440 * 60; // 1 Day
     let minDist = 1000000;
     let result = {
-      offset: null,
-      dist: null,
-      ric: null,
+      offset: <number | null>null,
+      dist: <number | null>null,
+      ric: <StateVectorSgp4 | null>null,
     };
 
     for (let t = 0; t < propLength; t++) {
@@ -427,7 +438,15 @@ export abstract class SatMath {
       }
     }
 
-    return result;
+    if (result.dist === null) {
+      throw new Error('No closest approach found');
+    }
+
+    return result as unknown as {
+      offset: number;
+      dist: number;
+      ric: { position: [number, number, number]; velocity: [number, number, number] };
+    };
   }
 
   /**
@@ -453,7 +472,7 @@ export abstract class SatMath {
   }
 
   static estimateRcsUsingHistoricalData(satInput: DetailedSatellite): number | null {
-    const historicRcs = [];
+    const historicRcs: number[] = [];
     const catalogManager = keepTrackApi.getCatalogManager();
     const objectCache = catalogManager.objectCache;
 
@@ -464,7 +483,7 @@ export abstract class SatMath {
 
       const sat = obj as DetailedSatellite;
 
-      if (sat.bus === satInput.bus && sat.bus !== 'Unknown' && sat.rcs > 0) {
+      if (sat.bus === satInput.bus && sat.bus !== 'Unknown' && sat.rcs && sat.rcs > 0) {
         historicRcs.push(sat.rcs);
         continue;
       }
@@ -485,7 +504,7 @@ export abstract class SatMath {
         }
       }
 
-      if (matchCount / maxLength > 0.85 && sat.rcs > 0) {
+      if (matchCount / maxLength > 0.85 && sat.rcs && sat.rcs > 0) {
         historicRcs.push(sat.rcs);
       }
     }
@@ -495,42 +514,6 @@ export abstract class SatMath {
     }
 
     return historicRcs.map((rcs_) => rcs_).reduce((a, b) => a + b, 0) / historicRcs.length;
-  }
-
-  static calcElsetAge(
-    sat: DetailedSatellite,
-    nowInput: Date,
-    outputUnits: 'days' | 'hours' | 'minutes' | 'seconds' = 'days',
-  ): number {
-    const currentYearFull = nowInput.getUTCFullYear();
-    const currentYearShort = currentYearFull % 100;
-
-    const epochYearShort = parseInt(sat.tle1.substring(18, 20), 10);
-    const epochDayOfYear = parseFloat(sat.tle1.substring(20, 32));
-
-    let epochYearFull: number;
-
-    if (epochYearShort <= currentYearShort) {
-      epochYearFull = 2000 + epochYearShort;
-    } else {
-      epochYearFull = 1900 + epochYearShort;
-    }
-
-    const epochJday = epochDayOfYear + (epochYearFull * 365);
-    const currentJday = getDayOfYear() + (currentYearFull * 365);
-    const currentTime = (nowInput.getUTCHours() * 3600 + nowInput.getUTCMinutes() * 60 + nowInput.getUTCSeconds()) / 86400;
-    const daysOld = (currentJday + currentTime) - epochJday;
-
-    switch (outputUnits) {
-      case 'hours':
-        return daysOld * 24;
-      case 'minutes':
-        return daysOld * 1440;
-      case 'seconds':
-        return daysOld * 86400;
-      default:
-        return daysOld;
-    }
   }
 
   /**
@@ -757,7 +740,7 @@ export abstract class SatMath {
     sat2?: DetailedSatellite,
     orbits = 1,
   ): T[] {
-    const orbitPoints = [];
+    const orbitPoints: T[] = [];
 
     for (let i = 0; i < points; i++) {
       const offset = ((i * sat.period * orbits) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
@@ -771,8 +754,8 @@ export abstract class SatMath {
         continue;
       }
 
-      let eciPts2: EciVec3;
-      let velPts2: EciVec3;
+      let eciPts2: EciVec3 = { x: 0, y: 0, z: 0 } as EciVec3;
+      let velPts2: EciVec3 = { x: 0, y: 0, z: 0 } as EciVec3;
 
       if (sat2) {
         eciPts2 = <EciVec3>SatMath.getEci(sat2, now).position;
@@ -797,7 +780,7 @@ export abstract class SatMath {
    */
   static getEci(sat: DetailedSatellite, now: Date) {
     try {
-      const { m } = SatMath.calculateTimeVariables(now, sat.satrec);
+      const { m } = SatMath.calculateTimeVariables(now, sat.satrec) as { m: number };
 
 
       return Sgp4.propagate(sat.satrec, m);
@@ -819,11 +802,11 @@ export abstract class SatMath {
     sensor: Sensor,
     isHideToasts = false,
   ): {
-    az: Degrees;
-    el: Degrees;
-    rng: Kilometers;
+    az: Degrees | null;
+    el: Degrees | null;
+    rng: Kilometers | null;
   } {
-    const { gmst, m } = SatMath.calculateTimeVariables(now, satrec);
+    const { gmst, m } = SatMath.calculateTimeVariables(now, satrec) as { gmst: GreenwichMeanSiderealTime; m: number };
     const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
 
     if (!positionEci) {
@@ -831,17 +814,12 @@ export abstract class SatMath {
         errorManagerInstance.info(`No ECI position for ${satrec.satnum} at ${now}`);
       }
 
-      return { az: <Degrees>null, el: <Degrees>null, rng: <Kilometers>null };
+      return { az: null, el: null, rng: null };
     }
     const positionEcf = eci2ecf(positionEci, gmst);
 
     return ecfRad2rae(sensor.llaRad(), positionEcf);
   }
-
-  /**
-   * Keeps the last 1 sun direction calculations in memory to avoid unnecessary calculations.
-   */
-  static sunDirectionCache: { jd: number; sunDirection: EciArr3 } = { jd: null, sunDirection: null };
 
   /**
    *Calculates the direction of the sun in the sky based on the Julian date.
@@ -853,8 +831,8 @@ export abstract class SatMath {
     if (!jd) {
       throw new Error('Julian date is required');
     }
-    if (jd === SatMath.sunDirectionCache.jd) {
-      return SatMath.sunDirectionCache.sunDirection;
+    if (jd === keepTrackApi.getScene().sun.sunDirectionCache.jd) {
+      return keepTrackApi.getScene().sun.sunDirectionCache.sunDirection;
     }
 
     const n = jd - 2451545;
@@ -888,39 +866,9 @@ export abstract class SatMath {
     const z = DISTANCE_TO_SUN * Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
 
     // Update cache
-    SatMath.sunDirectionCache = { jd, sunDirection: [x, y, z] };
+    keepTrackApi.getScene().sun.sunDirectionCache = { jd, sunDirection: [x, y, z] };
 
     return [x, y, z];
-  }
-
-  /**
-   * Calculates the inertial azimuth of a satellite given its latitude and inclination.
-   * @param lat - The latitude of the satellite in degrees.
-   * @param inc - The inclination of the satellite in degrees.
-   * @returns The inertial azimuth of the satellite in degrees.
-   */
-  static calcInertAz(lat: Degrees, inc: Degrees): Degrees {
-    const phi = lat * DEG2RAD;
-    const i = inc * DEG2RAD;
-
-    const az = Math.asin(Math.cos(i) / Math.cos(phi));
-
-    return <Degrees>(az * RAD2DEG);
-  }
-
-  /**
-   * Calculates the inclination angle of a satellite from its launch azimuth and latitude.
-   * @param lat - The latitude of the observer in degrees.
-   * @param az - The launch azimuth angle of the satellite in degrees clockwise from north.
-   * @returns The inclination angle of the satellite in degrees.
-   */
-  static calcIncFromAz(lat: number, az: number): number {
-    const phi = lat * DEG2RAD;
-    const beta = az * DEG2RAD;
-
-    const inc = Math.acos(Math.sin(beta) * Math.cos(phi));
-
-    return <Degrees>(inc * RAD2DEG);
   }
 
   /**
@@ -936,7 +884,7 @@ export abstract class SatMath {
    */
   static normalizeRaan(sat: DetailedSatellite, now: Date): number {
     const precessionRate = this.getNodalPrecessionRate(sat);
-    const daysSinceEpoch = SatMath.calcElsetAge(sat, now);
+    const daysSinceEpoch = sat.ageOfElset(now);
     let normalizedRaan = sat.rightAscension + (precessionRate * daysSinceEpoch);
 
     // Ensure RAAN stays within 0-360 range
@@ -984,6 +932,7 @@ export abstract class SatMath {
     // Convert to degrees per day
     return omegaP * (180 / Math.PI) * 86400;
   }
+
   /**
    * Calculates the angle between 2 satellites and the Sun
    * @param hoverSat The first satellite object.

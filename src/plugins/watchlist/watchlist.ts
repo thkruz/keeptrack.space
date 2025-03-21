@@ -27,7 +27,6 @@ import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/int
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
-import { SettingsManager } from '@app/settings/settings';
 import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sat-line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
@@ -63,7 +62,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
-  isWatchlistChanged: boolean = null;
+  isWatchlistChanged: boolean | null = null;
   sideMenuElementHtml = keepTrackApi.html`
     <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
       <div id="watchlist-content" class="side-menu">
@@ -185,7 +184,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     reader.onload = (e) => {
       this.onReaderLoad_(e);
     };
-    reader.readAsText((<HTMLInputElement>evt.target).files[0]);
+
+    const inputFiles = (<HTMLInputElement>evt.target).files ?? [];
+
+    if (inputFiles[0]) {
+      reader.readAsText(inputFiles[0]);
+    }
     evt.preventDefault();
   }
 
@@ -197,39 +201,51 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     clickAndDragWidth(getEl('watchlist-menu'));
 
     // Add button selected on watchlist menu
-    getEl('watchlist-add').addEventListener('click', () => {
+    getEl('watchlist-add')?.addEventListener('click', () => {
       this.onAddEvent_();
     });
     // Enter pressed/selected on watchlist menu
-    getEl('watchlist-content').addEventListener('submit', (evt: Event) => {
+    getEl('watchlist-content')?.addEventListener('submit', (evt: Event) => {
       evt.preventDefault();
       this.onAddEvent_();
     });
 
     // Remove button selected on watchlist menu
-    getEl('watchlist-list').addEventListener('click', (evt: Event) => {
+    getEl('watchlist-list')?.addEventListener('click', (evt: Event) => {
       keepTrackApi.getSoundManager().play(SoundNames.CLICK);
       if ((<HTMLElement>evt.target).classList.contains('sat-name')) {
-        this.selectSat(parseInt((<HTMLElement>evt.target).dataset.satName));
+        const satName = (<HTMLElement>evt.target).dataset.satName;
+
+        if (satName) {
+          this.selectSat(parseInt(satName));
+        } else {
+          errorManagerInstance.debug('sat-name is null');
+        }
       } else if ((<HTMLElement>evt.target).classList.contains('watchlist-remove')) {
-        this.removeSat(parseInt((<HTMLElement>evt.target).dataset.satId));
+        const satId = (<HTMLElement>evt.target).dataset.satId;
+
+        if (satId) {
+          this.removeSat(parseInt(satId));
+        } else {
+          errorManagerInstance.debug('sat-id is null');
+        }
       }
     });
 
-    getEl('watchlist-save').addEventListener('click', (evt: Event) => {
+    getEl('watchlist-save')?.addEventListener('click', (evt: Event) => {
       this.onSaveClicked_(evt);
     });
 
-    getEl('watchlist-clear').addEventListener('click', () => {
+    getEl('watchlist-clear')?.addEventListener('click', () => {
       this.onClearClicked_();
     });
 
-    getEl('watchlist-open').addEventListener('click', () => {
+    getEl('watchlist-open')?.addEventListener('click', () => {
       keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
-      getEl('watchlist-file').click();
+      getEl('watchlist-file')?.click();
     });
 
-    getEl('watchlist-file').addEventListener('change', (evt: Event) => {
+    getEl('watchlist-file')?.addEventListener('change', (evt: Event) => {
       this.onFileChanged_(evt);
 
       // Reset file input
@@ -244,8 +260,6 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @param isSkipSearch - A boolean indicating whether to skip the search operation.
    */
   updateWatchlist({ updateWatchlistList, isSkipSearch = false }: UpdateWatchlistParams = {}) {
-    const settingsManager: SettingsManager = window.settingsManager;
-
     if (typeof updateWatchlistList !== 'undefined') {
       this.watchlistList = updateWatchlistList;
     }
@@ -253,11 +267,10 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     if (!this.watchlistList) {
       return;
     }
-    // settingsManager.isThemesNeeded = true;
     this.isWatchlistChanged = this.isWatchlistChanged !== null;
     let watchlistString = '';
     let watchlistListHTML = '';
-    let sat: DetailedSatellite;
+    let sat: DetailedSatellite | null;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     for (let i = 0; i < this.watchlistList.length; i++) {
@@ -279,13 +292,18 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         </div>`;
       }
     }
-    getEl('watchlist-list').innerHTML = watchlistListHTML;
+
+    const watchlistElement = getEl('watchlist-list');
+
+    if (watchlistElement) {
+      watchlistElement.innerHTML = watchlistListHTML;
+    }
 
     keepTrackApi.runEvent(KeepTrackApiEvents.onWatchlistUpdated, this.watchlistList);
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       // No duplicates
-      watchlistString += catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY).sccNum;
+      watchlistString += catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY)?.sccNum ?? '';
       if (i !== this.watchlistList.length - 1) {
         watchlistString += ',';
       }
@@ -294,13 +312,15 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     if (!isSkipSearch) {
       keepTrackApi.getUiManager().doSearch(watchlistString, true);
     }
-    keepTrackApi.getColorSchemeManager().setColorScheme(settingsManager.currentColorScheme, true); // force color recalc
+    const colorSchemeManager = keepTrackApi.getColorSchemeManager();
 
-    const saveWatchlist = [];
+    colorSchemeManager.setColorScheme(colorSchemeManager.currentColorScheme, true); // force color recalc
+
+    const saveWatchlist: string[] = [];
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       sat = catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);
-      saveWatchlist[i] = sat.sccNum;
+      saveWatchlist[i] = sat?.sccNum ?? '';
     }
 
     PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, JSON.stringify(saveWatchlist));
@@ -309,7 +329,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   selectSat(id: number) {
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
-    selectSatManagerInstance.selectSat(id);
+    selectSatManagerInstance?.selectSat(id);
   }
 
   /**
@@ -339,7 +359,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     if (this.watchlistList.length <= 0) {
       uiManagerInstance.doSearch('');
       colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
-      uiManagerInstance.colorSchemeChangeAlert(settingsManager.currentColorScheme);
+      uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
     }
   }
 
@@ -351,9 +371,9 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     } else {
       const sat = keepTrackApi.getCatalogManager().getSat(id);
 
-      if (sat.sccNum) {
+      if (sat?.sccNum) {
         errorManagerInstance.warn(`NORAD: ${sat.sccNum} already in watchlist!`, true);
-      } else {
+      } else if (sat) {
         const jscString = sat.source === CatalogSource.VIMPEL ? ` (JSC Vimpel ${sat.altId})` : '';
 
         errorManagerInstance.warn(`Object ${id}${jscString} already in watchlist!`, true);
@@ -445,7 +465,15 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @param evt - The ProgressEvent<FileReader> object.
    */
   private onReaderLoad_(evt: ProgressEvent<FileReader>) {
-    if (evt.target.readyState !== 2) {
+    const target = evt.target;
+
+    if (!target) {
+      errorManagerInstance.error(new Error('target is null'), 'watchlist.ts', 'Error reading watchlist!');
+
+      return;
+    }
+
+    if (target.readyState !== 2) {
       return;
     }
 
@@ -501,11 +529,16 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    */
   private onSaveClicked_(evt: Event) {
     keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
-    const satIds = [];
+    const satIds: string[] = [];
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       const sat = keepTrackApi.getCatalogManager().getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);
 
+      if (sat === null) {
+        errorManagerInstance.warn(`Sat ${this.watchlistList[i].id} not found!`, true);
+
+        continue;
+      }
       satIds[i] = sat.sccNum;
     }
     const watchlistString = JSON.stringify(satIds);

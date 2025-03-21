@@ -26,7 +26,7 @@ import { SensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager | null;
   // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
   private readonly sensorList_: DetailedSensor[] = [];
   isRequireSatelliteSelected = true;
@@ -46,7 +46,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       if (sensors[sensor] instanceof DetailedSensor) {
         return sensors[sensor];
       }
-      console.error(`Sensor ${sensor} not found in sensor catalog`);
+      errorManagerInstance.debug(`Sensor ${sensor} not found in sensor catalog`);
 
       return null;
     }).filter((sensor) => sensor !== null);
@@ -58,13 +58,13 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
     // Default to only the MW sensors being enabled
     this.disabledSensors_ = this.sensorList_.filter((sensor) =>
-      !sensorGroups.find((group) => group.name === 'mw')?.list.includes(sensor.objName),
+      !sensorGroups.find((group) => group.name === 'mw')?.list.includes(sensor.objName ?? ''),
     );
   }
 
 
   bottomIconCallback: () => void = () => {
-    const sat = this.selectSatManager_.getSelectedSat();
+    const sat = this.selectSatManager_?.getSelectedSat();
 
     if (!sat?.isSatellite()) {
       return;
@@ -106,7 +106,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       visible: look.visible,
     }));
 
-    saveCsv(exportData, `multisite-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
+    saveCsv(exportData, `multisite-${(this.selectSatManager_?.getSelectedSat() as DetailedSatellite | undefined)?.sccNum6 ?? '000000'}-look-angles`);
   };
   sideMenuSettingsOptions: SideMenuSettingsOptions = {
     width: 300,
@@ -146,7 +146,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.staticOffsetChange,
       cbName: this.id,
       cb: () => {
-        const sat = this.selectSatManager_.getSelectedSat();
+        const sat = this.selectSatManager_?.getSelectedSat();
 
         if (!sat?.isSatellite()) {
           return;
@@ -242,7 +242,15 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     // Save Current Sensor as a new array
     const tempSensor = [...sensorManagerInstance.currentSensors];
 
-    const orbitalPeriod = MINUTES_PER_DAY / ((sat.satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
+    const satrec = sat.satrec;
+
+    if (!satrec) {
+      errorManagerInstance.warn('Satellite record not found');
+
+      return;
+    }
+
+    const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
 
     const multiSiteArray = <TearrData[]>[];
 
@@ -259,7 +267,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         // 5second Looks
         offset = i * 1000; // Offset in seconds (msec * 1000)
         const now = timeManagerInstance.getOffsetTimeObj(offset);
-        const multiSitePass = MultiSiteLookAnglesPlugin.propagateMultiSite_(now, sat.satrec, sensor);
+        const multiSitePass = MultiSiteLookAnglesPlugin.propagateMultiSite_(now, satrec, sensor);
         let canStationObserve = true;
 
         if (multiSitePass.time !== '') {
@@ -293,13 +301,23 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     // Setup Realtime and Offset Time
     const aer = SatMath.getRae(now, satrec, sensor);
 
-    if (SatMath.checkIsInView(sensor, aer)) {
+    if (aer.az === null || aer.el === null || aer.rng === null) {
+      return {
+        time: '',
+        el: <Degrees>0,
+        az: <Degrees>0,
+        rng: <Kilometers>0,
+        objName: '',
+      };
+    }
+
+    if (SatMath.checkIsInView(sensor, aer as TearrData)) {
       return {
         time: now.toISOString(),
-        el: aer.el,
-        az: aer.az,
-        rng: aer.rng,
-        objName: sensor.objName,
+        el: aer.el ?? <Degrees>0,
+        az: aer.az ?? <Degrees>0,
+        rng: aer.rng ?? <Kilometers>0,
+        objName: sensor.objName ?? '',
       };
     }
 

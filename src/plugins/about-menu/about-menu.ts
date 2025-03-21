@@ -23,7 +23,8 @@ export class AboutMenu extends KeepTrackPlugin {
             <p>KeepTrack is the only Astrodynamics software designed specifically for non-engineers.
             It only takes 20 megabytes of space (half of which is the satellite information), can run on a cellphone, and is available without installation - even offline.</p>
             <p>KeepTrack follows the design guidelines laid out by the <a style="color: #48f3e3 !important;" href="https://www.astrouxds.com/" target="_blank">
-              United States Space Force Space and Missiles Center</a>. With most of the features you would expect out of software costing thousands of dollars, KeepTrack is completely free under the GNU General Public License!</p>
+              United States Space Force Space and Missiles Center</a>. With most of the features you would expect out of software costing thousands of dollars, KeepTrack is
+              completely free under the GNU General Public License!</p>
           </div>
         </div>
         <div class="row">
@@ -36,17 +37,20 @@ export class AboutMenu extends KeepTrackPlugin {
           <div class="col s12">
             Created by <a style="color: #48f3e3 !important;" href="https://github.com/thkruz/" target="_blank">Theodore Kruczek</a>
             to help visualize orbital calculations for application to Ground Based Radars and Optical
-            Telescopes. Substantial help with the user interface was provided by <a style="color: #48f3e3 !important;" href="https://www.linkedin.com/in/leroiclaassen-webdev/" target="_blank">Le-Roi Claassen</a>.
+            Telescopes. Substantial help with the user interface was provided by <a style="color: #48f3e3 !important;" href="https://www.linkedin.com/in/leroiclaassen-webdev/"
+            target="_blank">Le-Roi Claassen</a>.
             Based on the original work of <a style="color: #48f3e3 !important;" href="https://github.com/jeyoder/" target="_blank">James Yoder</a>
           </div>
         </div>
         <div class="row">
           <h5 class="center-align">Featured Users</h5>
           <div class="col s12">
-            Used at the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">Combined Space Operations Center</a><br>
-            Displayed in <a style="color: #48f3e3 !important;" href="https://espace.epfl.ch/event/cosmos-archaeology/" target="_blank">Cosmos Archaeology</a> at the University of Lausanne<br>
+            Used at the <a style="color: #48f3e3 !important;" href="https://www.youtube.com/embed/OfvkKBNup5A?autoplay=0&start=521&modestbranding=1" target="_blank">
+              Combined Space Operations Center</a><br>Displayed in <a style="color: #48f3e3 !important;" href="https://espace.epfl.ch/event/cosmos-archaeology/" target="_blank">
+                Cosmos Archaeology</a> at the University of Lausanne<br>
             Powering the ESA sponsored <a style="color: #48f3e3 !important;" href="https://clearspace.today" target="_blank">ClearSpace-1 Website</a><br>
-            Used in Studio Roosegaarde's <a style="color: #48f3e3 !important;" href="https://www.studioroosegaarde.net/project/space-waste-lab" target="_blank">Space Waste Lab</a><br>
+            Used in Studio Roosegaarde's <a style="color: #48f3e3 !important;" href="https://www.studioroosegaarde.net/project/space-waste-lab" target="_blank">
+              Space Waste Lab</a><br>
             Shown on <a style="color: #48f3e3 !important;" href="https://www.youtube.com/watch?v=gRhOkDapSGM" target="_blank">HBO's Vice Season 6 Episode 13</a><br>
             <br>
             Is my code aiding your project? <a style="color: #48f3e3 !important;" href="mailto: theodore.kruczek@gmail.com" target="_blank">Let me know!</a>
@@ -80,12 +84,15 @@ export class AboutMenu extends KeepTrackPlugin {
   Additionally you can find information about other projects that are currently using KeepTrack.
   If you have any questions or comments, please contact me at <a href="mailto:theodore.kruczek@gmail.com" target="_blank">
     theodore.kruczek@gmail.com
-  </a>. If you would like to contribute to KeepTrack, please visit the <a href="https://github.com/thkruz/keeptrack.space" target="_blank">https://github.com/thkruz/keeptrack.space</a>
+  </a>. If you would like to contribute to KeepTrack, please visit the <a href="https://github.com/thkruz/keeptrack.space" target="_blank">
+    https://github.com/thkruz/keeptrack.space</a>
   <br><br>
   Frequently Asked Questions:<br>
   <br>
   Q: How is this different from stuffin.space?<br>
-  A: KeepTrack is a complete rewrite of stuffin.space. It is written in TypeScript, uses WebGL 2.0 and new shaders, has a new rendering pipeline, has substantially more analysis features, and uses the <a href="https://github.com/thkruz/ootk/" target="_blank">Orbital Object Toolkit</a> for propagation. There isn't a single line of the original code remaining, but the core concept of two web workers for orbits and propagation remains...for now...<br>
+  A: KeepTrack is a complete rewrite of stuffin.space. It is written in TypeScript, uses WebGL 2.0 and new shaders, has a new rendering pipeline, has substantially more analysis
+  features, and uses the <a href="https://github.com/thkruz/ootk/" target="_blank">Orbital Object Toolkit</a> for propagation. There isn't a single line of the original code
+  remaining, but the core concept of two web workers for orbits and propagation remains...for now...<br>
   <br>
   Q: Why would a normal person use some of these features?<br>
   A: Many of the features were developed for specific individuals/agencies. They may not be very useful for the general public, but are included just in case.<br>
@@ -94,12 +101,7 @@ export class AboutMenu extends KeepTrackPlugin {
   A: The mobile version is limited because it is not possible to run a full desktop application on a mobile device.<br>
   <br>
   Q: Why do the dots jitter sometimes?<br>
-  A: The dots jitter because the orbit is being propagated once a second and interpolated between updates. If your PC becomes busy or the time changes the propagation thread will become out of sync for a moment from the main thread.<br>
+  A: The dots jitter because the orbit is being propagated once a second and interpolated between updates. If your PC becomes busy or the time changes the propagation thread will
+  become out of sync for a moment from the main thread.<br>
   `;
 }
-
-/**
- * @deprecated
- * The main website now covers all of this functionality.
- */
-export const aboutMenuPlugin = new AboutMenu();

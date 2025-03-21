@@ -51,7 +51,7 @@ interface GroundTracePoint {
 export class StereoMap extends KeepTrackPlugin {
   readonly id = 'StereoMap';
   dependencies_ = [SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager | null;
 
   constructor() {
     super();
@@ -110,7 +110,7 @@ export class StereoMap extends KeepTrackPlugin {
           this.resize2DMap_();
         });
 
-        getEl('map-menu').addEventListener('click', (evt: Event) => {
+        getEl('map-menu')?.addEventListener('click', (evt: Event) => {
           if (!(<HTMLElement>evt.target).classList.contains('map-look')) {
             return;
           }
@@ -146,7 +146,7 @@ export class StereoMap extends KeepTrackPlugin {
     keyboardManager.registerKeyUpEvent({
       key: 'M',
       callback: () => {
-        if (keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
+        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -2 <= -1) {
           return;
         }
 
@@ -166,7 +166,7 @@ export class StereoMap extends KeepTrackPlugin {
 
   updateMap(): void {
     try {
-      if (this.selectSatManager_.selectedSat === -1) {
+      if (this.selectSatManager_?.selectedSat ?? -2 <= -1) {
         return;
       }
       if (!this.isMenuButtonActive) {
@@ -215,8 +215,12 @@ export class StereoMap extends KeepTrackPlugin {
     const selectableInterval = Math.ceil(pointPerOrbit / 50);
     let selectableIdx = 1;
 
-    const sat = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_.selectedSat);
+    const sat = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_?.selectedSat ?? -1);
     const sensorList = keepTrackApi.getSensorManager().currentSensors;
+
+    if (!sat || !sensorList) {
+      return;
+    }
 
     // Start at 1 so that the first point is NOT the satellite
     for (let i = 1; i < pointPerOrbit; i++) {
@@ -244,6 +248,10 @@ export class StereoMap extends KeepTrackPlugin {
     // Draw ground trace
     const ctx = this.canvas_.getContext('2d');
     const bigJumpSize = 0.2 * settingsManager.mapWidth;
+
+    if (!ctx) {
+      return;
+    }
 
     ctx.strokeStyle = groundTracePoints[0].inView ? '#ffff00' : '#ff0000';
     ctx.lineWidth = 4;
@@ -286,6 +294,10 @@ export class StereoMap extends KeepTrackPlugin {
     const copyrightStr = !settingsManager.copyrightOveride ? `©${n} KEEPTRACK.SPACE` : '';
     const cw = this.canvas_.width;
     const ch = this.canvas_.height;
+
+    if (!ctx) {
+      return;
+    }
 
     ctx.font = '24px nasalization';
     let textWidth = ctx.measureText(copyrightStr).width;
@@ -351,7 +363,7 @@ export class StereoMap extends KeepTrackPlugin {
         newSensor.style.top = `${map.y - sensorDom.height / 2}px`;
         newSensor.style.width = `${sensorDom.width}px`;
         newSensor.style.height = `${sensorDom.height}px`;
-        getEl('map-menu').appendChild(newSensor);
+        getEl('map-menu')?.appendChild(newSensor);
         showEl(`map-sensor-${selectableIdx}`);
         selectableIdx++;
       }
@@ -362,7 +374,12 @@ export class StereoMap extends KeepTrackPlugin {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    const sat = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat);
+    const sat = catalogManagerInstance.getObject(this.selectSatManager_?.selectedSat ?? -1);
+
+    if (!sat) {
+      return;
+    }
+
     const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
     const lla = eci2lla(sat.position, gmst);
     const map = {
@@ -371,31 +388,37 @@ export class StereoMap extends KeepTrackPlugin {
     };
     const satDom = <HTMLImageElement>getEl('map-sat');
 
-    getEl('map-sat').style.left = `${map.x - satDom.width / 2}px`;
-    getEl('map-sat').style.top = `${map.y - satDom.height / 2}px`;
+    const mapSatelliteDOM = getEl('map-sat');
+
+    if (mapSatelliteDOM) {
+      mapSatelliteDOM.style.left = `${map.x - satDom.width / 2}px`;
+      mapSatelliteDOM.style.top = `${map.y - satDom.height / 2}px`;
+    }
   }
 
   private resize2DMap_(isForceWidescreen?: boolean): void {
     isForceWidescreen ??= false;
     const mapMenuDOM = getEl('map-menu');
 
-    if (isForceWidescreen || window.innerWidth > window.innerHeight) {
-      // If widescreen
-      settingsManager.mapWidth = window.innerWidth;
-      settingsManager.mapHeight = settingsManager.mapWidth / 2;
-      mapMenuDOM.style.width = `${window.innerWidth}px`;
+    if (mapMenuDOM) {
+      if (isForceWidescreen || window.innerWidth > window.innerHeight) {
+        // If widescreen
+        settingsManager.mapWidth = window.innerWidth;
+        settingsManager.mapHeight = settingsManager.mapWidth / 2;
+        mapMenuDOM.style.width = `${window.innerWidth}px`;
 
-      this.canvas_.width = settingsManager.mapWidth;
-      this.canvas_.height = settingsManager.mapHeight;
-    } else {
-      settingsManager.mapHeight = window.innerHeight - 100; // Subtract 100 portrait (mobile)
-      settingsManager.mapWidth = settingsManager.mapHeight * 2;
-      mapMenuDOM.style.width = `${settingsManager.mapWidth}px`;
+        this.canvas_.width = settingsManager.mapWidth;
+        this.canvas_.height = settingsManager.mapHeight;
+      } else {
+        settingsManager.mapHeight = window.innerHeight - 100; // Subtract 100 portrait (mobile)
+        settingsManager.mapWidth = settingsManager.mapHeight * 2;
+        mapMenuDOM.style.width = `${settingsManager.mapWidth}px`;
 
-      this.canvas_.width = settingsManager.mapWidth;
-      this.canvas_.style.width = `${settingsManager.mapWidth}px`;
-      this.canvas_.height = settingsManager.mapHeight;
-      this.canvas_.style.height = `${settingsManager.mapHeight}px`;
+        this.canvas_.width = settingsManager.mapWidth;
+        this.canvas_.style.width = `${settingsManager.mapWidth}px`;
+        this.canvas_.height = settingsManager.mapHeight;
+        this.canvas_.style.height = `${settingsManager.mapHeight}px`;
+      }
     }
 
     this.drawEarthLayer_();
@@ -405,11 +428,11 @@ export class StereoMap extends KeepTrackPlugin {
     const ctx = this.canvas_.getContext('2d');
 
     if (this.earthImg_.src) {
-      ctx.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
+      ctx?.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
     } else {
       this.earthImg_.src = `${settingsManager.installDirectory}textures/earthmap4k.jpg`;
       this.earthImg_.onload = () => {
-        ctx.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
+        ctx?.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
       };
     }
   }
@@ -436,7 +459,7 @@ export class StereoMap extends KeepTrackPlugin {
     if (!(<HTMLElement>evt.target)?.dataset.time) {
       return;
     }
-    const time = (<HTMLElement>evt.target).dataset.time;
+    const time = (<HTMLElement>evt.target).dataset.time ?? null;
 
     if (time !== null) {
       const timeArr = time.split(' ');

@@ -49,15 +49,10 @@ export class SensorSurvFence extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    /*
-     * TODO: There are edge cases where the icon remains available when it should not be
-     * It does not break anything, but it is a bug
-     */
-
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.id,
-      cb: (sensor: Sensor | string): void => {
+      cb: (sensor): void => {
         if (sensor) {
           this.setBottomIconToEnabled();
         } else {

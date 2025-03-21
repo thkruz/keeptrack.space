@@ -347,7 +347,7 @@ export abstract class SatMath {
    * @param rae An object containing the range, azimuth, and elevation of the satellite in RAE coordinates.
    * @returns A boolean indicating whether the satellite is within the field of view of the sensor.
    */
-  static checkIsInView(sensor: Sensor, rae: { rng: number; az: number; el: number }): boolean {
+  static checkIsInView(sensor: Sensor, rae: { rng: Kilometers; az: Degrees; el: Degrees }): boolean {
     const { az, el, rng } = rae;
 
     if (sensor.minAz > sensor.maxAz) {

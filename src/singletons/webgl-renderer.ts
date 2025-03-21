@@ -143,7 +143,7 @@ export class WebGLRenderer {
       event: KeepTrackApiEvents.resize,
       cbName: 'webgl-Renderer',
       cb: () => {
-        this.resizeCanvas();
+        this.resizeCanvas(true);
       },
     });
 

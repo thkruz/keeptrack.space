@@ -126,12 +126,17 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       return false;
     });
 
-    if (this.isSunLineVisible_) {
-      getEl('sensor-sun-btn').textContent = 'Remove Line to Sun  \u25B6';
-      this.isSunLineVisible_ = true;
-    } else {
-      getEl('sensor-sun-btn').textContent = 'Add Line to Sun  \u25B6';
-      this.isSunLineVisible_ = false;
+    const sunButtonElement = getEl('sensor-sun-btn');
+    const moonButtonElement = getEl('sensor-moon-btn');
+
+    if (sunButtonElement) {
+      if (this.isSunLineVisible_) {
+        sunButtonElement.textContent = 'Remove Line to Sun  \u25B6';
+        this.isSunLineVisible_ = true;
+      } else {
+        sunButtonElement.textContent = 'Add Line to Sun  \u25B6';
+        this.isSunLineVisible_ = false;
+      }
     }
 
     this.isMonnLineVisible_ = lineManager.lines.some((line) => {
@@ -142,26 +147,36 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       return false;
     });
 
-    if (this.isMonnLineVisible_) {
-      getEl('sensor-moon-btn').textContent = 'Remove Line to Moon  \u25B6';
-      this.isMonnLineVisible_ = true;
-    } else {
-      getEl('sensor-moon-btn').textContent = 'Add Line to Moon  \u25B6';
-      this.isMonnLineVisible_ = false;
+    if (moonButtonElement) {
+      if (this.isMonnLineVisible_) {
+        moonButtonElement.textContent = 'Remove Line to Moon  \u25B6';
+        this.isMonnLineVisible_ = true;
+      } else {
+        moonButtonElement.textContent = 'Add Line to Moon  \u25B6';
+        this.isMonnLineVisible_ = false;
+      }
     }
   }
 
   private addSensorToMoonBtnListener() {
-    getEl('sensor-moon-btn').addEventListener('click', () => {
+    getEl('sensor-moon-btn')?.addEventListener('click', () => {
+      const sensorMoonBtnElement = getEl('sensor-moon-btn');
+
+      if (!sensorMoonBtnElement) {
+        return;
+      }
+
       if (this.isMonnLineVisible_) {
         const lineManager = keepTrackApi.getLineManager();
 
         for (const line of lineManager.lines) {
           if (line instanceof SensorToMoonLine) {
             line.isGarbage = true;
-            getEl('sensor-moon-btn').textContent = 'Add Line to Moon  \u25B6';
+
+            sensorMoonBtnElement.textContent = 'Add Line to Moon  \u25B6';
             this.isMonnLineVisible_ = false;
             keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+
 
             return;
           }
@@ -179,7 +194,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           .createSensorToMoon(keepTrackApi.getSensorManager().currentSensors[0]);
 
         // Change Button Text
-        getEl('sensor-moon-btn').textContent = 'Remove Line to Moon  \u25B6';
+        sensorMoonBtnElement.textContent = 'Remove Line to Moon  \u25B6';
         this.isMonnLineVisible_ = true;
         keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
       }
@@ -187,14 +202,20 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
   }
 
   private addSensorToSunBtnListener_() {
-    getEl('sensor-sun-btn').addEventListener('click', () => {
+    getEl('sensor-sun-btn')?.addEventListener('click', () => {
+      const sensorSunBtnElement = getEl('sensor-sun-btn');
+
+      if (!sensorSunBtnElement) {
+        return;
+      }
+
       if (this.isSunLineVisible_) {
         const lineManager = keepTrackApi.getLineManager();
 
         for (const line of lineManager.lines) {
           if (line instanceof SensorToSunLine) {
             line.isGarbage = true;
-            getEl('sensor-sun-btn').textContent = 'Add Line to Sun  \u25B6';
+            sensorSunBtnElement.textContent = 'Add Line to Sun  \u25B6';
             this.isSunLineVisible_ = false;
             keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
 
@@ -214,7 +235,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
           .createSensorToSun(keepTrackApi.getSensorManager().currentSensors[0]);
 
         // Change Button Text
-        getEl('sensor-sun-btn').textContent = 'Remove Line to Sun  \u25B6';
+        sensorSunBtnElement.textContent = 'Remove Line to Sun  \u25B6';
         this.isSunLineVisible_ = true;
         keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
       }
@@ -228,26 +249,42 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
     const firstSensor = keepTrackApi.getSensorManager().currentSensors[0];
 
-    getEl('sensor-latitude').innerHTML = firstSensor.lat > 0 ? `${firstSensor.lat.toFixed(2)}° N` : `${Math.abs(firstSensor.lat).toFixed(2)}° S`;
-    getEl('sensor-longitude').innerHTML = firstSensor.lon > 0 ? `${firstSensor.lon.toFixed(2)}° E` : `${Math.abs(firstSensor.lon).toFixed(2)}° W`;
-    getEl('sensor-minazimuth').innerHTML = `${firstSensor.minAz.toFixed(1).toString()}°`;
-    getEl('sensor-maxazimuth').innerHTML = `${firstSensor.maxAz.toFixed(1).toString()}°`;
-    getEl('sensor-minelevation').innerHTML = `${firstSensor.minEl.toFixed(1).toString()}°`;
-    getEl('sensor-maxelevation').innerHTML = `${firstSensor.maxEl.toFixed(1).toString()}°`;
-    getEl('sensor-minrange').innerHTML = `${firstSensor.minRng.toFixed(1).toString()} km`;
-    getEl('sensor-maxrange').innerHTML = `${firstSensor.maxRng.toFixed(1).toString()} km`;
+    const sensorLatitudeElement = getEl('sensor-latitude');
+    const sensorLongitudeElement = getEl('sensor-longitude');
+    const sensorMinAzimuthElement = getEl('sensor-minazimuth');
+    const sensorMaxAzimuthElement = getEl('sensor-maxazimuth');
+    const sensorMinElevationElement = getEl('sensor-minelevation');
+    const sensorMaxElevationElement = getEl('sensor-maxelevation');
+    const sensorMinRangeElement = getEl('sensor-minrange');
+    const sensorMaxRangeElement = getEl('sensor-maxrange');
+    const sensorBandElement = getEl('sensor-band');
+    const beamwidthElement = getEl('sensor-beamwidth');
+
+    if (!sensorLatitudeElement || !sensorLongitudeElement || !sensorMinAzimuthElement || !sensorMaxAzimuthElement || !sensorMinElevationElement || !sensorMaxElevationElement ||
+      !sensorMinRangeElement || !sensorMaxRangeElement || !sensorBandElement || !beamwidthElement) {
+      return;
+    }
+
+    sensorLatitudeElement.innerHTML = firstSensor.lat > 0 ? `${firstSensor.lat.toFixed(2)}° N` : `${Math.abs(firstSensor.lat).toFixed(2)}° S`;
+    sensorLongitudeElement.innerHTML = firstSensor.lon > 0 ? `${firstSensor.lon.toFixed(2)}° E` : `${Math.abs(firstSensor.lon).toFixed(2)}° W`;
+    sensorMinAzimuthElement.innerHTML = `${firstSensor.minAz.toFixed(1).toString()}°`;
+    sensorMaxAzimuthElement.innerHTML = `${firstSensor.maxAz.toFixed(1).toString()}°`;
+    sensorMinElevationElement.innerHTML = `${firstSensor.minEl.toFixed(1).toString()}°`;
+    sensorMaxElevationElement.innerHTML = `${firstSensor.maxEl.toFixed(1).toString()}°`;
+    sensorMinRangeElement.innerHTML = `${firstSensor.minRng.toFixed(1).toString()} km`;
+    sensorMaxRangeElement.innerHTML = `${firstSensor.maxRng.toFixed(1).toString()} km`;
     if (firstSensor.type === SpaceObjectType.OPTICAL || firstSensor.type === SpaceObjectType.OBSERVER) {
-      hideEl(getEl('sensor-band').parentElement);
-      hideEl(getEl('sensor-beamwidth').parentElement);
+      hideEl(sensorBandElement?.parentElement ?? '');
+      hideEl(beamwidthElement?.parentElement ?? '');
     } else {
-      showEl(getEl('sensor-band').parentElement);
-      getEl('sensor-band').innerHTML = firstSensor.freqBand ? firstSensor.freqBand : 'Unknown';
+      showEl(sensorBandElement?.parentElement ?? '');
+      sensorBandElement.innerHTML = firstSensor.freqBand ? firstSensor.freqBand : 'Unknown';
 
       if (firstSensor instanceof RfSensor) {
-        showEl(getEl('sensor-beamwidth').parentElement);
-        getEl('sensor-beamwidth').innerHTML = firstSensor.beamwidth ? `${firstSensor.beamwidth.toFixed(1).toString()}°` : 'Unknown';
+        showEl(beamwidthElement?.parentElement ?? '');
+        beamwidthElement.innerHTML = firstSensor.beamwidth ? `${firstSensor.beamwidth.toFixed(1).toString()}°` : 'Unknown';
       } else {
-        hideEl(getEl('sensor-beamwidth').parentElement);
+        hideEl(beamwidthElement?.parentElement ?? '');
       }
     }
   }

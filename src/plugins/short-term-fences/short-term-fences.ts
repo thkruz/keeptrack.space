@@ -14,7 +14,7 @@ import { SoundNames } from '../sounds/SoundNames';
 export class ShortTermFences extends KeepTrackPlugin {
   readonly id = 'ShortTermFences';
   dependencies_: string[] = [SatInfoBox.name, SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager | null;
 
   constructor() {
     super();
@@ -106,14 +106,14 @@ export class ShortTermFences extends KeepTrackPlugin {
         showEl('stf-on-object-link');
 
         if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
-          getEl('actions-section').insertAdjacentHTML(
+          getEl('actions-section')?.insertAdjacentHTML(
             'beforeend',
             keepTrackApi.html`
             <div id="stf-on-object-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                   data-tooltip="Visualize Sensor Search Capability">Build Short Term Fence on this object...</div>
             `,
           );
-          getEl('stf-on-object-link').addEventListener('click', this.stfOnObjectLinkClick_.bind(this));
+          getEl('stf-on-object-link')?.addEventListener('click', this.stfOnObjectLinkClick_.bind(this));
           this.isAddStfLinksOnce = true;
         }
       },
@@ -127,21 +127,21 @@ export class ShortTermFences extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl('stfForm').addEventListener('submit', (e: Event) => {
+        getEl('stfForm')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
           this.onSubmit_.bind(this)();
         });
-        getEl('stf-remove-last').addEventListener('click', () => {
+        getEl('stf-remove-last')?.addEventListener('click', () => {
           keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
           keepTrackApi.getSensorManager().removeStf();
         });
-        getEl('stf-clear-all').addEventListener('click', () => {
+        getEl('stf-clear-all')?.addEventListener('click', () => {
           keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
           keepTrackApi.getSensorManager().clearStf();
         });
 
-        getEl('stf-azExt').addEventListener('blur', () => {
+        getEl('stf-azExt')?.addEventListener('blur', () => {
           const centerAz = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
           const centerEl = parseFloat((<HTMLInputElement>getEl('stf-el')).value);
           const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
@@ -168,7 +168,7 @@ export class ShortTermFences extends KeepTrackPlugin {
 
           (<HTMLInputElement>getEl('stf-azExtKm')).value = azKm.toFixed(1);
         });
-        getEl('stf-elExt').addEventListener('blur', () => {
+        getEl('stf-elExt')?.addEventListener('blur', () => {
           const centerAz = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
           const centerEl = parseFloat((<HTMLInputElement>getEl('stf-el')).value);
           const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
@@ -207,8 +207,8 @@ export class ShortTermFences extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: 'shortTermFences',
-      cb: (sensor: any, id: number): void => {
-        if (sensor == null && id == null) {
+      cb: (sensor, id): void => {
+        if (sensor === null && id === null) {
           this.closeAndDisable_();
           slideOutLeft(getEl(this.sideMenuElementName), 1000);
         } else {
@@ -283,7 +283,6 @@ export class ShortTermFences extends KeepTrackPlugin {
     }
 
     keepTrackApi.getSensorManager().addStf(stfSensor);
-    // keepTrackApi.getPlugin(SensorFov)?.enableFovView();
   }
 
   private stfOnObjectLinkClick_() {
@@ -297,6 +296,13 @@ export class ShortTermFences extends KeepTrackPlugin {
     }
 
     const now = keepTrackApi.getTimeManager().simulationTimeObj;
+
+    if (!this.selectSatManager_) {
+      errorManagerInstance.warn('No selectSatManager instance found');
+
+      return;
+    }
+
     const rae = eci2rae(now, this.selectSatManager_.primarySatObj.position, sensorManagerInstance.currentSensors[0]);
 
     (<HTMLInputElement>getEl('stf-az')).value = rae.az.toFixed(1);

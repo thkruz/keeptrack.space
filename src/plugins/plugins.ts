@@ -220,7 +220,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'core',
       cb: () => {
-        uiManagerFinal(plugins);
+        uiManagerFinal();
       },
     });
   } catch (e) {
@@ -228,7 +228,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
   }
 };
 
-export const uiManagerFinal = (plugins: any): void => {
+export const uiManagerFinal = (): void => {
   const bicDom = getEl('bottom-icons-container');
 
   if (bicDom) {
@@ -252,7 +252,7 @@ export const uiManagerFinal = (plugins: any): void => {
    * }
    */
 
-  if (getEl('bottom-icons') && getEl('bottom-icons').innerText == '') {
+  if (getEl('bottom-icons') && getEl('bottom-icons').innerText === '') {
     getEl('nav-footer').style.visibility = 'hidden';
     hideEl('nav-footer');
   } else {
@@ -265,10 +265,6 @@ export const uiManagerFinal = (plugins: any): void => {
     const bottomHeight = bottomContainer.offsetHeight;
 
     document.documentElement.style.setProperty('--bottom-menu-top', `${bottomHeight}px`);
-  }
-
-  if (plugins.aboutManager) {
-    getEl('versionNumber-text').innerHTML = `${settingsManager.versionNumber} - ${settingsManager.versionDate}`;
   }
 
   // Only turn on analytics if on keeptrack.space ()

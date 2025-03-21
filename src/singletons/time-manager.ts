@@ -59,7 +59,7 @@ export class TimeManager {
 
   static currentEpoch(currentDate: Date): [string, string] {
     const currentDateObj = new Date(currentDate);
-    const epochYear = currentDateObj.getUTCFullYear().toString().substr(2, 2);
+    const epochYear = currentDateObj.getUTCFullYear().toString().slice(2, 4);
     const epochDay = getDayOfYear(currentDateObj);
     const timeOfDay = (currentDateObj.getUTCHours() * 60 + currentDateObj.getUTCMinutes()) / 1440;
     const epochDayStr = (epochDay + timeOfDay).toFixed(8).padStart(12, '0');

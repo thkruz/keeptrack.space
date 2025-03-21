@@ -582,8 +582,9 @@ export class Calendar {
 
     timeManagerInstance.calculateSimulationTime();
     timeManagerInstance.changePropRate(propRate);
-    this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, 200, -100);
     this.propagationRate = propRate;
+    this.updateTimeInput();
+    this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, 200, -100);
   }
 
   private updateHour(hour: number): void {
@@ -623,11 +624,11 @@ export class Calendar {
     const timeInput = document.getElementById('calendar-time-input') as HTMLInputElement;
 
     if (timeInput) {
-      timeInput.value = this.formatTime(
+      timeInput.value = `${this.formatTime(
         this.simulationDate.getUTCHours(),
         this.simulationDate.getUTCMinutes(),
         this.simulationDate.getUTCSeconds(),
-      );
+      )} | (x${this.propagationRate.toString()})`;
     }
   }
 

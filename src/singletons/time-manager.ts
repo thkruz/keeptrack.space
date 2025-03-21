@@ -3,7 +3,6 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
-import { StringPad } from '../lib/stringPad';
 import { DateTimeManager } from '../plugins/date-time-manager/date-time-manager';
 import { UrlManager } from '../static/url-manager';
 import { errorManagerInstance } from './errorManager';
@@ -63,7 +62,7 @@ export class TimeManager {
     const epochYear = currentDateObj.getUTCFullYear().toString().substr(2, 2);
     const epochDay = getDayOfYear(currentDateObj);
     const timeOfDay = (currentDateObj.getUTCHours() * 60 + currentDateObj.getUTCMinutes()) / 1440;
-    const epochDayStr = StringPad.pad0((epochDay + timeOfDay).toFixed(8), 12);
+    const epochDayStr = (epochDay + timeOfDay).toFixed(8).padStart(12, '0');
 
 
     return [epochYear, epochDayStr];
@@ -355,14 +354,14 @@ export class TimeManager {
       }
 
       // Avoid race condition
-      if (this.dateDOM == null) {
+      if (!this.dateDOM) {
         try {
           this.dateDOM = getEl('datetime-text');
-          if (this.dateDOM == null) {
+          if (!this.dateDOM) {
             return;
           }
         } catch {
-          console.log('errors...');
+          errorManagerInstance.debug('Date DOM not found');
 
           return;
         }
@@ -380,13 +379,13 @@ export class TimeManager {
     // Passing datetimeInput eliminates needing jQuery in main module
     if (
       this.lastTime - this.simulationTimeObj.getTime() < 300 &&
-      ((<DateTimeManager>keepTrackApi.getPlugin(DateTimeManager))?.isEditTimeOpen || !settingsManager.cruncherReady || !keepTrackApi.getPlugin(DateTimeManager))
+      ((keepTrackApi.getPlugin(DateTimeManager))?.isEditTimeOpen || !settingsManager.cruncherReady || !keepTrackApi.getPlugin(DateTimeManager))
     ) {
       if (settingsManager.plugins.datetime) {
-        if (this.datetimeInputDOM == null) {
+        if (!this.datetimeInputDOM) {
           this.datetimeInputDOM = <HTMLInputElement>getEl('datetime-input-tb', true);
         }
-        if (this.datetimeInputDOM !== null) {
+        if (!this.datetimeInputDOM) {
           this.datetimeInputDOM.value = `${this.selectedDate.toISOString().slice(0, 10)} ${this.selectedDate.toISOString().slice(11, 19)}`;
         }
       }

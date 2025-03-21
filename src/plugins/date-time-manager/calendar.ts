@@ -8,10 +8,10 @@ import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 export class Calendar {
   private readonly containerId: string;
   private calendarDate: Date;
-  private simulationDate: Date | null;
+  private simulationDate: Date;
   private propagationRate: number = 1;
   private isVisible: boolean = false;
-  private readonly timerUntilEnabled: number | null = 10000;
+  private readonly timerUntilEnabled: number = 10000;
   private isCalendarEnabled: boolean = false;
 
   constructor(containerId: string) {
@@ -215,7 +215,7 @@ export class Calendar {
       const min = parseInt(slider.getAttribute('data-min') || '0');
       const max = parseInt(slider.getAttribute('data-max') || '59');
       const step = parseInt(slider.getAttribute('data-step') || '1');
-      const handle: HTMLElement = slider.querySelector('.ui-slider-handle');
+      const handle: HTMLElement | null = slider.querySelector('.ui-slider-handle');
 
       const updateSliderPosition = (clientX: number) => {
         const rect = slider.getBoundingClientRect();
@@ -224,7 +224,9 @@ export class Calendar {
         percentage = Math.max(0, Math.min(1, percentage));
         const value = Math.round((percentage * (max - min) + min) / step) * step;
 
-        handle.style.left = `${percentage * 100}%`;
+        if (handle) {
+          handle.style.left = `${percentage * 100}%`;
+        }
         updateFunction(value);
       };
 
@@ -486,12 +488,12 @@ export class Calendar {
     let dayOfYear = -1;
 
     if (target.classList.contains('ui-datepicker-cal-day')) {
-      const jdayElement: HTMLElement = target.parentElement?.querySelector('.ui-datepicker-jday');
+      const jdayElement: HTMLElement | null | undefined = target.parentElement?.querySelector('.ui-datepicker-jday');
 
       // If we pick the calendar day, find the parent, then get the second span (class === ui-datepicker-jday)
       dayOfYear = parseInt((jdayElement)?.innerText ?? '-1');
     } else if (target.tagName === 'A') {
-      const jdayElement: HTMLElement = target.querySelector('.ui-datepicker-jday');
+      const jdayElement: HTMLElement | null = target.querySelector('.ui-datepicker-jday');
 
       dayOfYear = parseInt((jdayElement)?.innerText ?? '-1');
     } else if (target.classList.contains('ui-datepicker-jday')) {
@@ -580,7 +582,6 @@ export class Calendar {
 
     timeManagerInstance.calculateSimulationTime();
     timeManagerInstance.changePropRate(propRate);
-    settingsManager.isPropRateChange = true;
     this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, 200, -100);
     this.propagationRate = propRate;
   }
@@ -610,7 +611,7 @@ export class Calendar {
     const slider = document.getElementById(sliderId);
 
     if (slider) {
-      const handle: HTMLElement = slider.querySelector('.ui-slider-handle');
+      const handle: HTMLElement | null = slider.querySelector('.ui-slider-handle');
 
       if (handle) {
         handle.style.left = `${((value - min) / range) * 100}%`;
@@ -652,18 +653,24 @@ export class Calendar {
     const today = new Date();
     const jday = this.getUTCDayOfYear(timeManagerInstance.simulationTimeObj);
 
-    getEl('jday').innerHTML = jday.toString();
+    const jdayElement = getEl('jday');
+
+    if (jdayElement) {
+      jdayElement.innerHTML = jday.toString();
+    }
     timeManagerInstance.changeStaticOffset(this.simulationDate.getTime() - today.getTime());
-    colorSchemeManagerInstance.setColorScheme(settingsManager.currentColorScheme, true);
+    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
     timeManagerInstance.calculateSimulationTime();
 
     timeManagerInstance.lastBoxUpdateTime = timeManagerInstance.realTime;
 
     try {
       const watchlistOverlay = keepTrackApi.getPlugin(WatchlistOverlay);
-
-      watchlistOverlay.lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;
       const uiManagerInstance = keepTrackApi.getUiManager();
+
+      if (watchlistOverlay) {
+        watchlistOverlay.lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;
+      }
 
       uiManagerInstance.updateNextPassOverlay(true);
     } catch {

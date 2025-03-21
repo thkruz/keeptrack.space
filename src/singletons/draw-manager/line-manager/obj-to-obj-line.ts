@@ -1,6 +1,7 @@
 import { EciArr3 } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { DetailedSatellite } from 'ootk';
 import { Line, LineColors } from './line';
 
@@ -26,7 +27,10 @@ export class ObjToObjLine extends Line {
 
       eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
     } else {
-      throw new Error('Invalid type');
+      errorManagerInstance.debug(`ObjToObjLine: ${this.obj} is not a MissileObject or DetailedSatellite`);
+      this.isGarbage = true;
+
+      return;
     }
 
     if (this.obj2 instanceof MissileObject) {
@@ -36,7 +40,10 @@ export class ObjToObjLine extends Line {
 
       eciArr2 = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
     } else {
-      throw new Error('Invalid type');
+      errorManagerInstance.debug(`ObjToObjLine: ${this.obj2} is not a MissileObject or DetailedSatellite`);
+      this.isGarbage = true;
+
+      return;
     }
 
     this.updateVertBuf(eciArr, eciArr2);

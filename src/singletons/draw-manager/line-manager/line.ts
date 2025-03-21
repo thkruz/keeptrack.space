@@ -24,9 +24,10 @@ export const LineColors = {
  * It requires a precompiled shader program and its attributes to work.
  */
 export abstract class Line {
-  private vertBuf_: WebGLBuffer;
+  private readonly vertBuf_: WebGLBuffer;
   protected color_: vec4;
   protected isDraw_ = true;
+  /** This flag is set to true when the line is no longer needed. The garbage collector will handle removing it */
   isGarbage = false;
 
   constructor() {

@@ -1,4 +1,4 @@
-import { DEG2RAD, Degrees, Kilometers, Radians, TAU } from 'ootk';
+import { DEG2RAD, Degrees, getDayOfYear, Kilometers, Radians, TAU } from 'ootk';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from './constants';
 
 /**
@@ -74,19 +74,6 @@ export const alt2zoom = (alt: Kilometers, minZoomDistance: Kilometers, maxZoomDi
 
 
   return Number.isNaN(zoomLevel) ? MIN_ZOOM_LEVEL : Math.min(Math.max(zoomLevel, MIN_ZOOM_LEVEL), MAX_ZOOM_LEVEL);
-};
-
-export const getDayOfYear = (date = new Date()): number => {
-  const dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-  const mn = date.getUTCMonth();
-  const dn = date.getUTCDate();
-  let dayOfYear = dayCount[mn] + dn;
-
-  if (mn > 1 && isLeapYear_(date)) {
-    dayOfYear++;
-  }
-
-  return dayOfYear;
 };
 
 const isLeapYear_ = (dateIn: Date) => {

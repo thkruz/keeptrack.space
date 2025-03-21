@@ -13,13 +13,13 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SearchManager } from '@app/singletons/search-manager';
 import { CatalogSearch } from '@app/static/catalog-search';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
-import { SatMath } from '@app/static/sat-math';
+import { SatMath, SunStatus } from '@app/static/sat-math';
 import { SensorMath, TearrData } from '@app/static/sensor-math';
 import { StringExtractor } from '@app/static/string-extractor';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import Draggabilly from 'draggabilly';
-import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, PayloadStatus, RfSensor, SpaceObjectType, Sun, cKmPerMs, eci2lla } from 'ootk';
+import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, PayloadStatus, RfSensor, SpaceObjectType, Sun, SunTime, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from '../missile/missile-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -35,7 +35,7 @@ import { SelectSatManager } from './select-sat-manager';
 export class SatInfoBox extends KeepTrackPlugin {
   readonly id = 'SatInfoBox';
   dependencies_: string[] = [SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
   private isVisible_ = false;
 
   constructor() {
@@ -51,13 +51,15 @@ export class SatInfoBox extends KeepTrackPlugin {
   private islaunchDataLoaded_ = false;
   private issatMissionDataLoaded_ = false;
   private isTopLinkEventListenersAdded_ = false;
-  private isActionsSectionCollapsed_ = true;
-  private isIdentifiersSectionCollapsed_ = false;
-  private isOrbitalSectionCollapsed_ = false;
-  private isSecondaryDataSectionCollapsed_ = false;
-  private isSensorDataSectionCollapsed_ = false;
-  private isObjectDataSectionCollapsed_ = false;
-  private isMissionSectionCollapsed_ = false;
+
+  // Starting values of the collapsable sections
+  private readonly isActionsSectionCollapsed_ = true;
+  private readonly isIdentifiersSectionCollapsed_ = false;
+  private readonly isOrbitalSectionCollapsed_ = false;
+  private readonly isSecondaryDataSectionCollapsed_ = false;
+  private readonly isSensorDataSectionCollapsed_ = false;
+  private readonly isObjectDataSectionCollapsed_ = false;
+  private readonly isMissionSectionCollapsed_ = false;
 
   currentTEARR = <TearrData>{
     az: 0,
@@ -155,7 +157,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             if (!sat.position?.x || !sat.position?.y || !sat.position?.z || isNaN(sat.position?.x) || isNaN(sat.position?.y) || isNaN(sat.position?.z)) {
               const newPosition = SatMath.getEci(sat, timeManagerInstance.simulationTimeObj).position as { x: number; y: number; z: number };
 
-              if (!newPosition || (newPosition?.x == 0 && newPosition?.y == 0 && newPosition?.z == 0)) {
+              if (!newPosition || (newPosition?.x === 0 && newPosition?.y === 0 && newPosition?.z === 0)) {
                 keepTrackApi
                   .getUiManager()
                   .toast(
@@ -198,7 +200,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               inView: isInView,
             };
 
-            this.currentTEARR = currentTearr; // TODO: Make SatMath 100% static
+            this.currentTEARR = currentTearr;
           } else {
             // Is Missile
             this.currentTEARR = missileManager.getMissileTEARR(obj as MissileObject);
@@ -324,8 +326,6 @@ export class SatInfoBox extends KeepTrackPlugin {
           }
 
           if (this.selectSatManager_.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
-            console.log('showing secondary sat info');
-            console.log(this.selectSatManager_.secondarySat);
             showEl('secondary-sat-info');
             showEl('sec-angle-link');
           } else if (this.selectSatManager_.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
@@ -574,7 +574,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     lineManagerInstance.createObjToObj(this.selectSatManager_.primarySatObj, this.selectSatManager_.secondarySatObj, LineColors.BLUE);
   }
 
-  private updateOrbitData_ = (sat: DetailedSatellite): void => {
+  private updateOrbitData_(sat: DetailedSatellite): void {
     if (sat.isSatellite()) {
       getEl('sat-apogee').innerHTML = `${sat.apogee.toFixed(0)} km`;
       getEl('sat-perigee').innerHTML = `${sat.perigee.toFixed(0)} km`;
@@ -591,7 +591,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       periodDom.dataset.tooltip = `Mean Motion: ${(MINUTES_PER_DAY / sat.period).toFixed(2)}`;
 
       const now: Date | number | string = new Date();
-      const daysold = SatMath.calcElsetAge(sat, now);
+      const daysold = sat.ageOfElset(now);
       const age = daysold >= 1 ? daysold : daysold * 24;
       const units = daysold >= 1 ? 'Days' : 'Hours';
       const elsetAgeDom = getEl('sat-elset-age');
@@ -621,7 +621,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       getEl('sec-angle-link')?.addEventListener('click', this.drawLineToSat_.bind(this));
       this.isTopLinkEventListenersAdded_ = true;
     }
-  };
+  }
 
   private addRemoveWatchlist_() {
     const watchlistPlugin = keepTrackApi.getPlugin(WatchlistPlugin);
@@ -667,7 +667,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private static updateObjectData_ = (obj: BaseObject): void => {
+  private static updateObjectData_(obj: BaseObject): void {
     if (!obj || obj.isStatic() || obj.isSensor()) {
       return;
     }
@@ -683,7 +683,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
     getEl('sat-alt-name').innerHTML = isHasAltName ? (obj as DetailedSatellite).altName : 'N/A';
 
-    const watchlistPlugin = <WatchlistPlugin>keepTrackApi.getPlugin(WatchlistPlugin);
+    const watchlistPlugin = keepTrackApi.getPlugin(WatchlistPlugin);
 
     if (watchlistPlugin) {
       if (watchlistPlugin.isOnWatchlist(obj.id)) {
@@ -729,7 +729,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       getEl('sat-source').innerHTML = sat.source || CatalogSource.CELESTRAK;
       SatInfoBox.updateRcsData_(sat);
     }
-  };
+  }
 
   private static updateLaunchData_(obj?: BaseObject) {
     if (!obj || (!obj.isSatellite() && !obj.isMissile())) {
@@ -791,7 +791,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
   private static updateLaunchSiteCorrelationTable_(obj: BaseObject) {
     let siteArr = [];
-    let site = {} as any;
+    const site = {} as any;
     let missileLV: any;
     let missileOrigin: any;
     let satLvString: any;
@@ -804,15 +804,17 @@ export class SatInfoBox extends KeepTrackPlugin {
       missileLV = misl.desc.split('(')[1].split(')')[0]; // Remove the () from the booster type
 
       site.site = missileOrigin;
-      site.sitec = misl.country;
+      site.launchPad = 'Unknown';
     } else {
       const sat = obj as DetailedSatellite;
 
-      site = StringExtractor.extractLaunchSite(sat.launchSite);
+      // Enhanced Catalog uses full names
+      site.site = sat.launchSite?.length > 6 ? sat.launchSite : StringExtractor.extractLaunchSite(sat.launchSite).site;
+      site.launchPad = sat.launchPad;
     }
 
-    getEl('sat-site').innerHTML = site.site;
-    getEl('sat-sitec').innerHTML = site.sitec;
+    getEl('sat-launchSite').innerHTML = site.site;
+    getEl('sat-launchPad').innerHTML = site.launchPad;
 
     return { missileLV, satLvString };
   }
@@ -855,8 +857,8 @@ export class SatInfoBox extends KeepTrackPlugin {
               <div class="sat-info-key" data-position="top" data-delay="50"
                 data-tooltip="Location Where Object Launched From">Launch Site</div>
               <div class="sat-info-value">
-                <div id="sat-site">SITE</div>
-                <div id="sat-sitec">LAUNCH COUNTRY</div>
+                <div id="sat-launchSite">LAUNCH SITE</div>
+                <div id="sat-launchPad">LAUNCH PAD</div>
               </div>
               </div>
             <div class="sat-info-row">
@@ -1271,6 +1273,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       }
 
 
+      getEl('sat-mission').innerHTML = sat?.mission && sat?.mission !== '' ? sat?.mission : 'Unknown';
       getEl('sat-purpose').innerHTML = sat?.purpose && sat?.purpose !== '' ? sat?.purpose : 'Unknown';
       getEl('sat-contractor').innerHTML = sat?.manufacturer && sat?.manufacturer !== '' ? sat?.manufacturer : 'Unknown';
       // Update with other mass options
@@ -1285,6 +1288,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       getEl('sat-bus').innerHTML = sat?.bus && sat?.bus !== '' ? sat?.bus : 'Unknown';
       getEl('sat-configuration').innerHTML = sat?.configuration && sat?.configuration !== '' ? sat?.configuration : 'Unknown';
       getEl('sat-payload').innerHTML = sat?.payload && sat?.payload !== '' ? sat?.payload : 'Unknown';
+      getEl('sat-equipment').innerHTML = sat?.equipment && sat?.equipment !== '' ? sat?.equipment : 'Unknown';
       getEl('sat-motor').innerHTML = sat?.motor && sat?.motor !== '' ? sat?.motor : 'Unknown';
       getEl('sat-length').innerHTML = sat?.length && sat?.length !== '' ? `${sat?.length} m` : 'Unknown';
       getEl('sat-diameter').innerHTML = sat?.diameter && sat?.diameter !== '' ? `${sat?.diameter} m` : 'Unknown';
@@ -1364,6 +1368,15 @@ export class SatInfoBox extends KeepTrackPlugin {
           </div>
           <div class="sat-info-row sat-only-info">
             <div class="sat-info-key" data-position="top" data-delay="50"
+              data-tooltip="Overview of the Satellite's Mission">
+              Mission
+            </div>
+            <div class="sat-info-value" id="sat-mission">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key" data-position="top" data-delay="50"
               data-tooltip="Primary User of the Satellite">
               User
             </div>
@@ -1430,6 +1443,15 @@ export class SatInfoBox extends KeepTrackPlugin {
               Payload
             </div>
             <div class="sat-info-value" id="sat-payload">
+              NO DATA
+            </div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key" data-position="top" data-delay="50"
+              data-tooltip="Equipment on the Satellite">
+              Equipment
+            </div>
+            <div class="sat-info-value" id="sat-equipment">
               NO DATA
             </div>
           </div>
@@ -1510,76 +1532,71 @@ export class SatInfoBox extends KeepTrackPlugin {
       }
     }
 
-    if (!sensorManagerInstance.currentSensors[0]?.lat) {
+    if (!sensorManagerInstance.isSensorSelected()) {
       const satSunDom = getEl('sat-sun');
 
       if (satSunDom) {
         satSunDom.parentElement.style.display = 'none';
       }
     } else {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
-      const now = new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.propOffset);
+      SatInfoBox.calculateSunStatus_(obj);
+    }
+  }
 
-      let satInSun = -1;
-      let sunTime;
+  private static calculateSunStatus_(obj: BaseObject) {
+    let satInSun: SunStatus;
+    let sunTime: SunTime;
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const now = new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.propOffset);
 
-      try {
-        sunTime = Sun.getTimes(now, sensorManagerInstance.currentSensors[0].lat, sensorManagerInstance.currentSensors[0].lon);
-        satInSun = SatMath.calculateIsInSun(obj, keepTrackApi.getScene().sun.eci);
-      } catch {
-        satInSun = -1;
-      }
+    try {
+      sunTime = Sun.getTimes(now, sensorManagerInstance.currentSensors[0].lat, sensorManagerInstance.currentSensors[0].lon);
+      satInSun = SatMath.calculateIsInSun(obj, keepTrackApi.getScene().sun.eci);
+    } catch {
+      satInSun = SunStatus.UNKNOWN;
+    }
 
+    // If No Sensor, then Ignore Sun Exclusion
+    const satSunDom = getEl('sat-sun');
+
+    if (satSunDom) {
       // If No Sensor, then Ignore Sun Exclusion
-      const satSunDom = getEl('sat-sun');
-
-      if (sensorManagerInstance.currentSensors[0].lat === null) {
-        if (satSunDom) {
-          satSunDom.parentElement.style.display = 'none';
-        }
+      if (!sensorManagerInstance.isSensorSelected()) {
+        satSunDom.parentElement.style.display = 'none';
 
         return;
-      } else if (satSunDom) {
-        satSunDom.parentElement.style.display = 'flex';
       }
+      satSunDom.parentElement.style.display = 'flex';
 
       // If Radar Selected, then Say the Sun Doesn't Matter
-      if (sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OPTICAL && sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OBSERVER && satSunDom) {
+      if (sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OPTICAL && sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OBSERVER) {
         satSunDom.innerHTML = 'No Effect';
-        // If Dawn Dusk Can be Calculated then show if the satellite is in the sun
-      } else if (sunTime?.sunriseStart.getTime() - now.getTime() > 0 || (sunTime?.sunsetEnd.getTime() - now.getTime() < 0 && satSunDom)) {
-        if (satInSun == 0) {
+
+        return;
+      }
+
+      // If we are in the sun exclusion zone, then say so
+      if (sunTime?.sunriseStart.getTime() - now.getTime() < 0 || (sunTime?.sunsetEnd.getTime() - now.getTime() > 0)) {
+        // Unless you are in sun exclusion
+        satSunDom.innerHTML = 'Sun Exclusion';
+      }
+
+      // If it is night then tell the user if the satellite is illuminated
+      switch (satInSun) {
+        case SunStatus.UMBRAL:
           satSunDom.innerHTML = 'No Sunlight';
-        }
-        if (satInSun == 1) {
+          break;
+        case SunStatus.PENUMBRAL:
           satSunDom.innerHTML = 'Limited Sunlight';
-        }
-        if (satInSun == 2) {
+          break;
+        case SunStatus.SUN:
           satSunDom.innerHTML = 'Direct Sunlight';
-        }
-        /*
-         * If Optical Sesnor but Dawn Dusk Can't Be Calculated, then you are at a
-         * high latitude and we need to figure that out
-         */
-      } else if (sunTime?.nadir != 'Invalid Date' && (sunTime?.sunriseStart == 'Invalid Date' || sunTime?.sunsetEnd == 'Invalid Date') && satSunDom) {
-        // TODO: Figure out how to calculate this
-        console.debug('No Dawn or Dusk');
-        if (satInSun == 0) {
-          satSunDom.innerHTML = 'No Sunlight';
-        }
-        if (satInSun == 1) {
-          satSunDom.innerHTML = 'Limited Sunlight';
-        }
-        if (satInSun == 2) {
-          satSunDom.innerHTML = 'Direct Sunlight';
-        }
-      } else if (satSunDom) {
-        if (satInSun == -1) {
+          break;
+        case SunStatus.UNKNOWN:
+        default:
           satSunDom.innerHTML = 'Unable to Calculate';
-        } else {
-          // Unless you are in sun exclusion
-          satSunDom.innerHTML = 'Sun Exclusion';
-        }
+          break;
       }
     }
   }

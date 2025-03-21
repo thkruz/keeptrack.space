@@ -240,7 +240,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
         rcs = rcsEst ? `${rcsEst.toFixed(2)}` : 'Unknown';
       }
 
-      age = sat ? `${SatMath.calcElsetAge(sat, new Date(), 'hours').toFixed(2)}` : 'Unknown';
+      age = sat ? `${sat.ageOfElset(new Date(), 'hours').toFixed(2)}` : 'Unknown';
 
       // remove any non-numeric characters from the length, diameter, and span
       const span = sat?.span ? parseFloat(sat.span.replace(/[^0-9.]/gu, '')) : -1;

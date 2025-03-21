@@ -254,7 +254,7 @@ export class SettingsManager {
    */
   orbitGroupAlpha = 0.5;
   loopTimeMachine = null;
-  isDisableSelectSat = null;
+  isDisableSelectSat: boolean | null = null;
   timeMachineLongToast = false;
   lastInteractionTime = 0;
   /**
@@ -289,7 +289,7 @@ export class SettingsManager {
    *
    * These can then be used in the mesh manager to force a specific mesh to be used
    */
-  meshListOverride = [];
+  meshListOverride: string[] = [];
   isDebrisOnly = false;
   isDisableCss = null;
   /**
@@ -642,7 +642,7 @@ export class SettingsManager {
      *
      * It can be loaded from a local file or a remote source
      */
-    tle: 'https://api.keeptrack.space/v2/sats',
+    tle: 'http://127.0.0.1:8787/v3/sats',
     tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
     vimpel: 'https://r2.keeptrack.space/vimpel.json',
   };
@@ -728,11 +728,6 @@ export class SettingsManager {
    * List of the last search results
    */
   lastSearchResults = [];
-  /**
-   * @deprecated
-   * Global flag for determining if the legend is open
-   */
-  legendMenuOpen = false;
   /**
    * String to limit which satellites are loaded from the catalog
    */
@@ -1134,8 +1129,8 @@ export class SettingsManager {
    * When set to `false`, the system may use internal or other sources of TLE data.
    */
   externalTLEsOnly = false;
-  positionCruncher: Worker = null;
-  orbitCruncher: Worker = null;
+  positionCruncher: Worker | null = null;
+  orbitCruncher: Worker | null = null;
   /** Enables the camera widget */
   drawCameraWidget = false;
 
@@ -1296,7 +1291,10 @@ export class SettingsManager {
      * URL Params > Local Storage > Default
      */
     this.loadPersistedSettings();
-    this.loadOverrides_(settingsOverride);
+
+    if (settingsOverride) {
+      this.loadOverrides_(settingsOverride);
+    }
 
     const params = this.loadOverridesFromUrl_();
 
@@ -1593,7 +1591,7 @@ export class SettingsManager {
                     if (sccNum >= 0) {
                       const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
 
-                      if (id >= 0) {
+                      if (id && id >= 0) {
                         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
                       } else {
                         keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
@@ -1632,7 +1630,6 @@ export class SettingsManager {
             this.smallImages = true;
             break;
           case 'lowperf':
-            // this.lowPerf = true;
             this.isShowSplashScreen = false;
             this.isDrawMilkyWay = false;
             this.isDrawLess = true;
@@ -1809,7 +1806,7 @@ export class SettingsManager {
     a.click();
   }
 
-  private loadOverrides_(settingsOverride: any) {
+  private loadOverrides_(settingsOverride: SettingsManagerOverride) {
     // combine settingsOverride with window.settingsOverride
     const overrides = { ...settingsOverride, ...window.settingsOverride };
     // override values in this with overrides
@@ -1879,19 +1876,6 @@ export class SettingsManager {
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
   timeMachineString(_yearStr: string): string | boolean {
     return false;
-  }
-
-  /**
-   * @deprecated
-   * Sets the current color scheme in the settings only.
-   */
-  setCurrentColorScheme(val: any): void {
-    if (!val) {
-      console.warn('Settings Manager: Invalid color scheme');
-
-      return;
-    }
-    this.currentColorScheme = val;
   }
 }
 

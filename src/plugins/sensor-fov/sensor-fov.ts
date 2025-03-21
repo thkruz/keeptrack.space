@@ -24,7 +24,6 @@ import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import fovPng from '@public/img/icons/fov.png';
-import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
@@ -53,15 +52,15 @@ export class SensorFov extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.id,
-      cb: (sensor: Sensor | string): void => {
+      cb: (sensor): void => {
         if (sensor) {
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
+          getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
         } else {
-          getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconDisabledClassString);
+          getEl(this.bottomIconElementName)?.classList.add(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = true;
           this.isMenuButtonActive = false;
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
+          getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
         }
       },
     });
@@ -69,15 +68,15 @@ export class SensorFov extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.sensorDotSelected,
       cbName: this.id,
-      cb: (sensor: Sensor): void => {
+      cb: (sensor): void => {
         if (sensor) {
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconDisabledClassString);
+          getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
         } else {
-          getEl(this.bottomIconElementName).classList.add(KeepTrackPlugin.iconDisabledClassString);
+          getEl(this.bottomIconElementName)?.classList.add(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = true;
           this.isMenuButtonActive = false;
-          getEl(this.bottomIconElementName).classList.remove(KeepTrackPlugin.iconSelectedClassString);
+          getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
         }
       },
     });

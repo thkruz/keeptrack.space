@@ -9,7 +9,6 @@ import findSatPng from '@public/img/icons/database-search.png';
 
 import { countryCodeList, countryNameList } from '@app/catalogs/countries';
 import { CatalogExporter } from '@app/static/catalog-exporter';
-import { SatMath } from '@app/static/sat-math';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -629,7 +628,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const now = new Date();
 
     return possibles.filter((possible) => {
-      const ageHours = SatMath.calcElsetAge(possible, now, 'hours');
+      const ageHours = possible.ageOfElset(now);
 
 
       return ageHours >= minTleAge && ageHours <= maxTleAge;

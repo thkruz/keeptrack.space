@@ -35,8 +35,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SunStatus } from '@app/static/sat-math';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Days, DetailedSatellite, SpaceObjectType, Star } from 'ootk';
-import { getDayOfYear } from '../lib/transforms';
+import { BaseObject, Days, DetailedSatellite, getDayOfYear, SpaceObjectType, Star } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
 import { MissileObject } from './catalog-manager/MissileObject';
@@ -231,7 +230,7 @@ export class ColorSchemeManager {
      */
 
     if (!params) {
-      // errorManagerInstance.warn('No params passed to ageOfElset');
+      errorManagerInstance.debug('No params passed to ageOfElset');
       const now = new Date();
 
       params = {
@@ -240,8 +239,8 @@ export class ColorSchemeManager {
       };
     }
 
-    const jday = params?.jday || 0;
-    const currentYearShort = params?.year || 0;
+    const jday = params?.jday ?? 0;
+    const currentYearShort = params?.year ?? 0;
 
     if (obj.isStar()) {
       return this.starColor_(obj as Star);
@@ -462,7 +461,7 @@ export class ColorSchemeManager {
       cb: () => {
         keepTrackApi.getColorSchemeManager().calculateColorBuffers();
       },
-      validationFunc: (m: PositionCruncherOutgoingMsg) => m.satInView?.length > 0,
+      validationFunc: (m: PositionCruncherOutgoingMsg) => (!!((m.satInView?.length && m.satInView?.length > 0))),
       isSkipFirst: true,
       isRunCbOnFailure: true,
       maxRetries: 5,
@@ -510,7 +509,7 @@ export class ColorSchemeManager {
       // Velocity is a special case - we need to know the velocity of each satellite
 
       if (this.currentColorScheme?.name === this.velocity.name) {
-        this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, satVel, params);
+        this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, satVel as Float32Array, params);
       } else {
         this.calculateBufferData_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, params);
       }
@@ -651,7 +650,7 @@ export class ColorSchemeManager {
         this.objectTypeFlags.payload === false) ||
       (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
+        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
         sat.type === SpaceObjectType.PAYLOAD &&
         this.objectTypeFlags.payload === false)
@@ -667,7 +666,7 @@ export class ColorSchemeManager {
         this.objectTypeFlags.rocketBody === false) ||
       (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
+        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
         sat.type === SpaceObjectType.ROCKET_BODY &&
         this.objectTypeFlags.rocketBody === false)
@@ -683,7 +682,7 @@ export class ColorSchemeManager {
         this.objectTypeFlags.debris === false) ||
       (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
+        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
         sat.type === SpaceObjectType.DEBRIS &&
         this.objectTypeFlags.debris === false)
@@ -703,7 +702,7 @@ export class ColorSchemeManager {
         (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
+        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
         (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false)
@@ -722,7 +721,7 @@ export class ColorSchemeManager {
     }
 
     if (dotsManagerInstance.inViewData?.[sat.id] === 1 && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
-      if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
+      if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
         // Intentional
       } else {
         return {
@@ -968,8 +967,8 @@ export class ColorSchemeManager {
     };
 
     this.resetObjectTypeFlags();
-    this.colorBuffer = renderer.gl.createBuffer() as WebGLBuffer;
-    this.pickableBuffer = renderer.gl.createBuffer() as WebGLBuffer;
+    this.colorBuffer = renderer.gl.createBuffer();
+    this.pickableBuffer = renderer.gl.createBuffer();
 
     // Create the color buffers as soon as the position cruncher is ready
     keepTrackApi.register({
@@ -1147,8 +1146,8 @@ export class ColorSchemeManager {
   }
 
   neighbors(obj: BaseObject, params?: {
-    orbitDensity?: number[][];
-    orbitDensityMax?: number;
+    orbitDensity: number[][];
+    orbitDensityMax: number;
   }): ColorInformation {
     /*
      * NOSONAR
@@ -1412,26 +1411,25 @@ export class ColorSchemeManager {
   }
 
   async setColorScheme(scheme: ((obj: BaseObject, params?: {
-    orbitDensity?: number[][];
-    orbitDensityMax?: number;
-    jday?: number;
-    year?: number;
+    orbitDensity: number[][];
+    orbitDensityMax: number;
+  } & {
+    jday: number;
+    year: number;
   }) => ColorInformation) | null, isForceRecolor?: boolean) {
     try {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
       scheme ??= this.default;
-      const possibleColorScheme = this[scheme.name];
+      const possibleColorScheme = this[scheme.name] as ColorRuleSet;
 
-      this.currentColorScheme = possibleColorScheme ? possibleColorScheme : this.default;
-      settingsManager.setCurrentColorScheme(this.currentColorScheme); // Deprecated
+      this.currentColorScheme = possibleColorScheme ?? this.default;
       this.calculateColorBuffers(isForceRecolor);
       dotsManagerInstance.buffers.color = this.colorBuffer;
       dotsManagerInstance.buffers.pickability = this.pickableBuffer;
     } catch (error) {
       // If we can't load the color scheme, just use the default
       errorManagerInstance.log(error);
-      settingsManager.setCurrentColorScheme(this.default);
       this.currentColorScheme = this.default;
       this.calculateColorBuffers(isForceRecolor);
     }
@@ -1979,7 +1977,7 @@ export class ColorSchemeManager {
   private preValidateColorScheme_(isForceRecolor = false) {
     if (this.currentColorScheme === this.group || this.currentColorScheme === this.groupCountries) {
       const watchlistMenu = getEl('watchlist-menu');
-      const watchlistTransform = watchlistMenu?.style.transform || '';
+      const watchlistTransform = watchlistMenu?.style.transform ?? '';
 
       if (
         keepTrackApi.getUiManager().searchManager.getCurrentSearch() === '' &&
@@ -2052,7 +2050,7 @@ export class ColorSchemeManager {
   private setSelectedAndHoverBuffer_() {
     const selSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
 
-    if (selSat > -1) {
+    if (selSat && selSat > -1) {
       // Selected satellites are always one color so forget whatever we just did
       this.colorData[selSat * 4] = settingsManager.selectedColor[0]; // R
       this.colorData[selSat * 4 + 1] = settingsManager.selectedColor[1]; // G

@@ -2,6 +2,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { slideInDown, slideOutUp } from '@app/lib/slide';
 import { ConeSettings } from '@app/singletons/draw-manager/cone-mesh';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Degrees, Kilometers } from 'ootk';
 import { SettingsManager } from './../settings';
 
@@ -50,7 +51,7 @@ export const sateliot = (settingsManager: SettingsManager) => {
   const isMobile = window.innerWidth < 1024;
 
   if (isMobile) {
-    console.log('isMobile');
+    errorManagerInstance.debug('isMobile');
     settingsManager.maxZoomDistance = <Kilometers>150000;
     settingsManager.zFar = 300000;
   }
@@ -58,7 +59,7 @@ export const sateliot = (settingsManager: SettingsManager) => {
   const isTablet = window.innerWidth < 1024 && window.innerWidth > 768;
 
   if (isTablet) {
-    console.log('isTablet');
+    errorManagerInstance.debug('isTablet');
     settingsManager.maxZoomDistance = <Kilometers>100000;
     settingsManager.zFar = 300000;
   }
@@ -99,20 +100,27 @@ export const sateliot = (settingsManager: SettingsManager) => {
 
     // open/close results
     getEl('toggle-search-icon')?.addEventListener('click', () => {
-      // const searchResults = getEl('search-results');
+      const searchResults = getEl('search-results');
+
+      if (!searchResults) {
+        errorManagerInstance.warn('search-results element not found');
+
+        return;
+      }
+
       const searchManagerInstance = keepTrackApi.getUiManager().searchManager;
 
       searchManagerInstance.isSearchOpen = !searchManagerInstance.isSearchOpen;
       if (searchManagerInstance.isSearchOpen) {
-        slideOutUp(getEl('search-results'), 1000);
+        slideOutUp(searchResults, 1000);
       } else {
-        slideInDown(getEl('search-results'), 1000);
+        slideInDown(searchResults, 1000);
       }
     });
 
     // restore the view
     getEl('restore-view-icon')?.addEventListener('click', () => {
-      console.log('restore view');
+      errorManagerInstance.debug('restore-view-icon clicked');
       keepTrackApi.getMainCamera().reset();
       keepTrackApi.getMainCamera().lookAtLatLon(41.38160380932027 as Degrees, 2.1420305583779276 as Degrees, 0.67);
     });

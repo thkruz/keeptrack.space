@@ -218,7 +218,7 @@ export class KeepTrack {
       this.update_(dt); // Do any per frame calculations
       this.draw_(dt);
 
-      if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -2 > -1) {
+      if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
         const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
 
         if (selectedSatellite) {

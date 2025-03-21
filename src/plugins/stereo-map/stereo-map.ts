@@ -146,7 +146,7 @@ export class StereoMap extends KeepTrackPlugin {
     keyboardManager.registerKeyUpEvent({
       key: 'M',
       callback: () => {
-        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -2 <= -1) {
+        if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
           return;
         }
 
@@ -166,7 +166,7 @@ export class StereoMap extends KeepTrackPlugin {
 
   updateMap(): void {
     try {
-      if (this.selectSatManager_?.selectedSat ?? -2 <= -1) {
+      if ((this.selectSatManager_?.selectedSat ?? -1) <= -1) {
         return;
       }
       if (!this.isMenuButtonActive) {

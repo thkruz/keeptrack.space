@@ -653,7 +653,7 @@ export abstract class KeepTrackPlugin {
      * const searchDom = getEl('search', true);
      * if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
      */
-    if (!(keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -2 > -1)) {
+    if (!((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1)) {
       errorManagerInstance.warn(i18next.t('errorMsgs.SelectSatelliteFirst'), true);
       shake(getEl(this.bottomIconElementName));
 

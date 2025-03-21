@@ -59,6 +59,10 @@ a,
   display: none !important;
 }
 
+.eruda-entry-btn {
+  display: none !important;
+}
+
 #keeptrack-root {
   margin: 0;
   position: absolute;

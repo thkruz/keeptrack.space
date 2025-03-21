@@ -19,7 +19,7 @@ import { GroupType } from './object-group';
 import { Scene } from './scene';
 
 export class WebGLRenderer {
-  private hoverBoxOnSatMiniElements_ = null;
+  private hoverBoxOnSatMiniElements_: HTMLElement | null = null;
   private isRotationEvent_: boolean;
   private isSatMiniBoxInUse_ = false;
   private labelCount_ = 0;
@@ -61,8 +61,8 @@ export class WebGLRenderer {
   projectionCameraMatrix: mat4;
   postProcessingManager: PostProcessingManager;
 
-  private selectSatManager_: SelectSatManager;
-  sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime };
+  private selectSatManager_: SelectSatManager | null;
+  sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } | null = null;
 
   static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
     const pMatrix = mat4.create();
@@ -79,10 +79,10 @@ export class WebGLRenderer {
 
   static getCanvasInfo(): { vw: number; vh: number } {
     // Using minimum allows the canvas to be full screen without fighting with scrollbars
-    const cw = keepTrackApi.containerRoot.clientWidth || document.documentElement.clientWidth || 0;
+    const cw = keepTrackApi.containerRoot?.clientWidth ?? document.documentElement.clientWidth ?? 0;
     const iw = window.innerWidth || 0;
     const vw = Math.min.apply(null, [cw, iw].filter(Boolean));
-    const vh = Math.min(keepTrackApi.containerRoot.clientHeight || document.documentElement.clientHeight || 0, window.innerHeight || 0);
+    const vh = Math.min(keepTrackApi.containerRoot?.clientHeight ?? document.documentElement.clientHeight ?? 0, window.innerHeight ?? 0);
 
     return { vw, vh };
   }
@@ -254,7 +254,10 @@ export class WebGLRenderer {
       if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
         if (this.isSatMiniBoxInUse_) {
           this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
-          this.hoverBoxOnSatMiniElements_.innerHTML = '';
+
+          if (this.hoverBoxOnSatMiniElements_) {
+            this.hoverBoxOnSatMiniElements_.innerHTML = '';
+          }
         }
         this.isSatMiniBoxInUse_ = false;
 

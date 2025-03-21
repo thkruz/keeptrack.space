@@ -230,6 +230,10 @@ export class KeepTrack {
   }
 
   static getDefaultBodyHtml(): void {
+    if (!keepTrackApi.containerRoot) {
+      throw new Error('Container root is not set');
+    }
+
     SplashScreen.initLoadingScreen(keepTrackApi.containerRoot);
 
     keepTrackApi.containerRoot.id = 'keeptrack-root';
@@ -623,6 +627,7 @@ theodore.kruczek at gmail dot com.
 
     // Display it if that settings is enabled
     if (this.isShowFPS) {
+      // eslint-disable-next-line no-console
       console.log(KeepTrack.getFps_(renderer.dt));
     }
 

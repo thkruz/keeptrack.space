@@ -253,7 +253,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
 
     // Deselect any satellites
-    if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -2 <= -1) {
+    if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
       try {
         keepTrackApi
           .getMainCamera()

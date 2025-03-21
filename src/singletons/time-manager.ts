@@ -130,7 +130,7 @@ export class TimeManager {
       }
 
       if (!settingsManager.disableUI) {
-        const datetimeTextElement = getEl('datetime-text');
+        const datetimeTextElement = getEl('datetime-text', true);
 
         if (!datetimeTextElement) {
           errorManagerInstance.debug('Datetime text element not found');

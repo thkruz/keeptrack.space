@@ -218,8 +218,13 @@ export class KeepTrack {
       this.update_(dt); // Do any per frame calculations
       this.draw_(dt);
 
-      if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
-        keepTrackApi.getUiManager().updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, keepTrackApi.getPlugin(SelectSatManager).getSelectedSat());
+      if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -2 > -1) {
+        const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
+
+        if (selectedSatellite) {
+          keepTrackApi.getUiManager().
+            updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, selectedSatellite);
+        }
       }
     }
   }
@@ -569,12 +574,14 @@ theodore.kruczek at gmail dot com.
 
           console.config.set('catchGlobalErr', false);
 
-          const erudaContainerDom = getEl('eruda-console').parentElement.parentElement;
+          const erudaContainerDom = getEl('eruda-console')?.parentElement?.parentElement;
 
-          erudaContainerDom.style.top = 'calc(var(--top-menu-height) + 30px)';
-          erudaContainerDom.style.height = '80%';
-          erudaContainerDom.style.width = '60%';
-          erudaContainerDom.style.left = '20%';
+          if (erudaContainerDom) {
+            erudaContainerDom.style.top = 'calc(var(--top-menu-height) + 30px)';
+            erudaContainerDom.style.height = '80%';
+            erudaContainerDom.style.width = '60%';
+            erudaContainerDom.style.left = '20%';
+          }
         }
       }
 
@@ -592,6 +599,7 @@ theodore.kruczek at gmail dot com.
       window.addEventListener('resize', () => {
         keepTrackApi.runEvent(KeepTrackApiEvents.resize);
       });
+      keepTrackApi.runEvent(KeepTrackApiEvents.resize);
 
       keepTrackApi.isInitialized = true;
       keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);

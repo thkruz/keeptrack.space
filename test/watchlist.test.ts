@@ -1,4 +1,3 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
@@ -24,8 +23,6 @@ describe('WatchlistPlugin_form', () => {
 
   beforeEach(() => {
     setupDefaultHtml();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     watchlistPlugin = new WatchlistPlugin();
     window.M = {
       keys: {
@@ -35,8 +32,9 @@ describe('WatchlistPlugin_form', () => {
         ARROW_UP: 38,
         ARROW_DOWN: 40,
       },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
+    websiteInit(watchlistPlugin);
   });
 
   it('should be initialized', () => {

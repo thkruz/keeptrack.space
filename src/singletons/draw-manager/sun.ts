@@ -20,6 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 /* eslint-disable camelcase */
+import { EciArr3 } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { GlUtils } from '@app/static/gl-utils';
 import { GLSL3 } from '@app/static/material';
@@ -56,11 +57,15 @@ export class Sun {
   /** The position of the sun in WebGL coordinates. */
   position = [0, 0, 0] as vec3;
   sizeRandomFactor_ = 0.0;
+  /**
+   * Keeps the last 1 sun direction calculations in memory to avoid unnecessary calculations.
+   */
+  sunDirectionCache: { jd: number; sunDirection: EciArr3; } = { jd: 0, sunDirection: [0, 0, 0] };
 
   /**
    * This is run once per frame to render the sun.
    */
-  draw(earthLightDirection: vec3, tgtBuffer: WebGLFramebuffer = null) {
+  draw(earthLightDirection: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_) {
       return;
     }
@@ -71,8 +76,10 @@ export class Sun {
 
     this.setUniforms_(earthLightDirection);
 
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
+    if (this.mesh.material.map) {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
+    }
 
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -93,11 +100,11 @@ export class Sun {
     const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun-1024.jpg`);
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
-        u_sampler: <WebGLUniformLocation>null,
-        u_lightDirection: <WebGLUniformLocation>null,
-        u_sizeOfSun: <WebGLUniformLocation>null,
-        u_sunDistance: <WebGLUniformLocation>null,
-        u_isTexture: <WebGLUniformLocation>null,
+        u_sampler: <WebGLUniformLocation | null>null,
+        u_lightDirection: <WebGLUniformLocation | null>null,
+        u_sizeOfSun: <WebGLUniformLocation | null>null,
+        u_sunDistance: <WebGLUniformLocation | null>null,
+        u_isTexture: <WebGLUniformLocation | null>null,
       },
       map: texture,
       vertexShader: this.shaders_.vert,

@@ -219,18 +219,28 @@ export class TimeManager {
       key: ',',
       callback: () => {
         this.calculateSimulationTime();
+        let newPropRate = this.propRate;
+
         if (this.propRate < 0.001 && this.propRate > -0.001) {
-          this.changePropRate(-0.001);
+          newPropRate = -0.001;
         }
 
         if (this.propRate < -1000) {
-          this.changePropRate(-1000);
+          newPropRate = -1000;
         }
 
-        if (this.propRate < 0) {
-          this.changePropRate(this.propRate * 1.5);
+        if (newPropRate < 0) {
+          newPropRate = (this.propRate * 1.5);
         } else {
-          this.changePropRate((this.propRate * 2) / 3);
+          newPropRate = ((this.propRate * 2) / 3);
+        }
+
+        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+
+        if (calendarInstance) {
+          calendarInstance.updatePropRate(newPropRate);
+        } else {
+          this.changePropRate(newPropRate);
         }
       },
     });
@@ -239,18 +249,28 @@ export class TimeManager {
       key: '.',
       callback: () => {
         this.calculateSimulationTime();
+        let newPropRate = this.propRate;
+
         if (this.propRate < 0.001 && this.propRate > -0.001) {
-          this.changePropRate(0.001);
+          newPropRate = 0.001;
         }
 
         if (this.propRate > 1000) {
-          this.changePropRate(1000);
+          newPropRate = 1000;
         }
 
-        if (this.propRate > 0) {
-          this.changePropRate(this.propRate * 1.5);
+        if (newPropRate > 0) {
+          newPropRate = (this.propRate * 1.5);
         } else {
-          this.changePropRate((this.propRate * 2) / 3);
+          newPropRate = ((this.propRate * 2) / 3);
+        }
+
+        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+
+        if (calendarInstance) {
+          calendarInstance.updatePropRate(newPropRate);
+        } else {
+          this.changePropRate(newPropRate);
         }
       },
     });
@@ -276,10 +296,20 @@ export class TimeManager {
     keyboardManager.registerKeyEvent({
       key: '/',
       callback: () => {
+        let newPropRate: number;
+
         if (this.propRate === 1) {
-          this.changePropRate(0);
+          newPropRate = 0;
         } else {
-          this.changePropRate(1);
+          newPropRate = 1;
+        }
+
+        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+
+        if (calendarInstance) {
+          calendarInstance.updatePropRate(newPropRate);
+        } else {
+          this.changePropRate(newPropRate);
         }
         this.calculateSimulationTime();
       },

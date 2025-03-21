@@ -14,6 +14,10 @@ export class Calendar {
   private readonly timerUntilEnabled: number = 10000;
   private isCalendarEnabled: boolean = false;
 
+  // PropRate Slider limits
+  private readonly propRateLimitMin = -20;
+  private readonly propRateLimitMax = 20;
+
   constructor(containerId: string) {
     this.containerId = containerId;
     this.calendarDate = new Date();
@@ -195,7 +199,7 @@ export class Calendar {
 
     if (unit === 'rate') {
       currentValue = this.propagationRate;
-      const updatedRate = (currentValue + change);
+      const updatedRate = Math.max(this.propRateLimitMin, Math.min(currentValue + change, this.propRateLimitMax));
 
       this.updatePropRate(updatedRate);
     }
@@ -363,7 +367,9 @@ export class Calendar {
     const hours = this.simulationDate.getUTCHours();
     const minutes = this.simulationDate.getUTCMinutes();
     const seconds = this.simulationDate.getUTCSeconds();
-    const propRate = this.propagationRate;
+    const propRate = Math.max(this.propRateLimitMin, Math.min(this.propagationRate, this.propRateLimitMax));
+    const propRateRange = this.propRateLimitMax - this.propRateLimitMin;
+    const propagationPercentage = ((propRate - this.propRateLimitMin) / propRateRange) * 100;
 
     return keepTrackApi.html`
       <div class="ui-timepicker-div">
@@ -429,8 +435,8 @@ export class Calendar {
           <dt class="ui_tpicker_proprate_label">${i18next.t('Propagation')}</dt>
           <dd class="ui_tpicker_proprate">
             <div id="ui_tpicker_proprate_slider" class="ui_tpicker_proprate_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
-            style="display: inline-block; width: 100px;" data-min="-100" data-max="100" data-step="1">
-              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${(((propRate + 100) / 200) * 100).toString()}%;"></span>
+            style="display: inline-block; width: 100px;" data-min="${this.propRateLimitMin.toString()}" data-max="${this.propRateLimitMax.toString()}" data-step="1">
+              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${(propagationPercentage).toString()}%;"></span>
             </div>
             <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar"
             style="margin-left: 10px; margin-right: 0px;">
@@ -517,7 +523,7 @@ export class Calendar {
     this.attachEvents();
   }
 
-  private setToNow(): void {
+  setToNow(): void {
     this.calendarDate = new Date();
     this.simulationDate = new Date(this.calendarDate);
     this.updatePropRate(1);
@@ -577,14 +583,15 @@ export class Calendar {
     }
   }
 
-  private updatePropRate(propRate: number): void {
+  updatePropRate(propRate: number): void {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
+    propRate = Math.max(this.propRateLimitMin, Math.min(propRate, this.propRateLimitMax));
     timeManagerInstance.calculateSimulationTime();
     timeManagerInstance.changePropRate(propRate);
     this.propagationRate = propRate;
     this.updateTimeInput();
-    this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, 200, -100);
+    this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, (this.propRateLimitMax - this.propRateLimitMin), this.propRateLimitMin);
   }
 
   private updateHour(hour: number): void {

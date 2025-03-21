@@ -307,11 +307,13 @@ export abstract class KeepTrackPlugin {
       this.addSideMenu(sideMenuHtmlWrapped);
 
       keepTrackApi.register({
-        event: KeepTrackApiEvents.uiManagerInit,
+        event: KeepTrackApiEvents.uiManagerFinal,
         cbName: this.id,
         cb: () => {
           getEl(`${this.sideMenuElementName}-settings-btn`)?.addEventListener('click', () => {
             if (!this.isSettingsMenuEnabled_) {
+              errorManagerInstance.debug('Settings menu is disabled');
+
               return;
             }
 

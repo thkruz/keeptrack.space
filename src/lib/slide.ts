@@ -11,7 +11,7 @@ export const slideOutLeft = (el: HTMLElement | null, duration: number, callback?
     return;
   }
   el.style.transition = `transform ${duration / 1000}s ease-in-out`;
-  el.style.transform = `translateX(${offset || -100}%)`;
+  el.style.transform = `translateX(${offset ?? -100}%)`;
   setTimeout(() => {
     if (callback) {
       callback();

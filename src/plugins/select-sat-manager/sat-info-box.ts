@@ -800,9 +800,9 @@ export class SatInfoBox extends KeepTrackPlugin {
     const satMisl = obj as DetailedSatellite | MissileObject;
 
     SatInfoBox.updateCountryCorrelationTable_(satMisl);
-    const { missileLV, satLvString }: { missileLV: string; satLvString: string } = SatInfoBox.updateLaunchSiteCorrelationTable_(satMisl);
+    SatInfoBox.updateLaunchSiteCorrelationTable_(satMisl);
 
-    SatInfoBox.updateLaunchVehicleCorrelationTable_(obj, missileLV, satLvString);
+    SatInfoBox.updateLaunchVehicleCorrelationTable_(obj);
 
     if (satMisl.isMissile()) {
       return;
@@ -813,19 +813,39 @@ export class SatInfoBox extends KeepTrackPlugin {
     getEl('sat-configuration').innerHTML = sat.configuration !== '' ? sat.configuration : 'Unknown';
   }
 
-  private static updateLaunchVehicleCorrelationTable_(obj: BaseObject, missileLV: string, satLvString: string) {
+  private static updateLaunchVehicleCorrelationTable_(obj: BaseObject) {
     let satVehicleDom = getEl('sat-vehicle');
-    // Remove any existing event listeners
+
+    if (!satVehicleDom) {
+      errorManagerInstance.debug('sat-vehicle element not found');
+
+      return;
+    }
+
     const tempEl = satVehicleDom.cloneNode(true);
 
+    if (!satVehicleDom.parentNode) {
+      errorManagerInstance.debug('sat-vehicle element parent not found');
+
+      return;
+    }
+
+    // Remove any existing event listeners
     satVehicleDom.parentNode.replaceChild(tempEl, satVehicleDom);
+
     // Update links
     satVehicleDom = getEl('sat-vehicle');
+
+    if (!satVehicleDom) {
+      errorManagerInstance.debug('sat-vehicle element not found');
+
+      return;
+    }
 
     if (obj.isMissile()) {
       const missile = obj as MissileObject;
 
-      missile.launchVehicle = missileLV;
+      missile.launchVehicle = missile.desc.split('(')[1].split(')')[0]; // Remove the () from the booster type
       satVehicleDom.innerHTML = missile.launchVehicle;
     } else {
       const sat = obj as DetailedSatellite;
@@ -834,7 +854,8 @@ export class SatInfoBox extends KeepTrackPlugin {
       if (sat.launchVehicle === 'U') {
         satVehicleDom.innerHTML = 'Unknown';
       } // Replace with Unknown if necessary
-      satLvString = StringExtractor.extractLiftVehicle(sat.launchVehicle); // Replace with link if available
+      const satLvString = StringExtractor.extractLiftVehicle(sat.launchVehicle); // Replace with link if available
+
       satVehicleDom.innerHTML = satLvString;
 
       if (satLvString.includes('http')) {
@@ -847,23 +868,22 @@ export class SatInfoBox extends KeepTrackPlugin {
         satVehicleDom.classList.remove('pointable');
       }
     }
-
-    return satLvString;
   }
 
   private static updateLaunchSiteCorrelationTable_(obj: BaseObject) {
     let siteArr: string[] = [];
-    const site = {} as any;
-    let missileLV: any;
-    let missileOrigin: any;
-    let satLvString: any;
+    const site = {
+      site: 'Unknown',
+      launchPad: 'Unknown',
+      wikiUrl: null as string | null,
+    };
+    let missileOrigin: string;
 
     if (obj.isMissile()) {
       const misl = obj as MissileObject;
 
       siteArr = misl.desc.split('(');
-      missileOrigin = siteArr[0].substr(0, siteArr[0].length - 1);
-      missileLV = misl.desc.split('(')[1].split(')')[0]; // Remove the () from the booster type
+      missileOrigin = siteArr[0].slice(0, siteArr[0].length - 1);
 
       site.site = missileOrigin;
       site.launchPad = 'Unknown';
@@ -871,14 +891,41 @@ export class SatInfoBox extends KeepTrackPlugin {
       const sat = obj as DetailedSatellite;
 
       // Enhanced Catalog uses full names
-      site.site = sat.launchSite?.length > 6 ? sat.launchSite : StringExtractor.extractLaunchSite(sat.launchSite).site;
+      if (sat.launchSite?.length > 6) {
+        site.site = sat.launchSite;
+      } else {
+        const launchData = StringExtractor.extractLaunchSite(sat.launchSite);
+
+        site.site = launchData.site;
+        site.wikiUrl = launchData.wikiUrl;
+      }
+
       site.launchPad = sat.launchPad;
     }
 
-    getEl('sat-launchSite').innerHTML = site.site;
-    getEl('sat-launchPad').innerHTML = site.launchPad;
+    const launchSiteElement = getEl('sat-launchSite');
+    const launchPadElement = getEl('sat-launchPad');
 
-    return { missileLV, satLvString };
+    if (!launchSiteElement || !launchPadElement) {
+      errorManagerInstance.debug('sat-launchSite or sat-launchPad element not found');
+
+      return;
+    }
+
+    launchPadElement.innerHTML = site.launchPad;
+
+    if (site.wikiUrl) {
+      launchSiteElement.innerHTML = `<a class="iframe" href="${site.wikiUrl}">${site.site}</a>`;
+      launchSiteElement.classList.add('pointable');
+      launchSiteElement.addEventListener('click', (e) => {
+        e.preventDefault();
+        openColorbox((<HTMLAnchorElement>launchSiteElement.firstChild).href);
+      });
+    } else {
+      launchSiteElement.innerHTML = site.site;
+      launchSiteElement.classList.remove('pointable');
+    }
+
   }
 
   private static updateCountryCorrelationTable_(obj: DetailedSatellite | MissileObject) {
@@ -1670,7 +1717,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     if (!sensorManagerInstance.isSensorSelected()) {
       const satSunDom = getEl('sat-sun');
 
-      if (satSunDom) {
+      if (satSunDom?.parentElement) {
         satSunDom.parentElement.style.display = 'none';
       }
     } else {
@@ -1695,7 +1742,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     // If No Sensor, then Ignore Sun Exclusion
     const satSunDom = getEl('sat-sun');
 
-    if (satSunDom) {
+    if (satSunDom?.parentElement) {
       // If No Sensor, then Ignore Sun Exclusion
       if (!sensorManagerInstance.isSensorSelected()) {
         satSunDom.parentElement.style.display = 'none';
@@ -1843,7 +1890,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       (id) => {
         const el = getEl(id, true);
 
-        if (!el) {
+        if (!el?.parentElement) {
           return;
         }
         hideEl(el.parentElement);
@@ -1869,7 +1916,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       (id) => {
         const el = getEl(id, true);
 
-        if (!el) {
+        if (!el?.parentElement) {
           return;
         }
         el.parentElement.style.display = 'flex';

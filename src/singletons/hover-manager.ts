@@ -1,3 +1,4 @@
+import { country2flagIcon } from '@app/catalogs/countries';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
@@ -8,7 +9,6 @@ import { SensorMath } from '../static/sensor-math';
 import { StringExtractor } from '../static/string-extractor';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
-import { country2flagIcon } from '@app/catalogs/countries';
 
 export class HoverManager {
   /** The id of the object currently being hovered */
@@ -139,7 +139,7 @@ export class HoverManager {
 
     const launchSite = StringExtractor.extractLaunchSite(landObj.name);
 
-    this.satHoverBoxNode1.textContent = `${launchSite.site}, ${launchSite.sitec}`;
+    this.satHoverBoxNode1.textContent = `${launchSite.site}, ${launchSite.country}`;
     this.satHoverBoxNode2.innerHTML =
       `${spaceObjType2Str(landObj.type) +
       SensorMath.distanceString(landObj, catalogManagerInstance.getObject(keepTrackApi.getSensorManager().currentSensors[0]?.id) as DetailedSensor)

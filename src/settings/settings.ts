@@ -179,8 +179,8 @@ export class SettingsManager {
    * Current color scheme for the application.
    */
   currentColorScheme = null;
-  hiResWidth = null;
-  hiResHeight = null;
+  hiResWidth: number | null = null;
+  hiResHeight: number | null = null;
   screenshotMode = null;
   lastBoxUpdateTime = null;
   /**

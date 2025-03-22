@@ -12,11 +12,11 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class OrbitReferences extends KeepTrackPlugin {
   readonly id = 'OrbitReferences';
   dependencies_: string[] = [SatInfoBox.name, SelectSatManager.name];
-  private selectSatManager_: SelectSatManager;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   doOnce = false;

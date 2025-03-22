@@ -2,8 +2,9 @@
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
+import { hideLoading, showLoading } from '@app/lib/showLoading';
 import { SettingsManager } from '@app/settings/settings';
+import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import displaySettingsPng from '@public/img/icons/display-settings.png';
@@ -61,41 +62,63 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
           <div class="row center">
             <button id="${this.sideMenuElementName}-reset-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Reset to Defaults &#9658;</button>
           </div>
+          <div>
+            <div class="input-field col s12">
+              <select id="${this.formPrefix_}-godrays-quality">
+                <option value="-1">Off</option>
+                <option value="16">Low</option>
+                <option value="32" selected>Medium</option>
+                <option value="64">High</option>
+                <option value="128">Ultra</option>
+                <option value="-2">Custom</option>
+              </select>
+              <label>Godrays Quality</label>
+            </div>
+            <div class="input-field col s12 start-hidden">
+              <input value="32" id="${this.formPrefix_}-godrays-samples" type="text" data-position="top" data-delay="50" data-tooltip="The number of samples for the godrays.">
+              <label for="${this.formPrefix_}-godrays-samples">Godray Samples</label>
+            </div>
+            <div class="input-field col s12 start-hidden">
+              <input value="30" id="${this.formPrefix_}-godrays-decay" type="text" data-position="top" data-delay="50" data-tooltip="The rate at which the godrays decay.">
+              <label for="${this.formPrefix_}-godrays-decay">Godrays Decay</label>
+            </div>
+            <div class="input-field col s12 start-hidden">
+              <input value="0.6" id="${this.formPrefix_}-godrays-exposure" type="text" data-position="top" data-delay="50" data-tooltip="The exposure of the godrays.">
+              <label for="${this.formPrefix_}-godrays-exposure">Godrays Exposure</label>
+            </div>
+            <div class="input-field col s12 start-hidden">
+              <input value="0.1" id="${this.formPrefix_}-godrays-density" type="text" data-position="top" data-delay="50" data-tooltip="The density of the godrays.">
+              <label for="${this.formPrefix_}-godrays-density">Godrays Density</label>
+            </div>
+            <div class="input-field col s12 start-hidden">
+              <input value="0.5" id="${this.formPrefix_}-godrays-weight" type="text" data-position="top" data-delay="50" data-tooltip="The weight of the godrays.">
+              <label for="${this.formPrefix_}-godrays-weight">Godrays Weight</label>
+            </div>
+            <div class="input-field col s12 start-hidden">
+              <input value="0.5" id="${this.formPrefix_}-godrays-illumination-decay" type="text" data-position="top" data-delay="50"
+              data-tooltip="The decay of the godrays illumination.">
+              <label for="${this.formPrefix_}-godrays-illumination-decay">Godrays Illumination Decay</label>
+            </div>
+          </div>
           <div class="input-field col s12">
-            <select id="${this.formPrefix_}-godrays-quality">
-              <option value="-1">Off</option>
-              <option value="16">Low</option>
-              <option value="32" selected>Medium</option>
-              <option value="64">High</option>
-              <option value="128">Ultra</option>
-              <option value="-2">Custom</option>
+            <select id="${this.formPrefix_}-earth-day-texture-quality">
+              <option value="${EarthNightTextureQuality.POTATO}">Potato</option>
+              <option value="${EarthNightTextureQuality.LOW}">Low</option>
+              <option value="${EarthNightTextureQuality.MEDIUM}" selected>Medium</option>
+              <option value="${EarthNightTextureQuality.HIGH}">High</option>
+              <option value="${EarthNightTextureQuality.ULTRA}">Ultra</option>
             </select>
-            <label>Godrays Quality</label>
+            <label>Earth Day Quality</label>
           </div>
-          <div class="input-field col s12 start-hidden">
-            <input value="32" id="${this.formPrefix_}-godrays-samples" type="text" data-position="top" data-delay="50" data-tooltip="The number of samples for the godrays.">
-            <label for="${this.formPrefix_}-godrays-samples">Godray Samples</label>
-          </div>
-          <div class="input-field col s12 start-hidden">
-            <input value="30" id="${this.formPrefix_}-godrays-decay" type="text" data-position="top" data-delay="50" data-tooltip="The rate at which the godrays decay.">
-            <label for="${this.formPrefix_}-godrays-decay">Godrays Decay</label>
-          </div>
-          <div class="input-field col s12 start-hidden">
-            <input value="0.6" id="${this.formPrefix_}-godrays-exposure" type="text" data-position="top" data-delay="50" data-tooltip="The exposure of the godrays.">
-            <label for="${this.formPrefix_}-godrays-exposure">Godrays Exposure</label>
-          </div>
-          <div class="input-field col s12 start-hidden">
-            <input value="0.1" id="${this.formPrefix_}-godrays-density" type="text" data-position="top" data-delay="50" data-tooltip="The density of the godrays.">
-            <label for="${this.formPrefix_}-godrays-density">Godrays Density</label>
-          </div>
-          <div class="input-field col s12 start-hidden">
-            <input value="0.5" id="${this.formPrefix_}-godrays-weight" type="text" data-position="top" data-delay="50" data-tooltip="The weight of the godrays.">
-            <label for="${this.formPrefix_}-godrays-weight">Godrays Weight</label>
-          </div>
-          <div class="input-field col s12 start-hidden">
-            <input value="0.5" id="${this.formPrefix_}-godrays-illumination-decay" type="text" data-position="top" data-delay="50"
-            data-tooltip="The decay of the godrays illumination.">
-            <label for="${this.formPrefix_}-godrays-illumination-decay">Godrays Illumination Decay</label>
+          <div class="input-field col s12">
+            <select id="${this.formPrefix_}-earth-night-texture-quality">
+              <option value="${EarthNightTextureQuality.POTATO}">Potato</option>
+              <option value="${EarthNightTextureQuality.LOW}">Low</option>
+              <option value="${EarthNightTextureQuality.MEDIUM}" selected>Medium</option>
+              <option value="${EarthNightTextureQuality.HIGH}">High</option>
+              <option value="${EarthNightTextureQuality.ULTRA}">Ultra</option>
+            </select>
+            <label>Earth Night Quality</label>
           </div>
           <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Draw the Sun">
@@ -151,8 +174,8 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl(`${this.sideMenuElementName}-form`).addEventListener('change', this.onFormChange_.bind(this));
-        getEl(`${this.sideMenuElementName}-reset-btn`).addEventListener('click', this.resetToDefaults_.bind(this));
+        getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', this.onFormChange_.bind(this));
+        getEl(`${this.sideMenuElementName}-reset-btn`)?.addEventListener('click', this.resetToDefaults_.bind(this));
 
         this.syncOnLoad_();
       },
@@ -170,6 +193,9 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
       (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.MEDIUM.toString();
       (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).dispatchEvent(new Event('change'));
       this.updateGodrays_(GodraySamples.MEDIUM);
+
+      (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-day-texture-quality`)).value = EarthNightTextureQuality.MEDIUM;
+      (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-night-texture-quality`)).value = EarthNightTextureQuality.MEDIUM;
 
       settingsManager.isDrawSun = true;
       if (settingsManager.isBlackEarth) {
@@ -217,6 +243,44 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
           const godraysQuality = parseInt((<HTMLSelectElement>getEl(`${this.formPrefix_}-godrays-quality`)).value, 10);
 
           showLoading(() => this.updateGodrays_(godraysQuality));
+        }
+        break;
+      case `${this.formPrefix_}-earth-day-texture-quality`:
+        {
+          const earth = keepTrackApi.getScene().earth;
+          const earthDayTextureQuality = (<HTMLSelectElement>getEl(`${this.formPrefix_}-earth-day-texture-quality`)).value as EarthDayTextureQuality;
+          const src = `${settingsManager.installDirectory}textures/earthmap${earthDayTextureQuality}.jpg`;
+
+          settingsManager.earthDayTextureQuality = earthDayTextureQuality;
+
+          if (earthDayTextureQuality === EarthDayTextureQuality.HIGH || earthDayTextureQuality === EarthDayTextureQuality.ULTRA) {
+            showLoading(() => {
+              earth.loadHiRes(earth.textureDay, src, hideLoading);
+            }, -1);
+          } else {
+            earth.loadHiRes(earth.textureDay, src);
+          }
+
+          SettingsManager.preserveSettings();
+        }
+        break;
+      case `${this.formPrefix_}-earth-night-texture-quality`:
+        {
+          const earth = keepTrackApi.getScene().earth;
+          const earthNightTextureQuality = (<HTMLSelectElement>getEl(`${this.formPrefix_}-earth-night-texture-quality`)).value as EarthNightTextureQuality;
+          const src = `${settingsManager.installDirectory}textures/earthlights${earthNightTextureQuality}.jpg`;
+
+          settingsManager.earthNightTextureQuality = earthNightTextureQuality;
+
+          if (earthNightTextureQuality === EarthNightTextureQuality.HIGH || earthNightTextureQuality === EarthNightTextureQuality.ULTRA) {
+            showLoading(() => {
+              earth.loadHiRes(earth.textureNight, src, hideLoading);
+            }, -1);
+          } else {
+            earth.loadHiRes(earth.textureNight, src);
+          }
+
+          SettingsManager.preserveSettings();
         }
         break;
       default:
@@ -279,30 +343,44 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
       return;
     }
 
-    const godraysDecay = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-decay`)).value);
-    const godraysExposure = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-exposure`)).value);
-    const godraysDensity = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-density`)).value);
-    const godraysWeight = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-weight`)).value);
-    const godraysIlluminationDecay = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-illumination-decay`)).value);
+    const godraysDecayValue = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-decay`)).value);
+    const godraysExposureValue = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-exposure`)).value);
+    const godraysDensityValue = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-density`)).value);
+    const godraysWeightValue = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-weight`)).value);
+    const godraysIlluminationDecayValue = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-illumination-decay`)).value);
+
+    const godraysSamplesParent = getEl(`${this.formPrefix_}-godrays-samples`)?.parentElement;
+    const godraysDecayParent = getEl(`${this.formPrefix_}-godrays-decay`)?.parentElement;
+    const godraysExposureParent = getEl(`${this.formPrefix_}-godrays-exposure`)?.parentElement;
+    const godraysDensityParent = getEl(`${this.formPrefix_}-godrays-density`)?.parentElement;
+    const godraysWeightParent = getEl(`${this.formPrefix_}-godrays-weight`)?.parentElement;
+    const godraysIlluminationDecayParent = getEl(`${this.formPrefix_}-godrays-illumination-decay`)?.parentElement;
+
+    if (!godraysSamplesParent || !godraysDecayParent || !godraysExposureParent || !godraysDensityParent || !godraysWeightParent || !godraysIlluminationDecayParent) {
+      errorManagerInstance.warn('Could not find the godray settings elements!');
+
+      return;
+    }
 
     if (godraysQuality === GodraySamples.CUSTOM && previousQuality !== GodraySamples.CUSTOM) {
       // Unhide the custom settings
-      getEl(`${this.formPrefix_}-godrays-samples`).parentElement.style.display = 'block';
-      getEl(`${this.formPrefix_}-godrays-decay`).parentElement.style.display = 'block';
-      getEl(`${this.formPrefix_}-godrays-exposure`).parentElement.style.display = 'block';
-      getEl(`${this.formPrefix_}-godrays-density`).parentElement.style.display = 'block';
-      getEl(`${this.formPrefix_}-godrays-weight`).parentElement.style.display = 'block';
-      getEl(`${this.formPrefix_}-godrays-illumination-decay`).parentElement.style.display = 'block';
+      godraysSamplesParent.style.display = 'block';
+      godraysDecayParent.style.display = 'block';
+      godraysExposureParent.style.display = 'block';
+      godraysDensityParent.style.display = 'block';
+      godraysWeightParent.style.display = 'block';
+      godraysDecayParent.style.display = 'block';
+      godraysIlluminationDecayParent.style.display = 'block';
     }
 
     if (godraysQuality !== GodraySamples.CUSTOM) {
       // Hide the custom settings
-      getEl(`${this.formPrefix_}-godrays-samples`).parentElement.style.display = 'none';
-      getEl(`${this.formPrefix_}-godrays-decay`).parentElement.style.display = 'none';
-      getEl(`${this.formPrefix_}-godrays-exposure`).parentElement.style.display = 'none';
-      getEl(`${this.formPrefix_}-godrays-density`).parentElement.style.display = 'none';
-      getEl(`${this.formPrefix_}-godrays-weight`).parentElement.style.display = 'none';
-      getEl(`${this.formPrefix_}-godrays-illumination-decay`).parentElement.style.display = 'none';
+      godraysSamplesParent.style.display = 'none';
+      godraysDecayParent.style.display = 'none';
+      godraysExposureParent.style.display = 'none';
+      godraysDensityParent.style.display = 'none';
+      godraysDecayParent.style.display = 'none';
+      godraysIlluminationDecayParent.style.display = 'none';
     }
 
     if (godraysQuality === GodraySamples.OFF) {
@@ -319,11 +397,11 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
 
     if (settingsManager.godraysSamples === GodraySamples.CUSTOM) {
       settingsManager.godraysSamples = godraysSamples;
-      settingsManager.godraysDecay = godraysDecay;
-      settingsManager.godraysExposure = godraysExposure;
-      settingsManager.godraysDensity = godraysDensity;
-      settingsManager.godraysWeight = godraysWeight;
-      settingsManager.godraysIlluminationDecay = godraysIlluminationDecay;
+      settingsManager.godraysDecay = godraysDecayValue;
+      settingsManager.godraysExposure = godraysExposureValue;
+      settingsManager.godraysDensity = godraysDensityValue;
+      settingsManager.godraysWeight = godraysWeightValue;
+      settingsManager.godraysIlluminationDecay = godraysIlluminationDecayValue;
     } else {
       settingsManager.godraysDecay = 0.983;
       settingsManager.godraysDensity = 1.8;
@@ -363,6 +441,9 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-density`)).value = settingsManager.godraysDensity.toString();
     (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-weight`)).value = settingsManager.godraysWeight.toString();
     (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-illumination-decay`)).value = settingsManager.godraysIlluminationDecay.toString();
+
+    (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-day-texture-quality`)).value = settingsManager.earthDayTextureQuality;
+    (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-night-texture-quality`)).value = settingsManager.earthNightTextureQuality;
 
     const settingsElements = [
       { id: 'settings-drawSun', setting: 'isDrawSun' },

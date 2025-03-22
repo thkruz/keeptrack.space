@@ -76,7 +76,7 @@ The feature set rivals those of expensive toolkits, such as AGI's STK, and inclu
 
 # Installation
 
-A github page is automatically deployed with the most-current version of the main branch to https://thkruz.github.io/keeptrack.space/. Periodically the most stable version will be pushed to https://keeptrack.space from the CI/CD pipeline.
+KeepTrack is automatically deployed with the most-current version of the main branch to https://keeptrack.space via Cloudflare.
 
 ## Prerequisites
 
@@ -92,12 +92,6 @@ npm run build                                             #Build the project.
 npm start                                                 #Start the server.
 ```
 
-## Launching Offline Mode
-
-KeepTrack was designed to run without the need for a server. On Windows, close all open copies of chrome and then launch the included KeepTrack.bat file. This will launch the index.html file inside of chrome with the "--allow-file-access-from-files" flag temporarily enabled. This is necessary to allow loading the catalog .json files from your computer.
-
-NOTE: You MUST compile the code first. Opening the index.html file in the src folder will not work. If that feels overwhelming, take a look at https://github.com/thkruz/keeptrack.space/tree/gh-pages for a built version that can be downloaded and launched without the need to build it.
-
 # Usage
 
 The main index.html page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (positionCruncher.ts and orbitCruncher.ts) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.
@@ -106,7 +100,7 @@ The main draw loop (drawManager.ts) has been optimized to reduce memory leaks an
 
 Any modifications to a satellite require that information to be passed to the positionCruncher webworker to ensure the UI calculations match the dot on the screen. Most calculations utilize a brute-force method of guess and check (lookangle times, missile trajectories, etc). Optimizing the loop for those calculations is critcal to keeping the project responsive. One trick to improve performance is that satSet creates a dictionary of index -> Norad ID number and index -> COSPAR number to allow rapid lookup of satellite data.
 
-There are Typescript files for generating TLE.json that are not included, but https://keeptrack.space/tle/TLE2.json can be referenced for an up-to-date catalog.
+There are Typescript files for generating TLE.json that are not included, but https://api.keeptrack.space/v2/sats can be referenced for an up-to-date catalog.
 
 # Release Notes
 

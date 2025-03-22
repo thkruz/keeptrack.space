@@ -5,6 +5,8 @@ import { getEl } from './get-el';
 
 /**
  * Show loading screen for a given time and then run callback
+ *
+ * Use -1 to show loading screen indefinitely and remove it manually
  */
 export const showLoading = (callback?: () => void, delay?: number): void => {
   const loading = getEl('loading-screen', true);
@@ -16,10 +18,15 @@ export const showLoading = (callback?: () => void, delay?: number): void => {
   keepTrackApi.getSoundManager().play(SoundNames.LOADING);
 
   fadeIn(loading, 'flex', 500);
+
   setTimeout(() => {
     if (callback) {
       // eslint-disable-next-line callback-return
       callback();
+    }
+
+    if (delay === -1) {
+      return;
     }
     hideLoading();
   }, delay || 100);

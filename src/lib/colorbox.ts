@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { getEl } from './get-el';
-import { showLoading } from './showLoading';
+import { hideLoading, showLoading } from './showLoading';
 import { slideInRight, slideOutLeft } from './slide';
 
 interface ColorboxOptions {
@@ -42,10 +42,12 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
     if (options.image) {
       setupImageColorbox_(url);
     } else {
-      setupIframeColorbox_(url);
+      setupIframeColorbox_(url, () => {
+        slideInRight(getEl('colorbox-container'), 750);
+        hideLoading();
+      });
     }
-    slideInRight(getEl('colorbox-container'), 1000);
-  }, 2000);
+  }, -1);
 };
 
 export const closeColorbox = (): void => {
@@ -60,7 +62,7 @@ export const closeColorbox = (): void => {
 
   slideOutLeft(
     getEl('colorbox-container'),
-    1000,
+    750,
     () => {
       colorboxDom.style.display = 'none';
     },
@@ -75,6 +77,13 @@ export const createColorbox = () => {
   const colorboxDiv = document.createElement('div');
 
   colorboxDiv.id = 'colorbox-div';
+
+  if (!keepTrackApi.containerRoot) {
+    errorManagerInstance.warn('Container root not found!');
+
+    return;
+  }
+
   keepTrackApi.containerRoot.appendChild(colorboxDiv);
   const colorboxContainer = document.createElement('div');
 
@@ -114,21 +123,27 @@ export const createColorbox = () => {
 /**
  * Sets the colorbox to display an iframe
  */
-const setupIframeColorbox_ = (url: string) => {
+const setupIframeColorbox_ = (url: string, onLoadCb: () => void) => {
   const colorboxContainerDom = getEl('colorbox-container');
 
   if (!colorboxContainerDom) {
-    console.warn('Colorbox container not found!');
+    errorManagerInstance.warn('Colorbox container not found!');
 
     return;
   }
-  (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'block';
+  const colorboxIframe = <HTMLIFrameElement>getEl('colorbox-iframe');
+
+  colorboxIframe.style.display = 'block';
   // Catch failures to load
   (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {
     errorManagerInstance.warn(`Failed to load: ${url}`);
     closeColorbox();
   };
-  (<HTMLIFrameElement>getEl('colorbox-iframe')).src = url;
+  colorboxIframe.src = url;
+  colorboxIframe.onload = () => {
+    onLoadCb();
+  };
+
   (<HTMLImageElement>getEl('colorbox-img')).style.display = 'none';
 };
 
@@ -139,7 +154,7 @@ const setupImageColorbox_ = (url: string) => {
   const colorboxContainerDom = getEl('colorbox-container');
 
   if (!colorboxContainerDom) {
-    console.warn('Colorbox container not found!');
+    errorManagerInstance.warn('Colorbox container not found!');
 
     return;
   }

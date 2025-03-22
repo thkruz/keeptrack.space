@@ -51,11 +51,11 @@ interface GroundTracePoint {
 export class StereoMap extends KeepTrackPlugin {
   readonly id = 'StereoMap';
   dependencies_ = [SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager | null;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   /** The size of half of the dot used in the stereo map. (See CSS) */

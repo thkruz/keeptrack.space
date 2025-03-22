@@ -40,9 +40,9 @@ export abstract class StringExtractor {
     return countryMapList[countryCode] ?? 'Unknown';
   }
 
-  public static extractLaunchSite(LS: string): { site: string; sitec: string } {
+  public static extractLaunchSite(LS: string): { site: string; country: string, wikiUrl: string | null } {
     if (!LS || LS === '') {
-      return { site: 'Unknown', sitec: 'Unknown' };
+      return { site: 'Unknown', country: 'Unknown', wikiUrl: null };
     }
 
     const launchSite = launchSiteMap[LS];
@@ -52,7 +52,7 @@ export abstract class StringExtractor {
     }
     errorManagerInstance.debug(`Unknown launch site: ${LS}`);
 
-    return { site: 'Unknown', sitec: 'Unknown' };
+    return { site: 'Unknown', country: 'Unknown', wikiUrl: null };
 
   }
 

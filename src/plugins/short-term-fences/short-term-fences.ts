@@ -14,11 +14,11 @@ import { SoundNames } from '../sounds/SoundNames';
 export class ShortTermFences extends KeepTrackPlugin {
   readonly id = 'ShortTermFences';
   dependencies_: string[] = [SatInfoBox.name, SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager | null;
+  private readonly selectSatManager_: SelectSatManager;
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   bottomIconImg = wifiFindPng;

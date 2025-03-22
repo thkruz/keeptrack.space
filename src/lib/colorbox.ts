@@ -75,6 +75,13 @@ export const createColorbox = () => {
   const colorboxDiv = document.createElement('div');
 
   colorboxDiv.id = 'colorbox-div';
+
+  if (!keepTrackApi.containerRoot) {
+    errorManagerInstance.warn('Container root not found!');
+
+    return;
+  }
+
   keepTrackApi.containerRoot.appendChild(colorboxDiv);
   const colorboxContainer = document.createElement('div');
 
@@ -118,7 +125,7 @@ const setupIframeColorbox_ = (url: string) => {
   const colorboxContainerDom = getEl('colorbox-container');
 
   if (!colorboxContainerDom) {
-    console.warn('Colorbox container not found!');
+    errorManagerInstance.warn('Colorbox container not found!');
 
     return;
   }
@@ -139,7 +146,7 @@ const setupImageColorbox_ = (url: string) => {
   const colorboxContainerDom = getEl('colorbox-container');
 
   if (!colorboxContainerDom) {
-    console.warn('Colorbox container not found!');
+    errorManagerInstance.warn('Colorbox container not found!');
 
     return;
   }

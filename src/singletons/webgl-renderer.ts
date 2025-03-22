@@ -61,7 +61,7 @@ export class WebGLRenderer {
   projectionCameraMatrix: mat4;
   postProcessingManager: PostProcessingManager;
 
-  private selectSatManager_: SelectSatManager | null;
+  private selectSatManager_: SelectSatManager;
   sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } | null = null;
 
   static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
@@ -187,7 +187,7 @@ export class WebGLRenderer {
   // eslint-disable-next-line require-await
   async init(settings: SettingsManager): Promise<void> {
     this.settings_ = settings;
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
 
     this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
     keepTrackApi.getHoverManager().init();

@@ -26,7 +26,7 @@ import { SensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager | null;
+  private readonly selectSatManager_: SelectSatManager;
   // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
   private readonly sensorList_: DetailedSensor[] = [];
   isRequireSatelliteSelected = true;
@@ -41,7 +41,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager);
+    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
     this.sensorList_ = sensorGroups.map((group) => group.list).flat().map((sensor) => {
       if (sensors[sensor] instanceof DetailedSensor) {
         return sensors[sensor];

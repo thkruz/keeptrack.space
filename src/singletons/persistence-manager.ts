@@ -43,6 +43,8 @@ export enum StorageKey {
   GRAPHICS_SETTINGS_GODRAYS_DENSITY = 'keepTrack-graphicsSettings-godraysDensity',
   GRAPHICS_SETTINGS_GODRAYS_WEIGHT = 'keepTrack-graphicsSettings-godraysWeight',
   GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY = 'keepTrack-graphicsSettings-godraysIlluminationDecay',
+  GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION = 'keepTrack-graphicsSettings-earthDayResolution',
+  GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION = 'keepTrack-graphicsSettings-earthNightResolution',
 }
 export class PersistenceManager {
   private readonly storage_: Storage;

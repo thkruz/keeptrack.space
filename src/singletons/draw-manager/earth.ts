@@ -31,7 +31,24 @@ import { SphereGeometry } from '@app/static/sphere-geometry';
 import { SplashScreen } from '@app/static/splash-screen';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
+import { errorManagerInstance } from '../errorManager';
 import { OcclusionProgram } from './post-processing';
+
+export enum EarthNightTextureQuality {
+  POTATO = '512',
+  LOW = '1K',
+  MEDIUM = '2K',
+  HIGH = '4K',
+  ULTRA = '16K',
+}
+
+export enum EarthDayTextureQuality {
+  POTATO = '512',
+  LOW = '1K',
+  MEDIUM = '2K',
+  HIGH = '4K',
+  ULTRA = '16K',
+}
 
 export class Earth {
   private gl_: WebGL2RenderingContext;
@@ -43,11 +60,11 @@ export class Earth {
   private isSpecularTextureReady_ = false;
   private isTexturesReady_ = false;
   private modelViewMatrix_: mat4;
-  private normalMatrix_: mat3 = mat3.create();
+  private readonly normalMatrix_: mat3 = mat3.create();
   private settings_: SettingsManager;
   private textureBump_: WebGLTexture;
-  private textureDay_: WebGLTexture;
-  private textureNight_: WebGLTexture;
+  textureDay: WebGLTexture;
+  textureNight: WebGLTexture;
   private textureSpec_: WebGLTexture;
   private vaoOcclusion_: WebGLVertexArrayObject;
   isHiResReady: boolean;
@@ -55,6 +72,7 @@ export class Earth {
   /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
   mesh: Mesh;
+  imageCache: Record<string, HTMLImageElement> = {};
 
   /**
    * This is run once per frame to render the earth.
@@ -148,24 +166,41 @@ export class Earth {
   /**
    * Helper function to load the high resolution earth textures.
    */
-  async loadHiRes(texture: WebGLTexture, src: string): Promise<void> {
+  loadHiRes(texture: WebGLTexture, src: string, cb?: (() => void)): void {
     try {
-      const img = new Image();
+      let img = this.imageCache[src];
 
-      img.onload = () => {
+      if (!img) {
+        img = new Image();
+
+        img.onload = () => {
+          if (!this.settings_.isBlackEarth) {
+            GlUtils.bindImageToTexture(this.gl_, texture, img);
+          }
+
+          this.isDayTextureReady_ = true;
+          this.isHiResReady = true;
+          this.onImageLoaded_();
+
+          if (cb) {
+            cb();
+          }
+        };
+        img.src = src;
+        this.imageCache[src] = img;
+        this.isUseHiRes = true;
+      } else {
         if (!this.settings_.isBlackEarth) {
           GlUtils.bindImageToTexture(this.gl_, texture, img);
         }
 
-        this.isDayTextureReady_ = true;
-        this.isHiResReady = true;
-        this.onImageLoaded_();
-      };
-      img.src = src;
+        if (cb) {
+          cb();
+        }
+      }
 
-      this.isUseHiRes = true;
     } catch (e) {
-      console.debug(e);
+      errorManagerInstance.warn(`Failed to load texture: ${src}`);
     }
   }
 
@@ -175,8 +210,8 @@ export class Earth {
    */
   reloadEarthHiResTextures() {
     this.init(settingsManager, this.gl_);
-    this.loadHiRes(this.textureDay_, Earth.getSrcHiResDay_(this.settings_));
-    this.loadHiRes(this.textureNight_, Earth.getSrcHiResNight_(this.settings_));
+    this.loadHiRes(this.textureDay, Earth.getSrcHiResDay_(this.settings_));
+    this.loadHiRes(this.textureNight, Earth.getSrcHiResNight_(this.settings_));
   }
 
   /**
@@ -237,7 +272,10 @@ export class Earth {
     if (!settings.installDirectory) {
       throw new Error('settings.installDirectory is undefined');
     }
-    let src = `${settings.installDirectory}textures/earthmap4k.jpg`;
+
+    const quality = settings.earthDayTextureQuality;
+
+    let src = `${settings.installDirectory}textures/earthmap${quality}.jpg`;
 
     if (settings.smallImages) {
       src = `${settings.installDirectory}textures/earthmap512.jpg`;
@@ -275,7 +313,9 @@ export class Earth {
       throw new Error('settings.installDirectory is undefined');
     }
 
-    let src = `${settings.installDirectory}textures/earthlights4k.jpg`;
+    const quality = settings.earthNightTextureQuality;
+
+    let src = `${settings.installDirectory}textures/earthlights${quality}.jpg`;
 
     if (settings.vectorImages) {
       src = `${settings.installDirectory}textures/dayearthvector-4096.jpg`;
@@ -422,15 +462,15 @@ export class Earth {
 
   private initTextureDay_(): void {
     SplashScreen.loadStr(SplashScreen.msg.painting);
-    this.textureDay_ = this.gl_.createTexture();
+    this.textureDay = this.gl_.createTexture();
     const img = new Image();
 
     img.onload = () => {
       if (!this.settings_.isBlackEarth) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureDay_, img);
+        GlUtils.bindImageToTexture(this.gl_, this.textureDay, img);
       } else {
         // Delete the texture
-        this.textureDay_ = null;
+        this.textureDay = null;
       }
 
       this.isDayTextureReady_ = true;
@@ -440,15 +480,15 @@ export class Earth {
   }
 
   private initTextureNight_(): void {
-    this.textureNight_ = this.gl_.createTexture();
+    this.textureNight = this.gl_.createTexture();
     const img = new Image();
 
     img.onload = () => {
       if (!this.settings_.isBlackEarth) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureNight_, img);
+        GlUtils.bindImageToTexture(this.gl_, this.textureNight, img);
       } else {
         // Delete the texture
-        this.textureNight_ = null;
+        this.textureNight = null;
       }
 
       this.isNightTextureReady_ = true;
@@ -482,10 +522,10 @@ export class Earth {
   }
 
   private initTextures_(): void {
-    if (!this.textureDay_ || this.settings_.isBlackEarth) {
+    if (!this.textureDay || this.settings_.isBlackEarth) {
       this.initTextureDay_();
     }
-    if (!this.textureNight_ || this.settings_.isBlackEarth) {
+    if (!this.textureNight || this.settings_.isBlackEarth) {
       this.initTextureNight_();
     }
     if (!this.textureBump_ || this.settings_.isBlackEarth) {
@@ -567,7 +607,7 @@ export class Earth {
     // Day Map
     gl.uniform1i(this.mesh.material.uniforms.uDayMap, 0);
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.textureDay_);
+    gl.bindTexture(gl.TEXTURE_2D, this.textureDay);
 
     // Night Map
     gl.uniform1i(this.mesh.material.uniforms.uNightMap, 1);
@@ -577,13 +617,13 @@ export class Earth {
     const altNightTexBind = keepTrackApi.events.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null;
 
     if (!altNightTexBind) {
-      gl.bindTexture(gl.TEXTURE_2D, this.textureNight_);
+      gl.bindTexture(gl.TEXTURE_2D, this.textureNight);
     } else {
       /*
        * If there are callbacks use those to determine which texture to use
        * This is primarily used for the night mode toggle
        */
-      altNightTexBind(gl, this.textureNight_, this.textureDay_);
+      altNightTexBind(gl, this.textureNight, this.textureDay);
     }
 
     // Bump Map

@@ -24,6 +24,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import type { KeepTrackPlugins } from '@app/plugins/plugins';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-scheme-manager';
+import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
@@ -96,6 +97,8 @@ export class SettingsManager {
   };
   changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
   changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute
+  earthDayTextureQuality = EarthDayTextureQuality.MEDIUM;
+  earthNightTextureQuality = EarthNightTextureQuality.MEDIUM;
 
   static preserveSettings() {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
@@ -132,6 +135,8 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY, settingsManager.godraysDensity.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT, settingsManager.godraysWeight.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY, settingsManager.godraysIlluminationDecay.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality.toString());
   }
 
   colors: ColorSchemeColorMap;
@@ -633,6 +638,10 @@ export class SettingsManager {
    * Color of the dot when hovering over an object.
    */
   hoverColor = <[number, number, number, number]>[1.0, 1.0, 0.0, 1.0]; // Yellow
+  /**
+   * The relative path to the installation directory. This is necessary if the application is
+   * a folder inside the main folder of the webserver.
+   */
   installDirectory = '';
   dataSources = {
     /**
@@ -1134,6 +1143,7 @@ export class SettingsManager {
   /** Enables the camera widget */
   drawCameraWidget = false;
 
+  // eslint-disable-next-line max-statements
   loadPersistedSettings() {
     const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
 
@@ -1271,6 +1281,19 @@ export class SettingsManager {
     if (disableTimeMachineToastsString !== null) {
       this.isDisableTimeMachineToasts = disableTimeMachineToastsString === 'true';
     }
+
+    const earthDayTextureQaulityString = PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION);
+
+    if (earthDayTextureQaulityString !== null) {
+      this.earthDayTextureQuality = earthDayTextureQaulityString as EarthDayTextureQuality;
+    }
+
+    const earthNightTextureQaulityString = PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION);
+
+    if (earthNightTextureQaulityString !== null) {
+      this.earthNightTextureQuality = earthNightTextureQaulityString as EarthNightTextureQuality;
+    }
+
     const searchLimitString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SEARCH_LIMIT);
 
     if (searchLimitString !== null) {

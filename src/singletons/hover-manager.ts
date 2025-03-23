@@ -203,7 +203,7 @@ export class HoverManager {
 
       let confidenceScoreString = confidenceScore.toString();
 
-      if (settingsManager.externalTLEsOnly) {
+      if (settingsManager.dataSources.externalTLEsOnly) {
         confidenceScoreString = 'External';
         color = 'gray';
       }

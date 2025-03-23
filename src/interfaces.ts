@@ -63,6 +63,13 @@ export interface Colors {
   age5: rgbaArray;
   age6: rgbaArray;
   age7: rgbaArray;
+  celestrakDefaultActivePayload: rgbaArray;
+  celestrakDefaultInactivePayload: rgbaArray;
+  celestrakDefaultRocketBody: rgbaArray;
+  celestrakDefaultDebris: rgbaArray;
+  celestrakDefaultSensor: rgbaArray;
+  celestrakDefaultFov: rgbaArray;
+  celestrakDefaultUnknown: rgbaArray;
   analyst: rgbaArray;
   countryCIS: rgbaArray;
   countryOther: rgbaArray;

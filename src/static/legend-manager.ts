@@ -5,6 +5,8 @@ import { rgbCss } from '../lib/rgbCss';
 import {
   ageOfElsetDiv,
   astronomyDiv,
+  celestrakDefaultDiv,
+  celestrakDefaultSensorDiv,
   confidenceDiv,
   countriesDiv,
   dataSourceDiv,
@@ -68,6 +70,13 @@ export abstract class LegendManager {
     '.legend-densityMed-box',
     '.legend-densityLow-box',
     '.legend-densityOther-box',
+    '.legend-celestrakDefaultActivePayload-box',
+    '.legend-celestrakDefaultInactivePayload-box',
+    '.legend-celestrakDefaultOpRocketBody-box',
+    '.legend-celestrakDefaultOpDebris-box',
+    '.legend-celestrakDefaultSensor-box',
+    '.legend-celestrakDefaultFov-box',
+    '.legend-celestrakDefaultUnknown-box',
     '.legend-sourceUssf-box',
     '.legend-sourceAldoria-box',
     '.legend-sourceCelestrak-box',
@@ -90,6 +99,8 @@ export abstract class LegendManager {
     planetarium: planetariumDiv,
     astronomy: astronomyDiv,
     timeMachine: timeMachineMenuDiv,
+    celestrakDefault: celestrakDefaultDiv,
+    celestrakDefaultSensor: celestrakDefaultSensorDiv,
     clear: '',
     default: '',
   };
@@ -101,6 +112,7 @@ export abstract class LegendManager {
       return;
     }
 
+    // TODO there should be a setting that determines the defaults (Celestrak Rebase)
     const selectedOption =
       LegendManager.menuOptions[menu] || (keepTrackApi.getSensorManager().currentSensors.length > 0 ? defaultSensorDiv : defaultDiv);
 

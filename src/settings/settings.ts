@@ -652,8 +652,18 @@ export class SettingsManager {
      * It can be loaded from a local file or a remote source
      */
     tle: 'https://api.keeptrack.space/v3/sats',
+    /** url for an external TLE source */
+    externalTLEs: '',
+    /**
+     * A boolean flag indicating whether only external TLEs (Two-Line Elements) should be used.
+     * When set to `true`, the system will exclusively utilize external TLE data.
+     * When set to `false`, the system may use internal or other sources of TLE data.
+     */
+    externalTLEsOnly: false,
     tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
     vimpel: 'https://r2.keeptrack.space/vimpel.json',
+    /** This determines if tle source is loaded to supplement externalTLEs  */
+    isSupplementExternal: false,
   };
   /**
    * Determines whether or not to hide the propogation rate text on the GUI.
@@ -904,10 +914,6 @@ export class SettingsManager {
    * Determines whether or not to use political map texture for the Earth.
    */
   politicalImages = false;
-  /**
-   * url for an external TLE source
-   */
-  externalTLEs: string;
   pTime = [];
   /**
    * Global flag for determining if a screenshot is queued
@@ -1132,12 +1138,6 @@ export class SettingsManager {
    * 0 = earth and 1 = max distance from earth
    */
   initZoomLevel: number;
-  /**
-   * A boolean flag indicating whether only external TLEs (Two-Line Elements) should be used.
-   * When set to `true`, the system will exclusively utilize external TLE data.
-   * When set to `false`, the system may use internal or other sources of TLE data.
-   */
-  externalTLEsOnly = false;
   positionCruncher: Worker | null = null;
   orbitCruncher: Worker | null = null;
   /** Enables the camera widget */
@@ -1379,9 +1379,9 @@ export class SettingsManager {
       // eslint-disable-next-line no-console
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.1') {
+    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.2') {
       this.colors = {
-        version: '1.4.1',
+        version: '1.4.2',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
         sunlight100: [1.0, 1.0, 1.0, 0.7],
@@ -1452,13 +1452,20 @@ export class SettingsManager {
         rcsLarge: [0, 1.0, 0, 0.6],
         rcsUnknown: [1.0, 1.0, 0, 0.6],
         age1: [0, 1.0, 0, 0.9],
-        age2: [0.6, 0.996, 0, 0.9],
-        age3: [0.8, 1.0, 0, 0.9],
-        age4: [1.0, 1.0, 0, 0.9],
-        age5: [1.0, 0.8, 0.0, 0.9],
-        age6: [1.0, 0.6, 0.0, 0.9],
-        age7: [1.0, 0.0, 0.0, 0.9],
-        lostobjects: [0.2, 1.0, 0.0, 0.65],
+        age2: [0, 1.0, 0, 0.9],
+        age3: [0, 1.0, 0, 0.9],
+        age4: [0, 1.0, 0, 0.9],
+        age5: [0, 1.0, 0, 0.9],
+        age6: [0, 1.0, 0, 0.9],
+        age7: [0, 1.0, 0, 0.9],
+        celestrakDefaultActivePayload: [0.0, 1.0, 0.0, 0.85],
+        celestrakDefaultInactivePayload: [1.0, 0.5, 0.0, 1.0],
+        celestrakDefaultRocketBody: [1.0, 0.0, 0.0, 1.0],
+        celestrakDefaultDebris: [0.5, 0.5, 0.5, 0.9],
+        celestrakDefaultSensor: [0.0, 0.0, 1.0, 0.85],
+        celestrakDefaultFov: [0.0, 0.0, 1.0, 0.85],
+        celestrakDefaultUnknown: [1, 1, 1, 0.85],
+        lostobjects: [1, 0, 0, 0.8],
         satLEO: [0.2, 1.0, 0.0, 0.65],
         satGEO: [0.2, 1.0, 0.0, 0.65],
         inGroup: [1.0, 0.0, 0.0, 1.0],
@@ -1590,14 +1597,14 @@ export class SettingsManager {
             }
             break;
           case 'external-only':
-            this.externalTLEsOnly = true;
+            this.dataSources.externalTLEsOnly = true;
             break;
           case 'gp':
             this.dataSources.tle = decodeURIComponent(val);
             break;
           case 'tle':
             // Decode from UTF-8
-            this.externalTLEs = decodeURIComponent(val);
+            this.dataSources.externalTLEs = decodeURIComponent(val);
             break;
           case 'jsc':
             this.isEnableJscCatalog = val === 'true';
@@ -1704,6 +1711,26 @@ export class SettingsManager {
             break;
           case 'noPropRate':
             this.isAlwaysHidePropRate = true;
+            break;
+          case 'CATNR':
+            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${val}&FORMAT=3LE`;
+            this.dataSources.externalTLEsOnly = true;
+            break;
+          case 'NAME':
+            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?NAME=${val}&FORMAT=3LE`;
+            this.dataSources.externalTLEsOnly = true;
+            break;
+          case 'INTDES':
+            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?INTDES=${val}&FORMAT=3LE`;
+            this.dataSources.externalTLEsOnly = true;
+            break;
+          case 'GROUP':
+            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${val}&FORMAT=3LE`;
+            this.dataSources.externalTLEsOnly = true;
+            break;
+          case 'SPECIAL':
+            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?SPECIAL=${val}&FORMAT=3LE`;
+            this.dataSources.externalTLEsOnly = true;
             break;
           default:
         }

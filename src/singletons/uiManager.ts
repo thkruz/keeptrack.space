@@ -494,6 +494,10 @@ export class UiManager {
     this.lastToast = toastText;
 
     try {
+      // Stop toasts from crashing the app
+      if (this.activeToastList_.length > 20) {
+        return;
+      }
       const toastMsg = this.makeToast_(toastText, type, isLong);
 
       if (toastMsg) {

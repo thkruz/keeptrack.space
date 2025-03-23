@@ -54,6 +54,7 @@ export class ColorMenu extends KeepTrackPlugin {
   rmbL2Html = keepTrackApi.html`
   <ul class='dropdown-contents'>
     <li id="colors-default-rmb"><a href="#">Object Types</a></li>
+    <li id="colors-celestrak-rmb"><a href="#">Celestrak Color Scheme</a></li>
     <li id="colors-rcs-rmb"><a href="#">Radar Cross Section</a></li>
     <li id="colors-density-rmb"><a href="#">Orbit Density</a></li>
     <li id="colors-starlink-rmb"><a href="#">Starlink</a></li>
@@ -97,6 +98,9 @@ export class ColorMenu extends KeepTrackPlugin {
         break;
       case 'colors-default-rmb':
         ColorMenu.colorsMenuClick('default');
+        break;
+      case 'colors-celestrak-rmb':
+        ColorMenu.colorsMenuClick('celestrak');
         break;
       default:
         if (targetId?.includes('colors-')) {
@@ -229,6 +233,11 @@ export class ColorMenu extends KeepTrackPlugin {
         } else {
           colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.countries, true);
         }
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        break;
+      case 'celestrak':
+        LegendManager.change('celestrak');
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.celestrakDefault, true);
         uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
         break;
       case 'default':

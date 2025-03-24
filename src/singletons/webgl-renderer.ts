@@ -63,6 +63,7 @@ export class WebGLRenderer {
 
   private selectSatManager_: SelectSatManager;
   sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } | null = null;
+  lastResizeTime: number;
 
   static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
     const pMatrix = mat4.create();
@@ -143,7 +144,17 @@ export class WebGLRenderer {
       event: KeepTrackApiEvents.resize,
       cbName: 'webgl-Renderer',
       cb: () => {
+        // Clear any existing resize timer
+        clearTimeout(this.lastResizeTime);
+
+        /*
+         * Set a new timer to resize the canvas after 100 ms
+         * This is to prevent multiple resize events from firing in quick succession
+         * and causing performance issues
+         */
+        this.lastResizeTime = window.setTimeout(() => {
         this.resizeCanvas();
+        }, 100);
       },
     });
 

@@ -134,7 +134,7 @@ export class ColorSchemeManager {
     });
   }
 
-  async calculateColorBuffers(isForceRecolor = false): Promise<void> {
+  calculateColorBuffers(isForceRecolor = false): void {
     try {
       /*
        * These two variables only need to be set once, but we want to make sure they aren't called before the satellites
@@ -248,9 +248,8 @@ export class ColorSchemeManager {
         // Generate some buffers
         this.colorData = new Float32Array(catalogManagerInstance.numObjects * 4);
         this.pickableData = new Int8Array(catalogManagerInstance.numObjects);
-        this.calculateColorBuffers(true).then(() => {
-          this.isReady = true;
-        });
+        this.calculateColorBuffers(true);
+        this.isReady = true;
 
         // This helps keep the inview colors up to date
         keepTrackApi.register({

@@ -50,7 +50,8 @@ export class GroupsManager {
 
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.group);
+    colorSchemeManagerInstance.isUseGroupColorScheme = true;
+    colorSchemeManagerInstance.calculateColorBuffers();
   }
 
   clearSelect(): void {

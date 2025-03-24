@@ -86,7 +86,7 @@
   }
 
   #legend-hover-menu {
-    padding-left: 35px;
+    padding-left: 5px;
     color: white;
     background: var(--color-dark-background);
     width: 300px;

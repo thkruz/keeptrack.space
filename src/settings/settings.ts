@@ -23,7 +23,8 @@ import { KeepTrackApiEvents, MenuMode, SensorGeolocation, ToastMsgType } from '@
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { KeepTrackPlugins } from '@app/plugins/plugins';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { ColorSchemeColorMap } from '@app/singletons/color-scheme-manager';
+import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
+import { DefaultColorSchemeColorMap } from '@app/singletons/color-schemes/default-color-scheme';
 import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
@@ -139,7 +140,7 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality.toString());
   }
 
-  colors: ColorSchemeColorMap;
+  colors: ColorSchemeColorMap & DefaultColorSchemeColorMap;
 
   /** Ensures no html is injected into the page */
   isPreventDefaultHtml = false;
@@ -405,7 +406,7 @@ export class SettingsManager {
    */
   isOrbitCruncherInEcf = false;
   lastSearch = null;
-  isGroupOverlayDisabled = null;
+  isGroupOverlayDisabled: boolean | null = null;
   /**
    * Distance from satellite when we switch to close camera mode
    */
@@ -1368,7 +1369,7 @@ export class SettingsManager {
   private setColorSettings_() {
     this.selectedColorFallback = this.selectedColor;
 
-    this.colors = {} as ColorSchemeColorMap;
+    this.colors = {} as ColorSchemeColorMap & DefaultColorSchemeColorMap;
     try {
       const jsonString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DOT_COLORS);
 
@@ -1451,23 +1452,7 @@ export class SettingsManager {
         rcsMed: [0.2, 0.4, 1.0, 1],
         rcsLarge: [0, 1.0, 0, 0.6],
         rcsUnknown: [1.0, 1.0, 0, 0.6],
-        age1: [0, 1.0, 0, 0.9],
-        age2: [0, 1.0, 0, 0.9],
-        age3: [0, 1.0, 0, 0.9],
-        age4: [0, 1.0, 0, 0.9],
-        age5: [0, 1.0, 0, 0.9],
-        age6: [0, 1.0, 0, 0.9],
-        age7: [0, 1.0, 0, 0.9],
-        celestrakDefaultActivePayload: [0.0, 1.0, 0.0, 0.85],
-        celestrakDefaultInactivePayload: [1.0, 0.5, 0.0, 1.0],
-        celestrakDefaultRocketBody: [1.0, 0.0, 0.0, 1.0],
-        celestrakDefaultDebris: [0.5, 0.5, 0.5, 0.9],
-        celestrakDefaultSensor: [0.0, 0.0, 1.0, 0.85],
-        celestrakDefaultFov: [0.0, 0.0, 1.0, 0.85],
-        celestrakDefaultUnknown: [1, 1, 1, 0.85],
         lostobjects: [1, 0, 0, 0.8],
-        satLEO: [0.2, 1.0, 0.0, 0.65],
-        satGEO: [0.2, 1.0, 0.0, 0.65],
         inGroup: [1.0, 0.0, 0.0, 1.0],
         countryPRC: [1.0, 0, 0, 0.6],
         countryUS: [0.2, 0.4, 1.0, 1],
@@ -1481,11 +1466,6 @@ export class SettingsManager {
         notional: [1, 0, 0, 0.8],
         starlink: [0.0, 0.8, 0.0, 0.8],
         starlinkNot: [0.8, 0.0, 0.0, 0.8],
-        sourceUssf: [0.2, 1.0, 1.0, 0.7],
-        sourceAldoria: [0.2, 0.4, 1.0, 1],
-        sourceCelestrak: [1.0, 0.75, 0.0, 0.65],
-        sourcePrismnet: [1.0, 1.0, 1.0, 0.8],
-        sourceVimpel: [1.0, 0, 0, 0.6],
       };
 
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));

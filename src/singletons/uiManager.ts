@@ -29,7 +29,7 @@ import { ColorRuleSet, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces'
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import '@materializecss/materialize';
-import { BaseObject, DetailedSatellite, MILLISECONDS_PER_SECOND, Milliseconds } from 'ootk';
+import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from 'ootk';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
 import { closeColorbox } from '../lib/colorbox';
 import { getClass } from '../lib/get-class';
@@ -37,6 +37,7 @@ import { getEl, hideEl, setInnerHtml, showEl } from '../lib/get-el';
 import { rgbCss } from '../lib/rgbCss';
 import { LegendManager } from '../static/legend-manager';
 import { UiValidation } from '../static/ui-validation';
+import { ColorScheme } from './color-schemes/color-scheme';
 import { errorManagerInstance } from './errorManager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
@@ -55,7 +56,7 @@ export class UiManager {
   isCurrentlyTyping = false;
   isUiVisible = true;
   lastBoxUpdateTime = 0;
-  lastColorScheme: ColorRuleSet;
+  lastColorScheme: ColorRuleSet | ColorScheme;
   lastNextPassCalcSatId = 0;
   lastNextPassCalcSensorShortName: string;
   lastToast: string;
@@ -178,7 +179,7 @@ export class UiManager {
     return toastMsg;
   }
 
-  colorSchemeChangeAlert(newScheme: ColorRuleSet) {
+  colorSchemeChangeAlert(newScheme: ColorRuleSet | ColorScheme) {
     // Don't Make an alert the first time!
     if (!this.lastColorScheme) {
       this.lastColorScheme = newScheme;
@@ -197,49 +198,7 @@ export class UiManager {
     // record the new color scheme
     this.lastColorScheme = newScheme;
     // Make an alert
-    switch (newScheme.name) {
-      case 'default':
-      case 'group':
-        this.toast('Color Scheme Changed to Object Types', ToastMsgType.normal, false);
-        break;
-      case 'velocity':
-        this.toast('Color Scheme Changed to Velocity', ToastMsgType.normal, false);
-        break;
-      case 'sunlight':
-        this.toast('Color Scheme Changed to Sunlight', ToastMsgType.normal, false);
-        break;
-      case 'countries':
-      case 'groupCountries':
-        this.toast('Color Scheme Changed to Countries', ToastMsgType.normal, false);
-        break;
-      case 'leo':
-        this.toast('Color Scheme Changed to Near Earth', ToastMsgType.normal, false);
-        break;
-      case 'geo':
-        this.toast('Color Scheme Changed to Deep Space', ToastMsgType.normal, false);
-        break;
-      case 'ageOfElset':
-        this.toast('Color Scheme Changed to GP Age', ToastMsgType.normal, false);
-        break;
-      case 'rcs':
-        this.toast('Color Scheme Changed to Radar Cross Section', ToastMsgType.normal, false);
-        break;
-      case 'smallsats':
-        this.toast('Color Scheme Changed to Small Satellites', ToastMsgType.normal, false);
-        break;
-      case 'lostobjects':
-        this.toast('Color Scheme Changed to Lost Objects', ToastMsgType.normal, false);
-        break;
-      case 'neighbors':
-        this.toast('Color Scheme Changed to Orbit Density', ToastMsgType.normal, false);
-        break;
-      case 'confidence':
-        this.toast('Color Scheme Changed to Confidence', ToastMsgType.normal, false);
-        break;
-      default:
-        this.toast(`Color Scheme Changed to ${newScheme.name}`, ToastMsgType.normal, false);
-        break;
-    }
+    this.toast(`Color Scheme Changed to ${newScheme instanceof ColorScheme ? newScheme.label : newScheme.name}`, ToastMsgType.normal, false);
   }
 
   doSearch(searchString: string, isPreventDropDown?: boolean) {
@@ -389,55 +348,37 @@ export class UiManager {
 
   legendHoverMenuClick(legendType: string) {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeInstance = colorSchemeManagerInstance.currentColorScheme;
     const slug = legendType.split('-')[1];
+    let isFlagOn = true;
 
-    if (slug.startsWith('velocity')) {
-      let colorString: [number, number, number, number];
+    if (colorSchemeManagerInstance.objectTypeFlags[slug]) {
+      isFlagOn = false;
+    }
 
-      switch (slug) {
-        case 'velocityFast':
-          colorString = [0.75, 0.75, 0, 1];
-          break;
-        case 'velocityMed':
-          colorString = [0.75, 0.25, 0, 1];
-          break;
-        case 'velocitySlow':
-          colorString = [1.0, 0, 0.0, 1.0];
-          break;
-        default:
-          colorString = [1.0, 0, 0.0, 1.0];
-          break;
-      }
-      if (colorSchemeManagerInstance.objectTypeFlags[slug]) {
-        colorSchemeManagerInstance.objectTypeFlags[slug] = false;
-        getClass(`legend-${slug}-box`).forEach((el) => {
-          el.style.background = 'black';
-        });
-      } else {
-        colorSchemeManagerInstance.objectTypeFlags[slug] = true;
-        getClass(`legend-${slug}-box`).forEach((el) => {
-          el.style.background = rgbCss(colorString).toString();
-        });
-      }
-    } else if (colorSchemeManagerInstance.objectTypeFlags[slug]) {
-      colorSchemeManagerInstance.objectTypeFlags[slug] = false;
+    if (!isFlagOn) {
       getClass(`legend-${slug}-box`).forEach((el) => {
         el.style.background = 'black';
       });
     } else {
-      colorSchemeManagerInstance.objectTypeFlags[slug] = true;
       getClass(`legend-${slug}-box`).forEach((el) => {
-        const color = settingsManager.colors?.[slug];
+        const color = colorSchemeInstance?.colorTheme[slug] ?? null;
 
         if (!color) {
-          errorManagerInstance.debug(`Color not found for ${slug}`);
+          errorManagerInstance.log(`Color not found for ${slug}`);
         } else {
           el.style.background = rgbCss(color);
         }
       });
     }
 
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
+    colorSchemeManagerInstance.objectTypeFlags[slug] = isFlagOn;
+    if (colorSchemeInstance) {
+      colorSchemeInstance.objectTypeFlags[slug] = colorSchemeManagerInstance.objectTypeFlags[slug];
+    }
+
+
+    colorSchemeManagerInstance.calculateColorBuffers(true);
   }
 
   onReady() {

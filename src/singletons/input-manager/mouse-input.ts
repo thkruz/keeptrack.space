@@ -12,7 +12,6 @@ import { DetailedSatellite, Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
 import { showLoading } from '../../lib/showLoading';
-import { LegendManager } from '../../static/legend-manager';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { lineManagerInstance } from '../draw-manager/line-manager';
 import { LineColors } from '../draw-manager/line-manager/line';
@@ -584,14 +583,7 @@ export class MouseInput {
          */
 
         // Revert any group color scheme back to a non group scheme
-        if (colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group) {
-          colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
-          LegendManager.change('default');
-        }
-        if (colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.groupCountries) {
-          colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.countries, true);
-          LegendManager.change('countries');
-        }
+        colorSchemeManagerInstance.isUseGroupColorScheme = false;
 
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
         break;

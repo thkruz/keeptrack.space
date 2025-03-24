@@ -153,7 +153,7 @@ export class WebGLRenderer {
          * and causing performance issues
          */
         this.lastResizeTime = window.setTimeout(() => {
-        this.resizeCanvas();
+          this.resizeCanvas();
         }, 100);
       },
     });
@@ -607,7 +607,7 @@ export class WebGLRenderer {
       // All Orbits
       groupsManagerInstance.groupList.debris = groupsManagerInstance.createGroup(GroupType.ALL, '', 'AllSats');
       groupsManagerInstance.selectGroup(groupsManagerInstance.groupList.debris);
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true); // force color recalc
+      colorSchemeManagerInstance.calculateColorBuffers(true); // force color recalc
       groupsManagerInstance.groupList.debris.updateOrbits();
       this.settings_.isOrbitOverlayVisible = true;
     }

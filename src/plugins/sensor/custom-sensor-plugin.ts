@@ -170,11 +170,11 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           typ: CruncerMessageTypes.SUNLIGHT_VIEW,
         });
         LegendManager.change('sunlight');
-        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.SunlightColorScheme);
         waitForCruncher({
           cruncher: catalogManagerInstance.satCruncher,
           cb: () => {
-            colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.sunlight, true);
+            colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.SunlightColorScheme, true);
           },
           validationFunc: (data: any) => data.satInSun,
         });
@@ -199,8 +199,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         (<HTMLInputElement>getEl('cs-maxrange')).value = '5556';
         triggerSubmit(<HTMLFormElement>getEl('customSensor'));
         LegendManager.change('default');
-        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
-        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme, true);
+        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorSchemeUpdate);
         catalogManagerInstance.satCruncher.postMessage({
           isSunlightView: false,
           typ: CruncerMessageTypes.SUNLIGHT_VIEW,
@@ -213,8 +213,6 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       case 'colors-sunlight-rmb':
       case 'colors-country-rmb':
       case 'colors-velocity-rmb':
-      case 'colors-ageOfElset-rmb':
-      case 'colors-dataSource-rmb':
       case 'colors-default-rmb':
         break;
       default:

@@ -93,10 +93,10 @@ describe('uiManager', () => {
     const uiManagerInstance = new UiManager();
     const colorSchemeManagerInstance = new ColorSchemeManager();
 
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManager.colorSchemeInstances.DefaultColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManager.colorSchemeInstances.DefaultColorScheme)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.group)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.default)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManager.colorSchemeInstances.DefaultColorScheme)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.velocity)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.countries)).not.toThrow();

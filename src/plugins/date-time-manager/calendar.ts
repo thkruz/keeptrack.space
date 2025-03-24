@@ -667,7 +667,7 @@ export class Calendar {
       jdayElement.innerHTML = jday.toString();
     }
     timeManagerInstance.changeStaticOffset(this.simulationDate.getTime() - today.getTime());
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
+    colorSchemeManagerInstance.calculateColorBuffers(true);
     timeManagerInstance.calculateSimulationTime();
 
     timeManagerInstance.lastBoxUpdateTime = timeManagerInstance.realTime;

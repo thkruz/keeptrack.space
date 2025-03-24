@@ -93,21 +93,17 @@ describe('uiManager', () => {
     const uiManagerInstance = new UiManager();
     const colorSchemeManagerInstance = new ColorSchemeManager();
 
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManager.colorSchemeInstances.DefaultColorScheme)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManager.colorSchemeInstances.DefaultColorScheme)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.group)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManager.colorSchemeInstances.DefaultColorScheme)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.velocity)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.sunlight)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.countries)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.groupCountries)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.leo)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.geo)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.ageOfElset)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.rcs)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.smallsats)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.lostobjects)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.neighbors)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.VelocityColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.SunlightColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.CountryColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.GpAgeColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.RcsColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.SmallSatColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.DensityColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.CelestrakColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.SourceColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.ConfidenceColorScheme)).not.toThrow();
   });
 
   // Should process footerToggle and hideUi

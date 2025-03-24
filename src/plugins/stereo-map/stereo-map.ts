@@ -427,6 +427,8 @@ export class StereoMap extends KeepTrackPlugin {
   private drawEarthLayer_(): void {
     const ctx = this.canvas_.getContext('2d');
 
+    // TODO: What if the ctx becomes broken/corrupted? Issue #1018
+
     if (this.earthImg_.src) {
       ctx?.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
     } else {

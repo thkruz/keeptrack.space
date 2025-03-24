@@ -651,7 +651,7 @@ theodore.kruczek at gmail dot com.
      * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
      */
     if (!settingsManager.isMobileModeEnabled) {
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme); // avoid recalculating ALL colors
+      colorSchemeManagerInstance.calculateColorBuffers(false); // avoid recalculating ALL colors
     }
   }
 

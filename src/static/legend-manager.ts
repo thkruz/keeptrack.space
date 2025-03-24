@@ -1,98 +1,53 @@
 import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
+import { DefaultColorScheme } from '@app/singletons/color-schemes/default-color-scheme';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { rgbCss } from '../lib/rgbCss';
 import {
-  ageOfElsetDiv,
   astronomyDiv,
-  confidenceDiv,
-  countriesDiv,
-  dataSourceDiv,
   deepDiv,
-  defaultDiv,
-  defaultSensorDiv,
   nearDiv,
-  neighborsDiv,
   planetariumDiv,
-  rcsDiv,
-  smallDiv,
-  sunlightDiv,
-  timeMachineMenuDiv,
-  velocityDiv,
 } from './legend-manager/legend-divs';
 
 export abstract class LegendManager {
-  private static readonly legendClassList = [
-    '.legend-payload-box',
-    '.legend-rocketBody-box',
-    '.legend-debris-box',
-    '.legend-inFOV-box',
-    '.legend-facility-box',
-    '.legend-sensor-box',
-    '.legend-facility-box',
-    '.legend-missile-box',
-    '.legend-missileInview-box',
-    '.legend-pink-box',
-    '.legend-inFOV-box',
+  private static legendClassList = [
     '.legend-inviewAlt-box',
     '.legend-starLow-box',
     '.legend-starMed-box',
     '.legend-starHi-box',
-    '.legend-satLow-box',
-    '.legend-satMed-box',
-    '.legend-satHi-box',
     '.legend-inviewAlt-box',
-    '.legend-confidenceLow-box',
-    '.legend-confidenceMed-box',
-    '.legend-confidenceHi-box',
-    '.legend-rcsSmall-box',
-    '.legend-rcsMed-box',
-    '.legend-rcsLarge-box',
-    '.legend-rcsUnknown-box',
     '.legend-satLEO-box',
     '.legend-satGEO-box',
-    '.legend-countryUS-box',
-    '.legend-countryCIS-box',
-    '.legend-countryPRC-box',
-    '.legend-countryOther-box',
-    '.legend-age1-box',
-    '.legend-age2-box',
-    '.legend-age3-box',
-    '.legend-age4-box',
-    '.legend-age5-box',
-    '.legend-age6-box',
-    '.legend-age7-box',
-    '.legend-satSmall-box',
-    '.legend-densityPayload-box',
-    '.legend-densityHi-box',
-    '.legend-densityMed-box',
-    '.legend-densityLow-box',
-    '.legend-densityOther-box',
-    '.legend-sourceUssf-box',
-    '.legend-sourceAldoria-box',
-    '.legend-sourceCelestrak-box',
-    '.legend-sourcePrismnet-box',
-    '.legend-sourceVimpel-box',
   ];
 
-  private static readonly menuOptions = {
-    rcs: rcsDiv,
-    confidence: confidenceDiv,
-    neighbors: neighborsDiv,
-    small: smallDiv,
+  private static menuOptions = {
     near: nearDiv,
     deep: deepDiv,
-    velocity: velocityDiv,
-    sunlight: sunlightDiv,
-    ageOfElset: ageOfElsetDiv,
-    dataSource: dataSourceDiv,
-    countries: countriesDiv,
     planetarium: planetariumDiv,
     astronomy: astronomyDiv,
-    timeMachine: timeMachineMenuDiv,
     clear: '',
     default: '',
   };
+
+  static {
+    const addonLegends = {};
+    const addonlegendClassList = [] as string[];
+
+    // eslint-disable-next-line guard-for-in
+    for (const ColorSchemeClass of ColorSchemeManager.addonColorSchemes) {
+      addonLegends[ColorSchemeClass.name] = ColorSchemeClass.legendHtml;
+
+      for (const flag in ColorSchemeClass.uniqueObjectTypeFlags) {
+        if (flag) {
+          addonlegendClassList.push(`.legend-${flag}-box`);
+        }
+      }
+    }
+
+    LegendManager.menuOptions = { ...LegendManager.menuOptions, ...addonLegends };
+    LegendManager.legendClassList = [...LegendManager.legendClassList, ...addonlegendClassList];
+  }
 
   static change(menu: string) {
     const legendHoverDom = getEl('legend-hover-menu');
@@ -101,8 +56,8 @@ export abstract class LegendManager {
       return;
     }
 
-    const selectedOption =
-      LegendManager.menuOptions[menu] || (keepTrackApi.getSensorManager().currentSensors.length > 0 ? defaultSensorDiv : defaultDiv);
+    // TODO there should be a setting that determines the defaults (Celestrak Rebase)
+    const selectedOption = LegendManager.menuOptions[menu] ?? DefaultColorScheme.legendHtml;
 
     legendHoverDom.innerHTML = selectedOption;
     if (menu === 'clear') {
@@ -120,7 +75,6 @@ export abstract class LegendManager {
     colorSchemeManagerInstance.resetObjectTypeFlags();
 
     try {
-      LegendManager.setVelocityColor_(colorSchemeManagerInstance);
       LegendManager.setColors_(colorSchemeManagerInstance);
     } catch {
       setTimeout(LegendManager.legendColorsChange, 100);
@@ -141,24 +95,5 @@ export abstract class LegendManager {
       }
       colorSchemeManagerInstance.objectTypeFlags[selector.split('-')[1]] = true;
     });
-  }
-
-  private static setVelocityColor_(colorSchemeManagerInstance: ColorSchemeManager) {
-    const velocitySlowClass = <HTMLElement>document.querySelector('.legend-velocitySlow-box');
-    const velocityMedClass = <HTMLElement>document.querySelector('.legend-velocityMed-box');
-    const velocityFastClass = <HTMLElement>document.querySelector('.legend-velocityFast-box');
-
-    if (velocitySlowClass) {
-      velocitySlowClass.style.background = rgbCss([1, 0, 0, 1]);
-    }
-    if (velocityMedClass) {
-      velocityMedClass.style.background = rgbCss([0.75, 0.25, 0, 1]);
-    }
-    if (velocityFastClass) {
-      velocityFastClass.style.background = rgbCss([0.75, 0.75, 0, 1]);
-    }
-    colorSchemeManagerInstance.objectTypeFlags.velocitySlow = true;
-    colorSchemeManagerInstance.objectTypeFlags.velocityMed = true;
-    colorSchemeManagerInstance.objectTypeFlags.velocityFast = true;
   }
 }

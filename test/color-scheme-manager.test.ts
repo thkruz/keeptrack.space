@@ -102,7 +102,7 @@ const obj26 = defaultSat.clone();
 obj26.type = SpaceObjectType.UNKNOWN;
 const obj27 = defaultSat.clone();
 
-obj27.type = null;
+obj27.type = null as unknown as SpaceObjectType;
 const obj28 = defaultSat.clone();
 
 obj28.inclination = 175 as Degrees;
@@ -333,19 +333,12 @@ describe('ColorSchemeManager', () => {
     expect(colorSchemeManager).toBeDefined();
   });
 
-  // Test apogee color scheme
-  it('should be able to get apogee color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.apogee(sat);
-
-    testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
-  });
-
   // Test age of elset color scheme
   it('should be able to get age of elset color scheme', () => {
     const test = (sat: BaseObject) =>
-      colorSchemeManager.ageOfElset(sat, {
+      colorSchemeManager.colorSchemeInstances.GpAgeColorScheme.update(sat, {
         jday: 1,
-        year: '23',
+        year: 23,
       });
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
@@ -353,14 +346,14 @@ describe('ColorSchemeManager', () => {
 
   // Test countries color scheme
   it('should be able to get countries color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.countries(sat);
+    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.CountryColorScheme.update(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
 
   // Test default color scheme
   it('should be able to get default color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.default(sat);
+    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.DefaultColorScheme.update(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
 
@@ -370,19 +363,12 @@ describe('ColorSchemeManager', () => {
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
 
-  // Test geo color scheme
-  it('should be able to get geo color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.geo(sat);
-
-    testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
-  });
-
   // Test group color scheme
   it('should be able to get group color scheme', () => {
     const group = keepTrackApi.getGroupsManager().createGroup(GroupType.SCC_NUM, [1]);
 
     keepTrackApi.getGroupsManager().selectGroup(group);
-    const test = (sat: BaseObject) => colorSchemeManager.group(sat);
+    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.DefaultColorScheme.updateGroup(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
@@ -415,58 +401,37 @@ describe('ColorSchemeManager', () => {
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
 
-  // Test leo color scheme
-  it('should be able to get leo color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.leo(sat);
-
-    testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
-  });
-
-  // Test lostobjects color scheme
-  it('should be able to get lostobjects color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.lostobjects(sat);
-
-    testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
-  });
-
   // Test groupCountries color scheme
   it('should be able to get lostobjects color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.groupCountries(sat);
+    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.CountryColorScheme.updateGroup(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
 
   // Test rcs color scheme
   it('should be able to get rcs color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.rcs(sat);
+    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.RcsColorScheme.update(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
 
   // Test smallsats color scheme
   it('should be able to get smallsats color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.smallsats(sat);
+    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.SmallSatColorScheme.update(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
 
   // Test velocity color scheme
   it('should be able to get velocity color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.velocity(sat);
+    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.VelocityColorScheme.update(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
 
   // Test sunlight color scheme
   it('should be able to get sunlight color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.sunlight(sat);
-
-    testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
-  });
-
-  // Test onlyFov color scheme
-  it('should be able to get onlyfov color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.onlyFOV(sat);
+    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.SunlightColorScheme.update(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
@@ -493,7 +458,7 @@ describe('ColorSchemeManager', () => {
     }
 
     const test = (sat: BaseObject) =>
-      colorSchemeManager.neighbors(sat, {
+      colorSchemeManager.colorSchemeInstances.DensityColorScheme.update(sat, {
         orbitDensity: orbitDensityMatrix,
         orbitDensityMax: 180,
       });

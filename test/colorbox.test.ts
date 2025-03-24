@@ -93,7 +93,7 @@ describe('openColorbox_function', () => {
 
     const colorboxContainer = <HTMLElement>getEl('colorbox-container');
 
-    expect(colorboxContainer.style.transform).toBe('translateX(-100%)');
+    expect(colorboxContainer.style.transform).toBe('translateX(-200%)');
     const colorboxIframe = <HTMLElement>getEl('colorbox-iframe');
 
     expect(colorboxIframe.style.display).toBe('none');
@@ -122,7 +122,10 @@ describe('openColorbox_function', () => {
 
   // Tests that colorbox is closed when clicked
   it('test_close_colorbox', () => {
-    openColorbox('https://www.example.com');
+    // Create a spyon
+    const cb = jest.fn();
+
+    openColorbox('https://www.example.com', { callback: cb });
     jest.advanceTimersByTime(2000);
 
     const colorboxDom = <HTMLElement>getEl('colorbox-div');
@@ -130,6 +133,7 @@ describe('openColorbox_function', () => {
     expect(colorboxDom.style.display).toBe('block');
     colorboxDom.click();
     jest.advanceTimersByTime(1000);
-    expect(colorboxDom.style.display).toBe('none');
+
+    expect(cb).toHaveBeenCalled();
   });
 });

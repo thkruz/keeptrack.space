@@ -164,13 +164,8 @@ export class SearchManager {
       settingsManager.lastSearchResults = [];
       dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
 
-      if (colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.group) {
-        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
-      } else if (colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.groupCountries) {
-        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.countries, true);
-      } else {
-        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
-      }
+      colorSchemeManagerInstance.isUseGroupColorScheme = false;
+      colorSchemeManagerInstance.calculateColorBuffers(true);
     } catch (error) {
       console.warn(error);
     }
@@ -647,14 +642,8 @@ export class SearchManager {
     slideInDown(getEl('search-results'), 1000);
     this.isResultsOpen = true;
 
-    if (
-      colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.groupCountries ||
-      colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.countries
-    ) {
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.groupCountries, true);
-    } else {
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.group, true);
-    }
+    colorSchemeManagerInstance.isUseGroupColorScheme = true;
+    colorSchemeManagerInstance.calculateColorBuffers(true);
   }
 
   toggleSearch() {

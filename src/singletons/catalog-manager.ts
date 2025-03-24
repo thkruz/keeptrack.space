@@ -243,8 +243,8 @@ export class CatalogManager {
    *
    */
   getObject(i: number | null | undefined, type: GetSatType = GetSatType.DEFAULT): BaseObject | null {
-    if (i === null || i <= -1) {
-      errorManagerInstance.debug('getSat: i is null');
+    if (i === null || (i ?? -1) <= -1) {
+      // errorManagerInstance.debug('getSat: i is null'); - This happens a lot but is useful for debugging
 
       return null;
     }

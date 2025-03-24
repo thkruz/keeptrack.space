@@ -179,7 +179,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
           keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
 
           // groupsManager.selectGroup(null); // Deselect all orbits
-          keepTrackApi.getColorSchemeManager().setColorScheme(keepTrackApi.getColorSchemeManager().default, true); // Reset All Colors
+          keepTrackApi.getColorSchemeManager().setColorScheme(keepTrackApi.getColorSchemeManager().colorSchemeInstances.DefaultColorScheme, true); // Reset All Colors
           keepTrackApi.getUiManager().dismissAllToasts();
 
           /*

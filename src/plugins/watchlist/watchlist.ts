@@ -314,7 +314,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     }
     const colorSchemeManager = keepTrackApi.getColorSchemeManager();
 
-    colorSchemeManager.setColorScheme(colorSchemeManager.currentColorScheme, true); // force color recalc
+    colorSchemeManager.calculateColorBuffers(true); // force color recalc
 
     const saveWatchlist: string[] = [];
 
@@ -358,8 +358,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     if (this.watchlistList.length <= 0) {
       uiManagerInstance.doSearch('');
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true);
-      uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorScheme);
+      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme, true);
+      uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorSchemeUpdate);
     }
   }
 

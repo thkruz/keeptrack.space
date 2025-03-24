@@ -271,7 +271,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
     const colorSchemeManager = keepTrackApi.getColorSchemeManager();
 
-    if (colorSchemeManager.currentColorScheme === colorSchemeManager.default) {
+    if (colorSchemeManager.currentColorSchemeUpdate === colorSchemeManager.colorSchemeInstances.DefaultColorScheme.update) {
       LegendManager.change('default');
     }
   }

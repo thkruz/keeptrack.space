@@ -187,8 +187,8 @@ export class CatalogLoader {
     const settingsManager: SettingsManager = window.settingsManager;
 
     try {
-
-      if (settingsManager.dataSources.tle === 'https://api.keeptrack.space/v2/sats' || settingsManager.dataSources.tle === 'http://localhost:8787/v2/sats') {
+      // TODO: Which sources can use this should be definied in the settings (Celestrak Rebase)
+      if (settingsManager.dataSources.tle === 'https://api.keeptrack.space/v3/sats' || settingsManager.dataSources.tle === 'http://localhost:8787/v3/sats') {
         if (!settingsManager.limitSats) {
           CatalogLoader.setupGetVariables();
         }
@@ -204,17 +204,24 @@ export class CatalogLoader {
       }: { extraSats: Promise<ExtraSat[]>; asciiCatalog: Promise<AsciiTleSat[] | void>; jsCatalog: Promise<JsSat[]>; externalCatalog: Promise<AsciiTleSat[] | void> } =
         CatalogLoader.getAdditionalCatalogs_(settingsManager);
 
-      if (settingsManager.externalTLEsOnly) {
-        // Load our database for the extra information - the satellites will be filtered out
-        await fetch(settingsManager.dataSources.tle)
-          .then((response) => response.json())
-          .then((data) => CatalogLoader.parse({
-            keepTrackTle: data,
+      if (settingsManager.dataSources.externalTLEsOnly) {
+        if (settingsManager.dataSources.isSupplementExternal) {
+          // Load our database for the extra information - the satellites will be filtered out
+          await fetch(settingsManager.dataSources.tle)
+            .then((response) => response.json())
+            .then((data) => CatalogLoader.parse({
+              keepTrackTle: data,
+              externalCatalog,
+            }))
+            .catch((error) => {
+              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+            });
+        } else {
+          // Load the external TLEs only
+          await CatalogLoader.parse({
             externalCatalog,
-          }))
-          .catch((error) => {
-            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
+        }
       } else if (settingsManager.isUseDebrisCatalog) {
         // Load the debris catalog
         await fetch(settingsManager.dataSources.tleDebris)
@@ -439,13 +446,13 @@ export class CatalogLoader {
     if (settingsManager.offline && !settingsManager.isDisableExtraCatalog) {
       extraSats = CatalogLoader.getExtraCatalog_(settingsManager);
     }
-    if (!settingsManager.externalTLEs && !settingsManager.isDisableAsciiCatalog) {
+    if (!settingsManager.dataSources.externalTLEs && !settingsManager.isDisableAsciiCatalog) {
       asciiCatalog = CatalogLoader.getAsciiCatalog_(settingsManager);
     }
     if (settingsManager.isEnableJscCatalog) {
       jsCatalog = CatalogLoader.getJscCatalog_(settingsManager);
     }
-    if (settingsManager.externalTLEs) {
+    if (settingsManager.dataSources.externalTLEs) {
       externalCatalog = CatalogLoader.getExternalCatalog_(settingsManager);
     }
 
@@ -487,7 +494,7 @@ export class CatalogLoader {
    */
   // eslint-disable-next-line require-await
   private static async getExternalCatalog_(settingsManager: SettingsManager): Promise<AsciiTleSat[] | void> {
-    return fetch(settingsManager.externalTLEs)
+    return fetch(settingsManager.dataSources.externalTLEs)
       .then((resp) => {
         if (resp.ok) {
           const externalCatalog: AsciiTleSat[] = [];
@@ -511,16 +518,16 @@ export class CatalogLoader {
             return externalCatalog;
           });
         }
-        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.externalTLEs}`);
+        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.dataSources.externalTLEs}`);
         errorManagerInstance.info('Reverting to internal TLEs');
-        settingsManager.externalTLEs = '';
+        settingsManager.dataSources.externalTLEs = '';
 
         return [];
       })
       .catch(() => {
-        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.externalTLEs}`);
+        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.dataSources.externalTLEs}`);
         errorManagerInstance.info('Reverting to internal TLEs');
-        settingsManager.externalTLEs = '';
+        settingsManager.dataSources.externalTLEs = '';
       });
   }
 
@@ -786,7 +793,10 @@ export class CatalogLoader {
     tempSatData[i].tle1 = element.TLE1;
     tempSatData[i].tle2 = element.TLE2;
     tempSatData[i].name = element.ON || tempSatData[i].name || 'Unknown';
-    tempSatData[i].source = settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT;
+    tempSatData[i].source = settingsManager.dataSources.externalTLEs ? settingsManager.dataSources.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT;
+    if (settingsManager.dataSources.externalTLEs === 'https://storage.keeptrack.space/data/celestrak.txt') {
+      tempSatData[i].source = CatalogSource.CELESTRAK;
+    }
     tempSatData[i].altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
 
     const satellite = new DetailedSatellite(tempSatData[i]);
@@ -799,7 +809,7 @@ export class CatalogLoader {
       element.ON = 'Unknown';
     }
     if (typeof element.OT === 'undefined') {
-      element.OT = SpaceObjectType.SPECIAL;
+      element.OT = SpaceObjectType.UNKNOWN;
     }
     const intlDes = this.parseIntlDes_(element.TLE1);
     const sccNum = Tle.convertA5to6Digit(element.SCC.toString());
@@ -815,11 +825,15 @@ export class CatalogLoader {
       sccNum,
       tle1: element.TLE1,
       tle2: element.TLE2,
-      source: settingsManager.externalTLEs ? settingsManager.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT,
+      source: settingsManager.dataSources.externalTLEs ? settingsManager.dataSources.externalTLEs.split('/')[2] : CatalogSource.TLE_TXT,
       intlDes,
       typ: 'sat', // TODO: What is this?
       id: tempSatData.length,
     };
+
+    if (settingsManager.dataSources.externalTLEs === 'https://storage.keeptrack.space/data/celestrak.txt') {
+      asciiSatInfo.source = CatalogSource.CELESTRAK;
+    }
 
     catalogManagerInstance.sccIndex[`${sccNum.toString()}`] = tempSatData.length;
     catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
@@ -837,8 +851,10 @@ export class CatalogLoader {
   }
 
   private static processAsciiCatalog_(asciiCatalog: AsciiTleSat[], catalogManagerInstance: CatalogManager, tempSatData: any[]) {
-    if (settingsManager.externalTLEs) {
-      errorManagerInstance.info(`Processing ${settingsManager.externalTLEs}`);
+    if (settingsManager.dataSources.externalTLEs) {
+      if (settingsManager.dataSources.externalTLEs !== 'https://storage.keeptrack.space/data/celestrak.txt') {
+        errorManagerInstance.info(`Processing ${settingsManager.dataSources.externalTLEs}`);
+      }
     } else {
       errorManagerInstance.log('Processing ASCII Catalog');
     }
@@ -857,11 +873,11 @@ export class CatalogLoader {
       }
     }
 
-    if (settingsManager.externalTLEs) {
-      if (settingsManager.externalTLEsOnly) {
+    if (settingsManager.dataSources.externalTLEs) {
+      if (settingsManager.dataSources.externalTLEsOnly) {
         tempSatData = tempSatData.filter((sat) => {
           if (sat.altId === 'EXTERNAL_SAT') {
-            console.log(sat);
+            sat.altId = ''; // Reset the altId
 
             return true;
           }
@@ -903,8 +919,8 @@ export class CatalogLoader {
           static: false,
           missile: false,
           active: true,
-          name: element.ON || 'Unknown',
-          type: element.OT || SpaceObjectType.SPECIAL,
+          name: element.ON ?? 'Unknown',
+          type: element.OT ?? SpaceObjectType.UNKNOWN,
           country: 'Unknown',
           rocket: 'Unknown',
           site: 'Unknown',
@@ -969,11 +985,10 @@ export class CatalogLoader {
             sccNum: '',
             TLE1: element.TLE1,
             TLE2: element.TLE2,
-            source: 'JSC Vimpel',
+            source: CatalogSource.VIMPEL,
             altId,
             intlDes: '',
             id: tempObjData.length,
-            srouce: CatalogSource.VIMPEL,
           };
 
           const satellite = new DetailedSatellite({

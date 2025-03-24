@@ -26,7 +26,7 @@ export class TimeMachine extends KeepTrackPlugin {
       LegendManager.change('clear');
       settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
       groupManagerInstance.clearSelect();
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true); // force color recalc
+      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme, true); // force color recalc
       this.setBottomIconToUnselected();
     }
   };
@@ -85,7 +85,8 @@ export class TimeMachine extends KeepTrackPlugin {
 
     groupManagerInstance.selectGroup(yearGroup);
     yearGroup.updateOrbits();
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.group, false); // force color recalc
+    colorSchemeManagerInstance.isUseGroupColorScheme = true;
+    colorSchemeManagerInstance.calculateColorBuffers();
 
     if (!settingsManager.isDisableTimeMachineToasts) {
       if (year >= 57 && year < 100) {
@@ -128,7 +129,7 @@ export class TimeMachine extends KeepTrackPlugin {
     this.isMenuButtonActive = false;
     this.isTimeMachineRunning = false;
     groupManagerInstance.clearSelect();
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManager.default, true);
+    colorSchemeManagerInstance.setColorScheme(colorSchemeManager.colorSchemeInstances.DefaultColorScheme, true);
   }
 }
 

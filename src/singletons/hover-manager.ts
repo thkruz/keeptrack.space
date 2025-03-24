@@ -203,7 +203,7 @@ export class HoverManager {
 
       let confidenceScoreString = confidenceScore.toString();
 
-      if (settingsManager.externalTLEsOnly) {
+      if (settingsManager.dataSources.externalTLEsOnly) {
         confidenceScoreString = 'External';
         color = 'gray';
       }
@@ -392,14 +392,20 @@ export class HoverManager {
     // If Old Select Sat Picked Color it Correct Color
 
     if (this.lasthoveringSat !== -1 && this.lasthoveringSat !== primarySatId) {
-      const newColor = colorSchemeManagerInstance.currentColorScheme(catalogManagerInstance.getObject(this.lasthoveringSat)).color;
+      const hoveredSatellite = catalogManagerInstance.getObject(this.lasthoveringSat);
 
-      colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4] = newColor[0]; // R
-      colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 1] = newColor[1]; // G
-      colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 2] = newColor[2]; // B
-      colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 3] = newColor[3]; // A
+      if (hoveredSatellite) {
+        // Todo what if this is a group color scheme?
+        const newColor = colorSchemeManagerInstance.currentColorScheme?.update(hoveredSatellite).color ??
+          colorSchemeManagerInstance.currentColorSchemeUpdate(hoveredSatellite).color;
 
-      gl.bufferSubData(gl.ARRAY_BUFFER, this.lasthoveringSat * 4 * 4, new Float32Array(newColor));
+        colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4] = newColor[0]; // R
+        colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 1] = newColor[1]; // G
+        colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 2] = newColor[2]; // B
+        colorSchemeManagerInstance.colorData[this.lasthoveringSat * 4 + 3] = newColor[3]; // A
+
+        gl.bufferSubData(gl.ARRAY_BUFFER, this.lasthoveringSat * 4 * 4, new Float32Array(newColor));
+      }
     }
     // If New Hover Sat Picked Color it
     if (this.hoveringSat !== -1 && this.hoveringSat !== primarySatId) {

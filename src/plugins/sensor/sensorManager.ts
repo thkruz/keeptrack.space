@@ -264,7 +264,7 @@ export class SensorManager {
     // Return to default settings with nothing 'inview'
     SensorManager.updateSensorUiStyling(null);
     this.setSensor(null); // Pass sensorId to identify which sensor the user clicked
-    if (colorSchemeManagerInstance.currentColorScheme === colorSchemeManagerInstance.default) {
+    if (colorSchemeManagerInstance.currentColorSchemeUpdate === colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme.update) {
       LegendManager.change('default');
     }
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -300,7 +300,7 @@ export class SensorManager {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
       dotsManagerInstance.resetSatInView();
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
+      colorSchemeManagerInstance.calculateColorBuffers(true);
     }, 2000);
 
     keepTrackApi.runEvent(KeepTrackApiEvents.resetSensor);

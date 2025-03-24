@@ -489,7 +489,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       LegendManager.legendColorsChange();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
+      colorSchemeManagerInstance.calculateColorBuffers(true);
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MANAGER_COLORS, JSON.stringify(settingsManager.colors));
     }
   }
@@ -664,7 +664,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
      * }
      */
     keepTrackApi.getGroupsManager().clearSelect();
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.default, true); // force color recalc
+    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme, true); // force color recalc
 
     keepTrackApi.getPlugin(TimeMachine)?.setBottomIconToUnselected();
 
@@ -687,7 +687,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       uiManagerInstance.searchManager.doSearch(keepTrackApi.getUiManager().searchManager.getCurrentSearch());
     }
 
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
+    colorSchemeManagerInstance.calculateColorBuffers(true);
 
     SettingsManager.preserveSettings();
   }

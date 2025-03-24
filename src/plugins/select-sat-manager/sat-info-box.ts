@@ -710,7 +710,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       // We encode confidence score in the 65th character in the TLE line 1
       const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
 
-      if (settingsManager.externalTLEsOnly) {
+      if (settingsManager.dataSources.externalTLEsOnly) {
         text = 'External';
         color = 'gray';
       } else if (confidenceScore >= 7) {

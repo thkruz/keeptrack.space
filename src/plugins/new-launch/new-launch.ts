@@ -200,7 +200,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     timeManagerInstance.changeStaticOffset(quadZTime.getTime() - today.getTime()); // Find the offset from today
 
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.currentColorScheme, true);
+    colorSchemeManagerInstance.calculateColorBuffers(true);
 
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 

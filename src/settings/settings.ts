@@ -1380,9 +1380,9 @@ export class SettingsManager {
       // eslint-disable-next-line no-console
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.2') {
+    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.4') {
       this.colors = {
-        version: '1.4.2',
+        version: '1.4.4',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
         sunlight100: [1.0, 1.0, 1.0, 0.7],

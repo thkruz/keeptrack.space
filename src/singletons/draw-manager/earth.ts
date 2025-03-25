@@ -37,17 +37,17 @@ import { OcclusionProgram } from './post-processing';
 export enum EarthNightTextureQuality {
   POTATO = '512',
   LOW = '1K',
-  MEDIUM = '2K',
-  HIGH = '4K',
-  ULTRA = '16K',
+  MEDIUM = '2k',
+  HIGH = '4k',
+  ULTRA = '16k',
 }
 
 export enum EarthDayTextureQuality {
   POTATO = '512',
-  LOW = '1K',
-  MEDIUM = '2K',
-  HIGH = '4K',
-  ULTRA = '16K',
+  LOW = '1k',
+  MEDIUM = '2k',
+  HIGH = '4k',
+  ULTRA = '16k',
 }
 
 export class Earth {

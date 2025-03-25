@@ -118,12 +118,12 @@ Procfile          text
 *.ico             binary
 *.jng             binary
 *.jp2             binary
-*.jpg filter=lfs diff=lfs merge=lfs -text
-*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.jpg             binary
+*.jpeg            binary
 *.jpx             binary
 *.jxr             binary
 *.pdf             binary
-*.png filter=lfs diff=lfs merge=lfs -text
+*.png             binary
 *.psb             binary
 *.psd             binary
 # SVG treated as an asset (binary) by default.

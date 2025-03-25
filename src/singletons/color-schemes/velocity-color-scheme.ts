@@ -8,7 +8,7 @@ export class VelocityColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
   label = 'Velocity';
-  name = VelocityColorScheme.name;
+  name = 'VelocityColorScheme';
   isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {

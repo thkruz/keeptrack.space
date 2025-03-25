@@ -10,7 +10,7 @@ export class StarlinkColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
   label = 'Starlink';
-  name = StarlinkColorScheme.name;
+  name = 'StarlinkColorScheme';
   isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {

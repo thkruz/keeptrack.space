@@ -16,7 +16,7 @@ export class DensityColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
   label = 'Orbit Density';
-  name = DensityColorScheme.name;
+  name = 'DensityColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     densityPayload: true,

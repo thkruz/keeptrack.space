@@ -1,9 +1,9 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../camera';
 import { MissileObject } from '../catalog-manager/MissileObject';
-import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 
 export interface ColorSchemeColorMap {
   version: string;
@@ -60,7 +60,7 @@ export abstract class ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   static readonly uniqueObjectTypeFlags: Record<string, boolean>;
   legendHtml: string = '';
-  /** This is used in code for matching */
+  /** This is used in code for matching. Must be the class name. */
   name: string = 'default-color-scheme';
   /** This is used in the UI */
   label: string = 'Default Color Scheme';

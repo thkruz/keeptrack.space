@@ -12,7 +12,7 @@ export class SunlightColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
   label = 'Sunlight Status';
-  name = SunlightColorScheme.name;
+  name = 'SunlightColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     satHi: true,

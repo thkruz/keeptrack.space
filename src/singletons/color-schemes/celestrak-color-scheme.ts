@@ -22,6 +22,7 @@ export class CelestrakColorScheme extends ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   label = 'Celestrak';
   name = 'CelestrakColorScheme';
+  static readonly id = 'CelestrakColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     celestrakDefaultActivePayload: true,

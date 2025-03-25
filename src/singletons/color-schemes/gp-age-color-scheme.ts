@@ -20,6 +20,7 @@ export class GpAgeColorScheme extends ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   label = 'GP Age';
   name = 'GpAgeColorScheme';
+  static readonly id = 'GpAgeColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     age1: true,

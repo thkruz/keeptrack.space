@@ -664,7 +664,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
      * }
      */
     keepTrackApi.getGroupsManager().clearSelect();
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme, true); // force color recalc
+    colorSchemeManagerInstance.calculateColorBuffers(true); // force color recalc
 
     keepTrackApi.getPlugin(TimeMachine)?.setBottomIconToUnselected();
 

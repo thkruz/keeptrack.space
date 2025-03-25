@@ -358,8 +358,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     if (this.watchlistList.length <= 0) {
       uiManagerInstance.doSearch('');
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme, true);
-      uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorSchemeUpdate);
+      colorSchemeManagerInstance.calculateColorBuffers(true);
     }
   }
 

@@ -15,8 +15,8 @@ export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
 export class ConfidenceColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Confidence';
-  name = 'ConfidenceColorScheme';
+  readonly label = 'Confidence';
+  readonly id = 'ConfidenceColorScheme';
   static readonly id = 'ConfidenceColorScheme';
 
   static readonly uniqueObjectTypeFlags = {

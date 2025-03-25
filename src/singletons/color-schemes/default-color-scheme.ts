@@ -23,8 +23,8 @@ export interface DefaultColorSchemeColorMap extends ColorSchemeColorMap {
 export class DefaultColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Object Type';
-  name = 'DefaultColorScheme';
+  readonly label = 'Object Type';
+  readonly id = 'DefaultColorScheme';
   static readonly id = 'DefaultColorScheme';
 
   static readonly uniqueObjectTypeFlags = {

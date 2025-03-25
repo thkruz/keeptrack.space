@@ -32,7 +32,7 @@ import { errorManagerInstance } from './errorManager';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { BaseObject, DetailedSatellite } from 'ootk';
+import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
 import { CelestrakColorScheme } from './color-schemes/celestrak-color-scheme';
@@ -51,7 +51,7 @@ import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
 import { PersistenceManager, StorageKey } from './persistence-manager';
 
 export class ColorSchemeManager {
-  private readonly DOTS_PER_CALC = 450;
+  private readonly DOTS_PER_CALC = 350;
   private gl_: WebGL2RenderingContext;
 
   // This is where you confiure addon color schemes
@@ -83,7 +83,8 @@ export class ColorSchemeManager {
     StarlinkColorScheme: new StarlinkColorScheme(),
     SmallSatColorScheme: new SmallSatColorScheme(),
   };
-  currentColorScheme: ColorScheme = this.colorSchemeInstances.DefaultColorScheme;
+  currentColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+  lastColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
   isUseGroupColorScheme = false;
 
   constructor() {
@@ -105,7 +106,6 @@ export class ColorSchemeManager {
   currentColorSchemeUpdate: ColorRuleSet;
   iSensor = 0;
   isReady = false;
-  lastColorScheme: ColorScheme;
   lastDotColored = 0;
   objectTypeFlags = {
     starLow: true,
@@ -161,15 +161,15 @@ export class ColorSchemeManager {
       // Note the colorscheme for next time
       this.lastColorScheme = this.currentColorScheme;
 
-      if (this.lastSavedColorSchemeName_ !== this.currentColorScheme.name) {
-        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.name);
-        this.lastSavedColorSchemeName_ = this.currentColorScheme.name;
+      if (this.lastSavedColorSchemeName_ !== this.currentColorScheme.id) {
+        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
+        this.lastSavedColorSchemeName_ = this.currentColorScheme.id;
       }
 
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 
       // We also need the velocity data if we are trying to colorizing that
-      const satVel: Float32Array | null = this.currentColorScheme?.name === VelocityColorScheme.name ? dotsManagerInstance.getSatVel() : null;
+      const satVel: Float32Array | null = this.currentColorScheme?.id === VelocityColorScheme.name ? dotsManagerInstance.getSatVel() : null;
 
       // Reset Which Sensor we are coloring before the loop begins
       if (firstDotToColor === 0) {
@@ -182,10 +182,10 @@ export class ColorSchemeManager {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       // Velocity is a special case - we need to know the velocity of each satellite
 
-      if (this.currentColorScheme?.name === VelocityColorScheme.name) {
+      if (this.currentColorScheme?.id === VelocityColorScheme.name) {
         this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, satVel as Float32Array, params);
       } else {
-        this.calculateBufferData_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, params);
+        this.calculateBufferDataLoop_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, params);
       }
 
       // If we don't do this then everytime the color refreshes it will undo any effect being applied outside of this loop
@@ -230,7 +230,6 @@ export class ColorSchemeManager {
       cbName: 'colorSchemeManager',
       cb: (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
 
         /*
@@ -244,7 +243,8 @@ export class ColorSchemeManager {
           LegendManager.change(cachedColorScheme);
           possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
         }
-        this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances.DefaultColorScheme;
+        this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+        this.lastColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
 
         // Generate some buffers
         this.colorData = new Float32Array(catalogManagerInstance.numObjects * 4);
@@ -267,24 +267,24 @@ export class ColorSchemeManager {
     });
   }
 
-  isDebrisOff(obj: BaseObject) {
-    return obj.type === 3 && this.currentColorScheme?.objectTypeFlags.debris === false;
-  }
-
   isInView(obj: BaseObject) {
-    return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && this.currentColorScheme?.objectTypeFlags.inFOV === true;
+    return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && this.currentColorScheme?.objectTypeFlags.inFOV;
   }
 
   isInViewOff(obj: BaseObject) {
-    return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && this.currentColorScheme?.objectTypeFlags.inFOV === false;
+    return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && !this.currentColorScheme?.objectTypeFlags.inFOV;
   }
 
   isPayloadOff(obj: BaseObject) {
-    return obj.type === 1 && this.currentColorScheme?.objectTypeFlags.payload === false;
+    return obj.type === SpaceObjectType.PAYLOAD && !this.currentColorScheme?.objectTypeFlags.payload;
   }
 
   isRocketBodyOff(obj: BaseObject) {
-    return obj.type === 2 && this.currentColorScheme?.objectTypeFlags.rocketBody === false;
+    return obj.type === SpaceObjectType.ROCKET_BODY && !this.currentColorScheme?.objectTypeFlags.rocketBody;
+  }
+
+  isDebrisOff(obj: BaseObject) {
+    return obj.type === SpaceObjectType.DEBRIS && !this.currentColorScheme?.objectTypeFlags.debris;
   }
 
   reloadColors() {
@@ -302,15 +302,19 @@ export class ColorSchemeManager {
     }
   }
 
-  async setColorScheme(scheme: ColorScheme, isForceRecolor?: boolean) {
+  setColorScheme(scheme: ColorScheme, isForceRecolor?: boolean) {
     try {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
+      const uiManagerInstance = keepTrackApi.getUiManager();
 
-      scheme ??= this.colorSchemeInstances.DefaultColorScheme;
+      LegendManager.change(scheme.id);
+      uiManagerInstance.colorSchemeChangeAlert(scheme);
+
+      scheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
 
       if (scheme instanceof ColorScheme) {
-        this.currentColorScheme = this.colorSchemeInstances[scheme.name];
-        this.currentColorSchemeUpdate = this.colorSchemeInstances[scheme.name].update;
+        this.currentColorScheme = this.colorSchemeInstances[scheme.id];
+        this.currentColorSchemeUpdate = this.colorSchemeInstances[scheme.id].update;
       } else {
         throw new Error('Color scheme is not a valid color scheme');
       }
@@ -321,8 +325,7 @@ export class ColorSchemeManager {
     } catch (error) {
       // If we can't load the color scheme, just use the default
       errorManagerInstance.log(error);
-      // TODO: The default colorscheme should be set in settings (Celestrak Rebase)
-      this.currentColorSchemeUpdate = this.colorSchemeInstances.DefaultColorScheme.update;
+      this.currentColorSchemeUpdate = this.colorSchemeInstances[settingsManager.defaultColorScheme]?.update ?? this.colorSchemeInstances.DefaultColorScheme.update;
       this.calculateColorBuffers(isForceRecolor);
     }
   }
@@ -339,12 +342,12 @@ export class ColorSchemeManager {
     if (!isForceRecolor && this.currentColorScheme === this.lastColorScheme) {
       if (this.lastDotColored < settingsManager.dotsOnScreen) {
         firstDotToColor = this.lastDotColored;
-        lastDotToColor = firstDotToColor + (settingsManager.dotsPerColor || this.DOTS_PER_CALC);
+        lastDotToColor = firstDotToColor + (settingsManager.dotsPerColor ?? this.DOTS_PER_CALC);
         if (lastDotToColor > settingsManager.dotsOnScreen) {
           lastDotToColor = settingsManager.dotsOnScreen;
         }
       } else {
-        lastDotToColor = settingsManager.dotsPerColor || this.DOTS_PER_CALC;
+        lastDotToColor = settingsManager.dotsPerColor ?? this.DOTS_PER_CALC;
         lastDotToColor = Math.min(lastDotToColor, settingsManager.dotsOnScreen);
       }
 
@@ -365,54 +368,46 @@ export class ColorSchemeManager {
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       satData[i].totalVelocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
-
-      let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
-
-      if (this.isUseGroupColorScheme) {
-        colors ??= this.currentColorScheme?.updateGroup(satData[i], params) ?? this.currentColorSchemeUpdate(satData[i], params);
-      } else {
-        colors ??= this.currentColorScheme?.update(satData[i], params) ?? this.currentColorSchemeUpdate(satData[i], params);
-      }
-
-      this.colorData[i * 4] = colors.color[0]; // R
-      this.colorData[i * 4 + 1] = colors.color[1]; // G
-      this.colorData[i * 4 + 2] = colors.color[2]; // B
-      this.colorData[i * 4 + 3] = colors.color[3]; // A
-      this.pickableData[i] = colors.pickable;
+      this.calculateBufferData_(i, satData, params);
     }
   }
 
-  private calculateBufferData_(
+  private calculateBufferDataLoop_(
     firstDotToColor: number,
     lastDotToColor: number,
     satData: BaseObject[],
     params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number },
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
-      let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
-
-      if (this.isUseGroupColorScheme) {
-        colors ??= this.currentColorScheme?.updateGroup(satData[i], params) ?? this.currentColorSchemeUpdate(satData[i], params);
-      } else {
-        colors ??= this.currentColorScheme?.update(satData[i], params) ?? this.currentColorSchemeUpdate(satData[i], params);
-      }
-
-      if (!colors || !colors.color) {
-        // Catch for when colorscheme fails - this shouldn't happen if the color scheme is valid
-        this.colorData[i * 4] = 0; // R
-        this.colorData[i * 4 + 1] = 0; // G
-        this.colorData[i * 4 + 2] = 0; // B
-        this.colorData[i * 4 + 3] = 0; // A
-        this.pickableData[i] = Pickable.No;
-        continue;
-      }
-
-      this.colorData[i * 4] = colors.color[0]; // R
-      this.colorData[i * 4 + 1] = colors.color[1]; // G
-      this.colorData[i * 4 + 2] = colors.color[2]; // B
-      this.colorData[i * 4 + 3] = colors.color[3]; // A
-      this.pickableData[i] = colors.pickable;
+      this.calculateBufferData_(i, satData, params);
     }
+  }
+
+  private calculateBufferData_(i: number, satData: BaseObject[],
+    params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number }) {
+    let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
+
+    if (this.isUseGroupColorScheme) {
+      colors ??= this.currentColorScheme?.updateGroup(satData[i], params) ?? this.currentColorSchemeUpdate(satData[i], params);
+    } else {
+      colors ??= this.currentColorScheme?.update(satData[i], params) ?? this.currentColorSchemeUpdate(satData[i], params);
+    }
+
+    if (!colors?.color) {
+      // Catch for when colorscheme fails - this shouldn't happen if the color scheme is valid
+      this.colorData[i * 4] = 0; // R
+      this.colorData[i * 4 + 1] = 0; // G
+      this.colorData[i * 4 + 2] = 0; // B
+      this.colorData[i * 4 + 3] = 0; // A
+      this.pickableData[i] = Pickable.No;
+      return;
+    }
+
+    this.colorData[i * 4] = colors.color[0]; // R
+    this.colorData[i * 4 + 1] = colors.color[1]; // G
+    this.colorData[i * 4 + 2] = colors.color[2]; // B
+    this.colorData[i * 4 + 3] = colors.color[3]; // A
+    this.pickableData[i] = colors.pickable;
   }
 
   private static getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
@@ -505,7 +500,7 @@ export class ColorSchemeManager {
         }
       }
 
-      this.setColorScheme(this.colorSchemeInstances.DefaultColorScheme); // TODO: the default should be set in settings (Celestrak Rebase)
+      this.setColorScheme(this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme);
     }
   }
 

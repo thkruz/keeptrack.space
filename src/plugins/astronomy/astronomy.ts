@@ -26,12 +26,11 @@
 import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { LegendManager } from '@app/static/legend-manager';
 import constellationPng from '@public/img/icons/constellation.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Planetarium } from '../planetarium/planetarium';
-import { MenuMode } from '@app/interfaces';
 
 export class Astronomy extends KeepTrackPlugin {
   readonly id = 'Astronomy';
@@ -57,7 +56,6 @@ export class Astronomy extends KeepTrackPlugin {
       orbitManagerInstance.clearInViewOrbit();
       keepTrackApi.getMainCamera().cameraType = CameraType.ASTRONOMY; // Activate Astronomy Camera Mode
       // getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
-      LegendManager.change('astronomy');
 
       keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
     } else {
@@ -67,9 +65,8 @@ export class Astronomy extends KeepTrackPlugin {
       drawManagerInstance.glInit();
       uiManagerInstance.hideSideMenus();
       keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
-      LegendManager.change('default');
       // getEl('fov-text').innerHTML = ('');
-      getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
+      getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-selected');
     }
   };
 }

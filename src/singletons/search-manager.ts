@@ -8,7 +8,6 @@ import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { slideInDown, slideOutUp } from '../lib/slide';
 import { TopMenu } from '../plugins/top-menu/top-menu';
-import { LegendManager } from '../static/legend-manager';
 import { UrlManager } from '../static/url-manager';
 import { MissileObject } from './catalog-manager/MissileObject';
 import type { UiManager } from './uiManager';
@@ -268,7 +267,6 @@ export class SearchManager {
     }
 
     // Don't let the search overlap with the legend
-    LegendManager.change('clear');
     UrlManager.updateURL();
   }
 

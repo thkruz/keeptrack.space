@@ -30,7 +30,6 @@ import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime
 import { keepTrackApi } from '../keepTrackApi';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
 import { SettingsManager } from '../settings/settings';
-import { LegendManager } from '../static/legend-manager';
 import { SatMath } from '../static/sat-math';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
@@ -860,14 +859,12 @@ export class Camera {
         break;
       case CameraType.PLANETARIUM:
         uiManagerInstance.toast('Planetarium Camera Mode', ToastMsgType.standby);
-        LegendManager.change('planetarium');
         break;
       case CameraType.SATELLITE:
         uiManagerInstance.toast('Satellite Camera Mode', ToastMsgType.standby);
         break;
       case CameraType.ASTRONOMY:
         uiManagerInstance.toast('Astronomy Camera Mode', ToastMsgType.standby);
-        LegendManager.change('astronomy');
         break;
       default:
         errorManagerInstance.log(`Invalid Camera Type: ${this.cameraType}`);

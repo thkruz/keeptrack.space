@@ -5,7 +5,6 @@ import { slideInRight } from '@app/lib/slide';
 import { triggerSubmit } from '@app/lib/trigger-submit';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { LegendManager } from '@app/static/legend-manager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
@@ -147,7 +146,6 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const mouseInputInstance = keepTrackApi.getInputManager().mouse;
 
@@ -157,7 +155,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         this.setBottomIconToSelected();
         sensorManagerInstance.isCustomSensorMenuOpen = true;
         if (!(<HTMLInputElement>getEl('cs-telescope')).checked) {
-          getEl('cs-telescope').click();
+          getEl('cs-telescope')?.click();
         }
         (<HTMLInputElement>getEl('cs-uiName')).value = 'Observer';
         (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
@@ -169,8 +167,6 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           isSunlightView: true,
           typ: CruncerMessageTypes.SUNLIGHT_VIEW,
         });
-        LegendManager.change('sunlight');
-        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.SunlightColorScheme);
         waitForCruncher({
           cruncher: catalogManagerInstance.satCruncher,
           cb: () => {
@@ -180,31 +176,34 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         });
         break;
       case 'create-sensor-rmb':
-        slideInRight(getEl('custom-sensor-menu'), 1000);
-        this.setBottomIconToSelected();
-        sensorManagerInstance.isCustomSensorMenuOpen = true;
-        if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
-          getEl('cs-telescope').click();
+        {
+          slideInRight(getEl('custom-sensor-menu'), 1000);
+          this.setBottomIconToSelected();
+          sensorManagerInstance.isCustomSensorMenuOpen = true;
+          if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
+            getEl('cs-telescope').click();
+          }
+          (<HTMLInputElement>getEl('cs-uiName')).value = 'Custom Sensor';
+          (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
+          (<HTMLInputElement>getEl('cs-lon')).value = mouseInputInstance.latLon.lon.toString();
+          (<HTMLInputElement>getEl('cs-hei')).value = '0';
+          (<HTMLInputElement>getEl('cs-type')).value = 'Phased Array Radar';
+          (<HTMLInputElement>getEl('cs-minaz')).value = '0';
+          (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
+          (<HTMLInputElement>getEl('cs-minel')).value = '10';
+          (<HTMLInputElement>getEl('cs-maxel')).value = '90';
+          (<HTMLInputElement>getEl('cs-minrange')).value = '0';
+          (<HTMLInputElement>getEl('cs-maxrange')).value = '5556';
+          triggerSubmit(<HTMLFormElement>getEl('customSensor'));
+          const defaultColorScheme = colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme] ??
+            colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme;
+
+          colorSchemeManagerInstance.setColorScheme(defaultColorScheme, true);
+          catalogManagerInstance.satCruncher.postMessage({
+            isSunlightView: false,
+            typ: CruncerMessageTypes.SUNLIGHT_VIEW,
+          });
         }
-        (<HTMLInputElement>getEl('cs-uiName')).value = 'Custom Sensor';
-        (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
-        (<HTMLInputElement>getEl('cs-lon')).value = mouseInputInstance.latLon.lon.toString();
-        (<HTMLInputElement>getEl('cs-hei')).value = '0';
-        (<HTMLInputElement>getEl('cs-type')).value = 'Phased Array Radar';
-        (<HTMLInputElement>getEl('cs-minaz')).value = '0';
-        (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
-        (<HTMLInputElement>getEl('cs-minel')).value = '10';
-        (<HTMLInputElement>getEl('cs-maxel')).value = '90';
-        (<HTMLInputElement>getEl('cs-minrange')).value = '0';
-        (<HTMLInputElement>getEl('cs-maxrange')).value = '5556';
-        triggerSubmit(<HTMLFormElement>getEl('customSensor'));
-        LegendManager.change('default');
-        colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme, true);
-        uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.currentColorSchemeUpdate);
-        catalogManagerInstance.satCruncher.postMessage({
-          isSunlightView: false,
-          typ: CruncerMessageTypes.SUNLIGHT_VIEW,
-        });
         break;
       case 'colors-confidence-rmb':
       case 'colors-rcs-rmb':

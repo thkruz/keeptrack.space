@@ -7,8 +7,8 @@ import { ColorScheme } from './color-scheme';
 export class VelocityColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Velocity';
-  name = 'VelocityColorScheme';
+  readonly label = 'Velocity';
+  readonly id = 'VelocityColorScheme';
   static readonly id = 'VelocityColorScheme';
   isOptionInRmbMenu = false;
 

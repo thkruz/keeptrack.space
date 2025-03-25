@@ -60,10 +60,12 @@ export abstract class ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   static readonly uniqueObjectTypeFlags: Record<string, boolean>;
   legendHtml: string = '';
-  /** This is used in code for matching. Must be the class name. */
-  name: string = 'default-color-scheme';
   /** This is used in the UI */
-  label: string = 'Default Color Scheme';
+  readonly label: string = 'Default Color Scheme';
+  /** This is used in code for matching. Must be the class name. */
+  readonly id: string = 'ColorScheme';
+  /** This is used in code for matching. Must be the class name. */
+  static readonly id: string = 'ColorScheme';
   isOptionInColorMenu: boolean = true;
   isOptionInRmbMenu: boolean = true;
 

@@ -26,12 +26,11 @@
 import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { LegendManager } from '@app/static/legend-manager';
 import planetariumPng from '@public/img/icons/planetarium.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
-import { MenuMode } from '@app/interfaces';
 
 export class Planetarium extends KeepTrackPlugin {
   readonly id = 'Planetarium';
@@ -74,8 +73,6 @@ export class Planetarium extends KeepTrackPlugin {
        * TODO: implement fov information
        * getEl('fov-text').innerHTML = ('FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg');
        */
-      LegendManager.change('planetarium');
-
       keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
     } else {
       keepTrackApi.getMainCamera().isPanReset = true;

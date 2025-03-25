@@ -11,8 +11,8 @@ import { ColorScheme } from './color-scheme';
 export class SunlightColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Sunlight Status';
-  name = 'SunlightColorScheme';
+  readonly label = 'Sunlight Status';
+  readonly id = 'SunlightColorScheme';
   static readonly id = 'SunlightColorScheme';
 
   static readonly uniqueObjectTypeFlags = {

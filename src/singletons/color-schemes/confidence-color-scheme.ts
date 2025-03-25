@@ -16,7 +16,7 @@ export class ConfidenceColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
   label = 'Confidence';
-  name = ConfidenceColorScheme.name;
+  name = 'ConfidenceColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     confidenceHi: true,

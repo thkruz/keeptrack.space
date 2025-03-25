@@ -18,7 +18,7 @@ export class SourceColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
   label = 'Data Source';
-  name = SourceColorScheme.name;
+  name = 'SourceColorSchemeColorMap';
 
   static readonly uniqueObjectTypeFlags = {
     sourceUssf: true,

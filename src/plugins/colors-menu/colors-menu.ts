@@ -126,7 +126,7 @@ export class ColorMenu extends KeepTrackPlugin {
     for (const colorScheme in colorSchemeManagerInstance.colorSchemeInstances) {
       const colorSchemeInstance = colorSchemeManagerInstance.colorSchemeInstances[colorScheme] as ColorScheme;
 
-      if (colorSchemeInstance.constructor.name === colorName) {
+      if (colorSchemeInstance.name === colorName) {
         colorSchemeInstance.onSelected();
         LegendManager.change(colorName);
         if (keepTrackApi.getGroupsManager().selectedGroup !== null) {

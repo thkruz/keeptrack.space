@@ -8,7 +8,7 @@ export class SmallSatColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
   label = 'Small Satellites';
-  name = SmallSatColorScheme.name;
+  name = 'SmallSatColorScheme';
   isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {

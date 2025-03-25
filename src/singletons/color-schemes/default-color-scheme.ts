@@ -254,7 +254,7 @@ export class DefaultColorScheme extends ColorScheme {
       errorManagerInstance.info(`${sat.id.toString()} has no color!`);
 
       return {
-        color: this.colorTheme.transparent,
+        color: settingsManager.colors.transparent ?? this.colorTheme.transparent,
         pickable: Pickable.No,
       };
     }
@@ -315,7 +315,7 @@ export class DefaultColorScheme extends ColorScheme {
 
     // Hide Everything Else
     return {
-      color: this.colorTheme.transparent,
+      color: settingsManager.colors.transparent ?? this.colorTheme.transparent,
       pickable: Pickable.No,
     };
   }

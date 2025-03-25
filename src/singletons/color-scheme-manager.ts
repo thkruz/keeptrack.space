@@ -83,8 +83,8 @@ export class ColorSchemeManager {
     StarlinkColorScheme: new StarlinkColorScheme(),
     SmallSatColorScheme: new SmallSatColorScheme(),
   };
-  currentColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
-  lastColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+  currentColorScheme: ColorScheme | undefined = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+  lastColorScheme: ColorScheme | undefined = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
   isUseGroupColorScheme = false;
 
   constructor() {
@@ -161,7 +161,7 @@ export class ColorSchemeManager {
       // Note the colorscheme for next time
       this.lastColorScheme = this.currentColorScheme;
 
-      if (this.lastSavedColorSchemeName_ !== this.currentColorScheme.id) {
+      if (this.currentColorScheme && this.lastSavedColorSchemeName_ !== this.currentColorScheme?.id) {
         PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
         this.lastSavedColorSchemeName_ = this.currentColorScheme.id;
       }
@@ -416,6 +416,12 @@ export class ColorSchemeManager {
     const sat = objectData[i] as DetailedSatellite;
 
     if (!settingsManager.isShowNotionalSats && objectData[i].isNotional()) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowVimpelSats && objectData[i].name?.startsWith('JSC Vimpel')) {
       colors = {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,

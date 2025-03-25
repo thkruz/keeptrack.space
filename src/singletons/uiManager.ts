@@ -123,6 +123,7 @@ export class UiManager {
     this.activeToastList_.forEach((toast) => {
       toast.dismiss();
     });
+    this.activeToastList_ = [];
   }
 
   private makeToast_(toastText: string, type: ToastMsgType, isLong = false) {
@@ -137,16 +138,23 @@ export class UiManager {
     // Add an on click event to dismiss the toast
     toastMsg.$el[0].addEventListener('click', () => {
       toastMsg.dismiss();
+      this.activeToastList_ = this.activeToastList_.filter((t) => t !== toastMsg);
     });
 
     toastMsg.$el[0].addEventListener('contextmenu', () => {
       this.dismissAllToasts();
     });
 
+
     type = type || ToastMsgType.standby;
     if (isLong) {
       toastMsg.timeRemaining = UiManager.LONG_TIMER_DELAY;
     }
+
+    setTimeout(() => {
+      this.activeToastList_ = this.activeToastList_.filter((t) => t !== toastMsg);
+    }, toastMsg.timeRemaining);
+
     switch (type) {
       case ToastMsgType.standby:
         toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
@@ -183,7 +191,7 @@ export class UiManager {
      * Don't make an alert unless something has really changed
      * Check if the name of the lastColorScheme function is the same as the name of the new color scheme
      */
-    if (keepTrackApi.getColorSchemeManager().lastColorScheme.id === newScheme.id) {
+    if (keepTrackApi.getColorSchemeManager().lastColorScheme?.id === newScheme.id) {
       return;
     }
 
@@ -438,7 +446,7 @@ export class UiManager {
     }
   }
 
-  private readonly activeToastList_ = [] as {
+  private activeToastList_ = [] as {
     $el: NodeListOf<HTMLElement>;
     timeRemaining: number;
     dismiss: () => void;

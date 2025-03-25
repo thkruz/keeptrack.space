@@ -178,7 +178,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
           keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
 
           // groupsManager.selectGroup(null); // Deselect all orbits
-          keepTrackApi.getColorSchemeManager().setColorScheme(keepTrackApi.getColorSchemeManager().colorSchemeInstances.DefaultColorScheme, true); // Reset All Colors
+          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true); // Reset All Colors
           keepTrackApi.getUiManager().dismissAllToasts();
 
           /*

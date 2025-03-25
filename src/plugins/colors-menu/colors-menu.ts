@@ -3,7 +3,6 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { ColorScheme } from '@app/singletons/color-schemes/color-scheme';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { LegendManager } from '@app/static/legend-manager';
 import palettePng from '@public/img/icons/palette.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -52,7 +51,7 @@ export class ColorMenu extends KeepTrackPlugin {
         continue;
       }
 
-      html += `<li class="menu-selectable" data-color="${colorSchemes[colorScheme].name}">${colorSchemes[colorScheme].label}</li>`;
+      html += `<li class="menu-selectable" data-color="${colorSchemes[colorScheme].id}">${colorSchemes[colorScheme].label}</li>`;
     }
 
     return html;
@@ -69,7 +68,7 @@ export class ColorMenu extends KeepTrackPlugin {
         continue;
       }
 
-      html += `<li id="colors-${colorSchemes[colorScheme].name}-rmb"><a href="#">${colorSchemes[colorScheme].label}</a></li>`;
+      html += `<li id="colors-${colorSchemes[colorScheme].id}-rmb"><a href="#">${colorSchemes[colorScheme].label}</a></li>`;
     }
 
     return html;
@@ -116,7 +115,6 @@ export class ColorMenu extends KeepTrackPlugin {
 
   static readonly colorsMenuClick = (colorName: string) => {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
 
     // If selecteSatManager is loaded, clear selected sat
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // clear selected sat
@@ -126,16 +124,14 @@ export class ColorMenu extends KeepTrackPlugin {
     for (const colorScheme in colorSchemeManagerInstance.colorSchemeInstances) {
       const colorSchemeInstance = colorSchemeManagerInstance.colorSchemeInstances[colorScheme] as ColorScheme;
 
-      if (colorSchemeInstance.name === colorName) {
+      if (colorSchemeInstance.id === colorName) {
         colorSchemeInstance.onSelected();
-        LegendManager.change(colorName);
         if (keepTrackApi.getGroupsManager().selectedGroup !== null) {
           colorSchemeManagerInstance.isUseGroupColorScheme = true;
         } else {
           colorSchemeManagerInstance.isUseGroupColorScheme = false;
         }
         colorSchemeManagerInstance.setColorScheme(colorSchemeInstance, true);
-        uiManagerInstance.colorSchemeChangeAlert(colorSchemeInstance);
         keepTrackApi.getUiManager().hideSideMenus();
 
         return;

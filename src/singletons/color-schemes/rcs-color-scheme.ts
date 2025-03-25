@@ -15,8 +15,8 @@ export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
 export class RcsColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Radar Cross Section';
-  name = 'RcsColorScheme';
+  readonly label = 'Radar Cross Section';
+  readonly id = 'RcsColorScheme';
   static readonly id = 'RcsColorScheme';
 
   static readonly uniqueObjectTypeFlags = {

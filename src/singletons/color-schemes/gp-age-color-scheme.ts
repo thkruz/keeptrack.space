@@ -18,8 +18,8 @@ export interface GpAgeColorSchemeColorMap extends ColorSchemeColorMap {
 export class GpAgeColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'GP Age';
-  name = 'GpAgeColorScheme';
+  readonly label = 'GP Age';
+  readonly id = 'GpAgeColorScheme';
   static readonly id = 'GpAgeColorScheme';
 
   static readonly uniqueObjectTypeFlags = {

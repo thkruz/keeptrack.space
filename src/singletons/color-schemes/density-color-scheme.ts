@@ -15,8 +15,8 @@ export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
 export class DensityColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Orbit Density';
-  name = 'DensityColorScheme';
+  readonly label = 'Orbit Density';
+  readonly id = 'DensityColorScheme';
   static readonly id = 'DensityColorScheme';
 
   static readonly uniqueObjectTypeFlags = {

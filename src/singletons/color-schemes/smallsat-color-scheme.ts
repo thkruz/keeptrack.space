@@ -7,8 +7,8 @@ import { ColorScheme } from './color-scheme';
 export class SmallSatColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Small Satellites';
-  name = 'SmallSatColorScheme';
+  readonly label = 'Small Satellites';
+  readonly id = 'SmallSatColorScheme';
   static readonly id = 'SmallSatColorScheme';
   isOptionInRmbMenu = false;
 

@@ -74,6 +74,13 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
               </label>
             </div>
             <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Vimpel satellites">
+                <input id="settings-vimpel" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Vimpel Satellites
+              </label>
+            </div>
+            <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Disable to hide LEO satellites">
                 <input id="settings-leoSats" type="checkbox" checked/>
                 <span class="lever"></span>
@@ -434,6 +441,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     const settingsElements = [
       { id: 'settings-notionalSats', setting: 'isShowNotionalSats' },
+      { id: 'settings-vimpel', setting: 'isShowVimpelSats' },
       { id: 'settings-leoSats', setting: 'isShowLeoSats' },
       { id: 'settings-starlinkSats', setting: 'isShowStarlinkSats' },
       { id: 'settings-heoSats', setting: 'isShowHeoSats' },
@@ -494,6 +502,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
   }
 
+  // eslint-disable-next-line complexity
   private static onFormChange_(e: Event, isDMChecked?: boolean, isSLMChecked?: boolean) {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
@@ -501,6 +510,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     switch ((<HTMLElement>e.target)?.id) {
       case 'settings-notionalSats':
+      case 'settings-vimpel':
       case 'settings-leoSats':
       case 'settings-starlinkSats':
       case 'settings-heoSats':
@@ -557,6 +567,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   static resetToDefaults() {
     keepTrackApi.getSoundManager().play(SoundNames.BUTTON_CLICK);
+    settingsManager.isShowNotionalSats = true;
+    settingsManager.isShowVimpelSats = true;
     settingsManager.isShowLeoSats = true;
     settingsManager.isShowHeoSats = true;
     settingsManager.isShowMeoSats = true;
@@ -593,6 +605,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
     settingsManager.isShowNotionalSats = (<HTMLInputElement>getEl('settings-notionalSats')).checked;
+    settingsManager.isShowVimpelSats = (<HTMLInputElement>getEl('settings-vimpel')).checked;
     settingsManager.isShowLeoSats = (<HTMLInputElement>getEl('settings-leoSats')).checked;
     settingsManager.isShowStarlinkSats = (<HTMLInputElement>getEl('settings-starlinkSats')).checked;
     settingsManager.isShowHeoSats = (<HTMLInputElement>getEl('settings-heoSats')).checked;
@@ -664,7 +677,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
      * }
      */
     keepTrackApi.getGroupsManager().clearSelect();
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme, true); // force color recalc
+    colorSchemeManagerInstance.calculateColorBuffers(true); // force color recalc
 
     keepTrackApi.getPlugin(TimeMachine)?.setBottomIconToUnselected();
 

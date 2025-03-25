@@ -1,8 +1,6 @@
 import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import type { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { GroupType } from '@app/singletons/object-group';
-import { LegendManager } from '@app/static/legend-manager';
 import historyPng from '@public/img/icons/history.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -17,16 +15,14 @@ export class TimeMachine extends KeepTrackPlugin {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
     if (this.isMenuButtonActive) {
-      LegendManager.change('timeMachine');
       keepTrackApi.getUiManager().searchManager.hideResults();
       this.setBottomIconToSelected();
       this.historyOfSatellitesPlay();
     } else {
       this.isTimeMachineRunning = false;
-      LegendManager.change('clear');
       settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
       groupManagerInstance.clearSelect();
-      colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme, true); // force color recalc
+      colorSchemeManagerInstance.calculateColorBuffers(true); // force color recalc
       this.setBottomIconToUnselected();
     }
   };
@@ -108,13 +104,13 @@ export class TimeMachine extends KeepTrackPlugin {
         }, settingsManager.timeMachineDelayAtPresentDay);
       } else {
         setTimeout(() => {
-          this.removeSatellite(runCount, colorSchemeManagerInstance);
+          this.removeSatellite(runCount);
         }, TimeMachine.TIME_BETWEEN_SATELLITES); // Linger for 10 seconds
       }
     }
   }
 
-  removeSatellite(runCount: number, colorSchemeManager: ColorSchemeManager): void {
+  removeSatellite(runCount: number): void {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const groupManagerInstance = keepTrackApi.getGroupsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -129,7 +125,7 @@ export class TimeMachine extends KeepTrackPlugin {
     this.isMenuButtonActive = false;
     this.isTimeMachineRunning = false;
     groupManagerInstance.clearSelect();
-    colorSchemeManagerInstance.setColorScheme(colorSchemeManager.colorSchemeInstances.DefaultColorScheme, true);
+    colorSchemeManagerInstance.calculateColorBuffers(true);
   }
 }
 

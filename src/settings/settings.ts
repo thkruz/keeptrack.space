@@ -102,6 +102,8 @@ export class SettingsManager {
   earthNightTextureQuality = EarthNightTextureQuality.MEDIUM;
 
   static preserveSettings() {
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_NOTIONAL_SATS, settingsManager.isShowNotionalSats.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_VIMPEL_SATS, settingsManager.isShowVimpelSats.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_STARLINK_SATS, settingsManager.isShowStarlinkSats.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HEO_SATS, settingsManager.isShowHeoSats.toString());
@@ -142,6 +144,12 @@ export class SettingsManager {
 
   colors: ColorSchemeColorMap & DefaultColorSchemeColorMap;
 
+  /**
+   * The default color scheme to use when the application is loaded. This must be a string that matches a class name of one of the available color schemes.
+   * Ex. DefaultColorScheme, CelestrakColorScheme, etc.
+   */
+  defaultColorScheme: 'DefaultColorScheme';
+
   /** Ensures no html is injected into the page */
   isPreventDefaultHtml = false;
   /**
@@ -175,11 +183,6 @@ export class SettingsManager {
    * TODO: This doesn't belong in the settings manager.
    */
   lastMapUpdateTime = 0;
-  /**
-   * @deprecated
-   * Current color scheme for the application.
-   */
-  currentColorScheme = null;
   hiResWidth: number | null = null;
   hiResHeight: number | null = null;
   screenshotMode = null;
@@ -234,6 +237,10 @@ export class SettingsManager {
    * Notional satellites are satellites that haven't launched yet.
    */
   isShowNotionalSats = true;
+  /**
+   * Determines whether or not to show Vimpel satellites in the application.
+   */
+  isShowVimpelSats = true;
   /**
    * Determines whether or not to show Starlink satellites in the application.
    */
@@ -1089,6 +1096,10 @@ export class SettingsManager {
   isAutoZoomOut = false;
   autoZoomSpeed = 0.00002;
   maxNotionalDebris = 100000;
+  /**
+   * This is an override for how many dot colors are calculated per draw loop.
+   * Higher numbers will make the dots more accurate, but will slow down the simulation.
+   */
   dotsPerColor: number;
   /**
    * Minimum distance from satellite when we switch to close camera mode
@@ -1151,6 +1162,13 @@ export class SettingsManager {
     if (isShowNotionalSatsString !== null) {
       this.isShowNotionalSats = isShowNotionalSatsString === 'true';
     }
+
+    const isShowVimpelSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_VIMPEL_SATS);
+
+    if (isShowVimpelSatsString !== null) {
+      this.isShowVimpelSats = isShowVimpelSatsString === 'true';
+    }
+
     const leoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_LEO_SATS);
 
     if (leoSatsString !== null) {

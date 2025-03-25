@@ -33,7 +33,6 @@ import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { LegendManager } from '@app/static/legend-manager';
 import { SatMath, SunStatus } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
@@ -264,9 +263,6 @@ export class SensorManager {
     // Return to default settings with nothing 'inview'
     SensorManager.updateSensorUiStyling(null);
     this.setSensor(null); // Pass sensorId to identify which sensor the user clicked
-    if (colorSchemeManagerInstance.currentColorSchemeUpdate === colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme.update) {
-      LegendManager.change('default');
-    }
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     catalogManagerInstance.satCruncher.postMessage({

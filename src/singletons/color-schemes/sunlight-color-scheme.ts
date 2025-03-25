@@ -11,8 +11,8 @@ import { ColorScheme } from './color-scheme';
 export class SunlightColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Sunlight Status';
-  name = 'SunlightColorScheme';
+  readonly label = 'Sunlight Status';
+  readonly id = 'SunlightColorScheme';
   static readonly id = 'SunlightColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
@@ -38,8 +38,8 @@ export class SunlightColorScheme extends ColorScheme {
       ...this.objectTypeFlags, ...SunlightColorScheme.uniqueObjectTypeFlags,
     };
     keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'colorSchemeManager',
+      event: KeepTrackApiEvents.onKeepTrackReady,
+      cbName: 'SunlightColorScheme',
       cb: (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -72,6 +72,15 @@ export class SunlightColorScheme extends ColorScheme {
   }
 
   update(obj: BaseObject): ColorInformation {
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
+
+    if ((dotsManagerInstance.inSunData?.length ?? -1) < obj.id) {
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
+
     const checkFacility = this.checkFacility_(obj);
 
     if (checkFacility) {
@@ -103,7 +112,6 @@ export class SunlightColorScheme extends ColorScheme {
     if (obj.isMissile()) {
       return this.missileColor_(obj as MissileObject);
     }
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
 
     // In FOV
     if (dotsManagerInstance.inViewData?.[obj.id] === 1 && dotsManagerInstance.inSunData[obj.id] > 0 && this.objectTypeFlags.sunlightFov) {

@@ -9,8 +9,8 @@ import { ColorScheme } from './color-scheme';
 export class StarlinkColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Starlink';
-  name = 'StarlinkColorScheme';
+  readonly label = 'Starlink';
+  readonly id = 'StarlinkColorScheme';
   static readonly id = 'StarlinkColorScheme';
   isOptionInRmbMenu = false;
 

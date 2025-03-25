@@ -5,7 +5,6 @@ import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { LegendManager } from '@app/static/legend-manager';
 import sensorPng from '@public/img/icons/sensor.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
@@ -269,11 +268,6 @@ export class SensorListPlugin extends KeepTrackPlugin {
         // Multi-sensors break this
       }
     }
-    const colorSchemeManager = keepTrackApi.getColorSchemeManager();
-
-    if (colorSchemeManager.currentColorSchemeUpdate === colorSchemeManager.colorSchemeInstances.DefaultColorScheme.update) {
-      LegendManager.change('default');
-    }
   }
 
   private static createLiForSensor_(sensor: DetailedSensor) {
@@ -365,15 +359,12 @@ export class SensorListPlugin extends KeepTrackPlugin {
         // If there is a sensorId set use that
         if (typeof currentSensor[0] === 'undefined' || currentSensor[0] === null) {
           sensorManagerInstance.setSensor(null, currentSensor[1]);
-          LegendManager.change('default');
           // If the sensor is a string, load that collection of sensors
         } else if (typeof currentSensor[0].objName === 'undefined') {
           sensorManagerInstance.setSensor(currentSensor[0], currentSensor[1]);
-          LegendManager.change('default');
         } else {
           // Seems to be a single sensor without a sensorId, load that
           sensorManagerInstance.setSensor(sensors[currentSensor[0].objName], currentSensor[1]);
-          LegendManager.change('default');
         }
       } catch {
         PersistenceManager.getInstance().removeItem(StorageKey.CURRENT_SENSOR);

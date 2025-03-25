@@ -572,16 +572,6 @@ export class MouseInput {
         uiManagerInstance.searchManager.closeSearch();
         uiManagerInstance.hideSideMenus();
 
-        /*
-         * if (
-         *   (!catalogManagerInstance.isSensorManagerLoaded || sensorManagerInstance.currentSensors[0].lat != null) &&
-         *   mainCameraInstance.cameraType !== CameraType.PLANETARIUM &&
-         *   mainCameraInstance.cameraType !== CameraType.ASTRONOMY
-         * ) {
-         *   LegendManager.change('default');
-         * }
-         */
-
         // Revert any group color scheme back to a non group scheme
         colorSchemeManagerInstance.isUseGroupColorScheme = false;
 

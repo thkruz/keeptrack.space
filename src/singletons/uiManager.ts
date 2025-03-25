@@ -25,7 +25,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorRuleSet, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import '@materializecss/materialize';
@@ -56,7 +56,6 @@ export class UiManager {
   isCurrentlyTyping = false;
   isUiVisible = true;
   lastBoxUpdateTime = 0;
-  lastColorScheme: ColorRuleSet | ColorScheme;
   lastNextPassCalcSatId = 0;
   lastNextPassCalcSensorShortName: string;
   lastToast: string;
@@ -124,6 +123,7 @@ export class UiManager {
     this.activeToastList_.forEach((toast) => {
       toast.dismiss();
     });
+    this.activeToastList_ = [];
   }
 
   private makeToast_(toastText: string, type: ToastMsgType, isLong = false) {
@@ -138,16 +138,23 @@ export class UiManager {
     // Add an on click event to dismiss the toast
     toastMsg.$el[0].addEventListener('click', () => {
       toastMsg.dismiss();
+      this.activeToastList_ = this.activeToastList_.filter((t) => t !== toastMsg);
     });
 
     toastMsg.$el[0].addEventListener('contextmenu', () => {
       this.dismissAllToasts();
     });
 
+
     type = type || ToastMsgType.standby;
     if (isLong) {
       toastMsg.timeRemaining = UiManager.LONG_TIMER_DELAY;
     }
+
+    setTimeout(() => {
+      this.activeToastList_ = this.activeToastList_.filter((t) => t !== toastMsg);
+    }, toastMsg.timeRemaining);
+
     switch (type) {
       case ToastMsgType.standby:
         toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
@@ -179,26 +186,17 @@ export class UiManager {
     return toastMsg;
   }
 
-  colorSchemeChangeAlert(newScheme: ColorRuleSet | ColorScheme) {
-    // Don't Make an alert the first time!
-    if (!this.lastColorScheme) {
-      this.lastColorScheme = newScheme;
-
-      return;
-    }
-
+  colorSchemeChangeAlert(newScheme: ColorScheme) {
     /*
      * Don't make an alert unless something has really changed
      * Check if the name of the lastColorScheme function is the same as the name of the new color scheme
      */
-    if (this.lastColorScheme.name === newScheme.name) {
+    if (keepTrackApi.getColorSchemeManager().lastColorScheme?.id === newScheme.id) {
       return;
     }
 
-    // record the new color scheme
-    this.lastColorScheme = newScheme;
     // Make an alert
-    this.toast(`Color Scheme Changed to ${newScheme instanceof ColorScheme ? newScheme.label : newScheme.name}`, ToastMsgType.normal, false);
+    this.toast(`Color Scheme Changed to ${newScheme.label}`, ToastMsgType.normal, false);
   }
 
   doSearch(searchString: string, isPreventDropDown?: boolean) {
@@ -282,7 +280,6 @@ export class UiManager {
         if (getEl('legend-hover-menu')?.innerHTML.length === 0) {
           // TODO: Figure out why it is empty sometimes
           errorManagerInstance.debug('Legend Menu is Empty');
-          LegendManager.change('default');
         }
 
         showEl('legend-hover-menu');
@@ -449,7 +446,7 @@ export class UiManager {
     }
   }
 
-  private readonly activeToastList_ = [] as {
+  private activeToastList_ = [] as {
     $el: NodeListOf<HTMLElement>;
     timeRemaining: number;
     dismiss: () => void;

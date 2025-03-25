@@ -20,8 +20,8 @@ export interface CelestrakColorSchemeColorMap extends ColorSchemeColorMap {
 export class CelestrakColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Celestrak';
-  name = 'CelestrakColorScheme';
+  readonly label = 'Celestrak';
+  readonly id = 'CelestrakColorScheme';
   static readonly id = 'CelestrakColorScheme';
 
   static readonly uniqueObjectTypeFlags = {

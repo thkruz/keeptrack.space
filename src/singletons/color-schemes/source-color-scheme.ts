@@ -17,8 +17,8 @@ export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
 export class SourceColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
-  label = 'Data Source';
-  name = 'SourceColorSchemeColorMap';
+  readonly label = 'Data Source';
+  readonly id = 'SourceColorScheme';
   static readonly id = 'SourceColorScheme';
 
   static readonly uniqueObjectTypeFlags = {

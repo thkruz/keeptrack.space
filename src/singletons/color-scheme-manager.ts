@@ -83,7 +83,7 @@ export class ColorSchemeManager {
     StarlinkColorScheme: new StarlinkColorScheme(),
     SmallSatColorScheme: new SmallSatColorScheme(),
   };
-  currentColorScheme: ColorScheme;
+  currentColorScheme: ColorScheme = this.colorSchemeInstances.DefaultColorScheme;
   isUseGroupColorScheme = false;
 
   constructor() {
@@ -238,12 +238,13 @@ export class ColorSchemeManager {
          * this can result in all dots turning black
          * if (cachedColorScheme && !(cachedColorScheme === this.group.name || cachedColorScheme === this.groupCountries.name)) {
          */
+        let possibleColorScheme: ColorScheme | null = null;
+
         if (cachedColorScheme) {
           LegendManager.change(cachedColorScheme);
-          const possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
-
-          this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances.DefaultColorScheme;
+          possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
         }
+        this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances.DefaultColorScheme;
 
         // Generate some buffers
         this.colorData = new Float32Array(catalogManagerInstance.numObjects * 4);

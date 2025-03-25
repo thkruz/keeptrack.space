@@ -18,6 +18,7 @@ export class CountryColorScheme extends ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   label = 'Country';
   name = 'CountryColorScheme';
+  static readonly id = 'CountryColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     countryUS: true,

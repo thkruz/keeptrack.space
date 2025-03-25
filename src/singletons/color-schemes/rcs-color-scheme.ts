@@ -17,6 +17,7 @@ export class RcsColorScheme extends ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   label = 'Radar Cross Section';
   name = 'RcsColorScheme';
+  static readonly id = 'RcsColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     rcsXXSmall: true,

@@ -9,6 +9,7 @@ export class SmallSatColorScheme extends ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   label = 'Small Satellites';
   name = 'SmallSatColorScheme';
+  static readonly id = 'SmallSatColorScheme';
   isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {

@@ -11,6 +11,7 @@ export class StarlinkColorScheme extends ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   label = 'Starlink';
   name = 'StarlinkColorScheme';
+  static readonly id = 'StarlinkColorScheme';
   isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {

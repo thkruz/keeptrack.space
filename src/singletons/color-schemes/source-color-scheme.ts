@@ -19,6 +19,7 @@ export class SourceColorScheme extends ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   label = 'Data Source';
   name = 'SourceColorSchemeColorMap';
+  static readonly id = 'SourceColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     sourceUssf: true,

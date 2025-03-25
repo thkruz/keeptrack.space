@@ -25,6 +25,7 @@ export class DefaultColorScheme extends ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   label = 'Object Type';
   name = 'DefaultColorScheme';
+  static readonly id = 'DefaultColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     payload: true,

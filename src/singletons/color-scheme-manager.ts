@@ -42,6 +42,7 @@ import { CountryColorScheme } from './color-schemes/country-color-scheme';
 import { DefaultColorScheme, DefaultColorSchemeColorMap } from './color-schemes/default-color-scheme';
 import { DensityColorScheme } from './color-schemes/density-color-scheme';
 import { GpAgeColorScheme } from './color-schemes/gp-age-color-scheme';
+import { MissionColorScheme } from './color-schemes/mission-color-scheme';
 import { RcsColorScheme } from './color-schemes/rcs-color-scheme';
 import { SmallSatColorScheme } from './color-schemes/smallsat-color-scheme';
 import { SourceColorScheme } from './color-schemes/source-color-scheme';
@@ -60,6 +61,7 @@ export class ColorSchemeManager {
     CelestrakColorScheme,
     CountryColorScheme,
     RcsColorScheme,
+    MissionColorScheme,
     ConfidenceColorScheme,
     DensityColorScheme,
     SunlightColorScheme,
@@ -74,6 +76,7 @@ export class ColorSchemeManager {
     CelestrakColorScheme: new CelestrakColorScheme(),
     CountryColorScheme: new CountryColorScheme(),
     RcsColorScheme: new RcsColorScheme(),
+    MissionColorScheme: new MissionColorScheme(),
     ConfidenceColorScheme: new ConfidenceColorScheme(),
     DensityColorScheme: new DensityColorScheme(),
     SunlightColorScheme: new SunlightColorScheme(),
@@ -452,6 +455,24 @@ export class ColorSchemeManager {
       };
     }
     if (!settingsManager.isShowGeoSats && sat.perigee > 32000) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowPayloads && objectData[i].type === SpaceObjectType.PAYLOAD) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowRocketBodies && objectData[i].type === SpaceObjectType.ROCKET_BODY) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowDebris && objectData[i].type === SpaceObjectType.DEBRIS) {
       colors = {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,

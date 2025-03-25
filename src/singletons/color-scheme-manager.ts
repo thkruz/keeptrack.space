@@ -86,8 +86,8 @@ export class ColorSchemeManager {
     StarlinkColorScheme: new StarlinkColorScheme(),
     SmallSatColorScheme: new SmallSatColorScheme(),
   };
-  currentColorScheme: ColorScheme | undefined = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
-  lastColorScheme: ColorScheme | undefined = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+  currentColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+  lastColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
   isUseGroupColorScheme = false;
 
   constructor() {
@@ -106,6 +106,10 @@ export class ColorSchemeManager {
   // Colors are all 0-255
   colorData: Float32Array;
   colorTheme: ColorSchemeColorMap & DefaultColorSchemeColorMap;
+  /**
+   * This is the update function that will be used color the dots
+   * it should be set to either the colorscheme class's update function or the group update function
+   */
   currentColorSchemeUpdate: ColorRuleSet;
   iSensor = 0;
   isReady = false;
@@ -122,7 +126,6 @@ export class ColorSchemeManager {
   pickableBuffer: WebGLBuffer;
   pickableBufferOneTime: boolean;
   pickableData: Int8Array;
-  lastSavedColorSchemeName_ = '';
 
   calcColorBufsNextCruncher(): void {
     waitForCruncher({
@@ -150,29 +153,19 @@ export class ColorSchemeManager {
       // Revert colorscheme if search box is empty
       this.preValidateColorScheme_(isForceRecolor);
 
-      if (this.currentColorScheme) {
-        if (this.isUseGroupColorScheme) {
-          this.currentColorSchemeUpdate = this.currentColorScheme.updateGroup ?? this.currentColorScheme.update;
-        } else {
-          this.currentColorSchemeUpdate = this.currentColorScheme.update;
-        }
+      if (this.isUseGroupColorScheme) {
+        // current.updateGroup -> current.update -> settings.default.updateGroupupdateGroup -> default.updateGroup
+        this.currentColorSchemeUpdate = this.currentColorScheme.updateGroup ?? this.currentColorScheme.update ??
+          this.colorSchemeInstances[settingsManager.defaultColorScheme].updateGroup ?? this.colorSchemeInstances.DefaultColorScheme.updateGroup;
+      } else {
+        // current.update -> settings.default.update -> default.update
+        this.currentColorSchemeUpdate = this.currentColorScheme.update ?? this.colorSchemeInstances[settingsManager.defaultColorScheme].update ??
+          this.colorSchemeInstances.DefaultColorScheme.update;
       }
 
       // Figure out if we are coloring all of the dots - assume yes initially
       const { firstDotToColor, lastDotToColor } = this.calcFirstAndLastDot_(isForceRecolor);
 
-      // Note the colorscheme for next time
-      this.lastColorScheme = this.currentColorScheme;
-
-      if (this.currentColorScheme && this.lastSavedColorSchemeName_ !== this.currentColorScheme?.id) {
-        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
-        this.lastSavedColorSchemeName_ = this.currentColorScheme.id;
-      }
-
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
-
-      // We also need the velocity data if we are trying to colorizing that
-      const satVel: Float32Array | null = this.currentColorScheme?.id === VelocityColorScheme.name ? dotsManagerInstance.getSatVel() : null;
 
       // Reset Which Sensor we are coloring before the loop begins
       if (firstDotToColor === 0) {
@@ -181,21 +174,32 @@ export class ColorSchemeManager {
 
       // Lets loop through all the satellites and color them in one by one
       const params = this.calculateParams_();
-
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      // Velocity is a special case - we need to know the velocity of each satellite
 
-      if (this.currentColorScheme?.id === VelocityColorScheme.name) {
+      // Velocity is a special case - we need to know the velocity of each satellite
+      if (this.currentColorScheme?.id === VelocityColorScheme.id) {
+        // We also need the velocity data if we are trying to colorizing that
+        const dotsManagerInstance = keepTrackApi.getDotsManager();
+        const satVel: Float32Array | null = this.currentColorScheme?.id === VelocityColorScheme.id ? dotsManagerInstance.getSatVel() : null;
+
         this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, satVel as Float32Array, params);
       } else {
         this.calculateBufferDataLoop_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, params);
       }
 
-      // If we don't do this then everytime the color refreshes it will undo any effect being applied outside of this loop
-      this.setSelectedAndHoverBuffer_(); // A
-
+      // If we don't do this then every time the color refreshes it will undo any effect being applied outside of this loop
+      this.setSelectedAndHoverBuffer_();
       this.sendColorBufferToGpu();
+
+      // Save the color scheme if needed
+      if (this.currentColorScheme?.id && this.lastColorScheme?.id !== this.currentColorScheme?.id) {
+        PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
+        // Note the colorscheme for next time
+        this.lastColorScheme = this.currentColorScheme;
+      }
     } catch (e) {
+      this.currentColorScheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+      this.lastColorScheme = this.currentColorScheme;
       errorManagerInstance.debug(e);
     }
   }
@@ -234,20 +238,18 @@ export class ColorSchemeManager {
       cb: (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
+        let possibleColorScheme: ColorScheme | null = null;
 
         /*
          * We don't want to reload a cached group color scheme because we might not have a search
          * this can result in all dots turning black
-         * if (cachedColorScheme && !(cachedColorScheme === this.group.name || cachedColorScheme === this.groupCountries.name)) {
          */
-        let possibleColorScheme: ColorScheme | null = null;
-
         if (cachedColorScheme) {
           LegendManager.change(cachedColorScheme);
           possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
         }
         this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
-        this.lastColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+        this.lastColorScheme = this.currentColorScheme;
 
         // Generate some buffers
         this.colorData = new Float32Array(catalogManagerInstance.numObjects * 4);
@@ -397,13 +399,7 @@ export class ColorSchemeManager {
     }
 
     if (!colors?.color) {
-      // Catch for when colorscheme fails - this shouldn't happen if the color scheme is valid
-      this.colorData[i * 4] = 0; // R
-      this.colorData[i * 4 + 1] = 0; // G
-      this.colorData[i * 4 + 2] = 0; // B
-      this.colorData[i * 4 + 3] = 0; // A
-      this.pickableData[i] = Pickable.No;
-      return;
+      throw new Error(`Color information is missing for satellite at index ${i}`);
     }
 
     this.colorData[i * 4] = colors.color[0]; // R

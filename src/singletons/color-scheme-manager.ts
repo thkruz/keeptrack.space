@@ -52,9 +52,6 @@ import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
 import { PersistenceManager, StorageKey } from './persistence-manager';
 
 export class ColorSchemeManager {
-  private readonly DOTS_PER_CALC = 350;
-  private gl_: WebGL2RenderingContext;
-
   // This is where you confiure addon color schemes
   static readonly addonColorSchemes = [
     DefaultColorScheme,
@@ -86,25 +83,15 @@ export class ColorSchemeManager {
     StarlinkColorScheme: new StarlinkColorScheme(),
     SmallSatColorScheme: new SmallSatColorScheme(),
   };
+  private readonly DOTS_PER_CALC = 350;
+  private gl_: WebGL2RenderingContext;
   currentColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
   lastColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
   isUseGroupColorScheme = false;
-
-  constructor() {
-    this.colorBuffer = null as unknown as WebGLBuffer;
-    this.colorBufferOneTime = false;
-
-    this.pickableBuffer = null as unknown as WebGLBuffer;
-    this.pickableBufferOneTime = false;
-
-    this.colorData = new Float32Array(0);
-    this.pickableData = new Int8Array(0);
-  }
-
-  colorBuffer: WebGLBuffer;
-  colorBufferOneTime: boolean;
+  colorBuffer: WebGLBuffer | null = null;
+  colorBufferOneTime = false;
   // Colors are all 0-255
-  colorData: Float32Array;
+  colorData = new Float32Array(0);
   colorTheme: ColorSchemeColorMap & DefaultColorSchemeColorMap;
   /**
    * This is the update function that will be used color the dots
@@ -122,10 +109,9 @@ export class ColorSchemeManager {
     sensor: true,
     inFOV: true,
   };
-
-  pickableBuffer: WebGLBuffer;
-  pickableBufferOneTime: boolean;
-  pickableData: Int8Array;
+  pickableBuffer: WebGLBuffer | null = null;
+  pickableBufferOneTime = false;
+  pickableData = new Int8Array(0);
 
   calcColorBufsNextCruncher(): void {
     waitForCruncher({
@@ -325,8 +311,12 @@ export class ColorSchemeManager {
       }
 
       this.calculateColorBuffers(isForceRecolor);
-      dotsManagerInstance.buffers.color = this.colorBuffer;
-      dotsManagerInstance.buffers.pickability = this.pickableBuffer;
+      if (this.colorBuffer && this.pickableBuffer) {
+        dotsManagerInstance.buffers.color = this.colorBuffer;
+        dotsManagerInstance.buffers.pickability = this.pickableBuffer;
+      } else {
+        throw new Error('Color or pickable buffer is not initialized');
+      }
     } catch (error) {
       // If we can't load the color scheme, just use the default
       errorManagerInstance.log(error);
@@ -337,6 +327,75 @@ export class ColorSchemeManager {
 
   setToGroupColorScheme() {
     this.isUseGroupColorScheme = true;
+  }
+
+  private static getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
+    let colors: ColorInformation | null = null;
+
+    const sat = objectData[i] as DetailedSatellite;
+
+    if (!settingsManager.isShowNotionalSats && objectData[i].isNotional()) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowVimpelSats && objectData[i].name?.startsWith('JSC Vimpel')) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowLeoSats && sat.apogee < 6000) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowStarlinkSats && objectData[i].name?.includes('STARLINK')) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowHeoSats && (sat.eccentricity >= 0.1 || (sat.apogee >= 6000 && sat.perigee < 6000))) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowMeoSats && sat.perigee <= 32000 && sat.perigee >= 6000) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowGeoSats && sat.perigee > 32000) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowPayloads && objectData[i].type === SpaceObjectType.PAYLOAD) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowRocketBodies && objectData[i].type === SpaceObjectType.ROCKET_BODY) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (!settingsManager.isShowDebris && objectData[i].type === SpaceObjectType.DEBRIS) {
+      colors = {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+
+    return colors;
   }
 
   private calcFirstAndLastDot_(isForceRecolor: boolean) {
@@ -407,75 +466,6 @@ export class ColorSchemeManager {
     this.colorData[i * 4 + 2] = colors.color[2]; // B
     this.colorData[i * 4 + 3] = colors.color[3]; // A
     this.pickableData[i] = colors.pickable;
-  }
-
-  private static getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
-    let colors: ColorInformation | null = null;
-
-    const sat = objectData[i] as DetailedSatellite;
-
-    if (!settingsManager.isShowNotionalSats && objectData[i].isNotional()) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-    if (!settingsManager.isShowVimpelSats && objectData[i].name?.startsWith('JSC Vimpel')) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-    if (!settingsManager.isShowLeoSats && sat.apogee < 6000) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-    if (!settingsManager.isShowStarlinkSats && objectData[i].name?.includes('STARLINK')) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-    if (!settingsManager.isShowHeoSats && (sat.eccentricity >= 0.1 || (sat.apogee >= 6000 && sat.perigee < 6000))) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-    if (!settingsManager.isShowMeoSats && sat.perigee <= 32000 && sat.perigee >= 6000) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-    if (!settingsManager.isShowGeoSats && sat.perigee > 32000) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-    if (!settingsManager.isShowPayloads && objectData[i].type === SpaceObjectType.PAYLOAD) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-    if (!settingsManager.isShowRocketBodies && objectData[i].type === SpaceObjectType.ROCKET_BODY) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-    if (!settingsManager.isShowDebris && objectData[i].type === SpaceObjectType.DEBRIS) {
-      colors = {
-        color: [0, 0, 0, 0],
-        pickable: Pickable.No,
-      };
-    }
-
-    return colors;
   }
 
   private calculateParams_() {

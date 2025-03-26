@@ -384,7 +384,7 @@ export class OrbitFinder {
         const result = this.meanACalcLoop(this.goalDirection);
 
         if (result !== PropagationResults.Success) {
-          return ['Error', `Failed to find solution with ${this.goalDirection}bound direction`];
+          return ['Error', `Failed to find solution with ${this.goalDirection} bound direction`];
         }
 
         const meanAnomalySuccess = this.updateOrbit({

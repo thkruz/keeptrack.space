@@ -517,7 +517,7 @@ export class SettingsManager {
   /**
    * The maximum number of satellite labels to display on desktop devices.
    */
-  desktopMaxLabels = 20000;
+  desktopMaxLabels = 500;
   /**
    * The minimum width of the desktop view in pixels.
    */

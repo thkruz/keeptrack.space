@@ -243,7 +243,8 @@ export class Breakup extends KeepTrackPlugin {
     const tle2 = tles[1];
 
     if (tle1 === 'Error') {
-      errorManagerInstance.error(new Error(tle2), 'breakup.ts', i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
+      console.error(tle2);
+      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
 
       return;
     }
@@ -301,7 +302,8 @@ export class Breakup extends KeepTrackPlugin {
          */
         iTLEs = new OrbitFinder(sat, launchLat, launchLon, <'N' | 'S'>upOrDown, new Date(simulationTimeObj.getTime() + 1), newAlt as Kilometers, rascOffset).rotateOrbitToLatLon();
         if (iTLEs[0] === 'Error') {
-          errorManagerInstance.error(new Error(iTLEs[1]), 'breakup.ts', i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
+          console.error(iTLEs[1]);
+          errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
 
           return;
         }

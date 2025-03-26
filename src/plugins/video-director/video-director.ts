@@ -39,7 +39,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   readonly id = 'VideoDirectorPlugin';
   dependencies_ = [];
 
-  menuMode: MenuMode[] = [MenuMode.EXPIREMENTAL, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.EXPERIMENTAL, MenuMode.ALL];
 
   isRotateL = true;
   isRotateR = false;

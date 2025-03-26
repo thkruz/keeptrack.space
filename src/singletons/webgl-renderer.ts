@@ -232,6 +232,7 @@ export class WebGLRenderer {
    * - If the satellite label mode is off or the camera type is not planetarium and there are no satellites in the watchlist in view,
    *   the method clears the satellite mini boxes and returns.
    */
+  // eslint-disable-next-line max-statements
   orbitsAbove() {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
@@ -286,7 +287,7 @@ export class WebGLRenderer {
 
       orbitManagerInstance.clearInViewOrbit();
 
-      let obj: BaseObject;
+      let obj: BaseObject | null;
 
       this.labelCount_ = 0;
 
@@ -303,21 +304,37 @@ export class WebGLRenderer {
         for (let i = 0; i < catalogManagerInstance.orbitalSats && this.labelCount_ < settingsManager.maxLabels; i++) {
           obj = catalogManagerInstance.getObject(i, GetSatType.POSITION_ONLY);
 
-          if (!obj.isSatellite()) {
+          if (!obj?.isSatellite()) {
             continue;
           }
           const sat = <DetailedSatellite>obj;
+          const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-          if (keepTrackApi.getColorSchemeManager().isPayloadOff(sat)) {
+          if (colorSchemeManagerInstance.isPayloadOff(sat)) {
             continue;
           }
-          if (keepTrackApi.getColorSchemeManager().isRocketBodyOff(sat)) {
+          if (colorSchemeManagerInstance.isRocketBodyOff(sat)) {
             continue;
           }
-          if (keepTrackApi.getColorSchemeManager().isDebrisOff(sat)) {
+          if (colorSchemeManagerInstance.isDebrisOff(sat)) {
             continue;
           }
-          if (keepTrackApi.getColorSchemeManager().isInViewOff(sat)) {
+          if (colorSchemeManagerInstance.isJscVimpelSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isNotionalSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isGeoSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isLeoSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isMeoSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isHeoSatOff(sat)) {
             continue;
           }
 

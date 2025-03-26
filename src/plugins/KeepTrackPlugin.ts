@@ -203,6 +203,11 @@ export abstract class KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.ALL];
 
   /**
+   * The callback to run when the bottom icon is deselected for any reason
+   */
+  onSetBottomIconToUnselected: () => void;
+
+  /**
    * Creates a new instance of the KeepTrackPlugin class.
    * @param pluginName The name of the plugin.
    */
@@ -602,6 +607,9 @@ export abstract class KeepTrackPlugin {
       return;
     }
     this.isMenuButtonActive = false;
+    if (this.onSetBottomIconToUnselected) {
+      this.onSetBottomIconToUnselected();
+    }
     if (isHideSideMenus) {
       keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
     }

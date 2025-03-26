@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { getEl } from '@app/lib/get-el';
+import { hideEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
 import { MenuMode } from '@app/interfaces';
@@ -34,7 +34,7 @@ import { Astronomy } from '../astronomy/astronomy';
 
 export class Planetarium extends KeepTrackPlugin {
   readonly id = 'Planetarium';
-  dependencies_: string[];
+  dependencies_: string[] = [];
 
   menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
@@ -42,10 +42,30 @@ export class Planetarium extends KeepTrackPlugin {
   isRequireSensorSelected = true;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
-  bottomIconCallback = (): void => {
+
+  onSetBottomIconToUnselected = (): void => {
     const renderer = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
+    keepTrackApi.getMainCamera().isPanReset = true;
+    keepTrackApi.getMainCamera().isLocalRotateReset = true;
+    settingsManager.fieldOfView = 0.6;
+    renderer.glInit();
+    uiManagerInstance.hideSideMenus();
+    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
+    orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+      keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT;
+    }
+
+    /*
+     * TODO: implement fov information
+     * getEl('fov-text').innerHTML = ('');
+     */
+  };
+
+  bottomIconCallback = (): void => {
     if (this.isMenuButtonActive) {
       if (!this.verifySensorSelected()) {
         return;
@@ -53,21 +73,13 @@ export class Planetarium extends KeepTrackPlugin {
 
       keepTrackApi.getMainCamera().cameraType = CameraType.PLANETARIUM; // Activate Planetarium Camera Mode
 
-      /*
-       * Assume Sensor plugin is on because we are in planetarium view
-       * TODO: This should explicitly check for the sensor plugin
-       */
-      try {
-        getEl('cspocAllSensor').style.display = 'none';
-        getEl('mwAllSensor').style.display = 'none';
-        getEl('mdAllSensor').style.display = 'none';
-        getEl('esocAllSensor').style.display = 'none';
-        getEl('llAllSensor').style.display = 'none';
-        getEl('rusAllSensor').style.display = 'none';
-        getEl('prcAllSensor').style.display = 'none';
-      } catch {
-        // Do nothing
-      }
+      hideEl('cspocAllSensor');
+      hideEl('mwAllSensor');
+      hideEl('mdAllSensor');
+      hideEl('esocAllSensor');
+      hideEl('llAllSensor');
+      hideEl('rusAllSensor');
+      hideEl('prcAllSensor');
 
       /*
        * TODO: implement fov information
@@ -75,19 +87,7 @@ export class Planetarium extends KeepTrackPlugin {
        */
       keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
     } else {
-      keepTrackApi.getMainCamera().isPanReset = true;
-      keepTrackApi.getMainCamera().isLocalRotateReset = true;
-      settingsManager.fieldOfView = 0.6;
-      renderer.glInit();
-      uiManagerInstance.hideSideMenus();
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
-
-      orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-      keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
-      /*
-       * TODO: implement fov information
-       * getEl('fov-text').innerHTML = ('');
-       */
+      this.onSetBottomIconToUnselected();
     }
   };
 }

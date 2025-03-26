@@ -214,7 +214,7 @@ export enum MenuMode {
   BASIC,
   ADVANCED,
   ANALYSIS,
-  EXPIREMENTAL,
+  EXPERIMENTAL,
   ALL,
 }
 

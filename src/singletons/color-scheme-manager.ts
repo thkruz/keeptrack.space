@@ -261,21 +261,39 @@ export class ColorSchemeManager {
   isInView(obj: BaseObject) {
     return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && this.currentColorScheme?.objectTypeFlags.inFOV;
   }
-
   isInViewOff(obj: BaseObject) {
     return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && !this.currentColorScheme?.objectTypeFlags.inFOV;
   }
-
   isPayloadOff(obj: BaseObject) {
-    return obj.type === SpaceObjectType.PAYLOAD && !this.currentColorScheme?.objectTypeFlags.payload;
+    return obj.type === SpaceObjectType.PAYLOAD && !settingsManager.isShowPayloads;
   }
-
   isRocketBodyOff(obj: BaseObject) {
-    return obj.type === SpaceObjectType.ROCKET_BODY && !this.currentColorScheme?.objectTypeFlags.rocketBody;
+    return obj.type === SpaceObjectType.ROCKET_BODY && !settingsManager.isShowRocketBodies;
   }
-
   isDebrisOff(obj: BaseObject) {
-    return obj.type === SpaceObjectType.DEBRIS && !this.currentColorScheme?.objectTypeFlags.debris;
+    return obj.type === SpaceObjectType.DEBRIS && !settingsManager.isShowDebris;
+  }
+  isJscVimpelSatOff(obj: BaseObject) {
+    return obj.name?.startsWith('JSC Vimpel') && !settingsManager.isShowVimpelSats;
+  }
+  isNotionalSatOff(obj: BaseObject) {
+    return obj.isNotional() && !settingsManager.isShowNotionalSats;
+  }
+  isLeoSatOff(obj: BaseObject) {
+    return (obj as DetailedSatellite).apogee < 6000 && !settingsManager.isShowLeoSats;
+  }
+  isMeoSatOff(obj: BaseObject) {
+    return (obj as DetailedSatellite).perigee <= 32000 && (obj as DetailedSatellite).perigee >= 6000 && !settingsManager.isShowMeoSats;
+  }
+  isGeoSatOff(obj: BaseObject) {
+    return (obj as DetailedSatellite).perigee > 32000 && !settingsManager.isShowGeoSats;
+  }
+  isHeoSatOff(obj: BaseObject) {
+    return (obj as DetailedSatellite).eccentricity >= 0.1 && ((obj as DetailedSatellite).apogee >= 6000 && (obj as DetailedSatellite).perigee < 6000) &&
+      !settingsManager.isShowHeoSats;
+  }
+  isStarlinkSatOff(obj: BaseObject) {
+    return obj.name?.includes('STARLINK') && !this.currentColorScheme?.objectTypeFlags.starlink;
   }
 
   reloadColors() {

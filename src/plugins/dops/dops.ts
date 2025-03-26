@@ -16,7 +16,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';
   dependencies_ = [];
 
-  menuMode: MenuMode[] = [MenuMode.EXPIREMENTAL, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.EXPERIMENTAL, MenuMode.ALL];
 
   bottomIconImg = gpsPng;
   bottomIconCallback = (): void => {

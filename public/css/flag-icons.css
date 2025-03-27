@@ -10,6 +10,10 @@
     background-image: url(../flags/nato.png);
 }
 
+.fi-su {
+    background-image: url(../flags/ussr.png);
+}
+
 .fi-esa {
     background-image: url(../flags/esa.png);
 }

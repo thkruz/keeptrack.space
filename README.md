@@ -92,6 +92,8 @@ npm run build                                             #Build the project.
 npm start                                                 #Start the server.
 ```
 
+A more detailed tutorial can be found [here](https://keeptrack.space/resources/getting-keeptrack-running-locally/).
+
 # Usage
 
 The main index.html page loads a canvas element set to the size of the window that displays the earth, satellites, and stars. The UI is loaded in DOM elements on top of the canvas element. Two webworkers are loaded (positionCruncher.ts and orbitCruncher.ts) to handle constant calculation of satellite locations and updating orbit lines when an object is highlighted.

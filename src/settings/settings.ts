@@ -877,6 +877,7 @@ export class SettingsManager {
    * TODO: Reimplement stars
    */
   isDisableStars = true;
+  /** Flag to determine if external data is available */
   offline = false;
   /**
    * The offset in the x direction for the offset camera mode.
@@ -1697,6 +1698,8 @@ export class SettingsManager {
             break;
           case 'offline':
             this.offline = true;
+            this.dataSources.tle = '/tle/tle.json';
+            this.dataSources.vimpel = '/tle/vimpel.json';
             break;
           case 'notmtoast':
             this.isDisableTimeMachineToasts = true;

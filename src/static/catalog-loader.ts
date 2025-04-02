@@ -130,7 +130,7 @@ export interface KeepTrackTLEFile {
 }
 
 export class CatalogLoader {
-  static filterTLEDatabase(resp: KeepTrackTLEFile[], extraSats?: ExtraSat[], asciiCatalog?: AsciiTleSat[] | void, jsCatalog?: JsSat[]): void {
+  static filterTLEDatabase(resp: KeepTrackTLEFile[], extraSats: ExtraSat[] | null, asciiCatalog: AsciiTleSat[] | null, jsCatalog: JsSat[] | null): void {
     let tempObjData: BaseObject[] = [];
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
@@ -143,21 +143,21 @@ export class CatalogLoader {
       CatalogLoader.addSccNum_(resp, i);
 
       // Check if first digit is a letter
-      resp[i].sccNum = Tle.convertA5to6Digit(resp[i]?.sccNum);
+      resp[i].sccNum = Tle.convertA5to6Digit(resp[i]?.sccNum ?? '');
 
       CatalogLoader.processAllSats_(resp, i, catalogManagerInstance, tempObjData, notionalSatNum);
     }
 
-    if (extraSats?.length > 0) {
-      CatalogLoader.processExtraSats_(extraSats, catalogManagerInstance, tempObjData);
+    if ((extraSats?.length ?? 0) > 0) {
+      CatalogLoader.processExtraSats_(extraSats as ExtraSat[], catalogManagerInstance, tempObjData);
     }
 
     if (asciiCatalog && asciiCatalog?.length > 0) {
       tempObjData = CatalogLoader.processAsciiCatalog_(asciiCatalog, catalogManagerInstance, tempObjData);
     }
 
-    if (jsCatalog?.length > 0) {
-      CatalogLoader.processJsCatalog_(jsCatalog, catalogManagerInstance, tempObjData);
+    if ((jsCatalog?.length ?? 0) > 0) {
+      CatalogLoader.processJsCatalog_(jsCatalog as JsSat[], catalogManagerInstance, tempObjData);
     }
 
     CatalogLoader.addNonSatelliteObjects_(catalogManagerInstance, tempObjData);
@@ -201,7 +201,7 @@ export class CatalogLoader {
         asciiCatalog,
         jsCatalog,
         externalCatalog,
-      }: { extraSats: Promise<ExtraSat[]>; asciiCatalog: Promise<AsciiTleSat[] | void>; jsCatalog: Promise<JsSat[]>; externalCatalog: Promise<AsciiTleSat[] | void> } =
+      } =
         CatalogLoader.getAdditionalCatalogs_(settingsManager);
 
       if (settingsManager.dataSources.externalTLEsOnly) {
@@ -235,6 +235,16 @@ export class CatalogLoader {
           .catch((error) => {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
+      } else if (settingsManager.offline) {
+        await fetch(`${settingsManager.installDirectory}tle/tle.json`)
+          .then((response) => response.json())
+          .then((data) => CatalogLoader.parse({
+            keepTrackTle: data,
+            keepTrackExtra: extraSats,
+            keepTrackAscii: asciiCatalog,
+            externalCatalog,
+            vimpelCatalog: jsCatalog,
+          }));
       } else {
         // Load the primary catalog
         await fetch(settingsManager.dataSources.tle)
@@ -285,10 +295,10 @@ export class CatalogLoader {
     vimpelCatalog: jsCatalog = Promise.resolve([]),
   }: {
     keepTrackTle?: KeepTrackTLEFile[];
-    keepTrackExtra?: Promise<ExtraSat[]>;
-    keepTrackAscii?: Promise<AsciiTleSat[] | void>;
-    externalCatalog?: Promise<AsciiTleSat[] | void>;
-    vimpelCatalog?: Promise<JsSat[]>;
+    keepTrackExtra?: Promise<ExtraSat[]> | null;
+    keepTrackAscii?: Promise<AsciiTleSat[]> | null;
+    externalCatalog?: Promise<AsciiTleSat[] | null> | null;
+    vimpelCatalog?: Promise<JsSat[]> | null;
   }): Promise<void> {
     await Promise.all([extraSats, asciiCatalog, externalCatalog, jsCatalog]).then(([extraSats, asciiCatalog, externalCatalog, jsCatalog]) => {
       asciiCatalog = externalCatalog || asciiCatalog;
@@ -438,10 +448,10 @@ export class CatalogLoader {
    * @returns An object containing promises for extraSats, asciiCatalog, jsCatalog, and externalCatalog.
    */
   private static getAdditionalCatalogs_(settingsManager: SettingsManager) {
-    let extraSats: Promise<ExtraSat[]> = null;
-    let externalCatalog: Promise<AsciiTleSat[] | void> = null;
-    let asciiCatalog: Promise<AsciiTleSat[]> = null;
-    let jsCatalog: Promise<JsSat[]> = null;
+    let extraSats: Promise<ExtraSat[]> | null = null;
+    let externalCatalog: Promise<AsciiTleSat[] | null> | null = null;
+    let asciiCatalog: Promise<AsciiTleSat[]> | null = null;
+    let jsCatalog: Promise<JsSat[]> | null = null;
 
     if (settingsManager.offline && !settingsManager.isDisableExtraCatalog) {
       extraSats = CatalogLoader.getExtraCatalog_(settingsManager);
@@ -493,7 +503,7 @@ export class CatalogLoader {
    * @returns {Promise<AsciiTleSat[]>} - A promise that resolves to an array of AsciiTleSat objects representing the satellite TLEs.
    */
   // eslint-disable-next-line require-await
-  private static async getExternalCatalog_(settingsManager: SettingsManager): Promise<AsciiTleSat[] | void> {
+  private static async getExternalCatalog_(settingsManager: SettingsManager): Promise<AsciiTleSat[] | null> {
     return fetch(settingsManager.dataSources.externalTLEs)
       .then((resp) => {
         if (resp.ok) {
@@ -528,6 +538,8 @@ export class CatalogLoader {
         errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.dataSources.externalTLEs}`);
         errorManagerInstance.info('Reverting to internal TLEs');
         settingsManager.dataSources.externalTLEs = '';
+
+        return null;
       });
   }
 
@@ -554,13 +566,22 @@ export class CatalogLoader {
         if (response.ok) {
           return response.json();
         }
-        errorManagerInstance.warn('Error loading vimpel.json');
-
-        return [];
-
+        throw new Error('Error loading vimpel.json');
       })
-      .catch(() => {
-        errorManagerInstance.warn('Error loading vimpel.json');
+      .catch(async () => {
+        errorManagerInstance.warn('Failed to download latest vimpel.json ! Using offline vimpel.json which may be out of date!');
+
+        return fetch(`${settingsManager.installDirectory}tle/vimpel.json`)
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error('Error loading fallback vimpel.json');
+          }).catch(() => {
+            errorManagerInstance.warn('Error loading fallback vimpel.json');
+
+            return [];
+          });
       });
   }
 
@@ -572,7 +593,7 @@ export class CatalogLoader {
   private static getSatDataString_(objData: BaseObject[]) {
     return JSON.stringify(
       objData.map((obj) => {
-        let data: CruncherSat;
+        let data: CruncherSat = {};
 
         // Order matters here
         if (obj.isSatellite()) {
@@ -712,12 +733,12 @@ export class CatalogLoader {
         resp[i].tle1 = `${resp[i].tle1.substring(0, 64)}5${resp[i].tle1.substring(65)}` as TleLine1;
       }
 
-      let rcs: number;
+      let rcs: number | null = null;
 
       rcs = resp[i].rcs === 'LARGE' ? 5 : rcs;
       rcs = resp[i].rcs === 'MEDIUM' ? 0.5 : rcs;
       rcs = resp[i].rcs === 'SMALL' ? 0.05 : rcs;
-      rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : rcs ?? null;
+      rcs = resp[i].rcs && !isNaN(parseFloat(resp[i].rcs)) ? parseFloat(resp[i].rcs) : rcs;
 
       // Never fail just because of one bad satellite
       let isAddedToCatalog = false;
@@ -950,7 +971,7 @@ export class CatalogLoader {
     }
   }
 
-  private static processJsCatalog_(jsCatalog: JsSat[], catalogManagerInstance: CatalogManager, tempObjData: any[]) {
+  private static processJsCatalog_(jsCatalog: JsSat[], catalogManagerInstance: CatalogManager, tempObjData: BaseObject[]) {
     errorManagerInstance.debug(`Processing ${settingsManager.isEnableJscCatalog ? 'JSC Vimpel' : 'Extended'} Catalog`);
     // If jsCatalog catalogue
     for (const element of jsCatalog) {

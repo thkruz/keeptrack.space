@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../camera';
+import { DensityBin } from '../catalog-manager';
 import { MissileObject } from '../catalog-manager/MissileObject';
 
 export interface ColorSchemeColorMap {
@@ -27,10 +28,14 @@ export interface ColorSchemeColorMap {
   countryOther: [number, number, number, number];
   satSmall: [number, number, number, number];
   densityPayload: [number, number, number, number];
-  densityHi: [number, number, number, number];
-  densityMed: [number, number, number, number];
-  densityLow: [number, number, number, number];
-  densityOther: [number, number, number, number];
+  spatialDensityHi: [number, number, number, number];
+  spatialDensityMed: [number, number, number, number];
+  spatialDensityLow: [number, number, number, number];
+  spatialDensityOther: [number, number, number, number];
+  orbitalPlaneDensityHi?: rgbaArray;
+  orbitalPlaneDensityMed?: rgbaArray;
+  orbitalPlaneDensityLow?: rgbaArray;
+  orbitalPlaneDensityOther?: rgbaArray;
   sunlight100: [number, number, number, number];
   sunlight80: [number, number, number, number];
   sunlight60: [number, number, number, number];
@@ -49,9 +54,19 @@ export interface ColorSchemeColorMap {
   starlinkNot: [number, number, number, number];
   facility: rgbaArray;
   sensor: rgbaArray;
+  sensorAlt: rgbaArray;
   marker: rgbaArray[];
   inViewAlt?: rgbaArray;
   inFOV: rgbaArray;
+}
+
+export interface ColorSchemeParams {
+  year: number;
+  jday: number;
+  orbitDensity: DensityBin[];
+  orbitDensityMax: number;
+  orbitalPlaneDensity: number[][];
+  orbitalPlaneDensityMax: number;
 }
 
 export abstract class ColorScheme {
@@ -98,7 +113,7 @@ export abstract class ColorScheme {
     };
   }
 
-  abstract update(obj: BaseObject, params?: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number }): ColorInformation;
+  abstract update(obj: BaseObject, params?: ColorSchemeParams): ColorInformation;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateGroup(obj: BaseObject, _params?): ColorInformation {
@@ -134,8 +149,10 @@ export abstract class ColorScheme {
   calculateParams(): {
     year?: number,
     jday?: number,
-    orbitDensity?: number[][],
+    orbitDensity?: DensityBin[],
     orbitDensityMax?: number,
+    orbitalPlaneDensity?: number[][],
+    orbitalPlaneDensityMax?: number,
   } | null {
     return null;
   }

@@ -1399,9 +1399,9 @@ export class SettingsManager {
       // eslint-disable-next-line no-console
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.4') {
+    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.5') {
       this.colors = {
-        version: '1.4.4',
+        version: '1.4.5',
         length: 0,
         facility: [0.64, 0.0, 0.64, 1.0],
         sunlight100: [1.0, 1.0, 1.0, 0.7],
@@ -1411,6 +1411,7 @@ export class SettingsManager {
         starMed: [1.0, 1.0, 1.0, 0.85],
         starLow: [1.0, 1.0, 1.0, 0.65],
         sensor: [1.0, 0.0, 0.0, 1.0],
+        sensorAlt: [0.0, 0.0, 1.0, 1.0],
         marker: [
           [0.2, 1.0, 1.0, 1.0],
           [1.0, 0.2, 1.0, 1.0],
@@ -1478,10 +1479,10 @@ export class SettingsManager {
         countryCIS: [1.0, 1.0, 1.0, 1.0],
         countryOther: [0, 1.0, 0, 0.6],
         densityPayload: [0.15, 0.7, 0.8, 1.0],
-        densityHi: [1, 0, 0, 1],
-        densityMed: [1, 0.4, 0, 1],
-        densityLow: [1, 1, 0, 0.9],
-        densityOther: [0.8, 0.8, 0.8, 0.3],
+        spatialDensityHi: [1, 0, 0, 1],
+        spatialDensityMed: [1, 0.4, 0, 1],
+        spatialDensityLow: [1, 1, 0, 0.9],
+        spatialDensityOther: [0.8, 0.8, 0.8, 0.3],
         notional: [1, 0, 0, 0.8],
         starlink: [0.0, 0.8, 0.0, 0.8],
         starlinkNot: [0.8, 0.0, 0.0, 0.8],

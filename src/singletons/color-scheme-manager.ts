@@ -35,17 +35,19 @@ import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
+import { DensityBin } from './catalog-manager';
 import { CelestrakColorScheme } from './color-schemes/celestrak-color-scheme';
-import { ColorScheme, ColorSchemeColorMap } from './color-schemes/color-scheme';
+import { ColorScheme, ColorSchemeColorMap, ColorSchemeParams } from './color-schemes/color-scheme';
 import { ConfidenceColorScheme } from './color-schemes/confidence-color-scheme';
 import { CountryColorScheme } from './color-schemes/country-color-scheme';
 import { DefaultColorScheme, DefaultColorSchemeColorMap } from './color-schemes/default-color-scheme';
-import { DensityColorScheme } from './color-schemes/density-color-scheme';
 import { GpAgeColorScheme } from './color-schemes/gp-age-color-scheme';
 import { MissionColorScheme } from './color-schemes/mission-color-scheme';
+import { OrbitalPlaneDensityColorScheme } from './color-schemes/orbital-plane-density-color-scheme';
 import { RcsColorScheme } from './color-schemes/rcs-color-scheme';
 import { SmallSatColorScheme } from './color-schemes/smallsat-color-scheme';
 import { SourceColorScheme } from './color-schemes/source-color-scheme';
+import { SpatialDensityColorScheme } from './color-schemes/spatial-density-color-scheme';
 import { StarlinkColorScheme } from './color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from './color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
@@ -60,7 +62,8 @@ export class ColorSchemeManager {
     RcsColorScheme,
     MissionColorScheme,
     ConfidenceColorScheme,
-    DensityColorScheme,
+    OrbitalPlaneDensityColorScheme,
+    SpatialDensityColorScheme,
     SunlightColorScheme,
     GpAgeColorScheme,
     SourceColorScheme,
@@ -75,7 +78,8 @@ export class ColorSchemeManager {
     RcsColorScheme: new RcsColorScheme(),
     MissionColorScheme: new MissionColorScheme(),
     ConfidenceColorScheme: new ConfidenceColorScheme(),
-    DensityColorScheme: new DensityColorScheme(),
+    OrbitalPlaneDensityColorScheme: new OrbitalPlaneDensityColorScheme(),
+    SpatialDensityColorScheme: new SpatialDensityColorScheme(),
     SunlightColorScheme: new SunlightColorScheme(),
     GpAgeColorScheme: new GpAgeColorScheme(),
     SourceColorScheme: new SourceColorScheme(),
@@ -446,7 +450,7 @@ export class ColorSchemeManager {
     lastDotToColor: number,
     satData: BaseObject[],
     satVel: Float32Array,
-    params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number },
+    params: ColorSchemeParams,
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       satData[i].totalVelocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
@@ -458,7 +462,7 @@ export class ColorSchemeManager {
     firstDotToColor: number,
     lastDotToColor: number,
     satData: BaseObject[],
-    params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number },
+    params: ColorSchemeParams,
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       this.calculateBufferData_(i, satData, params);
@@ -466,7 +470,7 @@ export class ColorSchemeManager {
   }
 
   private calculateBufferData_(i: number, satData: BaseObject[],
-    params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number }) {
+    params: ColorSchemeParams) {
     let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
 
     if (this.isUseGroupColorScheme) {
@@ -486,12 +490,14 @@ export class ColorSchemeManager {
     this.pickableData[i] = colors.pickable;
   }
 
-  private calculateParams_() {
+  private calculateParams_(): ColorSchemeParams {
     const params = {
       year: 0,
       jday: 0,
-      orbitDensity: [] as number[][],
+      orbitDensity: [] as DensityBin[],
       orbitDensityMax: 0,
+      orbitalPlaneDensity: [] as number[][],
+      orbitalPlaneDensityMax: 0,
     };
 
     if (this.currentColorScheme) {
@@ -502,6 +508,8 @@ export class ColorSchemeManager {
         params.jday = params_.jday ?? params.jday;
         params.orbitDensity = params_.orbitDensity ?? params.orbitDensity;
         params.orbitDensityMax = params_.orbitDensityMax ?? params.orbitDensityMax;
+        params.orbitalPlaneDensity = params_.orbitalPlaneDensity ?? params.orbitalPlaneDensity;
+        params.orbitalPlaneDensityMax = params_.orbitalPlaneDensityMax ?? params.orbitalPlaneDensityMax;
       }
     }
 

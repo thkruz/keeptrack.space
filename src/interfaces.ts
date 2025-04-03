@@ -335,4 +335,6 @@ export enum KeepTrackApiEvents {
   touchStart = 'touchStart',
   ConeMeshUpdate = 'ConeMeshUpdate',
   bottomMenuModeChange = 'bottomMenuModeChange',
+  saveSettings = 'saveSettings',
+  loadSettings = 'loadSettings',
 }

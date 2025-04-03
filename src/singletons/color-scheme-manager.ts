@@ -32,7 +32,7 @@ import { errorManagerInstance } from './errorManager';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
+import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
 import { DensityBin } from './catalog-manager';
@@ -269,35 +269,78 @@ export class ColorSchemeManager {
     return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && !this.currentColorScheme?.objectTypeFlags.inFOV;
   }
   isPayloadOff(obj: BaseObject) {
-    return obj.type === SpaceObjectType.PAYLOAD && !settingsManager.isShowPayloads;
+    return !settingsManager.filter.payloads && obj.type === SpaceObjectType.PAYLOAD;
   }
   isRocketBodyOff(obj: BaseObject) {
-    return obj.type === SpaceObjectType.ROCKET_BODY && !settingsManager.isShowRocketBodies;
+    return !settingsManager.filter.rocketBodies && obj.type === SpaceObjectType.ROCKET_BODY;
   }
   isDebrisOff(obj: BaseObject) {
-    return obj.type === SpaceObjectType.DEBRIS && !settingsManager.isShowDebris;
+    return !settingsManager.filter.debris && obj.type === SpaceObjectType.DEBRIS;
   }
-  isJscVimpelSatOff(obj: BaseObject) {
-    return obj.name?.startsWith('JSC Vimpel') && !settingsManager.isShowVimpelSats;
+  isUnknownTypeOff(obj: BaseObject) {
+    return !settingsManager.filter.unknownType && obj.type === SpaceObjectType.UNKNOWN;
   }
   isNotionalSatOff(obj: BaseObject) {
-    return obj.isNotional() && !settingsManager.isShowNotionalSats;
+    return !settingsManager.filter.notionalSatellites && obj.isNotional();
   }
   isLeoSatOff(obj: BaseObject) {
-    return (obj as DetailedSatellite).apogee < 6000 && !settingsManager.isShowLeoSats;
+    return !settingsManager.filter.lEOSatellites && (obj as DetailedSatellite).apogee < 6000;
   }
   isMeoSatOff(obj: BaseObject) {
-    return (obj as DetailedSatellite).perigee <= 32000 && (obj as DetailedSatellite).perigee >= 6000 && !settingsManager.isShowMeoSats;
-  }
-  isGeoSatOff(obj: BaseObject) {
-    return (obj as DetailedSatellite).perigee > 32000 && !settingsManager.isShowGeoSats;
+    return !settingsManager.filter.mEOSatellites && (obj as DetailedSatellite).perigee <= 32000 && (obj as DetailedSatellite).perigee >= 6000;
   }
   isHeoSatOff(obj: BaseObject) {
-    return (obj as DetailedSatellite).eccentricity >= 0.1 && ((obj as DetailedSatellite).apogee >= 6000 && (obj as DetailedSatellite).perigee < 6000) &&
-      !settingsManager.isShowHeoSats;
+    return !settingsManager.filter.hEOSatellites && (obj as DetailedSatellite).eccentricity >= 0.1 && ((obj as DetailedSatellite).apogee >= 6000 &&
+      (obj as DetailedSatellite).perigee < 6000);
+  }
+  isGeoSatOff(obj: BaseObject) {
+    return !settingsManager.filter.gEOSatellites && (obj as DetailedSatellite).perigee > 32000;
+  }
+  isUnitedStatesOff(obj: BaseObject) {
+    return !settingsManager.filter.unitedStates && (obj as DetailedSatellite)?.country === 'US';
+  }
+  isUnitedKingdomOff(obj: BaseObject) {
+    return !settingsManager.filter.unitedKingdom && (obj as DetailedSatellite)?.country === 'UK';
+  }
+  isFranceOff(obj: BaseObject) {
+    return !settingsManager.filter.france && (obj as DetailedSatellite)?.country === 'F';
+  }
+  isGermanyOff(obj: BaseObject) {
+    return !settingsManager.filter.germany && (obj as DetailedSatellite)?.country === 'D';
+  }
+  isJapanOff(obj: BaseObject) {
+    return !settingsManager.filter.japan && (obj as DetailedSatellite)?.country === 'J';
+  }
+  isChinaOff(obj: BaseObject) {
+    return !settingsManager.filter.china && (obj as DetailedSatellite)?.country === 'CN';
+  }
+  isIndiaOff(obj: BaseObject) {
+    return !settingsManager.filter.india && (obj as DetailedSatellite)?.country === 'IN';
+  }
+  isRussiaOff(obj: BaseObject) {
+    return !settingsManager.filter.russia && (obj as DetailedSatellite)?.country === 'RU';
+  }
+  isUssrOff(obj: BaseObject) {
+    return !settingsManager.filter.uSSR && (obj as DetailedSatellite)?.country === 'SU';
+  }
+  isSouthKoreaOff(obj: BaseObject) {
+    return !settingsManager.filter.southKorea && (obj as DetailedSatellite)?.country === 'KR';
+  }
+  isAustraliaOff(obj: BaseObject) {
+    return !settingsManager.filter.australia && (obj as DetailedSatellite)?.country === 'AU';
+  }
+  isOtherCountriesOff(obj: BaseObject) {
+    return !settingsManager.filter.otherCountries &&
+      !['US', 'UK', 'F', 'D', 'J', 'CN', 'IN', 'RU', 'SU', 'KR', 'AU'].includes((obj as DetailedSatellite)?.country);
+  }
+  isJscVimpelSatOff(obj: BaseObject) {
+    return !settingsManager.filter.vimpelSatellites && (obj as DetailedSatellite)?.source === CatalogSource.VIMPEL;
+  }
+  isCelestrakSatOff(obj: BaseObject) {
+    return !settingsManager.filter.celestrakSatellites && (obj as DetailedSatellite)?.source === CatalogSource.CELESTRAK;
   }
   isStarlinkSatOff(obj: BaseObject) {
-    return obj.name?.includes('STARLINK') && !this.currentColorScheme?.objectTypeFlags.starlink;
+    return !settingsManager.filter.starlinkSatellites && obj.name?.includes('STARLINK');
   }
 
   reloadColors() {
@@ -351,73 +394,157 @@ export class ColorSchemeManager {
     this.isUseGroupColorScheme = true;
   }
 
-  private static getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
-    let colors: ColorInformation | null = null;
-
+  private getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
     const sat = objectData[i] as DetailedSatellite;
 
-    if (!settingsManager.isShowNotionalSats && objectData[i].isNotional()) {
-      colors = {
+    // Optimize for the most common cases first
+
+    if (this.isDebrisOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowVimpelSats && objectData[i].name?.startsWith('JSC Vimpel')) {
-      colors = {
+    if (this.isJscVimpelSatOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowLeoSats && sat.apogee < 6000) {
-      colors = {
+    if (this.isStarlinkSatOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowStarlinkSats && objectData[i].name?.includes('STARLINK')) {
-      colors = {
+    if (this.isCelestrakSatOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowHeoSats && (sat.eccentricity >= 0.1 || (sat.apogee >= 6000 && sat.perigee < 6000))) {
-      colors = {
+    if (this.isUnitedStatesOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowMeoSats && sat.perigee <= 32000 && sat.perigee >= 6000) {
-      colors = {
+    if (this.isUnitedKingdomOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowGeoSats && sat.perigee > 32000) {
-      colors = {
+    if (this.isFranceOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowPayloads && objectData[i].type === SpaceObjectType.PAYLOAD) {
-      colors = {
+    if (this.isGermanyOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowRocketBodies && objectData[i].type === SpaceObjectType.ROCKET_BODY) {
-      colors = {
+    if (this.isJapanOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowDebris && objectData[i].type === SpaceObjectType.DEBRIS) {
-      colors = {
+    if (this.isChinaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isIndiaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isRussiaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isUssrOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isSouthKoreaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isAustraliaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isOtherCountriesOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isLeoSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isPayloadOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isRocketBodyOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isUnknownTypeOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isNotionalSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isHeoSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isMeoSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isGeoSatOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
 
-    return colors;
+    return null;
   }
 
   private calcFirstAndLastDot_(isForceRecolor: boolean) {
@@ -471,7 +598,7 @@ export class ColorSchemeManager {
 
   private calculateBufferData_(i: number, satData: BaseObject[],
     params: ColorSchemeParams) {
-    let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
+    let colors = this.getColorIfDisabledSat_(satData, i);
 
     if (this.isUseGroupColorScheme) {
       colors ??= this.currentColorScheme?.updateGroup(satData[i], params) ?? this.currentColorSchemeUpdate(satData[i], params);

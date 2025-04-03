@@ -190,28 +190,32 @@ export class HoverManager {
       country = country.length > 0 ? country : 'Unknown';
       this.satHoverBoxNode3.textContent = country;
     } else {
-      const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
-      let color: string;
+      let confidenceScoreString = '';
+      let color: string = 'black';
 
-      if (confidenceScore >= 7) {
-        color = 'green';
-      } else if (confidenceScore >= 4) {
-        color = 'orange';
-      } else {
-        color = 'red';
-      }
+      if (settingsManager.isShowConfidenceLevels) {
+        const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
 
-      let confidenceScoreString = confidenceScore.toString();
+        if (confidenceScore >= 7) {
+          color = 'green';
+        } else if (confidenceScore >= 4) {
+          color = 'orange';
+        } else {
+          color = 'red';
+        }
 
-      if (settingsManager.dataSources.externalTLEsOnly) {
-        confidenceScoreString = 'External';
-        color = 'gray';
+        confidenceScoreString = ` (${confidenceScore.toString()})`;
+
+        if (settingsManager.dataSources.externalTLEsOnly) {
+          confidenceScoreString = ' (External)';
+          color = 'gray';
+        }
       }
 
       this.satHoverBoxNode1.innerHTML = keepTrackApi.html`
         <span id="hoverbox-fi"></span>
         <span>${sat.name}</span>
-        <span style='color:${color};'> (${confidenceScoreString.toString()})</span>
+        <span style='color:${color};'>${confidenceScoreString}</span>
       `;
 
       getEl('hoverbox-fi').classList.value = `fi ${country2flagIcon(sat.country)}`;

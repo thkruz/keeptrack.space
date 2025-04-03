@@ -622,8 +622,6 @@ export class CatalogManager {
 
     this.orbitDensity = this.calculateOrbitalDensity_(activeSats, 25);
     this.buildOrbitPlaneDensityMatrix_(activeSats);
-
-    console.log(this.orbitalPlaneDensity);
   }
 
   private calculateEffectiveAltitude_(satellite: DetailedSatellite): number {

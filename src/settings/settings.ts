@@ -21,6 +21,7 @@
 
 import { KeepTrackApiEvents, MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
 import type { KeepTrackPlugins } from '@app/plugins/plugins';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
@@ -95,24 +96,15 @@ export class SettingsManager {
     transponderChannelData: true,
     calculator: true,
     createSat: true,
+    filterMenu: true,
   };
   changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
   changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute
   earthDayTextureQuality = EarthDayTextureQuality.MEDIUM;
   earthNightTextureQuality = EarthNightTextureQuality.MEDIUM;
+  filter: FilterPluginSettings = {};
 
   static preserveSettings() {
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_NOTIONAL_SATS, settingsManager.isShowNotionalSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_VIMPEL_SATS, settingsManager.isShowVimpelSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_LEO_SATS, settingsManager.isShowLeoSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_STARLINK_SATS, settingsManager.isShowStarlinkSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HEO_SATS, settingsManager.isShowHeoSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MEO_SATS, settingsManager.isShowMeoSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GEO_SATS, settingsManager.isShowGeoSats.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_PAYLOADS, settingsManager.isShowPayloads.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ROCKET_BODIES, settingsManager.isShowRocketBodies.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEBRIS, settingsManager.isShowDebris.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_AGENCIES, settingsManager.isShowAgencies.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, settingsManager.isDrawOrbits.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, settingsManager.isDrawTrailingOrbits.toString());
@@ -140,6 +132,8 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY, settingsManager.godraysIlluminationDecay.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality.toString());
+
+    keepTrackApi.runEvent(KeepTrackApiEvents.saveSettings);
   }
 
   colors: ColorSchemeColorMap & DefaultColorSchemeColorMap;
@@ -1156,151 +1150,24 @@ export class SettingsManager {
   /** Enables the camera widget */
   drawCameraWidget = false;
 
-  // eslint-disable-next-line max-statements
   loadPersistedSettings() {
-    const isShowNotionalSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_NOTIONAL_SATS);
-
-    if (isShowNotionalSatsString !== null) {
-      this.isShowNotionalSats = isShowNotionalSatsString === 'true';
-    }
-
-    const isShowVimpelSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_VIMPEL_SATS);
-
-    if (isShowVimpelSatsString !== null) {
-      this.isShowVimpelSats = isShowVimpelSatsString === 'true';
-    }
-
-    const leoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_LEO_SATS);
-
-    if (leoSatsString !== null) {
-      this.isShowLeoSats = leoSatsString === 'true';
-    }
-    const starlinkSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_STARLINK_SATS);
-
-    if (starlinkSatsString !== null) {
-      this.isShowStarlinkSats = starlinkSatsString === 'true';
-    }
-    const heoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_HEO_SATS);
-
-    if (heoSatsString !== null) {
-      this.isShowHeoSats = heoSatsString === 'true';
-    }
-    const meoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_MEO_SATS);
-
-    if (meoSatsString !== null) {
-      this.isShowMeoSats = meoSatsString === 'true';
-    }
-    const geoSatsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_GEO_SATS);
-
-    if (geoSatsString !== null) {
-      this.isShowGeoSats = geoSatsString === 'true';
-    }
-    const payloadsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_PAYLOADS);
-
-    if (payloadsString !== null) {
-      this.isShowPayloads = payloadsString === 'true';
-    }
-    const rocketBodiesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_ROCKET_BODIES);
-
-    if (rocketBodiesString !== null) {
-      this.isShowRocketBodies = rocketBodiesString === 'true';
-    }
-    const debrisString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DEBRIS);
-
-    if (debrisString !== null) {
-      this.isShowDebris = debrisString === 'true';
-    }
-    const agenciesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_AGENCIES);
-
-    if (agenciesString !== null) {
-      this.isShowAgencies = agenciesString === 'true';
-    }
-    const drawOrbitsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ORBITS);
-
-    if (drawOrbitsString !== null) {
-      this.isDrawOrbits = drawOrbitsString === 'true';
-    }
-
-    const drawCameraWidgetString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET);
-
-    if (drawCameraWidgetString !== null) {
-      this.drawCameraWidget = drawCameraWidgetString === 'true';
-    }
-    const drawTrailingOrbitsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS);
-
-    if (drawTrailingOrbitsString !== null) {
-      this.isDrawTrailingOrbits = drawTrailingOrbitsString === 'true';
-    }
-    const isOrbitCruncherInEcfString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ECF);
-
-    if (isOrbitCruncherInEcfString !== null) {
-      this.isOrbitCruncherInEcf = isOrbitCruncherInEcfString === 'true';
-    }
-    const drawInCoverageLinesString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES);
-
-    if (drawInCoverageLinesString !== null) {
-      this.isDrawInCoverageLines = drawInCoverageLinesString === 'true';
-    }
-    const drawSunString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_SUN);
-
-    if (drawSunString !== null) {
-      this.isDrawSun = drawSunString === 'true';
-    }
-    const blackEarthString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH);
-
-    if (blackEarthString !== null) {
-      this.isBlackEarth = blackEarthString === 'true';
-    }
-    const drawAtmosphereString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE);
-
-    if (drawAtmosphereString !== null) {
-      this.isDrawAtmosphere = drawAtmosphereString === 'true';
-    }
-    const drawAuroraString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_AURORA);
-
-    if (drawAuroraString !== null) {
-      this.isDrawAurora = drawAuroraString === 'true';
-    }
-    const drawMilkyWayString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_MILKY_WAY);
-
-    if (drawMilkyWayString !== null) {
-      this.isDrawMilkyWay = drawMilkyWayString === 'true';
-    }
-    const graySkyboxString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_GRAY_SKYBOX);
-
-    if (graySkyboxString !== null) {
-      this.isGraySkybox = graySkyboxString === 'true';
-    }
-    const eciOnHoverString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_ECI_ON_HOVER);
-
-    if (eciOnHoverString !== null) {
-      this.isEciOnHover = eciOnHoverString === 'true';
-    }
-    const isShowConfidenceLevelsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS);
-
-    if (isShowConfidenceLevelsString !== null) {
-      this.isShowConfidenceLevels = isShowConfidenceLevelsString === 'true';
-    }
-    const demoModeOnString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DEMO_MODE);
-
-    if (demoModeOnString !== null) {
-      this.isDemoModeOn = demoModeOnString === 'true';
-    }
-    const satLabelModeOnString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SAT_LABEL_MODE);
-
-    if (satLabelModeOnString !== null) {
-      this.isSatLabelModeOn = satLabelModeOnString === 'true';
-    }
-    const freezePropRateOnDragString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG);
-
-    if (freezePropRateOnDragString !== null) {
-      this.isFreezePropRateOnDrag = freezePropRateOnDragString === 'true';
-    }
-    const disableTimeMachineToastsString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS);
-
-    if (disableTimeMachineToastsString !== null) {
-      this.isDisableTimeMachineToasts = disableTimeMachineToastsString === 'true';
-    }
+    this.isDrawOrbits = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ORBITS, this.isDrawOrbits) as boolean;
+    this.drawCameraWidget = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, this.drawCameraWidget) as boolean;
+    this.isDrawTrailingOrbits = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, this.isDrawTrailingOrbits) as boolean;
+    this.isOrbitCruncherInEcf = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ECF, this.isOrbitCruncherInEcf) as boolean;
+    this.isDrawInCoverageLines = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, this.isDrawInCoverageLines) as boolean;
+    this.isDrawSun = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_SUN, this.isDrawSun) as boolean;
+    this.isBlackEarth = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_BLACK_EARTH, this.isBlackEarth) as boolean;
+    this.isDrawAtmosphere = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ATMOSPHERE, this.isDrawAtmosphere) as boolean;
+    this.isDrawAurora = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_AURORA, this.isDrawAurora) as boolean;
+    this.isDrawMilkyWay = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_MILKY_WAY, this.isDrawMilkyWay) as boolean;
+    this.isGraySkybox = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_GRAY_SKYBOX, this.isGraySkybox) as boolean;
+    this.isEciOnHover = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_ECI_ON_HOVER, this.isEciOnHover) as boolean;
+    this.isShowConfidenceLevels = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_CONFIDENCE_LEVELS, this.isShowConfidenceLevels) as boolean;
+    this.isDemoModeOn = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DEMO_MODE, this.isDemoModeOn) as boolean;
+    this.isSatLabelModeOn = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_SAT_LABEL_MODE, this.isSatLabelModeOn) as boolean;
+    this.isFreezePropRateOnDrag = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, this.isFreezePropRateOnDrag) as boolean;
+    this.isDisableTimeMachineToasts = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, this.isDisableTimeMachineToasts) as boolean;
 
     const earthDayTextureQaulityString = PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION);
 

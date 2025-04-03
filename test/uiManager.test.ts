@@ -16,7 +16,7 @@ describe('uiManager', () => {
 
   // Should process getsensorinfo
   it('process_getsensorinfo', () => {
-    keepTrackApi.containerRoot.innerHTML = `
+    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML = `
     <div id="sensor-latitude"></div>
     <div id="sensor-longitude"></div>
     <div id="sensor-minazimuth"></div>
@@ -38,7 +38,7 @@ describe('uiManager', () => {
 
   // Should process updateSensorPosition
   it('process_updateSensorPosition', () => {
-    keepTrackApi.containerRoot.innerHTML = `
+    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML = `
       <input id="cs-lat" />
       <input id="cs-lon" />
       <input id="cs-hei" />
@@ -74,7 +74,7 @@ describe('uiManager', () => {
     expect((<HTMLInputElement>getEl('cs-lon')).value).toBe('22');
     expect((<HTMLInputElement>getEl('cs-hei')).value).toBe('0.022');
 
-    keepTrackApi.containerRoot.innerHTML = '<div id="search"></div>';
+    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML = '<div id="search"></div>';
     disableConsoleErrors();
     expect(() =>
       UiGeolocation.updateSensorPosition({
@@ -100,7 +100,8 @@ describe('uiManager', () => {
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.GpAgeColorScheme)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.RcsColorScheme)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.SmallSatColorScheme)).not.toThrow();
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.DensityColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.SpatialDensityColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.OrbitalPlaneDensityColorScheme)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.CelestrakColorScheme)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.SourceColorScheme)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.ConfidenceColorScheme)).not.toThrow();
@@ -109,7 +110,7 @@ describe('uiManager', () => {
   // Should process footerToggle and hideUi
   it('process_footerToggle_hideUi', () => {
     setupMinimumHtml();
-    keepTrackApi.containerRoot.innerHTML += `
+    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML += `
     <div id="sat-infobox"></div>
     <div id="nav-footer"></div>
     <div id="nav-footer-toggle"></div>
@@ -126,7 +127,7 @@ describe('uiManager', () => {
   // Should process initMenuController
   it('process_initMenuController', () => {
     setupStandardEnvironment();
-    keepTrackApi.containerRoot.innerHTML += `
+    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML += `
     <div id="legend-menu"></div>
     <div id="legend-hover-menu"></div>
     <div id="legend-icon"></div>
@@ -157,7 +158,7 @@ describe('uiManager', () => {
   // Should process postStart
   it('process_postStart', () => {
     setupStandardEnvironment();
-    keepTrackApi.containerRoot.innerHTML += `
+    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML += `
     <div id="editSat"></div>
     <div id="cs-geolocation"></div>
     <div id="es-ecen"></div>

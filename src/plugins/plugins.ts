@@ -25,6 +25,7 @@ import { DebrisScreening } from './debris-screening/debris-screening';
 import { DebugMenuPlugin } from './debug/debug';
 import { DopsPlugin } from './dops/dops';
 import { EditSat } from './edit-sat/edit-sat';
+import { FilterMenuPlugin } from './filter-menu/filter-menu';
 import { GamepadPlugin } from './gamepad/gamepad';
 import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
@@ -72,6 +73,7 @@ import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 
 export type KeepTrackPlugins = {
+  filterMenu?: boolean;
   transponderChannelData?: boolean;
   videoDirector?: boolean;
   debrisScreening?: boolean;
@@ -194,6 +196,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new Lat2LonPlots().init(), enabled: plugins.plotAnalysis },
       { init: () => new Inc2AltPlots().init(), enabled: plugins.plotAnalysis },
       { init: () => new Inc2LonPlots().init(), enabled: plugins.plotAnalysis },
+      { init: () => new FilterMenuPlugin().init(), enabled: plugins.filterMenu },
       { init: () => new SettingsMenuPlugin().init(), enabled: plugins.settingsMenu },
       { init: () => new GraphicsMenuPlugin().init(), enabled: plugins.graphicsMenu },
       { init: () => new SoundManager().init(), enabled: plugins.soundManager },
@@ -215,6 +218,9 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       // Set --nav-bar-height of :root to 0px if topMenu is not enabled and ensure it overrides any other value
       document.documentElement.style.setProperty('--nav-bar-height', '0px');
     }
+
+    // Load any settings from local storage after all plugins are loaded
+    keepTrackApi.runEvent(KeepTrackApiEvents.loadSettings);
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,

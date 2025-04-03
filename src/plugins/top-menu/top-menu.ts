@@ -22,7 +22,7 @@ export class TopMenu extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerInit,
       cbName: this.id,
       cb: () => {
-        getEl('keeptrack-header').insertAdjacentHTML(
+        getEl('keeptrack-header')?.insertAdjacentHTML(
           'beforeend',
           keepTrackApi.html`
             <nav>
@@ -70,7 +70,7 @@ export class TopMenu extends KeepTrackPlugin {
           `,
         );
 
-        keepTrackApi.containerRoot.insertAdjacentHTML(
+        keepTrackApi.containerRoot?.insertAdjacentHTML(
           'beforeend',
           keepTrackApi.html`
             <div id="help-outer-container" class="valign">

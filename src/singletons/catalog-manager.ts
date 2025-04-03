@@ -63,6 +63,13 @@ declare module '@app/interfaces' {
   }
 }
 
+export interface DensityBin {
+  minAltitude: number;
+  maxAltitude: number;
+  count: number;
+  density: number; // spatial density (objects per km³)
+}
+
 export class CatalogManager {
   private static readonly TEMPLATE_INTLDES = '58001A';
   private static readonly TEMPLATE_TLE1_BEGINNING = '1 ';
@@ -94,8 +101,10 @@ export class CatalogManager {
   missileSet = [] as MissileObject[];
   numSatellites: number = 0;
   numObjects: number = 0;
-  orbitDensity: number[][] = [];
+  orbitDensity: DensityBin[] = [];
   orbitDensityMax = 0;
+  orbitalPlaneDensity: number[][] = [];
+  orbitalPlaneDensityMax = 0;
   orbitalSats: number;
   satCruncher: Worker;
   objectCache: BaseObject[];
@@ -609,38 +618,105 @@ export class CatalogManager {
   }
 
   private buildOrbitDensityMatrix_() {
+    const activeSats = this.getSats().filter((sat) => sat.active);
+
+    this.orbitDensity = this.calculateOrbitalDensity_(activeSats, 25);
+    this.buildOrbitPlaneDensityMatrix_(activeSats);
+  }
+
+  private calculateEffectiveAltitude_(satellite: DetailedSatellite): number {
+    // Using the mean altitude approach
+    return (satellite.apogee + satellite.perigee) / 2;
+  }
+
+  private buildOrbitPlaneDensityMatrix_(satellites: DetailedSatellite[]) {
     // Build the orbit density matrix
-    for (let i = 0; i < 180; i++) {
-      this.orbitDensity[i] = [];
-      for (let p = 90; p < 1500; p++) {
-        this.orbitDensity[i][p] = 0;
+    for (let i = 0; i < 180; i += 2) {
+      this.orbitalPlaneDensity[i] = [];
+      for (let a = 75; a < 40000; a += 25) {
+        this.orbitalPlaneDensity[i][a] = 0;
       }
     }
 
-    for (let i = 0; i < this.numObjects; i++) {
+    for (let i = 0; i < satellites.length; i++) {
       // Static objects lack these values and including them increase the JS heap a lot
-      if (!this.objectCache[i].isSatellite()) {
+      if (!satellites[i].active) {
         continue;
       }
-      const sat = this.objectCache[i] as DetailedSatellite;
+      const sat = satellites[i] as DetailedSatellite;
 
-      if (this.objectCache[i].type !== SpaceObjectType.PAYLOAD) {
-        const inc = Math.round(sat.inclination);
-        const per = Math.round(sat.period);
+      if (satellites[i].active) {
+        const inc = Math.floor(sat.inclination / 2) * 2;
+        const alt = Math.floor(this.calculateEffectiveAltitude_(sat) / 25) * 25;
 
-        this.orbitDensity[inc][per] += 1;
+        this.orbitalPlaneDensity[inc][alt] += 1;
       }
 
-      this.objectCache[i].velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
+      satellites[i].velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
     }
 
-    this.orbitDensityMax = 0;
-    for (let i = 0; i < 180; i++) {
-      for (let p = 90; p < 1500; p++) {
-        if (this.orbitDensity[i][p] > this.orbitDensityMax) {
-          this.orbitDensityMax = this.orbitDensity[i][p];
+    this.orbitalPlaneDensityMax = 0;
+    for (let i = 0; i < 180; i += 2) {
+      for (let alt = 75; alt < 40000; alt += 25) {
+        if (this.orbitalPlaneDensity[i][alt] > this.orbitalPlaneDensityMax) {
+          this.orbitalPlaneDensityMax = this.orbitalPlaneDensity[i][alt];
         }
       }
     }
+  }
+
+  private calculateOrbitalDensity_(satellites: DetailedSatellite[], binSize: number = 25): DensityBin[] {
+    const altitudes = satellites.map((satellite) => (
+      {
+        id: satellite.id,
+        sccNum: satellite.sccNum,
+        altitude: this.calculateEffectiveAltitude_(satellite),
+      }
+    ));
+
+    // Sort satellites by altitude
+    const sortedSatellites = [...altitudes].sort((a, b) => a.altitude - b.altitude);
+
+    /*
+     * Find min and max altitudes
+     */
+    // const minAltitude = Math.floor(sortedSatellites[0].altitude / binSize) * binSize;
+    const minAltitude = 75;
+    //  const maxAltitude = Math.ceil(sortedSatellites[sortedSatellites.length - 1].altitude / binSize) * binSize;
+    const maxAltitude = 2000;
+
+    // Create altitude bins
+    const bins: DensityBin[] = [];
+
+    for (let alt = minAltitude; alt < maxAltitude; alt += binSize) {
+      bins.push({
+        minAltitude: alt,
+        maxAltitude: alt + binSize,
+        count: 0,
+        density: 0,
+      });
+    }
+
+    // Count satellites in each bin
+    for (const satellite of sortedSatellites) {
+      const binIndex = Math.floor((satellite.altitude - minAltitude) / binSize);
+
+      if (binIndex >= 0 && binIndex < bins.length) {
+        bins[binIndex].count++;
+      }
+    }
+
+    // Calculate density for each bin
+    for (const bin of bins) {
+      // Calculate the volume of the spherical shell (in km³)
+      const innerRadius = 6371 + bin.minAltitude; // Earth radius (6371 km) + min altitude
+      const outerRadius = 6371 + bin.maxAltitude; // Earth radius (6371 km) + max altitude
+      const volume = (4 / 3) * Math.PI * (outerRadius ** 3 - innerRadius ** 3);
+
+      // Calculate spatial density (objects per km³)
+      bin.density = bin.count / volume;
+    }
+
+    return bins;
   }
 }

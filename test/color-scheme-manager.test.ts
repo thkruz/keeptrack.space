@@ -453,10 +453,10 @@ describe('ColorSchemeManager', () => {
 
   // Test neighbors color scheme
   it('should be able to get neighbors color scheme', () => {
-    const orbitDensityMatrix = [];
+    const orbitDensityMatrix: number[][] = [];
 
     for (let i = 0; i < 180; i++) {
-      const innerMatrix = [];
+      const innerMatrix: number[] = [];
 
       for (let j = 0; j < 500; j++) {
         innerMatrix.push(i);
@@ -465,9 +465,9 @@ describe('ColorSchemeManager', () => {
     }
 
     const test = (sat: BaseObject) =>
-      colorSchemeManager.colorSchemeInstances.DensityColorScheme.update(sat, {
-        orbitDensity: orbitDensityMatrix,
-        orbitDensityMax: 180,
+      colorSchemeManager.colorSchemeInstances.OrbitalPlaneDensityColorScheme.update(sat, {
+        orbitalPlaneDensity: orbitDensityMatrix,
+        orbitalPlaneDensityMax: 180,
       });
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);

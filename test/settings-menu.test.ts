@@ -21,22 +21,17 @@ describe('SettingsMenuPlugin_class', () => {
     const settingsMenuPlugin = new SettingsMenuPlugin();
 
     websiteInit(settingsMenuPlugin);
-    expect(() => getEl('settings-leoSats').click()).not.toThrow();
-    expect(() => getEl('settings-heoSats').click()).not.toThrow();
-    expect(() => getEl('settings-meoSats').click()).not.toThrow();
-    expect(() => getEl('settings-geoSats').click()).not.toThrow();
-    expect(() => getEl('settings-showAgencies').click()).not.toThrow();
-    expect(() => getEl('settings-drawOrbits').click()).not.toThrow();
-    expect(() => getEl('settings-drawTrailingOrbits').click()).not.toThrow();
-    expect(() => getEl('settings-drawEcf').click()).not.toThrow();
-    expect(() => getEl('settings-isDrawInCoverageLines').click()).not.toThrow();
-    expect(() => getEl('settings-eciOnHover').click()).not.toThrow();
-    expect(() => getEl('settings-hos').click()).not.toThrow();
-    expect(() => getEl('settings-demo-mode').click()).not.toThrow();
-    expect(() => getEl('settings-sat-label-mode').click()).not.toThrow();
-    expect(() => getEl('settings-freeze-drag').click()).not.toThrow();
-    expect(() => getEl('settings-time-machine-toasts').click()).not.toThrow();
-    expect(() => getEl('settings-snp').click()).not.toThrow();
+    expect(() => getEl('settings-drawOrbits')?.click()).not.toThrow();
+    expect(() => getEl('settings-drawTrailingOrbits')?.click()).not.toThrow();
+    expect(() => getEl('settings-drawEcf')?.click()).not.toThrow();
+    expect(() => getEl('settings-isDrawInCoverageLines')?.click()).not.toThrow();
+    expect(() => getEl('settings-eciOnHover')?.click()).not.toThrow();
+    expect(() => getEl('settings-hos')?.click()).not.toThrow();
+    expect(() => getEl('settings-demo-mode')?.click()).not.toThrow();
+    expect(() => getEl('settings-sat-label-mode')?.click()).not.toThrow();
+    expect(() => getEl('settings-freeze-drag')?.click()).not.toThrow();
+    expect(() => getEl('settings-time-machine-toasts')?.click()).not.toThrow();
+    expect(() => getEl('settings-snp')?.click()).not.toThrow();
   });
   // Test submitting changes
   it('should submit changes', () => {
@@ -49,6 +44,6 @@ describe('SettingsMenuPlugin_class', () => {
     colorSchemeManagerInstance.setColorScheme = jest.fn();
     colorSchemeManagerInstance.reloadColors = jest.fn();
     keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
-    expect(() => getEl('settings-submit').click()).not.toThrow();
+    expect(() => getEl('settings-submit')?.click()).not.toThrow();
   });
 });

@@ -8,17 +8,6 @@ export enum StorageKey {
   IS_ADVICE_ENABLED = 'v2-isAdviceEnabled',
   LAST_MAP = 'v2-keepTrack-earthTexture',
   COLOR_SCHEME = 'v2-keepTrack-colorScheme',
-  SETTINGS_NOTIONAL_SATS = 'v2-keepTrack-settings-notionalSats',
-  SETTINGS_VIMPEL_SATS = 'v2-keepTrack-settings-vimpelSats',
-  SETTINGS_LEO_SATS = 'v2-keepTrack-settings-LEOSats',
-  SETTINGS_STARLINK_SATS = 'v2-keepTrack-settings-starlinkSats',
-  SETTINGS_HEO_SATS = 'v2-keepTrack-settings-HEOSats',
-  SETTINGS_MEO_SATS = 'v2-keepTrack-settings-MEOSats',
-  SETTINGS_GEO_SATS = 'v2-keepTrack-settings-GEOSats',
-  SETTINGS_PAYLOADS = 'v2-keepTrack-settings-payloads',
-  SETTINGS_ROCKET_BODIES = 'v2-keepTrack-settings-rocketBodies',
-  SETTINGS_DEBRIS = 'v2-keepTrack-settings-debris',
-  SETTINGS_AGENCIES = 'v2-keepTrack-settings-agencies',
   SETTINGS_DRAW_CAMERA_WIDGET = 'v2-keepTrack-settings-drawCameraWidget',
   SETTINGS_DRAW_ORBITS = 'v2-keepTrack-settings-drawOrbits',
   SETTINGS_DRAW_ECF = 'v2-keepTrack-settings-drawECF',
@@ -46,6 +35,31 @@ export enum StorageKey {
   GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY = 'v2-keepTrack-graphicsSettings-godraysIlluminationDecay',
   GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthDayResolution',
   GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthNightResolution',
+  FILTER_SETTINGS_PAYLOADS = 'v2-filter-settings-payload',
+  FILTER_SETTINGS_ROCKET_BODIES = 'v2-filter-settings-rocket-bodies',
+  FILTER_SETTINGS_DEBRIS = 'v2-filter-settings-debris',
+  FILTER_SETTINGS_UNKNOWN_TYPE = 'v2-filter-settings-unknown-type',
+  FILTER_SETTINGS_AGENCIES = 'v2-filter-settings-agencies',
+  FILTER_SETTINGS_LEO = 'v2-filter-settings-leo',
+  FILTER_SETTINGS_HEO = 'v2-filter-settings-heo',
+  FILTER_SETTINGS_MEO = 'v2-filter-settings-meo',
+  FILTER_SETTINGS_GEO = 'v2-filter-settings-geo',
+  FILTER_SETTINGS_VIMPEL = 'v2-filter-settings-vimpel',
+  FILTER_SETTINGS_CELESTRAK = 'v2-filter-settings-celestrak',
+  FILTER_SETTINGS_NOTIONAL = 'v2-filter-settings-notional',
+  FILTER_SETTINGS_UNITED_STATES = 'v2-filter-settings-united-states',
+  FILTER_SETTINGS_UNITED_KINGDOM = 'v2-filter-settings-united-kingdom',
+  FILTER_SETTINGS_FRANCE = 'v2-filter-settings-france',
+  FILTER_SETTINGS_GERMANY = 'v2-filter-settings-germany',
+  FILTER_SETTINGS_JAPAN = 'v2-filter-settings-japan',
+  FILTER_SETTINGS_CHINA = 'v2-filter-settings-china',
+  FILTER_SETTINGS_INDIA = 'v2-filter-settings-india',
+  FILTER_SETTINGS_RUSSIA = 'v2-filter-settings-russia',
+  FILTER_SETTINGS_USSR = 'v2-filter-settings-ussr',
+  FILTER_SETTINGS_SOUTH_KOREA = 'v2-filter-settings-south-korea',
+  FILTER_SETTINGS_AUSTRALIA = 'v2-filter-settings-australia',
+  FILTER_SETTINGS_OTHER_COUNTRIES = 'v2-filter-settings-other-countries',
+  FILTER_SETTINGS_STARLINK = 'v2-filter-settings-starlink',
 }
 export class PersistenceManager {
   private readonly storage_: Storage;
@@ -90,6 +104,18 @@ export class PersistenceManager {
     }
 
     return value;
+  }
+
+  checkIfEnabled(key: string, fallback: boolean | undefined): boolean | undefined {
+    PersistenceManager.verifyKey_(key);
+
+    const value = this.storage_.getItem(key);
+
+    if (value === null) {
+      return fallback;
+    }
+
+    return value === 'true';
   }
 
   saveItem(key: string, value: string): void {

@@ -67,83 +67,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
             <h5 class="center-align">General Settings</h5>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide notional satellites">
-                <input id="settings-notionalSats" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show Notional Satellites
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Vimpel satellites">
-                <input id="settings-vimpel" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show Vimpel Satellites
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide LEO satellites">
-                <input id="settings-leoSats" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show LEO Satellites
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Starlink satellites">
-                <input id="settings-starlinkSats" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show Starlink Satellites
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide HEO satellites">
-                <input id="settings-heoSats" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show HEO Satellites
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide MEO satellites">
-                <input id="settings-meoSats" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show MEO Satellites
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide GEO satellites">
-                <input id="settings-geoSats" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show GEO Satellites
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Payloads">
-                <input id="settings-showPayloads" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show Payloads
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Rocket Bodies">
-                <input id="settings-showRocketBodies" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show Rocket Bodies
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable to hide Debris">
-                <input id="settings-showDebris" type="checkbox" checked/>
-                <span class="lever"></span>
-                Show Debris
-              </label>
-            </div>
-            <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Planned feature - This will show agencies on the globe.">
-                <input id="settings-showAgencies" type="checkbox" disabled/>
-                <span class="lever"></span>
-                Show Agencies
-              </label>
-            </div>
-            <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Disable this to hide the camera widget">
                 <input id="settings-drawCameraWidget" type="checkbox" checked/>
                 <span class="lever"></span>
@@ -440,17 +363,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
 
     const settingsElements = [
-      { id: 'settings-notionalSats', setting: 'isShowNotionalSats' },
-      { id: 'settings-vimpel', setting: 'isShowVimpelSats' },
-      { id: 'settings-leoSats', setting: 'isShowLeoSats' },
-      { id: 'settings-starlinkSats', setting: 'isShowStarlinkSats' },
-      { id: 'settings-heoSats', setting: 'isShowHeoSats' },
-      { id: 'settings-meoSats', setting: 'isShowMeoSats' },
-      { id: 'settings-geoSats', setting: 'isShowGeoSats' },
-      { id: 'settings-showPayloads', setting: 'isShowPayloads' },
-      { id: 'settings-showRocketBodies', setting: 'isShowRocketBodies' },
-      { id: 'settings-showDebris', setting: 'isShowDebris' },
-      { id: 'settings-showAgencies', setting: 'isShowAgencies' },
       { id: 'settings-drawOrbits', setting: 'isDrawOrbits' },
       { id: 'settings-drawTrailingOrbits', setting: 'isDrawTrailingOrbits' },
       { id: 'settings-drawEcf', setting: 'isOrbitCruncherInEcf' },
@@ -460,6 +372,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       { id: 'settings-confidence-levels', setting: 'isShowConfidenceLevels' },
       { id: 'settings-demo-mode', setting: 'isDemoModeOn' },
       { id: 'settings-sat-label-mode', setting: 'isSatLabelModeOn' },
+      { id: 'settings-snp', setting: 'isShowNextPassOnHover' },
       { id: 'settings-freeze-drag', setting: 'isFreezePropRateOnDrag' },
       { id: 'settings-time-machine-toasts', setting: 'isDisableTimeMachineToasts' },
     ];
@@ -509,17 +422,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
 
     switch ((<HTMLElement>e.target)?.id) {
-      case 'settings-notionalSats':
-      case 'settings-vimpel':
-      case 'settings-leoSats':
-      case 'settings-starlinkSats':
-      case 'settings-heoSats':
-      case 'settings-meoSats':
-      case 'settings-geoSats':
-      case 'settings-showPayloads':
-      case 'settings-showRocketBodies':
-      case 'settings-showDebris':
-      case 'settings-showAgencies':
       case 'settings-drawOrbits':
       case 'settings-drawCameraWidget':
       case 'settings-drawTrailingOrbits':
@@ -567,16 +469,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   static resetToDefaults() {
     keepTrackApi.getSoundManager().play(SoundNames.BUTTON_CLICK);
-    settingsManager.isShowNotionalSats = true;
-    settingsManager.isShowVimpelSats = true;
-    settingsManager.isShowLeoSats = true;
-    settingsManager.isShowHeoSats = true;
-    settingsManager.isShowMeoSats = true;
-    settingsManager.isShowGeoSats = true;
-    settingsManager.isShowPayloads = true;
-    settingsManager.isShowRocketBodies = true;
-    settingsManager.isShowDebris = true;
-    settingsManager.isShowAgencies = false;
     settingsManager.isDrawOrbits = true;
     settingsManager.drawCameraWidget = false;
     settingsManager.isDrawTrailingOrbits = false;
@@ -604,17 +496,6 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
-    settingsManager.isShowNotionalSats = (<HTMLInputElement>getEl('settings-notionalSats')).checked;
-    settingsManager.isShowVimpelSats = (<HTMLInputElement>getEl('settings-vimpel')).checked;
-    settingsManager.isShowLeoSats = (<HTMLInputElement>getEl('settings-leoSats')).checked;
-    settingsManager.isShowStarlinkSats = (<HTMLInputElement>getEl('settings-starlinkSats')).checked;
-    settingsManager.isShowHeoSats = (<HTMLInputElement>getEl('settings-heoSats')).checked;
-    settingsManager.isShowMeoSats = (<HTMLInputElement>getEl('settings-meoSats')).checked;
-    settingsManager.isShowGeoSats = (<HTMLInputElement>getEl('settings-geoSats')).checked;
-    settingsManager.isShowPayloads = (<HTMLInputElement>getEl('settings-showPayloads')).checked;
-    settingsManager.isShowRocketBodies = (<HTMLInputElement>getEl('settings-showRocketBodies')).checked;
-    settingsManager.isShowDebris = (<HTMLInputElement>getEl('settings-showDebris')).checked;
-    settingsManager.isShowAgencies = (<HTMLInputElement>getEl('settings-showAgencies')).checked;
     settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
     settingsManager.drawCameraWidget = (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked;

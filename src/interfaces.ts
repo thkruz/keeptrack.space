@@ -1,4 +1,5 @@
 import { BaseObject, Degrees, DetailedSatellite, Kilometers, Meters, Milliseconds, Radians, SpaceObjectType, Vec3Flat, ZoomValue } from 'ootk';
+import { ColorSchemeParams } from './singletons/color-schemes/color-scheme';
 
 /** Array of ECI Coordinates [x, y, z] */
 export type EciArr3 = Vec3Flat<number>;
@@ -229,7 +230,7 @@ export interface ColorRuleParams {
   satInView?: Int8Array;
 }
 
-export type ColorRuleSet = (obj: BaseObject, params?: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number }) => ColorInformation;
+export type ColorRuleSet = (obj: BaseObject, params?: ColorSchemeParams) => ColorInformation;
 
 /**
  ***********************************************************
@@ -334,4 +335,6 @@ export enum KeepTrackApiEvents {
   touchStart = 'touchStart',
   ConeMeshUpdate = 'ConeMeshUpdate',
   bottomMenuModeChange = 'bottomMenuModeChange',
+  saveSettings = 'saveSettings',
+  loadSettings = 'loadSettings',
 }

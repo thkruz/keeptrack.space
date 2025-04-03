@@ -32,20 +32,22 @@ import { errorManagerInstance } from './errorManager';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
+import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
 import { TimeMachine } from './../plugins/time-machine/time-machine';
+import { DensityBin } from './catalog-manager';
 import { CelestrakColorScheme } from './color-schemes/celestrak-color-scheme';
-import { ColorScheme, ColorSchemeColorMap } from './color-schemes/color-scheme';
+import { ColorScheme, ColorSchemeColorMap, ColorSchemeParams } from './color-schemes/color-scheme';
 import { ConfidenceColorScheme } from './color-schemes/confidence-color-scheme';
 import { CountryColorScheme } from './color-schemes/country-color-scheme';
 import { DefaultColorScheme, DefaultColorSchemeColorMap } from './color-schemes/default-color-scheme';
-import { DensityColorScheme } from './color-schemes/density-color-scheme';
 import { GpAgeColorScheme } from './color-schemes/gp-age-color-scheme';
 import { MissionColorScheme } from './color-schemes/mission-color-scheme';
+import { OrbitalPlaneDensityColorScheme } from './color-schemes/orbital-plane-density-color-scheme';
 import { RcsColorScheme } from './color-schemes/rcs-color-scheme';
 import { SmallSatColorScheme } from './color-schemes/smallsat-color-scheme';
 import { SourceColorScheme } from './color-schemes/source-color-scheme';
+import { SpatialDensityColorScheme } from './color-schemes/spatial-density-color-scheme';
 import { StarlinkColorScheme } from './color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from './color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
@@ -60,7 +62,8 @@ export class ColorSchemeManager {
     RcsColorScheme,
     MissionColorScheme,
     ConfidenceColorScheme,
-    DensityColorScheme,
+    OrbitalPlaneDensityColorScheme,
+    SpatialDensityColorScheme,
     SunlightColorScheme,
     GpAgeColorScheme,
     SourceColorScheme,
@@ -75,7 +78,8 @@ export class ColorSchemeManager {
     RcsColorScheme: new RcsColorScheme(),
     MissionColorScheme: new MissionColorScheme(),
     ConfidenceColorScheme: new ConfidenceColorScheme(),
-    DensityColorScheme: new DensityColorScheme(),
+    OrbitalPlaneDensityColorScheme: new OrbitalPlaneDensityColorScheme(),
+    SpatialDensityColorScheme: new SpatialDensityColorScheme(),
     SunlightColorScheme: new SunlightColorScheme(),
     GpAgeColorScheme: new GpAgeColorScheme(),
     SourceColorScheme: new SourceColorScheme(),
@@ -265,35 +269,78 @@ export class ColorSchemeManager {
     return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && !this.currentColorScheme?.objectTypeFlags.inFOV;
   }
   isPayloadOff(obj: BaseObject) {
-    return obj.type === SpaceObjectType.PAYLOAD && !settingsManager.isShowPayloads;
+    return !settingsManager.filter.payloads && obj.type === SpaceObjectType.PAYLOAD;
   }
   isRocketBodyOff(obj: BaseObject) {
-    return obj.type === SpaceObjectType.ROCKET_BODY && !settingsManager.isShowRocketBodies;
+    return !settingsManager.filter.rocketBodies && obj.type === SpaceObjectType.ROCKET_BODY;
   }
   isDebrisOff(obj: BaseObject) {
-    return obj.type === SpaceObjectType.DEBRIS && !settingsManager.isShowDebris;
+    return !settingsManager.filter.debris && obj.type === SpaceObjectType.DEBRIS;
   }
-  isJscVimpelSatOff(obj: BaseObject) {
-    return obj.name?.startsWith('JSC Vimpel') && !settingsManager.isShowVimpelSats;
+  isUnknownTypeOff(obj: BaseObject) {
+    return !settingsManager.filter.unknownType && obj.type === SpaceObjectType.UNKNOWN;
   }
   isNotionalSatOff(obj: BaseObject) {
-    return obj.isNotional() && !settingsManager.isShowNotionalSats;
+    return !settingsManager.filter.notionalSatellites && obj.isNotional();
   }
   isLeoSatOff(obj: BaseObject) {
-    return (obj as DetailedSatellite).apogee < 6000 && !settingsManager.isShowLeoSats;
+    return !settingsManager.filter.lEOSatellites && (obj as DetailedSatellite).apogee < 6000;
   }
   isMeoSatOff(obj: BaseObject) {
-    return (obj as DetailedSatellite).perigee <= 32000 && (obj as DetailedSatellite).perigee >= 6000 && !settingsManager.isShowMeoSats;
-  }
-  isGeoSatOff(obj: BaseObject) {
-    return (obj as DetailedSatellite).perigee > 32000 && !settingsManager.isShowGeoSats;
+    return !settingsManager.filter.mEOSatellites && (obj as DetailedSatellite).perigee <= 32000 && (obj as DetailedSatellite).perigee >= 6000;
   }
   isHeoSatOff(obj: BaseObject) {
-    return (obj as DetailedSatellite).eccentricity >= 0.1 && ((obj as DetailedSatellite).apogee >= 6000 && (obj as DetailedSatellite).perigee < 6000) &&
-      !settingsManager.isShowHeoSats;
+    return !settingsManager.filter.hEOSatellites && (obj as DetailedSatellite).eccentricity >= 0.1 && ((obj as DetailedSatellite).apogee >= 6000 &&
+      (obj as DetailedSatellite).perigee < 6000);
+  }
+  isGeoSatOff(obj: BaseObject) {
+    return !settingsManager.filter.gEOSatellites && (obj as DetailedSatellite).perigee > 32000;
+  }
+  isUnitedStatesOff(obj: BaseObject) {
+    return !settingsManager.filter.unitedStates && (obj as DetailedSatellite)?.country === 'US';
+  }
+  isUnitedKingdomOff(obj: BaseObject) {
+    return !settingsManager.filter.unitedKingdom && (obj as DetailedSatellite)?.country === 'UK';
+  }
+  isFranceOff(obj: BaseObject) {
+    return !settingsManager.filter.france && (obj as DetailedSatellite)?.country === 'F';
+  }
+  isGermanyOff(obj: BaseObject) {
+    return !settingsManager.filter.germany && (obj as DetailedSatellite)?.country === 'D';
+  }
+  isJapanOff(obj: BaseObject) {
+    return !settingsManager.filter.japan && (obj as DetailedSatellite)?.country === 'J';
+  }
+  isChinaOff(obj: BaseObject) {
+    return !settingsManager.filter.china && (obj as DetailedSatellite)?.country === 'CN';
+  }
+  isIndiaOff(obj: BaseObject) {
+    return !settingsManager.filter.india && (obj as DetailedSatellite)?.country === 'IN';
+  }
+  isRussiaOff(obj: BaseObject) {
+    return !settingsManager.filter.russia && (obj as DetailedSatellite)?.country === 'RU';
+  }
+  isUssrOff(obj: BaseObject) {
+    return !settingsManager.filter.uSSR && (obj as DetailedSatellite)?.country === 'SU';
+  }
+  isSouthKoreaOff(obj: BaseObject) {
+    return !settingsManager.filter.southKorea && (obj as DetailedSatellite)?.country === 'KR';
+  }
+  isAustraliaOff(obj: BaseObject) {
+    return !settingsManager.filter.australia && (obj as DetailedSatellite)?.country === 'AU';
+  }
+  isOtherCountriesOff(obj: BaseObject) {
+    return !settingsManager.filter.otherCountries &&
+      !['US', 'UK', 'F', 'D', 'J', 'CN', 'IN', 'RU', 'SU', 'KR', 'AU'].includes((obj as DetailedSatellite)?.country);
+  }
+  isJscVimpelSatOff(obj: BaseObject) {
+    return !settingsManager.filter.vimpelSatellites && (obj as DetailedSatellite)?.source === CatalogSource.VIMPEL;
+  }
+  isCelestrakSatOff(obj: BaseObject) {
+    return !settingsManager.filter.celestrakSatellites && (obj as DetailedSatellite)?.source === CatalogSource.CELESTRAK;
   }
   isStarlinkSatOff(obj: BaseObject) {
-    return obj.name?.includes('STARLINK') && !this.currentColorScheme?.objectTypeFlags.starlink;
+    return !settingsManager.filter.starlinkSatellites && obj.name?.includes('STARLINK');
   }
 
   reloadColors() {
@@ -347,73 +394,157 @@ export class ColorSchemeManager {
     this.isUseGroupColorScheme = true;
   }
 
-  private static getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
-    let colors: ColorInformation | null = null;
-
+  private getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
     const sat = objectData[i] as DetailedSatellite;
 
-    if (!settingsManager.isShowNotionalSats && objectData[i].isNotional()) {
-      colors = {
+    // Optimize for the most common cases first
+
+    if (this.isDebrisOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowVimpelSats && objectData[i].name?.startsWith('JSC Vimpel')) {
-      colors = {
+    if (this.isJscVimpelSatOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowLeoSats && sat.apogee < 6000) {
-      colors = {
+    if (this.isStarlinkSatOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowStarlinkSats && objectData[i].name?.includes('STARLINK')) {
-      colors = {
+    if (this.isCelestrakSatOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowHeoSats && (sat.eccentricity >= 0.1 || (sat.apogee >= 6000 && sat.perigee < 6000))) {
-      colors = {
+    if (this.isUnitedStatesOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowMeoSats && sat.perigee <= 32000 && sat.perigee >= 6000) {
-      colors = {
+    if (this.isUnitedKingdomOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowGeoSats && sat.perigee > 32000) {
-      colors = {
+    if (this.isFranceOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowPayloads && objectData[i].type === SpaceObjectType.PAYLOAD) {
-      colors = {
+    if (this.isGermanyOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowRocketBodies && objectData[i].type === SpaceObjectType.ROCKET_BODY) {
-      colors = {
+    if (this.isJapanOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
-    if (!settingsManager.isShowDebris && objectData[i].type === SpaceObjectType.DEBRIS) {
-      colors = {
+    if (this.isChinaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isIndiaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isRussiaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isUssrOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isSouthKoreaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isAustraliaOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isOtherCountriesOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isLeoSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isPayloadOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isRocketBodyOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isUnknownTypeOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isNotionalSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isHeoSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isMeoSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isGeoSatOff(sat)) {
+      return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,
       };
     }
 
-    return colors;
+    return null;
   }
 
   private calcFirstAndLastDot_(isForceRecolor: boolean) {
@@ -446,7 +577,7 @@ export class ColorSchemeManager {
     lastDotToColor: number,
     satData: BaseObject[],
     satVel: Float32Array,
-    params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number },
+    params: ColorSchemeParams,
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       satData[i].totalVelocity = Math.sqrt(satVel[i * 3] * satVel[i * 3] + satVel[i * 3 + 1] * satVel[i * 3 + 1] + satVel[i * 3 + 2] * satVel[i * 3 + 2]);
@@ -458,7 +589,7 @@ export class ColorSchemeManager {
     firstDotToColor: number,
     lastDotToColor: number,
     satData: BaseObject[],
-    params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number },
+    params: ColorSchemeParams,
   ) {
     for (let i = firstDotToColor; i < lastDotToColor; i++) {
       this.calculateBufferData_(i, satData, params);
@@ -466,8 +597,8 @@ export class ColorSchemeManager {
   }
 
   private calculateBufferData_(i: number, satData: BaseObject[],
-    params: { year: number; jday: number; orbitDensity: number[][]; orbitDensityMax: number }) {
-    let colors = ColorSchemeManager.getColorIfDisabledSat_(satData, i);
+    params: ColorSchemeParams) {
+    let colors = this.getColorIfDisabledSat_(satData, i);
 
     if (this.isUseGroupColorScheme) {
       colors ??= this.currentColorScheme?.updateGroup(satData[i], params) ?? this.currentColorSchemeUpdate(satData[i], params);
@@ -486,12 +617,14 @@ export class ColorSchemeManager {
     this.pickableData[i] = colors.pickable;
   }
 
-  private calculateParams_() {
+  private calculateParams_(): ColorSchemeParams {
     const params = {
       year: 0,
       jday: 0,
-      orbitDensity: [] as number[][],
+      orbitDensity: [] as DensityBin[],
       orbitDensityMax: 0,
+      orbitalPlaneDensity: [] as number[][],
+      orbitalPlaneDensityMax: 0,
     };
 
     if (this.currentColorScheme) {
@@ -502,6 +635,8 @@ export class ColorSchemeManager {
         params.jday = params_.jday ?? params.jday;
         params.orbitDensity = params_.orbitDensity ?? params.orbitDensity;
         params.orbitDensityMax = params_.orbitDensityMax ?? params.orbitDensityMax;
+        params.orbitalPlaneDensity = params_.orbitalPlaneDensity ?? params.orbitalPlaneDensity;
+        params.orbitalPlaneDensityMax = params_.orbitalPlaneDensityMax ?? params.orbitalPlaneDensityMax;
       }
     }
 

@@ -191,7 +191,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     getEl('menu-astronomy', true)?.classList.remove('bmenu-item-disabled');
   }
 
-  private selectSatChange_(obj?: DetailedSatellite | MissileObject) {
+  private selectSatChange_(obj = null as DetailedSatellite | MissileObject | null) {
     const id = obj?.id ?? -1;
 
     keepTrackApi.getSoundManager()?.play(SoundNames.WHOOSH);
@@ -286,7 +286,7 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   lastSelectedSat(id?: number): number {
-    this.lastSelectedSat_ = id >= -1 ? id : this.lastSelectedSat_;
+    this.lastSelectedSat_ = (typeof id !== 'undefined' && id !== null && id >= -1) ? id : this.lastSelectedSat_;
 
     return this.lastSelectedSat_;
   }

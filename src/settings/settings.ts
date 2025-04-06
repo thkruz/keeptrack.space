@@ -39,7 +39,10 @@ import { sateliot } from './presets/sateliot';
 import { starTalk } from './presets/startalk';
 
 export class SettingsManager {
-  classificationStr = '' as ClassificationString;
+  /**
+   * A variable to hold a classification string, set to `null` when unused
+   */
+  classificationStr = null as ClassificationString | null;
   menuMode: MenuMode = MenuMode.BASIC;
   // This controls which of the built-in plugins are loaded
   plugins = <KeepTrackPlugins>{
@@ -195,6 +198,9 @@ export class SettingsManager {
    * The text and version number still appear.
    */
   isShowSplashScreen = true;
+  /**
+   * Determines whether or not to show notional debris in the application. This was designed for presentation purposes.
+   */
   isNotionalDebris = false;
   isFreezePropRateOnDrag = false;
   /**
@@ -260,7 +266,7 @@ export class SettingsManager {
    * Transparency when a group of satellites is selected
    */
   orbitGroupAlpha = 0.5;
-  loopTimeMachine = null;
+  loopTimeMachine = false;
   isDisableSelectSat: boolean | null = null;
   timeMachineLongToast = false;
   lastInteractionTime = 0;
@@ -321,8 +327,9 @@ export class SettingsManager {
   /**
    * Determines how many draw commands are used for sun illumination
    * This should be a GodraySamples value (16, 32, 64, 128)
+   * @default 16
    */
-  godraysSamples = 32;
+  godraysSamples = 16;
   /**
    * The decay factor for the godray effect.
    *
@@ -337,9 +344,9 @@ export class SettingsManager {
    * The exposure level for the godrays effect.
    * Controls the brightness/intensity of the godray rendering.
    * Higher values make godrays more pronounced.
-   * @default 0.6.
+   * @default 0.75.
    */
-  godraysExposure = 0.6;
+  godraysExposure = 0.75;
   /**
    * The density of godrays effect.
    * Controls the intensity and thickness of the light scattering effect.
@@ -361,14 +368,15 @@ export class SettingsManager {
    * Higher values make the godrays fade more quickly as they extend away from the light source.
    * Lower values allow the godrays to extend further with less intensity reduction.
    *
-   * @default 2.5
+   * @default 2.7
    */
-  godraysIlluminationDecay = 2.5;
+  godraysIlluminationDecay = 2.7;
   /**
    * The size of the sun in the simulation, represented as a scale factor.
    * A value of 0.9 indicates the sun is displayed at 90% of its default size.
+   * A value of 1.1 indicates the sun is displayed at 110% of its default size.
    */
-  sizeOfSun = 0.9;
+  sizeOfSun = 1.1;
   /**
    * Determines whether to use a sun texture.
    * When set to true, the application will render the sun with a custom texture.
@@ -406,7 +414,7 @@ export class SettingsManager {
    * Show orbits in ECF vs ECI
    */
   isOrbitCruncherInEcf = false;
-  lastSearch = null;
+  lastSearch: string | string[] = '';
   isGroupOverlayDisabled: boolean | null = null;
   /**
    * Distance from satellite when we switch to close camera mode
@@ -748,7 +756,7 @@ export class SettingsManager {
   /**
    * List of the last search results
    */
-  lastSearchResults = [];
+  lastSearchResults: number[] = [];
   /**
    * String to limit which satellites are loaded from the catalog
    */
@@ -1136,7 +1144,7 @@ export class SettingsManager {
   isShowConfidenceLevels = true;
   /**
    * The container root element for the application
-   * NOTE: This is for initializing it, but keepTrackApi will be reerenced throughout
+   * NOTE: This is for initializing it, but keepTrackApi.containerRoot will be used throughout
    * the application when looking for the container root element
    */
   containerRoot: HTMLDivElement;

@@ -10,6 +10,7 @@ import { SatMath } from '@app/static/sat-math';
 import { launchSites } from '@app/catalogs/launch-sites';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
+import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Degrees, DetailedSatellite, SatelliteRecord, Sgp4 } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -271,7 +272,7 @@ export class NewLaunch extends KeepTrackPlugin {
         uiManagerInstance.toast('Launch Nominal Created!', ToastMsgType.standby);
         uiManagerInstance.searchManager.doSearch(sat.sccNum);
       },
-      validationFunc: (data: any) => typeof data.satPos !== 'undefined',
+      validationFunc: (data: PositionCruncherOutgoingMsg) => typeof data.satPos !== 'undefined',
       error: () => {
         if (!this.isDoingCalculations) {
           // If we are not doing calculations, then it must have finished already.

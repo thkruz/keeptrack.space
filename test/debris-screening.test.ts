@@ -8,8 +8,10 @@ describe('DebrisScreening_class', () => {
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
-      AutoInit: () => { },
-    } as any;
+      AutoInit: () => {
+        // Mock the M.AutoInit function
+      },
+    } as unknown as typeof window.M;
     // debrisScreeningPlugin = new DebrisScreening();
   });
 
@@ -23,8 +25,10 @@ describe('DebrisScreening_form', () => {
   beforeEach(() => {
     setupDefaultHtml();
     window.M = {
-      AutoInit: () => { },
-    } as any;
+      AutoInit: () => {
+        // Mock the M.AutoInit function
+      },
+    } as unknown as typeof window.M;
     debrisScreeningPlugin = new DebrisScreening();
   });
 

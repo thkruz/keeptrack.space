@@ -1,3 +1,4 @@
+import { BufferAttribute } from './buffer-attribute';
 import { GlUtils } from './gl-utils';
 
 export interface ProgramParams {
@@ -27,21 +28,24 @@ export class WebGlProgramHelper {
   fragmentShaderCode: string;
   program: WebGLProgram;
 
-  constructor(gl: WebGL2RenderingContext, vertexShaderCode: string, fragmentShaderCode: string, attribs?: any, uniforms?: any, params?: ProgramParams) {
+  constructor(gl: WebGL2RenderingContext, vertexShaderCode: string, fragmentShaderCode: string, attribs?: Record<string, BufferAttribute> | undefined,
+    uniforms?: Record<string, WebGLUniformLocation> | undefined, params?: ProgramParams) {
     this.gl_ = gl;
-    this.name = params?.name;
+    this.name = params?.name ?? 'WebGLProgram';
     this.vertexShaderCode = vertexShaderCode;
     this.fragmentShaderCode = fragmentShaderCode;
 
     this.vertexShader = WebGlProgramHelper.createVertexShader_(gl, vertexShaderCode);
     this.fragmentShader = WebGlProgramHelper.createFragmentShader_(gl, fragmentShaderCode);
+
     this.program = this.createProgram(gl, this.vertexShader, this.fragmentShader, attribs, uniforms);
   }
 
   /**
    * Creates a WebGL program from a vertex and fragment shader.
    */
-  createProgram(gl: WebGL2RenderingContext, vertShader: WebGLShader, fragShader: WebGLShader, attribs: any, uniforms: any): WebGLProgram {
+  createProgram(gl: WebGL2RenderingContext, vertShader: WebGLShader, fragShader: WebGLShader, attribs?: Record<string, BufferAttribute> | undefined,
+    uniforms?: Record<string, WebGLUniformLocation> | undefined): WebGLProgram {
     const program = gl.createProgram();
 
     gl.attachShader(program, vertShader);
@@ -73,6 +77,10 @@ export class WebGlProgramHelper {
   private static createVertexShader_(gl: WebGL2RenderingContext, source: string): WebGLShader {
     const vertShader = gl.createShader(gl.VERTEX_SHADER);
 
+    if (!vertShader) {
+      throw new Error('Failed to create vertex shader');
+    }
+
     gl.shaderSource(vertShader, source);
     gl.compileShader(vertShader);
     if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
@@ -87,6 +95,10 @@ export class WebGlProgramHelper {
    */
   private static createFragmentShader_(gl: WebGL2RenderingContext, source: string): WebGLShader {
     const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+    if (!fragShader) {
+      throw new Error('Failed to create fragment shader');
+    }
 
     gl.shaderSource(fragShader, source);
     gl.compileShader(fragShader);

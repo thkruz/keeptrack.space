@@ -80,6 +80,10 @@ export class InputManager {
     // eslint-disable-next-line no-sync
     const sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
 
+    if (!sync) {
+      throw new Error('Failed to create sync object');
+    }
+
     gl.flush();
 
     await InputManager.clientWaitAsync(gl, sync, 0, <Milliseconds>10);
@@ -142,7 +146,7 @@ export class InputManager {
     return <Kilometers[]>(<unknown>ptSurf);
   }
 
-  public static getSatIdFromCoordAlt(x: number, y: number): number {
+  public static getSatIdFromCoordAlt(x: number, y: number): number | null {
     const eci = InputManager.unProject(x, y);
     const eciArray = {
       x: eci[0],
@@ -253,7 +257,7 @@ export class InputManager {
       keepTrackApi.runEvent(KeepTrackApiEvents.rightBtnMenuAdd);
 
       // Now add the reset/clear options
-      getEl('right-btn-menu-ul').insertAdjacentHTML(
+      getEl('right-btn-menu-ul')!.insertAdjacentHTML(
         'beforeend',
         keepTrackApi.html`
         <li id="toggle-time-rmb"><a href="#">Pause Clock</a></li>
@@ -263,7 +267,7 @@ export class InputManager {
         `,
       );
 
-      getEl('rmb-wrapper').insertAdjacentHTML(
+      getEl('rmb-wrapper')!.insertAdjacentHTML(
         'beforeend',
         keepTrackApi.html`
         <div id="view-rmb-menu" class="right-btn-menu">
@@ -329,7 +333,7 @@ export class InputManager {
 
       // sort getEl('rmb-wrapper').children by order in rmbMenuItems
       const rmbWrapper = getEl('right-btn-menu-ul');
-      const rmbWrapperChildren = rmbWrapper.children;
+      const rmbWrapperChildren = rmbWrapper!.children;
       const rmbWrapperChildrenArray = Array.from(rmbWrapperChildren);
 
       rmbWrapperChildrenArray.sort((a, b) => {
@@ -339,8 +343,8 @@ export class InputManager {
 
         return aOrder - bOrder;
       });
-      rmbWrapper.innerHTML = '';
-      rmbWrapperChildrenArray.forEach((child) => rmbWrapper.appendChild(child));
+      rmbWrapper!.innerHTML = '';
+      rmbWrapperChildrenArray.forEach((child) => rmbWrapper!.appendChild(child));
     }
 
     const canvasDOM = <HTMLCanvasElement>getEl('keeptrack-canvas');
@@ -357,7 +361,7 @@ export class InputManager {
     }
 
     if (settingsManager.disableNormalEvents || settingsManager.disableDefaultContextMenu) {
-      window.oncontextmenu = function (event) {
+      window.oncontextmenu = (event) => {
         event.preventDefault();
         event.stopPropagation();
 
@@ -422,7 +426,7 @@ export class InputManager {
     hideEl('earth-political-rmb');
 
     if (lineManagerInstance.lines.length > 0) {
-      getEl('clear-lines-rmb').style.display = 'block';
+      getEl('clear-lines-rmb')!.style.display = 'block';
       numMenuItems++;
     }
 
@@ -432,7 +436,7 @@ export class InputManager {
       }
       const sat = catalogManagerInstance.getObject(this.mouse.clickedSat);
 
-      if (typeof sat === 'undefined' || sat == null) {
+      if (typeof sat === 'undefined' || sat === null) {
         return;
       }
 
@@ -441,17 +445,17 @@ export class InputManager {
         showEl('view-related-sats-rmb');
 
         if (sensorManagerInstance.isSensorSelected() && sensorManagerInstance.whichRadar !== 'CUSTOM') {
-          getEl('line-sensor-sat-rmb').style.display = 'block';
+          getEl('line-sensor-sat-rmb')!.style.display = 'block';
         }
 
         if (!settingsManager.isMobileModeEnabled) {
-          getEl('line-earth-sat-rmb').style.display = 'block';
+          getEl('line-earth-sat-rmb')!.style.display = 'block';
         }
         if (!settingsManager.isMobileModeEnabled) {
-          getEl('line-sat-sat-rmb').style.display = 'block';
+          getEl('line-sat-sat-rmb')!.style.display = 'block';
         }
         if (!settingsManager.isMobileModeEnabled) {
-          getEl('line-sat-sun-rmb').style.display = 'block';
+          getEl('line-sat-sun-rmb')!.style.display = 'block';
         }
       } else {
         switch (sat.type) {
@@ -459,7 +463,7 @@ export class InputManager {
           case SpaceObjectType.OPTICAL:
           case SpaceObjectType.MECHANICAL:
           case SpaceObjectType.GROUND_SENSOR_STATION:
-            getEl('view-sensor-info-rmb').style.display = 'block';
+            getEl('view-sensor-info-rmb')!.style.display = 'block';
             break;
           default:
         }
@@ -488,22 +492,22 @@ export class InputManager {
       });
     }
 
-    rightBtnMenuDOM.style.display = 'block';
-    satHoverBoxDOM.style.display = 'none';
+    rightBtnMenuDOM!.style.display = 'block';
+    satHoverBoxDOM!.style.display = 'none';
 
     /*
      * Offset size is based on size in style.css
      * TODO: Make this dynamic
      */
     const mainCameraInstance = keepTrackApi.getMainCamera();
-    const offsetX = mainCameraInstance.mouseX < canvasDOM.clientWidth / 2 ? 0 : -1 * 165;
-    const offsetY = mainCameraInstance.mouseY < canvasDOM.clientHeight / 2 ? 0 : numMenuItems * -25;
+    const offsetX = mainCameraInstance.mouseX < canvasDOM!.clientWidth / 2 ? 0 : -1 * 165;
+    const offsetY = mainCameraInstance.mouseY < canvasDOM!.clientHeight / 2 ? 0 : numMenuItems * -25;
 
-    rightBtnMenuDOM.style.display = 'block';
-    rightBtnMenuDOM.style.textAlign = 'center';
-    rightBtnMenuDOM.style.position = 'absolute';
-    rightBtnMenuDOM.style.left = `${mainCameraInstance.mouseX + offsetX}px`;
-    rightBtnMenuDOM.style.top = `${mainCameraInstance.mouseY + offsetY}px`;
+    rightBtnMenuDOM!.style.display = 'block';
+    rightBtnMenuDOM!.style.textAlign = 'center';
+    rightBtnMenuDOM!.style.position = 'absolute';
+    rightBtnMenuDOM!.style.left = `${mainCameraInstance.mouseX + offsetX}px`;
+    rightBtnMenuDOM!.style.top = `${mainCameraInstance.mouseY + offsetY}px`;
   }
 
   /* istanbul ignore next */
@@ -529,7 +533,7 @@ export class InputManager {
   }
 
   /** readpixels used to determine which satellite is hovered is the biggest performance hit and we should throttle that */
-  public update(dt?: Milliseconds) {
+  public update(dt = 0 as Milliseconds) {
     /*
      * gl.readPixels in uiInput.getSatIdFromCoord creates a lot of jank
      * Earlier in the loop we decided how much to throttle updateHover

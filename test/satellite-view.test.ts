@@ -28,6 +28,8 @@ import { standardPluginSuite } from './generic-tests';
  */
 
 describe('SatelliteViewPlugin_class', () => {
+  let selectSatManagerInstance: SelectSatManager;
+
   beforeEach(() => {
     // eslint-disable-next-line guard-for-in
     for (const callback in keepTrackApi.events) {
@@ -39,6 +41,15 @@ describe('SatelliteViewPlugin_class', () => {
     const selectSatManager = new SelectSatManager();
 
     selectSatManager.init();
+
+    selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager) as SelectSatManager;
+
+    expect(selectSatManagerInstance).toBeDefined();
+    expect(selectSatManagerInstance).not.toBeNull();
+
+    if (!selectSatManagerInstance) {
+      throw new Error('SelectSatManager is null');
+    }
   });
 
   standardPluginSuite(SatelliteViewPlugin, 'SatelliteViewPlugin');
@@ -52,7 +63,7 @@ describe('SatelliteViewPlugin_class', () => {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     expect(registerSpy).toHaveBeenCalled();
-    expect(getEl('bottom-icons').innerHTML).toContain('satellite-view-bottom-icon');
+    expect(getEl('bottom-icons')?.innerHTML).toContain('satellite-view-bottom-icon');
   });
 
   // Tests that a toast message is displayed when no satellite is selected and trying to activate Satellite Camera Mode
@@ -60,7 +71,7 @@ describe('SatelliteViewPlugin_class', () => {
     const plugin = new SatelliteViewPlugin();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    keepTrackApi.getPlugin(SelectSatManager).selectedSat = -1;
+    selectSatManagerInstance.selectedSat = -1;
     plugin.init();
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
@@ -74,7 +85,7 @@ describe('SatelliteViewPlugin_class', () => {
     const plugin = new SatelliteViewPlugin();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    keepTrackApi.getPlugin(SelectSatManager).selectedSat = 1;
+    selectSatManagerInstance.selectedSat = 1;
     plugin.init();
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
@@ -83,12 +94,12 @@ describe('SatelliteViewPlugin_class', () => {
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
 
-  // Tests that clicking the Satellite Camera Mode icon reverts the camera to the default camera
-  it('test_bottomMenuClick_callback_satellite_selected', () => {
+  // Tests that clicking the Satellite Camera Mode icon switches the camera to Satellite mode
+  it('should_switch_to_satellite_camera_mode_when_icon_clicked', () => {
     const plugin = new SatelliteViewPlugin();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    keepTrackApi.getPlugin(SelectSatManager).selectedSat = 1;
+    selectSatManagerInstance.selectedSat = 1;
     plugin.init();
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);

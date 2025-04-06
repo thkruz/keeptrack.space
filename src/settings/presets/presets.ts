@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
+import { GroupType } from '@app/singletons/object-group';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
 
@@ -49,7 +50,7 @@ export class SettingsPresets {
       const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
       const debrisSpan = '<span style="color: rgb(150, 150, 150);">Debris </span>';
 
-      document.getElementById('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+      document.getElementById('textOverlay')!.innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
 
       return `${english}`;
     };
@@ -73,7 +74,7 @@ export class SettingsPresets {
       style.appendChild(document.createTextNode(toastCss));
       document.head.appendChild(style);
 
-      document.getElementById('textOverlay').style.cssText = `
+      document.getElementById('textOverlay')!.style.cssText = `
                     border-radius: 2px;
                     bottom: 75px;
                     right: 150px;
@@ -89,9 +90,9 @@ export class SettingsPresets {
                     color: white;
                   }`;
 
-      getEl('nav-footer').style.display = 'none';
-      keepTrackApi.getPlugin(TimeMachine).isMenuButtonActive = true;
-      keepTrackApi.getPlugin(TimeMachine).bottomIconCallback();
+      getEl('nav-footer')!.style.display = 'none';
+      keepTrackApi.getPlugin(TimeMachine)!.isMenuButtonActive = true;
+      keepTrackApi.getPlugin(TimeMachine)!.bottomIconCallback();
     };
   }
 
@@ -205,7 +206,7 @@ export class SettingsPresets {
       style.appendChild(document.createTextNode(toastCss));
       document.head.appendChild(style);
 
-      getEl('textOverlay').style.cssText = `
+      getEl('textOverlay')!.style.cssText = `
                     border-radius: 2px;
                     bottom: 75px;
                     right: 150px;
@@ -250,11 +251,11 @@ export class SettingsPresets {
     settings.searchLimit = 100000;
     settings.onLoadCb = () => {
       const groupManagerInstance = keepTrackApi.getGroupsManager();
-      const allSats = groupManagerInstance.createGroup(0, null);
+      const allSats = groupManagerInstance.createGroup(GroupType.ALL);
 
       groupManagerInstance.selectGroup(allSats);
       allSats.updateOrbits();
-      keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
+      keepTrackApi.getColorSchemeManager().isUseGroupColorScheme = true;
     };
   }
 
@@ -322,11 +323,11 @@ export class SettingsPresets {
     settings.isEnableJscCatalog = false;
     settings.onLoadCb = () => {
       const groupManagerInstance = keepTrackApi.getGroupsManager();
-      const sccNumGroup = groupManagerInstance.createGroup(9, [25544]);
+      const sccNumGroup = groupManagerInstance.createGroup(GroupType.ID_LIST, [25544]);
 
       groupManagerInstance.selectGroup(sccNumGroup);
       sccNumGroup.updateOrbits();
-      keepTrackApi.getColorSchemeManager().setColorScheme((<any>keepTrackApi.getColorSchemeManager()).group, true);
+      keepTrackApi.getColorSchemeManager().isUseGroupColorScheme = true;
     };
   }
 
@@ -363,7 +364,7 @@ export class SettingsPresets {
       cb: () => {
         keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
         setTimeout(() => {
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(43721));
+          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(43721) ?? -1);
           settings.isDisableSelectSat = true;
         }, 5000);
       },

@@ -1,5 +1,6 @@
 export const shake = (el: HTMLElement | HTMLDivElement | null, duration?: number, callback?: () => void): void => {
   if (!el) {
+    // eslint-disable-next-line no-console
     console.warn('Element not found!');
 
     return;

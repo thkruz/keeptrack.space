@@ -108,7 +108,7 @@ export class Scene {
         // Draw a black object mesh on top of the sun in the godrays frame buffer
         if (
           !settingsManager.modelsOnSatelliteViewOverride &&
-          keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1 &&
+          (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
           keepTrackApi.getMainCamera().camDistBuffer <= settingsManager.nearZoomLevel
         ) {
           renderer.meshManager.drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
@@ -252,12 +252,12 @@ export class Scene {
 
   async loadScene(): Promise<void> {
     try {
-      await this.earth.init(settingsManager, this.gl_);
+      this.earth.init(settingsManager, this.gl_);
       keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
       await this.sun.init(this.gl_);
 
       if (!settingsManager.isDisableGodrays) {
-        await keepTrackApi.getScene().godrays?.init(this.gl_, this.sun);
+        keepTrackApi.getScene().godrays?.init(this.gl_, this.sun);
       }
 
       if (!settingsManager.isDisableMoon) {
@@ -265,14 +265,14 @@ export class Scene {
       }
 
       if (!settingsManager.isDisableSearchBox) {
-        await this.searchBox.init(this.gl_);
+        this.searchBox.init(this.gl_);
       }
       if (!settingsManager.isDisableSkybox) {
-        await this.skybox.init(settingsManager, this.gl_);
+        this.skybox.init(settingsManager, this.gl_);
       }
     } catch (error) {
       errorManagerInstance.log(error);
-      console.error(error); // Errors aren't showing as toast messages
+      // Errors aren't showing as toast messages
     }
   }
 }

@@ -54,7 +54,7 @@ describe('getDopsList_method', () => {
 
   // Tests that the method returns an array of length 1440
   it('test_happy_path_returns_array_of_length_1440', () => {
-    expect(result.length).toBe(1440);
+    expect(result).toHaveLength(1440);
   });
 
   // Tests that each DopList object has a time property of type Date
@@ -75,7 +75,7 @@ describe('updateDopsTable_method', () => {
     DopMath.updateDopsTable(dopsResults);
     const table = getEl('dops') as HTMLTableElement;
 
-    expect(table.rows.length).toBe(3);
+    expect(table.rows).toHaveLength(3);
     expect(table.rows[0].cells[0].innerHTML).toBe('Time');
     expect(table.rows[0].cells[1].innerHTML).toBe('HDOP');
     expect(table.rows[0].cells[2].innerHTML).toBe('PDOP');

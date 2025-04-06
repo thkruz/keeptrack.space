@@ -420,7 +420,7 @@ export class Camera {
       this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
       this.earthCenteredLastZoom = this.zoomTarget_;
       this.camZoomSnappedOnSat = false;
-    } else if (this.camDistBuffer < settingsManager.nearZoomLevel || this.zoomLevel_ == -1) {
+    } else if (this.camDistBuffer < settingsManager.nearZoomLevel || this.zoomLevel_ === -1) {
       // Inside camDistBuffer
       settingsManager.selectedColor = [0, 0, 0, 0];
       this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 5); // delta is +/- 100
@@ -500,7 +500,7 @@ export class Camera {
     mat4.identity(this.camMatrix);
 
     // Ensure we don't zoom in past our satellite
-    if (this.cameraType == CameraType.FIXED_TO_SAT) {
+    if (this.cameraType === CameraType.FIXED_TO_SAT) {
       if (target.id === -1 || target.type === SpaceObjectType.STAR) {
         this.cameraType = CameraType.DEFAULT;
       } else {
@@ -514,7 +514,7 @@ export class Camera {
       }
     }
 
-    if (this.cameraType == CameraType.SATELLITE) {
+    if (this.cameraType === CameraType.SATELLITE) {
       if (target.id === -1 || target.type === SpaceObjectType.STAR) {
         this.cameraType = CameraType.DEFAULT;
       }
@@ -588,6 +588,7 @@ export class Camera {
       this.camYaw = this.earthCenteredYaw_;
       this.isAutoPitchYawToTarget = true;
 
+      // eslint-disable-next-line multiline-comment-style
       // this.camPitch = this.earthCenteredPitch_;
       // this.camYaw = this.earthCenteredYaw_;
       // // External to Local Rotation
@@ -1083,7 +1084,7 @@ export class Camera {
     const satId = catalogManagerInstance.starName2Id(c.name, dotsManagerInstance.starIndex1, dotsManagerInstance.starIndex2);
     const sat = catalogManagerInstance.getObject(satId);
 
-    if (sat == null) {
+    if (sat === null) {
       throw new Error('Star not found');
     }
 
@@ -1267,7 +1268,7 @@ export class Camera {
       this.camYaw = <Radians>(this.camYaw + TAU);
     }
 
-    if (this.cameraType == CameraType.DEFAULT || this.cameraType == CameraType.OFFSET) {
+    if (this.cameraType === CameraType.DEFAULT || this.cameraType === CameraType.OFFSET) {
       this.earthCenteredPitch_ = this.camPitch;
       this.earthCenteredYaw_ = this.camYaw;
       if (this.earthCenteredYaw_ < 0) {
@@ -1403,7 +1404,7 @@ export class Camera {
       this.zoomTarget = 0.5;
     }
 
-    if (!sensorPos && (this.cameraType == CameraType.PLANETARIUM || this.cameraType == CameraType.ASTRONOMY)) {
+    if (!sensorPos && (this.cameraType === CameraType.PLANETARIUM || this.cameraType === CameraType.ASTRONOMY)) {
       this.cameraType = CameraType.DEFAULT;
       errorManagerInstance.debug('A sensor should be selected first if this mode is allowed to be planetarium or astronmy.');
     }
@@ -1434,7 +1435,7 @@ export class Camera {
     this.fpsPos_[0] = 0;
 
     // Move out from the center of the Earth in FPS Mode
-    if (this.cameraType == CameraType.FPS) {
+    if (this.cameraType === CameraType.FPS) {
       this.fpsPos_[1] = 25000;
     } else {
       this.fpsPos_[1] = 0;
@@ -1577,12 +1578,12 @@ export class Camera {
         this.camYawSpeed = (dt * leftOrRight * this.settings_.cameraMovementSpeed) / 50;
       }
 
-      if (this.camYaw == this.earthCenteredYaw_ && this.camPitch == this.earthCenteredPitch_) {
+      if (this.camYaw === this.earthCenteredYaw_ && this.camPitch === this.earthCenteredPitch_) {
         this.ftsRotateReset = false;
       }
     }
 
-    if (this.cameraType == CameraType.FIXED_TO_SAT) {
+    if (this.cameraType === CameraType.FIXED_TO_SAT) {
       this.camPitch = normalizeAngle(this.camPitch);
       this.ftsPitch = this.camPitch;
       this.ftsYaw_ = this.camYaw;
@@ -1659,7 +1660,7 @@ export class Camera {
         if (this.localRotateCurrent.yaw > -0.001 && this.localRotateCurrent.yaw < 0.001) {
           this.localRotateCurrent.yaw = <Radians>0;
         }
-        if (this.localRotateCurrent.pitch == 0 && this.localRotateCurrent.roll == 0 && this.localRotateCurrent.yaw == <Radians>0) {
+        if (this.localRotateCurrent.pitch === 0 && this.localRotateCurrent.roll === 0 && this.localRotateCurrent.yaw === <Radians>0) {
           this.isLocalRotateReset = false;
         }
       }
@@ -1744,7 +1745,7 @@ export class Camera {
           this.fpsPos_[2] = 0;
         }
 
-        if (this.panCurrent.x == 0 && this.panCurrent.y == 0 && this.panCurrent.z == 0 && this.fpsPos_[0] == 0 && this.fpsPos_[1] == 0 && this.fpsPos_[2] == 0) {
+        if (this.panCurrent.x === 0 && this.panCurrent.y === 0 && this.panCurrent.z === 0 && this.fpsPos_[0] === 0 && this.fpsPos_[1] === 0 && this.fpsPos_[2] === 0) {
           this.isPanReset = false;
         }
       }

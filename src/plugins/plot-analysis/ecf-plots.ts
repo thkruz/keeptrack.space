@@ -33,7 +33,7 @@ export class EcfPlot extends KeepTrackPlugin {
       return;
     }
 
-    this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
+    this.createPlot(this.getPlotData(), getEl(this.plotCanvasId)!);
   };
 
   plotCanvasId = 'plot-analysis-chart-ecf';
@@ -52,7 +52,7 @@ export class EcfPlot extends KeepTrackPlugin {
     minWidth: 800,
     maxWidth: 4096,
     callback: () => {
-      this.createPlot(this.getPlotData(), getEl(this.plotCanvasId));
+      this.createPlot(this.getPlotData(), getEl(this.plotCanvasId)!);
     },
   };
 
@@ -141,9 +141,9 @@ export class EcfPlot extends KeepTrackPlugin {
         type: 'scatter3D',
         name: sat.name,
         dimensions: [app.config.xAxis3D, app.config.yAxis3D, app.config.zAxis3D],
-        data: sat.value.map((item: any, idx: number) => ({
+        data: sat.value?.map((item, idx) => ({
           itemStyle: {
-            opacity: 1 - idx / sat.value.length, // opacity by time
+            opacity: 1 - idx / sat.value!.length, // opacity by time
           },
           value: [item[app.fieldIndices[app.config.xAxis3D]], item[app.fieldIndices[app.config.yAxis3D]], item[app.fieldIndices[app.config.zAxis3D]], item[3]],
         })),

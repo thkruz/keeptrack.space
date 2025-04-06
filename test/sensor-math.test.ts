@@ -2,19 +2,20 @@ import { keepTrackContainer } from '@app/container';
 import { Singletons } from '@app/interfaces';
 import { SatMath } from '@app/static/sat-math';
 import { SensorMath } from '@app/static/sensor-math';
+import { SatelliteRecord } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 describe('sensor-math', () => {
   // Should be able to process getTearData
   it('process_getTearData', () => {
-    const test = () => SensorMath.getTearData(new Date('2023-01-01T00:00:00.000Z'), defaultSat.satrec, [defaultSensor], false);
+    const test = () => SensorMath.getTearData(new Date('2023-01-01T00:00:00.000Z'), defaultSat.satrec as SatelliteRecord, [defaultSensor], false);
 
     expect(test).not.toThrow();
   });
   it('process_getTearData_isRiseSetLookangles', () => {
     // jest mock SatMath.checkIsInView to return true
     jest.spyOn(SatMath, 'checkIsInView').mockReturnValue(true);
-    const test = () => SensorMath.getTearData(new Date('2023-01-01T00:00:00.000Z'), defaultSat.satrec, [defaultSensor], true);
+    const test = () => SensorMath.getTearData(new Date('2023-01-01T00:00:00.000Z'), defaultSat.satrec as SatelliteRecord, [defaultSensor], true);
 
     expect(test).not.toThrow();
   });
@@ -30,7 +31,7 @@ describe('sensor-math', () => {
   });
 
   // Should be able to process nextpass
-  it('process_nextpassList', () => {
+  it('process_nextpass', () => {
     const test = () => SensorMath.nextpass(defaultSat, [defaultSensor]);
 
     expect(test).not.toThrow();

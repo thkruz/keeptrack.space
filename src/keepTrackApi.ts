@@ -178,7 +178,7 @@ export class KeepTrackApi {
     this.loadedPlugins = [];
   }
 
-  containerRoot = <HTMLDivElement | null>null;
+  containerRoot = null as unknown as HTMLDivElement;
   isInitialized = false;
   loadedPlugins = <KeepTrackPlugin[]>[];
   rmbMenuItems = <rmbMenuItem[]>[];

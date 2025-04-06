@@ -2,7 +2,7 @@ import { GlUtils } from '@app/static/gl-utils';
 import { Material, MaterialParameters } from './material';
 
 export interface ShaderMaterialParameters extends MaterialParameters {
-  uniforms?: any;
+  uniforms?: Record<string, WebGLUniformLocation | null> | undefined;
   vertexShader?: string;
   fragmentShader?: string;
   linewidth?: number;
@@ -45,10 +45,13 @@ export class ShaderMaterial extends Material {
     this.map = parameters?.map || null;
 
     if (this.map) {
-      if (parameters.textureType === 'flat') {
+      if (parameters?.textureType === 'flat') {
         this.initFlatTexture();
       }
-      if (parameters.textureType === 'image') {
+      if (parameters?.textureType === 'image') {
+        if (!parameters?.image) {
+          throw new Error('Image is required when map is provided');
+        }
         GlUtils.bindImageToTexture(this.gl, this.map, parameters.image);
       }
     }

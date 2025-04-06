@@ -9,7 +9,8 @@ import * as getElAll from './../src/lib/get-el';
  *Code Analysis
  *
  *Objective:
- *The openColorbox function is used to display a colorbox with either an image or an iframe, depending on the options passed in. It also includes a loading screen and a callback function that can be triggered when the colorbox is closed.
+ *The openColorbox function is used to display a colorbox with either an image or an iframe, depending on the options passed in. It also includes a loading screen and a callback
+ *function that can be triggered when the colorbox is closed.
  *
  *Inputs:
  *- url: a string representing the URL of the image or iframe to be displayed in the colorbox

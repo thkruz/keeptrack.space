@@ -23,7 +23,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
     if (!this.isMenuButtonActive) {
       return;
     }
-    const chartDom = getEl(this.plotCanvasId);
+    const chartDom = getEl(this.plotCanvasId)!;
 
     this.createPlot(Inc2AltPlots.getPlotData(), chartDom);
   };
@@ -56,8 +56,8 @@ export class Inc2AltPlots extends KeepTrackPlugin {
       // Setup Configuration
       this.chart = echarts.init(chartDom);
       this.chart.on('click', (event) => {
-        if ((event.data as any)?.id) {
-          this.selectSatManager_.selectSat((event.data as any).id);
+        if ((event.data as unknown as { id: number })?.id > -1) {
+          this.selectSatManager_.selectSat((event.data as unknown as { id: number })?.id);
         }
       });
     }
@@ -176,7 +176,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
       series: data.map((country) => ({
         type: 'scatter',
         name: country.name,
-        data: country.value.map((item) => ({
+        data: country.value?.map((item) => ({
           name: item[3],
           id: item[4],
           value: [item[1], item[0], item[2]],
@@ -196,11 +196,11 @@ export class Inc2AltPlots extends KeepTrackPlugin {
   }
 
   static getPlotData(): EChartsData {
-    const china = [];
-    const usa = [];
-    const france = [];
-    const russia = [];
-    const other = [];
+    const china = [] as unknown as [number, number, number, string, number][];
+    const usa = [] as unknown as [number, number, number, string, number][];
+    const france = [] as unknown as [number, number, number, string, number][];
+    const russia = [] as unknown as [number, number, number, string, number][];
+    const other = [] as unknown as [number, number, number, string, number][];
 
     keepTrackApi.getCatalogManager().objectCache.forEach((obj) => {
       if (obj.type !== SpaceObjectType.PAYLOAD) {
@@ -213,7 +213,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
         return;
       }
 
-      sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY);
+      sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY)!;
       const now = keepTrackApi.getTimeManager().simulationTimeObj;
 
       if (sat.lla(now).alt < 70) {
@@ -264,6 +264,6 @@ export class Inc2AltPlots extends KeepTrackPlugin {
       { name: 'Other', value: other },
       { name: 'Russia', value: russia },
       { name: 'China', value: china },
-    ] as EChartsData;
+    ] as unknown as EChartsData;
   }
 }

@@ -75,7 +75,8 @@ export class KeyboardInput {
 
     if (settingsManager.disableZoomControls || settingsManager.disableNormalEvents) {
       const stopKeyZoom = (event: KeyboardEvent) => {
-        if (event.ctrlKey && (event.code == 'Equal' || event.code == 'NumpadAdd' || event.code == 'NumpadSubtract' || event.code == 'NumpadSubtract' || event.code == 'Minus')) {
+        if (event.ctrlKey && (event.code === 'Equal' || event.code === 'NumpadAdd' || event.code === 'NumpadSubtract' || event.code === 'NumpadSubtract' ||
+          event.code === 'Minus')) {
           event.preventDefault();
         }
       };

@@ -516,7 +516,7 @@ export class MissilePlugin extends KeepTrackPlugin {
     const subList = [100, 600, 213, 214, 215, 321, 500, 400];
 
     for (let i = 0; i < subList.length; i++) {
-      if (subList[i] == parseInt((<HTMLInputElement>getEl('ms-attacker')).value)) {
+      if (subList[i] === parseInt((<HTMLInputElement>getEl('ms-attacker')).value)) {
         this.isSub_ = true;
       }
     }

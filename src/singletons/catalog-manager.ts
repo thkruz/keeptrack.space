@@ -252,7 +252,7 @@ export class CatalogManager {
    *
    */
   getObject(i: number | null | undefined, type: GetSatType = GetSatType.DEFAULT): BaseObject | null {
-    if (i === null || (i ?? -1) <= -1) {
+    if (i === null || typeof i === 'undefined' || (i ?? -1) <= -1) {
       // errorManagerInstance.debug('getSat: i is null'); - This happens a lot but is useful for debugging
 
       return null;
@@ -316,7 +316,7 @@ export class CatalogManager {
     return satIdArray.map((id) => ((<DetailedSatellite>this.getObject(id))?.sccNum || -1).toString()).filter((satnum) => satnum !== '-1');
   }
 
-  async init(satCruncherOveride?: any): Promise<void> {
+  init(satCruncherOveride?: Worker): void {
     try {
       SplashScreen.loadStr(SplashScreen.msg.elsets);
       // See if we are running jest right now for testing
@@ -421,18 +421,21 @@ export class CatalogManager {
     if (!settingsManager.isDisableSensors) {
       let i = 0;
 
-      // eslint-disable-next-line guard-for-in
       for (const sensor in sensors) {
-        sensors[sensor].sensorId = i;
-        this.staticSet.push(sensors[sensor]);
-        i++;
+        if (Object.prototype.hasOwnProperty.call(sensors, sensor)) {
+          sensors[sensor].sensorId = i;
+          this.staticSet.push(sensors[sensor]);
+          i++;
+        }
       }
     }
 
     // Create Launch Sites
     if (!settingsManager.isDisableLaunchSites) {
-      // eslint-disable-next-line guard-for-in
       for (const launchSiteName in launchSites) {
+        if (!Object.prototype.hasOwnProperty.call(launchSites, launchSiteName)) {
+          continue;
+        }
         const launchSite = launchSites[launchSiteName];
 
         this.staticSet.push({

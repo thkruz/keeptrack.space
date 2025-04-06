@@ -70,7 +70,7 @@ describe('KeyboardInput_class', () => {
     keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
     const evt = { key: null };
 
-    keyboardInput.keyHandler(<KeyboardEvent>evt);
+    keyboardInput.keyHandler(evt as unknown as KeyboardEvent);
     expect(true).toBe(true);
   });
 
@@ -99,6 +99,6 @@ describe('KeyboardInput_class', () => {
         // Do nothing
       },
     });
-    expect(keyboardInput.keyEvents.length).toBe(1);
+    expect(keyboardInput.keyEvents).toHaveLength(1);
   });
 });

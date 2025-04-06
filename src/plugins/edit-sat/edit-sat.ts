@@ -125,14 +125,14 @@ export class EditSat extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'editSat',
       cb: () => {
-        getEl('editSat-newTLE').addEventListener('click', this.editSatNewTleClick_.bind(this));
+        getEl('editSat-newTLE')!.addEventListener('click', this.editSatNewTleClick_.bind(this));
 
-        getEl('editSat').addEventListener('submit', (e: Event) => {
+        getEl('editSat')!.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           EditSat.editSatSubmit();
         });
 
-        getEl(`${EditSat.elementPrefix}-per`).addEventListener('change', () => {
+        getEl(`${EditSat.elementPrefix}-per`)!.addEventListener('change', () => {
           const per = (<HTMLInputElement>getEl('es-per')).value;
 
           if (per === '') {
@@ -143,7 +143,7 @@ export class EditSat extends KeepTrackPlugin {
           (<HTMLInputElement>getEl('es-meanmo')).value = meanmo.toFixed(4);
         });
 
-        getEl(`${EditSat.elementPrefix}-meanmo`).addEventListener('change', () => {
+        getEl(`${EditSat.elementPrefix}-meanmo`)!.addEventListener('change', () => {
           const meanmo = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value;
 
           if (meanmo === '') {
@@ -154,14 +154,14 @@ export class EditSat extends KeepTrackPlugin {
           (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = per;
         });
 
-        getEl('editSat-save').addEventListener('click', EditSat.editSatSaveClick);
+        getEl('editSat-save')!.addEventListener('click', EditSat.editSatSaveClick);
 
-        getEl('editSat-open').addEventListener('click', () => {
+        getEl('editSat-open')!.addEventListener('click', () => {
           keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
-          getEl('editSat-file').click();
+          getEl('editSat-file')!.click();
         });
 
-        getEl('editSat-file').addEventListener('change', (evt: Event) => {
+        getEl('editSat-file')!.addEventListener('change', (evt: Event) => {
           if (!window.FileReader) {
             return;
           } // Browser is not compatible
@@ -169,8 +169,8 @@ export class EditSat extends KeepTrackPlugin {
           evt.preventDefault();
         });
 
-        getEl(`${EditSat.elementPrefix}-error`).addEventListener('click', () => {
-          getEl(`${EditSat.elementPrefix}-error`).style.display = 'none';
+        getEl(`${EditSat.elementPrefix}-error`)!.addEventListener('click', () => {
+          getEl(`${EditSat.elementPrefix}-error`)!.style.display = 'none';
         });
       },
     });
@@ -239,17 +239,21 @@ export class EditSat extends KeepTrackPlugin {
       const reader = new FileReader();
 
       reader.onload = EditSat.readerOnLoad_;
-      reader.readAsText((<any>evt.target).files[0]);
+      const eventTarget = evt.target as HTMLInputElement;
+
+      reader.readAsText(eventTarget.files![0]);
     } catch (e) {
       errorManagerInstance.error(e, 'doReaderActions', 'Error reading file!');
     }
   }
 
-  private static readerOnLoad_(evt: any) {
-    if (evt.target.readyState !== 2) {
+  private static readerOnLoad_(evt: Event) {
+    const eventTarget = evt.target as FileReader;
+
+    if (eventTarget.readyState !== 2) {
       return;
     }
-    if (evt.target.error) {
+    if (eventTarget.error) {
       errorManagerInstance.warn(i18next.t('errorMsgs.EditSat.errorReadingFile'));
 
       return;
@@ -259,9 +263,15 @@ export class EditSat extends KeepTrackPlugin {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    const object = JSON.parse(<string>evt.target.result);
+    const object = JSON.parse(<string>eventTarget.result);
     const sccNum = parseInt(StringPad.pad0(object.tle1.substr(2, 5).trim(), 5));
     const sat = keepTrackApi.getCatalogManager().sccNum2Sat(sccNum);
+
+    if (!sat) {
+      errorManagerInstance.warn(i18next.t('errorMsgs.EditSat.satelliteNotFound', { sccNum }));
+
+      return;
+    }
 
     let satrec: SatelliteRecord;
 
@@ -331,7 +341,7 @@ export class EditSat extends KeepTrackPlugin {
       const id = keepTrackApi.getCatalogManager().sccNum2Id(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
       const obj = keepTrackApi.getCatalogManager().getObject(id);
 
-      if (!obj.isSatellite()) {
+      if (!obj?.isSatellite()) {
         return;
       }
 
@@ -383,7 +393,7 @@ export class EditSat extends KeepTrackPlugin {
       });
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
-      orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
+      orbitManagerInstance.changeOrbitBufferData(id!, tle1, tle2);
       /*
        *
        * Reload Menu with new TLE
@@ -427,7 +437,7 @@ export class EditSat extends KeepTrackPlugin {
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    getEl(`${EditSat.elementPrefix}-error`).style.display = 'none';
+    getEl(`${EditSat.elementPrefix}-error`)!.style.display = 'none';
     const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
     const satId = catalogManagerInstance.sccNum2Id(parseInt(scc));
 
@@ -436,7 +446,7 @@ export class EditSat extends KeepTrackPlugin {
     }
     const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
 
-    if (!obj.isSatellite()) {
+    if (!obj?.isSatellite()) {
       return;
     }
 
@@ -476,13 +486,14 @@ export class EditSat extends KeepTrackPlugin {
       });
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
-      orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
+      orbitManagerInstance.changeOrbitBufferData(satId!, tle1, tle2);
       sat.active = true;
       sat.editTle(tle1, tle2);
       sat.country = country;
       keepTrackApi.getMainCamera().zoomTarget = ZoomValue.GEO;
     } else {
-      keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.', ToastMsgType.caution, true);
+      keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.',
+        ToastMsgType.caution, true);
     }
   }
 

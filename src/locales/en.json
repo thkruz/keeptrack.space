@@ -58,6 +58,7 @@
       "disablingSun": "Your computer is struggling! Disabling Sun."
     },
     "Breakup": {
+      "SatelliteNotFound": "Satellite not found!",
       "CannotCreateBreakupForNonCircularOrbits": "Cannot create a breakup for non-circular orbits. Working on a fix.",
       "CannotCalcDirectionOfSatellite": "Cannot calculate direction of satellite. Try again later.",
       "ErrorCreatingBreakup": "Error creating breakup!",
@@ -69,7 +70,8 @@
       "errorProcessingCollisions": "Error processing SOCRATES data!"
     },
     "EditSat": {
-      "errorReadingFile": "Error while reading file!"
+      "errorReadingFile": "Error while reading file!",
+      "satelliteNotFound": "Satellite {{sccNum}} not found!"
     },
     "Reports": {
       "popupBlocker": "Please allow popups for this site to view reports."

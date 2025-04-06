@@ -16,10 +16,10 @@ export class StreamManager {
   static readonly BIT_RATE_2_MBPS = 2000000;
   static readonly BIT_RATE_1_MBPS = 1000000;
 
-  private mediaRecorder_: MediaRecorder = null;
-  private recordedBlobs = [];
-  private supportedType = <string>null;
-  private videoBitsPerSec_ = null;
+  private mediaRecorder_ = null as MediaRecorder | null;
+  private recordedBlobs = [] as Blob[];
+  private supportedType: string | undefined;
+  private videoBitsPerSec_ = null as number | null;
 
   public isVideoRecording = false;
   private stream_: MediaStream;
@@ -42,7 +42,7 @@ export class StreamManager {
     }
   }
 
-  async getStream(displayMediaOptions?: MediaRecorderOptions) {
+  getStream(displayMediaOptions?: MediaRecorderOptions) {
     displayMediaOptions ??= {
       video: {
         cursor: 'never',
@@ -51,14 +51,18 @@ export class StreamManager {
     };
 
     if (window.location.protocol === 'https:' || settingsManager.offline) {
+      const enhancedNavigator = navigator as Navigator &
+      { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream>; } &
+      { mediaDevices: { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream>; }; };
+
       if ('getDisplayMedia' in navigator) {
-        return (navigator as any).getDisplayMedia(displayMediaOptions).catch((err: Error) => {
+        return enhancedNavigator.getDisplayMedia(displayMediaOptions).catch((err: Error) => {
           StreamManager.handleError(err);
 
           return null;
         });
       } else if ('getDisplayMedia' in navigator.mediaDevices) {
-        return navigator.mediaDevices.getDisplayMedia(displayMediaOptions as any).catch((err) => {
+        return enhancedNavigator.mediaDevices.getDisplayMedia(displayMediaOptions).catch((err) => {
           StreamManager.handleError(err);
 
           return null;
@@ -87,7 +91,7 @@ export class StreamManager {
     if (!this.mediaRecorder_) {
       throw new Error('MediaRecorder is not initialized');
     }
-    if (this.isVideoRecording == false) {
+    if (this.isVideoRecording === false) {
       return;
     } // Already stopped
 
@@ -120,9 +124,15 @@ export class StreamManager {
   }
 
   start(): void {
-    this.getStream()
+    const streamPromise = this.getStream();
+
+    if (streamPromise === false) {
+      return;
+    }
+
+    streamPromise
       .then((steam) => {
-        if (steam == false) {
+        if (!steam) {
           return;
         }
         this.isVideoRecording = true;
@@ -135,7 +145,7 @@ export class StreamManager {
             break;
           }
         }
-        if (this.supportedType == null) {
+        if (this.supportedType === null) {
           errorManagerInstance.debug('No supported type found for MediaRecorder');
         }
         const options = {

@@ -506,8 +506,10 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
     let isHoveringOverPass = false;
 
-    // eslint-disable-next-line guard-for-in
     for (const key in this.drawEvents_) {
+      if (!this.drawEvents_[key]) {
+        continue;
+      }
       const success = this.drawEvents_[key](mouseX, mouseY);
 
       isHoveringOverPass = isHoveringOverPass || success;

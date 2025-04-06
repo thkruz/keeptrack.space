@@ -1,5 +1,6 @@
-import { SpaceObjectType } from 'ootk';
+/* eslint-disable max-lines */
 import { ControlSite } from '@app/singletons/catalog-manager/ControlSite';
+import { SpaceObjectType } from 'ootk';
 
 export interface ControlSiteParams {
   Code: string;
@@ -65574,10 +65575,7 @@ export const controlSites = <ControlSite[]>[
     linkBeidou: false,
     linkGlonass: false,
   }),
-
-  // ///////////////////////////////////
   // Additional Locations
-  // ///////////////////////////////////
 
   // https://gssc.esa.int/navipedia/images/5/5d/Galileo_s_Global_Ground_Segment.jpg
   new ControlSite({

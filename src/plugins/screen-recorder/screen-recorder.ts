@@ -51,7 +51,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
         try {
           this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));
         } catch (e) {
-          console.warn(e);
+          errorManagerInstance.warn(`Compatibility Error with Recording: ${e}`);
         }
       },
     });

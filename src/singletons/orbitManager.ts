@@ -229,7 +229,8 @@ export class OrbitManager {
         if (window.location.href.startsWith('file://')) {
           setInnerHtml(
             'loader-text',
-            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other copies of chrome are running when you start it.',
+            'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other ' +
+            'copies of chrome are running when you start it.',
           );
         } else {
           errorManagerInstance.error(error, 'OrbitManager.init', 'Failed to create orbit web worker!');
@@ -477,7 +478,7 @@ export class OrbitManager {
   private drawInViewObjectOrbit_(mainCameraInstance: Camera): void {
     if (this.currentInView_.length >= 1) {
       // There might be some z-fighting
-      if (mainCameraInstance.cameraType == CameraType.PLANETARIUM) {
+      if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
         this.lineManagerInstance_.setColorUniforms(settingsManager.orbitPlanetariumColor);
       } else {
         this.lineManagerInstance_.setColorUniforms(settingsManager.orbitInViewColor);

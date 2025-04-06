@@ -25,7 +25,8 @@ export class ErrorManager {
     }
   }
 
-  public error(e: Error, funcName: string, toastMsg?: string) {
+  error(e: Error, funcName: string, toastMsg?: string) {
+    // eslint-disable-next-line no-console
     console.error(e);
 
     toastMsg ??= e.message || 'Unknown error';
@@ -65,7 +66,7 @@ ${e.stack}`,
     });
   }
 
-  public warn(msg: string, isHideFromConsole = false) {
+  warn(msg: string, isHideFromConsole = false) {
     if (this.ALLOW_WARN) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
@@ -82,7 +83,7 @@ ${e.stack}`,
     }
   }
 
-  public info(msg: string) {
+  info(msg: string) {
     if (this.ALLOW_INFO) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
@@ -98,7 +99,7 @@ ${e.stack}`,
     }
   }
 
-  public log(msg: string) {
+  log(msg: string) {
     if (this.ALLOW_LOG) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
@@ -114,7 +115,7 @@ ${e.stack}`,
     }
   }
 
-  public debug(msg: string) {
+  debug(msg: string) {
     if (this.ALLOW_DEBUG) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 

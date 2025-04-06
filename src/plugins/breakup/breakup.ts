@@ -158,7 +158,7 @@ export class Breakup extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl('breakup').addEventListener('submit', (e: Event) => {
+        getEl('breakup')!.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           showLoading(() => this.onSubmit_());
         });
@@ -210,7 +210,14 @@ export class Breakup extends KeepTrackPlugin {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     const { satId, breakupCount, rascVariation, incVariation, meanmoVariation, startNum } = Breakup.getFormData_(catalogManagerInstance);
-    const mainsat = catalogManagerInstance.getSat(satId);
+    const mainsat = catalogManagerInstance.getSat(satId ?? -1);
+
+    if (!mainsat || satId === null) {
+      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.SatelliteNotFound'));
+
+      return;
+    }
+
     const origsat = mainsat;
 
     // Launch Points are the Satellites Current Location
@@ -243,7 +250,7 @@ export class Breakup extends KeepTrackPlugin {
     const tle2 = tles[1];
 
     if (tle1 === 'Error') {
-      console.error(tle2);
+      // console.error(tle2);
       errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
 
       return;
@@ -302,7 +309,7 @@ export class Breakup extends KeepTrackPlugin {
          */
         iTLEs = new OrbitFinder(sat, launchLat, launchLon, <'N' | 'S'>upOrDown, new Date(simulationTimeObj.getTime() + 1), newAlt as Kilometers, rascOffset).rotateOrbitToLatLon();
         if (iTLEs[0] === 'Error') {
-          console.error(iTLEs[1]);
+          // console.error(iTLEs[1]);
           errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
 
           return;
@@ -340,6 +347,12 @@ export class Breakup extends KeepTrackPlugin {
         const a5Num = Tle.convert6DigitToA5((startNum + i).toString());
         const satId = catalogManagerInstance.sccNum2Id(a5Num);
 
+        if (!satId) {
+          errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.SatelliteNotFound'));
+
+          return;
+        }
+
         iTle1 = `1 ${a5Num}${iTle1.substring(7)}` as TleLine1;
         iTle2 = `2 ${a5Num} ${incStr} ${iTle2.substring(17, 52)}${meanmoStr}${iTle2.substring(63)}`;
 
@@ -369,7 +382,7 @@ export class Breakup extends KeepTrackPlugin {
           return;
         }
 
-        if (SatMath.altitudeCheck(newSat.satrec, simulationTimeObj) > 1) {
+        if (SatMath.altitudeCheck(newSat.satrec!, simulationTimeObj) > 1) {
           catalogManagerInstance.objectCache[satId] = newSat;
           catalogManagerInstance.satCruncher.postMessage({
             typ: CruncerMessageTypes.SAT_EDIT,

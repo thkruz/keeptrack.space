@@ -196,12 +196,12 @@ export class CelestrakColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.ROCKET_BODY &&
         this.objectTypeFlags.celestrakDefaultRocketBody === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.celestrakDefaultRocketBody === false) ||
-      (catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
-        typeof sat.vmag === 'undefined' &&
-        sat.type === SpaceObjectType.ROCKET_BODY &&
-        this.objectTypeFlags.celestrakDefaultRocketBody === false)
+      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY &&
+        this.objectTypeFlags.celestrakDefaultRocketBody === false) || (catalogManagerInstance.isSensorManagerLoaded &&
+          sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
+          typeof sat.vmag === 'undefined' &&
+          sat.type === SpaceObjectType.ROCKET_BODY &&
+          this.objectTypeFlags.celestrakDefaultRocketBody === false)
     ) {
       return {
         color: this.colorTheme.deselected,
@@ -214,7 +214,7 @@ export class CelestrakColorScheme extends ColorScheme {
         this.objectTypeFlags.celestrakDefaultDebris === false) ||
       (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.celestrakDefaultDebris === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER &&
+        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
         sat.type === SpaceObjectType.DEBRIS &&
         this.objectTypeFlags.celestrakDefaultDebris === false)
@@ -225,7 +225,8 @@ export class CelestrakColorScheme extends ColorScheme {
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.celestrakDefaultFov === false && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.celestrakDefaultFov === false &&
+      keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -233,7 +234,7 @@ export class CelestrakColorScheme extends ColorScheme {
     }
 
     if (dotsManagerInstance.inViewData?.[sat.id] === 1 && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
-      if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type == SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
+      if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
         // Intentional
       } else {
         return {

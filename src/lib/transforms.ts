@@ -32,7 +32,8 @@ export const lon2yaw = (lon: Degrees, selectedDate: Date): Radians => {
   const doy = getDayOfYear(selectedDate);
   const modifier = 1000 * 60 * 60 * (-11.23 + 0.065666667 * doy);
 
-  propTime.setUTCHours(selectedDate.getUTCHours()); // + (selectedDate.getUTCMonth() * 2 - 11) / 2); // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
+  propTime.setUTCHours(selectedDate.getUTCHours());
+  // + (selectedDate.getUTCMonth() * 2 - 11) / 2); // Offset has to account for time of year. Add 2 Hours per month into the year starting at -12.
   propTime.setUTCMinutes(selectedDate.getUTCMinutes());
   propTime.setUTCSeconds(selectedDate.getUTCSeconds());
   propTime = new Date(propTime.getTime() * 1 + modifier);

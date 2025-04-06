@@ -1,0 +1,51 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "globals": {
+    "M": "readonly",
+    "process": "readonly",
+    "global": "writable",
+    "__dirname": "readonly",
+    "settingsManager": "writable"
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2021
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "rules": {
+    "no-console": "warn",
+    "complexity": [
+      "error",
+      {
+        "max": 40
+      }
+    ],
+    "max-lines": [
+      "error",
+      {
+        "max": 1000
+      }
+    ],
+    "max-len": [
+      "error",
+      {
+        "code": 180
+      }
+    ],
+    "eqeqeq": "error",
+    "no-empty-function": "error",
+    "no-eq-null": "error",
+    "no-multi-assign": "error",
+    "require-await": "error"
+  }
+}

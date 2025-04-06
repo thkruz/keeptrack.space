@@ -33,7 +33,7 @@ export abstract class DopMath {
       return dops;
     }
 
-    const A = <any>numeric.rep([nsat, 4], 0);
+    const A = numeric.rep([nsat, 4], 0) as number[][];
 
     for (let n = 1; n <= nsat; n++) {
       const { az, el } = azElList[n - 1];
@@ -142,7 +142,7 @@ export abstract class DopMath {
   }
 
   public static getDopsList(getOffsetTimeObj: (offset: number) => Date, gpsSats: DetailedSatellite[], lat: Degrees, lon: Degrees, alt: Kilometers, el: Degrees): DopList {
-    const dopsResults = [];
+    const dopsResults = [] as DopList;
 
     for (let t = 0; t < 1440; t++) {
       const offset = t * 60 * MILLISECONDS_PER_SECOND;

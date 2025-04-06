@@ -103,6 +103,7 @@ export class KeepTrack {
   uiManager: UiManager;
   inputManager: InputManager;
   mainCameraInstance: Camera;
+  cameraControlWidget: CameraControlWidget;
 
   constructor(
     settingsOverride: SettingsManagerOverride = {
@@ -181,7 +182,7 @@ export class KeepTrack {
 
     const cameraControlWidget = new CameraControlWidget();
 
-    console.log(cameraControlWidget);
+    this.cameraControlWidget = cameraControlWidget;
 
     keepTrackContainer.registerSingleton(Singletons.MainCamera, mainCameraInstance);
     const hoverManagerInstance = new HoverManager();
@@ -284,7 +285,7 @@ export class KeepTrack {
 
   private static setContainerElement() {
     // User provides the container using the settingsManager
-    const containerDom = settingsManager.containerRoot ?? document.getElementById('keeptrack-root');
+    const containerDom = settingsManager.containerRoot ?? document.getElementById('keeptrack-root') as HTMLDivElement;
 
     if (!containerDom) {
       throw new Error('Failed to find container');
@@ -292,7 +293,7 @@ export class KeepTrack {
 
     // If no current shadow DOM, create one - this is mainly for testing
     if (!keepTrackApi.containerRoot) {
-      keepTrackApi.containerRoot = containerDom as unknown as HTMLDivElement;
+      keepTrackApi.containerRoot = containerDom;
     }
   }
 
@@ -396,6 +397,7 @@ export class KeepTrack {
   }
 
   private static printLogoToConsole_() {
+    // eslint-disable-next-line no-console
     console.log(`
  _  __            _______             _       _____
 | |/ /           |__   __|           | |     / ____|
@@ -424,12 +426,15 @@ theodore.kruczek at gmail dot com.
 
     if (LoaderText) {
       LoaderText.innerHTML = errorHtml;
+      // eslint-disable-next-line no-console
       console.error(error);
     } else {
+      // eslint-disable-next-line no-console
       console.error(error);
     }
     // istanbul ignore next
     if (!isThisNode()) {
+      // eslint-disable-next-line no-console
       console.warn(error);
     }
   }
@@ -516,7 +521,7 @@ theodore.kruczek at gmail dot com.
 
       catalogManagerInstance.initObjects();
 
-      await catalogManagerInstance.init();
+      catalogManagerInstance.init();
       colorSchemeManagerInstance.init();
 
       await CatalogLoader.load(); // Needs Object Manager and gl first
@@ -527,7 +532,7 @@ theodore.kruczek at gmail dot com.
 
       uiManagerInstance.init();
 
-      dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer);
+      dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer!);
 
       this.inputManager.init();
 

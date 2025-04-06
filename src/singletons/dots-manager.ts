@@ -41,13 +41,13 @@ export class DotsManager {
   private positionBufferOneTime_ = false;
   private settings_: SettingsManager;
   // Array for which colors go to which ids
-  private sizeBufferOneTime: any;
+  private isSizeBufferOneTime_ = false;
 
   buffers = {
-    position: <WebGLBuffer>null,
-    size: <WebGLBuffer>null,
-    color: <WebGLBuffer>null,
-    pickability: <WebGLBuffer>null,
+    position: <WebGLBuffer><unknown>null,
+    size: <WebGLBuffer><unknown>null,
+    color: <WebGLBuffer><unknown>null,
+    pickability: <WebGLBuffer><unknown>null,
   };
 
   inSunData: Int8Array;
@@ -56,9 +56,9 @@ export class DotsManager {
   isReady: boolean;
   pickReadPixelBuffer: Uint8Array;
   pickingBuffers = {
-    position: <WebGLBuffer>null,
-    color: <WebGLBuffer>null,
-    pickability: <WebGLBuffer>null,
+    position: <WebGLBuffer><unknown>null,
+    color: <WebGLBuffer><unknown>null,
+    pickability: <WebGLBuffer><unknown>null,
   };
 
   pickingRenderBuffer: WebGLRenderbuffer;
@@ -66,7 +66,7 @@ export class DotsManager {
   positionData: Float32Array;
   programs = {
     dots: {
-      program: <WebGLProgram>null,
+      program: <WebGLProgram><unknown>null,
       attribs: {
         a_position: new BufferAttribute({
           location: 0,
@@ -90,14 +90,14 @@ export class DotsManager {
         }),
       },
       uniforms: {
-        u_pMvCamMatrix: <WebGLUniformLocation>null,
-        u_minSize: <WebGLUniformLocation>null,
-        u_maxSize: <WebGLUniformLocation>null,
+        u_pMvCamMatrix: <WebGLUniformLocation><unknown>null,
+        u_minSize: <WebGLUniformLocation><unknown>null,
+        u_maxSize: <WebGLUniformLocation><unknown>null,
       },
-      vao: <WebGLVertexArrayObject>null,
+      vao: <WebGLVertexArrayObject><unknown>null,
     },
     picking: {
-      program: <WebGLProgram>null,
+      program: <WebGLProgram><unknown>null,
       attribs: {
         a_position: new BufferAttribute({
           location: 0,
@@ -116,22 +116,22 @@ export class DotsManager {
         }),
       },
       uniforms: {
-        u_pMvCamMatrix: <WebGLUniformLocation>null,
-        u_minSize: <WebGLUniformLocation>null,
-        u_maxSize: <WebGLUniformLocation>null,
+        u_pMvCamMatrix: <WebGLUniformLocation><unknown>null,
+        u_minSize: <WebGLUniformLocation><unknown>null,
+        u_maxSize: <WebGLUniformLocation><unknown>null,
       },
-      vao: <WebGLVertexArrayObject>null,
+      vao: <WebGLVertexArrayObject><unknown>null,
     },
   };
 
   shaders_ = {
     dots: {
-      vert: <string>null,
-      frag: <string>null,
+      vert: <string><unknown>null,
+      frag: <string><unknown>null,
     },
     picking: {
-      vert: <string>null,
-      frag: <string>null,
+      vert: <string><unknown>null,
+      frag: <string><unknown>null,
     },
   };
 
@@ -164,7 +164,7 @@ export class DotsManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
 
-    if (keepTrackApi.getMainCamera().cameraType == CameraType.PLANETARIUM) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       gl.uniform1f(this.programs.dots.uniforms.u_minSize, this.settings_.satShader.minSizePlanetarium);
       gl.uniform1f(this.programs.dots.uniforms.u_maxSize, this.settings_.satShader.maxSizePlanetarium);
     } else {
@@ -535,33 +535,6 @@ export class DotsManager {
      * TODO: Remove this once we figure out why this is happening
      */
 
-    if (typeof object.velocity === 'undefined') {
-      console.error('Object velocity is undefined', object);
-      console.trace();
-
-      return;
-    }
-    if (typeof object.velocity?.x === 'undefined') {
-      console.error('Object velocity.x is undefined', object);
-      console.trace();
-
-      return;
-    }
-
-    if (typeof object.velocity?.y === 'undefined') {
-      console.error('Object position is undefined', object);
-      console.trace();
-
-      return;
-    }
-
-    if (typeof object.position?.z === 'undefined') {
-      console.error('Object position.x is undefined', object);
-      console.trace();
-
-      return;
-    }
-
     object.velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
     object.totalVelocity = 0;
 
@@ -603,8 +576,8 @@ export class DotsManager {
     const renderer = keepTrackApi.getRenderer();
 
     if (!settingsManager.lowPerf && renderer.dtAdjusted > settingsManager.minimumDrawDt) {
-      if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
-        const obj = keepTrackApi.getCatalogManager().objectCache[keepTrackApi.getPlugin(SelectSatManager)?.selectedSat] as DetailedSatellite | MissileObject;
+      if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
+        const obj = keepTrackApi.getCatalogManager().objectCache[keepTrackApi.getPlugin(SelectSatManager)!.selectedSat] as DetailedSatellite | MissileObject;
 
         if (obj.isSatellite()) {
           const sat = obj as DetailedSatellite;
@@ -633,7 +606,7 @@ export class DotsManager {
   updateSizeBuffer(bufferLen: number = 3) {
     const gl = keepTrackApi.getRenderer().gl;
 
-    if (!this.sizeBufferOneTime) {
+    if (!this.isSizeBufferOneTime_) {
       this.sizeData = new Int8Array(bufferLen);
     }
 
@@ -647,7 +620,7 @@ export class DotsManager {
       }
     }
 
-    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
+    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1;
 
     if (selectedSat > -1) {
       this.sizeData[selectedSat] = 1.0;
@@ -665,9 +638,9 @@ export class DotsManager {
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.size);
-    if (!this.sizeBufferOneTime) {
+    if (!this.isSizeBufferOneTime_) {
       gl.bufferData(gl.ARRAY_BUFFER, this.sizeData, gl.DYNAMIC_DRAW);
-      this.sizeBufferOneTime = true;
+      this.isSizeBufferOneTime_ = true;
     } else {
       gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.sizeData);
     }

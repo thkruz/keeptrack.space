@@ -26,7 +26,7 @@ describe('Breakup_class', () => {
         () =>
           ({
             rotateOrbitToLatLon: () => [defaultSat.tle1, defaultSat.tle2],
-          }) as any,
+          }) as OrbitFinderFile.OrbitFinder,
       );
       expect(() => breakupPlugin['onSubmit_']()).not.toThrow();
     });

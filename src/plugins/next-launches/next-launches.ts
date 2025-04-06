@@ -10,6 +10,39 @@ import calendar2Png from '@public/img/icons/calendar2.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 
+interface LaunchInfoData {
+  window_start: string | number | Date;
+  window_end: string | number | Date;
+  last_updated: string | number | Date;
+  name: string;
+  pad?: {
+    location: {
+      name: string;
+    };
+    wiki_url: string;
+  };
+  launch_service_provider?: {
+    name: string;
+    country_code: string;
+    wiki_url: string;
+  };
+  mission?: {
+    description: string;
+    name: string;
+    type: string;
+    wiki_url: string;
+  };
+  rocket?: {
+    configuration: {
+      full_name: string;
+      name: string;
+      family: string;
+      wiki_url: string;
+    };
+  };
+
+}
+
 export interface LaunchInfoObject {
   agency: string;
   agencyURL: string;
@@ -67,7 +100,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     </div>
   </div>`;
 
-  launchList = [];
+  launchList = [] as LaunchInfoObject[];
 
   addJs(): void {
     super.addJs();
@@ -75,9 +108,9 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl('export-launch-info').addEventListener('click', () => {
+        getEl('export-launch-info')!.addEventListener('click', () => {
           keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
-          saveCsv(this.launchList, 'launchList');
+          saveCsv(this.launchList as unknown as Array<Record<string, unknown>>, 'launchList');
         });
       },
     });
@@ -99,9 +132,9 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
           }
 
           // Only needs populated once
-          if (tbl.innerHTML == '') {
+          if (tbl.innerHTML === '') {
             NextLaunchesPlugin.initTable(tbl, this.launchList);
-            const aElements = getEl('nextLaunch-table').querySelectorAll('a');
+            const aElements = getEl('nextLaunch-table')!.querySelectorAll('a');
 
             aElements.forEach((element) => {
               element.addEventListener('click', (e) => {
@@ -114,7 +147,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     }
   }
 
-  processData(resp: { results: Array<any> }) {
+  processData(resp: { results: LaunchInfoData[] }) {
     for (let i = 0; i < resp.results.length; i++) {
       /**
        * Info from launchlibrary.net
@@ -123,7 +156,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
       const launchInfo: LaunchInfoObject = {
         name: '',
-        updated: null,
+        updated: null as unknown as Date,
         windowStart: new Date(launchLibResult.window_start),
         windowEnd: new Date(launchLibResult.window_end),
         location: '',
@@ -145,8 +178,8 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
         launchInfo.updated = new Date(launchLibResult.last_updated);
       }
       launchInfo.name = typeof launchLibResult.name !== 'undefined' ? launchLibResult.name : 'Unknown';
-      launchInfo.location = launchLibResult.pad?.location?.name.split(',', 1)[0];
-      launchInfo.locationURL = launchLibResult.pad?.wiki_url;
+      launchInfo.location = launchLibResult.pad?.location?.name.split(',', 1)[0] ?? 'Unknown';
+      launchInfo.locationURL = launchLibResult.pad?.wiki_url ?? '';
       if (typeof launchLibResult.launch_service_provider !== 'undefined') {
         launchInfo.agency = typeof launchLibResult.launch_service_provider.name !== 'undefined' ? launchLibResult.launch_service_provider.name : 'Unknown';
         launchInfo.country = typeof launchLibResult.launch_service_provider.country_code !== 'undefined' ? launchLibResult.launch_service_provider.country_code : 'Unknown';
@@ -158,7 +191,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
         launchInfo.country = 'UNK';
         launchInfo.agencyURL = '';
       }
-      if (launchLibResult.mission != null) {
+      if (launchLibResult.mission) {
         launchInfo.mission = launchLibResult.mission.description;
         launchInfo.missionName = launchLibResult.mission.name;
         launchInfo.missionType = launchLibResult.mission.type;
@@ -166,11 +199,13 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
           launchInfo.missionURL = launchLibResult.mission.wiki_url;
         }
       }
-      launchInfo.rocket = launchLibResult.rocket?.configuration.full_name;
-      launchInfo.rocketConfig = launchLibResult.rocket?.configuration.name;
-      launchInfo.rocketFamily = launchLibResult.rocket?.configuration.family;
-      if (typeof launchLibResult.rocket.configuration.wiki_url !== 'undefined') {
-        launchInfo.rocketURL = launchLibResult.rocket.configuration.wiki_url;
+      if (launchLibResult.rocket) {
+        launchInfo.rocket = launchLibResult.rocket?.configuration.full_name;
+        launchInfo.rocketConfig = launchLibResult.rocket?.configuration.name;
+        launchInfo.rocketFamily = launchLibResult.rocket?.configuration.family;
+        if (typeof launchLibResult.rocket.configuration.wiki_url !== 'undefined') {
+          launchInfo.rocketURL = launchLibResult.rocket.configuration.wiki_url;
+        }
       }
       this.launchList[i] = launchInfo;
     }

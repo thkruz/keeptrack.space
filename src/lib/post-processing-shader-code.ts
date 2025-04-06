@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { keepTrackApi } from '../keepTrackApi';
 
 export const postProcessingShaderCode = {

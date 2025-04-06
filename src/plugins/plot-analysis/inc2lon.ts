@@ -25,7 +25,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
 
   bottomIconImg = barChart4BarsPng;
   bottomIconCallback = () => {
-    const chartDom = getEl(this.plotCanvasId);
+    const chartDom = getEl(this.plotCanvasId)!;
 
     this.createPlot(Inc2LonPlots.getPlotData(), chartDom);
   };
@@ -58,8 +58,8 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       // Setup Configuration
       this.chart = echarts.init(chartDom);
       this.chart.on('click', (event) => {
-        if ((event.data as any)?.id) {
-          this.selectSatManager_.selectSat((event.data as any).id);
+        if ((event.data as unknown as { id: number })?.id > -1) {
+          this.selectSatManager_.selectSat((event.data as unknown as { id: number })?.id);
         }
       });
     }
@@ -178,7 +178,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       series: data.map((country) => ({
         type: 'scatter',
         name: country.name,
-        data: country.value.map((item) => ({
+        data: country.value?.map((item) => ({
           name: item[3],
           id: item[4],
           value: [item[1], item[0], item[2]],
@@ -198,13 +198,13 @@ export class Inc2LonPlots extends KeepTrackPlugin {
   }
 
   static getPlotData(): EChartsData {
-    const china = [];
-    const usa = [];
-    const france = [];
-    const russia = [];
-    const india = [];
-    const japan = [];
-    const other = [];
+    const china = [] as unknown as [number, number, number, string, number][];
+    const usa = [] as unknown as [number, number, number, string, number][];
+    const france = [] as unknown as [number, number, number, string, number][];
+    const russia = [] as unknown as [number, number, number, string, number][];
+    const india = [] as unknown as [number, number, number, string, number][];
+    const japan = [] as unknown as [number, number, number, string, number][];
+    const other = [] as unknown as [number, number, number, string, number][];
 
     keepTrackApi.getCatalogManager().objectCache.forEach((obj) => {
       if (obj.type !== SpaceObjectType.PAYLOAD) {
@@ -272,6 +272,6 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       { name: 'China', value: china },
       { name: 'India', value: india },
       { name: 'Japan', value: japan },
-    ] as EChartsData;
+    ] as unknown as EChartsData;
   }
 }

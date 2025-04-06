@@ -32,14 +32,12 @@ import { DEG2RAD, Kilometers, Meters, Radians } from 'ootk';
  *- The method assumes the speed of light to be 3 * 10^8 m/s and the value of pi to be 3.141592653589793.
  *
  */
-describe.skip('minSignal_method', () => {
+describe('minSignal_method', () => {
   // Tests that the method returns the correct minimum detectable signal in dB for valid input values.
-  it('test_min_signal_with_valid_input', () => {
+  it.skip('test_min_signal_with_valid_input', () => {
     expect(RadarMath.minSignal(100000 as Watts, 10, 300 as Meters, 3000 as Meters, 450)).toMatchSnapshot();
   });
-});
 
-describe('minSignal_method', () => {
   // Tests that the method returns the correct minimum detectable signal in dB for valid input values.
   it('test_min_signal_valid_input', () => {
     const pW = 100 as Watts;

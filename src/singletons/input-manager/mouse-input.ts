@@ -424,10 +424,10 @@ export class MouseInput {
     const target = <HTMLElement>e.target;
     let targetId = target.id;
 
-    if (target.tagName == 'A') {
+    if (target.tagName === 'A') {
       targetId = (<HTMLElement>target.parentNode).id;
     }
-    if (target.tagName == 'UL') {
+    if (target.tagName === 'UL') {
       targetId = (<HTMLElement>target.firstChild).id;
     }
 

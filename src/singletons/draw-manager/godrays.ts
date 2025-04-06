@@ -41,7 +41,7 @@ export class Godrays {
    */
   renderBuffer: WebGLRenderbuffer;
 
-  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer) {
+  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
     if (!this.isLoaded_ || settingsManager.isDisableGodrays) {
       return;
     }
@@ -80,7 +80,7 @@ export class Godrays {
     gl.depthMask(true);
   }
 
-  async init(gl: WebGL2RenderingContext, sun: Sun): Promise<void> {
+  init(gl: WebGL2RenderingContext, sun: Sun): void {
     this.gl_ = gl;
     this.sun_ = sun;
 
@@ -102,15 +102,15 @@ export class Godrays {
     });
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
-        u_samples: settingsManager.godraysSamples ?? 32,
-        u_sunPosition: <WebGLUniformLocation>null,
-        u_sampler: <WebGLUniformLocation>null,
-        u_resolution: <WebGLUniformLocation>null,
-        u_decay: <WebGLUniformLocation>null,
-        u_exposure: <WebGLUniformLocation>null,
-        u_density: <WebGLUniformLocation>null,
-        u_weight: <WebGLUniformLocation>null,
-        u_illuminationDecay: <WebGLUniformLocation>null,
+        u_samples: <WebGLUniformLocation><unknown>null,
+        u_sunPosition: <WebGLUniformLocation><unknown>null,
+        u_sampler: <WebGLUniformLocation><unknown>null,
+        u_resolution: <WebGLUniformLocation><unknown>null,
+        u_decay: <WebGLUniformLocation><unknown>null,
+        u_exposure: <WebGLUniformLocation><unknown>null,
+        u_density: <WebGLUniformLocation><unknown>null,
+        u_weight: <WebGLUniformLocation><unknown>null,
+        u_illuminationDecay: <WebGLUniformLocation><unknown>null,
       },
       map: gl.createTexture(),
       textureType: 'flat',

@@ -74,8 +74,10 @@ export class BufferGeometry {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.combinedBuffer);
 
-    // eslint-disable-next-line guard-for-in
     for (const key in this.attributes) {
+      if (!Object.prototype.hasOwnProperty.call(this.attributes, key)) {
+        continue;
+      }
       const attribute = this.attributes[key];
 
       gl.enableVertexAttribArray(attribute.location);

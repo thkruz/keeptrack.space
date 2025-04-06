@@ -20,13 +20,13 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.watchlistPlugin_ = keepTrackApi.getPlugin(WatchlistPlugin);
+    this.watchlistPlugin_ = keepTrackApi.getPlugin(WatchlistPlugin)!;
   }
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   private readonly OVERLAY_CALC_LENGTH_IN_DAYS = 0.5;
-  private infoOverlayDOMHtmlStrArr = [];
+  private infoOverlayDOMHtmlStrArr = [] as string[];
   private lastSensorId: number;
   private lastSimTimeWhenCalc: number;
   private nextPassArray: SatPassTimes[] = [];
@@ -36,7 +36,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       return;
     }
 
-    if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0) {
+    if (keepTrackApi.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
       keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', ToastMsgType.caution);
       shake(getEl('menu-info-overlay'));
 
@@ -72,10 +72,10 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   isRequireSensorSelected = true;
 
   static uiManagerFinal() {
-    getEl('info-overlay-content').addEventListener('click', (evt: Event) => {
+    getEl('info-overlay-content')!.addEventListener('click', (evt: Event) => {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-      const sccNum = parseInt((<HTMLElement>evt.target).textContent.split(':')[0]);
+      const sccNum = parseInt((<HTMLElement>evt.target).textContent!.split(':')[0]);
       const id = catalogManagerInstance.sccNum2Id(sccNum);
 
       if (id !== null) {
@@ -153,6 +153,10 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     for (const obj of this.watchlistPlugin_.watchlistList) {
       const sat = catalogManagerInstance.getSat(obj.id);
 
+      if (!sat) {
+        continue;
+      }
+
       if (sensorManagerInstance.currentSensors.length > 1) {
         this.updateFovLinesMulti_(sat);
       } else {
@@ -186,7 +190,12 @@ export class WatchlistOverlay extends KeepTrackPlugin {
         const satArray: DetailedSatellite[] = [];
 
         for (const obj of this.watchlistPlugin_.watchlistList) {
-          satArray.push(catalogManagerInstance.getSat(obj.id, GetSatType.EXTRA_ONLY));
+          const satellite = catalogManagerInstance.getSat(obj.id, GetSatType.EXTRA_ONLY);
+
+          if (!satellite) {
+            continue;
+          }
+          satArray.push(satellite);
         }
 
         this.nextPassArray = SensorMath.nextpassList(satArray, sensorManagerInstance.currentSensors, 1, this.OVERLAY_CALC_LENGTH_IN_DAYS);
@@ -204,7 +213,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
   }
 
-  private pushOverlayElement_(s: number, propTime: any, infoOverlayDOMHtmlStrArr: string[]) {
+  private pushOverlayElement_(s: number, propTime: number, infoOverlayDOMHtmlStrArr: string[]) {
     const isSatInView = keepTrackApi.getDotsManager().inViewData[this.nextPassArray[s].sat.id];
     // If old time and not in view, skip it
 
@@ -253,10 +262,10 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       this.infoOverlayDOMHtmlStrArr = [];
       this.infoOverlayDOMHtmlStrArr.push('<div>');
       for (let s = 0; s < this.nextPassArray.length; s++) {
-        this.pushOverlayElement_(s, timeManagerInstance.simulationTimeObj, this.infoOverlayDOMHtmlStrArr);
+        this.pushOverlayElement_(s, timeManagerInstance.simulationTimeObj.getTime(), this.infoOverlayDOMHtmlStrArr);
       }
       this.infoOverlayDOMHtmlStrArr.push('</div>');
-      getEl('info-overlay-content').innerHTML = this.infoOverlayDOMHtmlStrArr.join('');
+      getEl('info-overlay-content')!.innerHTML = this.infoOverlayDOMHtmlStrArr.join('');
       this.lastOverlayUpdateTime = timeManagerInstance.realTime;
     }
   }

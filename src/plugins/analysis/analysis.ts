@@ -33,17 +33,18 @@ import { SatMath } from '@app/static/sat-math';
 
 import { getUnique } from '@app/lib/get-unique';
 import { saveCsv } from '@app/lib/saveVariable';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
 import folderCodePng from '@public/img/icons/folder-code.png';
-import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, SatelliteRecord, TAU } from 'ootk';
+import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
   protected dependencies_: [];
-  searchStrCache_: string = null;
+  closeObjectSearchStrCache_: string | null = null;
   menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
   bottomIconImg = folderCodePng;
   sideMenuElementName = 'analysis-menu';
@@ -265,15 +266,18 @@ export class AnalysisMenu extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,
       cbName: this.id,
-      cb: (sensor: DetailedSensor | string) => {
+      cb: (sensor) => {
+        if (!sensor) {
+          return;
+        }
         AnalysisMenu.setSensor_(sensor);
       },
     });
   }
 
   private findCloseObjects_() {
-    if (this.searchStrCache_) {
-      return this.searchStrCache_;
+    if (this.closeObjectSearchStrCache_) {
+      return this.closeObjectSearchStrCache_;
     }
     const searchRadius = 50; // km
 
@@ -304,13 +308,13 @@ export class AnalysisMenu extends KeepTrackPlugin {
     }
 
     // Dont need to do this math more than once
-    this.searchStrCache_ = searchStr;
+    this.closeObjectSearchStrCache_ = searchStr;
 
     return searchStr; // csoListUnique;
   }
 
   private static getActualCSOs_(csoListUnique: { sat1: DetailedSatellite; sat2: DetailedSatellite }[], searchRadius: number) {
-    const csoStrArr = []; // Clear CSO List
+    const csoStrArr = [] as string[]; // Clear CSO List
 
     // Loop through the possible CSOs
     for (const posCso of csoListUnique) {
@@ -370,7 +374,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   }
 
   private static getPossibleCSOs_(satList: DetailedSatellite[], searchRadius: number) {
-    const csoList = [];
+    const csoList = [] as { sat1: DetailedSatellite; sat2: DetailedSatellite }[]; // Clear CSO List
     // Loop through all the satellites with valid positions
 
     for (let i = 0; i < satList.length; i++) {
@@ -461,7 +465,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     let offset = 0;
 
     const satrec = keepTrackApi.getCatalogManager().calcSatrec(sat);
-    const lookanglesTable = []; // Iniially no rows to the table
+    const lookanglesTable = [] as lookanglesRow[]; // Clear Look Angles Table
 
     const looksInterval = 5;
     const looksLength = 7;
@@ -480,13 +484,13 @@ export class AnalysisMenu extends KeepTrackPlugin {
     let stop3 = false;
 
     const propagateBestPass_ = (now: Date, satrecIn: SatelliteRecord): lookanglesRow => {
-      const aer = SatMath.getRae(now, satrecIn, sensor);
+      const aer = SatMath.getRae(now, satrecIn, sensor) as unknown as RaeVec3;
       const isInFOV = SatMath.checkIsInView(sensor, aer);
 
       if (isInFOV) {
         // Previous Pass to Calculate first line of coverage
         const now1 = timeManagerInstance.getOffsetTimeObj(offset - looksInterval * 1000);
-        let aer1 = SatMath.getRae(now1, satrecIn, sensor);
+        let aer1 = SatMath.getRae(now1, satrecIn, sensor) as unknown as RaeVec3;
 
         let isInFOV1 = SatMath.checkIsInView(sensor, aer1);
 
@@ -505,7 +509,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
           // Next Pass to Calculate Last line of coverage
           const _now1 = timeManagerInstance.getOffsetTimeObj(offset + looksInterval * 1000);
 
-          aer1 = SatMath.getRae(_now1, satrecIn, sensor);
+          aer1 = SatMath.getRae(_now1, satrecIn, sensor) as unknown as RaeVec3;
 
           isInFOV1 = SatMath.checkIsInView(sensor, aer1);
           if (!isInFOV1) {
@@ -563,9 +567,9 @@ export class AnalysisMenu extends KeepTrackPlugin {
               PASS_SCORE: score.toFixed(1),
               START_DATE: sTime,
               START_TIME: sTime,
-              START_AZIMUTH: sAz,
-              START_ELEVATION: sEl,
-              START_RANGE: srng,
+              START_AZIMUTH: sAz!,
+              START_ELEVATION: sEl!,
+              START_RANGE: srng!,
               STOP_DATE: now,
               STOP_TIME: now,
               STOP_AZIMTUH: aer.az.toFixed(0),
@@ -653,13 +657,18 @@ export class AnalysisMenu extends KeepTrackPlugin {
           continue;
         }
         const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(satId));
+
+        if (!sat) {
+          continue;
+        }
         const satPasses = AnalysisMenu.findBestPass_(sat, [sensor]);
 
         for (const pass of satPasses) {
           passes.push(pass);
         }
       } catch (e) {
-        console.debug(e);
+        errorManagerInstance.debug(`Error finding best passes for ${satId}: ${e}`);
+
       }
     }
     passes.sort((a, b) => (b.START_DTG as number) - (a.START_DTG as number));
@@ -695,7 +704,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     if (!sensorManagerInstance.isSensorSelected()) {
       keepTrackApi.getUiManager().toast('You must select a sensor first!', ToastMsgType.critical);
     } else {
-      AnalysisMenu.findBestPasses_(sats, sensorManagerInstance.getSensor());
+      AnalysisMenu.findBestPasses_(sats, sensorManagerInstance.getSensor()!);
     }
   }
 
@@ -706,15 +715,33 @@ export class AnalysisMenu extends KeepTrackPlugin {
     const latMargin = parseFloat((<HTMLInputElement>getEl('analysis-of-lat-marg')).value);
     const lonMargin = parseFloat((<HTMLInputElement>getEl('analysis-of-lon-marg')).value);
 
+    const watchlistPlugin = keepTrackApi.getPlugin(WatchlistPlugin);
+
+    if (!watchlistPlugin) {
+      errorManagerInstance.warn('Watchlist plugin not found. Cannot find overflights.');
+
+      return;
+    }
+
     // Get watchlist satellites
-    const idList = keepTrackApi.getPlugin(WatchlistPlugin).getSatellites();
+    const idList = watchlistPlugin.getSatellites();
 
     // For each satellite loop through 72 hours at 30 second intervals
     const durationInSeconds = 72 * 60 * 60;
-    const overflights = [];
+    const overflights = [] as {
+      START_DTG: string;
+      SATELLITE_ID: string;
+      LATITUDE: number;
+      LONGITUDE: number;
+    }[];
 
     for (const satId of idList) {
       const sat = keepTrackApi.getCatalogManager().getSat(satId);
+
+      if (!sat) {
+        continue;
+      }
+
       let time = this.getStartTime_();
 
       for (let t = 0; t < durationInSeconds; t += 30) {

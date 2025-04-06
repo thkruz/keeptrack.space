@@ -1,6 +1,4 @@
 /* eslint-disable max-lines */
-/* eslint-disable complexity */
-/* eslint-disable max-statements */
 import { country2flagIcon } from '@app/catalogs/countries';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -140,6 +138,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateSelectBox,
       cbName: this.id,
+      // eslint-disable-next-line complexity, max-statements
       cb: (obj: BaseObject) => {
         if (!keepTrackApi.isInitialized) {
           return;
@@ -590,7 +589,15 @@ export class SatInfoBox extends KeepTrackPlugin {
   private nearOrbitsLink_() {
     keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const nearbyObjects = CatalogSearch.findObjsByOrbit(catalogManagerInstance.getSats(), catalogManagerInstance.getSat(this.selectSatManager_.selectedSat));
+    const selectedSatellite = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
+
+    if (!selectedSatellite) {
+      errorManagerInstance.warn('No satellite selected!');
+
+      return;
+    }
+
+    const nearbyObjects = CatalogSearch.findObjsByOrbit(catalogManagerInstance.getSats(), selectedSatellite);
     const searchStr = SearchManager.doArraySearch(catalogManagerInstance, nearbyObjects);
 
     keepTrackApi.getUiManager().searchManager.doSearch(searchStr, false);
@@ -599,12 +606,12 @@ export class SatInfoBox extends KeepTrackPlugin {
   private allObjectsLink_(): void {
     keepTrackApi.getSoundManager().play(SoundNames.CLICK);
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const selectedSatelliteData = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY);
 
-    if (this.selectSatManager_.selectedSat === -1) {
+    if (!selectedSatelliteData) {
       return;
     }
-    const intldes = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY).intlDes;
-    const searchStr = intldes.slice(0, 8);
+    const searchStr = selectedSatelliteData.intlDes.slice(0, 8);
 
     keepTrackApi.getUiManager().doSearch(searchStr);
     (<HTMLInputElement>getEl('search')).value = searchStr;
@@ -638,14 +645,14 @@ export class SatInfoBox extends KeepTrackPlugin {
 
   private updateOrbitData_(sat: DetailedSatellite): void {
     if (sat.isSatellite()) {
-      getEl('sat-apogee').innerHTML = `${sat.apogee.toFixed(0)} km`;
-      getEl('sat-perigee').innerHTML = `${sat.perigee.toFixed(0)} km`;
-      getEl('sat-inclination').innerHTML = `${sat.inclination.toFixed(2)}°`;
-      getEl('sat-eccentricity').innerHTML = sat.eccentricity.toFixed(3);
-      getEl('sat-raan').innerHTML = `${sat.rightAscension.toFixed(2)}°`;
-      getEl('sat-argPe').innerHTML = `${sat.argOfPerigee.toFixed(2)}°`;
+      getEl('sat-apogee')!.innerHTML = `${sat.apogee.toFixed(0)} km`;
+      getEl('sat-perigee')!.innerHTML = `${sat.perigee.toFixed(0)} km`;
+      getEl('sat-inclination')!.innerHTML = `${sat.inclination.toFixed(2)}°`;
+      getEl('sat-eccentricity')!.innerHTML = sat.eccentricity.toFixed(3);
+      getEl('sat-raan')!.innerHTML = `${sat.rightAscension.toFixed(2)}°`;
+      getEl('sat-argPe')!.innerHTML = `${sat.argOfPerigee.toFixed(2)}°`;
 
-      const periodDom = getEl('sat-period');
+      const periodDom = getEl('sat-period')!;
 
       periodDom.innerHTML = `${sat.period.toFixed(2)} min`;
       periodDom.dataset.position = 'top';
@@ -656,11 +663,9 @@ export class SatInfoBox extends KeepTrackPlugin {
       const daysold = sat.ageOfElset(now);
       const age = daysold >= 1 ? daysold : daysold * 24;
       const units = daysold >= 1 ? 'Days' : 'Hours';
-      const elsetAgeDom = getEl('sat-elset-age');
+      const elsetAgeDom = getEl('sat-elset-age')!;
 
-      if (elsetAgeDom) {
-        elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
-      }
+      elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
 
       SatInfoBox.updateConfidenceDom_(sat);
 
@@ -736,28 +741,28 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     const isHasAltName = (obj as DetailedSatellite)?.altName && (obj as DetailedSatellite).altName !== '';
 
-    getEl('sat-info-title-name').innerHTML = obj.name;
+    getEl('sat-info-title-name')!.innerHTML = obj.name;
 
     if (obj.isSatellite() && (obj as DetailedSatellite).sccNum5 === '25544') {
-      getEl('sat-infobox-fi').classList.value = 'fi fi-iss';
+      getEl('sat-infobox-fi')!.classList.value = 'fi fi-iss';
     } else {
-      getEl('sat-infobox-fi').classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
+      getEl('sat-infobox-fi')!.classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
     }
-    getEl('sat-alt-name').innerHTML = isHasAltName ? (obj as DetailedSatellite).altName : 'N/A';
+    getEl('sat-alt-name')!.innerHTML = isHasAltName ? (obj as DetailedSatellite).altName : 'N/A';
 
     const watchlistPlugin = keepTrackApi.getPlugin(WatchlistPlugin);
 
     if (watchlistPlugin) {
       if (watchlistPlugin.isOnWatchlist(obj.id)) {
-        getEl('sat-remove-watchlist').style.display = 'block';
-        getEl('sat-add-watchlist').style.display = 'none';
+        getEl('sat-remove-watchlist')!.style.display = 'block';
+        getEl('sat-add-watchlist')!.style.display = 'none';
       } else {
-        getEl('sat-add-watchlist').style.display = 'block';
-        getEl('sat-remove-watchlist').style.display = 'none';
+        getEl('sat-add-watchlist')!.style.display = 'block';
+        getEl('sat-remove-watchlist')!.style.display = 'none';
       }
     } else {
-      getEl('sat-add-watchlist').style.display = 'none';
-      getEl('sat-remove-watchlist').style.display = 'none';
+      getEl('sat-add-watchlist')!.style.display = 'none';
+      getEl('sat-remove-watchlist')!.style.display = 'none';
     }
 
     SatInfoBox.updateSatType_(obj);
@@ -769,26 +774,24 @@ export class SatInfoBox extends KeepTrackPlugin {
      */
 
     if (obj.isMissile()) {
-      getEl('sat-intl-des').innerHTML = 'N/A';
-      getEl('sat-objnum').innerHTML = 'N/A';
-      getEl('sat-altid').innerHTML = 'N/A';
-      getEl('sat-source').innerHTML = 'N/A';
+      getEl('sat-intl-des')!.innerHTML = 'N/A';
+      getEl('sat-objnum')!.innerHTML = 'N/A';
+      getEl('sat-altid')!.innerHTML = 'N/A';
+      getEl('sat-source')!.innerHTML = 'N/A';
     } else {
       const sat = obj as DetailedSatellite;
 
-      getEl('sat-intl-des').innerHTML = sat.intlDes === 'none' ? 'N/A' : sat.intlDes;
+      getEl('sat-intl-des')!.innerHTML = sat.intlDes === 'none' ? 'N/A' : sat.intlDes;
       if (sat.source && sat.source === CatalogSource.VIMPEL) {
-        getEl('sat-objnum').innerHTML = 'N/A';
-        getEl('sat-intl-des').innerHTML = 'N/A';
+        getEl('sat-objnum')!.innerHTML = 'N/A';
+        getEl('sat-intl-des')!.innerHTML = 'N/A';
       } else {
-        const satObjNumDom = getEl('sat-objnum');
-
-        satObjNumDom.innerHTML = sat.sccNum;
+        getEl('sat-objnum')!.innerHTML = sat.sccNum;
         // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
       }
 
-      getEl('sat-altid').innerHTML = sat.altId || 'N/A';
-      getEl('sat-source').innerHTML = sat.source || CatalogSource.CELESTRAK;
+      getEl('sat-altid')!.innerHTML = sat.altId || 'N/A';
+      getEl('sat-source')!.innerHTML = sat.source || CatalogSource.CELESTRAK;
       SatInfoBox.updateRcsData_(sat);
     }
   }
@@ -810,7 +813,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     const sat = satMisl as DetailedSatellite;
 
-    getEl('sat-configuration').innerHTML = sat.configuration !== '' ? sat.configuration : 'Unknown';
+    getEl('sat-configuration')!.innerHTML = sat.configuration !== '' ? sat.configuration : 'Unknown';
   }
 
   private static updateLaunchVehicleCorrelationTable_(obj: BaseObject) {
@@ -1219,22 +1222,24 @@ export class SatInfoBox extends KeepTrackPlugin {
       });
 
       draggie.on('dragStart', () => {
-        getEl(SatInfoBox.containerId_).style.height = 'fit-content';
-        getEl(SatInfoBox.containerId_).style.maxHeight = '80%';
-        document.documentElement.style.setProperty('--search-box-bottom', '0px');
-        getEl(SatInfoBox.containerId_).classList.remove('satinfo-fixed');
+        const satInfoBoxElement = getEl(SatInfoBox.containerId_)!;
 
-        getEl('search-results').style.maxHeight = '80%';
+        satInfoBoxElement.style.height = 'fit-content';
+        satInfoBoxElement.style.maxHeight = '80%';
+        document.documentElement.style.setProperty('--search-box-bottom', '0px');
+        satInfoBoxElement.classList.remove('satinfo-fixed');
+
+        getEl('search-results')!.style.maxHeight = '80%';
       });
     }
 
     // If right click kill and reinit
-    const satInfobox = getEl(SatInfoBox.containerId_);
+    const satInfobox = getEl(SatInfoBox.containerId_)!;
 
-    satInfobox.addEventListener('mousedown', (e: any) => {
+    satInfobox.addEventListener('mousedown', (e: MouseEvent) => {
       if (e.button === 2) {
         SatInfoBox.resetMenuLocation(satInfobox);
-        getEl('search-results').style.maxHeight = '';
+        getEl('search-results')!.style.maxHeight = '';
       }
     });
   }
@@ -1388,6 +1393,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
+  // eslint-disable-next-line complexity
   private static updateSatMissionData_(obj?: BaseObject) {
     if (obj === null || typeof obj === 'undefined') {
       return;
@@ -1399,13 +1405,13 @@ export class SatInfoBox extends KeepTrackPlugin {
       keepTrackApi.containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
         (<HTMLElement>el).style.display = 'flex';
       });
-      let satUserDom = getEl('sat-user');
+      let satUserDom = getEl('sat-user')!;
       const satUserString = StringExtractor.extractUserUrl(sat?.owner); // Replace with link if available
 
       satUserDom.innerHTML = satUserString;
       const tempEl = satUserDom.cloneNode(true);
 
-      satUserDom.parentNode.replaceChild(tempEl, satUserDom);
+      satUserDom.parentNode!.replaceChild(tempEl, satUserDom);
       satUserDom = tempEl as HTMLElement;
 
       if (satUserString.includes('http')) {
@@ -1730,14 +1736,21 @@ export class SatInfoBox extends KeepTrackPlugin {
     let sunTime: SunTime;
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const now = new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.propOffset);
+    let now = new Date(timeManagerInstance.simulationTimeObj.getTime());
 
     try {
       sunTime = Sun.getTimes(now, sensorManagerInstance.currentSensors[0].lat, sensorManagerInstance.currentSensors[0].lon);
       satInSun = SatMath.calculateIsInSun(obj, keepTrackApi.getScene().sun.eci);
     } catch {
+      sunTime = {
+        sunriseStart: new Date(2050),
+        sunsetEnd: new Date(1970),
+      } as SunTime;
       satInSun = SunStatus.UNKNOWN;
     }
+
+    // Reset the time to the current simulation time
+    now = new Date(timeManagerInstance.simulationTimeObj.getTime());
 
     // If No Sensor, then Ignore Sun Exclusion
     const satSunDom = getEl('sat-sun');
@@ -1754,30 +1767,38 @@ export class SatInfoBox extends KeepTrackPlugin {
       // If Radar Selected, then Say the Sun Doesn't Matter
       if (sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OPTICAL && sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OBSERVER) {
         satSunDom.innerHTML = 'No Effect';
+        satSunDom.style.color = 'green';
 
         return;
       }
 
       // If we are in the sun exclusion zone, then say so
-      if (sunTime?.sunriseStart.getTime() - now.getTime() < 0 || (sunTime?.sunsetEnd.getTime() - now.getTime() > 0)) {
+      if (sunTime?.sunriseStart.getTime() - now.getTime() < 0 && (sunTime?.sunsetEnd.getTime() - now.getTime() > 0)) {
         // Unless you are in sun exclusion
         satSunDom.innerHTML = 'Sun Exclusion';
+        satSunDom.style.color = 'red';
+
+        return;
       }
 
       // If it is night then tell the user if the satellite is illuminated
       switch (satInSun) {
         case SunStatus.UMBRAL:
           satSunDom.innerHTML = 'No Sunlight';
+          satSunDom.style.color = 'red';
           break;
         case SunStatus.PENUMBRAL:
           satSunDom.innerHTML = 'Limited Sunlight';
+          satSunDom.style.color = 'orange';
           break;
         case SunStatus.SUN:
           satSunDom.innerHTML = 'Direct Sunlight';
+          satSunDom.style.color = 'green';
           break;
         case SunStatus.UNKNOWN:
         default:
           satSunDom.innerHTML = 'Unable to Calculate';
+          satSunDom.style.color = 'red';
           break;
       }
     }

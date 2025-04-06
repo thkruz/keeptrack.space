@@ -1,5 +1,6 @@
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, Sgp4, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { SatMath } from '../static/sat-math';
+import { errorManagerInstance } from './errorManager';
 
 enum PropagationResults {
   Near = 0,
@@ -58,7 +59,16 @@ export class OrbitFinder {
   }
 
   private getCurrentOrbitParams(): OrbitParameters {
+    if (!this.sat?.satrec) {
+      throw new Error('Satellite data is not available');
+    }
+
     const { m, gmst } = SatMath.calculateTimeVariables(this.now, this.sat.satrec);
+
+    if (!m) {
+      throw new Error('Invalid time variables');
+    }
+
     const positionEci = <EciVec3>Sgp4.propagate(this.sat.satrec, m).position;
     const { lat, lon, alt } = eci2lla(positionEci, gmst);
 
@@ -74,7 +84,7 @@ export class OrbitFinder {
 
   private determineDirection(newLat: number): 'N' | 'S' | null {
     if (this.lastLatitude === null) {
-      console.error(`Initial latitude: ${newLat}`);
+      errorManagerInstance.log(`Initial latitude: ${newLat}`);
       this.lastLatitude = newLat;
 
       return null;
@@ -86,17 +96,17 @@ export class OrbitFinder {
 
     const direction = newLat > this.lastLatitude ? 'N' : 'S';
 
-    console.warn(`Current latitude: ${this.lastLatitude} - New latitude: ${newLat} - Direction: ${direction}`);
+    errorManagerInstance.log(`Current latitude: ${this.lastLatitude} - New latitude: ${newLat} - Direction: ${direction}`);
 
     this.lastLatitude = newLat;
 
-    console.warn(`New direction: ${direction}`);
+    errorManagerInstance.log(`New direction: ${direction}`);
 
     return direction;
   }
 
   private isCorrectDirection(): boolean {
-    console.log(`Current direction: ${this.currentDirection} - Goal direction: ${this.goalDirection}`);
+    errorManagerInstance.log(`Current direction: ${this.currentDirection} - Goal direction: ${this.goalDirection}`);
 
     return this.currentDirection === this.goalDirection;
   }
@@ -114,6 +124,10 @@ export class OrbitFinder {
 
     // Update current parameters and check direction
     const { m, gmst } = SatMath.calculateTimeVariables(this.now, satrec);
+
+    if (!m) {
+      throw new Error('Invalid time variables');
+    }
     const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
     const { lat, lon, alt } = eci2lla(positionEci, gmst);
 
@@ -179,6 +193,10 @@ export class OrbitFinder {
     }
 
     const { m, gmst } = SatMath.calculateTimeVariables(now, satrec);
+
+    if (!m) {
+      return PropagationResults.Error;
+    }
     const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
     const { lat } = eci2lla(positionEci, gmst);
 
@@ -268,7 +286,7 @@ export class OrbitFinder {
           this.goalParams.longitude,
         );
       case 'argOfPerigee':
-        console.warn(`Current altitude: ${this.currentParams.altitude} - Goal altitude: ${this.goalParams.altitude}`);
+        errorManagerInstance.info(`Current altitude: ${this.currentParams.altitude} - Goal altitude: ${this.goalParams.altitude}`);
 
         return this.currentParams.altitude - this.goalParams.altitude;
       default:
@@ -290,6 +308,10 @@ export class OrbitFinder {
 
     // Update current parameters without direction check
     const { m, gmst } = SatMath.calculateTimeVariables(this.now, satrec);
+
+    if (!m) {
+      throw new Error('Invalid time variables');
+    }
     const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
     const { lat, lon, alt } = eci2lla(positionEci, gmst);
 
@@ -309,13 +331,13 @@ export class OrbitFinder {
         // 1. Find original perigee position
         const perigeeParams = this.findPerigeePosition();
 
-        console.log('Original perigee position:', perigeeParams);
+        errorManagerInstance.log(`Original perigee position: ${perigeeParams.latitude} - ${perigeeParams.longitude} - ${perigeeParams.altitude}`);
 
         // 2. Move new satellite to perigee without direction check
         this.updateOrbitWithoutDirectionCheck({
           meanAnomaly: 0,
         });
-        console.log('Positioned at initial perigee:', this.currentParams);
+        errorManagerInstance.log(`Positioned at initial perigee: ${this.currentParams.latitude} - ${this.currentParams.longitude} - ${this.currentParams.altitude}`);
 
         // 3. Rotate argument of perigee to match original latitude
         let bestArgPerigee = this.currentParams.argOfPerigee;
@@ -333,7 +355,7 @@ export class OrbitFinder {
           if (latError < bestLatError) {
             bestLatError = latError;
             bestArgPerigee = argPer;
-            console.log(`New best arg perigee: ${argPer} with lat error ${latError}`);
+            errorManagerInstance.log(`New best arg perigee: ${argPer} with lat error ${latError}`);
           }
 
           if (latError <= OrbitFinder.MAX_LAT_ERROR) {
@@ -347,7 +369,7 @@ export class OrbitFinder {
           argOfPerigee: bestArgPerigee,
         });
 
-        console.log('After arg perigee adjustment:', this.currentParams);
+        errorManagerInstance.log(`After arg perigee adjustment: ${this.currentParams.latitude} - ${this.currentParams.longitude} - ${this.currentParams.altitude}`);
 
         // 4. Now find the correct mean anomaly for target position
         this.lastLatitude = null;
@@ -376,8 +398,8 @@ export class OrbitFinder {
         }
 
         // Verify final position
-        console.log('Final position:', this.currentParams);
-        console.log(`Target altitude: ${this.goalParams.altitude}, Current altitude: ${this.currentParams.altitude}`);
+        errorManagerInstance.log(`Final position: ${this.currentParams.latitude}, ${this.currentParams.longitude}, ${this.currentParams.altitude}`);
+        errorManagerInstance.log(`Target altitude: ${this.goalParams.altitude}, Current altitude: ${this.currentParams.altitude}`);
 
       } else {
         // Original logic for circular orbits
@@ -415,7 +437,7 @@ export class OrbitFinder {
       ];
 
     } catch (error) {
-      console.error('Error in rotateOrbitToLatLon:', error);
+      errorManagerInstance.log(`Error in rotateOrbitToLatLon: ${error.message}`);
 
       return ['Error', error.message];
     }
@@ -436,6 +458,10 @@ export class OrbitFinder {
       }
 
       const { m, gmst } = SatMath.calculateTimeVariables(this.now, satrec);
+
+      if (!m) {
+        throw new Error('Invalid time variables');
+      }
       const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
       const { lat, lon, alt } = eci2lla(positionEci, gmst);
 
@@ -456,7 +482,7 @@ export class OrbitFinder {
       throw new Error('Failed to find perigee position');
     }
 
-    console.log(`Found perigee at altitude ${perigeeParams.altitude} km`);
+    errorManagerInstance.log(`Found perigee at altitude ${perigeeParams.altitude} km`);
 
     return perigeeParams;
   }

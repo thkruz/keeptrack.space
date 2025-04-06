@@ -4,9 +4,16 @@
 export type ClassificationString = '' | 'Unclassified' | 'CUI' | 'Confidential' | 'Secret' | 'Top Secret' | 'Top Secret//SCI';
 
 export class Classification {
-  static getColors(classification: ClassificationString) {
+  static getColors(classification: ClassificationString | null) {
     let backgroundColor: string;
     let color: string;
+
+    if (!classification) {
+      return {
+        backgroundColor: '#ffffff',
+        color: '#000000',
+      };
+    }
 
     if (classification.startsWith('Top Secret//SCI')) {
       backgroundColor = '#fce93a';

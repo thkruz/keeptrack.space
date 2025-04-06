@@ -5,7 +5,8 @@ import { clickAndDragHeight, clickAndDragWidth } from './../src/lib/click-and-dr
  *Code Analysis
  *
  *Objective:
- *The objective of the clickAndDragWidth function is to add click and drag functionality to resize an HTML element horizontally by creating a new element on the right edge of the given element and updating its width on mouse movement.
+ *The objective of the clickAndDragWidth function is to add click and drag functionality to resize an HTML element horizontally by creating a new element on the right edge of the
+ *given element and updating its width on mouse movement.
  *
  *Inputs:
  *- el: the HTML element to be resized
@@ -30,7 +31,7 @@ import { clickAndDragHeight, clickAndDragWidth } from './../src/lib/click-and-dr
 
 describe('clickAndDragWidth_function', () => {
   // Mock requestAnimationFrame
-  global.requestAnimationFrame = (callback: any) => {
+  global.requestAnimationFrame = (callback: FrameRequestCallback) => {
     setTimeout(callback, 0);
 
     return 16;
@@ -89,7 +90,10 @@ describe('clickAndDragWidth_function', () => {
     expect(el.style.width).toBe('500px');
   });
 
-  // Tests that the function sets the width to the minWidth if the calculated width is less than the minWidth, and sets the width to the maxWidth if the calculated width is greater than the maxWidth
+  /*
+   * Tests that the function sets the width to the minWidth if the calculated width is less than the minWidth, and sets the width to the maxWidth if the calculated width is greater
+   *  than the maxWidth
+   */
   it('test_width_bounds', () => {
     const el = document.createElement('div');
 
@@ -114,7 +118,8 @@ describe('clickAndDragWidth_function', () => {
  *Code Analysis
  *
  *Objective:
- *The objective of the 'clickAndDragHeight' function is to create a new element on the right edge of the given HTML element, which can be clicked and dragged to adjust the height of the given element. The function also allows for setting a maximum height and a callback function to be executed when the height is changed.
+ *The objective of the 'clickAndDragHeight' function is to create a new element on the right edge of the given HTML element, which can be clicked and dragged to adjust the height
+ *of the given element. The function also allows for setting a maximum height and a callback function to be executed when the height is changed.
  *
  *Inputs:
  *- el: the HTML element to adjust the height of
@@ -131,7 +136,8 @@ describe('clickAndDragWidth_function', () => {
  *- None (the function does not return anything)
  *
  *Additional aspects:
- *- The 'addEventsHeight_' function is called within the 'clickAndDragHeight' function to add event listeners to the new element and adjust the height of the given HTML element accordingly
+ *- The 'addEventsHeight_' function is called within the 'clickAndDragHeight' function to add event listeners to the new element and adjust the height of the given HTML element
+ *  accordingly
  *- The 'createElHeight_' function is used to create the new element on the right edge of the given HTML element
  *- The 'settingsManager' variable is not defined within the given code and may be defined elsewhere in the program
  */
@@ -142,7 +148,7 @@ describe('clickAndDragHeight_function', () => {
     const el = document.createElement('div');
 
     clickAndDragHeight(el);
-    expect(el.children.length).toBe(1);
+    expect(el.children).toHaveLength(1);
     expect(el.children[0].tagName).toBe('DIV');
   });
 

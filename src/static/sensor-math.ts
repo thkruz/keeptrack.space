@@ -279,6 +279,12 @@ export class SensorMath {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
+    if (!sat.satrec) {
+      errorManagerInstance.debug('No satellite record');
+
+      return;
+    }
+
     sensors = sensorManagerInstance.verifySensors(sensors);
     // TOOD: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
     const sensor = sensors[0];
@@ -293,12 +299,11 @@ export class SensorMath {
       offset = i * 1000; // Offset in seconds (msec * 1000)
       const now = timeManagerInstance.getOffsetTimeObj(offset);
       const { m, j, gmst } = SatMath.calculateTimeVariables(now, sat.satrec);
-
       const [sunX, sunY, sunZ] = SatMath.getSunDirection(j);
-      const eci = <EciVec3>Sgp4.propagate(sat.satrec, m).position;
+      const eci = <EciVec3>Sgp4.propagate(sat.satrec, m!).position;
 
       if (!eci) {
-        console.debug('No ECI position for', sat.name, 'at', now);
+        errorManagerInstance.debug(`No ECI position for ${sat.satrec?.satnum} at ${now}`);
         continue;
       }
 

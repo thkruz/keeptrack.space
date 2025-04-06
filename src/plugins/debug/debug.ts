@@ -8,6 +8,7 @@ import debugPng from '@public/img/icons/debug.png';
 
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -16,7 +17,7 @@ import { SoundNames } from '../sounds/SoundNames';
 
 export class DebugMenuPlugin extends KeepTrackPlugin {
   readonly id = 'DebugMenuPlugin';
-  dependencies_ = [];
+  dependencies_ = [SelectSatManager.name];
   isErudaVisible = false;
 
   menuMode: MenuMode[] = [MenuMode.ALL];
@@ -164,7 +165,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           return;
         }
         const camera = keepTrackApi.getMainCamera();
-        const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+        const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
 
         if (camera && selectSatManagerInstance) {
           const selectedSat = selectSatManagerInstance.selectedSat;
@@ -182,7 +183,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           const sat = keepTrackApi.getCatalogManager().getObject(selectSatManagerInstance.selectedSat);
 
           if (!sat) {
-            console.warn('Satellite not found');
+            errorManagerInstance.warn('Satellite not found');
 
             return;
           }
@@ -242,7 +243,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   }
 
   private static canClick_(element: { parentElement: { className: string } }) {
-    if (typeof element.parentElement === 'undefined' || element.parentElement == null) {
+    if (typeof element.parentElement === 'undefined' || element.parentElement === null) {
       return null;
     }
 

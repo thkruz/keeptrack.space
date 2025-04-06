@@ -10,6 +10,7 @@ import { slideInDown, slideOutUp } from '../lib/slide';
 import { TopMenu } from '../plugins/top-menu/top-menu';
 import { UrlManager } from '../static/url-manager';
 import { MissileObject } from './catalog-manager/MissileObject';
+import { errorManagerInstance } from './errorManager';
 import type { UiManager } from './uiManager';
 
 export interface SearchResult {
@@ -38,7 +39,7 @@ export enum SearchResultType {
 export class SearchManager {
   isSearchOpen = false;
   isResultsOpen = false;
-  private lastResultGroup_ = <ObjectGroup>null;
+  private lastResultGroup_: ObjectGroup<GroupType> | null = null;
   private uiManager_: UiManager;
 
   constructor(uiManager: UiManager) {
@@ -47,7 +48,7 @@ export class SearchManager {
     const searchResults = document.createElement('div');
 
     searchResults.id = TopMenu.SEARCH_RESULT_ID;
-    uiWrapper.prepend(searchResults);
+    uiWrapper!.prepend(searchResults);
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
@@ -125,7 +126,7 @@ export class SearchManager {
   /**
    * Returns a boolean indicating whether the search results box is currently open.
    */
-  getLastResultGroup(): ObjectGroup {
+  getLastResultGroup(): ObjectGroup<GroupType> | null {
     return this.lastResultGroup_;
   }
 
@@ -155,7 +156,7 @@ export class SearchManager {
       const groupManagerInstance = keepTrackApi.getGroupsManager();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-      slideOutUp(getEl('search-results'), 1000);
+      slideOutUp(getEl('search-results')!, 1000);
       groupManagerInstance.clearSelect();
       this.isResultsOpen = false;
 
@@ -166,16 +167,21 @@ export class SearchManager {
       colorSchemeManagerInstance.isUseGroupColorScheme = false;
       colorSchemeManagerInstance.calculateColorBuffers(true);
     } catch (error) {
-      console.warn(error);
+      errorManagerInstance.log(error);
     }
   }
 
   static doArraySearch(catalogManagerInstance: CatalogManager, array: number[]) {
-    return array.reduce((searchStr, i) => `${searchStr}${(<DetailedSatellite>catalogManagerInstance.objectCache[i])?.sccNum},`, '').slice(0, -1);
+    return array.reduce((searchStr, i) => {
+      const detailedSatellite = <DetailedSatellite>catalogManagerInstance.objectCache[i];
+
+      // Use the sccNum unless it is missing (Vimpel), then use name
+      return detailedSatellite?.sccNum.length > 0 ? `${searchStr}${detailedSatellite.sccNum},` : `${searchStr}${detailedSatellite.name},`;
+    }, '').slice(0, -1);
   }
 
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
-    if (searchString == '') {
+    if (searchString === '') {
       this.hideResults();
 
       return;
@@ -301,7 +307,8 @@ export class SearchManager {
           return true;
         } // Skip non satellites and missiles
 
-        if (sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel')) {
+        // TODO: Vimpel additions may slow things down - perhaps make it a setting?
+        if ((sat.name.toUpperCase().indexOf(searchStringIn) !== -1 && !sat.name.includes('Vimpel'))) { // || sat.name.toUpperCase() === searchStringIn) {
           results.push({
             strIndex: sat.name.indexOf(searchStringIn),
             searchType: SearchResultType.OBJECT_NAME,
@@ -508,7 +515,7 @@ export class SearchManager {
 
     const satData = catalogManagerInstance.objectCache;
 
-    getEl('search-results').innerHTML = results.reduce((html, result) => {
+    getEl('search-results')!.innerHTML = results.reduce((html, result) => {
       const obj = <DetailedSatellite | MissileObject>satData[result.id];
 
       html += `<div class="search-result" data-obj-id="${obj.id}">`;
@@ -637,7 +644,7 @@ export class SearchManager {
       SatInfoBox.resetMenuLocation(satInfoboxDom, false);
     }
 
-    slideInDown(getEl('search-results'), 1000);
+    slideInDown(getEl('search-results')!, 1000);
     this.isResultsOpen = true;
 
     colorSchemeManagerInstance.isUseGroupColorScheme = true;

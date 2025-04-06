@@ -34,7 +34,6 @@ export abstract class LegendManager {
     const addonLegends = {};
     const addonlegendClassList = [] as string[];
 
-    // eslint-disable-next-line guard-for-in
     for (const ColorSchemeClass of ColorSchemeManager.addonColorSchemes) {
       addonLegends[ColorSchemeClass.id] = ColorSchemeClass.legendHtml;
 

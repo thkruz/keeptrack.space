@@ -31,7 +31,6 @@ export class WebGLRenderer {
 
   /** A canvas where the renderer draws its output. */
   domElement: HTMLCanvasElement;
-  demoModeSatellite: any;
   /**
    * The number of milliseconds since the last draw event
    *
@@ -134,7 +133,7 @@ export class WebGLRenderer {
   // eslint-disable-next-line require-await
   async glInit(): Promise<WebGL2RenderingContext> {
     // Ensure the canvas is available
-    this.domElement ??= isThisNode() ? <HTMLCanvasElement>(<any>document).canvas : <HTMLCanvasElement>getEl('keeptrack-canvas');
+    this.domElement = <HTMLCanvasElement>getEl('keeptrack-canvas');
 
     if (!this.domElement) {
       throw new Error('The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.');
@@ -228,7 +227,8 @@ export class WebGLRenderer {
    * - If the camera type is planetarium, the method iterates over the orbital satellites in the catalog and adds their orbits and labels.
    * - If the camera type is not planetarium, the method iterates over the satellites in the watchlist and adds their labels.
    * - The method updates the flag indicating that the satellite mini boxes are in use and records the current time as the last label update time.
-   * - If the camera type is not astronomy, planetarium, or there are no satellites in the watchlist in view, the method resets the sensor position and the flag to draw orbits above.
+   * - If the camera type is not astronomy, planetarium, or there are no satellites in the watchlist in view, the method resets the sensor position and the flag to draw orbits
+   *   above.
    * - If the satellite label mode is off or the camera type is not planetarium and there are no satellites in the watchlist in view,
    *   the method clears the satellite mini boxes and returns.
    */
@@ -574,7 +574,7 @@ export class WebGLRenderer {
 
     // If this.selectedSat_.selectedSat has changed then select it
     if (this.selectSatManager_?.selectedSat !== this.selectSatManager_?.lastSelectedSat()) {
-      console.error('selectedSat has changed');
+      errorManagerInstance.debug('selectedSat has changed');
       // this.selectSatManager_.selectSat(this.selectSatManager_?.selectedSat);
     }
 
@@ -692,13 +692,13 @@ export class WebGLRenderer {
 
   private validateProjectionMatrix_() {
     if (!this.projectionMatrix) {
-      console.error('projectionMatrix is undefined - retrying');
+      errorManagerInstance.log('projectionMatrix is undefined - retrying');
       this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
     }
 
     for (let i = 0; i < 16; i++) {
       if (isNaN(this.projectionMatrix[i])) {
-        console.error('projectionMatrix is NaN - retrying');
+        errorManagerInstance.log('projectionMatrix is NaN - retrying');
         this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
       }
     }
@@ -708,76 +708,9 @@ export class WebGLRenderer {
         break;
       }
       if (i === 15) {
-        console.error('projectionMatrix is all zeros - retrying');
+        errorManagerInstance.log('projectionMatrix is all zeros - retrying');
         this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
       }
     }
   }
 }
-
-/*
- * DEBUG: Kept for future use
- * export const checkIfPostProcessingRequired = (postProcessingManagerOverride?) => {
- *   if (postProcessingManagerOverride) drawManager.postProcessingManager = postProcessingManagerOverride;
- */
-
-/*
- *   // if (keepTrackApi.getMainCamera().camPitchAccel > 0.0002 || keepTrackApi.getMainCamera().camPitchAccel < -0.0002 || keepTrackApi.getMainCamera().camYawAccel > 0.0002 || keepTrackApi.getMainCamera().camYawAccel < -0.0002) {
- *   //   // drawManager.gaussianAmt += this.dt * 2;
- *   //   // drawManager.gaussianAmt = Math.min(500, Math.max(drawManager.gaussianAmt, 0));
- *   //   drawManager.gaussianAmt = 500;
- *   // }
- */
-
-/*
- * DEBUG: Kept for future use
- *   // if (drawManager.gaussianAmt > 0) {
- *   //   drawManager.gaussianAmt -= this.dt * 2;
- *   //   drawManager.isNeedPostProcessing = true;
- *   drawManager.postProcessingManager.isGaussianNeeded = false;
- *   // } else {
- *   //   drawManager.postProcessingManager.isGaussianNeeded = false;
- *   // }
- */
-
-/*
- * DEBUG: Kept for future use
- *   // Slight Blur
- *   drawManager.postProcessingManager.isFxaaNeeded = false;
- *   // Horrible Results
- *   drawManager.postProcessingManager.isSmaaNeeded = false;
- */
-
-/*
- * DEBUG: Kept for future use
- *   if (drawManager.postProcessingManager.isGaussianNeeded) {
- *     drawManager.isNeedPostProcessing = true;
- *     drawManager.postProcessingManager.switchFrameBuffer();
- *     return;
- *   }
- */
-
-/*
- * DEBUG: Kept for future use
- *   if (drawManager.postProcessingManager.isFxaaNeeded) {
- *     drawManager.isNeedPostProcessing = true;
- *     drawManager.postProcessingManager.switchFrameBuffer();
- *     return;
- *   }
- */
-
-/*
- * DEBUG: Kept for future use
- *   if (drawManager.postProcessingManager.isSmaaNeeded) {
- *     drawManager.isNeedPostProcessing = true;
- *     drawManager.postProcessingManager.switchFrameBuffer();
- *     return;
- *   }
- */
-
-/*
- * DEBUG: Kept for future use
- *   // drawManager.postProcessingManager.switchFrameBuffer();
- *   drawManager.isNeedPostProcessing = false;
- * };
- */

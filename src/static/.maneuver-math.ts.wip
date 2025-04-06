@@ -18,7 +18,7 @@ export abstract class ManueverMath {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    if (sensorManagerInstance.currentSensors?.length == 0) throw new Error('No sensors selected');
+    if (sensorManagerInstance.currentSensors?.length === 0) throw new Error('No sensors selected');
 
     // TODO This needs rewrote from scratch to bypass the satcruncher
     var mainsat = catalogManagerInstance.getSat(satId);

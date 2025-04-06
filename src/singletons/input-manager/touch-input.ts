@@ -44,7 +44,6 @@ export class TouchInput {
   maxPinchSize = Math.hypot(window.innerWidth, window.innerHeight);
   dragHasMoved: boolean;
   isPanning: boolean;
-  mouseTimeout: any;
   touchX: number;
   touchY: number;
   touchStartX: number;

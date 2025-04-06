@@ -47,9 +47,15 @@ export abstract class GlUtils {
   /**
    * Assigns uniforms to a uniform object.
    */
-  public static assignUniforms(uniforms: any, gl: WebGL2RenderingContext, program: WebGLProgram, uniformsList: string[]): void {
+  public static assignUniforms(uniforms: Record<string, WebGLUniformLocation>, gl: WebGL2RenderingContext, program: WebGLProgram, uniformsList: string[]): void {
     uniformsList.forEach((uniform) => {
-      uniforms[uniform] = gl.getUniformLocation(program, uniform);
+      const uniformLocation = gl.getUniformLocation(program, uniform);
+
+      if (!uniformLocation) {
+        throw new Error(`Uniform ${uniform} not found in program ${program}`);
+      }
+
+      uniforms[uniform] = uniformLocation as WebGLUniformLocation;
     });
   }
 
@@ -98,8 +104,7 @@ export abstract class GlUtils {
   /**
    * Binds an image to a texture.
    */
-  // eslint-disable-next-line require-await
-  public static async bindImageToTexture(gl: WebGL2RenderingContext, texture: WebGLTexture, img: HTMLImageElement): Promise<void> {
+  public static bindImageToTexture(gl: WebGL2RenderingContext, texture: WebGLTexture, img: HTMLImageElement): void {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
 
@@ -111,7 +116,9 @@ export abstract class GlUtils {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
       gl.generateMipmap(gl.TEXTURE_2D);
     } else {
+      // eslint-disable-next-line no-console
       console.warn(`Texture ${img.src} is not power of 2!`);
+
       // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -214,8 +221,8 @@ export abstract class GlUtils {
   }
 
   static createRadarDomeVertices(minRange: number, maxRange: number, minEl: number, maxEl: number, minAz: number, maxAz: number) {
-    const combinedArray = [];
-    const indices = [];
+    const combinedArray = [] as number[];
+    const indices = [] as number[];
     const elevationExtent = maxEl - minEl;
     let azimuthExtent = maxAz - minAz;
 
@@ -315,7 +322,7 @@ export abstract class GlUtils {
    */
   public static createSphere(radius: number, latBands: number, longBands: number, isSkipTexture = false): { combinedArray: number[]; vertIndex: number[] } {
     // generate a uvsphere bottom up, CCW order
-    const combinedArray = [];
+    const combinedArray = [] as number[];
 
     for (let lat = 0; lat <= latBands; lat++) {
       const latAngle = (Math.PI / latBands) * lat - Math.PI / 2;
@@ -354,7 +361,7 @@ export abstract class GlUtils {
     }
 
     // ok let's calculate vertex draw orders.... indiv triangles
-    const vertIndex = [];
+    const vertIndex = [] as number[];
 
     for (let lat = 0; lat < latBands; lat++) {
       // this is for each QUAD, not each vertex, so <
@@ -469,7 +476,7 @@ export abstract class GlUtils {
       20, 21, 22, 20, 22, 23,
     ];
 
-    const combinedArray = [];
+    const combinedArray = [] as number[];
 
     for (let i = 0; i < vertices.length; i += 3) {
       combinedArray.push(vertices[i], vertices[i + 1], vertices[i + 2]);
@@ -490,7 +497,7 @@ export abstract class GlUtils {
     const normals = this.calculateNormals(vertices, indices);
 
     // Combine arrays
-    const combinedArray = [];
+    const combinedArray = [] as number[];
 
     for (let i = 0; i < vertices.length; i += 3) {
       combinedArray.push(vertices[i], vertices[i + 1], vertices[i + 2]);
@@ -508,7 +515,7 @@ export abstract class GlUtils {
       acc.push(cur.x, cur.y, cur.z);
 
       return acc;
-    }, []);
+    }, [] as number[]);
   }
 
   public static subtract(a: number[], b: number[]): number[] {

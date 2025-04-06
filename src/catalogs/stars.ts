@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 export const stars = [
   { name: 'Sirius', ra: 6.752481, dec: -16.716116, vmag: -1.44 },
   { name: 'Canopus', ra: 6.399195, dec: -52.69566, vmag: -0.63 },

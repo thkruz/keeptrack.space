@@ -586,9 +586,7 @@ export const sensors = <SensorList>{
     country: 'Australia',
     operator: Operators.RAAF,
   }),
-  // //////////////
   // TPY-2 RADARS
-  // //////////////
   HARTPY: new DetailedSensor({
     objName: 'HARTPY',
     id: 0,
@@ -731,9 +729,7 @@ export const sensors = <SensorList>{
     country: 'United States',
     operator: Operators.USA,
   }),
-  // //////////////////////
   // LEO LABS
-  // //////////////////////
   LEOMSR: new DetailedSensor({
     objName: 'LEOMSR',
     id: 0,
@@ -923,9 +919,7 @@ export const sensors = <SensorList>{
   }),
   // LEO LABS ARSR on hold as of 2023-11-12 due to national security concerns from Argentina
 
-  // //////////////////////
   // ESOC RADARS
-  // //////////////////////
   GRV: new DetailedSensor({
     objName: 'GRV',
     id: 0,
@@ -1227,9 +1221,7 @@ export const sensors = <SensorList>{
     country: 'Norway',
     operator: Operators.EISCAT,
   }),
-  // ////////////////////////////////////////////////////////////////////////////////////////////////
   // RUSSIAN RADARS
-  // ////////////////////////////////////////////////////////////////////////////////////////////////
   OLED: new DetailedSensor({
     objName: 'OLED',
     id: 0,
@@ -1574,9 +1566,8 @@ export const sensors = <SensorList>{
     country: 'Russia',
     operator: Operators.RUSSF,
   }),
-  // ////////////////////////////////////////////////////////////////////////////////////////////////
+  // eslint-disable-next-line multiline-comment-style
   // CHINESE RADARS
-  // ////////////////////////////////////////////////////////////////////////////////////////////////
   // XUA: new DetailedSensor({ // Not operational anymore
   //   id: 0,
   //   name: 'Xuanhua, China',
@@ -1706,9 +1697,7 @@ export const sensors = <SensorList>{
     country: 'China',
     operator: Operators.CAS,
   }),
-  // ////////////////////////////////////////////////////////////////////////////////////////////////
   // OTHER SENSORS
-  // ////////////////////////////////////////////////////////////////////////////////////////////////
   MLS: new DetailedSensor({
     objName: 'MLS',
     id: 0,
@@ -1806,7 +1795,8 @@ export const sensors = <SensorList>{
     lon: <Degrees>121.072,
     alt: <Kilometers>2.6, // https://taiwanenglishnews.com/tag/leshan-radar-station/ (2.6km)
     minAz: <Degrees>0, // Appears to be 3 faced
-    maxAz: <Degrees>360, // https://www.google.com/maps/place/24%C2%B029'45.6%22N+121%C2%B004'15.6%22E/@24.4985462,121.0709751,154m/data=!3m1!1e3!4m5!3m4!1s0x0:0xe0073e890dc05d63!8m2!3d24.496!4d121.071
+    // https://www.google.com/maps/place/24%C2%B029'45.6%22N+121%C2%B004'15.6%22E/@24.4985462,121.0709751,154m/data=!3m1!1e3!4m5!3m4!1s0x0:0xe0073e890dc05d63!8m2!3d24.496!4d121.071
+    maxAz: <Degrees>360,
     minEl: <Degrees>-1, // "Tracks surface ships" https://www.globalsecurity.org/military/world/taiwan/air-defense-over.htm
     maxEl: <Degrees>85,
     minRng: <Kilometers>200,

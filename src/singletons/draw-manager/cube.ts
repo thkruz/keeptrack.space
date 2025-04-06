@@ -19,7 +19,7 @@ export class Box {
    * @param {Kilometers} v - The distance from the center of the object to the outside of the box along the in-track axis.
    * @param {Kilometers} w - The distance from the center of the object to the outside of the box along the cross-track axis.
    */
-  public setCubeSize(u: Kilometers, v: Kilometers, w: Kilometers) {
+  setCubeSize(u: Kilometers, v: Kilometers, w: Kilometers) {
     /*
      * When scaling the cube our axis aren't correct. They are labeled as u, v, w but they are actually v, w, u.
      * So we need to swap them around.
@@ -49,10 +49,10 @@ export class Box {
 
   private buffers_ = {
     vertCount: 0,
-    combinedBuf: null as WebGLBuffer,
-    vertPosBuf: null as WebGLBuffer,
-    vertNormBuf: null as WebGLBuffer,
-    vertIndexBuf: null as WebGLBuffer,
+    combinedBuf: null as unknown as WebGLBuffer,
+    vertPosBuf: null as unknown as WebGLBuffer,
+    vertNormBuf: null as unknown as WebGLBuffer,
+    vertIndexBuf: null as unknown as WebGLBuffer,
   };
 
   private gl_: WebGL2RenderingContext;
@@ -60,59 +60,25 @@ export class Box {
   private mvMatrix_: mat4;
   private nMatrix_ = mat3.create();
   private program_: WebGLProgram;
-  private shaders_ = {
-    frag: keepTrackApi.glsl`#version 300 es
-      #ifdef GL_FRAGMENT_PRECISION_HIGH
-        precision highp float;
-      #else
-        precision mediump float;
-      #endif
-
-      in vec3 v_normal;
-
-      out vec4 fragColor;
-
-      void main(void) {
-        fragColor = vec4(0.2, 0.0, 0.0, 0.2);
-      }
-      `,
-    vert: keepTrackApi.glsl`#version 300 es
-      uniform mat4 u_pMatrix;
-      uniform mat4 u_camMatrix;
-      uniform mat4 u_mvMatrix;
-      uniform mat3 u_nMatrix;
-
-      in vec3 a_position;
-      in vec3 a_normal;
-
-      out vec3 v_normal;
-
-      void main(void) {
-          vec4 position = u_mvMatrix * vec4(a_position, 1.0);
-          gl_Position = u_pMatrix * u_camMatrix * position;
-          v_normal = u_nMatrix * a_normal;
-      }
-      `,
-  };
 
   private textureMap_ = {
-    src: <string>null,
-    texture: <WebGLTexture>null,
+    src: <string><unknown>null,
+    texture: <WebGLTexture><unknown>null,
   };
 
   private uniforms_ = {
-    u_nMatrix: <WebGLUniformLocation>null,
-    u_pMatrix: <WebGLUniformLocation>null,
-    u_camMatrix: <WebGLUniformLocation>null,
-    u_mvMatrix: <WebGLUniformLocation>null,
+    u_nMatrix: <WebGLUniformLocation><unknown>null,
+    u_pMatrix: <WebGLUniformLocation><unknown>null,
+    u_camMatrix: <WebGLUniformLocation><unknown>null,
+    u_mvMatrix: <WebGLUniformLocation><unknown>null,
   };
 
   private vao: WebGLVertexArrayObject;
 
-  public drawPosition = [0, 0, 0] as vec3;
-  public eci: EciVec3;
+  drawPosition = [0, 0, 0] as vec3;
+  eci: EciVec3;
 
-  public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
+  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
     if (!this.isLoaded_) {
       return;
     }
@@ -146,11 +112,11 @@ export class Box {
     gl.disable(gl.BLEND);
   }
 
-  public forceLoaded() {
+  forceLoaded() {
     this.isLoaded_ = true;
   }
 
-  public async init(gl: WebGL2RenderingContext): Promise<void> {
+  init(gl: WebGL2RenderingContext): void {
     this.gl_ = gl;
     this.textureMap_.src = `${settingsManager.installDirectory}textures/moon-1024.jpg`;
 
@@ -161,7 +127,7 @@ export class Box {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public update(obj: BaseObject, _selectedDate?: Date) {
+  update(obj: BaseObject, _selectedDate?: Date) {
     if (!this.isLoaded_) {
       return;
     }
@@ -234,4 +200,39 @@ export class Box {
 
     gl.bindVertexArray(null);
   }
+
+  private shaders_ = {
+    frag: keepTrackApi.glsl`#version 300 es
+      #ifdef GL_FRAGMENT_PRECISION_HIGH
+        precision highp float;
+      #else
+        precision mediump float;
+      #endif
+
+      in vec3 v_normal;
+
+      out vec4 fragColor;
+
+      void main(void) {
+        fragColor = vec4(0.2, 0.0, 0.0, 0.2);
+      }
+      `,
+    vert: keepTrackApi.glsl`#version 300 es
+      uniform mat4 u_pMatrix;
+      uniform mat4 u_camMatrix;
+      uniform mat4 u_mvMatrix;
+      uniform mat3 u_nMatrix;
+
+      in vec3 a_position;
+      in vec3 a_normal;
+
+      out vec3 v_normal;
+
+      void main(void) {
+          vec4 position = u_mvMatrix * vec4(a_position, 1.0);
+          gl_Position = u_pMatrix * u_camMatrix * position;
+          v_normal = u_nMatrix * a_normal;
+      }
+      `,
+  };
 }

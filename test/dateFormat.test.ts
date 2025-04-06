@@ -4,7 +4,8 @@ import { dateFormat } from '@app/lib/dateFormat';
 
 /**
  *Objective:
- *The dateFormat function is designed to format a given date object or string into a specified format mask. It can also handle UTC time and has default format masks for various date and time formats.
+ *The dateFormat function is designed to format a given date object or string into a specified format mask. It can also handle UTC time and has default format masks for various
+ *date and time formats.
  *
  *Inputs:
  *- date: a string or Date object representing the date to be formatted (optional)

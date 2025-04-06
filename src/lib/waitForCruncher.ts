@@ -1,3 +1,4 @@
+import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { errorManagerInstance } from '../singletons/errorManager';
 
 const DEFAULT_ERROR = () => {
@@ -10,7 +11,7 @@ interface WaitForCruncherParams {
   /** The callback function to be called when a valid message is received. */
   cb: () => void;
   /** The function to validate if the cruncher sent the correct message. */
-  validationFunc: (data: any) => boolean;
+  validationFunc: (data: PositionCruncherOutgoingMsg) => boolean | Int8Array | undefined;
   /** The error callback function to be called when the maximum retry count is reached. */
   error?: () => void;
   /** The current retry count. */

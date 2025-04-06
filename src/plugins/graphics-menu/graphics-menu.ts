@@ -190,9 +190,9 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     keepTrackApi.getSoundManager().play(SoundNames.BUTTON_CLICK);
 
     showLoading(() => {
-      (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.MEDIUM.toString();
+      (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.LOW.toString();
       (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).dispatchEvent(new Event('change'));
-      this.updateGodrays_(GodraySamples.MEDIUM);
+      this.updateGodrays_(GodraySamples.LOW);
 
       (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-day-texture-quality`)).value = EarthNightTextureQuality.MEDIUM;
       (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-night-texture-quality`)).value = EarthNightTextureQuality.MEDIUM;
@@ -471,7 +471,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     try {
       settingsManager.godraysSamples = parseInt(
         PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES) ||
-        GodraySamples.MEDIUM.toString(),
+        GodraySamples.LOW.toString(),
       );
       settingsManager.godraysDecay = parseFloat(
         PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY) ||
@@ -495,9 +495,9 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
       );
     } catch (error) {
       errorManagerInstance.warn('Failed to load godray settings from local storage! Resetting to defaults.');
-      (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.MEDIUM.toString();
+      (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.LOW.toString();
       (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).dispatchEvent(new Event('change'));
-      this.updateGodrays_(GodraySamples.MEDIUM);
+      this.updateGodrays_(GodraySamples.LOW);
     }
   }
 }

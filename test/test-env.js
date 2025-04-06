@@ -46,8 +46,10 @@ global.speechSynthesis = {
   getVoices: jest.fn(),
 };
 
-global.document.canvas = new HTMLCanvasElement(1920, 1080);
-global.document.canvas.style = {};
+/*
+ * global.document.canvas = new HTMLCanvasElement(1920, 1080);
+ * global.document.canvas.style = {};
+ */
 
 global.window.resizeTo = (width, height) => {
   global.window.innerWidth = width || global.window.innerWidth;
@@ -81,10 +83,12 @@ global.requestAnimationFrame = function requestAnimationFrame(cb) {
 };
 
 global.console = {
+  error: console.error.bind(console),
+
+  warn: console.warn.bind(console),
+
   // Ignore console.log() type statements during test
   log: jest.fn(),
-  error: jest.fn(),
-  warn: jest.fn(),
   info: jest.fn(),
   debug: jest.fn(),
 };
@@ -102,7 +106,7 @@ window.HTMLMediaElement.prototype.addTextTrack = () => {
   /* do nothing */
 };
 
-global.document.canvas.addEventListener = () => true;
+// global.document.canvas.addEventListener = () => true;
 
 /*
  * Eruda is a console for mobile web browsers

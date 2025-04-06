@@ -6,6 +6,7 @@ import { triggerSubmit } from '@app/lib/trigger-submit';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UiGeolocation } from '@app/static/ui-manager-geolocation';
+import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import sensorAddPng from '@public/img/icons/sensor-add.png';
@@ -172,7 +173,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           cb: () => {
             colorSchemeManagerInstance.setColorScheme(colorSchemeManagerInstance.colorSchemeInstances.SunlightColorScheme, true);
           },
-          validationFunc: (data: any) => data.satInSun,
+          validationFunc: (data: PositionCruncherOutgoingMsg) => data.satInSun,
         });
         break;
       case 'create-sensor-rmb':
@@ -181,7 +182,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           this.setBottomIconToSelected();
           sensorManagerInstance.isCustomSensorMenuOpen = true;
           if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
-            getEl('cs-telescope').click();
+            getEl('cs-telescope')!.click();
           }
           (<HTMLInputElement>getEl('cs-uiName')).value = 'Custom Sensor';
           (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
@@ -250,19 +251,19 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   }
 
   private static addCustomSensorFormSubmitListener() {
-    getEl('customSensor').addEventListener('submit', (e: Event) => {
+    getEl('customSensor')!.addEventListener('submit', (e: Event) => {
       // Prevent the form from submitting
       e.preventDefault();
     });
   }
 
   private static addUseGeolocationListener_() {
-    getEl('cs-geolocation').addEventListener('click', UiGeolocation.useCurrentGeolocationAsSensor);
+    getEl('cs-geolocation')!.addEventListener('click', UiGeolocation.useCurrentGeolocationAsSensor);
     keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
   }
 
   private static addClearCustomSensorListener_() {
-    getEl('cs-clear').addEventListener('click', () => {
+    getEl('cs-clear')!.addEventListener('click', () => {
       keepTrackApi.getSensorManager().clearSecondarySensors();
       keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
       CustomSensorPlugin.updateCustomSensorListDom();
@@ -270,11 +271,11 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   }
 
   private static addCustomSensorBtnCLickListener_() {
-    getEl('cs-submit').addEventListener('click', () => {
+    getEl('cs-submit')!.addEventListener('click', () => {
       CustomSensorPlugin.processCustomSensorSubmit_();
       keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
     });
-    getEl('cs-replace').addEventListener('click', () => {
+    getEl('cs-replace')!.addEventListener('click', () => {
       CustomSensorPlugin.processCustomSensorSubmit_(true);
       keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
     });
@@ -288,8 +289,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
 
     (<HTMLInputElement>getEl('sensor-type')).value = (<HTMLInputElement>getEl('cs-type')).value.replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
-    getEl('sensor-info-title').innerHTML = 'Custom Sensor';
-    getEl('sensor-country').innerHTML = 'Custom Sensor';
+    getEl('sensor-info-title')!.innerHTML = 'Custom Sensor';
+    getEl('sensor-country')!.innerHTML = 'Custom Sensor';
 
     const uiName = (<HTMLInputElement>getEl('cs-uiName')).value;
     const lon = CustomSensorPlugin.str2Deg((<HTMLInputElement>getEl('cs-lon')).value);
@@ -328,7 +329,6 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     keepTrackApi.getSensorManager().addSecondarySensor(
       new DetailedSensor({
-        id: null,
         lat,
         lon,
         alt: CustomSensorPlugin.str2Km(alt),
@@ -355,12 +355,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   }
 
   private static updateCustomSensorListDom() {
-    const primarySensor = keepTrackApi.getSensorManager().currentSensors[0]?.objName.startsWith('Custom Sensor')
+    const primarySensor = keepTrackApi.getSensorManager().currentSensors[0]?.objName?.startsWith('Custom Sensor')
       ? [keepTrackApi.getSensorManager().currentSensors[0]]
       : [] as DetailedSensor[];
     const sensors = primarySensor.concat(keepTrackApi.getSensorManager().secondarySensors);
 
-    getEl('custom-sensors-sensor-list').innerHTML = sensors.map((sensor) => `
+    getEl('custom-sensors-sensor-list')!.innerHTML = sensors.map((sensor) => `
       <div class="row" style="height: 100%; display: flex; align-items: center; margin: 20px 0px;">
         <div class="col s10 m10 l10">
           <div><strong>Sensor Name:</strong> ${sensor.uiName}</div>
@@ -392,15 +392,15 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   }
 
   private static addTelescopeClickListener_() {
-    getEl('cs-telescope').addEventListener('click', () => {
+    getEl('cs-telescope')!.addEventListener('click', () => {
       // If it is checked
       if ((<HTMLInputElement>getEl('cs-telescope')).checked) {
-        getEl('cs-minaz-div').style.display = 'none';
-        getEl('cs-maxaz-div').style.display = 'none';
-        getEl('cs-minel-div').style.display = 'none';
-        getEl('cs-maxel-div').style.display = 'none';
-        getEl('cs-minrange-div').style.display = 'none';
-        getEl('cs-maxrange-div').style.display = 'none';
+        getEl('cs-minaz-div')!.style.display = 'none';
+        getEl('cs-maxaz-div')!.style.display = 'none';
+        getEl('cs-minel-div')!.style.display = 'none';
+        getEl('cs-maxel-div')!.style.display = 'none';
+        getEl('cs-minrange-div')!.style.display = 'none';
+        getEl('cs-maxrange-div')!.style.display = 'none';
         (<HTMLInputElement>getEl('cs-minaz')).value = '0';
         (<HTMLInputElement>getEl('cs-maxaz')).value = '360';
         (<HTMLInputElement>getEl('cs-minel')).value = '10';
@@ -408,12 +408,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         (<HTMLInputElement>getEl('cs-minrange')).value = '100';
         (<HTMLInputElement>getEl('cs-maxrange')).value = '1000000';
       } else {
-        getEl('cs-minaz-div').style.display = 'block';
-        getEl('cs-maxaz-div').style.display = 'block';
-        getEl('cs-minel-div').style.display = 'block';
-        getEl('cs-maxel-div').style.display = 'block';
-        getEl('cs-minrange-div').style.display = 'block';
-        getEl('cs-maxrange-div').style.display = 'block';
+        getEl('cs-minaz-div')!.style.display = 'block';
+        getEl('cs-maxaz-div')!.style.display = 'block';
+        getEl('cs-minel-div')!.style.display = 'block';
+        getEl('cs-maxel-div')!.style.display = 'block';
+        getEl('cs-minrange-div')!.style.display = 'block';
+        getEl('cs-maxrange-div')!.style.display = 'block';
 
         const sensorManagerInstance = keepTrackApi.getSensorManager();
 

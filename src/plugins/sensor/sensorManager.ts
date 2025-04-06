@@ -1,3 +1,4 @@
+/* eslint-disable max-depth */
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -78,7 +79,11 @@ export class SensorManager {
     return null;
   }
 
-  getSensorByObjName(objName: string): DetailedSensor | null {
+  getSensorByObjName(objName: string | undefined): DetailedSensor | null {
+    if (!objName) {
+      return null;
+    }
+
     // Look through all current, secondary, and stf sensors
     const sensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
 
@@ -186,7 +191,7 @@ export class SensorManager {
     return this.currentSensors?.length > 0 && this.currentSensors[0]?.isSensor();
   }
 
-  removeSensor(sensor: DetailedSensor) {
+  removeSensor(sensor: DetailedSensor | null) {
     this.currentSensors = this.currentSensors.filter((s) => s !== sensor);
 
     if (this.currentSensors.length === 0) {
@@ -394,6 +399,9 @@ export class SensorManager {
       // Look through all known sensors
       if (!isSensorFound) {
         for (const sensor in sensors) {
+          if (!(sensors[sensor] instanceof DetailedSensor)) {
+            continue;
+          }
           /*
            * TODO: Require explicit sensor selection!
            * If this is the sensor we selected

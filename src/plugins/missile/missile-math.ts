@@ -1,3 +1,6 @@
+/* eslint-disable max-params */
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
@@ -996,7 +999,9 @@ export class Missile {
     const FuelArea1 = 0.25 * Math.PI * (Diameter - Thickness) ** 2; // (m^2)
     const FuelArea2 = 0.25 * Math.PI * (Diameter * 0.75 - Thickness) ** 2; // (m^2)
     const FuelVolume = FuelArea1 * (Length * 0.651) + FuelArea2 * (Length * 0.178); // (m^3)
-    let FuelMass = FuelDensity * FuelVolume; // http://www.lr.tudelft.nl/en/organisation/departments/space-engineering/space-systems-engineering/expertise-areas/space-propulsion/design-of-elements/rocket-propellants/solids/
+    // eslint-disable-next-line max-len
+    // http://www.lr.tudelft.nl/en/organisation/departments/space-engineering/space-systems-engineering/expertise-areas/space-propulsion/design-of-elements/rocket-propellants/solids/
+    let FuelMass = FuelDensity * FuelVolume;
 
     // Here are the initial conditions
     let dthetadt = 0.001; // (m/s)

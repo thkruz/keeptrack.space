@@ -7,9 +7,13 @@ describe('ColorMenu_class', () => {
   beforeEach(() => {
     setupStandardEnvironment();
     keepTrackApi.getCatalogManager().satCruncher = {
-      addEventListener: () => {},
-      postMessage: () => {},
-    } as any;
+      addEventListener: () => {
+        // Mock the addEventListener function
+      },
+      postMessage: () => {
+        // Mock the postMessage function
+      },
+    } as unknown as Worker;
   });
 
   standardPluginSuite(ColorMenu);

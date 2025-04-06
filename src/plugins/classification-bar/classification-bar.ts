@@ -27,18 +27,18 @@ export class ClassificationBar extends KeepTrackPlugin {
     }
 
     if (classificationString === '') {
-      getEl(this.containerDomId).style.display = 'none';
+      getEl(this.containerDomId)!.style.display = 'none';
       this.updateTopMenuHeight_(false);
     } else {
-      getEl(this.containerDomId).style.display = 'flex';
+      getEl(this.containerDomId)!.style.display = 'flex';
       this.updateTopMenuHeight_(true);
     }
 
-    getEl(this.textStringDomId).innerHTML = classificationString;
+    getEl(this.textStringDomId)!.innerHTML = classificationString;
 
     const classificationContainerDom = getEl(this.containerDomId);
 
-    classificationContainerDom.style.fontWeight = '500';
+    classificationContainerDom!.style.fontWeight = '500';
 
     if (Classification.isValidClassification(classificationString)) {
       const colors = Classification.getColors(classificationString);
@@ -47,8 +47,8 @@ export class ClassificationBar extends KeepTrackPlugin {
       color = colors.color;
     }
 
-    classificationContainerDom.style.backgroundColor = backgroundColor;
-    classificationContainerDom.style.color = color;
+    classificationContainerDom!.style.backgroundColor = backgroundColor;
+    classificationContainerDom!.style.color = color;
 
     this.classificationString_ = classificationString;
   }
@@ -85,7 +85,7 @@ export class ClassificationBar extends KeepTrackPlugin {
       this.createContainer_();
       this.updateString();
     } else {
-      errorManagerInstance.log('Classification string is empty so not loading classification bar');
+      errorManagerInstance.debug('Classification string is empty so not loading classification bar');
     }
   }
 

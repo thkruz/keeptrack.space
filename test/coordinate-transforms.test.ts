@@ -5,7 +5,9 @@ import { DetailedSatellite } from 'ootk';
 
 /**
  *Main functionalities:
- *The CoordinateTransforms class provides static methods for converting between different coordinate systems used in satellite tracking. It includes methods for converting satellite position and velocity vectors from ECI to RIC reference frame, converting RAE (Right Ascension, Azimuth, Elevation) coordinates to ECEF (Earth-Centered, Earth-Fixed) coordinates, converting ECI coordinates to latitude, longitude and altitude, and converting ECI coordinates to RAE coordinates.
+ *The CoordinateTransforms class provides static methods for converting between different coordinate systems used in satellite tracking. It includes methods for converting
+ *satellite position and velocity vectors from ECI to RIC reference frame, converting RAE (Right Ascension, Azimuth, Elevation) coordinates to ECEF (Earth-Centered, Earth-Fixed)
+ *coordinates, converting ECI coordinates to latitude, longitude and altitude, and converting ECI coordinates to RAE coordinates.
  *
  *Methods:
  *- sat2ric(sat: SatObject, reference: SatObject): Converts satellite position and velocity vectors from ECI to RIC reference frame.

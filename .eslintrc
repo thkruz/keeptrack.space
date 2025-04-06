@@ -148,7 +148,7 @@
     "no-caller": "error",
     "no-catch-shadow": "error",
     "no-confusing-arrow": "error",
-    "no-console": "warn", // TODO: change to error
+    "no-console": "off",
     "no-constructor-return": "error",
     "no-continue": "off",
     "no-div-regex": "error",
@@ -241,7 +241,7 @@
     "no-useless-return": "error",
     "no-var": "error",
     "no-void": "error",
-    "no-warning-comments": "warn",
+    "no-warning-comments": "off",
     "no-whitespace-before-property": "error",
     "nonblock-statement-body-position": "error",
     "object-curly-newline": "error",
@@ -303,5 +303,19 @@
     "yield-star-spacing": "error",
     "yoda": "error",
     "@typescript-eslint/no-explicit-any": "warn"
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/src/**/*.{js,ts}"
+      ],
+      "extends": "./.eslintrc.src.json"
+    },
+    {
+      "files": [
+        "**/test/**/*.{js,ts}"
+      ],
+      "extends": "./.eslintrc.test.json"
+    }
+  ]
 }

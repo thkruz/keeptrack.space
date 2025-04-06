@@ -1,0 +1,35 @@
+{
+  "env": {
+    "jest": true,
+    "browser": true,
+    "es2021": true
+  },
+  "globals": {
+    "M": "readonly",
+    "process": "readonly",
+    "global": "writable",
+    "__dirname": "readonly",
+    "settingsManager": "writable"
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2021
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "jest"
+  ],
+  "rules": {
+    "no-console": "off",
+    "jest/no-disabled-tests": "off",
+    "jest/no-focused-tests": "error",
+    "jest/no-identical-title": "error",
+    "jest/prefer-to-have-length": "warn",
+    "jest/valid-expect": "error"
+  }
+}

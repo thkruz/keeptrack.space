@@ -1,3 +1,4 @@
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import 'flag-icons/css/flag-icons.min.css';
 import '../../public/css/flag-icons.css';
 
@@ -371,7 +372,7 @@ export const country2flagIcon = (country: string): string => {
     return `fi-${codes[0].toLowerCase()}`;
   }
 
-  console.warn(`Country code not found for ${country}`);
+  errorManagerInstance.debug(`Country code not found for ${country}`);
 
   return 'fi-unknown';
 };
@@ -905,7 +906,7 @@ export const launchSiteMap: Record<string, {
     wikiUrl: 'https://en.wikipedia.org/wiki/Submarine-launched_ballistic_missile',
   },
   KYMSC: {
-    site: 'Kapustin Yar Missile and Space Complex',
+    site: 'Kapustin Yar MSC',
     country: 'Russia',
     wikiUrl: 'https://en.wikipedia.org/wiki/Kapustin_Yar',
   },
@@ -920,7 +921,7 @@ export const launchSiteMap: Record<string, {
     wikiUrl: 'https://en.wikipedia.org/wiki/Svobodny_Cosmodrome',
   },
   TAISC: {
-    site: 'Taiyuan Satellite Launch Center',
+    site: 'Taiyuan SLC',
     country: 'China',
     wikiUrl: 'https://en.wikipedia.org/wiki/Taiyuan_Satellite_Launch_Center',
   },

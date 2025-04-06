@@ -24,14 +24,14 @@ export class SkyBoxSphere {
   private mvMatrix_ = mat4.create();
   private nMatrix_ = mat3.create();
   private settings_: SettingsManager;
-  private textureBoundaries_ = <WebGLTexture>null;
-  private textureConstellations_ = <WebGLTexture>null;
+  private textureBoundaries_ = <WebGLTexture><unknown>null;
+  private textureConstellations_ = <WebGLTexture><unknown>null;
   private textureGraySkybox_: WebGLTexture;
-  private textureMilkyWay_ = <WebGLTexture>null;
+  private textureMilkyWay_ = <WebGLTexture><unknown>null;
   mesh: Mesh;
   private isLoaded_ = false;
 
-  public static getSrcBoundaries(settings: SettingsManager): string {
+  static getSrcBoundaries(settings: SettingsManager): string {
     if (!settings.installDirectory) {
       throw new Error('installDirectory is not defined');
     }
@@ -41,7 +41,7 @@ export class SkyBoxSphere {
     return src;
   }
 
-  public static getSrcConstellations(settings: SettingsManager): string {
+  static getSrcConstellations(settings: SettingsManager): string {
     if (!settings.installDirectory) {
       throw new Error('installDirectory is not defined');
     }
@@ -51,7 +51,7 @@ export class SkyBoxSphere {
     return src;
   }
 
-  public static getSrcGraySkybox(settings: SettingsManager): string {
+  static getSrcGraySkybox(settings: SettingsManager): string {
     if (!settings.installDirectory) {
       throw new Error('installDirectory is not defined');
     }
@@ -61,7 +61,7 @@ export class SkyBoxSphere {
     return src;
   }
 
-  public static getSrcMilkyWay(settings: SettingsManager): string {
+  static getSrcMilkyWay(settings: SettingsManager): string {
     if (!settings.installDirectory) {
       throw new Error('installDirectory is not defined');
     }
@@ -79,7 +79,7 @@ export class SkyBoxSphere {
     return src;
   }
 
-  public render(tgtBuffer?: WebGLFramebuffer): void {
+  render(tgtBuffer = null as WebGLFramebuffer | null): void {
     if (!this.isLoaded_) {
       return;
     }
@@ -175,7 +175,7 @@ export class SkyBoxSphere {
     }
   }
 
-  public async init(settings: SettingsManager, gl: WebGL2RenderingContext): Promise<void> {
+  init(settings: SettingsManager, gl: WebGL2RenderingContext): void {
     this.gl_ = gl;
     this.settings_ = settings;
 
@@ -188,10 +188,10 @@ export class SkyBoxSphere {
     this.initTextures_();
     const material = new ShaderMaterial(gl, {
       uniforms: {
-        u_texMilkyWay: <WebGLUniformLocation>null,
-        u_texBoundaries: <WebGLUniformLocation>null,
-        u_texConstellations: <WebGLUniformLocation>null,
-        u_fMilkyWay: <WebGLUniformLocation>null,
+        u_texMilkyWay: <WebGLUniformLocation><unknown>null,
+        u_texBoundaries: <WebGLUniformLocation><unknown>null,
+        u_texConstellations: <WebGLUniformLocation><unknown>null,
+        u_fMilkyWay: <WebGLUniformLocation><unknown>null,
       },
       vertexShader: this.shaders_.vert,
       fragmentShader: this.shaders_.frag,
@@ -211,7 +211,7 @@ export class SkyBoxSphere {
     this.isLoaded_ = true;
   }
 
-  public update(): void {
+  update(): void {
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
 

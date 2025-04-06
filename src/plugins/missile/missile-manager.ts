@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-len */
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
@@ -42,7 +44,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
 
         // Add the missile to the catalog
         catalogManagerInstance.objectCache[x] = newMissileArray[i];
-        if (!catalogManagerInstance.objectCache[x].velocity?.x) {
+        if (!catalogManagerInstance.objectCache[x].velocity?.x && !catalogManagerInstance.objectCache[x].velocity?.y && !catalogManagerInstance.objectCache[x].velocity?.z) {
           catalogManagerInstance.objectCache[x].velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
         }
         catalogManagerInstance.objectCache[x].totalVelocity ??= 0;
@@ -1038,7 +1040,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
  *        'Analyst',
  *        minAlt
  *      );
- *      if (success == 1) {
+ *      if (success === 1) {
  *        console.log(`Missile ${missilesLaunched} Launched`);
  *      } else {
  *        console.log('Missile Out of Range');

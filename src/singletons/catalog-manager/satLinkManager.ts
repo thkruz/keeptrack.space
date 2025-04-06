@@ -92,8 +92,11 @@ export class SatLinkManager {
     try {
       this.idToSatnum_();
 
-      // eslint-disable-next-line guard-for-in
       for (const controlSite in controlSiteList) {
+        if (!Object.prototype.hasOwnProperty.call(controlSiteList, controlSite)) {
+          continue;
+        }
+
         if (controlSiteList[controlSite].linkAehf) {
           this.aehfUsers.push(controlSiteList[controlSite].name);
         }
@@ -116,8 +119,10 @@ export class SatLinkManager {
 
     const staticSet = keepTrackApi.getCatalogManager().staticSet;
 
-    // eslint-disable-next-line guard-for-in
     for (const sensor in staticSet) {
+      if (!Object.prototype.hasOwnProperty.call(staticSet, sensor)) {
+        continue;
+      }
       if (staticSet[sensor].linkAehf) {
         this.aehfUsers.push(staticSet[sensor].name);
       }
@@ -136,9 +141,9 @@ export class SatLinkManager {
     }
   }
 
-  async showLinks(lineManager: LineManager, group: SatConstellationString, timeManager: TimeManager) {
+  showLinks(lineManager: LineManager, group: SatConstellationString, timeManager: TimeManager) {
     let satlist: number[];
-    let userlist: string[];
+    let userlist: string[] = [];
     let minTheta: number;
     let elevationMask: number;
     let linkType: LinkType;
@@ -207,13 +212,12 @@ export class SatLinkManager {
               const catalogManagerInstance = keepTrackApi.getCatalogManager();
               const sat1 = catalogManagerInstance.getSat(satlist[i]);
               const sat2 = catalogManagerInstance.getSat(satlist[j]);
-              /*
-               *
-               * Debug for finding decayed satellites
-               *
-               */
 
-              if (sat1.position.x === 0 || sat1.position.y === 0 || sat1.position.z === 0 || sat2.position.x === 0 || sat2.position.y === 0 || sat2.position.z === 0) {
+              if (!sat1 || !sat2) {
+                continue;
+              }
+
+              if ((sat1.position.x === 0 && sat1.position.y === 0 && sat1.position.z === 0) || (sat2.position.x === 0 && sat2.position.y === 0 && sat2.position.z === 0)) {
                 continue;
               }
               // NOTE: Reference old version for debug code
@@ -244,7 +248,7 @@ export class SatLinkManager {
         for (const sensorName of userlist) {
           const id = catalogManagerInstance.getSensorFromSensorName(sensorName.toString());
           const user = catalogManagerInstance.getObject(id) as DetailedSensor;
-          let bestSat: DetailedSatellite = null;
+          let bestSat = null as unknown as DetailedSatellite;
           let bestRange = 1000000;
 
           for (const satId of satlist) {
@@ -280,7 +284,7 @@ export class SatLinkManager {
             continue;
           }
           // Loop through all of the satellites
-          let bestSat: DetailedSatellite = null;
+          let bestSat = null as unknown as DetailedSatellite;
           let bestRange = 1000000;
 
           for (const satId of satlist) {

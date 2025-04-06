@@ -45,7 +45,6 @@ export class ColorMenu extends KeepTrackPlugin {
 
     let html = '';
 
-    // eslint-disable-next-line guard-for-in
     for (const colorScheme in colorSchemes) {
       if (!colorSchemes[colorScheme].isOptionInColorMenu) {
         continue;
@@ -62,7 +61,6 @@ export class ColorMenu extends KeepTrackPlugin {
 
     let html = '';
 
-    // eslint-disable-next-line guard-for-in
     for (const colorScheme in colorSchemes) {
       if (!colorSchemes[colorScheme].isOptionInRmbMenu) {
         continue;
@@ -120,9 +118,12 @@ export class ColorMenu extends KeepTrackPlugin {
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // clear selected sat
 
     // Lets look through the addon color schemes
-    // eslint-disable-next-line guard-for-in
     for (const colorScheme in colorSchemeManagerInstance.colorSchemeInstances) {
-      const colorSchemeInstance = colorSchemeManagerInstance.colorSchemeInstances[colorScheme] as ColorScheme;
+      if (!(colorSchemeManagerInstance.colorSchemeInstances[colorScheme] instanceof ColorScheme)) {
+        continue;
+      }
+
+      const colorSchemeInstance = colorSchemeManagerInstance.colorSchemeInstances[colorScheme];
 
       if (colorSchemeInstance.id === colorName) {
         colorSchemeInstance.onSelected();

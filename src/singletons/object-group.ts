@@ -12,17 +12,32 @@ export enum GroupType {
   NAME_REGEX = 4,
   COUNTRY = 5,
   COUNTRY_REGEX = 6,
-  SHAPE_REGEX = 7,
-  BUS_REGEX = 8,
+  SHAPE_STRING = 7,
+  BUS_STRING = 8,
   SCC_NUM = 9,
   ID_LIST = 10,
   PAYLOAD_NAME_REGEX = 11,
 }
 
-export class ObjectGroup {
+export type GroupData = {
+  [GroupType.ALL]: undefined;
+  [GroupType.YEAR]: number;
+  [GroupType.YEAR_OR_LESS]: number;
+  [GroupType.INTLDES]: string[];
+  [GroupType.NAME_REGEX]: RegExp
+  [GroupType.COUNTRY]: string;
+  [GroupType.COUNTRY_REGEX]: RegExp;
+  [GroupType.SHAPE_STRING]: string;
+  [GroupType.BUS_STRING]: string;
+  [GroupType.SCC_NUM]: number[];
+  [GroupType.ID_LIST]: number[];
+  [GroupType.PAYLOAD_NAME_REGEX]: RegExp;
+};
+
+export class ObjectGroup<T extends GroupType> {
   ids: number[] = [];
 
-  constructor(type: GroupType, data: any) {
+  constructor(type: T, data: GroupData[T]) {
     const objData = keepTrackApi.getCatalogManager().objectCache;
 
     switch (type) {
@@ -37,60 +52,60 @@ export class ObjectGroup {
         });
         break;
       case GroupType.YEAR:
-        this.ids = CatalogSearch.year(keepTrackApi.getCatalogManager().getSats(), data)
+        this.ids = CatalogSearch.year(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .filter((sat: DetailedSatellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
           .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.YEAR_OR_LESS:
-        this.ids = CatalogSearch.yearOrLess(keepTrackApi.getCatalogManager().getSats(), data)
+        this.ids = CatalogSearch.yearOrLess(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR_OR_LESS])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .filter((sat: DetailedSatellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
           .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.INTLDES:
-        this.ids = data
+        this.ids = (data as GroupData[GroupType.INTLDES])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((intlDes: string) => keepTrackApi.getCatalogManager().intlDes2id(intlDes))
           .filter((id: number | null) => id !== null);
         break;
       case GroupType.NAME_REGEX:
-        this.ids = CatalogSearch.objectName(objData, data)
+        this.ids = CatalogSearch.objectName(objData, data as GroupData[GroupType.NAME_REGEX])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((obj: BaseObject) => obj.id);
         break;
       case GroupType.PAYLOAD_NAME_REGEX:
-        this.ids = CatalogSearch.objectName(objData, data)
+        this.ids = CatalogSearch.objectName(objData, data as GroupData[GroupType.PAYLOAD_NAME_REGEX])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((obj: BaseObject) => obj.id)
           .filter((id: number) => objData[id].isPayload());
         break;
       case GroupType.COUNTRY:
-        this.createGroupByCountry_(data, keepTrackApi.getCatalogManager().getSats());
+        this.createGroupByCountry_(data as GroupData[GroupType.COUNTRY], keepTrackApi.getCatalogManager().getSats());
         break;
       case GroupType.COUNTRY_REGEX:
-        this.ids = CatalogSearch.country(keepTrackApi.getCatalogManager().getSats(), data)
+        this.ids = CatalogSearch.country(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.COUNTRY_REGEX])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((obj: BaseObject) => obj.id);
         break;
-      case GroupType.SHAPE_REGEX:
-        this.ids = CatalogSearch.shape(keepTrackApi.getCatalogManager().getSats(), data)
+      case GroupType.SHAPE_STRING:
+        this.ids = CatalogSearch.shape(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.SHAPE_STRING])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: DetailedSatellite) => sat.id);
         break;
-      case GroupType.BUS_REGEX:
-        this.ids = CatalogSearch.bus(keepTrackApi.getCatalogManager().getSats(), data)
+      case GroupType.BUS_STRING:
+        this.ids = CatalogSearch.bus(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.BUS_STRING])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.SCC_NUM:
-        this.ids = data
+        this.ids = (data as GroupData[GroupType.SCC_NUM])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sccNum: number) => keepTrackApi.getCatalogManager().sccNum2Id(sccNum))
           .filter((id: number | null) => id !== null);
         break;
       case GroupType.ID_LIST:
-        this.ids = data.slice(0, settingsManager.maxOribtsDisplayed).map((id: number) => id);
+        this.ids = (data as GroupData[GroupType.ID_LIST]).slice(0, settingsManager.maxOribtsDisplayed).map((id: number) => id);
         break;
       default:
         throw new Error('Unknown group type');
@@ -116,7 +131,7 @@ export class ObjectGroup {
     return this;
   };
 
-  private createGroupByCountry_(data: any, satData: DetailedSatellite[]) {
+  private createGroupByCountry_(data: GroupData[GroupType.COUNTRY], satData: DetailedSatellite[]) {
     // Map country name to country code
     const expandedData = data.split('|').map((countryName: string) => countryMapList[countryName]);
     // Concat data with expandedData using | as a delimiter

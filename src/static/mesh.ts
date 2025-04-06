@@ -11,7 +11,7 @@ export class Mesh {
   program: WebGlProgramHelper;
   precision: 'highp' | 'mediump' | 'lowp';
 
-  constructor(gl: WebGL2RenderingContext, geometry: BufferGeometry, material: Material, params?: ProgramParams) {
+  constructor(gl: WebGL2RenderingContext, geometry: BufferGeometry, material: Material, params: ProgramParams) {
     this.gl = gl;
     this.geometry = geometry;
     if (params?.disabledAttributes?.position) {
@@ -44,7 +44,7 @@ export class Mesh {
       delete this.material.uniforms.cameraPosition;
     }
 
-    this.name = params?.name;
+    this.name = params?.name ?? 'Mesh';
     this.precision = params?.precision || 'highp';
 
     const { vertexShaderHeader, fragmentShaderHeader } = this.createShaderHeaders_(params);

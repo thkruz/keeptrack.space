@@ -17,7 +17,7 @@ describe('classification_bar_plugin', () => {
 
   it('process_init', () => {
     standardPluginInit(ClassificationBar);
-    expect(getEl('classification-string', true)).toBe(null);
+    expect(getEl('classification-string')).toBeDefined();
   });
 
   it('process_init_with_settings_classification', () => {

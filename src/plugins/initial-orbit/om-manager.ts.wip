@@ -94,7 +94,7 @@ om.kp2tle = (kp, epoch, timeManager: TimeManager) => {
   const argpe = kp.argOfPerigee;
   const meana = kp.mo;
   const meanmo = 1440 / kp.period;
-  epoch = typeof epoch == 'undefined' || epoch == null ? new Date(timeManager.calculateSimulationTime()) : epoch;
+  epoch = typeof epoch === 'undefined' || epoch === null ? new Date(timeManager.calculateSimulationTime()) : epoch;
   const yy = epoch.getUTCFullYear() - 2000; // This won't work before year 2000, but that shouldn't matter
   const epochd = _dayOfYear(epoch.getUTCMonth(), epoch.getUTCDate(), epoch.getUTCHours(), epoch.getUTCMinutes(), epoch.getUTCSeconds());
   const epochd2 = parseFloat(epochd) + epoch.getUTCMilliseconds() * MILLISECONDS_PER_DAY;

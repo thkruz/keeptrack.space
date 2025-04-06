@@ -5,6 +5,7 @@ import gpsPng from '@public/img/icons/gps.png';
 
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import type { GroupsManager } from '@app/singletons/groups-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { DopMath } from '@app/static/dop-math';
@@ -101,7 +102,7 @@ export class DopsPlugin extends KeepTrackPlugin {
           const dragPosition = keepTrackApi.getInputManager().mouse.dragPosition;
 
           if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
-            console.debug('latLon undefined!');
+            errorManagerInstance.debug('latLon undefined!');
             const gmst = SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst;
 
             latLon = eci2lla(
@@ -150,7 +151,7 @@ export class DopsPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl('dops-form').addEventListener('submit', (e: Event) => {
+        getEl('dops-form')!.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           DopsPlugin.updateSideMenu();
         });
@@ -177,8 +178,11 @@ export class DopsPlugin extends KeepTrackPlugin {
   }
 
   static getGpsSats(catalogManagerInstance: CatalogManager, groupManagerInstance: GroupsManager): DetailedSatellite[] {
-    const gpsSats = (groupManagerInstance.groupList.GPSGroup ??= groupManagerInstance.createGroup(GroupType.NAME_REGEX, /NAVSTAR/iu, 'GPSGroup'));
-    const gpsSatObjects = [];
+    if (!groupManagerInstance.groupList.GPSGroup) {
+      groupManagerInstance.groupList.GPSGroup = groupManagerInstance.createGroup(GroupType.NAME_REGEX, /NAVSTAR/iu, 'GPSGroup');
+    }
+    const gpsSats = groupManagerInstance.groupList.GPSGroup;
+    const gpsSatObjects = [] as DetailedSatellite[];
 
     gpsSats.ids.forEach((id: number) => {
       const sat = catalogManagerInstance.getSat(id);

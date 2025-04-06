@@ -4,10 +4,37 @@ import { BaseObject, DetailedSatellite } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { errorManagerInstance } from '../singletons/errorManager';
 
+interface CatalogExportCsvFields {
+  [key: string]: unknown; // Add string index signature
+  satId: string;
+  name: string;
+  tle1: string;
+  tle2: string;
+  inclination: number;
+  eccentricity: number;
+  period: number;
+  raan: number;
+  apogee: number;
+  perigee: number;
+  country: string;
+  site: string;
+  rocket: string;
+  rcs: number | null;
+  visualMagnitude: number | null;
+  user: string;
+  mission: string;
+  purpose: string;
+  contractor: string;
+  dryMass: string;
+  liftMass: string;
+  lifeExpected: string | number;
+  power: string;
+}
+
 export class CatalogExporter {
   static exportTle2Csv(objData: BaseObject[], isDeleteAnalysts = true) {
     try {
-      const catalogTLE2 = [];
+      const catalogTLE2 = [] as CatalogExportCsvFields[];
       const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as DetailedSatellite).tle1) as DetailedSatellite[];
 
       if (satOnlyData.length === 0) {
@@ -80,7 +107,7 @@ export class CatalogExporter {
 
   static exportTle2Txt(objData: BaseObject[], numberOfLines = 2, isDeleteAnalysts = true) {
     try {
-      const catalogTLE2 = [];
+      const catalogTLE2 = [] as string[];
       const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as DetailedSatellite).tle1) as DetailedSatellite[];
 
       if (satOnlyData.length === 0) {
@@ -102,10 +129,10 @@ export class CatalogExporter {
         }
 
         if (sat.tle1.includes('NO TLE')) {
-          console.log(sat.sccNum);
+          errorManagerInstance.log(sat.sccNum);
         }
         if (sat.tle2.includes('NO TLE')) {
-          console.log(sat.sccNum);
+          errorManagerInstance.log(sat.sccNum);
         }
 
         catalogTLE2.push(sat.tle1);

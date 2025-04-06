@@ -12,7 +12,8 @@ export class MobileManager {
       if (!keepTrackApi.isInitialized) {
         if (MobileManager.checkIfMobileDevice()) {
           if (!settingsManager.isMobileModeEnabled) {
-            keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.', ToastMsgType.normal);
+            keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
+              ToastMsgType.normal);
           }
           settingsManager.isMobileModeEnabled = true;
 
@@ -101,7 +102,7 @@ export class MobileManager {
         errorManagerInstance.debug('MobileManager.checkMobileMode() called after initialization!');
       }
     } catch (e) {
-      console.debug(e);
+      errorManagerInstance.log(e);
     }
   }
 

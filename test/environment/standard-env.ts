@@ -41,7 +41,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   Image = jest.fn().mockImplementation(() => ({
     decode: () => Promise.resolve(new Uint8ClampedArray([0, 0, 0, 0])),
   }));
-  keepTrackApi.containerRoot = null;
+  keepTrackApi.containerRoot = null as unknown as HTMLDivElement;
   keepTrackApi.analytics = {
     track: jest.fn(),
     identify: jest.fn(),
@@ -233,8 +233,9 @@ const backupConsoleError = {
 };
 
 export const disableConsoleErrors = () => {
-  console.error = jest.fn();
-  console.warn = jest.fn();
+  // console.error = jest.fn();
+
+  // console.warn = jest.fn();
   console.info = jest.fn();
   console.log = jest.fn();
 };
@@ -252,7 +253,7 @@ export const standardSelectSat = () => {
   keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
   keepTrackApi.getCatalogManager().getObject = () => defaultSat;
-  keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
+  keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0);
 };
 export const setupMinimumHtml = () => {
   keepTrackApi.containerRoot.innerHTML = `
@@ -397,8 +398,10 @@ export const setupDefaultHtml = () => {
 };
 
 export const clearAllCallbacks = () => {
-  // eslint-disable-next-line guard-for-in
   for (const callback in keepTrackApi.events) {
+    if (!Object.prototype.hasOwnProperty.call(keepTrackApi.events, callback)) {
+      continue;
+    }
     keepTrackApi.events[callback] = [];
   }
 };

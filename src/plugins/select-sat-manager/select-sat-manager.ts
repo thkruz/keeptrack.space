@@ -178,7 +178,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType == CameraType.DEFAULT) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
       keepTrackApi.runEvent(KeepTrackApiEvents.sensorDotSelected, sensor);
     }
@@ -243,7 +243,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType == CameraType.DEFAULT) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
       keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
     }
@@ -332,12 +332,12 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
     // If New Select Sat Picked Color it
     if (i > -1) {
-      // if error then log i
-      if (i > colorSchemeManagerInstance.colorData.length / 4) {
-        console.error('i is greater than colorData length');
-        console.error(i);
+      if (i >= 0 && i < colorSchemeManagerInstance.colorData.length / 4) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.color); // Ensure we are using the correct buffer
+        gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * Float32Array.BYTES_PER_ELEMENT, new Float32Array(settingsManager.selectedColor));
+      } else {
+        throw new RangeError(`bufferSubData: Index out of bounds. Provided index: ${i}, valid range: 0 to ${colorSchemeManagerInstance.colorData.length / 4 - 1}`);
       }
-      gl.bufferSubData(gl.ARRAY_BUFFER, i * 4 * 4, new Float32Array(settingsManager.selectedColor));
 
       dotsManagerInstance.sizeData[i] = 1.0;
       gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);

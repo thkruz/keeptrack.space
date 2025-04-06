@@ -217,7 +217,7 @@ describe('getEcfOfCurrentOrbit_method', () => {
     const points = 10;
     const ecfPoints = SatMath.getEcfOfCurrentOrbit(sat, points, () => new Date());
 
-    expect(ecfPoints.length).toBe(points);
+    expect(ecfPoints).toHaveLength(points);
     expect(ecfPoints[0]).toHaveProperty('x');
     expect(ecfPoints[0]).toHaveProperty('y');
     expect(ecfPoints[0]).toHaveProperty('z');
@@ -229,7 +229,7 @@ describe('getEcfOfCurrentOrbit_method', () => {
     const points = 0;
     const ecfPoints = SatMath.getEcfOfCurrentOrbit(sat, points, () => new Date());
 
-    expect(ecfPoints.length).toBe(0);
+    expect(ecfPoints).toHaveLength(0);
   });
 
   // Tests that the method can handle different time offsets
@@ -259,7 +259,7 @@ describe('getEciOfCurrentOrbit_method', () => {
     const points = 10;
     const eciPoints = SatMath.getEciOfCurrentOrbit(sat, points, () => new Date());
 
-    expect(eciPoints.length).toBe(points);
+    expect(eciPoints).toHaveLength(points);
     expect(eciPoints[0]).toHaveProperty('x');
     expect(eciPoints[0]).toHaveProperty('y');
     expect(eciPoints[0]).toHaveProperty('z');
@@ -271,7 +271,7 @@ describe('getEciOfCurrentOrbit_method', () => {
     const points = 0;
     const eciPoints = SatMath.getEciOfCurrentOrbit(sat, points, () => new Date());
 
-    expect(eciPoints.length).toBe(0);
+    expect(eciPoints).toHaveLength(0);
   });
 
   // Tests that the method can handle different time offsets
@@ -301,7 +301,7 @@ describe('getLlaOfCurrentOrbit_method', () => {
     const points = 10;
     const llaPoints = SatMath.getLlaOfCurrentOrbit(sat, points, () => new Date());
 
-    expect(llaPoints.length).toBe(points);
+    expect(llaPoints).toHaveLength(points);
     expect(llaPoints[0]).toHaveProperty('lat');
     expect(llaPoints[0]).toHaveProperty('lon');
     expect(llaPoints[0]).toHaveProperty('alt');
@@ -313,7 +313,7 @@ describe('getLlaOfCurrentOrbit_method', () => {
     const points = 0;
     const llaPoints = SatMath.getLlaOfCurrentOrbit(sat, points, () => new Date());
 
-    expect(llaPoints.length).toBe(0);
+    expect(llaPoints).toHaveLength(0);
   });
 
   // Tests that the method can handle different time offsets
@@ -352,7 +352,7 @@ describe('getRicOfCurrentOrbit_method', () => {
     const points = 10;
     const outPoints = SatMath.getRicOfCurrentOrbit(sat, sat2, points, () => new Date(2023, 1, 1), 1);
 
-    expect(outPoints.length).toBe(points);
+    expect(outPoints).toHaveLength(points);
     expect(outPoints[0]).toHaveProperty('x');
     expect(outPoints[0]).toHaveProperty('y');
     expect(outPoints[0]).toHaveProperty('z');
@@ -363,7 +363,7 @@ describe('getRicOfCurrentOrbit_method', () => {
     const points = 0;
     const outPoints = SatMath.getRicOfCurrentOrbit(sat, sat2, points, () => new Date(2023, 1, 1), 1);
 
-    expect(outPoints.length).toBe(0);
+    expect(outPoints).toHaveLength(0);
   });
 
   // Tests that the methods handles bad eci calculations

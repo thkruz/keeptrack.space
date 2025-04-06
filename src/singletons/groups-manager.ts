@@ -1,5 +1,5 @@
 import { keepTrackApi } from '../keepTrackApi';
-import { GroupType, ObjectGroup } from './object-group';
+import { GroupData, GroupType, ObjectGroup } from './object-group';
 
 /**
  * /*! /////////////////////////////////////////////////////////////////////////////
@@ -24,17 +24,17 @@ import { GroupType, ObjectGroup } from './object-group';
  */
 
 export class GroupsManager {
-  groupList: Record<string, ObjectGroup> = {};
-  selectedGroup: ObjectGroup = null;
+  groupList: Record<string, ObjectGroup<GroupType>> = {};
+  selectedGroup: ObjectGroup<GroupType> | null = null;
   stopUpdatingInViewSoon: boolean;
 
-  private changeGroup_(group: ObjectGroup): ObjectGroup {
+  private changeGroup_(group: ObjectGroup<GroupType> | null): ObjectGroup<GroupType> | null {
     this.selectedGroup = group;
 
     return this.selectedGroup;
   }
 
-  selectGroup(group: ObjectGroup): void {
+  selectGroup(group: ObjectGroup<GroupType>): void {
     this.changeGroup_(group);
     group.updateOrbits();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -65,7 +65,7 @@ export class GroupsManager {
    *
    * Do not include a name if the group is temporary or will change
    */
-  createGroup(type: GroupType, data: any, name?: string): ObjectGroup {
+  createGroup<T extends GroupType>(type: GroupType, data?: GroupData[T], name?: string): ObjectGroup<T> {
     // Seee if this group already exists and return it
     if (name) {
       if (this.groupList[name]) {

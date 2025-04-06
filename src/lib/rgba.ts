@@ -16,7 +16,7 @@ export const hex2rgba = (hex: string): rgbaType => {
   if (c.length !== 3 && c.length !== 6) {
     throw new Error('Invalid hex input');
   }
-  if (c.length == 3) {
+  if (c.length === 3) {
     c = [c[0], c[0], c[1], c[1], c[2], c[2]];
   }
   const parsedC = parseInt(c.join(''), 16);

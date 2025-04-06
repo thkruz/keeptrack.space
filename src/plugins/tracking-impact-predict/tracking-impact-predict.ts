@@ -86,16 +86,16 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   }
 
   private uiManagerFinal_() {
-    getEl(this.sideMenuElementName).addEventListener('click', (evt: any) => {
-      const el = <HTMLElement>evt.target.parentElement;
+    getEl(this.sideMenuElementName)!.addEventListener('click', (evt: Event) => {
+      const el = (<HTMLElement>evt.target)?.parentElement;
 
-      if (!el.classList.contains('tip-object')) {
+      if (!el?.classList.contains('tip-object')) {
         return;
       }
 
       showLoading(() => {
         // Might be better code for this.
-        const hiddenRow = el.dataset?.row;
+        const hiddenRow = el.dataset?.row || null;
 
         if (hiddenRow !== null) {
           this.eventClicked_(parseInt(hiddenRow));

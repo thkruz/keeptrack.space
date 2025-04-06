@@ -131,7 +131,7 @@ export interface KeepTrackTLEFile {
 
 export class CatalogLoader {
   static filterTLEDatabase(resp: KeepTrackTLEFile[], extraSats: ExtraSat[] | null, asciiCatalog: AsciiTleSat[] | null, jsCatalog: JsSat[] | null): void {
-    let tempObjData: BaseObject[] = [];
+    let tempObjData: DetailedSatellite[] = [];
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
     catalogManagerInstance.sccIndex = <{ [key: string]: number }>{};
@@ -555,13 +555,18 @@ export class CatalogLoader {
   }
 
   /**
-   * Retrieves the JsSat catalog from the specified settings manager.
-   * @param settingsManager - The settings manager to retrieve the catalog from.
-   * @returns A promise that resolves to an array of JsSat objects.
+   * Retrieves the JSC catalog by fetching the `vimpel.json` file from the specified data source.
+   * If the primary source fails, it attempts to load a fallback `vimpel.json` file from the offline directory.
+   * Logs warnings if both the primary and/or fallback sources fail.
+   *
+   * @param settingsManager - An instance of `SettingsManager` containing configuration details,
+   *                          including the data source URL and installation directory.
+   * @returns A promise that resolves to an array of `JsSat` objects representing the catalog.
+   *          If both the primary and fallback sources fail, an empty array is returned.
+   * @throws An error if the fallback `vimpel.json` cannot be loaded.
    */
-  // eslint-disable-next-line require-await
   private static async getJscCatalog_(settingsManager: SettingsManager): Promise<JsSat[]> {
-    return fetch(settingsManager.dataSources.vimpel)
+    const vimpelJson = await fetch(settingsManager.dataSources.vimpel)
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -571,7 +576,7 @@ export class CatalogLoader {
       .catch(async () => {
         errorManagerInstance.warn('Failed to download latest vimpel.json ! Using offline vimpel.json which may be out of date!');
 
-        return fetch(`${settingsManager.installDirectory}tle/vimpel.json`)
+        const vimpelJson = await fetch(`${settingsManager.installDirectory}tle/vimpel.json`)
           .then((response) => {
             if (response.ok) {
               return response.json();
@@ -581,8 +586,12 @@ export class CatalogLoader {
             errorManagerInstance.warn('Error loading fallback vimpel.json');
 
             return [];
-          });
-      });
+          }) as JsSat[];
+
+        return vimpelJson;
+      }) as JsSat[];
+
+    return vimpelJson;
   }
 
   /**
@@ -630,7 +639,7 @@ export class CatalogLoader {
     );
   }
 
-  private static makeDebris(notionalDebris: any, meanAnom: number, notionalSatNum: number, tempSatData: BaseObject[]) {
+  private static makeDebris(notionalDebris: DetailedSatellite, meanAnom: number, notionalSatNum: number, tempSatData: BaseObject[]) {
     const debris = { ...notionalDebris };
 
     debris.id = tempSatData.length;
@@ -650,7 +659,7 @@ export class CatalogLoader {
 
     notionalSatNum++;
 
-    meanAnom = parseFloat(debris.TLE2.substr(43, 51)) + meanAnom;
+    meanAnom = parseFloat(debris.tle2.substr(43, 51)) + meanAnom;
     if (meanAnom > 360) {
       meanAnom -= 360;
     }
@@ -658,13 +667,16 @@ export class CatalogLoader {
       meanAnom += 360;
     }
 
-    debris.TLE2 =
-      debris.TLE2.substr(0, 17) + // Columns 1-18
+    debris.tle2 =
+      debris.tle2.substr(0, 17) + // Columns 1-18
       StringPad.pad0((Math.random() * 360).toFixed(4), 8) + // New RAAN
-      debris.TLE2.substr(25, 18) + // Columns 25-44
+      debris.tle2.substr(25, 18) + // Columns 25-44
       StringPad.pad0(meanAnom.toFixed(4), 8) + // New Mean Anomaly
-      debris.TLE2.substr(51); // Columns 51-69
-    tempSatData.push(debris);
+      debris.tle2.substr(51) as TleLine2; // Columns 51-69
+
+    const debrisObj = new DetailedSatellite(debris);
+
+    tempSatData.push(debrisObj);
   }
 
   private static parseAscii3LE_(content: string[], externalCatalog: AsciiTleSat[]) {
@@ -718,7 +730,7 @@ export class CatalogLoader {
 
     resp[i].intlDes = intlDes;
     resp[i].active = true;
-    if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === 2 || resp[i].type === 3))) {
+    if (!settingsManager.isDebrisOnly || (settingsManager.isDebrisOnly && (resp[i].type === SpaceObjectType.ROCKET_BODY || resp[i].type === SpaceObjectType.DEBRIS))) {
       resp[i].id = tempObjData.length;
       resp[i].source = CatalogSource.CELESTRAK;
 
@@ -735,6 +747,7 @@ export class CatalogLoader {
 
       let rcs: number | null = null;
 
+      // TODO: Celestrak does not include these rough estimates, so we need to get them from somewhere else
       rcs = resp[i].rcs === 'LARGE' ? 5 : rcs;
       rcs = resp[i].rcs === 'MEDIUM' ? 0.5 : rcs;
       rcs = resp[i].rcs === 'SMALL' ? 0.05 : rcs;
@@ -745,10 +758,10 @@ export class CatalogLoader {
 
       try {
         const satellite = new DetailedSatellite({
+          ...resp[i],
           id: tempObjData.length,
           tle1: resp[i].tle1,
           tle2: resp[i].tle2,
-          ...resp[i],
           rcs,
         });
 
@@ -764,7 +777,7 @@ export class CatalogLoader {
       }
     }
 
-    if (settingsManager.isNotionalDebris && resp[i].type === 3) {
+    if (settingsManager.isNotionalDebris && resp[i].type === SpaceObjectType.DEBRIS) {
       const notionalDebris = new DetailedSatellite({
         id: 0,
         name: `${resp[i].name} (1cm Notional)`,
@@ -860,9 +873,9 @@ export class CatalogLoader {
     catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
     const satellite = new DetailedSatellite({
+      ...asciiSatInfo,
       tle1: asciiSatInfo.tle1,
       tle2: asciiSatInfo.tle2,
-      ...asciiSatInfo,
     });
 
     satellite.id = tempSatData.length;
@@ -871,7 +884,7 @@ export class CatalogLoader {
     tempSatData.push(satellite);
   }
 
-  private static processAsciiCatalog_(asciiCatalog: AsciiTleSat[], catalogManagerInstance: CatalogManager, tempSatData: any[]) {
+  private static processAsciiCatalog_(asciiCatalog: AsciiTleSat[], catalogManagerInstance: CatalogManager, tempSatData: DetailedSatellite[]) {
     if (settingsManager.dataSources.externalTLEs) {
       if (settingsManager.dataSources.externalTLEs !== 'https://storage.keeptrack.space/data/celestrak.txt') {
         errorManagerInstance.info(`Processing ${settingsManager.dataSources.externalTLEs}`);
@@ -919,7 +932,7 @@ export class CatalogLoader {
     return tempSatData;
   }
 
-  private static processExtraSats_(extraSats: ExtraSat[], catalogManagerInstance: CatalogManager, tempSatData: any[]) {
+  private static processExtraSats_(extraSats: ExtraSat[], catalogManagerInstance: CatalogManager, tempSatData: DetailedSatellite[]) {
     // If extra catalogue
     for (const element of extraSats) {
       if (!element.SCC || !element.TLE1 || !element.TLE2) {
@@ -931,8 +944,8 @@ export class CatalogLoader {
         if (typeof tempSatData[i] === 'undefined') {
           continue;
         }
-        tempSatData[i].TLE1 = element.TLE1;
-        tempSatData[i].TLE2 = element.TLE2;
+        tempSatData[i].tle1 = element.TLE1 as TleLine1;
+        tempSatData[i].tle2 = element.TLE2 as TleLine2;
         tempSatData[i].source = CatalogSource.EXTRA_JSON;
       } else {
         const intlDes = CatalogLoader.parseIntlDes_(element.TLE1);
@@ -959,9 +972,9 @@ export class CatalogLoader {
         catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
         const satellite = new DetailedSatellite({
+          ...extrasSatInfo,
           tle1: extrasSatInfo.tle1,
           tle2: extrasSatInfo.tle2,
-          ...extrasSatInfo,
         });
 
         satellite.id = tempSatData.length;

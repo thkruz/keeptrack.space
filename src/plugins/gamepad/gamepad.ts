@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -315,6 +316,9 @@ export class GamepadPlugin {
           keepTrackApi.getMainCamera().fpsVertSpeed -= (zoomIn * 2) ** 3 * renderer.dt * settingsManager.cameraMovementSpeed;
         }
         break;
+      default:
+        // Do nothing
+        break;
     }
   }
 
@@ -348,6 +352,9 @@ export class GamepadPlugin {
             keepTrackApi.getMainCamera().fpsSideSpeed = x ** 3 * drawManagerInstance.dt;
           }
           break;
+        default:
+          // Do nothing
+          break;
       }
     }
   }
@@ -378,6 +385,9 @@ export class GamepadPlugin {
         case CameraType.ASTRONOMY:
           keepTrackApi.getMainCamera().camPitchSpeed += (y / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
           keepTrackApi.getMainCamera().camYawSpeed -= (x / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+          break;
+        default:
+          // Do nothing
           break;
       }
     }

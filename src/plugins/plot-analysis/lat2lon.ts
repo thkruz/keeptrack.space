@@ -27,7 +27,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
 
   bottomIconImg = scatterPlot4Png;
   bottomIconCallback = () => {
-    const chartDom = getEl(this.plotCanvasId);
+    const chartDom = getEl(this.plotCanvasId)!;
 
     this.createPlot(Lat2LonPlots.getPlotData(), chartDom);
   };
@@ -59,8 +59,8 @@ export class Lat2LonPlots extends KeepTrackPlugin {
       // Setup Configuration
       this.chart = echarts.init(chartDom);
       this.chart.on('click', (event) => {
-        if ((event.data as any)?.id) {
-          this.selectSatManager_.selectSat((event.data as any).id);
+        if ((event.data as unknown as { id: number })?.id > -1) {
+          this.selectSatManager_.selectSat((event.data as unknown as { id: number })?.id);
         }
       });
     }
@@ -145,10 +145,10 @@ export class Lat2LonPlots extends KeepTrackPlugin {
       series: data.map((item) => ({
         type: 'line',
         name: item.country,
-        data: item.data.map((dataPoint: any) => ({
+        data: item.data?.map((dataPoint: [number, number, (number | undefined)?]) => ({
           name: item.name,
           id: item.satId,
-          value: [dataPoint[2], dataPoint[1], dataPoint[0]],
+          value: [dataPoint[2] ?? 0, dataPoint[1], dataPoint[0]],
         })),
         /*
          * symbolSize: 8,

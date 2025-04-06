@@ -18,7 +18,7 @@ export class Material {
   fragmentShader: string;
   gl: WebGL2RenderingContext;
   glslVersion?: GLSLVersion;
-  map?: WebGLTexture;
+  map: WebGLTexture | null = null;
   static id = -1;
 
   constructor(parameters: MaterialParameters) {

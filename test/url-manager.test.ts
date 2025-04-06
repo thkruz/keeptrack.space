@@ -13,13 +13,14 @@ describe('UrlManager_class', () => {
     jest.resetAllMocks();
   });
 
-  // Tests that URL parameters with valid values are parsed correctly
-  it('test_parse_valid_params', () => {
+  // Tests that URL parameters with valid satellite and search values are parsed correctly
+  it('should_parse_valid_satellite_and_search_params', () => {
     const url = 'http://localhost:8080/?sat=25544&search=ISS&rate=1.0&date=1630512000000';
 
-    delete window.location;
-    // @ts-expect-error allow reassigning window.location
-    window.location = new URL(url);
+    Object.defineProperty(window, 'location', {
+      value: new URL(url),
+      writable: true,
+    });
 
     const expectedSelectedSat = 25544;
     const expectedCurrentSearch = 'ISS';
@@ -31,7 +32,16 @@ describe('UrlManager_class', () => {
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
-    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
+    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+
+    expect(selectedSatelliteManager).toBeDefined();
+    expect(selectedSatelliteManager).not.toBeNull();
+
+    if (!selectedSatelliteManager) {
+      throw new Error('SelectedSatelliteManager is null');
+    }
+
+    selectedSatelliteManager.selectSat = jest.fn();
     catalogManagerInstance.sccNum2Id = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -42,7 +52,7 @@ describe('UrlManager_class', () => {
     UrlManager.parseGetVariables();
     keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
 
-    expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).toHaveBeenCalledWith(expectedSelectedSat);
+    expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);
     expect(timeManagerInstance.propRate).toBe(expectedPropRate);
     // TODO: Handle the timer in parse_valid_params
@@ -54,9 +64,10 @@ describe('UrlManager_class', () => {
   it('test_parse_valid_params', () => {
     const url = 'http://localhost:8080/?intldes=1988-064A';
 
-    delete window.location;
-    // @ts-expect-error allow reassigning window.location
-    window.location = new URL(url);
+    Object.defineProperty(window, 'location', {
+      value: new URL(url),
+      writable: true,
+    });
 
     const expectedSelectedSat = 10;
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -64,7 +75,16 @@ describe('UrlManager_class', () => {
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
-    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
+    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+
+    expect(selectedSatelliteManager).toBeDefined();
+    expect(selectedSatelliteManager).not.toBeNull();
+
+    if (!selectedSatelliteManager) {
+      throw new Error('SelectedSatelliteManager is null');
+    }
+
+    selectedSatelliteManager.selectSat = jest.fn();
     catalogManagerInstance.intlDes2id = () => 10;
     catalogManagerInstance.getObject = () => ({ id: 10, sccNum: '25544', active: true }) as unknown as BaseObject;
     uiManagerInstance.doSearch = jest.fn();
@@ -73,16 +93,17 @@ describe('UrlManager_class', () => {
     UrlManager.parseGetVariables();
     keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
 
-    expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).toHaveBeenCalledWith(expectedSelectedSat);
+    expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
   });
 
   // Tests that URL parameters valid but satellite not found
   it('test_parse_valid_params_sat_not_found', () => {
     const url = 'http://localhost:8080/?intldes=1988-064A';
 
-    delete window.location;
-    // @ts-expect-error allow reassigning window.location
-    window.location = new URL(url);
+    Object.defineProperty(window, 'location', {
+      value: new URL(url),
+      writable: true,
+    });
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
@@ -90,7 +111,16 @@ describe('UrlManager_class', () => {
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
     uiManagerInstance.toast = jest.fn();
-    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
+    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+
+    expect(selectedSatelliteManager).toBeDefined();
+    expect(selectedSatelliteManager).not.toBeNull();
+
+    if (!selectedSatelliteManager) {
+      throw new Error('SelectedSatelliteManager is null');
+    }
+
+    selectedSatelliteManager.selectSat = jest.fn();
     catalogManagerInstance.intlDes2id = () => null;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -105,9 +135,10 @@ describe('UrlManager_class', () => {
   it('test_parse_valid_params_sat_not_found2', () => {
     const url = 'http://localhost:8080/?sat=99999';
 
-    delete window.location;
-    // @ts-expect-error allow reassigning window.location
-    window.location = new URL(url);
+    Object.defineProperty(window, 'location', {
+      value: new URL(url),
+      writable: true,
+    });
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
@@ -115,7 +146,16 @@ describe('UrlManager_class', () => {
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
     uiManagerInstance.toast = jest.fn();
-    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
+    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+
+    expect(selectedSatelliteManager).toBeDefined();
+    expect(selectedSatelliteManager).not.toBeNull();
+
+    if (!selectedSatelliteManager) {
+      throw new Error('SelectedSatelliteManager is null');
+    }
+
+    selectedSatelliteManager.selectSat = jest.fn();
     catalogManagerInstance.sccNum2Id = () => null;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -130,9 +170,10 @@ describe('UrlManager_class', () => {
   it('test_parse_empty_params', () => {
     const url = 'http://localhost:8080/';
 
-    delete window.location;
-    // @ts-expect-error allow reassigning window.location
-    window.location = new URL(url);
+    Object.defineProperty(window, 'location', {
+      value: new URL(url),
+      writable: true,
+    });
 
     const expectedSelectedSat = 25544;
     const expectedCurrentSearch = 'ISS';
@@ -144,7 +185,15 @@ describe('UrlManager_class', () => {
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
-    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
+    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+
+    expect(selectedSatelliteManager).toBeDefined();
+    expect(selectedSatelliteManager).not.toBeNull();
+
+    if (!selectedSatelliteManager) {
+      throw new Error('SelectedSatelliteManager is null');
+    }
+    selectedSatelliteManager.selectSat = jest.fn();
     catalogManagerInstance.sccNum2Id = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -152,7 +201,7 @@ describe('UrlManager_class', () => {
     UrlManager.parseGetVariables();
     keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
 
-    expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
+    expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).not.toHaveBeenCalledWith(expectedCurrentSearch);
     expect(timeManagerInstance.propRate).not.toBe(expectedPropRate);
     expect(timeManagerInstance.staticOffset).not.toBe(expectedStaticOffset);
@@ -162,9 +211,10 @@ describe('UrlManager_class', () => {
   it('test_parse_invalid_params', () => {
     const url = 'http://localhost:8080/?sat=invalid&search=ISS&rate=invalid&date=invalid';
 
-    delete window.location;
-    // @ts-expect-error allow reassigning window.location
-    window.location = new URL(url);
+    Object.defineProperty(window, 'location', {
+      value: new URL(url),
+      writable: true,
+    });
 
     const expectedSelectedSat = 25544;
     const expectedCurrentSearch = 'ISS';
@@ -176,7 +226,15 @@ describe('UrlManager_class', () => {
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
-    keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
+    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+
+    expect(selectedSatelliteManager).toBeDefined();
+    expect(selectedSatelliteManager).not.toBeNull();
+
+    if (!selectedSatelliteManager) {
+      throw new Error('SelectedSatelliteManager is null');
+    }
+    selectedSatelliteManager.selectSat = jest.fn();
     catalogManagerInstance.sccNum2Id = (objNum: number) => objNum;
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
@@ -184,7 +242,7 @@ describe('UrlManager_class', () => {
     UrlManager.parseGetVariables();
     keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
 
-    expect(keepTrackApi.getPlugin(SelectSatManager).selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
+    expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);
     expect(timeManagerInstance.propRate).not.toBe(expectedPropRate);
     expect(timeManagerInstance.staticOffset).not.toBe(expectedStaticOffset);

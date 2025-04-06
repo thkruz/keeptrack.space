@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
-import { DownloadModelsOptions, MeshMap, OBJ } from 'webgl-obj-loader';
+import { DownloadModelsOptions, Layout, MeshMap, OBJ } from 'webgl-obj-loader';
 import { SplashScreen } from '../../static/splash-screen';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { errorManagerInstance } from '../errorManager';
@@ -11,7 +11,10 @@ type MeshModel = {
   id: number;
   mesh: {
     vertices: number[];
-    vertexBuffer: WebGLBuffer;
+    vertexBuffer: WebGLBuffer & {
+      numItems: number;
+      layout: Layout;
+    };
     indexBuffer: {
       numItems: number;
     };
@@ -76,12 +79,12 @@ export class MeshManager {
   private sccNumTianhe_ = '48274';
 
   private uniforms_ = {
-    uPMatrix: <WebGLUniformLocation>null,
-    uCamMatrix: <WebGLUniformLocation>null,
-    uMvMatrix: <WebGLUniformLocation>null,
-    uNormalMatrix: <WebGLUniformLocation>null,
-    uLightDirection: <WebGLUniformLocation>null,
-    uInSun: <WebGLUniformLocation>null,
+    uPMatrix: <WebGLUniformLocation><unknown>null,
+    uCamMatrix: <WebGLUniformLocation><unknown>null,
+    uMvMatrix: <WebGLUniformLocation><unknown>null,
+    uNormalMatrix: <WebGLUniformLocation><unknown>null,
+    uLightDirection: <WebGLUniformLocation><unknown>null,
+    uInSun: <WebGLUniformLocation><unknown>null,
   };
 
   calculateNadirYaw_: () => Radians;
@@ -95,7 +98,7 @@ export class MeshManager {
     rotation: { x: 0, y: 0, z: 0 } as Vec3<Degrees>,
   };
 
-  models = <Record<string, MeshModel>>{
+  models = <Record<string, MeshModel>><unknown>{
     aehf: null,
     // beidou: null,
     debris0: null,
@@ -202,7 +205,7 @@ export class MeshManager {
     if (keepTrackApi.getMainCamera().camDistBuffer >= settingsManager.nearZoomLevel) {
       return;
     }
-    if (typeof this.currentMeshObject.id === 'undefined' || typeof this.currentMeshObject.model === 'undefined' || this.currentMeshObject.id == -1) {
+    if (typeof this.currentMeshObject.id === 'undefined' || typeof this.currentMeshObject.model === 'undefined' || this.currentMeshObject.id === -1) {
       return;
     }
 
@@ -244,7 +247,7 @@ export class MeshManager {
     if (!this.currentMeshObject) {
       return;
     }
-    if (typeof this.currentMeshObject?.id === 'undefined' || this.currentMeshObject?.id == -1) {
+    if (typeof this.currentMeshObject?.id === 'undefined' || this.currentMeshObject?.id === -1) {
       return;
     }
 
@@ -300,14 +303,14 @@ export class MeshManager {
       return;
     }
 
-    if (this.sccNumAehf_.findIndex((num) => sat.sccNum == num) !== -1) {
+    if (this.sccNumAehf_.findIndex((num) => sat.sccNum === num) !== -1) {
       this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.aehf;
 
       return;
     }
 
-    if (this.sccNumDsp_.findIndex((num) => sat.sccNum == num) !== -1) {
+    if (this.sccNumDsp_.findIndex((num) => sat.sccNum === num) !== -1) {
       this.currentMeshObject.isRotationStable = true;
       this.currentMeshObject.model = this.models.dsp;
 
@@ -407,16 +410,16 @@ export class MeshManager {
       // Do Nothing
     }
 
-    switch (true) {
-      case sat.rcs < 0.1 && sat.rcs > 0.04:
+    switch (!isNaN(sat.rcs as number)) {
+      case sat.rcs! < 0.1 && sat.rcs! > 0.04:
         this.currentMeshObject.model = this.models.s1u;
 
         return;
-      case sat.rcs < 0.22 && sat.rcs >= 0.1:
+      case sat.rcs! < 0.22 && sat.rcs! >= 0.1:
         this.currentMeshObject.model = this.models.s2u;
 
         return;
-      case sat.rcs < 0.33 && sat.rcs >= 0.22:
+      case sat.rcs! < 0.33 && sat.rcs! >= 0.22:
         this.currentMeshObject.model = this.models.s3u;
 
         return;
@@ -484,6 +487,11 @@ export class MeshManager {
     if (this.currentMeshObject.isRotationStable !== null) {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const sat = catalogManagerInstance.getObject(this.currentMeshObject.id);
+
+      if (sat === null) {
+        return;
+      }
+
       const drawPosition = vec3.fromValues(sat.position.x, sat.position.y, sat.position.z);
 
       // Calculate a position to look at along the satellite's velocity vector
@@ -525,7 +533,7 @@ export class MeshManager {
     try {
       this.currentMeshObject.id = typeof obj?.id !== 'undefined' ? obj.id : -1;
 
-      if (typeof this.currentMeshObject.id === 'undefined' || this.currentMeshObject.id == -1) {
+      if (typeof this.currentMeshObject.id === 'undefined' || this.currentMeshObject.id === -1) {
         return;
       }
       if (settingsManager.modelsOnSatelliteViewOverride) {
@@ -537,11 +545,11 @@ export class MeshManager {
       const pos = new Vector3D(obj.position.x, obj.position.y, obj.position.z);
 
       this.currentMeshObject.inSun = Sun.lightingRatio(pos, Sun.position(EpochUTC.fromDateTime(selectedDate)));
-      this.currentMeshObject.isRotationStable = null;
+      this.currentMeshObject.isRotationStable = false;
 
       if (settingsManager.meshOverride) {
         if (typeof this.models[settingsManager.meshOverride] === 'undefined') {
-          console.debug(`Mesh override not found: ${settingsManager.meshOverride}`);
+          errorManagerInstance.debug(`Mesh override not found: ${settingsManager.meshOverride}`);
           settingsManager.meshOverride = null;
         } else {
           this.currentMeshObject.model = this.models[settingsManager.meshOverride];
@@ -630,17 +638,17 @@ export class MeshManager {
 
   }
 
-  private applyAttributePointers_(model: any) {
+  private applyAttributePointers_(model: MeshModel) {
     const gl = this.gl_;
     const layout = model.mesh.vertexBuffer.layout;
 
     for (const attrName in this.attribs_) {
-      if (!Object.prototype.hasOwnProperty.call(this.attribs_, attrName) || this.attrIndices_[attrName] == -1) {
+      if (!Object.prototype.hasOwnProperty.call(this.attribs_, attrName) || this.attrIndices_[attrName] === -1) {
         continue;
       }
       const layoutKey = this.attribs_[attrName];
 
-      if (typeof this.attrIndices_[attrName] !== 'undefined' && this.attrIndices_[attrName] != -1) {
+      if (typeof this.attrIndices_[attrName] !== 'undefined' && this.attrIndices_[attrName] !== -1) {
         const attr = layout.attributeMap[layoutKey];
 
         gl.vertexAttribPointer(this.attrIndices_[attrName], attr.size, gl[attr.type], attr.normalized, attr.stride, attr.offset);
@@ -656,14 +664,14 @@ export class MeshManager {
         continue;
       }
       this.attrIndices_[attrName] = gl.getAttribLocation(this.program_, attrName);
-      if (this.attrIndices_[attrName] != -1) {
+      if (this.attrIndices_[attrName] !== -1) {
         if (enable) {
           gl.enableVertexAttribArray(this.attrIndices_[attrName]);
         } else {
           gl.disableVertexAttribArray(this.attrIndices_[attrName]);
         }
       } else if (this.numOfWarnings_ < 10) {
-        console.warn(`Shader attribute "${attrName}" not found in shader. Is it undeclared or unused in the shader code?`);
+        errorManagerInstance.warn(`Shader attribute "${attrName}" not found in shader. Is it undeclared or unused in the shader code?`);
         this.numOfWarnings_++;
       }
     }
@@ -674,11 +682,16 @@ export class MeshManager {
     const layout = new OBJ.Layout(OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.UV, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT);
 
     // initialize the mesh's buffers
-    // eslint-disable-next-line guard-for-in
     for (const mesh in this.meshes_) {
+      if (!Object.prototype.hasOwnProperty.call(this.meshes_, mesh)) {
+        continue;
+      }
       try {
         // Create the vertex buffer for this mesh
-        const vertexBuffer = <any>gl.createBuffer();
+        const vertexBuffer = gl.createBuffer() as WebGLBuffer & {
+          numItems: number;
+          layout: Layout;
+        };
 
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
@@ -690,7 +703,9 @@ export class MeshManager {
         this.meshes_[mesh].vertexBuffer = vertexBuffer;
 
         // Create the index buffer for this mesh
-        const indexBuffer = <any>gl.createBuffer();
+        const indexBuffer = gl.createBuffer() as WebGLBuffer & {
+          numItems: number;
+        };
 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
         const indexData = this.meshes_[mesh].makeIndexBufferDataForMaterials(...Object.values(this.meshes_[mesh].materialIndices));
@@ -724,12 +739,22 @@ export class MeshManager {
     const gl = this.gl_;
 
     const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
+
+    if (!fragShader) {
+      throw new Error('Could not create fragment shader');
+    }
+
     const fragCode = this.shader_.frag;
 
     gl.shaderSource(fragShader, fragCode);
     gl.compileShader(fragShader);
 
     const vertShader = gl.createShader(gl.VERTEX_SHADER);
+
+    if (!vertShader) {
+      throw new Error('Could not create vertex shader');
+    }
+
     const vertCode = this.shader_.vert;
 
     gl.shaderSource(vertShader, vertCode);
@@ -741,7 +766,7 @@ export class MeshManager {
     gl.linkProgram(this.program_);
 
     if (!gl.getProgramParameter(this.program_, gl.LINK_STATUS)) {
-      console.log('Could not initialise shaders');
+      errorManagerInstance.warn('Could not initialise shaders');
     }
     gl.useProgram(this.program_);
 
@@ -755,12 +780,12 @@ export class MeshManager {
       aSpecularExponent: OBJ.Layout.SPECULAR_EXPONENT.key,
     };
 
-    this.uniforms_.uPMatrix = gl.getUniformLocation(this.program_, 'uPMatrix');
-    this.uniforms_.uCamMatrix = gl.getUniformLocation(this.program_, 'uCamMatrix');
-    this.uniforms_.uMvMatrix = gl.getUniformLocation(this.program_, 'uMvMatrix');
-    this.uniforms_.uNormalMatrix = gl.getUniformLocation(this.program_, 'uNormalMatrix');
-    this.uniforms_.uLightDirection = gl.getUniformLocation(this.program_, 'uLightDirection');
-    this.uniforms_.uInSun = gl.getUniformLocation(this.program_, 'uInSun');
+    this.uniforms_.uPMatrix = gl.getUniformLocation(this.program_, 'uPMatrix') as WebGLUniformLocation;
+    this.uniforms_.uCamMatrix = gl.getUniformLocation(this.program_, 'uCamMatrix') as WebGLUniformLocation;
+    this.uniforms_.uMvMatrix = gl.getUniformLocation(this.program_, 'uMvMatrix') as WebGLUniformLocation;
+    this.uniforms_.uNormalMatrix = gl.getUniformLocation(this.program_, 'uNormalMatrix') as WebGLUniformLocation;
+    this.uniforms_.uLightDirection = gl.getUniformLocation(this.program_, 'uLightDirection') as WebGLUniformLocation;
+    this.uniforms_.uInSun = gl.getUniformLocation(this.program_, 'uInSun') as WebGLUniformLocation;
   }
 
   private populateFileList(): void {

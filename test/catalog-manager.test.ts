@@ -3,7 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { CatalogSearch } from '@app/static/catalog-search';
-import { Degrees, DetailedSatellite, Kilometers, Minutes, SpaceObjectType } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, SpaceObjectType } from 'ootk';
 import { CatalogManager } from './../src/singletons/catalog-manager';
 import { defaultSat } from './environment/apiMocks';
 
@@ -108,7 +108,7 @@ describe('calcSatrec', () => {
 
     catalogManagerInstance.objectCache = [];
     catalogManagerInstance.objectCache.push(nonmatchSat, nonmatchSat2, nonmatchSat3);
-    const correctResult = [];
+    const correctResult = [] as string[];
 
     for (let i = 0; i < 100; i++) {
       catalogManagerInstance.objectCache.push(matchSat);
@@ -123,24 +123,24 @@ describe('calcSatrec', () => {
   // should process exportTle2Csv
   it('process_export_tle_csv', () => {
     catalogManagerInstance.objectCache = [];
-    CatalogExporter.exportTle2Csv(catalogManagerInstance.objectCache as any);
+    CatalogExporter.exportTle2Csv(catalogManagerInstance.objectCache as BaseObject[]);
 
     catalogManagerInstance.objectCache = [defaultSat];
-    CatalogExporter.exportTle2Csv(catalogManagerInstance.objectCache as any);
+    CatalogExporter.exportTle2Csv(catalogManagerInstance.objectCache as BaseObject[]);
   });
 
   // should process exportTle2Txt
-  it('process_export_tle_csv', () => {
+  it('process_export_tle_txt', () => {
     catalogManagerInstance.objectCache = [];
-    CatalogExporter.exportTle2Txt(catalogManagerInstance.objectCache as any);
+    CatalogExporter.exportTle2Txt(catalogManagerInstance.objectCache as BaseObject[]);
 
     catalogManagerInstance.objectCache = [defaultSat];
-    CatalogExporter.exportTle2Txt(catalogManagerInstance.objectCache as any);
+    CatalogExporter.exportTle2Txt(catalogManagerInstance.objectCache as BaseObject[]);
   });
 
   // should process getIdFromIntlDes
   it('process_get_id_from_intl_des', () => {
-    catalogManagerInstance.cosparIndex = [] as any;
+    catalogManagerInstance.cosparIndex = [] as unknown as { [key: string]: number };
     catalogManagerInstance.cosparIndex[defaultSat.intlDes] = 0;
     const result = catalogManagerInstance.intlDes2id(defaultSat.intlDes);
 
@@ -161,14 +161,14 @@ describe('calcSatrec', () => {
   // Should allow set secondary
   it('process_set_secondary', () => {
     catalogManagerInstance.objectCache = [defaultSat];
-    expect(() => keepTrackApi.getPlugin(SelectSatManager).setSecondarySat(0)).not.toThrow();
+    expect(() => keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(0)).not.toThrow();
   });
 
   // Should allow switch primary
   it('process_switch_primary', () => {
     catalogManagerInstance.objectCache = [defaultSat];
-    expect(() => keepTrackApi.getPlugin(SelectSatManager).switchPrimarySecondary()).not.toThrow();
-    expect(() => keepTrackApi.getPlugin(SelectSatManager).switchPrimarySecondary()).not.toThrow();
+    expect(() => keepTrackApi.getPlugin(SelectSatManager)?.switchPrimarySecondary()).not.toThrow();
+    expect(() => keepTrackApi.getPlugin(SelectSatManager)?.switchPrimarySecondary()).not.toThrow();
   });
 
   // Should addAnalystSat
@@ -177,7 +177,7 @@ describe('calcSatrec', () => {
     catalogManagerInstance.satCruncher = {
       postMessage: jest.fn(),
       terminate: jest.fn(),
-    } as any;
+    } as unknown as Worker;
     expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 0)).not.toThrow();
   });
 
@@ -187,7 +187,7 @@ describe('calcSatrec', () => {
     catalogManagerInstance.satCruncher = {
       postMessage: jest.fn(),
       terminate: jest.fn(),
-    } as any;
+    } as unknown as Worker;
     expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1.slice(0, 68), defaultSat.tle2, 0)).toThrow();
     expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1, `${defaultSat.tle2}0`, 0)).toThrow();
     expect(() => catalogManagerInstance.addAnalystSat(defaultSat.tle1, defaultSat.tle2, 1)).not.toThrow();

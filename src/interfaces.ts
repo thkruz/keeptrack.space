@@ -7,6 +7,7 @@ export type EciArr3 = Vec3Flat<number>;
 /** Array of ECF Coordinates [x, y, z] */
 export type EcfArr3 = Vec3Flat<number>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Constructor<I> = new (...args: any[]) => I;
 
 export interface SatShader {
@@ -107,24 +108,24 @@ export interface SensorObjectCruncher {
 }
 
 export type lookanglesRow = {
-  START_DTG: number | string;
-  SATELLITE_ID: string;
-  PASS_SCORE: string;
-  START_DATE: Date | string
-  START_TIME: Date | string;
-  START_AZIMUTH: string;
-  START_ELEVATION: string;
-  START_RANGE: string;
-  STOP_DATE: Date | string;
-  STOP_TIME: Date | string;
-  STOP_AZIMTUH: string;
-  STOP_ELEVATION: string;
-  STOP_RANGE: string;
-  TIME_IN_COVERAGE_SECONDS: number;
-  MINIMUM_RANGE: string;
-  MAXIMUM_ELEVATION: string;
-  SENSOR_TO_SUN_AZIMUTH: string;
-  SENSOR_TO_SUN_ELEVATION: string;
+  START_DTG: number | string | null;
+  SATELLITE_ID: string | null;
+  PASS_SCORE: string | null;
+  START_DATE: Date | string | null;
+  START_TIME: Date | string | null;
+  START_AZIMUTH: string | null;
+  START_ELEVATION: string | null;
+  START_RANGE: string | null;
+  STOP_DATE: Date | string | null;
+  STOP_TIME: Date | string | null;
+  STOP_AZIMTUH: string | null;
+  STOP_ELEVATION: string | null;
+  STOP_RANGE: string | null;
+  TIME_IN_COVERAGE_SECONDS: number | null;
+  MINIMUM_RANGE: string | null;
+  MAXIMUM_ELEVATION: string | null;
+  SENSOR_TO_SUN_AZIMUTH: string | null;
+  SENSOR_TO_SUN_ELEVATION: string | null;
 };
 
 export type SatPassTimes = {

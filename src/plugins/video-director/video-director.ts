@@ -165,9 +165,9 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl('video-director-form').addEventListener('change', VideoDirectorPlugin.onFormChange);
-        getEl('video-director-form').addEventListener('submit', VideoDirectorPlugin.onSubmit);
-        getEl('video-director-rotate').addEventListener('click', () => {
+        getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);
+        getEl('video-director-form')!.addEventListener('submit', VideoDirectorPlugin.onSubmit);
+        getEl('video-director-rotate')!.addEventListener('click', () => {
           keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
           keepTrackApi.getMainCamera().autoRotate(true);
         });
@@ -175,12 +175,14 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     });
   }
 
-  private static onFormChange(e: any) {
+  private static onFormChange(e: Event) {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
     }
 
-    switch (e.target?.id) {
+    const elementId = (<HTMLElement>e.target)?.id;
+
+    switch (elementId) {
       case 'video-director-rotateL':
       case 'video-director-rotateR':
       case 'video-director-rotateU':
@@ -191,7 +193,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
       case 'video-director-panD':
       case 'video-director-zoomIn':
       case 'video-director-zoomOut':
-        if ((<HTMLInputElement>getEl(e.target.id)).checked) {
+        if ((<HTMLInputElement>getEl(elementId))?.checked) {
           // Play sound for enabling option
           keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
@@ -266,7 +268,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     }
   }
 
-  private static onSubmit(e: any) {
+  private static onSubmit(e: SubmitEvent) {
     if (typeof e === 'undefined' || e === null) {
       throw new Error('e is undefined');
     }

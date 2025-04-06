@@ -24,7 +24,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
     if (!this.isMenuButtonActive) {
       return;
     }
-    const chartDom = getEl(this.plotCanvasId);
+    const chartDom = getEl(this.plotCanvasId)!;
 
     this.createPlot(Time2LonPlots.getPlotData(), chartDom);
   };
@@ -55,8 +55,8 @@ export class Time2LonPlots extends KeepTrackPlugin {
       // Setup Configuration
       this.chart = echarts.init(chartDom);
       this.chart.on('click', (event) => {
-        if ((event.data as any)?.id) {
-          this.selectSatManager_.selectSat((event.data as any).id);
+        if ((event.data as unknown as { id: number })?.id > -1) {
+          this.selectSatManager_.selectSat((event.data as unknown as { id: number })?.id);
         }
       });
     }
@@ -176,7 +176,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
       series: data.map((item) => ({
         type: 'line',
         name: item.country,
-        data: item.data.map((dataPoint: {
+        data: item.data?.map((dataPoint: {
           0: number;
           1: number;
         }) => ({

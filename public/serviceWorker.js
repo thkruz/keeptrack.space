@@ -1,9 +1,7 @@
 const currentCacheName = 'KeepTrack-v8.1.1';
 const contentToCache = ['./'];
 
-// ////////////////////////////////////////////////////////////////////////////
 // Auto-install
-// ////////////////////////////////////////////////////////////////////////////
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(currentCacheName).then((cache) => cache.addAll(contentToCache)));
 });

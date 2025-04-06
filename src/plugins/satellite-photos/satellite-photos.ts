@@ -49,21 +49,21 @@ export class SatellitePhotos extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl('meteosat9-link').addEventListener('click', () => {
+        getEl('meteosat9-link')!.addEventListener('click', () => {
           // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
           SatellitePhotos.loadPic_(28912, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg');
         });
-        getEl('meteosat11-link').addEventListener('click', () => {
+        getEl('meteosat11-link')!.addEventListener('click', () => {
           // Meteosat 11 provides 0 deg full earth images every 15 minutes
           SatellitePhotos.loadPic_(40732, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg');
         });
-        getEl('himawari8-link').addEventListener('click', () => {
+        getEl('himawari8-link')!.addEventListener('click', () => {
           SatellitePhotos.himawari8_();
         });
-        getEl('goes16-link').addEventListener('click', () => {
+        getEl('goes16-link')!.addEventListener('click', () => {
           SatellitePhotos.loadPic_(41866, 'https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg');
         });
-        getEl('goes18-link').addEventListener('click', () => {
+        getEl('goes18-link')!.addEventListener('click', () => {
           SatellitePhotos.loadPic_(51850, 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg');
         });
       },
@@ -109,8 +109,8 @@ export class SatellitePhotos extends KeepTrackPlugin {
         for (let i = 1; i < this.discvrPhotos_.length + 1; i++) {
           const html = `<li id="discovr-link${i}" class="link satPhotoRow">DSCOVR Image ${i}</li>`;
 
-          getEl('sat-photo-menu-list').insertAdjacentHTML('beforeend', html);
-          getEl(`discovr-link${i}`).addEventListener('click', () => {
+          getEl('sat-photo-menu-list')!.insertAdjacentHTML('beforeend', html);
+          getEl(`discovr-link${i}`)!.addEventListener('click', () => {
             SatellitePhotos.loadPic_(-1, this.discvrPhotos_[i - 1].imageUrl);
             keepTrackApi.getMainCamera().camSnap(lat2pitch(this.discvrPhotos_[i - 1].lat), lon2yaw(this.discvrPhotos_[i - 1].lon, keepTrackApi.getTimeManager().simulationTimeObj));
             keepTrackApi.getMainCamera().changeZoom(0.7);
@@ -120,15 +120,15 @@ export class SatellitePhotos extends KeepTrackPlugin {
         errorManagerInstance.log('https://epic.gsfc.nasa.gov/ request failed!');
         const html = '<li class="link satPhotoRow disabled">DSCOVR Temporarily Unavailable</li>';
 
-        getEl('sat-photo-menu-list').insertAdjacentHTML('beforeend', html);
+        getEl('sat-photo-menu-list')!.insertAdjacentHTML('beforeend', html);
       }
     };
 
-    req.onerror = function () {
+    req.onerror = () => {
       errorManagerInstance.log('https://epic.gsfc.nasa.gov/ request failed!');
       const html = '<li class="link satPhotoRow disabled">DSCOVR Temporarily Unavailable</li>';
 
-      getEl('sat-photo-menu-list').insertAdjacentHTML('beforeend', html);
+      getEl('sat-photo-menu-list')!.insertAdjacentHTML('beforeend', html);
     };
 
     req.send();
@@ -145,13 +145,13 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
   private static loadPic_(satId: number, url: string): void {
     keepTrackApi.getUiManager().searchManager.hideResults();
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(satId));
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(satId) ?? -1);
     keepTrackApi.getMainCamera().changeZoom(0.7);
     SatellitePhotos.colorbox_(url);
   }
 
   private static himawari8_(): void {
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(40267));
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(40267) ?? -1);
     keepTrackApi.getMainCamera().changeZoom(0.7);
 
     // Propagation time minus 30 minutes so that the pictures have time to become available

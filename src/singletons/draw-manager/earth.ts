@@ -117,12 +117,12 @@ export class Earth {
   /**
    * This is run once per session to initialize the earth.
    */
-  async init(settings: SettingsManager, gl?: WebGL2RenderingContext): Promise<void> {
+  init(settings: SettingsManager, gl?: WebGL2RenderingContext): void {
     try {
       if (!gl && !this.gl_) {
         throw new Error('No WebGL context found');
       }
-      this.gl_ ??= gl;
+      this.gl_ ??= gl!;
       this.settings_ = settings;
 
       this.initTextures_();
@@ -133,14 +133,14 @@ export class Earth {
       });
       const material = new ShaderMaterial(this.gl_, {
         uniforms: {
-          uGlow: <WebGLUniformLocation>null,
-          uIsDrawAtmosphere: <WebGLUniformLocation>null,
-          uIsDrawAurora: <WebGLUniformLocation>null,
-          uLightDirection: <WebGLUniformLocation>null,
-          uDayMap: <WebGLUniformLocation>null,
-          uNightMap: <WebGLUniformLocation>null,
-          uBumpMap: <WebGLUniformLocation>null,
-          uSpecMap: <WebGLUniformLocation>null,
+          uGlow: <WebGLUniformLocation><unknown>null,
+          uIsDrawAtmosphere: <WebGLUniformLocation><unknown>null,
+          uIsDrawAurora: <WebGLUniformLocation><unknown>null,
+          uLightDirection: <WebGLUniformLocation><unknown>null,
+          uDayMap: <WebGLUniformLocation><unknown>null,
+          uNightMap: <WebGLUniformLocation><unknown>null,
+          uBumpMap: <WebGLUniformLocation><unknown>null,
+          uSpecMap: <WebGLUniformLocation><unknown>null,
         },
         vertexShader: this.shaders_.vert,
         fragmentShader: this.shaders_.frag,
@@ -159,7 +159,7 @@ export class Earth {
       this.initVaoVisible_();
       this.initVaoOcclusion_();
     } catch (error) {
-      console.debug(error);
+      errorManagerInstance.debug(error);
     }
   }
 
@@ -470,7 +470,7 @@ export class Earth {
         GlUtils.bindImageToTexture(this.gl_, this.textureDay, img);
       } else {
         // Delete the texture
-        this.textureDay = null;
+        this.textureDay = null as unknown as WebGLTexture;
       }
 
       this.isDayTextureReady_ = true;
@@ -488,7 +488,7 @@ export class Earth {
         GlUtils.bindImageToTexture(this.gl_, this.textureNight, img);
       } else {
         // Delete the texture
-        this.textureNight = null;
+        this.textureNight = null as unknown as WebGLTexture;
       }
 
       this.isNightTextureReady_ = true;

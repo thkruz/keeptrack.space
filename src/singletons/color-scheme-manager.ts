@@ -136,7 +136,7 @@ export class ColorSchemeManager {
        * These two variables only need to be set once, but we want to make sure they aren't called before the satellites
        * are loaded into catalogManagerInstance. Don't move the buffer data creation into the constructor!
        */
-      if (!this.pickableData || !this.colorData) {
+      if (this.pickableData.length === 0 || this.colorData.length === 0) {
         return;
       }
 
@@ -147,6 +147,11 @@ export class ColorSchemeManager {
         // current.updateGroup -> current.update -> settings.default.updateGroupupdateGroup -> default.updateGroup
         this.currentColorSchemeUpdate = this.currentColorScheme.updateGroup ?? this.currentColorScheme.update ??
           this.colorSchemeInstances[settingsManager.defaultColorScheme].updateGroup ?? this.colorSchemeInstances.DefaultColorScheme.updateGroup;
+
+        // If the group color scheme is the same as the current color scheme, then we don't need to use the group color scheme
+        if (this.currentColorSchemeUpdate === this.currentColorScheme.update) {
+          this.isUseGroupColorScheme = false;
+        }
       } else {
         // current.update -> settings.default.update -> default.update
         this.currentColorSchemeUpdate = this.currentColorScheme.update ?? this.colorSchemeInstances[settingsManager.defaultColorScheme].update ??
@@ -190,6 +195,7 @@ export class ColorSchemeManager {
     } catch (e) {
       this.currentColorScheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
       this.lastColorScheme = this.currentColorScheme;
+      this.isUseGroupColorScheme = false;
       errorManagerInstance.debug(e);
     }
   }
@@ -352,9 +358,10 @@ export class ColorSchemeManager {
     this.objectTypeFlags.starMed = true;
     this.objectTypeFlags.starHi = true;
 
-    // eslint-disable-next-line guard-for-in
     for (const colorScheme in this.colorSchemeInstances) {
-      this.colorSchemeInstances[colorScheme].resetObjectTypeFlags();
+      if (Object.prototype.hasOwnProperty.call(this.colorSchemeInstances, colorScheme)) {
+        this.colorSchemeInstances[colorScheme].resetObjectTypeFlags();
+      }
     }
   }
 

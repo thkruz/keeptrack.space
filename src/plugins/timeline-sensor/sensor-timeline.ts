@@ -1,6 +1,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-lines */
+
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -35,7 +36,11 @@ export class SensorTimeline extends KeepTrackPlugin {
   private canvasStatic_: HTMLCanvasElement;
   private ctxStatic_: CanvasRenderingContext2D;
   private drawEvents_: { [key: string]: (mouseX: number, mouseY: number) => boolean } = {};
+<<<<<<< HEAD
   private readonly allSensorLists_ = [] as DetailedSensor[];
+=======
+  private readonly allSensorLists_: DetailedSensor[] = [];
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
   private readonly enabledSensors_: DetailedSensor[] = [];
   private lengthOfLookAngles_ = 24 as Hours;
   private lengthOfBadPass_ = 120 as Seconds;
@@ -129,13 +134,12 @@ export class SensorTimeline extends KeepTrackPlugin {
         <label for="sensor-timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
       </div>
     </div>
-    <!-- Toggle Switch for Boolean Value -->
-    <div class="row">
-      <label for="sensor-timeline-toggle" class="btn btn-ui waves-effect waves-light">
-        <input type="checkbox" id="sensor-timeline-toggle" />
-        <span class="lever"></span>
-        Detailed Plot
-      </label>
+    <div class="switch row">
+            <label for="sensor-timeline-toggle" data-position="top" data-delay="50" data-tooltip="Detailed Plot">
+              <input id="sensor-timeline-toggle" type="checkbox"/>
+              <span class="lever"></span>
+              Detailed Plot
+            </label>
     </div>
     <div class="row" style="margin: 0 10px;">
       <div id="sensor-timeline-sensor-list">
@@ -202,8 +206,13 @@ export class SensorTimeline extends KeepTrackPlugin {
       cb: () => {
         this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
+<<<<<<< HEAD
         this.ctx_ = this.canvas_.getContext('2d')!;
         this.ctxStatic_ = this.canvasStatic_.getContext('2d')!;
+=======
+        this.ctx_ = this.canvas_.getContext('2d') as CanvasRenderingContext2D;
+        this.ctxStatic_ = this.canvasStatic_!.getContext('2d') as CanvasRenderingContext2D;
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
         getEl('sensor-timeline-setting-total-length')!.addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-total-length')).value) as Hours;
@@ -212,7 +221,11 @@ export class SensorTimeline extends KeepTrackPlugin {
         });
 
         getEl('sensor-timeline-setting-interval')!.addEventListener('change', () => {
+<<<<<<< HEAD
           this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-interval')).value) as Seconds;
+=======
+          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
@@ -278,12 +291,12 @@ export class SensorTimeline extends KeepTrackPlugin {
         const SatInSuns = passes[2];
         const StationInNights = passes[3];
 
-        /*
-         * console.log(ObservablePasses);
-         * console.log(SatInFoVs);
-         * console.log(SatInSuns);
-         * console.log(StationInNights);
-         */
+
+        console.log(ObservablePasses);
+        console.log(SatInFoVs);
+        console.log(SatInSuns);
+        console.log(StationInNights);
+
 
         this.drawDetailedTimeline_(ObservablePasses, SatInFoVs, SatInSuns, StationInNights);
       } else if (this.detailedPlot === false) {
@@ -383,24 +396,40 @@ export class SensorTimeline extends KeepTrackPlugin {
       let isBecomeObservable = false;
       let isBecomeUnobservable = false;
 
+<<<<<<< HEAD
       let startObservableTime = null as unknown as Date;
+=======
+      let startObservableTime = new Date();
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
       // ---------------
 
       let isInFoV = false;
       let isEnterFov = false;
       let isExitFov = false;
+<<<<<<< HEAD
       let startInFoVTime = null as unknown as Date;
+=======
+      let startInFoVTime = new Date();
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
       let isSatInSun = false;
       let isSatEnterSun = false;
       let isSatExitSun = false;
+<<<<<<< HEAD
       let startSunTime = null as unknown as Date;
+=======
+      let startSunTime = new Date();
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
       let isStationInNight = false;
       let isStationEnterNight = false;
       let isStationExitNight = false;
+<<<<<<< HEAD
       let startNightTime = null as unknown as Date;
+=======
+      let startNightTime = new Date();
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
       // ---------------
 
@@ -415,7 +444,11 @@ export class SensorTimeline extends KeepTrackPlugin {
         // 5second Looks
         offset = i * 1000; // Offset in miliseconds (sec * 1000)
         const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+<<<<<<< HEAD
         const multiSitePass = SensorTimeline.propagateMultiSite(now, satellite.satrec!, sensor);
+=======
+        const isInFovAtThisIter = SatMath.checkIsInView(sensor, SatMath.getRae(now, satellite.satrec, sensor) as { rng: Kilometers, el: Degrees, az: Degrees });
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
         const isObservableAtThisIter = SensorTimeline.checkObservable(now, satellite, sensor);
 
         // --------
@@ -426,16 +459,15 @@ export class SensorTimeline extends KeepTrackPlugin {
 
         // --------
 
-
         // Check if sat is Observable and enters the FoV
-        if (multiSitePass.time && !isObservable && isObservableAtThisIter) {
+        if (isInFovAtThisIter && !isObservable && isObservableAtThisIter) {
           startObservableTime = now;
           isObservable = true;
           isBecomeObservable = true;
         }
 
         // Check if sat exits the FoV or becomes Unobservable
-        if ((!multiSitePass.time || !isObservableAtThisIter) && isObservable) {
+        if ((!isInFovAtThisIter || !isObservableAtThisIter) && isObservable) {
           isBecomeUnobservable = true;
           isObservable = false;
           /*
@@ -464,13 +496,14 @@ export class SensorTimeline extends KeepTrackPlugin {
 
         // -----------------------------------------------
 
-        if (multiSitePass.time && !isInFoV) {
+        // Check if sat is in FoV
+        if (isInFovAtThisIter && !isInFoV) {
           startInFoVTime = now;
           isInFoV = true;
           isEnterFov = true;
         }
 
-        if (!multiSitePass.time && isInFoV) {
+        if (!isInFovAtThisIter && isInFoV) {
           isExitFov = true;
           isInFoV = false;
         }
@@ -482,6 +515,25 @@ export class SensorTimeline extends KeepTrackPlugin {
           });
           isEnterFov = false;
           isExitFov = false;
+        }
+
+        // Check if sat in Sun
+        if (isSatInSunAtThisIter && !isSatInSun) {
+          startSunTime = now;
+          isSatInSun = true;
+          isSatEnterSun = true;
+        }
+        if (!isSatInSunAtThisIter && isSatInSun) {
+          isSatExitSun = true;
+          isSatInSun = false;
+        }
+        if ((isSatEnterSun && isSatExitSun) || (isSatEnterSun && i === durationInSeconds - this.angleCalculationInterval_)) {
+          SatinSuns.passes.push({
+            start: startSunTime,
+            end: now,
+          });
+          isSatEnterSun = false;
+          isSatExitSun = false;
         }
 
         if (sensor.type === SpaceObjectType.OPTICAL && this.detailedPlot) {
@@ -504,24 +556,6 @@ export class SensorTimeline extends KeepTrackPlugin {
             isStationExitNight = false;
           }
 
-          // Check if sat in Sun
-          if (isSatInSunAtThisIter && !isSatInSun) {
-            startSunTime = now;
-            isSatInSun = true;
-            isSatEnterSun = true;
-          }
-          if (!isSatInSunAtThisIter && isSatInSun) {
-            isSatExitSun = true;
-            isSatInSun = false;
-          }
-          if ((isSatEnterSun && isSatExitSun) || (isSatEnterSun && i === durationInSeconds - this.angleCalculationInterval_)) {
-            SatinSuns.passes.push({
-              start: startSunTime,
-              end: now,
-            });
-            isSatEnterSun = false;
-            isSatExitSun = false;
-          }
         }
       }
       AllObservablePasses.push(ObservablePasses);
@@ -535,8 +569,9 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   static propagateMultiSite(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor) {
     // Setup Realtime and Offset Time
-    const aer = SatMath.getRae(now, satrec, sensor);
+    const rae = SatMath.getRae(now, satrec, sensor) as { rng: Kilometers, el: Degrees, az: Degrees };
 
+<<<<<<< HEAD
     if (!aer.az || !aer.el || !aer.rng) {
       return {
         time: null,
@@ -548,11 +583,14 @@ export class SensorTimeline extends KeepTrackPlugin {
     }
 
     if (SatMath.checkIsInView(sensor, aer as RaeVec3)) {
+=======
+    if (SatMath.checkIsInView(sensor, rae)) {
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
       return {
         time: now,
-        el: aer.el,
-        az: aer.az,
-        rng: aer.rng,
+        el: rae.el,
+        az: rae.az,
+        rng: rae.rng,
         objName: null,
       };
     }
@@ -704,7 +742,11 @@ export class SensorTimeline extends KeepTrackPlugin {
       // Draw sensor name
       this.ctx_.fillStyle = 'rgb(255, 255, 255)';
       this.ctx_.font = '14px Consolas';
+<<<<<<< HEAD
       this.ctx_.fillText((sensorPass.sensor.uiName ?? 'Missing uiName').concat(': can collect'), leftOffset - 165, y + 5);
+=======
+      this.ctx_.fillText(sensorPass.sensor.uiName!.concat(': can collect'), leftOffset - 165, y + 5);
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
       // Draw passes
       sensorPass.passes.forEach((pass) => {
@@ -760,11 +802,19 @@ export class SensorTimeline extends KeepTrackPlugin {
             timeManagerInstance.calculateSimulationTime();
             keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
 
+<<<<<<< HEAD
             const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
             const currentSatId = selectSatManagerInstance.selectedSat;
 
             selectSatManagerInstance.selectSat(-1);
             selectSatManagerInstance.selectSat(currentSatId);
+=======
+            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+            const currentSatId = selectSatManagerInstance!.selectedSat;
+
+            selectSatManagerInstance!.selectSat(null);
+            selectSatManagerInstance!.selectSat(currentSatId);
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
           }
         });
 
@@ -797,7 +847,11 @@ export class SensorTimeline extends KeepTrackPlugin {
       // Draw sensor name
       this.ctx_.fillStyle = 'rgb(255, 255, 255)';
       this.ctx_.font = '14px Consolas';
+<<<<<<< HEAD
       this.ctx_.fillText((ObservablePeriod.sensor.uiName ?? 'Missing uiName').concat(': in FoV'), leftOffset - 165, y + 5);
+=======
+      this.ctx_.fillText(ObservablePeriod.sensor.uiName!.concat(': sat in FoV'), leftOffset - 165, y + 5);
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
       // Draw passes
       ObservablePeriod.passes.forEach((pass) => {
@@ -846,11 +900,19 @@ export class SensorTimeline extends KeepTrackPlugin {
             timeManagerInstance.calculateSimulationTime();
             keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
 
+<<<<<<< HEAD
             const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
             const currentSatId = selectSatManagerInstance.selectedSat;
 
             selectSatManagerInstance.selectSat(-1);
             selectSatManagerInstance.selectSat(currentSatId);
+=======
+            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+            const currentSatId = selectSatManagerInstance!.selectedSat;
+
+            selectSatManagerInstance!.selectSat(null);
+            selectSatManagerInstance!.selectSat(currentSatId);
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
           }
         });
 
@@ -883,7 +945,11 @@ export class SensorTimeline extends KeepTrackPlugin {
       // Draw sensor name
       this.ctx_.fillStyle = 'rgb(255, 255, 255)';
       this.ctx_.font = '14px Consolas';
+<<<<<<< HEAD
       this.ctx_.fillText((ObservablePeriod.sensor.uiName ?? 'Missing uiName').concat(': available'), leftOffset - 165, y + 5);
+=======
+      this.ctx_.fillText(ObservablePeriod.sensor.uiName!.concat(': available'), leftOffset - 165, y + 5);
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
       // Draw passes
       ObservablePeriod.passes.forEach((pass) => {
@@ -932,11 +998,19 @@ export class SensorTimeline extends KeepTrackPlugin {
             timeManagerInstance.calculateSimulationTime();
             keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
 
+<<<<<<< HEAD
             const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
             const currentSatId = selectSatManagerInstance.selectedSat;
 
             selectSatManagerInstance.selectSat(-1);
             selectSatManagerInstance.selectSat(currentSatId);
+=======
+            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+            const currentSatId = selectSatManagerInstance!.selectedSat;
+
+            selectSatManagerInstance!.selectSat(null);
+            selectSatManagerInstance!.selectSat(currentSatId);
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
           }
         });
 
@@ -1078,8 +1152,6 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       this.drawEvents_[`${SatinSuns.length} - ${ObservablePeriod.sensor.id} - no - passes`] = drawEvent;
     }
-    // });
-
 
     // Add one mousemove event
     this.canvas_.addEventListener('mousemove', (event) => {
@@ -1115,7 +1187,11 @@ export class SensorTimeline extends KeepTrackPlugin {
     const oldCanvas = this.canvas_;
     const newCanvas = oldCanvas.cloneNode(true) as HTMLCanvasElement;
 
+<<<<<<< HEAD
     oldCanvas.parentNode?.replaceChild(newCanvas, oldCanvas);
+=======
+    oldCanvas.parentNode!.replaceChild(newCanvas, oldCanvas);
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
     this.canvas_ = newCanvas;
     this.ctx_ = this.canvas_.getContext('2d')!;
 
@@ -1181,7 +1257,11 @@ export class SensorTimeline extends KeepTrackPlugin {
       // Draw sensor name
       this.ctx_.fillStyle = 'rgb(255, 255, 255)';
       this.ctx_.font = '14px Consolas';
+<<<<<<< HEAD
       this.ctx_.fillText((sensorPass.sensor.uiName ?? 'Missing uiName'), leftOffset - 165, y + 5);
+=======
+      this.ctx_.fillText(sensorPass.sensor.uiName!, leftOffset - 150, y + 5);
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
       // Draw passes
       sensorPass.passes.forEach((pass) => {
@@ -1238,7 +1318,11 @@ export class SensorTimeline extends KeepTrackPlugin {
             keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
 
             const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
+<<<<<<< HEAD
             const currentSatId = selectSatManagerInstance.selectedSat;
+=======
+            const currentSatId = selectSatManagerInstance!.selectedSat;
+>>>>>>> ad7319df (fix: 🐛 Fixed bugs with input values and plot)
 
             selectSatManagerInstance.selectSat(-1);
             selectSatManagerInstance.selectSat(currentSatId);

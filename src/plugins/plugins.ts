@@ -258,8 +258,8 @@ export const uiManagerFinal = (): void => {
    * }
    */
 
-  if (getEl('bottom-icons') && getEl('bottom-icons').innerText === '') {
-    getEl('nav-footer').style.visibility = 'hidden';
+  if (getEl('bottom-icons') && getEl('bottom-icons')!.innerText === '') {
+    getEl('nav-footer')!.style.visibility = 'hidden';
     hideEl('nav-footer');
   } else {
     showEl('nav-footer');
@@ -302,11 +302,13 @@ export const uiManagerFinal = (): void => {
 
   ['bottom-icons', 'bottom-icons-filter'].forEach((divIdWithScroll) => {
 
-    getEl(divIdWithScroll).addEventListener(
+    getEl(divIdWithScroll)!.addEventListener(
       'wheel',
       (event: WheelEvent) => {
         event.preventDefault(); // Prevent default scroll behavior
-        wheel(event.currentTarget, event.deltaY);
+        if (event.currentTarget) {
+          wheel(event.currentTarget, event.deltaY);
+        }
       },
       { passive: false }, // Must be false to allow preventDefault()
     );

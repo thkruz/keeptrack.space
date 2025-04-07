@@ -236,7 +236,8 @@ export const disableConsoleErrors = () => {
   // console.error = jest.fn();
 
   // console.warn = jest.fn();
-  console.info = jest.fn();
+
+  // console.info = jest.fn();
   console.log = jest.fn();
 };
 

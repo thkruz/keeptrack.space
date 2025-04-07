@@ -58,7 +58,7 @@ export class CelestrakColorScheme extends ColorScheme {
      * @ts-expect-error
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (obj.isNotional() && (window as any).noNotional) {
+    if (obj.isNotional()) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,

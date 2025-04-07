@@ -93,7 +93,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.onHelpMenuClick]: [];
   [KeepTrackApiEvents.onKeepTrackReady]: [];
   [KeepTrackApiEvents.selectSatData]: [DetailedSatellite | MissileObject | BaseObject, number];
-  [KeepTrackApiEvents.setSecondarySat]: [DetailedSatellite, number];
+  [KeepTrackApiEvents.setSecondarySat]: [DetailedSatellite | null, number];
   [KeepTrackApiEvents.uiManagerInit]: [];
   [KeepTrackApiEvents.uiManagerOnReady]: [];
   [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];

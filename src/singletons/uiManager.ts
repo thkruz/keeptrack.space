@@ -28,6 +28,7 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
+import { isThisNode } from '@app/static/isThisNode';
 import '@materializecss/materialize';
 import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from 'ootk';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
@@ -430,6 +431,14 @@ export class UiManager {
 
   toast(toastText: string, type: ToastMsgType, isLong = false) {
     this.lastToast = toastText;
+
+    if (isThisNode()) {
+      // Testing environment only
+      // eslint-disable-next-line no-console
+      console.warn('Toast:', toastText);
+
+      return;
+    }
 
     try {
       // Stop toasts from crashing the app

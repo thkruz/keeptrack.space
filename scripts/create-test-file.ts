@@ -1,10 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { writeFileSync } = require('fs');
+import { writeFileSync } from 'fs';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+// Verify current directory is scripts
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Get first argument from command line
 const fileName = process.argv[2];
 
-// Verify current directory is scripts
+
 if (__dirname.split('\\').pop() !== 'scripts') {
   const red = '\x1b[31m';
   const reset = '\x1b[0m';

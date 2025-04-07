@@ -28,28 +28,28 @@ describe('SatInfoBoxCore_class', () => {
     });
 
     it('should work when I click all-objects-link', () => {
-      expect(() => getEl('all-objects-link').click()).not.toThrow();
+      expect(() => getEl('all-objects-link')!.click()).not.toThrow();
     });
     it('should work when I click near-orbits-link', () => {
-      expect(() => getEl('near-orbits-link').click()).not.toThrow();
+      expect(() => getEl('near-orbits-link')!.click()).not.toThrow();
     });
     it('should work when I click near-objects-link1', () => {
-      expect(() => getEl('near-objects-link1').click()).not.toThrow();
+      expect(() => getEl('near-objects-link1')!.click()).not.toThrow();
     });
     it('should work when I click near-objects-link2', () => {
-      expect(() => getEl('near-objects-link2').click()).not.toThrow();
+      expect(() => getEl('near-objects-link2')!.click()).not.toThrow();
     });
     it('should work when I click near-objects-link4', () => {
-      expect(() => getEl('near-objects-link4').click()).not.toThrow();
+      expect(() => getEl('near-objects-link4')!.click()).not.toThrow();
     });
     it('should work when I click sun-angle-link', () => {
-      expect(() => getEl('sun-angle-link').click()).not.toThrow();
+      expect(() => getEl('sun-angle-link')!.click()).not.toThrow();
     });
     it('should work when I click nadir-angle-link', () => {
-      expect(() => getEl('nadir-angle-link').click()).not.toThrow();
+      expect(() => getEl('nadir-angle-link')!.click()).not.toThrow();
     });
     it('should work when I click sec-angle-link', () => {
-      expect(() => getEl('sec-angle-link').click()).not.toThrow();
+      expect(() => getEl('sec-angle-link')!.click()).not.toThrow();
     });
   });
 

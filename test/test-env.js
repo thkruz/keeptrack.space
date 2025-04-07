@@ -84,11 +84,10 @@ global.requestAnimationFrame = function requestAnimationFrame(cb) {
 
 global.console = {
   error: console.error.bind(console),
-
   warn: console.warn.bind(console),
+  log: console.log.bind(console),
 
   // Ignore console.log() type statements during test
-  log: jest.fn(),
   info: jest.fn(),
   debug: jest.fn(),
 };

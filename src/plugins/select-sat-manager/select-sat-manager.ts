@@ -30,7 +30,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   primarySatObj: DetailedSatellite | MissileObject = this.noSatObj_;
   secondarySat = -1;
-  secondarySatObj: DetailedSatellite;
+  secondarySatObj: DetailedSatellite | null = null;
   private lastSelectedSat_ = -1;
 
   addJs(): void {
@@ -96,7 +96,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     const obj = keepTrackApi.getCatalogManager().getObject(satId);
 
-    if (!obj) {
+    if (!obj || !obj.active) {
       this.selectSatReset_();
     } else {
 
@@ -286,7 +286,9 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   lastSelectedSat(id?: number): number {
-    this.lastSelectedSat_ = (typeof id !== 'undefined' && id !== null && id >= -1) ? id : this.lastSelectedSat_;
+    if (typeof id !== 'undefined' && id !== null && id >= -1) {
+      this.lastSelectedSat_ = id;
+    }
 
     return this.lastSelectedSat_;
   }
@@ -356,6 +358,10 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.secondarySat = id;
     if (this.secondarySatObj?.id !== id) {
       this.secondarySatObj = keepTrackApi.getCatalogManager().getObject(id) as DetailedSatellite;
+
+      if (!this.secondarySatObj) {
+        this.secondarySatObj = null;
+      }
     }
 
     if (this.secondarySat === this.selectedSat) {

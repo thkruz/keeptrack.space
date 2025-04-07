@@ -72,7 +72,7 @@ export class RicPlot extends KeepTrackPlugin {
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSecondarySat,
       cbName: this.id,
-      cb: (obj: BaseObject) => {
+      cb: (obj: BaseObject | null) => {
         if (!obj || this.selectSatManager_.selectedSat === -1) {
           if (this.isMenuButtonActive) {
             this.hideSideMenus();

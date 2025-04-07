@@ -638,7 +638,7 @@ export class SearchManager {
       return html;
     }, '');
 
-    const satInfoboxDom = getEl('sat-infobox');
+    const satInfoboxDom = getEl('sat-infobox', true);
 
     if (satInfoboxDom) {
       SatInfoBox.resetMenuLocation(satInfoboxDom, false);

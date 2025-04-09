@@ -312,7 +312,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (lastSelectedObject > -1) {
       colorSchemeManagerInstance.currentColorSchemeUpdate ??=
         colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme]?.update ??
-        colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme.update;
+        Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0].update;
 
       const lastSat = keepTrackApi.getCatalogManager().getObject(lastSelectedObject);
 

@@ -93,7 +93,7 @@ describe('uiManager', () => {
     const uiManagerInstance = new UiManager();
     const colorSchemeManagerInstance = new ColorSchemeManager();
 
-    expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme)).not.toThrow();
+    expect(() => uiManagerInstance.colorSchemeChangeAlert(Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0])).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.VelocityColorScheme)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.SunlightColorScheme)).not.toThrow();
     expect(() => uiManagerInstance.colorSchemeChangeAlert(colorSchemeManagerInstance.colorSchemeInstances.CountryColorScheme)).not.toThrow();

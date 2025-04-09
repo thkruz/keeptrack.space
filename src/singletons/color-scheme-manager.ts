@@ -89,8 +89,8 @@ export class ColorSchemeManager {
   };
   private readonly DOTS_PER_CALC = 350;
   private gl_: WebGL2RenderingContext;
-  currentColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
-  lastColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+  currentColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
+  lastColorScheme: ColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
   isUseGroupColorScheme = false;
   colorBuffer: WebGLBuffer | null = null;
   colorBufferOneTime = false;
@@ -146,7 +146,7 @@ export class ColorSchemeManager {
       if (this.isUseGroupColorScheme) {
         // current.updateGroup -> current.update -> settings.default.updateGroupupdateGroup -> default.updateGroup
         this.currentColorSchemeUpdate = this.currentColorScheme.updateGroup ?? this.currentColorScheme.update ??
-          this.colorSchemeInstances[settingsManager.defaultColorScheme].updateGroup ?? this.colorSchemeInstances.DefaultColorScheme.updateGroup;
+          this.colorSchemeInstances[settingsManager.defaultColorScheme].updateGroup ?? Object.values(this.colorSchemeInstances)[0].updateGroup;
 
         // If the group color scheme is the same as the current color scheme, then we don't need to use the group color scheme
         if (this.currentColorSchemeUpdate === this.currentColorScheme.update) {
@@ -155,7 +155,7 @@ export class ColorSchemeManager {
       } else {
         // current.update -> settings.default.update -> default.update
         this.currentColorSchemeUpdate = this.currentColorScheme.update ?? this.colorSchemeInstances[settingsManager.defaultColorScheme].update ??
-          this.colorSchemeInstances.DefaultColorScheme.update;
+          Object.values(this.colorSchemeInstances)[0].update;
       }
 
       // Figure out if we are coloring all of the dots - assume yes initially
@@ -193,7 +193,7 @@ export class ColorSchemeManager {
         this.lastColorScheme = this.currentColorScheme;
       }
     } catch (e) {
-      this.currentColorScheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+      this.currentColorScheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
       this.lastColorScheme = this.currentColorScheme;
       this.isUseGroupColorScheme = false;
       errorManagerInstance.debug(e);
@@ -244,7 +244,7 @@ export class ColorSchemeManager {
           LegendManager.change(cachedColorScheme);
           possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
         }
-        this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+        this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
         this.lastColorScheme = this.currentColorScheme;
 
         // Generate some buffers
@@ -373,7 +373,7 @@ export class ColorSchemeManager {
       LegendManager.change(scheme.id);
       uiManagerInstance.colorSchemeChangeAlert(scheme);
 
-      scheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme;
+      scheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
 
       if (scheme instanceof ColorScheme) {
         this.currentColorScheme = this.colorSchemeInstances[scheme.id];
@@ -392,7 +392,7 @@ export class ColorSchemeManager {
     } catch (error) {
       // If we can't load the color scheme, just use the default
       errorManagerInstance.log(error);
-      this.currentColorSchemeUpdate = this.colorSchemeInstances[settingsManager.defaultColorScheme]?.update ?? this.colorSchemeInstances.DefaultColorScheme.update;
+      this.currentColorSchemeUpdate = this.colorSchemeInstances[settingsManager.defaultColorScheme]?.update ?? Object.values(this.colorSchemeInstances)[0].update;
       this.calculateColorBuffers(isForceRecolor);
     }
   }
@@ -673,7 +673,7 @@ export class ColorSchemeManager {
         }
       }
 
-      this.setColorScheme(this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? this.colorSchemeInstances.DefaultColorScheme);
+      this.setColorScheme(this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0]);
     }
   }
 

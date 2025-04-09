@@ -1222,8 +1222,9 @@ input:focus {
   filter: brightness(1.8);
 }
 
-.bmenu-item-disabled img {
-  filter: grayscale(1);
+.bmenu-item-disabled img,
+.bmenu-item-disabled img * {
+  filter: grayscale(1) !important;
 }
 
 .bmenu-item-disabled .status-icon {

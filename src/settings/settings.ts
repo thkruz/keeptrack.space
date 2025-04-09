@@ -100,6 +100,7 @@ export class SettingsManager {
     calculator: true,
     createSat: true,
     filterMenu: true,
+    RPOCalculator: true,
   };
   changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
   changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute

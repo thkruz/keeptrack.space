@@ -26,6 +26,7 @@ import { DebugMenuPlugin } from './debug/debug';
 import { DopsPlugin } from './dops/dops';
 import { EditSat } from './edit-sat/edit-sat';
 import { FilterMenuPlugin } from './filter-menu/filter-menu';
+import { RPOCalculator } from './find-RPO/RPO-calculator';
 import { GamepadPlugin } from './gamepad/gamepad';
 import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
@@ -132,6 +133,7 @@ export type KeepTrackPlugins = {
   timelineAlt?: boolean;
   calculator?: boolean;
   createSat?: boolean;
+  RPOCalculator?: boolean;
 };
 
 // Register all core modules
@@ -202,6 +204,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new SoundManager().init(), enabled: plugins.soundManager },
       { init: () => new GamepadPlugin().init(), enabled: plugins.gamepad },
       { init: () => new VideoDirectorPlugin().init(), enabled: plugins.videoDirector },
+      { init: () => new RPOCalculator().init(), enabled: plugins.RPOCalculator },
     ];
 
     for (const { init, enabled } of pluginList) {

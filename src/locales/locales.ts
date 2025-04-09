@@ -90,6 +90,11 @@ export const loadLocalization = () => ({
       title: i18next.t('plugins.SensorTimeline.title'),
       helpBody: i18next.t('plugins.SensorTimeline.helpBody'),
     },
+    RPOCalculator: {
+      bottomIconLabel: i18next.t('plugins.RPOCalculator.bottomIconLabel'),
+      title: i18next.t('plugins.RPOCalculator.title'),
+      helpBody: i18next.t('plugins.RPOCalculator.helpBody'),
+    },
     SatelliteTimeline: {
       bottomIconLabel: i18next.t('plugins.SatelliteTimeline.bottomIconLabel'),
       title: i18next.t('plugins.SatelliteTimeline.title'),

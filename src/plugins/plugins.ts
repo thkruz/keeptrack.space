@@ -28,6 +28,7 @@ import { EditSat } from './edit-sat/edit-sat';
 import { FilterMenuPlugin } from './filter-menu/filter-menu';
 import { GamepadPlugin } from './gamepad/gamepad';
 import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
+import { KeepTrackPlugin } from './KeepTrackPlugin';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
 import { MissilePlugin } from './missile/missile-plugin';
 import { NewLaunch } from './new-launch/new-launch';
@@ -227,6 +228,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       cbName: 'core',
       cb: () => {
         uiManagerFinal();
+        KeepTrackPlugin.hideUnusedMenuModes();
       },
     });
   } catch (e) {

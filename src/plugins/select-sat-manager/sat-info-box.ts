@@ -740,6 +740,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
 
     const isHasAltName: boolean = !!((obj as DetailedSatellite)?.altName && (obj as DetailedSatellite).altName !== '');
+    const isHasAltId: boolean = !!((obj as DetailedSatellite)?.altId && (obj as DetailedSatellite).altId !== '');
 
     getEl('sat-info-title-name')!.innerHTML = obj.name;
 
@@ -751,11 +752,15 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (isHasAltName) {
       showEl(getEl('sat-alt-name')!.parentElement!, 'flex');
-      showEl(getEl('sat-alt-id')!.parentElement!, 'flex');
       getEl('sat-alt-name')!.innerHTML = (obj as DetailedSatellite).altName;
-      getEl('sat-alt-id')!.innerHTML = (obj as DetailedSatellite).altId;
     } else {
       hideEl(getEl('sat-alt-name')!.parentElement!);
+    }
+
+    if (isHasAltId) {
+      showEl(getEl('sat-alt-id')!.parentElement!, 'flex');
+      getEl('sat-alt-id')!.innerHTML = (obj as DetailedSatellite).altId;
+    } else {
       hideEl(getEl('sat-alt-id')!.parentElement!);
     }
 

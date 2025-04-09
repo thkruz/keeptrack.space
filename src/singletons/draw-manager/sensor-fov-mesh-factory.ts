@@ -58,8 +58,8 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
       return false;
     }
 
-    if (mesh.sensor.type !== SpaceObjectType.SHORT_TERM_FENCE && (!keepTrackApi.getPlugin(SensorFov).isMenuButtonActive &&
-      !keepTrackApi.getPlugin(SensorSurvFence).isMenuButtonActive)) {
+    if (mesh.sensor.type !== SpaceObjectType.SHORT_TERM_FENCE && (!keepTrackApi.getPlugin(SensorFov)?.isMenuButtonActive &&
+      !keepTrackApi.getPlugin(SensorSurvFence)?.isMenuButtonActive)) {
       return false;
     }
 

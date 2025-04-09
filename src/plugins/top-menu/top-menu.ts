@@ -44,7 +44,7 @@ export class TopMenu extends KeepTrackPlugin {
                     </a>
                   </li>
                   <li>
-                    <a id="tutorial-btn" class="top-menu-icons">
+                    <a id="tutorial-btn" class="top-menu-icons bmenu-item-disabled">
                       <div id="tutorial-icon" class="top-menu-icons">
                         <img src=${helpPng} alt="" />
                       </div>

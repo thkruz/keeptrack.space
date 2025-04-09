@@ -4,7 +4,7 @@ import * as getEl from '@app/lib/get-el';
 import { settingsManager } from '@app/settings/settings';
 import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { ColorScheme } from '@app/singletons/color-schemes/color-scheme';
-import { DefaultColorScheme } from '@app/singletons/color-schemes/default-color-scheme';
+import { ObjectTypeColorScheme } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { GroupType } from '@app/singletons/object-group';
 import { LegendManager } from '@app/static/legend-manager';
@@ -497,7 +497,7 @@ describe('ColorSchemeManager Block 2', () => {
     colorSchemeManager.pickableBuffer = {};
     colorSchemeManager.calculateColorBuffers = jest.fn();
 
-    const mockColorScheme = new DefaultColorScheme();
+    const mockColorScheme = new ObjectTypeColorScheme();
 
     // Act
     colorSchemeManager.setColorScheme(mockColorScheme, true);

@@ -25,7 +25,7 @@ import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu'
 import type { KeepTrackPlugins } from '@app/plugins/plugins';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
-import { DefaultColorSchemeColorMap } from '@app/singletons/color-schemes/default-color-scheme';
+import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
@@ -148,13 +148,13 @@ export class SettingsManager {
     keepTrackApi.runEvent(KeepTrackApiEvents.saveSettings);
   }
 
-  colors: ColorSchemeColorMap & DefaultColorSchemeColorMap;
+  colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
 
   /**
    * The default color scheme to use when the application is loaded. This must be a string that matches a class name of one of the available color schemes.
    * Ex. DefaultColorScheme, CelestrakColorScheme, etc.
    */
-  defaultColorScheme: 'DefaultColorScheme';
+  defaultColorScheme: 'CelestrakColorScheme';
 
   /** Ensures no html is injected into the page */
   isPreventDefaultHtml = false;
@@ -1283,7 +1283,7 @@ export class SettingsManager {
   private setColorSettings_() {
     this.selectedColorFallback = this.selectedColor;
 
-    this.colors = {} as ColorSchemeColorMap & DefaultColorSchemeColorMap;
+    this.colors = {} as ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
     try {
       const jsonString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DOT_COLORS);
 

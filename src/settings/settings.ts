@@ -126,7 +126,11 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HOS, settingsManager.colors.transparent[3] === 0 ? 'true' : 'false');
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
+    if (settingsManager.isShowConfidenceLevels) {
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
+    } else {
+      PersistenceManager.getInstance().removeItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS);
+    }
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEMO_MODE, settingsManager.isDemoModeOn.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE, settingsManager.isSatLabelModeOn.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
@@ -1153,7 +1157,7 @@ export class SettingsManager {
   /**
    * Indicates whether to show confidence levels when hovering over an object.
    */
-  isShowConfidenceLevels = true;
+  isShowConfidenceLevels: boolean = false;
   /**
    * The container root element for the application
    * NOTE: This is for initializing it, but keepTrackApi.containerRoot will be used throughout
@@ -1183,7 +1187,11 @@ export class SettingsManager {
     this.isDrawMilkyWay = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_MILKY_WAY, this.isDrawMilkyWay) as boolean;
     this.isGraySkybox = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_GRAY_SKYBOX, this.isGraySkybox) as boolean;
     this.isEciOnHover = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_ECI_ON_HOVER, this.isEciOnHover) as boolean;
-    this.isShowConfidenceLevels = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_CONFIDENCE_LEVELS, this.isShowConfidenceLevels) as boolean;
+    if (settingsManager.isShowConfidenceLevels) {
+      this.isShowConfidenceLevels = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_CONFIDENCE_LEVELS, this.isShowConfidenceLevels) as boolean;
+    } else {
+      this.isShowConfidenceLevels = false;
+    }
     this.isDemoModeOn = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DEMO_MODE, this.isDemoModeOn) as boolean;
     this.isSatLabelModeOn = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_SAT_LABEL_MODE, this.isSatLabelModeOn) as boolean;
     this.isFreezePropRateOnDrag = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, this.isFreezePropRateOnDrag) as boolean;

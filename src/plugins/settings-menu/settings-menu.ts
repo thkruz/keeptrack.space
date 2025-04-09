@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ColorPick } from '@app/lib/color-pick';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl } from '@app/lib/get-el';
 import { parseRgba } from '@app/lib/rgba';
 import { rgbCss } from '@app/lib/rgbCss';
 import { SettingsManager } from '@app/settings/settings';
@@ -248,6 +248,15 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
         getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
         getEl('settings-form')?.addEventListener('submit', SettingsMenuPlugin.onSubmit_);
         getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.resetToDefaults);
+
+
+        if (!settingsManager.isShowConfidenceLevels) {
+          hideEl(getEl('settings-confidence-levels')!.parentElement!.parentElement!);
+        }
+
+        if (!settingsManager.plugins.timeMachine) {
+          hideEl(getEl('settings-time-machine-toasts')!.parentElement!.parentElement!);
+        }
 
         const colorPalette = [
           // Reds

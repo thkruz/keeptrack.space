@@ -1,5 +1,5 @@
 import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
-import { DefaultColorScheme } from '@app/singletons/color-schemes/default-color-scheme';
+import { ObjectTypeColorScheme } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { rgbCss } from '../lib/rgbCss';
@@ -56,7 +56,7 @@ export abstract class LegendManager {
     }
 
     // TODO there should be a setting that determines the defaults (Celestrak Rebase)
-    const selectedOption = LegendManager.menuOptions[menu] ?? DefaultColorScheme.legendHtml;
+    const selectedOption = LegendManager.menuOptions[menu] ?? ObjectTypeColorScheme.legendHtml;
 
     legendHoverDom.innerHTML = selectedOption;
     if (menu === 'clear') {

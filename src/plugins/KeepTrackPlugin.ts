@@ -843,6 +843,18 @@ export abstract class KeepTrackPlugin {
   openSideMenu() {
     this.hideSideMenus();
     slideInRight(getEl(this.sideMenuElementName), 1000);
+    KeepTrackPlugin.openSideMenu_();
+  }
+
+  /**
+   * This runs after a side menu is opened.
+   */
+  private static openSideMenu_() {
+    getEl('tutorial-btn')?.classList.remove('bmenu-item-disabled');
+  }
+
+  private static closeSideMenu_() {
+    getEl('tutorial-btn')?.classList.add('bmenu-item-disabled');
   }
 
   openSettingsMenu() {
@@ -864,6 +876,7 @@ export abstract class KeepTrackPlugin {
     const settingsMenuElement = getEl(`${this.sideMenuElementName}`);
 
     slideOutLeft(settingsMenuElement, 1000);
+    KeepTrackPlugin.closeSideMenu_();
   }
 
   closeSettingsMenu() {

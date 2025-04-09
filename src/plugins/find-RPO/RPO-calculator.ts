@@ -7,9 +7,10 @@ import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import rpo from '@public/img/icons/rpo.png';
 import { vec3 } from 'gl-matrix';
-import { BaseObject, CatalogSource, DetailedSatellite, Kilometers, Seconds, Sgp4, StateVectorSgp4, Vector3D } from 'ootk';
+import { BaseObject, CatalogSource, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Seconds, Sgp4, StateVectorSgp4 } from 'ootk';
 import { KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+
 
 interface RPO {
     sat1Id: string,
@@ -225,8 +226,8 @@ export class RPOCalculator extends KeepTrackPlugin {
     private findRPOSubmit() {
 
         const AvA = (<HTMLInputElement>getEl('AVA')).checked;
-        const maxDis = parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('maxDis')).value);
-        const maxVel = parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('maxVel')).value);
+        const maxDis = parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('maxDis')).value) as Kilometers;
+        const maxVel = parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('maxVel')).value) as KilometersPerSecond;
         const duration = parseFloat(<StringifiedNumber>(<HTMLInputElement>getEl('duration')).value) * 60 ** 2 as Seconds;
         const type = (<HTMLInputElement>getEl('dropdown')).value;
 
@@ -279,6 +280,8 @@ export class RPOCalculator extends KeepTrackPlugin {
 
     private async onSubmit(e: MouseEvent) {
         await this.asyncFunctionWrapper(e);
+        // This is to try to make the findRPOs run asynchronously so that 
+        // the UI does not freeze during its execution which can take some timetime
     }
 
     private async asyncFunctionWrapper(e: MouseEvent) {
@@ -480,7 +483,7 @@ export class RPOCalculator extends KeepTrackPlugin {
     }
 }
 
-function getRIC(pos1: Vector3D, vel1: Vector3D, pos2: Vector3D, vel2: Vector3D) {
+function getRIC(pos1: EciVec3, vel1: EciVec3, pos2: EciVec3, vel2: EciVec3) {
 
     const sat1 = { position: pos1, velocity: vel1 };
     const sat2 = { position: pos2, velocity: vel2 };
@@ -490,16 +493,17 @@ function getRIC(pos1: Vector3D, vel1: Vector3D, pos2: Vector3D, vel2: Vector3D) 
     return ric;
 }
 
-function subtract(vec1: Vector3D, vec2: Vector3D): Vector3D {
-    const x = vec1.x - vec2.x;
-    const y = vec1.y - vec2.y;
-    const z = vec1.z - vec2.z;
-    return new Vector3D(x, y, z)
-}
+// function subtract(vec1: EciVec3, vec2: EciVec3): EciVec3 {
+//     const x = vec1.x - vec2.x as Kilometers;
+//     const y = vec1.y - vec2.y as Kilometers;
+//     const z = vec1.z - vec2.z as Kilometers;
+//     const ret : EciVec3 = { x, y, z };
+//     return ret
+// }
 
-function norm(vec: Vector3D): number {
-    return Math.sqrt(vec.x ** 2 + vec.y ** 2 + vec.z ** 2)
-}
+// function norm(vec: EciVec3): Kilometers | KilometersPerSecond {
+//     return Math.sqrt(vec.x ** 2 + vec.y ** 2 + vec.z ** 2) as Kilometers
+// }
 
 export function findClosestApproach(sat1: DetailedSatellite, sat2: DetailedSatellite, start: Date, duration: Seconds): RPO {
 
@@ -516,7 +520,7 @@ export function findClosestApproach(sat1: DetailedSatellite, sat2: DetailedSatel
     // very small steps defined to be at least 10 points per orbit
     var veryLittleStep = shortestPeriod / 100;
 
-    var currentDist = Infinity;
+    var currentDist = Infinity as Kilometers;
 
     for (let t = 0; t < duration; t += bigStep) {
 
@@ -529,11 +533,12 @@ export function findClosestApproach(sat1: DetailedSatellite, sat2: DetailedSatel
             m = SatMath.calculateTimeVariables(now, sat2.satrec).m as number;
             var sat2State = Sgp4.propagate(sat2.satrec, m);
 
-            var pos1 = <Vector3D>sat1State.position;
-            var pos2 = <Vector3D>sat2State.position;
+            var pos1 = <EciVec3>sat1State.position;
+            var pos2 = <EciVec3>sat2State.position;
 
-            var relPos = subtract(pos2, pos1);
-            var currentDist = norm(relPos);
+            // var relPos = subtract(pos2, pos1);
+            // var currentDist = norm(relPos) as Kilometers;
+            var currentDist = SatMath.distance(pos2, pos1);
 
         }
         catch (e) {
@@ -560,11 +565,12 @@ export function findClosestApproach(sat1: DetailedSatellite, sat2: DetailedSatel
             m = SatMath.calculateTimeVariables(now, sat2.satrec).m as number;
             var sat2State = Sgp4.propagate(sat2.satrec, m);
 
-            var pos1 = <Vector3D>sat1State.position;
-            var pos2 = <Vector3D>sat2State.position;
+            var pos1 = <EciVec3>sat1State.position;
+            var pos2 = <EciVec3>sat2State.position;
 
-            var relPos = subtract(pos2, pos1);
-            var currentDist = norm(relPos);
+            // var relPos = subtract(pos2, pos1);
+            // var currentDist = norm(relPos) as  Kilometers;
+            var currentDist = SatMath.distance(pos2, pos1);
 
         }
         catch (e) {
@@ -583,6 +589,13 @@ export function findClosestApproach(sat1: DetailedSatellite, sat2: DetailedSatel
     var sat1State: StateVectorSgp4;
     var sat2State: StateVectorSgp4;
 
+    var ric = {
+        position: vec3.fromValues(0, 0, 0),
+        velocity: vec3.fromValues(0, 0, 0)
+    };
+
+    var relVelNorm = 0 as KilometersPerSecond;
+
     for (let t = 0; t < duration; t += veryLittleStep) {
 
         let now = new Date(start.getTime() + t * 1000)
@@ -593,24 +606,26 @@ export function findClosestApproach(sat1: DetailedSatellite, sat2: DetailedSatel
         m = SatMath.calculateTimeVariables(now, sat2.satrec).m;
         sat2State = Sgp4.propagate(sat2.satrec, m as number);
 
-        var pos1 = <Vector3D>sat1State.position;
-        var pos2 = <Vector3D>sat2State.position;
+        var pos1 = <EciVec3>sat1State.position;
+        var pos2 = <EciVec3>sat2State.position;
 
-        var relPos = subtract(pos2, pos1);
-        var currentDist = norm(relPos);
+        // var relPos = subtract(pos2, pos1);
+        // var currentDist = norm(relPos) as Kilometers;
+        var currentDist = SatMath.distance(pos2, pos1);
 
 
         if (currentDist < minDist) {
             minDist = currentDist;
             approachDate = now;
 
-            const vel1 = <Vector3D>sat1State.velocity;
-            const vel2 = <Vector3D>sat2State.velocity;
+            const vel1 = <EciVec3>sat1State.velocity;
+            const vel2 = <EciVec3>sat2State.velocity;
 
-            var minRelVel = subtract(vel2, vel1);
-            var relVelNorm = norm(minRelVel);
+            // var minRelVel = subtract(vel2, vel1);
+            // relVelNorm = norm(minRelVel) as KilometersPerSecond;
+            relVelNorm = SatMath.velocity(vel2, vel1);
 
-            var ric = getRIC(pos1, vel1, pos2, vel2)
+            ric = getRIC(pos1, vel1, pos2, vel2)
 
         }
     }
@@ -625,6 +640,7 @@ export function findClosestApproach(sat1: DetailedSatellite, sat2: DetailedSatel
     } else {
         var sat2Num = sat2.sccNum;
     }
+
     const rpo: RPO = {
         sat1Id: sat1Num,
         sat2Id: sat2Num,

@@ -27,7 +27,7 @@ import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
-import logoPng from '@public/img/kts-text-logo.png';
+import logoPng from '@public/img/logo-primary.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class Screenshot extends KeepTrackPlugin {

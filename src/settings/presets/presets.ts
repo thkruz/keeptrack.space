@@ -333,7 +333,7 @@ export class SettingsPresets {
 
   static loadPresetFacSat2(settings: SettingsManager) {
     settings.isDisableKeyboard = true;
-    settings.isShowLogo = true;
+    settings.isShowPrimaryLogo = true;
     settings.isShowSplashScreen = false;
     settings.maxAnalystSats = 1;
     settings.maxMissiles = 1;

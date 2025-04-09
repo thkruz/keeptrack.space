@@ -106,6 +106,11 @@ export class SettingsManager {
   earthDayTextureQuality = EarthDayTextureQuality.MEDIUM;
   earthNightTextureQuality = EarthNightTextureQuality.MEDIUM;
   filter: FilterPluginSettings = {};
+  /**
+   * This enables/disable the mission data section of the sat-info-box. There is no value if your data set contains no mission data.
+   */
+  isMissionDataEnabled = true;
+
 
   static preserveSettings() {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
@@ -738,7 +743,14 @@ export class SettingsManager {
    * Determines whether or not to show the satellite labels.
    */
   isSatLabelModeOn = true;
-  isShowLogo = true;
+  /**
+   * Flag for showing the primary logo
+   */
+  isShowPrimaryLogo = true;
+  /**
+   * Flag for showing the secondary logo for partnerships
+   */
+  isShowSecondaryLogo = false;
   /**
    * Flag for using the debris catalog instead of the full catalog
    *
@@ -1250,7 +1262,7 @@ export class SettingsManager {
   private checkIfIframe_() {
     if (window.self !== window.top) {
       this.isInIframe = true;
-      this.isShowLogo = true;
+      this.isShowPrimaryLogo = true;
     }
   }
 
@@ -1584,7 +1596,7 @@ export class SettingsManager {
             this.copyrightOveride = true;
             break;
           case 'logo':
-            this.isShowLogo = true;
+            this.isShowPrimaryLogo = true;
             break;
           case 'noPropRate':
             this.isAlwaysHidePropRate = true;

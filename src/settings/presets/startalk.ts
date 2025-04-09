@@ -46,7 +46,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
   settingsManager.colors.unknown = [0.6, 0.6, 0.6, 0.85];
 
   settingsManager.isDrawOrbits = false;
-  settingsManager.isShowLogo = false;
+  settingsManager.isShowPrimaryLogo = false;
 
   settingsManager.colors.transparent = [1.0, 1.0, 1.0, 0.0]; // Transparent
 

@@ -10,7 +10,7 @@ import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
 import { SatMath, SunStatus } from '@app/static/sat-math';
 import {
-  BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Hours, Kilometers, lla2eci, MILLISECONDS_PER_SECOND, Radians,
+  BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Hours, Kilometers, lla2eci, Milliseconds, MILLISECONDS_PER_SECOND, Radians,
   SatelliteRecord,
   Seconds, SpaceObjectType, Sun
 } from 'ootk';
@@ -642,8 +642,10 @@ export class SensorTimeline extends KeepTrackPlugin {
     const width = this.canvas_.width * 0.75;
     const height = this.canvas_.height * 0.85;
     const timeManager = keepTrackApi.getTimeManager();
-    const startTime = timeManager.simulationTimeObj.getTime();
-    const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000;
+    const initialTime = timeManager.simulationTimeObj.getTime() as Milliseconds;
+    const startHourOffset = timeManager.simulationTimeObj.getUTCMinutes() * 60 * 1000 as Milliseconds;
+    const startTime = initialTime - startHourOffset as Milliseconds;
+    const endTime = initialTime + this.lengthOfLookAngles_ * 60 * 60 * 1000 + startHourOffset as Milliseconds;
 
     // clear canvas
     this.ctx_.reset();
@@ -700,8 +702,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       // Draw passes
       sensorPass.passes.forEach((pass) => {
-        const passStart = pass.start.getTime();
-        const passEnd = pass.end.getTime();
+        const passStart = pass.start.getTime() + startHourOffset;
+        const passEnd = pass.end.getTime() + startHourOffset;
         const x1 = leftOffset + (passStart - startTime) * xScale;
         const x2 = leftOffset + (passEnd - startTime) * xScale;
 
@@ -793,8 +795,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       // Draw passes
       ObservablePeriod.passes.forEach((pass) => {
-        const passStart = pass.start.getTime();
-        const passEnd = pass.end.getTime();
+        const passStart = pass.start.getTime() + startHourOffset;
+        const passEnd = pass.end.getTime() + startHourOffset;
         const x1 = leftOffset + (passStart - startTime) * xScale;
         const x2 = leftOffset + (passEnd - startTime) * xScale;
 
@@ -879,8 +881,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       // Draw passes
       ObservablePeriod.passes.forEach((pass) => {
-        const passStart = pass.start.getTime();
-        const passEnd = pass.end.getTime();
+        const passStart = pass.start.getTime() + startHourOffset;
+        const passEnd = pass.end.getTime() + startHourOffset;
         const x1 = leftOffset + (passStart - startTime) * xScale;
         const x2 = leftOffset + (passEnd - startTime) * xScale;
 
@@ -966,8 +968,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
     // Draw passes
     ObservablePeriod.passes.forEach((pass) => {
-      const passStart = pass.start.getTime();
-      const passEnd = pass.end.getTime();
+      const passStart = pass.start.getTime() + startHourOffset;
+      const passEnd = pass.end.getTime() + startHourOffset;
       const x1 = leftOffset + (passStart - startTime) * xScale;
       const x2 = leftOffset + (passEnd - startTime) * xScale;
 
@@ -1117,8 +1119,10 @@ export class SensorTimeline extends KeepTrackPlugin {
     const width = this.canvas_.width * 0.75;
     const height = this.canvas_.height * 0.75;
     const timeManager = keepTrackApi.getTimeManager();
-    const startTime = timeManager.simulationTimeObj.getTime();
-    const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000;
+    const initialTime = timeManager.simulationTimeObj.getTime() as Milliseconds;
+    const startHourOffset = timeManager.simulationTimeObj.getUTCMinutes() * 60 * 1000 as Milliseconds;
+    const startTime = initialTime - startHourOffset as Milliseconds;
+    const endTime = initialTime + this.lengthOfLookAngles_ * 60 * 60 * 1000 + startHourOffset as Milliseconds;
 
     // clear canvas
     this.ctx_.reset();
@@ -1175,8 +1179,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       // Draw passes
       sensorPass.passes.forEach((pass) => {
-        const passStart = pass.start.getTime();
-        const passEnd = pass.end.getTime();
+        const passStart = pass.start.getTime() + startHourOffset;
+        const passEnd = pass.end.getTime() + startHourOffset;
         const x1 = leftOffset + (passStart - startTime) * xScale;
         const x2 = leftOffset + (passEnd - startTime) * xScale;
 

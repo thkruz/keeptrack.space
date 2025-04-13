@@ -1,4 +1,5 @@
 import { ToastMsgType } from '@app/interfaces';
+import { Telemetry } from '@app/static/telemetry';
 import githubIssueUrl, { Options } from 'new-github-issue-url';
 import { keepTrackApi } from '../keepTrackApi';
 import { isThisNode } from '../static/isThisNode';
@@ -26,6 +27,14 @@ export class ErrorManager {
   }
 
   error(e: Error, funcName: string, toastMsg?: string) {
+    if (!isThisNode() && !Telemetry.isInitialized) {
+      Telemetry.initialize(keepTrackApi.getRenderer().gl, keepTrackApi.getRenderer().domElement);
+    }
+
+    if (Telemetry.isInitialized) {
+      Telemetry.sendErrorData(e, funcName);
+    }
+
     // eslint-disable-next-line no-console
     console.error(e);
 

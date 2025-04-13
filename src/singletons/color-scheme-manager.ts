@@ -266,6 +266,8 @@ export class ColorSchemeManager {
 
       },
     });
+
+    LegendManager.change(this.currentColorScheme.id);
   }
 
   isInView(obj: BaseObject) {
@@ -651,6 +653,11 @@ export class ColorSchemeManager {
   }
 
   private preValidateColorScheme_(isForceRecolor = false) {
+    // Confirm we are using a valid color scheme
+    if (!Object.keys(this.colorSchemeInstances).includes(this.currentColorScheme.id)) {
+      this.currentColorScheme = this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
+    }
+
     if (this.isUseGroupColorScheme) {
       const watchlistMenu = getEl('watchlist-menu');
       const watchlistTransform = watchlistMenu?.style.transform ?? '';

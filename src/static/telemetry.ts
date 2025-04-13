@@ -60,7 +60,7 @@ interface WebGLTelemetryData {
   // Application State
   application: {
     version: string;
-    timestamp: number;
+    timestamp: string;
     currentScene?: string;
     assetLoadState?: {
       loaded: number;
@@ -74,6 +74,12 @@ interface WebGLTelemetryData {
       numTextures?: number;
       numBuffers?: number;
     };
+    primarySatObj?: object;
+    secondarySatObj?: object | null;
+    currentSensor?: object[];
+    plugins: Record<string, boolean>;
+    simulationTime?: object;
+    [key: string]: unknown; // Additional custom data
   };
 
   // User Interaction
@@ -122,9 +128,10 @@ export class Telemetry {
   /**
    * Send error data when an error occurs
    */
-  static sendErrorData(e: Error, funcName: string, additionalData?: Record<string, any>): void {
+  static sendErrorData(e: Error, funcName: string, additionalData?: Record<string, unknown>): void {
     if (!this.gl || !this.canvas) {
-      console.error('Cannot send telemetry: WebGL context or canvas not initialized');
+      // eslint-disable-next-line no-console
+      console.debug('Cannot send telemetry: WebGL context or canvas not initialized');
 
       return;
     }
@@ -143,7 +150,7 @@ export class Telemetry {
         application: {
           version: this.appVersion,
           timestamp: new Date().toISOString(),
-          ...additionalData?.application,
+          ...additionalData?.application as Record<string, unknown>,
           primarySatObj: (<SelectSatManager>keepTrackApi.getPluginByName('SelectSatManager'))?.primarySatObj,
           secondarySatObj: (<SelectSatManager>keepTrackApi.getPluginByName('SelectSatManager'))?.secondarySatObj,
           currentSensor: keepTrackApi.getSensorManager()?.currentSensors,
@@ -155,8 +162,8 @@ export class Telemetry {
       // Add optional user interaction data if available
       if (additionalData?.lastInputType || additionalData?.lastInputTime) {
         telemetryData.interaction = {
-          lastInputType: additionalData.lastInputType,
-          lastInputTime: additionalData.lastInputTime,
+          lastInputType: additionalData.lastInputType as 'mouse' | 'touch' | 'keyboard' | 'gamepad' | 'none',
+          lastInputTime: additionalData.lastInputTime as number,
         };
       }
 
@@ -164,7 +171,8 @@ export class Telemetry {
       this.sendTelemetryData(telemetryData);
 
     } catch (err) {
-      console.error('Error preparing telemetry:', err);
+      // eslint-disable-next-line no-console
+      console.debug('Error preparing telemetry:', err);
     }
   }
 
@@ -194,9 +202,15 @@ export class Telemetry {
 
     if (error !== gl.NO_ERROR) {
       switch (error) {
-        case gl.INVALID_ENUM: this.lastError = 'INVALID_ENUM'; break;
-        case gl.INVALID_VALUE: this.lastError = 'INVALID_VALUE'; break;
-        case gl.INVALID_OPERATION: this.lastError = 'INVALID_OPERATION'; break;
+        case gl.INVALID_ENUM:
+          this.lastError = 'INVALID_ENUM';
+          break;
+        case gl.INVALID_VALUE:
+          this.lastError = 'INVALID_VALUE';
+          break;
+        case gl.INVALID_OPERATION:
+          this.lastError = 'INVALID_OPERATION';
+          break;
         case gl.INVALID_FRAMEBUFFER_OPERATION:
           this.lastError = 'INVALID_FRAMEBUFFER_OPERATION';
           break;
@@ -226,7 +240,10 @@ export class Telemetry {
    * Collect system information
    */
   private static collectSystemInfo(): WebGLTelemetryData['system'] {
-    const connection = (navigator as any).connection;
+    const connection = (navigator as Navigator & { connection?: unknown }).connection as {
+      effectiveType?: string;
+      downlink?: number;
+    };
 
     const systemInfo: WebGLTelemetryData['system'] = {
       userAgent: navigator.userAgent,
@@ -238,12 +255,21 @@ export class Telemetry {
       colorDepth: window.screen.colorDepth,
     };
 
+    const performanceData = performance as {
+      memory?: {
+        jsHeapSizeLimit: number;
+        totalJSHeapSize: number;
+        usedJSHeapSize: number;
+      };
+      deviceMemory?: number;
+    };
+
     // Add memory info if available
-    if ((performance as any).memory) {
+    if (performanceData.memory) {
       systemInfo.memoryInfo = {
-        jsHeapSizeLimit: (performance as any).memory.jsHeapSizeLimit,
-        totalJSHeapSize: (performance as any).memory.totalJSHeapSize,
-        usedJSHeapSize: (performance as any).memory.usedJSHeapSize,
+        jsHeapSizeLimit: performanceData.memory.jsHeapSizeLimit,
+        totalJSHeapSize: performanceData.memory.totalJSHeapSize,
+        usedJSHeapSize: performanceData.memory.usedJSHeapSize,
       };
     }
 
@@ -306,7 +332,8 @@ export class Telemetry {
         'Content-Type': 'application/json',
       },
     }).catch((err) => {
-      console.error('Error sending telemetry:', err);
+      // eslint-disable-next-line no-console
+      console.debug('Error sending telemetry:', err);
     });
   }
 
@@ -314,7 +341,7 @@ export class Telemetry {
    * Capture current performance snapshot
    * Call this method immediately before sending error data for better context
    */
-  static capturePerformanceSnapshot(): Record<string, any> {
+  static capturePerformanceSnapshot(): Record<string, unknown> {
     if (!this.gl) {
       return {};
     }
@@ -335,7 +362,7 @@ export class Telemetry {
   /**
    * Add custom application state to the telemetry data
    */
-  static addAppState(scene: string, lastAction?: string): Record<string, any> {
+  static addAppState(scene: string, lastAction?: string): Record<string, unknown> {
     return {
       application: {
         currentScene: scene,
@@ -347,7 +374,7 @@ export class Telemetry {
   /**
    * Add asset loading state to the telemetry data
    */
-  static addAssetState(loaded: number, failed: number, failedAssets?: string[]): Record<string, any> {
+  static addAssetState(loaded: number, failed: number, failedAssets?: string[]): Record<string, unknown> {
     return {
       application: {
         assetLoadState: {
@@ -362,7 +389,7 @@ export class Telemetry {
   /**
    * Add user interaction data
    */
-  static addInteractionData(inputType: 'mouse' | 'touch' | 'keyboard' | 'gamepad' | 'none'): Record<string, any> {
+  static addInteractionData(inputType: 'mouse' | 'touch' | 'keyboard' | 'gamepad' | 'none'): Record<string, unknown> {
     return {
       lastInputType: inputType,
       lastInputTime: Date.now(),

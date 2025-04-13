@@ -33,9 +33,9 @@ export class LineManager {
     }),
   };
   uniforms_ = {
-    u_color: <WebGLUniformLocation>null,
-    u_camMatrix: <WebGLUniformLocation>null,
-    u_pMatrix: <WebGLUniformLocation>null,
+    u_color: null as unknown as WebGLUniformLocation,
+    u_camMatrix: null as unknown as WebGLUniformLocation,
+    u_pMatrix: null as unknown as WebGLUniformLocation,
   };
   program: WebGLProgram;
 

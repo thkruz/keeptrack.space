@@ -25,10 +25,10 @@ export class SensorFovMesh extends CustomMesh {
   sensor: DetailedSensor;
 
   uniforms_ = {
-    u_pMatrix: <WebGLUniformLocation>null,
-    u_camMatrix: <WebGLUniformLocation>null,
-    u_mvMatrix: <WebGLUniformLocation>null,
-    u_color: <WebGLUniformLocation>null,
+    u_pMatrix: null as unknown as WebGLUniformLocation,
+    u_camMatrix: null as unknown as WebGLUniformLocation,
+    u_mvMatrix: null as unknown as WebGLUniformLocation,
+    u_color: null as unknown as WebGLUniformLocation,
   };
   /**
    * A typed array that stores the indices for the bottom part of the sensor field of view mesh.

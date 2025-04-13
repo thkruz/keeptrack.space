@@ -19,10 +19,10 @@ export interface ConeSettings {
 
 export class ConeMesh extends CustomMesh {
   uniforms_ = {
-    u_pMatrix: <WebGLUniformLocation>null,
-    u_camMatrix: <WebGLUniformLocation>null,
-    u_mvMatrix: <WebGLUniformLocation>null,
-    u_color: <WebGLUniformLocation>null,
+    u_pMatrix: null as unknown as WebGLUniformLocation,
+    u_camMatrix: null as unknown as WebGLUniformLocation,
+    u_mvMatrix: null as unknown as WebGLUniformLocation,
+    u_color: null as unknown as WebGLUniformLocation,
   };
   private verticesTmp_: number[] = [];
   private indicesTmp_: number[] = [];

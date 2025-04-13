@@ -74,10 +74,10 @@ export class CustomMesh {
   };
 
   private uniforms_ = {
-    u_nMatrix: <WebGLUniformLocation>null,
-    u_pMatrix: <WebGLUniformLocation>null,
-    u_camMatrix: <WebGLUniformLocation>null,
-    u_mvMatrix: <WebGLUniformLocation>null,
+    u_nMatrix: null as unknown as WebGLUniformLocation,
+    u_pMatrix: null as unknown as WebGLUniformLocation,
+    u_camMatrix: null as unknown as WebGLUniformLocation,
+    u_mvMatrix: null as unknown as WebGLUniformLocation,
   };
 
   private vao: WebGLVertexArrayObject;

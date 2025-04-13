@@ -100,11 +100,11 @@ export class Sun {
     const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun-1024.jpg`);
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
-        u_sampler: <WebGLUniformLocation | null>null,
-        u_lightDirection: <WebGLUniformLocation | null>null,
-        u_sizeOfSun: <WebGLUniformLocation | null>null,
-        u_sunDistance: <WebGLUniformLocation | null>null,
-        u_isTexture: <WebGLUniformLocation | null>null,
+        u_sampler: null as unknown as WebGLUniformLocation,
+        u_lightDirection: null as unknown as WebGLUniformLocation,
+        u_sizeOfSun: null as unknown as WebGLUniformLocation,
+        u_sunDistance: null as unknown as WebGLUniformLocation,
+        u_isTexture: null as unknown as WebGLUniformLocation,
       },
       map: texture,
       vertexShader: this.shaders_.vert,

@@ -40,6 +40,7 @@ export class MobileManager {
           settingsManager.plugins.topMenu = cachePlugins.topMenu;
           settingsManager.plugins.datetime = cachePlugins.datetime;
           settingsManager.plugins.soundManager = cachePlugins.soundManager;
+          settingsManager.defaultColorScheme = 'CelestrakColorScheme';
 
           settingsManager.isDisableGodrays = true;
           settingsManager.isDisableSkybox = true;

@@ -850,11 +850,11 @@ export abstract class KeepTrackPlugin {
    * This runs after a side menu is opened.
    */
   private static openSideMenu_() {
-    getEl('tutorial-btn')?.classList.remove('bmenu-item-disabled');
+    getEl('tutorial-btn', true)?.classList.remove('bmenu-item-disabled');
   }
 
   private static closeSideMenu_() {
-    getEl('tutorial-btn')?.classList.add('bmenu-item-disabled');
+    getEl('tutorial-btn', true)?.classList.add('bmenu-item-disabled');
   }
 
   openSettingsMenu() {

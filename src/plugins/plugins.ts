@@ -141,8 +141,8 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
   try {
     const pluginList = [
       { init: () => new SelectSatManager().init(), enabled: true },
-      { init: () => new DebugMenuPlugin().init(), enabled: plugins.debug },
       { init: () => new TopMenu().init(), enabled: plugins.topMenu },
+      { init: () => new DebugMenuPlugin().init(), enabled: plugins.debug },
       { init: () => new SatInfoBox().init(), enabled: plugins.satInfoboxCore },
       { init: () => new DateTimeManager().init(), enabled: plugins.datetime },
       { init: () => new SocialMedia().init(), enabled: plugins.social },

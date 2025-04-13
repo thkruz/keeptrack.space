@@ -661,9 +661,7 @@ theodore.kruczek at gmail dot com.
      * Update Colors
      * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
      */
-    if (!settingsManager.isMobileModeEnabled) {
-      colorSchemeManagerInstance.calculateColorBuffers(false); // avoid recalculating ALL colors
-    }
+    colorSchemeManagerInstance.calculateColorBuffers(false); // avoid recalculating ALL colors
   }
 
   // Make the api available

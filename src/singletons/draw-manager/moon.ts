@@ -44,7 +44,7 @@ export class Moon {
   /** Whether the moon has been loaded. */
   private isLoaded_ = false;
   /** The model view matrix. */
-  private modelViewMatrix_ = <mat4>null;
+  private modelViewMatrix_ = null as unknown as mat4;
   /** The normal matrix. */
   private readonly normalMatrix_ = mat3.create();
 
@@ -58,7 +58,7 @@ export class Moon {
   /**
    * This is run once per frame to render the moon.
    */
-  draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer = null) {
+  draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_ || settingsManager.isDisableMoon) {
       return;
     }
@@ -103,9 +103,9 @@ export class Moon {
     const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/moon-1024.jpg`);
     const material = new ShaderMaterial(gl, {
       uniforms: {
-        sampler: <WebGLUniformLocation>null,
-        drawPosition: <WebGLUniformLocation>null,
-        sunPos: <WebGLUniformLocation>null,
+        sampler: null as unknown as WebGLUniformLocation,
+        drawPosition: null as unknown as WebGLUniformLocation,
+        sunPos: null as unknown as WebGLUniformLocation,
       },
       map: texture,
       vertexShader: this.shaders_.vert,

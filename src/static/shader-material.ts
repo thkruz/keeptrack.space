@@ -2,7 +2,7 @@ import { GlUtils } from '@app/static/gl-utils';
 import { Material, MaterialParameters } from './material';
 
 export interface ShaderMaterialParameters extends MaterialParameters {
-  uniforms?: Record<string, WebGLUniformLocation | null> | undefined;
+  uniforms?: Record<string, WebGLUniformLocation> | undefined;
   vertexShader?: string;
   fragmentShader?: string;
   linewidth?: number;
@@ -31,12 +31,12 @@ export class ShaderMaterial extends Material {
     this.uniforms = {
       ...this.uniforms,
       ...{
-        modelMatrix: null,
-        modelViewMatrix: null,
-        projectionMatrix: null,
-        viewMatrix: null,
-        normalMatrix: null,
-        cameraPosition: null,
+        modelMatrix: null as unknown as WebGLUniformLocation,
+        modelViewMatrix: null as unknown as WebGLUniformLocation,
+        projectionMatrix: null as unknown as WebGLUniformLocation,
+        viewMatrix: null as unknown as WebGLUniformLocation,
+        normalMatrix: null as unknown as WebGLUniformLocation,
+        cameraPosition: null as unknown as WebGLUniformLocation,
       },
     };
 

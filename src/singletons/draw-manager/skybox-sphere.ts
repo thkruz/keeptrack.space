@@ -188,10 +188,10 @@ export class SkyBoxSphere {
     this.initTextures_();
     const material = new ShaderMaterial(gl, {
       uniforms: {
-        u_texMilkyWay: <WebGLUniformLocation><unknown>null,
-        u_texBoundaries: <WebGLUniformLocation><unknown>null,
-        u_texConstellations: <WebGLUniformLocation><unknown>null,
-        u_fMilkyWay: <WebGLUniformLocation><unknown>null,
+        u_texMilkyWay: null as unknown as WebGLUniformLocation,
+        u_texBoundaries: null as unknown as WebGLUniformLocation,
+        u_texConstellations: null as unknown as WebGLUniformLocation,
+        u_fMilkyWay: null as unknown as WebGLUniformLocation,
       },
       vertexShader: this.shaders_.vert,
       fragmentShader: this.shaders_.frag,
@@ -203,6 +203,7 @@ export class SkyBoxSphere {
       precision: 'highp',
       disabledUniforms: {
         modelMatrix: true,
+        normalMatrix: true,
         viewMatrix: true,
         cameraPosition: true,
       },
@@ -268,7 +269,6 @@ export class SkyBoxSphere {
         uniform float u_fMilkyWay;
 
         in vec2 v_texcoord;
-        in vec3 v_normal;
         in float v_dist;
 
         out vec4 fragColor;
@@ -290,7 +290,6 @@ export class SkyBoxSphere {
         `,
     vert: keepTrackApi.glsl`
         out vec2 v_texcoord;
-        out vec3 v_normal;
         out float v_dist;
 
         void main(void) {
@@ -302,7 +301,6 @@ export class SkyBoxSphere {
 
             v_texcoord = uv;
             v_texcoord.x = 1.0 - v_texcoord.x;
-            v_normal = normalMatrix * normal;
         }
         `,
   };

@@ -698,6 +698,6 @@ describe('ColorSchemeManager Block 2', () => {
 
     // Assert
     expect(colorSchemeManager.isUseGroupColorScheme).toBe(false);
-    expect(colorSchemeManager.setColorScheme).toHaveBeenCalledWith(Object.values(colorSchemeManager.colorSchemeInstances)[0]);
+    expect(colorSchemeManager.currentColorScheme).toBe(Object.values(colorSchemeManager.colorSchemeInstances)[0]);
   });
 });

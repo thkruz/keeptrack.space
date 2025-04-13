@@ -280,7 +280,7 @@ export class ColorSchemeManager {
     return settingsManager.filter?.payloads === false && obj.type === SpaceObjectType.PAYLOAD;
   }
   isRocketBodyOff(obj: BaseObject) {
-    return !settingsManager.filter?.rocketBodies === false && obj.type === SpaceObjectType.ROCKET_BODY;
+    return settingsManager.filter?.rocketBodies === false && obj.type === SpaceObjectType.ROCKET_BODY;
   }
   isDebrisOff(obj: BaseObject) {
     return settingsManager.filter?.debris === false && obj.type === SpaceObjectType.DEBRIS;

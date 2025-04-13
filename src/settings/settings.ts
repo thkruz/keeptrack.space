@@ -684,6 +684,7 @@ export class SettingsManager {
     /** This determines if tle source is loaded to supplement externalTLEs  */
     isSupplementExternal: false,
   };
+  telemetryServer = 'https://telemetry.keeptrack.space';
   /**
    * Determines whether or not to hide the propogation rate text on the GUI.
    */

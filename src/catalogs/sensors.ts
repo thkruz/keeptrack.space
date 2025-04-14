@@ -25,6 +25,7 @@ export enum Operators {
   CALTECH = 'CALTECH',
   COMMERCIAL = 'COMMERCIAL',
   ITAF = 'ITAF', // Italian Air Force
+  OWLNET = 'OWL-Net',
 }
 
 export const sensors = <SensorList>{
@@ -1807,5 +1808,117 @@ export const sensors = <SensorList>{
     url: 'https://fas.org/man/eprint/leshan.pdf',
     country: 'Republic of China (Taiwan)',
     operator: Operators.ROC,
+  }),
+
+  // Korean OWL-Net
+  OWLKorea: new DetailedSensor({
+    objName: 'OWLKorea', // City is Daejeon
+    id: 0,
+    name: 'OWL-Net, Korea',
+    uiName: 'OWL-Net Korea',
+    system: 'OWL-Net',
+    type: SpaceObjectType.OPTICAL,
+    lat: <Degrees>36.397635,
+    lon: <Degrees>127.375679,
+    alt: <Kilometers>0.139, // https://koreascience.kr/article/JAKO201535151810320.pdf
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>5, // Not sure what the minimum is
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>100, // Multiple reports mentioning LEO tracking
+    maxRng: <Kilometers>200000,
+    zoom: ZoomValue.GEO,
+    changeObjectInterval: <Milliseconds>20000,
+    url: '',
+    country: 'Republic of Korea',
+    operator: Operators.OWLNET,
+  }),
+  OWLMongolia: new DetailedSensor({
+    objName: 'OWLMongolia', // City is Songino
+    id: 0,
+    name: 'OWL-Net, Mongolia',
+    uiName: 'OWL-Net Mongolia',
+    system: 'OWL-Net',
+    type: SpaceObjectType.OPTICAL,
+    lat: <Degrees>47.886111,
+    lon: <Degrees>106.334722,
+    alt: <Kilometers>1.674, // https://koreascience.kr/article/JAKO201618241377396.pdf
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>5, // Not sure what the minimum is
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>100, // Multiple reports mentioning LEO tracking
+    maxRng: <Kilometers>200000,
+    zoom: ZoomValue.GEO,
+    changeObjectInterval: <Milliseconds>20000,
+    url: '',
+    country: 'Republic of Korea',
+    operator: Operators.OWLNET,
+  }),
+  OWLMorocco: new DetailedSensor({
+    objName: 'OWLMorocco', // City is Oukaïmeden
+    id: 0,
+    name: 'OWL-Net, Morocco',
+    uiName: 'OWL-Net Morocco',
+    system: 'OWL-Net',
+    type: SpaceObjectType.OPTICAL,
+    lat: <Degrees>31.206008082312465,
+    lon: <Degrees>-7.866824237940079,
+    alt: <Kilometers>2.725, // https://koreascience.kr/article/JAKO201618241377396.pdf
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>5, // Not sure what the minimum is
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>100, // Multiple reports mentioning LEO tracking
+    maxRng: <Kilometers>200000,
+    zoom: ZoomValue.GEO,
+    changeObjectInterval: <Milliseconds>20000,
+    url: '',
+    country: 'Republic of Korea',
+    operator: Operators.OWLNET,
+  }),
+  OWLIsrael: new DetailedSensor({
+    objName: 'OWLIsrael',
+    id: 0,
+    name: 'OWL-Net, Israel',
+    uiName: 'OWL-Net Israel',
+    system: 'OWL-Net',
+    type: SpaceObjectType.OPTICAL,
+    lat: <Degrees>30.597389,
+    lon: <Degrees>34.762194,
+    alt: <Kilometers>0.8704, // Estimate
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>5, // Not sure what the minimum is
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>100, // Multiple reports mentioning LEO tracking
+    maxRng: <Kilometers>200000,
+    zoom: ZoomValue.GEO,
+    changeObjectInterval: <Milliseconds>20000,
+    url: '',
+    country: 'Republic of Korea',
+    operator: Operators.OWLNET,
+  }),
+  OWLUSA: new DetailedSensor({
+    objName: 'OWLUSA',
+    id: 0,
+    name: 'OWL-Net, USA',
+    uiName: 'OWL-Net USA',
+    system: 'OWL-Net',
+    type: SpaceObjectType.OPTICAL,
+    lat: <Degrees>32.44220852576508,
+    lon: <Degrees>-110.7892718047087,
+    alt: <Kilometers>2.7868, // Estimate
+    minAz: <Degrees>0,
+    maxAz: <Degrees>360,
+    minEl: <Degrees>5, // Not sure what the minimum is
+    maxEl: <Degrees>90,
+    minRng: <Kilometers>100, // Multiple reports mentioning LEO tracking
+    maxRng: <Kilometers>200000,
+    zoom: ZoomValue.GEO,
+    changeObjectInterval: <Milliseconds>20000,
+    url: '',
+    country: 'Republic of Korea',
+    operator: Operators.OWLNET,
   }),
 };

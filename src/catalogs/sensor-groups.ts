@@ -58,6 +58,15 @@ export const sensorGroups: SensorGroup[] = [
     list: ['COBRADANE', 'HARTPY', 'QTRTPY', 'KURTPY', 'SHATPY', 'KCSTPY', 'SBXRDR'],
   },
   {
+    name: 'OWL-Net',
+    header: 'OWL-Net Sensors',
+    topLink: {
+      name: 'All OWL-Net Sensors',
+      badge: 'OWL-Net',
+    },
+    list: ['OWLKorea', 'OWLMongolia', 'OWLMorocco', 'OWLIsrael', 'OWLUSA'],
+  },
+  {
     name: 'leolabs',
     header: 'LeoLabs Sensors',
     topLink: {

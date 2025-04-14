@@ -1,3 +1,4 @@
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
@@ -11,6 +12,7 @@ import { SensorFovMesh } from './sensor-fov-mesh';
 export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
   drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
     let i = 0;
+    let didWeDrawSomething = false;
     let lastSensorObjName = '';
 
     const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
@@ -25,13 +27,29 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
       const sensors = activeSensors.filter((s) => s.objName === mesh.sensor.objName);
 
       if (sensors.length > 0) {
+        didWeDrawSomething = true;
         mesh.draw(pMatrix, camMatrix, keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
         if (mesh.sensor.objName !== lastSensorObjName) {
           i++;
-          lastSensorObjName = mesh.sensor.objName;
+          lastSensorObjName = mesh.sensor.objName as string; // It is NOT optional in KeepTrack even though ootk allows it to be
         }
       }
     });
+
+    /*
+     * If we didn't draw anything, we should disable the FOV view plugin
+     * and show a toast message to the user.
+     * This is to prevent the user from being confused when they select a sensor
+     * and nothing happens.
+     */
+    if (!didWeDrawSomething) {
+      const sensorFovPlugin = keepTrackApi.getPlugin(SensorFov);
+
+      if (sensorFovPlugin && sensorFovPlugin.isMenuButtonActive) {
+        keepTrackApi.getUiManager().toast('No valid FOV to draw! We can\'t draw multiple Deep Space sensors at once.', ToastMsgType.caution);
+        sensorFovPlugin.disableFovView();
+      }
+    }
   }
 
   /**

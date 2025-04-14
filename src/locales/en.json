@@ -67,7 +67,7 @@
       "InvalidStartNum": "Invalid satellite starting number! Defaulting to 90000!",
       "BreakupGeneratorFailed": "Breakup Generator Failed!"
     },
-    "Collissions": {
+    "Collisions": {
       "noCollisionsData": "No collision data found!",
       "errorProcessingCollisions": "Error processing SOCRATES data!"
     },
@@ -203,7 +203,7 @@
       "title": "Short Term Fences (STF) Menu",
       "helpBody": "The Short Term Fences (STF) Menu is used for visualizing sensor search boxes. <br><br> This is unlikely to be very helpful unless you own/operate a sensor with a search box functionality."
     },
-    "Collissions": {
+    "Collisions": {
       "bottomIconLabel": "Collisions",
       "title": "Collisions Menu",
       "helpBody": "The Collisions Menu shows satellites with a high probability of collision. <br><br> Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision."

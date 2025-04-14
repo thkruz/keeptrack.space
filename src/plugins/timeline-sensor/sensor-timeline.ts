@@ -9,13 +9,15 @@ import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
 import { SatMath, SunStatus } from '@app/static/sat-math';
 import {
-  BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Hours, Kilometers, lla2eci, MILLISECONDS_PER_SECOND, Radians, RaeVec3, SatelliteRecord,
+  BaseObject, calcGmst, DEG2RAD, DetailedSatellite, DetailedSensor, EpochUTC, Hours, lla2eci, MILLISECONDS_PER_SECOND, Radians, RaeVec3, SatelliteRecord,
   Seconds, SpaceObjectType, Sun,
 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorManager } from '../sensor/sensorManager';
 import { SoundNames } from '../sounds/SoundNames';
+
+import { fetchWeatherApi } from 'openmeteo';
 
 interface Pass {
   start: Date;
@@ -25,6 +27,13 @@ interface Pass {
 interface ObservablePasses {
   sensor: DetailedSensor;
   passes: Pass[];
+}
+
+interface weatherReport {
+  latitude: number;
+  longitude: number;
+  hourly: Date[];
+  cloudCover: Float32Array;
 }
 
 export class SensorTimeline extends KeepTrackPlugin {
@@ -42,6 +51,7 @@ export class SensorTimeline extends KeepTrackPlugin {
   private lengthOfAvgPass_ = 240 as Seconds;
   private angleCalculationInterval_ = <Seconds>30;
   private detailedPlot = false;
+  private useWeather = true;
 
   constructor() {
     super();
@@ -129,13 +139,20 @@ export class SensorTimeline extends KeepTrackPlugin {
         <label for="sensor-timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
       </div>
     </div>
-    <!-- Toggle Switch for Boolean Value -->
+    <!-- Toggle Switch for Boolean Values -->
     <div class="row">
       <label for="sensor-timeline-toggle" class="btn btn-ui waves-effect waves-light">
         <input type="checkbox" id="sensor-timeline-toggle" />
         <span class="lever"></span>
         Detailed Plot
       </label>
+    </div>
+    <div class="switch row">
+            <label for="weather-toggle" data-position="top" data-delay="50" data-tooltip="Account for weather when calculating passes using weather forecasts">
+              <input id="weather-toggle" type="checkbox" checked/>
+              <span class="lever"></span>
+              Use Weather
+            </label>
     </div>
     <div class="row" style="margin: 0 10px;">
       <div id="sensor-timeline-sensor-list">
@@ -234,6 +251,12 @@ export class SensorTimeline extends KeepTrackPlugin {
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
+
+        getEl('weather-toggle')!.addEventListener('change', () => {
+          this.useWeather = (<HTMLInputElement>getEl('weather-toggle')).checked;
+          this.ctxStatic_.reset();
+          this.updateTimeline();
+        });
       },
     });
 
@@ -259,7 +282,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     });
   }
 
-  updateTimeline(): void {
+  async updateTimeline(): Promise<void> {
     try {
       if (keepTrackApi.getPlugin(SelectSatManager)!.selectedSat === -1) {
         return;
@@ -269,26 +292,27 @@ export class SensorTimeline extends KeepTrackPlugin {
       }
 
       this.calculateSensors_();
-      const passes = this.calculatePasses_();
+      const passes = await this.calculatePasses_();
+
+      const ObservablePasses = passes[0];
+      const SatInFoVs = passes[1];
+      const SatInSuns = passes[2];
+      const StationInNights = passes[3];
+      const ClearSkies = passes[4];
+
+      // console.log('observable', ObservablePasses);
+      // console.log('fov', SatInFoVs);
+      // console.log('sun', SatInSuns);
+      // console.log('night', StationInNights);
+      // console.log('weather', ClearSkies);
 
       if (this.detailedPlot === true) {
 
-        const ObservablePasses = passes[0];
-        const SatInFoVs = passes[1];
-        const SatInSuns = passes[2];
-        const StationInNights = passes[3];
+        this.drawDetailedTimeline_(ObservablePasses, SatInFoVs, SatInSuns, StationInNights, ClearSkies);
 
-        /*
-         * console.log(ObservablePasses);
-         * console.log(SatInFoVs);
-         * console.log(SatInSuns);
-         * console.log(StationInNights);
-         */
-
-        this.drawDetailedTimeline_(ObservablePasses, SatInFoVs, SatInSuns, StationInNights);
       } else if (this.detailedPlot === false) {
         // console.log(passes[0]);
-        this.drawTimeline_(passes[0]);
+        this.drawTimeline_(ObservablePasses);
       }
     } catch (e) {
       errorManagerInstance.info(e);
@@ -340,16 +364,30 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   //
   // eslint-disable-next-line complexity
-  private calculatePasses_(): [ObservablePasses[], ObservablePasses[], ObservablePasses[], ObservablePasses[]] {
+  private async calculatePasses_(): Promise<ObservablePasses[][]> {
     const AllObservablePasses: ObservablePasses[] = [];
     const AllSatInFoVs: ObservablePasses[] = [];
     const AllSatinSuns: ObservablePasses[] = [];
     const AllSensorNights: ObservablePasses[] = [];
+    const AllClearSkies: ObservablePasses[] = [];
 
 
     const satellite = keepTrackApi.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite;
 
-    for (const sensor of this.enabledSensors_) {
+    const lats: number[] = [];
+    const lons: number[] = [];
+
+    this.enabledSensors_.forEach((sensor) => {
+      lats.push(sensor.lat);
+      lons.push(sensor.lon);
+    })
+
+    const start_date = keepTrackApi.getTimeManager().getOffsetTimeObj(0);
+    const end_date = new Date(start_date.getTime() + this.lengthOfLookAngles_ * 60 * 60 * 1000);
+    const AllWeatherData = await this.getWeather_(lats, lons, start_date, end_date);
+    // console.log('weather reports', AllWeatherData);
+
+    for (const [i, sensor] of this.enabledSensors_.entries()) {
       const ObservablePasses: ObservablePasses = {
         sensor,
         passes: [],
@@ -366,7 +404,13 @@ export class SensorTimeline extends KeepTrackPlugin {
         sensor,
         passes: [],
       };
+      const ClearSkies: ObservablePasses = {
+        sensor,
+        passes: [],
+      };
 
+      // Get weather data for the sensor
+      const weatherReport = AllWeatherData[i]
 
       // Skip if satellite is above the max range of the sensor
       if (sensor.maxRng < satellite.perigee && (!sensor.maxRng2 || sensor.maxRng2 < satellite.perigee)) {
@@ -385,7 +429,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       let startObservableTime = null as unknown as Date;
 
-      // ---------------
+      // ---------------Forgive me for these Variable Names
 
       let isInFoV = false;
       let isEnterFov = false;
@@ -402,6 +446,12 @@ export class SensorTimeline extends KeepTrackPlugin {
       let isStationExitNight = false;
       let startNightTime = null as unknown as Date;
 
+      let isWeatherGood = false;
+      let isWeatherBecomeGood = false;
+      let isWeatherBecomeBad = false;
+      let startGoodWeatherTime = null as unknown as Date;
+
+
       // ---------------
 
       if (sensor.type !== SpaceObjectType.OPTICAL) {
@@ -409,33 +459,43 @@ export class SensorTimeline extends KeepTrackPlugin {
           start: keepTrackApi.getTimeManager().getOffsetTimeObj(0),
           end: keepTrackApi.getTimeManager().getOffsetTimeObj((durationInSeconds - this.angleCalculationInterval_) * 1000),
         });
+
+        if (this.useWeather) {
+          ClearSkies.passes.push({
+            start: keepTrackApi.getTimeManager().getOffsetTimeObj(0),
+            end: keepTrackApi.getTimeManager().getOffsetTimeObj((durationInSeconds - this.angleCalculationInterval_) * 1000),
+          });
+        }
       }
 
       for (let i = 0; i < durationInSeconds; i += this.angleCalculationInterval_) {
         // 5second Looks
         offset = i * 1000; // Offset in miliseconds (sec * 1000)
         const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
-        const multiSitePass = SensorTimeline.propagateMultiSite(now, satellite.satrec!, sensor);
+        const isInFOVAtThisIter = SensorTimeline.checkSatInFOV(now, satellite.satrec!, sensor);
         const isObservableAtThisIter = SensorTimeline.checkObservable(now, satellite, sensor);
+        if (this.useWeather && sensor.type === SpaceObjectType.OPTICAL) {
+          var isWeatherGoodatThisIter = SensorTimeline.checkWeatherIsGood(weatherReport, now);
+        }
+        else { var isWeatherGoodatThisIter = true; }
 
         // --------
 
         const isStationInNightAtThisIter = SensorTimeline.checkStationInNight(now, sensor);
-        // console.log(isStationInNightAtThisIter)
         const isSatInSunAtThisIter = SensorTimeline.checkSatinSun(now, satellite);
 
         // --------
 
 
         // Check if sat is Observable and enters the FoV
-        if (multiSitePass.time && !isObservable && isObservableAtThisIter) {
+        if (isInFOVAtThisIter && !isObservable && isObservableAtThisIter && isWeatherGoodatThisIter) {
           startObservableTime = now;
           isObservable = true;
           isBecomeObservable = true;
         }
 
         // Check if sat exits the FoV or becomes Unobservable
-        if ((!multiSitePass.time || !isObservableAtThisIter) && isObservable) {
+        if ((!isInFOVAtThisIter || !isObservableAtThisIter || !isWeatherGoodatThisIter) && isObservable) {
           isBecomeUnobservable = true;
           isObservable = false;
           /*
@@ -464,13 +524,14 @@ export class SensorTimeline extends KeepTrackPlugin {
 
         // -----------------------------------------------
 
-        if (multiSitePass.time && !isInFoV) {
+        // Check if sat in FoV
+        if (isInFOVAtThisIter && !isInFoV) {
           startInFoVTime = now;
           isInFoV = true;
           isEnterFov = true;
         }
 
-        if (!multiSitePass.time && isInFoV) {
+        if (!isInFOVAtThisIter && isInFoV) {
           isExitFov = true;
           isInFoV = false;
         }
@@ -482,6 +543,25 @@ export class SensorTimeline extends KeepTrackPlugin {
           });
           isEnterFov = false;
           isExitFov = false;
+        }
+
+        // Check if sat in Sun
+        if (isSatInSunAtThisIter && !isSatInSun) {
+          startSunTime = now;
+          isSatInSun = true;
+          isSatEnterSun = true;
+        }
+        if (!isSatInSunAtThisIter && isSatInSun) {
+          isSatExitSun = true;
+          isSatInSun = false;
+        }
+        if ((isSatEnterSun && isSatExitSun) || (isSatEnterSun && i === durationInSeconds - this.angleCalculationInterval_)) {
+          SatinSuns.passes.push({
+            start: startSunTime,
+            end: now,
+          });
+          isSatEnterSun = false;
+          isSatExitSun = false;
         }
 
         if (sensor.type === SpaceObjectType.OPTICAL && this.detailedPlot) {
@@ -504,66 +584,56 @@ export class SensorTimeline extends KeepTrackPlugin {
             isStationExitNight = false;
           }
 
-          // Check if sat in Sun
-          if (isSatInSunAtThisIter && !isSatInSun) {
-            startSunTime = now;
-            isSatInSun = true;
-            isSatEnterSun = true;
+          if (this.useWeather) {
+            // Check if weather is good
+
+            if (isWeatherGoodatThisIter && !isWeatherGood) {
+              startGoodWeatherTime = now;
+              isWeatherGood = true;
+              isWeatherBecomeGood = true;
+            }
+            if (!isWeatherGoodatThisIter && isWeatherGood) {
+              isWeatherBecomeBad = true;
+              isWeatherGood = false;
+            }
+            if ((isWeatherBecomeGood && isWeatherBecomeBad) || (isWeatherBecomeGood && i === durationInSeconds - this.angleCalculationInterval_)) {
+              ClearSkies.passes.push({
+                start: startGoodWeatherTime,
+                end: now,
+              });
+              isWeatherBecomeGood = false;
+              isWeatherBecomeBad = false;
+            }
+
           }
-          if (!isSatInSunAtThisIter && isSatInSun) {
-            isSatExitSun = true;
-            isSatInSun = false;
-          }
-          if ((isSatEnterSun && isSatExitSun) || (isSatEnterSun && i === durationInSeconds - this.angleCalculationInterval_)) {
-            SatinSuns.passes.push({
-              start: startSunTime,
-              end: now,
-            });
-            isSatEnterSun = false;
-            isSatExitSun = false;
-          }
+
         }
       }
       AllObservablePasses.push(ObservablePasses);
       AllSatInFoVs.push(SatInFoVs);
       AllSatinSuns.push(SatinSuns);
       AllSensorNights.push(SensorNights);
+      AllClearSkies.push(ClearSkies);
     }
 
-    return [AllObservablePasses, AllSatInFoVs, AllSatinSuns, AllSensorNights];
+    return [AllObservablePasses, AllSatInFoVs, AllSatinSuns, AllSensorNights, AllClearSkies];
   }
 
-  static propagateMultiSite(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor) {
+  static checkSatInFOV(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): boolean {
     // Setup Realtime and Offset Time
     const aer = SatMath.getRae(now, satrec, sensor);
 
     if (!aer.az || !aer.el || !aer.rng) {
-      return {
-        time: null,
-        el: <Degrees>0,
-        az: <Degrees>0,
-        rng: <Kilometers>0,
-        objName: null,
-      };
+      return false;
     }
 
     if (SatMath.checkIsInView(sensor, aer as RaeVec3)) {
-      return {
-        time: now,
-        el: aer.el,
-        az: aer.az,
-        rng: aer.rng,
-        objName: null,
-      };
+      return true;
     }
 
-    return {
-      time: null,
-      el: <Degrees>0,
-      az: <Degrees>0,
-      rng: <Kilometers>0,
-      objName: null,
-    };
+    else {
+      return false;
+    }
 
   }
 
@@ -634,7 +704,18 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   }
 
-  private drawDetailedTimeline_(ObservablePasses: ObservablePasses[], SatinFoVs: ObservablePasses[], SatinSuns: ObservablePasses[], StationInNights: ObservablePasses[]): void {
+  static checkWeatherIsGood(weatherReport: weatherReport, now: Date): boolean {
+
+    const diffs = weatherReport.hourly.map(date => Math.abs(date.getTime() - now.getTime()));
+    const minDiff = Math.min(...diffs);
+    const idx = diffs.indexOf(minDiff);
+
+    if (weatherReport.cloudCover[idx] < 50) { return true; }
+    else { return false; }
+
+  }
+
+  private drawDetailedTimeline_(ObservablePasses: ObservablePasses[], SatinFoVs: ObservablePasses[], SatinSuns: ObservablePasses[], StationInNights: ObservablePasses[], clearSkies: ObservablePasses[]): void {
     const oldCanvas = this.canvas_;
     const newCanvas = oldCanvas.cloneNode(true) as HTMLCanvasElement;
 
@@ -963,9 +1044,97 @@ export class SensorTimeline extends KeepTrackPlugin {
       }
     });
 
+    if (this.useWeather) {
+      clearSkies.forEach((ObservablePeriod, index) => {
+        const y = 90 + topOffset + (index + 1) * yStep;
+
+        // Draw sensor name
+        this.ctx_.fillStyle = 'rgb(255, 255, 255)';
+        this.ctx_.font = '14px Consolas';
+        this.ctx_.fillText((ObservablePeriod.sensor.uiName ?? 'Missing uiName').concat(': Clear Weather'), leftOffset - 165, y + 5);
+
+        // Draw passes
+        ObservablePeriod.passes.forEach((pass) => {
+          const passStart = pass.start.getTime();
+          const passEnd = pass.end.getTime();
+          const x1 = leftOffset + (passStart - startTime) * xScale;
+          const x2 = leftOffset + (passEnd - startTime) * xScale;
+
+          this.ctx_.fillStyle = 'rgb(24, 49, 163)';
+
+
+          this.ctx_.fillRect(x1, y - 10, x2 - x1, 20);
+
+
+          const drawEvent = (mouseX: number, mouseY: number): boolean => {
+            if (mouseX >= x1 - 10 && mouseX <= x2 + 10 && mouseY >= y - 10 && mouseY <= y + 10) {
+              const startTime = new Date(passStart).toISOString().slice(11, 19);
+              const endTime = new Date(passEnd).toISOString().slice(11, 19);
+
+              // Calculate width of box based on text
+              const text = `${ObservablePeriod.sensor.uiName}: ${startTime} - ${endTime}`;
+
+              this.drawTooltip_(text, mouseX, mouseY);
+
+              return true;
+            }
+
+            return false;
+          };
+
+          this.drawEvents_[`${index} - ${passStart} - ${passEnd}`] = drawEvent;
+
+          // Create an onclick event for each pass
+          this.canvas_.addEventListener('click', (event) => {
+            const rect = this.canvas_.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+
+            // If the mouse is over a pass change the sensor
+            if (drawEvent(mouseX, mouseY)) {
+              const timeManagerInstance = keepTrackApi.getTimeManager();
+
+              keepTrackApi.getSensorManager().setSensor(ObservablePeriod.sensor);
+
+              timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
+              timeManagerInstance.calculateSimulationTime();
+              keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+
+              const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
+              const currentSatId = selectSatManagerInstance.selectedSat;
+
+              selectSatManagerInstance.selectSat(-1);
+              selectSatManagerInstance.selectSat(currentSatId);
+            }
+          });
+
+        });
+
+        // If no passes draw a light gray bar to indicate no passes
+        if (ObservablePeriod.passes.length === 0) {
+          this.ctx_.fillStyle = 'rgba(200, 200, 200, 0.2)';
+          this.ctx_.fillRect(leftOffset, y - 10, width, 20);
+
+          const drawEvent = (mouseX: number, mouseY: number): boolean => {
+            if (mouseX >= leftOffset && mouseX <= leftOffset + width && mouseY >= y - 10 && mouseY <= y + 10) {
+              const text = `${ObservablePeriod.sensor.uiName}: No Passes`;
+
+              this.drawTooltip_(text, mouseX, mouseY);
+
+              return true;
+            }
+
+            return false;
+          };
+
+          this.drawEvents_[`${index} - ${ObservablePeriod.sensor.id} - no - passes`] = drawEvent;
+        }
+      });
+    }
+
     // SatinSuns.forEach((ObservablePeriod, index) => {
     const ObservablePeriod = SatinSuns[0];
-    const y = 90 + topOffset + SatinSuns.length * yStep;
+    const y = 120 + topOffset + SatinSuns.length * yStep;
 
     // Draw sensor name
     this.ctx_.fillStyle = 'rgb(255, 255, 255)';
@@ -1318,5 +1487,50 @@ export class SensorTimeline extends KeepTrackPlugin {
 
     this.canvasStatic_.width = this.canvas_.width;
     this.canvasStatic_.height = this.canvas_.height;
+  }
+
+  private async getWeather_(lats: number[], lons: number[], start_date: Date, end_date: Date): Promise<weatherReport[]> {
+
+    const params = {
+      "latitude": lats,
+      "longitude": lons,
+      "start_date": start_date.toISOString().slice(0, 10),
+      "end_date": end_date.toISOString().slice(0, 10),
+      "hourly": "cloud_cover",
+    };
+
+    // console.log(params);
+
+    const url = "https://api.open-meteo.com/v1/forecast";
+    const responses = await fetchWeatherApi(url, params);
+
+    // Helper function to form time ranges
+    const range = (start: number, stop: number, step: number) =>
+      Array.from({ length: (stop - start) / step }, (_, i) => start + i * step);
+
+    const AllWeatherData: weatherReport[] = [];
+
+    // Process locations.
+    responses.forEach((response) => {
+
+      // Attributes for timezone and location
+      const utcOffsetSeconds = response.utcOffsetSeconds();
+
+      const hourly = response.hourly()!;
+
+      // Note: The order of weather variables in the URL query and the indices below need to match!
+      const weatherData: weatherReport = {
+        latitude: response.latitude(),
+        longitude: response.longitude(),
+        hourly: range(Number(hourly.time()), Number(hourly.timeEnd()), hourly.interval()).map(
+          (t) => new Date((t + utcOffsetSeconds) * 1000)
+        ),
+        cloudCover: hourly.variables(0)!.valuesArray()!,
+      };
+
+      AllWeatherData.push(weatherData);
+    })
+
+    return AllWeatherData;
   }
 }

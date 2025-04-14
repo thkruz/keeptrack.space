@@ -14,11 +14,11 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { countryCodeList, countryNameList } from '@app/catalogs/countries';
 import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
+import { t7e } from '@app/locales/keys';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
-import i18next from 'i18next';
 
 /**
  * Interface for TLE input parameters
@@ -334,7 +334,7 @@ export class CreateSat extends KeepTrackPlugin {
         errorManagerInstance.error(
           new Error(tle2),
           'create-sat.ts',
-          i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'),
+          t7e('errorMsgs.CreateSat.errorCreatingSat'),
         );
 
         return;

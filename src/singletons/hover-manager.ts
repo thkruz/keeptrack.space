@@ -1,8 +1,8 @@
 import { country2flagIcon } from '@app/catalogs/countries';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
-import i18next from 'i18next';
 import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
 import { SensorMath } from '../static/sensor-math';
@@ -250,21 +250,21 @@ export class HoverManager {
 
   private static getLaunchYear(sat: DetailedSatellite) {
     if (sat.type === SpaceObjectType.NOTIONAL) {
-      return i18next.t('hoverManager.launchedPlanned');
+      return t7e('hoverManager.launchedPlanned');
     }
     if (sat.source === CatalogSource.VIMPEL) {
-      return i18next.t('hoverManager.launchedUnknown');
+      return t7e('hoverManager.launchedUnknown');
     }
 
     const launchYear = parseInt(sat.intlDes.slice(2, 4));
 
     if (launchYear < 57) {
-      return `${i18next.t('hoverManager.launched')}: 20${launchYear.toString().padStart(2, '0')}`;
+      return `${t7e('hoverManager.launched')}: 20${launchYear.toString().padStart(2, '0')}`;
     } else if (launchYear >= 57 && launchYear < 100) {
-      return `${i18next.t('hoverManager.launched')}: 19${launchYear.toString().padStart(2, '0')}`;
+      return `${t7e('hoverManager.launched')}: 19${launchYear.toString().padStart(2, '0')}`;
     }
 
-    return i18next.t('hoverManager.launchedUnknown');
+    return t7e('hoverManager.launchedUnknown');
 
   }
 

@@ -7,11 +7,11 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 
+import { t7e } from '@app/locales/keys';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -254,7 +254,7 @@ export class EditSat extends KeepTrackPlugin {
       return;
     }
     if (eventTarget.error) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.EditSat.errorReadingFile'));
+      errorManagerInstance.warn(t7e('errorMsgs.EditSat.errorReadingFile'));
 
       return;
     }
@@ -268,7 +268,7 @@ export class EditSat extends KeepTrackPlugin {
     const sat = keepTrackApi.getCatalogManager().sccNum2Sat(sccNum);
 
     if (!sat) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.EditSat.satelliteNotFound', { sccNum }));
+      errorManagerInstance.warn(t7e('errorMsgs.EditSat.satelliteNotFound', { sccNum }));
 
       return;
     }

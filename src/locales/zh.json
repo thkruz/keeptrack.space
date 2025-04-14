@@ -38,7 +38,9 @@
       "minute": "分钟",
       "second": "秒",
       "now": "现在",
-      "done": "完成"
+      "done": "完成",
+      "pause": "暂停",
+      "propagation": "传播"
     }
   },
   "errorMsgs": {
@@ -62,14 +64,19 @@
       "CannotCalcDirectionOfSatellite": "无法计算卫星方向。请稍后再试。",
       "ErrorCreatingBreakup": "创建解体时出错！",
       "InvalidStartNum": "无效的卫星起始编号！默认为90000！",
-      "BreakupGeneratorFailed": "解体生成器失败！"
+      "BreakupGeneratorFailed": "解体生成器失败！",
+      "SatelliteNotFound": "未找到卫星！"
     },
     "Collissions": {
       "noCollisionsData": "未找到碰撞数据！",
       "errorProcessingCollisions": "处理SOCRATES数据时出错！"
     },
     "EditSat": {
-      "errorReadingFile": "读取文件时出错！"
+      "errorReadingFile": "读取文件时出错！",
+      "satelliteNotFound": "未找到卫星！"
+    },
+    "CreateSat": {
+      "errorCreatingSat": "创建卫星时出错！"
     },
     "Reports": {
       "popupBlocker": "请允许此网站的弹出窗口以查看报告。"

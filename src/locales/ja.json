@@ -38,7 +38,9 @@
       "minute": "分",
       "second": "秒",
       "now": "現在",
-      "done": "完了"
+      "done": "完了",
+      "pause": "一時停止",
+      "propagation": "伝播"
     }
   },
   "errorMsgs": {
@@ -62,14 +64,19 @@
       "CannotCalcDirectionOfSatellite": "衛星の方向を計算できません。後でやり直してください。",
       "ErrorCreatingBreakup": "分裂の作成中にエラーが発生しました！",
       "InvalidStartNum": "無効な衛星開始番号です！デフォルトで90000に設定します！",
-      "BreakupGeneratorFailed": "分裂ジェネレーターが失敗しました！"
+      "BreakupGeneratorFailed": "分裂ジェネレーターが失敗しました！",
+      "SatelliteNotFound": "衛星が見つかりません！"
     },
     "Collissions": {
       "noCollisionsData": "衝突データが見つかりません！",
       "errorProcessingCollisions": "SOCRATESデータの処理中にエラーが発生しました！"
     },
     "EditSat": {
-      "errorReadingFile": "ファイル読み込み中にエラーが発生しました！"
+      "errorReadingFile": "ファイル読み込み中にエラーが発生しました！",
+      "satelliteNotFound": "衛星が見つかりません！"
+    },
+    "CreateSat": {
+      "errorCreatingSat": "衛星の作成中にエラーが発生しました！"
     },
     "Reports": {
       "popupBlocker": "レポートを表示するには、このサイトのポップアップを許可してください。"

@@ -24,9 +24,9 @@ import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
+import { t7e } from '@app/locales/keys';
 import { CameraType } from '@app/singletons/camera';
 import viewInAirPng from '@public/img/icons/view-in-air.png';
-import i18next from 'i18next';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -58,7 +58,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(i18next.t('errorMsgs.SelectSatelliteFirst'), ToastMsgType.serious, true);
+      uiManagerInstance.toast(t7e('errorMsgs.SelectSatelliteFirst'), ToastMsgType.serious, true);
       shake(getEl(this.bottomIconElementName));
     }
   };

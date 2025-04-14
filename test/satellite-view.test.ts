@@ -2,11 +2,11 @@ import { keepTrackContainer } from '@app/container';
 import { KeepTrackApiEvents, Singletons, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { t7e } from '@app/locales/keys';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { UiManager } from '@app/singletons/uiManager';
-import i18next from 'i18next';
 import { mockCameraManager, mockUiManager } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
 
@@ -77,7 +77,7 @@ describe('SatelliteViewPlugin_class', () => {
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
     keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
-    expect(uiManagerInstance.toast).toHaveBeenCalledWith(i18next.t('errorMsgs.SelectSatelliteFirst'), ToastMsgType.serious, true);
+    expect(uiManagerInstance.toast).toHaveBeenCalledWith(t7e('errorMsgs.SelectSatelliteFirst'), ToastMsgType.serious, true);
   });
 
   // Tests that a toast message is not displayed when a satellite is selected and trying to activate Satellite Camera Mode

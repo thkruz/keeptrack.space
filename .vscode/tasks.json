@@ -3,7 +3,10 @@
   "tasks": [
     {
       "label": "App: Start All",
-      "dependsOn": ["App: Build and Serve", "App: Open in Brave"],
+      "dependsOn": [
+        "App: Build and Serve",
+        "App: Open in Brave"
+      ],
       "icon": {
         "id": "server",
         "color": "terminal.ansiCyan"
@@ -11,7 +14,10 @@
     },
     {
       "label": "App: Build and Serve",
-      "dependsOn": ["App: Build", "App: Serve Server"],
+      "dependsOn": [
+        "App: Build",
+        "App: Serve Server"
+      ],
       "icon": {
         "id": "server-environment",
         "color": "terminal.ansiCyan"
@@ -80,7 +86,9 @@
       "command": "",
       "windows": {
         "command": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe",
-        "args": ["http://localhost:8080"]
+        "args": [
+          "http://localhost:8080"
+        ]
       },
       "icon": {
         "id": "browser",
@@ -102,7 +110,9 @@
       "command": "",
       "windows": {
         "command": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe",
-        "args": ["https://github.com/thkruz/keeptrack.space"]
+        "args": [
+          "https://github.com/thkruz/keeptrack.space"
+        ]
       },
       "icon": {
         "id": "browser",
@@ -159,6 +169,17 @@
         "kind": "test",
         "isDefault": false
       }
+    },
+    {
+      "label": "Generate Translation Keys",
+      "command": "npm run generate-t7e-keys",
+      "type": "shell",
+      "args": [],
+      "icon": {
+        "id": "symbol-key",
+        "color": "terminal.ansiGreen"
+      },
+      "problemMatcher": []
     }
   ],
   "extensions": {
@@ -182,7 +203,11 @@
     }
   ],
   "settings": {
-    "jest.disabledWorkspaceFolders": [".vscode", ".git", "node_modules"],
+    "jest.disabledWorkspaceFolders": [
+      ".vscode",
+      ".git",
+      "node_modules"
+    ],
     "typescript.tsdk": "node_modules/typescript/lib"
   }
 }

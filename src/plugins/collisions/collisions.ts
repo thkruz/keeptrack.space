@@ -5,7 +5,7 @@ import './collisions.css';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
-import i18next from 'i18next';
+import { t7e } from '@app/locales/keys';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -112,7 +112,7 @@ export class Collissions extends KeepTrackPlugin {
           this.createTable_();
 
           if (this.collisionList_.length === 0) {
-            errorManagerInstance.warn(i18next.t('errorMsgs.Collissions.noCollisionsData'));
+            errorManagerInstance.warn(t7e('errorMsgs.Collissions.noCollisionsData'));
           }
         });
       });
@@ -144,7 +144,7 @@ export class Collissions extends KeepTrackPlugin {
 
       this.createBody_(tbl);
     } catch (e) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.Collissions.errorProcessingCollisions'));
+      errorManagerInstance.warn(t7e('errorMsgs.Collissions.errorProcessingCollisions'));
     }
   }
 

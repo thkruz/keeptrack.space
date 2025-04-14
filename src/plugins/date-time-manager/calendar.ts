@@ -1,8 +1,8 @@
 import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { t7e } from '@app/locales/keys';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import i18next from 'i18next';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 
 export class Calendar {
@@ -76,13 +76,13 @@ export class Calendar {
       ${this.renderTimePicker()}
       <div class="ui-datepicker-buttonpane ui-widget-content">
         <button type="button" class="ui-datepicker-current ui-state-default ui-priority-secondary ui-corner-all" data-handler="today" data-event="click">
-          ${i18next.t('time.calendar.now')}
+          ${t7e('time.calendar.now')}
         </button>
         <button type="button" class="ui-datepicker-pause ui-state-default ui-priority-secondary ui-corner-all" data-handler="pause" data-event="click">
-          ${i18next.t('Pause')}
+          ${t7e('time.calendar.pause')}
         </button>
         <button type="button" class="ui-datepicker-close ui-state-default ui-priority-primary ui-corner-all" data-handler="hide" data-event="click">
-          ${i18next.t('time.calendar.done')}
+          ${t7e('time.calendar.done')}
         </button>
       </div>
     `;
@@ -255,8 +255,8 @@ export class Calendar {
 
   private renderDayHeaders(): string {
     const daysOfWeek = [
-      i18next.t('time.days-short.1'), i18next.t('time.days-short.2'), i18next.t('time.days-short.3'),
-      i18next.t('time.days-short.4'), i18next.t('time.days-short.5'), i18next.t('time.days-short.6'), i18next.t('time.days-short.0'),
+      t7e('time.days-short.1'), t7e('time.days-short.2'), t7e('time.days-short.3'),
+      t7e('time.days-short.4'), t7e('time.days-short.5'), t7e('time.days-short.6'), t7e('time.days-short.0'),
     ];
 
 
@@ -374,11 +374,11 @@ export class Calendar {
     return keepTrackApi.html`
       <div class="ui-timepicker-div">
         <dl>
-          <dt class="ui_tpicker_time_label">${i18next.t('time.calendar.time')}</dt>
+          <dt class="ui_tpicker_time_label">${t7e('time.calendar.time')}</dt>
           <dd class="ui_tpicker_time">
             <input id="calendar-time-input" class="ui_tpicker_time_input" value="${this.formatTime(hours, minutes, seconds)} | (x${propRate.toString()})" disabled>
           </dd>
-          <dt class="ui_tpicker_hour_label">${i18next.t('time.calendar.hour')}</dt>
+          <dt class="ui_tpicker_hour_label">${t7e('time.calendar.hour')}</dt>
           <dd class="ui_tpicker_hour">
             <div id="ui_tpicker_hour_slider" class="ui_tpicker_hour_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
             style="display: inline-block; width: 100px;" data-min="0" data-max="23" data-step="1">
@@ -396,7 +396,7 @@ export class Calendar {
               </button>
             </span>
           </dd>
-          <dt class="ui_tpicker_minute_label">${i18next.t('time.calendar.minute')}</dt>
+          <dt class="ui_tpicker_minute_label">${t7e('time.calendar.minute')}</dt>
           <dd class="ui_tpicker_minute">
             <div id="ui_tpicker_minute_slider" class="ui_tpicker_minute_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
             style="display: inline-block; width: 100px;" data-min="0" data-max="59" data-step="1">
@@ -414,7 +414,7 @@ export class Calendar {
               </button>
             </span>
           </dd>
-          <dt class="ui_tpicker_second_label">${i18next.t('time.calendar.second')}</dt>
+          <dt class="ui_tpicker_second_label">${t7e('time.calendar.second')}</dt>
           <dd class="ui_tpicker_second">
             <div id="ui_tpicker_second_slider" class="ui_tpicker_second_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
             style="display: inline-block; width: 100px;" data-min="0" data-max="59" data-step="1">
@@ -432,7 +432,7 @@ export class Calendar {
               </button>
             </span>
           </dd>
-          <dt class="ui_tpicker_proprate_label">${i18next.t('Propagation')}</dt>
+          <dt class="ui_tpicker_proprate_label">${t7e('time.calendar.propagation')}</dt>
           <dd class="ui_tpicker_proprate">
             <div id="ui_tpicker_proprate_slider" class="ui_tpicker_proprate_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
             style="display: inline-block; width: 100px;" data-min="${this.propRateLimitMin.toString()}" data-max="${this.propRateLimitMax.toString()}" data-step="1">
@@ -457,10 +457,10 @@ export class Calendar {
 
   private getUTCMonthName(monthIndex: number): string {
     const monthNames = [
-      i18next.t('time.months.1'), i18next.t('time.months.2'), i18next.t('time.months.3'),
-      i18next.t('time.months.4'), i18next.t('time.months.5'), i18next.t('time.months.6'),
-      i18next.t('time.months.7'), i18next.t('time.months.8'), i18next.t('time.months.9'),
-      i18next.t('time.months.10'), i18next.t('time.months.11'), i18next.t('time.months.12'),
+      t7e('time.months.1'), t7e('time.months.2'), t7e('time.months.3'),
+      t7e('time.months.4'), t7e('time.months.5'), t7e('time.months.6'),
+      t7e('time.months.7'), t7e('time.months.8'), t7e('time.months.9'),
+      t7e('time.months.10'), t7e('time.months.11'), t7e('time.months.12'),
     ];
 
 
@@ -469,8 +469,8 @@ export class Calendar {
 
   private getUTCDayFullName(dayIndex: number): string {
     const dayNames = [
-      i18next.t('time.days.0'), i18next.t('time.days.1'), i18next.t('time.days.2'),
-      i18next.t('time.days.3'), i18next.t('time.days.4'), i18next.t('time.days.5'), i18next.t('time.days.6'),
+      t7e('time.days.0'), t7e('time.days.1'), t7e('time.days.2'),
+      t7e('time.days.3'), t7e('time.days.4'), t7e('time.days.5'), t7e('time.days.6'),
     ];
 
 
@@ -546,7 +546,7 @@ export class Calendar {
 
   toggleDatePicker(): void {
     if (!this.isCalendarEnabled) {
-      keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+      keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
       return;
     }
@@ -561,7 +561,7 @@ export class Calendar {
 
   showDatePicker(): void {
     if (!this.isCalendarEnabled) {
-      keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+      keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
       return;
     }

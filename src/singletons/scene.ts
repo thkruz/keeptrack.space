@@ -1,8 +1,8 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
-import i18next from 'i18next';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
@@ -147,32 +147,32 @@ export class Scene {
           settingsManager.isDisableGodrays = true;
           settingsManager.sizeOfSun = 1.65;
           settingsManager.isUseSunTexture = true;
-          keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.Scene.disablingGodrays'), ToastMsgType.caution);
+          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingGodrays'), ToastMsgType.caution);
           break;
         }
         if (settingsManager.isDrawAurora) {
           settingsManager.isDrawAurora = false;
-          keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.Scene.disablingAurora'), ToastMsgType.caution);
+          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAurora'), ToastMsgType.caution);
           break;
         }
         if (settingsManager.isDrawAtmosphere) {
           settingsManager.isDrawAtmosphere = false;
-          keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.Scene.disablingAtmosphere'), ToastMsgType.caution);
+          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAtmosphere'), ToastMsgType.caution);
           break;
         }
         if (!settingsManager.isDisableMoon) {
           settingsManager.isDisableMoon = true;
-          keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.Scene.disablingMoon'), ToastMsgType.caution);
+          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingMoon'), ToastMsgType.caution);
           break;
         }
         if (settingsManager.isDrawMilkyWay) {
           settingsManager.isDrawMilkyWay = false;
-          keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.Scene.disablingMilkyWay'), ToastMsgType.caution);
+          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingMilkyWay'), ToastMsgType.caution);
           break;
         }
         if (settingsManager.isDrawSun) {
           settingsManager.isDrawSun = false;
-          keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.Scene.disablingSun'), ToastMsgType.caution);
+          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingSun'), ToastMsgType.caution);
           break;
         }
         isSettingsLeftToDisable = false;

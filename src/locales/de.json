@@ -38,7 +38,9 @@
       "minute": "Minute",
       "second": "Sekunde",
       "now": "Jetzt",
-      "done": "Fertig"
+      "done": "Fertig",
+      "pause": "Pause",
+      "propagation": "Ausbreitung"
     }
   },
   "errorMsgs": {
@@ -62,14 +64,19 @@
       "CannotCalcDirectionOfSatellite": "Die Richtung des Satelliten kann nicht berechnet werden. Versuchen Sie es später erneut.",
       "ErrorCreatingBreakup": "Fehler beim Erstellen des Zerfalls!",
       "InvalidStartNum": "Ungültige Satellitenstartnummer! Standardmäßig auf 90000 gesetzt!",
-      "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!"
+      "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!",
+      "SatelliteNotFound": "Satellit nicht gefunden!"
     },
     "Collissions": {
       "noCollisionsData": "Keine Kollisionsdaten gefunden!",
       "errorProcessingCollisions": "Fehler bei der Verarbeitung der SOCRATES-Daten!"
     },
     "EditSat": {
-      "errorReadingFile": "Fehler beim Lesen der Datei!"
+      "errorReadingFile": "Fehler beim Lesen der Datei!",
+      "satelliteNotFound": "Satellit nicht gefunden!"
+    },
+    "CreateSat": {
+      "errorCreatingSat": "Fehler beim Erstellen des Satelliten!"
     },
     "Reports": {
       "popupBlocker": "Bitte erlauben Sie Popups für diese Seite, um Berichte anzuzeigen."
@@ -241,8 +248,11 @@
       "title": "Stereografisches Karten-Menü",
       "helpBody": "Das Stereografische Karten-Menü wird verwendet, um Satellitenbodenspuren in einer stereografischen Projektion zu visualisieren. <br/><br/> Sie können auf einen Punkt entlang der Bodenspur klicken, um die Zeit der Simulation zu ändern, wenn der Satellit diesen Punkt erreicht. <br/><br/> Die gelben Punkte zeigen an, wann der Satellit im Sichtfeld des Sensors ist. Die roten Punkte zeigen an, wann der Satellit nicht im Sichtfeld des Sensors ist. Der Punkt, der dem Satelliten am nächsten ist, ist die aktuelle Zeit."
     },
-    "SensorSurvFence": {
+    "SensorFov": {
       "bottomIconLabel": "Sensor-Sichtfeld"
+    },
+    "SensorSurvFence": {
+      "bottomIconLabel": "Sensor-Überwachungszaun"
     },
     "SensorFence": {
       "bottomIconLabel": "Sensor-Zaun"
@@ -292,6 +302,9 @@
     },
     "ScreenRecorder": {
       "bottomIconLabel": "Video aufnehmen"
+    },
+    "Astronomy": {
+      "bottomIconLabel": "Sternenhimmel"
     },
     "AnalysisMenu": {
       "bottomIconLabel": "Analyse",

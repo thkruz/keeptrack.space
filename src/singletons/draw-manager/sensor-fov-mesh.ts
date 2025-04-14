@@ -59,8 +59,8 @@ export class SensorFovMesh extends CustomMesh {
       return;
     }
 
-    const isFovDrawn = keepTrackApi.getPlugin(SensorFov).isMenuButtonActive;
-    const isSurvFenceDrawn = keepTrackApi.getPlugin(SensorSurvFence).isMenuButtonActive;
+    const isFovDrawn = keepTrackApi.getPlugin(SensorFov)?.isMenuButtonActive;
+    const isSurvFenceDrawn = keepTrackApi.getPlugin(SensorSurvFence)?.isMenuButtonActive;
     const isStfCreated = keepTrackApi.getSensorManager().stfSensors.length > 0;
 
     if (!isFovDrawn && !isSurvFenceDrawn && !isStfCreated) {

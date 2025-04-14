@@ -135,10 +135,10 @@ export const loadLocalization = () => ({
       title: t7e('plugins.ShortTermFences.title'),
       helpBody: t7e('plugins.ShortTermFences.helpBody'),
     },
-    Collissions: {
-      bottomIconLabel: t7e('plugins.Collissions.bottomIconLabel'),
-      title: t7e('plugins.Collissions.title'),
-      helpBody: t7e('plugins.Collissions.helpBody'),
+    Collisions: {
+      bottomIconLabel: t7e('plugins.Collisions.bottomIconLabel'),
+      title: t7e('plugins.Collisions.title'),
+      helpBody: t7e('plugins.Collisions.helpBody'),
     },
     TrackingImpactPredict: {
       bottomIconLabel: t7e('plugins.TrackingImpactPredict.bottomIconLabel'),

@@ -67,7 +67,7 @@
       "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!",
       "SatelliteNotFound": "Satellit nicht gefunden!"
     },
-    "Collissions": {
+    "Collisions": {
       "noCollisionsData": "Keine Kollisionsdaten gefunden!",
       "errorProcessingCollisions": "Fehler bei der Verarbeitung der SOCRATES-Daten!"
     },
@@ -203,7 +203,7 @@
       "title": "Kurzzeit-Zäune (STF) Menü",
       "helpBody": "Das Kurzzeit-Zäune (STF) Menü wird verwendet, um Sensor-Suchboxen zu visualisieren. <br><br> Dies ist wahrscheinlich nicht sehr hilfreich, es sei denn, Sie besitzen/betreiben einen Sensor mit einer Suchbox-Funktionalität."
     },
-    "Collissions": {
+    "Collisions": {
       "bottomIconLabel": "Kollisionen",
       "title": "Kollisionen-Menü",
       "helpBody": "Das Kollisionen-Menü zeigt Satelliten mit einer hohen Kollisionswahrscheinlichkeit. <br><br> Durch Klicken auf eine Zeile werden die beiden an der Kollision beteiligten Satelliten ausgewählt und die Zeit auf den Zeitpunkt der Kollision geändert."

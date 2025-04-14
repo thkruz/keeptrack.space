@@ -1,5 +1,5 @@
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import collissionsPng from '@public/img/icons/collisions.png';
+import CollisionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
@@ -28,15 +28,15 @@ export interface CollisionEvent {
   MAX_PROB: number;
 }
 
-export class Collissions extends KeepTrackPlugin {
-  readonly id = 'Collissions';
+export class Collisions extends KeepTrackPlugin {
+  readonly id = 'Collisions';
   dependencies_ = [];
   private readonly collisionDataSrc = 'https://api.keeptrack.space/v2/socrates/latest';
   private selectSatIdOnCruncher_: number | null = null;
   private collisionList_ = <CollisionEvent[]>[];
 
   bottomIconElementName: string = 'menu-satellite-collision';
-  bottomIconImg = collissionsPng;
+  bottomIconImg = CollisionsPng;
   sideMenuElementName: string = 'collisions-menu';
   sideMenuElementHtml = keepTrackApi.html`
   <div id="collisions-menu" class="side-menu-parent start-hidden text-select">
@@ -112,7 +112,7 @@ export class Collissions extends KeepTrackPlugin {
           this.createTable_();
 
           if (this.collisionList_.length === 0) {
-            errorManagerInstance.warn(t7e('errorMsgs.Collissions.noCollisionsData'));
+            errorManagerInstance.warn(t7e('errorMsgs.Collisions.noCollisionsData'));
           }
         });
       });
@@ -140,11 +140,11 @@ export class Collissions extends KeepTrackPlugin {
 
       tbl.innerHTML = ''; // Clear the table from old object data
 
-      Collissions.createHeaders_(tbl);
+      Collisions.createHeaders_(tbl);
 
       this.createBody_(tbl);
     } catch (e) {
-      errorManagerInstance.warn(t7e('errorMsgs.Collissions.errorProcessingCollisions'));
+      errorManagerInstance.warn(t7e('errorMsgs.Collisions.errorProcessingCollisions'));
     }
   }
 
@@ -174,12 +174,12 @@ export class Collissions extends KeepTrackPlugin {
     tr.setAttribute('data-row', i.toString());
 
     // Populate the table with the data
-    Collissions.createCell_(tr, this.collisionList_[i].TOCA.slice(0, 19).replace('T', ' '));
-    Collissions.createCell_(tr, this.collisionList_[i].SAT1.toString());
-    Collissions.createCell_(tr, this.collisionList_[i].SAT2.toString());
-    Collissions.createCell_(tr, this.collisionList_[i].MAX_PROB.toFixed(3));
-    Collissions.createCell_(tr, this.collisionList_[i].MIN_RNG.toString());
-    Collissions.createCell_(tr, this.collisionList_[i].REL_SPEED.toFixed(2));
+    Collisions.createCell_(tr, this.collisionList_[i].TOCA.slice(0, 19).replace('T', ' '));
+    Collisions.createCell_(tr, this.collisionList_[i].SAT1.toString());
+    Collisions.createCell_(tr, this.collisionList_[i].SAT2.toString());
+    Collisions.createCell_(tr, this.collisionList_[i].MAX_PROB.toFixed(3));
+    Collisions.createCell_(tr, this.collisionList_[i].MIN_RNG.toString());
+    Collisions.createCell_(tr, this.collisionList_[i].REL_SPEED.toFixed(2));
 
     return tr;
   }

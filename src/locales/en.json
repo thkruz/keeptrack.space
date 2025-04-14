@@ -38,7 +38,9 @@
       "minute": "Minute",
       "second": "Second",
       "now": "Now",
-      "done": "Done"
+      "done": "Done",
+      "pause": "Pause",
+      "propagation": "Propagation"
     }
   },
   "errorMsgs": {
@@ -72,6 +74,9 @@
     "EditSat": {
       "errorReadingFile": "Error while reading file!",
       "satelliteNotFound": "Satellite {{sccNum}} not found!"
+    },
+    "CreateSat": {
+      "errorCreatingSat": "Error creating satellite!"
     },
     "Reports": {
       "popupBlocker": "Please allow popups for this site to view reports."

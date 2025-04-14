@@ -6,11 +6,11 @@ import { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import streamPng from '@public/img/icons/stream.png';
 
+import { t7e } from '@app/locales/keys';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import i18next from 'i18next';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -44,7 +44,7 @@ export class Breakup extends KeepTrackPlugin {
     const sat = obj as DetailedSatellite;
 
     if (sat?.apogee - sat?.perigee > this.maxDifApogeeVsPerigee_) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
+      errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
       this.closeSideMenu();
       this.setBottomIconToDisabled();
 
@@ -178,7 +178,7 @@ export class Breakup extends KeepTrackPlugin {
         } else if ((sat as DetailedSatellite)?.apogee - (sat as DetailedSatellite)?.perigee > this.maxDifApogeeVsPerigee_) {
           if (this.isMenuButtonActive) {
             this.closeSideMenu();
-            errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
+            errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
           }
           this.setBottomIconToUnselected();
           this.setBottomIconToDisabled();
@@ -213,7 +213,7 @@ export class Breakup extends KeepTrackPlugin {
     const mainsat = catalogManagerInstance.getSat(satId ?? -1);
 
     if (!mainsat || satId === null) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.SatelliteNotFound'));
+      errorManagerInstance.warn(t7e('errorMsgs.Breakup.SatelliteNotFound'));
 
       return;
     }
@@ -229,7 +229,7 @@ export class Breakup extends KeepTrackPlugin {
     const upOrDown = SatMath.getDirection(mainsat, simulationTimeObj);
 
     if (upOrDown === 'Error') {
-      errorManagerInstance.warn(i18next.t('plugins.CannotCalcDirectionOfSatellite'));
+      errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCalcDirectionOfSatellite'));
     }
 
     const currentEpoch = TimeManager.currentEpoch(simulationTimeObj);
@@ -239,7 +239,7 @@ export class Breakup extends KeepTrackPlugin {
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
     if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
+      errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
 
       return;
     }
@@ -251,7 +251,7 @@ export class Breakup extends KeepTrackPlugin {
 
     if (tle1 === 'Error') {
       // console.error(tle2);
-      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
+      errorManagerInstance.warn(t7e('errorMsgs.Breakup.ErrorCreatingBreakup'));
 
       return;
     }
@@ -310,7 +310,7 @@ export class Breakup extends KeepTrackPlugin {
         iTLEs = new OrbitFinder(sat, launchLat, launchLon, <'N' | 'S'>upOrDown, new Date(simulationTimeObj.getTime() + 1), newAlt as Kilometers, rascOffset).rotateOrbitToLatLon();
         if (iTLEs[0] === 'Error') {
           // console.error(iTLEs[1]);
-          errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
+          errorManagerInstance.warn(t7e('errorMsgs.Breakup.ErrorCreatingBreakup'));
 
           return;
         }
@@ -348,7 +348,7 @@ export class Breakup extends KeepTrackPlugin {
         const satId = catalogManagerInstance.sccNum2Id(a5Num);
 
         if (!satId) {
-          errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.SatelliteNotFound'));
+          errorManagerInstance.warn(t7e('errorMsgs.Breakup.SatelliteNotFound'));
 
           return;
         }
@@ -377,7 +377,7 @@ export class Breakup extends KeepTrackPlugin {
             },
           });
         } catch (e) {
-          errorManagerInstance.error(e, 'breakup.ts', i18next.t('errorMsgs.Breakup.ErrorCreatingBreakup'));
+          errorManagerInstance.error(e, 'breakup.ts', t7e('errorMsgs.Breakup.ErrorCreatingBreakup'));
 
           return;
         }
@@ -393,7 +393,7 @@ export class Breakup extends KeepTrackPlugin {
           });
           orbitManagerInstance.changeOrbitBufferData(satId, iTle1, iTle2);
         } else {
-          errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.BreakupGeneratorFailed'));
+          errorManagerInstance.warn(t7e('errorMsgs.Breakup.BreakupGeneratorFailed'));
         }
       }
     }
@@ -413,7 +413,7 @@ export class Breakup extends KeepTrackPlugin {
     let startNum = parseInt((<HTMLInputElement>getEl('hc-startNum')).value);
 
     if (isNaN(startNum)) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.Breakup.InvalidStartNum'));
+      errorManagerInstance.warn(t7e('errorMsgs.Breakup.InvalidStartNum'));
       startNum = 90000;
     }
 

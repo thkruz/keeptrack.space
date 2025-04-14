@@ -38,7 +38,9 @@
       "minute": "Хвилина",
       "second": "Секунда",
       "now": "Зараз",
-      "done": "Готово"
+      "done": "Готово",
+      "pause": "Пауза",
+      "propagation": "Пропагування"
     }
   },
   "errorMsgs": {
@@ -62,14 +64,19 @@
       "CannotCalcDirectionOfSatellite": "Неможливо розрахувати напрямок супутника. Спробуйте пізніше.",
       "ErrorCreatingBreakup": "Помилка при створенні руйнування!",
       "InvalidStartNum": "Недійсний початковий номер супутника! За замовчуванням встановлено 90000!",
-      "BreakupGeneratorFailed": "Генератор руйнування не спрацював!"
+      "BreakupGeneratorFailed": "Генератор руйнування не спрацював!",
+      "SatelliteNotFound": "Супутник не знайдено!"
     },
     "Collissions": {
       "noCollisionsData": "Дані про зіткнення не знайдено!",
       "errorProcessingCollisions": "Помилка обробки даних SOCRATES!"
     },
     "EditSat": {
-      "errorReadingFile": "Помилка при читанні файлу!"
+      "errorReadingFile": "Помилка при читанні файлу!",
+      "satelliteNotFound": "Супутник не знайдено!"
+    },
+    "CreateSat": {
+      "errorCreatingSat": "Помилка при створенні супутника!"
     },
     "Reports": {
       "popupBlocker": "Будь ласка, дозвольте спливаючі вікна для цього сайту, щоб переглядати звіти."

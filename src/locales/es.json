@@ -38,7 +38,9 @@
       "minute": "Minuto",
       "second": "Segundo",
       "now": "Ahora",
-      "done": "Hecho"
+      "done": "Hecho",
+      "pause": "Pausa",
+      "propagation": "Propagación"
     }
   },
   "errorMsgs": {
@@ -62,14 +64,19 @@
       "CannotCalcDirectionOfSatellite": "No se puede calcular la dirección del satélite. Intente de nuevo más tarde.",
       "ErrorCreatingBreakup": "¡Error al crear la ruptura!",
       "InvalidStartNum": "¡Número de inicio de satélite inválido! ¡Restableciendo a 90000!",
-      "BreakupGeneratorFailed": "¡El generador de ruptura falló!"
+      "BreakupGeneratorFailed": "¡El generador de ruptura falló!",
+      "SatelliteNotFound": "¡Satélite no encontrado!"
     },
     "Collissions": {
       "noCollisionsData": "¡No se encontraron datos de colisión!",
       "errorProcessingCollisions": "¡Error al procesar los datos de SOCRATES!"
     },
     "EditSat": {
-      "errorReadingFile": "¡Error al leer el archivo!"
+      "errorReadingFile": "¡Error al leer el archivo!",
+      "satelliteNotFound": "¡Satélite no encontrado!"
+    },
+    "CreateSat": {
+      "errorCreatingSat": "¡Error al crear el satélite!"
     },
     "Reports": {
       "popupBlocker": "Por favor, permita las ventanas emergentes en este sitio para ver los informes."
@@ -292,6 +299,9 @@
     },
     "ScreenRecorder": {
       "bottomIconLabel": "Grabar Video"
+    },
+    "Astronomy": {
+      "bottomIconLabel": "Astronomía"
     },
     "AnalysisMenu": {
       "bottomIconLabel": "Análisis",

@@ -31,6 +31,7 @@ import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
+import { t7e } from '@app/locales/keys';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
@@ -38,7 +39,6 @@ import { SatMath, SunStatus } from '@app/static/sat-math';
 import { TearrData } from '@app/static/sensor-math';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import i18next from 'i18next';
 import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from 'ootk';
 import { sensorGroups } from '../../catalogs/sensor-groups';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -142,7 +142,7 @@ export class SensorManager {
     const sensorId = catalogManagerInstance.getSensorFromSensorName(sensor.name);
 
     if (!sensorId) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.SensorNotFound'));
+      errorManagerInstance.warn(t7e('errorMsgs.SensorNotFound'));
 
       return;
     }
@@ -164,7 +164,7 @@ export class SensorManager {
         lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 1);
         break;
       default:
-        errorManagerInstance.warn(i18next.t('errorMsgs.SensorNotFound'));
+        errorManagerInstance.warn(t7e('errorMsgs.SensorNotFound'));
         break;
     }
   }
@@ -507,7 +507,7 @@ export class SensorManager {
         (getEl('reset-sensor-button') as HTMLButtonElement).disabled = true;
       }
     } catch (error) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.SensorManager.errorUpdatingUi'));
+      errorManagerInstance.warn(t7e('errorMsgs.SensorManager.errorUpdatingUi'));
     }
   }
 
@@ -534,7 +534,7 @@ export class SensorManager {
 
   private sensorSunStatus_(now: Date, sensor?: DetailedSensor): { sunStatus: SunStatus } {
     if (!sensor) {
-      throw new Error(i18next.t('errorMsgs.SensorNotFound'));
+      throw new Error(t7e('errorMsgs.SensorNotFound'));
     }
     // Station Lat Lon Alt vector for further ECI transformation
     const lla = {
@@ -574,7 +574,7 @@ export class SensorManager {
     const sensor = sensors[0];
 
     if (!sensor) {
-      throw new Error(i18next.t('errorMsgs.SensorNotFound'));
+      throw new Error(t7e('errorMsgs.SensorNotFound'));
     }
 
     const { gmst } = SatMath.calculateTimeVariables(now);

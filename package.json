@@ -35,6 +35,7 @@
     "build:watch": "node --max-old-space-size=8192 ./scripts/build.mjs development --watch",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs -o ./docs/CHANGELOG.md",
     "cypress:open": "cypress open",
+    "generate-t7e-keys": "npx tsx ./scripts/generate-translation-keys.ts && npx eslint --fix ./scripts/generate-translation-keys.ts",
     "lcov": "node ./scripts/openLcov.mjs",
     "lint": "eslint . --ignore-path .gitignore --ext js,ts,tsx",
     "createtest": "npx tsx ./scripts/create-test-file.ts",

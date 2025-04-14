@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents, MenuMode, Singletons } from '@app/interfaces';
+import { t7e } from '@app/locales/keys';
 import { Localization } from '@app/locales/locales';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
-import i18next from 'i18next';
 import Module from 'module';
 import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -679,7 +679,7 @@ export abstract class KeepTrackPlugin {
   verifySensorSelected(isMakeToast = true): boolean {
     if (!keepTrackApi.getSensorManager().isSensorSelected()) {
       if (isMakeToast) {
-        errorManagerInstance.warn(i18next.t('errorMsgs.SelectSensorFirst'), true);
+        errorManagerInstance.warn(t7e('errorMsgs.SelectSensorFirst'), true);
         shake(getEl(this.bottomIconElementName));
       }
 
@@ -700,7 +700,7 @@ export abstract class KeepTrackPlugin {
      * if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
      */
     if (!((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1)) {
-      errorManagerInstance.warn(i18next.t('errorMsgs.SelectSatelliteFirst'), true);
+      errorManagerInstance.warn(t7e('errorMsgs.SelectSatelliteFirst'), true);
       shake(getEl(this.bottomIconElementName));
 
       return false;

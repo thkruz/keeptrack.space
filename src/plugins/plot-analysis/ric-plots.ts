@@ -1,11 +1,11 @@
 import { EChartsData, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { t7e } from '@app/locales/keys';
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import scatterPlot3Png from '@public/img/icons/scatter-plot3.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import i18next from 'i18next';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -30,12 +30,12 @@ export class RicPlot extends KeepTrackPlugin {
   bottomIconImg = scatterPlot3Png;
   bottomIconCallback = () => {
     if (this.selectSatManager_.selectedSat === -1) {
-      keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.SelectSatelliteFirst'), ToastMsgType.critical);
+      keepTrackApi.getUiManager().toast(t7e('errorMsgs.SelectSatelliteFirst'), ToastMsgType.critical);
 
       return;
     }
     if (!this.selectSatManager_.secondarySatObj) {
-      keepTrackApi.getUiManager().toast(i18next.t('errorMsgs.SelectSecondarySatellite'), ToastMsgType.critical);
+      keepTrackApi.getUiManager().toast(t7e('errorMsgs.SelectSecondarySatellite'), ToastMsgType.critical);
 
       return;
     }

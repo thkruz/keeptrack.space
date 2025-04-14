@@ -38,7 +38,9 @@
       "minute": "Минута",
       "second": "Секунда",
       "now": "Сейчас",
-      "done": "Готово"
+      "done": "Готово",
+      "pause": "Пауза",
+      "propagation": "Пропагирование"
     }
   },
   "errorMsgs": {
@@ -62,14 +64,19 @@
       "CannotCalcDirectionOfSatellite": "Невозможно вычислить направление спутника. Попробуйте позже.",
       "ErrorCreatingBreakup": "Ошибка при создании разрушения!",
       "InvalidStartNum": "Неверный начальный номер спутника! Установлено значение по умолчанию: 90000!",
-      "BreakupGeneratorFailed": "Генератор разрушений не удалось запустить!"
+      "BreakupGeneratorFailed": "Генератор разрушений не удалось запустить!",
+      "SatelliteNotFound": "Спутник не найден!"
     },
     "Collissions": {
       "noCollisionsData": "Данные о столкновениях не найдены!",
       "errorProcessingCollisions": "Ошибка обработки данных SOCRATES!"
     },
     "EditSat": {
-      "errorReadingFile": "Ошибка при чтении файла!"
+      "errorReadingFile": "Ошибка при чтении файла!",
+      "satelliteNotFound": "Спутник не найден!"
+    },
+    "CreateSat": {
+      "errorCreatingSat": "Ошибка при создании спутника!"
     },
     "Reports": {
       "popupBlocker": "Разрешите всплывающие окна для просмотра отчетов."

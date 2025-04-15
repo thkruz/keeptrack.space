@@ -1,6 +1,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-lines */
+
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -9,8 +10,10 @@ import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
 import { SatMath, SunStatus } from '@app/static/sat-math';
 import {
-  BaseObject, calcGmst, DEG2RAD, DetailedSatellite, DetailedSensor, EpochUTC, Hours, lla2eci, MILLISECONDS_PER_SECOND, Radians, RaeVec3, SatelliteRecord,
-  Seconds, SpaceObjectType, Sun,
+  BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Hours, Kilometers, lla2eci, Milliseconds, MILLISECONDS_PER_SECOND, Radians,
+  RaeVec3,
+  SatelliteRecord,
+  Seconds, SpaceObjectType, Sun
 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -139,13 +142,12 @@ export class SensorTimeline extends KeepTrackPlugin {
         <label for="sensor-timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
       </div>
     </div>
-    <!-- Toggle Switch for Boolean Values -->
-    <div class="row">
-      <label for="sensor-timeline-toggle" class="btn btn-ui waves-effect waves-light">
-        <input type="checkbox" id="sensor-timeline-toggle" />
-        <span class="lever"></span>
-        Detailed Plot
-      </label>
+    <div class="switch row">
+            <label for="sensor-timeline-toggle" data-position="top" data-delay="50" data-tooltip="Detailed Plot">
+              <input id="sensor-timeline-toggle" type="checkbox"/>
+              <span class="lever"></span>
+              Detailed Plot
+            </label>
     </div>
     <div class="switch row">
             <label for="weather-toggle" data-position="top" data-delay="50" data-tooltip="Account for weather when calculating passes using weather forecasts">
@@ -219,8 +221,8 @@ export class SensorTimeline extends KeepTrackPlugin {
       cb: () => {
         this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
-        this.ctx_ = this.canvas_.getContext('2d')!;
-        this.ctxStatic_ = this.canvasStatic_.getContext('2d')!;
+        this.ctx_ = this.canvas_.getContext('2d') as CanvasRenderingContext2D;
+        this.ctxStatic_ = this.canvasStatic_!.getContext('2d') as CanvasRenderingContext2D;
 
         getEl('sensor-timeline-setting-total-length')!.addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-total-length')).value) as Hours;
@@ -229,7 +231,7 @@ export class SensorTimeline extends KeepTrackPlugin {
         });
 
         getEl('sensor-timeline-setting-interval')!.addEventListener('change', () => {
-          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-interval')).value) as Seconds;
+          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
@@ -486,7 +488,6 @@ export class SensorTimeline extends KeepTrackPlugin {
 
         // --------
 
-
         // Check if sat is Observable and enters the FoV
         if (isInFOVAtThisIter && !isObservable && isObservableAtThisIter && isWeatherGoodatThisIter) {
           startObservableTime = now;
@@ -621,13 +622,13 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   static checkSatInFOV(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): boolean {
     // Setup Realtime and Offset Time
-    const aer = SatMath.getRae(now, satrec, sensor);
+    const rae = SatMath.getRae(now, satrec, sensor) as { rng: Kilometers, el: Degrees, az: Degrees };
 
-    if (!aer.az || !aer.el || !aer.rng) {
+    if (!rae.az || !rae.el || !rae.rng) {
       return false;
     }
 
-    if (SatMath.checkIsInView(sensor, aer as RaeVec3)) {
+    if (SatMath.checkIsInView(sensor, rae as RaeVec3)) {
       return true;
     }
 
@@ -731,8 +732,10 @@ export class SensorTimeline extends KeepTrackPlugin {
     const width = this.canvas_.width * 0.75;
     const height = this.canvas_.height * 0.85;
     const timeManager = keepTrackApi.getTimeManager();
-    const startTime = timeManager.simulationTimeObj.getTime();
-    const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000;
+    const initialTime = timeManager.simulationTimeObj.getTime() as Milliseconds;
+    const startHourOffset = timeManager.simulationTimeObj.getUTCMinutes() * 60 * 1000 as Milliseconds;
+    const startTime = initialTime - startHourOffset as Milliseconds;
+    const endTime = initialTime + this.lengthOfLookAngles_ * 60 * 60 * 1000 + startHourOffset as Milliseconds;
 
     // clear canvas
     this.ctx_.reset();
@@ -785,12 +788,12 @@ export class SensorTimeline extends KeepTrackPlugin {
       // Draw sensor name
       this.ctx_.fillStyle = 'rgb(255, 255, 255)';
       this.ctx_.font = '14px Consolas';
-      this.ctx_.fillText((sensorPass.sensor.uiName ?? 'Missing uiName').concat(': can collect'), leftOffset - 165, y + 5);
+      this.ctx_.fillText(sensorPass.sensor.uiName!.concat(': can collect'), leftOffset - 165, y + 5);
 
       // Draw passes
       sensorPass.passes.forEach((pass) => {
-        const passStart = pass.start.getTime();
-        const passEnd = pass.end.getTime();
+        const passStart = pass.start.getTime() + startHourOffset;
+        const passEnd = pass.end.getTime() + startHourOffset;
         const x1 = leftOffset + (passStart - startTime) * xScale;
         const x2 = leftOffset + (passEnd - startTime) * xScale;
 
@@ -882,8 +885,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       // Draw passes
       ObservablePeriod.passes.forEach((pass) => {
-        const passStart = pass.start.getTime();
-        const passEnd = pass.end.getTime();
+        const passStart = pass.start.getTime() + startHourOffset;
+        const passEnd = pass.end.getTime() + startHourOffset;
         const x1 = leftOffset + (passStart - startTime) * xScale;
         const x2 = leftOffset + (passEnd - startTime) * xScale;
 
@@ -968,8 +971,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       // Draw passes
       ObservablePeriod.passes.forEach((pass) => {
-        const passStart = pass.start.getTime();
-        const passEnd = pass.end.getTime();
+        const passStart = pass.start.getTime() + startHourOffset;
+        const passEnd = pass.end.getTime() + startHourOffset;
         const x1 = leftOffset + (passStart - startTime) * xScale;
         const x2 = leftOffset + (passEnd - startTime) * xScale;
 
@@ -1143,8 +1146,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
     // Draw passes
     ObservablePeriod.passes.forEach((pass) => {
-      const passStart = pass.start.getTime();
-      const passEnd = pass.end.getTime();
+      const passStart = pass.start.getTime() + startHourOffset;
+      const passEnd = pass.end.getTime() + startHourOffset;
       const x1 = leftOffset + (passStart - startTime) * xScale;
       const x2 = leftOffset + (passEnd - startTime) * xScale;
 
@@ -1247,8 +1250,6 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       this.drawEvents_[`${SatinSuns.length} - ${ObservablePeriod.sensor.id} - no - passes`] = drawEvent;
     }
-    // });
-
 
     // Add one mousemove event
     this.canvas_.addEventListener('mousemove', (event) => {
@@ -1296,8 +1297,10 @@ export class SensorTimeline extends KeepTrackPlugin {
     const width = this.canvas_.width * 0.75;
     const height = this.canvas_.height * 0.75;
     const timeManager = keepTrackApi.getTimeManager();
-    const startTime = timeManager.simulationTimeObj.getTime();
-    const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000;
+    const initialTime = timeManager.simulationTimeObj.getTime() as Milliseconds;
+    const startHourOffset = timeManager.simulationTimeObj.getUTCMinutes() * 60 * 1000 as Milliseconds;
+    const startTime = initialTime - startHourOffset as Milliseconds;
+    const endTime = initialTime + this.lengthOfLookAngles_ * 60 * 60 * 1000 + startHourOffset as Milliseconds;
 
     // clear canvas
     this.ctx_.reset();
@@ -1354,8 +1357,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       // Draw passes
       sensorPass.passes.forEach((pass) => {
-        const passStart = pass.start.getTime();
-        const passEnd = pass.end.getTime();
+        const passStart = pass.start.getTime() + startHourOffset;
+        const passEnd = pass.end.getTime() + startHourOffset;
         const x1 = leftOffset + (passStart - startTime) * xScale;
         const x2 = leftOffset + (passEnd - startTime) * xScale;
 

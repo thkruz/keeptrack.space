@@ -161,6 +161,7 @@
     "new-github-issue-url": "^1.0.0",
     "numeric": "^1.2.6",
     "ootk": "^4.0.9",
+    "openmeteo": "^1.2.0",
     "resizable": "^1.2.1",
     "uuid": "^11.1.0",
     "webgl-obj-loader": "^2.0.8"

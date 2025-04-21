@@ -739,7 +739,8 @@ export class SatInfoBox extends KeepTrackPlugin {
       return;
     }
 
-    const isHasAltName = (obj as DetailedSatellite)?.altName && (obj as DetailedSatellite).altName !== '';
+    const isHasAltName: boolean = !!((obj as DetailedSatellite)?.altName && (obj as DetailedSatellite).altName !== '');
+    const isHasAltId: boolean = !!((obj as DetailedSatellite)?.altId && (obj as DetailedSatellite).altId !== '');
 
     getEl('sat-info-title-name')!.innerHTML = obj.name;
 
@@ -748,7 +749,20 @@ export class SatInfoBox extends KeepTrackPlugin {
     } else {
       getEl('sat-infobox-fi')!.classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
     }
-    getEl('sat-alt-name')!.innerHTML = isHasAltName ? (obj as DetailedSatellite).altName : 'N/A';
+
+    if (isHasAltName) {
+      showEl(getEl('sat-alt-name')!.parentElement!, 'flex');
+      getEl('sat-alt-name')!.innerHTML = (obj as DetailedSatellite).altName;
+    } else {
+      hideEl(getEl('sat-alt-name')!.parentElement!);
+    }
+
+    if (isHasAltId) {
+      showEl(getEl('sat-alt-id')!.parentElement!, 'flex');
+      getEl('sat-alt-id')!.innerHTML = (obj as DetailedSatellite).altId;
+    } else {
+      hideEl(getEl('sat-alt-id')!.parentElement!);
+    }
 
     const watchlistPlugin = keepTrackApi.getPlugin(WatchlistPlugin);
 
@@ -776,7 +790,6 @@ export class SatInfoBox extends KeepTrackPlugin {
     if (obj.isMissile()) {
       getEl('sat-intl-des')!.innerHTML = 'N/A';
       getEl('sat-objnum')!.innerHTML = 'N/A';
-      getEl('sat-altid')!.innerHTML = 'N/A';
       getEl('sat-source')!.innerHTML = 'N/A';
     } else {
       const sat = obj as DetailedSatellite;
@@ -790,7 +803,6 @@ export class SatInfoBox extends KeepTrackPlugin {
         // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
       }
 
-      getEl('sat-altid')!.innerHTML = sat.altId || 'N/A';
       getEl('sat-source')!.innerHTML = sat.source || CatalogSource.CELESTRAK;
       SatInfoBox.updateRcsData_(sat);
     }
@@ -1110,7 +1122,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           </div>
           <div class="sat-info-row sat-only-info">
             <div class="sat-info-key">Alt ID</div>
-            <div class="sat-info-value" id="sat-altid">99999</div>
+            <div class="sat-info-value" id="sat-alt-id">99999</div>
           </div>
           <div class="sat-info-row sat-only-info">
             <div class="sat-info-key">Source</div>
@@ -1549,7 +1561,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     getEl(SatInfoBox.containerId_)?.insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
-        <div id="sat-mission-data">
+        <div id="sat-mission-data" class="start hidden">
           <div class="sat-info-section-header">
             Mission
             <span id="mission-section-collapse" class="section-collapse material-icons" style="position: absolute; right: 0;">expand_less</span>
@@ -1946,8 +1958,10 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     const satMissionData = getEl('sat-mission-data', true);
 
-    if (satMissionData) {
-      satMissionData.style.display = 'block';
+    if (settingsManager.isMissionDataEnabled) {
+      satMissionData!.style.display = 'block';
+    } else {
+      satMissionData!.style.display = 'none';
     }
 
     const satIdentifierData = getEl('sat-identifier-data', true);

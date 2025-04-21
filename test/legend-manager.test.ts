@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CelestrakColorScheme } from '@app/singletons/color-schemes/celestrak-color-scheme';
-import { DefaultColorScheme } from '@app/singletons/color-schemes/default-color-scheme';
 import { GpAgeColorScheme } from '@app/singletons/color-schemes/gp-age-color-scheme';
+import { ObjectTypeColorScheme } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { RcsColorScheme } from '@app/singletons/color-schemes/rcs-color-scheme';
 import { SmallSatColorScheme } from '@app/singletons/color-schemes/smallsat-color-scheme';
 import { StarlinkColorScheme } from '@app/singletons/color-schemes/starlink-color-scheme';
@@ -53,7 +53,7 @@ describe('LegendManager_class', () => {
     const legendHoverDom = document.createElement('div');
 
     [
-      GpAgeColorScheme, RcsColorScheme, DefaultColorScheme, SunlightColorScheme,
+      GpAgeColorScheme, RcsColorScheme, ObjectTypeColorScheme, SunlightColorScheme,
       VelocityColorScheme, CelestrakColorScheme, StarlinkColorScheme, SmallSatColorScheme,
     ].forEach((ThisColorScheme) => {
       // Arrange
@@ -115,8 +115,8 @@ describe('LegendManager_class', () => {
       return null;
     });
 
-    LegendManager.change(DefaultColorScheme.name);
+    LegendManager.change(ObjectTypeColorScheme.name);
 
-    expect(legendHoverDom.innerHTML).toBe(DefaultColorScheme.legendHtml);
+    expect(legendHoverDom.innerHTML).toBe(ObjectTypeColorScheme.legendHtml);
   });
 });

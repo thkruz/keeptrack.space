@@ -1,6 +1,7 @@
 #sat-info-title {
   font-size: 22px !important;
-  height: 25px;
+  min-height: 25px;
+  height: auto;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;

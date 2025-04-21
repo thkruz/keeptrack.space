@@ -25,7 +25,7 @@ import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu'
 import type { KeepTrackPlugins } from '@app/plugins/plugins';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
-import { DefaultColorSchemeColorMap } from '@app/singletons/color-schemes/default-color-scheme';
+import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
@@ -106,6 +106,11 @@ export class SettingsManager {
   earthDayTextureQuality = EarthDayTextureQuality.MEDIUM;
   earthNightTextureQuality = EarthNightTextureQuality.MEDIUM;
   filter: FilterPluginSettings = {};
+  /**
+   * This enables/disable the mission data section of the sat-info-box. There is no value if your data set contains no mission data.
+   */
+  isMissionDataEnabled = true;
+
 
   static preserveSettings() {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
@@ -121,7 +126,11 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HOS, settingsManager.colors.transparent[3] === 0 ? 'true' : 'false');
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
+    if (settingsManager.isShowConfidenceLevels) {
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
+    } else {
+      PersistenceManager.getInstance().removeItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS);
+    }
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEMO_MODE, settingsManager.isDemoModeOn.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE, settingsManager.isSatLabelModeOn.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
@@ -139,13 +148,13 @@ export class SettingsManager {
     keepTrackApi.runEvent(KeepTrackApiEvents.saveSettings);
   }
 
-  colors: ColorSchemeColorMap & DefaultColorSchemeColorMap;
+  colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
 
   /**
    * The default color scheme to use when the application is loaded. This must be a string that matches a class name of one of the available color schemes.
    * Ex. DefaultColorScheme, CelestrakColorScheme, etc.
    */
-  defaultColorScheme: 'DefaultColorScheme';
+  defaultColorScheme: 'CelestrakColorScheme';
 
   /** Ensures no html is injected into the page */
   isPreventDefaultHtml = false;
@@ -738,7 +747,14 @@ export class SettingsManager {
    * Determines whether or not to show the satellite labels.
    */
   isSatLabelModeOn = true;
-  isShowLogo = true;
+  /**
+   * Flag for showing the primary logo
+   */
+  isShowPrimaryLogo = true;
+  /**
+   * Flag for showing the secondary logo for partnerships
+   */
+  isShowSecondaryLogo = false;
   /**
    * Flag for using the debris catalog instead of the full catalog
    *
@@ -1141,7 +1157,7 @@ export class SettingsManager {
   /**
    * Indicates whether to show confidence levels when hovering over an object.
    */
-  isShowConfidenceLevels = true;
+  isShowConfidenceLevels: boolean = false;
   /**
    * The container root element for the application
    * NOTE: This is for initializing it, but keepTrackApi.containerRoot will be used throughout
@@ -1171,7 +1187,11 @@ export class SettingsManager {
     this.isDrawMilkyWay = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_MILKY_WAY, this.isDrawMilkyWay) as boolean;
     this.isGraySkybox = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_GRAY_SKYBOX, this.isGraySkybox) as boolean;
     this.isEciOnHover = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_ECI_ON_HOVER, this.isEciOnHover) as boolean;
-    this.isShowConfidenceLevels = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_CONFIDENCE_LEVELS, this.isShowConfidenceLevels) as boolean;
+    if (settingsManager.isShowConfidenceLevels) {
+      this.isShowConfidenceLevels = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_CONFIDENCE_LEVELS, this.isShowConfidenceLevels) as boolean;
+    } else {
+      this.isShowConfidenceLevels = false;
+    }
     this.isDemoModeOn = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DEMO_MODE, this.isDemoModeOn) as boolean;
     this.isSatLabelModeOn = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_SAT_LABEL_MODE, this.isSatLabelModeOn) as boolean;
     this.isFreezePropRateOnDrag = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, this.isFreezePropRateOnDrag) as boolean;
@@ -1250,7 +1270,7 @@ export class SettingsManager {
   private checkIfIframe_() {
     if (window.self !== window.top) {
       this.isInIframe = true;
-      this.isShowLogo = true;
+      this.isShowPrimaryLogo = true;
     }
   }
 
@@ -1263,7 +1283,7 @@ export class SettingsManager {
   private setColorSettings_() {
     this.selectedColorFallback = this.selectedColor;
 
-    this.colors = {} as ColorSchemeColorMap & DefaultColorSchemeColorMap;
+    this.colors = {} as ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
     try {
       const jsonString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DOT_COLORS);
 
@@ -1584,7 +1604,7 @@ export class SettingsManager {
             this.copyrightOveride = true;
             break;
           case 'logo':
-            this.isShowLogo = true;
+            this.isShowPrimaryLogo = true;
             break;
           case 'noPropRate':
             this.isAlwaysHidePropRate = true;

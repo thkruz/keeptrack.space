@@ -6,7 +6,7 @@ import Module from 'module';
 import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { clickAndDragWidth } from '../lib/click-and-drag';
-import { getEl } from '../lib/get-el';
+import { getEl, hideEl } from '../lib/get-el';
 import { shake } from '../lib/shake';
 import { slideInRight, slideOutLeft } from '../lib/slide';
 import { errorManagerInstance } from '../singletons/errorManager';
@@ -476,9 +476,47 @@ export abstract class KeepTrackPlugin {
 
     if (this.bottomIconElementName) {
       this.registerMenuMode();
+      this.menuMode.forEach((menuMode) => {
+        KeepTrackPlugin.registeredMenus[menuMode].push(this.bottomIconElementName);
+      });
     }
 
     this.isJsAdded = true;
+  }
+
+  static registeredMenus = {
+    [MenuMode.BASIC]: [] as string[],
+    [MenuMode.ADVANCED]: [] as string[],
+    [MenuMode.ANALYSIS]: [] as string[],
+    [MenuMode.EXPERIMENTAL]: [] as string[],
+    [MenuMode.ALL]: [] as string[],
+  };
+
+  static hideUnusedMenuModes(): void {
+    for (const menuMode in Object.keys(KeepTrackPlugin.registeredMenus)) {
+      if (Object.prototype.hasOwnProperty.call(KeepTrackPlugin.registeredMenus, menuMode)) {
+        const menuElements = KeepTrackPlugin.registeredMenus[menuMode];
+
+        if (menuElements.length === 0) {
+          switch (parseInt(menuMode)) {
+            case MenuMode.BASIC:
+              hideEl('menu-filter-basic');
+              break;
+            case MenuMode.ADVANCED:
+              hideEl('menu-filter-advanced');
+              break;
+            case MenuMode.ANALYSIS:
+              hideEl('menu-filter-analysis');
+              break;
+            case MenuMode.EXPERIMENTAL:
+              hideEl('menu-filter-experimental');
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    }
   }
 
   registerMenuMode(): void {
@@ -805,6 +843,18 @@ export abstract class KeepTrackPlugin {
   openSideMenu() {
     this.hideSideMenus();
     slideInRight(getEl(this.sideMenuElementName), 1000);
+    KeepTrackPlugin.openSideMenu_();
+  }
+
+  /**
+   * This runs after a side menu is opened.
+   */
+  private static openSideMenu_() {
+    getEl('tutorial-btn')?.classList.remove('bmenu-item-disabled');
+  }
+
+  private static closeSideMenu_() {
+    getEl('tutorial-btn')?.classList.add('bmenu-item-disabled');
   }
 
   openSettingsMenu() {
@@ -826,6 +876,7 @@ export abstract class KeepTrackPlugin {
     const settingsMenuElement = getEl(`${this.sideMenuElementName}`);
 
     slideOutLeft(settingsMenuElement, 1000);
+    KeepTrackPlugin.closeSideMenu_();
   }
 
   closeSettingsMenu() {

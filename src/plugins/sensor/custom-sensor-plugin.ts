@@ -197,7 +197,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           (<HTMLInputElement>getEl('cs-maxrange')).value = '5556';
           triggerSubmit(<HTMLFormElement>getEl('customSensor'));
           const defaultColorScheme = colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme] ??
-            colorSchemeManagerInstance.colorSchemeInstances.DefaultColorScheme;
+            Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0];
 
           colorSchemeManagerInstance.setColorScheme(defaultColorScheme, true);
           catalogManagerInstance.satCruncher.postMessage({

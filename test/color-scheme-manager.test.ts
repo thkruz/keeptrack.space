@@ -4,7 +4,7 @@ import * as getEl from '@app/lib/get-el';
 import { settingsManager } from '@app/settings/settings';
 import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { ColorScheme } from '@app/singletons/color-schemes/color-scheme';
-import { DefaultColorScheme } from '@app/singletons/color-schemes/default-color-scheme';
+import { ObjectTypeColorScheme } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { GroupType } from '@app/singletons/object-group';
 import { LegendManager } from '@app/static/legend-manager';
@@ -358,7 +358,7 @@ describe('ColorSchemeManager', () => {
 
   // Test default color scheme
   it('should be able to get default color scheme', () => {
-    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.DefaultColorScheme.update(sat);
+    const test = (sat: BaseObject) => Object.values(colorSchemeManager.colorSchemeInstances)[0].update(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
 
@@ -373,7 +373,7 @@ describe('ColorSchemeManager', () => {
     const group = keepTrackApi.getGroupsManager().createGroup(GroupType.SCC_NUM, [1]);
 
     keepTrackApi.getGroupsManager().selectGroup(group);
-    const test = (sat: BaseObject) => colorSchemeManager.colorSchemeInstances.DefaultColorScheme.updateGroup(sat);
+    const test = (sat: BaseObject) => Object.values(colorSchemeManager.colorSchemeInstances)[0].updateGroup(sat);
 
     testMultipleSats(colorSchemeManager, listOfSatsToTest, test);
   });
@@ -497,7 +497,7 @@ describe('ColorSchemeManager Block 2', () => {
     colorSchemeManager.pickableBuffer = {};
     colorSchemeManager.calculateColorBuffers = jest.fn();
 
-    const mockColorScheme = new DefaultColorScheme();
+    const mockColorScheme = new ObjectTypeColorScheme();
 
     // Act
     colorSchemeManager.setColorScheme(mockColorScheme, true);
@@ -544,7 +544,7 @@ describe('ColorSchemeManager Block 2', () => {
 
     // Assert
     expect(errorManagerInstance.log).toHaveBeenCalled();
-    expect(colorSchemeManager.currentColorSchemeUpdate).toBe(colorSchemeManager.colorSchemeInstances.DefaultColorScheme.update);
+    expect(colorSchemeManager.currentColorSchemeUpdate).toBe(Object.values(colorSchemeManager.colorSchemeInstances)[0].update);
     expect(colorSchemeManager.calculateColorBuffers).toHaveBeenCalledWith(false);
   });
 
@@ -698,6 +698,6 @@ describe('ColorSchemeManager Block 2', () => {
 
     // Assert
     expect(colorSchemeManager.isUseGroupColorScheme).toBe(false);
-    expect(colorSchemeManager.setColorScheme).toHaveBeenCalledWith(colorSchemeManager.colorSchemeInstances.DefaultColorScheme);
+    expect(colorSchemeManager.setColorScheme).toHaveBeenCalledWith(Object.values(colorSchemeManager.colorSchemeInstances)[0]);
   });
 });

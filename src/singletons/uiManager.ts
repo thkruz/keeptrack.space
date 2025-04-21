@@ -245,8 +245,11 @@ export class UiManager {
 
     this.searchManager = new SearchManager(this);
 
-    if (settingsManager.isShowLogo) {
-      getEl('demo-logo')?.classList.remove('start-hidden');
+    if (settingsManager.isShowPrimaryLogo) {
+      getEl('logo-primary')?.classList.remove('start-hidden');
+    }
+    if (settingsManager.isShowSecondaryLogo) {
+      getEl('logo-secondary')?.classList.remove('start-hidden');
     }
 
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);

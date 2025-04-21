@@ -7,7 +7,7 @@ import { MissileObject } from '../catalog-manager/MissileObject';
 import { errorManagerInstance } from '../errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 
-export interface DefaultColorSchemeColorMap extends ColorSchemeColorMap {
+export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
   payload: rgbaArray;
   rocketBody: rgbaArray;
   debris: rgbaArray;
@@ -20,12 +20,12 @@ export interface DefaultColorSchemeColorMap extends ColorSchemeColorMap {
   inFOV: rgbaArray;
 }
 
-export class DefaultColorScheme extends ColorScheme {
+export class ObjectTypeColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
   readonly label = 'Object Type';
-  readonly id = 'DefaultColorScheme';
-  static readonly id = 'DefaultColorScheme';
+  readonly id = 'ObjectTypeColorScheme';
+  static readonly id = 'ObjectTypeColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
     payload: true,
@@ -54,9 +54,9 @@ export class DefaultColorScheme extends ColorScheme {
   };
 
   constructor() {
-    super(DefaultColorScheme.uniqueColorTheme);
+    super(ObjectTypeColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...DefaultColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags, ...ObjectTypeColorScheme.uniqueObjectTypeFlags,
     };
   }
 

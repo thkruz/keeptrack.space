@@ -1222,8 +1222,9 @@ input:focus {
   filter: brightness(1.8);
 }
 
-.bmenu-item-disabled img {
-  filter: grayscale(1);
+.bmenu-item-disabled img,
+.bmenu-item-disabled img * {
+  filter: grayscale(1) !important;
 }
 
 .bmenu-item-disabled .status-icon {
@@ -1285,18 +1286,34 @@ input:focus {
   height: 2em;
 }
 
-#demo-logo {
+#logo-primary {
   position: absolute;
   top: calc(var(--top-menu-height) + 10px);
   left: 10px;
   height: auto;
-  width: 4%;
+  width: 4vw;
   z-index: 0;
   max-width: 150px;
-  min-width: 60px;
+  min-width: 70px;
 }
 
-#demo-logo img {
+#logo-primary img {
+  width: 100%;
+  height: 100%;
+}
+
+#logo-secondary {
+  position: absolute;
+  top: calc(var(--top-menu-height) + 10px);
+  left: calc(20px + max(4vw, 70px));
+  height: auto;
+  width: 4vw;
+  z-index: 0;
+  max-width: 150px;
+  min-width: 70px;
+}
+
+#logo-secondary img {
   width: 100%;
   height: 100%;
 }

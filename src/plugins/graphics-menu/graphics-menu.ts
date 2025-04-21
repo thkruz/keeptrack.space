@@ -196,6 +196,8 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
 
       (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-day-texture-quality`)).value = EarthNightTextureQuality.MEDIUM;
       (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-night-texture-quality`)).value = EarthNightTextureQuality.MEDIUM;
+      (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-day-texture-quality`)).dispatchEvent(new Event('change'));
+      (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-night-texture-quality`)).dispatchEvent(new Event('change'));
 
       settingsManager.isDrawSun = true;
       if (settingsManager.isBlackEarth) {

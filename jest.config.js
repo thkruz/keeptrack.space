@@ -1,6 +1,5 @@
-import type { JestConfigWithTsJest } from 'ts-jest';
-
-const jestConfig: JestConfigWithTsJest = {
+// Equivalent ES module Jest config for ES module projects
+export default {
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/tsconfig-jest.json',
@@ -29,5 +28,3 @@ const jestConfig: JestConfigWithTsJest = {
   coverageReporters: ['lcov', 'html', 'text'],
   coveragePathIgnorePatterns: ['/node_modules/', '/src/lib/external/', '/test/', '/dist/'],
 };
-
-export default jestConfig;

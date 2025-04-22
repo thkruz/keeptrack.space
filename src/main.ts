@@ -1,16 +1,10 @@
 /**
- * /*! /////////////////////////////////////////////////////////////////////////////
+ *!
+ * /////////////////////////////////////////////////////////////////////////////
  *
- * main.ts is a TypeScript implementation of the KeepTrack class. This is responsible for
- * initializing the website.
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
- * @Copyright (C) 2015-2016, James Yoder
- *
- * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
- * under the MIT License. Please reference https://keeptrack.space/license/thingsinspace.txt
+ * @Copyright (C) 2025 Kruczek Labs LLC
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software

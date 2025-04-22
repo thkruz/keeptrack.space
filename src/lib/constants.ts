@@ -1,17 +1,12 @@
 /**
- * /*! /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * The file constants.ts contains a set of constants used in the KeepTrack application.
  * It defines constants related to zooming, radians, degrees, milliseconds, Earth's gravitational
  * constant, minutes, distances of the Sun and Moon from the Earth, and more.
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
- * @Copyright (C) 2015-2016, James Yoder
- *
- * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
- * under the MIT License. Please reference https://keeptrack.space/license/thingsinspace.txt
+ * @Copyright (C) 2025 Kruczek Labs LLC
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software

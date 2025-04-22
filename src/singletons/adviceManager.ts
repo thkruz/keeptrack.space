@@ -1,7 +1,7 @@
 /*
  * /////////////////////////////////////////////////////////////////////////////
  *
- * (c) 2016-2023, Theodore Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  *
  * advice-module.js manages all recommended actions to the user in a semi-tutorial
  * manner. It works closely with ui.js

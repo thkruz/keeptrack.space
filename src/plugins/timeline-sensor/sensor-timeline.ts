@@ -19,6 +19,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorManager } from '../sensor/sensorManager';
 import { SoundNames } from '../sounds/SoundNames';
 
+import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { fetchWeatherApi } from 'openmeteo';
 
 interface Pass {
@@ -75,7 +76,7 @@ export class SensorTimeline extends KeepTrackPlugin {
   private leftOffset: number;
 
   private readonly allSensorLists_ = [] as DetailedSensor[];
-  private readonly enabledSensors_: DetailedSensor[] = [];
+  private enabledSensors_: DetailedSensor[] = [];
 
   private lengthOfLookAngles_ = 24 as Hours;
   private lengthOfBadPass_ = 120 as Seconds;
@@ -295,6 +296,30 @@ export class SensorTimeline extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
+    // We need to wait for the sensorIds to be assigned before we can use them. Once they are ready we will reload the users last selected sensors
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.onCruncherReady,
+      cbName: this.id,
+      cb: () => {
+        const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
+        let enabledSensors = [] as number[];
+
+        if (cachedEnabledSensors) {
+          enabledSensors = JSON.parse(cachedEnabledSensors) as number[];
+        }
+
+        if (enabledSensors.length > 0) {
+          this.enabledSensors_ = this.allSensorLists_.filter((s: DetailedSensor) => enabledSensors.includes(s.sensorId!));
+
+          if (this.enabledSensors_.length === 0) {
+            this.enabledSensors_ = this.allSensorLists_;
+          }
+
+
+        }
+      },
+    });
+
     keepTrackApi.register({
       event: KeepTrackApiEvents.selectSatData,
       cbName: this.id,
@@ -388,6 +413,8 @@ export class SensorTimeline extends KeepTrackPlugin {
 
         this.ctxStatic_.reset();
         this.updateTimeline();
+
+        PersistenceManager.getInstance().saveItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS, JSON.stringify(this.enabledSensors_.map((s) => s.sensorId!)));
       });
       sensorListDom.appendChild(sensorButton);
       sensorListDom.appendChild(document.createTextNode(' '));

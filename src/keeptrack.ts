@@ -52,7 +52,6 @@ import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manage
 import { SensorManager } from './plugins/sensor/sensorManager';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
-import { VERSION_DATE } from './settings/versionDate.js';
 import { Camera } from './singletons/camera';
 import { CameraControlWidget } from './singletons/camera-control-widget';
 import { CatalogManager } from './singletons/catalog-manager';
@@ -480,7 +479,6 @@ theodore.kruczek at gmail dot com.
 
       // Upodate the version number and date
       settingsManager.versionNumber = VERSION;
-      settingsManager.versionDate = VERSION_DATE;
 
       // Error Trapping
       window.addEventListener('error', (e: ErrorEvent) => {

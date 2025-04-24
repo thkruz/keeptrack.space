@@ -20,8 +20,8 @@ jobs:
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3.1.1
         with:
-          file_or_dir: ${{ github.workspace }}/
-            .github/workflows/build-pipeline.yml
+          file_or_dir: |
+            ${{ github.workspace }}/.github/workflows/build-pipeline.yml
   compliance:
     needs: lint-yml
     name: NPM Audit Report

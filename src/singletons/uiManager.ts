@@ -68,10 +68,15 @@ export class UiManager {
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
-      document.documentElement?.requestFullscreen().catch((err) => {
+      try {
+        document.documentElement?.requestFullscreen().catch((err) => {
+          // Might fail on some browsers
+          errorManagerInstance.debug(err);
+        });
+      } catch (e) {
         // Might fail on some browsers
-        errorManagerInstance.debug(err);
-      });
+        errorManagerInstance.debug(e);
+      }
     } else {
       document.exitFullscreen();
     }

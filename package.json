@@ -134,6 +134,7 @@
     "style-loader": "^3.3.4",
     "ts-jest": "^29.1.1",
     "ts-loader": "^9.4.4",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.0",
     "typescript": "^5.3.3",
     "webgl-lint": "^1.11.3",
@@ -161,7 +162,7 @@
     "material-icons": "^1.13.12",
     "new-github-issue-url": "^1.0.0",
     "numeric": "^1.2.6",
-    "ootk": "^4.0.9",
+    "ootk": "^5.0.0",
     "resizable": "^1.2.1",
     "uuid": "^11.1.0",
     "webgl-obj-loader": "^2.0.8"

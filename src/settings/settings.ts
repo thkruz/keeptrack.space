@@ -110,6 +110,10 @@ export class SettingsManager {
    * This enables/disable the mission data section of the sat-info-box. There is no value if your data set contains no mission data.
    */
   isMissionDataEnabled = true;
+  /**
+   * If ECF Orbits are drawn, this is the number of orbits to draw.
+   */
+  numberOfEcfOrbitsToDraw = 1;
 
 
   static preserveSettings() {

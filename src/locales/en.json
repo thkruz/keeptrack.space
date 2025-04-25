@@ -165,9 +165,9 @@
       "helpBody": "The Sensor Timeline menu shows when a list of sensors have visibility of one satellite. The timeline is color-coded to show the quality of the pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to change the sensor and time to that pass. <br><br> The timeline can be modified by changing the start and end time of the simulation. Additionally, the timeline can be modified by changing the length and interval options."
     },
     "RPOCalculator": {
-      "bottomIconLabel": "Remote Proximity Operations",
-      "title": "Remote Proximity Operations (RPO)",
-      "titleSecondary": "Remote Proximity Operations List",
+      "bottomIconLabel": "Rendezvous and Proximity Operations",
+      "title": "Rendezvous and Proximity Operations (RPO)",
+      "titleSecondary": "Rendezvous and Proximity Operations List",
       "helpBody": "Find coming approachs between satellites"
     },
     "SatelliteTimeline": {

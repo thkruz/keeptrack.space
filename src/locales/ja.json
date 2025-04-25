@@ -99,7 +99,8 @@
     "painting": "地球を描画中...",
     "coloring": "線の内側を着色中...",
     "elsets": "GPを探索中...",
-    "models": "3Dモデルを構築中..."
+    "models": "3Dモデルを構築中...",
+    "cunningPlan": "狡猾な計画を立て中..."
   },
   "splashScreens": {
     "1": "衛星モデルは実際よりも大きく表示されています。他はすべて実寸です。",
@@ -162,6 +163,25 @@
       "bottomIconLabel": "センサータイムライン",
       "title": "センサータイムラインメニュー",
       "helpBody": "センサータイムラインメニューは、複数のセンサーが1つの衛星の視認性を持つ時間を示します。タイムラインは通過の品質を示すためにカラーコードされています。赤は悪い通過、黄色は平均的な通過、緑は良い通過を示します。通過をクリックすると、センサーと時間がその通過に変更されます。<br><br>タイムラインは、シミュレーションの開始時間と終了時間を変更することで修正できます。さらに、タイムラインは長さと間隔のオプションを変更することでも修正できます。"
+    },
+    "ProximityOps": {
+      "bottomIconLabel": "ランデブー・近接運用",
+      "title": "ランデブー・近接運用（RPO）",
+      "titleSecondary": "ランデブー・近接運用リスト",
+      "helpBody": "衛星間の今後の接近を検索します",
+      "noradId": "NORAD ID",
+      "maxDistThreshold": "最大距離閾値（km）",
+      "maxRelativeVelocity": "最大相対速度（km/s）",
+      "searchDuration": "検索期間（時間）",
+      "geoText": "静止軌道",
+      "leoText": "低軌道",
+      "orbitType": "軌道タイプ",
+      "geoAllVsAll": "静止軌道 全て対全て",
+      "geoAllVsAllTooltip": "全ての静止軌道衛星間でRPOを検索",
+      "comparePayloadsOnly": "ペイロードのみ比較",
+      "comparePayloadsOnlyTooltip": "ペイロード間のみRPOを検索",
+      "ignoreVimpelRso": "Vimpel RSOを無視",
+      "ignoreVimpelRsoTooltip": "Vimpelカタログ由来のRSOを無視"
     },
     "SatelliteTimeline": {
       "bottomIconLabel": "衛星タイムライン",

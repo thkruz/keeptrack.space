@@ -99,7 +99,8 @@
     "painting": "지구 그리는 중...",
     "coloring": "선 안에 색칠하는 중...",
     "elsets": "GP 찾는 중...",
-    "models": "3D 모델 구축 중..."
+    "models": "3D 모델 구축 중...",
+    "cunningPlan": "교활한 계획 세우는 중..."
   },
   "splashScreens": {
     "1": "위성 모델은 실제보다 크게 표시됩니다. 다른 모든 것은 실제 크기입니다.",
@@ -162,6 +163,25 @@
       "bottomIconLabel": "센서 타임라인",
       "title": "센서 타임라인 메뉴",
       "helpBody": "센서 타임라인 메뉴는 센서 목록이 하나의 위성을 볼 수 있는 시간을 보여줍니다. 타임라인은 패스의 품질을 나타내기 위해 색상으로 구분됩니다. 빨간색은 나쁜 패스, 노란색은 평균 패스, 녹색은 좋은 패스를 나타냅니다. 패스를 클릭하면 센서와 시간이 해당 패스로 변경됩니다. <br><br> 타임라인은 시뮬레이션의 시작 및 종료 시간을 변경하여 수정할 수 있습니다. 또한 길이 및 간격 옵션을 변경하여 타임라인을 수정할 수 있습니다."
+    },
+    "ProximityOps": {
+      "bottomIconLabel": "란데부 및 근접 조작",
+      "title": "란데부 및 근접 조작(RPO)",
+      "titleSecondary": "란데부 및 근접 조작 목록",
+      "helpBody": "위성 간의 다가오는 접근을 찾습니다.",
+      "noradId": "NORAD ID",
+      "maxDistThreshold": "최대 거리 임계값 (km)",
+      "maxRelativeVelocity": "최대 상대 속도 (km/s)",
+      "searchDuration": "검색 기간 (시간)",
+      "geoText": "정지궤도",
+      "leoText": "저지구궤도",
+      "orbitType": "궤도 유형",
+      "geoAllVsAll": "정지궤도 전체 대 전체",
+      "geoAllVsAllTooltip": "모든 정지궤도 위성 간의 RPO를 검색합니다.",
+      "comparePayloadsOnly": "페이로드만 비교",
+      "comparePayloadsOnlyTooltip": "페이로드 간의 RPO만 검색합니다.",
+      "ignoreVimpelRso": "Vimpel RSO 무시",
+      "ignoreVimpelRsoTooltip": "Vimpel 카탈로그에서 가져온 RSO를 무시합니다."
     },
     "SatelliteTimeline": {
       "bottomIconLabel": "위성 타임라인",

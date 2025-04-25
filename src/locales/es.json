@@ -99,7 +99,8 @@
     "painting": "Pintando la Tierra...",
     "coloring": "Coloreando dentro de las líneas...",
     "elsets": "Localizando GPs...",
-    "models": "Construyendo modelos 3D..."
+    "models": "Construyendo modelos 3D...",
+    "cunningPlan": "Desarrollando un plan astuto..."
   },
   "splashScreens": {
     "1": "Los modelos de satélites aparecen más grandes de lo que son en realidad. Todo lo demás está a escala.",
@@ -162,6 +163,25 @@
       "bottomIconLabel": "Línea de Tiempo del Sensor",
       "title": "Menú de Línea de Tiempo del Sensor",
       "helpBody": "El menú de Línea de Tiempo del Sensor muestra cuándo una lista de sensores tiene visibilidad de un satélite. La línea de tiempo está codificada por colores para mostrar la calidad del pase. Rojo es un mal pase, amarillo es un pase promedio y verde es un buen pase. Haz clic en un pase para cambiar el sensor y el tiempo a ese pase. <br><br> La línea de tiempo puede ser modificada cambiando el tiempo de inicio y fin de la simulación. Además, la línea de tiempo puede ser modificada cambiando las opciones de longitud e intervalo."
+    },
+    "ProximityOps": {
+      "bottomIconLabel": "Rendezvous y Operaciones de Proximidad",
+      "title": "Rendezvous y Operaciones de Proximidad (RPO)",
+      "titleSecondary": "Lista de Rendezvous y Operaciones de Proximidad",
+      "helpBody": "Encuentra acercamientos próximos entre satélites",
+      "noradId": "ID NORAD",
+      "maxDistThreshold": "Distancia Máxima de Umbral (km)",
+      "maxRelativeVelocity": "Velocidad Relativa Máxima (km/s)",
+      "searchDuration": "Duración de Búsqueda (horas)",
+      "geoText": "Geoestacionario",
+      "leoText": "Órbita Terrestre Baja",
+      "orbitType": "Tipo de Órbita",
+      "geoAllVsAll": "Geoestacionario Todos vs Todos",
+      "geoAllVsAllTooltip": "Buscar RPOs entre todos los satélites geoestacionarios",
+      "comparePayloadsOnly": "Comparar Solo Cargas Útiles",
+      "comparePayloadsOnlyTooltip": "Buscar solo RPOs entre cargas útiles",
+      "ignoreVimpelRso": "Ignorar Vimpel RSO",
+      "ignoreVimpelRsoTooltip": "Ignorar RSOs provenientes del Catálogo Vimpel"
     },
     "SatelliteTimeline": {
       "bottomIconLabel": "Línea de Tiempo del Satélite",

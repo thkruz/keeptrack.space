@@ -45,13 +45,15 @@ describe('openColorbox_function', () => {
         <div id="colorbox-div" style="display:block;"></div>
         <div id="colorbox-iframe" style="display:none;"></div>
         <div id="colorbox-img" style="display:none;"></div>
-        <div id="loading-screen" style="display:none;"></div>
+        <div id="loading-screen" style="display:none;">
+          <div id="loader-text"></div>
+        </div>
         `;
   });
 
   // Tests that a colorbox is created if it does not exist
   it('test_create_colorbox', () => {
-    getEl('colorbox-div').remove();
+    getEl('colorbox-div')!.remove();
     const colorboxDiv = getEl('colorbox-div', true);
 
     expect(colorboxDiv).toBeNull();

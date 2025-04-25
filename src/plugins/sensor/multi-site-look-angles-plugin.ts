@@ -89,7 +89,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     <div class="row">
       <table id="multi-site-look-angles-table" class="center-align striped-light centered"></table>
     </div>`;
-  sideMenuSettingsHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = keepTrackApi.html`
     <div class="row" style="margin: 0 10px;">
       <div id="multi-site-look-angles-sensor-list">
       </div>
@@ -108,7 +108,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
     saveCsv(exportData, `multisite-${(this.selectSatManager_?.getSelectedSat() as DetailedSatellite | undefined)?.sccNum6 ?? '000000'}-look-angles`);
   };
-  sideMenuSettingsOptions: SideMenuSettingsOptions = {
+  sideMenuSecondaryOptions: SideMenuSettingsOptions = {
     width: 300,
     leftOffset: null,
     zIndex: 3,

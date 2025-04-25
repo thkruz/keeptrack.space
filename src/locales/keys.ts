@@ -79,6 +79,7 @@ export const Keys = [
   'loadingScreenMsgs.coloring',
   'loadingScreenMsgs.elsets',
   'loadingScreenMsgs.models',
+  'loadingScreenMsgs.cunningPlan',
   'splashScreens.1',
   'splashScreens.2',
   'splashScreens.3',
@@ -244,6 +245,10 @@ export const Keys = [
   'plugins.GraphicsMenuPlugin.bottomIconLabel',
   'plugins.GraphicsMenuPlugin.title',
   'plugins.GraphicsMenuPlugin.helpBody',
+  'plugins.RPOCalculator.bottomIconLabel',
+  'plugins.RPOCalculator.title',
+  'plugins.RPOCalculator.titleSecondary',
+  'plugins.RPOCalculator.helpBody',
 ] as const;
 
 // Type for all valid translation keys

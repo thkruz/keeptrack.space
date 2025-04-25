@@ -116,12 +116,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     </div>
     </form>
     `;
-  sideMenuSettingsHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = keepTrackApi.html`
     <div class="row" style="margin: 0 10px;">
       <div id="custom-sensors-sensor-list">
       </div>
     </div>`;
-  sideMenuSettingsOptions: SideMenuSettingsOptions = {
+  sideMenuSecondaryOptions: SideMenuSettingsOptions = {
     width: 450,
     leftOffset: null,
     zIndex: 3,

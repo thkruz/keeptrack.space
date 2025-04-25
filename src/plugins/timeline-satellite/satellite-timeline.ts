@@ -66,7 +66,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       <canvas id="satellite-timeline-canvas"></canvas>
       <canvas id="satellite-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
-  sideMenuSettingsHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = keepTrackApi.html`
     <div class="row">
       <div class="input-field col s12">
         <input id="satellite-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
@@ -99,7 +99,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         <label for="satellite-timeline-setting-avg-length" class="active">Average Pass Length (Seconds)</label>
       </div>
     </div>`;
-  sideMenuSettingsOptions = {
+  sideMenuSecondaryOptions = {
     width: 350,
     leftOffset: 0,
     zIndex: 10,

@@ -1,7 +1,20 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { t7e, TranslationKey } from '@app/locales/keys';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
+import { SplashScreen } from '@app/static/splash-screen';
 import { fadeIn, fadeOut } from './fade';
 import { getEl } from './get-el';
+
+const messages = ['cunningPlan'];
+
+const getRandomMessage = () => {
+  const randomIndex = Math.floor(Math.random() * messages.length);
+
+
+  const msg = messages[randomIndex];
+
+  return t7e(`loadingScreenMsgs.${msg}` as TranslationKey);
+};
 
 /**
  * Show loading screen for a given time and then run callback
@@ -11,9 +24,12 @@ import { getEl } from './get-el';
 export const showLoading = (callback?: () => void, delay?: number): void => {
   const loading = getEl('loading-screen', true);
 
+  // Pick a random loading screen message
+
   if (!loading) {
     return;
   }
+  SplashScreen.loadStr(getRandomMessage());
 
   keepTrackApi.getSoundManager().play(SoundNames.LOADING);
 
@@ -35,11 +51,19 @@ export const showLoading = (callback?: () => void, delay?: number): void => {
 export const showLoadingSticky = (): void => {
   const loading = getEl('loading-screen');
 
+  if (!loading) {
+    return;
+  }
+
   fadeIn(loading, 'flex', 500);
 };
 
 export const hideLoading = () => {
   const loading = getEl('loading-screen');
+
+  if (!loading) {
+    return;
+  }
 
   fadeOut(loading, 1000);
   keepTrackApi.getSoundManager().stop(SoundNames.LOADING);

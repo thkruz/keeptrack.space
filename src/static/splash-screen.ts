@@ -14,6 +14,8 @@ export abstract class SplashScreen {
     coloring: t7e('loadingScreenMsgs.coloring'),
     elsets: t7e('loadingScreenMsgs.elsets'),
     models: t7e('loadingScreenMsgs.models'),
+
+    cunningPlan: t7e('loadingScreenMsgs.cunningPlan'),
   };
 
   static readonly textElId = 'loader-text';

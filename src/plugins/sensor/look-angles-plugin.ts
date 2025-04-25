@@ -68,7 +68,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     <div class="row">
       <table id="looks" class="center-align striped-light centered"></table>
     </div>`;
-  sideMenuSettingsHtml = keepTrackApi.html`
+  sideMenuSecondaryHtml = keepTrackApi.html`
     <div class="switch row">
         <label>
             <input id="settings-riseset" type="checkbox" checked="true" />
@@ -107,7 +107,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     saveCsv(csvData, `${sensor.shortName ?? sensor.objName ?? 'unk'}-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
   };
-  sideMenuSettingsOptions = {
+  sideMenuSecondaryOptions = {
     width: 300,
     zIndex: 3,
   };

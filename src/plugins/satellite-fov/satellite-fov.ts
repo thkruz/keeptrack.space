@@ -103,7 +103,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     <div id="sat-fov-active-cones" class="col s12">
     </div>
   </div>`;
-  sideMenuSettingsHtml = keepTrackApi.html`
+  sideMenuSecondaryHtml = keepTrackApi.html`
   <form id="sat-fov-settings-form">
     <div class="row">
       <div class="col s12">

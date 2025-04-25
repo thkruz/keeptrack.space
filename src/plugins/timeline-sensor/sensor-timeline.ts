@@ -89,7 +89,7 @@ export class SensorTimeline extends KeepTrackPlugin {
       <canvas id="sensor-timeline-canvas"></canvas>
       <canvas id="sensor-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
-  sideMenuSettingsHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = keepTrackApi.html`
     <!-- <div class="switch row">
       <label>
         <input id="settings-riseset" type="checkbox" checked="true" />
@@ -141,7 +141,7 @@ export class SensorTimeline extends KeepTrackPlugin {
       <div id="sensor-timeline-sensor-list">
       </div>
     </div>`;
-  sideMenuSettingsOptions = {
+  sideMenuSecondaryOptions = {
     width: 350,
     leftOffset: 0,
     zIndex: 10,

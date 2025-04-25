@@ -1,5 +1,5 @@
 import { mat3, vec3 } from 'gl-matrix';
-import { DetailedSatellite, EciVec3 } from 'ootk';
+import { DetailedSatellite, PosVel } from 'ootk';
 
 /**
  * This class provides static methods for converting between different coordinate systems used in satellite tracking.
@@ -12,8 +12,8 @@ export abstract class CoordinateTransforms {
    * @returns {Object} Object containing satellite position and velocity vectors in RIC reference frame.
    */
   public static sat2ric(
-    sat: DetailedSatellite | { position: EciVec3; velocity: EciVec3 },
-    reference: DetailedSatellite | { position: EciVec3; velocity: EciVec3 },
+    sat: DetailedSatellite | PosVel,
+    reference: DetailedSatellite | PosVel,
   ): { position: vec3; velocity: vec3 } {
     const { position, velocity } = sat;
     const r = vec3.fromValues(position.x, position.y, position.z);

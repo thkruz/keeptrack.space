@@ -5,7 +5,7 @@ import { showLoading } from '@app/lib/showLoading';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath } from '@app/static/sat-math';
 import frameInspectPng from '@public/img/icons/frame-inspect.png';
-import { DetailedSatellite, EciVec3, Hours, Kilometers, Milliseconds, Minutes, Seconds, Sgp4 } from 'ootk';
+import { DetailedSatellite, Hours, Kilometers, Milliseconds, Minutes, PosVel, Seconds, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -189,8 +189,13 @@ export class DebrisScreening extends KeepTrackPlugin {
     for (let t = <Minutes>0; t < <Seconds>(timeVal * 60); t++) {
       offset = <Milliseconds>(t * 1000 * 60);
       const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
-      const { m } = SatMath.calculateTimeVariables(now, sat.satrec);
-      const satSv = Sgp4.propagate(sat.satrec, m) as { position: EciVec3; velocity: EciVec3 };
+      const { m } = SatMath.calculateTimeVariables(now, sat.satrec) as { m: number };
+      const satSv = Sgp4.propagate(sat.satrec, m);
+
+
+      if (!satSv.position || !satSv.velocity) {
+        continue;
+      }
 
       for (let idx = 0; idx < possibleSats.length; idx++) {
         const obj2 = keepTrackApi.getCatalogManager().getObject(possibleSats[idx], GetSatType.SKIP_POS_VEL);
@@ -200,16 +205,16 @@ export class DebrisScreening extends KeepTrackPlugin {
         }
 
         const sat2 = obj2 as DetailedSatellite;
-        const { m } = SatMath.calculateTimeVariables(now, sat2.satrec);
-        const sat2Sv = Sgp4.propagate(sat2.satrec, m) as { position: EciVec3; velocity: EciVec3 };
+        const { m } = SatMath.calculateTimeVariables(now, sat2.satrec) as { m: number };
+        const sat2Sv = Sgp4.propagate(sat2.satrec, m);
 
-        if (!sat2Sv) {
+        if (!sat2Sv.position || !sat2Sv.velocity) {
           // Remove from possible sats
           possibleSats.splice(idx, 1);
           break;
         }
 
-        const ric = CoordinateTransforms.sat2ric({ position: satSv.position, velocity: satSv.velocity }, { position: sat2Sv.position, velocity: sat2Sv.velocity });
+        const ric = CoordinateTransforms.sat2ric(satSv as PosVel, sat2Sv as PosVel);
 
         if (Math.abs(ric.position[0]) < uVal && Math.abs(ric.position[1]) < vVal && Math.abs(ric.position[2]) < wVal) {
           searchList.push(sat2.sccNum);

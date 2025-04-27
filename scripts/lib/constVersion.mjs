@@ -74,11 +74,7 @@ export const generateConstVersion = (source, dest) => {
     `![Latest Version](https://img.shields.io/badge/version-${latestVersion}-`,
   );
 
-  fs.writeFileSync(readmePath, newReadmeData, 'utf8', (err) => {
-    if (err) {
-      throw err;
-    }
-  });
+  fs.writeFileSync(readmePath, newReadmeData, 'utf8');
   console.log(`Version ${latestVersion} written to ${readmePath}`);
   console.log('README.md updated');
 };

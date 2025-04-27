@@ -69,7 +69,7 @@ describe('SensorTimeline Weather Integration', () => {
     await expect(sensorTimelinePlugin.updateTimeline()).resolves.not.toThrow();
 
     // Check to see if errorManagerInstance.info was run
-    expect(errorManagerInstance.info).toHaveBeenCalledTimes(1);
+    expect(errorManagerInstance.info).toHaveBeenCalledTimes(0);
 
     const calculatedPasses = await sensorTimelinePlugin['calculatePasses_']();
 

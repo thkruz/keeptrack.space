@@ -597,7 +597,6 @@ export class WebGLRenderer {
           keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 2],
         ];
 
-        console.log('firstPointOut', firstPointOut);
         keepTrackApi.getOrbitManager().updateFirstPointOut(this.selectSatManager_.primarySatObj.id, firstPointOut);
       }
 

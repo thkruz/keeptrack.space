@@ -106,6 +106,13 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
             <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Draw lines from sensor to satellites when in FOV">
+                <input id="settings-isDrawCovarianceEllipsoid" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw Covariance Ellipsoid
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Draw lines from sensor to satellites when in FOV">
                 <input id="settings-isDrawInCoverageLines" type="checkbox" checked/>
                 <span class="lever"></span>
                 Draw FOV Lines
@@ -387,6 +394,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       { id: 'settings-drawEcf', setting: 'isOrbitCruncherInEcf' },
       { id: 'settings-numberOfEcfOrbitsToDraw', setting: 'numberOfEcfOrbitsToDraw' },
       { id: 'settings-isDrawInCoverageLines', setting: 'isDrawInCoverageLines' },
+      { id: 'settings-isDrawCovarianceEllipsoid', setting: 'isDrawCovarianceEllipsoid' },
       { id: 'settings-eciOnHover', setting: 'isEciOnHover' },
       { id: 'settings-hos', setting: 'colors.transparent[3] === 0' },
       { id: 'settings-confidence-levels', setting: 'isShowConfidenceLevels' },
@@ -448,6 +456,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-drawEcf':
       case 'settings-numberOfEcfOrbitsToDraw':
       case 'settings-isDrawInCoverageLines':
+      case 'settings-isDrawCovarianceEllipsoid':
       case 'settings-drawSun':
       case 'settings-drawBlackEarth':
       case 'settings-drawAtmosphere':
@@ -528,6 +537,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
     settingsManager.numberOfEcfOrbitsToDraw = numberOfEcfOrbitsToDraw;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
+    settingsManager.isDrawCovarianceEllipsoid = (<HTMLInputElement>getEl('settings-isDrawCovarianceEllipsoid')).checked;
     settingsManager.drawCameraWidget = (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked;
     const ccWidgetCanvas = getEl('camera-control-widget');
 

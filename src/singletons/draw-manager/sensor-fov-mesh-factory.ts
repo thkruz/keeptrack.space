@@ -122,11 +122,11 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
       const sensor2 = new DetailedSensor({
         ...sensor,
         minAz: sensor.minAz2,
-        maxAz: sensor.maxAz2,
-        minEl: sensor.minEl2,
-        maxEl: sensor.maxEl2,
-        minRng: sensor.minRng2,
-        maxRng: sensor.maxRng2,
+        maxAz: sensor.maxAz2!,
+        minEl: sensor.minEl2!,
+        maxEl: sensor.maxEl2!,
+        minRng: sensor.minRng2!,
+        maxRng: sensor.maxRng2!,
         volume: sensor.isVolumetric,
       });
 

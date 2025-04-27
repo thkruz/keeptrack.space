@@ -7,7 +7,7 @@ export class SatRicLine extends Line {
   sat: DetailedSatellite;
   private coordinate_: 'R' | 'I' | 'C';
 
-  private readonly lineLength = 500;
+  private readonly lineLength = 2;
 
   constructor(sat: DetailedSatellite, coordinate: 'R' | 'I' | 'C', color = LineColors.ORANGE) {
     super();

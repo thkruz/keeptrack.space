@@ -61,7 +61,7 @@ export class LineManager {
     this.add(new SatRicLine(sat, 'C', LineColors.BLUE));
   }
 
-  createSatToRef(sat: DetailedSatellite | MissileObject | null, ref: vec3, color?: vec4): void {
+  createSatToRef(sat: DetailedSatellite | MissileObject | null, ref: vec3, color = LineColors.PURPLE): void {
     if (!sat || !(sat instanceof DetailedSatellite)) {
       return;
     }
@@ -201,7 +201,7 @@ export class LineManager {
     }
   }
 
-  draw(tgtBuffer: WebGLFramebuffer = null): void {
+  draw(tgtBuffer = null as WebGLFramebuffer | null): void {
     if (this.lines.length === 0) {
       return;
     }
@@ -227,7 +227,7 @@ export class LineManager {
     }
   }
 
-  runBeforeDraw(tgtBuffer: WebGLFramebuffer) {
+  runBeforeDraw(tgtBuffer = null as WebGLFramebuffer | null): void {
     const { projectionMatrix, gl } = keepTrackApi.getRenderer();
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);

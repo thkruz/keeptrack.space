@@ -114,6 +114,17 @@ export class SettingsManager {
    * If ECF Orbits are drawn, this is the number of orbits to draw.
    */
   numberOfEcfOrbitsToDraw = 1;
+  /**
+   * The confidence level to use when drawing Covariance ellipsoids.
+   * 1 = 68.27% confidence
+   * 2 = 95.45% confidence
+   * 3 = 99.73% confidence
+   */
+  covarianceConfidenceLevel: number = 2;
+  /**
+   * Flag to determine if the covariance ellipsoid should be drawn.
+   */
+  isDrawCovarianceEllipsoid = false;
 
 
   static preserveSettings() {
@@ -123,6 +134,7 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ECF, settingsManager.isOrbitCruncherInEcf.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, settingsManager.isDrawInCoverageLines.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_SUN, settingsManager.isDrawSun.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, settingsManager.isDrawCovarianceEllipsoid.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH, settingsManager.isBlackEarth.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE, settingsManager.isDrawAtmosphere.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_AURORA, settingsManager.isDrawAurora.toString());
@@ -430,9 +442,10 @@ export class SettingsManager {
   lastSearch: string | string[] = '';
   isGroupOverlayDisabled: boolean | null = null;
   /**
-   * Distance from satellite when we switch to close camera mode
+   * Distance from satellite when we switch to close camera mode.
+   * This is used to slow down the dolly effect when zooming in on a satellite.
    */
-  nearZoomLevel = <Kilometers>300;
+  nearZoomLevel = 25 as Kilometers;
   isPreventColorboxClose = false;
   isDayNightToggle = false;
   isUseHigherFOVonMobile = null;
@@ -1127,8 +1140,9 @@ export class SettingsManager {
   dotsPerColor: number;
   /**
    * Minimum distance from satellite when we switch to close camera mode
+   * The camera will not be able to get closer than this distance
    */
-  minDistanceFromSatellite = <Kilometers>15;
+  minDistanceFromSatellite = 1.25 as Kilometers;
 
   /**
    * Disable toast messages
@@ -1186,6 +1200,7 @@ export class SettingsManager {
     this.isOrbitCruncherInEcf = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ECF, this.isOrbitCruncherInEcf) as boolean;
     this.isDrawInCoverageLines = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, this.isDrawInCoverageLines) as boolean;
     this.isDrawSun = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_SUN, this.isDrawSun) as boolean;
+    this.isDrawCovarianceEllipsoid = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, this.isDrawCovarianceEllipsoid) as boolean;
     this.isBlackEarth = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_BLACK_EARTH, this.isBlackEarth) as boolean;
     this.isDrawAtmosphere = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ATMOSPHERE, this.isDrawAtmosphere) as boolean;
     this.isDrawAurora = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_AURORA, this.isDrawAurora) as boolean;

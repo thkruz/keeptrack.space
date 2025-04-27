@@ -1,24 +1,26 @@
+import { EciArr3, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
-import { DownloadModelsOptions, Layout, MeshMap, OBJ } from 'webgl-obj-loader';
+import { DownloadModelsOptions, Layout, Mesh, MeshMap, OBJ } from 'webgl-obj-loader';
 import { SplashScreen } from '../../static/splash-screen';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { errorManagerInstance } from '../errorManager';
 import { OcclusionProgram } from './post-processing';
 
+type KeepTrackMesh = Mesh & {
+  vertexBuffer: WebGLBuffer & {
+    numItems: number;
+    layout: Layout;
+  };
+  indexBuffer: WebGLBuffer & {
+    numItems: number;
+  };
+};
+
 type MeshModel = {
   id: number;
-  mesh: {
-    vertices: number[];
-    vertexBuffer: WebGLBuffer & {
-      numItems: number;
-      layout: Layout;
-    };
-    indexBuffer: {
-      numItems: number;
-    };
-  };
+  mesh: KeepTrackMesh
 };
 
 export interface MeshObject {
@@ -47,7 +49,7 @@ export class MeshManager {
   private gl_: WebGL2RenderingContext;
   isReady = false;
   private meshList_: string[] = [];
-  private meshes_ = {};
+  private meshes_: KeepTrackMesh;
   private numOfWarnings_: number;
   private program_: WebGLProgram;
   private sccNumAehf_ = ['36868', '38254', '39256', '43651', '44481', '45465'];
@@ -93,8 +95,8 @@ export class MeshManager {
     position: { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>,
     sccNum: '',
     inSun: 0,
-    model: null,
-    isRotationStable: null,
+    model: null as unknown as MeshModel,
+    isRotationStable: false,
     rotation: { x: 0, y: 0, z: 0 } as Vec3<Degrees>,
   };
 
@@ -145,7 +147,7 @@ export class MeshManager {
   checkIfNameKnown(name: string): boolean {
     // TODO: Currently all named models aim at nadir - that isn't always true
 
-    let newModel = null;
+    let newModel = null as unknown as MeshModel;
 
     if (name.startsWith('STARLINK')) {
       newModel = this.models.starlink;
@@ -193,7 +195,7 @@ export class MeshManager {
     return false;
   }
 
-  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLBuffer) {
+  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
     // Meshes aren't finished loading
     if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) {
       return;
@@ -457,7 +459,7 @@ export class MeshManager {
          *   console.debug('Mesh:', mesh);
          * }
          */
-        this.meshes_ = models;
+        this.meshes_ = models as unknown as KeepTrackMesh;
         this.initShaders();
         this.initBuffers();
         this.isReady = true;
@@ -479,23 +481,29 @@ export class MeshManager {
 
     this.updateModel_(selectedDate, sat);
 
+    const posData = keepTrackApi.getDotsManager().positionData;
+    const position = {
+      x: posData[sat.id * 3],
+      y: posData[sat.id * 3 + 1],
+      z: posData[sat.id * 3 + 2],
+    };
+    const drawPosition = [position.x, position.y, position.z] as EciArr3;
+
     // Move the mesh to its location in world space
     this.mvMatrix_ = mat4.create();
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, vec3.fromValues(sat.position.x, sat.position.y, sat.position.z));
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, drawPosition);
 
     // Rotate the Satellite to Face Nadir if needed
     if (this.currentMeshObject.isRotationStable !== null) {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const sat = catalogManagerInstance.getObject(this.currentMeshObject.id);
+      const sat = catalogManagerInstance.getObject(this.currentMeshObject.id, GetSatType.POSITION_ONLY);
 
       if (sat === null) {
         return;
       }
 
-      const drawPosition = vec3.fromValues(sat.position.x, sat.position.y, sat.position.z);
-
       // Calculate a position to look at along the satellite's velocity vector
-      const lookAtPos = [sat.position.x + sat.velocity.x, sat.position.y + sat.velocity.y, sat.position.z + sat.velocity.z];
+      const lookAtPos = [drawPosition[0] + sat.velocity.x, drawPosition[1] + sat.velocity.y, drawPosition[2] + sat.velocity.z];
 
       let up: vec3;
 
@@ -695,10 +703,34 @@ export class MeshManager {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 
+        // Get the original vertex data
         const vertexData = this.meshes_[mesh].makeBufferData(layout);
 
+        /*
+         * Scale positions to 1/20th (assuming positions are first in layout)
+         * Find the position attribute in the layout
+         */
+        const positionAttr = layout.attributeMap[OBJ.Layout.POSITION.key];
+
+        if (positionAttr) {
+          /*
+           * vertexData is a Float32Array
+           * For each vertex, scale the position components
+           */
+          const vertexArray = new Float32Array(vertexData);
+
+          for (let i = 0; i < vertexArray.length; i += layout.stride / 4) {
+            // positionAttr.offset is in bytes, convert to floats
+            const posOffset = positionAttr.offset / 4;
+
+            vertexArray[i + posOffset + 0] *= 0.05;
+            vertexArray[i + posOffset + 1] *= 0.05;
+            vertexArray[i + posOffset + 2] *= 0.05;
+          }
+        }
+
         gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
-        vertexBuffer.numItems = vertexData.numItems;
+        vertexBuffer.numItems = vertexData.numItems as number;
         vertexBuffer.layout = layout;
         this.meshes_[mesh].vertexBuffer = vertexBuffer;
 
@@ -711,7 +743,7 @@ export class MeshManager {
         const indexData = this.meshes_[mesh].makeIndexBufferDataForMaterials(...Object.values(this.meshes_[mesh].materialIndices));
 
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
-        indexBuffer.numItems = indexData.numItems;
+        indexBuffer.numItems = indexData.numItems as number;
         this.meshes_[mesh].indexBuffer = indexBuffer;
 
         /*

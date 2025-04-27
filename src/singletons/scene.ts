@@ -9,6 +9,7 @@ import { Camera } from './camera';
 import { ConeMeshFactory } from './draw-manager/cone-mesh-factory';
 import { Box } from './draw-manager/cube';
 import { Earth } from './draw-manager/earth';
+import { Ellipsoid } from './draw-manager/ellipsoid';
 import { Godrays } from './draw-manager/godrays';
 import { Moon } from './draw-manager/moon';
 import { SensorFovMeshFactory } from './draw-manager/sensor-fov-mesh-factory';
@@ -40,6 +41,8 @@ export class Scene {
     godrays: null as WebGLFramebuffer,
   };
   updateVisualsBasedOnPerformanceTime_ = 0;
+  primaryCovBubble: Ellipsoid;
+  secondaryCovBubble: Ellipsoid;
 
   constructor(params: SceneParams) {
     this.gl_ = params.gl;
@@ -51,6 +54,9 @@ export class Scene {
     this.sun = new Sun();
     this.godrays = new Godrays();
     this.searchBox = new Box();
+    this.searchBox.setColor([1, 0, 0, 0.3]);
+    this.primaryCovBubble = new Ellipsoid(([0, 0, 0]));
+    this.secondaryCovBubble = new Ellipsoid(([0, 0, 0]));
     this.sensorFovFactory = new SensorFovMeshFactory();
     this.coneFactory = new ConeMeshFactory();
   }
@@ -207,7 +213,7 @@ export class Scene {
     keepTrackApi.getLineManager().draw(null);
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
-    if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
+    if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
       if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
         renderer.meshManager.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
       }
@@ -216,8 +222,18 @@ export class Scene {
 
   // eslint-disable-next-line class-methods-use-this
   renderTransparent(renderer: WebGLRenderer, camera: Camera): void {
-    if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
+    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+
+    if (!selectedSatelliteManager) {
+      return;
+    }
+
+    if (selectedSatelliteManager.selectedSat > -1) {
       this.searchBox.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+      this.primaryCovBubble.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+    }
+    if (selectedSatelliteManager.secondarySat > -1) {
+      this.secondaryCovBubble.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
     }
   }
 

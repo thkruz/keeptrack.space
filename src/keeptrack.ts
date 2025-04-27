@@ -217,7 +217,7 @@ export class KeepTrack {
       this.draw_(dt);
 
       if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-        const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
+        const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
 
         if (selectedSatellite) {
           keepTrackApi.getUiManager().
@@ -445,7 +445,7 @@ theodore.kruczek at gmail dot com.
     const renderer = keepTrackApi.getRenderer();
     const camera = keepTrackApi.getMainCamera();
 
-    camera.draw(keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat(), renderer.sensorPos);
+    camera.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, renderer.sensorPos);
     renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
 
     if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {

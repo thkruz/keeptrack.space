@@ -1,4 +1,5 @@
 // import 'webgl-lint';
+import { vec3 } from 'gl-matrix';
 import { BufferAttribute } from './buffer-attribute';
 
 export abstract class GlUtils {
@@ -47,7 +48,7 @@ export abstract class GlUtils {
   /**
    * Assigns uniforms to a uniform object.
    */
-  public static assignUniforms(uniforms: Record<string, WebGLUniformLocation>, gl: WebGL2RenderingContext, program: WebGLProgram, uniformsList: string[]): void {
+  public static assignUniforms(uniforms: Record<string, WebGLUniformLocation | null>, gl: WebGL2RenderingContext, program: WebGLProgram, uniformsList: string[]): void {
     uniformsList.forEach((uniform) => {
       const uniformLocation = gl.getUniformLocation(program, uniform);
 
@@ -475,6 +476,60 @@ export abstract class GlUtils {
       16, 17, 18, 16, 18, 19,
       20, 21, 22, 20, 22, 23,
     ];
+
+    const combinedArray = [] as number[];
+
+    for (let i = 0; i < vertices.length; i += 3) {
+      combinedArray.push(vertices[i], vertices[i + 1], vertices[i + 2]);
+      combinedArray.push(normals[i], normals[i + 1], normals[i + 2]);
+    }
+
+    return {
+      combinedArray,
+      vertIndex: indices,
+    };
+  }
+
+  public static ellipsoidFromCovariance(radii: vec3) {
+    const latitudeBands = 12;
+    const longitudeBands = 24;
+
+    const vertices = [] as number[];
+    const normals = [] as number[];
+    const indices = [] as number[];
+
+    for (let latNumber = 0; latNumber <= latitudeBands; latNumber++) {
+      const theta = (latNumber * Math.PI) / latitudeBands;
+      const sinTheta = Math.sin(theta);
+      const cosTheta = Math.cos(theta);
+
+      for (let longNumber = 0; longNumber <= longitudeBands; longNumber++) {
+        const phi = (longNumber * 2 * Math.PI) / longitudeBands;
+        const sinPhi = Math.sin(phi);
+        const cosPhi = Math.cos(phi);
+
+        const x = cosPhi * sinTheta;
+        const y = cosTheta;
+        const z = sinPhi * sinTheta;
+
+        const normal = vec3.fromValues(x, y, z);
+
+        vec3.normalize(normal, normal);
+
+        vertices.push(radii[0] * x, radii[1] * y, radii[2] * z);
+        normals.push(normal[0], normal[1], normal[2]);
+      }
+    }
+
+    for (let latNumber = 0; latNumber < latitudeBands; latNumber++) {
+      for (let longNumber = 0; longNumber < longitudeBands; longNumber++) {
+        const first = latNumber * (longitudeBands + 1) + longNumber;
+        const second = first + longitudeBands + 1;
+
+        indices.push(first, second, first + 1);
+        indices.push(second, second + 1, first + 1);
+      }
+    }
 
     const combinedArray = [] as number[];
 

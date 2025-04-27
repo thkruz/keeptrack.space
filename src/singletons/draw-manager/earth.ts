@@ -76,7 +76,7 @@ export class Earth {
   /**
    * This is run once per frame to render the earth.
    */
-  draw(tgtBuffer: WebGLFramebuffer) {
+  draw(tgtBuffer: WebGLFramebuffer | null) {
     if (!this.isTexturesReady_) {
       return;
     }
@@ -407,7 +407,7 @@ export class Earth {
   /**
    * This is run once per frame to render the earth.
    */
-  private drawColoredEarth_(tgtBuffer: WebGLFramebuffer) {
+  private drawColoredEarth_(tgtBuffer: WebGLFramebuffer | null) {
     const gl = this.gl_;
 
     this.mesh.program.use();

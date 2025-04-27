@@ -18,9 +18,14 @@ export class SatToRefLine extends Line {
   }
 
   update(): void {
-    const eci = this.sat.eci(keepTrackApi.getTimeManager().simulationTimeObj);
-    const eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
+    const posData = keepTrackApi.getDotsManager().positionData;
+    const position = {
+      x: posData[this.sat.id * 3],
+      y: posData[this.sat.id * 3 + 1],
+      z: posData[this.sat.id * 3 + 2],
+    };
+    const satArr = [position.x, position.y, position.z] as EciArr3;
 
-    this.updateVertBuf(eciArr, this.ref2_ as EciArr3);
+    this.updateVertBuf(satArr, this.ref2_ as EciArr3);
   }
 }

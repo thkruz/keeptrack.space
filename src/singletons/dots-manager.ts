@@ -145,7 +145,7 @@ export class DotsManager {
    * @param pMvCamMatrix - The projection matrix.
    * @param tgtBuffer - The WebGLFramebuffer to draw on.
    */
-  draw(pMvCamMatrix: mat4, tgtBuffer: WebGLFramebuffer) {
+  draw(pMvCamMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
     if (!this.isReady || !settingsManager.cruncherReady) {
       return;
     }

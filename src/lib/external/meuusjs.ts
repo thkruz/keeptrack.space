@@ -3,7 +3,7 @@
 
 /*!
  Copyright (c) 2016 Fabio Soldati, www.peakfinder.org
- Copyright (c) 2021 Theodore Kruczek, www.github.com/thkruz
+ Copyright (c) 2025 Kruczek Labs LLC
  License MIT: http://www.opensource.org/licenses/MIT
 */
 

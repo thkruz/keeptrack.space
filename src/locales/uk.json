@@ -99,7 +99,8 @@
     "painting": "Малювання Землі...",
     "coloring": "Розфарбовування всередині ліній...",
     "elsets": "Пошук GPs...",
-    "models": "Створення 3D-моделей..."
+    "models": "Створення 3D-моделей...",
+    "cunningPlan": "Розробка хитрої схеми..."
   },
   "splashScreens": {
     "1": "Моделі супутників виглядають більшими, ніж вони є насправді. Все інше в масштабі.",
@@ -162,6 +163,30 @@
       "bottomIconLabel": "Sensor Timeline",
       "title": "Sensor Timeline Menu",
       "helpBody": "The Sensor Timeline menu shows when a list of sensors have visibility of one satellite. The timeline is color-coded to show the quality of the pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to change the sensor and time to that pass. <br><br> The timeline can be modified by changing the start and end time of the simulation. Additionally, the timeline can be modified by changing the length and interval options."
+    },
+    "ProximityOps": {
+      "bottomIconLabel": "Зближення та операції зближення",
+      "title": "Зближення та операції зближення (RPO)",
+      "titleSecondary": "Список зближень та операцій зближення",
+      "helpBody": "Знайти майбутні зближення між супутниками",
+      "noradId": "NORAD ID",
+      "maxDistThreshold": "Максимальний поріг відстані (км)",
+      "maxRelativeVelocity": "Максимальна відносна швидкість (км/с)",
+      "searchDuration": "Тривалість пошуку (години)",
+      "geoText": "Геостаціонарна",
+      "leoText": "Низька навколоземна орбіта",
+      "orbitType": "Тип орбіти",
+      "geoAllVsAll": "Геостаціонарна всі проти всіх",
+      "geoAllVsAllTooltip": "Пошук RPO між усіма геостаціонарними супутниками",
+      "comparePayloadsOnly": "Порівнювати лише корисні навантаження",
+      "comparePayloadsOnlyTooltip": "Шукати RPO лише між корисними навантаженнями",
+      "ignoreVimpelRso": "Ігнорувати Vimpel RSO",
+      "ignoreVimpelRsoTooltip": "Ігнорувати RSO з каталогу Vimpel"
+    },
+    "RPOCalculator": {
+      "bottomIconLabel": "RPO Calculator",
+      "title": "RPO Calculator Menu",
+      "helpBody": "Find coming approachs between satellites"
     },
     "SatelliteTimeline": {
       "bottomIconLabel": "Satellite Timeline",

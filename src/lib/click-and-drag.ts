@@ -2,9 +2,9 @@ import { ClickDragOptions } from '@app/plugins/KeepTrackPlugin';
 
 export const clickAndDragWidth = (el: HTMLElement | null, options: ClickDragOptions = {
   isDraggable: true,
-}): void => {
+}): HTMLDivElement | null => {
   if (!el) {
-    return;
+    return null;
   }
 
   const minWidth = options.minWidth ?? 280;
@@ -24,7 +24,11 @@ export const clickAndDragWidth = (el: HTMLElement | null, options: ClickDragOpti
     const edgeEl = createElWidth_(el);
 
     addEventsWidth_(edgeEl, el, width, minWidth, maxWidth, options);
+
+    return edgeEl;
   }
+
+  return null;
 };
 
 export const clickAndDragHeight = (el: HTMLElement, maxHeight?: number, callback?: () => void): void => {

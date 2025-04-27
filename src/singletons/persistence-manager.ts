@@ -27,6 +27,7 @@ export enum StorageKey {
   SETTINGS_DRAW_AURORA = 'v2-keepTrack-settings-drawAurora',
   SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
   SETTINGS_CONFIDENCE_LEVELS = 'v2-keepTrack-settings-confidenceLevels',
+  SETTINGS_DRAW_COVARIANCE_ELLIPSOID = 'v2-keepTrack-settings-drawCovarianceEllipsoid',
   GRAPHICS_SETTINGS_GODRAYS_SAMPLES = 'v2-keepTrack-graphicsSettings-godraysSamples',
   GRAPHICS_SETTINGS_GODRAYS_DECAY = 'v2-keepTrack-graphicsSettings-godraysDecay',
   GRAPHICS_SETTINGS_GODRAYS_EXPOSURE = 'v2-keepTrack-graphicsSettings-godraysExposure',
@@ -60,6 +61,7 @@ export enum StorageKey {
   FILTER_SETTINGS_AUSTRALIA = 'v2-filter-settings-australia',
   FILTER_SETTINGS_OTHER_COUNTRIES = 'v2-filter-settings-other-countries',
   FILTER_SETTINGS_STARLINK = 'v2-filter-settings-starlink',
+  SENSOR_TIMELINE_ENABLED_SENSORS = 'v2-sensor-timeline-enabled-sensors',
 }
 export class PersistenceManager {
   private readonly storage_: Storage;

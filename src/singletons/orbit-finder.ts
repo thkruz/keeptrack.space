@@ -65,7 +65,7 @@ export class OrbitFinder {
 
     const { m, gmst } = SatMath.calculateTimeVariables(this.now, this.sat.satrec);
 
-    if (!m) {
+    if (m === null) {
       throw new Error('Invalid time variables');
     }
 
@@ -84,7 +84,7 @@ export class OrbitFinder {
 
   private determineDirection(newLat: number): 'N' | 'S' | null {
     if (this.lastLatitude === null) {
-      errorManagerInstance.log(`Initial latitude: ${newLat}`);
+      errorManagerInstance.debug(`Initial latitude: ${newLat}`);
       this.lastLatitude = newLat;
 
       return null;
@@ -96,17 +96,17 @@ export class OrbitFinder {
 
     const direction = newLat > this.lastLatitude ? 'N' : 'S';
 
-    errorManagerInstance.log(`Current latitude: ${this.lastLatitude} - New latitude: ${newLat} - Direction: ${direction}`);
+    errorManagerInstance.debug(`Current latitude: ${this.lastLatitude} - New latitude: ${newLat} - Direction: ${direction}`);
 
     this.lastLatitude = newLat;
 
-    errorManagerInstance.log(`New direction: ${direction}`);
+    errorManagerInstance.debug(`New direction: ${direction}`);
 
     return direction;
   }
 
   private isCorrectDirection(): boolean {
-    errorManagerInstance.log(`Current direction: ${this.currentDirection} - Goal direction: ${this.goalDirection}`);
+    errorManagerInstance.debug(`Current direction: ${this.currentDirection} - Goal direction: ${this.goalDirection}`);
 
     return this.currentDirection === this.goalDirection;
   }
@@ -125,7 +125,7 @@ export class OrbitFinder {
     // Update current parameters and check direction
     const { m, gmst } = SatMath.calculateTimeVariables(this.now, satrec);
 
-    if (!m) {
+    if (m === null) {
       throw new Error('Invalid time variables');
     }
     const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
@@ -194,7 +194,7 @@ export class OrbitFinder {
 
     const { m, gmst } = SatMath.calculateTimeVariables(now, satrec);
 
-    if (!m) {
+    if (m === null) {
       return PropagationResults.Error;
     }
     const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
@@ -309,7 +309,7 @@ export class OrbitFinder {
     // Update current parameters without direction check
     const { m, gmst } = SatMath.calculateTimeVariables(this.now, satrec);
 
-    if (!m) {
+    if (m === null) {
       throw new Error('Invalid time variables');
     }
     const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;
@@ -459,7 +459,7 @@ export class OrbitFinder {
 
       const { m, gmst } = SatMath.calculateTimeVariables(this.now, satrec);
 
-      if (!m) {
+      if (m === null) {
         throw new Error('Invalid time variables');
       }
       const positionEci = <EciVec3>Sgp4.propagate(satrec, m).position;

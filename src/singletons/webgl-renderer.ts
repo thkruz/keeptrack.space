@@ -601,9 +601,21 @@ export class WebGLRenderer {
       }
 
       keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);
+
+      keepTrackApi.getScene().primaryCovBubble.update(primarySat);
     } else {
       keepTrackApi.getScene().searchBox.update(null);
     }
+  }
+
+  private updateSecondarySatellite_() {
+    const secondarySat = keepTrackApi.getPlugin(SelectSatManager)?.secondarySatObj;
+
+    if (!secondarySat) {
+      return;
+    }
+
+    keepTrackApi.getScene().secondaryCovBubble.update(secondarySat);
   }
 
   setCanvasSize(height: number, width: number) {
@@ -635,6 +647,7 @@ export class WebGLRenderer {
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     this.updatePrimarySatellite_();
+    this.updateSecondarySatellite_();
     keepTrackApi.getMainCamera().update(this.dt);
 
     const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);

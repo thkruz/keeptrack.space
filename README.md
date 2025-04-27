@@ -1,4 +1,4 @@
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/thkruz/keeptrack.space?style=flat-square) ![Sonar Coverage](https://img.shields.io/sonar/coverage/thkruz_keeptrack.space?server=https%3A%2F%2Fsonarcloud.io&style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square) <img src="./public/img/textLogoLg.png" width='100%' alt="KeepTrack.Space" align="center">
+![Latest Version](https://img.shields.io/badge/version-10.5.0-darkgreen?style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square) <img src="./public/img/textLogoLg.png" width='100%' alt="KeepTrack.Space" align="center">
 
 # Table of Contents
 
@@ -126,6 +126,6 @@ There are Typescript files for generating TLE.json that are not included, but ht
 
 # License
 
-Copyright (C) 2016-2025 Theodore Kruczek<br> Copyright (C) 2020-2025 Heather Kruczek
+Copyright (C) 2025 Kruczek Labs LLC
 
 KeepTrack.Space is licensed under the GNU Affero General Public License. This means you can freely use, modify, and distribute it, provided you adhere to the terms of the license. For more details, see the [Full License](https://github.com/thkruz/keeptrack.space/blob/master/LICENSE).

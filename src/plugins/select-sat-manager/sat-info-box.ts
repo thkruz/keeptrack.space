@@ -226,6 +226,29 @@ export class SatInfoBox extends KeepTrackPlugin {
             }
           }
 
+          const covMatrix = this.selectSatManager_.primarySatCovMatrix;
+          let covRadial = covMatrix[0];
+          let covCrossTrack = covMatrix[1];
+          let covInTrack = covMatrix[2];
+
+          const useKm =
+            covRadial > 0.5 &&
+            covCrossTrack > 0.5 &&
+            covInTrack > 0.5;
+
+          if (useKm) {
+            getEl('sat-uncertainty-radial')!.innerHTML = `${(covMatrix[0]).toFixed(2)} km`;
+            getEl('sat-uncertainty-crosstrack')!.innerHTML = `${(covMatrix[1]).toFixed(2)} km`;
+            getEl('sat-uncertainty-intrack')!.innerHTML = `${(covMatrix[2]).toFixed(2)} km`;
+          } else {
+            covRadial *= 1000;
+            covCrossTrack *= 1000;
+            covInTrack *= 1000;
+            getEl('sat-uncertainty-radial')!.innerHTML = `${covRadial.toFixed(2)} m`;
+            getEl('sat-uncertainty-crosstrack')!.innerHTML = `${covCrossTrack.toFixed(2)} m`;
+            getEl('sat-uncertainty-intrack')!.innerHTML = `${covInTrack.toFixed(2)} m`;
+          }
+
           if (
             settingsManager.plugins?.stereoMap &&
             keepTrackApi.getPlugin(StereoMap)?.isMenuButtonActive &&
@@ -269,7 +292,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             hideEl('sec-angle-link');
           }
 
-          if (this.selectSatManager_.secondarySat !== -1 && obj.isSatellite()) {
+          if (this.selectSatManager_.secondarySatObj && obj.isSatellite()) {
             const sat = obj as DetailedSatellite;
             const ric = CoordinateTransforms.sat2ric(this.selectSatManager_.secondarySatObj, sat);
             const dist = SensorMath.distanceString(sat, this.selectSatManager_.secondarySatObj).split(' ')[2];
@@ -1221,6 +1244,27 @@ export class SatInfoBox extends KeepTrackPlugin {
               Age of GP
             </div>
             <div class="sat-info-value" id="sat-elset-age">xxx.xxxx</div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key" data-position="top" data-delay="50"
+              data-tooltip="Radial Uncertainty (meters)">
+              Radial Sigma
+            </div>
+            <div class="sat-info-value" id="sat-uncertainty-radial">xxx.xxxx</div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key" data-position="top" data-delay="50"
+              data-tooltip="In Track Uncertainty (meters)">
+              In Track Sigma
+            </div>
+            <div class="sat-info-value" id="sat-uncertainty-intrack">xxx.xxxx</div>
+          </div>
+          <div class="sat-info-row sat-only-info">
+            <div class="sat-info-key" data-position="top" data-delay="50"
+              data-tooltip="Cross Track Uncertainty (meters)">
+              Cross Track Sigma
+            </div>
+            <div class="sat-info-value" id="sat-uncertainty-crosstrack">xxx.xxxx</div>
           </div>
         </div>
       </div>

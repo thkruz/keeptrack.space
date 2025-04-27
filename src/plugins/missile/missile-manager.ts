@@ -13,7 +13,7 @@ import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, gl
 import { jday } from '@app/lib/transforms';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { DEG2RAD, Degrees, EciVec3, Kilometers, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from 'ootk';
+import { DEG2RAD, Degrees, EciVec3, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from 'ootk';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 
@@ -45,7 +45,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
         // Add the missile to the catalog
         catalogManagerInstance.objectCache[x] = newMissileArray[i];
         if (!catalogManagerInstance.objectCache[x].velocity?.x && !catalogManagerInstance.objectCache[x].velocity?.y && !catalogManagerInstance.objectCache[x].velocity?.z) {
-          catalogManagerInstance.objectCache[x].velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
+          catalogManagerInstance.objectCache[x].velocity = { x: 0, y: 0, z: 0 } as EciVec3<KilometersPerSecond>;
         }
         catalogManagerInstance.objectCache[x].totalVelocity ??= 0;
 
@@ -117,7 +117,7 @@ export const clearMissiles = () => {
 
     catalogManagerInstance.objectCache[x] = missileObj;
     // Set the velocity to 0 if it doesn't exist
-    catalogManagerInstance.objectCache[x].velocity ??= { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
+    catalogManagerInstance.objectCache[x].velocity ??= { x: 0, y: 0, z: 0 } as EciVec3<KilometersPerSecond>;
     catalogManagerInstance.objectCache[x].totalVelocity ??= 0;
 
     catalogManagerInstance.satCruncher.postMessage({

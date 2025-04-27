@@ -1,3 +1,4 @@
+/* eslint-disable no-sync */
 import fs from 'fs';
 
 /**
@@ -14,21 +15,23 @@ export const VERSION = '${version}';\n
  * @param {string} source - path to package.json
  * @returns {Promise<string>} - resolves with version number
  */
-const readVersion = async (source) => {
+const readVersion = (source) => {
   // eslint-disable-next-line no-sync
   const data = fs.readFileSync(source, (err) => {
-    if (err) throw err;
+    if (err) {
+      throw err;
+    }
   });
   let json;
 
   try {
     json = JSON.parse(data);
   } catch {
-    throw new Error(`file doesn't contain valid json`);
+    throw new Error('file doesn\'t contain valid json');
   }
 
   if (!json?.version) {
-    throw new Error(`file doesn't contain version`);
+    throw new Error('file doesn\'t contain version');
   }
 
   return json.version;
@@ -41,8 +44,12 @@ const readVersion = async (source) => {
  */
 const writeVersion = (path, version) => {
   const data = template(version);
+
+
   return fs.writeFile(path, data, 'utf8', (err) => {
-    if (err) throw err;
+    if (err) {
+      throw err;
+    }
   });
 };
 
@@ -51,6 +58,25 @@ const writeVersion = (path, version) => {
  * @param {string} dest - path to the version.js
  * @returns {void}
  */
-export const generateConstVersion = (source, dest) => readVersion(source).then((ver) => writeVersion(dest, ver));
+export const generateConstVersion = (source, dest) => {
+  const latestVersion = readVersion(source);
+
+  writeVersion(dest, latestVersion);
+
+  /*
+   * Find ![Latest Version](https://img.shields.io/badge/version-*-darkgreen?style=flat-square) and
+   * update it with the new version
+   */
+  const readmePath = './README.md';
+  const readmeData = fs.readFileSync(readmePath, 'utf8');
+  const newReadmeData = readmeData.replace(
+    /!\[Latest Version\]\(https:\/\/img\.shields\.io\/badge\/version-[^-]+-/u,
+    `![Latest Version](https://img.shields.io/badge/version-${latestVersion}-`,
+  );
+
+  fs.writeFileSync(readmePath, newReadmeData, 'utf8');
+  console.log(`Version ${latestVersion} written to ${readmePath}`);
+  console.log('README.md updated');
+};
 
 export default generateConstVersion;

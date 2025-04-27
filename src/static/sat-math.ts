@@ -5,8 +5,7 @@
  * providing tailored functions for calculating orbital data.
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -37,6 +36,7 @@ import {
   KilometersPerSecond,
   MILLISECONDS_TO_DAYS,
   MINUTES_PER_DAY,
+  PosVel,
   RAD2DEG,
   RIC,
   Radians,
@@ -387,11 +387,11 @@ export abstract class SatMath {
 
   /**
    * Calculates the velocity between two objects in ECI coordinates.
-   * @param obj1 The first object's ECI coordinates.
-   * @param obj2 The second object's ECI coordinates.
+   * @param obj1 The first object's velocity in ECI coordinates.
+   * @param obj2 The second object's velocity in ECI coordinates.
    * @returns The velocity between the two objects in kilometers/s.
    */
-  static velocity(obj1: EciVec3, obj2: EciVec3): KilometersPerSecond {
+  static velocity(obj1: EciVec3<KilometersPerSecond>, obj2: EciVec3<KilometersPerSecond>): KilometersPerSecond {
     return <KilometersPerSecond>Math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2 + (obj1.z - obj2.z) ** 2);
   }
 
@@ -698,7 +698,7 @@ export abstract class SatMath {
       sat,
       points,
       getOffsetTimeObj,
-      (params: { eciPts: EciVec3; eciPts2: EciVec3; velPts: EciVec3; velPts2: EciVec3; offset: number }) => {
+      (params: { eciPts: EciVec3; eciPts2: EciVec3; velPts: EciVec3<KilometersPerSecond>; velPts2: EciVec3<KilometersPerSecond>; offset: number }) => {
         const vel1 = {
           total: 0,
           ...params.velPts,
@@ -736,7 +736,7 @@ export abstract class SatMath {
     sat: DetailedSatellite,
     points: number,
     getOffsetTimeObj: (offset: number) => Date,
-    transformFunc: (params: { eciPts: EciVec3; eciPts2: EciVec3; velPts: EciVec3; velPts2: EciVec3; angle: number; offset: number }) => T,
+    transformFunc: (params: { eciPts: EciVec3; eciPts2: EciVec3; velPts: EciVec3<KilometersPerSecond>; velPts2: EciVec3<KilometersPerSecond>; angle: number; offset: number }) => T,
     sat2?: DetailedSatellite,
     orbits = 1,
   ): T[] {
@@ -746,20 +746,20 @@ export abstract class SatMath {
       const offset = ((i * sat.period * orbits) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
       const now = getOffsetTimeObj(offset);
       const angle = (-i * (sat.period / points) * TAU) / sat.period;
-      const eciPts = <EciVec3>SatMath.getEci(sat, now).position;
-      const velPts = <EciVec3>SatMath.getEci(sat, now).velocity;
+      const eciPts = SatMath.getEci(sat, now).position;
+      const velPts = SatMath.getEci(sat, now).velocity;
 
       if (!eciPts) {
         errorManagerInstance.debug(`No ECI position for ${sat.sccNum} at ${now}`);
         continue;
       }
 
-      let eciPts2: EciVec3 = { x: 0, y: 0, z: 0 } as EciVec3;
-      let velPts2: EciVec3 = { x: 0, y: 0, z: 0 } as EciVec3;
+      let eciPts2 = { x: 0, y: 0, z: 0 } as EciVec3;
+      let velPts2 = { x: 0, y: 0, z: 0 } as EciVec3<KilometersPerSecond>;
 
       if (sat2) {
-        eciPts2 = <EciVec3>SatMath.getEci(sat2, now).position;
-        velPts2 = <EciVec3>SatMath.getEci(sat2, now).velocity;
+        eciPts2 = SatMath.getEci(sat2, now).position;
+        velPts2 = SatMath.getEci(sat2, now).velocity;
         if (!eciPts2) {
           errorManagerInstance.debug(`No ECI position for ${sat2.sccNum} at ${now}`);
           continue;
@@ -778,14 +778,18 @@ export abstract class SatMath {
    * @param now The time at which to calculate the ECI coordinates.
    * @returns An object containing the ECI coordinates and velocity of the satellite at the given time.
    */
-  static getEci(sat: DetailedSatellite, now: Date) {
+  static getEci(sat: DetailedSatellite, now: Date): PosVel {
     try {
       const { m } = SatMath.calculateTimeVariables(now, sat.satrec) as { m: number };
+      const sv = Sgp4.propagate(sat.satrec, m);
 
+      if (!sv.position || !sv.velocity) {
+        return { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } } as PosVel;
+      }
 
-      return Sgp4.propagate(sat.satrec, m);
+      return sv as PosVel;
     } catch {
-      return { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } };
+      return { position: { x: 0, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } } as PosVel;
     }
   }
 

@@ -99,7 +99,8 @@
     "painting": "正在绘制地球...",
     "coloring": "正在线内着色...",
     "elsets": "正在定位轨道参数...",
-    "models": "正在构建3D模型..."
+    "models": "正在构建3D模型...",
+    "cunningPlan": "正在制定狡猾的计划..."
   },
   "splashScreens": {
     "1": "卫星模型看起来比实际大小要大。其他一切都是按比例显示的。",
@@ -162,6 +163,25 @@
       "bottomIconLabel": "Sensor Timeline",
       "title": "Sensor Timeline Menu",
       "helpBody": "The Sensor Timeline menu shows when a list of sensors have visibility of one satellite. The timeline is color-coded to show the quality of the pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to change the sensor and time to that pass. <br><br> The timeline can be modified by changing the start and end time of the simulation. Additionally, the timeline can be modified by changing the length and interval options."
+    },
+    "ProximityOps": {
+      "bottomIconLabel": "交会与近距离操作",
+      "title": "交会与近距离操作（RPO）",
+      "titleSecondary": "交会与近距离操作列表",
+      "helpBody": "查找卫星之间即将发生的接近事件",
+      "noradId": "NORAD编号",
+      "maxDistThreshold": "最大距离阈值（公里）",
+      "maxRelativeVelocity": "最大相对速度（公里/秒）",
+      "searchDuration": "搜索时长（小时）",
+      "geoText": "地球同步轨道",
+      "leoText": "近地轨道",
+      "orbitType": "轨道类型",
+      "geoAllVsAll": "地球同步轨道全部对全部",
+      "geoAllVsAllTooltip": "搜索所有地球同步轨道卫星之间的RPO",
+      "comparePayloadsOnly": "仅比较有效载荷",
+      "comparePayloadsOnlyTooltip": "仅搜索有效载荷之间的RPO",
+      "ignoreVimpelRso": "忽略Vimpel RSO",
+      "ignoreVimpelRsoTooltip": "忽略来自Vimpel目录的RSO"
     },
     "SatelliteTimeline": {
       "bottomIconLabel": "Satellite Timeline",

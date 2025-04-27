@@ -18,8 +18,7 @@ import { TimeMachine } from '../time-machine/time-machine';
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -92,6 +91,24 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
                 <input id="settings-drawEcf" type="checkbox" />
                 <span class="lever"></span>
                 Draw Orbits in ECF
+              </label>
+            </div>
+            <div class="input-field col s12">
+              <select id="settings-numberOfEcfOrbitsToDraw">
+                <option value="1" selected>1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="10">10</option>
+              </select>
+              <label>Number of ECF Orbits to Draw</label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Draw lines from sensor to satellites when in FOV">
+                <input id="settings-isDrawCovarianceEllipsoid" type="checkbox" checked/>
+                <span class="lever"></span>
+                Draw Covariance Ellipsoid
               </label>
             </div>
             <div class="switch row">
@@ -375,7 +392,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       { id: 'settings-drawOrbits', setting: 'isDrawOrbits' },
       { id: 'settings-drawTrailingOrbits', setting: 'isDrawTrailingOrbits' },
       { id: 'settings-drawEcf', setting: 'isOrbitCruncherInEcf' },
+      { id: 'settings-numberOfEcfOrbitsToDraw', setting: 'numberOfEcfOrbitsToDraw' },
       { id: 'settings-isDrawInCoverageLines', setting: 'isDrawInCoverageLines' },
+      { id: 'settings-isDrawCovarianceEllipsoid', setting: 'isDrawCovarianceEllipsoid' },
       { id: 'settings-eciOnHover', setting: 'isEciOnHover' },
       { id: 'settings-hos', setting: 'colors.transparent[3] === 0' },
       { id: 'settings-confidence-levels', setting: 'isShowConfidenceLevels' },
@@ -435,7 +454,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-drawCameraWidget':
       case 'settings-drawTrailingOrbits':
       case 'settings-drawEcf':
+      case 'settings-numberOfEcfOrbitsToDraw':
       case 'settings-isDrawInCoverageLines':
+      case 'settings-isDrawCovarianceEllipsoid':
       case 'settings-drawSun':
       case 'settings-drawBlackEarth':
       case 'settings-drawAtmosphere':
@@ -506,7 +527,17 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
     settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
+    const numberOfEcfOrbitsToDraw = parseInt((<HTMLInputElement>getEl('settings-numberOfEcfOrbitsToDraw')).value);
+
+    if (numberOfEcfOrbitsToDraw !== settingsManager.numberOfEcfOrbitsToDraw) {
+      keepTrackApi.getOrbitManager().orbitWorker.postMessage({
+        typ: OrbitCruncherType.SETTINGS_UPDATE,
+        numberOfOrbitsToDraw: numberOfEcfOrbitsToDraw,
+      });
+    }
+    settingsManager.numberOfEcfOrbitsToDraw = numberOfEcfOrbitsToDraw;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
+    settingsManager.isDrawCovarianceEllipsoid = (<HTMLInputElement>getEl('settings-isDrawCovarianceEllipsoid')).checked;
     settingsManager.drawCameraWidget = (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked;
     const ccWidgetCanvas = getEl('camera-control-widget');
 

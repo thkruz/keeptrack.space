@@ -4,7 +4,7 @@ import { GlUtils } from '../static/gl-utils';
 /* eslint-disable no-useless-escape */
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
-import { BaseObject, DetailedSatellite, EciVec3, Kilometers, SpaceObjectType } from 'ootk';
+import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { BufferAttribute } from '../static/buffer-attribute';
@@ -145,7 +145,7 @@ export class DotsManager {
    * @param pMvCamMatrix - The projection matrix.
    * @param tgtBuffer - The WebGLFramebuffer to draw on.
    */
-  draw(pMvCamMatrix: mat4, tgtBuffer: WebGLFramebuffer) {
+  draw(pMvCamMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
     if (!this.isReady || !settingsManager.cruncherReady) {
       return;
     }
@@ -535,14 +535,14 @@ export class DotsManager {
      * TODO: Remove this once we figure out why this is happening
      */
 
-    object.velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
+    object.velocity = { x: 0, y: 0, z: 0 } as EciVec3<KilometersPerSecond>;
     object.totalVelocity = 0;
 
     const isChanged = object.velocity.x !== this.velocityData[i * 3] || object.velocity.y !== this.velocityData[i * 3 + 1] || object.velocity.z !== this.velocityData[i * 3 + 2];
 
-    object.velocity.x = (this.velocityData[i * 3] as Kilometers) || (0 as Kilometers);
-    object.velocity.y = (this.velocityData[i * 3 + 1] as Kilometers) || (0 as Kilometers);
-    object.velocity.z = (this.velocityData[i * 3 + 2] as Kilometers) || (0 as Kilometers);
+    object.velocity.x = (this.velocityData[i * 3] as KilometersPerSecond) || (0 as KilometersPerSecond);
+    object.velocity.y = (this.velocityData[i * 3 + 1] as KilometersPerSecond) || (0 as KilometersPerSecond);
+    object.velocity.z = (this.velocityData[i * 3 + 2] as KilometersPerSecond) || (0 as KilometersPerSecond);
     if (object.type === SpaceObjectType.BALLISTIC_MISSILE) {
       const missile = object as MissileObject;
       const newVel = Math.sqrt(missile.velocity.x ** 2 + missile.velocity.y ** 2 + missile.velocity.z ** 2);

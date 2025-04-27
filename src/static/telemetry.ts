@@ -94,31 +94,34 @@ interface WebGLTelemetryData {
  * Only collects data when explicitly called - no ongoing monitoring.
  */
 export class Telemetry {
-  private static gl: WebGLRenderingContext | WebGL2RenderingContext | null = null;
-  private static canvas: HTMLCanvasElement | null = null;
-  private static appVersion: string = VERSION;
-  private static lastError: string = 'NO_ERROR';
-  private static contextLost: boolean = false;
   static isInitialized: boolean = false;
+  private static readonly minimumTelemetryInterval = 10 * 60 * 1000; // 10 minutes
+  private static gl_: WebGLRenderingContext | WebGL2RenderingContext | null = null;
+  private static canvas_: HTMLCanvasElement | null = null;
+  private static appVersion_: string = VERSION;
+  private static lastError_: string = 'NO_ERROR';
+  private static contextLost_: boolean = false;
+  private static lastTimestamp_: number = 0;
+
 
   /**
    * Initialize with references to WebGL context and canvas
    */
   static initialize(gl: WebGLRenderingContext | WebGL2RenderingContext, canvas: HTMLCanvasElement, appVersion?: string): void {
-    this.gl = gl;
-    this.canvas = canvas;
+    this.gl_ = gl;
+    this.canvas_ = canvas;
     if (appVersion) {
-      this.appVersion = appVersion;
+      this.appVersion_ = appVersion;
     }
 
     // Set up minimal context loss detection
     if (canvas) {
       canvas.addEventListener('webglcontextlost', () => {
-        this.contextLost = true;
+        this.contextLost_ = true;
       });
 
       canvas.addEventListener('webglcontextrestored', () => {
-        this.contextLost = false;
+        this.contextLost_ = false;
       });
     }
 
@@ -129,7 +132,7 @@ export class Telemetry {
    * Send error data when an error occurs
    */
   static sendErrorData(e: Error, funcName: string, additionalData?: Record<string, unknown>): void {
-    if (!this.gl || !this.canvas) {
+    if (!this.gl_ || !this.canvas_) {
       // eslint-disable-next-line no-console
       console.debug('Cannot send telemetry: WebGL context or canvas not initialized');
 
@@ -148,7 +151,7 @@ export class Telemetry {
         system: this.collectSystemInfo(),
         canvas: this.collectCanvasInfo(),
         application: {
-          version: this.appVersion,
+          version: this.appVersion_,
           timestamp: new Date().toISOString(),
           ...additionalData?.application as Record<string, unknown>,
           primarySatObj: (<SelectSatManager>keepTrackApi.getPluginByName('SelectSatManager'))?.primarySatObj,
@@ -180,7 +183,7 @@ export class Telemetry {
    * Collect WebGL context information
    */
   private static collectWebGLInfo(): WebGLTelemetryData['webGLInfo'] {
-    if (!this.gl) {
+    if (!this.gl_) {
       return {
         contextType: 'unknown',
         vendor: 'unknown',
@@ -188,12 +191,12 @@ export class Telemetry {
         version: 'unknown',
         extensions: [],
         maxTextureSize: 0,
-        contextLost: this.contextLost,
-        lastError: this.lastError,
+        contextLost: this.contextLost_,
+        lastError: this.lastError_,
       };
     }
 
-    const gl = this.gl;
+    const gl = this.gl_;
     const isWebGL2 = 'WebGL2RenderingContext' in window && gl instanceof WebGL2RenderingContext;
     const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
 
@@ -203,24 +206,24 @@ export class Telemetry {
     if (error !== gl.NO_ERROR) {
       switch (error) {
         case gl.INVALID_ENUM:
-          this.lastError = 'INVALID_ENUM';
+          this.lastError_ = 'INVALID_ENUM';
           break;
         case gl.INVALID_VALUE:
-          this.lastError = 'INVALID_VALUE';
+          this.lastError_ = 'INVALID_VALUE';
           break;
         case gl.INVALID_OPERATION:
-          this.lastError = 'INVALID_OPERATION';
+          this.lastError_ = 'INVALID_OPERATION';
           break;
         case gl.INVALID_FRAMEBUFFER_OPERATION:
-          this.lastError = 'INVALID_FRAMEBUFFER_OPERATION';
+          this.lastError_ = 'INVALID_FRAMEBUFFER_OPERATION';
           break;
         case gl.OUT_OF_MEMORY:
-          this.lastError = 'OUT_OF_MEMORY';
+          this.lastError_ = 'OUT_OF_MEMORY';
           break;
         case gl.CONTEXT_LOST_WEBGL:
-          this.lastError = 'CONTEXT_LOST_WEBGL';
+          this.lastError_ = 'CONTEXT_LOST_WEBGL';
           break;
-        default: this.lastError = `Unknown error (${error})`;
+        default: this.lastError_ = `Unknown error (${error})`;
       }
     }
 
@@ -231,8 +234,8 @@ export class Telemetry {
       version: gl.getParameter(gl.VERSION),
       extensions: gl.getSupportedExtensions() || [],
       maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE),
-      contextLost: this.contextLost,
-      lastError: this.lastError,
+      contextLost: this.contextLost_,
+      lastError: this.lastError_,
     };
   }
 
@@ -286,7 +289,7 @@ export class Telemetry {
    * Collect canvas information
    */
   private static collectCanvasInfo(): WebGLTelemetryData['canvas'] {
-    if (!this.canvas || !this.gl) {
+    if (!this.canvas_ || !this.gl_) {
       return {
         width: 0,
         height: 0,
@@ -303,14 +306,14 @@ export class Telemetry {
       };
     }
 
-    const attributes = this.gl.getContextAttributes() || {};
+    const attributes = this.gl_.getContextAttributes() || {};
 
     return {
-      width: this.canvas.width,
-      height: this.canvas.height,
-      clientWidth: this.canvas.clientWidth,
-      clientHeight: this.canvas.clientHeight,
-      isFullscreen: document.fullscreenElement === this.canvas,
+      width: this.canvas_.width,
+      height: this.canvas_.height,
+      clientWidth: this.canvas_.clientWidth,
+      clientHeight: this.canvas_.clientHeight,
+      isFullscreen: document.fullscreenElement === this.canvas_,
       contextAttributes: {
         alpha: attributes.alpha || false,
         antialias: attributes.antialias || false,
@@ -325,6 +328,11 @@ export class Telemetry {
    * Send telemetry data to the server
    */
   private static sendTelemetryData(data: WebGLTelemetryData): void {
+    // Avoid sending telemetry too frequently
+    if (Date.now() - this.lastTimestamp_ < Telemetry.minimumTelemetryInterval) {
+      return;
+    }
+
     fetch(settingsManager.telemetryServer, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -335,6 +343,8 @@ export class Telemetry {
       // eslint-disable-next-line no-console
       console.debug('Error sending telemetry:', err);
     });
+
+    this.lastTimestamp_ = Date.now();
   }
 
   /**
@@ -342,7 +352,7 @@ export class Telemetry {
    * Call this method immediately before sending error data for better context
    */
   static capturePerformanceSnapshot(): Record<string, unknown> {
-    if (!this.gl) {
+    if (!this.gl_) {
       return {};
     }
 

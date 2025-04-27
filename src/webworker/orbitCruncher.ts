@@ -15,6 +15,7 @@ export enum OrbitCruncherType {
   CHANGE_ORBIT_TYPE,
   MISSILE_UPDATE,
   SATELLITE_UPDATE,
+  SETTINGS_UPDATE,
 }
 
 export enum OrbitDrawTypes {
@@ -28,6 +29,7 @@ const objCache = [] as OrbitCruncherCachedObject[];
 let numberOfSegments: number;
 let orbitType = OrbitDrawTypes.ORBIT;
 let orbitFadeFactor = 1.0;
+let numberOfOrbitsToDraw = 1;
 
 // Handles Incomming Messages to sat-cruncher from main thread
 try {
@@ -47,6 +49,7 @@ export const onmessageProcessing = (m: {
     objData?: string;
     numSegs: number;
     orbitFadeFactor?: number;
+    numberOfOrbitsToDraw?: number;
     // Change Orbit Type Only
     orbitType?: OrbitDrawTypes.ORBIT;
     // Satellite Update Only
@@ -65,7 +68,8 @@ export const onmessageProcessing = (m: {
 }) => {
   switch (m.data.typ) {
     case OrbitCruncherType.INIT:
-      orbitFadeFactor = m.data.orbitFadeFactor;
+      orbitFadeFactor = m.data.orbitFadeFactor ?? 1.0;
+      numberOfOrbitsToDraw = m.data.numberOfOrbitsToDraw ?? 1;
       numberOfSegments = m.data.numSegs;
       break;
     case OrbitCruncherType.SATELLITE_UPDATE:
@@ -82,6 +86,9 @@ export const onmessageProcessing = (m: {
         objCache[m.data.id].altList = m.data.altList;
       }
       // Don't Add Anything Else
+      break;
+    case OrbitCruncherType.SETTINGS_UPDATE:
+      numberOfOrbitsToDraw = m.data.numberOfOrbitsToDraw ?? numberOfOrbitsToDraw;
       break;
     case OrbitCruncherType.CHANGE_ORBIT_TYPE:
       orbitType = m.data.orbitType;
@@ -154,7 +161,12 @@ export const onmessageProcessing = (m: {
 
       // Calculate Satellite Orbits
       const period = (2 * Math.PI) / objCache[id].satrec.no; // convert rads/min to min
-      const timeslice = period / numberOfSegments;
+      let timeslice = period / numberOfSegments;
+
+      // If a ECF output and  Geostationary orbit, then we can draw multiple orbits
+      if (isEcfOutput && objCache[id].satrec.no < 0.01) {
+        timeslice *= numberOfOrbitsToDraw;
+      }
 
       if (orbitType === OrbitDrawTypes.ORBIT) {
         while (i < len) {

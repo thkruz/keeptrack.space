@@ -1,12 +1,9 @@
 /**
- * /*! /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
- * main.js is the primary javascript file for keeptrack.space. It manages all user
- * interaction with the application.
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -55,7 +52,6 @@ import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manage
 import { SensorManager } from './plugins/sensor/sensorManager';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
-import { VERSION_DATE } from './settings/versionDate.js';
 import { Camera } from './singletons/camera';
 import { CameraControlWidget } from './singletons/camera-control-widget';
 import { CatalogManager } from './singletons/catalog-manager';
@@ -221,7 +217,7 @@ export class KeepTrack {
       this.draw_(dt);
 
       if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-        const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
+        const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
 
         if (selectedSatellite) {
           keepTrackApi.getUiManager().
@@ -449,7 +445,7 @@ theodore.kruczek at gmail dot com.
     const renderer = keepTrackApi.getRenderer();
     const camera = keepTrackApi.getMainCamera();
 
-    camera.draw(keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat(), renderer.sensorPos);
+    camera.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, renderer.sensorPos);
     renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
 
     if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
@@ -483,7 +479,6 @@ theodore.kruczek at gmail dot com.
 
       // Upodate the version number and date
       settingsManager.versionNumber = VERSION;
-      settingsManager.versionDate = VERSION_DATE;
 
       // Error Trapping
       window.addEventListener('error', (e: ErrorEvent) => {

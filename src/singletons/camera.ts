@@ -1,12 +1,11 @@
 /* eslint-disable complexity */
 /* eslint-disable max-lines */
 /**
- * /*! /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -420,11 +419,21 @@ export class Camera {
       this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
       this.earthCenteredLastZoom = this.zoomTarget_;
       this.camZoomSnappedOnSat = false;
-    } else if (this.camDistBuffer < settingsManager.nearZoomLevel || this.zoomLevel_ === -1) {
+    } else if ((this.camDistBuffer < settingsManager.nearZoomLevel || this.camDistBuffer < (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25) ||
+      this.zoomLevel_ === -1) {
       // Inside camDistBuffer
       settingsManager.selectedColor = [0, 0, 0, 0];
-      this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 5); // delta is +/- 100
-      this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, this.settings_.minDistanceFromSatellite), settingsManager.nearZoomLevel);
+      this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 100); // delta is +/- 100
+      this.camDistBuffer = <Kilometers>Math.min(
+        Math.max(
+          this.camDistBuffer,
+          this.settings_.minDistanceFromSatellite,
+        ),
+        Math.max(
+          settingsManager.nearZoomLevel,
+          (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25,
+        ),
+      );
     } else if (this.camDistBuffer >= settingsManager.nearZoomLevel) {
       // Outside camDistBuffer
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
@@ -1126,6 +1135,11 @@ export class Camera {
 
     if (sat.position.x === 0 && sat.position.y === 0 && sat.position.z === 0) {
       keepTrackApi.getUiManager().toast('Object is inside the earth!', ToastMsgType.critical);
+      const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+
+      if (selectSatManagerInstance) {
+        selectSatManagerInstance.selectSat(-1);
+      }
       this.camZoomSnappedOnSat = false;
       this.camAngleSnappedOnSat = false;
 
@@ -1557,7 +1571,7 @@ export class Camera {
       this.camYaw = normalizeAngle(this.camYaw);
       this.camPitch = normalizeAngle(this.camPitch);
 
-      const marginOfError = 0.05;
+      const marginOfError = 3;
 
       if (this.camPitch >= this.earthCenteredPitch_ - marginOfError && this.camPitch <= this.earthCenteredPitch_ + marginOfError) {
         this.camPitch = this.earthCenteredPitch_;

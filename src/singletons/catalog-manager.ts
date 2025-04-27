@@ -5,8 +5,7 @@
  * It manages all interaction with the satellite catalogue.
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -29,7 +28,7 @@
 import { KeepTrackApiEvents, MissileParams } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, EciVec3, Kilometers, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, EciVec3, KilometersPerSecond, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
 import { launchSites } from '../catalogs/launch-sites';
 import { sensors } from '../catalogs/sensors';
@@ -655,7 +654,7 @@ export class CatalogManager {
         this.orbitalPlaneDensity[inc][alt] += 1;
       }
 
-      satellites[i].velocity = { x: 0, y: 0, z: 0 } as EciVec3<Kilometers>;
+      satellites[i].velocity = { x: 0, y: 0, z: 0 } as EciVec3<KilometersPerSecond>;
     }
 
     this.orbitalPlaneDensityMax = 0;

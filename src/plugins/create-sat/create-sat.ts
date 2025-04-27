@@ -4,6 +4,7 @@ import {
   DetailedSatelliteParams,
   EciVec3,
   FormatTle,
+  KilometersPerSecond,
   SatelliteRecord,
   Sgp4,
 } from 'ootk';
@@ -167,8 +168,8 @@ export class CreateSat extends KeepTrackPlugin {
     this.setupPeriodMeanMotionConverters_();
 
     // Submit and save buttons
-    getEl('createSat-submit').addEventListener('click', CreateSat.createSatSubmit_);
-    getEl('createSat-save').addEventListener('click', CreateSat.exportTLE_);
+    getEl('createSat-submit')!.addEventListener('click', CreateSat.createSatSubmit_);
+    getEl('createSat-save')!.addEventListener('click', CreateSat.exportTLE_);
 
     countryNameList.forEach((countryName: string) => {
       let countryCode = countryCodeList[countryName];
@@ -177,7 +178,7 @@ export class CreateSat extends KeepTrackPlugin {
         countryCode = countryCode.split('|')[0];
       }
 
-      getEl(`${CreateSat.elementPrefix}-country`).insertAdjacentHTML('beforeend', `<option value="${countryCode}">${countryName}</option>`);
+      getEl(`${CreateSat.elementPrefix}-country`)!.insertAdjacentHTML('beforeend', `<option value="${countryCode}">${countryName}</option>`);
     });
 
     // Populate default values
@@ -189,7 +190,7 @@ export class CreateSat extends KeepTrackPlugin {
    */
   private setupPeriodMeanMotionConverters_(): void {
     // Period to Mean Motion conversion
-    getEl(`${CreateSat.elementPrefix}-per`).addEventListener('change', () => {
+    getEl(`${CreateSat.elementPrefix}-per`)!.addEventListener('change', () => {
       const perInput = getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement;
       const per = perInput.value;
 
@@ -207,7 +208,7 @@ export class CreateSat extends KeepTrackPlugin {
     });
 
     // Mean Motion to Period conversion
-    getEl(`${CreateSat.elementPrefix}-meanmo`).addEventListener('change', () => {
+    getEl(`${CreateSat.elementPrefix}-meanmo`)!.addEventListener('change', () => {
       const meanmoInput = getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement;
       const meanmo = meanmoInput.value;
 
@@ -286,7 +287,7 @@ export class CreateSat extends KeepTrackPlugin {
   private static createSatSubmit_(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const errorElement = getEl(`${CreateSat.elementPrefix}-error`);
+    const errorElement = getEl(`${CreateSat.elementPrefix}-error`)!;
 
     // Hide any previous error
     errorElement.style.display = 'none';
@@ -296,10 +297,10 @@ export class CreateSat extends KeepTrackPlugin {
 
     try {
       // Convert SCC to internal ID
-      const satId = catalogManagerInstance.sccNum2Id(parseInt(inputParams.scc));
+      const satId = catalogManagerInstance.sccNum2Id(parseInt(inputParams.scc)) ?? -1;
       const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
 
-      if (!obj.isSatellite()) {
+      if (!obj?.isSatellite()) {
         keepTrackApi.getUiManager().toast(
           'Invalid satellite object',
           ToastMsgType.error,
@@ -365,7 +366,7 @@ export class CreateSat extends KeepTrackPlugin {
       // Propagate satellite to get position and velocity
       const spg4vec = Sgp4.propagate(satrec, 0);
       const pos = spg4vec.position as EciVec3;
-      const vel = spg4vec.velocity as EciVec3;
+      const vel = spg4vec.velocity as EciVec3<KilometersPerSecond>;
 
       // Create new satellite object
       const info: DetailedSatelliteParams = {

@@ -44,6 +44,7 @@ import { Lat2LonPlots } from './plot-analysis/lat2lon';
 import { RicPlot } from './plot-analysis/ric-plots';
 import { Time2LonPlots } from './plot-analysis/time2lon';
 import { PolarPlotPlugin } from './polar-plot/polar-plot';
+import { ProximityOps } from './proximity-ops/proximity-ops';
 import { ReportsPlugin } from './reports/reports';
 import { SatConstellations } from './sat-constellations/sat-constellations';
 import { SatelliteFov } from './satellite-fov/satellite-fov';
@@ -133,6 +134,7 @@ export type KeepTrackPlugins = {
   timelineAlt?: boolean;
   calculator?: boolean;
   createSat?: boolean;
+  RPOCalculator?: boolean;
 };
 
 // Register all core modules
@@ -160,6 +162,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new PolarPlotPlugin().init(), enabled: plugins.polarPlot },
       { init: () => new NextLaunchesPlugin().init(), enabled: plugins.nextLaunch },
       { init: () => new FindSatPlugin().init(), enabled: plugins.findSat },
+      { init: () => new ProximityOps().init(), enabled: plugins.RPOCalculator },
       { init: () => new ShortTermFences().init(), enabled: plugins.shortTermFences },
       { init: () => new OrbitReferences().init(), enabled: plugins.orbitReferences },
       { init: () => new Collisions().init(), enabled: plugins.collisions },

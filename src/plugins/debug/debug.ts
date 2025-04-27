@@ -2,7 +2,7 @@ import * as gremlins from 'gremlins.js';
 
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import debugPng from '@public/img/icons/debug.png';
 
@@ -117,7 +117,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
               return;
             }
 
-            const sat = keepTrackApi.getCatalogManager().getObject(selectedSat);
+            const sat = keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.POSITION_ONLY);
 
             if (sat) {
               const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
@@ -169,7 +169,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
         if (camera && selectSatManagerInstance) {
           const selectedSat = selectSatManagerInstance.selectedSat;
-          const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getObject(selectedSat) : null;
+          const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.POSITION_ONLY) : null;
 
           const position = camera.getCameraPosition(sat?.position);
 
@@ -180,7 +180,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           this.lastCameraUpdate = <Milliseconds>new Date().getTime();
         }
         if (selectSatManagerInstance.selectedSat >= 0) {
-          const sat = keepTrackApi.getCatalogManager().getObject(selectSatManagerInstance.selectedSat);
+          const sat = keepTrackApi.getCatalogManager().getObject(selectSatManagerInstance.selectedSat, GetSatType.POSITION_ONLY);
 
           if (!sat) {
             errorManagerInstance.warn('Satellite not found');

@@ -98,7 +98,7 @@ export class OrbitManager {
   draw(
     pMatrix: mat4,
     camMatrix: mat4,
-    tgtBuffer: WebGLFramebuffer,
+    tgtBuffer: WebGLFramebuffer | null,
     hoverManagerInstance: HoverManager,
     colorSchemeManagerInstance: ColorSchemeManager,
     mainCameraInstance: Camera,
@@ -313,7 +313,7 @@ export class OrbitManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    const obj = catalogManagerInstance.getObject(id);
+    const obj = catalogManagerInstance.getObject(id, GetSatType.EXTRA_ONLY);
 
     if (!obj) {
       return;

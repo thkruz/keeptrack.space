@@ -1,7 +1,6 @@
 import { cpSync, mkdirSync, readdirSync, rmSync } from 'fs';
 import webpack from 'webpack';
 import generateConstVersion from './lib/constVersion.mjs';
-import { updateTime } from './lib/updateTime.mjs';
 import { generateConfig } from './webpack.mjs';
 
 console.clear();
@@ -45,9 +44,6 @@ files.forEach((file) => {
 
 console.log('Updating version number...'); // NOSONAR
 generateConstVersion('./package.json', 'src/settings/version.js');
-
-console.log('Updating last update time...'); // NOSONAR
-updateTime();
 
 const webpackConfig = generateConfig(env, isWatch);
 

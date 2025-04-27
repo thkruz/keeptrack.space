@@ -102,9 +102,9 @@ export abstract class KeepTrackPlugin {
   /**
    * The html to use for the side menu's attached settings menu.
    */
-  sideMenuSettingsHtml: string;
+  sideMenuSecondaryHtml: string;
 
-  sideMenuSettingsOptions: SideMenuSettingsOptions = {
+  sideMenuSecondaryOptions: SideMenuSettingsOptions = {
     width: 300,
     leftOffset: null,
     zIndex: 3,
@@ -200,12 +200,22 @@ export abstract class KeepTrackPlugin {
    * Determins if the side menu is adjustable by clicking and dragging.
    */
   dragOptions: ClickDragOptions;
+  /**
+   * Determines if the side menu's secondary menu is adjustable by clicking and dragging.
+   */
+  dragOptionsSecondary: ClickDragOptions;
   menuMode: MenuMode[] = [MenuMode.ALL];
 
   /**
    * The callback to run when the bottom icon is deselected for any reason
    */
   onSetBottomIconToUnselected: () => void;
+
+  /**
+   * The icon to use for the secondary menu button.
+   * @default 'settings'
+   */
+  secondaryMenuIcon = 'settings';
 
   /**
    * Creates a new instance of the KeepTrackPlugin class.
@@ -260,7 +270,7 @@ export abstract class KeepTrackPlugin {
       throw new Error(`${this.id} HTML already added.`);
     }
 
-    this.sideMenuSettingsOptions.leftOffset = typeof this.sideMenuSettingsOptions.leftOffset === 'number' ? this.sideMenuSettingsOptions.leftOffset : null;
+    this.sideMenuSecondaryOptions.leftOffset = typeof this.sideMenuSecondaryOptions.leftOffset === 'number' ? this.sideMenuSecondaryOptions.leftOffset : null;
 
     this.helpTitle = Localization.plugins[this.id]?.title ?? this.helpTitle ?? this.sideMenuTitle;
     this.helpBody = Localization.plugins[this.id]?.helpBody ?? this.helpBody;
@@ -284,7 +294,7 @@ export abstract class KeepTrackPlugin {
     }
 
     if (this.sideMenuElementName && this.sideMenuElementHtml) {
-      if (this.sideMenuSettingsHtml) {
+      if (this.sideMenuSecondaryHtml) {
         const sideMenuHtmlWrapped = this.generateSideMenuHtml_();
 
         this.addSideMenu(sideMenuHtmlWrapped);
@@ -295,16 +305,16 @@ export abstract class KeepTrackPlugin {
       throw new Error(`${this.id} side menu element name and html must both be defined.`);
     }
 
-    if (this.sideMenuSettingsHtml) {
+    if (this.sideMenuSecondaryHtml) {
       const sideMenuHtmlWrapped = keepTrackApi.html`
-        <div id="${this.sideMenuElementName}-settings"
+        <div id="${this.sideMenuElementName}-secondary"
           class="side-menu-parent start-hidden text-select"
-          style="z-index: ${this.sideMenuSettingsOptions.zIndex.toString()};
-          width: ${this.sideMenuSettingsOptions.width.toString()}px;"
+          style="z-index: ${this.sideMenuSecondaryOptions.zIndex.toString()};
+          width: ${this.sideMenuSecondaryOptions.width.toString()}px;"
         >
-          <div id="${this.sideMenuElementName}-settings-content" class="side-menu-settings" style="padding: 0px 10px;">
+          <div id="${this.sideMenuElementName}-secondary-content" class="side-menu-settings" style="padding: 0px 10px;">
             <div class="row"></div>
-            ${this.sideMenuSettingsHtml}
+            ${this.sideMenuSecondaryHtml}
           </div>
         </div>
       `;
@@ -315,7 +325,7 @@ export abstract class KeepTrackPlugin {
         event: KeepTrackApiEvents.uiManagerFinal,
         cbName: this.id,
         cb: () => {
-          getEl(`${this.sideMenuElementName}-settings-btn`)?.addEventListener('click', () => {
+          getEl(`${this.sideMenuElementName}-secondary-btn`)?.addEventListener('click', () => {
             if (!this.isSettingsMenuEnabled_) {
               errorManagerInstance.debug('Settings menu is disabled');
 
@@ -324,16 +334,16 @@ export abstract class KeepTrackPlugin {
 
             keepTrackApi.getSoundManager().play(SoundNames.CLICK);
             if (this.isSideMenuSettingsOpen) {
-              this.closeSettingsMenu();
+              this.closeSecondaryMenu();
 
-              const settingsButtonElement = getEl(`${this.sideMenuElementName}-settings-btn`);
+              const settingsButtonElement = getEl(`${this.sideMenuElementName}-secondary-btn`);
 
               if (settingsButtonElement) {
                 settingsButtonElement.style.color = 'var(--color-dark-text-accent)';
               }
             } else {
-              this.openSettingsMenu();
-              const settingsButtonElement = getEl(`${this.sideMenuElementName}-settings-btn`);
+              this.openSecondaryMenu();
+              const settingsButtonElement = getEl(`${this.sideMenuElementName}-secondary-btn`);
 
               if (settingsButtonElement) {
                 settingsButtonElement.style.color = 'var(--statusDarkNormal)';
@@ -360,6 +370,10 @@ export abstract class KeepTrackPlugin {
 
     if (this.dragOptions) {
       this.registerClickAndDragOptions(this.dragOptions);
+    }
+
+    if (this.dragOptionsSecondary) {
+      this.registerClickAndDragOptionsSecondary(this.dragOptionsSecondary);
     }
 
     if ((this.rmbL1Html || this.rmbL2Html) && !this.rmbCallback) {
@@ -402,7 +416,7 @@ export abstract class KeepTrackPlugin {
   isRmbOnSat = false;
 
   private generateSideMenuHtml_() {
-    const menuWidthStr = `${this.sideMenuSettingsOptions.width.toString()} px !important`;
+    const menuWidthStr = `${this.sideMenuSecondaryOptions.width.toString()} px !important`;
     const downloadIconHtml = this.downloadIconCb ? keepTrackApi.html`
       <button id="${this.sideMenuElementName}-download-btn";
         class="center-align btn btn-ui waves-effect waves-light"
@@ -414,12 +428,12 @@ export abstract class KeepTrackPlugin {
       </button>
     ` : '';
     const settingsIconHtml = keepTrackApi.html`
-      <button id="${this.sideMenuElementName}-settings-btn"
+      <button id="${this.sideMenuElementName}-secondary-btn"
         class="center-align btn btn-ui waves-effect waves-light"
         style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--color-dark-text-accent); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
         type="button">
         <i class="material-icons" style="font-size: 2em;height: 30px;width: 30px;display: flex;justify-content: center;align-items: center;">
-          settings
+          ${this.secondaryMenuIcon}
         </i>
       </button>`;
     const spacerDiv = keepTrackApi.html`<div style="width: 30px; height: 30px; display: block; margin: 0px 5px 0px 0px;"></div>`;
@@ -466,8 +480,8 @@ export abstract class KeepTrackPlugin {
       this.registerHideSideMenu(this.bottomIconElementName, this.closeSideMenu.bind(this));
     }
 
-    if (this.sideMenuSettingsHtml) {
-      this.registerHideSideMenu(this.bottomIconElementName, this.closeSettingsMenu.bind(this));
+    if (this.sideMenuSecondaryHtml) {
+      this.registerHideSideMenu(this.bottomIconElementName, this.closeSecondaryMenu.bind(this));
     }
 
     if (this.rmbCallback) {
@@ -857,18 +871,18 @@ export abstract class KeepTrackPlugin {
     getEl('tutorial-btn', true)?.classList.add('bmenu-item-disabled');
   }
 
-  openSettingsMenu() {
-    const settingsMenuElement = getEl(`${this.sideMenuElementName}-settings`);
+  openSecondaryMenu() {
+    const secondaryMenuElement = getEl(`${this.sideMenuElementName}-secondary`);
     const sideMenuElement = getEl(this.sideMenuElementName);
 
-    if (settingsMenuElement) {
+    if (secondaryMenuElement) {
       this.isSideMenuSettingsOpen = true;
-      if (this.sideMenuSettingsOptions.leftOffset !== null) {
-        settingsMenuElement.style.left = `${this.sideMenuSettingsOptions.leftOffset}px`;
+      if (this.sideMenuSecondaryOptions.leftOffset !== null) {
+        secondaryMenuElement.style.left = `${this.sideMenuSecondaryOptions.leftOffset}px`;
       } else {
-        settingsMenuElement.style.left = `${sideMenuElement?.getBoundingClientRect().right ?? 0}px`;
+        secondaryMenuElement.style.left = `${sideMenuElement?.getBoundingClientRect().right ?? 0}px`;
       }
-      slideInRight(settingsMenuElement, 1000);
+      slideInRight(secondaryMenuElement, 1000);
     }
   }
 
@@ -879,14 +893,14 @@ export abstract class KeepTrackPlugin {
     KeepTrackPlugin.closeSideMenu_();
   }
 
-  closeSettingsMenu() {
+  closeSecondaryMenu() {
     this.isSideMenuSettingsOpen = false;
-    const settingsButtonElement = getEl(`${this.sideMenuElementName}-settings-btn`);
+    const secondaryButtonElement = getEl(`${this.sideMenuElementName}-secondary-btn`);
 
-    if (settingsButtonElement) {
-      settingsButtonElement.style.color = 'var(--color-dark-text-accent)';
+    if (secondaryButtonElement) {
+      secondaryButtonElement.style.color = 'var(--color-dark-text-accent)';
     }
-    slideOutLeft(getEl(`${this.sideMenuElementName}-settings`), 1500, null, -300);
+    slideOutLeft(getEl(`${this.sideMenuElementName}-secondary`), 1500, null, -300);
   }
 
   registerSubmitButtonClicked(callback: ((() => void) | null) = null) {
@@ -916,13 +930,28 @@ export abstract class KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        if (this.sideMenuSettingsHtml) {
-          opts.attachedElement = getEl(`${this.sideMenuElementName}-settings`);
+        if (this.sideMenuSecondaryHtml) {
+          opts.attachedElement = getEl(`${this.sideMenuElementName}-secondary`);
         }
-        if (this.sideMenuSettingsOptions.leftOffset) {
-          opts.leftOffset = this.sideMenuSettingsOptions.leftOffset;
+        if (this.sideMenuSecondaryOptions.leftOffset) {
+          opts.leftOffset = this.sideMenuSecondaryOptions.leftOffset;
         }
         clickAndDragWidth(getEl(this.sideMenuElementName), opts);
+      },
+    });
+  }
+
+  registerClickAndDragOptionsSecondary(opts: ClickDragOptions = {} as ClickDragOptions): void {
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: this.id,
+      cb: () => {
+        const edgeEl = clickAndDragWidth(getEl(`${this.sideMenuElementName}-secondary`), opts);
+
+        if (edgeEl) {
+          edgeEl.style.top = '0px';
+          edgeEl.style.position = 'absolute';
+        }
       },
     });
   }

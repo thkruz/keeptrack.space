@@ -1,6 +1,6 @@
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
-import { mat3, mat4, vec3 } from 'gl-matrix';
+import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, EciVec3, Kilometers } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { GlUtils } from '../../static/gl-utils';
@@ -71,14 +71,24 @@ export class Box {
     u_pMatrix: <WebGLUniformLocation><unknown>null,
     u_camMatrix: <WebGLUniformLocation><unknown>null,
     u_mvMatrix: <WebGLUniformLocation><unknown>null,
+    u_color: <WebGLUniformLocation><unknown>null,
   };
+
+  private color_ = [0.5, 0.5, 0.5, 0.5]; // Set color to gray with alpha
 
   private vao: WebGLVertexArrayObject;
 
   drawPosition = [0, 0, 0] as vec3;
   eci: EciVec3;
 
-  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
+  setColor(color: vec4) {
+    this.color_[0] = color[0];
+    this.color_[1] = color[1];
+    this.color_[2] = color[2];
+    this.color_[3] = color[3];
+  }
+
+  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
     if (!this.isLoaded_) {
       return;
     }
@@ -97,18 +107,20 @@ export class Box {
     gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
+    gl.uniform4fv(this.uniforms_.u_color, this.color_);
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
 
     // Enable alpha blending
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.disable(gl.DEPTH_TEST);
+    gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
     gl.bindVertexArray(this.vao);
     gl.drawElements(gl.TRIANGLES, this.buffers_.vertCount, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
 
     // Disable alpha blending
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
   }
 
@@ -127,7 +139,7 @@ export class Box {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  update(obj: BaseObject, _selectedDate?: Date) {
+  update(obj: BaseObject | null, _selectedDate?: Date) {
     if (!this.isLoaded_) {
       return;
     }
@@ -178,7 +190,7 @@ export class Box {
 
     // Assign Attributes
     GlUtils.assignAttributes(this.attribs_, gl, this.program_, ['a_position', 'a_normal']);
-    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix']);
+    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_color']);
   }
 
   private initVao_() {
@@ -203,20 +215,15 @@ export class Box {
 
   private shaders_ = {
     frag: keepTrackApi.glsl`#version 300 es
-      #ifdef GL_FRAGMENT_PRECISION_HIGH
-        precision highp float;
-      #else
-        precision mediump float;
-      #endif
-
+      precision mediump float;
       in vec3 v_normal;
-
       out vec4 fragColor;
+      uniform vec4 u_color;
 
       void main(void) {
-        fragColor = vec4(0.2, 0.0, 0.0, 0.2);
+        fragColor = vec4(u_color.rgb * u_color.a, u_color.a);
       }
-      `,
+    `,
     vert: keepTrackApi.glsl`#version 300 es
       uniform mat4 u_pMatrix;
       uniform mat4 u_camMatrix;

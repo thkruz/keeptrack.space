@@ -7,7 +7,8 @@ import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UrlManager } from '@app/static/url-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
+import { vec3 } from 'gl-matrix';
+import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
@@ -29,8 +30,12 @@ export class SelectSatManager extends KeepTrackPlugin {
   });
 
   primarySatObj: DetailedSatellite | MissileObject = this.noSatObj_;
+  /** Ellipsoid radii for the primary satellite in RCI coordinates */
+  primarySatCovMatrix: vec3;
   secondarySat = -1;
   secondarySatObj: DetailedSatellite | null = null;
+  /** Ellipsoid radii for the secondary satellite in RCI coordinates */
+  secondarySatCovMatrix: vec3;
   private lastSelectedSat_ = -1;
 
   addJs(): void {
@@ -233,7 +238,23 @@ export class SelectSatManager extends KeepTrackPlugin {
   private selectSatObject_(sat: DetailedSatellite | MissileObject) {
     if (sat.id !== this.lastSelectedSat()) {
       this.selectSatChange_(sat);
+      if (sat.id >= 0 && sat instanceof DetailedSatellite) {
+        const covMatrix = createSampleCovarianceFromTle(sat.tle1, sat.tle2).matrix.elements;
+        const radii = [
+          Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, // Radial
+          Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, // Cross-track
+          Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, // In-track
+        ] as vec3;
+
+        this.primarySatCovMatrix = radii;
+
+        const primaryCovBubble = keepTrackApi.getScene().primaryCovBubble;
+
+        primaryCovBubble.setColor([1, 0, 0, 0.3]);
+        primaryCovBubble.setRadii(keepTrackApi.getRenderer().gl, radii);
+      }
     }
+
 
     // stop rotation if it is on
     keepTrackApi.getMainCamera().autoRotate(false);
@@ -361,6 +382,22 @@ export class SelectSatManager extends KeepTrackPlugin {
 
       if (!this.secondarySatObj) {
         this.secondarySatObj = null;
+      }
+
+      if ((this.secondarySatObj?.id ?? -1) >= 0 && this.secondarySatObj instanceof DetailedSatellite) {
+        const covMatrix = createSampleCovarianceFromTle(this.secondarySatObj.tle1, this.secondarySatObj.tle2).matrix.elements;
+        const radii = [
+          Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, // Radial
+          Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, // Cross-track
+          Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, // In-track
+        ] as vec3;
+
+        this.secondarySatCovMatrix = radii;
+
+        const secondaryCovBubble = keepTrackApi.getScene().secondaryCovBubble;
+
+        secondaryCovBubble.setColor([0, 0, 1, 0.4]);
+        secondaryCovBubble.setRadii(keepTrackApi.getRenderer().gl, radii);
       }
     }
 

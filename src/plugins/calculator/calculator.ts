@@ -290,7 +290,7 @@ export class Calculator extends KeepTrackPlugin {
     <div id="calculator-content-wrapper">
       ${this.itrfHtml}
     </div>`;
-  sideMenuSettingsHtml = keepTrackApi.html`
+  sideMenuSecondaryHtml = keepTrackApi.html`
   <div>
     <div class="center-align row">
       <button id="calculator-itrf" class="btn btn-ui waves-effect waves-light" type="button" name="action">ITRF</button>

@@ -1,10 +1,9 @@
 /**
- * /*! /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -77,7 +76,7 @@ export class Earth {
   /**
    * This is run once per frame to render the earth.
    */
-  draw(tgtBuffer: WebGLFramebuffer) {
+  draw(tgtBuffer: WebGLFramebuffer | null) {
     if (!this.isTexturesReady_) {
       return;
     }
@@ -408,7 +407,7 @@ export class Earth {
   /**
    * This is run once per frame to render the earth.
    */
-  private drawColoredEarth_(tgtBuffer: WebGLFramebuffer) {
+  private drawColoredEarth_(tgtBuffer: WebGLFramebuffer | null) {
     const gl = this.gl_;
 
     this.mesh.program.use();

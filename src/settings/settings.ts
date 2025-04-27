@@ -1,9 +1,8 @@
 /* eslint-disable max-lines */
 /**
- * // /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -100,6 +99,7 @@ export class SettingsManager {
     calculator: true,
     createSat: true,
     filterMenu: true,
+    RPOCalculator: true,
   };
   changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
   changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute
@@ -110,6 +110,21 @@ export class SettingsManager {
    * This enables/disable the mission data section of the sat-info-box. There is no value if your data set contains no mission data.
    */
   isMissionDataEnabled = true;
+  /**
+   * If ECF Orbits are drawn, this is the number of orbits to draw.
+   */
+  numberOfEcfOrbitsToDraw = 1;
+  /**
+   * The confidence level to use when drawing Covariance ellipsoids.
+   * 1 = 68.27% confidence
+   * 2 = 95.45% confidence
+   * 3 = 99.73% confidence
+   */
+  covarianceConfidenceLevel: number = 2;
+  /**
+   * Flag to determine if the covariance ellipsoid should be drawn.
+   */
+  isDrawCovarianceEllipsoid = false;
 
 
   static preserveSettings() {
@@ -119,6 +134,7 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ECF, settingsManager.isOrbitCruncherInEcf.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, settingsManager.isDrawInCoverageLines.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_SUN, settingsManager.isDrawSun.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, settingsManager.isDrawCovarianceEllipsoid.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH, settingsManager.isBlackEarth.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE, settingsManager.isDrawAtmosphere.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_AURORA, settingsManager.isDrawAurora.toString());
@@ -426,9 +442,10 @@ export class SettingsManager {
   lastSearch: string | string[] = '';
   isGroupOverlayDisabled: boolean | null = null;
   /**
-   * Distance from satellite when we switch to close camera mode
+   * Distance from satellite when we switch to close camera mode.
+   * This is used to slow down the dolly effect when zooming in on a satellite.
    */
-  nearZoomLevel = <Kilometers>300;
+  nearZoomLevel = 25 as Kilometers;
   isPreventColorboxClose = false;
   isDayNightToggle = false;
   isUseHigherFOVonMobile = null;
@@ -1123,8 +1140,9 @@ export class SettingsManager {
   dotsPerColor: number;
   /**
    * Minimum distance from satellite when we switch to close camera mode
+   * The camera will not be able to get closer than this distance
    */
-  minDistanceFromSatellite = <Kilometers>15;
+  minDistanceFromSatellite = 1.25 as Kilometers;
 
   /**
    * Disable toast messages
@@ -1182,6 +1200,7 @@ export class SettingsManager {
     this.isOrbitCruncherInEcf = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ECF, this.isOrbitCruncherInEcf) as boolean;
     this.isDrawInCoverageLines = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, this.isDrawInCoverageLines) as boolean;
     this.isDrawSun = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_SUN, this.isDrawSun) as boolean;
+    this.isDrawCovarianceEllipsoid = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, this.isDrawCovarianceEllipsoid) as boolean;
     this.isBlackEarth = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_BLACK_EARTH, this.isBlackEarth) as boolean;
     this.isDrawAtmosphere = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ATMOSPHERE, this.isDrawAtmosphere) as boolean;
     this.isDrawAurora = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_AURORA, this.isDrawAurora) as boolean;

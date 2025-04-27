@@ -17,10 +17,10 @@ export abstract class CustomMesh {
 
   protected buffers_ = {
     vertCount: 0,
-    combinedBuf: null as WebGLBuffer,
-    vertPosBuf: null as WebGLBuffer,
-    vertNormBuf: null as WebGLBuffer,
-    vertIndexBuf: null as WebGLBuffer,
+    combinedBuf: null as WebGLBuffer | null,
+    vertPosBuf: null as WebGLBuffer | null,
+    vertNormBuf: null as WebGLBuffer | null,
+    vertIndexBuf: null as WebGLBuffer | null,
   };
 
   protected attribs_ = {

@@ -1,11 +1,10 @@
 /* eslint-disable max-classes-per-file */
 /**
- * /*! /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -473,7 +472,7 @@ export class UiManager {
    * Checks if enough time has elapsed and then calls all queued updateSelectBox callbacks
    */
   updateSelectBox(realTime: Milliseconds, lastBoxUpdateTime: Milliseconds, obj: BaseObject): void {
-    if (!obj || obj.isStatic()) {
+    if (!obj || obj.id === -1 || obj.isStatic()) {
       return;
     }
 

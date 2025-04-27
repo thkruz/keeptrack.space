@@ -16,8 +16,7 @@ import { SoundNames } from '../sounds/SoundNames';
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  *
  * KeepTrack is free software: you can redistribute it and/or modify it under the
  * terms of the GNU Affero General Public License as published by the Free Software
@@ -190,9 +189,9 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     keepTrackApi.getSoundManager().play(SoundNames.BUTTON_CLICK);
 
     showLoading(() => {
-      (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.LOW.toString();
+      (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.OFF.toString();
       (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).dispatchEvent(new Event('change'));
-      this.updateGodrays_(GodraySamples.LOW);
+      this.updateGodrays_(GodraySamples.OFF);
 
       (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-day-texture-quality`)).value = EarthNightTextureQuality.MEDIUM;
       (<HTMLInputElement>getEl(`${this.formPrefix_}-earth-night-texture-quality`)).value = EarthNightTextureQuality.MEDIUM;
@@ -473,7 +472,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     try {
       settingsManager.godraysSamples = parseInt(
         PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES) ||
-        GodraySamples.LOW.toString(),
+        GodraySamples.OFF.toString(),
       );
       settingsManager.godraysDecay = parseFloat(
         PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY) ||
@@ -495,11 +494,18 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
         PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY) ||
         '2.5',
       );
+
+      if (settingsManager.godraysSamples === GodraySamples.OFF) {
+        settingsManager.isUseSunTexture = true;
+        settingsManager.isDisableGodrays = true;
+        settingsManager.sizeOfSun = 1.65;
+      }
+
     } catch (error) {
       errorManagerInstance.warn('Failed to load godray settings from local storage! Resetting to defaults.');
-      (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.LOW.toString();
+      (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).value = GodraySamples.OFF.toString();
       (<HTMLInputElement>getEl(`${this.formPrefix_}-godrays-quality`)).dispatchEvent(new Event('change'));
-      this.updateGodrays_(GodraySamples.LOW);
+      this.updateGodrays_(GodraySamples.OFF);
     }
   }
 }

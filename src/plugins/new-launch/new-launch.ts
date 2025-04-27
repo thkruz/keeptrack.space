@@ -8,11 +8,14 @@ import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 import { SatMath } from '@app/static/sat-math';
 
 import { launchSites } from '@app/catalogs/launch-sites';
+import { t7e } from '@app/locales/keys';
+import { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
+import { TimeManager } from '@app/singletons/time-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, SatelliteRecord, Sgp4 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -154,8 +157,36 @@ export class NewLaunch extends KeepTrackPlugin {
     showLoadingSticky();
 
     const sccNum = (<HTMLInputElement>getEl('nl-scc')).value;
-    const id = catalogManagerInstance.sccNum2Id(parseInt(sccNum));
-    const sat = catalogManagerInstance.getObject(id) as DetailedSatellite;
+    const inputSat = catalogManagerInstance.sccNum2Sat(parseInt(sccNum))!;
+    let nominalSat: DetailedSatellite | null = null;
+    let id = -1;
+
+    // TODO: Next available analyst satellite should be a function in the catalog manager
+    for (let nomninalNumber = 500; nomninalNumber < 2500; nomninalNumber++) {
+      nominalSat = catalogManagerInstance.sccNum2Sat(CatalogManager.ANALYST_START_ID + nomninalNumber);
+
+      if (nominalSat && !nominalSat?.active) {
+        id = nominalSat.id;
+        break;
+      }
+    }
+
+    if (id === -1 || !nominalSat) {
+      uiManagerInstance.toast('No more nominal satellites available!', ToastMsgType.critical);
+      this.isDoingCalculations = false;
+      hideLoading();
+
+      return;
+    }
+
+    const sat = this.createNominalSat_(inputSat, nominalSat.sccNum, id);
+
+    if (!sat) {
+      this.isDoingCalculations = false;
+      hideLoading();
+
+      return;
+    }
 
     const upOrDown = <'N' | 'S'>(<HTMLInputElement>getEl('nl-updown')).value;
     const launchFac = (<HTMLInputElement>getEl('nl-facility')).value;
@@ -233,7 +264,7 @@ export class NewLaunch extends KeepTrackPlugin {
     keepTrackApi.getSoundManager()?.play(SoundNames.LIFT_OFF);
 
     // Prevent caching of old TLEs
-    sat.satrec = null;
+    sat.satrec = null as unknown as SatelliteRecord;
 
     let satrec: SatelliteRecord;
 
@@ -269,6 +300,9 @@ export class NewLaunch extends KeepTrackPlugin {
         this.isDoingCalculations = false;
         hideLoading();
 
+        // Deseletect the satellite
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(sat.id);
+
         uiManagerInstance.toast('Launch Nominal Created!', ToastMsgType.standby);
         uiManagerInstance.searchManager.doSearch(sat.sccNum);
       },
@@ -283,6 +317,7 @@ export class NewLaunch extends KeepTrackPlugin {
         hideLoading();
         uiManagerInstance.toast('Cruncher failed to meet requirement after multiple tries! Is this launch even possible?', ToastMsgType.critical);
       },
+      isSkipFirst: true,
       maxRetries: 50,
     });
   };
@@ -338,5 +373,105 @@ export class NewLaunch extends KeepTrackPlugin {
       submitButtonDom.disabled = false;
       submitButtonDom.textContent = 'Create Launch Nominal \u25B6';
     }
+  }
+
+  private createNominalSat_(inputParams: DetailedSatellite, scc: string, id: number): DetailedSatellite | null {
+    const country = inputParams.country;
+    const type = inputParams.type;
+    const intl = `${inputParams.epochYear}69B`; // International designator
+
+    // Create TLE from parameters
+    const { tle1: tle1_, tle2 } = FormatTle.createTle({
+      sat: inputParams,
+      inc: inputParams.inclination,
+      meanmo: inputParams.meanMotion,
+      rasc: inputParams.rightAscension,
+      argPe: inputParams.argOfPerigee,
+      meana: inputParams.meanAnomaly,
+      ecen: inputParams.eccentricity.toString().split('.')[1].padStart(7, '0'),
+      epochyr: inputParams.epochYear.toString().padStart(2, '0'),
+      epochday: inputParams.epochDay.toString().padStart(3, '0'),
+      intl,
+      scc,
+    });
+
+    // Check if TLE generation failed
+    if (tle1_ === 'Error') {
+      errorManagerInstance.error(
+        new Error(tle2),
+        'create-sat.ts',
+        t7e('errorMsgs.CreateSat.errorCreatingSat'),
+      );
+
+      return null;
+    }
+
+    const currentEpoch = TimeManager.currentEpoch(keepTrackApi.getTimeManager().simulationTimeObj);
+
+    const tle1 = (tle1_.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + tle1_.substr(32)) as TleLine1;
+
+    // Create satellite record from TLE
+    let satrec: SatelliteRecord;
+
+    try {
+      satrec = Sgp4.createSatrec(tle1, tle2);
+    } catch (e) {
+      errorManagerInstance.error(e as Error, 'create-sat.ts', 'Error creating satellite record!');
+
+      return null;
+    }
+
+    // Validate altitude is reasonable
+    if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) <= 1) {
+      keepTrackApi.getUiManager().toast(
+        'Failed to propagate satellite. Try different parameters or report this issue if parameters are correct.',
+        ToastMsgType.caution,
+        true,
+      );
+
+      return null;
+    }
+
+    // Propagate satellite to get position and velocity
+    const spg4vec = Sgp4.propagate(satrec, 0);
+    const pos = spg4vec.position as EciVec3;
+    const vel = spg4vec.velocity as EciVec3<KilometersPerSecond>;
+
+    // Create new satellite object
+    const info: DetailedSatelliteParams = {
+      id,
+      type,
+      country,
+      tle1,
+      tle2,
+      name: 'New Launch Nominal',
+    };
+
+    const newSat = new DetailedSatellite({
+      ...info,
+      ...{
+        position: pos,
+        velocity: vel,
+        source: 'User Created',
+      },
+    });
+
+    newSat.active = true;
+
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
+    // Add to catalog
+    catalogManagerInstance.objectCache[id] = newSat;
+
+    // Update orbit buffer
+    try {
+      keepTrackApi.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
+    } catch (e) {
+      errorManagerInstance.error(e as Error, 'create-sat.ts', 'Changing orbit buffer data failed');
+
+      return null;
+    }
+
+    return newSat;
   }
 }

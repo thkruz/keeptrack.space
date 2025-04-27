@@ -1,10 +1,9 @@
 /**
- * /*! /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -28,12 +27,15 @@ import {
   Celestial,
   DEG2RAD,
   Degrees,
+  DetailedSatellite,
   DetailedSensor,
   EcfVec3,
   EciVec3,
   EpochUTC,
   GreenwichMeanSiderealTime,
   Kilometers,
+  KilometersPerSecond,
+  LandObject,
   Milliseconds,
   Minutes,
   PI,
@@ -564,10 +566,12 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
   return true;
 };
 export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): void => {
+  const landObject = objCache[i] as unknown as LandObject;
+
   const lla = {
-    lat: (objCache[i].lat * DEG2RAD) as Radians,
-    lon: (objCache[i].lon * DEG2RAD) as Radians,
-    alt: (objCache[i].alt + GROUND_BUFFER_DISTANCE) as Kilometers,
+    lat: (landObject.lat * DEG2RAD) as Radians,
+    lon: (landObject.lon * DEG2RAD) as Radians,
+    alt: (landObject.alt + GROUND_BUFFER_DISTANCE) as Kilometers,
   };
   const eci = lla2eci(lla, gmst);
 
@@ -579,13 +583,14 @@ export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): vo
 export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderealTime, j: number, isSunExclusion: boolean): boolean => {
   let positionEcf: EcfVec3;
   let rae: RaeVec3<Kilometers, Degrees>;
+  const satelliteData = objCache[i] as unknown as DetailedSatellite; // This is checked in updateSatCache
 
   // Skip reentries
-  if (!objCache[i].active) {
+  if (!satelliteData.active) {
     return false;
   }
-  const m = (j - objCache[i].satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
-  const pv = Sgp4.propagate(objCache[i].satrec, m) as { position: EciVec3; velocity: EciVec3 };
+  const m = (j - satelliteData.satrec.jdsatepoch) * 1440.0; // 1440 = minutes_per_day
+  const pv = Sgp4.propagate(satelliteData.satrec, m) as { position: EciVec3; velocity: EciVec3<KilometersPerSecond> };
 
   try {
     if (isResponseCount < 5 && isResponseCount > 1 && !objCache[i].isUpdated) {

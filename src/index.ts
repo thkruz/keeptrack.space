@@ -1,12 +1,11 @@
 /**
- * /*! /////////////////////////////////////////////////////////////////////////////
+ * /////////////////////////////////////////////////////////////////////////////
  *
  * index.ts is a TypeScript implementation of the KeepTrack class. This is responsible for
  * initializing the website.
  * https://keeptrack.space
  *
- * @Copyright (C) 2016-2025 Theodore Kruczek
- * @Copyright (C) 2020-2025 Heather Kruczek
+ * @Copyright (C) 2025 Kruczek Labs LLC
  * @Copyright (C) 2015-2016, James Yoder
  *
  * Original source code released by James Yoder at https://github.com/jeyoder/ThingsInSpace/
@@ -27,3 +26,4 @@
  */
 
 export { KeepTrack } from './keeptrack';
+

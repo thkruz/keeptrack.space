@@ -1,10 +1,14 @@
 {
   "name": "keeptrack.space",
-  "version": "10.4.0",
+  "version": "10.5.0",
   "type": "module",
   "description": "Complex astrodynamics tools designed for non-engineers to make learning about orbital mechanics and satellite operations more accessible.",
   "author": "Theodore Kruczek",
   "contributors": [
+    {
+      "name": "Theo Warsmann",
+      "url": "https://github.com/Koroviev-and-Begemot"
+    },
     {
       "name": "Le-Roi Claassen",
       "url": "https://www.linkedin.com/in/leroiclaassen-webdev/"

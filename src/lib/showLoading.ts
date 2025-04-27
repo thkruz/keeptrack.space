@@ -5,7 +5,7 @@ import { SplashScreen } from '@app/static/splash-screen';
 import { fadeIn, fadeOut } from './fade';
 import { getEl } from './get-el';
 
-const messages = ['cunningPlan'];
+const messages = ['cunningPlan', 'satIntel', 'science', 'math'];
 
 const getRandomMessage = () => {
   const randomIndex = Math.floor(Math.random() * messages.length);

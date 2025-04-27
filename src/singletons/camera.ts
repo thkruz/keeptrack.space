@@ -1135,6 +1135,11 @@ export class Camera {
 
     if (sat.position.x === 0 && sat.position.y === 0 && sat.position.z === 0) {
       keepTrackApi.getUiManager().toast('Object is inside the earth!', ToastMsgType.critical);
+      const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+
+      if (selectSatManagerInstance) {
+        selectSatManagerInstance.selectSat(-1);
+      }
       this.camZoomSnappedOnSat = false;
       this.camAngleSnappedOnSat = false;
 

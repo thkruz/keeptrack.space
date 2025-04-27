@@ -168,8 +168,8 @@ export class CreateSat extends KeepTrackPlugin {
     this.setupPeriodMeanMotionConverters_();
 
     // Submit and save buttons
-    getEl('createSat-submit').addEventListener('click', CreateSat.createSatSubmit_);
-    getEl('createSat-save').addEventListener('click', CreateSat.exportTLE_);
+    getEl('createSat-submit')!.addEventListener('click', CreateSat.createSatSubmit_);
+    getEl('createSat-save')!.addEventListener('click', CreateSat.exportTLE_);
 
     countryNameList.forEach((countryName: string) => {
       let countryCode = countryCodeList[countryName];
@@ -178,7 +178,7 @@ export class CreateSat extends KeepTrackPlugin {
         countryCode = countryCode.split('|')[0];
       }
 
-      getEl(`${CreateSat.elementPrefix}-country`).insertAdjacentHTML('beforeend', `<option value="${countryCode}">${countryName}</option>`);
+      getEl(`${CreateSat.elementPrefix}-country`)!.insertAdjacentHTML('beforeend', `<option value="${countryCode}">${countryName}</option>`);
     });
 
     // Populate default values
@@ -190,7 +190,7 @@ export class CreateSat extends KeepTrackPlugin {
    */
   private setupPeriodMeanMotionConverters_(): void {
     // Period to Mean Motion conversion
-    getEl(`${CreateSat.elementPrefix}-per`).addEventListener('change', () => {
+    getEl(`${CreateSat.elementPrefix}-per`)!.addEventListener('change', () => {
       const perInput = getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement;
       const per = perInput.value;
 
@@ -287,7 +287,7 @@ export class CreateSat extends KeepTrackPlugin {
   private static createSatSubmit_(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const errorElement = getEl(`${CreateSat.elementPrefix}-error`);
+    const errorElement = getEl(`${CreateSat.elementPrefix}-error`)!;
 
     // Hide any previous error
     errorElement.style.display = 'none';

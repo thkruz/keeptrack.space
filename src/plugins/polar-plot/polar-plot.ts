@@ -36,7 +36,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = true;
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ANALYSIS, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = polarPlotPng;
   bottomIconCallback: () => void = () => {

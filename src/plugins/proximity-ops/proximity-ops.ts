@@ -43,7 +43,7 @@ export class ProximityOps extends KeepTrackPlugin {
   isIconDisabledOnLoad = false;
   isIconDisabled = false;
 
-  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL, MenuMode.EXPERIMENTAL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ANALYSIS, MenuMode.ALL];
 
   private readonly timeManagerInstance = keepTrackApi.getTimeManager()!;
   private readonly selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
@@ -493,11 +493,6 @@ export class ProximityOps extends KeepTrackPlugin {
       sats = allSats
         .filter((sat) => {
           const raan2 = SatMath.normalizeRaan(sat, nowDate);
-
-          if (sat.sccNum === '62460' || sat.sccNum === '62459') {
-            console.log('raan1', raan1);
-            console.log('raan2', raan2);
-          }
 
           return sat.tle1 &&
             (180 - Math.abs(Math.abs(primarySat.inclination - sat.inclination) - 180)) < 5 &&

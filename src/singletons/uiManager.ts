@@ -467,7 +467,7 @@ export class UiManager {
    * Checks if enough time has elapsed and then calls all queued updateSelectBox callbacks
    */
   updateSelectBox(realTime: Milliseconds, lastBoxUpdateTime: Milliseconds, obj: BaseObject): void {
-    if (!obj || obj.isStatic()) {
+    if (!obj || obj.id === -1 || obj.isStatic()) {
       return;
     }
 

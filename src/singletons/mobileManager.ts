@@ -46,6 +46,7 @@ export class MobileManager {
           settingsManager.isDisableSkybox = true;
           settingsManager.isDisableMoon = true;
           settingsManager.isDisableSearchBox = true;
+          settingsManager.isDrawCovarianceEllipsoid = false;
 
           settingsManager.isDisableAsyncReadPixels = true;
 

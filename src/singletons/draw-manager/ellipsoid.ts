@@ -9,7 +9,7 @@ import { GlUtils } from '../../static/gl-utils';
 /* eslint-disable camelcase */
 
 export class Ellipsoid {
-  private attribs_ = {
+  private readonly attribs_ = {
     a_position: new BufferAttribute({
       location: 0,
       vertices: 3,
@@ -24,7 +24,7 @@ export class Ellipsoid {
     }),
   };
 
-  private buffers_ = {
+  private readonly buffers_ = {
     vertCount: 0,
     combinedBuf: null as unknown as WebGLBuffer,
     vertIndexBuf: null as unknown as WebGLBuffer,
@@ -33,13 +33,13 @@ export class Ellipsoid {
   private gl_: WebGL2RenderingContext;
   private isLoaded_ = false;
   private mvMatrix_: mat4;
-  private nMatrix_ = mat3.create();
+  private readonly nMatrix_ = mat3.create();
   private program_: WebGLProgram;
   private vao: WebGLVertexArrayObject;
 
   drawPosition = [0, 0, 0] as vec3;
 
-  private uniforms_ = {
+  private readonly uniforms_ = {
     u_nMatrix: <WebGLUniformLocation><unknown>null,
     u_pMatrix: <WebGLUniformLocation><unknown>null,
     u_camMatrix: <WebGLUniformLocation><unknown>null,

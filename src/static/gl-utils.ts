@@ -52,7 +52,10 @@ export abstract class GlUtils {
     uniformsList.forEach((uniform) => {
       const uniformLocation = gl.getUniformLocation(program, uniform);
 
-      if (!uniformLocation) {
+      // TODO: We need to handle turning on uniforms better
+
+      // Avoid crashing production immediately even if it might crash later.
+      if (!uniformLocation && window.location.hostname === 'localhost') {
         throw new Error(`Uniform ${uniform} not found in program ${program}`);
       }
 

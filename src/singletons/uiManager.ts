@@ -317,7 +317,7 @@ export class UiManager {
     const navFooterDom = getEl('nav-footer');
 
     if (navFooterDom && parseInt(window.getComputedStyle(navFooterDom).bottom.replace('px', '')) < 0) {
-      keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+      keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       setTimeout(() => {
         const bottomHeight = getEl('bottom-icons-container')?.offsetHeight;
 
@@ -326,7 +326,7 @@ export class UiManager {
     } else {
       // If the footer is open, then it will be hidden shortly but we don't want to wait for it to be hidden
       document.documentElement.style.setProperty('--bottom-menu-top', '0px');
-      keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+      keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
     }
   }
 

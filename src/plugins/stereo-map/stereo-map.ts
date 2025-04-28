@@ -444,14 +444,24 @@ export class StereoMap extends KeepTrackPlugin {
   private drawEarthLayer_(): void {
     const ctx = this.canvas_.getContext('2d');
 
-    // TODO: What if the ctx becomes broken/corrupted? Issue #1018
-
-    if (this.earthImg_.src) {
-      ctx?.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
-    } else {
+    // Only draw if the image is completely loaded and not broken
+    if (this.earthImg_.complete && this.earthImg_.naturalWidth !== 0) {
+      try {
+        ctx?.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
+      } catch (e) {
+        errorManagerInstance.warn(`Failed to draw earth image on canvas: ${(e as Error).message}`);
+      }
+    } else if (!this.earthImg_.src) {
       this.earthImg_.src = `${settingsManager.installDirectory}textures/earthmap4k.jpg`;
       this.earthImg_.onload = () => {
-        ctx?.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
+        try {
+          ctx?.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
+        } catch (e) {
+          errorManagerInstance.warn(`Failed to draw earth image on canvas after load: ${(e as Error).message}`);
+        }
+      };
+      this.earthImg_.onerror = () => {
+        errorManagerInstance.warn('Earth image failed to load for stereo map.');
       };
     }
   }

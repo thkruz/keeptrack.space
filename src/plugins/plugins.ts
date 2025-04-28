@@ -149,6 +149,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new DateTimeManager().init(), enabled: plugins.datetime },
       { init: () => new SocialMedia().init(), enabled: plugins.social },
       { init: () => new ClassificationBar().init(), enabled: plugins.classificationBar },
+      { init: () => new SoundManager().init(), enabled: plugins.soundManager },
       { init: () => new SensorListPlugin().init(), enabled: plugins.sensor },
       { init: () => new SensorInfoPlugin().init(), enabled: plugins.sensor },
       { init: () => new CustomSensorPlugin().init(), enabled: plugins.sensor },
@@ -203,7 +204,6 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new FilterMenuPlugin().init(), enabled: plugins.filterMenu },
       { init: () => new SettingsMenuPlugin().init(), enabled: plugins.settingsMenu },
       { init: () => new GraphicsMenuPlugin().init(), enabled: plugins.graphicsMenu },
-      { init: () => new SoundManager().init(), enabled: plugins.soundManager },
       { init: () => new GamepadPlugin().init(), enabled: plugins.gamepad },
       { init: () => new VideoDirectorPlugin().init(), enabled: plugins.videoDirector },
     ];

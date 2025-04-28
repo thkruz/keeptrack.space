@@ -216,7 +216,9 @@ export class Inc2AltPlots extends KeepTrackPlugin {
       sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY)!;
       const now = keepTrackApi.getTimeManager().simulationTimeObj;
 
-      if (sat.lla(now).alt < 70) {
+      const alt = sat.lla(now)?.alt ?? 0;
+
+      if (alt < 70) {
         return;
       } // TODO: USE THIS FOR FINDING DECAYS!
 
@@ -225,13 +227,13 @@ export class Inc2AltPlots extends KeepTrackPlugin {
         case 'United States':
         case 'US':
         case 'USA':
-          usa.push([sat.inclination, sat.lla(now).alt, sat.period, sat.name, sat.id]);
+          usa.push([sat.inclination, alt, sat.period, sat.name, sat.id]);
 
           return;
         case 'France':
         case 'FR':
         case 'F':
-          france.push([sat.inclination, sat.lla(now).alt, sat.period, sat.name, sat.id]);
+          france.push([sat.inclination, alt, sat.period, sat.name, sat.id]);
 
           return;
 
@@ -240,7 +242,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
         case 'RU':
         case 'SU':
         case 'Russia':
-          russia.push([sat.inclination, sat.lla(now).alt, sat.period, sat.name, sat.id]);
+          russia.push([sat.inclination, alt, sat.period, sat.name, sat.id]);
 
           return;
         case 'China':
@@ -249,11 +251,11 @@ export class Inc2AltPlots extends KeepTrackPlugin {
         case 'China (Republic)':
         case 'PRC':
         case 'CN':
-          china.push([sat.inclination, sat.lla(now).alt, sat.period, sat.name, sat.id]);
+          china.push([sat.inclination, alt, sat.period, sat.name, sat.id]);
 
           return;
         default:
-          other.push([sat.inclination, sat.lla(now).alt, sat.period, sat.name, sat.id]);
+          other.push([sat.inclination, alt, sat.period, sat.name, sat.id]);
 
       }
     });

@@ -112,6 +112,10 @@ export class Ellipsoid {
   init(gl: WebGL2RenderingContext): void {
     this.gl_ = gl;
 
+    if (!settingsManager.isDrawCovarianceEllipsoid) {
+      return;
+    }
+
     this.initProgram_();
     this.initBuffers_();
     this.initVao_();
@@ -191,6 +195,7 @@ export class Ellipsoid {
       uniform vec4 u_color;
 
       void main(void) {
+        float dummy = v_normal.x + v_normal.y + v_normal.z;
         fragColor = vec4(u_color.rgb * u_color.a, u_color.a);
       }
     `,

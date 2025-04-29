@@ -120,3 +120,6 @@ src/tools
 
 stats.json
 .qodo
+
+# Local env files
+.env

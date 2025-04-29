@@ -153,6 +153,7 @@
     "@analytics/google-analytics": "^1.0.7",
     "@materializecss/materialize": "^1.2.2",
     "analytics": "^0.8.14",
+    "dotenv": "^16.5.0",
     "draggabilly": "^3.0.0",
     "echarts": "^5.4.3",
     "echarts-gl": "^2.0.9",

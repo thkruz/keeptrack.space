@@ -1,5 +1,6 @@
 /* eslint-disable no-process-env */
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
+import dotenv from 'dotenv';
 import { readdirSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { dirname } from 'path';
@@ -113,91 +114,118 @@ export const generateConfig = (env, isWatch) => {
  * @param {string} dirName - The directory name.
  * @returns {webpack.Configuration} - The base configuration object.
  */
-const getBaseConfig = (dirName) => ({
-  resolve: {
-    extensions: ['.ts', '.js'],
-    alias: {
-      '@app': `${dirName}/../src`,
-      '@public': `${dirName}/../public`,
-      '@css': `${dirName}/../public/css`,
+const getBaseConfig = (dirName) => {
+  // Load .env to get STYLE_CSS_PATH
+  let styleCssPath;
+  let loadingScreenCssPath;
+
+  try {
+    // Dynamically import dotenv only if running in Node.js
+    const env = dotenv.config({ path: './.env' });
+
+    styleCssPath = env.parsed && env.parsed.STYLE_CSS_PATH
+      ? env.parsed.STYLE_CSS_PATH
+      : 'public/css/style.css';
+
+    loadingScreenCssPath = env.parsed && env.parsed.LOADING_SCREEN_CSS_PATH
+      ? env.parsed.LOADING_SCREEN_CSS_PATH
+      : 'public/css/loading-screen.css';
+
+  } catch {
+    styleCssPath = 'public/css/style.css';
+    loadingScreenCssPath = 'public/css/loading-screen.css';
+  }
+
+  console.log(`styleCssPath: ${styleCssPath}`);
+  console.log(`loadingScreenCssPath: ${loadingScreenCssPath}`);
+
+  return {
+    resolve: {
+      extensions: ['.ts', '.js'],
+      alias: {
+        '@app': `${dirName}/../src`,
+        '@public': `${dirName}/../public`,
+        '@css/style.css': `${dirName}/../${styleCssPath}`,
+        '@css/loading-screen.css': `${dirName}/../${loadingScreenCssPath}`,
+        '@css': `${dirName}/../public/css`,
+      },
     },
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(?:png|svg|jpg|jpeg|gif)$/iu,
-        include: [/src/u, /public/u],
-        type: 'asset/resource',
-        generator: {
-          filename: '../img/[name][ext]',
+    module: {
+      rules: [
+        {
+          test: /\.(?:png|svg|jpg|jpeg|gif)$/iu,
+          include: [/src/u, /public/u],
+          type: 'asset/resource',
+          generator: {
+            filename: '../img/[name][ext]',
+          },
         },
-      },
-      {
-        test: /\.(?:mp3|wav|flac)$/iu,
-        include: [/src/u, /public/u],
-        type: 'asset/resource',
-        generator: {
-          filename: '../audio/[name][ext]',
+        {
+          test: /\.(?:mp3|wav|flac)$/iu,
+          include: [/src/u, /public/u],
+          type: 'asset/resource',
+          generator: {
+            filename: '../audio/[name][ext]',
+          },
         },
-      },
-      {
-        test: /\.(?:woff2|woff|ttf|eot)$/iu,
-        include: [/src/u, /public/u],
-        type: 'asset/resource',
-        generator: {
-          filename: '../fonts/[name][ext]',
+        {
+          test: /\.(?:woff2|woff|ttf|eot)$/iu,
+          include: [/src/u, /public/u],
+          type: 'asset/resource',
+          generator: {
+            filename: '../fonts/[name][ext]',
+          },
         },
-      },
-      {
-        test: /\.css$/iu,
-        include: [/node_modules/u, /src/u, /public/u],
-        use: ['style-loader', 'css-loader'],
-        generator: {
-          filename: './css/[name][ext]',
+        {
+          test: /\.css$/iu,
+          include: [/node_modules/u, /src/u, /public/u],
+          use: ['style-loader', 'css-loader'],
+          generator: {
+            filename: './css/[name][ext]',
+          },
         },
-      },
-      {
-        test: /\.worker\.(?:js|ts)$/iu,
-        use: {
-          loader: 'worker-loader',
+        {
+          test: /\.worker\.(?:js|ts)$/iu,
+          use: {
+            loader: 'worker-loader',
+          },
         },
-      },
-      {
-        test: /\.tsx?$/u,
-        loader: 'ts-loader',
-        exclude: [/node_modules/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u, /\src\/admin/u],
-        options: {
-          transpileOnly: false,
-          configFile: 'tsconfig.build.json',
+        {
+          test: /\.tsx?$/u,
+          loader: 'ts-loader',
+          exclude: [/node_modules/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u, /\src\/admin/u],
+          options: {
+            transpileOnly: false,
+            configFile: 'tsconfig.build.json',
+          },
         },
-      },
-      {
-        test: /\.m?js$/u,
-        include: [/src/u, /node_modules/u],
-        resolve: {
-          fullySpecified: false,
+        {
+          test: /\.m?js$/u,
+          include: [/src/u, /node_modules/u],
+          resolve: {
+            fullySpecified: false,
+          },
+          use: {
+            loader: 'babel-loader',
+          },
         },
-        // exclude: [/(?:node_modules|bower_components)/u, /\dist/u, /\coverage/u, /\settings\.js/iu, /\.test\.jsx?$/u],
-        use: {
-          loader: 'babel-loader',
+        {
+          test: /\.m?js$/u,
+          enforce: 'pre',
+          use: ['source-map-loader'],
         },
-      },
-      {
-        test: /\.m?js$/u,
-        enforce: 'pre',
-        use: ['source-map-loader'],
-      },
+      ],
+    },
+    ignoreWarnings: [/asset size limit/u, /combined asset size exceeds the recommended limit/u],
+    stats: 'errors-warnings',
+    plugins: [
+      new WebpackBar({
+        fancy: true,
+        profile: true,
+      }),
     ],
-  },
-  ignoreWarnings: [/asset size limit/u, /combined asset size exceeds the recommended limit/u],
-  stats: 'errors-warnings',
-  plugins: [
-    new WebpackBar({
-      fancy: true,
-      profile: true,
-    }),
-  ],
-});
+  };
+};
 
 /**
  * Returns a modified webpack configuration object for non-embed mode.

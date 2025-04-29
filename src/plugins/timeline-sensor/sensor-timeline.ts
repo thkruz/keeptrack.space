@@ -897,8 +897,6 @@ export class SensorTimeline extends KeepTrackPlugin {
   }
 
   private drawTooltip_(text: string, mouseX: number, mouseY: number) {
-    console.log('draw tooltip', text, mouseX, mouseY);
-
     this.ctx_.font = '14px Consolas';
 
     const boxWidth = this.ctx_.measureText(text).width;

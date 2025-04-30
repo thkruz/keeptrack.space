@@ -697,7 +697,7 @@ export class SettingsManager {
      */
     externalTLEsOnly: false,
     tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
-    vimpel: 'https://r2.keeptrack.space/vimpel.json',
+    vimpel: 'https://api.keeptrack.space/v3/r2/vimpel.json',
     /** This determines if tle source is loaded to supplement externalTLEs  */
     isSupplementExternal: false,
   };
@@ -1628,6 +1628,13 @@ export class SettingsManager {
             break;
           case 'noPropRate':
             this.isAlwaysHidePropRate = true;
+            break;
+          case 'supplement-data':
+            this.dataSources.isSupplementExternal = true;
+            break;
+          case 'latest-sats':
+            this.dataSources.tle = `https://api.keeptrack.space/v3/sats/latest/${val}`;
+            this.isEnableJscCatalog = false;
             break;
           case 'CATNR':
             this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${val}&FORMAT=3LE`;

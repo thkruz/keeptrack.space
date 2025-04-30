@@ -1242,7 +1242,6 @@ export class SettingsManager {
     this.checkIfIframe_();
     this.setInstallDirectory_();
     this.setMobileSettings_();
-    this.setEmbedOverrides_();
     this.setColorSettings_();
     /**
      * Load Order:
@@ -1711,31 +1710,6 @@ export class SettingsManager {
       !this.smallImages
     ) {
       this.lowresImages = true;
-    }
-  }
-
-  /**
-   * Sets the embed overrides for the settings.
-   * If the current page is an embed.html page, it sets various settings to specific values.
-   *
-   * FOR TESTING ONLY
-   */
-  private setEmbedOverrides_() {
-    let pageName = location.href.split('/').slice(-1);
-
-    pageName = pageName[0].split('?').slice(0);
-
-    if (pageName[0] === 'embed.html') {
-      this.disableUI = true;
-      this.startWithOrbitsDisplayed = true;
-      this.isAutoResizeCanvas = true;
-      this.enableHoverOverlay = true;
-      this.enableHoverOrbits = true;
-      this.isDrawLess = true;
-      this.smallImages = true;
-      this.hiresNoCloudsImages = false;
-      this.updateHoverDelayLimitSmall = 25;
-      this.updateHoverDelayLimitBig = 45;
     }
   }
 

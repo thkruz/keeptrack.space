@@ -24,7 +24,6 @@
     "test/**/*.jpg",
     "public/serviceWorker.js",
     "public/settings/settingsOverride.js",
-    "public/settings/settingsOverrideEmbed.js",
     "src/globabl.d.ts"
   ],
   "exclude": [

@@ -10,18 +10,22 @@ export class MobileManager {
     try {
       // Don't become mobile after initialization
       if (!keepTrackApi.isInitialized) {
-        if (MobileManager.checkIfMobileDevice()) {
+        if (MobileManager.checkIfMobileDevice() && !settingsManager.isMobileModeBlocked) {
+          settingsManager.cameraMovementSpeed = 0.0025;
+          settingsManager.cameraMovementSpeedMin = 0.0025;
+          settingsManager.zoomSpeed = 0.025;
+          if (settingsManager.isMobileModeBlocked) {
+            return;
+          }
+
           if (!settingsManager.isMobileModeEnabled) {
             keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
               ToastMsgType.normal);
           }
-          settingsManager.isMobileModeEnabled = true;
 
+          settingsManager.isMobileModeEnabled = true;
           settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
           settingsManager.enableHoverOverlay = false;
-          settingsManager.cameraMovementSpeed = 0.0025;
-          settingsManager.cameraMovementSpeedMin = 0.0025;
-          settingsManager.zoomSpeed = 0.025;
 
           if (settingsManager.isUseHigherFOVonMobile) {
             settingsManager.fieldOfView = settingsManager.fieldOfViewMax;

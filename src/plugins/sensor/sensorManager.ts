@@ -332,10 +332,8 @@ export class SensorManager {
     return null;
   }
 
-  setSensor(selectedSensor: DetailedSensor | string | null, sensorId?: number): void {
-    if (!selectedSensor) {
-      selectedSensor = SensorManager.getSensorFromsensorId(sensorId);
-    }
+  setSensor(selectedSensor: DetailedSensor | string | null, sensorId: number | null = null): void {
+    selectedSensor ??= SensorManager.getSensorFromsensorId(sensorId);
 
     if (selectedSensor instanceof DetailedSensor) {
       keepTrackApi.analytics.track('select_sensor', {
@@ -441,23 +439,6 @@ export class SensorManager {
 
     // Run any callbacks
     keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, selectedSensor, sensorId ?? null);
-
-    /*
-     * TODO: Move this to top menu plugin
-     * Update UI to reflect new sensor
-     */
-    const sensorSelectedDom = getEl('sensor-selected', true);
-
-    if (sensorSelectedDom) {
-      sensorSelectedDom.innerText = this.sensorTitle;
-
-      // If this.sensorTitle is empty hide the div
-      if (this.sensorTitle === '') {
-        sensorSelectedDom.style.display = 'none';
-      } else {
-        sensorSelectedDom.style.display = 'block';
-      }
-    }
 
     for (const sensor of this.currentSensors) {
       keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);

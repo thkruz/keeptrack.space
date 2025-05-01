@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
+import { SatMath } from '@app/static/sat-math';
 import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
 import { SensorMath } from '../static/sensor-math';
@@ -199,7 +200,7 @@ export class HoverManager {
       let color: string = 'black';
 
       if (settingsManager.isShowConfidenceLevels) {
-        const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
+        const confidenceScore = SatMath.calculateSatConfidenceScore(sat);
 
         if (confidenceScore >= 7) {
           color = 'green';

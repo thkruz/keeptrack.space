@@ -46,6 +46,7 @@ import {
   SpaceObjectType,
   StateVectorSgp4,
   TAU,
+  createSampleCovarianceFromTle,
   ecf2eci,
   ecfRad2rae,
   eci2ecf,
@@ -957,5 +958,39 @@ export abstract class SatMath {
     const angle = this.getAngleBetweenSatellitesAndSun(hoverSat as DetailedSatellite, secondaryObj as DetailedSatellite, sunEci);
 
     return angle * RAD2DEG as Degrees;
+  }
+
+  static calculateSatConfidenceScore(sat: DetailedSatellite): number {
+    const covMatrix = createSampleCovarianceFromTle(sat.tle1, sat.tle2).matrix.elements;
+    const radii = [
+      Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, // Radial
+      Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, // Cross-track
+      Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, // In-track
+    ] as vec3;
+    const covInTrack = radii[2];
+
+    /*
+     * Calculate the confidence score based on the in-track covariance
+     * 3km is a perfect score, 30km is a medium score, 300km is a bad score
+     */
+    let confidenceScore;
+
+    // Scale confidenceScore from 0 (worst, covInTrack >= 300) to 9 (best, covInTrack <= 3)
+    if (covInTrack <= 3) {
+      confidenceScore = 9;
+    } else if (covInTrack >= 300) {
+      confidenceScore = 0;
+    } else {
+      // Linear interpolation between 3km (score 9) and 300km (score 0)
+      confidenceScore = 9 - ((covInTrack - 3) / (300 - 3)) * 9;
+      confidenceScore = Math.round(confidenceScore);
+    }
+
+    // If VIMPEL source then subtract 2 from the score
+    if (sat.source === 'VIMPEL') {
+      confidenceScore -= 2;
+    }
+
+    return Math.max(0, confidenceScore);
   }
 }

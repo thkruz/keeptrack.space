@@ -243,9 +243,9 @@ export class SelectSatManager extends KeepTrackPlugin {
 
         // Max out at 10000 km to avoid huge bubbles
         const radii = [
-          Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 10000), // Radial
-          Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 10000), // Cross-track
-          Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 10000), // In-track
+          Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
+          Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
+          Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
         ] as vec3;
 
         this.primarySatCovMatrix = radii;
@@ -391,9 +391,9 @@ export class SelectSatManager extends KeepTrackPlugin {
 
         // Max out at 10000 km to avoid huge bubbles
         const radii = [
-          Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 10000), // Radial
-          Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 10000), // Cross-track
-          Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 10000), // In-track
+          Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
+          Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
+          Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
         ] as vec3;
 
         this.secondarySatCovMatrix = radii;

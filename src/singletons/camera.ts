@@ -415,7 +415,7 @@ export class Camera {
 
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
     const isCameraCloseToSatellite = this.camDistBuffer < settingsManager.nearZoomLevel;
-    const maxCovarianceDistance = Math.min((keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 10, 10000);
+    const maxCovarianceDistance = Math.min((keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
     const isCameraCloseToCovarianceBubble = settingsManager.isDrawCovarianceEllipsoid &&
       this.camDistBuffer < maxCovarianceDistance;
 

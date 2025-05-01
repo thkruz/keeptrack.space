@@ -1182,7 +1182,7 @@ export class SettingsManager {
   /**
    * Indicates whether to show confidence levels when hovering over an object.
    */
-  isShowConfidenceLevels: boolean = false;
+  isShowConfidenceLevels = true;
   /**
    * The container root element for the application
    * NOTE: This is for initializing it, but keepTrackApi.containerRoot will be used throughout

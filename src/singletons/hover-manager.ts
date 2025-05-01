@@ -77,7 +77,10 @@ export class HoverManager {
     const renderer = keepTrackApi.getRenderer();
 
     this.satHoverBoxDOM.style.display = 'none';
-    renderer.setCursor('default');
+
+    if (!settingsManager.isMobileModeBlocked) {
+      renderer.setCursor('pointer');
+    }
 
     return true;
   }
@@ -130,7 +133,9 @@ export class HoverManager {
 
       Object.assign(this.satHoverBoxDOM.style, style);
 
-      renderer.setCursor('pointer');
+      if (!settingsManager.isMobileModeBlocked) {
+        renderer.setCursor('pointer');
+      }
     }
   }
 

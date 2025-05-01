@@ -125,9 +125,15 @@ export class SettingsManager {
    * Flag to determine if the covariance ellipsoid should be drawn.
    */
   isDrawCovarianceEllipsoid = false;
+  isPreserveSettings = true;
+  isMobileModeBlocked = false;
 
 
   static preserveSettings() {
+    if (!settingsManager.isPreserveSettings) {
+      return;
+    }
+
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, settingsManager.isDrawOrbits.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, settingsManager.isDrawTrailingOrbits.toString());
@@ -1402,7 +1408,9 @@ export class SettingsManager {
         starlinkNot: [0.8, 0.0, 0.0, 0.8],
       };
 
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));
+      if (this.isPreserveSettings) {
+        PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));
+      }
     }
   }
 

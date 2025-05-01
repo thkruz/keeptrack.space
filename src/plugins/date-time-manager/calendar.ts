@@ -294,7 +294,7 @@ export class Calendar {
             isSelected ? 'ui-datepicker-current-day' : '',
           ].filter(Boolean).join(' ');
 
-          const jday = this.getUTCDayOfYear(new Date(this.calendarDate.getUTCFullYear(), this.calendarDate.getUTCMonth(), dayCount)) + 1;
+          const jday = this.getUTCDayOfYear(new Date(this.calendarDate.getUTCFullYear(), this.calendarDate.getUTCMonth(), dayCount));
 
           const dayCountPadded = dayCount.toString().padStart(2, '0');
           const jdayPadded = jday.toString().padStart(3, '0');

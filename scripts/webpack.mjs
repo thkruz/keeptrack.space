@@ -1,7 +1,6 @@
 /* eslint-disable no-process-env */
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
 import dotenv from 'dotenv';
-import { readdirSync } from 'fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -74,27 +73,6 @@ export const generateConfig = (env, isWatch) => {
   const mainConfig = getMainConfig(baseConfig, dirName, 'dist');
 
   webpackConfig.push(mainConfig);
-
-  const exampleConfig = getMainConfig(baseConfig, dirName, 'dist', '../../');
-
-  exampleConfig.plugins = [
-    new CleanTerminalPlugin({
-      beforeCompile: true,
-    }),
-  ];
-  const examples = readdirSync('./public/examples', { withFileTypes: true });
-
-  examples.forEach((example) => {
-    if (!example.isDirectory()) {
-      exampleConfig.plugins.push(
-        new HtmlWebpackPlugin({
-          filename: `../examples/${example.name}`,
-          template: `./public/examples/${example.name}`,
-        }),
-      );
-    }
-  });
-  webpackConfig.push(exampleConfig);
 
   const webWorkerConfig = getWebWorkerConfig(baseConfig, dirName, 'dist', '');
 

@@ -54,19 +54,11 @@ try {
 
 console.log('Copy static files...');
 // Get a list of all files (not folders) in the public folder
-let files = readdirSync('./public', { withFileTypes: true });
+const files = readdirSync('./public', { withFileTypes: true });
 
 files.forEach((file) => {
   if (!file.isDirectory()) {
     cpSync(`./public/${file.name}`, `./dist/${file.name}`);
-  }
-});
-
-files = readdirSync('./public/examples', { withFileTypes: true });
-mkdirSync('./dist/examples');
-files.forEach((file) => {
-  if (!file.isDirectory()) {
-    cpSync(`./public/examples/${file.name}`, `./dist/examples/${file.name}`);
   }
 });
 

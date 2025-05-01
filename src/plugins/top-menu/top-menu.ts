@@ -97,7 +97,7 @@ export class TopMenu extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: () => {
-        getEl('sound-btn').onclick = () => {
+        getEl('sound-btn')!.onclick = () => {
           const soundIcon = <HTMLImageElement>getEl('sound-icon');
           const soundManager = keepTrackApi.getSoundManager();
 
@@ -110,13 +110,13 @@ export class TopMenu extends KeepTrackPlugin {
           if (!soundManager.isMute) {
             soundManager.isMute = true;
             soundIcon.src = soundOffPng;
-            soundIcon.parentElement.classList.remove('bmenu-item-selected');
-            soundIcon.parentElement.classList.add('bmenu-item-error');
+            soundIcon.parentElement!.classList.remove('bmenu-item-selected');
+            soundIcon.parentElement!.classList.add('bmenu-item-error');
           } else {
             soundManager.isMute = false;
             soundIcon.src = soundOnPng;
-            soundIcon.parentElement.classList.add('bmenu-item-selected');
-            soundIcon.parentElement.classList.remove('bmenu-item-error');
+            soundIcon.parentElement!.classList.add('bmenu-item-selected');
+            soundIcon.parentElement!.classList.remove('bmenu-item-error');
           }
         };
       },

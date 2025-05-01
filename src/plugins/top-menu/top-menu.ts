@@ -16,7 +16,7 @@ export class TopMenu extends KeepTrackPlugin {
   dependencies_ = [];
   static readonly SEARCH_RESULT_ID = 'search-results';
 
-  addHtml = (): void => {
+  addHtml() {
     super.addHtml();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
@@ -89,9 +89,9 @@ export class TopMenu extends KeepTrackPlugin {
         adviceManagerInstance.init();
       },
     });
-  };
+  }
 
-  addJs = (): void => {
+  addJs() {
     super.addJs();
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
@@ -121,5 +121,29 @@ export class TopMenu extends KeepTrackPlugin {
         };
       },
     });
-  };
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.setSensor,
+      cbName: this.id,
+      cb: () => {
+        this.updateSensorName();
+      },
+    });
+  }
+
+  updateSensorName() {
+    const sensorSelectedDom = getEl('sensor-selected', true);
+
+    if (sensorSelectedDom) {
+      const sensorTitle = keepTrackApi.getSensorManager()?.sensorTitle;
+
+      // If this.sensorTitle is empty hide the div
+      if (!sensorTitle || sensorTitle === '') {
+        sensorSelectedDom.style.display = 'none';
+      } else {
+        sensorSelectedDom.innerText = sensorTitle;
+        sensorSelectedDom.style.display = 'block';
+      }
+    }
+  }
 }

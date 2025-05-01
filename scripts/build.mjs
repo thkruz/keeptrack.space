@@ -12,7 +12,6 @@ let settingsPath;
 let favIconPath;
 let textLogoPath;
 
-console.log(process.env);
 if (process.env?.CF_PAGES) {
   // If cloudflare is used, use the settings path from the environment variable
   console.log('Using cloudflare pages settings');

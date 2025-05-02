@@ -17,11 +17,7 @@ export const VERSION = '${version}';\n
  */
 const readVersion = (source) => {
   // eslint-disable-next-line no-sync
-  const data = fs.readFileSync(source, (err) => {
-    if (err) {
-      throw err;
-    }
-  });
+  const data = fs.readFileSync(source, 'utf8');
   let json;
 
   try {

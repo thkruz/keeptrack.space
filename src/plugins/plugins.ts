@@ -192,6 +192,13 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new TimeMachine().init(), enabled: plugins.timeMachine },
       { init: () => new SatellitePhotos().init(), enabled: plugins.photoManager },
       { init: () => new ScreenRecorder().init(), enabled: plugins.screenRecorder },
+      {
+        init: () => (async () => {
+          const ioPlugin = await import('../plugins/initial-orbit/initial-orbit');
+
+          ioPlugin.init();
+        })(), enabled: plugins.initialOrbit,
+      },
       { init: () => new AnalysisMenu().init(), enabled: plugins.analysis },
       { init: () => new Calculator().init(), enabled: plugins.calculator },
       { init: () => new EciPlot().init(), enabled: plugins.plotAnalysis },
@@ -323,3 +330,4 @@ export const uiManagerFinal = (): void => {
 
 // Create common import for all plugins
 export { StreamManager as CanvasRecorder, catalogLoader };
+

@@ -124,5 +124,5 @@ stats.json
 # Local env files
 .env
 
-# Commercial Plugins
-src/plugins-commercial
+# Pro Plugins
+src/plugins-pro

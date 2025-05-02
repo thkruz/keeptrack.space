@@ -24,7 +24,8 @@
     "test/**/*.jpg",
     "public/serviceWorker.js",
     "public/settings/settingsOverride.js",
-    "src/globabl.d.ts"
+    "src/globabl.d.ts",
+    "src/plugins-pro.old/**/*.ts",
   ],
   "exclude": [
     "node_modules/**/*",

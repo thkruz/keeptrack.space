@@ -2,6 +2,7 @@
 import dotenv from 'dotenv';
 import { cpSync, mkdirSync, readdirSync, rmSync } from 'fs';
 import webpack from 'webpack';
+import { enableCommercial } from './build-pro';
 import generateConstVersion from './lib/constVersion.mjs';
 import { generateConfig } from './webpack.mjs';
 
@@ -11,6 +12,7 @@ console.clear();
 let settingsPath;
 let favIconPath;
 let textLogoPath;
+let isCommercial = false;
 
 if (process.env?.CF_PAGES) {
   // If cloudflare is used, use the settings path from the environment variable
@@ -21,6 +23,8 @@ if (process.env?.CF_PAGES) {
   favIconPath = process.env.FAVICON_PATH;
   console.log('Text logo path:', process.env.TEXT_LOGO_PATH);
   textLogoPath = process.env.TEXT_LOGO_PATH;
+  isCommercial = process.env.IS_COMMERCIAL === 'true';
+  console.log('Is commercial:', isCommercial);
 } else {
   // Replace /dist/settings/settingsOverride.js with the one in the .env file
   const env = dotenv.config({ path: './.env' });
@@ -32,8 +36,12 @@ if (process.env?.CF_PAGES) {
   favIconPath = env.parsed.FAVICON_PATH;
   console.log('Text logo path:', env.parsed.TEXT_LOGO_PATH);
   textLogoPath = env.parsed.TEXT_LOGO_PATH;
+  isCommercial = env.parsed.IS_COMMERCIAL === 'true';
+  console.log('Is commercial:', isCommercial);
 }
 
+// Setup any commercial plugins
+enableCommercial(isCommercial);
 
 const myArgs = process.argv.slice(2);
 const args = myArgs[0];

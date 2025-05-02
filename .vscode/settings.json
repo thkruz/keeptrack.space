@@ -74,7 +74,7 @@
   "jestrunner.runOptions": [
     "-o --coverage"
   ],
-  "task.autoDetect": "off",
+  "task.autoDetect": "on",
   "editor.rulers": [
     180
   ],

@@ -1,0 +1,3 @@
+[submodule "src/plugins-commercial"]
+	path = src/plugins-commercial
+	url = https://github.com/thkruz/keeptrack-space-commercial

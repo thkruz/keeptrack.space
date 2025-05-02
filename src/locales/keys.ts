@@ -262,6 +262,9 @@ export const Keys = [
   'plugins.ProximityOps.comparePayloadsOnlyTooltip',
   'plugins.ProximityOps.ignoreVimpelRso',
   'plugins.ProximityOps.ignoreVimpelRsoTooltip',
+  'plugins.InitialOrbitDeterminationPlugin.bottomIconLabel',
+  'plugins.InitialOrbitDeterminationPlugin.title',
+  'plugins.InitialOrbitDeterminationPlugin.helpBody',
 ] as const;
 
 // Type for all valid translation keys

@@ -392,6 +392,11 @@
       "bottomIconLabel": "Graphics Menu",
       "title": "Graphics Menu",
       "helpBody": "The Graphics Menu is used to change the graphics settings of the application."
+    },
+    "InitialOrbitDeterminationPlugin": {
+      "bottomIconLabel": "Initial Orbit Determination",
+      "title": "Initial Orbit Determination Menu",
+      "helpBody": "The Initial Orbit Determination (IOD) menu is used to calculate the initial orbit of a satellite based on its position and velocity vectors. <br><br> The IOD menu allows you to select the following options: <ul style=\"margin-left: 40px;\"> <li> Select the satellite's position and velocity vectors </li> <li> Select the time of the observation </li> <li> Select the method of calculation </li> </ul>"
     }
   }
 }

@@ -194,9 +194,9 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new ScreenRecorder().init(), enabled: plugins.screenRecorder },
       {
         init: () => (async () => {
-          const ioPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
+          const ioPlugin = await import('../plugins/initial-orbit/initial-orbit');
 
-          ioPlugin.init();
+          new ioPlugin.InitialOrbitDeterminationPlugin().init();
         })(), enabled: plugins.initialOrbit,
       },
       { init: () => new AnalysisMenu().init(), enabled: plugins.analysis },

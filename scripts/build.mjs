@@ -23,8 +23,8 @@ if (process.env?.CF_PAGES) {
   favIconPath = process.env.FAVICON_PATH;
   console.log('Text logo path:', process.env.TEXT_LOGO_PATH);
   textLogoPath = process.env.TEXT_LOGO_PATH;
-  isPro = process.env.IS_COMMERCIAL === 'true';
-  console.log('Is commercial:', isPro);
+  isPro = process.env.IS_PRO === 'true';
+  console.log('Is pro:', isPro);
 } else {
   // Replace /dist/settings/settingsOverride.js with the one in the .env file
   const env = dotenv.config({ path: './.env' });
@@ -37,7 +37,7 @@ if (process.env?.CF_PAGES) {
   console.log('Text logo path:', env.parsed.TEXT_LOGO_PATH);
   textLogoPath = env.parsed.TEXT_LOGO_PATH;
   isPro = env.parsed.IS_PRO === 'true';
-  console.log('Is commercial:', isPro);
+  console.log('Is pro:', isPro);
 }
 
 // Setup any commercial plugins

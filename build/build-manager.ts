@@ -34,7 +34,7 @@ class BuildManager {
       fileManager.copyTopLevelFiles('./public', './dist');
 
       // Copy resource directories
-      const resourceDirs = ['audio', 'data', 'img', 'meshes', 'res', 'settings', 'simulation', 'textures', 'tle'];
+      const resourceDirs = ['data', 'meshes', 'res', 'simulation', 'textures', 'tle'];
 
       resourceDirs.forEach((dir) => {
         fileManager.copyDirectory(`public/${dir}`, `dist/${dir}`, { recursive: true });

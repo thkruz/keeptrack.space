@@ -1,9 +1,8 @@
+import { Configuration, CopyRspackPlugin, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
 import dotenv from 'dotenv';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { Configuration } from 'webpack';
 import WebpackBar from 'webpackbar/rspack';
 
 export class WebpackManager {
@@ -53,7 +52,14 @@ export class WebpackManager {
         ...baseConfig,
         ...{
           optimization: {
-            minimize: true,
+            minimizer: [
+              new SwcJsMinimizerRspackPlugin({
+                // JS minimizer configuration
+              }),
+              new LightningCssMinimizerRspackPlugin({
+                // CSS minimizer configuration
+              }),
+            ],
           },
         },
       };
@@ -206,7 +212,10 @@ export class WebpackManager {
       new CleanTerminalPlugin({
         beforeCompile: true,
       }),
-      new HtmlWebpackPlugin({
+      new CopyRspackPlugin({
+        patterns: [{ from: 'public', to: 'dist' }],
+      }),
+      new HtmlRspackPlugin({
         filename: '../index.html',
         template: './public/index.html',
       }),

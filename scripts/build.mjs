@@ -2,7 +2,7 @@
 import dotenv from 'dotenv';
 import { cpSync, mkdirSync, readdirSync, rmSync } from 'fs';
 import webpack from 'webpack';
-import { enablepro } from './build-pro';
+import { enablepro } from './build-pro.mjs';
 import generateConstVersion from './lib/constVersion.mjs';
 import { generateConfig } from './webpack.mjs';
 

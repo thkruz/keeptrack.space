@@ -34,8 +34,9 @@
     "lib/workers"
   ],
   "scripts": {
-    "build": "npx tsx ./build/build.ts production",
-    "build:watch": "npx --max-old-space-size=8192 tsx ./build/build.ts development --watch",
+    "build": "npx tsx ./build/build-manager.ts production",
+    "build:dev": "npx tsx ./build/build-manager.ts development",
+    "build:watch": "npx --max-old-space-size=8192 tsx ./build/build-manager.ts development --watch",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs -o ./docs/CHANGELOG.md",
     "cypress:open": "cypress open",
     "generate-t7e-keys": "npx tsx ./build/generate-translation-keys.ts && npx eslint --fix ./build/generate-translation-keys.ts",
@@ -100,7 +101,6 @@
     "@types/numeric": "^1.2.2",
     "@types/papaparse": "^5.3.14",
     "@types/webgl2": "^0.0.11",
-    "@types/webpack": "^5.28.5",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "@typescript-eslint/typescript-estree": "^8.29.0",
@@ -144,7 +144,6 @@
     "typescript": "^5.3.3",
     "webgl-lint": "^1.11.3",
     "webgl-mock": "^0.1.7",
-    "webpack-bundle-analyzer": "^4.10.2",
     "webpackbar": "^7.0.0",
     "worker-loader": "^3.0.8"
   },

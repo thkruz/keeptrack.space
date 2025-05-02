@@ -1489,12 +1489,12 @@ input:focus {
 
 .ui-icon-circle-triangle-e {
   background-position: -33px -17px;
-  filter: brightness(1.9) sepia(1) hue-rotate(160deg) saturate(2.5);
+  filter: brightness(1.4) sepia(1) hue-rotate(-46deg) saturate(7.5);
 }
 
 .ui-icon-circle-triangle-w {
   background-position: -97px -17px;
-  filter: brightness(1.9) sepia(1) hue-rotate(160deg) saturate(2.5);
+  filter: brightness(1.4) sepia(1) hue-rotate(-46deg) saturate(7.5);
 }
 
 .ui-slider-handle {

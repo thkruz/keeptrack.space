@@ -74,6 +74,7 @@ import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
 import { SensorMath } from './static/sensor-math';
 import { SplashScreen } from './static/splash-screen';
+import { EngineEvents, Tessa } from './tessa';
 
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
@@ -201,20 +202,21 @@ export class KeepTrack {
     this.demoManager = new DemoManager();
   }
 
-  /** Check if the FPS is above a certain threshold */
-  static isFpsAboveLimit(dt: Milliseconds, minimumFps: number): boolean {
-    return KeepTrack.getFps_(dt) > minimumFps;
-  }
-
   gameLoop(timestamp = <Milliseconds>0): void {
     requestAnimationFrame(this.gameLoop.bind(this));
+    const tessaEngine = Tessa.getInstance();
     const dt = <Milliseconds>(timestamp - this.lastGameLoopTimestamp_);
+
+    tessaEngine.setFps(Tessa.calculateFps(dt));
 
     this.lastGameLoopTimestamp_ = timestamp;
 
     if (settingsManager.cruncherReady) {
+      tessaEngine.runEvent(EngineEvents.onUpdateLoop, dt);
       this.update_(dt); // Do any per frame calculations
+      tessaEngine.runEvent(EngineEvents.onRenderFrameStart);
       this.draw_(dt);
+      tessaEngine.runEvent(EngineEvents.onRenderFrameEnd);
 
       if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
         const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
@@ -297,10 +299,6 @@ export class KeepTrack {
     if (!keepTrackApi.containerRoot) {
       keepTrackApi.containerRoot = containerDom;
     }
-  }
-
-  private static getFps_(dt: Milliseconds): number {
-    return 1000 / dt;
   }
 
   /* istanbul ignore next */
@@ -448,9 +446,9 @@ theodore.kruczek at gmail dot com.
     camera.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, renderer.sensorPos);
     renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
 
-    if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+    if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
       keepTrackApi.getOrbitManager().updateAllVisibleOrbits();
-      this.inputManager.update(dt);
+      this.inputManager.update();
 
       // Only update hover if we are not on mobile
       if (!settingsManager.isMobileModeEnabled) {
@@ -634,7 +632,7 @@ theodore.kruczek at gmail dot com.
     // Display it if that settings is enabled
     if (this.isShowFPS) {
       // eslint-disable-next-line no-console
-      console.log(KeepTrack.getFps_(renderer.dt));
+      console.log(Tessa.getInstance().framesPerSecond);
     }
 
     // Update official time for everyone else

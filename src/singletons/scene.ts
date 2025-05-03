@@ -1,8 +1,8 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
+import { Tessa } from '@app/tessa';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
@@ -145,7 +145,7 @@ export class Scene {
       settingsManager.isDrawAurora ||
       settingsManager.isDrawMilkyWay) &&
       Date.now() - this.updateVisualsBasedOnPerformanceTime_ > 10000 && // Only check every 10 seconds
-      !KeepTrack.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
+      Tessa.calculateFps(this.averageDrawTime as Milliseconds) < 30) {
       let isSettingsLeftToDisable = true;
 
       while (isSettingsLeftToDisable) {

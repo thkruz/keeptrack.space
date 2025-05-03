@@ -4,10 +4,10 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
-import { KeepTrack } from '../keeptrack';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 
+import { Tessa } from '@app/tessa';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
@@ -533,7 +533,7 @@ export class InputManager {
   }
 
   /** readpixels used to determine which satellite is hovered is the biggest performance hit and we should throttle that */
-  public update(dt = 0 as Milliseconds) {
+  public update() {
     /*
      * gl.readPixels in uiInput.getSatIdFromCoord creates a lot of jank
      * Earlier in the loop we decided how much to throttle updateHover
@@ -541,11 +541,13 @@ export class InputManager {
      * it was looking at
      */
 
-    if (KeepTrack.isFpsAboveLimit(dt, 30)) {
+    const tessaEngine = Tessa.getInstance();
+
+    if (tessaEngine.framesPerSecond > 30) {
       if (this.updateHoverDelayLimit > 0) {
         --this.updateHoverDelayLimit;
       }
-    } else if (KeepTrack.isFpsAboveLimit(dt, 15)) {
+    } else if (tessaEngine.framesPerSecond > 15) {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
     } else {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;

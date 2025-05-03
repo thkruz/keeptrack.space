@@ -269,10 +269,10 @@ export enum Singletons {
   Scene = 'Scene',
   MeshManager = 'MeshManager',
 }
+
 /**
  * Enum containing the registrable events used in the KeepTrack API.
  */
-
 export enum KeepTrackApiEvents {
   onHelpMenuClick = 'onHelpMenuClick',
   /**

@@ -170,7 +170,7 @@ export class SettingsManager {
    * The default color scheme to use when the application is loaded. This must be a string that matches a class name of one of the available color schemes.
    * Ex. DefaultColorScheme, CelestrakColorScheme, etc.
    */
-  defaultColorScheme: 'CelestrakColorScheme';
+  defaultColorScheme = 'CelestrakColorScheme';
 
   /** Ensures no html is injected into the page */
   isPreventDefaultHtml = false;

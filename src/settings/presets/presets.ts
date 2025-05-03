@@ -304,6 +304,7 @@ export class SettingsPresets {
     settings.limitSats = '25544';
     settings.disableAllPlugins();
     settings.isDisableStars = true;
+    settings.isDrawCovarianceEllipsoid = false;
     settings.maxAnalystSats = 1;
     settings.maxMissiles = 1;
     settings.maxFieldOfViewMarkers = 1;
@@ -323,7 +324,7 @@ export class SettingsPresets {
     settings.isEnableJscCatalog = false;
     settings.onLoadCb = () => {
       const groupManagerInstance = keepTrackApi.getGroupsManager();
-      const sccNumGroup = groupManagerInstance.createGroup(GroupType.ID_LIST, [25544]);
+      const sccNumGroup = groupManagerInstance.createGroup(GroupType.ID_LIST, [0]);
 
       groupManagerInstance.selectGroup(sccNumGroup);
       sccNumGroup.updateOrbits();
@@ -341,6 +342,7 @@ export class SettingsPresets {
     settings.isShowSplashScreen = true;
     settings.isEPFL = true;
     settings.disableAllPlugins();
+    settings.isDrawCovarianceEllipsoid = false;
     settings.isLoadLastMap = false;
     settings.isShowRocketBodies = true;
     settings.isShowDebris = true;

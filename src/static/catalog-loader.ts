@@ -188,10 +188,17 @@ export class CatalogLoader {
 
     try {
       // TODO: Which sources can use this should be definied in the settings (Celestrak Rebase)
-      if (settingsManager.dataSources.tle === 'https://api.keeptrack.space/v3/sats' || settingsManager.dataSources.tle === 'http://localhost:8787/v3/sats') {
+      if (
+        (/^https?:\/\/(?:api\.keeptrack\.space|localhost:8787)\/v[23]\/sats$/u).test(settingsManager.dataSources.tle)
+      ) {
         if (!settingsManager.limitSats) {
           CatalogLoader.setupGetVariables();
         }
+        // If using v3 switch to v2
+        if (settingsManager.dataSources.tle.includes('v3')) {
+          settingsManager.dataSources.tle = settingsManager.dataSources.tle.replace(/\/v3\//u, '/v2/');
+        }
+
         settingsManager.dataSources.tle = `${settingsManager.dataSources.tle}/${settingsManager.limitSats}`;
         settingsManager.dataSources.tle = settingsManager.dataSources.tle.replace(/\/$/u, '');
       }

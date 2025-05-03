@@ -754,6 +754,14 @@ export class Camera {
         this.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, keepTrackApi.getRenderer().sensorPos);
       },
     });
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onUpdate,
+      cbName: Camera.id,
+      cb: () => {
+        this.update(Tessa.getInstance().dt);
+      },
+    });
   }
 
   private registerKeyboardEvents_() {

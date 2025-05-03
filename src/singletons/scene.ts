@@ -2,8 +2,9 @@ import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
+import { SatMath } from '@app/static/sat-math';
 import { Tessa } from '@app/tessa/tessa';
-import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
+import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
 import { ConeMeshFactory } from './draw-manager/cone-mesh-factory';
@@ -24,6 +25,8 @@ export interface SceneParams {
 }
 
 export class Scene {
+  static readonly id = 'Scene';
+
   private gl_: WebGL2RenderingContext;
   background: WebGLTexture;
   skybox: SkyBoxSphere;
@@ -64,9 +67,19 @@ export class Scene {
   init(gl: WebGL2RenderingContext): void {
     this.gl_ = gl;
     this.skybox.init(settingsManager, gl);
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.updateLoop,
+      cbName: Scene.id,
+      cb: this.update.bind(this),
+    });
   }
 
-  update(simulationTime: Date, gmst: GreenwichMeanSiderealTime, j: number) {
+  update() {
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const simulationTime = timeManagerInstance.simulationTimeObj;
+    const { gmst, j } = SatMath.calculateTimeVariables(simulationTime);
+
     this.sun.update(j);
     this.earth.update(gmst);
     this.moon.update(simulationTime);

@@ -256,7 +256,7 @@ export class EciPlot extends KeepTrackPlugin {
       });
     }
 
-    const lastSatId = this.selectSatManager_.lastSelectedSat();
+    const lastSatId = this.selectSatManager_.lastSelectedPrimarySatId();
 
     if (lastSatId !== -1) {
       const lastSatObj = catalogManagerInstance.getObject(lastSatId) as DetailedSatellite;

@@ -443,7 +443,7 @@ export const keepTrackApiStubs = {
     catalogManager: {
       isLaunchSiteManagerLoaded: true,
       lasthoveringSat: 0,
-      lastSelectedSat: () => 1,
+      lastSelectedPrimarySat: () => 1,
       extractCountry: () => 'India',
       setHoveringSat: jest.fn(),
       setLasthoveringSat: jest.fn(),

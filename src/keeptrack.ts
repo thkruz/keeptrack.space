@@ -472,8 +472,18 @@ theodore.kruczek at gmail dot com.
         this.inputManager.init();
         this.demoManager.init();
 
-        await renderer.init(settingsManager);
+        keepTrackApi.getHoverManager().init();
+        renderer.init();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         renderer.meshManager.init(renderer.gl);
+
+        Tessa.getInstance().register({
+          event: EngineEvents.onUpdate,
+          cbName: KeepTrack.id,
+          cb: () => {
+            keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
+          },
+        });
       },
     ];
   }

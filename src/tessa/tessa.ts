@@ -37,22 +37,10 @@ export class Tessa {
   simulationStep: Milliseconds;
   lastGameLoopTimestamp_ = 0 as Milliseconds;
   isRunning = false;
-  static getInstance() {
-    Tessa.instance ??= new Tessa();
-
-    return Tessa.instance;
-  }
-  static getInstanceOrNull() {
-    return Tessa.instance || null;
-  }
-  static setInstance(instance: Tessa) {
-    Tessa.instance = instance;
-  }
-  static clearInstance() {
-    Tessa.instance = null;
-  }
-
-
+  /** Flag to indicate if the engine is still loading */
+  isInitialized = false;
+  framesPerSecond = 0;
+  assetList: (() => Promise<void>)[] = [] as (() => Promise<void>)[];
   /**
    * Create an array of empty arrays for each event in the EngineEvents enum.
    * This will be used to store the callbacks for each event.
@@ -66,7 +54,7 @@ export class Tessa {
     };
 
   constructor() {
-    Tessa.printConsoleMessage();
+    Tessa.printConsoleMessage_();
   }
 
   /**
@@ -77,8 +65,6 @@ export class Tessa {
     this.isInitialized = false; // Not ready until assets are loaded
     this.runEvent(EngineEvents.onEngineInitialized);
   }
-
-  assetList: (() => Promise<void>)[] = [] as (() => Promise<void>)[];
 
   /**
    * Loads assets required for the engine/game.
@@ -98,41 +84,6 @@ export class Tessa {
     } catch (error) {
       Tessa.showErrorCode_(<Error & { lineNumber: number }>error);
     }
-  }
-
-  private static showErrorCode_(error: Error & { lineNumber: number }): void {
-    // TODO: Replace console calls with ErrorManagerInstance
-
-    let errorHtml = '';
-
-    errorHtml += error?.message ? `${error.message}<br>` : '';
-    errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
-    errorHtml += error?.stack ? `${error.stack}<br>` : '';
-    const LoaderText = getEl('loader-text');
-
-    if (LoaderText) {
-      LoaderText.innerHTML = errorHtml;
-      // eslint-disable-next-line no-console
-      console.error(error);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
-    // istanbul ignore next
-    if (!isThisNode()) {
-      // eslint-disable-next-line no-console
-      console.warn(error);
-    }
-  }
-
-  /** Flag to indicate if the engine is still loading */
-  isInitialized = false;
-  framesPerSecond = 0;
-
-  static calculateFps(dt: Milliseconds): number {
-    const fps = 1000 / dt;
-
-    return fps;
   }
 
   gameLoop(timestamp = 0 as Milliseconds) {
@@ -192,19 +143,56 @@ export class Tessa {
     this.events_[event].forEach((cbObj) => cbObj.cb(...args));
   }
 
-  private verifyEvent_(event: keyof EngineEventArguments) {
-    if (!this.events_[event]) {
-      this.events_[event] = [];
-    }
-  }
-
   unregisterAllEvents() {
     for (const event of Object.keys(this.events_) as (keyof EngineEventArguments)[]) {
       this.events_[event] = [];
     }
   }
 
-  static printConsoleMessage() {
+  private verifyEvent_(event: keyof EngineEventArguments) {
+    if (!this.events_[event]) {
+      this.events_[event] = [];
+    }
+  }
+
+  static getInstance() {
+    Tessa.instance ??= new Tessa();
+
+    return Tessa.instance;
+  }
+
+  static calculateFps(dt: Milliseconds): number {
+    const fps = 1000 / dt;
+
+    return fps;
+  }
+
+  private static showErrorCode_(error: Error & { lineNumber: number }): void {
+    // TODO: Replace console calls with ErrorManagerInstance
+
+    let errorHtml = '';
+
+    errorHtml += error?.message ? `${error.message}<br>` : '';
+    errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
+    errorHtml += error?.stack ? `${error.stack}<br>` : '';
+    const LoaderText = getEl('loader-text');
+
+    if (LoaderText) {
+      LoaderText.innerHTML = errorHtml;
+      // eslint-disable-next-line no-console
+      console.error(error);
+    } else {
+      // eslint-disable-next-line no-console
+      console.error(error);
+    }
+    // istanbul ignore next
+    if (!isThisNode()) {
+      // eslint-disable-next-line no-console
+      console.warn(error);
+    }
+  }
+
+  private static printConsoleMessage_() {
     // eslint-disable-next-line no-console
     console.log(`
  _____ _____ _____ _____  ___

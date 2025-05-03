@@ -339,4 +339,8 @@ export enum KeepTrackApiEvents {
   bottomMenuModeChange = 'bottomMenuModeChange',
   saveSettings = 'saveSettings',
   loadSettings = 'loadSettings',
+  onPrimarySatelliteUpdate = 'onPrimarySatelliteUpdate',
+  onPrimarySatelliteChange = 'onPrimarySatelliteChange',
+  onSecondarySatelliteUpdate = 'onSecondarySatelliteUpdate',
+  onSecondarySatelliteChange = 'onSecondarySatelliteChange',
 }

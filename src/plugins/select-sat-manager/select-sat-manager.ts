@@ -38,7 +38,8 @@ export class SelectSatManager extends KeepTrackPlugin {
   secondarySatObj: DetailedSatellite | null = null;
   /** Ellipsoid radii for the secondary satellite in RCI coordinates */
   secondarySatCovMatrix: vec3;
-  private lastSelectedSat_ = -1;
+  private lastSelectedPrimarySat_ = -1;
+  private lastSelectedSecondarySat_ = -1;
 
   addJs(): void {
     super.addJs();
@@ -60,6 +61,62 @@ export class SelectSatManager extends KeepTrackPlugin {
 
           keepTrackApi.getUiManager().
             updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
+        }
+      },
+    });
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onUpdate,
+      cbName: this.id,
+      cb: () => {
+        // If the selected satellite is not the same as the last selected satellite, run the event
+        if (this.selectedSat !== this.lastSelectedPrimarySatId()) {
+          keepTrackApi.runEvent(KeepTrackApiEvents.onPrimarySatelliteChange, this.primarySatObj, this.selectedSat);
+        }
+
+        // If the primary satellite is an object, update it
+        if (this.primarySatObj.id !== -1) {
+          const timeManagerInstance = keepTrackApi.getTimeManager();
+          const primarySat = keepTrackApi.getCatalogManager().getObject(this.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
+
+          keepTrackApi.getMeshManager().update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
+          keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
+          if (primarySat.isMissile()) {
+            keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
+          }
+
+          // If in satellite view the orbit buffer needs to be updated every time
+          if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE ||
+            keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)
+          ) {
+            keepTrackApi.getOrbitManager().updateOrbitBuffer(this.primarySatObj.id);
+            const firstPointOut = [
+              keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3],
+              keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3 + 1],
+              keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3 + 2],
+            ];
+
+            keepTrackApi.getOrbitManager().updateFirstPointOut(this.primarySatObj.id, firstPointOut);
+          }
+
+          keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);
+
+          keepTrackApi.getScene().primaryCovBubble.update(primarySat);
+        } else {
+          keepTrackApi.getScene().searchBox.update(null);
+        }
+
+        // If the secondary satellite is not the same as the last selected satellite, run the event
+        if (this.secondarySat !== this.lastSelectedSecondarySatId()) {
+          keepTrackApi.runEvent(KeepTrackApiEvents.onSecondarySatelliteChange, this.secondarySatObj, this.secondarySat);
+        }
+
+        // If the secondary satellite is an object, update it
+        if (this.secondarySat > -1) {
+          // TODO: Refactor this as a cb
+          keepTrackApi.getScene().secondaryCovBubble?.update(this.secondarySatObj!);
+
+          keepTrackApi.runEvent(KeepTrackApiEvents.onSecondarySatelliteUpdate, this.secondarySatObj, this.secondarySat);
         }
       },
     });
@@ -179,7 +236,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, spaceObj, spaceObj?.id);
 
     // Record the last selected sat
-    this.lastSelectedSat(this.selectedSat);
+    this.lastSelectedPrimarySatId(this.selectedSat);
   }
 
   private selectSensorObject_(sensor: DetailedSensor) {
@@ -227,7 +284,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.setSelectedSat_(id);
 
     // If deselecting a satellite, clear the selected orbit
-    if (id === -1 && this.lastSelectedSat_ > -1) {
+    if (id === -1 && this.lastSelectedPrimarySat_ > -1) {
       keepTrackApi.getOrbitManager().clearSelectOrbit();
     }
 
@@ -235,12 +292,12 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private selectSatReset_() {
-    if (this.lastSelectedSat() !== -1) {
+    if (this.lastSelectedPrimarySatId() !== -1) {
       this.selectSatChange_(null);
     }
 
     // Run this ONCE when clicking empty space
-    if (this.lastSelectedSat() !== -1) {
+    if (this.lastSelectedPrimarySatId() !== -1) {
       keepTrackApi.getMainCamera().exitFixedToSat();
 
       document.documentElement.style.setProperty('--search-box-bottom', '0px');
@@ -251,7 +308,7 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private selectSatObject_(sat: DetailedSatellite | MissileObject) {
-    if (sat.id !== this.lastSelectedSat()) {
+    if (sat.id !== this.lastSelectedPrimarySatId()) {
       this.selectSatChange_(sat);
       if (sat.id >= 0 && sat instanceof DetailedSatellite) {
         const covMatrix = createSampleCovarianceFromTle(sat.tle1, sat.tle2).matrix.elements;
@@ -323,12 +380,20 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
   }
 
-  lastSelectedSat(id?: number): number {
+  lastSelectedPrimarySatId(id?: number): number {
     if (typeof id !== 'undefined' && id !== null && id >= -1) {
-      this.lastSelectedSat_ = id;
+      this.lastSelectedPrimarySat_ = id;
     }
 
-    return this.lastSelectedSat_;
+    return this.lastSelectedPrimarySat_;
+  }
+
+  lastSelectedSecondarySatId(id?: number): number {
+    if (typeof id !== 'undefined' && id !== null && id >= -1) {
+      this.lastSelectedSecondarySat_ = id;
+    }
+
+    return this.lastSelectedSecondarySat_;
   }
 
   private static updateCruncher_(i: number) {
@@ -345,7 +410,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
     // If Old Select Sat Picked Color it Correct Color
-    const lastSelectedObject = this.lastSelectedSat();
+    const lastSelectedObject = this.lastSelectedPrimarySatId();
 
     if (lastSelectedObject > -1) {
       colorSchemeManagerInstance.currentColorSchemeUpdate ??=

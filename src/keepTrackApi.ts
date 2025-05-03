@@ -101,6 +101,10 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.bottomMenuModeChange]: [];
   [KeepTrackApiEvents.saveSettings]: [];
   [KeepTrackApiEvents.loadSettings]: [];
+  [KeepTrackApiEvents.onPrimarySatelliteUpdate]: [BaseObject | null, number];
+  [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number];
+  [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number];
+  [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number];
 };
 
 interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {

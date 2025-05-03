@@ -1,6 +1,5 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { EngineEvents } from '@app/tessa/engine-events';
 import { Tessa } from '@app/tessa/tessa';
@@ -8,11 +7,8 @@ import { mat4, vec2, vec4 } from 'gl-matrix';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime } from 'ootk';
 import { GetSatType } from '../interfaces';
 import { getEl } from '../lib/get-el';
-import { SettingsManager } from '../settings/settings';
 import { isThisNode } from '../static/isThisNode';
-import { SatMath } from '../static/sat-math';
 import { Camera, CameraType } from './camera';
-import { MissileObject } from './catalog-manager/MissileObject';
 import { MeshManager } from './draw-manager/mesh-manager';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
@@ -28,8 +24,6 @@ export class WebGLRenderer {
   private labelCount_ = 0;
   private satHoverMiniDOM_: HTMLDivElement;
   private satLabelModeLastTime_ = 0;
-  private satMiniBox_: HTMLDivElement;
-  private settings_: SettingsManager;
   private isContextLost_ = false;
 
   /** A canvas where the renderer draws its output. */
@@ -38,7 +32,6 @@ export class WebGLRenderer {
    * Main source of glContext for rest of the application
    */
   gl: WebGL2RenderingContext;
-  gmst: GreenwichMeanSiderealTime;
   isDrawOrbitsAbove: boolean;
   isPostProcessingResizeNeeded: boolean;
   isShowDistance = false;
@@ -51,7 +44,6 @@ export class WebGLRenderer {
   projectionCameraMatrix: mat4;
   postProcessingManager: PostProcessingManager;
 
-  private selectSatManager_: SelectSatManager;
   sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } | null = null;
   lastResizeTime: number;
 
@@ -185,13 +177,7 @@ export class WebGLRenderer {
     return gl;
   }
 
-  // eslint-disable-next-line require-await
-  async init(settings: SettingsManager): Promise<void> {
-    this.settings_ = settings;
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
-
-    this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
-    keepTrackApi.getHoverManager().init();
+  init(): void {
     this.startWithOrbits();
 
     // Reinitialize the canvas on mobile rotation
@@ -199,10 +185,8 @@ export class WebGLRenderer {
       this.isRotationEvent_ = true;
     });
 
-    keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-
     Tessa.getInstance().register({
-      event: EngineEvents.onUpdate,
+      event: EngineEvents.onUpdateStart,
       cbName: 'webgl-renderer',
       cb: () => {
         this.update();
@@ -304,7 +288,7 @@ export class WebGLRenderer {
        * @todo Reuse hoverBoxOnSatMini DOM Elements
        * @body Currently are writing and deleting the nodes every draw element. Reusuing them with a transition effect will make it smoother
        */
-      this.hoverBoxOnSatMiniElements_.innerHTML = '';
+      this.hoverBoxOnSatMiniElements_!.innerHTML = '';
       if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
@@ -380,7 +364,7 @@ export class WebGLRenderer {
           this.satHoverMiniDOM_.style.left = `${satScreenPositionArray.x + 20}px`;
           this.satHoverMiniDOM_.style.top = `${satScreenPositionArray.y}px`;
 
-          this.hoverBoxOnSatMiniElements_.appendChild(this.satHoverMiniDOM_);
+          this.hoverBoxOnSatMiniElements_!.appendChild(this.satHoverMiniDOM_);
           this.labelCount_++;
         }
       } else {
@@ -432,7 +416,7 @@ export class WebGLRenderer {
           this.satHoverMiniDOM_.style.left = `${satScreenPositionArray.x + 20}px`;
           this.satHoverMiniDOM_.style.top = `${satScreenPositionArray.y}px`;
 
-          this.hoverBoxOnSatMiniElements_.appendChild(this.satHoverMiniDOM_);
+          this.hoverBoxOnSatMiniElements_!.appendChild(this.satHoverMiniDOM_);
           this.labelCount_++;
         });
       }
@@ -446,8 +430,11 @@ export class WebGLRenderer {
     // Hide satMiniBoxes When Not in Use
     if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
       if (this.isSatMiniBoxInUse_) {
-        this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
-        this.satMiniBox_.innerHTML = '';
+        const satMiniBox = getEl('sat-minibox');
+
+        if (satMiniBox) {
+          satMiniBox.innerHTML = '';
+        }
       }
       this.isSatMiniBoxInUse_ = false;
     }
@@ -571,60 +558,6 @@ export class WebGLRenderer {
     this.isPostProcessingResizeNeeded = false;
   }
 
-  /**
-   * Update the primary selected satellite
-   */
-  private updatePrimarySatellite_() {
-    if (!this.selectSatManager_) {
-      return;
-    }
-
-    // If this.selectedSat_.selectedSat has changed then select it
-    if (this.selectSatManager_?.selectedSat !== this.selectSatManager_?.lastSelectedSat()) {
-      errorManagerInstance.debug('selectedSat has changed');
-      // this.selectSatManager_.selectSat(this.selectSatManager_?.selectedSat);
-    }
-
-    if (this.selectSatManager_?.primarySatObj.id !== -1) {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
-      const primarySat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
-
-      this.meshManager.update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
-      keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
-      if (primarySat.isMissile()) {
-        keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
-      }
-
-      // If in satellite view the orbit buffer needs to be updated every time
-      if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)) {
-        keepTrackApi.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
-        const firstPointOut = [
-          keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3],
-          keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 1],
-          keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 2],
-        ];
-
-        keepTrackApi.getOrbitManager().updateFirstPointOut(this.selectSatManager_.primarySatObj.id, firstPointOut);
-      }
-
-      keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);
-
-      keepTrackApi.getScene().primaryCovBubble.update(primarySat);
-    } else {
-      keepTrackApi.getScene().searchBox.update(null);
-    }
-  }
-
-  private updateSecondarySatellite_() {
-    const secondarySat = keepTrackApi.getPlugin(SelectSatManager)?.secondarySatObj;
-
-    if (!secondarySat) {
-      return;
-    }
-
-    keepTrackApi.getScene().secondaryCovBubble.update(secondarySat);
-  }
-
   setCanvasSize(height: number, width: number) {
     this.domElement.width = width;
     this.domElement.height = height;
@@ -636,7 +569,7 @@ export class WebGLRenderer {
 
   // eslint-disable-next-line require-await
   async startWithOrbits(): Promise<void> {
-    if (this.settings_.startWithOrbitsDisplayed) {
+    if (settingsManager.startWithOrbitsDisplayed) {
       const groupsManagerInstance = keepTrackApi.getGroupsManager();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
@@ -645,49 +578,27 @@ export class WebGLRenderer {
       groupsManagerInstance.selectGroup(groupsManagerInstance.groupList.debris);
       colorSchemeManagerInstance.calculateColorBuffers(true); // force color recalc
       groupsManagerInstance.groupList.debris.updateOrbits();
-      this.settings_.isOrbitOverlayVisible = true;
+      settingsManager.isOrbitOverlayVisible = true;
     }
   }
 
   update(): void {
     this.validateProjectionMatrix_();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-
-    this.updatePrimarySatellite_();
-    this.updateSecondarySatellite_();
-    keepTrackApi.getMainCamera().update(Tessa.getInstance().dt);
-
-    const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
-
-    this.gmst = gmst;
-
-    keepTrackApi.getScene().update(timeManagerInstance.simulationTimeObj, gmst, j);
-
     this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
-
-    /*
-     * cone.update([
-     *   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3],
-     *   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3 + 1],
-     *   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3 + 2],
-     * ]);
-     */
-
-    keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
   }
 
-  getCurrentViewport(target?: vec4): vec4 {
+  getCurrentViewport(target = vec4.create()): vec4 {
     const gl = this.gl;
 
-    vec4.set(target ?? vec4.create(), 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    vec4.set(target, 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     return target;
   }
 
-  getDrawingBufferSize(target?: vec2): vec2 {
+  getDrawingBufferSize(target = vec2.create()): vec2 {
     const gl = this.gl;
 
-    vec2.set(target ?? vec2.create(), gl.drawingBufferWidth, gl.drawingBufferHeight);
+    vec2.set(target, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     return target;
   }

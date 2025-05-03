@@ -15,7 +15,7 @@ import { Milliseconds } from 'ootk';
 export enum EngineEvents {
   onReady = 'onReady',
   onEngineInitialized = 'onEngineInitialized',
-  onUpdateLoop = 'onUpdateLoop',
+  onUpdate = 'onUpdate',
   onRenderFrameStart = 'onRenderFrameStart',
   onRenderFrameEnd = 'onRenderFrameEnd',
   onResize = 'onResize',
@@ -34,7 +34,7 @@ export enum EngineEvents {
 type EngineEventArguments = {
   [EngineEvents.onReady]: [];
   [EngineEvents.onEngineInitialized]: [];
-  [EngineEvents.onUpdateLoop]: [Milliseconds];
+  [EngineEvents.onUpdate]: [Milliseconds];
   [EngineEvents.onRenderFrameStart]: [];
   [EngineEvents.onRenderFrameEnd]: [];
   [EngineEvents.onResize]: [];

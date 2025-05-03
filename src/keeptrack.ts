@@ -211,7 +211,7 @@ export class KeepTrack {
     this.lastGameLoopTimestamp_ = timestamp;
 
     if (settingsManager.cruncherReady) {
-      tessaEngine.runEvent(EngineEvents.onUpdateLoop, dt);
+      tessaEngine.runEvent(EngineEvents.onUpdate, dt);
       this.update_(dt); // Do any per frame calculations
       tessaEngine.runEvent(EngineEvents.onRenderFrameStart);
       this.draw_(dt);
@@ -623,7 +623,6 @@ theodore.kruczek at gmail dot com.
   private update_(dt = <Milliseconds>0) {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const renderer = keepTrackApi.getRenderer();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     Tessa.getInstance().setDeltaTime(dt, timeManagerInstance.propRate);
 
@@ -641,12 +640,6 @@ theodore.kruczek at gmail dot com.
     keepTrackApi.getDotsManager().updatePositionBuffer();
 
     renderer.update();
-
-    /*
-     * Update Colors
-     * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
-     */
-    colorSchemeManagerInstance.calculateColorBuffers(false); // avoid recalculating ALL colors
   }
 
   // Make the api available

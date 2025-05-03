@@ -167,7 +167,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
     super.addJs();
 
     Tessa.getInstance().register({
-      event: EngineEvents.onUpdateLoop,
+      event: EngineEvents.onUpdate,
       cbName: this.id,
       cb: (): void => {
         if (this.isShowFPS) {

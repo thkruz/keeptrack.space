@@ -30,6 +30,7 @@ import { errorManagerInstance } from './errorManager';
 
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { EngineEvents, Tessa } from '@app/tessa';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
@@ -53,6 +54,7 @@ import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
 import { PersistenceManager, StorageKey } from './persistence-manager';
 
 export class ColorSchemeManager {
+  static readonly id = 'ColorSchemeManager';
   // This is where you confiure addon color schemes
   static readonly addonColorSchemes = [
     ObjectTypeColorScheme,
@@ -263,6 +265,18 @@ export class ColorSchemeManager {
           },
         });
 
+      },
+    });
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onUpdate,
+      cbName: ColorSchemeManager.id,
+      cb: () => {
+        /*
+         * Update Colors
+         * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
+         */
+        this.calculateColorBuffers(false); // avoid recalculating ALL colors
       },
     });
 

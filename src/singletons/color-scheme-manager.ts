@@ -711,7 +711,7 @@ export class ColorSchemeManager {
   private setSelectedAndHoverBuffer_() {
     const selSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
 
-    if (selSat && selSat > -1) {
+    if (typeof selSat !== 'undefined' && selSat > -1) {
       // Selected satellites are always one color so forget whatever we just did
       this.colorData[selSat * 4] = settingsManager.selectedColor[0]; // R
       this.colorData[selSat * 4 + 1] = settingsManager.selectedColor[1]; // G

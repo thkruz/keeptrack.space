@@ -82,7 +82,6 @@ export class KeepTrack {
     [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
 
   isReady = false;
-  private isUpdateTimeThrottle_: boolean;
   private lastGameLoopTimestamp_ = <Milliseconds>0;
   private readonly settingsOverride_: SettingsManagerOverride;
 
@@ -211,9 +210,12 @@ export class KeepTrack {
     this.lastGameLoopTimestamp_ = timestamp;
 
     if (settingsManager.cruncherReady) {
+      Tessa.getInstance().setDeltaTime(dt, keepTrackApi.getTimeManager().propRate);
+      tessaEngine.runEvent(EngineEvents.onUpdateStart, dt);
       tessaEngine.runEvent(EngineEvents.onUpdate, dt);
-      this.update_(dt); // Do any per frame calculations
+      tessaEngine.runEvent(EngineEvents.onUpdateEnd, dt);
       tessaEngine.runEvent(EngineEvents.onRenderFrameStart);
+      tessaEngine.runEvent(EngineEvents.onRenderFrame);
       this.draw_(dt);
       tessaEngine.runEvent(EngineEvents.onRenderFrameEnd);
 
@@ -618,28 +620,6 @@ theodore.kruczek at gmail dot com.
         this.postStart_();
       }, 100);
     }
-  }
-
-  private update_(dt = <Milliseconds>0) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const renderer = keepTrackApi.getRenderer();
-
-    Tessa.getInstance().setDeltaTime(dt, timeManagerInstance.propRate);
-
-    // Update official time for everyone else
-    timeManagerInstance.setNow(<Milliseconds>Date.now());
-    if (!this.isUpdateTimeThrottle_) {
-      this.isUpdateTimeThrottle_ = true;
-      timeManagerInstance.setSelectedDate(timeManagerInstance.simulationTimeObj);
-      setTimeout(() => {
-        this.isUpdateTimeThrottle_ = false;
-      }, 500);
-    }
-
-    // Update Draw Positions
-    keepTrackApi.getDotsManager().updatePositionBuffer();
-
-    renderer.update();
   }
 
   // Make the api available

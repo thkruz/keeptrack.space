@@ -10,32 +10,74 @@
 import { Milliseconds } from 'ootk';
 
 /**
- * Enum containing core engine evennts
+ * Enumerates the various events emitted by the engine.
+ *
+ * These events cover the engine lifecycle, rendering, updating, resizing, and user input interactions.
  */
 export enum EngineEvents {
+  /** Emitted when the engine is ready */
   onReady = 'onReady',
+  /** Emitted after the engine has been initialized */
   onEngineInitialized = 'onEngineInitialized',
+  /**
+   * Emitted at the start of an update cycle
+   *
+   * Events that ARE time sensitive should be handled here.
+   * This is the first event that is emitted after the update frame starts.
+   */
+  onUpdateStart = 'onUpdateStart',
+  /**
+   * Emitted during the update cycle
+   *
+   * Events that ARE NOT time sensitive should be handled here.
+   * This is the second event that is emitted after the update frame starts.
+   */
   onUpdate = 'onUpdate',
+  /**
+   * Emitted at the end of an update cycle
+   *
+   * Events that ARE time sensitive should be handled here.
+   * This is the last event that is emitted before the render frame starts.
+   */
+  onUpdateEnd = 'onUpdateEnd',
+  /** Emitted at the start of a render frame */
   onRenderFrameStart = 'onRenderFrameStart',
+  /** Emitted during the render frame */
+  onRenderFrame = 'onRenderFrame',
+  /** Emitted at the end of a render frame */
   onRenderFrameEnd = 'onRenderFrameEnd',
+  /** Emitted when the engine or viewport is resized */
   onResize = 'onResize',
+  /** Emitted when a mouse button is pressed */
   onMouseDown = 'onMouseDown',
+  /** Emitted when a mouse button is released */
   onMouseUp = 'onMouseUp',
+  /** Emitted when the mouse is moved */
   onMouseMove = 'onMouseMove',
+  /** Emitted when the mouse wheel is used */
   onMouseWheel = 'onMouseWheel',
+  /** Emitted when a touch starts */
   onTouchStart = 'onTouchStart',
+  /** Emitted when a touch ends */
   onTouchEnd = 'onTouchEnd',
+  /** Emitted when a touch moves */
   onTouchMove = 'onTouchMove',
+  /** Emitted when a key is pressed down */
   onKeyDown = 'onKeyDown',
+  /** Emitted when a key is released */
   onKeyUp = 'onKeyUp',
+  /** Emitted when a key is pressed */
   onKeyPress = 'onKeyPress',
 }
 
 type EngineEventArguments = {
   [EngineEvents.onReady]: [];
   [EngineEvents.onEngineInitialized]: [];
+  [EngineEvents.onUpdateStart]: [Milliseconds];
   [EngineEvents.onUpdate]: [Milliseconds];
+  [EngineEvents.onUpdateEnd]: [Milliseconds];
   [EngineEvents.onRenderFrameStart]: [];
+  [EngineEvents.onRenderFrame]: [];
   [EngineEvents.onRenderFrameEnd]: [];
   [EngineEvents.onResize]: [];
   [EngineEvents.onMouseDown]: [];

@@ -2,7 +2,7 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
-import { Tessa } from '@app/tessa';
+import { EngineEvents, Tessa } from '@app/tessa';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime } from 'ootk';
 import { GetSatType } from '../interfaces';
@@ -198,6 +198,14 @@ export class WebGLRenderer {
     });
 
     keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onUpdate,
+      cbName: 'webgl-renderer',
+      cb: () => {
+        this.update();
+      },
+    });
   }
 
   /**

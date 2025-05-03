@@ -3,7 +3,7 @@ import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Tessa } from '@app/tessa';
+import { EngineEvents, Tessa } from '@app/tessa';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Milliseconds, SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -342,6 +342,14 @@ export class DotsManager {
     this.buffers.size = renderer.gl.createBuffer();
 
     this.initProgramPicking();
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onUpdate,
+      cbName: 'DotsManager.updatePositionBuffer',
+      cb: () => {
+        this.updatePositionBuffer();
+      },
+    });
   }
 
   /**

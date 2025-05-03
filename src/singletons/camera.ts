@@ -24,6 +24,7 @@
 import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { EngineEvents, Tessa } from '@app/tessa/tessa';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -53,6 +54,7 @@ export enum CameraType {
 }
 
 export class Camera {
+  static readonly id = 'Camera';
   private chaseSpeed_ = 0.0005;
   private earthCenteredPitch_ = <Radians>0;
   private earthCenteredYaw_ = <Radians>0;
@@ -742,6 +744,14 @@ export class Camera {
       event: KeepTrackApiEvents.touchStart,
       cbName: 'mainCamera',
       cb: this.touchStart_.bind(this),
+    });
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onRenderFrame,
+      cbName: Camera.id,
+      cb: () => {
+        this.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, keepTrackApi.getRenderer().sensorPos);
+      },
     });
   }
 

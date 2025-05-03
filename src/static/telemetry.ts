@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { VERSION } from '@app/settings/version';
-import { Tessa } from '@app/tessa';
+import { Tessa } from '@app/tessa/tessa';
 
 interface WebGLTelemetryData {
   // Basic Error Information

@@ -1,14 +1,31 @@
 import { DetailedSatellite, Milliseconds } from 'ootk';
 
+import { EngineEvents, Tessa } from '@app/tessa/tessa';
 import { keepTrackApi } from '../keepTrackApi';
+import { HoverManager } from './hover-manager';
 
 export class DemoManager {
+  static readonly id = 'DemoManager';
+
   private readonly UPDATE_INTERVAL_ = <Milliseconds>3000;
   private readonly IS_RANDOM_ = true;
   private lastTime_ = <Milliseconds>0;
-  public satellite = 0;
+  satellite = 0;
 
-  public update(): void {
+  init(): void {
+    Tessa.getInstance().register({
+      event: EngineEvents.onUpdate,
+      cbName: HoverManager.id,
+      cb: () => {
+        // If Demo Mode do stuff
+        if (settingsManager.isDemoModeOn && keepTrackApi.getSensorManager()?.currentSensors[0]?.lat !== null) {
+          this.update();
+        }
+      },
+    });
+  }
+
+  update(): void {
     const satData = keepTrackApi.getCatalogManager().objectCache;
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 

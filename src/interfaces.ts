@@ -268,6 +268,7 @@ export enum Singletons {
   PersistenceManager = 'PersistenceManager',
   Scene = 'Scene',
   MeshManager = 'MeshManager',
+  DemoManager = 'DemoManager',
 }
 
 /**

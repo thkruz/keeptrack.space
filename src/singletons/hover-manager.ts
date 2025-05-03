@@ -4,6 +4,7 @@ import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
 import { SatMath } from '@app/static/sat-math';
+import { EngineEvents, Tessa } from '@app/tessa/tessa';
 import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
 import { SensorMath } from '../static/sensor-math';
@@ -12,6 +13,8 @@ import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
 
 export class HoverManager {
+  static readonly id = 'hoverManager';
+
   /** The id of the object currently being hovered */
   private currentHoverId = -1;
   /** This is used to track how many orbit buffers have been updated this draw cycle */
@@ -35,6 +38,20 @@ export class HoverManager {
     this.satHoverBoxNode2 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox2'));
     this.satHoverBoxNode3 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox3'));
     this.satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onUpdate,
+      cbName: HoverManager.id,
+      cb: () => {
+        // TODO: Reevaluate these conditions
+        if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+          // Only update hover if we are not on mobile
+          if (!settingsManager.isMobileModeEnabled) {
+            this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+          }
+        }
+      },
+    });
   }
 
   /**

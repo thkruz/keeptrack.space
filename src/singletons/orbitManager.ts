@@ -3,6 +3,7 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { EngineEvents, Tessa } from '@app/tessa/tessa';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
@@ -30,6 +31,7 @@ export interface ObjDataJson {
 }
 
 export class OrbitManager {
+  static readonly id = 'orbitManager';
   private currentInView_ = <number[]>[];
   private currentSelectId_ = -1;
   private glBuffers_ = <WebGLBuffer[]>[];
@@ -202,8 +204,19 @@ export class OrbitManager {
       objData: objDataString,
       numSegs: settingsManager.orbitSegments,
     });
-    this.isInitialized_ = true;
 
+    Tessa.getInstance().register({
+      event: EngineEvents.onUpdate,
+      cbName: OrbitManager.id,
+      cb: () => {
+        // TODO: Reevaluate these conditions
+        if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+          this.updateAllVisibleOrbits();
+        }
+      },
+    });
+
+    this.isInitialized_ = true;
     keepTrackApi.runEvent(KeepTrackApiEvents.orbitManagerInit);
   }
 

@@ -27,6 +27,7 @@
 
 import { KeepTrackApiEvents, MissileParams } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { EngineEvents, Tessa } from '@app/tessa/tessa';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Degrees, DetailedSatellite, EciVec3, KilometersPerSecond, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
@@ -615,6 +616,7 @@ export class CatalogManager {
 
     // Run any functions registered with the API
     keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherReady);
+    Tessa.getInstance().runEvent(EngineEvents.onEngineInitialized);
 
     settingsManager.cruncherReady = true;
   }

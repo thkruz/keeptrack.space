@@ -7,7 +7,9 @@
  * Anything beyond core engine functionality should be in the KeepTrack API.
  */
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { Milliseconds } from 'ootk';
+import { keepTrackApi } from '../keepTrackApi';
 
 /**
  * Enumerates the various events emitted by the engine.
@@ -99,6 +101,7 @@ interface TessaRegisterParams<T extends keyof EngineEventArguments> {
 }
 
 export class Tessa {
+  static readonly id = 'Tessa';
   static instance: Tessa | null = null; // NOSONAR
   /**
    * The number of milliseconds since the update loop started.
@@ -112,6 +115,7 @@ export class Tessa {
    *  Use this for all simulation time/physics calculations
    */
   simulationStep: Milliseconds;
+  lastGameLoopTimestamp_ = 0 as Milliseconds;
   static getInstance() {
     Tessa.instance ??= new Tessa();
 
@@ -140,14 +144,49 @@ export class Tessa {
       [K in keyof EngineEventArguments]: TessaRegisterParams<K>[];
     };
 
+  constructor() {
+    Tessa.printConsoleMessage();
+    this.register({
+      event: EngineEvents.onEngineInitialized,
+      cbName: Tessa.id,
+      cb: () => {
+        this.isInitialized = true;
+      },
+    });
+  }
+
   /** Flag to indicate if the engine is still loading */
-  isLoading = true;
+  isInitialized = false;
   framesPerSecond = 0;
 
   static calculateFps(dt: Milliseconds): number {
     const fps = 1000 / dt;
 
     return fps;
+  }
+
+  gameLoop(timestamp = 0 as Milliseconds) {
+    const dt = <Milliseconds>(timestamp - this.lastGameLoopTimestamp_);
+
+    requestAnimationFrame(this.gameLoop.bind(this));
+    this.tick(dt);
+    this.lastGameLoopTimestamp_ = timestamp;
+  }
+
+  tick(dt: Milliseconds) {
+    this.setFps(Tessa.calculateFps(dt));
+    if (!this.isInitialized) {
+      return;
+    }
+
+    this.setDeltaTime(dt, keepTrackApi.getTimeManager().propRate);
+    this.runEvent(EngineEvents.onUpdateStart, dt);
+    this.runEvent(EngineEvents.onUpdate, dt);
+    this.runEvent(EngineEvents.onUpdateEnd, dt);
+    this.runEvent(EngineEvents.onRenderFrameStart);
+    this.runEvent(EngineEvents.onRenderFrame);
+    keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, dt);
+    this.runEvent(EngineEvents.onRenderFrameEnd);
   }
 
   setDeltaTime(dt: Milliseconds, propagationRate: number) {
@@ -193,5 +232,22 @@ export class Tessa {
     for (const event of Object.keys(this.events_) as (keyof EngineEventArguments)[]) {
       this.events_[event] = [];
     }
+  }
+
+  static printConsoleMessage() {
+    // eslint-disable-next-line no-console
+    console.log(`
+ _____ _____ _____ _____  ___
+|_   _|  ___/  ___/  ___|/ _ \\
+  | | | |__ \\ \`--.\\ \`--./ /_\\ \\
+  | | |  __| \`--. \\\`--. \\  _  |
+  | | | |___/\\__/ /\\__/ / | | |
+  \\_/ \\____/\\____/\\____/\\_| |_/
+
+Powered by the TESSA engine.
+Learn more at https://keeptrack.space/tessa
+This software is licensed under the GNU Affero General Public License (AGPL).
+See https://www.gnu.org/licenses/agpl-3.0.html for details.
+    `);
   }
 }

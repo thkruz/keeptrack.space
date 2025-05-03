@@ -6,6 +6,7 @@ import { CameraType } from '@app/singletons/camera';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UrlManager } from '@app/static/url-manager';
+import { EngineEvents, Tessa } from '@app/tessa/tessa';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
@@ -47,6 +48,19 @@ export class SelectSatManager extends KeepTrackPlugin {
       event: KeepTrackApiEvents.updateLoop,
       cbName: this.id,
       cb: this.checkIfSelectSatVisible.bind(this),
+    });
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onRenderFrameEnd,
+      cbName: this.id,
+      cb: () => {
+        if (this.primarySatObj.id !== -1) {
+          const timeManagerInstance = keepTrackApi.getTimeManager();
+
+          keepTrackApi.getUiManager().
+            updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
+        }
+      },
     });
   }
 

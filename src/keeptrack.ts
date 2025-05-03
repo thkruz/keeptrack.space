@@ -43,12 +43,10 @@ import thuleJpg from '@public/img/wallpaper/thule.jpg';
 import 'material-icons/iconfont/material-icons.css';
 
 import eruda, { ErudaConsole } from 'eruda';
-import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
 import { KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
-import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from './plugins/sensor/sensorManager';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
@@ -74,7 +72,7 @@ import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
 import { SensorMath } from './static/sensor-math';
 import { SplashScreen } from './static/splash-screen';
-import { EngineEvents, Tessa } from './tessa';
+import { Tessa } from './tessa/tessa';
 
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
@@ -82,7 +80,6 @@ export class KeepTrack {
     [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
 
   isReady = false;
-  private lastGameLoopTimestamp_ = <Milliseconds>0;
   private readonly settingsOverride_: SettingsManagerOverride;
 
   colorManager: ColorSchemeManager;
@@ -184,6 +181,9 @@ export class KeepTrack {
     const hoverManagerInstance = new HoverManager();
 
     keepTrackContainer.registerSingleton(Singletons.HoverManager, hoverManagerInstance);
+    const demoManagerInstance = new DemoManager();
+
+    keepTrackContainer.registerSingleton(Singletons.DemoManager, demoManagerInstance);
 
     this.mainCameraInstance = mainCameraInstance;
     this.errorManager = errorManagerInstance;
@@ -197,37 +197,7 @@ export class KeepTrack {
     this.sensorManager = sensorManagerInstance;
     this.uiManager = uiManagerInstance;
     this.inputManager = inputManagerInstance;
-    this.demoManager = new DemoManager();
-  }
-
-  gameLoop(timestamp = <Milliseconds>0): void {
-    requestAnimationFrame(this.gameLoop.bind(this));
-    const tessaEngine = Tessa.getInstance();
-    const dt = <Milliseconds>(timestamp - this.lastGameLoopTimestamp_);
-
-    tessaEngine.setFps(Tessa.calculateFps(dt));
-
-    this.lastGameLoopTimestamp_ = timestamp;
-
-    if (settingsManager.cruncherReady) {
-      Tessa.getInstance().setDeltaTime(dt, keepTrackApi.getTimeManager().propRate);
-      tessaEngine.runEvent(EngineEvents.onUpdateStart, dt);
-      tessaEngine.runEvent(EngineEvents.onUpdate, dt);
-      tessaEngine.runEvent(EngineEvents.onUpdateEnd, dt);
-      tessaEngine.runEvent(EngineEvents.onRenderFrameStart);
-      tessaEngine.runEvent(EngineEvents.onRenderFrame);
-      this.draw_(dt);
-      tessaEngine.runEvent(EngineEvents.onRenderFrameEnd);
-
-      if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-        const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
-
-        if (selectedSatellite) {
-          keepTrackApi.getUiManager().
-            updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, selectedSatellite);
-        }
-      }
-    }
+    this.demoManager = demoManagerInstance;
   }
 
   static getDefaultBodyHtml(): void {
@@ -440,31 +410,6 @@ theodore.kruczek at gmail dot com.
     }
   }
 
-  private draw_(dt = <Milliseconds>0) {
-    const renderer = keepTrackApi.getRenderer();
-    const camera = keepTrackApi.getMainCamera();
-
-    camera.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, renderer.sensorPos);
-    renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
-
-    if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
-      keepTrackApi.getOrbitManager().updateAllVisibleOrbits();
-      this.inputManager.update();
-
-      // Only update hover if we are not on mobile
-      if (!settingsManager.isMobileModeEnabled) {
-        keepTrackApi.getHoverManager().setHoverId(this.inputManager.mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-      }
-    }
-
-    // If Demo Mode do stuff
-    if (settingsManager.isDemoModeOn && keepTrackApi.getSensorManager()?.currentSensors[0]?.lat !== null) {
-      this.demoManager.update();
-    }
-
-    keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, dt);
-  }
-
   async run(): Promise<void> {
     try {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -535,12 +480,13 @@ theodore.kruczek at gmail dot com.
       dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer!);
 
       this.inputManager.init();
+      this.demoManager.init();
 
       await renderer.init(settingsManager);
       renderer.meshManager.init(renderer.gl);
 
       // Now that everything is loaded, start rendering to thg canvas
-      this.gameLoop();
+      Tessa.getInstance().gameLoop();
 
       this.postStart_();
       this.isReady = true;

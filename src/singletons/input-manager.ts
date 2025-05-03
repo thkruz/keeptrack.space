@@ -7,7 +7,7 @@ import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 
-import { Tessa } from '@app/tessa';
+import { EngineEvents, Tessa } from '@app/tessa/tessa';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
@@ -25,6 +25,8 @@ export type KeyEvent = {
 };
 
 export class InputManager {
+  static readonly id = 'InputManager';
+
   private updateHoverDelay = 0;
   private updateHoverDelayLimit = 3;
   isRmbMenuOpen = false;
@@ -381,6 +383,17 @@ export class InputManager {
     this.mouse.init(canvasDOM);
     this.touch.init(canvasDOM);
     this.keyboard.init();
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onUpdate,
+      cbName: InputManager.id,
+      cb: () => {
+        // TODO: Reevaluate these conditions
+        if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+          this.update();
+        }
+      },
+    });
   }
 
   public openRmbMenu(clickedSatId: number = -1) {

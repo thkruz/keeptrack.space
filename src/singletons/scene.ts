@@ -2,7 +2,7 @@ import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
-import { Tessa } from '@app/tessa';
+import { Tessa } from '@app/tessa/tessa';
 import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';

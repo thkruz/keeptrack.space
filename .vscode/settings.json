@@ -81,5 +81,7 @@
   "sonarlint.connectedMode.project": {
     "connectionId": "http-localhost-9000",
     "projectKey": "keeptrack"
-  }
+  },
+  "git.autorefresh": false,
+  "git.autoRepositoryDetection": "openEditors",
 }

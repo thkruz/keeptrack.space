@@ -9,7 +9,7 @@ import debugPng from '@public/img/icons/debug.png';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { EngineEvents, Tessa } from '@app/tessa';
+import { EngineEvents, Tessa } from '@app/tessa/tessa';
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';

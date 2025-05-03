@@ -2,7 +2,7 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
-import { EngineEvents, Tessa } from '@app/tessa';
+import { EngineEvents, Tessa } from '@app/tessa/tessa';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime } from 'ootk';
 import { GetSatType } from '../interfaces';
@@ -20,6 +20,7 @@ import { GroupType } from './object-group';
 import { Scene } from './scene';
 
 export class WebGLRenderer {
+  static readonly id = 'webgl-renderer';
   private hoverBoxOnSatMiniElements_: HTMLElement | null = null;
   private isRotationEvent_: boolean;
   private isSatMiniBoxInUse_ = false;
@@ -204,6 +205,14 @@ export class WebGLRenderer {
       cbName: 'webgl-renderer',
       cb: () => {
         this.update();
+      },
+    });
+
+    Tessa.getInstance().register({
+      event: EngineEvents.onRenderFrame,
+      cbName: WebGLRenderer.id,
+      cb: () => {
+        this.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
       },
     });
   }

@@ -23,8 +23,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-/* eslint-disable no-unreachable */
-
 import logoPrimaryPng from '@public/img/logo-primary.png';
 import logoSecondaryPng from '@public/img/logo-secondary.png';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
@@ -72,14 +70,16 @@ import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
 import { SensorMath } from './static/sensor-math';
 import { SplashScreen } from './static/splash-screen';
+import { EngineEvents } from './tessa/engine-events';
 import { Tessa } from './tessa/tessa';
 
 export class KeepTrack {
+  static readonly id = 'KeepTrack';
+
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
   private static readonly splashScreenImgList_ =
     [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
 
-  isReady = false;
   private readonly settingsOverride_: SettingsManagerOverride;
 
   colorManager: ColorSchemeManager;
@@ -104,28 +104,29 @@ export class KeepTrack {
       isShowSplashScreen: true,
     },
   ) {
-    if (this.isReady) {
-      throw new Error('KeepTrack is already started');
+    this.settingsOverride_ = settingsOverride;
+    settingsManager.init(this.settingsOverride_);
+  }
+
+  private static keepTrackInstance: KeepTrack | null = null;
+
+  static getInstance(settingsOverride?: SettingsManagerOverride): KeepTrack {
+    if (!KeepTrack.keepTrackInstance) {
+      KeepTrack.keepTrackInstance = new KeepTrack(settingsOverride);
+
+      // Expose to window for debugging
+      window.keepTrack = KeepTrack.keepTrackInstance;
     }
 
-    this.settingsOverride_ = settingsOverride;
+    return KeepTrack.keepTrackInstance;
   }
 
   init() {
-    settingsManager.init(this.settingsOverride_);
-
-    KeepTrack.setContainerElement();
+    KeepTrack.setContainerElement_();
 
     if (!this.settingsOverride_.isPreventDefaultHtml) {
       import(/* webpackMode: "eager" */ '@css/loading-screen.css');
       KeepTrack.getDefaultBodyHtml();
-      BottomMenu.init();
-
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.uiManagerFinal,
-        cbName: 'addBottomMenuFilterButtons',
-        cb: () => BottomMenu.addBottomMenuFilterButtons(),
-      });
 
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
         KeepTrack.loadSplashScreen_();
@@ -258,7 +259,7 @@ export class KeepTrack {
     }
   }
 
-  private static setContainerElement() {
+  private static setContainerElement_() {
     // User provides the container using the settingsManager
     const containerDom = settingsManager.containerRoot ?? document.getElementById('keeptrack-root') as HTMLDivElement;
 
@@ -272,13 +273,8 @@ export class KeepTrack {
     }
   }
 
-  /* istanbul ignore next */
-  static async initCss(): Promise<void> {
+  static async loadCss(): Promise<void> {
     try {
-      if (!isThisNode()) {
-        KeepTrack.printLogoToConsole_();
-      }
-
       // Load the CSS
       if (!settingsManager.isDisableCss) {
         import('@css/fonts.css');
@@ -385,114 +381,101 @@ theodore.kruczek at gmail dot com.
         `);
   }
 
-  private static showErrorCode(error: Error & { lineNumber: number }): void {
-    // TODO: Replace console calls with ErrorManagerInstance
+  registerAssets(): void {
+    Tessa.getInstance().assetList = [
+      async () => {
+        this.init();
 
-    let errorHtml = '';
+        await KeepTrack.loadCss();
 
-    errorHtml += error?.message ? `${error.message}<br>` : '';
-    errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
-    errorHtml += error?.stack ? `${error.stack}<br>` : '';
-    const LoaderText = getEl('loader-text');
-
-    if (LoaderText) {
-      LoaderText.innerHTML = errorHtml;
-      // eslint-disable-next-line no-console
-      console.error(error);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
-    // istanbul ignore next
-    if (!isThisNode()) {
-      // eslint-disable-next-line no-console
-      console.warn(error);
-    }
-  }
-
-  async run(): Promise<void> {
-    try {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      const timeManagerInstance = keepTrackApi.getTimeManager();
-      const renderer = keepTrackApi.getRenderer();
-      const sceneInstance = keepTrackApi.getScene();
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
-      const uiManagerInstance = keepTrackApi.getUiManager();
-      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
-      // Upodate the version number and date
-      settingsManager.versionNumber = VERSION;
-
-      // Error Trapping
-      window.addEventListener('error', (e: ErrorEvent) => {
-        if (!settingsManager.isGlobalErrorTrapOn) {
-          return;
-        }
-        if (isThisNode()) {
-          throw e.error;
-        }
-        errorManagerInstance.error(e.error, 'Global Error Trapper', e.message);
-      });
-
-      keepTrackApi.getMainCamera().init(settingsManager);
-
-      SplashScreen.loadStr(SplashScreen.msg.science);
-      mobileManager.init();
-
-      // Load all the plugins now that we have the API initialized
-      await import('./plugins/plugins')
-        .then((mod) => mod.loadPlugins(keepTrackApi, settingsManager.plugins))
-        .catch(() => {
-          // intentionally left blank
+        Tessa.getInstance().register({
+          event: EngineEvents.onGameLoopStarted,
+          cbName: KeepTrack.id,
+          cb: () => {
+            this.postStart_();
+          },
         });
 
-      SplashScreen.loadStr(SplashScreen.msg.science2);
-      // Start initializing the rest of the website
-      timeManagerInstance.init();
-      uiManagerInstance.onReady();
+        if (!isThisNode()) {
+          KeepTrack.printLogoToConsole_();
+        }
 
-      SplashScreen.loadStr(SplashScreen.msg.dots);
-      /*
-       * MobileManager.checkMobileMode();
-       * We need to know if we are on a small screen before starting webgl
-       */
-      await renderer.glInit();
+        BottomMenu.init();
 
-      sceneInstance.init(renderer.gl);
-      sceneInstance.loadScene();
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const orbitManagerInstance = keepTrackApi.getOrbitManager();
+        const timeManagerInstance = keepTrackApi.getTimeManager();
+        const renderer = keepTrackApi.getRenderer();
+        const sceneInstance = keepTrackApi.getScene();
+        const dotsManagerInstance = keepTrackApi.getDotsManager();
+        const uiManagerInstance = keepTrackApi.getUiManager();
+        const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-      dotsManagerInstance.init(settingsManager);
+        // Upodate the version number and date
+        settingsManager.versionNumber = VERSION;
 
-      catalogManagerInstance.initObjects();
+        // Error Trapping
+        window.addEventListener('error', (e: ErrorEvent) => {
+          if (!settingsManager.isGlobalErrorTrapOn) {
+            return;
+          }
+          if (isThisNode()) {
+            throw e.error;
+          }
+          errorManagerInstance.error(e.error, 'Global Error Trapper', e.message);
+        });
 
-      catalogManagerInstance.init();
-      colorSchemeManagerInstance.init();
+        keepTrackApi.getMainCamera().init(settingsManager);
 
-      await CatalogLoader.load(); // Needs Object Manager and gl first
+        SplashScreen.loadStr(SplashScreen.msg.science);
+        mobileManager.init();
 
-      lineManagerInstance.init();
+        // Load all the plugins now that we have the API initialized
+        await import('./plugins/plugins')
+          .then((mod) => mod.loadPlugins(keepTrackApi, settingsManager.plugins))
+          .catch(() => {
+            // intentionally left blank
+          });
 
-      orbitManagerInstance.init(lineManagerInstance, renderer.gl);
+        SplashScreen.loadStr(SplashScreen.msg.science2);
+        // Start initializing the rest of the website
+        timeManagerInstance.init();
+        uiManagerInstance.onReady();
 
-      uiManagerInstance.init();
+        SplashScreen.loadStr(SplashScreen.msg.dots);
+        /*
+         * MobileManager.checkMobileMode();
+         * We need to know if we are on a small screen before starting webgl
+         */
+        await renderer.glInit();
 
-      dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer!);
+        sceneInstance.init(renderer.gl);
+        sceneInstance.loadScene();
 
-      this.inputManager.init();
-      this.demoManager.init();
+        dotsManagerInstance.init(settingsManager);
 
-      await renderer.init(settingsManager);
-      renderer.meshManager.init(renderer.gl);
+        catalogManagerInstance.initObjects();
 
-      // Now that everything is loaded, start rendering to thg canvas
-      Tessa.getInstance().gameLoop();
+        catalogManagerInstance.init();
+        colorSchemeManagerInstance.init();
 
-      this.postStart_();
-      this.isReady = true;
-    } catch (error) {
-      KeepTrack.showErrorCode(<Error & { lineNumber: number }>error);
-    }
+        await CatalogLoader.load(); // Needs Object Manager and gl first
+
+        lineManagerInstance.init();
+
+        orbitManagerInstance.init(lineManagerInstance, renderer.gl);
+
+        uiManagerInstance.init();
+
+        dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer!);
+
+        this.inputManager.init();
+        this.demoManager.init();
+
+        await renderer.init(settingsManager);
+        renderer.meshManager.init(renderer.gl);
+      },
+    ];
   }
 
   private postStart_() {

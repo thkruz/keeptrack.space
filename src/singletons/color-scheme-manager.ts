@@ -30,7 +30,8 @@ import { errorManagerInstance } from './errorManager';
 
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EngineEvents, Tessa } from '@app/tessa/tessa';
+import { EngineEvents } from '@app/tessa/engine-events';
+import { Tessa } from '@app/tessa/tessa';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';

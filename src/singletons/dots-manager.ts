@@ -3,7 +3,8 @@ import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EngineEvents, Tessa } from '@app/tessa/tessa';
+import { EngineEvents } from '@app/tessa/engine-events';
+import { Tessa } from '@app/tessa/tessa';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Milliseconds, SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';

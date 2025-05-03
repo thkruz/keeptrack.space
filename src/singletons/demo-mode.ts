@@ -1,6 +1,7 @@
 import { DetailedSatellite, Milliseconds } from 'ootk';
 
-import { EngineEvents, Tessa } from '@app/tessa/tessa';
+import { EngineEvents } from '@app/tessa/engine-events';
+import { Tessa } from '@app/tessa/tessa';
 import { keepTrackApi } from '../keepTrackApi';
 import { HoverManager } from './hover-manager';
 

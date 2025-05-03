@@ -7,7 +7,8 @@ import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 
-import { EngineEvents, Tessa } from '@app/tessa/tessa';
+import { EngineEvents } from '@app/tessa/engine-events';
+import { Tessa } from '@app/tessa/tessa';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';

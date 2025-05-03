@@ -3,7 +3,8 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EngineEvents, Tessa } from '@app/tessa/tessa';
+import { EngineEvents } from '@app/tessa/engine-events';
+import { Tessa } from '@app/tessa/tessa';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';

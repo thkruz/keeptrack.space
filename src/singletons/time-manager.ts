@@ -1,5 +1,6 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { EngineEvents, Tessa } from '@app/tessa/tessa';
+import { EngineEvents } from '@app/tessa/engine-events';
+import { Tessa } from '@app/tessa/tessa';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';

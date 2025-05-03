@@ -24,7 +24,8 @@
 import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EngineEvents, Tessa } from '@app/tessa/tessa';
+import { EngineEvents } from '@app/tessa/engine-events';
+import { Tessa } from '@app/tessa/tessa';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';

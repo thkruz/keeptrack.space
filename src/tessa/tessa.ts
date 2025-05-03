@@ -8,91 +8,11 @@
  */
 
 import { KeepTrackApiEvents } from '@app/interfaces';
+import { getEl } from '@app/lib/get-el';
+import { isThisNode } from '@app/static/isThisNode';
 import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
-
-/**
- * Enumerates the various events emitted by the engine.
- *
- * These events cover the engine lifecycle, rendering, updating, resizing, and user input interactions.
- */
-export enum EngineEvents {
-  /** Emitted when the engine is ready */
-  onReady = 'onReady',
-  /** Emitted after the engine has been initialized */
-  onEngineInitialized = 'onEngineInitialized',
-  /**
-   * Emitted at the start of an update cycle
-   *
-   * Events that ARE time sensitive should be handled here.
-   * This is the first event that is emitted after the update frame starts.
-   */
-  onUpdateStart = 'onUpdateStart',
-  /**
-   * Emitted during the update cycle
-   *
-   * Events that ARE NOT time sensitive should be handled here.
-   * This is the second event that is emitted after the update frame starts.
-   */
-  onUpdate = 'onUpdate',
-  /**
-   * Emitted at the end of an update cycle
-   *
-   * Events that ARE time sensitive should be handled here.
-   * This is the last event that is emitted before the render frame starts.
-   */
-  onUpdateEnd = 'onUpdateEnd',
-  /** Emitted at the start of a render frame */
-  onRenderFrameStart = 'onRenderFrameStart',
-  /** Emitted during the render frame */
-  onRenderFrame = 'onRenderFrame',
-  /** Emitted at the end of a render frame */
-  onRenderFrameEnd = 'onRenderFrameEnd',
-  /** Emitted when the engine or viewport is resized */
-  onResize = 'onResize',
-  /** Emitted when a mouse button is pressed */
-  onMouseDown = 'onMouseDown',
-  /** Emitted when a mouse button is released */
-  onMouseUp = 'onMouseUp',
-  /** Emitted when the mouse is moved */
-  onMouseMove = 'onMouseMove',
-  /** Emitted when the mouse wheel is used */
-  onMouseWheel = 'onMouseWheel',
-  /** Emitted when a touch starts */
-  onTouchStart = 'onTouchStart',
-  /** Emitted when a touch ends */
-  onTouchEnd = 'onTouchEnd',
-  /** Emitted when a touch moves */
-  onTouchMove = 'onTouchMove',
-  /** Emitted when a key is pressed down */
-  onKeyDown = 'onKeyDown',
-  /** Emitted when a key is released */
-  onKeyUp = 'onKeyUp',
-  /** Emitted when a key is pressed */
-  onKeyPress = 'onKeyPress',
-}
-
-type EngineEventArguments = {
-  [EngineEvents.onReady]: [];
-  [EngineEvents.onEngineInitialized]: [];
-  [EngineEvents.onUpdateStart]: [Milliseconds];
-  [EngineEvents.onUpdate]: [Milliseconds];
-  [EngineEvents.onUpdateEnd]: [Milliseconds];
-  [EngineEvents.onRenderFrameStart]: [];
-  [EngineEvents.onRenderFrame]: [];
-  [EngineEvents.onRenderFrameEnd]: [];
-  [EngineEvents.onResize]: [];
-  [EngineEvents.onMouseDown]: [];
-  [EngineEvents.onMouseUp]: [];
-  [EngineEvents.onMouseMove]: [];
-  [EngineEvents.onMouseWheel]: [];
-  [EngineEvents.onTouchStart]: [];
-  [EngineEvents.onTouchEnd]: [];
-  [EngineEvents.onTouchMove]: [];
-  [EngineEvents.onKeyDown]: [];
-  [EngineEvents.onKeyUp]: [];
-  [EngineEvents.onKeyPress]: [];
-};
+import { EngineEventArguments, EngineEvents } from './engine-events';
 
 interface TessaRegisterParams<T extends keyof EngineEventArguments> {
   event: T;
@@ -116,6 +36,7 @@ export class Tessa {
    */
   simulationStep: Milliseconds;
   lastGameLoopTimestamp_ = 0 as Milliseconds;
+  isRunning = false;
   static getInstance() {
     Tessa.instance ??= new Tessa();
 
@@ -146,13 +67,62 @@ export class Tessa {
 
   constructor() {
     Tessa.printConsoleMessage();
-    this.register({
-      event: EngineEvents.onEngineInitialized,
-      cbName: Tessa.id,
-      cb: () => {
-        this.isInitialized = true;
-      },
-    });
+  }
+
+  /**
+   * Initializes the engine, sets it as ready, and fires the initialization event.
+   * This should be called before loading assets or starting the game loop.
+   */
+  initialize() {
+    this.isInitialized = false; // Not ready until assets are loaded
+    this.runEvent(EngineEvents.onEngineInitialized);
+  }
+
+  assetList: (() => Promise<void>)[] = [] as (() => Promise<void>)[];
+
+  /**
+   * Loads assets required for the engine/game.
+   * Once assets are loaded, sets the engine as initialized and starts the game loop.
+   * You can extend this method to handle async asset loading if needed.
+   */
+  async run() {
+    try {
+      await Promise.all(this.assetList.map((asset) => asset()));
+
+      this.runEvent(EngineEvents.onAssetsLoaded);
+      this.isInitialized = true;
+      this.gameLoop(performance.now() as Milliseconds);
+      this.runEvent(EngineEvents.onGameLoopStarted);
+
+      this.isRunning = true;
+    } catch (error) {
+      Tessa.showErrorCode_(<Error & { lineNumber: number }>error);
+    }
+  }
+
+  private static showErrorCode_(error: Error & { lineNumber: number }): void {
+    // TODO: Replace console calls with ErrorManagerInstance
+
+    let errorHtml = '';
+
+    errorHtml += error?.message ? `${error.message}<br>` : '';
+    errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
+    errorHtml += error?.stack ? `${error.stack}<br>` : '';
+    const LoaderText = getEl('loader-text');
+
+    if (LoaderText) {
+      LoaderText.innerHTML = errorHtml;
+      // eslint-disable-next-line no-console
+      console.error(error);
+    } else {
+      // eslint-disable-next-line no-console
+      console.error(error);
+    }
+    // istanbul ignore next
+    if (!isThisNode()) {
+      // eslint-disable-next-line no-console
+      console.warn(error);
+    }
   }
 
   /** Flag to indicate if the engine is still loading */

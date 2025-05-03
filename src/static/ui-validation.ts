@@ -1,4 +1,6 @@
+import { keepTrackApi } from '@app/keepTrackApi';
 import { EditSat } from '@app/plugins/edit-sat/edit-sat';
+import { MissilePlugin } from '@app/plugins/missile/missile-plugin';
 import { getEl } from '../lib/get-el';
 
 export abstract class UiValidation {
@@ -47,23 +49,27 @@ export abstract class UiValidation {
      * Note: Depending on which plugins on enabled, some or all of
      * the following event listeners may be added.
      */
-    getEl('editSat')
-      ?.querySelectorAll('input')
-      .forEach((el: HTMLInputElement) => {
-        if (el.id === `${EditSat.elementPrefix}-country`) {
-          return;
-        }
-        el.addEventListener('keydown', UiValidation.validateNumOnly_);
-      });
-    getEl(`${EditSat.elementPrefix}-ecen`)?.addEventListener('keydown', UiValidation.allowPeriod_);
-    getEl(`${EditSat.elementPrefix}-day`)?.addEventListener('keyup', UiValidation.esDay366_);
-    getEl(`${EditSat.elementPrefix}-inc`)?.addEventListener('keyup', UiValidation.esInc180_);
-    getEl(`${EditSat.elementPrefix}-rasc`)?.addEventListener('keyup', UiValidation.esRasc360_);
-    getEl(`${EditSat.elementPrefix}-meanmo`)?.addEventListener('keyup', UiValidation.esMeanmo18_);
-    getEl(`${EditSat.elementPrefix}-argPe`)?.addEventListener('keyup', UiValidation.esArgPe360_);
-    getEl(`${EditSat.elementPrefix}-meana`)?.addEventListener('keyup', UiValidation.esMeana360_);
-    getEl('ms-lat')?.addEventListener('keyup', UiValidation.msLat90_);
-    getEl('ms-lon')?.addEventListener('keyup', UiValidation.msLon180_);
+    if (keepTrackApi.getPlugin(EditSat)) {
+      getEl('editSat')!
+        .querySelectorAll('input')
+        .forEach((el: HTMLInputElement) => {
+          if (el.id === `${EditSat.elementPrefix}-country`) {
+            return;
+          }
+          el.addEventListener('keydown', UiValidation.validateNumOnly_);
+        });
+      getEl(`${EditSat.elementPrefix}-ecen`)!.addEventListener('keydown', UiValidation.allowPeriod_);
+      getEl(`${EditSat.elementPrefix}-day`)!.addEventListener('keyup', UiValidation.esDay366_);
+      getEl(`${EditSat.elementPrefix}-inc`)!.addEventListener('keyup', UiValidation.esInc180_);
+      getEl(`${EditSat.elementPrefix}-rasc`)!.addEventListener('keyup', UiValidation.esRasc360_);
+      getEl(`${EditSat.elementPrefix}-meanmo`)!.addEventListener('keyup', UiValidation.esMeanmo18_);
+      getEl(`${EditSat.elementPrefix}-argPe`)!.addEventListener('keyup', UiValidation.esArgPe360_);
+      getEl(`${EditSat.elementPrefix}-meana`)!.addEventListener('keyup', UiValidation.esMeana360_);
+    }
+    if (keepTrackApi.getPlugin(MissilePlugin)) {
+      getEl('ms-lat')?.addEventListener('keyup', UiValidation.msLat90_);
+      getEl('ms-lon')?.addEventListener('keyup', UiValidation.msLon180_);
+    }
   }
 
   private static allowPeriod_(e: KeyboardEvent) {

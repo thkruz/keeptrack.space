@@ -626,8 +626,7 @@ theodore.kruczek at gmail dot com.
     const renderer = keepTrackApi.getRenderer();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-    renderer.dt = dt;
-    renderer.dtAdjusted = <Milliseconds>(Math.min(renderer.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
+    Tessa.getInstance().setDeltaTime(dt, timeManagerInstance.propRate);
 
     // Display it if that settings is enabled
     if (this.isShowFPS) {

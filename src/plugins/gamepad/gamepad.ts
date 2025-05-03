@@ -4,6 +4,7 @@ import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import { Tessa } from '@app/tessa';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -285,7 +286,7 @@ export class GamepadPlugin {
     if (zoomOut === 0 && zoomIn === 0) {
       return;
     } // Not Zooming
-    const renderer = keepTrackApi.getRenderer();
+    const tessaEngine = Tessa.getInstance();
 
     let zoomTarget = keepTrackApi.getMainCamera().zoomLevel();
 
@@ -293,8 +294,8 @@ export class GamepadPlugin {
       case CameraType.DEFAULT:
       case CameraType.OFFSET:
       case CameraType.FIXED_TO_SAT:
-        zoomTarget += (zoomOut / 500) * renderer.dt;
-        zoomTarget -= (zoomIn / 500) * renderer.dt;
+        zoomTarget += (zoomOut / 500) * tessaEngine.dt;
+        zoomTarget -= (zoomIn / 500) * tessaEngine.dt;
         keepTrackApi.getMainCamera().zoomTarget = zoomTarget;
         keepTrackApi.getMainCamera().camZoomSnappedOnSat = false;
         keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
@@ -310,10 +311,10 @@ export class GamepadPlugin {
       case CameraType.PLANETARIUM:
       case CameraType.ASTRONOMY:
         if (zoomOut !== 0) {
-          keepTrackApi.getMainCamera().fpsVertSpeed += (zoomOut * 2) ** 3 * renderer.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().fpsVertSpeed += (zoomOut * 2) ** 3 * tessaEngine.dt * settingsManager.cameraMovementSpeed;
         }
         if (zoomIn !== 0) {
-          keepTrackApi.getMainCamera().fpsVertSpeed -= (zoomIn * 2) ** 3 * renderer.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().fpsVertSpeed -= (zoomIn * 2) ** 3 * tessaEngine.dt * settingsManager.cameraMovementSpeed;
         }
         break;
       default:
@@ -328,7 +329,7 @@ export class GamepadPlugin {
 
     if (x > this.deadzone || x < -this.deadzone || y > this.deadzone || y < -this.deadzone) {
       keepTrackApi.getMainCamera().autoRotate(false);
-      const drawManagerInstance = keepTrackApi.getRenderer();
+      const tessaEngine = Tessa.getInstance();
 
       settingsManager.lastGamepadMovement = Date.now();
 
@@ -338,18 +339,18 @@ export class GamepadPlugin {
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().camAngleSnappedOnSat = false;
           keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
-          keepTrackApi.getMainCamera().camPitchSpeed -= (y ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
-          keepTrackApi.getMainCamera().camYawSpeed += (x ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().camPitchSpeed -= (y ** 3 / 200) * tessaEngine.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().camYawSpeed += (x ** 3 / 200) * tessaEngine.dt * settingsManager.cameraMovementSpeed;
           break;
         case CameraType.FPS:
         case CameraType.SATELLITE:
         case CameraType.PLANETARIUM:
         case CameraType.ASTRONOMY:
           if (y > this.deadzone || y < -this.deadzone) {
-            keepTrackApi.getMainCamera().fpsForwardSpeed = -(y ** 3) * drawManagerInstance.dt;
+            keepTrackApi.getMainCamera().fpsForwardSpeed = -(y ** 3) * tessaEngine.dt;
           }
           if (x > this.deadzone || x < -this.deadzone) {
-            keepTrackApi.getMainCamera().fpsSideSpeed = x ** 3 * drawManagerInstance.dt;
+            keepTrackApi.getMainCamera().fpsSideSpeed = x ** 3 * tessaEngine.dt;
           }
           break;
         default:
@@ -366,7 +367,7 @@ export class GamepadPlugin {
 
     const x = this.currentController.axes[2];
     const y = this.currentController.axes[3];
-    const drawManagerInstance = keepTrackApi.getRenderer();
+    const tessaEngine = Tessa.getInstance();
 
     keepTrackApi.getMainCamera().isLocalRotateOverride = false;
     if (y > this.deadzone || y < -this.deadzone || x > this.deadzone || x < -this.deadzone) {
@@ -383,8 +384,8 @@ export class GamepadPlugin {
         case CameraType.SATELLITE:
         case CameraType.PLANETARIUM:
         case CameraType.ASTRONOMY:
-          keepTrackApi.getMainCamera().camPitchSpeed += (y / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
-          keepTrackApi.getMainCamera().camYawSpeed -= (x / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().camPitchSpeed += (y / 100) * tessaEngine.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().camYawSpeed -= (x / 100) * tessaEngine.dt * settingsManager.cameraMovementSpeed;
           break;
         default:
           // Do nothing

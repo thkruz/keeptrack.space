@@ -93,7 +93,7 @@ export class Scene {
   drawTimeArray: number[] = Array(150).fill(16);
 
   renderBackground(renderer: WebGLRenderer, camera: Camera): void {
-    this.drawTimeArray.push(Math.min(100, renderer.dt));
+    this.drawTimeArray.push(Math.min(100, Tessa.getInstance().dt));
     if (this.drawTimeArray.length > 150) {
       this.drawTimeArray.shift();
     }

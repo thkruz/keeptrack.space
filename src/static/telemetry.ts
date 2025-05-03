@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { VERSION } from '@app/settings/version';
+import { Tessa } from '@app/tessa';
 
 interface WebGLTelemetryData {
   // Basic Error Information
@@ -363,7 +364,7 @@ export class Telemetry {
     return {
       application: {
         renderState: {
-          fps: 1000 / keepTrackApi.getRenderer().dt,
+          fps: Tessa.getInstance().framesPerSecond,
         },
       },
     };

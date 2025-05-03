@@ -3,15 +3,15 @@ import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { Tessa } from '@app/tessa';
 import { mat4 } from 'gl-matrix';
-import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, SpaceObjectType } from 'ootk';
+import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Milliseconds, SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { BufferAttribute } from '../static/buffer-attribute';
 import { WebGlProgramHelper } from '../static/webgl-program';
 import { CameraType } from './camera';
 import { MissileObject } from './catalog-manager/MissileObject';
-import { WebGLRenderer } from './webgl-renderer';
 
 declare module '@app/interfaces' {
   interface SatShader {
@@ -573,9 +573,9 @@ export class DotsManager {
       return;
     }
 
-    const renderer = keepTrackApi.getRenderer();
+    const simulationStep = Tessa.getInstance().simulationStep;
 
-    if (!settingsManager.lowPerf && renderer.dtAdjusted > settingsManager.minimumDrawDt) {
+    if (!settingsManager.lowPerf && simulationStep > settingsManager.minimumDrawDt) {
       if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
         const obj = keepTrackApi.getCatalogManager().objectCache[keepTrackApi.getPlugin(SelectSatManager)!.selectedSat] as DetailedSatellite | MissileObject;
 
@@ -595,7 +595,7 @@ export class DotsManager {
           this.velocityData[sat.id * 3 + 2] = pv.velocity.z;
         }
       }
-      this.interpolatePositions_(renderer);
+      this.interpolatePositions_(simulationStep);
     }
   }
 
@@ -775,14 +775,14 @@ export class DotsManager {
 
   /**
    * Updates the velocities of the dots based on the renderer's time delta and the current position data.
-   * @param renderer - The WebGL renderer used to calculate the time delta.
+   * @param simulationStep The time delta in milliseconds.
    */
-  private interpolatePositions_(renderer: WebGLRenderer) {
+  private interpolatePositions_(simulationStep: Milliseconds) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitalSats3 = catalogManagerInstance.orbitalSats * 3;
 
     for (let i = 0; i < orbitalSats3; i++) {
-      this.positionData[i] += this.velocityData[i] * renderer.dtAdjusted;
+      this.positionData[i] += this.velocityData[i] * simulationStep;
     }
   }
 }

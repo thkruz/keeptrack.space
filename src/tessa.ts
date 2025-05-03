@@ -58,6 +58,18 @@ interface TessaRegisterParams<T extends keyof EngineEventArguments> {
 
 export class Tessa {
   static instance: Tessa | null = null; // NOSONAR
+  /**
+   * The number of milliseconds since the update loop started.
+   *
+   *  Use this for all ui interactions that are agnostic to propagation rate
+   */
+  dt: Milliseconds;
+  /**
+   * The number of milliseconds since the last update loop multiplied by propagation rate
+   *
+   *  Use this for all simulation time/physics calculations
+   */
+  simulationStep: Milliseconds;
   static getInstance() {
     Tessa.instance ??= new Tessa();
 
@@ -94,6 +106,12 @@ export class Tessa {
     const fps = 1000 / dt;
 
     return fps;
+  }
+
+  setDeltaTime(dt: Milliseconds, propagationRate: number) {
+    this.dt = dt;
+    this.simulationStep = (Math.min(dt / 1000.0, 1.0 / Math.max(propagationRate, 0.001)) * propagationRate) as Milliseconds;
+    this.framesPerSecond = Tessa.calculateFps(dt);
   }
 
   setFps(fps: number) {

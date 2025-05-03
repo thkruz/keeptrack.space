@@ -2,8 +2,9 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
+import { Tessa } from '@app/tessa';
 import { mat4, vec2, vec4 } from 'gl-matrix';
-import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
+import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime } from 'ootk';
 import { GetSatType } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SettingsManager } from '../settings/settings';
@@ -31,18 +32,6 @@ export class WebGLRenderer {
 
   /** A canvas where the renderer draws its output. */
   domElement: HTMLCanvasElement;
-  /**
-   * The number of milliseconds since the last draw event
-   *
-   *  Use this for all ui interactions that are agnostic to propagation rate
-   */
-  dt: Milliseconds;
-  /**
-   * The number of milliseconds since the last draw event multiplied by propagation rate
-   *
-   *  Use this for all time calculations involving position and velocity
-   */
-  dtAdjusted: Milliseconds;
   /**
    * Main source of glContext for rest of the application
    */
@@ -648,7 +637,7 @@ export class WebGLRenderer {
 
     this.updatePrimarySatellite_();
     this.updateSecondarySatellite_();
-    keepTrackApi.getMainCamera().update(this.dt);
+    keepTrackApi.getMainCamera().update(Tessa.getInstance().dt);
 
     const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
 

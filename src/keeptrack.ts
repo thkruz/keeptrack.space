@@ -81,7 +81,6 @@ export class KeepTrack {
   private static readonly splashScreenImgList_ =
     [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
 
-  private readonly isShowFPS = false;
   isReady = false;
   private isUpdateTimeThrottle_: boolean;
   private lastGameLoopTimestamp_ = <Milliseconds>0;
@@ -627,12 +626,6 @@ theodore.kruczek at gmail dot com.
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     Tessa.getInstance().setDeltaTime(dt, timeManagerInstance.propRate);
-
-    // Display it if that settings is enabled
-    if (this.isShowFPS) {
-      // eslint-disable-next-line no-console
-      console.log(Tessa.getInstance().framesPerSecond);
-    }
 
     // Update official time for everyone else
     timeManagerInstance.setNow(<Milliseconds>Date.now());

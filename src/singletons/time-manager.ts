@@ -1,5 +1,5 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { EngineEvents } from '@app/tessa/engine-events';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
 import { Tessa } from '@app/tessa/tessa';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, Milliseconds } from 'ootk';
@@ -207,19 +207,15 @@ export class TimeManager {
     this.setSelectedDate(this.simulationTimeObj);
     this.initializeKeyboardBindings_();
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onUpdateStart,
-      cbName: TimeManager.id,
-      cb: () => {
-        this.setNow(<Milliseconds>Date.now());
-        if (!this.isUpdateTimeThrottle_) {
-          this.isUpdateTimeThrottle_ = true;
-          this.setSelectedDate(this.simulationTimeObj);
-          setTimeout(() => {
-            this.isUpdateTimeThrottle_ = false;
-          }, 500);
-        }
-      },
+    Tessa.getInstance().on(CoreEngineEvents.BeforeUpdate, () => {
+      this.setNow(<Milliseconds>Date.now());
+      if (!this.isUpdateTimeThrottle_) {
+        this.isUpdateTimeThrottle_ = true;
+        this.setSelectedDate(this.simulationTimeObj);
+        setTimeout(() => {
+          this.isUpdateTimeThrottle_ = false;
+        }, 500);
+      }
     });
   }
 

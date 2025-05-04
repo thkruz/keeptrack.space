@@ -23,9 +23,13 @@
 import { KeepTrack } from './keeptrack';
 import { Tessa } from './tessa/tessa';
 
-Tessa.getInstance().initialize(); // Initialize the engine
-
 KeepTrack.getInstance(window.settingsOverride)
   .registerAssets(); // Register assets with the engine
 
-Tessa.getInstance().run(); // Start the engine
+Tessa.getInstance().initialize(); // Initialize the engine
+Tessa.getInstance().loadAssets().then(() => {
+  Tessa.getInstance().start(); // Start the engine
+}).catch((error) => {
+  // Handle asset loading errors
+  console.error('Error loading assets:', error);
+});

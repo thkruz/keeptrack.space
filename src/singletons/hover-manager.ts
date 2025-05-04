@@ -4,7 +4,7 @@ import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
 import { SatMath } from '@app/static/sat-math';
-import { EngineEvents } from '@app/tessa/engine-events';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
 import { Tessa } from '@app/tessa/tessa';
 import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
@@ -40,18 +40,14 @@ export class HoverManager {
     this.satHoverBoxNode3 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox3'));
     this.satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onUpdate,
-      cbName: HoverManager.id,
-      cb: () => {
-        // TODO: Reevaluate these conditions
-        if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
-          // Only update hover if we are not on mobile
-          if (!settingsManager.isMobileModeEnabled) {
-            this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-          }
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      // TODO: Reevaluate these conditions
+      if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+        // Only update hover if we are not on mobile
+        if (!settingsManager.isMobileModeEnabled) {
+          this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
         }
-      },
+      }
     });
   }
 
@@ -202,7 +198,6 @@ export class HoverManager {
     if (!settingsManager.enableHoverOverlay) {
       return;
     }
-    const renderer = keepTrackApi.getRenderer();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     // Use this as a default if no UI
@@ -250,14 +245,15 @@ export class HoverManager {
         this.satHoverBoxNode2.textContent = HoverManager.getLaunchYear(sat);
       }
 
-      if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass && renderer.isShowDistance) {
+      if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass && settingsManager.isShowDistance) {
         if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
           this.satHoverBoxNode3.innerHTML =
             `${SensorMath.nextpass(sat) + SensorMath.distanceString(sat, keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat() as DetailedSatellite)}`;
         } else {
           this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat);
         }
-      } else if (renderer.isShowDistance) {
+      } else if (settingsManager.isShowDistance) {
+        // TODO: Should also require isEciOnHover or SecondarySat
         this.showRicOrEci_(sat);
       } else if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass) {
         this.satHoverBoxNode3.textContent = SensorMath.nextpass(sat);

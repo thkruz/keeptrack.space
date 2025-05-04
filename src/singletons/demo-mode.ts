@@ -1,9 +1,8 @@
 import { DetailedSatellite, Milliseconds } from 'ootk';
 
-import { EngineEvents } from '@app/tessa/engine-events';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
 import { Tessa } from '@app/tessa/tessa';
 import { keepTrackApi } from '../keepTrackApi';
-import { HoverManager } from './hover-manager';
 
 export class DemoManager {
   static readonly id = 'DemoManager';
@@ -14,15 +13,11 @@ export class DemoManager {
   satellite = 0;
 
   init(): void {
-    Tessa.getInstance().register({
-      event: EngineEvents.onUpdate,
-      cbName: HoverManager.id,
-      cb: () => {
-        // If Demo Mode do stuff
-        if (settingsManager.isDemoModeOn && keepTrackApi.getSensorManager()?.currentSensors[0]?.lat !== null) {
-          this.update();
-        }
-      },
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      // If Demo Mode do stuff
+      if (settingsManager.isDemoModeOn && keepTrackApi.getSensorManager()?.currentSensors[0]?.lat !== null) {
+        this.update();
+      }
     });
   }
 

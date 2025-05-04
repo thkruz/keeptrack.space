@@ -30,7 +30,7 @@ import { errorManagerInstance } from './errorManager';
 
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EngineEvents } from '@app/tessa/engine-events';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
 import { Tessa } from '@app/tessa/tessa';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
@@ -269,16 +269,12 @@ export class ColorSchemeManager {
       },
     });
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onUpdate,
-      cbName: ColorSchemeManager.id,
-      cb: () => {
-        /*
-         * Update Colors
-         * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
-         */
-        this.calculateColorBuffers(false); // avoid recalculating ALL colors
-      },
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      /*
+       * Update Colors
+       * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
+       */
+      this.calculateColorBuffers(false); // avoid recalculating ALL colors
     });
 
     LegendManager.change(this.currentColorScheme.id);

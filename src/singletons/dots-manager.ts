@@ -1,9 +1,9 @@
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
 import { SatCruncherMessageData } from '../interfaces';
 import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EngineEvents } from '@app/tessa/engine-events';
 import { Tessa } from '@app/tessa/tessa';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Milliseconds, SpaceObjectType } from 'ootk';
@@ -344,13 +344,7 @@ export class DotsManager {
 
     this.initProgramPicking();
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onUpdate,
-      cbName: 'DotsManager.updatePositionBuffer',
-      cb: () => {
-        this.updatePositionBuffer();
-      },
-    });
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => this.updatePositionBuffer());
   }
 
   /**
@@ -604,7 +598,7 @@ export class DotsManager {
           this.velocityData[sat.id * 3 + 2] = pv.velocity.z;
         }
       }
-      this.interpolatePositions_(simulationStep);
+      this.interpolatePositions_(simulationStep as Milliseconds);
     }
   }
 

@@ -9,7 +9,7 @@ import debugPng from '@public/img/icons/debug.png';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { EngineEvents } from '@app/tessa/engine-events';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
 import { Tessa } from '@app/tessa/tessa';
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
@@ -167,17 +167,13 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onUpdate,
-      cbName: this.id,
-      cb: (): void => {
-        if (this.isShowFPS) {
-          const fps = Tessa.getInstance().framesPerSecond;
+    Tessa.getInstance().on(CoreEngineEvents.Update, (): void => {
+      if (this.isShowFPS) {
+        const fps = Tessa.getInstance().framesPerSecond;
 
-          // eslint-disable-next-line no-console
-          console.log(`FPS: ${fps}`);
-        }
-      },
+        // eslint-disable-next-line no-console
+        console.log(`FPS: ${fps}`);
+      }
     });
 
     keepTrackApi.register({

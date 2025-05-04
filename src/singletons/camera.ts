@@ -22,9 +22,10 @@
  */
 
 import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
+import { KeepTrack } from '@app/keeptrack';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EngineEvents } from '@app/tessa/engine-events';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
 import { Tessa } from '@app/tessa/tessa';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla } from 'ootk';
@@ -747,20 +748,12 @@ export class Camera {
       cb: this.touchStart_.bind(this),
     });
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onRenderFrame,
-      cbName: Camera.id,
-      cb: () => {
-        this.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, keepTrackApi.getRenderer().sensorPos);
-      },
+    Tessa.getInstance().on(CoreEngineEvents.Render, () => {
+      this.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, KeepTrack.getInstance().sensorPos);
     });
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onUpdate,
-      cbName: Camera.id,
-      cb: () => {
-        this.update(Tessa.getInstance().dt);
-      },
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      this.update(Tessa.getInstance().deltaTime as Milliseconds);
     });
   }
 

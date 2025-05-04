@@ -127,6 +127,7 @@ export class SettingsManager {
   isDrawCovarianceEllipsoid = false;
   isPreserveSettings = true;
   isMobileModeBlocked = false;
+  isShowDistance = false;
 
 
   static preserveSettings() {

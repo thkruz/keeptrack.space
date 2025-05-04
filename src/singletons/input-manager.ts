@@ -7,7 +7,7 @@ import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 
-import { EngineEvents } from '@app/tessa/engine-events';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
 import { Tessa } from '@app/tessa/tessa';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
@@ -385,15 +385,11 @@ export class InputManager {
     this.touch.init(canvasDOM);
     this.keyboard.init();
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onUpdate,
-      cbName: InputManager.id,
-      cb: () => {
-        // TODO: Reevaluate these conditions
-        if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
-          this.update();
-        }
-      },
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      // TODO: Reevaluate these conditions
+      if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+        this.update();
+      }
     });
   }
 

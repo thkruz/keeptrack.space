@@ -6,7 +6,7 @@ import { CameraType } from '@app/singletons/camera';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UrlManager } from '@app/static/url-manager';
-import { EngineEvents } from '@app/tessa/engine-events';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
 import { Tessa } from '@app/tessa/tessa';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { vec3 } from 'gl-matrix';
@@ -52,73 +52,65 @@ export class SelectSatManager extends KeepTrackPlugin {
       cb: this.checkIfSelectSatVisible.bind(this),
     });
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onRenderFrameEnd,
-      cbName: this.id,
-      cb: () => {
-        if (this.primarySatObj.id !== -1) {
-          const timeManagerInstance = keepTrackApi.getTimeManager();
+    Tessa.getInstance().on(CoreEngineEvents.AfterRender, () => {
+      if (this.primarySatObj.id !== -1) {
+        const timeManagerInstance = keepTrackApi.getTimeManager();
 
-          keepTrackApi.getUiManager().
-            updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
-        }
-      },
+        keepTrackApi.getUiManager().
+          updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
+      }
     });
 
-    Tessa.getInstance().register({
-      event: EngineEvents.onUpdate,
-      cbName: this.id,
-      cb: () => {
-        // If the selected satellite is not the same as the last selected satellite, run the event
-        if (this.selectedSat !== this.lastSelectedPrimarySatId()) {
-          keepTrackApi.runEvent(KeepTrackApiEvents.onPrimarySatelliteChange, this.primarySatObj, this.selectedSat);
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      // If the selected satellite is not the same as the last selected satellite, run the event
+      if (this.selectedSat !== this.lastSelectedPrimarySatId()) {
+        keepTrackApi.runEvent(KeepTrackApiEvents.onPrimarySatelliteChange, this.primarySatObj, this.selectedSat);
+      }
+
+      // If the primary satellite is an object, update it
+      if (this.primarySatObj.id !== -1) {
+        const timeManagerInstance = keepTrackApi.getTimeManager();
+        const primarySat = keepTrackApi.getCatalogManager().getObject(this.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
+
+        keepTrackApi.getMeshManager().update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
+        keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
+        if (primarySat.isMissile()) {
+          keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
         }
 
-        // If the primary satellite is an object, update it
-        if (this.primarySatObj.id !== -1) {
-          const timeManagerInstance = keepTrackApi.getTimeManager();
-          const primarySat = keepTrackApi.getCatalogManager().getObject(this.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
+        // If in satellite view the orbit buffer needs to be updated every time
+        if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE ||
+          keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)
+        ) {
+          keepTrackApi.getOrbitManager().updateOrbitBuffer(this.primarySatObj.id);
+          const firstPointOut = [
+            keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3],
+            keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3 + 1],
+            keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3 + 2],
+          ];
 
-          keepTrackApi.getMeshManager().update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
-          keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
-          if (primarySat.isMissile()) {
-            keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
-          }
-
-          // If in satellite view the orbit buffer needs to be updated every time
-          if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE ||
-            keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)
-          ) {
-            keepTrackApi.getOrbitManager().updateOrbitBuffer(this.primarySatObj.id);
-            const firstPointOut = [
-              keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3],
-              keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3 + 1],
-              keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3 + 2],
-            ];
-
-            keepTrackApi.getOrbitManager().updateFirstPointOut(this.primarySatObj.id, firstPointOut);
-          }
-
-          keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);
-
-          keepTrackApi.getScene().primaryCovBubble.update(primarySat);
-        } else {
-          keepTrackApi.getScene().searchBox.update(null);
+          keepTrackApi.getOrbitManager().updateFirstPointOut(this.primarySatObj.id, firstPointOut);
         }
 
-        // If the secondary satellite is not the same as the last selected satellite, run the event
-        if (this.secondarySat !== this.lastSelectedSecondarySatId()) {
-          keepTrackApi.runEvent(KeepTrackApiEvents.onSecondarySatelliteChange, this.secondarySatObj, this.secondarySat);
-        }
+        keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);
 
-        // If the secondary satellite is an object, update it
-        if (this.secondarySat > -1) {
-          // TODO: Refactor this as a cb
-          keepTrackApi.getScene().secondaryCovBubble?.update(this.secondarySatObj!);
+        keepTrackApi.getScene().primaryCovBubble.update(primarySat);
+      } else {
+        keepTrackApi.getScene().searchBox.update(null);
+      }
 
-          keepTrackApi.runEvent(KeepTrackApiEvents.onSecondarySatelliteUpdate, this.secondarySatObj, this.secondarySat);
-        }
-      },
+      // If the secondary satellite is not the same as the last selected satellite, run the event
+      if (this.secondarySat !== this.lastSelectedSecondarySatId()) {
+        keepTrackApi.runEvent(KeepTrackApiEvents.onSecondarySatelliteChange, this.secondarySatObj, this.secondarySat);
+      }
+
+      // If the secondary satellite is an object, update it
+      if (this.secondarySat > -1) {
+        // TODO: Refactor this as a cb
+        keepTrackApi.getScene().secondaryCovBubble?.update(this.secondarySatObj!);
+
+        keepTrackApi.runEvent(KeepTrackApiEvents.onSecondarySatelliteUpdate, this.secondarySatObj, this.secondarySat);
+      }
     });
   }
 

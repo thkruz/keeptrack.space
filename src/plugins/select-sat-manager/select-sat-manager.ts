@@ -483,7 +483,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       keepTrackApi.getOrbitManager().clearSelectOrbit(false);
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.setSecondarySat, this.secondarySatObj, id);
+    Doris.getInstance().emit(KeepTrackApiEvents.setSecondarySat, this.secondarySatObj, id);
   }
 
   private setSelectedSat_(id: number): void {

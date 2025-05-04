@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { EChartsData, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -9,7 +10,6 @@ import 'echarts-gl';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { Doris } from '@app/doris/doris';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -70,19 +70,15 @@ export class RicPlot extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSecondarySat,
-      cbName: this.id,
-      cb: (obj: BaseObject | null) => {
-        if (!obj || this.selectSatManager_.selectedSat === -1) {
-          if (this.isMenuButtonActive) {
-            this.hideSideMenus();
-          }
-          this.setBottomIconToDisabled();
-        } else {
-          this.setBottomIconToEnabled();
+    Doris.getInstance().on(KeepTrackApiEvents.setSecondarySat, (obj: BaseObject | null): void => {
+      if (!obj || this.selectSatManager_.selectedSat === -1) {
+        if (this.isMenuButtonActive) {
+          this.hideSideMenus();
         }
-      },
+        this.setBottomIconToDisabled();
+      } else {
+        this.setBottomIconToEnabled();
+      }
     });
 
     Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {

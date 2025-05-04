@@ -57,16 +57,12 @@ export class SensorSurvFence extends KeepTrackPlugin {
       }
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.id,
-      cb: (sensor: Sensor): void => {
-        if (sensor) {
-          this.setBottomIconToEnabled();
-        } else {
-          this.setBottomIconToDisabled();
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.sensorDotSelected, (sensor: Sensor): void => {
+      if (sensor) {
+        this.setBottomIconToEnabled();
+      } else {
+        this.setBottomIconToDisabled();
+      }
     });
   }
 

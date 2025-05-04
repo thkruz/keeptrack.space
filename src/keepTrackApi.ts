@@ -79,8 +79,11 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null]; // Done
   [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]]; // Done
   [KeepTrackApiEvents.staticOffsetChange]: [number]; // Done
-  [KeepTrackApiEvents.onLineChange]: [LineManager];
-  [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
+  [KeepTrackApiEvents.onLineChange]: [LineManager]; // Done
+  [KeepTrackApiEvents.saveSettings]: []; // Done
+  [KeepTrackApiEvents.loadSettings]: []; // Done
+  [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor]; // Done
+
   [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
   [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];
   [KeepTrackApiEvents.onCruncherMessage]: [];
@@ -92,8 +95,6 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
   [KeepTrackApiEvents.ConeMeshUpdate]: [];
   [KeepTrackApiEvents.bottomMenuModeChange]: [];
-  [KeepTrackApiEvents.saveSettings]: []; // Done
-  [KeepTrackApiEvents.loadSettings]: []; // Done
   [KeepTrackApiEvents.onPrimarySatelliteUpdate]: [BaseObject | null, number];
   [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number];
   [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number];

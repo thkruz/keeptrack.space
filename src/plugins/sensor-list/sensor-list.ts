@@ -161,37 +161,33 @@ export class SensorListPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        if (settingsManager.isMobileModeEnabled) {
-          return;
-        }
-        if (!obj.isSensor()) {
-          return;
-        }
-        const sensor = obj as DetailedSensor;
+    Doris.getInstance().on(KeepTrackApiEvents.sensorDotSelected, (obj: BaseObject) => {
+      if (settingsManager.isMobileModeEnabled) {
+        return;
+      }
+      if (!obj.isSensor()) {
+        return;
+      }
+      const sensor = obj as DetailedSensor;
 
-        const sensorManagerInstance = keepTrackApi.getSensorManager();
-        // No sensor manager on mobile
+      const sensorManagerInstance = keepTrackApi.getSensorManager();
+      // No sensor manager on mobile
 
-        sensorManagerInstance.setSensor(null, sensor.sensorId);
+      sensorManagerInstance.setSensor(null, sensor.sensorId);
 
-        if (sensorManagerInstance.currentSensors.length === 0) {
-          throw new Error('No sensors found');
-        }
-        const timeManagerInstance = keepTrackApi.getTimeManager();
+      if (sensorManagerInstance.currentSensors.length === 0) {
+        throw new Error('No sensors found');
+      }
+      const timeManagerInstance = keepTrackApi.getTimeManager();
 
-        keepTrackApi
-          .getMainCamera()
-          .lookAtLatLon(
-            sensorManagerInstance.currentSensors[0].lat,
-            sensorManagerInstance.currentSensors[0].lon,
-            sensorManagerInstance.currentSensors[0].zoom ?? ZoomValue.GEO,
-            timeManagerInstance.selectedDate,
-          );
-      },
+      keepTrackApi
+        .getMainCamera()
+        .lookAtLatLon(
+          sensorManagerInstance.currentSensors[0].lat,
+          sensorManagerInstance.currentSensors[0].lon,
+          sensorManagerInstance.currentSensors[0].zoom ?? ZoomValue.GEO,
+          timeManagerInstance.selectedDate,
+        );
     });
 
     Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {

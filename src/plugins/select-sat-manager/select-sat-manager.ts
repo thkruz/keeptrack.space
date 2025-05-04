@@ -249,7 +249,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.runEvent(KeepTrackApiEvents.sensorDotSelected, sensor);
+      Doris.getInstance().emit(KeepTrackApiEvents.sensorDotSelected, sensor);
     }
 
     this.setSelectedSat_(-1);

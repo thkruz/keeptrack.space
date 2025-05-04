@@ -61,20 +61,16 @@ export class SensorFov extends KeepTrackPlugin {
       }
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.id,
-      cb: (sensor): void => {
-        if (sensor) {
-          getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
-          this.isIconDisabled = false;
-        } else {
-          getEl(this.bottomIconElementName)?.classList.add(KeepTrackPlugin.iconDisabledClassString);
-          this.isIconDisabled = true;
-          this.isMenuButtonActive = false;
-          getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.sensorDotSelected, (sensor): void => {
+      if (sensor) {
+        getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
+        this.isIconDisabled = false;
+      } else {
+        getEl(this.bottomIconElementName)?.classList.add(KeepTrackPlugin.iconDisabledClassString);
+        this.isIconDisabled = true;
+        this.isMenuButtonActive = false;
+        getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
+      }
     });
   }
 

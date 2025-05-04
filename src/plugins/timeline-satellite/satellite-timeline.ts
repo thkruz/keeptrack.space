@@ -5,6 +5,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 
 import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { shake } from '@app/lib/shake';
 import { SatMath } from '@app/static/sat-math';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord, Seconds } from 'ootk';
@@ -179,11 +180,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       cb: this.onWatchlistUpdated_.bind(this),
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.resize,
-      cbName: this.id,
-      cb: this.resizeCanvas_.bind(this),
-    });
+    Doris.getInstance().on(CoreEngineEvents.Resize, this.resizeCanvas_.bind(this));
   }
 
   private onWatchlistUpdated_(watchlistList: number[]) {

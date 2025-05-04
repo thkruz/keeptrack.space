@@ -79,7 +79,6 @@ export class SensorFov extends KeepTrackPlugin {
   }
 
   disableFovView() {
-    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.id);
     this.setBottomIconToUnselected(false);
   }
 

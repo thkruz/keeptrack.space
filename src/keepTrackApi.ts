@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { AnalyticsInstance } from 'analytics';
-import { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
+import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { keepTrackContainer } from './container';
 import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
 import { saveCsv, saveVariable } from './lib/saveVariable';
@@ -76,11 +76,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.HtmlInitialize]: []; // Done
   [KeepTrackApiEvents.AfterHtmlInitialize]: []; // Done
   [KeepTrackApiEvents.resetSensor]: []; // Done
-  [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
-  [KeepTrackApiEvents.changeSensorMarkers]: [string];
-  [KeepTrackApiEvents.resize]: [];
-  [KeepTrackApiEvents.altCanvasResize]: [];
-  [KeepTrackApiEvents.endOfDraw]: [Milliseconds];
+  [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null]; // Done
   [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
   [KeepTrackApiEvents.staticOffsetChange]: [number];
   [KeepTrackApiEvents.onLineAdded]: [LineManager];
@@ -117,10 +113,6 @@ declare module '@app/doris/events/event-types' {
     [KeepTrackApiEvents.AfterHtmlInitialize]: [];
     [KeepTrackApiEvents.resetSensor]: [];
     [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
-    [KeepTrackApiEvents.changeSensorMarkers]: [string];
-    [KeepTrackApiEvents.resize]: [];
-    [KeepTrackApiEvents.altCanvasResize]: [];
-    [KeepTrackApiEvents.endOfDraw]: [Milliseconds];
     [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
     [KeepTrackApiEvents.staticOffsetChange]: [number];
     [KeepTrackApiEvents.onLineAdded]: [LineManager];
@@ -227,18 +219,9 @@ export class KeepTrackApi {
   loadedPlugins = <KeepTrackPlugin[]>[];
   rmbMenuItems = <rmbMenuItem[]>[];
   events = {
-    altCanvasResize: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.altCanvasResize>[],
-    nightToggle: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.nightToggle>[],
   } as {
       [K in KeepTrackApiEvents]: KeepTrackApiRegisterParams<K>[];
     };
-
-  methods = {
-    nightToggle: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => {
-      this.events.nightToggle.forEach((cb) => cb.cb(gl, nightTexture, texture));
-    },
-    altCanvasResize: (): boolean => this.events.altCanvasResize.some((cb) => cb.cb()),
-  };
 
   runEvent<T extends KeepTrackApiEvents>(event: T, ...args: KeepTrackApiEventArguments[T]) {
     this.verifyEvent_(event);

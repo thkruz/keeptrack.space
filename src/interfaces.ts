@@ -310,10 +310,6 @@ export enum KeepTrackApiEvents {
    * Run in the setSensor method of SensorManager instance with parameters (sensor: DetailedSensor | string, staticId: number)
    */
   setSensor = 'setSensor',
-  changeSensorMarkers = 'changeSensorMarkers',
-  resize = 'resize',
-  altCanvasResize = 'altCanvasResize',
-  endOfDraw = 'endOfDraw',
   /**
    * Run in the updateWatchlist method of CatalogManager instance with parameters (watchlist: number[])
    */

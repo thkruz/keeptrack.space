@@ -22,7 +22,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
@@ -105,21 +107,15 @@ export class Screenshot extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.altCanvasResize,
-      cbName: this.id,
-      cb: () => this.queuedScreenshot_,
+    Doris.getInstance().on(CoreEngineEvents.AfterRender, () => {
+      if (this.queuedScreenshot_) {
+        this.takeScreenShot();
+      }
     });
+  }
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.endOfDraw,
-      cbName: this.id,
-      cb: () => {
-        if (this.queuedScreenshot_) {
-          this.takeScreenShot();
-        }
-      },
-    });
+  isQueuedScreenshot(): boolean {
+    return this.queuedScreenshot_;
   }
 
   private queuedScreenshot_ = false;
@@ -160,7 +156,7 @@ export class Screenshot extends KeepTrackPlugin {
 
     const { classificationstr, classificationColor } = Screenshot.calculateClassificationText_();
 
-    if (classificationstr !== '') {
+    if (classificationstr && classificationstr !== '') {
       tempCtx.font = '24px nasalization';
       tempCtx.globalAlpha = 1.0;
 
@@ -180,7 +176,7 @@ export class Screenshot extends KeepTrackPlugin {
     return image;
   }
 
-  private static calculateClassificationText_(): { classificationstr: string; classificationColor: string } {
+  private static calculateClassificationText_(): { classificationstr: string | null; classificationColor: string } {
     if (settingsManager.classificationStr === '') {
       return { classificationstr: '', classificationColor: '' };
     }

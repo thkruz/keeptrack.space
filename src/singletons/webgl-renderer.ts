@@ -1,7 +1,7 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { Screenshot } from '@app/plugins/screenshot/screenshot';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { BaseObject } from 'ootk';
 import { getEl } from '../lib/get-el';
@@ -66,7 +66,8 @@ export class WebGLRenderer {
       return;
     }
 
-    if (keepTrackApi.methods.altCanvasResize()) {
+
+    if (keepTrackApi.getPlugin(Screenshot)?.isQueuedScreenshot()) {
       this.resizeCanvas(true);
       this.isAltCanvasSize_ = true;
     } else if (this.isAltCanvasSize_) {
@@ -161,22 +162,18 @@ export class WebGLRenderer {
       this.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.resize,
-      cbName: WebGLRenderer.id,
-      cb: () => {
-        // Clear any existing resize timer
-        clearTimeout(this.lastResizeTime);
+    Doris.getInstance().on(CoreEngineEvents.Resize, () => {
+      // Clear any existing resize timer
+      clearTimeout(this.lastResizeTime);
 
-        /*
-         * Set a new timer to resize the canvas after 100 ms
-         * This is to prevent multiple resize events from firing in quick succession
-         * and causing performance issues
-         */
-        this.lastResizeTime = window.setTimeout(() => {
-          this.resizeCanvas();
-        }, 100);
-      },
+      /*
+       * Set a new timer to resize the canvas after 100 ms
+       * This is to prevent multiple resize events from firing in quick succession
+       * and causing performance issues
+       */
+      this.lastResizeTime = window.setTimeout(() => {
+        this.resizeCanvas();
+      }, 100);
     });
   }
 

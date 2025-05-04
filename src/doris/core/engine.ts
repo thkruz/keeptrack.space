@@ -1,8 +1,5 @@
-import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { Milliseconds } from 'ootk';
 import { EventBus } from '../events/event-bus';
 import { CoreEngineEvents, EventMap } from '../events/event-types';
 import { InputSystem } from '../input/input-system';
@@ -228,7 +225,6 @@ export class Engine {
     this.eventBus.emit(CoreEngineEvents.BeforeRender);
     this.eventBus.emit(CoreEngineEvents.Render);
     // this.renderer.render(this.sceneManager.activeScene);
-    keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, Doris.getInstance().deltaTime as Milliseconds);
     this.eventBus.emit(CoreEngineEvents.AfterRender);
   }
 

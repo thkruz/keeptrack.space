@@ -2,6 +2,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import CollisionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -9,7 +10,6 @@ import { t7e } from '@app/locales/keys';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { Doris } from '@app/doris/doris';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {
@@ -68,17 +68,13 @@ export class Collisions extends KeepTrackPlugin {
 
     Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.id,
-      cb: () => {
-        if (this.selectSatIdOnCruncher_ !== null) {
-          // If selectedSatManager is loaded, set the selected sat to the one that was just added
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+    Doris.getInstance().on(KeepTrackApiEvents.onCruncherMessage, () => {
+      if (this.selectSatIdOnCruncher_ !== null) {
+        // If selectedSatManager is loaded, set the selected sat to the one that was just added
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
 
-          this.selectSatIdOnCruncher_ = null;
-        }
-      },
+        this.selectSatIdOnCruncher_ = null;
+      }
     });
   }
 

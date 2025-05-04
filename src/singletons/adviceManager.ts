@@ -18,8 +18,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';
 
@@ -43,7 +43,7 @@ export class AdviceManager {
     this.tutIconDOM = getEl('tutorial-icon');
 
     this.tutIconDOM.addEventListener('click', () => {
-      keepTrackApi.runEvent(KeepTrackApiEvents.onHelpMenuClick);
+      Doris.getInstance().emit(KeepTrackApiEvents.onHelpMenuClick);
     });
 
     // TODO: This should be registered with the keyboard class
@@ -54,7 +54,7 @@ export class AdviceManager {
           this.isAdviceOpen = false;
           this.helpOuterDOM.style.display = 'none';
         } else {
-          keepTrackApi.runEvent(KeepTrackApiEvents.onHelpMenuClick);
+          Doris.getInstance().emit(KeepTrackApiEvents.onHelpMenuClick);
         }
       }
     };

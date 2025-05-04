@@ -24,12 +24,8 @@ test('keepTrackApi Unit Testing', () => {
     // Do nothing
   });
 
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.onCruncherMessage,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  Doris.getInstance().on(KeepTrackApiEvents.onCruncherMessage, () => {
+    // Do nothing
   });
 
   Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
@@ -90,7 +86,7 @@ test('keepTrackApi Unit Testing', () => {
 
   keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, 'test' as unknown as DetailedSatellite);
   Doris.getInstance().emit(KeepTrackApiEvents.onCruncherReady);
-  keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherMessage);
+  Doris.getInstance().emit(KeepTrackApiEvents.onCruncherMessage);
   Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
   Doris.getInstance().emit(KeepTrackApiEvents.BeforeHtmlInitialize);
   Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'test');

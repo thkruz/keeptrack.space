@@ -822,7 +822,7 @@ theodore.kruczek at gmail dot com.
       }
 
       keepTrackApi.isInitialized = true;
-      keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+      Doris.getInstance().emit(KeepTrackApiEvents.onKeepTrackReady);
       if (settingsManager.onLoadCb) {
         settingsManager.onLoadCb();
       }

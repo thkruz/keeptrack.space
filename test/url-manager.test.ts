@@ -51,7 +51,7 @@ describe('UrlManager_class', () => {
     Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    Doris.getInstance().emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);
@@ -92,7 +92,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    Doris.getInstance().emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
   });
@@ -127,7 +127,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    Doris.getInstance().emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(uiManagerInstance.toast).toHaveBeenCalled();
   });
@@ -162,7 +162,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    Doris.getInstance().emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(uiManagerInstance.toast).toHaveBeenCalled();
   });
@@ -200,7 +200,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    Doris.getInstance().emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).not.toHaveBeenCalledWith(expectedCurrentSearch);
@@ -241,7 +241,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    Doris.getInstance().emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);

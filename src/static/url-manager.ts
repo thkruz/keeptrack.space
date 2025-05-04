@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -95,38 +96,30 @@ export abstract class UrlManager {
   }
 
   private static handleIntldesParam_(val: string) {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onKeepTrackReady,
-      cbName: 'getVariableSat',
-      cb: () => {
-        const uiManagerInstance = keepTrackApi.getUiManager();
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const urlSatId = catalogManagerInstance.intlDes2id(val.toUpperCase());
+    Doris.getInstance().on(KeepTrackApiEvents.onKeepTrackReady, () => {
+      const uiManagerInstance = keepTrackApi.getUiManager();
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const urlSatId = catalogManagerInstance.intlDes2id(val.toUpperCase());
 
-        if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId).active) {
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
-        } else {
-          uiManagerInstance.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
-        }
-      },
+      if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId).active) {
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
+      } else {
+        uiManagerInstance.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+      }
     });
   }
 
   private static handleSatParam_(val: string) {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onKeepTrackReady,
-      cbName: 'getVariableSat',
-      cb: () => {
-        const uiManagerInstance = keepTrackApi.getUiManager();
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
+    Doris.getInstance().on(KeepTrackApiEvents.onKeepTrackReady, () => {
+      const uiManagerInstance = keepTrackApi.getUiManager();
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
 
-        if (urlSatId !== null) {
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
-        } else {
-          uiManagerInstance.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
-        }
-      },
+      if (urlSatId !== null) {
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
+      } else {
+        uiManagerInstance.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+      }
     });
   }
 

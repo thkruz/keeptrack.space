@@ -2,6 +2,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import sputnickPng from '@public/img/icons/sputnick.png';
 import './tracking-impact-predict.css';
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -10,7 +11,6 @@ import { RAD2DEG } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { Doris } from '@app/doris/doris';
 
 export interface TipMsg {
   'NORAD_CAT_ID': string,
@@ -67,18 +67,13 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     super.addJs();
 
     Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));
+    Doris.getInstance().on(KeepTrackApiEvents.onCruncherMessage, () => {
+      if (this.selectSatIdOnCruncher_ !== null) {
+        // If selectedSatManager is loaded, set the selected sat to the one that was just added
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.id,
-      cb: () => {
-        if (this.selectSatIdOnCruncher_ !== null) {
-          // If selectedSatManager is loaded, set the selected sat to the one that was just added
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
-
-          this.selectSatIdOnCruncher_ = null;
-        }
-      },
+        this.selectSatIdOnCruncher_ = null;
+      }
     });
   }
 

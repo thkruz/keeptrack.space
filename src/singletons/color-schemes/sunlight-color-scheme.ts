@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+import { Doris } from '@app/doris/doris';
 import { ColorInformation, KeepTrackApiEvents, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
@@ -37,20 +38,16 @@ export class SunlightColorScheme extends ColorScheme {
     this.objectTypeFlags = {
       ...this.objectTypeFlags, ...SunlightColorScheme.uniqueObjectTypeFlags,
     };
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onKeepTrackReady,
-      cbName: 'SunlightColorScheme',
-      cb: (): void => {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    Doris.getInstance().on(KeepTrackApiEvents.onKeepTrackReady, (): void => {
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-        if (colorSchemeManagerInstance.currentColorScheme === this) {
-          catalogManagerInstance.satCruncher.postMessage({
-            isSunlightView: true,
-            typ: CruncerMessageTypes.SUNLIGHT_VIEW,
-          });
-        }
-      },
+      if (colorSchemeManagerInstance.currentColorScheme === this) {
+        catalogManagerInstance.satCruncher.postMessage({
+          isSunlightView: true,
+          typ: CruncerMessageTypes.SUNLIGHT_VIEW,
+        });
+      }
     });
   }
 

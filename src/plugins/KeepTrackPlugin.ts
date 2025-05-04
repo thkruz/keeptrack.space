@@ -921,18 +921,14 @@ export abstract class KeepTrackPlugin {
    * @param helpText The help text to show.
    */
   registerHelp(helpTitle: string, helpText: string) {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onHelpMenuClick,
-      cbName: `${this.id}`,
-      cb: (): boolean => {
-        if (this.isMenuButtonActive) {
-          adviceManagerInstance.showAdvice(helpTitle, helpText);
+    Doris.getInstance().on(KeepTrackApiEvents.onHelpMenuClick, (): boolean => {
+      if (this.isMenuButtonActive) {
+        adviceManagerInstance.showAdvice(helpTitle, helpText);
 
-          return true;
-        }
+        return true;
+      }
 
-        return false;
-      },
+      return false;
     });
   }
 

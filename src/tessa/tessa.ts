@@ -6,14 +6,14 @@ export class Tessa {
   private static readonly defaultCanvas: string = 'keeptrack-canvas';
   static instance: Engine | null = null; // NOSONAR
 
-  constructor() {
-    Tessa.printConsoleMessage_();
-  }
-
   static getInstance() {
-    Tessa.instance ??= new Engine({
-      canvasId: isThisNode() ? Tessa.defaultCanvas : 'keeptrack-canvas',
-    });
+    if (!Tessa.instance) {
+      Tessa.instance = new Engine({
+        canvasId: isThisNode() ? Tessa.defaultCanvas : 'keeptrack-canvas',
+      });
+
+      Tessa.printConsoleMessage_();
+    }
 
     return Tessa.instance;
   }

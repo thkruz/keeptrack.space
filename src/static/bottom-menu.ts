@@ -81,7 +81,7 @@ export class BottomMenu {
     settingsManager.menuMode = menuMode;
     this.deselectAllBottomMenuFilterButtons_();
     menuButtonDom.classList.add('bmenu-item-selected');
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuModeChange);
+    Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuModeChange);
   }
 
   static addBottomMenuFilterButtons() {
@@ -98,7 +98,7 @@ export class BottomMenu {
       menuExperimentalDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuExperimentalDom, MenuMode.EXPERIMENTAL));
       menuAllDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuAllDom, MenuMode.ALL));
 
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuModeChange);
+      Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuModeChange);
     } else {
       errorManagerInstance.warn('Failed to find all bottom menu filter buttons');
     }

@@ -476,7 +476,7 @@ export class UiManager {
     const sat = obj as DetailedSatellite;
 
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
-      keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, sat);
+      Doris.getInstance().emit(KeepTrackApiEvents.updateSelectBox, sat);
       keepTrackApi.getTimeManager().lastBoxUpdateTime = realTime;
     }
   }

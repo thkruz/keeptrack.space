@@ -33,11 +33,11 @@ describe('SatInfoBoxCore_class2', () => {
     Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
     Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
     selectSatManager.selectSat(0);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
 
     Doris.getInstance().emit(KeepTrackApiEvents.setSensor, defaultSensor, 2);
     keepTrackApi.getCatalogManager().isSensorManagerLoaded = true;
     selectSatManager.selectSat(0);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
   });
 });

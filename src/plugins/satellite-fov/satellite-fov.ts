@@ -205,14 +205,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       },
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.ConeMeshUpdate,
-      cbName: SatelliteFov.name,
-      cb: () => {
-        this.updateListOfFovMeshes_();
-      },
-    });
-
+    Doris.getInstance().on(KeepTrackApiEvents.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
     Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
       this.updateListOfFovMeshes_();
 

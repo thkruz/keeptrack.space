@@ -110,222 +110,218 @@ export class SatInfoBox extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateSelectBox,
-      cbName: this.id,
-      // eslint-disable-next-line complexity, max-statements
-      cb: (obj: BaseObject) => {
-        if (!keepTrackApi.isInitialized) {
-          return;
+    // eslint-disable-next-line complexity, max-statements
+    Doris.getInstance().on(KeepTrackApiEvents.updateSelectBox, (obj: BaseObject) => {
+      if (!keepTrackApi.isInitialized) {
+        return;
+      }
+
+      if (!obj?.isSatellite() && !obj?.isMissile()) {
+        return;
+      }
+
+      try {
+        const timeManagerInstance = keepTrackApi.getTimeManager();
+        const sensorManagerInstance = keepTrackApi.getSensorManager();
+
+        if (obj.isSatellite()) {
+          const sat = obj as DetailedSatellite;
+
+          if (!sat.position?.x || !sat.position?.y || !sat.position?.z || isNaN(sat.position?.x) || isNaN(sat.position?.y) || isNaN(sat.position?.z)) {
+            const newPosition = SatMath.getEci(sat, timeManagerInstance.simulationTimeObj).position as { x: number; y: number; z: number };
+
+            if (!newPosition || (newPosition?.x === 0 && newPosition?.y === 0 && newPosition?.z === 0)) {
+              keepTrackApi
+                .getUiManager()
+                .toast(
+                  `Satellite ${sat.sccNum} is not in orbit!<br>Sim time is ${timeManagerInstance.simulationTimeObj.toUTCString()}.<br>Be sure to check you have the right TLE.`,
+                  ToastMsgType.error,
+                  true,
+                );
+              this.selectSatManager_.selectSat(-1);
+
+              return;
+            }
+          }
+
+          let isInView, rae;
+
+          if (keepTrackApi.getSensorManager().isSensorSelected()) {
+            const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+
+            rae = sensor.rae(sat, timeManagerInstance.simulationTimeObj);
+            isInView = sensor.isRaeInFov(rae);
+          } else {
+            rae = {
+              az: 0,
+              el: 0,
+              rng: 0,
+            };
+            isInView = false;
+          }
+
+          const lla = eci2lla(sat.position, SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst);
+          const currentTearr: TearrData = {
+            time: timeManagerInstance.simulationTimeObj.toISOString(),
+            az: rae.az,
+            el: rae.el,
+            rng: rae.rng,
+            objName: sat.name,
+            lat: lla.lat,
+            lon: lla.lon,
+            alt: lla.alt,
+            inView: isInView,
+          };
+
+          this.currentTEARR = currentTearr;
+        } else {
+          // Is Missile
+          this.currentTEARR = missileManager.getMissileTEARR(obj as MissileObject);
         }
 
-        if (!obj?.isSatellite() && !obj?.isMissile()) {
-          return;
+        const { gmst } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
+        const lla = eci2lla(obj.position, gmst);
+
+        const satLonElement = getEl('sat-longitude');
+        const satLatElement = getEl('sat-latitude');
+
+        if (satLonElement && satLatElement) {
+          if (lla.lon >= 0) {
+            satLonElement.innerHTML = `${lla.lon.toFixed(3)}°E`;
+          } else {
+            satLonElement.innerHTML = `${(lla.lon * -1).toFixed(3)}°W`;
+          }
+          if (lla.lat >= 0) {
+            satLatElement.innerHTML = `${lla.lat.toFixed(3)}°N`;
+          } else {
+            satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°S`;
+          }
         }
 
-        try {
-          const timeManagerInstance = keepTrackApi.getTimeManager();
-          const sensorManagerInstance = keepTrackApi.getSensorManager();
+        const covMatrix = this.selectSatManager_.primarySatCovMatrix;
+        let covRadial = covMatrix[0];
+        let covCrossTrack = covMatrix[1];
+        let covInTrack = covMatrix[2];
+
+        const useKm =
+          covRadial > 0.5 &&
+          covCrossTrack > 0.5 &&
+          covInTrack > 0.5;
+
+        if (useKm) {
+          getEl('sat-uncertainty-radial')!.innerHTML = `${(covMatrix[0]).toFixed(2)} km`;
+          getEl('sat-uncertainty-crosstrack')!.innerHTML = `${(covMatrix[1]).toFixed(2)} km`;
+          getEl('sat-uncertainty-intrack')!.innerHTML = `${(covMatrix[2]).toFixed(2)} km`;
+        } else {
+          covRadial *= 1000;
+          covCrossTrack *= 1000;
+          covInTrack *= 1000;
+          getEl('sat-uncertainty-radial')!.innerHTML = `${covRadial.toFixed(2)} m`;
+          getEl('sat-uncertainty-crosstrack')!.innerHTML = `${covCrossTrack.toFixed(2)} m`;
+          getEl('sat-uncertainty-intrack')!.innerHTML = `${covInTrack.toFixed(2)} m`;
+        }
+
+        if (
+          settingsManager.plugins?.stereoMap &&
+          keepTrackApi.getPlugin(StereoMap)?.isMenuButtonActive &&
+          timeManagerInstance.realTime > settingsManager.lastMapUpdateTime + 30000
+        ) {
+          keepTrackApi.getPlugin(StereoMap)?.updateMap();
+          settingsManager.lastMapUpdateTime = timeManagerInstance.realTime;
+        }
+
+        const satAltitudeElement = getEl('sat-altitude');
+        const satVelocityElement = getEl('sat-velocity');
+
+        if (satAltitudeElement && satVelocityElement) {
 
           if (obj.isSatellite()) {
             const sat = obj as DetailedSatellite;
+            const { gmst } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
 
-            if (!sat.position?.x || !sat.position?.y || !sat.position?.z || isNaN(sat.position?.x) || isNaN(sat.position?.y) || isNaN(sat.position?.z)) {
-              const newPosition = SatMath.getEci(sat, timeManagerInstance.simulationTimeObj).position as { x: number; y: number; z: number };
 
-              if (!newPosition || (newPosition?.x === 0 && newPosition?.y === 0 && newPosition?.z === 0)) {
-                keepTrackApi
-                  .getUiManager()
-                  .toast(
-                    `Satellite ${sat.sccNum} is not in orbit!<br>Sim time is ${timeManagerInstance.simulationTimeObj.toUTCString()}.<br>Be sure to check you have the right TLE.`,
-                    ToastMsgType.error,
-                    true,
-                  );
-                this.selectSatManager_.selectSat(-1);
-
-                return;
-              }
-            }
-
-            let isInView, rae;
-
-            if (keepTrackApi.getSensorManager().isSensorSelected()) {
-              const sensor = keepTrackApi.getSensorManager().currentSensors[0];
-
-              rae = sensor.rae(sat, timeManagerInstance.simulationTimeObj);
-              isInView = sensor.isRaeInFov(rae);
-            } else {
-              rae = {
-                az: 0,
-                el: 0,
-                rng: 0,
-              };
-              isInView = false;
-            }
-
-            const lla = eci2lla(sat.position, SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst);
-            const currentTearr: TearrData = {
-              time: timeManagerInstance.simulationTimeObj.toISOString(),
-              az: rae.az,
-              el: rae.el,
-              rng: rae.rng,
-              objName: sat.name,
-              lat: lla.lat,
-              lon: lla.lon,
-              alt: lla.alt,
-              inView: isInView,
-            };
-
-            this.currentTEARR = currentTearr;
+            satAltitudeElement.innerHTML = `${SatMath.getAlt(sat.position, gmst).toFixed(2)} km`;
+            satVelocityElement.innerHTML = `${sat.totalVelocity.toFixed(2)} km/s`;
           } else {
-            // Is Missile
-            this.currentTEARR = missileManager.getMissileTEARR(obj as MissileObject);
-          }
+            const misl = obj as MissileObject;
 
-          const { gmst } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
-          const lla = eci2lla(obj.position, gmst);
-
-          const satLonElement = getEl('sat-longitude');
-          const satLatElement = getEl('sat-latitude');
-
-          if (satLonElement && satLatElement) {
-            if (lla.lon >= 0) {
-              satLonElement.innerHTML = `${lla.lon.toFixed(3)}°E`;
+            satAltitudeElement.innerHTML = `${(this.currentTEARR?.alt ?? 0).toFixed(2)} km`;
+            if (misl.totalVelocity) {
+              satVelocityElement.innerHTML = `${misl.totalVelocity.toFixed(2)} km/s`;
             } else {
-              satLonElement.innerHTML = `${(lla.lon * -1).toFixed(3)}°W`;
-            }
-            if (lla.lat >= 0) {
-              satLatElement.innerHTML = `${lla.lat.toFixed(3)}°N`;
-            } else {
-              satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°S`;
+              satVelocityElement.innerHTML = 'Unknown';
             }
           }
+        }
 
-          const covMatrix = this.selectSatManager_.primarySatCovMatrix;
-          let covRadial = covMatrix[0];
-          let covCrossTrack = covMatrix[1];
-          let covInTrack = covMatrix[2];
+        this.updateSatelliteTearrData_(obj, sensorManagerInstance, timeManagerInstance);
 
-          const useKm =
-            covRadial > 0.5 &&
-            covCrossTrack > 0.5 &&
-            covInTrack > 0.5;
+        if (this.selectSatManager_.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
+          showEl('secondary-sat-info');
+          showEl('sec-angle-link');
+        } else if (this.selectSatManager_.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
+          hideEl('secondary-sat-info');
+          hideEl('sec-angle-link');
+        }
 
-          if (useKm) {
-            getEl('sat-uncertainty-radial')!.innerHTML = `${(covMatrix[0]).toFixed(2)} km`;
-            getEl('sat-uncertainty-crosstrack')!.innerHTML = `${(covMatrix[1]).toFixed(2)} km`;
-            getEl('sat-uncertainty-intrack')!.innerHTML = `${(covMatrix[2]).toFixed(2)} km`;
+        if (this.selectSatManager_.secondarySatObj && obj.isSatellite()) {
+          const sat = obj as DetailedSatellite;
+          const ric = CoordinateTransforms.sat2ric(this.selectSatManager_.secondarySatObj, sat);
+          const dist = SensorMath.distanceString(sat, this.selectSatManager_.secondarySatObj).split(' ')[2];
+
+          const satDistanceElement = getEl('sat-sec-dist');
+          const satRadiusElement = getEl('sat-sec-rad');
+          const satInTrackElement = getEl('sat-sec-intrack');
+          const satCrossTrackElement = getEl('sat-sec-crosstrack');
+
+          if (satDistanceElement && satRadiusElement && satInTrackElement && satCrossTrackElement) {
+            satDistanceElement.innerHTML = `${dist} km`;
+            satRadiusElement.innerHTML = `${ric.position[0].toFixed(2)}km`;
+            satInTrackElement.innerHTML = `${ric.position[1].toFixed(2)}km`;
+            satCrossTrackElement.innerHTML = `${ric.position[2].toFixed(2)}km`;
           } else {
-            covRadial *= 1000;
-            covCrossTrack *= 1000;
-            covInTrack *= 1000;
-            getEl('sat-uncertainty-radial')!.innerHTML = `${covRadial.toFixed(2)} m`;
-            getEl('sat-uncertainty-crosstrack')!.innerHTML = `${covCrossTrack.toFixed(2)} m`;
-            getEl('sat-uncertainty-intrack')!.innerHTML = `${covInTrack.toFixed(2)} m`;
+            errorManagerInstance.debug('Error updating secondary satellite info!');
           }
+        }
 
+        const nextPassElement = getEl('sat-nextpass');
+
+        if (sensorManagerInstance.isSensorSelected()) {
+          const uiManagerInstance = keepTrackApi.getUiManager();
+
+          /*
+           * If we didn't just calculate next pass time for this satellite and sensor combination do it
+           * TODO: Make new logic for this to allow it to be updated while selected
+           */
           if (
-            settingsManager.plugins?.stereoMap &&
-            keepTrackApi.getPlugin(StereoMap)?.isMenuButtonActive &&
-            timeManagerInstance.realTime > settingsManager.lastMapUpdateTime + 30000
+            (this.selectSatManager_.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
+              sensorManagerInstance.currentSensors[0].objName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
+            !obj.isMissile()
           ) {
-            keepTrackApi.getPlugin(StereoMap)?.updateMap();
-            settingsManager.lastMapUpdateTime = timeManagerInstance.realTime;
-          }
-
-          const satAltitudeElement = getEl('sat-altitude');
-          const satVelocityElement = getEl('sat-velocity');
-
-          if (satAltitudeElement && satVelocityElement) {
-
-            if (obj.isSatellite()) {
-              const sat = obj as DetailedSatellite;
-              const { gmst } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
-
-
-              satAltitudeElement.innerHTML = `${SatMath.getAlt(sat.position, gmst).toFixed(2)} km`;
-              satVelocityElement.innerHTML = `${sat.totalVelocity.toFixed(2)} km/s`;
-            } else {
-              const misl = obj as MissileObject;
-
-              satAltitudeElement.innerHTML = `${(this.currentTEARR?.alt ?? 0).toFixed(2)} km`;
-              if (misl.totalVelocity) {
-                satVelocityElement.innerHTML = `${misl.totalVelocity.toFixed(2)} km/s`;
-              } else {
-                satVelocityElement.innerHTML = 'Unknown';
-              }
-            }
-          }
-
-          this.updateSatelliteTearrData_(obj, sensorManagerInstance, timeManagerInstance);
-
-          if (this.selectSatManager_.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
-            showEl('secondary-sat-info');
-            showEl('sec-angle-link');
-          } else if (this.selectSatManager_.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
-            hideEl('secondary-sat-info');
-            hideEl('sec-angle-link');
-          }
-
-          if (this.selectSatManager_.secondarySatObj && obj.isSatellite()) {
             const sat = obj as DetailedSatellite;
-            const ric = CoordinateTransforms.sat2ric(this.selectSatManager_.secondarySatObj, sat);
-            const dist = SensorMath.distanceString(sat, this.selectSatManager_.secondarySatObj).split(' ')[2];
 
-            const satDistanceElement = getEl('sat-sec-dist');
-            const satRadiusElement = getEl('sat-sec-rad');
-            const satInTrackElement = getEl('sat-sec-intrack');
-            const satCrossTrackElement = getEl('sat-sec-crosstrack');
-
-            if (satDistanceElement && satRadiusElement && satInTrackElement && satCrossTrackElement) {
-              satDistanceElement.innerHTML = `${dist} km`;
-              satRadiusElement.innerHTML = `${ric.position[0].toFixed(2)}km`;
-              satInTrackElement.innerHTML = `${ric.position[1].toFixed(2)}km`;
-              satCrossTrackElement.innerHTML = `${ric.position[2].toFixed(2)}km`;
-            } else {
-              errorManagerInstance.debug('Error updating secondary satellite info!');
+            if (sat.perigee > sensorManagerInstance.currentSensors[0].maxRng) {
+              if (nextPassElement) {
+                nextPassElement.innerHTML = 'Beyond Max Range';
+              }
+            } else if (nextPassElement) {
+              nextPassElement.innerHTML = SensorMath.nextpass(sat, sensorManagerInstance.currentSensors, 2, 5);
             }
-          }
-
-          const nextPassElement = getEl('sat-nextpass');
-
-          if (sensorManagerInstance.isSensorSelected()) {
-            const uiManagerInstance = keepTrackApi.getUiManager();
 
             /*
-             * If we didn't just calculate next pass time for this satellite and sensor combination do it
-             * TODO: Make new logic for this to allow it to be updated while selected
+             *  IDEA: Code isInSun()
+             * sun.getXYZ();
+             * lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
              */
-            if (
-              (this.selectSatManager_.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
-                sensorManagerInstance.currentSensors[0].objName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
-              !obj.isMissile()
-            ) {
-              const sat = obj as DetailedSatellite;
-
-              if (sat.perigee > sensorManagerInstance.currentSensors[0].maxRng) {
-                if (nextPassElement) {
-                  nextPassElement.innerHTML = 'Beyond Max Range';
-                }
-              } else if (nextPassElement) {
-                nextPassElement.innerHTML = SensorMath.nextpass(sat, sensorManagerInstance.currentSensors, 2, 5);
-              }
-
-              /*
-               *  IDEA: Code isInSun()
-               * sun.getXYZ();
-               * lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
-               */
-            }
-            uiManagerInstance.lastNextPassCalcSatId = this.selectSatManager_.selectedSat;
-            uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0]?.objName ?? '';
-          } else if (nextPassElement) {
-            nextPassElement.innerHTML = 'Unavailable';
           }
-        } catch (e) {
-          errorManagerInstance.debug('Error updating satellite info!');
+          uiManagerInstance.lastNextPassCalcSatId = this.selectSatManager_.selectedSat;
+          uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0]?.objName ?? '';
+        } else if (nextPassElement) {
+          nextPassElement.innerHTML = 'Unavailable';
         }
-      },
+      } catch (e) {
+        errorManagerInstance.debug('Error updating satellite info!');
+      }
     });
 
     Doris.getInstance().on(KeepTrackApiEvents.onWatchlistUpdated, (watchlistList: { id: number, inView: boolean }[]) => {

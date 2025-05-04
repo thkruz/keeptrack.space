@@ -89,12 +89,12 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.onKeepTrackReady]: []; // Done
   [KeepTrackApiEvents.selectSatData]: [DetailedSatellite | MissileObject | BaseObject, number]; // Done
   [KeepTrackApiEvents.setSecondarySat]: [DetailedSatellite | null, number]; // Done
+  [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject]; // Done
+  [KeepTrackApiEvents.ConeMeshUpdate]: []; // Done
+  [KeepTrackApiEvents.bottomMenuModeChange]: []; // Done
 
   [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
   [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];
-  [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
-  [KeepTrackApiEvents.ConeMeshUpdate]: [];
-  [KeepTrackApiEvents.bottomMenuModeChange]: [];
   [KeepTrackApiEvents.onPrimarySatelliteUpdate]: [BaseObject | null, number];
   [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number];
   [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number];

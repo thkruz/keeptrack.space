@@ -531,15 +531,11 @@ export abstract class KeepTrackPlugin {
   }
 
   registerMenuMode(): void {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.bottomMenuModeChange,
-      cbName: this.id,
-      cb: (): void => {
-        this.hideBottomIcon();
-        if (this.menuMode.includes(settingsManager.menuMode)) {
-          this.showBottomIcon();
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.bottomMenuModeChange, (): void => {
+      this.hideBottomIcon();
+      if (this.menuMode.includes(settingsManager.menuMode)) {
+        this.showBottomIcon();
+      }
     });
   }
 

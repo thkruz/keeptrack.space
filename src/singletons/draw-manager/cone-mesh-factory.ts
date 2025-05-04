@@ -1,5 +1,5 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees } from 'ootk';
 import { ConeMesh, ConeSettings } from './cone-mesh';
@@ -45,12 +45,12 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
     const sensorFovMesh = new ConeMesh(coneAttachPoint, settings);
 
     this.add(sensorFovMesh);
-    keepTrackApi.runEvent(KeepTrackApiEvents.ConeMeshUpdate);
+    Doris.getInstance().emit(KeepTrackApiEvents.ConeMeshUpdate);
   }
 
   remove(id: number) {
     this.meshes.splice(id, 1);
-    keepTrackApi.runEvent(KeepTrackApiEvents.ConeMeshUpdate);
+    Doris.getInstance().emit(KeepTrackApiEvents.ConeMeshUpdate);
   }
 
   removeByObjectId(id: number) {
@@ -60,6 +60,6 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
       this.remove(index);
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.ConeMeshUpdate);
+    Doris.getInstance().emit(KeepTrackApiEvents.ConeMeshUpdate);
   }
 }

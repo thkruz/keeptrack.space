@@ -29,14 +29,10 @@ export class DateTimeManager extends KeepTrackPlugin {
       cb: this.updateDateTime.bind(this),
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateSelectBox,
-      cbName: this.id,
-      cb: () => {
-        const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
+    Doris.getInstance().on(KeepTrackApiEvents.updateSelectBox, () => {
+      const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
 
-        getEl('jday').innerHTML = jday.toString();
-      },
+      getEl('jday').innerHTML = jday.toString();
     });
   }
 

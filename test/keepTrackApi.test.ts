@@ -1,6 +1,6 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { isThisNode } from '@app/static/isThisNode';
-import { Tessa } from '@app/tessa/tessa';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from 'ootk';
 import { keepTrackApi } from '../src/keepTrackApi';
@@ -19,7 +19,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+  Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
     // Do nothing
   });
 
@@ -47,15 +47,15 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  Tessa.getInstance().on(KeepTrackApiEvents.bottomMenuClick, () => {
+  Doris.getInstance().on(KeepTrackApiEvents.bottomMenuClick, () => {
     // Do nothing
   });
 
-  Tessa.getInstance().on(KeepTrackApiEvents.hideSideMenus, (): void => {
+  Doris.getInstance().on(KeepTrackApiEvents.hideSideMenus, (): void => {
     // Do nothing
   });
 
-  Tessa.getInstance().on(KeepTrackApiEvents.nightToggle, () => {
+  Doris.getInstance().on(KeepTrackApiEvents.nightToggle, () => {
     // Do nothing
   });
 
@@ -132,12 +132,12 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, 'test' as unknown as DetailedSatellite);
-  Tessa.getInstance().emit(KeepTrackApiEvents.onCruncherReady);
+  Doris.getInstance().emit(KeepTrackApiEvents.onCruncherReady);
   keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherMessage);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
-  Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'test');
-  Tessa.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
+  Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'test');
+  Doris.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
 
   keepTrackApi.runEvent(KeepTrackApiEvents.orbitManagerInit);
   keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);

@@ -1,4 +1,5 @@
 import { keepTrackContainer } from '@app/container';
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
@@ -9,7 +10,6 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
-import { Tessa } from '@app/tessa/tessa';
 
 describe('SensorFov_class', () => {
   let SensorFovPlugin: SensorFov;
@@ -26,13 +26,13 @@ describe('SensorFov_class', () => {
   it('test_bottom_menu_click', () => {
     websiteInit(SensorFovPlugin);
 
-    expect(() => Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
 
     const sensorManagerInstance = new SensorManager();
 
     sensorManagerInstance.isSensorSelected = jest.fn().mockReturnValue(true);
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
-    expect(() => Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
   });
 
   // Test changing sensor

@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
@@ -28,7 +29,6 @@ import { GLSL3 } from '@app/static/material';
 import { Mesh } from '@app/static/mesh';
 import { ShaderMaterial } from '@app/static/shader-material';
 import { SphereGeometry } from '@app/static/sphere-geometry';
-import { Tessa } from '@app/tessa/tessa';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
 import { errorManagerInstance } from '../errorManager';
@@ -615,8 +615,8 @@ export class Earth {
     // Handle night texture binding with possible plugin override
     let nightTextureBound = false;
 
-    if (Tessa.getInstance().listenerCount(KeepTrackApiEvents.nightToggle) > 0) {
-      Tessa.getInstance().emit(
+    if (Doris.getInstance().listenerCount(KeepTrackApiEvents.nightToggle) > 0) {
+      Doris.getInstance().emit(
         KeepTrackApiEvents.nightToggle,
         gl,
         this.textureNight,

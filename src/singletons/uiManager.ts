@@ -24,11 +24,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { isThisNode } from '@app/static/isThisNode';
-import { Tessa } from '@app/tessa/tessa';
 import '@materializecss/materialize';
 import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from 'ootk';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
@@ -403,7 +403,7 @@ export class UiManager {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'uiManager',
       cb: () => {
-        this.bottomIconPress = (el: HTMLElement) => Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, el.id);
+        this.bottomIconPress = (el: HTMLElement) => Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, el.id);
         const BottomIcons = getEl('bottom-icons');
 
         BottomIcons?.addEventListener('click', (evt: Event) => {
@@ -431,7 +431,7 @@ export class UiManager {
         });
         this.hideSideMenus = () => {
           closeColorbox();
-          Tessa.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
+          Doris.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
         };
       },
     });

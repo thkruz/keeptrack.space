@@ -1,7 +1,7 @@
+import { Doris } from '@app/doris/doris';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { VERSION } from '@app/settings/version';
-import { Tessa } from '@app/tessa/tessa';
 
 interface WebGLTelemetryData {
   // Basic Error Information
@@ -364,7 +364,7 @@ export class Telemetry {
     return {
       application: {
         renderState: {
-          fps: Tessa.getInstance().framesPerSecond,
+          fps: Doris.getInstance().framesPerSecond,
         },
       },
     };

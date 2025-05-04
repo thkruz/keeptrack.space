@@ -1,7 +1,7 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import { Tessa } from '@app/tessa/tessa';
 import { Milliseconds } from 'ootk';
 import { EventBus } from '../events/event-bus';
 import { CoreEngineEvents, EventMap } from '../events/event-types';
@@ -128,28 +128,40 @@ export class Engine {
     poweredBy.style.marginBottom = '12px';
     poweredBy.style.opacity = '0.8';
 
-    // TESSA text
-    const tessaText = document.createElement('div');
+    // DORIS text
+    const dorisText = document.createElement('div');
 
-    tessaText.innerText = 'TESSA';
-    tessaText.style.fontSize = '64px';
-    tessaText.style.fontWeight = 'bold';
-    tessaText.style.letterSpacing = '0.2em';
-    tessaText.style.textShadow = '0 2px 16px #000, 0 0 8px #fff4';
+    dorisText.innerText = 'DORIS';
+    dorisText.style.fontSize = '64px';
+    dorisText.style.fontWeight = 'bold';
+    dorisText.style.letterSpacing = '0.2em';
+    dorisText.style.textShadow = '0 2px 16px #000, 0 0 8px #fff4';
 
-    // Version/license text
+    // Loading text
+    const loadingText = document.createElement('div');
+
+    loadingText.innerText = 'A not-so-intelligent, definitely-overambitious, and surprisingly useful small space engine.';
+    loadingText.style.fontSize = '16px';
+    loadingText.style.marginTop = '14px';
+    loadingText.style.opacity = '0.7';
+
+    // Version text
     const versionText = document.createElement('div');
 
     versionText.innerText = 'v1.0.0';
-    versionText.style.fontSize = '16px';
-    versionText.style.marginTop = '14px';
+    versionText.style.position = 'absolute';
+    versionText.style.bottom = '12px';
+    versionText.style.left = '12px';
+    versionText.style.fontSize = '14px';
     versionText.style.opacity = '0.7';
+    versionText.style.pointerEvents = 'none';
+    splashScreen.appendChild(versionText);
 
     // Copyright message
     const copyright = document.createElement('div');
 
     copyright.innerHTML =
-      `TESSA &mdash; Tracking Engine for Space Situational Awareness<br>
+      `DORIS &mdash; the Definitely Overengineered Render & Input System engine<br>
       &copy; 2025 Kruczek Labs LLC. All rights reserved.<br>
       Licensed under the GNU AGPL v3.0.<br>
       See LICENSE for details. Unauthorized use is prohibited.`;
@@ -163,8 +175,8 @@ export class Engine {
     copyright.style.pointerEvents = 'none';
 
     splashContent.appendChild(poweredBy);
-    splashContent.appendChild(tessaText);
-    splashContent.appendChild(versionText);
+    splashContent.appendChild(dorisText);
+    splashContent.appendChild(loadingText);
     splashScreen.appendChild(splashContent);
     splashScreen.appendChild(copyright);
 
@@ -216,7 +228,7 @@ export class Engine {
     this.eventBus.emit(CoreEngineEvents.BeforeRender);
     this.eventBus.emit(CoreEngineEvents.Render);
     // this.renderer.render(this.sceneManager.activeScene);
-    keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, Tessa.getInstance().deltaTime as Milliseconds);
+    keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, Doris.getInstance().deltaTime as Milliseconds);
     this.eventBus.emit(CoreEngineEvents.AfterRender);
   }
 

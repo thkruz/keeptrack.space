@@ -107,7 +107,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number];
 };
 
-declare module '@app/tessa/events/event-types' {
+declare module '@app/doris/events/event-types' {
   export interface ApplicationEventMap {
     [KeepTrackApiEvents.bottomMenuClick]: [string];
     [KeepTrackApiEvents.hideSideMenus]: [];

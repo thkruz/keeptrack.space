@@ -1,4 +1,5 @@
 /* eslint-disable max-depth */
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorMath } from '@app/static/sensor-math';
@@ -8,7 +9,6 @@ import { LineManager } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { TimeManager } from '../time-manager';
 import { ControlSite } from './ControlSite';
-import { Tessa } from '@app/tessa/tessa';
 
 export enum SatConstellationString {
   Aehf = 'aehf',
@@ -82,7 +82,7 @@ export class SatLinkManager {
   }
 
   init(controlSiteList: ControlSite[]) {
-    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => this.onCruncher_(controlSiteList));
+    Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => this.onCruncher_(controlSiteList));
   }
 
   private onCruncher_(controlSiteList: ControlSite[]) {

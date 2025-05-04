@@ -19,8 +19,8 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorManager } from '../sensor/sensorManager';
 import { SoundNames } from '../sounds/SoundNames';
 
+import { Doris } from '@app/doris/doris';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { Tessa } from '@app/tessa/tessa';
 import { fetchWeatherApi } from 'openmeteo';
 
 interface Pass {
@@ -291,7 +291,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     super.addJs();
 
     // We need to wait for the sensorIds to be assigned before we can use them. Once they are ready we will reload the users last selected sensors
-    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+    Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
       const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
       let enabledSensors = [] as number[];
 

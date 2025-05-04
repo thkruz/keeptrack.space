@@ -1,6 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { Tessa } from './../../tessa/tessa';
+import { Doris } from '../../doris/doris';
 
 import dayNightPng from '@public/img/icons/day-night.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -14,7 +14,7 @@ export class NightToggle extends KeepTrackPlugin {
   addJs() {
     super.addJs();
 
-    Tessa.getInstance().on(KeepTrackApiEvents.nightToggle, (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture): void => {
+    Doris.getInstance().on(KeepTrackApiEvents.nightToggle, (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture): void => {
       if (!this.isMenuButtonActive) {
         gl.bindTexture(gl.TEXTURE_2D, nightTexture);
       } else {

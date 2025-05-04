@@ -6,11 +6,11 @@ import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import debugPng from '@public/img/icons/debug.png';
 
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
-import { Tessa } from '@app/tessa/tessa';
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -167,9 +167,9 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    Tessa.getInstance().on(CoreEngineEvents.Update, (): void => {
+    Doris.getInstance().on(CoreEngineEvents.Update, (): void => {
       if (this.isShowFPS) {
-        const fps = Tessa.getInstance().framesPerSecond;
+        const fps = Doris.getInstance().framesPerSecond;
 
         // eslint-disable-next-line no-console
         console.log(`FPS: ${fps}`);

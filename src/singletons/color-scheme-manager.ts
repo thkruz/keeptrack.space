@@ -28,10 +28,10 @@ import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
 
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
-import { Tessa } from '@app/tessa/tessa';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
@@ -230,7 +230,7 @@ export class ColorSchemeManager {
     this.pickableBuffer = renderer.gl.createBuffer();
 
     // Create the color buffers as soon as the position cruncher is ready
-    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+    Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
       let possibleColorScheme: ColorScheme | null = null;
@@ -264,7 +264,7 @@ export class ColorSchemeManager {
       });
     });
 
-    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+    Doris.getInstance().on(CoreEngineEvents.Update, () => {
       /*
        * Update Colors
        * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore

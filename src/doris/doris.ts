@@ -1,0 +1,38 @@
+import { isThisNode } from '@app/static/isThisNode';
+import { Engine } from './core/engine';
+
+export class Doris {
+  static readonly id = 'Doris';
+  private static readonly defaultCanvas: string = 'keeptrack-canvas';
+  static instance: Engine | null = null; // NOSONAR
+
+  static getInstance() {
+    if (!Doris.instance) {
+      Doris.instance = new Engine({
+        canvasId: isThisNode() ? Doris.defaultCanvas : 'keeptrack-canvas',
+      });
+
+      Doris.printConsoleMessage_();
+    }
+
+    return Doris.instance;
+  }
+
+  private static printConsoleMessage_() {
+    // eslint-disable-next-line no-console
+    console.log(`
+______ ___________ _____ _____
+|  _  \\  _  | ___ \\_   _/  ___|
+| | | | | | | |_/ / | | \\ \`--.
+| | | | | | |    /  | |  \`--. \
+| |/ /\\ \\_/ / |\\ \\ _| |_/\\__/ /
+|___/  \\___/\\_| \\_|\\___/\\____/
+
+Powered by the Definitely Overengineered Render & Input System (DORIS) engine.
+A not-so-intelligent, definitely-overambitious, and surprisingly useful small space engine.
+Learn more at https://keeptrack.space/tessa
+This software is licensed under the GNU Affero General Public License (AGPL).
+See https://www.gnu.org/licenses/agpl-3.0.html for details.
+    `);
+  }
+}

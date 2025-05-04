@@ -1,6 +1,6 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
-import { Tessa } from '@app/tessa/tessa';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 
@@ -24,15 +24,15 @@ describe('NightToggle_class', () => {
     const nightToggle = new NightToggle();
 
     nightToggle.init();
-    Tessa.getInstance().emit(
+    Doris.getInstance().emit(
       KeepTrackApiEvents.nightToggle,
       global.mocks.glMock,
       global.mocks.textureNight,
       global.mocks.textureDay,
     );
-    Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'menu-day-night');
+    Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'menu-day-night');
     expect(() =>
-      Tessa.getInstance().emit(
+      Doris.getInstance().emit(
         KeepTrackApiEvents.nightToggle,
         global.mocks.glMock,
         null as unknown as WebGLTexture,

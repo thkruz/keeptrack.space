@@ -25,9 +25,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MissileParams } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { Tessa } from '@app/tessa/tessa';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Degrees, DetailedSatellite, EciVec3, KilometersPerSecond, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
@@ -614,7 +614,7 @@ export class CatalogManager {
     this.buildOrbitDensityMatrix_();
 
     // Run any functions registered with the API
-    Tessa.getInstance().emit(KeepTrackApiEvents.onCruncherReady);
+    Doris.getInstance().emit(KeepTrackApiEvents.onCruncherReady);
 
     settingsManager.cruncherReady = true;
   }

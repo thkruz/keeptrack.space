@@ -3,11 +3,11 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UrlManager } from '@app/static/url-manager';
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
-import { Tessa } from '@app/tessa/tessa';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
@@ -52,7 +52,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       cb: this.checkIfSelectSatVisible.bind(this),
     });
 
-    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+    Doris.getInstance().on(CoreEngineEvents.Update, () => {
       if (this.primarySatObj.id !== -1) {
         const timeManagerInstance = keepTrackApi.getTimeManager();
 
@@ -61,7 +61,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       }
     });
 
-    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+    Doris.getInstance().on(CoreEngineEvents.Update, () => {
       // If the selected satellite is not the same as the last selected satellite, run the event
       if (this.selectedSat !== this.lastSelectedPrimarySatId()) {
         keepTrackApi.runEvent(KeepTrackApiEvents.onPrimarySatelliteChange, this.primarySatObj, this.selectedSat);

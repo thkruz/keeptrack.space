@@ -7,9 +7,9 @@ import { GroupType } from '@app/singletons/object-group';
 import { StringExtractor } from '@app/static/string-extractor';
 import flagPng from '@public/img/icons/flag.png';
 
+import { Doris } from '@app/doris/doris';
 import { Localization } from '@app/locales/locales';
 import { SearchResult } from '@app/singletons/search-manager';
-import { Tessa } from '@app/tessa/tessa';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -35,7 +35,7 @@ export class CountriesMenu extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+    Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
       getEl('country-list')!.innerHTML = CountriesMenu.generateCountryList_();
     });
   }

@@ -3,6 +3,7 @@ import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import gpsPng from '@public/img/icons/gps.png';
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -10,7 +11,6 @@ import type { GroupsManager } from '@app/singletons/groups-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { DopMath } from '@app/static/dop-math';
 import { SatMath } from '@app/static/sat-math';
-import { Tessa } from '@app/tessa/tessa';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -132,7 +132,7 @@ export class DopsPlugin extends KeepTrackPlugin {
           (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
           (<HTMLInputElement>getEl('dops-alt')).value = '0';
           (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
-          Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
         } else {
           showLoading(DopsPlugin.updateSideMenu);
           this.setBottomIconToEnabled();

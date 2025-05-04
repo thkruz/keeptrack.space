@@ -18,6 +18,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
@@ -26,7 +27,6 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
-import { Tessa } from '@app/tessa/tessa';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
@@ -169,7 +169,7 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality.toString());
 
-    Tessa.getInstance().emit(KeepTrackApiEvents.saveSettings);
+    Doris.getInstance().emit(KeepTrackApiEvents.saveSettings);
   }
 
   colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
@@ -1534,7 +1534,7 @@ export class SettingsManager {
             this.isEnableJscCatalog = val === 'true';
             break;
           case 'sat':
-            Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+            Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
               setTimeout(() => {
                 if (typeof val === 'string') {
                   const sccNum = parseInt(val);

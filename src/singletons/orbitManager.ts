@@ -1,10 +1,10 @@
 /* */
 
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
-import { Tessa } from '@app/tessa/tessa';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
@@ -206,9 +206,9 @@ export class OrbitManager {
       numSegs: settingsManager.orbitSegments,
     });
 
-    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+    Doris.getInstance().on(CoreEngineEvents.Update, () => {
       // TODO: Reevaluate these conditions
-      if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+      if (Doris.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
         this.updateAllVisibleOrbits();
       }
     });

@@ -1,6 +1,6 @@
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
-import { Tessa } from '@app/tessa/tessa';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -207,7 +207,7 @@ export class TimeManager {
     this.setSelectedDate(this.simulationTimeObj);
     this.initializeKeyboardBindings_();
 
-    Tessa.getInstance().on(CoreEngineEvents.BeforeUpdate, () => {
+    Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, () => {
       this.setNow(<Milliseconds>Date.now());
       if (!this.isUpdateTimeThrottle_) {
         this.isUpdateTimeThrottle_ = true;

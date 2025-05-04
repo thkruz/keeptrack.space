@@ -20,11 +20,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from './doris/doris';
 import { KeepTrack } from './keeptrack';
-import { Tessa } from './tessa/tessa';
 
 KeepTrack.getInstance(window.settingsOverride)
   .registerAssets(); // Register assets with the engine
 
-Tessa.getInstance().initialize(); // Initialize the engine
-Tessa.getInstance().start(); // Start the engine
+Doris.getInstance().initialize(); // Initialize the engine
+Doris.getInstance().start(); // Start the engine

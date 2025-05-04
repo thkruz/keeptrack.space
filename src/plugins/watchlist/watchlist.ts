@@ -22,6 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
@@ -30,7 +31,6 @@ import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/senso
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { isThisNode } from '@app/static/isThisNode';
-import { Tessa } from '@app/tessa/tessa';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
@@ -111,7 +111,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       cb: this.uiManagerFinal_.bind(this),
     });
 
-    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => this.onCruncherReady_.bind(this));
+    Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => this.onCruncherReady_.bind(this));
   }
 
   /**

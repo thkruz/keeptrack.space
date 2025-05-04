@@ -1,7 +1,7 @@
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
-import { Tessa } from '@app/tessa/tessa';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { BaseObject } from 'ootk';
 import { getEl } from '../lib/get-el';
@@ -155,9 +155,9 @@ export class WebGLRenderer {
       this.isRotationEvent_ = true;
     });
 
-    Tessa.getInstance().on(CoreEngineEvents.BeforeUpdate, this.update.bind(this));
+    Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, this.update.bind(this));
 
-    Tessa.getInstance().on(CoreEngineEvents.Render, () => {
+    Doris.getInstance().on(CoreEngineEvents.Render, () => {
       this.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
     });
 

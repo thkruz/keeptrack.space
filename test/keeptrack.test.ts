@@ -1,7 +1,7 @@
+import { Doris } from '@app/doris/doris';
+import { EngineEvents } from '@app/doris/engine-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManagerOverride } from '@app/settings/settings';
-import { EngineEvents } from '@app/tessa/engine-events';
-import { Tessa } from '@app/tessa/tessa';
 import { DetailedSatellite, Milliseconds, Satellite } from 'ootk';
 import { keepTrackContainer } from '../src/container';
 import { SatCruncherMessageData, Singletons } from '../src/interfaces';
@@ -104,9 +104,9 @@ describe('code_snippet', () => {
     let keepTrack: KeepTrack;
     const initializationTest = async () => {
       keepTrack = new KeepTrack(settingsOverride);
-      Tessa.getInstance().initialize();
+      Doris.getInstance().initialize();
       keepTrack.registerAssets();
-      Tessa.getInstance().register({
+      Doris.getInstance().register({
         event: EngineEvents.onAssetsLoaded,
         cbName: 'test_constructor_initializes_objects_without_showErrorCode',
         cb: () => {
@@ -116,9 +116,9 @@ describe('code_snippet', () => {
           keepTrackApi.getMainCamera().draw = jest.fn();
         },
       });
-      await Tessa.getInstance().run();
+      await Doris.getInstance().run();
 
-      expect(Tessa.getInstance().isRunning).toBe(true);
+      expect(Doris.getInstance().isRunning).toBe(true);
     };
 
     expect(initializationTest).not.toThrow();
@@ -144,11 +144,11 @@ describe('code_snippet', () => {
 
     keepTrack.registerAssets();
 
-    Tessa.getInstance().run().then(() => {
+    Doris.getInstance().run().then(() => {
       drawManagerInstance.update = jest.fn();
       keepTrackApi.getMainCamera().draw = jest.fn();
       settingsManager.cruncherReady = true;
-      Tessa.getInstance().tick(performance.now() as Milliseconds);
+      Doris.getInstance().tick(performance.now() as Milliseconds);
       expect(drawManagerInstance.update).toHaveBeenCalled();
       expect(keepTrackApi.getMainCamera().draw).toHaveBeenCalled();
     });

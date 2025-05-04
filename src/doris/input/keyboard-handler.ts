@@ -1,4 +1,4 @@
-// src/tessa/input/KeyboardHandler.ts
+// src/doris/input/KeyboardHandler.ts
 import { EventBus } from '../events/event-bus';
 import { InputEvents } from '../events/event-types';
 

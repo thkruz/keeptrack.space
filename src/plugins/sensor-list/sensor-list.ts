@@ -1,11 +1,11 @@
 import { sensors } from '@app/catalogs/sensors';
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { getClass } from '@app/lib/get-class';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { Tessa } from '@app/tessa/tessa';
 import sensorPng from '@public/img/icons/sensor.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
@@ -93,7 +93,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       cbName: this.id,
       cb: () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {
-          Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
           keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
         });
 
@@ -202,7 +202,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     });
 
-    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+    Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
       if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
         SensorListPlugin.reloadLastSensor_();
       }

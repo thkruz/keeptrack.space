@@ -1,8 +1,8 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode, Singletons } from '@app/interfaces';
 import { t7e } from '@app/locales/keys';
 import { Localization } from '@app/locales/locales';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
-import { Tessa } from '@app/tessa/tessa';
 import Module from 'module';
 import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -664,7 +664,7 @@ export abstract class KeepTrackPlugin {
       this.onSetBottomIconToUnselected();
     }
     if (isHideSideMenus) {
-      Tessa.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
+      Doris.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
     }
     getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-selected');
   }
@@ -786,7 +786,7 @@ export abstract class KeepTrackPlugin {
       });
     }
 
-    Tessa.getInstance().on(KeepTrackApiEvents.bottomMenuClick, (iconName: string): void => {
+    Doris.getInstance().on(KeepTrackApiEvents.bottomMenuClick, (iconName: string): void => {
       if (iconName === this.bottomIconElementName) {
         keepTrackApi.analytics.track('bottom_menu_click', {
           plugin: this.id,
@@ -980,7 +980,7 @@ export abstract class KeepTrackPlugin {
    * @param slideCb The callback function to run when the side menu is hidden.
    */
   registerHideSideMenu(bottomIconElementName: string, slideCb: () => void): void {
-    Tessa.getInstance().on(KeepTrackApiEvents.hideSideMenus, (): void => {
+    Doris.getInstance().on(KeepTrackApiEvents.hideSideMenus, (): void => {
       slideCb();
       getEl(bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
       this.isMenuButtonActive = false;

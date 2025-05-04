@@ -1,10 +1,10 @@
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { SatCruncherMessageData } from '../interfaces';
 import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
+import { Doris } from '@app/doris/doris';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Tessa } from '@app/tessa/tessa';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Milliseconds, SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -344,7 +344,7 @@ export class DotsManager {
 
     this.initProgramPicking();
 
-    Tessa.getInstance().on(CoreEngineEvents.BeforeUpdate, () => this.updatePositionBuffer());
+    Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, () => this.updatePositionBuffer());
   }
 
   /**
@@ -576,7 +576,7 @@ export class DotsManager {
       return;
     }
 
-    const simulationStep = Tessa.getInstance().simulationStep;
+    const simulationStep = Doris.getInstance().simulationStep;
 
     if (!settingsManager.lowPerf && simulationStep > settingsManager.minimumDrawDt) {
       if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {

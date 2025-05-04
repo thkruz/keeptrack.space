@@ -1,8 +1,8 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { Tessa } from '@app/tessa/tessa';
 import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
@@ -295,7 +295,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       cbName: this.id,
       cb: () => {
         getEl('top-menu-filter-btn')?.addEventListener('click', () => {
-          Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
         });
       },
     });
@@ -311,11 +311,11 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       },
     });
 
-    Tessa.getInstance().on(KeepTrackApiEvents.saveSettings, () => {
+    Doris.getInstance().on(KeepTrackApiEvents.saveSettings, () => {
       this.saveSettings_();
     });
 
-    Tessa.getInstance().on(KeepTrackApiEvents.loadSettings, () => {
+    Doris.getInstance().on(KeepTrackApiEvents.loadSettings, () => {
       this.loadSettings_();
     });
   }

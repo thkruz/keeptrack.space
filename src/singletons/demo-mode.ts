@@ -1,7 +1,7 @@
 import { DetailedSatellite, Milliseconds } from 'ootk';
 
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
-import { Tessa } from '@app/tessa/tessa';
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { keepTrackApi } from '../keepTrackApi';
 
 export class DemoManager {
@@ -13,7 +13,7 @@ export class DemoManager {
   satellite = 0;
 
   init(): void {
-    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+    Doris.getInstance().on(CoreEngineEvents.Update, () => {
       // If Demo Mode do stuff
       if (settingsManager.isDemoModeOn && keepTrackApi.getSensorManager()?.currentSensors[0]?.lat !== null) {
         this.update();

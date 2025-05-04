@@ -1,10 +1,10 @@
+import { Engine } from '@app/doris/core/engine';
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SatMath } from '@app/static/sat-math';
-import { Engine } from '@app/tessa/core/engine';
-import { Tessa } from '@app/tessa/tessa';
 import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
@@ -107,7 +107,7 @@ export class Scene {
   drawTimeArray: number[] = Array(150).fill(16);
 
   renderBackground(renderer: WebGLRenderer, camera: Camera): void {
-    this.drawTimeArray.push(Math.min(100, Tessa.getInstance().deltaTime));
+    this.drawTimeArray.push(Math.min(100, Doris.getInstance().deltaTime));
     if (this.drawTimeArray.length > 150) {
       this.drawTimeArray.shift();
     }

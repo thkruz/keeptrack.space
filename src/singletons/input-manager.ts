@@ -7,8 +7,8 @@ import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
-import { Tessa } from '@app/tessa/tessa';
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
@@ -385,9 +385,9 @@ export class InputManager {
     this.touch.init(canvasDOM);
     this.keyboard.init();
 
-    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+    Doris.getInstance().on(CoreEngineEvents.Update, () => {
       // TODO: Reevaluate these conditions
-      if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+      if (Doris.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
         this.update();
       }
     });
@@ -551,7 +551,7 @@ export class InputManager {
      * it was looking at
      */
 
-    const tessaEngine = Tessa.getInstance();
+    const tessaEngine = Doris.getInstance();
 
     if (tessaEngine.framesPerSecond > 30) {
       if (this.updateHoverDelayLimit > 0) {

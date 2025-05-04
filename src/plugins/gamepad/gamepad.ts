@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { Tessa } from '@app/tessa/tessa';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -286,7 +286,7 @@ export class GamepadPlugin {
     if (zoomOut === 0 && zoomIn === 0) {
       return;
     } // Not Zooming
-    const tessaEngine = Tessa.getInstance();
+    const tessaEngine = Doris.getInstance();
 
     let zoomTarget = keepTrackApi.getMainCamera().zoomLevel();
 
@@ -329,7 +329,7 @@ export class GamepadPlugin {
 
     if (x > this.deadzone || x < -this.deadzone || y > this.deadzone || y < -this.deadzone) {
       keepTrackApi.getMainCamera().autoRotate(false);
-      const tessaEngine = Tessa.getInstance();
+      const tessaEngine = Doris.getInstance();
 
       settingsManager.lastGamepadMovement = Date.now();
 
@@ -367,7 +367,7 @@ export class GamepadPlugin {
 
     const x = this.currentController.axes[2];
     const y = this.currentController.axes[3];
-    const tessaEngine = Tessa.getInstance();
+    const tessaEngine = Doris.getInstance();
 
     keepTrackApi.getMainCamera().isLocalRotateOverride = false;
     if (y > this.deadzone || y < -this.deadzone || x > this.deadzone || x < -this.deadzone) {

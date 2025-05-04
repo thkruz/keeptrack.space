@@ -43,6 +43,8 @@ import 'material-icons/iconfont/material-icons.css';
 import eruda, { ErudaConsole } from 'eruda';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime } from 'ootk';
 import { keepTrackContainer } from './container';
+import { Doris } from './doris/doris';
+import { CoreEngineEvents } from './doris/events/event-types';
 import { GetSatType, KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
@@ -73,8 +75,6 @@ import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
 import { SensorMath } from './static/sensor-math';
 import { SplashScreen } from './static/splash-screen';
-import { CoreEngineEvents } from './tessa/events/event-types';
-import { Tessa } from './tessa/tessa';
 
 export class KeepTrack {
   static readonly id = 'KeepTrack';
@@ -132,7 +132,7 @@ export class KeepTrack {
       KeepTrack.getDefaultBodyHtml();
 
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
-        Tessa.getInstance().on(CoreEngineEvents.Initialize, () => {
+        Doris.getInstance().on(CoreEngineEvents.Initialize, () => {
           KeepTrack.loadSplashScreen_();
         });
       }
@@ -387,18 +387,18 @@ theodore.kruczek at gmail dot com.
   }
 
   registerAssets(): void {
-    Tessa.getInstance().on(CoreEngineEvents.BeforeInitialize, () => {
+    Doris.getInstance().on(CoreEngineEvents.BeforeInitialize, () => {
       this.init();
       loadLocalization();
     });
 
-    Tessa.getInstance().on(CoreEngineEvents.AssetLoadStart, (): Promise<void> => new Promise((resolve) => {
-      Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+    Doris.getInstance().on(CoreEngineEvents.AssetLoadStart, (): Promise<void> => new Promise((resolve) => {
+      Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
         resolve();
       });
     }));
 
-    Tessa.getInstance().on(CoreEngineEvents.AssetLoadStart,
+    Doris.getInstance().on(CoreEngineEvents.AssetLoadStart,
       async () => {
         await KeepTrack.loadCss();
 
@@ -434,7 +434,7 @@ theodore.kruczek at gmail dot com.
 
         keepTrackApi.getMainCamera().init(settingsManager);
 
-        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 1, 5);
+        Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 1, 5);
         mobileManager.init();
 
         // Load all the plugins now that we have the API initialized
@@ -444,7 +444,7 @@ theodore.kruczek at gmail dot com.
             // intentionally left blank
           });
 
-        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 2, 5);
+        Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 2, 5);
         // Start initializing the rest of the website
         timeManagerInstance.init();
         uiManagerInstance.onReady();
@@ -456,14 +456,14 @@ theodore.kruczek at gmail dot com.
         renderer.glInit(getEl('keeptrack-canvas') as HTMLCanvasElement);
 
         sceneInstance.init(renderer.gl);
-        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 3, 5);
+        Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 3, 5);
         sceneInstance.loadScene();
 
         dotsManagerInstance.init(settingsManager);
 
         catalogManagerInstance.initObjects();
 
-        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 4, 5);
+        Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 4, 5);
         catalogManagerInstance.init();
         colorSchemeManagerInstance.init();
 
@@ -486,10 +486,10 @@ theodore.kruczek at gmail dot com.
 
         renderer.meshManager.init(renderer.gl);
 
-        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 5, 5);
+        Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 5, 5);
       });
 
-    Tessa.getInstance().on(CoreEngineEvents.AssetLoadProgress, (progress: number, total: number) => {
+    Doris.getInstance().on(CoreEngineEvents.AssetLoadProgress, (progress: number, total: number) => {
       switch (progress) {
         case 1:
           SplashScreen.loadStr(`${SplashScreen.msg.science} ${Math.floor((progress / total) * 100)}%`);
@@ -510,14 +510,14 @@ theodore.kruczek at gmail dot com.
           break;
       }
 
-      Tessa.getInstance().pause(50);
+      Doris.getInstance().pause(50);
     });
 
-    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+    Doris.getInstance().on(CoreEngineEvents.Update, () => {
       this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
       keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
     });
-    Tessa.getInstance().on(CoreEngineEvents.AssetLoadComplete, this.postStart_.bind(this));
+    Doris.getInstance().on(CoreEngineEvents.AssetLoadComplete, this.postStart_.bind(this));
   }
 
   private hoverBoxOnSatMiniElements_: HTMLElement | null = null;

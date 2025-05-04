@@ -1,11 +1,11 @@
 import { country2flagIcon } from '@app/catalogs/countries';
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
 import { SatMath } from '@app/static/sat-math';
-import { CoreEngineEvents } from '@app/tessa/events/event-types';
-import { Tessa } from '@app/tessa/tessa';
 import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
 import { SensorMath } from '../static/sensor-math';
@@ -40,9 +40,9 @@ export class HoverManager {
     this.satHoverBoxNode3 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox3'));
     this.satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
 
-    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+    Doris.getInstance().on(CoreEngineEvents.Update, () => {
       // TODO: Reevaluate these conditions
-      if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+      if (Doris.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
         // Only update hover if we are not on mobile
         if (!settingsManager.isMobileModeEnabled) {
           this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);

@@ -261,4 +261,10 @@ export class Engine {
   ): void {
     this.eventBus.emit(event, ...args);
   }
+
+  listenerCount<T extends keyof EventMap>(
+    event: T,
+  ): number {
+    return this.eventBus.listenerCount(event);
+  }
 }

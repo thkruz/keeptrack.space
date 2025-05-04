@@ -55,12 +55,8 @@ test('keepTrackApi Unit Testing', () => {
     // Do nothing
   });
 
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.nightToggle,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  Tessa.getInstance().on(KeepTrackApiEvents.nightToggle, () => {
+    // Do nothing
   });
 
   keepTrackApi.register({
@@ -143,10 +139,6 @@ test('keepTrackApi Unit Testing', () => {
   Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'test');
   Tessa.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
 
-  /*
-   * let emptyTexture: WebGLTexture;
-   * keepTrackApi.runEvent(KeepTrackApiEvents.nightToggle(keepTrackApi.programs.drawManager.gl, emptyTexture, emptyTexture));
-   */
   keepTrackApi.runEvent(KeepTrackApiEvents.orbitManagerInit);
   keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
   keepTrackApi.runEvent(KeepTrackApiEvents.drawOptionalScenery);

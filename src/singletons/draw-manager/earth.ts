@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { SettingsManager } from '@app/settings/settings';
@@ -27,6 +28,7 @@ import { GLSL3 } from '@app/static/material';
 import { Mesh } from '@app/static/mesh';
 import { ShaderMaterial } from '@app/static/shader-material';
 import { SphereGeometry } from '@app/static/sphere-geometry';
+import { Tessa } from '@app/tessa/tessa';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
 import { errorManagerInstance } from '../errorManager';
@@ -610,17 +612,22 @@ export class Earth {
     gl.uniform1i(this.mesh.material.uniforms.uNightMap, 1);
     gl.activeTexture(gl.TEXTURE1);
 
-    // If there are no callbacks, just use the night texture
-    const altNightTexBind = keepTrackApi.events.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null;
+    // Handle night texture binding with possible plugin override
+    let nightTextureBound = false;
 
-    if (!altNightTexBind) {
+    if (Tessa.getInstance().listenerCount(KeepTrackApiEvents.nightToggle) > 0) {
+      Tessa.getInstance().emit(
+        KeepTrackApiEvents.nightToggle,
+        gl,
+        this.textureNight,
+        this.textureDay,
+      );
+
+      nightTextureBound = true;
+    }
+
+    if (!nightTextureBound) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureNight);
-    } else {
-      /*
-       * If there are callbacks use those to determine which texture to use
-       * This is primarily used for the night mode toggle
-       */
-      altNightTexBind(gl, this.textureNight, this.textureDay);
     }
 
     // Bump Map

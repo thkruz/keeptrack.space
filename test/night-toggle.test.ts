@@ -1,9 +1,8 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
+import { Tessa } from '@app/tessa/tessa';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
-import { Tessa } from '@app/tessa/tessa';
 
 describe('NightToggle_class', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -25,8 +24,20 @@ describe('NightToggle_class', () => {
     const nightToggle = new NightToggle();
 
     nightToggle.init();
-    expect(() => keepTrackApi.methods.nightToggle(global.mocks.glMock, null as unknown as WebGLTexture, null as unknown as WebGLTexture)).not.toThrow();
+    Tessa.getInstance().emit(
+      KeepTrackApiEvents.nightToggle,
+      global.mocks.glMock,
+      global.mocks.textureNight,
+      global.mocks.textureDay,
+    );
     Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'menu-day-night');
-    expect(() => keepTrackApi.methods.nightToggle(global.mocks.glMock, null as unknown as WebGLTexture, null as unknown as WebGLTexture)).not.toThrow();
+    expect(() =>
+      Tessa.getInstance().emit(
+        KeepTrackApiEvents.nightToggle,
+        global.mocks.glMock,
+        null as unknown as WebGLTexture,
+        null as unknown as WebGLTexture,
+      ),
+    ).not.toThrow();
   });
 });

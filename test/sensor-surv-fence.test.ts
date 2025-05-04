@@ -1,6 +1,6 @@
 import { keepTrackContainer } from '@app/container';
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
@@ -9,7 +9,6 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
-import { Doris } from '@app/doris/doris';
 
 describe('SensorSurvFence_class', () => {
   let sensorSurvFencePlugin: SensorSurvFence;
@@ -26,13 +25,13 @@ describe('SensorSurvFence_class', () => {
   it('test_bottom_menu_click', () => {
     websiteInit(sensorSurvFencePlugin);
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
 
     const sensorManagerInstance = new SensorManager();
 
     sensorManagerInstance.isSensorSelected = jest.fn().mockReturnValue(true);
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
   });
 
   // Test changing sensor

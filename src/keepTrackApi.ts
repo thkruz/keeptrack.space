@@ -7,7 +7,6 @@ import { saveCsv, saveVariable } from './lib/saveVariable';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import type { SensorManager } from './plugins/sensor/sensorManager';
 import { SoundManager } from './plugins/sounds/sound-manager';
-import { SoundNames } from './plugins/sounds/SoundNames';
 import { SettingsManager } from './settings/settings';
 import { Camera } from './singletons/camera';
 import type { CatalogManager } from './singletons/catalog-manager';
@@ -63,44 +62,6 @@ declare global {
   }
 }
 
-type KeepTrackApiEventArguments = {
-  [KeepTrackApiEvents.updateDateTime]: [Date]; // Done
-  [KeepTrackApiEvents.updatePropRate]: [number];
-
-  [KeepTrackApiEvents.bottomMenuClick]: [string]; // Done
-  [KeepTrackApiEvents.hideSideMenus]: []; // Done
-  [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture]; // Done
-  [KeepTrackApiEvents.orbitManagerInit]: []; // Done
-  [KeepTrackApiEvents.rmbMenuActions]: [string, number]; // Done
-  [KeepTrackApiEvents.rightBtnMenuAdd]: []; // Done
-  [KeepTrackApiEvents.BeforeHtmlInitialize]: []; // Done
-  [KeepTrackApiEvents.HtmlInitialize]: []; // Done
-  [KeepTrackApiEvents.AfterHtmlInitialize]: []; // Done
-  [KeepTrackApiEvents.resetSensor]: []; // Done
-  [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null]; // Done
-  [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]]; // Done
-  [KeepTrackApiEvents.staticOffsetChange]: [number]; // Done
-  [KeepTrackApiEvents.onLineChange]: [LineManager]; // Done
-  [KeepTrackApiEvents.saveSettings]: []; // Done
-  [KeepTrackApiEvents.loadSettings]: []; // Done
-  [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor]; // Done
-  [KeepTrackApiEvents.onCruncherReady]: []; // Done
-  [KeepTrackApiEvents.onCruncherMessage]: []; // Done
-  [KeepTrackApiEvents.onHelpMenuClick]: []; // Done
-  [KeepTrackApiEvents.onKeepTrackReady]: []; // Done
-  [KeepTrackApiEvents.selectSatData]: [DetailedSatellite | MissileObject | BaseObject, number]; // Done
-  [KeepTrackApiEvents.setSecondarySat]: [DetailedSatellite | null, number]; // Done
-  [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject]; // Done
-  [KeepTrackApiEvents.ConeMeshUpdate]: []; // Done
-  [KeepTrackApiEvents.bottomMenuModeChange]: []; // Done
-  [KeepTrackApiEvents.onPrimarySatelliteUpdate]: [BaseObject | null, number]; // Done
-  [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number]; // Done
-  [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number]; // Done
-  [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number]; // Done
-  [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent]; // Done
-  [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent]; // Done
-};
-
 declare module '@app/doris/events/event-types' {
   export interface ApplicationEventMap {
     [KeepTrackApiEvents.bottomMenuClick]: [string];
@@ -138,12 +99,6 @@ declare module '@app/doris/events/event-types' {
     [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number];
     [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number];
   }
-}
-
-interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {
-  event: T;
-  cbName: string;
-  cb: (...args: KeepTrackApiEventArguments[T]) => void;
 }
 
 type rmbMenuItem = {
@@ -202,14 +157,6 @@ export class KeepTrackApi {
       plugins: {},
     }),
   } as unknown as AnalyticsInstance;
-  /**
-   * Unregisters all events in the KeepTrackApi. Used for testing.
-   */
-  unregisterAllEvents() {
-    for (const event of Object.values(KeepTrackApiEvents)) {
-      this.events[event] = [];
-    }
-  }
 
   unregisterAllPlugins() {
     this.loadedPlugins = [];
@@ -219,27 +166,6 @@ export class KeepTrackApi {
   isInitialized = false;
   loadedPlugins = <KeepTrackPlugin[]>[];
   rmbMenuItems = <rmbMenuItem[]>[];
-  events = {
-  } as {
-      [K in KeepTrackApiEvents]: KeepTrackApiRegisterParams<K>[];
-    };
-
-  runEvent<T extends KeepTrackApiEvents>(event: T, ...args: KeepTrackApiEventArguments[T]) {
-    this.verifyEvent_(event);
-
-    if (event === KeepTrackApiEvents.bottomMenuClick) {
-      this.getSoundManager()?.play(SoundNames.BEEP);
-    }
-
-    (<KeepTrackApiRegisterParams<T>[]>this.events[event]).forEach((cb: KeepTrackApiRegisterParams<T>) => cb.cb(...args));
-  }
-
-  /** If the callback does not exist, create it */
-  private verifyEvent_(event: KeepTrackApiEvents) {
-    if (typeof this.events[event] === 'undefined') {
-      this.events[event] = [];
-    }
-  }
 
   getPlugin<T extends KeepTrackPlugin>(pluginClass: Constructor<T>): T | null {
     if (this.loadedPlugins.some((plugin: KeepTrackPlugin) => plugin instanceof pluginClass)) {
@@ -297,35 +223,6 @@ export class KeepTrackApi {
     str += literals[literals.length - 1];
 
     return str;
-  }
-
-  /**
-   * Registers a callback function for a specific event.
-   * @param {KeepTrackApiEvents} params.event - The name of the event to register the callback for.
-   * @param {string} params.cbName - The name of the callback function.
-   * @param params.cb - The callback function to register.
-   * @throws An error if the event is invalid.
-   */
-  register<T extends KeepTrackApiEvents>(params: { event: T; cbName: string; cb: (...args: KeepTrackApiEventArguments[T]) => void }) {
-    this.verifyEvent_(params.event);
-
-    // Add the callback
-    this.events[params.event].push({
-      cbName: params.cbName, cb: params.cb,
-      event: <T><unknown>null,
-    });
-  }
-
-  unregister(params: { event: KeepTrackApiEvents; cbName: string }) {
-    for (let i = 0; i < this.events[params.event].length; i++) {
-      if (this.events[params.event][i].cbName === params.cbName) {
-        this.events[params.event].splice(i, 1);
-
-        return;
-      }
-    }
-    // If we got this far, it means we couldn't find the callback
-    errorManagerInstance.error(new Error(`Callback "${params.cbName} not found"!`), 'keepTrackApi.unregister');
   }
 
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);

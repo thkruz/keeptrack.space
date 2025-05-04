@@ -80,7 +80,7 @@ export class Engine {
     new Promise<void>((resolve) => {
       setTimeout(() => {
         resolve();
-      }, 2000);
+      }, 2500);
       // Continue with initialization after splash screen
       this.eventBus.emit(CoreEngineEvents.Initialize).then(() => {
         this.loadAssets();

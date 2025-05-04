@@ -425,7 +425,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
             timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
             timeManagerInstance.calculateSimulationTime();
-            keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+            Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
             keepTrackApi.getPlugin(SelectSatManager).selectSat(satellitePass.satellite.id);
           }
         });

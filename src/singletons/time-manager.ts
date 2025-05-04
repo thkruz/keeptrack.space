@@ -295,7 +295,7 @@ export class TimeManager {
       callback: () => {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountBig);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+        Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       },
     });
 
@@ -304,7 +304,7 @@ export class TimeManager {
       callback: () => {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountBig);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+        Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       },
     });
 
@@ -335,7 +335,7 @@ export class TimeManager {
       callback: () => {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountSmall);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+        Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       },
     });
 
@@ -344,7 +344,7 @@ export class TimeManager {
       callback: () => {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+        Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       },
     });
   }

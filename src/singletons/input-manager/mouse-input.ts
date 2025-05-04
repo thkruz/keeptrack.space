@@ -68,7 +68,7 @@ export class MouseInput {
 
     UrlManager.updateURL();
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.canvasMouseDown, evt);
+    Doris.getInstance().emit(KeepTrackApiEvents.canvasMouseDown, evt);
   }
 
   public static earthClicked({ numMenuItems, clickedSatId }: { numMenuItems: number; clickedSatId: number }) {

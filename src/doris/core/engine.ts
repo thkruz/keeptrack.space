@@ -270,6 +270,19 @@ export class Engine {
     this.eventBus.emit(event, ...args);
   }
 
+  removeListener<T extends keyof EventMap>(
+    event: T,
+    callback: (...args: EventMap[T]) => void,
+  ): void {
+    this.eventBus.removeListener(event, callback);
+  }
+
+  removeAllListeners<T extends keyof EventMap>(
+    event: T,
+  ): boolean {
+    return this.eventBus.removeAllListeners(event);
+  }
+
   listenerCount<T extends keyof EventMap>(
     event: T,
   ): number {

@@ -64,14 +64,15 @@ declare global {
 }
 
 type KeepTrackApiEventArguments = {
+  [KeepTrackApiEvents.updateDateTime]: [Date]; // Done
+  [KeepTrackApiEvents.updatePropRate]: [number];
+
   [KeepTrackApiEvents.bottomMenuClick]: [string]; // Done
   [KeepTrackApiEvents.hideSideMenus]: []; // Done
   [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture]; // Done
   [KeepTrackApiEvents.orbitManagerInit]: []; // Done
   [KeepTrackApiEvents.rmbMenuActions]: [string, number]; // Done
   [KeepTrackApiEvents.rightBtnMenuAdd]: []; // Done
-  [KeepTrackApiEvents.updateDateTime]: [Date];
-  [KeepTrackApiEvents.updatePropRate]: [number];
   [KeepTrackApiEvents.BeforeHtmlInitialize]: []; // Done
   [KeepTrackApiEvents.HtmlInitialize]: []; // Done
   [KeepTrackApiEvents.AfterHtmlInitialize]: []; // Done
@@ -92,13 +93,12 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject]; // Done
   [KeepTrackApiEvents.ConeMeshUpdate]: []; // Done
   [KeepTrackApiEvents.bottomMenuModeChange]: []; // Done
-
-  [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
-  [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];
-  [KeepTrackApiEvents.onPrimarySatelliteUpdate]: [BaseObject | null, number];
-  [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number];
-  [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number];
-  [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number];
+  [KeepTrackApiEvents.onPrimarySatelliteUpdate]: [BaseObject | null, number]; // Done
+  [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number]; // Done
+  [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number]; // Done
+  [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number]; // Done
+  [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent]; // Done
+  [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent]; // Done
 };
 
 declare module '@app/doris/events/event-types' {

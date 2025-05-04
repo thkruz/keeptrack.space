@@ -9,7 +9,7 @@ import { defaultSat } from './environment/apiMocks';
 
 test('keepTrackApi Unit Testing', () => {
   expect(() => {
-    keepTrackApi.unregister({ event: KeepTrackApiEvents.touchStart, cbName: 'test' });
+    Doris.getInstance().removeAllListeners(KeepTrackApiEvents.touchStart);
   }).toThrow(Error);
 
   Doris.getInstance().on(KeepTrackApiEvents.updateSelectBox, () => {
@@ -56,12 +56,8 @@ test('keepTrackApi Unit Testing', () => {
     // Do nothing
   });
 
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.updateDateTime,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  Doris.getInstance().on(KeepTrackApiEvents.updateDateTime, () => {
+    // Do nothing
   });
 
   Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
@@ -87,7 +83,7 @@ test('keepTrackApi Unit Testing', () => {
   Doris.getInstance().emit(KeepTrackApiEvents.orbitManagerInit);
   Doris.getInstance().emit(CoreEngineEvents.Update, 0);
   Doris.getInstance().emit(KeepTrackApiEvents.rmbMenuActions, 'test', -1);
-  keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date());
+  Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date());
   Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
   Doris.getInstance().emit(KeepTrackApiEvents.rightBtnMenuAdd);
   Doris.getInstance().emit(KeepTrackApiEvents.selectSatData, defaultSat, 0);

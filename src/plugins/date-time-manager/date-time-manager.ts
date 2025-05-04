@@ -22,13 +22,7 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, this.uiManagerInit.bind(this));
     Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal.bind(this));
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateDateTime,
-      cbName: this.id,
-      cb: this.updateDateTime.bind(this),
-    });
-
+    Doris.getInstance().on(KeepTrackApiEvents.updateDateTime, this.updateDateTime.bind(this));
     Doris.getInstance().on(KeepTrackApiEvents.updateSelectBox, () => {
       const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
 
@@ -51,7 +45,7 @@ export class DateTimeManager extends KeepTrackPlugin {
   datetimeTextClick(): void {
     const simulationDateObj = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, simulationDateObj);
+    Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, simulationDateObj);
     this.calendar.setDate(simulationDateObj);
     this.calendar.toggleDatePicker();
 

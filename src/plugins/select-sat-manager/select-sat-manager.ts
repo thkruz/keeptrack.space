@@ -60,7 +60,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
       // If the selected satellite is not the same as the last selected satellite, run the event
       if (this.selectedSat !== this.lastSelectedPrimarySatId()) {
-        keepTrackApi.runEvent(KeepTrackApiEvents.onPrimarySatelliteChange, this.primarySatObj, this.selectedSat);
+        Doris.getInstance().emit(KeepTrackApiEvents.onPrimarySatelliteChange, this.primarySatObj, this.selectedSat);
       }
 
       // If the primary satellite is an object, update it
@@ -91,13 +91,14 @@ export class SelectSatManager extends KeepTrackPlugin {
         keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);
 
         keepTrackApi.getScene().primaryCovBubble.update(primarySat);
+        Doris.getInstance().emit(KeepTrackApiEvents.onPrimarySatelliteUpdate, primarySat, primarySat.id);
       } else {
         keepTrackApi.getScene().searchBox.update(null);
       }
 
       // If the secondary satellite is not the same as the last selected satellite, run the event
       if (this.secondarySat !== this.lastSelectedSecondarySatId()) {
-        keepTrackApi.runEvent(KeepTrackApiEvents.onSecondarySatelliteChange, this.secondarySatObj, this.secondarySat);
+        Doris.getInstance().emit(KeepTrackApiEvents.onSecondarySatelliteChange, this.secondarySatObj, this.secondarySat);
       }
 
       // If the secondary satellite is an object, update it
@@ -105,7 +106,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         // TODO: Refactor this as a cb
         keepTrackApi.getScene().secondaryCovBubble?.update(this.secondarySatObj!);
 
-        keepTrackApi.runEvent(KeepTrackApiEvents.onSecondarySatelliteUpdate, this.secondarySatObj, this.secondarySat);
+        Doris.getInstance().emit(KeepTrackApiEvents.onSecondarySatelliteUpdate, this.secondarySatObj, this.secondarySat);
       }
     });
   }

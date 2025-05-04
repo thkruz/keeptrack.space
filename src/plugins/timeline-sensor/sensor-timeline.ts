@@ -1113,7 +1113,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
           timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
           timeManagerInstance.calculateSimulationTime();
-          keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
+          Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
 
           const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
           const currentSatId = selectSatManagerInstance.selectedSat;

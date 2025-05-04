@@ -737,18 +737,8 @@ export class Camera {
       this.isAutoPitchYawToTarget = false;
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.canvasMouseDown,
-      cbName: 'mainCamera',
-      cb: this.canvasMouseDown_.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.touchStart,
-      cbName: 'mainCamera',
-      cb: this.touchStart_.bind(this),
-    });
-
+    Doris.getInstance().on(KeepTrackApiEvents.canvasMouseDown, this.canvasMouseDown_.bind(this));
+    Doris.getInstance().on(KeepTrackApiEvents.touchStart, this.touchStart_.bind(this));
     Doris.getInstance().on(CoreEngineEvents.Render, () => {
       this.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, KeepTrack.getInstance().sensorPos);
     });

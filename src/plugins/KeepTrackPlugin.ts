@@ -664,7 +664,7 @@ export abstract class KeepTrackPlugin {
       this.onSetBottomIconToUnselected();
     }
     if (isHideSideMenus) {
-      keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
+      Tessa.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
     }
     getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-selected');
   }
@@ -980,14 +980,10 @@ export abstract class KeepTrackPlugin {
    * @param slideCb The callback function to run when the side menu is hidden.
    */
   registerHideSideMenu(bottomIconElementName: string, slideCb: () => void): void {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.hideSideMenus,
-      cbName: this.id,
-      cb: (): void => {
-        slideCb();
-        getEl(bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
-        this.isMenuButtonActive = false;
-      },
+    Tessa.getInstance().on(KeepTrackApiEvents.hideSideMenus, (): void => {
+      slideCb();
+      getEl(bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
+      this.isMenuButtonActive = false;
     });
   }
 }

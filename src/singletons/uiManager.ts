@@ -431,7 +431,7 @@ export class UiManager {
         });
         this.hideSideMenus = () => {
           closeColorbox();
-          keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
+          Tessa.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
         };
       },
     });

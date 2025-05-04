@@ -51,12 +51,8 @@ test('keepTrackApi Unit Testing', () => {
     // Do nothing
   });
 
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.hideSideMenus,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  Tessa.getInstance().on(KeepTrackApiEvents.hideSideMenus, (): void => {
+    // Do nothing
   });
 
   keepTrackApi.register({
@@ -145,7 +141,7 @@ test('keepTrackApi Unit Testing', () => {
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
   Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'test');
-  keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
+  Tessa.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
 
   /*
    * let emptyTexture: WebGLTexture;

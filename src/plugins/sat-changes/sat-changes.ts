@@ -76,12 +76,7 @@ export const init = (): void => {
 
   // Add JavaScript
   Tessa.getInstance().on(KeepTrackApiEvents.bottomMenuClick, bottomMenuClick);
-
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.hideSideMenus,
-    cbName: 'satChanges',
-    cb: hideSideMenus,
-  });
+  Tessa.getInstance().on(KeepTrackApiEvents.hideSideMenus, hideSideMenus);
 };
 
 const uiManagerFinal = () => {

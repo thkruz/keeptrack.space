@@ -68,8 +68,8 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.hideSideMenus]: []; // Done
   [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture]; // Done
   [KeepTrackApiEvents.orbitManagerInit]: []; // Done
-  [KeepTrackApiEvents.rmbMenuActions]: [string, number];
-  [KeepTrackApiEvents.rightBtnMenuAdd]: [];
+  [KeepTrackApiEvents.rmbMenuActions]: [string, number]; // Done
+  [KeepTrackApiEvents.rightBtnMenuAdd]: []; // Done
   [KeepTrackApiEvents.updateDateTime]: [Date];
   [KeepTrackApiEvents.updatePropRate]: [number];
   [KeepTrackApiEvents.uiManagerFinal]: [];

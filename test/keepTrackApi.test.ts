@@ -88,12 +88,8 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.rightBtnMenuAdd,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  Doris.getInstance().on(KeepTrackApiEvents.rightBtnMenuAdd, () => {
+    // Do nothing
   });
 
   keepTrackApi.register({
@@ -117,7 +113,7 @@ test('keepTrackApi Unit Testing', () => {
   Doris.getInstance().emit(KeepTrackApiEvents.rmbMenuActions, 'test', -1);
   keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date());
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
-  keepTrackApi.runEvent(KeepTrackApiEvents.rightBtnMenuAdd);
+  Doris.getInstance().emit(KeepTrackApiEvents.rightBtnMenuAdd);
   keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, 0);
 });
 

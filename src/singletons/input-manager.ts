@@ -257,7 +257,7 @@ export class InputManager {
       `,
       );
       // Append any other menus before putting the reset/clear options
-      keepTrackApi.runEvent(KeepTrackApiEvents.rightBtnMenuAdd);
+      Doris.getInstance().emit(KeepTrackApiEvents.rightBtnMenuAdd);
 
       // Now add the reset/clear options
       getEl('right-btn-menu-ul')!.insertAdjacentHTML(

@@ -568,28 +568,24 @@ export abstract class KeepTrackPlugin {
   }
 
   addContextMenuLevel1Item(html: string): void {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.rightBtnMenuAdd,
-      cbName: this.id,
-      cb: () => {
-        const item = document.createElement('div');
+    Doris.getInstance().on(KeepTrackApiEvents.rightBtnMenuAdd, () => {
+      const item = document.createElement('div');
 
-        item.innerHTML = html;
+      item.innerHTML = html;
 
-        // Trim empty child nodes
-        item.childNodes.forEach((child) => {
-          if (child.nodeType === 3 && child.textContent?.trim() === '') {
-            item.removeChild(child);
-          }
-        });
-
-        const lastChild = item.lastChild;
-
-        // Replace outer element with first child
-        if (lastChild) {
-          getEl(KeepTrackPlugin.rmbMenuL1ContainerId)?.appendChild(lastChild);
+      // Trim empty child nodes
+      item.childNodes.forEach((child) => {
+        if (child.nodeType === 3 && child.textContent?.trim() === '') {
+          item.removeChild(child);
         }
-      },
+      });
+
+      const lastChild = item.lastChild;
+
+      // Replace outer element with first child
+      if (lastChild) {
+        getEl(KeepTrackPlugin.rmbMenuL1ContainerId)?.appendChild(lastChild);
+      }
     });
   }
 

@@ -70,7 +70,7 @@ export abstract class SplashScreen {
         const loadingScreenDom = getEl('loading-screen');
 
         if (loadingScreenDom) {
-          loadingScreenDom.style.transition = 'opacity 0.5s';
+          loadingScreenDom.style.transition = 'opacity 0.25s';
           loadingScreenDom.style.opacity = '0';
           setTimeout(() => {
             loadingScreenDom.classList.remove('full-loader');
@@ -81,10 +81,10 @@ export abstract class SplashScreen {
             hideEl('loading-hint');
             hideEl('logo-text');
             hideEl('logo-text-version');
-          }, 1000);
+          }, 250);
           SplashScreen.loadStr(SplashScreen.msg.math);
         }
-      }, 100);
+      }, 1000);
     }
   }
 

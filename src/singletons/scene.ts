@@ -145,8 +145,6 @@ export class Scene {
       if (!settingsManager.isDisableMoon) {
         this.moon.draw(this.sun.position);
       }
-
-      keepTrackApi.runEvent(KeepTrackApiEvents.drawOptionalScenery);
     }
 
     renderer.postProcessingManager.curBuffer = null;

@@ -168,7 +168,7 @@ export class LineManager {
     }
   }
 
-  createGrid(type: 'x' | 'y' | 'z', color?: LineColor, scalar = 1): void {
+  createGrid(type: 'x' | 'y' | 'z', color: LineColor = LineColors.WHITE, scalar = 1): void {
     if (type !== 'x' && type !== 'y' && type !== 'z') {
       throw new Error('Invalid type');
     }
@@ -194,7 +194,7 @@ export class LineManager {
       case 'z':
         for (let i = min; i <= max; i++) {
           this.add(new RefToRefLine([num2, 0, i * num1], [-num2, 0, i * num1], color));
-          this.add(new RefToRefLine([i * num1, num2, 0], [i * num1, -num2, 0], color));
+          this.add(new RefToRefLine([i * num1, 0, num2], [i * num1, 0, -num2], color));
         }
         break;
       default:

@@ -27,6 +27,7 @@ import { StereoMap } from '../stereo-map/stereo-map';
 import { WatchlistPlugin } from '../watchlist/watchlist';
 import './sat-info-box.css';
 import { SelectSatManager } from './select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 /**
  * This class controls all the functionality of the satellite info box.
@@ -126,11 +127,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       cb: SatInfoBox.updateObjectData_,
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {

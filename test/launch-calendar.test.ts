@@ -1,6 +1,5 @@
 import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { createColorbox } from '@app/lib/colorbox';
 import { LaunchCalendar } from '@app/plugins/launch-calendar/launch-calendar';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -21,8 +20,8 @@ describe('launch_calendar_plugin', () => {
 
   test('close_colorbox', () => {
     launchCalendarPlugin.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
-    keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
     Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
     jest.advanceTimersByTime(4000);
     // eslint-disable-next-line dot-notation

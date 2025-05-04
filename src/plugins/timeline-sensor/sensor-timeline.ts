@@ -238,51 +238,47 @@ export class SensorTimeline extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
-        this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
-        this.ctx_ = this.canvas_.getContext('2d') as CanvasRenderingContext2D;
-        this.ctxStatic_ = this.canvasStatic_!.getContext('2d') as CanvasRenderingContext2D;
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
+      this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
+      this.ctx_ = this.canvas_.getContext('2d') as CanvasRenderingContext2D;
+      this.ctxStatic_ = this.canvasStatic_!.getContext('2d') as CanvasRenderingContext2D;
 
-        getEl('sensor-timeline-setting-total-length')!.addEventListener('change', () => {
-          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-total-length')).value) as Hours;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('sensor-timeline-setting-total-length')!.addEventListener('change', () => {
+        this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-total-length')).value) as Hours;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('sensor-timeline-setting-interval')!.addEventListener('change', () => {
-          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('sensor-timeline-setting-interval')!.addEventListener('change', () => {
+        this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('sensor-timeline-setting-bad-length')!.addEventListener('change', () => {
-          this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('sensor-timeline-setting-bad-length')!.addEventListener('change', () => {
+        this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('sensor-timeline-setting-avg-length')!.addEventListener('change', () => {
-          this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-avg-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('sensor-timeline-setting-avg-length')!.addEventListener('change', () => {
+        this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-avg-length')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('sensor-timeline-toggle')!.addEventListener('change', () => {
-          this.detailedPlot = (<HTMLInputElement>getEl('sensor-timeline-toggle')).checked;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('sensor-timeline-toggle')!.addEventListener('change', () => {
+        this.detailedPlot = (<HTMLInputElement>getEl('sensor-timeline-toggle')).checked;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('weather-toggle')!.addEventListener('change', () => {
-          this.useWeather = (<HTMLInputElement>getEl('weather-toggle')).checked;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
-      },
+      getEl('weather-toggle')!.addEventListener('change', () => {
+        this.useWeather = (<HTMLInputElement>getEl('weather-toggle')).checked;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
     });
 
   }

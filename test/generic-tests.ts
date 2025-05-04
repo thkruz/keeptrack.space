@@ -66,8 +66,8 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
 
   expect(plugin.init).toBeDefined();
   expect(() => plugin.init()).not.toThrow();
-  expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize)).not.toThrow();
-  expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize)).not.toThrow();
+  expect(() => Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize)).not.toThrow();
+  expect(() => Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize)).not.toThrow();
 
   if (plugin.bottomIconElementName) {
     expect(getEl(plugin.bottomIconElementName)).toBeDefined();
@@ -85,8 +85,8 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
   BottomMenu.createBottomMenu();
   // clearAllCallbacks();
   plugin.init();
-  keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
-  keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
+  Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
+  Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
   Doris.getInstance().emit(KeepTrackApiEvents.BeforeHtmlInitialize);
   keepTrackApi.getCatalogManager().satCruncher = {
     addEventListener: jest.fn(),

@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -19,17 +20,8 @@ export class DateTimeManager extends KeepTrackPlugin {
   init(): void {
     super.init();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: this.uiManagerInit.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: this.uiManagerFinal.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, this.uiManagerInit.bind(this));
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal.bind(this));
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateDateTime,

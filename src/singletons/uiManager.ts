@@ -257,7 +257,7 @@ export class UiManager {
       getEl('logo-secondary')?.classList.remove('start-hidden');
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
 
     UiManager.initBottomMenuResizing_();
 
@@ -399,41 +399,37 @@ export class UiManager {
     // Run any plugins code
     Doris.getInstance().emit(KeepTrackApiEvents.BeforeHtmlInitialize);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: 'uiManager',
-      cb: () => {
-        this.bottomIconPress = (el: HTMLElement) => Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, el.id);
-        const BottomIcons = getEl('bottom-icons');
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      this.bottomIconPress = (el: HTMLElement) => Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, el.id);
+      const BottomIcons = getEl('bottom-icons');
 
-        BottomIcons?.addEventListener('click', (evt: Event) => {
-          const bottomIcons = getEl('bottom-icons');
-          let targetElement = <HTMLElement | null>evt.target;
+      BottomIcons?.addEventListener('click', (evt: Event) => {
+        const bottomIcons = getEl('bottom-icons');
+        let targetElement = <HTMLElement | null>evt.target;
 
-          while (targetElement && targetElement !== bottomIcons) {
-            if (targetElement.parentElement === bottomIcons) {
-              this.bottomIconPress(targetElement);
+        while (targetElement && targetElement !== bottomIcons) {
+          if (targetElement.parentElement === bottomIcons) {
+            this.bottomIconPress(targetElement);
 
-              return;
-            }
-            targetElement = targetElement.parentElement;
-          }
-
-          if (targetElement === bottomIcons) {
             return;
           }
+          targetElement = targetElement.parentElement;
+        }
 
-          if (!targetElement) {
-            errorManagerInstance.debug('targetElement is null');
-          } else {
-            this.bottomIconPress(targetElement);
-          }
-        });
-        this.hideSideMenus = () => {
-          closeColorbox();
-          Doris.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
-        };
-      },
+        if (targetElement === bottomIcons) {
+          return;
+        }
+
+        if (!targetElement) {
+          errorManagerInstance.debug('targetElement is null');
+        } else {
+          this.bottomIconPress(targetElement);
+        }
+      });
+      this.hideSideMenus = () => {
+        closeColorbox();
+        Doris.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
+      };
     });
   }
 

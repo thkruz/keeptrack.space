@@ -261,22 +261,15 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('filter-form')?.addEventListener('change', this.onFormChange_.bind(this));
-        getEl('filter-reset')?.addEventListener('click', this.resetToDefaults.bind(this));
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('filter-form')?.addEventListener('change', this.onFormChange_.bind(this));
+      getEl('filter-reset')?.addEventListener('click', this.resetToDefaults.bind(this));
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('nav-mobile2')?.insertAdjacentHTML(
-          'afterbegin',
-          keepTrackApi.html`
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
+      getEl('nav-mobile2')?.insertAdjacentHTML(
+        'afterbegin',
+        keepTrackApi.html`
             <li id="top-menu-filter-li">
               <a id="top-menu-filter-btn" class="top-menu-icons">
                 <div class="top-menu-icons bmenu-item-selected">
@@ -286,29 +279,20 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
               </a>
             </li>
           `,
-        );
-      },
+      );
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('top-menu-filter-btn')?.addEventListener('click', () => {
-          Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
-        });
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('top-menu-filter-btn')?.addEventListener('click', () => {
+        Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+      });
     });
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        this.syncOnLoad_();
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      this.syncOnLoad_();
     });
 
     Doris.getInstance().on(KeepTrackApiEvents.saveSettings, () => {

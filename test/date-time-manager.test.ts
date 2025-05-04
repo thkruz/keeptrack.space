@@ -1,5 +1,5 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -14,8 +14,8 @@ describe('DateTimeManager_class', () => {
     setupStandardEnvironment([TopMenu]);
     dtm = new DateTimeManager();
     dtm.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
-    keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
   });
 
   standardPluginSuite(DateTimeManager, 'DateTimeManager');

@@ -14,6 +14,7 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 export class Breakup extends KeepTrackPlugin {
   readonly id = 'Breakup';
@@ -154,15 +155,11 @@ export class Breakup extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('breakup')!.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          showLoading(() => this.onSubmit_());
-        });
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('breakup')!.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        showLoading(() => this.onSubmit_());
+      });
     });
 
     keepTrackApi.register({

@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
@@ -7,7 +8,6 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
-import { Doris } from '@app/doris/doris';
 
 describe('UpdateSatManager_class', () => {
   beforeEach(() => {
@@ -29,9 +29,9 @@ describe('SatInfoBoxCore_class2', () => {
     const selectSatManager = new SelectSatManager();
 
     selectSatManager.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
-    keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
     Doris.getInstance().emit(KeepTrackApiEvents.BeforeHtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
     selectSatManager.selectSat(0);
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
 

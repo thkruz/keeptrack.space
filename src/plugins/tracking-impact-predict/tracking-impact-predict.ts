@@ -10,6 +10,7 @@ import { RAD2DEG } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 export interface TipMsg {
   'NORAD_CAT_ID': string,
@@ -65,11 +66,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherMessage,

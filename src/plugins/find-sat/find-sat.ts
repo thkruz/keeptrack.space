@@ -8,6 +8,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import findSatPng from '@public/img/icons/database-search.png';
 
 import { countryCodeList, countryNameList } from '@app/catalogs/countries';
+import { Doris } from '@app/doris/doris';
 import { CatalogExporter } from '@app/static/catalog-exporter';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -230,20 +231,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('fbl-error').addEventListener('click', () => {
-          getEl('fbl-error').style.display = 'none';
-        });
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
+      getEl('fbl-error').addEventListener('click', () => {
+        getEl('fbl-error').style.display = 'none';
+      });
     });
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));
   }
 
   printLastResults() {

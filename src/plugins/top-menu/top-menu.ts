@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -18,13 +19,10 @@ export class TopMenu extends KeepTrackPlugin {
 
   addHtml() {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('keeptrack-header')?.insertAdjacentHTML(
-          'beforeend',
-          keepTrackApi.html`
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
+      getEl('keeptrack-header')?.insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
             <nav>
               <div id="nav-wrapper" class="nav-wrapper">
                 <ul id="nav-mobile2" class="right">
@@ -68,11 +66,11 @@ export class TopMenu extends KeepTrackPlugin {
               </div>
             </nav>
           `,
-        );
+      );
 
-        keepTrackApi.containerRoot?.insertAdjacentHTML(
-          'beforeend',
-          keepTrackApi.html`
+      keepTrackApi.containerRoot?.insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
             <div id="help-outer-container" class="valign">
               <div id="help-screen" class="valign-wrapper">
                 <div id="help-inner-container" class="valign">
@@ -84,42 +82,37 @@ export class TopMenu extends KeepTrackPlugin {
               </div>
             </div>
           `,
-        );
+      );
 
-        adviceManagerInstance.init();
-      },
+      adviceManagerInstance.init();
     });
   }
 
   addJs() {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('sound-btn')!.onclick = () => {
-          const soundIcon = <HTMLImageElement>getEl('sound-icon');
-          const soundManager = keepTrackApi.getSoundManager();
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('sound-btn')!.onclick = () => {
+        const soundIcon = <HTMLImageElement>getEl('sound-icon');
+        const soundManager = keepTrackApi.getSoundManager();
 
-          if (!soundManager) {
-            errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');
+        if (!soundManager) {
+          errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');
 
-            return;
-          }
+          return;
+        }
 
-          if (!soundManager.isMute) {
-            soundManager.isMute = true;
-            soundIcon.src = soundOffPng;
-            soundIcon.parentElement!.classList.remove('bmenu-item-selected');
-            soundIcon.parentElement!.classList.add('bmenu-item-error');
-          } else {
-            soundManager.isMute = false;
-            soundIcon.src = soundOnPng;
-            soundIcon.parentElement!.classList.add('bmenu-item-selected');
-            soundIcon.parentElement!.classList.remove('bmenu-item-error');
-          }
-        };
-      },
+        if (!soundManager.isMute) {
+          soundManager.isMute = true;
+          soundIcon.src = soundOffPng;
+          soundIcon.parentElement!.classList.remove('bmenu-item-selected');
+          soundIcon.parentElement!.classList.add('bmenu-item-error');
+        } else {
+          soundManager.isMute = false;
+          soundIcon.src = soundOnPng;
+          soundIcon.parentElement!.classList.add('bmenu-item-selected');
+          soundIcon.parentElement!.classList.remove('bmenu-item-error');
+        }
+      };
     });
 
     keepTrackApi.register({

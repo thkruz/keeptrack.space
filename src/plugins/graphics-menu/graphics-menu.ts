@@ -10,6 +10,7 @@ import { PersistenceManager, StorageKey } from '@app/singletons/persistence-mana
 import displaySettingsPng from '@public/img/icons/display-settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
+import { Doris } from '@app/doris/doris';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -169,15 +170,11 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', this.onFormChange_.bind(this));
-        getEl(`${this.sideMenuElementName}-reset-btn`)?.addEventListener('click', this.resetToDefaults_.bind(this));
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', this.onFormChange_.bind(this));
+      getEl(`${this.sideMenuElementName}-reset-btn`)?.addEventListener('click', this.resetToDefaults_.bind(this));
 
-        this.syncOnLoad_();
-      },
+      this.syncOnLoad_();
     });
   }
 

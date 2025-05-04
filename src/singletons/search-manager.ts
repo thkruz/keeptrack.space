@@ -12,6 +12,7 @@ import { UrlManager } from '../static/url-manager';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
 import type { UiManager } from './uiManager';
+import { Doris } from '@app/doris/doris';
 
 export interface SearchResult {
   id: number; // Catalog Index
@@ -50,11 +51,7 @@ export class SearchManager {
     searchResults.id = TopMenu.SEARCH_RESULT_ID;
     uiWrapper!.prepend(searchResults);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: 'Search Manager',
-      cb: this.addListeners_.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.addListeners_.bind(this));
   }
 
   private addListeners_() {

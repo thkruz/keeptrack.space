@@ -19,6 +19,7 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { Doris } from '@app/doris/doris';
 
 export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';
@@ -324,19 +325,15 @@ export class NewLaunch extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', () => {
-          const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', () => {
+        const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
-          if (!sat.isSatellite()) {
-            return;
-          }
-          this.preValidate_(sat);
-        });
-      },
+        if (!sat.isSatellite()) {
+          return;
+        }
+        this.preValidate_(sat);
+      });
     });
 
     keepTrackApi.register({

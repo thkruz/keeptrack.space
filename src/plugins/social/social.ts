@@ -4,17 +4,14 @@ import { getEl } from '@app/lib/get-el';
 import githubPng from '@public/img/icons/github.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
+import { Doris } from '@app/doris/doris';
 
 export class SocialMedia extends KeepTrackPlugin {
   readonly id = 'SocialMedia';
   dependencies_ = [TopMenu.name];
   addHtml() {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: SocialMedia.uiManagerFinal_,
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, SocialMedia.uiManagerFinal_.bind(this));
   }
 
   private static uiManagerFinal_(): void {

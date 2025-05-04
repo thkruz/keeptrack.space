@@ -9,6 +9,7 @@ import photoManagerPng from '@public/img/icons/photoManager.png';
 import { Degrees } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 interface DiscvrResponse {
   centroid_coordinates: {
@@ -45,28 +46,24 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('meteosat9-link')!.addEventListener('click', () => {
-          // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
-          SatellitePhotos.loadPic_(28912, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg');
-        });
-        getEl('meteosat11-link')!.addEventListener('click', () => {
-          // Meteosat 11 provides 0 deg full earth images every 15 minutes
-          SatellitePhotos.loadPic_(40732, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg');
-        });
-        getEl('himawari8-link')!.addEventListener('click', () => {
-          SatellitePhotos.himawari8_();
-        });
-        getEl('goes16-link')!.addEventListener('click', () => {
-          SatellitePhotos.loadPic_(41866, 'https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg');
-        });
-        getEl('goes18-link')!.addEventListener('click', () => {
-          SatellitePhotos.loadPic_(51850, 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg');
-        });
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('meteosat9-link')!.addEventListener('click', () => {
+        // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
+        SatellitePhotos.loadPic_(28912, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg');
+      });
+      getEl('meteosat11-link')!.addEventListener('click', () => {
+        // Meteosat 11 provides 0 deg full earth images every 15 minutes
+        SatellitePhotos.loadPic_(40732, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg');
+      });
+      getEl('himawari8-link')!.addEventListener('click', () => {
+        SatellitePhotos.himawari8_();
+      });
+      getEl('goes16-link')!.addEventListener('click', () => {
+        SatellitePhotos.loadPic_(41866, 'https://cdn.star.nesdis.noaa.gov/GOES16/ABI/FD/GEOCOLOR/latest.jpg');
+      });
+      getEl('goes18-link')!.addEventListener('click', () => {
+        SatellitePhotos.loadPic_(51850, 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg');
+      });
     });
 
     keepTrackApi.register({

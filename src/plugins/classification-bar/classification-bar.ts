@@ -4,6 +4,7 @@ import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Classification, ClassificationString } from '@app/static/classification';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { Doris } from '@app/doris/doris';
 
 export class ClassificationBar extends KeepTrackPlugin {
   readonly id = 'ClassificationBar';
@@ -56,11 +57,7 @@ export class ClassificationBar extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: this.uiManagerInit_.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, this.uiManagerInit_.bind(this));
   }
 
   private createContainer_(): void {

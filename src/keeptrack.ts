@@ -439,7 +439,7 @@ theodore.kruczek at gmail dot com.
 
         // Load all the plugins now that we have the API initialized
         await import('./plugins/plugins')
-          .then((mod) => mod.loadPlugins(keepTrackApi, settingsManager.plugins))
+          .then((mod) => mod.loadPlugins(settingsManager.plugins))
           .catch(() => {
             // intentionally left blank
           });
@@ -783,7 +783,7 @@ theodore.kruczek at gmail dot com.
       }
 
       // Update any CSS now that we know what is loaded
-      keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
+      Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
 
       if (settingsManager.plugins.debug) {
         const erudaDom = getEl('eruda');

@@ -2,6 +2,7 @@ import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import calculatorPng from '@public/img/icons/calculator.png';
 
+import { Doris } from '@app/doris/doris';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
@@ -312,35 +313,27 @@ export class Calculator extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: 'calculator',
-      cb: () => {
-        // Nothing to do here
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      // Nothing to do here
     });
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: Calculator.name,
-      cb: () => {
-        getEl('calculator-itrf').addEventListener('click', () => {
-          this.changeToITRF_();
-        });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('calculator-itrf').addEventListener('click', () => {
+        this.changeToITRF_();
+      });
 
-        getEl('calculator-j2000').addEventListener('click', () => {
-          this.changeToJ2000_();
-        });
+      getEl('calculator-j2000').addEventListener('click', () => {
+        this.changeToJ2000_();
+      });
 
-        getEl('calculator-rae').addEventListener('click', () => {
-          this.changeToRAE_();
-        });
+      getEl('calculator-rae').addEventListener('click', () => {
+        this.changeToRAE_();
+      });
 
-        this.addRemovableListeners();
-      },
+      this.addRemovableListeners();
     });
   }
 

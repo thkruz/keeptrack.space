@@ -10,7 +10,6 @@ import googleAnalytics from '@analytics/google-analytics';
 import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import createAnalytics from 'analytics';
-import { KeepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { AnalysisMenu } from './analysis/analysis';
@@ -139,7 +138,7 @@ export type KeepTrackPlugins = {
 };
 
 // Register all core modules
-export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugins): void => {
+export const loadPlugins = (plugins: KeepTrackPlugins): void => {
   plugins ??= <KeepTrackPlugins>{};
   try {
     const pluginList = [
@@ -234,13 +233,9 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
     // Load any settings from local storage after all plugins are loaded
     Doris.getInstance().emit(KeepTrackApiEvents.loadSettings);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: 'core',
-      cb: () => {
-        uiManagerFinal();
-        KeepTrackPlugin.hideUnusedMenuModes();
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      uiManagerFinal();
+      KeepTrackPlugin.hideUnusedMenuModes();
     });
   } catch (e) {
     errorManagerInstance.info(`Error loading core plugins:${e.message}`);

@@ -6,6 +6,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import palettePng from '@public/img/icons/palette.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 export class ColorMenu extends KeepTrackPlugin {
   readonly id = 'ColorMenu';
@@ -94,20 +95,16 @@ export class ColorMenu extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('colors-menu')
-          ?.querySelectorAll('li')
-          .forEach((element) => {
-            element.addEventListener('click', () => {
-              const colorName = element.dataset.color;
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('colors-menu')
+        ?.querySelectorAll('li')
+        .forEach((element) => {
+          element.addEventListener('click', () => {
+            const colorName = element.dataset.color;
 
-              ColorMenu.colorsMenuClick(colorName ?? '');
-            });
+            ColorMenu.colorsMenuClick(colorName ?? '');
           });
-      },
+        });
     });
   }
 

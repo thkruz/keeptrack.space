@@ -1,4 +1,5 @@
 import { keepTrackContainer } from '@app/container';
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -24,8 +25,8 @@ describe('TopMenu_class', () => {
     const topMenu = new TopMenu();
 
     topMenu.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
-    keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
 
     errorManagerInstance.warn = jest.fn();
@@ -39,8 +40,8 @@ describe('TopMenu_class', () => {
     const topMenu = new TopMenu();
 
     topMenu.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
-    keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
 
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     const soundIcon = getEl('sound-icon') as HTMLImageElement;

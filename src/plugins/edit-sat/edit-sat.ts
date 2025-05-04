@@ -16,6 +16,7 @@ import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLin
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { Doris } from '@app/doris/doris';
 
 export class EditSat extends KeepTrackPlugin {
   readonly id = 'EditSat';
@@ -121,58 +122,54 @@ export class EditSat extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: 'editSat',
-      cb: () => {
-        getEl('editSat-newTLE')!.addEventListener('click', this.editSatNewTleClick_.bind(this));
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('editSat-newTLE')!.addEventListener('click', this.editSatNewTleClick_.bind(this));
 
-        getEl('editSat')!.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          EditSat.editSatSubmit();
-        });
+      getEl('editSat')!.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        EditSat.editSatSubmit();
+      });
 
-        getEl(`${EditSat.elementPrefix}-per`)!.addEventListener('change', () => {
-          const per = (<HTMLInputElement>getEl('es-per')).value;
+      getEl(`${EditSat.elementPrefix}-per`)!.addEventListener('change', () => {
+        const per = (<HTMLInputElement>getEl('es-per')).value;
 
-          if (per === '') {
-            return;
-          }
-          const meanmo = 1440 / parseFloat(per);
+        if (per === '') {
+          return;
+        }
+        const meanmo = 1440 / parseFloat(per);
 
-          (<HTMLInputElement>getEl('es-meanmo')).value = meanmo.toFixed(4);
-        });
+        (<HTMLInputElement>getEl('es-meanmo')).value = meanmo.toFixed(4);
+      });
 
-        getEl(`${EditSat.elementPrefix}-meanmo`)!.addEventListener('change', () => {
-          const meanmo = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value;
+      getEl(`${EditSat.elementPrefix}-meanmo`)!.addEventListener('change', () => {
+        const meanmo = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-meanmo`)).value;
 
-          if (meanmo === '') {
-            return;
-          }
-          const per = (1440 / parseFloat(meanmo)).toFixed(4);
+        if (meanmo === '') {
+          return;
+        }
+        const per = (1440 / parseFloat(meanmo)).toFixed(4);
 
-          (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = per;
-        });
+        (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-per`)).value = per;
+      });
 
-        getEl('editSat-save')!.addEventListener('click', EditSat.editSatSaveClick);
+      getEl('editSat-save')!.addEventListener('click', EditSat.editSatSaveClick);
 
-        getEl('editSat-open')!.addEventListener('click', () => {
-          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
-          getEl('editSat-file')!.click();
-        });
+      getEl('editSat-open')!.addEventListener('click', () => {
+        keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+        getEl('editSat-file')!.click();
+      });
 
-        getEl('editSat-file')!.addEventListener('change', (evt: Event) => {
-          if (!window.FileReader) {
-            return;
-          } // Browser is not compatible
-          EditSat.doReaderActions_(evt);
-          evt.preventDefault();
-        });
+      getEl('editSat-file')!.addEventListener('change', (evt: Event) => {
+        if (!window.FileReader) {
+          return;
+        } // Browser is not compatible
+        EditSat.doReaderActions_(evt);
+        evt.preventDefault();
+      });
 
-        getEl(`${EditSat.elementPrefix}-error`)!.addEventListener('click', () => {
-          getEl(`${EditSat.elementPrefix}-error`)!.style.display = 'none';
-        });
-      },
+      getEl(`${EditSat.elementPrefix}-error`)!.addEventListener('click', () => {
+        getEl(`${EditSat.elementPrefix}-error`)!.style.display = 'none';
+      });
     });
   }
 

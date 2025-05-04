@@ -8,6 +8,7 @@ import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, second
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { Doris } from '@app/doris/doris';
 
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 
@@ -64,20 +65,16 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('polar-plot-save').addEventListener('click', () => {
-          const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
-          const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-          const link = document.createElement('a');
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('polar-plot-save').addEventListener('click', () => {
+        const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
+        const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+        const link = document.createElement('a');
 
-          link.href = image;
-          link.download = `sat-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-polar-plot.png`;
-          link.click();
-        });
-      },
+        link.href = image;
+        link.download = `sat-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-polar-plot.png`;
+        link.click();
+      });
     });
   }
 

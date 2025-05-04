@@ -9,6 +9,7 @@ import { GroupType } from '@app/singletons/object-group';
 import categoryPng from '@public/img/icons/category.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
@@ -51,26 +52,22 @@ export class SatConstellations extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: 'constellations',
-      cb: () => {
-        // Add additional constellations
-        getEl('constellations-menu').querySelector('ul').insertAdjacentHTML(
-          'beforeend',
-          this.additionalConstellations_
-            .map((constellation) => `<li class="menu-selectable" data-group="${constellation.groupSlug}">${constellation.groupName}</li>`)
-            .join(''),
-        );
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      // Add additional constellations
+      getEl('constellations-menu').querySelector('ul').insertAdjacentHTML(
+        'beforeend',
+        this.additionalConstellations_
+          .map((constellation) => `<li class="menu-selectable" data-group="${constellation.groupSlug}">${constellation.groupName}</li>`)
+          .join(''),
+      );
 
-        getEl('constellation-menu')
-          .querySelectorAll('li')
-          .forEach((element) => {
-            element.addEventListener('click', (evt: Event) => {
-              this.constellationMenuClick_((evt.target as HTMLElement).dataset.group);
-            });
+      getEl('constellation-menu')
+        .querySelectorAll('li')
+        .forEach((element) => {
+          element.addEventListener('click', (evt: Event) => {
+            this.constellationMenuClick_((evt.target as HTMLElement).dataset.group);
           });
-      },
+        });
     });
   }
 

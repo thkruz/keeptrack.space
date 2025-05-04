@@ -3,6 +3,7 @@ import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { hideEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
+import { Doris } from '@app/doris/doris';
 
 export class MobileManager {
   // eslint-disable-next-line require-await
@@ -71,12 +72,8 @@ export class MobileManager {
             },
           });
 
-          keepTrackApi.register({
-            event: KeepTrackApiEvents.AfterHtmlInitialize,
-            cbName: 'MobileManager.uiManagerFinal',
-            cb: () => {
-              hideEl('tutorial-btn');
-            },
+          Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+            hideEl('tutorial-btn');
           });
 
           settingsManager.maxAnalystSats = 1;

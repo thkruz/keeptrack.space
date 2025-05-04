@@ -13,6 +13,7 @@ import { BaseObject, CatalogSource, Degrees, DetailedSatellite, EciVec3, Kilomet
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
+import { Doris } from '@app/doris/doris';
 
 enum RPOType {
   GEO = 'GEO',
@@ -146,43 +147,38 @@ export class ProximityOps extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('submit')!.addEventListener('click', (e) => {
+        this.onSubmit_(e);
+      });
 
-        getEl('submit')!.addEventListener('click', (e) => {
-          this.onSubmit_(e);
-        });
+      getEl('proximity-ops-type')!.addEventListener('change', () => {
+        const orbitTypeInput = <HTMLSelectElement>getEl('proximity-ops-type');
+        const rpoAvailabilityInput = <HTMLInputElement>getEl('proximity-ops-ava');
+        const isAllVsAllChecked = rpoAvailabilityInput.checked;
 
-        getEl('proximity-ops-type')!.addEventListener('change', () => {
-          const orbitTypeInput = <HTMLSelectElement>getEl('proximity-ops-type');
-          const rpoAvailabilityInput = <HTMLInputElement>getEl('proximity-ops-ava');
-          const isAllVsAllChecked = rpoAvailabilityInput.checked;
+        if (isAllVsAllChecked && orbitTypeInput.value !== RPOType.GEO) {
+          // Deselect the all vs all checkbox
+          rpoAvailabilityInput.checked = false;
+          rpoAvailabilityInput.dispatchEvent(new Event('change'));
+        }
+      });
 
-          if (isAllVsAllChecked && orbitTypeInput.value !== RPOType.GEO) {
-            // Deselect the all vs all checkbox
-            rpoAvailabilityInput.checked = false;
-            rpoAvailabilityInput.dispatchEvent(new Event('change'));
-          }
-        });
+      getEl('proximity-ops-ava')!.addEventListener('change', () => {
+        const isAllVsAllChecked = (<HTMLInputElement>getEl('proximity-ops-ava')).checked;
+        const orbitTypeInput = <HTMLSelectElement>getEl('proximity-ops-type');
 
-        getEl('proximity-ops-ava')!.addEventListener('change', () => {
-          const isAllVsAllChecked = (<HTMLInputElement>getEl('proximity-ops-ava')).checked;
-          const orbitTypeInput = <HTMLSelectElement>getEl('proximity-ops-type');
+        if (isAllVsAllChecked) {
+          orbitTypeInput.value = 'GEO';
+          orbitTypeInput.setAttribute('disabled', 'true');
+        } else {
+          orbitTypeInput.removeAttribute('disabled');
+        }
 
-          if (isAllVsAllChecked) {
-            orbitTypeInput.value = 'GEO';
-            orbitTypeInput.setAttribute('disabled', 'true');
-          } else {
-            orbitTypeInput.removeAttribute('disabled');
-          }
+        orbitTypeInput.dispatchEvent(new Event('change'));
+      });
 
-          orbitTypeInput.dispatchEvent(new Event('change'));
-        });
-
-        getEl(`${this.sideMenuElementName}-secondary-btn`)!.style.color = 'var(--statusDarkDisabled)';
-      },
+      getEl(`${this.sideMenuElementName}-secondary-btn`)!.style.color = 'var(--statusDarkDisabled)';
     });
   }
 

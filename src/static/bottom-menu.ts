@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -12,17 +13,8 @@ export class BottomMenu {
   static readonly id = 'BottomMenu';
 
   static init() {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: BottomMenu.id,
-      cb: BottomMenu.createBottomMenu,
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: BottomMenu.id,
-      cb: () => BottomMenu.addBottomMenuFilterButtons(),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, BottomMenu.createBottomMenu.bind(this));
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, BottomMenu.addBottomMenuFilterButtons.bind(this));
   }
   static createBottomMenu(): void {
     const bottomMenuNode = document.createElement('div');

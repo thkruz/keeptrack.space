@@ -105,12 +105,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
-
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));
     Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => this.onCruncherReady_.bind(this));
   }
 

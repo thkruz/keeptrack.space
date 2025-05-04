@@ -182,11 +182,7 @@ export class MissilePlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: 'missile',
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {

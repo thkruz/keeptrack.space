@@ -39,6 +39,7 @@ import folderCodePng from '@public/img/icons/folder-code.png';
 import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
+import { Doris } from '@app/doris/doris';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
@@ -210,56 +211,52 @@ export class AnalysisMenu extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: 'analysis',
-      cb: () => {
-        getEl('analysis-bpt')?.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          AnalysisMenu.analysisBptSumbit_();
-        });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('analysis-bpt')?.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        AnalysisMenu.analysisBptSumbit_();
+      });
 
-        getEl('analysis-overflight')?.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          AnalysisMenu.findOverflight_();
-        });
+      getEl('analysis-overflight')?.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        AnalysisMenu.findOverflight_();
+      });
 
-        getEl('findCsoBtn')?.addEventListener('click', () => {
-          showLoading(this.findCsoBtnClick_.bind(this));
-        });
+      getEl('findCsoBtn')?.addEventListener('click', () => {
+        showLoading(this.findCsoBtnClick_.bind(this));
+      });
 
-        getEl('findReentries')?.addEventListener('click', () => {
-          showLoading(AnalysisMenu.findRaBtnClick_);
-        });
+      getEl('findReentries')?.addEventListener('click', () => {
+        showLoading(AnalysisMenu.findRaBtnClick_);
+      });
 
-        const objData = keepTrackApi.getCatalogManager().objectCache;
+      const objData = keepTrackApi.getCatalogManager().objectCache;
 
-        getEl('export-catalog-csv-btn')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Csv(objData);
-        });
+      getEl('export-catalog-csv-btn')?.addEventListener('click', () => {
+        CatalogExporter.exportTle2Csv(objData);
+      });
 
-        getEl('export-sat-fov-csv-btn')?.addEventListener('click', () => {
-          CatalogExporter.exportSatInFov2Csv(objData);
-        });
+      getEl('export-sat-fov-csv-btn')?.addEventListener('click', () => {
+        CatalogExporter.exportSatInFov2Csv(objData);
+      });
 
-        getEl('export-catalog-txt-2a')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Txt(objData);
-        });
+      getEl('export-catalog-txt-2a')?.addEventListener('click', () => {
+        CatalogExporter.exportTle2Txt(objData);
+      });
 
-        getEl('export-catalog-txt-2b')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Txt(objData, 2, false);
-        });
+      getEl('export-catalog-txt-2b')?.addEventListener('click', () => {
+        CatalogExporter.exportTle2Txt(objData, 2, false);
+      });
 
-        getEl('export-catalog-txt-3a')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Txt(objData, 3);
-        });
+      getEl('export-catalog-txt-3a')?.addEventListener('click', () => {
+        CatalogExporter.exportTle2Txt(objData, 3);
+      });
 
-        getEl('export-catalog-txt-3b')?.addEventListener('click', () => {
-          CatalogExporter.exportTle2Txt(objData, 3, false);
-        });
+      getEl('export-catalog-txt-3b')?.addEventListener('click', () => {
+        CatalogExporter.exportTle2Txt(objData, 3, false);
+      });
 
-        clickAndDragWidth(getEl('analysis-menu'));
-      },
+      clickAndDragWidth(getEl('analysis-menu'));
     });
 
     keepTrackApi.register({

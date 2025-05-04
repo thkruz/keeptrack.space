@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -158,28 +159,20 @@ export class SatelliteFov extends KeepTrackPlugin {
   addHtml(): void {
 
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('sat-fov-settings-form').addEventListener('change', this.handleFormChange_.bind(this));
-        getEl('sat-fov-settings-form').addEventListener('submit', this.handleFormChange_.bind(this));
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('sat-fov-settings-form').addEventListener('change', this.handleFormChange_.bind(this));
+      getEl('sat-fov-settings-form').addEventListener('submit', this.handleFormChange_.bind(this));
 
-        getEl('sat-fov-settings-default-form').addEventListener('change', this.handleDefaultFormChange_.bind(this));
-        getEl('sat-fov-settings-default-form').addEventListener('submit', this.handleDefaultFormChange_.bind(this));
-      },
+      getEl('sat-fov-settings-default-form').addEventListener('change', this.handleDefaultFormChange_.bind(this));
+      getEl('sat-fov-settings-default-form').addEventListener('submit', this.handleDefaultFormChange_.bind(this));
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('reset-sat-fov-cones-button').addEventListener('click', () => {
-          keepTrackApi.getScene().coneFactory.clear();
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
-          getEl('reset-sat-fov-cones-button').setAttribute('disabled', 'true');
-        });
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('reset-sat-fov-cones-button').addEventListener('click', () => {
+        keepTrackApi.getScene().coneFactory.clear();
+        keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+        getEl('reset-sat-fov-cones-button').setAttribute('disabled', 'true');
+      });
     });
   }
 

@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
@@ -114,26 +115,22 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('look-angles-length').addEventListener('change', () => {
-          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
-          this.refreshSideMenuData_();
-        });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('look-angles-length').addEventListener('change', () => {
+        this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
+        this.refreshSideMenuData_();
+      });
 
-        getEl('look-angles-interval').addEventListener('change', () => {
-          this.angleCalculationInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
-          this.refreshSideMenuData_();
-        });
+      getEl('look-angles-interval').addEventListener('change', () => {
+        this.angleCalculationInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
+        this.refreshSideMenuData_();
+      });
 
-        getEl('settings-riseset').addEventListener('change', this.settingsRisesetChange_.bind(this));
+      getEl('settings-riseset').addEventListener('change', this.settingsRisesetChange_.bind(this));
 
-        const sat = this.selectSatManager_.getSelectedSat();
+      const sat = this.selectSatManager_.getSelectedSat();
 
-        this.checkIfCanBeEnabled_(sat);
-      },
+      this.checkIfCanBeEnabled_(sat);
     });
 
     keepTrackApi.register({
@@ -144,12 +141,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       },
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.resetSensor,
-      cbName: this.id,
-      cb: () => {
-        this.checkIfCanBeEnabled_(null);
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.resetSensor, () => {
+      this.checkIfCanBeEnabled_(null);
     });
   }
 
@@ -164,7 +157,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     });
   }
 
-  private checkIfCanBeEnabled_(obj: BaseObject) {
+  private checkIfCanBeEnabled_(obj: BaseObject | null): void {
     if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
       this.setBottomIconToEnabled();
       if (this.isMenuButtonActive && obj) {

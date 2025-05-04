@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -62,26 +63,18 @@ export class TransponderChannelData extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        keepTrackApi.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_.map((sccNum) => parseInt(sccNum)));
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
+      keepTrackApi.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_.map((sccNum) => parseInt(sccNum)));
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        const exportLaunchInfo = getEl('export-channel-info');
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      const exportLaunchInfo = getEl('export-channel-info');
 
-        if (exportLaunchInfo) {
-          exportLaunchInfo.addEventListener('click', () => {
-            this.exportData();
-          });
-        }
-      },
+      if (exportLaunchInfo) {
+        exportLaunchInfo.addEventListener('click', () => {
+          this.exportData();
+        });
+      }
     });
   }
 

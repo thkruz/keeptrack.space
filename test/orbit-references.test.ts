@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -20,8 +21,8 @@ describe('OrbitReferences', () => {
     const orbitReferences = new OrbitReferences();
 
     expect(() => orbitReferences.init()).not.toThrow();
-    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
-    keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
     expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, 0)).not.toThrow();
 
     keepTrackApi.getCatalogManager().analSatSet = [defaultSat];

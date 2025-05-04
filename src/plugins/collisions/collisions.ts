@@ -9,6 +9,7 @@ import { t7e } from '@app/locales/keys';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {
@@ -65,11 +66,7 @@ export class Collisions extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.onCruncherMessage,

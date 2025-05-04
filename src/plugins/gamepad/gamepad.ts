@@ -23,10 +23,8 @@ export class GamepadPlugin {
       if (settingsManager.cruncherReady) {
         this.initializeGamepad(e.gamepad);
       } else {
-        keepTrackApi.register({
-          event: KeepTrackApiEvents.HtmlInitialize,
-          cbName: this.id,
-          cb: () => this.initializeGamepad(e.gamepad),
+        Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
+          this.initializeGamepad(e.gamepad);
         });
       }
     });

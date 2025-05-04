@@ -322,46 +322,42 @@ export abstract class KeepTrackPlugin {
 
       this.addSideMenu(sideMenuHtmlWrapped);
 
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.AfterHtmlInitialize,
-        cbName: this.id,
-        cb: () => {
-          getEl(`${this.sideMenuElementName}-secondary-btn`)?.addEventListener('click', () => {
-            if (!this.isSettingsMenuEnabled_) {
-              errorManagerInstance.debug('Settings menu is disabled');
+      Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+        getEl(`${this.sideMenuElementName}-secondary-btn`)?.addEventListener('click', () => {
+          if (!this.isSettingsMenuEnabled_) {
+            errorManagerInstance.debug('Settings menu is disabled');
 
-              return;
+            return;
+          }
+
+          keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+          if (this.isSideMenuSettingsOpen) {
+            this.closeSecondaryMenu();
+
+            const settingsButtonElement = getEl(`${this.sideMenuElementName}-secondary-btn`);
+
+            if (settingsButtonElement) {
+              settingsButtonElement.style.color = 'var(--color-dark-text-accent)';
             }
+          } else {
+            this.openSecondaryMenu();
+            const settingsButtonElement = getEl(`${this.sideMenuElementName}-secondary-btn`);
 
-            keepTrackApi.getSoundManager().play(SoundNames.CLICK);
-            if (this.isSideMenuSettingsOpen) {
-              this.closeSecondaryMenu();
+            if (settingsButtonElement) {
+              settingsButtonElement.style.color = 'var(--statusDarkNormal)';
+            }
+          }
+        });
 
-              const settingsButtonElement = getEl(`${this.sideMenuElementName}-secondary-btn`);
+        if (this.downloadIconCb) {
+          getEl(`${this.sideMenuElementName}-download-btn`)?.addEventListener('click', () => {
+            keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
 
-              if (settingsButtonElement) {
-                settingsButtonElement.style.color = 'var(--color-dark-text-accent)';
-              }
-            } else {
-              this.openSecondaryMenu();
-              const settingsButtonElement = getEl(`${this.sideMenuElementName}-secondary-btn`);
-
-              if (settingsButtonElement) {
-                settingsButtonElement.style.color = 'var(--statusDarkNormal)';
-              }
+            if (this.downloadIconCb) {
+              this.downloadIconCb();
             }
           });
-
-          if (this.downloadIconCb) {
-            getEl(`${this.sideMenuElementName}-download-btn`)?.addEventListener('click', () => {
-              keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
-
-              if (this.downloadIconCb) {
-                this.downloadIconCb();
-              }
-            });
-          }
-        },
+        }
       });
     }
 
@@ -590,17 +586,13 @@ export abstract class KeepTrackPlugin {
   }
 
   addContextMenuLevel2Item(elementId: string, html: string): void {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        const item = document.createElement('div');
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
+      const item = document.createElement('div');
 
-        item.id = elementId;
-        item.className = 'right-btn-menu';
-        item.innerHTML = html;
-        getEl(KeepTrackPlugin.rmbMenuL2ContainerId)?.appendChild(item);
-      },
+      item.id = elementId;
+      item.className = 'right-btn-menu';
+      item.innerHTML = html;
+      getEl(KeepTrackPlugin.rmbMenuL2ContainerId)?.appendChild(item);
     });
   }
 
@@ -609,18 +601,15 @@ export abstract class KeepTrackPlugin {
    * @param icon The icon to add to the bottom menu.
    */
   addBottomIcon(icon: Module, isDisabled = false): void {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        const button = document.createElement('div');
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
+      const button = document.createElement('div');
 
-        button.id = this.bottomIconElementName;
-        button.classList.add('bmenu-item');
-        if (isDisabled) {
-          button.classList.add('bmenu-item-disabled');
-        }
-        button.innerHTML = `
+      button.id = this.bottomIconElementName;
+      button.classList.add('bmenu-item');
+      if (isDisabled) {
+        button.classList.add('bmenu-item-disabled');
+      }
+      button.innerHTML = `
           <div class="bmenu-item-inner">
             <img
               alt="${this.id}"
@@ -630,8 +619,7 @@ export abstract class KeepTrackPlugin {
           </div>
           <span class="bmenu-title">${this.bottomIconLabel}</span>
           `;
-        getEl(KeepTrackPlugin.bottomIconsContainerId)?.appendChild(button);
-      },
+      getEl(KeepTrackPlugin.bottomIconsContainerId)?.appendChild(button);
     });
   }
 
@@ -717,12 +705,8 @@ export abstract class KeepTrackPlugin {
   }
 
   addSideMenu(sideMenuHtml: string): void {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl(KeepTrackPlugin.sideMenuContainerId)?.insertAdjacentHTML('beforeend', sideMenuHtml);
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
+      getEl(KeepTrackPlugin.sideMenuContainerId)?.insertAdjacentHTML('beforeend', sideMenuHtml);
     });
   }
 
@@ -893,55 +877,43 @@ export abstract class KeepTrackPlugin {
   }
 
   registerSubmitButtonClicked(callback: ((() => void) | null) = null) {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        const form = getEl(`${this.sideMenuElementName}-form`);
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      const form = getEl(`${this.sideMenuElementName}-form`);
 
-        if (form) {
-          form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (callback) {
-              // eslint-disable-next-line callback-return
-              callback();
-            }
-          });
-        } else {
-          throw new Error(`Form not found for ${this.sideMenuElementName}`);
-        }
-      },
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (callback) {
+            // eslint-disable-next-line callback-return
+            callback();
+          }
+        });
+      } else {
+        throw new Error(`Form not found for ${this.sideMenuElementName}`);
+      }
     });
   }
 
   registerClickAndDragOptions(opts: ClickDragOptions = {} as ClickDragOptions): void {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        if (this.sideMenuSecondaryHtml) {
-          opts.attachedElement = getEl(`${this.sideMenuElementName}-secondary`);
-        }
-        if (this.sideMenuSecondaryOptions.leftOffset) {
-          opts.leftOffset = this.sideMenuSecondaryOptions.leftOffset;
-        }
-        clickAndDragWidth(getEl(this.sideMenuElementName), opts);
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      if (this.sideMenuSecondaryHtml) {
+        opts.attachedElement = getEl(`${this.sideMenuElementName}-secondary`);
+      }
+      if (this.sideMenuSecondaryOptions.leftOffset) {
+        opts.leftOffset = this.sideMenuSecondaryOptions.leftOffset;
+      }
+      clickAndDragWidth(getEl(this.sideMenuElementName), opts);
     });
   }
 
   registerClickAndDragOptionsSecondary(opts: ClickDragOptions = {} as ClickDragOptions): void {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        const edgeEl = clickAndDragWidth(getEl(`${this.sideMenuElementName}-secondary`), opts);
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      const edgeEl = clickAndDragWidth(getEl(`${this.sideMenuElementName}-secondary`), opts);
 
-        if (edgeEl) {
-          edgeEl.style.top = '0px';
-          edgeEl.style.position = 'absolute';
-        }
-      },
+      if (edgeEl) {
+        edgeEl.style.top = '0px';
+        edgeEl.style.position = 'absolute';
+      }
     });
   }
 

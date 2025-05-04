@@ -43,21 +43,17 @@ export class CountriesMenu extends KeepTrackPlugin {
   addJs() {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('country-menu')
-          .querySelectorAll('li')
-          .forEach((element) => {
-            element.addEventListener('click', () => {
-              keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
-              CountriesMenu.countryMenuClick_(element.getAttribute('data-group'));
-            });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('country-menu')
+        .querySelectorAll('li')
+        .forEach((element) => {
+          element.addEventListener('click', () => {
+            keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+            CountriesMenu.countryMenuClick_(element.getAttribute('data-group'));
           });
+        });
 
-        clickAndDragWidth(getEl(this.sideMenuElementName));
-      },
+      clickAndDragWidth(getEl(this.sideMenuElementName));
     });
   }
 

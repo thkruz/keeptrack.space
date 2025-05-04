@@ -18,6 +18,7 @@ import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { SoundNames } from '../sounds/SoundNames';
 import { SensorInfoPlugin } from './sensor-info-plugin';
+import { Doris } from '@app/doris/doris';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   readonly id = 'CustomSensorPlugin';
@@ -229,16 +230,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        CustomSensorPlugin.httpsCheck_();
-        CustomSensorPlugin.addCustomSensorFormSubmitListener();
-        CustomSensorPlugin.addTelescopeClickListener_();
-        CustomSensorPlugin.addCustomSensorBtnCLickListener_();
-        CustomSensorPlugin.addClearCustomSensorListener_();
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      CustomSensorPlugin.httpsCheck_();
+      CustomSensorPlugin.addCustomSensorFormSubmitListener();
+      CustomSensorPlugin.addTelescopeClickListener_();
+      CustomSensorPlugin.addCustomSensorBtnCLickListener_();
+      CustomSensorPlugin.addClearCustomSensorListener_();
     });
   }
 

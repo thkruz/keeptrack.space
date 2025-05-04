@@ -9,6 +9,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import calendar2Png from '@public/img/icons/calendar2.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
+import { Doris } from '@app/doris/doris';
 
 interface LaunchInfoData {
   window_start: string | number | Date;
@@ -104,15 +105,11 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('export-launch-info')!.addEventListener('click', () => {
-          keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
-          saveCsv(this.launchList as unknown as Array<Record<string, unknown>>, 'launchList');
-        });
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('export-launch-info')!.addEventListener('click', () => {
+        keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
+        saveCsv(this.launchList as unknown as Array<Record<string, unknown>>, 'launchList');
+      });
     });
   }
 

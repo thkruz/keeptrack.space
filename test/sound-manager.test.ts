@@ -1,8 +1,8 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { standardPluginSuite } from './generic-tests';
+import { Doris } from '@app/doris/doris';
 
 describe('Sound Manager', () => {
   let soundManagerPlugin: SoundManager;
@@ -41,7 +41,7 @@ describe('Sound Manager', () => {
   });
 
   it('should_be_able_to_speak', () => {
-    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
+    Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
     // Mock SpeechSynthesisUtterance
     const mockSpeechUtterance = jest.fn(() => ({
       lang: 'en-US',

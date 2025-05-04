@@ -4,6 +4,7 @@ import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import wifiFindPng from '@public/img/icons/wifi-find.png';
 
+import { Doris } from '@app/doris/doris';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -123,86 +124,78 @@ export class ShortTermFences extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('stfForm')?.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
-          this.onSubmit_.bind(this)();
-        });
-        getEl('stf-remove-last')?.addEventListener('click', () => {
-          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
-          keepTrackApi.getSensorManager().removeStf();
-        });
-        getEl('stf-clear-all')?.addEventListener('click', () => {
-          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
-          keepTrackApi.getSensorManager().clearStf();
-        });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('stfForm')?.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+        this.onSubmit_.bind(this)();
+      });
+      getEl('stf-remove-last')?.addEventListener('click', () => {
+        keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+        keepTrackApi.getSensorManager().removeStf();
+      });
+      getEl('stf-clear-all')?.addEventListener('click', () => {
+        keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+        keepTrackApi.getSensorManager().clearStf();
+      });
 
-        getEl('stf-azExt')?.addEventListener('blur', () => {
-          const centerAz = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
-          const centerEl = parseFloat((<HTMLInputElement>getEl('stf-el')).value);
-          const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
+      getEl('stf-azExt')?.addEventListener('blur', () => {
+        const centerAz = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
+        const centerEl = parseFloat((<HTMLInputElement>getEl('stf-el')).value);
+        const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
 
-          let azExtDeg = parseFloat((<HTMLInputElement>getEl('stf-azExt')).value);
+        let azExtDeg = parseFloat((<HTMLInputElement>getEl('stf-azExt')).value);
 
-          if (azExtDeg > 80) {
-            azExtDeg = 80;
-            (<HTMLInputElement>getEl('stf-azExt')).value = azExtDeg.toFixed(1);
-          }
+        if (azExtDeg > 80) {
+          azExtDeg = 80;
+          (<HTMLInputElement>getEl('stf-azExt')).value = azExtDeg.toFixed(1);
+        }
 
-          const epoch = EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj);
-          const siteJ2000 = keepTrackApi.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
-          const pt1 = new RAE(epoch, rng as Kilometers, ((centerAz - azExtDeg / 2) * DEG2RAD) as Radians, (centerEl * DEG2RAD) as Radians).position(siteJ2000);
-          const pt2 = new RAE(
-            EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
-            rng as Kilometers,
-            ((centerAz + azExtDeg / 2) * DEG2RAD) as Radians,
-            (centerEl * DEG2RAD) as Radians,
-          ).position(siteJ2000);
+        const epoch = EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj);
+        const siteJ2000 = keepTrackApi.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
+        const pt1 = new RAE(epoch, rng as Kilometers, ((centerAz - azExtDeg / 2) * DEG2RAD) as Radians, (centerEl * DEG2RAD) as Radians).position(siteJ2000);
+        const pt2 = new RAE(
+          EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
+          rng as Kilometers,
+          ((centerAz + azExtDeg / 2) * DEG2RAD) as Radians,
+          (centerEl * DEG2RAD) as Radians,
+        ).position(siteJ2000);
 
-          // Calculate the distance between the two points
-          const azKm = Math.sqrt((pt1.x - pt2.x) ** 2 + (pt1.y - pt2.y) ** 2 + (pt1.z - pt2.z) ** 2);
+        // Calculate the distance between the two points
+        const azKm = Math.sqrt((pt1.x - pt2.x) ** 2 + (pt1.y - pt2.y) ** 2 + (pt1.z - pt2.z) ** 2);
 
-          (<HTMLInputElement>getEl('stf-azExtKm')).value = azKm.toFixed(1);
-        });
-        getEl('stf-elExt')?.addEventListener('blur', () => {
-          const centerAz = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
-          const centerEl = parseFloat((<HTMLInputElement>getEl('stf-el')).value);
-          const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
+        (<HTMLInputElement>getEl('stf-azExtKm')).value = azKm.toFixed(1);
+      });
+      getEl('stf-elExt')?.addEventListener('blur', () => {
+        const centerAz = parseFloat((<HTMLInputElement>getEl('stf-az')).value);
+        const centerEl = parseFloat((<HTMLInputElement>getEl('stf-el')).value);
+        const rng = parseFloat((<HTMLInputElement>getEl('stf-rng')).value);
 
-          let elExtDeg = parseFloat((<HTMLInputElement>getEl('stf-elExt')).value);
+        let elExtDeg = parseFloat((<HTMLInputElement>getEl('stf-elExt')).value);
 
-          if (elExtDeg > 80) {
-            elExtDeg = 80;
-            (<HTMLInputElement>getEl('stf-elExt')).value = elExtDeg.toFixed(1);
-          }
+        if (elExtDeg > 80) {
+          elExtDeg = 80;
+          (<HTMLInputElement>getEl('stf-elExt')).value = elExtDeg.toFixed(1);
+        }
 
-          const epoch = EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj);
-          const siteJ2000 = keepTrackApi.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
-          const pt1 = new RAE(epoch, rng as Kilometers, (centerAz * DEG2RAD) as Radians, ((centerEl - elExtDeg / 2) * DEG2RAD) as Radians).position(siteJ2000);
-          const pt2 = new RAE(
-            EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
-            rng as Kilometers,
-            (centerAz * DEG2RAD) as Radians,
-            ((centerEl + elExtDeg / 2) * DEG2RAD) as Radians,
-          ).position(siteJ2000);
+        const epoch = EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj);
+        const siteJ2000 = keepTrackApi.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
+        const pt1 = new RAE(epoch, rng as Kilometers, (centerAz * DEG2RAD) as Radians, ((centerEl - elExtDeg / 2) * DEG2RAD) as Radians).position(siteJ2000);
+        const pt2 = new RAE(
+          EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
+          rng as Kilometers,
+          (centerAz * DEG2RAD) as Radians,
+          ((centerEl + elExtDeg / 2) * DEG2RAD) as Radians,
+        ).position(siteJ2000);
 
-          // Calculate the distance between the two points
-          const elKm = Math.sqrt((pt1.x - pt2.x) ** 2 + (pt1.y - pt2.y) ** 2 + (pt1.z - pt2.z) ** 2);
+        // Calculate the distance between the two points
+        const elKm = Math.sqrt((pt1.x - pt2.x) ** 2 + (pt1.y - pt2.y) ** 2 + (pt1.z - pt2.z) ** 2);
 
-          (<HTMLInputElement>getEl('stf-elExtKm')).value = elKm.toFixed(1);
-        });
-      },
+        (<HTMLInputElement>getEl('stf-elExtKm')).value = elKm.toFixed(1);
+      });
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.resetSensor,
-      cbName: 'shortTermFences',
-      cb: this.closeAndDisable_.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.resetSensor, this.closeAndDisable_.bind(this));
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.setSensor,

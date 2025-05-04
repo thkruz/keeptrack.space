@@ -101,53 +101,49 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: (): void => {
-        getEl('debug-console')!.addEventListener('click', () => {
-          this.toggleEruda();
-        });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('debug-console')!.addEventListener('click', () => {
+        this.toggleEruda();
+      });
 
-        getEl('debug-gremlins')!.addEventListener('click', () => {
-          this.runGremlins();
-        });
+      getEl('debug-gremlins')!.addEventListener('click', () => {
+        this.runGremlins();
+      });
 
-        getEl('debug-toggle-fps')!.addEventListener('click', () => {
-          this.isShowFPS = !this.isShowFPS;
-        });
+      getEl('debug-toggle-fps')!.addEventListener('click', () => {
+        this.isShowFPS = !this.isShowFPS;
+      });
 
-        getEl('debug-cam-to-sat')?.addEventListener('click', () => {
-          const camera = keepTrackApi.getMainCamera();
+      getEl('debug-cam-to-sat')?.addEventListener('click', () => {
+        const camera = keepTrackApi.getMainCamera();
 
-          if (camera) {
-            const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
+        if (camera) {
+          const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
 
-            if (!selectedSat || selectedSat === -1) {
-              return;
-            }
-
-            const sat = keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.POSITION_ONLY);
-
-            if (sat) {
-              const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
-              const camPos = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
-
-              lineManagerInstance.createRef2Ref([camPos[0], camPos[1], camPos[2]], [sat.position.x, sat.position.y, sat.position.z], LineColors.PURPLE);
-            }
+          if (!selectedSat || selectedSat === -1) {
+            return;
           }
-        });
 
-        getEl('debug-cam-to-center')?.addEventListener('click', () => {
-          const camera = keepTrackApi.getMainCamera();
+          const sat = keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.POSITION_ONLY);
 
-          if (camera) {
-            const position = camera.getCameraPosition();
+          if (sat) {
+            const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
+            const camPos = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
 
-            lineManagerInstance.createRef2Ref(position, [0, 0, 0], LineColors.PURPLE);
+            lineManagerInstance.createRef2Ref([camPos[0], camPos[1], camPos[2]], [sat.position.x, sat.position.y, sat.position.z], LineColors.PURPLE);
           }
-        });
-      },
+        }
+      });
+
+      getEl('debug-cam-to-center')?.addEventListener('click', () => {
+        const camera = keepTrackApi.getMainCamera();
+
+        if (camera) {
+          const position = camera.getCameraPosition();
+
+          lineManagerInstance.createRef2Ref(position, [0, 0, 0], LineColors.PURPLE);
+        }
+      });
     });
   }
 

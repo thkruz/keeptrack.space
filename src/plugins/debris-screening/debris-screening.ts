@@ -8,6 +8,7 @@ import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import { DetailedSatellite, Hours, Kilometers, Milliseconds, Minutes, PosVel, Seconds, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 export class DebrisScreening extends KeepTrackPlugin {
   readonly id = 'DebrisScreening';
@@ -123,23 +124,19 @@ export class DebrisScreening extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl(`${this.sideMenuElementName}-form`).addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          showLoading(() => this.onFormSubmit());
-        });
-        getEl(`${this.sideMenuElementName}-vis`).addEventListener('click', (e: Event) => {
-          e.preventDefault();
-          showLoading(() => this.onVisClick());
-        });
-        getEl(`${this.sideMenuElementName}-clear-vis`).addEventListener('click', (e: Event) => {
-          e.preventDefault();
-          showLoading(() => DebrisScreening.onClearVisClick());
-        });
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl(`${this.sideMenuElementName}-form`).addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        showLoading(() => this.onFormSubmit());
+      });
+      getEl(`${this.sideMenuElementName}-vis`).addEventListener('click', (e: Event) => {
+        e.preventDefault();
+        showLoading(() => this.onVisClick());
+      });
+      getEl(`${this.sideMenuElementName}-clear-vis`).addEventListener('click', (e: Event) => {
+        e.preventDefault();
+        showLoading(() => DebrisScreening.onClearVisClick());
+      });
     });
   }
 

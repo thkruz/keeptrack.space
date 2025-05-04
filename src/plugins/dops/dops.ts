@@ -148,15 +148,11 @@ export class DopsPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('dops-form')!.addEventListener('submit', (e: Event) => {
-          e.preventDefault();
-          DopsPlugin.updateSideMenu();
-        });
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('dops-form')!.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        DopsPlugin.updateSideMenu();
+      });
     });
   }
 

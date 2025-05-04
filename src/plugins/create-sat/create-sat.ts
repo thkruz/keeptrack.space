@@ -20,6 +20,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
+import { Doris } from '@app/doris/doris';
 
 /**
  * Interface for TLE input parameters
@@ -153,11 +154,7 @@ export class CreateSat extends KeepTrackPlugin {
    */
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: 'createSat',
-      cb: () => this.uiManagerFinal_(),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));
   }
 
   /**

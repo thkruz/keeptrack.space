@@ -5,6 +5,7 @@ import videoSettingsPng from '@public/img/icons/video-settings.png';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
+import { Doris } from '@app/doris/doris';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -160,17 +161,13 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);
-        getEl('video-director-form')!.addEventListener('submit', VideoDirectorPlugin.onSubmit);
-        getEl('video-director-rotate')!.addEventListener('click', () => {
-          keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
-          keepTrackApi.getMainCamera().autoRotate(true);
-        });
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);
+      getEl('video-director-form')!.addEventListener('submit', VideoDirectorPlugin.onSubmit);
+      getEl('video-director-rotate')!.addEventListener('click', () => {
+        keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
+        keepTrackApi.getMainCamera().autoRotate(true);
+      });
     });
   }
 

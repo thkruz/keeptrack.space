@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ColorPick } from '@app/lib/color-pick';
@@ -258,121 +259,113 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
-        getEl('settings-form')?.addEventListener('submit', SettingsMenuPlugin.onSubmit_);
-        getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.resetToDefaults);
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
+      getEl('settings-form')?.addEventListener('submit', SettingsMenuPlugin.onSubmit_);
+      getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.resetToDefaults);
 
 
-        if (!settingsManager.isShowConfidenceLevels) {
-          hideEl(getEl('settings-confidence-levels')!.parentElement!.parentElement!);
-        }
+      if (!settingsManager.isShowConfidenceLevels) {
+        hideEl(getEl('settings-confidence-levels')!.parentElement!.parentElement!);
+      }
 
-        if (!settingsManager.plugins.timeMachine) {
-          hideEl(getEl('settings-time-machine-toasts')!.parentElement!.parentElement!);
-        }
+      if (!settingsManager.plugins.timeMachine) {
+        hideEl(getEl('settings-time-machine-toasts')!.parentElement!.parentElement!);
+      }
 
-        const colorPalette = [
-          // Reds
-          rgbCss([1.0, 0.0, 0.0, 1.0]), // Red
-          rgbCss([1.0, 0.4, 0.4, 1.0]), // Light Red
-          rgbCss([1.0, 0.0, 0.6, 1.0]), // Pink
-          rgbCss([1.0, 0.75, 0.8, 1.0]), // Light Pink
-          rgbCss([1.0, 0.0, 1.0, 1.0]), // Magenta
+      const colorPalette = [
+        // Reds
+        rgbCss([1.0, 0.0, 0.0, 1.0]), // Red
+        rgbCss([1.0, 0.4, 0.4, 1.0]), // Light Red
+        rgbCss([1.0, 0.0, 0.6, 1.0]), // Pink
+        rgbCss([1.0, 0.75, 0.8, 1.0]), // Light Pink
+        rgbCss([1.0, 0.0, 1.0, 1.0]), // Magenta
 
-          // Oranges
-          rgbCss([1.0, 0.65, 0.0, 1.0]), // Orange
-          rgbCss([0.85, 0.5, 0.0, 1.0]), // Dark Orange
-          rgbCss([1.0, 0.8, 0.6, 1.0]), // Peach
+        // Oranges
+        rgbCss([1.0, 0.65, 0.0, 1.0]), // Orange
+        rgbCss([0.85, 0.5, 0.0, 1.0]), // Dark Orange
+        rgbCss([1.0, 0.8, 0.6, 1.0]), // Peach
 
-          // Yellows
-          rgbCss([1.0, 1.0, 0.0, 1.0]), // Yellow
-          rgbCss([0.8, 0.4, 0.0, 1.0]), // Dark Yellow
+        // Yellows
+        rgbCss([1.0, 1.0, 0.0, 1.0]), // Yellow
+        rgbCss([0.8, 0.4, 0.0, 1.0]), // Dark Yellow
 
-          // Greens
-          rgbCss([0.4, 0.8, 0.0, 1.0]), // Chartreuse
-          rgbCss([0.0, 1.0, 0.0, 1.0]), // Lime Green
-          rgbCss([0.2, 1.0, 0.0, 0.5]), // Dark Green (with transparency)
-          rgbCss([0.5, 1.0, 0.5, 1.0]), // Mint Green
-          rgbCss([0.6, 0.8, 0.2, 1.0]), // Olive Green
+        // Greens
+        rgbCss([0.4, 0.8, 0.0, 1.0]), // Chartreuse
+        rgbCss([0.0, 1.0, 0.0, 1.0]), // Lime Green
+        rgbCss([0.2, 1.0, 0.0, 0.5]), // Dark Green (with transparency)
+        rgbCss([0.5, 1.0, 0.5, 1.0]), // Mint Green
+        rgbCss([0.6, 0.8, 0.2, 1.0]), // Olive Green
 
-          // Cyans
-          rgbCss([0.0, 1.0, 1.0, 1.0]), // Cyan
-          rgbCss([0.0, 0.8, 0.8, 1.0]), // Light Blue
-          rgbCss([0.0, 0.5, 0.5, 1.0]), // Teal
-          rgbCss([0.0, 0.2, 0.4, 1.0]), // Dark Teal
+        // Cyans
+        rgbCss([0.0, 1.0, 1.0, 1.0]), // Cyan
+        rgbCss([0.0, 0.8, 0.8, 1.0]), // Light Blue
+        rgbCss([0.0, 0.5, 0.5, 1.0]), // Teal
+        rgbCss([0.0, 0.2, 0.4, 1.0]), // Dark Teal
 
-          // Blues
-          rgbCss([0.2, 0.4, 1.0, 1.0]), // Dark Blue
-          rgbCss([0.0, 0.0, 0.5, 1.0]), // Navy Blue
+        // Blues
+        rgbCss([0.2, 0.4, 1.0, 1.0]), // Dark Blue
+        rgbCss([0.0, 0.0, 0.5, 1.0]), // Navy Blue
 
-          // Purples
-          rgbCss([0.5, 0.0, 1.0, 1.0]), // Purple
-          rgbCss([0.5, 0.0, 0.5, 1.0]), // Dark Purple
-          rgbCss([0.8, 0.2, 0.8, 1.0]), // Violet
+        // Purples
+        rgbCss([0.5, 0.0, 1.0, 1.0]), // Purple
+        rgbCss([0.5, 0.0, 0.5, 1.0]), // Dark Purple
+        rgbCss([0.8, 0.2, 0.8, 1.0]), // Violet
 
-          // Browns
-          rgbCss([0.5, 0.25, 0.0, 1.0]), // Brown
-          rgbCss([0.6, 0.4, 0.2, 1.0]), // Tan
-          rgbCss([0.9, 0.9, 0.5, 1.0]), // Beige
+        // Browns
+        rgbCss([0.5, 0.25, 0.0, 1.0]), // Brown
+        rgbCss([0.6, 0.4, 0.2, 1.0]), // Tan
+        rgbCss([0.9, 0.9, 0.5, 1.0]), // Beige
 
-          // Grays
-          rgbCss([0.9, 0.9, 0.9, 1.0]), // Light Gray
-          rgbCss([0.5, 0.5, 0.5, 1.0]), // Gray
-          rgbCss([0.1, 0.1, 0.1, 1.0]), // Dark Gray
-        ];
+        // Grays
+        rgbCss([0.9, 0.9, 0.9, 1.0]), // Light Gray
+        rgbCss([0.5, 0.5, 0.5, 1.0]), // Gray
+        rgbCss([0.1, 0.1, 0.1, 1.0]), // Dark Gray
+      ];
 
-        ColorPick.initColorPick('#settings-color-payload', {
-          initialColor: rgbCss(settingsManager.colors?.payload || [0.2, 1.0, 0.0, 0.5]),
-          palette: colorPalette,
-          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'payload'),
-        });
-        ColorPick.initColorPick('#settings-color-rocketBody', {
-          initialColor: rgbCss(settingsManager.colors?.rocketBody || [0.2, 0.4, 1.0, 1]),
-          palette: colorPalette,
-          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'rocketBody'),
-        });
-        ColorPick.initColorPick('#settings-color-debris', {
-          initialColor: rgbCss(settingsManager.colors?.debris || [0.5, 0.5, 0.5, 1]),
-          palette: colorPalette,
-          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'debris'),
-        });
-        ColorPick.initColorPick('#settings-color-inview', {
-          initialColor: rgbCss(settingsManager.colors?.inFOV || [0.85, 0.5, 0.0, 1.0]),
-          palette: colorPalette,
-          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'inview'),
-        });
-        ColorPick.initColorPick('#settings-color-missile', {
-          initialColor: rgbCss(settingsManager.colors?.missile || [1.0, 1.0, 0.0, 1.0]),
-          palette: colorPalette,
-          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'missile'),
-        });
-        ColorPick.initColorPick('#settings-color-missileInview', {
-          initialColor: rgbCss(settingsManager.colors?.missileInview || [1.0, 0.0, 0.0, 1.0]),
-          palette: colorPalette,
-          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'missileInview'),
-        });
-        ColorPick.initColorPick('#settings-color-special', {
-          initialColor: rgbCss(settingsManager.colors?.pink || [1.0, 0.0, 0.6, 1.0]),
-          palette: colorPalette,
-          onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'pink'),
-        });
-        this.isNotColorPickerInitialSetup = true;
-      },
+      ColorPick.initColorPick('#settings-color-payload', {
+        initialColor: rgbCss(settingsManager.colors?.payload || [0.2, 1.0, 0.0, 0.5]),
+        palette: colorPalette,
+        onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'payload'),
+      });
+      ColorPick.initColorPick('#settings-color-rocketBody', {
+        initialColor: rgbCss(settingsManager.colors?.rocketBody || [0.2, 0.4, 1.0, 1]),
+        palette: colorPalette,
+        onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'rocketBody'),
+      });
+      ColorPick.initColorPick('#settings-color-debris', {
+        initialColor: rgbCss(settingsManager.colors?.debris || [0.5, 0.5, 0.5, 1]),
+        palette: colorPalette,
+        onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'debris'),
+      });
+      ColorPick.initColorPick('#settings-color-inview', {
+        initialColor: rgbCss(settingsManager.colors?.inFOV || [0.85, 0.5, 0.0, 1.0]),
+        palette: colorPalette,
+        onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'inview'),
+      });
+      ColorPick.initColorPick('#settings-color-missile', {
+        initialColor: rgbCss(settingsManager.colors?.missile || [1.0, 1.0, 0.0, 1.0]),
+        palette: colorPalette,
+        onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'missile'),
+      });
+      ColorPick.initColorPick('#settings-color-missileInview', {
+        initialColor: rgbCss(settingsManager.colors?.missileInview || [1.0, 0.0, 0.0, 1.0]),
+        palette: colorPalette,
+        onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'missileInview'),
+      });
+      ColorPick.initColorPick('#settings-color-special', {
+        initialColor: rgbCss(settingsManager.colors?.pink || [1.0, 0.0, 0.6, 1.0]),
+        palette: colorPalette,
+        onColorSelected: (colorpick: ColorPick) => this.onColorSelected_(colorpick, 'pink'),
+      });
+      this.isNotColorPickerInitialSetup = true;
     });
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        SettingsMenuPlugin.syncOnLoad();
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      SettingsMenuPlugin.syncOnLoad();
     });
   }
 

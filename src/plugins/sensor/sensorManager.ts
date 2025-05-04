@@ -24,6 +24,7 @@
  */
 
 import { sensors } from '@app/catalogs/sensors';
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { openColorbox } from '@app/lib/colorbox';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
@@ -303,7 +304,7 @@ export class SensorManager {
       colorSchemeManagerInstance.calculateColorBuffers(true);
     }, 2000);
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.resetSensor);
+    Doris.getInstance().emit(KeepTrackApiEvents.resetSensor);
   }
 
   setCurrentSensor(sensor: DetailedSensor[] | null): void {

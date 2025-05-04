@@ -33,6 +33,7 @@ import { t7e } from '@app/locales/keys';
 import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 interface ReportData {
   filename: string;
@@ -91,15 +92,11 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('aer-report-btn').addEventListener('click', () => this.generateAzElRng_());
-        getEl('coes-report-btn').addEventListener('click', () => this.generateClasicalOrbElJ2000_());
-        getEl('eci-report-btn').addEventListener('click', () => this.generateEci_());
-        getEl('lla-report-btn').addEventListener('click', () => this.generateLla_());
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('aer-report-btn').addEventListener('click', () => this.generateAzElRng_());
+      getEl('coes-report-btn').addEventListener('click', () => this.generateClasicalOrbElJ2000_());
+      getEl('eci-report-btn').addEventListener('click', () => this.generateEci_());
+      getEl('lla-report-btn').addEventListener('click', () => this.generateLla_());
     });
 
     keepTrackApi.register({

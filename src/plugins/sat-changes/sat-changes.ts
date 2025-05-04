@@ -62,17 +62,8 @@ export const uiManagerInit = () => {
 
 export const init = (): void => {
   // Add HTML
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.HtmlInitialize,
-    cbName: 'satChanges',
-    cb: uiManagerInit,
-  });
-
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.AfterHtmlInitialize,
-    cbName: 'satChanges',
-    cb: uiManagerFinal,
-  });
+  Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, uiManagerInit);
+  Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, uiManagerFinal);
 
   // Add JavaScript
   Doris.getInstance().on(KeepTrackApiEvents.bottomMenuClick, bottomMenuClick);

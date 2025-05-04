@@ -72,54 +72,46 @@ export class SensorListPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.HtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('nav-mobile')?.insertAdjacentHTML(
-          'beforeend',
-          keepTrackApi.html`
+    Doris.getInstance().on(KeepTrackApiEvents.HtmlInitialize, () => {
+      getEl('nav-mobile')?.insertAdjacentHTML(
+        'beforeend',
+        keepTrackApi.html`
           <div id="sensor-selected-container">
             <div id="sensor-selected" class="waves-effect waves-light">
 
             </div>
           </div>
           `,
-        );
-      },
+      );
     });
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        getEl('sensor-selected-container')?.addEventListener('click', () => {
-          Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
-          keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
-        });
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      getEl('sensor-selected-container')?.addEventListener('click', () => {
+        Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+        keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+      });
 
-        getEl('sensor-list-content')?.addEventListener('click', (e: Event) => {
-          let realTarget = e.target as HTMLElement | null | undefined;
+      getEl('sensor-list-content')?.addEventListener('click', (e: Event) => {
+        let realTarget = e.target as HTMLElement | null | undefined;
 
+        if (!realTarget?.classList.contains('menu-selectable')) {
+          realTarget = realTarget?.closest('.menu-selectable');
           if (!realTarget?.classList.contains('menu-selectable')) {
-            realTarget = realTarget?.closest('.menu-selectable');
-            if (!realTarget?.classList.contains('menu-selectable')) {
-              return;
-            }
-          }
-
-          if (realTarget.id === 'reset-sensor-button') {
-            keepTrackApi.getSensorManager().resetSensorSelected();
-            keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
-
             return;
           }
+        }
 
-          keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
-          const sensorClick = realTarget.dataset.sensor;
+        if (realTarget.id === 'reset-sensor-button') {
+          keepTrackApi.getSensorManager().resetSensorSelected();
+          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
 
-          this.sensorListContentClick(sensorClick ?? '');
-        });
-      },
+          return;
+        }
+
+        keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+        const sensorClick = realTarget.dataset.sensor;
+
+        this.sensorListContentClick(sensorClick ?? '');
+      });
     });
 
     keepTrackApi.register({

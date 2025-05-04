@@ -72,10 +72,10 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.rightBtnMenuAdd]: []; // Done
   [KeepTrackApiEvents.updateDateTime]: [Date];
   [KeepTrackApiEvents.updatePropRate]: [number];
-  [KeepTrackApiEvents.BeforeHtmlInitialize]: [];
-  [KeepTrackApiEvents.HtmlInitialize]: [];
-  [KeepTrackApiEvents.AfterHtmlInitialize]: [];
-  [KeepTrackApiEvents.resetSensor]: [];
+  [KeepTrackApiEvents.BeforeHtmlInitialize]: []; // Done
+  [KeepTrackApiEvents.HtmlInitialize]: []; // Done
+  [KeepTrackApiEvents.AfterHtmlInitialize]: []; // Done
+  [KeepTrackApiEvents.resetSensor]: []; // Done
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
   [KeepTrackApiEvents.changeSensorMarkers]: [string];
   [KeepTrackApiEvents.resize]: [];

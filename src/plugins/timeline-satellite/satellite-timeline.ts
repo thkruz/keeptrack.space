@@ -4,6 +4,7 @@ import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 
+import { Doris } from '@app/doris/doris';
 import { shake } from '@app/lib/shake';
 import { SatMath } from '@app/static/sat-math';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord, Seconds } from 'ootk';
@@ -117,39 +118,35 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
-        this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
-        this.ctx_ = this.canvas_.getContext('2d');
-        this.ctxStatic_ = this.canvasStatic_.getContext('2d');
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
+      this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
+      this.ctx_ = this.canvas_.getContext('2d');
+      this.ctxStatic_ = this.canvasStatic_.getContext('2d');
 
-        getEl('satellite-timeline-setting-total-length').addEventListener('change', () => {
-          this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-total-length')).value) as Hours;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('satellite-timeline-setting-total-length').addEventListener('change', () => {
+        this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-total-length')).value) as Hours;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('satellite-timeline-setting-interval').addEventListener('change', () => {
-          this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-interval')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('satellite-timeline-setting-interval').addEventListener('change', () => {
+        this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-interval')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('satellite-timeline-setting-bad-length').addEventListener('change', () => {
-          this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-bad-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
+      getEl('satellite-timeline-setting-bad-length').addEventListener('change', () => {
+        this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-bad-length')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
 
-        getEl('satellite-timeline-setting-avg-length').addEventListener('change', () => {
-          this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-avg-length')).value) as Seconds;
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-        });
-      },
+      getEl('satellite-timeline-setting-avg-length').addEventListener('change', () => {
+        this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-avg-length')).value) as Seconds;
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+      });
     });
 
   }

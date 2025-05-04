@@ -8,6 +8,7 @@ import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { RfSensor, SpaceObjectType } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
+import { Doris } from '@app/doris/doris';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   readonly id = 'SensorInfoPlugin';
@@ -99,13 +100,9 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        this.addSensorToSunBtnListener_();
-        this.addSensorToMoonBtnListener();
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      this.addSensorToSunBtnListener_();
+      this.addSensorToMoonBtnListener();
     });
 
     keepTrackApi.register({

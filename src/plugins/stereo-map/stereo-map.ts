@@ -58,6 +58,7 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, Lla
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { Doris } from '@app/doris/doris';
 
 interface GroundTracePoint {
   x: number;
@@ -109,31 +110,27 @@ export class StereoMap extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.AfterHtmlInitialize,
-      cbName: this.id,
-      cb: () => {
-        this.canvas_ = <HTMLCanvasElement>getEl('map-2d');
+    Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
+      this.canvas_ = <HTMLCanvasElement>getEl('map-2d');
 
-        this.resize2DMap_();
+      this.resize2DMap_();
 
-        window.addEventListener('resize', () => {
-          if (!settingsManager.disableUI) {
-            this.resize2DMap_();
-          }
-        });
-
-        getEl('fullscreen-icon')?.addEventListener('click', () => {
+      window.addEventListener('resize', () => {
+        if (!settingsManager.disableUI) {
           this.resize2DMap_();
-        });
+        }
+      });
 
-        getEl('map-menu')?.addEventListener('click', (evt: Event) => {
-          if (!(<HTMLElement>evt.target).classList.contains('map-look')) {
-            return;
-          }
-          this.mapMenuClick_(evt);
-        });
-      },
+      getEl('fullscreen-icon')?.addEventListener('click', () => {
+        this.resize2DMap_();
+      });
+
+      getEl('map-menu')?.addEventListener('click', (evt: Event) => {
+        if (!(<HTMLElement>evt.target).classList.contains('map-look')) {
+          return;
+        }
+        this.mapMenuClick_(evt);
+      });
     });
   }
 

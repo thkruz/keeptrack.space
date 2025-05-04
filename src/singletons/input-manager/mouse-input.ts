@@ -1,5 +1,6 @@
 /* eslint-disable no-unreachable */
 // eslint-disable-next-line max-classes-per-file
+import { Doris } from '@app/doris/doris';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -578,7 +579,7 @@ export class MouseInput {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
         break;
       default:
-        keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
+        Doris.getInstance().emit(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
         break;
     }
     keepTrackApi.getSoundManager().play(SoundNames.CLICK);

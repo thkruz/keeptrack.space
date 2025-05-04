@@ -255,9 +255,9 @@ export const standardPluginRmbTests = (Plugin: Constructor<KeepTrackPlugin>, plu
         const plugin = new Plugin();
 
         websiteInit(plugin);
-        expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, rmbOption, -1)).not.toThrow();
+        expect(() => Doris.getInstance().emit(KeepTrackApiEvents.rmbMenuActions, rmbOption, -1)).not.toThrow();
         jest.advanceTimersByTime(1000);
-        expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, rmbOption, -1)).not.toThrow();
+        expect(() => Doris.getInstance().emit(KeepTrackApiEvents.rmbMenuActions, rmbOption, -1)).not.toThrow();
         jest.advanceTimersByTime(1000);
       });
     });

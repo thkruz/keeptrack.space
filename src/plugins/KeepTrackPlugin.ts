@@ -564,11 +564,7 @@ export abstract class KeepTrackPlugin {
   }
 
   registerRmbCallback(callback: (targetId: string, clickedSatId?: number) => void): void {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.rmbMenuActions,
-      cbName: this.id,
-      cb: callback,
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.rmbMenuActions, callback);
   }
 
   addContextMenuLevel1Item(html: string): void {

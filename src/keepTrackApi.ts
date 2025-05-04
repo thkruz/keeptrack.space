@@ -64,10 +64,10 @@ declare global {
 }
 
 type KeepTrackApiEventArguments = {
-  [KeepTrackApiEvents.bottomMenuClick]: [string];
-  [KeepTrackApiEvents.hideSideMenus]: [];
-  [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture];
-  [KeepTrackApiEvents.orbitManagerInit]: [];
+  [KeepTrackApiEvents.bottomMenuClick]: [string]; // Done
+  [KeepTrackApiEvents.hideSideMenus]: []; // Done
+  [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture]; // Done
+  [KeepTrackApiEvents.orbitManagerInit]: []; // Done
   [KeepTrackApiEvents.drawManagerLoadScene]: [];
   [KeepTrackApiEvents.drawOptionalScenery]: [];
   [KeepTrackApiEvents.updateLoop]: [];
@@ -99,8 +99,8 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
   [KeepTrackApiEvents.ConeMeshUpdate]: [];
   [KeepTrackApiEvents.bottomMenuModeChange]: [];
-  [KeepTrackApiEvents.saveSettings]: [];
-  [KeepTrackApiEvents.loadSettings]: [];
+  [KeepTrackApiEvents.saveSettings]: []; // Done
+  [KeepTrackApiEvents.loadSettings]: []; // Done
   [KeepTrackApiEvents.onPrimarySatelliteUpdate]: [BaseObject | null, number];
   [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number];
   [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number];

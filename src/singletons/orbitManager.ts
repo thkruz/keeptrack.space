@@ -214,7 +214,7 @@ export class OrbitManager {
     });
 
     this.isInitialized_ = true;
-    keepTrackApi.runEvent(KeepTrackApiEvents.orbitManagerInit);
+    Doris.getInstance().emit(KeepTrackApiEvents.orbitManagerInit);
   }
 
   private startCruncher_(orbitWorker?: Worker) {

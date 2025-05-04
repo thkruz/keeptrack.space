@@ -87,22 +87,18 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       }
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
-          this.isIconDisabled = false;
-          // If it is open then refresh the plot
-          if (this.isMenuButtonActive) {
-            this.updatePlot_();
-          }
-        } else {
-          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
-          this.isIconDisabled = true;
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
+        getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+        this.isIconDisabled = false;
+        // If it is open then refresh the plot
+        if (this.isMenuButtonActive) {
+          this.updatePlot_();
         }
-      },
+      } else {
+        getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+        this.isIconDisabled = true;
+      }
     });
 
     const keyboardManager = keepTrackApi.getInputManager().keyboard;

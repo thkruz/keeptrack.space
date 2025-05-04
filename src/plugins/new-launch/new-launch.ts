@@ -8,6 +8,7 @@ import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 import { SatMath } from '@app/static/sat-math';
 
 import { launchSites } from '@app/catalogs/launch-sites';
+import { Doris } from '@app/doris/doris';
 import { t7e } from '@app/locales/keys';
 import { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -19,7 +20,6 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
-import { Doris } from '@app/doris/doris';
 
 export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';
@@ -336,20 +336,16 @@ export class NewLaunch extends KeepTrackPlugin {
       });
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        if (obj?.isSatellite()) {
-          const sat = obj as DetailedSatellite;
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (obj?.isSatellite()) {
+        const sat = obj as DetailedSatellite;
 
-          (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
-          this.setBottomIconToEnabled();
-          this.preValidate_(sat);
-        } else {
-          this.setBottomIconToDisabled();
-        }
-      },
+        (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
+        this.setBottomIconToEnabled();
+        this.preValidate_(sat);
+      } else {
+        this.setBottomIconToDisabled();
+      }
     });
   }
 

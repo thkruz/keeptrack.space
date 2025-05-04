@@ -251,16 +251,12 @@ export class LineManager {
 
     this.program = new WebGlProgramHelper(gl, this.shaders_.vert, this.shaders_.frag, this.attribs, this.uniforms_).program;
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: 'LineManager',
-      cb: (sat: BaseObject) => {
-        if (sat) {
-          const sensor = keepTrackApi.getSensorManager().getSensor();
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (obj instanceof DetailedSatellite) {
+        const sensor = keepTrackApi.getSensorManager().getSensor();
 
-          this.createSensorToSatFovAndSelectedOnly(sensor, sat as DetailedSatellite);
-        }
-      },
+        this.createSensorToSatFovAndSelectedOnly(sensor, obj);
+      }
     });
   }
 

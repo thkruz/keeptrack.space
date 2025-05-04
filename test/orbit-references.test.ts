@@ -23,7 +23,7 @@ describe('OrbitReferences', () => {
     expect(() => orbitReferences.init()).not.toThrow();
     Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
     Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, 0)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.selectSatData, defaultSat, 0)).not.toThrow();
 
     keepTrackApi.getCatalogManager().analSatSet = [defaultSat];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);

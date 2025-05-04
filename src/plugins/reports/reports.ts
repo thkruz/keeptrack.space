@@ -29,11 +29,11 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import analysisPng from '@public/img/icons/reports.png';
 
 
+import { Doris } from '@app/doris/doris';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { Doris } from '@app/doris/doris';
 
 interface ReportData {
   filename: string;
@@ -99,18 +99,14 @@ export class ReportsPlugin extends KeepTrackPlugin {
       getEl('lla-report-btn').addEventListener('click', () => this.generateLla_());
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        if (obj?.isSatellite()) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
-          this.isIconDisabled = false;
-        } else {
-          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
-          this.isIconDisabled = true;
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (obj?.isSatellite()) {
+        getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+        this.isIconDisabled = false;
+      } else {
+        getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+        this.isIconDisabled = true;
+      }
     });
   }
 

@@ -118,12 +118,8 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        this.checkIfCanBeEnabled_(obj);
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      this.checkIfCanBeEnabled_(obj);
     });
   }
 

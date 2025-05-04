@@ -8,6 +8,7 @@ import { BaseObject, FormatTle, Tle } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 export class OrbitReferences extends KeepTrackPlugin {
   readonly id = 'OrbitReferences';
@@ -25,30 +26,26 @@ export class OrbitReferences extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj?: BaseObject) => {
-        // Skip this if there is no satellite object because the menu isn't open
-        if (!obj?.isSatellite()) {
-          hideEl('orbit-references-link');
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      // Skip this if there is no satellite object because the menu isn't open
+      if (!obj?.isSatellite()) {
+        hideEl('orbit-references-link');
 
-          return;
-        }
-        showEl('orbit-references-link');
+        return;
+      }
+      showEl('orbit-references-link');
 
-        if (!this.doOnce) {
-          getEl('actions-section').insertAdjacentHTML(
-            'beforeend',
-            keepTrackApi.html`
+      if (!this.doOnce) {
+        getEl('actions-section').insertAdjacentHTML(
+          'beforeend',
+          keepTrackApi.html`
                 <div id="orbit-references-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                       data-tooltip="Create Analyst Satellites in Orbit">Generate Orbit Reference Satellites...</div>
               `,
-          );
-          getEl('orbit-references-link').addEventListener('click', this.orbitReferencesLinkClick.bind(this));
-          this.doOnce = true;
-        }
-      },
+        );
+        getEl('orbit-references-link').addEventListener('click', this.orbitReferencesLinkClick.bind(this));
+        this.doOnce = true;
+      }
     });
   }
 

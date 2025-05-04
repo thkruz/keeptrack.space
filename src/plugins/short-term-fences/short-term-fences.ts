@@ -94,30 +94,26 @@ export class ShortTermFences extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        // Skip this if there is no satellite object because the menu isn't open
-        if (!obj?.isSatellite()) {
-          hideEl('stf-on-object-link');
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      // Skip this if there is no satellite object because the menu isn't open
+      if (!obj?.isSatellite()) {
+        hideEl('stf-on-object-link');
 
-          return;
-        }
-        showEl('stf-on-object-link');
+        return;
+      }
+      showEl('stf-on-object-link');
 
-        if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
-          getEl('actions-section')?.insertAdjacentHTML(
-            'beforeend',
-            keepTrackApi.html`
+      if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
+        getEl('actions-section')?.insertAdjacentHTML(
+          'beforeend',
+          keepTrackApi.html`
             <div id="stf-on-object-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                   data-tooltip="Visualize Sensor Search Capability">Build Short Term Fence on this object...</div>
             `,
-          );
-          getEl('stf-on-object-link')?.addEventListener('click', this.stfOnObjectLinkClick_.bind(this));
-          this.isAddStfLinksOnce = true;
-        }
-      },
+        );
+        getEl('stf-on-object-link')?.addEventListener('click', this.stfOnObjectLinkClick_.bind(this));
+        this.isAddStfLinksOnce = true;
+      }
     });
   }
 

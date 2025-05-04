@@ -1,9 +1,9 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { hideEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
-import { Doris } from '@app/doris/doris';
 
 export class MobileManager {
   // eslint-disable-next-line require-await
@@ -64,12 +64,8 @@ export class MobileManager {
           settingsManager.isDisableLaunchSites = true;
           settingsManager.isDisableControlSites = true;
 
-          keepTrackApi.register({
-            event: KeepTrackApiEvents.selectSatData,
-            cbName: 'MobileManager.selectSatData',
-            cb: () => {
-              keepTrackApi.getUiManager().searchManager.closeSearch();
-            },
+          Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (): void => {
+            keepTrackApi.getUiManager().searchManager?.closeSearch();
           });
 
           Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {

@@ -719,31 +719,23 @@ export abstract class KeepTrackPlugin {
     // Do Nothing
   }) {
     if (this.isRequireSensorSelected && this.isRequireSatelliteSelected) {
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.selectSatData,
-        cbName: this.id,
-        cb: (obj: BaseObject): void => {
-          if (!obj?.isSatellite() || !keepTrackApi.getSensorManager().isSensorSelected()) {
-            this.setBottomIconToDisabled();
-            this.setBottomIconToUnselected();
-          } else {
-            this.setBottomIconToEnabled();
-          }
-        },
+      Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+        if (!obj?.isSatellite() || !keepTrackApi.getSensorManager().isSensorSelected()) {
+          this.setBottomIconToDisabled();
+          this.setBottomIconToUnselected();
+        } else {
+          this.setBottomIconToEnabled();
+        }
       });
     }
     if (this.isRequireSatelliteSelected && !this.isRequireSensorSelected) {
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.selectSatData,
-        cbName: this.id,
-        cb: (obj: BaseObject): void => {
-          if (!obj) {
-            this.setBottomIconToDisabled();
-            this.setBottomIconToUnselected();
-          } else {
-            this.setBottomIconToEnabled();
-          }
-        },
+      Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+        if (!obj) {
+          this.setBottomIconToDisabled();
+          this.setBottomIconToUnselected();
+        } else {
+          this.setBottomIconToEnabled();
+        }
       });
     }
 

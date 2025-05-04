@@ -733,12 +733,8 @@ export class Camera {
 
     this.registerKeyboardEvents_();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: 'mainCamera',
-      cb: () => {
-        this.isAutoPitchYawToTarget = false;
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (): void => {
+      this.isAutoPitchYawToTarget = false;
     });
 
     keepTrackApi.register({

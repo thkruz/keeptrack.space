@@ -81,31 +81,27 @@ export class TransponderChannelData extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        if (
-          !obj ||
-          obj.id === -1 ||
-          !obj.isSatellite() ||
-          !this.satsWithChannels_.includes((obj as DetailedSatellite).sccNum)
-        ) {
-          if (this.isMenuButtonActive) {
-            this.closeSideMenu();
-          }
-          this.setBottomIconToDisabled();
-        } else {
-          // It is a satellite with channel information
-          this.setBottomIconToEnabled();
-
-          // If it is open, update the table
-          if (this.isMenuButtonActive && this.lastLoadedSat_ !== obj.id) {
-            this.showTable();
-            this.lastLoadedSat_ = obj.id;
-          }
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (
+        !obj ||
+        obj.id === -1 ||
+        !obj.isSatellite() ||
+        !this.satsWithChannels_.includes((obj as DetailedSatellite).sccNum)
+      ) {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
         }
-      },
+        this.setBottomIconToDisabled();
+      } else {
+        // It is a satellite with channel information
+        this.setBottomIconToEnabled();
+
+        // If it is open, update the table
+        if (this.isMenuButtonActive && this.lastLoadedSat_ !== obj.id) {
+          this.showTable();
+          this.lastLoadedSat_ = obj.id;
+        }
+      }
     });
   }
 

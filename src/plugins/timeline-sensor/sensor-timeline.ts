@@ -304,20 +304,16 @@ export class SensorTimeline extends KeepTrackPlugin {
       }
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
-        if (!this.isMenuButtonActive) {
-          return;
-        }
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (!this.isMenuButtonActive) {
+        return;
+      }
 
-        if (sat) {
-          this.ctxStatic_.reset();
-          this.updateTimeline();
-          this.canvas_.style.display = 'block';
-        }
-      },
+      if (obj instanceof DetailedSatellite) {
+        this.ctxStatic_.reset();
+        this.updateTimeline();
+        this.canvas_.style.display = 'block';
+      }
     });
   }
 

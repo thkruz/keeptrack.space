@@ -7,6 +7,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 
+import { Doris } from '@app/doris/doris';
 import { t7e } from '@app/locales/keys';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
@@ -16,7 +17,6 @@ import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLin
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
-import { Doris } from '@app/doris/doris';
 
 export class EditSat extends KeepTrackPlugin {
   readonly id = 'EditSat';
@@ -176,19 +176,15 @@ export class EditSat extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        if (!obj) {
-          if (this.isMenuButtonActive) {
-            this.closeSideMenu();
-          }
-          this.setBottomIconToDisabled();
-        } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
-          this.populateSideMenu_();
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (!obj) {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
         }
-      },
+        this.setBottomIconToDisabled();
+      } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
+        this.populateSideMenu_();
+      }
     });
   }
 

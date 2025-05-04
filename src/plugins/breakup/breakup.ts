@@ -6,6 +6,7 @@ import { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import streamPng from '@public/img/icons/stream.png';
 
+import { Doris } from '@app/doris/doris';
 import { t7e } from '@app/locales/keys';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
@@ -14,7 +15,6 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { Doris } from '@app/doris/doris';
 
 export class Breakup extends KeepTrackPlugin {
   readonly id = 'Breakup';
@@ -162,30 +162,26 @@ export class Breakup extends KeepTrackPlugin {
       });
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
-        if (!sat?.isSatellite()) {
-          if (this.isMenuButtonActive) {
-            this.closeSideMenu();
-          }
-          this.setBottomIconToUnselected();
-          this.setBottomIconToDisabled();
-        } else if ((sat as DetailedSatellite)?.apogee - (sat as DetailedSatellite)?.perigee > this.maxDifApogeeVsPerigee_) {
-          if (this.isMenuButtonActive) {
-            this.closeSideMenu();
-            errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
-          }
-          this.setBottomIconToUnselected();
-          this.setBottomIconToDisabled();
-        } else {
-          this.setBottomIconToEnabled();
-          if (this.isMenuButtonActive) {
-            this.updateSccNumInMenu_();
-          }
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (!obj?.isSatellite()) {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
         }
-      },
+        this.setBottomIconToUnselected();
+        this.setBottomIconToDisabled();
+      } else if ((obj as DetailedSatellite)?.apogee - (obj as DetailedSatellite)?.perigee > this.maxDifApogeeVsPerigee_) {
+        if (this.isMenuButtonActive) {
+          this.closeSideMenu();
+          errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
+        }
+        this.setBottomIconToUnselected();
+        this.setBottomIconToDisabled();
+      } else {
+        this.setBottomIconToEnabled();
+        if (this.isMenuButtonActive) {
+          this.updateSccNumInMenu_();
+        }
+      }
     });
   }
 

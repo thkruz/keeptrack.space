@@ -138,17 +138,13 @@ export class StereoMap extends KeepTrackPlugin {
     super.addJs();
     Doris.getInstance().on(KeepTrackApiEvents.onCruncherMessage, this.onCruncherMessage_.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
-        if (!this.isMenuButtonActive) {
-          return;
-        }
-        if (sat) {
-          this.updateMap();
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (!this.isMenuButtonActive) {
+        return;
+      }
+      if (obj instanceof DetailedSatellite) {
+        this.updateMap();
+      }
     });
 
     const keyboardManager = keepTrackApi.getInputManager().keyboard;

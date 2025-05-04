@@ -26,9 +26,10 @@ import { shake } from '@app/lib/shake';
 import { t7e } from '@app/locales/keys';
 import { CameraType } from '@app/singletons/camera';
 import viewInAirPng from '@public/img/icons/view-in-air.png';
-import { DetailedSatellite } from 'ootk';
+import { BaseObject, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
   readonly id = 'SatelliteViewPlugin';
@@ -49,16 +50,12 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj) => {
-        if (obj instanceof DetailedSatellite) {
-          this.setBottomIconToEnabled();
-        } else {
-          this.setBottomIconToDisabled();
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (obj instanceof DetailedSatellite) {
+        this.setBottomIconToEnabled();
+      } else {
+        this.setBottomIconToDisabled();
+      }
     });
   }
 

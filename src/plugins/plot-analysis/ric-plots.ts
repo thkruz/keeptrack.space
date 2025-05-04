@@ -9,6 +9,7 @@ import 'echarts-gl';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { Doris } from '@app/doris/doris';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -84,19 +85,15 @@ export class RicPlot extends KeepTrackPlugin {
       },
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        if (!obj || this.selectSatManager_.secondarySat === -1) {
-          if (this.isMenuButtonActive) {
-            this.hideSideMenus();
-          }
-          this.setBottomIconToDisabled();
-        } else {
-          this.setBottomIconToEnabled();
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (!obj || this.selectSatManager_.secondarySat === -1) {
+        if (this.isMenuButtonActive) {
+          this.hideSideMenus();
         }
-      },
+        this.setBottomIconToDisabled();
+      } else {
+        this.setBottomIconToEnabled();
+      }
     });
   }
 

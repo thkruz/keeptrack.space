@@ -114,47 +114,43 @@ export class SensorListPlugin extends KeepTrackPlugin {
       });
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        // Skip this if there is no satellite object because the menu isn't open
-        if (!obj?.isSatellite()) {
-          hideEl('sensors-in-fov-link');
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      // Skip this if there is no satellite object because the menu isn't open
+      if (!obj?.isSatellite()) {
+        hideEl('sensors-in-fov-link');
 
-          return;
-        }
+        return;
+      }
 
-        showEl('sensors-in-fov-link');
+      showEl('sensors-in-fov-link');
 
-        if (keepTrackApi.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
-          getEl('actions-section')?.insertAdjacentHTML(
-            'beforeend',
-            keepTrackApi.html`
+      if (keepTrackApi.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
+        getEl('actions-section')?.insertAdjacentHTML(
+          'beforeend',
+          keepTrackApi.html`
                   <div id="sensors-in-fov-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                         data-tooltip="Visualize Sensor Coverage">Show All Sensors with FOV...</div>
                 `,
-          );
-          getEl('sensors-in-fov-link')?.addEventListener('click', () => {
-            keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+        );
+        getEl('sensors-in-fov-link')?.addEventListener('click', () => {
+          keepTrackApi.getSoundManager().play(SoundNames.CLICK);
 
-            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+          const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
-            if (!selectSatManagerInstance) {
-              return;
-            }
+          if (!selectSatManagerInstance) {
+            return;
+          }
 
-            const sat = selectSatManagerInstance.getSelectedSat();
+          const sat = selectSatManagerInstance.getSelectedSat();
 
-            if (!sat.isSatellite()) {
-              return;
-            }
+          if (!sat.isSatellite()) {
+            return;
+          }
 
-            keepTrackApi.getLineManager().createSensorsToSatFovOnly(sat as DetailedSatellite);
-          });
-          this.isSensorLinksAdded = true;
-        }
-      },
+          keepTrackApi.getLineManager().createSensorsToSatFovOnly(sat as DetailedSatellite);
+        });
+        this.isSensorLinksAdded = true;
+      }
     });
   }
 

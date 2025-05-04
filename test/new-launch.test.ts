@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -50,7 +51,7 @@ describe('NewLaunch_form', () => {
       },
     };
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, defaultSat.id);
+    Doris.getInstance().emit(KeepTrackApiEvents.selectSatData, defaultSat, defaultSat.id);
     keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
 
     expect(() => getEl(`${newLaunchPlugin.sideMenuElementName}-submit`).click()).not.toThrow();

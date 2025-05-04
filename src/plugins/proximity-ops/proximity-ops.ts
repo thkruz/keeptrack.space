@@ -2,6 +2,7 @@ import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 
+import { Doris } from '@app/doris/doris';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
 import { t7e } from '@app/locales/keys';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -13,7 +14,6 @@ import { BaseObject, CatalogSource, Degrees, DetailedSatellite, EciVec3, Kilomet
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
-import { Doris } from '@app/doris/doris';
 
 enum RPOType {
   GEO = 'GEO',
@@ -185,14 +185,10 @@ export class ProximityOps extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        if (this.isMenuButtonActive && obj?.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl('proximity-ops-norad')).value) {
-          this.updateNoradId_();
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      if (this.isMenuButtonActive && obj?.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl('proximity-ops-norad')).value) {
+        this.updateNoradId_();
+      }
     });
   }
 

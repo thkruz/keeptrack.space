@@ -213,18 +213,14 @@ export class SatelliteFov extends KeepTrackPlugin {
       },
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: SatelliteFov.name,
-      cb: (sat: BaseObject) => {
-        this.updateListOfFovMeshes_();
+    Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
+      this.updateListOfFovMeshes_();
 
-        if (sat?.isSatellite()) {
-          this.isSettingsMenuEnabled_ = true;
-        } else {
-          this.isSettingsMenuEnabled_ = false;
-        }
-      },
+      if (obj?.isSatellite()) {
+        this.isSettingsMenuEnabled_ = true;
+      } else {
+        this.isSettingsMenuEnabled_ = false;
+      }
     });
   }
 

@@ -344,7 +344,7 @@ export class DotsManager {
 
     this.initProgramPicking();
 
-    Tessa.getInstance().on(CoreEngineEvents.Update, () => this.updatePositionBuffer());
+    Tessa.getInstance().on(CoreEngineEvents.BeforeUpdate, () => this.updatePositionBuffer());
   }
 
   /**

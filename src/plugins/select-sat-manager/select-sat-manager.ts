@@ -52,7 +52,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       cb: this.checkIfSelectSatVisible.bind(this),
     });
 
-    Tessa.getInstance().on(CoreEngineEvents.AfterRender, () => {
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
       if (this.primarySatObj.id !== -1) {
         const timeManagerInstance = keepTrackApi.getTimeManager();
 

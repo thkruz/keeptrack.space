@@ -183,99 +183,110 @@ export class CatalogLoader {
    *
    *  If all files are missing, the function will return an error.
    */
-  static async load(): Promise<void> {
-    const settingsManager: SettingsManager = window.settingsManager;
-
-    try {
-      // TODO: Which sources can use this should be definied in the settings (Celestrak Rebase)
-      if (settingsManager.dataSources.tle === 'https://api.keeptrack.space/v3/sats' || settingsManager.dataSources.tle === 'http://localhost:8787/v3/sats') {
-        if (!settingsManager.limitSats) {
-          CatalogLoader.setupGetVariables();
+  static load(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      try {
+        // TODO: Which sources can use this should be definied in the settings (Celestrak Rebase)
+        if (settingsManager.dataSources.tle === 'https://api.keeptrack.space/v3/sats' || settingsManager.dataSources.tle === 'http://localhost:8787/v3/sats') {
+          if (!settingsManager.limitSats) {
+            CatalogLoader.setupGetVariables();
+          }
+          settingsManager.dataSources.tle = `${settingsManager.dataSources.tle}/${settingsManager.limitSats}`;
+          settingsManager.dataSources.tle = settingsManager.dataSources.tle.replace(/\/$/u, '');
         }
-        settingsManager.dataSources.tle = `${settingsManager.dataSources.tle}/${settingsManager.limitSats}`;
-        settingsManager.dataSources.tle = settingsManager.dataSources.tle.replace(/\/$/u, '');
-      }
 
-      const {
-        extraSats,
-        asciiCatalog,
-        jsCatalog,
-        externalCatalog,
-      } =
-        CatalogLoader.getAdditionalCatalogs_(settingsManager);
+        const {
+          extraSats,
+          asciiCatalog,
+          jsCatalog,
+          externalCatalog,
+        } =
+          CatalogLoader.getAdditionalCatalogs_(settingsManager);
 
-      if (settingsManager.dataSources.externalTLEsOnly) {
-        if (settingsManager.dataSources.isSupplementExternal) {
-          // Load our database for the extra information - the satellites will be filtered out
-          await fetch(settingsManager.dataSources.tle)
+        if (settingsManager.dataSources.externalTLEsOnly) {
+          if (settingsManager.dataSources.isSupplementExternal) {
+            // Load our database for the extra information - the satellites will be filtered out
+            fetch(settingsManager.dataSources.tle)
+              .then((response) => response.json())
+              .then((data) => CatalogLoader.parse({
+                keepTrackTle: data,
+                externalCatalog,
+              }))
+              .then(resolve)
+              .catch((error) => {
+                errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+                reject(error);
+              });
+          } else {
+            // Load the external TLEs only
+            CatalogLoader.parse({
+              externalCatalog,
+            }).then(resolve).catch(reject);
+          }
+        } else if (settingsManager.isUseDebrisCatalog) {
+          // Load the debris catalog
+          fetch(settingsManager.dataSources.tleDebris)
             .then((response) => response.json())
             .then((data) => CatalogLoader.parse({
               keepTrackTle: data,
-              externalCatalog,
+              keepTrackExtra: extraSats,
+              keepTrackAscii: asciiCatalog,
+              vimpelCatalog: jsCatalog,
             }))
+            .then(resolve)
             .catch((error) => {
               errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+              reject(error);
             });
+        } else if (settingsManager.offline) {
+          fetch(`${settingsManager.installDirectory}tle/tle.json`)
+            .then((response) => response.json())
+            .then((data) => CatalogLoader.parse({
+              keepTrackTle: data,
+              keepTrackExtra: extraSats,
+              keepTrackAscii: asciiCatalog,
+              externalCatalog,
+              vimpelCatalog: jsCatalog,
+            }))
+            .then(resolve)
+            .catch(reject);
         } else {
-          // Load the external TLEs only
-          await CatalogLoader.parse({
-            externalCatalog,
-          });
+          // Load the primary catalog
+          fetch(settingsManager.dataSources.tle)
+            .then((response) => response.json())
+            .then((data) => CatalogLoader.parse({
+              keepTrackTle: data,
+              keepTrackExtra: extraSats,
+              keepTrackAscii: asciiCatalog,
+              externalCatalog,
+              vimpelCatalog: jsCatalog,
+            }))
+            .then(resolve)
+            .catch(async (error) => {
+              if (error.message === 'Failed to fetch') {
+                errorManagerInstance.warn('Failed to download latest catalog! Using offline catalog which may be out of date!');
+                await fetch(`${settingsManager.installDirectory}tle/tle.json`)
+                  .then((response) => response.json())
+                  .then((data) => CatalogLoader.parse({
+                    keepTrackTle: data,
+                    keepTrackExtra: extraSats,
+                    keepTrackAscii: asciiCatalog,
+                    externalCatalog,
+                    vimpelCatalog: jsCatalog,
+                  }))
+                  .then(resolve)
+                  .catch(reject);
+              } else {
+                errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+                reject(error);
+              }
+            });
         }
-      } else if (settingsManager.isUseDebrisCatalog) {
-        // Load the debris catalog
-        await fetch(settingsManager.dataSources.tleDebris)
-          .then((response) => response.json())
-          .then((data) => CatalogLoader.parse({
-            keepTrackTle: data,
-            keepTrackExtra: extraSats,
-            keepTrackAscii: asciiCatalog,
-            vimpelCatalog: jsCatalog,
-          }))
-          .catch((error) => {
-            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
-          });
-      } else if (settingsManager.offline) {
-        await fetch(`${settingsManager.installDirectory}tle/tle.json`)
-          .then((response) => response.json())
-          .then((data) => CatalogLoader.parse({
-            keepTrackTle: data,
-            keepTrackExtra: extraSats,
-            keepTrackAscii: asciiCatalog,
-            externalCatalog,
-            vimpelCatalog: jsCatalog,
-          }));
-      } else {
-        // Load the primary catalog
-        await fetch(settingsManager.dataSources.tle)
-          .then((response) => response.json())
-          .then((data) => CatalogLoader.parse({
-            keepTrackTle: data,
-            keepTrackExtra: extraSats,
-            keepTrackAscii: asciiCatalog,
-            externalCatalog,
-            vimpelCatalog: jsCatalog,
-          }))
-          .catch(async (error) => {
-            if (error.message === 'Failed to fetch') {
-              errorManagerInstance.warn('Failed to download latest catalog! Using offline catalog which may be out of date!');
-              await fetch(`${settingsManager.installDirectory}tle/tle.json`)
-                .then((response) => response.json())
-                .then((data) => CatalogLoader.parse({
-                  keepTrackTle: data,
-                  keepTrackExtra: extraSats,
-                  keepTrackAscii: asciiCatalog,
-                  externalCatalog,
-                  vimpelCatalog: jsCatalog,
-                }));
-            } else {
-              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
-            }
-          });
+      } catch (e) {
+        errorManagerInstance.warn('Failed to load TLE catalog(s)!');
+        reject(e);
       }
-    } catch (e) {
-      errorManagerInstance.warn('Failed to load TLE catalog(s)!');
-    }
+    });
   }
 
   /**

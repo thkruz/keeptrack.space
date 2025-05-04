@@ -3,7 +3,6 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
 import { DownloadModelsOptions, Layout, Mesh, MeshMap, OBJ } from 'webgl-obj-loader';
-import { SplashScreen } from '../../static/splash-screen';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { errorManagerInstance } from '../errorManager';
 import { OcclusionProgram } from './post-processing';
@@ -447,9 +446,6 @@ export class MeshManager {
 
       // Don't Continue until you have populated the mesh list
       this.populateFileList();
-
-      // Changes Loading Screen Text
-      SplashScreen.loadStr(SplashScreen.msg.models);
 
       OBJ.downloadModels(this.fileList_).then((models: MeshMap) => {
         /*

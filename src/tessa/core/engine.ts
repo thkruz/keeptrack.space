@@ -148,10 +148,11 @@ export class Engine {
     // Copyright message
     const copyright = document.createElement('div');
 
-    copyright.innerText =
-      '© 2025 Kruczek Labs LLC. All rights reserved.\n' +
-      'Licensed under the GNU AGPL v3.0. See LICENSE for details.\n' +
-      'Unauthorized copying, distribution, or modification is prohibited.';
+    copyright.innerHTML =
+      `TESSA &mdash; Tracking Engine for Space Situational Awareness<br>
+      &copy; 2025 Kruczek Labs LLC. All rights reserved.<br>
+      Licensed under the GNU AGPL v3.0.<br>
+      See LICENSE for details. Unauthorized use is prohibited.`;
     copyright.style.position = 'absolute';
     copyright.style.bottom = '12px';
     copyright.style.left = '0';
@@ -176,6 +177,12 @@ export class Engine {
     await this.eventBus.emit(CoreEngineEvents.AssetLoadStart);
     this.eventBus.emit(CoreEngineEvents.AssetLoadProgress, 0, 1);
     this.eventBus.emit(CoreEngineEvents.AssetLoadComplete);
+  }
+
+  pause(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
   }
 
   start(): void {

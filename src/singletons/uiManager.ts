@@ -28,6 +28,7 @@ import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { isThisNode } from '@app/static/isThisNode';
+import { Tessa } from '@app/tessa/tessa';
 import '@materializecss/materialize';
 import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from 'ootk';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';
@@ -59,7 +60,7 @@ export class UiManager {
   lastNextPassCalcSatId = 0;
   lastNextPassCalcSensorShortName: string;
   lastToast: string;
-  searchManager: SearchManager;
+  searchManager: SearchManager | null = null;
   updateInterval = 1000;
   updateNextPassOverlay: (arg0: boolean) => void;
   searchHoverSatId = -1;
@@ -402,7 +403,7 @@ export class UiManager {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: 'uiManager',
       cb: () => {
-        this.bottomIconPress = (el: HTMLElement) => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, el.id);
+        this.bottomIconPress = (el: HTMLElement) => Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, el.id);
         const BottomIcons = getEl('bottom-icons');
 
         BottomIcons?.addEventListener('click', (evt: Event) => {

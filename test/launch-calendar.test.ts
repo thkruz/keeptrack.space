@@ -5,6 +5,7 @@ import { LaunchCalendar } from '@app/plugins/launch-calendar/launch-calendar';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
+import { Tessa } from '@app/tessa/tessa';
 
 describe('launch_calendar_plugin', () => {
   let launchCalendarPlugin: LaunchCalendar;
@@ -22,7 +23,7 @@ describe('launch_calendar_plugin', () => {
     launchCalendarPlugin.init();
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
+    Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
     jest.advanceTimersByTime(4000);
     // eslint-disable-next-line dot-notation
     expect(() => launchCalendarPlugin['closeColorbox_']()).not.toThrow();

@@ -295,7 +295,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       cbName: this.id,
       cb: () => {
         getEl('top-menu-filter-btn')?.addEventListener('click', () => {
-          keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
         });
       },
     });

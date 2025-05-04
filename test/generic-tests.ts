@@ -5,6 +5,7 @@ import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { BottomMenu } from '@app/static/bottom-menu';
+import { Tessa } from '@app/tessa/tessa';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {
@@ -113,7 +114,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'random-icon');
+    Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'random-icon');
   });
 
   // Tests that clicking on the bottom icon toggles
@@ -126,13 +127,13 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled || plugin.isRequireSatelliteSelected || plugin.isRequireSensorSelected) {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
   });
@@ -153,14 +154,14 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
         expect(toggleButton!.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeTruthy();
       }
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeFalsy();
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
 
@@ -179,13 +180,13 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled || plugin.isRequireSensorSelected) {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
 
@@ -206,13 +207,13 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled) {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
   });

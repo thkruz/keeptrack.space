@@ -27,7 +27,6 @@ import { GLSL3 } from '@app/static/material';
 import { Mesh } from '@app/static/mesh';
 import { ShaderMaterial } from '@app/static/shader-material';
 import { SphereGeometry } from '@app/static/sphere-geometry';
-import { SplashScreen } from '@app/static/splash-screen';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
 import { errorManagerInstance } from '../errorManager';
@@ -460,7 +459,6 @@ export class Earth {
   }
 
   private initTextureDay_(): void {
-    SplashScreen.loadStr(SplashScreen.msg.painting);
     this.textureDay = this.gl_.createTexture();
     const img = new Image();
 

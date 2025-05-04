@@ -9,6 +9,7 @@ import satChngPng from '@public/img/icons/sats.png';
 
 import { dateFromJday } from '@app/lib/transforms';
 
+import { Tessa } from '@app/tessa/tessa';
 import './components/sat-changes.css';
 
 /**
@@ -74,11 +75,7 @@ export const init = (): void => {
   });
 
   // Add JavaScript
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.bottomMenuClick,
-    cbName: 'satChanges',
-    cb: bottomMenuClick,
-  });
+  Tessa.getInstance().on(KeepTrackApiEvents.bottomMenuClick, bottomMenuClick);
 
   keepTrackApi.register({
     event: KeepTrackApiEvents.hideSideMenus,

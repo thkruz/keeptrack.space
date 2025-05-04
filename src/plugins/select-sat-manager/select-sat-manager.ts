@@ -116,7 +116,11 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   checkIfSelectSatVisible() {
     if (keepTrackApi.getPlugin(TopMenu)) {
-      const currentSearch = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
+      const currentSearch = keepTrackApi.getUiManager().searchManager?.getCurrentSearch();
+
+      if (!currentSearch) {
+        return;
+      }
 
       // Base CSS Style based on if the search box is open or not
       let cssStyle = currentSearch.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';

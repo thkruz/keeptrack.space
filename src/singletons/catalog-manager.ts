@@ -318,7 +318,6 @@ export class CatalogManager {
 
   init(satCruncherOveride?: Worker): void {
     try {
-      SplashScreen.loadStr(SplashScreen.msg.elsets);
       // See if we are running jest right now for testing
       if (isThisNode()) {
         if (satCruncherOveride) {

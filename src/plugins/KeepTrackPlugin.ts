@@ -2,6 +2,7 @@ import { KeepTrackApiEvents, MenuMode, Singletons } from '@app/interfaces';
 import { t7e } from '@app/locales/keys';
 import { Localization } from '@app/locales/locales';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
+import { Tessa } from '@app/tessa/tessa';
 import Module from 'module';
 import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -785,56 +786,52 @@ export abstract class KeepTrackPlugin {
       });
     }
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.bottomMenuClick,
-      cbName: this.id,
-      cb: (iconName: string): void => {
-        if (iconName === this.bottomIconElementName) {
-          keepTrackApi.analytics.track('bottom_menu_click', {
-            plugin: this.id,
-            iconName,
-          });
+    Tessa.getInstance().on(KeepTrackApiEvents.bottomMenuClick, (iconName: string): void => {
+      if (iconName === this.bottomIconElementName) {
+        keepTrackApi.analytics.track('bottom_menu_click', {
+          plugin: this.id,
+          iconName,
+        });
 
-          if (this.isMenuButtonActive) {
-            if (this.sideMenuElementName || this.isForceHideSideMenus) {
-              this.hideSideMenus();
-            }
-            this.isMenuButtonActive = false;
-            getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
-          } else {
-            // Verifiy that the user has selected a sensor and/or satellite if required
-            if (this.isRequireSensorSelected) {
-              if (!this.verifySensorSelected()) {
-                return;
-              }
-            }
-
-            if (this.isRequireSatelliteSelected) {
-              if (!this.verifySatelliteSelected()) {
-                return;
-              }
-            }
-
-            // If the icon is disabled, skip automatically selecting it
-            if (!this.isIconDisabled) {
-              // Show the side menu if it exists
-              if (this.sideMenuElementName) {
-                this.openSideMenu();
-              }
-
-              // Show the bottom icon as selected
-              this.isMenuButtonActive = true;
-              getEl(this.bottomIconElementName)?.classList.add(KeepTrackPlugin.iconSelectedClassString);
+        if (this.isMenuButtonActive) {
+          if (this.sideMenuElementName || this.isForceHideSideMenus) {
+            this.hideSideMenus();
+          }
+          this.isMenuButtonActive = false;
+          getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
+        } else {
+          // Verifiy that the user has selected a sensor and/or satellite if required
+          if (this.isRequireSensorSelected) {
+            if (!this.verifySensorSelected()) {
+              return;
             }
           }
 
-          // If a callback is defined, call it even if the icon is disabled
-          if (callback) {
-            // eslint-disable-next-line callback-return
-            callback();
+          if (this.isRequireSatelliteSelected) {
+            if (!this.verifySatelliteSelected()) {
+              return;
+            }
+          }
+
+          // If the icon is disabled, skip automatically selecting it
+          if (!this.isIconDisabled) {
+            // Show the side menu if it exists
+            if (this.sideMenuElementName) {
+              this.openSideMenu();
+            }
+
+            // Show the bottom icon as selected
+            this.isMenuButtonActive = true;
+            getEl(this.bottomIconElementName)?.classList.add(KeepTrackPlugin.iconSelectedClassString);
           }
         }
-      },
+
+        // If a callback is defined, call it even if the icon is disabled
+        if (callback) {
+          // eslint-disable-next-line callback-return
+          callback();
+        }
+      }
     });
   }
 

@@ -9,6 +9,7 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { Tessa } from '@app/tessa/tessa';
 
 describe('SensorFov_class', () => {
   let SensorFovPlugin: SensorFov;
@@ -25,13 +26,13 @@ describe('SensorFov_class', () => {
   it('test_bottom_menu_click', () => {
     websiteInit(SensorFovPlugin);
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
 
     const sensorManagerInstance = new SensorManager();
 
     sensorManagerInstance.isSensorSelected = jest.fn().mockReturnValue(true);
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, SensorFovPlugin.bottomIconElementName)).not.toThrow();
   });
 
   // Test changing sensor

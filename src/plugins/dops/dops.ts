@@ -10,6 +10,7 @@ import type { GroupsManager } from '@app/singletons/groups-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { DopMath } from '@app/static/dop-math';
 import { SatMath } from '@app/static/sat-math';
+import { Tessa } from '@app/tessa/tessa';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -131,7 +132,7 @@ export class DopsPlugin extends KeepTrackPlugin {
           (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
           (<HTMLInputElement>getEl('dops-alt')).value = '0';
           (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
-          keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
         } else {
           showLoading(DopsPlugin.updateSideMenu);
           this.setBottomIconToEnabled();

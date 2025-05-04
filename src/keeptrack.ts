@@ -46,6 +46,7 @@ import { keepTrackContainer } from './container';
 import { GetSatType, KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
+import { loadLocalization } from './locales/locales';
 import { SensorManager } from './plugins/sensor/sensorManager';
 import { WatchlistPlugin } from './plugins/watchlist/watchlist';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
@@ -388,6 +389,7 @@ theodore.kruczek at gmail dot com.
   registerAssets(): void {
     Tessa.getInstance().on(CoreEngineEvents.BeforeInitialize, () => {
       this.init();
+      loadLocalization();
     });
 
     Tessa.getInstance().on(CoreEngineEvents.AssetLoadStart, (): Promise<void> => new Promise((resolve) => {
@@ -432,7 +434,7 @@ theodore.kruczek at gmail dot com.
 
         keepTrackApi.getMainCamera().init(settingsManager);
 
-        SplashScreen.loadStr(SplashScreen.msg.science);
+        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 1, 5);
         mobileManager.init();
 
         // Load all the plugins now that we have the API initialized
@@ -442,12 +444,11 @@ theodore.kruczek at gmail dot com.
             // intentionally left blank
           });
 
-        SplashScreen.loadStr(SplashScreen.msg.science2);
+        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 2, 5);
         // Start initializing the rest of the website
         timeManagerInstance.init();
         uiManagerInstance.onReady();
 
-        SplashScreen.loadStr(SplashScreen.msg.dots);
         /*
          * MobileManager.checkMobileMode();
          * We need to know if we are on a small screen before starting webgl
@@ -455,12 +456,14 @@ theodore.kruczek at gmail dot com.
         renderer.glInit(getEl('keeptrack-canvas') as HTMLCanvasElement);
 
         sceneInstance.init(renderer.gl);
+        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 3, 5);
         sceneInstance.loadScene();
 
         dotsManagerInstance.init(settingsManager);
 
         catalogManagerInstance.initObjects();
 
+        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 4, 5);
         catalogManagerInstance.init();
         colorSchemeManagerInstance.init();
 
@@ -480,14 +483,40 @@ theodore.kruczek at gmail dot com.
         keepTrackApi.getHoverManager().init();
         renderer.init();
         keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+
         renderer.meshManager.init(renderer.gl);
 
-        Tessa.getInstance().on(CoreEngineEvents.Update, () => {
-          this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
-          keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
-        });
+        Tessa.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 5, 5);
       });
 
+    Tessa.getInstance().on(CoreEngineEvents.AssetLoadProgress, (progress: number, total: number) => {
+      switch (progress) {
+        case 1:
+          SplashScreen.loadStr(`${SplashScreen.msg.science} ${Math.floor((progress / total) * 100)}%`);
+          break;
+        case 2:
+          SplashScreen.loadStr(SplashScreen.msg.science2);
+          break;
+        case 3:
+          SplashScreen.loadStr(SplashScreen.msg.painting);
+          break;
+        case 4:
+          SplashScreen.loadStr(SplashScreen.msg.elsets);
+          break;
+        case 5:
+          SplashScreen.loadStr(SplashScreen.msg.models);
+          break;
+        default:
+          break;
+      }
+
+      Tessa.getInstance().pause(50);
+    });
+
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
+      keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
+    });
     Tessa.getInstance().on(CoreEngineEvents.AssetLoadComplete, this.postStart_.bind(this));
   }
 

@@ -47,12 +47,8 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.bottomMenuClick,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  Tessa.getInstance().on(KeepTrackApiEvents.bottomMenuClick, () => {
+    // Do nothing
   });
 
   keepTrackApi.register({
@@ -148,7 +144,7 @@ test('keepTrackApi Unit Testing', () => {
   keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherMessage);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
-  keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'test');
+  Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'test');
   keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
 
   /*

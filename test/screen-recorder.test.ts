@@ -1,9 +1,9 @@
 /* eslint-disable dot-notation */
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { ScreenRecorder } from '@app/plugins/screen-recorder/screen-recorder';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
+import { Tessa } from '@app/tessa/tessa';
 
 describe('ScreenRecorder_class', () => {
   let screenRecorderPlugin: ScreenRecorder;
@@ -33,7 +33,7 @@ describe('ScreenRecorder_class', () => {
       // Do nothing
     };
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
 
   // Tests error handling
@@ -44,6 +44,6 @@ describe('ScreenRecorder_class', () => {
       throw new Error('test');
     };
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
 });

@@ -5,6 +5,7 @@ import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
+import { Tessa } from '@app/tessa/tessa';
 import sensorPng from '@public/img/icons/sensor.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
@@ -16,7 +17,6 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
-import { Tessa } from '@app/tessa/tessa';
 
 // TODO: Add a search bar and filter for sensors
 
@@ -93,7 +93,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       cbName: this.id,
       cb: () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {
-          keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          Tessa.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
           keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
         });
 

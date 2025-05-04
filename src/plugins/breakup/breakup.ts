@@ -155,7 +155,7 @@ export class Breakup extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('breakup')!.addEventListener('submit', (e: Event) => {

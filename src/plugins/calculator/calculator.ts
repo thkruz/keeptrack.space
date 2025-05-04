@@ -313,7 +313,7 @@ export class Calculator extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: 'calculator',
       cb: () => {
         // Nothing to do here
@@ -324,7 +324,7 @@ export class Calculator extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: Calculator.name,
       cb: () => {
         getEl('calculator-itrf').addEventListener('click', () => {

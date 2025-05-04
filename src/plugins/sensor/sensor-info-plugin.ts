@@ -100,7 +100,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         this.addSensorToSunBtnListener_();

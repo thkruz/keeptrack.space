@@ -46,8 +46,8 @@ describe('UrlManager_class', () => {
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
+    keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
 
     UrlManager.parseGetVariables();
     keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);

@@ -257,7 +257,7 @@ export class UiManager {
       getEl('logo-secondary')?.classList.remove('start-hidden');
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
 
     UiManager.initBottomMenuResizing_();
 
@@ -397,10 +397,10 @@ export class UiManager {
     LegendManager.legendColorsChange();
 
     // Run any plugins code
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
+    Doris.getInstance().emit(KeepTrackApiEvents.BeforeHtmlInitialize);
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: 'uiManager',
       cb: () => {
         this.bottomIconPress = (el: HTMLElement) => Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, el.id);

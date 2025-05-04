@@ -72,7 +72,7 @@ export class MobileManager {
           });
 
           keepTrackApi.register({
-            event: KeepTrackApiEvents.uiManagerFinal,
+            event: KeepTrackApiEvents.AfterHtmlInitialize,
             cbName: 'MobileManager.uiManagerFinal',
             cb: () => {
               hideEl('tutorial-btn');

@@ -235,7 +235,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
     Doris.getInstance().emit(KeepTrackApiEvents.loadSettings);
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: 'core',
       cb: () => {
         uiManagerFinal();

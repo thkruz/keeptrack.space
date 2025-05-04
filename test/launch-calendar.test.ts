@@ -21,8 +21,8 @@ describe('launch_calendar_plugin', () => {
 
   test('close_colorbox', () => {
     launchCalendarPlugin.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
+    keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
     Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
     jest.advanceTimersByTime(4000);
     // eslint-disable-next-line dot-notation

@@ -783,7 +783,7 @@ theodore.kruczek at gmail dot com.
       }
 
       // Update any CSS now that we know what is loaded
-      keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+      keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
 
       if (settingsManager.plugins.debug) {
         const erudaDom = getEl('eruda');

@@ -161,7 +161,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);

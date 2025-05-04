@@ -92,7 +92,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('aer-report-btn').addEventListener('click', () => this.generateAzElRng_());

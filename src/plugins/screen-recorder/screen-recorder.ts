@@ -1,5 +1,5 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import videocamPng from '@public/img/icons/videocam.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -44,16 +44,12 @@ export class ScreenRecorder extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerOnReady,
-      cbName: this.id,
-      cb: () => {
-        try {
-          this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));
-        } catch (e) {
-          errorManagerInstance.warn(`Compatibility Error with Recording: ${e}`);
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.BeforeHtmlInitialize, () => {
+      try {
+        this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));
+      } catch (e) {
+        errorManagerInstance.warn(`Compatibility Error with Recording: ${e}`);
+      }
     });
   }
 

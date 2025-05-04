@@ -211,7 +211,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: 'analysis',
       cb: () => {
         getEl('analysis-bpt')?.addEventListener('submit', (e: Event) => {

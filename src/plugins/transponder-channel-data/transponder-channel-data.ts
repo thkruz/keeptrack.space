@@ -63,7 +63,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: () => {
         keepTrackApi.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_.map((sccNum) => parseInt(sccNum)));
@@ -71,7 +71,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         const exportLaunchInfo = getEl('export-channel-info');

@@ -147,7 +147,7 @@ export class ProximityOps extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
 

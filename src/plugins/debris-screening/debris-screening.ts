@@ -124,7 +124,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl(`${this.sideMenuElementName}-form`).addEventListener('submit', (e: Event) => {

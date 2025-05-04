@@ -33,19 +33,15 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.register({
-    event: KeepTrackApiEvents.uiManagerInit,
+    event: KeepTrackApiEvents.HtmlInitialize,
     cbName: 'test',
     cb: () => {
       // Do nothing
     },
   });
 
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.uiManagerOnReady,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  Doris.getInstance().on(KeepTrackApiEvents.BeforeHtmlInitialize, () => {
+    // Do nothing
   });
 
   Doris.getInstance().on(KeepTrackApiEvents.bottomMenuClick, () => {
@@ -81,7 +77,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.register({
-    event: KeepTrackApiEvents.uiManagerFinal,
+    event: KeepTrackApiEvents.AfterHtmlInitialize,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -103,8 +99,8 @@ test('keepTrackApi Unit Testing', () => {
   keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, 'test' as unknown as DetailedSatellite);
   Doris.getInstance().emit(KeepTrackApiEvents.onCruncherReady);
   keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherMessage);
-  keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-  keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
+  keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
+  Doris.getInstance().emit(KeepTrackApiEvents.BeforeHtmlInitialize);
   Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, 'test');
   Doris.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
 
@@ -112,7 +108,7 @@ test('keepTrackApi Unit Testing', () => {
   Doris.getInstance().emit(CoreEngineEvents.Update, 0);
   Doris.getInstance().emit(KeepTrackApiEvents.rmbMenuActions, 'test', -1);
   keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date());
-  keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+  keepTrackApi.runEvent(KeepTrackApiEvents.AfterHtmlInitialize);
   Doris.getInstance().emit(KeepTrackApiEvents.rightBtnMenuAdd);
   keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, 0);
 });

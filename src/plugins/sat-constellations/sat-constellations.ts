@@ -52,7 +52,7 @@ export class SatConstellations extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: 'constellations',
       cb: () => {
         // Add additional constellations

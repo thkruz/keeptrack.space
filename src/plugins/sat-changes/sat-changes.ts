@@ -63,13 +63,13 @@ export const uiManagerInit = () => {
 export const init = (): void => {
   // Add HTML
   keepTrackApi.register({
-    event: KeepTrackApiEvents.uiManagerInit,
+    event: KeepTrackApiEvents.HtmlInitialize,
     cbName: 'satChanges',
     cb: uiManagerInit,
   });
 
   keepTrackApi.register({
-    event: KeepTrackApiEvents.uiManagerFinal,
+    event: KeepTrackApiEvents.AfterHtmlInitialize,
     cbName: 'satChanges',
     cb: uiManagerFinal,
   });

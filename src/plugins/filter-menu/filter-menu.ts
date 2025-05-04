@@ -262,7 +262,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('filter-form')?.addEventListener('change', this.onFormChange_.bind(this));
@@ -271,7 +271,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('nav-mobile2')?.insertAdjacentHTML(
@@ -291,7 +291,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('top-menu-filter-btn')?.addEventListener('click', () => {
@@ -304,7 +304,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         this.syncOnLoad_();

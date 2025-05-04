@@ -183,7 +183,7 @@ export class MissilePlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: 'missile',
       cb: this.uiManagerFinal_.bind(this),
     });

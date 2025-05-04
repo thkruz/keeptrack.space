@@ -41,7 +41,7 @@ describe('Sound Manager', () => {
   });
 
   it('should_be_able_to_speak', () => {
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.runEvent(KeepTrackApiEvents.HtmlInitialize);
     // Mock SpeechSynthesisUtterance
     const mockSpeechUtterance = jest.fn(() => ({
       lang: 'en-US',

@@ -122,7 +122,7 @@ export class EditSat extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: 'editSat',
       cb: () => {
         getEl('editSat-newTLE')!.addEventListener('click', this.editSatNewTleClick_.bind(this));

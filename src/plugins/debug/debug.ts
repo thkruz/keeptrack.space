@@ -102,7 +102,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: (): void => {
         getEl('debug-console')!.addEventListener('click', () => {

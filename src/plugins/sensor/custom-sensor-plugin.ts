@@ -230,7 +230,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         CustomSensorPlugin.httpsCheck_();

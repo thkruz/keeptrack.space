@@ -118,7 +118,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');

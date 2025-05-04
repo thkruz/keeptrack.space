@@ -73,7 +73,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('nav-mobile')?.insertAdjacentHTML(
@@ -89,7 +89,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     });
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {

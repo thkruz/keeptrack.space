@@ -323,7 +323,7 @@ export abstract class KeepTrackPlugin {
       this.addSideMenu(sideMenuHtmlWrapped);
 
       keepTrackApi.register({
-        event: KeepTrackApiEvents.uiManagerFinal,
+        event: KeepTrackApiEvents.AfterHtmlInitialize,
         cbName: this.id,
         cb: () => {
           getEl(`${this.sideMenuElementName}-secondary-btn`)?.addEventListener('click', () => {
@@ -591,7 +591,7 @@ export abstract class KeepTrackPlugin {
 
   addContextMenuLevel2Item(elementId: string, html: string): void {
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: () => {
         const item = document.createElement('div');
@@ -610,7 +610,7 @@ export abstract class KeepTrackPlugin {
    */
   addBottomIcon(icon: Module, isDisabled = false): void {
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: () => {
         const button = document.createElement('div');
@@ -718,7 +718,7 @@ export abstract class KeepTrackPlugin {
 
   addSideMenu(sideMenuHtml: string): void {
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl(KeepTrackPlugin.sideMenuContainerId)?.insertAdjacentHTML('beforeend', sideMenuHtml);
@@ -894,7 +894,7 @@ export abstract class KeepTrackPlugin {
 
   registerSubmitButtonClicked(callback: ((() => void) | null) = null) {
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         const form = getEl(`${this.sideMenuElementName}-form`);
@@ -916,7 +916,7 @@ export abstract class KeepTrackPlugin {
 
   registerClickAndDragOptions(opts: ClickDragOptions = {} as ClickDragOptions): void {
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         if (this.sideMenuSecondaryHtml) {
@@ -932,7 +932,7 @@ export abstract class KeepTrackPlugin {
 
   registerClickAndDragOptionsSecondary(opts: ClickDragOptions = {} as ClickDragOptions): void {
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         const edgeEl = clickAndDragWidth(getEl(`${this.sideMenuElementName}-secondary`), opts);

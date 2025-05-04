@@ -288,8 +288,8 @@ export enum KeepTrackApiEvents {
   updateSelectBox = 'updateSelectBox',
   onCruncherReady = 'onCruncherReady',
   onCruncherMessage = 'onCruncherMessage',
-  uiManagerInit = 'uiManagerInit',
-  uiManagerOnReady = 'uiManagerOnReady',
+  HtmlInitialize = 'uiManagerInit',
+  BeforeHtmlInitialize = 'uiManagerOnReady',
   bottomMenuClick = 'bottomMenuClick',
   hideSideMenus = 'hideSideMenus',
   nightToggle = 'nightToggle',
@@ -304,7 +304,7 @@ export enum KeepTrackApiEvents {
   rightBtnMenuAdd = 'rightBtnMenuAdd',
   updateDateTime = 'updateDateTime',
   updatePropRate = 'updatePropRate',
-  uiManagerFinal = 'uiManagerFinal',
+  AfterHtmlInitialize = 'uiManagerFinal',
   resetSensor = 'resetSensor',
   /**
    * Run in the setSensor method of SensorManager instance with parameters (sensor: DetailedSensor | string, staticId: number)

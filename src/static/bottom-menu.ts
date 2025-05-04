@@ -13,13 +13,13 @@ export class BottomMenu {
 
   static init() {
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: BottomMenu.id,
       cb: BottomMenu.createBottomMenu,
     });
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: BottomMenu.id,
       cb: () => BottomMenu.addBottomMenuFilterButtons(),
     });

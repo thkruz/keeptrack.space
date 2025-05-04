@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
 import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { CoreEngineEvents } from '@app/doris/events/event-types';
 
 export class GamepadPlugin {
   readonly id = 'GamepadPlugin';
@@ -24,7 +24,7 @@ export class GamepadPlugin {
         this.initializeGamepad(e.gamepad);
       } else {
         keepTrackApi.register({
-          event: KeepTrackApiEvents.uiManagerInit,
+          event: KeepTrackApiEvents.HtmlInitialize,
           cbName: this.id,
           cb: () => this.initializeGamepad(e.gamepad),
         });

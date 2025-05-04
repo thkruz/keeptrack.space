@@ -57,7 +57,7 @@ export class ClassificationBar extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: this.uiManagerInit_.bind(this),
     });

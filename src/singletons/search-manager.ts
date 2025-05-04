@@ -51,7 +51,7 @@ export class SearchManager {
     uiWrapper!.prepend(searchResults);
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: 'Search Manager',
       cb: this.addListeners_.bind(this),
     });

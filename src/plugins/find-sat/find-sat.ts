@@ -231,7 +231,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('fbl-error').addEventListener('click', () => {
@@ -240,7 +240,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       },
     });
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: this.uiManagerFinal_.bind(this),
     });

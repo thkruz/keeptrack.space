@@ -124,7 +124,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('stfForm')?.addEventListener('submit', (e: Event) => {

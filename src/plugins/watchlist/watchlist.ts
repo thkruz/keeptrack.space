@@ -106,7 +106,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: this.uiManagerFinal_.bind(this),
     });

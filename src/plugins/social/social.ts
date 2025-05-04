@@ -11,7 +11,7 @@ export class SocialMedia extends KeepTrackPlugin {
   addHtml() {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: SocialMedia.uiManagerFinal_,
     });

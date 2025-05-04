@@ -259,7 +259,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
@@ -368,7 +368,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         SettingsMenuPlugin.syncOnLoad();

@@ -20,13 +20,13 @@ export class DateTimeManager extends KeepTrackPlugin {
     super.init();
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: this.uiManagerInit.bind(this),
     });
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: this.uiManagerFinal.bind(this),
     });

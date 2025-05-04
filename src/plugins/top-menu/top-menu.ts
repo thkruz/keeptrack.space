@@ -19,7 +19,7 @@ export class TopMenu extends KeepTrackPlugin {
   addHtml() {
     super.addHtml();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
+      event: KeepTrackApiEvents.HtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('keeptrack-header')?.insertAdjacentHTML(
@@ -94,7 +94,7 @@ export class TopMenu extends KeepTrackPlugin {
   addJs() {
     super.addJs();
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: () => {
         getEl('sound-btn')!.onclick = () => {

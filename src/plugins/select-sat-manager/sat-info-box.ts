@@ -127,7 +127,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     });
 
     keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
+      event: KeepTrackApiEvents.AfterHtmlInitialize,
       cbName: this.id,
       cb: this.uiManagerFinal_.bind(this),
     });

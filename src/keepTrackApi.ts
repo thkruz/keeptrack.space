@@ -72,7 +72,9 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.rightBtnMenuAdd]: []; // Done
   [KeepTrackApiEvents.updateDateTime]: [Date];
   [KeepTrackApiEvents.updatePropRate]: [number];
-  [KeepTrackApiEvents.uiManagerFinal]: [];
+  [KeepTrackApiEvents.BeforeHtmlInitialize]: [];
+  [KeepTrackApiEvents.HtmlInitialize]: [];
+  [KeepTrackApiEvents.AfterHtmlInitialize]: [];
   [KeepTrackApiEvents.resetSensor]: [];
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
   [KeepTrackApiEvents.changeSensorMarkers]: [string];
@@ -91,8 +93,6 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.onKeepTrackReady]: [];
   [KeepTrackApiEvents.selectSatData]: [DetailedSatellite | MissileObject | BaseObject, number];
   [KeepTrackApiEvents.setSecondarySat]: [DetailedSatellite | null, number];
-  [KeepTrackApiEvents.uiManagerInit]: [];
-  [KeepTrackApiEvents.uiManagerOnReady]: [];
   [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
   [KeepTrackApiEvents.ConeMeshUpdate]: [];
   [KeepTrackApiEvents.bottomMenuModeChange]: [];
@@ -114,7 +114,7 @@ declare module '@app/doris/events/event-types' {
     [KeepTrackApiEvents.rightBtnMenuAdd]: [];
     [KeepTrackApiEvents.updateDateTime]: [Date];
     [KeepTrackApiEvents.updatePropRate]: [number];
-    [KeepTrackApiEvents.uiManagerFinal]: [];
+    [KeepTrackApiEvents.AfterHtmlInitialize]: [];
     [KeepTrackApiEvents.resetSensor]: [];
     [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
     [KeepTrackApiEvents.changeSensorMarkers]: [string];
@@ -133,8 +133,8 @@ declare module '@app/doris/events/event-types' {
     [KeepTrackApiEvents.onKeepTrackReady]: [];
     [KeepTrackApiEvents.selectSatData]: [DetailedSatellite | MissileObject | BaseObject, number];
     [KeepTrackApiEvents.setSecondarySat]: [DetailedSatellite | null, number];
-    [KeepTrackApiEvents.uiManagerInit]: [];
-    [KeepTrackApiEvents.uiManagerOnReady]: [];
+    [KeepTrackApiEvents.HtmlInitialize]: [];
+    [KeepTrackApiEvents.BeforeHtmlInitialize]: [];
     [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
     [KeepTrackApiEvents.ConeMeshUpdate]: [];
     [KeepTrackApiEvents.bottomMenuModeChange]: [];

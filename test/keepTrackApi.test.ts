@@ -1,5 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { isThisNode } from '@app/static/isThisNode';
+import { Tessa } from '@app/tessa/tessa';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from 'ootk';
 import { keepTrackApi } from '../src/keepTrackApi';
@@ -18,12 +19,8 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.onCruncherReady,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+    // Do nothing
   });
 
   keepTrackApi.register({
@@ -147,7 +144,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, 'test' as unknown as DetailedSatellite);
-  keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherReady);
+  Tessa.getInstance().emit(KeepTrackApiEvents.onCruncherReady);
   keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherMessage);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);

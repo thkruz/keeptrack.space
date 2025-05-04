@@ -1,5 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManagerOverride } from '@app/settings/settings';
+import { EngineEvents } from '@app/tessa/engine-events';
+import { Tessa } from '@app/tessa/tessa';
 import { DetailedSatellite, Milliseconds, Satellite } from 'ootk';
 import { keepTrackContainer } from '../src/container';
 import { SatCruncherMessageData, Singletons } from '../src/interfaces';
@@ -99,19 +101,24 @@ describe('code_snippet', () => {
 
   // Tests that the constructor initializes all necessary objects and settings correctly.
   it('test_constructor_initializes_objects_without_showErrorCode', () => {
-    const drawManagerInstance = keepTrackApi.getRenderer();
-
-    drawManagerInstance.update = jest.fn();
-    keepTrackApi.getMainCamera().draw = jest.fn();
-
     let keepTrack: KeepTrack;
     const initializationTest = async () => {
       keepTrack = new KeepTrack(settingsOverride);
-      keepTrack.init();
-      KeepTrack.initCss();
-      await keepTrack.run();
+      Tessa.getInstance().initialize();
+      keepTrack.registerAssets();
+      Tessa.getInstance().register({
+        event: EngineEvents.onAssetsLoaded,
+        cbName: 'test_constructor_initializes_objects_without_showErrorCode',
+        cb: () => {
+          const drawManagerInstance = keepTrackApi.getRenderer();
 
-      expect(keepTrack.isReady).toBe(true);
+          drawManagerInstance.update = jest.fn();
+          keepTrackApi.getMainCamera().draw = jest.fn();
+        },
+      });
+      await Tessa.getInstance().run();
+
+      expect(Tessa.getInstance().isRunning).toBe(true);
     };
 
     expect(initializationTest).not.toThrow();
@@ -127,12 +134,7 @@ describe('code_snippet', () => {
 
     const keepTrack = new KeepTrack(settingsOverride);
 
-    keepTrack.run().then(() => {
-      /*
-       * const error = new Error('Test error');
-       * expect(getEl('loader-text')?.innerHTML).toEqual(error.message);
-       */
-    });
+    keepTrack.registerAssets();
   });
 
   // Tests that the game loop updates and draws the application correctly.
@@ -140,15 +142,13 @@ describe('code_snippet', () => {
     const keepTrack = new KeepTrack(settingsOverride);
     const drawManagerInstance = keepTrackApi.getRenderer();
 
-    keepTrack.run().then(() => {
+    keepTrack.registerAssets();
+
+    Tessa.getInstance().run().then(() => {
       drawManagerInstance.update = jest.fn();
       keepTrackApi.getMainCamera().draw = jest.fn();
       settingsManager.cruncherReady = true;
-      keepTrack.gameLoop();
-      // eslint-disable-next-line dot-notation
-      keepTrack['update_'](1 as Milliseconds);
-      // eslint-disable-next-line dot-notation
-      keepTrack['draw_'](1 as Milliseconds);
+      Tessa.getInstance().tick(performance.now() as Milliseconds);
       expect(drawManagerInstance.update).toHaveBeenCalled();
       expect(keepTrackApi.getMainCamera().draw).toHaveBeenCalled();
     });
@@ -158,7 +158,7 @@ describe('code_snippet', () => {
   it('test_isPreventDefaultHtml_disabled', () => {
     const keepTrack = new KeepTrack({ isPreventDefaultHtml: false });
     const initializationTest = () => {
-      keepTrack.run();
+      keepTrack.registerAssets();
     };
 
     expect(initializationTest).not.toThrow();

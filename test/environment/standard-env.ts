@@ -65,7 +65,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackApi.unregisterAllEvents();
   keepTrackApi.unregisterAllPlugins();
   // eslint-disable-next-line dot-notation
-  KeepTrack['setContainerElement']();
+  KeepTrack['setContainerElement_']();
   setupDefaultHtml();
 
   clearAllCallbacks();

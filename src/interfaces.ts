@@ -268,11 +268,12 @@ export enum Singletons {
   PersistenceManager = 'PersistenceManager',
   Scene = 'Scene',
   MeshManager = 'MeshManager',
+  DemoManager = 'DemoManager',
 }
+
 /**
  * Enum containing the registrable events used in the KeepTrack API.
  */
-
 export enum KeepTrackApiEvents {
   onHelpMenuClick = 'onHelpMenuClick',
   /**
@@ -338,4 +339,8 @@ export enum KeepTrackApiEvents {
   bottomMenuModeChange = 'bottomMenuModeChange',
   saveSettings = 'saveSettings',
   loadSettings = 'loadSettings',
+  onPrimarySatelliteUpdate = 'onPrimarySatelliteUpdate',
+  onPrimarySatelliteChange = 'onPrimarySatelliteChange',
+  onSecondarySatelliteUpdate = 'onSecondarySatelliteUpdate',
+  onSecondarySatelliteChange = 'onSecondarySatelliteChange',
 }

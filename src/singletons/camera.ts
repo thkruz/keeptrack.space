@@ -22,8 +22,11 @@
  */
 
 import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
+import { KeepTrack } from '@app/keeptrack';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
+import { Tessa } from '@app/tessa/tessa';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -53,6 +56,7 @@ export enum CameraType {
 }
 
 export class Camera {
+  static readonly id = 'Camera';
   private chaseSpeed_ = 0.0005;
   private earthCenteredPitch_ = <Radians>0;
   private earthCenteredYaw_ = <Radians>0;
@@ -414,16 +418,29 @@ export class Camera {
     }
 
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    const isCameraCloseToSatellite = this.camDistBuffer < settingsManager.nearZoomLevel;
+    const maxCovarianceDistance = Math.min((keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
+    const isCameraCloseToCovarianceBubble = settingsManager.isDrawCovarianceEllipsoid &&
+      this.camDistBuffer < maxCovarianceDistance;
 
     if (settingsManager.isZoomStopsSnappedOnSat || !selectSatManagerInstance || selectSatManagerInstance?.selectedSat === -1) {
       this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
       this.earthCenteredLastZoom = this.zoomTarget_;
       this.camZoomSnappedOnSat = false;
-    } else if ((this.camDistBuffer < settingsManager.nearZoomLevel || this.camDistBuffer < (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25) ||
+    } else if ((isCameraCloseToSatellite || isCameraCloseToCovarianceBubble) ||
       this.zoomLevel_ === -1) {
       // Inside camDistBuffer
       settingsManager.selectedColor = [0, 0, 0, 0];
-      this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 100); // delta is +/- 100
+
+      /*
+       * Slowly zoom in/out, scaling speed with camDistBuffer (farther = faster)
+       * Exponential scaling for smoother zoom near the satellite
+       */
+      const scale = Math.max(0.01, (this.camDistBuffer / 100) ** 1.15); // Exponential factor > 1 for faster scaling as distance increases
+
+      this.camDistBuffer = <Kilometers>(this.camDistBuffer + (delta / 5) * scale); // delta is +/- 100
+
+      // Clamping camDistBuffer to be between minDistanceFromSatellite and maxZoomDistance
       this.camDistBuffer = <Kilometers>Math.min(
         Math.max(
           this.camDistBuffer,
@@ -431,7 +448,7 @@ export class Camera {
         ),
         Math.max(
           settingsManager.nearZoomLevel,
-          (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25,
+          maxCovarianceDistance,
         ),
       );
     } else if (this.camDistBuffer >= settingsManager.nearZoomLevel) {
@@ -450,7 +467,12 @@ export class Camera {
 
         if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
           this.camZoomSnappedOnSat = true;
-          this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), this.settings_.minDistanceFromSatellite);
+
+          if (this.settings_.isDrawCovarianceEllipsoid) {
+            this.camDistBuffer = <Kilometers>(Math.max(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), maxCovarianceDistance) - 1);
+          } else {
+            this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), this.settings_.minDistanceFromSatellite);
+          }
         }
       }
     }
@@ -487,6 +509,12 @@ export class Camera {
    * Splitting it into subfunctions would not be optimal
    */
   draw(target?: DetailedSatellite | MissileObject, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+
+    if (!timeManagerInstance.simulationTimeObj) {
+      return;
+    }
+
     // TODO: This should be handled better
     target ??= <DetailedSatellite>(<unknown>{
       id: -1,
@@ -498,7 +526,6 @@ export class Camera {
     let gmst: GreenwichMeanSiderealTime;
 
     if (!sensorPos?.gmst) {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
 
       gmst = sensorPos?.gmst ?? SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
     } else {
@@ -724,6 +751,14 @@ export class Camera {
       event: KeepTrackApiEvents.touchStart,
       cbName: 'mainCamera',
       cb: this.touchStart_.bind(this),
+    });
+
+    Tessa.getInstance().on(CoreEngineEvents.Render, () => {
+      this.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, KeepTrack.getInstance().sensorPos);
+    });
+
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      this.update(Tessa.getInstance().deltaTime as Milliseconds);
     });
   }
 

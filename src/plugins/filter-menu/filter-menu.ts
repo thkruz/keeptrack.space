@@ -2,6 +2,7 @@ import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
+import { Tessa } from '@app/tessa/tessa';
 import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
@@ -310,19 +311,12 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       },
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.saveSettings,
-      cbName: this.id,
-      cb: () => {
-        this.saveSettings_();
-      },
+    Tessa.getInstance().on(KeepTrackApiEvents.saveSettings, () => {
+      this.saveSettings_();
     });
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.loadSettings,
-      cbName: this.id,
-      cb: () => {
-        this.loadSettings_();
-      },
+
+    Tessa.getInstance().on(KeepTrackApiEvents.loadSettings, () => {
+      this.loadSettings_();
     });
   }
   private saveSettings_() {

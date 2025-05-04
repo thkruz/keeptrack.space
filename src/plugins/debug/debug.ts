@@ -9,6 +9,8 @@ import debugPng from '@public/img/icons/debug.png';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
+import { Tessa } from '@app/tessa/tessa';
 import eruda from 'eruda';
 import { Milliseconds } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -84,6 +86,9 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
             <span id="debug-sat-position-z"></span>
           </div>
         </div>
+        <div class="center-align row">
+          <button id="debug-toggle-fps" class="btn btn-ui waves-effect waves-light" type="button">Toggle FPS in Console &#9658;</button>
+        </div>
     </div>
   `;
 
@@ -91,6 +96,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
     nb: 100000,
     delay: 5,
   };
+  isShowFPS = false;
 
   addHtml(): void {
     super.addHtml();
@@ -99,12 +105,16 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
       event: KeepTrackApiEvents.uiManagerFinal,
       cbName: this.id,
       cb: (): void => {
-        getEl('debug-console')?.addEventListener('click', () => {
+        getEl('debug-console')!.addEventListener('click', () => {
           this.toggleEruda();
         });
 
-        getEl('debug-gremlins')?.addEventListener('click', () => {
+        getEl('debug-gremlins')!.addEventListener('click', () => {
           this.runGremlins();
+        });
+
+        getEl('debug-toggle-fps')!.addEventListener('click', () => {
+          this.isShowFPS = !this.isShowFPS;
         });
 
         getEl('debug-cam-to-sat')?.addEventListener('click', () => {
@@ -156,6 +166,15 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
+
+    Tessa.getInstance().on(CoreEngineEvents.Update, (): void => {
+      if (this.isShowFPS) {
+        const fps = Tessa.getInstance().framesPerSecond;
+
+        // eslint-disable-next-line no-console
+        console.log(`FPS: ${fps}`);
+      }
+    });
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.updateLoop,

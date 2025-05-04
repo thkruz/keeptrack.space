@@ -21,16 +21,10 @@
  */
 
 import { KeepTrack } from './keeptrack';
+import { Tessa } from './tessa/tessa';
 
-// Load the main website class
-const keepTrack = new KeepTrack(window.settingsOverride);
+KeepTrack.getInstance(window.settingsOverride)
+  .registerAssets(); // Register assets with the engine
 
-keepTrack.init();
-
-// Expose to window for debugging
-window.keepTrack = keepTrack;
-
-// Initialize the website
-KeepTrack.initCss().then(() => {
-  keepTrack.run();
-});
+Tessa.getInstance().initialize(); // Initialize the engine
+Tessa.getInstance().start(); // Start the engine

@@ -26,6 +26,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
+import { Tessa } from '@app/tessa/tessa';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
@@ -125,9 +126,16 @@ export class SettingsManager {
    * Flag to determine if the covariance ellipsoid should be drawn.
    */
   isDrawCovarianceEllipsoid = false;
+  isPreserveSettings = true;
+  isMobileModeBlocked = false;
+  isShowDistance = false;
 
 
   static preserveSettings() {
+    if (!settingsManager.isPreserveSettings) {
+      return;
+    }
+
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, settingsManager.isDrawOrbits.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, settingsManager.isDrawTrailingOrbits.toString());
@@ -161,7 +169,7 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality.toString());
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.saveSettings);
+    Tessa.getInstance().emit(KeepTrackApiEvents.saveSettings);
   }
 
   colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
@@ -1176,7 +1184,7 @@ export class SettingsManager {
   /**
    * Indicates whether to show confidence levels when hovering over an object.
    */
-  isShowConfidenceLevels: boolean = false;
+  isShowConfidenceLevels = true;
   /**
    * The container root element for the application
    * NOTE: This is for initializing it, but keepTrackApi.containerRoot will be used throughout
@@ -1242,7 +1250,6 @@ export class SettingsManager {
     this.checkIfIframe_();
     this.setInstallDirectory_();
     this.setMobileSettings_();
-    this.setEmbedOverrides_();
     this.setColorSettings_();
     /**
      * Load Order:
@@ -1403,7 +1410,9 @@ export class SettingsManager {
         starlinkNot: [0.8, 0.0, 0.0, 0.8],
       };
 
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));
+      if (this.isPreserveSettings) {
+        PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));
+      }
     }
   }
 
@@ -1525,28 +1534,24 @@ export class SettingsManager {
             this.isEnableJscCatalog = val === 'true';
             break;
           case 'sat':
-            keepTrackApi.register({
-              event: KeepTrackApiEvents.onCruncherReady,
-              cbName: 'satFromSettings',
-              cb: () => {
-                setTimeout(() => {
-                  if (typeof val === 'string') {
-                    const sccNum = parseInt(val);
+            Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+              setTimeout(() => {
+                if (typeof val === 'string') {
+                  const sccNum = parseInt(val);
 
-                    if (sccNum >= 0) {
-                      const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
+                  if (sccNum >= 0) {
+                    const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
 
-                      if (id && id >= 0) {
-                        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
-                      } else {
-                        keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
-                      }
+                    if (id && id >= 0) {
+                      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
                     } else {
                       keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
                     }
+                  } else {
+                    keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
                   }
-                }, 2000);
-              },
+                }
+              }, 2000);
             });
             break;
           case 'debug':
@@ -1718,31 +1723,6 @@ export class SettingsManager {
       !this.smallImages
     ) {
       this.lowresImages = true;
-    }
-  }
-
-  /**
-   * Sets the embed overrides for the settings.
-   * If the current page is an embed.html page, it sets various settings to specific values.
-   *
-   * FOR TESTING ONLY
-   */
-  private setEmbedOverrides_() {
-    let pageName = location.href.split('/').slice(-1);
-
-    pageName = pageName[0].split('?').slice(0);
-
-    if (pageName[0] === 'embed.html') {
-      this.disableUI = true;
-      this.startWithOrbitsDisplayed = true;
-      this.isAutoResizeCanvas = true;
-      this.enableHoverOverlay = true;
-      this.enableHoverOrbits = true;
-      this.isDrawLess = true;
-      this.smallImages = true;
-      this.hiresNoCloudsImages = false;
-      this.updateHoverDelayLimitSmall = 25;
-      this.updateHoverDelayLimitBig = 45;
     }
   }
 

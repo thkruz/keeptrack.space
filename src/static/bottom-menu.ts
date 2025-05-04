@@ -9,11 +9,19 @@ import localCafePng from '@public/img/icons/local-cafe.png';
 import sciencePng from '@public/img/icons/science.png';
 
 export class BottomMenu {
+  static readonly id = 'BottomMenu';
+
   static init() {
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerInit,
-      cbName: BottomMenu.name,
+      cbName: BottomMenu.id,
       cb: BottomMenu.createBottomMenu,
+    });
+
+    keepTrackApi.register({
+      event: KeepTrackApiEvents.uiManagerFinal,
+      cbName: BottomMenu.id,
+      cb: () => BottomMenu.addBottomMenuFilterButtons(),
     });
   }
   static createBottomMenu(): void {

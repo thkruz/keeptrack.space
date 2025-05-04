@@ -90,7 +90,7 @@ describe('SelectSatManager_class', () => {
 
   it('should select the previous satellite', () => {
     selectSatManager.selectSat(1);
-    expect(selectSatManager.lastSelectedSat()).toBe(1);
+    expect(selectSatManager.lastSelectedPrimarySatId()).toBe(1);
     selectSatManager.selectPrevSat();
 
     expect(selectSatManager.selectedSat).toBe(0);
@@ -98,7 +98,7 @@ describe('SelectSatManager_class', () => {
 
   it('should select the next satellite', () => {
     selectSatManager.selectSat(0);
-    expect(selectSatManager.lastSelectedSat()).toBe(0);
+    expect(selectSatManager.lastSelectedPrimarySatId()).toBe(0);
     selectSatManager.selectNextSat();
 
     expect(selectSatManager.selectedSat).toBe(1);
@@ -173,10 +173,10 @@ describe('SelectSatManager_class', () => {
 
     selectSatManager.selectSat(0);
 
-    expect(selectSatManager.lastSelectedSat()).toBe(0);
+    expect(selectSatManager.lastSelectedPrimarySatId()).toBe(0);
 
     selectSatManager.selectSat(-1);
-    expect(selectSatManager.lastSelectedSat()).toBe(-1);
+    expect(selectSatManager.lastSelectedPrimarySatId()).toBe(-1);
 
     expect(clearSelectOrbitSpy).toHaveBeenCalled();
   });

@@ -23,8 +23,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-/* eslint-disable no-unreachable */
-
 import logoPrimaryPng from '@public/img/logo-primary.png';
 import logoSecondaryPng from '@public/img/logo-secondary.png';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
@@ -43,16 +41,16 @@ import thuleJpg from '@public/img/wallpaper/thule.jpg';
 import 'material-icons/iconfont/material-icons.css';
 
 import eruda, { ErudaConsole } from 'eruda';
-import { Milliseconds } from 'ootk';
+import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime } from 'ootk';
 import { keepTrackContainer } from './container';
-import { KeepTrackApiEvents, Singletons } from './interfaces';
+import { GetSatType, KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
-import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from './plugins/sensor/sensorManager';
+import { WatchlistPlugin } from './plugins/watchlist/watchlist';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
-import { Camera } from './singletons/camera';
+import { Camera, CameraType } from './singletons/camera';
 import { CameraControlWidget } from './singletons/camera-control-widget';
 import { CatalogManager } from './singletons/catalog-manager';
 import { ColorSchemeManager } from './singletons/color-scheme-manager';
@@ -74,16 +72,16 @@ import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
 import { SensorMath } from './static/sensor-math';
 import { SplashScreen } from './static/splash-screen';
+import { CoreEngineEvents } from './tessa/events/event-types';
+import { Tessa } from './tessa/tessa';
 
 export class KeepTrack {
+  static readonly id = 'KeepTrack';
+
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
   private static readonly splashScreenImgList_ =
     [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
 
-  private readonly isShowFPS = false;
-  isReady = false;
-  private isUpdateTimeThrottle_: boolean;
-  private lastGameLoopTimestamp_ = <Milliseconds>0;
   private readonly settingsOverride_: SettingsManagerOverride;
 
   colorManager: ColorSchemeManager;
@@ -108,31 +106,34 @@ export class KeepTrack {
       isShowSplashScreen: true,
     },
   ) {
-    if (this.isReady) {
-      throw new Error('KeepTrack is already started');
+    this.settingsOverride_ = settingsOverride;
+    settingsManager.init(this.settingsOverride_);
+  }
+
+  private static keepTrackInstance: KeepTrack | null = null;
+
+  static getInstance(settingsOverride?: SettingsManagerOverride): KeepTrack {
+    if (!KeepTrack.keepTrackInstance) {
+      KeepTrack.keepTrackInstance = new KeepTrack(settingsOverride);
+
+      // Expose to window for debugging
+      window.keepTrack = KeepTrack.keepTrackInstance;
     }
 
-    this.settingsOverride_ = settingsOverride;
+    return KeepTrack.keepTrackInstance;
   }
 
   init() {
-    settingsManager.init(this.settingsOverride_);
-
-    KeepTrack.setContainerElement();
+    KeepTrack.setContainerElement_();
 
     if (!this.settingsOverride_.isPreventDefaultHtml) {
       import(/* webpackMode: "eager" */ '@css/loading-screen.css');
       KeepTrack.getDefaultBodyHtml();
-      BottomMenu.init();
-
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.uiManagerFinal,
-        cbName: 'addBottomMenuFilterButtons',
-        cb: () => BottomMenu.addBottomMenuFilterButtons(),
-      });
 
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
-        KeepTrack.loadSplashScreen_();
+        Tessa.getInstance().on(CoreEngineEvents.Initialize, () => {
+          KeepTrack.loadSplashScreen_();
+        });
       }
     }
 
@@ -185,6 +186,9 @@ export class KeepTrack {
     const hoverManagerInstance = new HoverManager();
 
     keepTrackContainer.registerSingleton(Singletons.HoverManager, hoverManagerInstance);
+    const demoManagerInstance = new DemoManager();
+
+    keepTrackContainer.registerSingleton(Singletons.DemoManager, demoManagerInstance);
 
     this.mainCameraInstance = mainCameraInstance;
     this.errorManager = errorManagerInstance;
@@ -198,33 +202,7 @@ export class KeepTrack {
     this.sensorManager = sensorManagerInstance;
     this.uiManager = uiManagerInstance;
     this.inputManager = inputManagerInstance;
-    this.demoManager = new DemoManager();
-  }
-
-  /** Check if the FPS is above a certain threshold */
-  static isFpsAboveLimit(dt: Milliseconds, minimumFps: number): boolean {
-    return KeepTrack.getFps_(dt) > minimumFps;
-  }
-
-  gameLoop(timestamp = <Milliseconds>0): void {
-    requestAnimationFrame(this.gameLoop.bind(this));
-    const dt = <Milliseconds>(timestamp - this.lastGameLoopTimestamp_);
-
-    this.lastGameLoopTimestamp_ = timestamp;
-
-    if (settingsManager.cruncherReady) {
-      this.update_(dt); // Do any per frame calculations
-      this.draw_(dt);
-
-      if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-        const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
-
-        if (selectedSatellite) {
-          keepTrackApi.getUiManager().
-            updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, selectedSatellite);
-        }
-      }
-    }
+    this.demoManager = demoManagerInstance;
   }
 
   static getDefaultBodyHtml(): void {
@@ -285,7 +263,7 @@ export class KeepTrack {
     }
   }
 
-  private static setContainerElement() {
+  private static setContainerElement_() {
     // User provides the container using the settingsManager
     const containerDom = settingsManager.containerRoot ?? document.getElementById('keeptrack-root') as HTMLDivElement;
 
@@ -299,17 +277,8 @@ export class KeepTrack {
     }
   }
 
-  private static getFps_(dt: Milliseconds): number {
-    return 1000 / dt;
-  }
-
-  /* istanbul ignore next */
-  static async initCss(): Promise<void> {
+  static async loadCss(): Promise<void> {
     try {
-      if (!isThisNode()) {
-        KeepTrack.printLogoToConsole_();
-      }
-
       // Load the CSS
       if (!settingsManager.isDisableCss) {
         import('@css/fonts.css');
@@ -416,137 +385,355 @@ theodore.kruczek at gmail dot com.
         `);
   }
 
-  private static showErrorCode(error: Error & { lineNumber: number }): void {
-    // TODO: Replace console calls with ErrorManagerInstance
+  registerAssets(): void {
+    Tessa.getInstance().on(CoreEngineEvents.BeforeInitialize, () => {
+      this.init();
+    });
 
-    let errorHtml = '';
-
-    errorHtml += error?.message ? `${error.message}<br>` : '';
-    errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
-    errorHtml += error?.stack ? `${error.stack}<br>` : '';
-    const LoaderText = getEl('loader-text');
-
-    if (LoaderText) {
-      LoaderText.innerHTML = errorHtml;
-      // eslint-disable-next-line no-console
-      console.error(error);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(error);
-    }
-    // istanbul ignore next
-    if (!isThisNode()) {
-      // eslint-disable-next-line no-console
-      console.warn(error);
-    }
-  }
-
-  private draw_(dt = <Milliseconds>0) {
-    const renderer = keepTrackApi.getRenderer();
-    const camera = keepTrackApi.getMainCamera();
-
-    camera.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, renderer.sensorPos);
-    renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
-
-    if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
-      keepTrackApi.getOrbitManager().updateAllVisibleOrbits();
-      this.inputManager.update(dt);
-
-      // Only update hover if we are not on mobile
-      if (!settingsManager.isMobileModeEnabled) {
-        keepTrackApi.getHoverManager().setHoverId(this.inputManager.mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-      }
-    }
-
-    // If Demo Mode do stuff
-    if (settingsManager.isDemoModeOn && keepTrackApi.getSensorManager()?.currentSensors[0]?.lat !== null) {
-      this.demoManager.update();
-    }
-
-    keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, dt);
-  }
-
-  async run(): Promise<void> {
-    try {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      const timeManagerInstance = keepTrackApi.getTimeManager();
-      const renderer = keepTrackApi.getRenderer();
-      const sceneInstance = keepTrackApi.getScene();
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
-      const uiManagerInstance = keepTrackApi.getUiManager();
-      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
-      // Upodate the version number and date
-      settingsManager.versionNumber = VERSION;
-
-      // Error Trapping
-      window.addEventListener('error', (e: ErrorEvent) => {
-        if (!settingsManager.isGlobalErrorTrapOn) {
-          return;
-        }
-        if (isThisNode()) {
-          throw e.error;
-        }
-        errorManagerInstance.error(e.error, 'Global Error Trapper', e.message);
+    Tessa.getInstance().on(CoreEngineEvents.AssetLoadStart, (): Promise<void> => new Promise((resolve) => {
+      Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+        resolve();
       });
+    }));
 
-      keepTrackApi.getMainCamera().init(settingsManager);
+    Tessa.getInstance().on(CoreEngineEvents.AssetLoadStart,
+      async () => {
+        await KeepTrack.loadCss();
 
-      SplashScreen.loadStr(SplashScreen.msg.science);
-      mobileManager.init();
 
-      // Load all the plugins now that we have the API initialized
-      await import('./plugins/plugins')
-        .then((mod) => mod.loadPlugins(keepTrackApi, settingsManager.plugins))
-        .catch(() => {
-          // intentionally left blank
+        if (!isThisNode()) {
+          KeepTrack.printLogoToConsole_();
+        }
+
+        BottomMenu.init();
+
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const orbitManagerInstance = keepTrackApi.getOrbitManager();
+        const timeManagerInstance = keepTrackApi.getTimeManager();
+        const renderer = keepTrackApi.getRenderer();
+        const sceneInstance = keepTrackApi.getScene();
+        const dotsManagerInstance = keepTrackApi.getDotsManager();
+        const uiManagerInstance = keepTrackApi.getUiManager();
+        const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+
+        // Upodate the version number and date
+        settingsManager.versionNumber = VERSION;
+
+        // Error Trapping
+        window.addEventListener('error', (e: ErrorEvent) => {
+          if (!settingsManager.isGlobalErrorTrapOn) {
+            return;
+          }
+          if (isThisNode()) {
+            throw e.error;
+          }
+          errorManagerInstance.error(e.error, 'Global Error Trapper', e.message);
         });
 
-      SplashScreen.loadStr(SplashScreen.msg.science2);
-      // Start initializing the rest of the website
-      timeManagerInstance.init();
-      uiManagerInstance.onReady();
+        keepTrackApi.getMainCamera().init(settingsManager);
 
-      SplashScreen.loadStr(SplashScreen.msg.dots);
-      /*
-       * MobileManager.checkMobileMode();
-       * We need to know if we are on a small screen before starting webgl
+        SplashScreen.loadStr(SplashScreen.msg.science);
+        mobileManager.init();
+
+        // Load all the plugins now that we have the API initialized
+        await import('./plugins/plugins')
+          .then((mod) => mod.loadPlugins(keepTrackApi, settingsManager.plugins))
+          .catch(() => {
+            // intentionally left blank
+          });
+
+        SplashScreen.loadStr(SplashScreen.msg.science2);
+        // Start initializing the rest of the website
+        timeManagerInstance.init();
+        uiManagerInstance.onReady();
+
+        SplashScreen.loadStr(SplashScreen.msg.dots);
+        /*
+         * MobileManager.checkMobileMode();
+         * We need to know if we are on a small screen before starting webgl
+         */
+        renderer.glInit(getEl('keeptrack-canvas') as HTMLCanvasElement);
+
+        sceneInstance.init(renderer.gl);
+        sceneInstance.loadScene();
+
+        dotsManagerInstance.init(settingsManager);
+
+        catalogManagerInstance.initObjects();
+
+        catalogManagerInstance.init();
+        colorSchemeManagerInstance.init();
+
+        await CatalogLoader.load(); // Needs Object Manager and gl first
+
+        lineManagerInstance.init();
+
+        orbitManagerInstance.init(lineManagerInstance, renderer.gl);
+
+        uiManagerInstance.init();
+
+        dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer!);
+
+        this.inputManager.init();
+        this.demoManager.init();
+
+        keepTrackApi.getHoverManager().init();
+        renderer.init();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        renderer.meshManager.init(renderer.gl);
+
+        Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+          this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
+          keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
+        });
+      });
+
+    Tessa.getInstance().on(CoreEngineEvents.AssetLoadComplete, this.postStart_.bind(this));
+  }
+
+  private hoverBoxOnSatMiniElements_: HTMLElement | null = null;
+  private isSatMiniBoxInUse_ = false;
+  private labelCount_ = 0;
+  private satHoverMiniDOM_: HTMLDivElement;
+  private satLabelModeLastTime_ = 0;
+  sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } | null = null;
+  isDrawOrbitsAbove: boolean;
+
+  /**
+   * Calculates and displays the orbits and labels of satellites above the current camera view.
+   * This method is only called when camera type is astronomy or planetarium,
+   * or when watchlist satellites are in view.
+   *
+   * @remarks
+   * - If the scene is not yet redrawn with a new camera, the method sets a flag to draw the orbits above once the scene is redrawn.
+   * - If the satellite label mode is off or the camera type is not planetarium and there are no satellites in the watchlist in view,
+   *   the method clears the satellite mini boxes and returns.
+   * - If the current sensor's latitude is null, the method returns.
+   * - If the minimum time between satellite labels has not elapsed since the last label update, the method returns.
+   * - The method clears the in-view orbits and initializes a counter for the labels.
+   * - The method retrieves the DOM element for the satellite mini boxes.
+   * - If the camera type is planetarium, the method iterates over the orbital satellites in the catalog and adds their orbits and labels.
+   * - If the camera type is not planetarium, the method iterates over the satellites in the watchlist and adds their labels.
+   * - The method updates the flag indicating that the satellite mini boxes are in use and records the current time as the last label update time.
+   * - If the camera type is not astronomy, planetarium, or there are no satellites in the watchlist in view, the method resets the sensor position and the flag to draw orbits
+   *   above.
+   * - If the satellite label mode is off or the camera type is not planetarium and there are no satellites in the watchlist in view,
+   *   the method clears the satellite mini boxes and returns.
+   */
+  // eslint-disable-next-line max-statements
+  orbitsAbove() {
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const watchlistPluginInstance = keepTrackApi.getPlugin(WatchlistPlugin);
+
+    if (
+      keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY ||
+      keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM ||
+      watchlistPluginInstance?.hasAnyInView()
+    ) {
+      // Catch race condition where sensor has been reset but camera hasn't been updated
+      try {
+        this.sensorPos = sensorManagerInstance.calculateSensorPos(timeManagerInstance.simulationTimeObj, sensorManagerInstance.currentSensors);
+      } catch (e) {
+        errorManagerInstance.debug('Sensor not found, clearing orbits above!');
+        this.sensorPos = null;
+        keepTrackApi.getOrbitManager().clearInViewOrbit();
+
+        return;
+      }
+      if (!this.isDrawOrbitsAbove) {
+        /*
+         * Don't do this until the scene is redrawn with a new camera or thousands of satellites will
+         * appear to be in the field of view
+         */
+        this.isDrawOrbitsAbove = true;
+
+        return;
+      }
+      // Previously called showOrbitsAbove();
+      if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
+        if (this.isSatMiniBoxInUse_) {
+          this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
+
+          if (this.hoverBoxOnSatMiniElements_) {
+            this.hoverBoxOnSatMiniElements_.innerHTML = '';
+          }
+        }
+        this.isSatMiniBoxInUse_ = false;
+
+        return;
+      }
+
+      if (sensorManagerInstance?.currentSensors[0]?.lat === null) {
+        return;
+      }
+      if (timeManagerInstance.realTime - this.satLabelModeLastTime_ < settingsManager.minTimeBetweenSatLabels) {
+        return;
+      }
+
+      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
+      orbitManagerInstance.clearInViewOrbit();
+
+      let obj: BaseObject | null;
+
+      this.labelCount_ = 0;
+
+      this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
+
+      /**
+       * @todo Reuse hoverBoxOnSatMini DOM Elements
+       * @body Currently are writing and deleting the nodes every draw element. Reusuing them with a transition effect will make it smoother
        */
-      await renderer.glInit();
+      this.hoverBoxOnSatMiniElements_!.innerHTML = '';
+      if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-      sceneInstance.init(renderer.gl);
-      sceneInstance.loadScene();
+        for (let i = 0; i < catalogManagerInstance.orbitalSats && this.labelCount_ < settingsManager.maxLabels; i++) {
+          obj = catalogManagerInstance.getObject(i, GetSatType.POSITION_ONLY);
 
-      dotsManagerInstance.init(settingsManager);
+          if (!obj?.isSatellite()) {
+            continue;
+          }
+          const sat = <DetailedSatellite>obj;
+          const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
-      catalogManagerInstance.initObjects();
+          if (colorSchemeManagerInstance.isPayloadOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isRocketBodyOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isDebrisOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isJscVimpelSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isNotionalSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isGeoSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isLeoSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isMeoSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isHeoSatOff(sat)) {
+            continue;
+          }
 
-      catalogManagerInstance.init();
-      colorSchemeManagerInstance.init();
+          const satScreenPositionArray = this.renderer.getScreenCoords(sat);
 
-      await CatalogLoader.load(); // Needs Object Manager and gl first
+          if (satScreenPositionArray.error) {
+            continue;
+          }
+          if (typeof satScreenPositionArray.x === 'undefined' || typeof satScreenPositionArray.y === 'undefined') {
+            continue;
+          }
+          if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) {
+            continue;
+          }
 
-      lineManagerInstance.init();
+          // Draw Orbits
+          if (!settingsManager.isShowSatNameNotOrbit) {
+            orbitManagerInstance.addInViewOrbit(i);
+          }
 
-      orbitManagerInstance.init(lineManagerInstance, renderer.gl);
+          /*
+           * Draw Sat Labels
+           * if (!settingsManager.enableHoverOverlay) continue
+           */
+          this.satHoverMiniDOM_ = document.createElement('div');
+          this.satHoverMiniDOM_.id = `sat-minibox-${i}`;
+          if (sat.source === CatalogSource.VIMPEL) {
+            this.satHoverMiniDOM_.textContent = `JSC${sat.altId}`;
+          } else {
+            this.satHoverMiniDOM_.textContent = sat.sccNum;
+          }
 
-      uiManagerInstance.init();
+          this.satHoverMiniDOM_.style.display = 'block';
+          this.satHoverMiniDOM_.style.position = 'absolute';
+          this.satHoverMiniDOM_.style.textShadow = '-2px -2px 5px #000, 2px -2px 5px #000, -2px 2px 5px #000, 2px 2px 5px #000';
+          this.satHoverMiniDOM_.style.left = `${satScreenPositionArray.x + 20}px`;
+          this.satHoverMiniDOM_.style.top = `${satScreenPositionArray.y}px`;
 
-      dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer!);
+          this.hoverBoxOnSatMiniElements_!.appendChild(this.satHoverMiniDOM_);
+          this.labelCount_++;
+        }
+      } else {
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const dotsManagerInstance = keepTrackApi.getDotsManager();
 
-      this.inputManager.init();
+        if (!dotsManagerInstance.inViewData) {
+          return;
+        }
 
-      await renderer.init(settingsManager);
-      renderer.meshManager.init(renderer.gl);
+        watchlistPluginInstance?.watchlistList.forEach(({ id }) => {
+          const obj = catalogManagerInstance.getObject(id, GetSatType.POSITION_ONLY) as DetailedSatellite;
 
-      // Now that everything is loaded, start rendering to thg canvas
-      this.gameLoop();
+          if (dotsManagerInstance.inViewData[id] === 0) {
+            return;
+          }
+          const satScreenPositionArray = this.renderer.getScreenCoords(obj);
 
-      this.postStart_();
-      this.isReady = true;
-    } catch (error) {
-      KeepTrack.showErrorCode(<Error & { lineNumber: number }>error);
+          if (satScreenPositionArray.error) {
+            return;
+          }
+          if (typeof satScreenPositionArray.x === 'undefined' || typeof satScreenPositionArray.y === 'undefined') {
+            return;
+          }
+          if (satScreenPositionArray.x > window.innerWidth || satScreenPositionArray.y > window.innerHeight) {
+            return;
+          }
+
+          /*
+           * Draw Sat Labels
+           * if (!settingsManager.enableHoverOverlay) continue
+           */
+          this.satHoverMiniDOM_ = document.createElement('div');
+          this.satHoverMiniDOM_.id = `sat-minibox-${id}`;
+          if (obj.source === CatalogSource.VIMPEL) {
+            this.satHoverMiniDOM_.textContent = `JSC${obj.altId}`;
+          } else {
+            this.satHoverMiniDOM_.textContent = obj.sccNum;
+          }
+
+          // Draw Orbits
+          if (!settingsManager.isShowSatNameNotOrbit) {
+            orbitManagerInstance.addInViewOrbit(id);
+          }
+
+          this.satHoverMiniDOM_.style.display = 'block';
+          this.satHoverMiniDOM_.style.position = 'absolute';
+          this.satHoverMiniDOM_.style.textShadow = '-2px -2px 5px #000, 2px -2px 5px #000, -2px 2px 5px #000, 2px 2px 5px #000';
+          this.satHoverMiniDOM_.style.left = `${satScreenPositionArray.x + 20}px`;
+          this.satHoverMiniDOM_.style.top = `${satScreenPositionArray.y}px`;
+
+          this.hoverBoxOnSatMiniElements_!.appendChild(this.satHoverMiniDOM_);
+          this.labelCount_++;
+        });
+      }
+      this.isSatMiniBoxInUse_ = true;
+      this.satLabelModeLastTime_ = timeManagerInstance.realTime;
+    } else {
+      this.sensorPos = null;
+      this.isDrawOrbitsAbove = false;
+    }
+
+    // Hide satMiniBoxes When Not in Use
+    if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
+      if (this.isSatMiniBoxInUse_) {
+        const satMiniBox = getEl('sat-minibox');
+
+        if (satMiniBox) {
+          satMiniBox.innerHTML = '';
+        }
+      }
+      this.isSatMiniBoxInUse_ = false;
     }
   }
 
@@ -621,42 +808,6 @@ theodore.kruczek at gmail dot com.
         this.postStart_();
       }, 100);
     }
-  }
-
-  private update_(dt = <Milliseconds>0) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const renderer = keepTrackApi.getRenderer();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
-    renderer.dt = dt;
-    renderer.dtAdjusted = <Milliseconds>(Math.min(renderer.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
-
-    // Display it if that settings is enabled
-    if (this.isShowFPS) {
-      // eslint-disable-next-line no-console
-      console.log(KeepTrack.getFps_(renderer.dt));
-    }
-
-    // Update official time for everyone else
-    timeManagerInstance.setNow(<Milliseconds>Date.now());
-    if (!this.isUpdateTimeThrottle_) {
-      this.isUpdateTimeThrottle_ = true;
-      timeManagerInstance.setSelectedDate(timeManagerInstance.simulationTimeObj);
-      setTimeout(() => {
-        this.isUpdateTimeThrottle_ = false;
-      }, 500);
-    }
-
-    // Update Draw Positions
-    keepTrackApi.getDotsManager().updatePositionBuffer();
-
-    renderer.update();
-
-    /*
-     * Update Colors
-     * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
-     */
-    colorSchemeManagerInstance.calculateColorBuffers(false); // avoid recalculating ALL colors
   }
 
   // Make the api available

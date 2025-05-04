@@ -8,6 +8,7 @@ import * as catalogLoader from '@app/static/catalog-loader';
 
 import googleAnalytics from '@analytics/google-analytics';
 import { KeepTrackApiEvents } from '@app/interfaces';
+import { Tessa } from '@app/tessa/tessa';
 import createAnalytics from 'analytics';
 import { KeepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
@@ -192,6 +193,13 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new TimeMachine().init(), enabled: plugins.timeMachine },
       { init: () => new SatellitePhotos().init(), enabled: plugins.photoManager },
       { init: () => new ScreenRecorder().init(), enabled: plugins.screenRecorder },
+      {
+        init: () => (async () => {
+          const ioPlugin = await import('../plugins/initial-orbit/initial-orbit');
+
+          new ioPlugin.InitialOrbitDeterminationPlugin().init();
+        })(), enabled: plugins.initialOrbit,
+      },
       { init: () => new AnalysisMenu().init(), enabled: plugins.analysis },
       { init: () => new Calculator().init(), enabled: plugins.calculator },
       { init: () => new EciPlot().init(), enabled: plugins.plotAnalysis },
@@ -224,7 +232,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
     }
 
     // Load any settings from local storage after all plugins are loaded
-    keepTrackApi.runEvent(KeepTrackApiEvents.loadSettings);
+    Tessa.getInstance().emit(KeepTrackApiEvents.loadSettings);
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,
@@ -323,3 +331,4 @@ export const uiManagerFinal = (): void => {
 
 // Create common import for all plugins
 export { StreamManager as CanvasRecorder, catalogLoader };
+

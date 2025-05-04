@@ -74,12 +74,14 @@
   "jestrunner.runOptions": [
     "-o --coverage"
   ],
-  "task.autoDetect": "off",
+  "task.autoDetect": "on",
   "editor.rulers": [
     180
   ],
   "sonarlint.connectedMode.project": {
     "connectionId": "http-localhost-9000",
     "projectKey": "keeptrack"
-  }
+  },
+  "git.autorefresh": false,
+  "git.autoRepositoryDetection": "openEditors",
 }

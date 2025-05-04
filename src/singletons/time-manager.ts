@@ -1,4 +1,6 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
+import { Tessa } from '@app/tessa/tessa';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -8,6 +10,7 @@ import { UrlManager } from '../static/url-manager';
 import { errorManagerInstance } from './errorManager';
 
 export class TimeManager {
+  static readonly id = 'TimeManager';
   dateDOM = null;
   datetimeInputDOM = <HTMLInputElement>null;
   /**
@@ -56,6 +59,7 @@ export class TimeManager {
    */
   private dynamicOffset_: number;
   isCreateClockDOMOnce_ = false;
+  private isUpdateTimeThrottle_ = false;
 
   static currentEpoch(currentDate: Date): [string, string] {
     const currentDateObj = new Date(currentDate);
@@ -202,6 +206,17 @@ export class TimeManager {
     this.calculateSimulationTime();
     this.setSelectedDate(this.simulationTimeObj);
     this.initializeKeyboardBindings_();
+
+    Tessa.getInstance().on(CoreEngineEvents.BeforeUpdate, () => {
+      this.setNow(<Milliseconds>Date.now());
+      if (!this.isUpdateTimeThrottle_) {
+        this.isUpdateTimeThrottle_ = true;
+        this.setSelectedDate(this.simulationTimeObj);
+        setTimeout(() => {
+          this.isUpdateTimeThrottle_ = false;
+        }, 500);
+      }
+    });
   }
 
   private initializeKeyboardBindings_() {

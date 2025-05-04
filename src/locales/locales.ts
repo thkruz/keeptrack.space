@@ -15,7 +15,6 @@ const opts: InitOptions = {
   interpolation: {
     escapeValue: false,
   },
-  // lng: 'ukUA',
   fallbackLng: 'en',
   debug: false,
   resources: {
@@ -322,6 +321,11 @@ export const loadLocalization = () => ({
       bottomIconLabel: t7e('plugins.GraphicsMenuPlugin.bottomIconLabel'),
       title: t7e('plugins.GraphicsMenuPlugin.title'),
       helpBody: t7e('plugins.GraphicsMenuPlugin.helpBody'),
+    },
+    InitialOrbitDeterminationPlugin: {
+      bottomIconLabel: t7e('plugins.InitialOrbitDeterminationPlugin.bottomIconLabel'),
+      title: t7e('plugins.InitialOrbitDeterminationPlugin.title'),
+      helpBody: t7e('plugins.InitialOrbitDeterminationPlugin.helpBody'),
     },
   },
 });

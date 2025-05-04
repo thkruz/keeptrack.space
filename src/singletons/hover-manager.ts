@@ -3,6 +3,9 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
+import { SatMath } from '@app/static/sat-math';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
+import { Tessa } from '@app/tessa/tessa';
 import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
 import { SensorMath } from '../static/sensor-math';
@@ -11,6 +14,8 @@ import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
 
 export class HoverManager {
+  static readonly id = 'hoverManager';
+
   /** The id of the object currently being hovered */
   private currentHoverId = -1;
   /** This is used to track how many orbit buffers have been updated this draw cycle */
@@ -34,6 +39,16 @@ export class HoverManager {
     this.satHoverBoxNode2 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox2'));
     this.satHoverBoxNode3 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox3'));
     this.satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
+
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      // TODO: Reevaluate these conditions
+      if (Tessa.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+        // Only update hover if we are not on mobile
+        if (!settingsManager.isMobileModeEnabled) {
+          this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+        }
+      }
+    });
   }
 
   /**
@@ -77,7 +92,10 @@ export class HoverManager {
     const renderer = keepTrackApi.getRenderer();
 
     this.satHoverBoxDOM.style.display = 'none';
-    renderer.setCursor('default');
+
+    if (!settingsManager.isMobileModeBlocked) {
+      renderer.setCursor('pointer');
+    }
 
     return true;
   }
@@ -130,7 +148,9 @@ export class HoverManager {
 
       Object.assign(this.satHoverBoxDOM.style, style);
 
-      renderer.setCursor('pointer');
+      if (!settingsManager.isMobileModeBlocked) {
+        renderer.setCursor('pointer');
+      }
     }
   }
 
@@ -178,7 +198,6 @@ export class HoverManager {
     if (!settingsManager.enableHoverOverlay) {
       return;
     }
-    const renderer = keepTrackApi.getRenderer();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     // Use this as a default if no UI
@@ -194,7 +213,7 @@ export class HoverManager {
       let color: string = 'black';
 
       if (settingsManager.isShowConfidenceLevels) {
-        const confidenceScore = parseInt(sat.tle1.substring(64, 65)) || 0;
+        const confidenceScore = SatMath.calculateSatConfidenceScore(sat);
 
         if (confidenceScore >= 7) {
           color = 'green';
@@ -226,14 +245,15 @@ export class HoverManager {
         this.satHoverBoxNode2.textContent = HoverManager.getLaunchYear(sat);
       }
 
-      if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass && renderer.isShowDistance) {
+      if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass && settingsManager.isShowDistance) {
         if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
           this.satHoverBoxNode3.innerHTML =
             `${SensorMath.nextpass(sat) + SensorMath.distanceString(sat, keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat() as DetailedSatellite)}`;
         } else {
           this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat);
         }
-      } else if (renderer.isShowDistance) {
+      } else if (settingsManager.isShowDistance) {
+        // TODO: Should also require isEciOnHover or SecondarySat
         this.showRicOrEci_(sat);
       } else if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass) {
         this.satHoverBoxNode3.textContent = SensorMath.nextpass(sat);

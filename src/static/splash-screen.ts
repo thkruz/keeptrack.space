@@ -30,7 +30,7 @@ export abstract class SplashScreen {
         <div id="logo-inner-container" class="valign">
           <div style="display: flex;">
             <!-- <span id="logo-text" class="logo-font">KEEP TRACK</span> -->
-            <img src="img/textLogoMd.png" alt="Keep Track" id="logo-text" class="logo-font">
+            <img src="img/logo.png" alt="Keep Track" id="logo-text" class="logo-font">
             <!-- <span id="logo-text-version" class="logo-font">10</span> -->
           </div>
           <span id="loader-text">Downloading Science...</span>
@@ -67,18 +67,25 @@ export abstract class SplashScreen {
     } else {
       // Loading Screen Resized and Hidden
       setTimeout(() => {
-        getEl('loading-screen')?.classList.remove('full-loader');
-        getEl('loading-screen')?.classList.add('mini-loader-container');
-        getEl('logo-inner-container')?.classList.add('mini-loader');
-        hideEl('loading-screen');
-        SplashScreen.loadStr(SplashScreen.msg.math);
+        const loadingScreenDom = getEl('loading-screen');
+
+        if (loadingScreenDom) {
+          loadingScreenDom.style.transition = 'opacity 0.5s';
+          loadingScreenDom.style.opacity = '0';
+          setTimeout(() => {
+            loadingScreenDom.classList.remove('full-loader');
+            loadingScreenDom.classList.add('mini-loader-container');
+            getEl('logo-inner-container')?.classList.add('mini-loader');
+            // We no longer need these elements
+            hideEl('loading-screen');
+            hideEl('loading-hint');
+            hideEl('logo-text');
+            hideEl('logo-text-version');
+          }, 1000);
+          SplashScreen.loadStr(SplashScreen.msg.math);
+        }
       }, 100);
     }
-
-    // We no longer need these elements
-    hideEl('loading-hint');
-    hideEl('logo-text');
-    hideEl('logo-text-version');
   }
 
   static loadStr(str: string) {

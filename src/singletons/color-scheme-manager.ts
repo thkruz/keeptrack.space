@@ -30,6 +30,8 @@ import { errorManagerInstance } from './errorManager';
 
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { CoreEngineEvents } from '@app/tessa/events/event-types';
+import { Tessa } from '@app/tessa/tessa';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
@@ -53,6 +55,7 @@ import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
 import { PersistenceManager, StorageKey } from './persistence-manager';
 
 export class ColorSchemeManager {
+  static readonly id = 'ColorSchemeManager';
   // This is where you confiure addon color schemes
   static readonly addonColorSchemes = [
     ObjectTypeColorScheme,
@@ -227,43 +230,46 @@ export class ColorSchemeManager {
     this.pickableBuffer = renderer.gl.createBuffer();
 
     // Create the color buffers as soon as the position cruncher is ready
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'colorSchemeManager',
-      cb: (): void => {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
-        let possibleColorScheme: ColorScheme | null = null;
+    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
+      let possibleColorScheme: ColorScheme | null = null;
 
-        /*
-         * We don't want to reload a cached group color scheme because we might not have a search
-         * this can result in all dots turning black
-         */
-        if (cachedColorScheme) {
-          LegendManager.change(cachedColorScheme);
-          possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
-        }
-        this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
-        this.lastColorScheme = this.currentColorScheme;
+      /*
+       * We don't want to reload a cached group color scheme because we might not have a search
+       * this can result in all dots turning black
+       */
+      if (cachedColorScheme) {
+        LegendManager.change(cachedColorScheme);
+        possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
+      }
+      this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
+      this.lastColorScheme = this.currentColorScheme;
 
-        // Generate some buffers
-        this.colorData = new Float32Array(catalogManagerInstance.numObjects * 4);
-        this.pickableData = new Int8Array(catalogManagerInstance.numObjects);
-        this.calculateColorBuffers(true);
-        this.isReady = true;
+      // Generate some buffers
+      this.colorData = new Float32Array(catalogManagerInstance.numObjects * 4);
+      this.pickableData = new Int8Array(catalogManagerInstance.numObjects);
+      this.calculateColorBuffers(true);
+      this.isReady = true;
 
-        // This helps keep the inview colors up to date
-        keepTrackApi.register({
-          event: KeepTrackApiEvents.staticOffsetChange,
-          cbName: 'colorSchemeManager',
-          cb: () => {
-            setTimeout(() => {
-              this.calcColorBufsNextCruncher();
-            }, 1000);
-          },
-        });
+      // This helps keep the inview colors up to date
+      keepTrackApi.register({
+        event: KeepTrackApiEvents.staticOffsetChange,
+        cbName: 'colorSchemeManager',
+        cb: () => {
+          setTimeout(() => {
+            this.calcColorBufsNextCruncher();
+          }, 1000);
+        },
+      });
+    });
 
-      },
+    Tessa.getInstance().on(CoreEngineEvents.Update, () => {
+      /*
+       * Update Colors
+       * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
+       */
+      this.calculateColorBuffers(false); // avoid recalculating ALL colors
     });
 
     LegendManager.change(this.currentColorScheme.id);

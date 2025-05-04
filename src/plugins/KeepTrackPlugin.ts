@@ -770,6 +770,7 @@ export abstract class KeepTrackPlugin {
             this.hideSideMenus();
           }
           this.isMenuButtonActive = false;
+          keepTrackApi.getSoundManager().play(SoundNames.CLICK);
           getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
         } else {
           // Verifiy that the user has selected a sensor and/or satellite if required
@@ -794,6 +795,7 @@ export abstract class KeepTrackPlugin {
 
             // Show the bottom icon as selected
             this.isMenuButtonActive = true;
+            keepTrackApi.getSoundManager().play(SoundNames.CLICK);
             getEl(this.bottomIconElementName)?.classList.add(KeepTrackPlugin.iconSelectedClassString);
           }
         }

@@ -174,12 +174,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         }
       },
     });
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.id,
-      cb: this.onWatchlistUpdated_.bind(this),
-    });
-
+    Doris.getInstance().on(KeepTrackApiEvents.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
     Doris.getInstance().on(CoreEngineEvents.Resize, this.resizeCanvas_.bind(this));
   }
 

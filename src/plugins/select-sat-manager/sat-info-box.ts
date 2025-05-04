@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/catalogs/countries';
+import { Doris } from '@app/doris/doris';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
@@ -27,7 +28,6 @@ import { StereoMap } from '../stereo-map/stereo-map';
 import { WatchlistPlugin } from '../watchlist/watchlist';
 import './sat-info-box.css';
 import { SelectSatManager } from './select-sat-manager';
-import { Doris } from '@app/doris/doris';
 
 /**
  * This class controls all the functionality of the satellite info box.
@@ -350,30 +350,26 @@ export class SatInfoBox extends KeepTrackPlugin {
       },
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.id,
-      cb: (watchlistList: { id: number, inView: boolean }[]) => {
-        let isOnList = false;
+    Doris.getInstance().on(KeepTrackApiEvents.onWatchlistUpdated, (watchlistList: { id: number, inView: boolean }[]) => {
+      let isOnList = false;
 
-        watchlistList.forEach(({ id }) => {
-          if (id === this.selectSatManager_.selectedSat) {
-            isOnList = true;
-          }
-        });
-
-        const addRemoveWatchlistDom = getEl('sat-add-watchlist');
-
-        if (addRemoveWatchlistDom) {
-          if (isOnList) {
-            (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'block';
-            (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'none';
-          } else {
-            (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'block';
-            (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'none';
-          }
+      watchlistList.forEach(({ id }) => {
+        if (id === this.selectSatManager_.selectedSat) {
+          isOnList = true;
         }
-      },
+      });
+
+      const addRemoveWatchlistDom = getEl('sat-add-watchlist');
+
+      if (addRemoveWatchlistDom) {
+        if (isOnList) {
+          (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'block';
+          (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'none';
+        } else {
+          (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'block';
+          (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'none';
+        }
+      }
     });
 
     keepTrackApi.register({

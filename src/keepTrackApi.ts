@@ -77,7 +77,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.AfterHtmlInitialize]: []; // Done
   [KeepTrackApiEvents.resetSensor]: []; // Done
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null]; // Done
-  [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
+  [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]]; // Done
   [KeepTrackApiEvents.staticOffsetChange]: [number];
   [KeepTrackApiEvents.onLineAdded]: [LineManager];
   [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];

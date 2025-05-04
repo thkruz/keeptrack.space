@@ -290,7 +290,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       watchlistElement.innerHTML = watchlistListHTML;
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.onWatchlistUpdated, this.watchlistList);
+    Doris.getInstance().emit(KeepTrackApiEvents.onWatchlistUpdated, this.watchlistList);
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       // No duplicates

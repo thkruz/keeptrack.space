@@ -142,6 +142,7 @@ export const loadPlugins = (plugins: KeepTrackPlugins): void => {
   plugins ??= <KeepTrackPlugins>{};
   try {
     const pluginList = [
+      { init: () => new SoundManager().init(), enabled: plugins.soundManager },
       { init: () => new SelectSatManager().init(), enabled: true },
       { init: () => new TopMenu().init(), enabled: plugins.topMenu },
       { init: () => new DebugMenuPlugin().init(), enabled: plugins.debug },
@@ -149,7 +150,6 @@ export const loadPlugins = (plugins: KeepTrackPlugins): void => {
       { init: () => new DateTimeManager().init(), enabled: plugins.datetime },
       { init: () => new SocialMedia().init(), enabled: plugins.social },
       { init: () => new ClassificationBar().init(), enabled: plugins.classificationBar },
-      { init: () => new SoundManager().init(), enabled: plugins.soundManager },
       { init: () => new SensorListPlugin().init(), enabled: plugins.sensor },
       { init: () => new SensorInfoPlugin().init(), enabled: plugins.sensor },
       { init: () => new CustomSensorPlugin().init(), enabled: plugins.sensor },

@@ -89,11 +89,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     Doris.getInstance().on(CoreEngineEvents.Update, this.update.bind(this));
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.id,
-      cb: this.onWatchlistUpdated_.bind(this),
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
     Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, WatchlistOverlay.uiManagerFinal.bind(this));
   }
 

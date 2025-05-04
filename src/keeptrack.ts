@@ -131,7 +131,9 @@ export class KeepTrack {
       KeepTrack.getDefaultBodyHtml();
 
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
-        KeepTrack.loadSplashScreen_();
+        Tessa.getInstance().on(CoreEngineEvents.Initialize, () => {
+          KeepTrack.loadSplashScreen_();
+        });
       }
     }
 
@@ -384,10 +386,19 @@ theodore.kruczek at gmail dot com.
   }
 
   registerAssets(): void {
-    Tessa.getInstance().on(CoreEngineEvents.AssetLoadComplete, this.postStart_.bind(this));
     Tessa.getInstance().on(CoreEngineEvents.BeforeInitialize, () => {
       this.init();
     });
+
+    Tessa.getInstance().on(CoreEngineEvents.AssetLoadStart, (): Promise<void> => new Promise((resolve) => {
+      keepTrackApi.register({
+        event: KeepTrackApiEvents.onCruncherReady,
+        cbName: 'cruncherReady',
+        cb: () => {
+          resolve();
+        },
+      });
+    }));
 
     Tessa.getInstance().on(CoreEngineEvents.AssetLoadStart,
       async () => {
@@ -480,6 +491,8 @@ theodore.kruczek at gmail dot com.
           keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
         });
       });
+
+    Tessa.getInstance().on(CoreEngineEvents.AssetLoadComplete, this.postStart_.bind(this));
   }
 
   private hoverBoxOnSatMiniElements_: HTMLElement | null = null;

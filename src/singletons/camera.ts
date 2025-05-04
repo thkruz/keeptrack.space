@@ -509,6 +509,12 @@ export class Camera {
    * Splitting it into subfunctions would not be optimal
    */
   draw(target?: DetailedSatellite | MissileObject, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+
+    if (!timeManagerInstance.simulationTimeObj) {
+      return;
+    }
+
     // TODO: This should be handled better
     target ??= <DetailedSatellite>(<unknown>{
       id: -1,
@@ -520,7 +526,6 @@ export class Camera {
     let gmst: GreenwichMeanSiderealTime;
 
     if (!sensorPos?.gmst) {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
 
       gmst = sensorPos?.gmst ?? SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
     } else {

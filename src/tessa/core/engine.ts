@@ -75,7 +75,101 @@ export class Engine {
 
     // Emit initial resize event to set up camera aspect ratios
     this.eventBus.emit(CoreEngineEvents.Resize, this.canvasWidth, this.canvasHeight);
-    this.eventBus.emit(CoreEngineEvents.Initialize);
+
+    // Create a Splash Screen on a new div element
+    const splashScreen = this.initializeSplashScreen_();
+
+    // Wait for 3 seconds before continuing the initialization
+    new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 2000);
+      // Continue with initialization after splash screen
+      this.eventBus.emit(CoreEngineEvents.Initialize).then(() => {
+        this.loadAssets();
+      });
+    }).then(() => {
+      // Remove the splash screen
+      splashScreen.style.transition = 'opacity 0.5s';
+      splashScreen.style.opacity = '0';
+      setTimeout(() => {
+        document.body.removeChild(splashScreen);
+      }, 500);
+    });
+  }
+
+  private initializeSplashScreen_() {
+    const splashScreen = document.createElement('div');
+
+    splashScreen.style.position = 'absolute';
+    splashScreen.style.top = '0';
+    splashScreen.style.left = '0';
+    splashScreen.style.width = '100%';
+    splashScreen.style.height = '100%';
+    splashScreen.style.backgroundColor = 'rgba(0, 0, 0, 1)';
+    splashScreen.style.color = 'white';
+    splashScreen.style.display = 'flex';
+    splashScreen.style.alignItems = 'center';
+    splashScreen.style.justifyContent = 'center';
+    splashScreen.style.zIndex = '10000';
+
+    // Create a container for splash content
+    const splashContent = document.createElement('div');
+
+    splashContent.style.display = 'flex';
+    splashContent.style.flexDirection = 'column';
+    splashContent.style.alignItems = 'center';
+
+    // "Powered by" text
+    const poweredBy = document.createElement('div');
+
+    poweredBy.innerText = 'Powered by';
+    poweredBy.style.fontSize = '20px';
+    poweredBy.style.marginBottom = '12px';
+    poweredBy.style.opacity = '0.8';
+
+    // TESSA text
+    const tessaText = document.createElement('div');
+
+    tessaText.innerText = 'TESSA';
+    tessaText.style.fontSize = '64px';
+    tessaText.style.fontWeight = 'bold';
+    tessaText.style.letterSpacing = '0.2em';
+    tessaText.style.textShadow = '0 2px 16px #000, 0 0 8px #fff4';
+
+    // Version/license text
+    const versionText = document.createElement('div');
+
+    versionText.innerText = 'v1.0.0';
+    versionText.style.fontSize = '16px';
+    versionText.style.marginTop = '14px';
+    versionText.style.opacity = '0.7';
+
+    // Copyright message
+    const copyright = document.createElement('div');
+
+    copyright.innerText =
+      '© 2025 Kruczek Labs LLC. All rights reserved.\n' +
+      'Licensed under the GNU AGPL v3.0. See LICENSE for details.\n' +
+      'Unauthorized copying, distribution, or modification is prohibited.';
+    copyright.style.position = 'absolute';
+    copyright.style.bottom = '12px';
+    copyright.style.left = '0';
+    copyright.style.width = '100%';
+    copyright.style.textAlign = 'center';
+    copyright.style.fontSize = '12px';
+    copyright.style.opacity = '0.5';
+    copyright.style.pointerEvents = 'none';
+
+    splashContent.appendChild(poweredBy);
+    splashContent.appendChild(tessaText);
+    splashContent.appendChild(versionText);
+    splashScreen.appendChild(splashContent);
+    splashScreen.appendChild(copyright);
+
+    document.body.appendChild(splashScreen);
+
+    return splashScreen;
   }
 
   async loadAssets(): Promise<void> {

@@ -8,6 +8,7 @@ import * as catalogLoader from '@app/static/catalog-loader';
 
 import googleAnalytics from '@analytics/google-analytics';
 import { KeepTrackApiEvents } from '@app/interfaces';
+import { Tessa } from '@app/tessa/tessa';
 import createAnalytics from 'analytics';
 import { KeepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
@@ -231,7 +232,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
     }
 
     // Load any settings from local storage after all plugins are loaded
-    keepTrackApi.runEvent(KeepTrackApiEvents.loadSettings);
+    Tessa.getInstance().emit(KeepTrackApiEvents.loadSettings);
 
     keepTrackApi.register({
       event: KeepTrackApiEvents.uiManagerFinal,

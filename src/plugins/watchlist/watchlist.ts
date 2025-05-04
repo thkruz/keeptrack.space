@@ -30,6 +30,7 @@ import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/senso
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { isThisNode } from '@app/static/isThisNode';
+import { Tessa } from '@app/tessa/tessa';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
@@ -110,11 +111,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       cb: this.uiManagerFinal_.bind(this),
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.id,
-      cb: this.onCruncherReady_.bind(this),
-    });
+    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => this.onCruncherReady_.bind(this));
   }
 
   /**

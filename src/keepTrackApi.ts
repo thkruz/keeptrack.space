@@ -107,6 +107,52 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number];
 };
 
+declare module '@app/tessa/events/event-types' {
+  export interface ApplicationEventMap {
+    [KeepTrackApiEvents.bottomMenuClick]: [string];
+    [KeepTrackApiEvents.hideSideMenus]: [];
+    [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture];
+    [KeepTrackApiEvents.orbitManagerInit]: [];
+    [KeepTrackApiEvents.drawManagerLoadScene]: [];
+    [KeepTrackApiEvents.drawOptionalScenery]: [];
+    [KeepTrackApiEvents.updateLoop]: [];
+    [KeepTrackApiEvents.rmbMenuActions]: [string, number];
+    [KeepTrackApiEvents.rightBtnMenuAdd]: [];
+    [KeepTrackApiEvents.updateDateTime]: [Date];
+    [KeepTrackApiEvents.updatePropRate]: [number];
+    [KeepTrackApiEvents.uiManagerFinal]: [];
+    [KeepTrackApiEvents.resetSensor]: [];
+    [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
+    [KeepTrackApiEvents.changeSensorMarkers]: [string];
+    [KeepTrackApiEvents.resize]: [];
+    [KeepTrackApiEvents.altCanvasResize]: [];
+    [KeepTrackApiEvents.endOfDraw]: [Milliseconds];
+    [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
+    [KeepTrackApiEvents.staticOffsetChange]: [number];
+    [KeepTrackApiEvents.onLineAdded]: [LineManager];
+    [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
+    [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
+    [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];
+    [KeepTrackApiEvents.onCruncherMessage]: [];
+    [KeepTrackApiEvents.onCruncherReady]: [];
+    [KeepTrackApiEvents.onHelpMenuClick]: [];
+    [KeepTrackApiEvents.onKeepTrackReady]: [];
+    [KeepTrackApiEvents.selectSatData]: [DetailedSatellite | MissileObject | BaseObject, number];
+    [KeepTrackApiEvents.setSecondarySat]: [DetailedSatellite | null, number];
+    [KeepTrackApiEvents.uiManagerInit]: [];
+    [KeepTrackApiEvents.uiManagerOnReady]: [];
+    [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
+    [KeepTrackApiEvents.ConeMeshUpdate]: [];
+    [KeepTrackApiEvents.bottomMenuModeChange]: [];
+    [KeepTrackApiEvents.saveSettings]: [];
+    [KeepTrackApiEvents.loadSettings]: [];
+    [KeepTrackApiEvents.onPrimarySatelliteUpdate]: [BaseObject | null, number];
+    [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number];
+    [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number];
+    [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number];
+  }
+}
+
 interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {
   event: T;
   cbName: string;

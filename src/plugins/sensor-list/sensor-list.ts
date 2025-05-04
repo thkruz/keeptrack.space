@@ -16,6 +16,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
+import { Tessa } from '@app/tessa/tessa';
 
 // TODO: Add a search bar and filter for sensors
 
@@ -201,14 +202,10 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.id,
-      cb: () => {
-        if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
-          SensorListPlugin.reloadLastSensor_();
-        }
-      },
+    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+      if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
+        SensorListPlugin.reloadLastSensor_();
+      }
     });
 
     const keyboardManager = keepTrackApi.getInputManager().keyboard;

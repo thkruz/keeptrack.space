@@ -20,6 +20,7 @@ import { SensorManager } from '../sensor/sensorManager';
 import { SoundNames } from '../sounds/SoundNames';
 
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
+import { Tessa } from '@app/tessa/tessa';
 import { fetchWeatherApi } from 'openmeteo';
 
 interface Pass {
@@ -290,27 +291,21 @@ export class SensorTimeline extends KeepTrackPlugin {
     super.addJs();
 
     // We need to wait for the sensorIds to be assigned before we can use them. Once they are ready we will reload the users last selected sensors
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.id,
-      cb: () => {
-        const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
-        let enabledSensors = [] as number[];
+    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+      const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
+      let enabledSensors = [] as number[];
 
-        if (cachedEnabledSensors) {
-          enabledSensors = JSON.parse(cachedEnabledSensors) as number[];
+      if (cachedEnabledSensors) {
+        enabledSensors = JSON.parse(cachedEnabledSensors) as number[];
+      }
+
+      if (enabledSensors.length > 0) {
+        this.enabledSensors_ = this.allSensorLists_.filter((s: DetailedSensor) => enabledSensors.includes(s.sensorId!));
+
+        if (this.enabledSensors_.length === 0) {
+          this.enabledSensors_ = this.allSensorLists_;
         }
-
-        if (enabledSensors.length > 0) {
-          this.enabledSensors_ = this.allSensorLists_.filter((s: DetailedSensor) => enabledSensors.includes(s.sensorId!));
-
-          if (this.enabledSensors_.length === 0) {
-            this.enabledSensors_ = this.allSensorLists_;
-          }
-
-
-        }
-      },
+      }
     });
 
     keepTrackApi.register({

@@ -8,6 +8,7 @@ import { LineManager } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { TimeManager } from '../time-manager';
 import { ControlSite } from './ControlSite';
+import { Tessa } from '@app/tessa/tessa';
 
 export enum SatConstellationString {
   Aehf = 'aehf',
@@ -81,11 +82,7 @@ export class SatLinkManager {
   }
 
   init(controlSiteList: ControlSite[]) {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'satLinkManager',
-      cb: () => this.onCruncher_(controlSiteList),
-    });
+    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => this.onCruncher_(controlSiteList));
   }
 
   private onCruncher_(controlSiteList: ControlSite[]) {

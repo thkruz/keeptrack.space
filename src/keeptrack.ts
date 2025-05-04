@@ -391,12 +391,8 @@ theodore.kruczek at gmail dot com.
     });
 
     Tessa.getInstance().on(CoreEngineEvents.AssetLoadStart, (): Promise<void> => new Promise((resolve) => {
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.onCruncherReady,
-        cbName: 'cruncherReady',
-        cb: () => {
-          resolve();
-        },
+      Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+        resolve();
       });
     }));
 

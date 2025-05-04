@@ -211,6 +211,9 @@ export interface PluginEventMap {
   [PluginEvents.Stop]: [string]; // pluginId
 }
 
+export interface ApplicationEventMap {
+}
+
 /**
  * Combined event map for all engine events
  * This is used by the TypedEventBus to ensure type safety
@@ -219,4 +222,5 @@ export interface EventMap extends
   EngineEventMap,
   SceneEventMap,
   InputEventMap,
-  PluginEventMap { }
+  PluginEventMap,
+  ApplicationEventMap { }

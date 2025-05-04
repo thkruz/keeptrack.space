@@ -6,6 +6,7 @@ import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { GroupType } from '@app/singletons/object-group';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
+import { Tessa } from '@app/tessa/tessa';
 
 export class SettingsPresets {
   static loadPresetMillionYear(settings: SettingsManager) {
@@ -358,16 +359,12 @@ export class SettingsPresets {
     settings.colors.debris = [0.5, 0.5, 0.5, 0.1];
     settings.colors.unknown = [0.5, 0.5, 0.5, 0.1];
     settings.colors.pink = [0.5, 0.5, 0.5, 0.1];
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'satFromsettings: SettingsManager',
-      cb: () => {
-        keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
-        setTimeout(() => {
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(43721) ?? -1);
-          settings.isDisableSelectSat = true;
-        }, 5000);
-      },
+    Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+      keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
+      setTimeout(() => {
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(43721) ?? -1);
+        settings.isDisableSelectSat = true;
+      }, 5000);
     });
   }
 }

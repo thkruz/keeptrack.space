@@ -26,6 +26,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
+import { Tessa } from '@app/tessa/tessa';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
@@ -168,7 +169,7 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality.toString());
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.saveSettings);
+    Tessa.getInstance().emit(KeepTrackApiEvents.saveSettings);
   }
 
   colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
@@ -1533,28 +1534,24 @@ export class SettingsManager {
             this.isEnableJscCatalog = val === 'true';
             break;
           case 'sat':
-            keepTrackApi.register({
-              event: KeepTrackApiEvents.onCruncherReady,
-              cbName: 'satFromSettings',
-              cb: () => {
-                setTimeout(() => {
-                  if (typeof val === 'string') {
-                    const sccNum = parseInt(val);
+            Tessa.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
+              setTimeout(() => {
+                if (typeof val === 'string') {
+                  const sccNum = parseInt(val);
 
-                    if (sccNum >= 0) {
-                      const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
+                  if (sccNum >= 0) {
+                    const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
 
-                      if (id && id >= 0) {
-                        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
-                      } else {
-                        keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
-                      }
+                    if (id && id >= 0) {
+                      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
                     } else {
                       keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
                     }
+                  } else {
+                    keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
                   }
-                }, 2000);
-              },
+                }
+              }, 2000);
             });
             break;
           case 'debug':

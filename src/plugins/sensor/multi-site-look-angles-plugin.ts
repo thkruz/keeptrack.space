@@ -1,4 +1,5 @@
 import { sensors } from '@app/catalogs/sensors';
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
@@ -142,17 +143,13 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.id,
-      cb: () => {
-        const sat = this.selectSatManager_?.getSelectedSat();
+    Doris.getInstance().on(KeepTrackApiEvents.staticOffsetChange, () => {
+      const sat = this.selectSatManager_?.getSelectedSat();
 
-        if (!sat?.isSatellite()) {
-          return;
-        }
-        this.refreshSideMenuData(sat as DetailedSatellite);
-      },
+      if (!sat?.isSatellite()) {
+        return;
+      }
+      this.refreshSideMenuData(sat as DetailedSatellite);
     });
   }
 

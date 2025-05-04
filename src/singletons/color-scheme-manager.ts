@@ -253,14 +253,10 @@ export class ColorSchemeManager {
       this.isReady = true;
 
       // This helps keep the inview colors up to date
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.staticOffsetChange,
-        cbName: 'colorSchemeManager',
-        cb: () => {
-          setTimeout(() => {
-            this.calcColorBufsNextCruncher();
-          }, 1000);
-        },
+      Doris.getInstance().on(KeepTrackApiEvents.staticOffsetChange, () => {
+        setTimeout(() => {
+          this.calcColorBufsNextCruncher();
+        }, 1000);
       });
     });
 

@@ -148,12 +148,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.id,
-      cb: () => {
-        this.refreshSideMenuData_();
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.staticOffsetChange, () => {
+      this.refreshSideMenuData_();
     });
   }
 

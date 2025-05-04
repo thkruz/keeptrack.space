@@ -4,11 +4,11 @@ import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
 
 
+import { Doris } from '@app/doris/doris';
 import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
-import { Doris } from '@app/doris/doris';
 
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 
@@ -81,14 +81,10 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.id,
-      cb: () => {
-        if (this.isMenuButtonActive) {
-          this.updatePlot_();
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.staticOffsetChange, () => {
+      if (this.isMenuButtonActive) {
+        this.updatePlot_();
+      }
     });
 
     keepTrackApi.register({

@@ -78,7 +78,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.resetSensor]: []; // Done
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null]; // Done
   [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]]; // Done
-  [KeepTrackApiEvents.staticOffsetChange]: [number];
+  [KeepTrackApiEvents.staticOffsetChange]: [number]; // Done
   [KeepTrackApiEvents.onLineAdded]: [LineManager];
   [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
   [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];

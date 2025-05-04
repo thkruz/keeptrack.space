@@ -169,7 +169,7 @@ export class TimeManager {
     this.staticOffset = staticOffset;
     this.calculateSimulationTime();
     this.synchronize();
-    keepTrackApi.runEvent(KeepTrackApiEvents.staticOffsetChange, this.staticOffset);
+    Doris.getInstance().emit(KeepTrackApiEvents.staticOffsetChange, this.staticOffset);
   }
 
   getOffsetTimeObj(offset: number) {

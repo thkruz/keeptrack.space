@@ -7,6 +7,7 @@ import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 
 export class GamepadPlugin {
   readonly id = 'GamepadPlugin';
@@ -38,14 +39,7 @@ export class GamepadPlugin {
   initializeGamepad(gamepad: Gamepad): void {
     keepTrackApi.getUiManager().toast('Gamepad connected', ToastMsgType.normal);
 
-    // Only initialize once
-    if (!this.currentController) {
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.updateLoop,
-        cbName: this.id,
-        cb: this.updateGamepad.bind(this),
-      });
-    }
+    Doris.getInstance().on(CoreEngineEvents.Update, this.updateGamepad.bind(this));
 
     this.currentController = gamepad;
   }

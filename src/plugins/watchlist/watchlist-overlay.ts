@@ -1,3 +1,5 @@
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { GetSatType, KeepTrackApiEvents, MenuMode, SatPassTimes, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
@@ -86,11 +88,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: 'watchlist',
-      cb: this.updateLoop.bind(this),
-    });
+    Doris.getInstance().on(CoreEngineEvents.Update, this.update.bind(this));
     keepTrackApi.register({
       event: KeepTrackApiEvents.onWatchlistUpdated,
       cbName: this.id,
@@ -103,7 +101,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     });
   }
 
-  updateLoop() {
+  update() {
     this.updateNextPassOverlay_();
 
     if (!keepTrackApi.getDotsManager().inViewData) {

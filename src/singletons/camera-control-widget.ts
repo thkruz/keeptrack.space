@@ -1,4 +1,5 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec3 } from 'gl-matrix';
 import { Radians } from 'ootk';
@@ -52,11 +53,7 @@ export class CameraControlWidget {
     document.addEventListener('mouseup', this.onMouseUp.bind(this));
     this.canvas.addEventListener('click', this.onClick.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: 'cameraControlWidget',
-      cb: this.draw.bind(this),
-    });
+    Doris.getInstance().on(CoreEngineEvents.Update, this.draw.bind(this));
   }
 
   private onMouseDown(event: MouseEvent) {

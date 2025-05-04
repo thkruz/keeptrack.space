@@ -1,3 +1,5 @@
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
@@ -191,11 +193,7 @@ export class MissilePlugin extends KeepTrackPlugin {
     super.addJs();
 
     // Missile oribts have to be updated every draw or they quickly become innacurate
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: 'updateMissileOrbits',
-      cb: this.updateLoop_.bind(this),
-    });
+    Doris.getInstance().on(CoreEngineEvents.Update, this.update_.bind(this));
   }
 
   private searchForRvs_() {
@@ -481,7 +479,7 @@ export class MissilePlugin extends KeepTrackPlugin {
     this.msTargetChange_();
   }
 
-  private updateLoop_(): void {
+  private update_(): void {
     if (typeof missileManager !== 'undefined' && missileManager.missileArray.length > 0) {
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
 

@@ -1,4 +1,5 @@
 import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { isThisNode } from '@app/static/isThisNode';
 import { expect } from '@jest/globals';
@@ -63,12 +64,8 @@ test('keepTrackApi Unit Testing', () => {
     // Do nothing
   });
 
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.updateLoop,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  Doris.getInstance().on(CoreEngineEvents.Update, () => {
+    // Do nothing
   });
 
   keepTrackApi.register({
@@ -120,7 +117,7 @@ test('keepTrackApi Unit Testing', () => {
   Doris.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
 
   Doris.getInstance().emit(KeepTrackApiEvents.orbitManagerInit);
-  keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
+  Doris.getInstance().emit(CoreEngineEvents.Update, 0);
   keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, 'test', -1);
   keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date());
   keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);

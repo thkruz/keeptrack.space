@@ -294,7 +294,6 @@ export enum KeepTrackApiEvents {
   hideSideMenus = 'hideSideMenus',
   nightToggle = 'nightToggle',
   orbitManagerInit = 'orbitManagerInit',
-  updateLoop = 'updateLoop',
   /**
    * Run as the default case in the rmbMenuActions event with parameters (targetId: string, clickedSat: number)
    */

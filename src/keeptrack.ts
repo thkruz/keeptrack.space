@@ -515,7 +515,6 @@ theodore.kruczek at gmail dot com.
 
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
       this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
-      keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
     });
     Doris.getInstance().on(CoreEngineEvents.AssetLoadComplete, this.postStart_.bind(this));
   }

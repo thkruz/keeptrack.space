@@ -1,6 +1,6 @@
 import { Engine } from '@app/doris/core/engine';
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/interfaces';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
@@ -19,6 +19,7 @@ import { SkyBoxSphere } from './draw-manager/skybox-sphere';
 import { Sun } from './draw-manager/sun';
 import { errorManagerInstance } from './errorManager';
 import { WebGLRenderer } from './webgl-renderer';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 
 export interface SceneParams {
   gl: WebGL2RenderingContext;
@@ -69,11 +70,7 @@ export class Scene {
     this.gl_ = gl;
     this.skybox.init(settingsManager, gl);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: Scene.id,
-      cb: this.update.bind(this),
-    });
+    Doris.getInstance().on(CoreEngineEvents.Update, this.update.bind(this));
   }
 
   update() {

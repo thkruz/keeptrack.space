@@ -191,7 +191,7 @@ export class WebpackManager {
       plugins: [
         new WebpackBar({
           name: 'KeepTrack Main Code',
-          color: '#ba160c',
+          color: '#66b242',
           basic: false,
           fancy: true,
           profile: false,
@@ -270,7 +270,7 @@ export class WebpackManager {
         plugins: [
           new WebpackBar({
             name: 'KeepTrack Workers',
-            color: '#ffffff',
+            color: '#66b242',
             basic: false,
             fancy: true,
             profile: false,

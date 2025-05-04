@@ -46,13 +46,9 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     this.registerKeyboardEvents_();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: this.id,
-      cb: this.checkIfSelectSatVisible.bind(this),
-    });
-
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
+      this.checkIfSelectSatVisible();
+
       if (this.primarySatObj.id !== -1) {
         const timeManagerInstance = keepTrackApi.getTimeManager();
 

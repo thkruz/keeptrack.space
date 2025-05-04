@@ -176,43 +176,39 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
       }
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: this.id,
-      cb: (): void => {
-        if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) {
+    Doris.getInstance().on(CoreEngineEvents.Update, () => {
+      if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) {
+        return;
+      }
+      const camera = keepTrackApi.getMainCamera();
+      const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
+
+      if (camera && selectSatManagerInstance) {
+        const selectedSat = selectSatManagerInstance.selectedSat;
+        const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.POSITION_ONLY) : null;
+
+        const position = camera.getCameraPosition(sat?.position);
+
+        setInnerHtml('debug-camera-position-x', `X: ${position[0].toFixed(2)}`);
+        setInnerHtml('debug-camera-position-y', `Y: ${position[1].toFixed(2)}`);
+        setInnerHtml('debug-camera-position-z', `Z: ${position[2].toFixed(2)}`);
+        setInnerHtml('debug-camera-distance-from-earth', `Distance from Center: ${camera.getCameraDistance().toFixed(2)} km`);
+        this.lastCameraUpdate = <Milliseconds>new Date().getTime();
+      }
+      if (selectSatManagerInstance.selectedSat >= 0) {
+        const sat = keepTrackApi.getCatalogManager().getObject(selectSatManagerInstance.selectedSat, GetSatType.POSITION_ONLY);
+
+        if (!sat) {
+          errorManagerInstance.warn('Satellite not found');
+
           return;
         }
-        const camera = keepTrackApi.getMainCamera();
-        const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
+        const position = sat.position;
 
-        if (camera && selectSatManagerInstance) {
-          const selectedSat = selectSatManagerInstance.selectedSat;
-          const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.POSITION_ONLY) : null;
-
-          const position = camera.getCameraPosition(sat?.position);
-
-          setInnerHtml('debug-camera-position-x', `X: ${position[0].toFixed(2)}`);
-          setInnerHtml('debug-camera-position-y', `Y: ${position[1].toFixed(2)}`);
-          setInnerHtml('debug-camera-position-z', `Z: ${position[2].toFixed(2)}`);
-          setInnerHtml('debug-camera-distance-from-earth', `Distance from Center: ${camera.getCameraDistance().toFixed(2)} km`);
-          this.lastCameraUpdate = <Milliseconds>new Date().getTime();
-        }
-        if (selectSatManagerInstance.selectedSat >= 0) {
-          const sat = keepTrackApi.getCatalogManager().getObject(selectSatManagerInstance.selectedSat, GetSatType.POSITION_ONLY);
-
-          if (!sat) {
-            errorManagerInstance.warn('Satellite not found');
-
-            return;
-          }
-          const position = sat.position;
-
-          setInnerHtml('debug-sat-position-x', `X: ${position.x.toFixed(2)}`);
-          setInnerHtml('debug-sat-position-y', `Y: ${position.y.toFixed(2)}`);
-          setInnerHtml('debug-sat-position-z', `Z: ${position.z.toFixed(2)}`);
-        }
-      },
+        setInnerHtml('debug-sat-position-x', `X: ${position.x.toFixed(2)}`);
+        setInnerHtml('debug-sat-position-y', `Y: ${position.y.toFixed(2)}`);
+        setInnerHtml('debug-sat-position-z', `Z: ${position.z.toFixed(2)}`);
+      }
     });
 
     const keyboardManager = keepTrackApi.getInputManager().keyboard;

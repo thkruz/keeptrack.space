@@ -68,7 +68,6 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.hideSideMenus]: []; // Done
   [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture]; // Done
   [KeepTrackApiEvents.orbitManagerInit]: []; // Done
-  [KeepTrackApiEvents.drawManagerLoadScene]: [];
   [KeepTrackApiEvents.drawOptionalScenery]: [];
   [KeepTrackApiEvents.updateLoop]: [];
   [KeepTrackApiEvents.rmbMenuActions]: [string, number];
@@ -113,7 +112,6 @@ declare module '@app/doris/events/event-types' {
     [KeepTrackApiEvents.hideSideMenus]: [];
     [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture];
     [KeepTrackApiEvents.orbitManagerInit]: [];
-    [KeepTrackApiEvents.drawManagerLoadScene]: [];
     [KeepTrackApiEvents.drawOptionalScenery]: [];
     [KeepTrackApiEvents.updateLoop]: [];
     [KeepTrackApiEvents.rmbMenuActions]: [string, number];

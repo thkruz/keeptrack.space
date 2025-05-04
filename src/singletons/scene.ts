@@ -283,7 +283,6 @@ export class Scene {
   async loadScene(): Promise<void> {
     try {
       this.earth.init(settingsManager, this.gl_);
-      keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
       await this.sun.init(this.gl_);
 
       if (!settingsManager.isDisableGodrays) {

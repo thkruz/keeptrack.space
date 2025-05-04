@@ -64,14 +64,6 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.register({
-    event: KeepTrackApiEvents.drawManagerLoadScene,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
-  });
-
-  keepTrackApi.register({
     event: KeepTrackApiEvents.drawOptionalScenery,
     cbName: 'test',
     cb: () => {
@@ -136,7 +128,6 @@ test('keepTrackApi Unit Testing', () => {
   Doris.getInstance().emit(KeepTrackApiEvents.hideSideMenus);
 
   Doris.getInstance().emit(KeepTrackApiEvents.orbitManagerInit);
-  keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
   keepTrackApi.runEvent(KeepTrackApiEvents.drawOptionalScenery);
   keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
   keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, 'test', -1);

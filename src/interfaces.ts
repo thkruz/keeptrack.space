@@ -294,7 +294,6 @@ export enum KeepTrackApiEvents {
   hideSideMenus = 'hideSideMenus',
   nightToggle = 'nightToggle',
   orbitManagerInit = 'orbitManagerInit',
-  drawManagerLoadScene = 'drawManagerLoadScene',
   drawOptionalScenery = 'drawOptionalScenery',
   updateLoop = 'updateLoop',
   /**

@@ -30,6 +30,7 @@ import { showLoading } from '@app/lib/showLoading';
 
 import { SatMath } from '@app/static/sat-math';
 
+import { Doris } from '@app/doris/doris';
 import { getUnique } from '@app/lib/get-unique';
 import { saveCsv } from '@app/lib/saveVariable';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -39,7 +40,6 @@ import folderCodePng from '@public/img/icons/folder-code.png';
 import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
-import { Doris } from '@app/doris/doris';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
@@ -259,15 +259,11 @@ export class AnalysisMenu extends KeepTrackPlugin {
       clickAndDragWidth(getEl('analysis-menu'));
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: this.id,
-      cb: (sensor) => {
-        if (!sensor) {
-          return;
-        }
-        AnalysisMenu.setSensor_(sensor);
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.setSensor, (sensor) => {
+      if (!sensor) {
+        return;
+      }
+      AnalysisMenu.setSensor_(sensor);
     });
   }
 

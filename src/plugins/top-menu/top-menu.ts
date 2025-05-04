@@ -115,13 +115,7 @@ export class TopMenu extends KeepTrackPlugin {
       };
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: this.id,
-      cb: () => {
-        this.updateSensorName();
-      },
-    });
+    Doris.getInstance().on(KeepTrackApiEvents.setSensor, this.updateSensorName.bind(this));
   }
 
   updateSensorName() {

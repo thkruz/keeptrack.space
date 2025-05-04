@@ -9,6 +9,7 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { Doris } from '@app/doris/doris';
 
 describe('SensorSurvFence_class', () => {
   let sensorSurvFencePlugin: SensorSurvFence;
@@ -38,10 +39,10 @@ describe('SensorSurvFence_class', () => {
   it('test_change_sensor', () => {
     websiteInit(sensorSurvFencePlugin);
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, 'sensor', 1)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 0)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 2)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, 'sensor', 1)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, defaultSensor, 0)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, defaultSensor, 2)).not.toThrow();
   });
 });

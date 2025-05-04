@@ -7,6 +7,7 @@ import { ShortTermFences } from '@app/plugins/short-term-fences/short-term-fence
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
+import { Doris } from '@app/doris/doris';
 
 describe('ShortTermFences_class', () => {
   beforeEach(() => {
@@ -28,8 +29,8 @@ describe('ShortTermFences_class', () => {
     const stf = new ShortTermFences();
 
     websiteInit(stf);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 1)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, defaultSensor, 1)).not.toThrow();
   });
 
   // test stfFormOnSubmit static method

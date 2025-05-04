@@ -197,17 +197,13 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     Doris.getInstance().on(KeepTrackApiEvents.resetSensor, this.closeAndDisable_.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: 'shortTermFences',
-      cb: (sensor, id): void => {
-        if (sensor === null && id === null) {
-          this.closeAndDisable_();
-          slideOutLeft(getEl(this.sideMenuElementName), 1000);
-        } else {
-          this.setBottomIconToEnabled();
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.setSensor, (sensor, id): void => {
+      if (sensor === null && id === null) {
+        this.closeAndDisable_();
+        slideOutLeft(getEl(this.sideMenuElementName), 1000);
+      } else {
+        this.setBottomIconToEnabled();
+      }
     });
   }
 

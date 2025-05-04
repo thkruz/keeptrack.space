@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -48,20 +49,16 @@ export class SensorFov extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: this.id,
-      cb: (sensor): void => {
-        if (sensor) {
-          getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
-          this.isIconDisabled = false;
-        } else {
-          getEl(this.bottomIconElementName)?.classList.add(KeepTrackPlugin.iconDisabledClassString);
-          this.isIconDisabled = true;
-          this.isMenuButtonActive = false;
-          getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.setSensor, (sensor): void => {
+      if (sensor) {
+        getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
+        this.isIconDisabled = false;
+      } else {
+        getEl(this.bottomIconElementName)?.classList.add(KeepTrackPlugin.iconDisabledClassString);
+        this.isIconDisabled = true;
+        this.isMenuButtonActive = false;
+        getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
+      }
     });
 
     keepTrackApi.register({

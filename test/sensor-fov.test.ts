@@ -1,7 +1,6 @@
 import { keepTrackContainer } from '@app/container';
 import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
@@ -39,10 +38,10 @@ describe('SensorFov_class', () => {
   it('test_change_sensor', () => {
     websiteInit(SensorFovPlugin);
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, 'sensor', 1)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 0)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 2)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, 'sensor', 1)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, defaultSensor, 0)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => Doris.getInstance().emit(KeepTrackApiEvents.setSensor, defaultSensor, 2)).not.toThrow();
   });
 });

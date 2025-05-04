@@ -439,7 +439,7 @@ export class SensorManager {
     }
 
     // Run any callbacks
-    keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, selectedSensor, sensorId ?? null);
+    Doris.getInstance().emit(KeepTrackApiEvents.setSensor, selectedSensor, sensorId ?? null);
 
     for (const sensor of this.currentSensors) {
       keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);

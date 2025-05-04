@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fencePng from '@public/img/icons/fence.png';
@@ -48,16 +49,12 @@ export class SensorSurvFence extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: this.id,
-      cb: (sensor): void => {
-        if (sensor) {
-          this.setBottomIconToEnabled();
-        } else {
-          this.setBottomIconToDisabled();
-        }
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.setSensor, (sensor): void => {
+      if (sensor) {
+        this.setBottomIconToEnabled();
+      } else {
+        this.setBottomIconToDisabled();
+      }
     });
 
     keepTrackApi.register({

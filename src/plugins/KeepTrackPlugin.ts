@@ -748,17 +748,13 @@ export abstract class KeepTrackPlugin {
     }
 
     if (this.isRequireSensorSelected && !this.isRequireSatelliteSelected) {
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.setSensor,
-        cbName: this.id,
-        cb: (sensor, sensorId): void => {
-          if (!sensor && !sensorId) {
-            this.setBottomIconToDisabled();
-            this.setBottomIconToUnselected();
-          } else {
-            this.setBottomIconToEnabled();
-          }
-        },
+      Doris.getInstance().on(KeepTrackApiEvents.setSensor, (sensor, sensorId): void => {
+        if (!sensor && !sensorId) {
+          this.setBottomIconToDisabled();
+          this.setBottomIconToUnselected();
+        } else {
+          this.setBottomIconToEnabled();
+        }
       });
     }
 

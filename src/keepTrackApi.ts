@@ -79,7 +79,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null]; // Done
   [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]]; // Done
   [KeepTrackApiEvents.staticOffsetChange]: [number]; // Done
-  [KeepTrackApiEvents.onLineAdded]: [LineManager];
+  [KeepTrackApiEvents.onLineChange]: [LineManager];
   [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
   [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
   [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];
@@ -115,7 +115,7 @@ declare module '@app/doris/events/event-types' {
     [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
     [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
     [KeepTrackApiEvents.staticOffsetChange]: [number];
-    [KeepTrackApiEvents.onLineAdded]: [LineManager];
+    [KeepTrackApiEvents.onLineChange]: [LineManager];
     [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
     [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
     [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];

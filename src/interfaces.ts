@@ -321,7 +321,7 @@ export enum KeepTrackApiEvents {
   /**
    * Runs when a line is added to the line manager
    */
-  onLineAdded = 'onLineAdded',
+  onLineChange = 'onLineAdded',
   /**
    * Runs when a sensor dot is selected but not when a sensor is selected from the sensor menu
    */

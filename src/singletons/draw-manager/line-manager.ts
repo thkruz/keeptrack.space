@@ -4,6 +4,7 @@
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { BaseObject, DetailedSatellite, DetailedSensor, RaeVec3 } from 'ootk';
 
+import { Doris } from '@app/doris/doris';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
@@ -43,12 +44,12 @@ export class LineManager {
 
   clear(): void {
     this.lines = [];
-    keepTrackApi.runEvent(KeepTrackApiEvents.onLineAdded, keepTrackApi.getLineManager());
+    Doris.getInstance().emit(KeepTrackApiEvents.onLineChange, this);
   }
 
   add(line: Line): void {
     this.lines.push(line);
-    keepTrackApi.runEvent(KeepTrackApiEvents.onLineAdded, this);
+    Doris.getInstance().emit(KeepTrackApiEvents.onLineChange, this);
   }
 
   createSatRicFrame(sat: DetailedSatellite | MissileObject | null): void {

@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
@@ -8,7 +9,6 @@ import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { RfSensor, SpaceObjectType } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
-import { Doris } from '@app/doris/doris';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   readonly id = 'SensorInfoPlugin';
@@ -105,12 +105,8 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       this.addSensorToMoonBtnListener();
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onLineAdded,
-      cbName: this.id,
-      cb: (lineManager: LineManager) => {
-        this.checkIfLinesVisible_(lineManager);
-      },
+    Doris.getInstance().on(KeepTrackApiEvents.onLineChange, (lineManager: LineManager) => {
+      this.checkIfLinesVisible_(lineManager);
     });
   }
 

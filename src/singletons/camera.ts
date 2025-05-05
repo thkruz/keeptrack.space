@@ -21,6 +21,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { PerspectiveCamera } from '@app/doris/camera/perspective-camera';
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents, WebGlEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
@@ -57,7 +58,7 @@ export enum CameraType {
   OFFSET = 8,
 }
 
-export class Camera {
+export class OriginalCamera extends PerspectiveCamera {
   static readonly id = 'Camera';
   /** Main source of projection matrix for rest of the application */
   projectionMatrix: mat4;
@@ -212,6 +213,7 @@ export class Camera {
   camDistBuffer = <Kilometers>0;
 
   constructor() {
+    super();
     this.settings_ = <SettingsManager>(<unknown>{
       autoPanSpeed: 1,
       autoRotateSpeed: 0.0075,
@@ -783,7 +785,7 @@ export class Camera {
   init(settings: SettingsManager) {
     this.settings_ = settings;
 
-    this.projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+    this.projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
 
     this.registerKeyboardEvents_();
 
@@ -798,7 +800,7 @@ export class Camera {
     });
 
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
-      this.update(Doris.getInstance().getTimeManager().getRealTimeDelta() as Milliseconds);
+      this.update();
     });
 
     Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, this.validateProjectionMatrix_.bind(this));
@@ -1302,7 +1304,9 @@ export class Camera {
   /**
    * Calculate the camera's position and camera matrix
    */
-  update(dt: Milliseconds) {
+  update() {
+    const dt = Doris.getInstance().getTimeManager().getRealTimeDelta() as Milliseconds;
+
     this.updatePan_(dt);
     this.updateLocalRotation_(dt);
     this.updatePitchYawSpeeds_(dt);
@@ -1371,13 +1375,13 @@ export class Camera {
   validateProjectionMatrix_() {
     if (!this.projectionMatrix) {
       errorManagerInstance.log('projectionMatrix is undefined - retrying');
-      this.projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+      this.projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
     }
 
     for (let i = 0; i < 16; i++) {
       if (isNaN(this.projectionMatrix[i])) {
         errorManagerInstance.log('projectionMatrix is NaN - retrying');
-        this.projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+        this.projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
       }
     }
 
@@ -1387,7 +1391,7 @@ export class Camera {
       }
       if (i === 15) {
         errorManagerInstance.log('projectionMatrix is all zeros - retrying');
-        this.projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+        this.projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
       }
     }
   }

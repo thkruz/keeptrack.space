@@ -11,7 +11,7 @@ import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
 import { GetSatType } from '../interfaces';
 import { setInnerHtml } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
-import { Camera, CameraType } from './camera';
+import { CameraType, OriginalCamera } from './camera';
 import { ColorSchemeManager } from './color-scheme-manager';
 import { LineManager } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
@@ -104,7 +104,7 @@ export class OrbitManager {
     tgtBuffer: WebGLFramebuffer | null,
     hoverManagerInstance: HoverManager,
     colorSchemeManagerInstance: ColorSchemeManager,
-    mainCameraInstance: Camera,
+    mainCameraInstance: OriginalCamera,
   ): void {
     if (!this.isInitialized_) {
       return;
@@ -485,7 +485,7 @@ export class OrbitManager {
     }
   }
 
-  private drawInViewObjectOrbit_(mainCameraInstance: Camera): void {
+  private drawInViewObjectOrbit_(mainCameraInstance: OriginalCamera): void {
     if (this.currentInView_.length >= 1) {
       // There might be some z-fighting
       if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {

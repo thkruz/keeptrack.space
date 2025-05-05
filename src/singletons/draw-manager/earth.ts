@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Component } from '@app/doris/components/component';
 import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -50,7 +51,7 @@ export enum EarthDayTextureQuality {
   ULTRA = '16k',
 }
 
-export class Earth {
+export class Earth extends Component {
   private gl_: WebGL2RenderingContext;
   private glowDirection_ = 1;
   private glowNumber_ = 0;
@@ -72,17 +73,6 @@ export class Earth {
   lightDirection = <vec3>[0, 0, 0];
   mesh: Mesh;
   imageCache: Record<string, HTMLImageElement> = {};
-
-  /**
-   * This is run once per frame to render the earth.
-   */
-  draw(tgtBuffer: WebGLFramebuffer | null) {
-    if (!this.isTexturesReady_) {
-      return;
-    }
-    this.drawColoredEarth_(tgtBuffer);
-    this.drawBlackGpuPickingEarth_();
-  }
 
   /**
    * This is run once per frame to render the earth in godrays buffer.
@@ -113,10 +103,25 @@ export class Earth {
      */
   }
 
+  constructor(gl: WebGL2RenderingContext) {
+    super();
+    this.gl_ = gl;
+    this.modelViewMatrix_ = mat4.create();
+    this.isHiResReady = false;
+    this.isUseHiRes = false;
+    this.textureDay = null as unknown as WebGLTexture;
+    this.textureNight = null as unknown as WebGLTexture;
+    this.textureBump_ = null as unknown as WebGLTexture;
+    this.textureSpec_ = null as unknown as WebGLTexture;
+
+    this.isTexturesReady_ = false;
+    this.initialize(gl);
+  }
+
   /**
    * This is run once per session to initialize the earth.
    */
-  init(gl?: WebGL2RenderingContext): void {
+  initialize(gl?: WebGL2RenderingContext): void {
     try {
       if (!gl && !this.gl_) {
         throw new Error('No WebGL context found');
@@ -159,6 +164,37 @@ export class Earth {
     } catch (error) {
       errorManagerInstance.debug(error);
     }
+  }
+
+  /**
+   * This is run once per frame to update the earth.
+   */
+  update(gmst: GreenwichMeanSiderealTime): void {
+    const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+
+    this.lightDirection = [pos.x, pos.y, pos.z];
+    vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
+
+    this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
+    // this.modelViewMatrix_ = mat4.mul(this.modelViewMatrix_, keepTrackApi.getMainCamera().camMatrix, this.modelViewMatrix_);
+    mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, gmst);
+    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
+
+    // Update the aurora glow
+    this.glowNumber_ += 0.0025 * this.glowDirection_;
+    this.glowDirection_ = this.glowNumber_ > 1 ? -1 : this.glowDirection_;
+    this.glowDirection_ = this.glowNumber_ < 0 ? 1 : this.glowDirection_;
+  }
+
+  /**
+   * This is run once per frame to render the earth.
+   */
+  render(tgtBuffer: WebGLFramebuffer | null) {
+    if (!this.isTexturesReady_ || !keepTrackApi.getMainCamera()) {
+      return;
+    }
+    this.drawColoredEarth_(tgtBuffer);
+    this.drawBlackGpuPickingEarth_();
   }
 
   /**
@@ -207,29 +243,9 @@ export class Earth {
    * It can be run multiple times to reload the textures.
    */
   reloadEarthHiResTextures(gl: WebGL2RenderingContext): void {
-    this.init(gl);
+    this.initialize(gl);
     this.loadHiRes(this.textureDay, Earth.getSrcHiResDay_(settingsManager));
     this.loadHiRes(this.textureNight, Earth.getSrcHiResNight_(settingsManager));
-  }
-
-  /**
-   * This is run once per frame to update the earth.
-   */
-  update(gmst: GreenwichMeanSiderealTime): void {
-    const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
-
-    this.lightDirection = [pos.x, pos.y, pos.z];
-    vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
-
-    this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
-    // this.modelViewMatrix_ = mat4.mul(this.modelViewMatrix_, keepTrackApi.getMainCamera().camMatrix, this.modelViewMatrix_);
-    mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, gmst);
-    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
-
-    // Update the aurora glow
-    this.glowNumber_ += 0.0025 * this.glowDirection_;
-    this.glowDirection_ = this.glowNumber_ > 1 ? -1 : this.glowDirection_;
-    this.glowDirection_ = this.glowNumber_ < 0 ? 1 : this.glowDirection_;
   }
 
   /**

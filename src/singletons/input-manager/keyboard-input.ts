@@ -3,7 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
-import { Camera } from '@app/singletons/camera';
+import { OriginalCamera } from '@app/singletons/camera';
 import { errorManagerInstance } from '../errorManager';
 import { KeyEvent } from '../input-manager';
 
@@ -216,7 +216,7 @@ export class KeyboardInput {
     }
   }
 
-  private releaseShiftKey(mainCameraInstance: Camera) {
+  private releaseShiftKey(mainCameraInstance: OriginalCamera) {
     setTimeout(() => {
       this.isShiftPressed = false;
       mainCameraInstance.fpsRun = 1;

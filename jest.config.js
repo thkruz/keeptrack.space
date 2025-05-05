@@ -22,6 +22,7 @@ export default {
     '\\.(css|less|sass|scss)$': '<rootDir>/build/mock/styleMock.js',
     '\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': '<rootDir>/build/mock/fileMock.js',
     '^@app(.*)$': '<rootDir>/src/$1',
+    '^@doris(.*)$': '<rootDir>/src/doris/$1',
     '^@public(.*)$': '<rootDir>/public/$1',
     '^@css(.*)$': '<rootDir>/public/css/$1',
   },

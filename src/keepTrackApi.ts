@@ -9,7 +9,7 @@ import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import type { SensorManager } from './plugins/sensor/sensorManager';
 import { SoundManager } from './plugins/sounds/sound-manager';
 import { SettingsManager } from './settings/settings';
-import { Camera } from './singletons/camera';
+import { OriginalCamera } from './singletons/camera';
 import type { CatalogManager } from './singletons/catalog-manager';
 import { MissileObject } from './singletons/catalog-manager/MissileObject';
 import type { ColorSchemeManager } from './singletons/color-scheme-manager';
@@ -241,7 +241,7 @@ export class KeepTrackApi {
   getSensorMath = () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath);
   getLineManager = () => keepTrackContainer.get<LineManager>(Singletons.LineManager);
   getHoverManager = () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager);
-  getMainCamera = () => keepTrackContainer.get<Camera>(Singletons.MainCamera);
+  getMainCamera = () => keepTrackContainer.get<OriginalCamera>(Singletons.MainCamera);
   getMeshManager = () => keepTrackContainer.get<MeshManager>(Singletons.MeshManager);
 
   saveCsv = saveCsv;

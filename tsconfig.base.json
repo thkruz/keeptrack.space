@@ -53,6 +53,9 @@
       "@app/*": [
         "src/*"
       ],
+      "@doris/*": [
+        "src/doris/*"
+      ],
       "@public/*": [
         "public/*"
       ],

@@ -6,7 +6,7 @@ import { getEl } from '@app/lib/get-el';
 import { t7e } from '@app/locales/keys';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Camera, CameraType } from '@app/singletons/camera';
+import { CameraType, OriginalCamera } from '@app/singletons/camera';
 import { UiManager } from '@app/singletons/uiManager';
 import { mockCameraManager, mockUiManager } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
@@ -76,7 +76,7 @@ describe('SatelliteViewPlugin_class', () => {
     plugin.init();
     Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
     Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
-    keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
+    keepTrackContainer.registerSingleton<OriginalCamera>(Singletons.MainCamera, mockCameraManager);
     Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).toHaveBeenCalledWith(t7e('errorMsgs.SelectSatelliteFirst'), ToastMsgType.serious, true);
   });
@@ -90,7 +90,7 @@ describe('SatelliteViewPlugin_class', () => {
     plugin.init();
     Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
     Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
-    keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
+    keepTrackContainer.registerSingleton<OriginalCamera>(Singletons.MainCamera, mockCameraManager);
     Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
@@ -104,9 +104,9 @@ describe('SatelliteViewPlugin_class', () => {
     plugin.init();
     Doris.getInstance().emit(KeepTrackApiEvents.HtmlInitialize);
     Doris.getInstance().emit(KeepTrackApiEvents.AfterHtmlInitialize);
-    const tempMockCamera = { ...mockCameraManager, cameraType: CameraType.SATELLITE } as Camera;
+    const tempMockCamera = { ...mockCameraManager, cameraType: CameraType.SATELLITE } as OriginalCamera;
 
-    keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, tempMockCamera);
+    keepTrackContainer.registerSingleton<OriginalCamera>(Singletons.MainCamera, tempMockCamera);
     Doris.getInstance().emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });

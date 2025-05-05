@@ -54,7 +54,7 @@ import { SensorManager } from './plugins/sensor/sensorManager';
 import { WatchlistPlugin } from './plugins/watchlist/watchlist';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
-import { Camera, CameraType } from './singletons/camera';
+import { CameraType, OriginalCamera } from './singletons/camera';
 import { CameraControlWidget } from './singletons/camera-control-widget';
 import { CatalogManager } from './singletons/catalog-manager';
 import { ColorSchemeManager } from './singletons/color-scheme-manager';
@@ -99,7 +99,7 @@ export class KeepTrack {
   sensorManager: SensorManager;
   uiManager: UiManager;
   inputManager: InputManager;
-  mainCameraInstance: Camera;
+  mainCameraInstance: OriginalCamera;
   cameraControlWidget: CameraControlWidget;
 
   constructor(
@@ -183,7 +183,7 @@ export class KeepTrack {
     const sensorMathInstance = new SensorMath();
 
     keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
-    const mainCameraInstance = new Camera();
+    const mainCameraInstance = new OriginalCamera();
 
     const cameraControlWidget = new CameraControlWidget();
 
@@ -530,7 +530,7 @@ theodore.kruczek at gmail dot com.
       }
 
       gl.viewport(0, 0, width, height);
-      keepTrackApi.getMainCamera().projectionMatrix = Camera.calculatePMatrix(gl);
+      keepTrackApi.getMainCamera().projectionMatrix = OriginalCamera.calculatePMatrix(gl);
 
       // Fix the gpu picker texture size if it has already been created
       const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -544,7 +544,7 @@ theodore.kruczek at gmail dot com.
     });
 
     Doris.getInstance().on(WebGlEvents.FovChanged, () => {
-      keepTrackApi.getMainCamera().projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+      keepTrackApi.getMainCamera().projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
       // Fix the gpu picker texture size if it has already been created
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 

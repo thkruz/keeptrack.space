@@ -1,4 +1,6 @@
 /* eslint-disable no-console */
+import { Doris } from '@app/doris/doris';
+import { Renderer } from '@app/doris/rendering/renderer';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
@@ -6,7 +8,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SensorManager } from '@app/plugins/sensor/sensorManager';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
-import { Camera } from '@app/singletons/camera';
+import { OriginalCamera } from '@app/singletons/camera';
 import { SatLinkManager } from '@app/singletons/catalog-manager/satLinkManager';
 import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { DotsManager } from '@app/singletons/dots-manager';
@@ -25,7 +27,6 @@ import { keepTrackContainer } from '../../src/container';
 import { Constructor, Singletons } from '../../src/interfaces';
 import { CatalogManager } from '../../src/singletons/catalog-manager';
 import { OrbitManager } from '../../src/singletons/orbitManager';
-import { WebGLRenderer } from '../../src/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './apiMocks';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
@@ -70,7 +71,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
 
   clearAllCallbacks();
 
-  const renderer = new WebGLRenderer();
+  const renderer = new Renderer(Doris.getInstance().getEventBus());
   const scene = new Scene({
     gl: global.mocks.glMock,
   });
@@ -303,7 +304,7 @@ export const mockUiManager: UiManager = <UiManager>(<unknown>{
   updateSelectBox: jest.fn(),
 });
 
-export const mockCameraManager = <Camera>(<unknown>{
+export const mockCameraManager = <OriginalCamera>(<unknown>{
   camAngleSnappedOnSat: false,
   camMatrix: mat4.create().fill(0),
   camPitch: null,

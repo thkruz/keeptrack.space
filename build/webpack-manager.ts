@@ -114,6 +114,7 @@ export class WebpackManager {
         extensions: ['.ts', '.js'],
         alias: {
           '@app': `${dirName}/../src`,
+          '@doris': `${dirName}/../src/doris`,
           '@public': `${dirName}/../public`,
           '@css/style.css': `${dirName}/../${styleCssPath}`,
           '@css/loading-screen.css': `${dirName}/../${loadingScreenCssPath}`,

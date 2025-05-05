@@ -9,7 +9,7 @@ import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SatMath } from '@app/static/sat-math';
 import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
-import { Camera } from './camera';
+import { OriginalCamera } from './camera';
 import { ConeMeshFactory } from './draw-manager/cone-mesh-factory';
 import { Box } from './draw-manager/cube';
 import { Earth } from './draw-manager/earth';
@@ -57,7 +57,7 @@ export class Scene {
     this.background = params?.background;
 
     this.skybox = new SkyBoxSphere();
-    this.earth = new Earth();
+    this.earth = new Earth(this.gl_);
     this.moon = new Moon();
     this.sun = new Sun();
     this.godrays = new Godrays();
@@ -97,7 +97,7 @@ export class Scene {
     this.coneFactory.updateAll();
   }
 
-  render(renderer: Renderer, camera: Camera): void {
+  render(renderer: Renderer, camera: OriginalCamera): void {
     if (!this.isInitialized_) {
       return;
     }
@@ -115,7 +115,7 @@ export class Scene {
   averageDrawTime = 0;
   drawTimeArray: number[] = Array(150).fill(16);
 
-  renderBackground(camera: Camera): void {
+  renderBackground(camera: OriginalCamera): void {
     this.drawTimeArray.push(Math.min(100, Doris.getInstance().getTimeManager().getRealTimeDelta()));
     if (this.drawTimeArray.length > 150) {
       this.drawTimeArray.shift();
@@ -221,14 +221,14 @@ export class Scene {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  renderOpaque(renderer: Renderer, camera: Camera): void {
+  renderOpaque(renderer: Renderer, camera: OriginalCamera): void {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const hoverManagerInstance = keepTrackApi.getHoverManager();
 
     // Draw Earth
-    this.earth.draw(this.postProcessingManager.curBuffer);
+    this.earth.render(this.postProcessingManager.curBuffer);
 
     // Draw Dots
     dotsManagerInstance.draw(renderer.projectionCameraMatrix, this.postProcessingManager.curBuffer);
@@ -248,7 +248,7 @@ export class Scene {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  renderTransparent(camera: Camera): void {
+  renderTransparent(camera: OriginalCamera): void {
     const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
 
     if (!selectedSatelliteManager) {
@@ -295,7 +295,7 @@ export class Scene {
 
   async loadScene(): Promise<void> {
     try {
-      this.earth.init(this.gl_);
+      this.earth.initialize(this.gl_);
       await this.sun.init(this.gl_);
 
       if (!settingsManager.isDisableGodrays) {

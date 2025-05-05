@@ -1,8 +1,9 @@
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { isThisNode } from '@app/static/isThisNode';
 import { mat4 } from 'gl-matrix';
-import { Camera as OldCamera } from '../../singletons/camera';
+import { OriginalCamera as OldCamera } from '../../singletons/camera';
 import type { Scene as OldScene } from '../../singletons/scene';
 import { Camera } from '../camera/camera';
 import { Doris } from '../doris';
@@ -84,8 +85,11 @@ export class Renderer {
     const camera = scene.activeCamera;
 
     if (!camera) {
-      return;
+      // return;
     }
+
+    // Apply the camera matrix
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), keepTrackApi.getMainCamera().projectionMatrix, keepTrackApi.getMainCamera().camMatrix);
 
     if (!this.gl) {
       // TODO: Try to reinitialize the context
@@ -96,12 +100,12 @@ export class Renderer {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
     // Render scene graph
-    this.renderNode(scene.root, camera);
+    this.renderNode(scene.root, camera!);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private renderNode(_node: SceneNode, _camera: Camera): void {
-    // TODO: Implement rendering logic for the node
+    _node.render(null);
   }
 
   private handleResize(): void {

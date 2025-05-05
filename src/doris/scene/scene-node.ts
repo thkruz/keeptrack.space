@@ -7,8 +7,8 @@ export class SceneNode {
   readonly transform: Transform = new Transform();
 
   private readonly components: Map<string, Component> = new Map();
-  private _parent: SceneNode | null = null;
-  private readonly _children: SceneNode[] = [];
+  private parent_: SceneNode | null = null;
+  private readonly children_: SceneNode[] = [];
 
   constructor(public name: string) {
     // Initialize transform
@@ -19,15 +19,15 @@ export class SceneNode {
       child.parent.removeChild(child);
     }
 
-    this.children.push(child);
+    this.children_.push(child);
     child.parent = this;
   }
 
   removeChild(child: SceneNode): void {
-    const index = this.children.indexOf(child);
+    const index = this.children_.indexOf(child);
 
     if (index !== -1) {
-      this.children.splice(index, 1);
+      this.children_.splice(index, 1);
       child.parent = null;
     }
   }
@@ -48,8 +48,19 @@ export class SceneNode {
     }
 
     // Update children
-    for (const child of this.children) {
+    for (const child of this.children_) {
       child.update(deltaTime);
+    }
+  }
+
+  render(buffer: WebGLBuffer | null): void {
+    // Render all components
+    for (const component of this.components.values()) {
+      component.render(buffer);
+    }
+    // Render children
+    for (const child of this.children_) {
+      child.render(buffer);
     }
   }
 
@@ -57,20 +68,20 @@ export class SceneNode {
    * Get all children of this node
    */
   get children(): SceneNode[] {
-    return [...this._children];
+    return [...this.children_];
   }
 
   /**
    * Get the parent node
    */
   get parent(): SceneNode | null {
-    return this._parent;
+    return this.parent_;
   }
 
   /**
    * Set the parent node (internal use)
    */
   set parent(node: SceneNode | null) {
-    this._parent = node;
+    this.parent_ = node;
   }
 }

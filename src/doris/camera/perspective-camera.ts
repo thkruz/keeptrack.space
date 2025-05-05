@@ -28,6 +28,14 @@ export class PerspectiveCamera extends Camera {
     );
   }
 
+  render(): void {
+    /*
+     * Implement rendering logic here
+     * For example, set the projection matrix in the shader
+     * this.shader.setUniform('projectionMatrix', this.projectionMatrix);
+     */
+  }
+
   // Additional methods specific to perspective cameras
   setFov(fov: number): void {
     this.fov = fov;

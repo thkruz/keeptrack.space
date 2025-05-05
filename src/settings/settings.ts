@@ -28,10 +28,10 @@ import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme'
 import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import { isThisNode } from '../doris/utils/isThisNode';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
 import { ClassificationString } from '../static/classification';
-import { isThisNode } from '../static/isThisNode';
 import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';

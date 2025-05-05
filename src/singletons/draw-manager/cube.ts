@@ -1,10 +1,10 @@
 import { Doris } from '@app/doris/doris';
-import { BufferAttribute } from '@app/static/buffer-attribute';
-import { WebGlProgramHelper } from '@app/static/webgl-program';
+import { BufferAttribute } from '@app/doris/webgl/buffer-attribute';
+import { WebGlProgramHelper } from '@app/doris/webgl/webgl-program';
 import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, EciVec3, Kilometers } from 'ootk';
+import { GlUtils } from '../../doris/webgl/gl-utils';
 import { keepTrackApi } from '../../keepTrackApi';
-import { GlUtils } from '../../static/gl-utils';
 
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */

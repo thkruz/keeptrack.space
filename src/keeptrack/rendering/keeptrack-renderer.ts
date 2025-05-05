@@ -10,8 +10,8 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import { mat4 } from 'gl-matrix';
 import { Milliseconds } from 'ootk';
 import { Renderer } from '../../doris/rendering/renderer';
-import { Scene } from '../../singletons/scene';
 import { LegacyCamera } from '../camera/legacy-camera';
+import { SpaceScene } from '../scene/space-scene';
 
 /**
  * Application-specific renderer for the legacy Scene/Camera system.
@@ -26,7 +26,7 @@ export class KeepTrackRenderer extends Renderer {
     Doris.getInstance().on(CoreEngineEvents.Render, this.render.bind(this));
   }
 
-  render(scene: Scene): void {
+  render(scene: SpaceScene): void {
     if (!scene.isInitialized_) {
       return;
     }
@@ -51,7 +51,7 @@ export class KeepTrackRenderer extends Renderer {
     Doris.getInstance().emit(CoreEngineEvents.RenderTransparent, camera, scene.postProcessingManager.curBuffer);
   }
 
-  renderBackground(scene: Scene, camera: LegacyCamera): void {
+  renderBackground(scene: SpaceScene, camera: LegacyCamera): void {
     if (!settingsManager.isDrawLess) {
       if (settingsManager.isDrawSun) {
         const fb = settingsManager.isDisableGodrays ? null : scene.godrays.godraysFramebuffer;
@@ -92,7 +92,7 @@ export class KeepTrackRenderer extends Renderer {
     scene.postProcessingManager.curBuffer = null;
   }
 
-  renderTransparent(scene: Scene, camera: LegacyCamera): void {
+  renderTransparent(scene: SpaceScene, camera: LegacyCamera): void {
     const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
 
     if (!selectedSatelliteManager) {

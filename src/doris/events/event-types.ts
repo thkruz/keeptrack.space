@@ -1,5 +1,5 @@
 import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
-import { Scene as OldScene } from '@app/singletons/scene';
+import { SpaceScene as OldScene } from '@app/keeptrack/scene/space-scene';
 import { Camera } from '../camera/camera';
 import { Plugin } from '../plugins/plugin';
 

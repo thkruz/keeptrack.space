@@ -1,9 +1,9 @@
+import { isThisNode } from '@app/doris/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { isThisNode } from '@app/static/isThisNode';
 import { mat4 } from 'gl-matrix';
-import type { Scene as OldScene } from '../../singletons/scene';
+import type { SpaceScene as OldScene } from '../../keeptrack/scene/space-scene';
 import { Camera } from '../camera/camera';
 import { Doris } from '../doris';
 import { EventBus } from '../events/event-bus';

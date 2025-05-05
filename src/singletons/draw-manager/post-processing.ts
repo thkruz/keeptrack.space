@@ -1,7 +1,7 @@
 // Shaders should NOT be modified
 /* eslint-disable no-useless-escape */
 
-import { WebGlProgramHelper } from '@app/static/webgl-program';
+import { WebGlProgramHelper } from '@app/doris/webgl/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
 import { postProcessingShaderCode } from '../../lib/post-processing-shader-code';
 

@@ -25,8 +25,8 @@
 
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
+import { isThisNode } from '../doris/utils/isThisNode';
 import { errorManagerInstance } from '../singletons/errorManager';
-import { isThisNode } from '../static/isThisNode';
 
 /**
  * Saves a variable as a text file.

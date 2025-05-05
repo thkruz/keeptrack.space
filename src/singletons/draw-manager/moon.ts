@@ -20,14 +20,14 @@
  */
 
 import { Doris } from '@app/doris/doris';
-import { GLSL3 } from '@app/static/material';
-import { Mesh } from '@app/static/mesh';
-import { ShaderMaterial } from '@app/static/shader-material';
-import { SphereGeometry } from '@app/static/sphere-geometry';
+import { GLSL3 } from '@app/doris/webgl/material';
+import { Mesh } from '@app/doris/webgl/mesh';
+import { ShaderMaterial } from '@app/doris/webgl/shader-material';
+import { SphereGeometry } from '@app/doris/webgl/sphere-geometry';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EciVec3, EpochUTC, Moon as MoonMath } from 'ootk';
+import { GlUtils } from '../../doris/webgl/gl-utils';
 import { keepTrackApi } from '../../keepTrackApi';
-import { GlUtils } from '../../static/gl-utils';
 
 export class Moon {
   /** The radius of the moon. */

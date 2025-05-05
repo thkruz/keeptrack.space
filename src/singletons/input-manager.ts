@@ -4,8 +4,8 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
+import { isThisNode } from '../doris/utils/isThisNode';
 import { getEl, hideEl, showEl } from '../lib/get-el';
-import { isThisNode } from '../static/isThisNode';
 
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';

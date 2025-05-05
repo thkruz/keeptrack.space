@@ -1,11 +1,11 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { BufferAttribute } from '@app/doris/webgl/buffer-attribute';
+import { FlatGeometry } from '@app/doris/webgl/flat-geometry';
+import { GLSL3 } from '@app/doris/webgl/material';
+import { Mesh } from '@app/doris/webgl/mesh';
+import { ShaderMaterial } from '@app/doris/webgl/shader-material';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BufferAttribute } from '@app/static/buffer-attribute';
-import { FlatGeometry } from '@app/static/flat-geometry';
-import { GLSL3 } from '@app/static/material';
-import { Mesh } from '@app/static/mesh';
-import { ShaderMaterial } from '@app/static/shader-material';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { Sun } from './sun';
 /* eslint-disable no-useless-escape */

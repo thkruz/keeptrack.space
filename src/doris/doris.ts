@@ -1,4 +1,4 @@
-import { isThisNode } from '@app/static/isThisNode';
+import { isThisNode } from '@app/doris/utils/isThisNode';
 import { Engine } from './core/engine';
 
 export class Doris {

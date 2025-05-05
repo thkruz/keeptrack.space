@@ -23,6 +23,7 @@
  */
 
 import { Doris } from '@app/doris/doris';
+import { isThisNode } from '@app/doris/utils/isThisNode';
 import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
@@ -30,7 +31,6 @@ import { getEl } from '@app/lib/get-el';
 import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sat-line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { isThisNode } from '@app/static/isThisNode';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';

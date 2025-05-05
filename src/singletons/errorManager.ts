@@ -2,8 +2,8 @@ import { Doris } from '@app/doris/doris';
 import { ToastMsgType } from '@app/interfaces';
 import { Telemetry } from '@app/static/telemetry';
 import githubIssueUrl, { Options } from 'new-github-issue-url';
+import { isThisNode } from '../doris/utils/isThisNode';
 import { keepTrackApi } from '../keepTrackApi';
-import { isThisNode } from '../static/isThisNode';
 
 export class ErrorManager {
   private readonly ALLOW_DEBUG = false; // window.location.hostname === 'localhost';

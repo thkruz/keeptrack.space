@@ -2,7 +2,7 @@
 import { EciArr3 } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { vec4 } from 'gl-matrix';
-import { GlUtils } from '../../../static/gl-utils';
+import { GlUtils } from '../../../doris/webgl/gl-utils';
 import { LineManager } from '../line-manager';
 
 export type LineColor = typeof LineColors[keyof typeof LineColors] | vec4;

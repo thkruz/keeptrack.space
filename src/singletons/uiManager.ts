@@ -25,10 +25,10 @@
  */
 
 import { Doris } from '@app/doris/doris';
+import { isThisNode } from '@app/doris/utils/isThisNode';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
-import { isThisNode } from '@app/static/isThisNode';
 import '@materializecss/materialize';
 import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from 'ootk';
 import { clickAndDragHeight, clickAndDragWidth } from '../lib/click-and-drag';

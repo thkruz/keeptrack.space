@@ -27,7 +27,7 @@ export class FlatGeometry extends BufferGeometry {
     const y2 = 0 + gl.drawingBufferHeight;
     const vertBuf = [x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2];
     const texCoordBuf = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1, 0.0, 1.0, 1.0];
-    const combinedBuf = [];
+    const combinedBuf = [] as number[][];
 
     [0, 1, 2, 3, 4, 5].forEach((i) => {
       combinedBuf.push([vertBuf[i * 2], vertBuf[i * 2 + 1], texCoordBuf[i * 2], texCoordBuf[i * 2 + 1]]);

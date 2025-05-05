@@ -1,22 +1,22 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { SatMath } from '@app/static/sat-math';
-import { keepTrackApi } from '../keepTrackApi';
-import { LegacyCamera } from '../keeptrack/camera/legacy-camera';
-import { ConeMeshFactory } from './draw-manager/cone-mesh-factory';
-import { Box } from './draw-manager/cube';
-import { Earth } from './draw-manager/earth';
-import { Ellipsoid } from './draw-manager/ellipsoid';
-import { Godrays } from './draw-manager/godrays';
-import { Moon } from './draw-manager/moon';
-import { PostProcessingManager } from './draw-manager/post-processing';
-import { SensorFovMeshFactory } from './draw-manager/sensor-fov-mesh-factory';
-import { SkyBoxSphere } from './draw-manager/skybox-sphere';
-import { Sun } from './draw-manager/sun';
-import { errorManagerInstance } from './errorManager';
+import { keepTrackApi } from '../../keepTrackApi';
+import { ConeMeshFactory } from '../../singletons/draw-manager/cone-mesh-factory';
+import { Box } from '../../singletons/draw-manager/cube';
+import { Earth } from '../../singletons/draw-manager/earth';
+import { Ellipsoid } from '../../singletons/draw-manager/ellipsoid';
+import { Godrays } from '../../singletons/draw-manager/godrays';
+import { Moon } from '../../singletons/draw-manager/moon';
+import { PostProcessingManager } from '../../singletons/draw-manager/post-processing';
+import { SensorFovMeshFactory } from '../../singletons/draw-manager/sensor-fov-mesh-factory';
+import { SkyBoxSphere } from '../../singletons/draw-manager/skybox-sphere';
+import { Sun } from '../../singletons/draw-manager/sun';
+import { errorManagerInstance } from '../../singletons/errorManager';
+import { LegacyCamera } from '../camera/legacy-camera';
 
-export class Scene {
-  static readonly id = 'Scene';
+export class SpaceScene {
+  static readonly id = 'SpaceScene';
   postProcessingManager: PostProcessingManager;
 
   skybox: SkyBoxSphere;

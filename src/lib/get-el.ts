@@ -1,5 +1,5 @@
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { isThisNode } from '../static/isThisNode';
+import { isThisNode } from '../doris/utils/isThisNode';
 
 /**
  * Returns the HTML element with the specified ID. If the element is not found, it returns null.

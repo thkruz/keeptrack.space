@@ -1,17 +1,17 @@
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { GlUtils } from '../doris/webgl/gl-utils';
 import { SatCruncherMessageData } from '../interfaces';
-import { GlUtils } from '../static/gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { Doris } from '@app/doris/doris';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Milliseconds, SpaceObjectType } from 'ootk';
+import { BufferAttribute } from '../doris/webgl/buffer-attribute';
+import { WebGlProgramHelper } from '../doris/webgl/webgl-program';
 import { CameraType } from '../keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
-import { BufferAttribute } from '../static/buffer-attribute';
-import { WebGlProgramHelper } from '../static/webgl-program';
 import { MissileObject } from './catalog-manager/MissileObject';
 
 declare module '@app/interfaces' {

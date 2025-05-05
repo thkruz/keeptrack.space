@@ -46,10 +46,12 @@ import { keepTrackContainer } from './container';
 import { Doris } from './doris/doris';
 import { CanvasEvents, CoreEngineEvents, WebGlEvents } from './doris/events/event-types';
 import { Renderer } from './doris/rendering/renderer';
+import { isThisNode } from './doris/utils/isThisNode';
 import { GetSatType, KeepTrackApiEvents, Singletons } from './interfaces';
 import { CameraType, LegacyCamera } from './keeptrack/camera/legacy-camera';
 import { TimeManager } from './keeptrack/core/time-manager';
 import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
+import { SpaceScene } from './keeptrack/scene/space-scene';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
 import { loadLocalization } from './locales/locales';
@@ -70,11 +72,9 @@ import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
 import { mobileManager } from './singletons/mobileManager';
 import { OrbitManager } from './singletons/orbitManager';
-import { Scene } from './singletons/scene';
 import { UiManager } from './singletons/uiManager';
 import { BottomMenu } from './static/bottom-menu';
 import { CatalogLoader } from './static/catalog-loader';
-import { isThisNode } from './static/isThisNode';
 import { SensorMath } from './static/sensor-math';
 import { SplashScreen } from './static/splash-screen';
 
@@ -159,7 +159,7 @@ export class KeepTrack {
     keepTrackContainer.registerSingleton(Singletons.MeshManager, meshManagerInstance);
 
     Doris.getInstance().once(WebGlEvents.AfterInit, () => {
-      const sceneInstance = new Scene();
+      const sceneInstance = new SpaceScene();
 
       keepTrackContainer.registerSingleton(Singletons.Scene, sceneInstance);
       this.renderer = Doris.getInstance().getRenderer();

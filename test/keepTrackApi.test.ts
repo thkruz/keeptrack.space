@@ -1,7 +1,7 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { isThisNode } from '@app/doris/utils/isThisNode';
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { isThisNode } from '@app/static/isThisNode';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from 'ootk';
 import { keepTrackApi } from '../src/keepTrackApi';

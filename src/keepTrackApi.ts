@@ -7,6 +7,7 @@ import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
 import { LegacyCamera } from './keeptrack/camera/legacy-camera';
 import type { TimeManager } from './keeptrack/core/time-manager';
 import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
+import { SpaceScene } from './keeptrack/scene/space-scene';
 import { saveCsv, saveVariable } from './lib/saveVariable';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import type { SensorManager } from './plugins/sensor/sensorManager';
@@ -24,7 +25,6 @@ import type { HoverManager } from './singletons/hover-manager';
 import type { InputManager } from './singletons/input-manager';
 import { PanTouchEvent, TapTouchEvent } from './singletons/input-manager/touch-input';
 import type { OrbitManager } from './singletons/orbitManager';
-import { Scene } from './singletons/scene';
 import type { UiManager } from './singletons/uiManager';
 import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
@@ -231,7 +231,7 @@ export class KeepTrackApi {
   /** Deprecate */
   getRenderer = () => keepTrackContainer.get<Renderer>(Singletons.WebGLRenderer);
   getAppRenderer = () => keepTrackContainer.get<KeepTrackRenderer>(Singletons.WebGLRendererApp);
-  getScene = () => keepTrackContainer.get<Scene>(Singletons.Scene);
+  getScene = () => keepTrackContainer.get<SpaceScene>(Singletons.Scene);
   getCatalogManager = () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
   getSensorManager = () => keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
   getUiManager = () => keepTrackContainer.get<UiManager>(Singletons.UiManager);

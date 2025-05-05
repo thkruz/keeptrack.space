@@ -1,4 +1,4 @@
-import { GlUtils } from '@app/static/gl-utils';
+import { GlUtils } from '@app/doris/webgl/gl-utils';
 import { Material, MaterialParameters } from './material';
 
 export interface ShaderMaterialParameters extends MaterialParameters {

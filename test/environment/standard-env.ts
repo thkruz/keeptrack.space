@@ -5,6 +5,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
 import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
 import { TimeManager } from '@app/keeptrack/core/time-manager';
+import { SpaceScene } from '@app/keeptrack/scene/space-scene';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from '@app/plugins/sensor/sensorManager';
@@ -17,7 +18,6 @@ import { ConeMeshFactory } from '@app/singletons/draw-manager/cone-mesh-factory'
 import { SensorFovMeshFactory } from '@app/singletons/draw-manager/sensor-fov-mesh-factory';
 import { GroupsManager } from '@app/singletons/groups-manager';
 import { InputManager } from '@app/singletons/input-manager';
-import { Scene } from '@app/singletons/scene';
 import { SearchManager } from '@app/singletons/search-manager';
 import { UiManager } from '@app/singletons/uiManager';
 import { BottomMenu } from '@app/static/bottom-menu';
@@ -72,7 +72,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   clearAllCallbacks();
 
   const renderer = new Renderer(Doris.getInstance().getEventBus());
-  const scene = new Scene({
+  const scene = new SpaceScene({
     gl: global.mocks.glMock,
   });
 

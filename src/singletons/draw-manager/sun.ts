@@ -20,14 +20,14 @@
  */
 /* eslint-disable camelcase */
 import { Doris } from '@app/doris/doris';
+import { GlUtils } from '@app/doris/webgl/gl-utils';
+import { GLSL3 } from '@app/doris/webgl/material';
+import { Mesh } from '@app/doris/webgl/mesh';
+import { ShaderMaterial } from '@app/doris/webgl/shader-material';
+import { SphereGeometry } from '@app/doris/webgl/sphere-geometry';
 import { EciArr3 } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { GlUtils } from '@app/static/gl-utils';
-import { GLSL3 } from '@app/static/material';
-import { Mesh } from '@app/static/mesh';
 import { SatMath } from '@app/static/sat-math';
-import { ShaderMaterial } from '@app/static/shader-material';
-import { SphereGeometry } from '@app/static/sphere-geometry';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EciVec3, Kilometers } from 'ootk';
 

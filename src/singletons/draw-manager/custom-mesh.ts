@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { BufferAttribute } from '@app/static/buffer-attribute';
-import { WebGlProgramHelper } from '@app/static/webgl-program';
+import { BufferAttribute } from '@app/doris/webgl/buffer-attribute';
+import { WebGlProgramHelper } from '@app/doris/webgl/webgl-program';
 import { mat4 } from 'gl-matrix';
 
 export abstract class CustomMesh {

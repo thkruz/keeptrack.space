@@ -6,9 +6,9 @@ import { BaseObject, DetailedSatellite, DetailedSensor, RaeVec3 } from 'ootk';
 
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { BufferAttribute } from '@app/doris/webgl/buffer-attribute';
+import { WebGlProgramHelper } from '@app/doris/webgl/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BufferAttribute } from '@app/static/buffer-attribute';
-import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { keepTrackContainer } from '../../container';
 import { MissileObject } from '../catalog-manager/MissileObject';

@@ -1,10 +1,10 @@
 /* eslint-disable no-use-before-define */
+import { isThisNode } from '@app/doris/utils/isThisNode';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
-import { isThisNode } from '@app/static/isThisNode';
 import satChngPng from '@public/img/icons/sats.png';
 
 import { dateFromJday } from '@app/lib/transforms';

@@ -45,6 +45,7 @@ import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime
 import { keepTrackContainer } from './container';
 import { Doris } from './doris/doris';
 import { CoreEngineEvents } from './doris/events/event-types';
+import { Renderer } from './doris/rendering/renderer';
 import { GetSatType, KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
@@ -60,6 +61,7 @@ import { ColorSchemeManager } from './singletons/color-scheme-manager';
 import { DemoManager } from './singletons/demo-mode';
 import { DotsManager } from './singletons/dots-manager';
 import { LineManager, lineManagerInstance } from './singletons/draw-manager/line-manager';
+import { MeshManager } from './singletons/draw-manager/mesh-manager';
 import { ErrorManager, errorManagerInstance } from './singletons/errorManager';
 import { GroupsManager } from './singletons/groups-manager';
 import { HoverManager } from './singletons/hover-manager';
@@ -69,7 +71,6 @@ import { OrbitManager } from './singletons/orbitManager';
 import { Scene } from './singletons/scene';
 import { TimeManager } from './singletons/time-manager';
 import { UiManager } from './singletons/uiManager';
-import { WebGLRenderer } from './singletons/webgl-renderer';
 import { BottomMenu } from './static/bottom-menu';
 import { CatalogLoader } from './static/catalog-loader';
 import { isThisNode } from './static/isThisNode';
@@ -94,7 +95,7 @@ export class KeepTrack {
   orbitManager: OrbitManager;
   catalogManager: CatalogManager;
   timeManager: TimeManager;
-  renderer: WebGLRenderer;
+  renderer: Renderer;
   sensorManager: SensorManager;
   uiManager: UiManager;
   inputManager: InputManager;
@@ -150,15 +151,20 @@ export class KeepTrack {
     const timeManagerInstance = new TimeManager();
 
     keepTrackContainer.registerSingleton(Singletons.TimeManager, timeManagerInstance);
-    const rendererInstance = new WebGLRenderer();
 
-    keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, rendererInstance);
-    keepTrackContainer.registerSingleton(Singletons.MeshManager, rendererInstance.meshManager);
-    const sceneInstance = new Scene({
-      gl: keepTrackApi.getRenderer().gl,
+    keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, Doris.getInstance().getRenderer());
+    const meshManagerInstance = new MeshManager();
+
+    keepTrackContainer.registerSingleton(Singletons.MeshManager, meshManagerInstance);
+
+    Doris.getInstance().once(CoreEngineEvents.WebGlAfterInit, () => {
+      const sceneInstance = new Scene({
+        gl: keepTrackApi.getRenderer().gl,
+      });
+
+      keepTrackContainer.registerSingleton(Singletons.Scene, sceneInstance);
+      this.renderer = Doris.getInstance().getRenderer();
     });
-
-    keepTrackContainer.registerSingleton(Singletons.Scene, sceneInstance);
     const sensorManagerInstance = new SensorManager();
 
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
@@ -199,7 +205,6 @@ export class KeepTrack {
     this.orbitManager = orbitManagerInstance;
     this.catalogManager = catalogManagerInstance;
     this.timeManager = timeManagerInstance;
-    this.renderer = rendererInstance;
     this.sensorManager = sensorManagerInstance;
     this.uiManager = uiManagerInstance;
     this.inputManager = inputManagerInstance;
@@ -417,6 +422,7 @@ theodore.kruczek at gmail dot com.
         const dotsManagerInstance = keepTrackApi.getDotsManager();
         const uiManagerInstance = keepTrackApi.getUiManager();
         const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+        const groupsManagerInstance = keepTrackApi.getGroupsManager();
 
         // Upodate the version number and date
         settingsManager.versionNumber = VERSION;
@@ -453,7 +459,7 @@ theodore.kruczek at gmail dot com.
          * MobileManager.checkMobileMode();
          * We need to know if we are on a small screen before starting webgl
          */
-        renderer.glInit(getEl('keeptrack-canvas') as HTMLCanvasElement);
+        renderer.initializeWebGLContext(getEl('keeptrack-canvas') as HTMLCanvasElement);
 
         sceneInstance.init(renderer.gl);
         Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 3, 5);
@@ -477,17 +483,20 @@ theodore.kruczek at gmail dot com.
 
         dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer!);
 
+        groupsManagerInstance.init();
+
         this.inputManager.init();
         this.demoManager.init();
 
         keepTrackApi.getHoverManager().init();
-        renderer.init();
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-
-        renderer.meshManager.init(renderer.gl);
 
         Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 5, 5);
       });
+
+    Doris.getInstance().once(CoreEngineEvents.WebGlAfterFirstInit, (gl: WebGL2RenderingContext) => {
+      keepTrackApi.getScene().earth.reloadEarthHiResTextures(gl);
+      keepTrackApi.getMeshManager().init(gl);
+    });
 
     Doris.getInstance().on(CoreEngineEvents.AssetLoadProgress, (progress: number, total: number) => {
       switch (progress) {
@@ -511,6 +520,41 @@ theodore.kruczek at gmail dot com.
       }
 
       Doris.getInstance().pause(50);
+    });
+
+    Doris.getInstance().on(CoreEngineEvents.CanvasResize, (width: number, height: number) => {
+      const gl = Doris.getInstance().getRenderer().gl;
+
+      if (!gl) {
+        return;
+      }
+
+      gl.viewport(0, 0, width, height);
+      keepTrackApi.getMainCamera().projectionMatrix = Camera.calculatePMatrix(gl);
+
+      // Fix the gpu picker texture size if it has already been created
+      const dotsManagerInstance = keepTrackApi.getDotsManager();
+
+      if (dotsManagerInstance.isReady) {
+        dotsManagerInstance.initProgramPicking();
+      }
+
+      // Fix flat geometry if it has already been created
+      keepTrackApi.getScene().godrays?.init(gl, keepTrackApi.getScene().sun);
+    });
+
+    Doris.getInstance().on(CoreEngineEvents.WebGlFovChanged, () => {
+      keepTrackApi.getMainCamera().projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+      // Fix the gpu picker texture size if it has already been created
+      const dotsManagerInstance = keepTrackApi.getDotsManager();
+
+      if (dotsManagerInstance.isReady) {
+        dotsManagerInstance.initProgramPicking();
+      }
+
+      // Fix flat geometry if it has already been created
+      keepTrackApi.getScene().godrays?.reinitialize();
+
     });
 
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
@@ -654,7 +698,7 @@ theodore.kruczek at gmail dot com.
             continue;
           }
 
-          const satScreenPositionArray = this.renderer.getScreenCoords(sat);
+          const satScreenPositionArray = this.mainCameraInstance.getScreenCoords(sat);
 
           if (satScreenPositionArray.error) {
             continue;
@@ -706,7 +750,7 @@ theodore.kruczek at gmail dot com.
           if (dotsManagerInstance.inViewData[id] === 0) {
             return;
           }
-          const satScreenPositionArray = this.renderer.getScreenCoords(obj);
+          const satScreenPositionArray = this.mainCameraInstance.getScreenCoords(obj);
 
           if (satScreenPositionArray.error) {
             return;

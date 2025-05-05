@@ -146,7 +146,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   // Pretend webGl works
   renderer.gl = global.mocks.glMock;
   // Pretend we have a working canvas
-  renderer.domElement = { style: { cursor: 'default' } } as unknown as HTMLCanvasElement;
+  renderer.canvas = { style: { cursor: 'default' } } as unknown as HTMLCanvasElement;
 
   const inputManagerInstance = new InputManager();
   const groupManagerInstance = new GroupsManager();

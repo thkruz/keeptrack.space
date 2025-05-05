@@ -81,9 +81,11 @@ export class UiManager {
       document.exitFullscreen();
     }
 
-    setTimeout(() => {
-      keepTrackApi.getRenderer().resizeCanvas(true);
-    }, 100);
+    /*
+     * setTimeout(() => {
+     *   keepTrackApi.getRenderer().resizeCanvas(true);
+     * }, 100);
+     */
   }
 
   /** This runs after the drawManagerInstance starts */

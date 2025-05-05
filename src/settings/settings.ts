@@ -1071,6 +1071,7 @@ export class SettingsManager {
   startWithFocus = false;
   /**
    * Automatically display all of the orbits
+   * This fires startWithOrbits in groups-manager.ts
    */
   startWithOrbitsDisplayed = false;
   brownEarthImages = false;

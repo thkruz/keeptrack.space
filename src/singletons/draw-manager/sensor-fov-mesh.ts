@@ -54,7 +54,7 @@ export class SensorFovMesh extends CustomMesh {
     mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, gmst);
   }
 
-  draw(pMatrix: mat4, camMatrix: mat4, color: [number, number, number, number], tgtBuffer?: WebGLFramebuffer) {
+  draw(pMatrix: mat4, camMatrix: mat4, color: [number, number, number, number], tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_) {
       return;
     }

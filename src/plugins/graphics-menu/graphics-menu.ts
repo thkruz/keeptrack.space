@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -10,7 +11,6 @@ import { PersistenceManager, StorageKey } from '@app/singletons/persistence-mana
 import displaySettingsPng from '@public/img/icons/display-settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
-import { Doris } from '@app/doris/doris';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -198,7 +198,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
       settingsManager.isDrawSun = true;
       if (settingsManager.isBlackEarth) {
         settingsManager.isBlackEarth = false;
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
       }
       settingsManager.isDrawAtmosphere = true;
       settingsManager.isDrawAurora = true;
@@ -297,7 +297,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
     settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
     if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
-      keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+      keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
     }
 
     // Must come after the above checks

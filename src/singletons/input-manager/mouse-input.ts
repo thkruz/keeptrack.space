@@ -514,32 +514,32 @@ export class MouseInput {
         MouseInput.resetCurrentEarthTexture();
         settingsManager.blueImages = true;
         MouseInput.saveMapToLocalStorage('blue');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
         break;
       case 'earth-nasa-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.nasaImages = true;
         MouseInput.saveMapToLocalStorage('nasa');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
         break;
       case 'earth-brown-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.brownEarthImages = true;
         MouseInput.saveMapToLocalStorage('brown');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
         break;
       case 'earth-low-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.lowresImages = true;
         MouseInput.saveMapToLocalStorage('low');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
         break;
       case 'earth-high-rmb':
         showLoading(() => {
           MouseInput.resetCurrentEarthTexture();
           settingsManager.hiresImages = true;
           MouseInput.saveMapToLocalStorage('high');
-          keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+          keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
         });
         break;
       case 'earth-high-no-clouds-rmb':
@@ -547,20 +547,20 @@ export class MouseInput {
           MouseInput.resetCurrentEarthTexture();
           settingsManager.hiresNoCloudsImages = true;
           MouseInput.saveMapToLocalStorage('high-nc');
-          keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+          keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
         });
         break;
       case 'earth-vec-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.vectorImages = true;
         MouseInput.saveMapToLocalStorage('vec');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
         break;
       case 'earth-political-rmb':
         MouseInput.resetCurrentEarthTexture();
         settingsManager.politicalImages = true;
         MouseInput.saveMapToLocalStorage('political'); // TODO: Verify this
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
         break;
       case 'toggle-time-rmb':
         timeManagerInstance.toggleTime();

@@ -27,8 +27,10 @@ import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { mat4, quat, vec3 } from 'gl-matrix';
-import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla } from 'ootk';
+import { mat4, quat, vec3, vec4 } from 'gl-matrix';
+import {
+  BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
+} from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
 import { SettingsManager } from '../settings/settings';
@@ -57,6 +59,8 @@ export enum CameraType {
 
 export class Camera {
   static readonly id = 'Camera';
+  /** Main source of projection matrix for rest of the application */
+  projectionMatrix: mat4;
   private chaseSpeed_ = 0.0005;
   private earthCenteredPitch_ = <Radians>0;
   private earthCenteredYaw_ = <Radians>0;
@@ -231,6 +235,56 @@ export class Camera {
     });
   }
 
+  static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
+    const pMatrix = mat4.create();
+
+    mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
+
+    // This converts everything from 3D space to ECI (z and y planes are swapped)
+    const eciToOpenGlMat: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+
+    mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
+
+    return pMatrix;
+  }
+
+  getScreenCoords(obj: BaseObject): {
+    x: number;
+    y: number;
+    z: number;
+    error: boolean;
+  } {
+    const pMatrix = this.projectionMatrix;
+    const camMatrix = this.camMatrix;
+    const screenPos = { x: 0, y: 0, z: 0, error: false };
+
+    try {
+      const pos = obj.position;
+
+      if (!pos) {
+        throw new Error(`No Position for Sat ${obj.id}`);
+      }
+
+      const posVec4 = <[number, number, number, number]>vec4.fromValues(pos.x, pos.y, pos.z, 1);
+
+      vec4.transformMat4(posVec4, posVec4, camMatrix);
+      vec4.transformMat4(posVec4, posVec4, pMatrix);
+
+      screenPos.x = posVec4[0] / posVec4[3];
+      screenPos.y = posVec4[1] / posVec4[3];
+      screenPos.z = posVec4[2] / posVec4[3];
+
+      screenPos.x = (screenPos.x + 1) * 0.5 * window.innerWidth;
+      screenPos.y = (-screenPos.y + 1) * 0.5 * window.innerHeight;
+
+      screenPos.error = !(screenPos.x >= 0 && screenPos.y >= 0 && screenPos.z >= 0 && screenPos.z <= 1);
+    } catch {
+      screenPos.error = true;
+    }
+
+    return screenPos;
+  }
+
   reset(isHardReset = false) {
     if (isHardReset) {
       this.zoomLevel_ = 0.6925;
@@ -392,11 +446,9 @@ export class Camera {
     }
 
     if (this.cameraType >= CameraType.MAX_CAMERA_TYPES) {
-      const renderer = keepTrackApi.getRenderer();
 
       this.isLocalRotateReset = true;
       this.settings_.fieldOfView = 0.6;
-      renderer.glInit();
       if (selectSatManagerInstance?.selectedSat > -1) {
         this.camZoomSnappedOnSat = true;
         this.cameraType = CameraType.FIXED_TO_SAT;
@@ -490,7 +542,7 @@ export class Camera {
       if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) {
         settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
       }
-      keepTrackApi.getRenderer().glInit();
+      Doris.getInstance().emit(CoreEngineEvents.WebGlFovChanged);
     }
   }
 
@@ -731,6 +783,8 @@ export class Camera {
   init(settings: SettingsManager) {
     this.settings_ = settings;
 
+    this.projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+
     this.registerKeyboardEvents_();
 
     Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (): void => {
@@ -746,6 +800,8 @@ export class Camera {
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
       this.update(Doris.getInstance().deltaTime as Milliseconds);
     });
+
+    Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, this.validateProjectionMatrix_.bind(this));
   }
 
   private registerKeyboardEvents_() {
@@ -1308,6 +1364,30 @@ export class Camera {
       this.earthCenteredYaw_ = this.camYaw;
       if (this.earthCenteredYaw_ < 0) {
         this.earthCenteredYaw_ = <Radians>(this.earthCenteredYaw_ + TAU);
+      }
+    }
+  }
+
+  validateProjectionMatrix_() {
+    if (!this.projectionMatrix) {
+      errorManagerInstance.log('projectionMatrix is undefined - retrying');
+      this.projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (isNaN(this.projectionMatrix[i])) {
+        errorManagerInstance.log('projectionMatrix is NaN - retrying');
+        this.projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+      }
+    }
+
+    for (let i = 0; i < 16; i++) {
+      if (this.projectionMatrix[i] !== 0) {
+        break;
+      }
+      if (i === 15) {
+        errorManagerInstance.log('projectionMatrix is all zeros - retrying');
+        this.projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
       }
     }
   }

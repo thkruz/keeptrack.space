@@ -3,13 +3,17 @@ import { Engine } from './core/engine';
 
 export class Doris {
   static readonly id = 'Doris';
-  private static readonly defaultCanvas: string = 'keeptrack-canvas';
+  private static readonly nodeCanvas: string = 'keeptrack-canvas';
+  private static readonly nodeContainer: string = 'keeptrack-root';
+  private static readonly browserCanvas: string = 'keeptrack-canvas';
+  private static readonly browserContainer: string = 'keeptrack-root';
   static instance: Engine | null = null; // NOSONAR
 
   static getInstance() {
     if (!Doris.instance) {
       Doris.instance = new Engine({
-        canvasId: isThisNode() ? Doris.defaultCanvas : 'keeptrack-canvas',
+        canvasId: isThisNode() ? Doris.nodeCanvas : Doris.browserCanvas,
+        containerRoot: isThisNode() ? Doris.nodeContainer : Doris.browserContainer,
       });
 
       Doris.printConsoleMessage_();

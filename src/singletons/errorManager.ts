@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { ToastMsgType } from '@app/interfaces';
 import { Telemetry } from '@app/static/telemetry';
 import githubIssueUrl, { Options } from 'new-github-issue-url';
@@ -28,7 +29,9 @@ export class ErrorManager {
 
   error(e: Error, funcName: string, toastMsg?: string) {
     if (!isThisNode() && !Telemetry.isInitialized) {
-      Telemetry.initialize(keepTrackApi.getRenderer().gl, keepTrackApi.getRenderer().domElement);
+      const { gl, canvas } = Doris.getInstance().getRenderer();
+
+      Telemetry.initialize(gl, canvas);
     }
 
     if (Telemetry.isInitialized) {

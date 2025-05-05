@@ -34,7 +34,7 @@ export class PostProcessingManager {
   public curBuffer: WebGLFramebuffer | null;
   public secBuffer: WebGLFramebuffer | null;
   private gl_: WebGL2RenderingContext;
-  private isReady_ = false;
+  isInitialized = false;
   public programs = {
     occlusion: <OcclusionProgram>{
       program: <WebGLProgram><unknown>null,
@@ -86,7 +86,7 @@ export class PostProcessingManager {
   };
 
   public init(gl: WebGL2RenderingContext): void {
-    if (this.isReady_) {
+    if (this.isInitialized) {
       return;
     }
     this.gl_ = gl;
@@ -94,7 +94,7 @@ export class PostProcessingManager {
     this.gl_.useProgram(this.programs.occlusion.program);
     this.setupOcclusion();
     this.curBuffer = null;
-    this.isReady_ = true;
+    this.isInitialized = true;
   }
 
   public setupOcclusion() {

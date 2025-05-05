@@ -61,7 +61,6 @@ export class Earth {
   private isTexturesReady_ = false;
   private modelViewMatrix_: mat4;
   private readonly normalMatrix_: mat3 = mat3.create();
-  private settings_: SettingsManager;
   private textureBump_: WebGLTexture;
   textureDay: WebGLTexture;
   textureNight: WebGLTexture;
@@ -117,19 +116,18 @@ export class Earth {
   /**
    * This is run once per session to initialize the earth.
    */
-  init(settings: SettingsManager, gl?: WebGL2RenderingContext): void {
+  init(gl?: WebGL2RenderingContext): void {
     try {
       if (!gl && !this.gl_) {
         throw new Error('No WebGL context found');
       }
       this.gl_ ??= gl!;
-      this.settings_ = settings;
 
       this.initTextures_();
       const geometry = new SphereGeometry(this.gl_, {
         radius: RADIUS_OF_EARTH,
-        widthSegments: this.settings_.earthNumLatSegs,
-        heightSegments: this.settings_.earthNumLonSegs,
+        widthSegments: settingsManager.earthNumLatSegs,
+        heightSegments: settingsManager.earthNumLonSegs,
       });
       const material = new ShaderMaterial(this.gl_, {
         uniforms: {
@@ -174,7 +172,7 @@ export class Earth {
         img = new Image();
 
         img.onload = () => {
-          if (!this.settings_.isBlackEarth) {
+          if (!settingsManager.isBlackEarth) {
             GlUtils.bindImageToTexture(this.gl_, texture, img);
           }
 
@@ -190,7 +188,7 @@ export class Earth {
         this.imageCache[src] = img;
         this.isUseHiRes = true;
       } else {
-        if (!this.settings_.isBlackEarth) {
+        if (!settingsManager.isBlackEarth) {
           GlUtils.bindImageToTexture(this.gl_, texture, img);
         }
 
@@ -208,10 +206,10 @@ export class Earth {
    * This is run once per session to initialize the high resolution earth textures.
    * It can be run multiple times to reload the textures.
    */
-  reloadEarthHiResTextures() {
-    this.init(settingsManager, this.gl_);
-    this.loadHiRes(this.textureDay, Earth.getSrcHiResDay_(this.settings_));
-    this.loadHiRes(this.textureNight, Earth.getSrcHiResNight_(this.settings_));
+  reloadEarthHiResTextures(gl: WebGL2RenderingContext): void {
+    this.init(gl);
+    this.loadHiRes(this.textureDay, Earth.getSrcHiResDay_(settingsManager));
+    this.loadHiRes(this.textureNight, Earth.getSrcHiResNight_(settingsManager));
   }
 
   /**
@@ -381,7 +379,7 @@ export class Earth {
      * no reason to render 100000s of pixels when
      * we're only going to read one
      */
-    if (!this.settings_.isMobileModeEnabled) {
+    if (!settingsManager.isMobileModeEnabled) {
       gl.enable(gl.SCISSOR_TEST);
       gl.scissor(
         keepTrackApi.getMainCamera().mouseX,
@@ -393,7 +391,7 @@ export class Earth {
 
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
 
-    if (!this.settings_.isMobileModeEnabled) {
+    if (!settingsManager.isMobileModeEnabled) {
       gl.disable(gl.SCISSOR_TEST);
     }
 
@@ -437,8 +435,8 @@ export class Earth {
 
     gl.uniform1f(this.mesh.material.uniforms.uGlow, this.glowNumber_);
     gl.uniform3fv(this.mesh.material.uniforms.uLightDirection, this.lightDirection);
-    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAtmosphere, this.settings_.isDrawAtmosphere ? 1.0 : 0.0);
-    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAurora, this.settings_.isDrawAurora ? 1.0 : 0.0);
+    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAtmosphere, settingsManager.isDrawAtmosphere ? 1.0 : 0.0);
+    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAurora, settingsManager.isDrawAurora ? 1.0 : 0.0);
   }
 
   private initTextureBump_(): void {
@@ -447,7 +445,7 @@ export class Earth {
     const img = new Image();
 
     img.onload = () => {
-      if (this.settings_.isDrawBumpMap && !this.settings_.isBlackEarth && !this.settings_.politicalImages) {
+      if (settingsManager.isDrawBumpMap && !settingsManager.isBlackEarth && !settingsManager.politicalImages) {
         GlUtils.bindImageToTexture(this.gl_, this.textureBump_, img);
       } else {
         // Bind a blank texture
@@ -457,7 +455,7 @@ export class Earth {
       this.isBumpTextureReady_ = true;
       this.onImageLoaded_();
     };
-    img.src = Earth.getSrcBump_(this.settings_);
+    img.src = Earth.getSrcBump_(settingsManager);
   }
 
   private initTextureDay_(): void {
@@ -465,7 +463,7 @@ export class Earth {
     const img = new Image();
 
     img.onload = () => {
-      if (!this.settings_.isBlackEarth) {
+      if (!settingsManager.isBlackEarth) {
         GlUtils.bindImageToTexture(this.gl_, this.textureDay, img);
       } else {
         // Delete the texture
@@ -475,7 +473,7 @@ export class Earth {
       this.isDayTextureReady_ = true;
       this.onImageLoaded_();
     };
-    img.src = Earth.getSrcDay_(this.settings_);
+    img.src = Earth.getSrcDay_(settingsManager);
   }
 
   private initTextureNight_(): void {
@@ -483,7 +481,7 @@ export class Earth {
     const img = new Image();
 
     img.onload = () => {
-      if (!this.settings_.isBlackEarth) {
+      if (!settingsManager.isBlackEarth) {
         GlUtils.bindImageToTexture(this.gl_, this.textureNight, img);
       } else {
         // Delete the texture
@@ -493,7 +491,7 @@ export class Earth {
       this.isNightTextureReady_ = true;
       this.onImageLoaded_();
     };
-    img.src = Earth.getSrcNight_(this.settings_);
+    img.src = Earth.getSrcNight_(settingsManager);
   }
 
   private initTextureSpec_(): void {
@@ -502,7 +500,7 @@ export class Earth {
     const img = new Image();
 
     img.onload = () => {
-      if (this.settings_.isDrawSpecMap && !this.settings_.isBlackEarth && !this.settings_.politicalImages) {
+      if (settingsManager.isDrawSpecMap && !settingsManager.isBlackEarth && !settingsManager.politicalImages) {
         GlUtils.bindImageToTexture(this.gl_, this.textureSpec_, img);
       } else {
         // Bind a blank texture
@@ -512,25 +510,25 @@ export class Earth {
       this.isSpecularTextureReady_ = true;
       this.onImageLoaded_();
     };
-    img.src = Earth.getSrcSpec_(this.settings_);
+    img.src = Earth.getSrcSpec_(settingsManager);
 
     /*
      * DEBUG:
-     * `${this.settings_.installDirectory}textures/earthspec1k.jpg`;
+     * `${settingsManager.installDirectory}textures/earthspec1k.jpg`;
      */
   }
 
   private initTextures_(): void {
-    if (!this.textureDay || this.settings_.isBlackEarth) {
+    if (!this.textureDay || settingsManager.isBlackEarth) {
       this.initTextureDay_();
     }
-    if (!this.textureNight || this.settings_.isBlackEarth) {
+    if (!this.textureNight || settingsManager.isBlackEarth) {
       this.initTextureNight_();
     }
-    if (!this.textureBump_ || this.settings_.isBlackEarth) {
+    if (!this.textureBump_ || settingsManager.isBlackEarth) {
       this.initTextureBump_();
     }
-    if (!this.textureSpec_ || this.settings_.isBlackEarth) {
+    if (!this.textureSpec_ || settingsManager.isBlackEarth) {
       this.initTextureSpec_();
     }
   }
@@ -633,7 +631,7 @@ export class Earth {
     // Bump Map
     gl.uniform1i(this.mesh.material.uniforms.uBumpMap, 2);
     gl.activeTexture(gl.TEXTURE2);
-    if (this.settings_.isDrawBumpMap) {
+    if (settingsManager.isDrawBumpMap) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureBump_);
     } else {
       gl.bindTexture(gl.TEXTURE_2D, null);
@@ -642,7 +640,7 @@ export class Earth {
     // Specular Map
     gl.uniform1i(this.mesh.material.uniforms.uSpecMap, 3);
     gl.activeTexture(gl.TEXTURE3);
-    if (this.settings_.isDrawSpecMap) {
+    if (settingsManager.isDrawSpecMap) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureSpec_);
     } else {
       gl.bindTexture(gl.TEXTURE_2D, null);

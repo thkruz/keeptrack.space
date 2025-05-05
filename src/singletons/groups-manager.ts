@@ -1,3 +1,6 @@
+import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { settingsManager } from '@app/settings/settings';
 import { keepTrackApi } from '../keepTrackApi';
 import { GroupData, GroupType, ObjectGroup } from './object-group';
 
@@ -86,5 +89,25 @@ export class GroupsManager {
     this.selectedGroup = null;
     this.stopUpdatingInViewSoon = false;
     this.groupList = {};
+    Doris.getInstance().on(KeepTrackApiEvents.onKeepTrackReady, this.startWithOrbits.bind(this));
+  }
+
+  startWithOrbits(): void {
+    if (settingsManager.startWithOrbitsDisplayed) {
+      const groupsManagerInstance = keepTrackApi.getGroupsManager();
+
+      /*
+       * All Orbits
+       * settingsManager.maxOribtsDisplayedDesktopAll = 100000;
+       * settingsManager.maxOribtsDisplayed = 100000;
+       * settingsManager.searchLimit = 100000;
+       * TODO: Maybe this should only be a preset and not a setting?
+       */
+      groupsManagerInstance.groupList.debris = groupsManagerInstance.createGroup(GroupType.ALL);
+      groupsManagerInstance.selectGroup(groupsManagerInstance.groupList.debris);
+      keepTrackApi.getColorSchemeManager().calculateColorBuffers(true); // force color recalc
+      groupsManagerInstance.groupList.debris.updateOrbits();
+      settingsManager.isOrbitOverlayVisible = true;
+    }
   }
 }

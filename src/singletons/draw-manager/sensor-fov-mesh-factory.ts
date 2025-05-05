@@ -10,7 +10,7 @@ import { SensorFovMesh } from './sensor-fov-mesh';
 // TODO: Sensors should be indpeneent of the object they are attached to. This will remove minAz2 and maxAz2 type of properties
 
 export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
-  drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
+  drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer | null = null) {
     let i = 0;
     let didWeDrawSomething = false;
     let lastSensorObjName = '';

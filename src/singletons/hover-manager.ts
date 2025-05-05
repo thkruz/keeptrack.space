@@ -108,7 +108,11 @@ export class HoverManager {
       const renderer = keepTrackApi.getRenderer();
 
       const obj = catalogManagerInstance.getObject(id);
-      const satScreenPositionArray = renderer.getScreenCoords(obj);
+
+      if (obj === null || typeof obj === 'undefined') {
+        return;
+      }
+      const satScreenPositionArray = keepTrackApi.getMainCamera().getScreenCoords(obj);
 
       if (
         satScreenPositionArray.error ||

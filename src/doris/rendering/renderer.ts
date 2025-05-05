@@ -1,31 +1,48 @@
+import { getEl } from '@app/lib/get-el';
+import { errorManagerInstance } from '@app/singletons/errorManager';
+import { isThisNode } from '@app/static/isThisNode';
+import { mat4 } from 'gl-matrix';
+import { Camera as OldCamera } from '../../singletons/camera';
+import type { Scene as OldScene } from '../../singletons/scene';
 import { Camera } from '../camera/camera';
+import { Doris } from '../doris';
 import { EventBus } from '../events/event-bus';
 import { CoreEngineEvents } from '../events/event-types';
 import { Scene } from '../scene/scene';
 import { SceneNode } from '../scene/scene-node';
 
 export class Renderer {
-  private gl: WebGL2RenderingContext | null;
+  /** Main source of glContext for rest of the application */
+  gl: WebGL2RenderingContext;
   private width: number;
   private height: number;
-  private canvas: HTMLCanvasElement;
+  /** A canvas where the renderer draws its output. */
+  canvas: HTMLCanvasElement;
+  projectionCameraMatrix: mat4;
+  private isFirstInit = false;
 
   constructor(
     private readonly eventBus: EventBus,
   ) {
     // Listen for resize events
     this.eventBus.on(CoreEngineEvents.Resize, this.handleResize.bind(this));
+    this.eventBus.on(CoreEngineEvents.CanvasBeforeResize, this.handleCanvasBeforeResize.bind(this));
+    this.eventBus.on(CoreEngineEvents.WebGlNeedsInit, this.initializeWebGLContext.bind(this));
   }
 
   initialize(canvas: HTMLCanvasElement): void {
     this.canvas = canvas;
-    this.gl = canvas.getContext('webgl2', {
-      alpha: false,
-      premultipliedAlpha: false,
-      antialias: true,
-      powerPreference: 'high-performance',
-      preserveDrawingBuffer: true,
-    });
+    this.gl = isThisNode()
+      ? global.mocks.glMock
+      : canvas.getContext('webgl2', {
+        alpha: false,
+        premultipliedAlpha: false,
+        desynchronized: false, // Setting to true causes flickering on mobile devices
+        antialias: true,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer: true,
+        stencil: false,
+      });
 
     if (!this.gl) {
       throw new Error('WebGL2 not supported');
@@ -39,14 +56,27 @@ export class Renderer {
     }
 
     // Initialize WebGL context
+    this.gl.getExtension('EXT_frag_depth');
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
     // Set up initial viewport
     this.updateViewport();
+
+    Doris.getInstance().emit(CoreEngineEvents.WebGlAfterInit, this.gl);
   }
 
-  render(scene: Scene | null): void {
+  render(scene: OldScene, camera: OldCamera): void {
+    // Apply the camera matrix
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.projectionMatrix, camera.camMatrix);
+
+    Doris.getInstance().emit(CoreEngineEvents.BeforeRender);
+    scene.render(this, camera);
+    Doris.getInstance().emit(CoreEngineEvents.Render);
+    Doris.getInstance().emit(CoreEngineEvents.AfterRender);
+  }
+
+  newRender(scene: Scene | null): void {
     if (!scene) {
       return;
     }
@@ -92,5 +122,91 @@ export class Renderer {
 
   getContext(): WebGL2RenderingContext | null {
     return this.gl;
+  }
+
+  initializeWebGLContext(domElement?: HTMLCanvasElement): WebGL2RenderingContext {
+    // Ensure the canvas is available
+    this.canvas ??= domElement ?? getEl('canvas') as HTMLCanvasElement;
+
+    if (!this.canvas) {
+      throw new Error('The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.');
+    }
+
+    // Try to prevent crashes
+    if (this.canvas?.addEventListener) {
+      this.canvas.addEventListener('webglcontextlost', this.onContextLost_.bind(this));
+      this.canvas.addEventListener('webglcontextrestored', this.onContextRestore_.bind(this));
+    }
+
+    const gl: WebGL2RenderingContext = isThisNode()
+      ? global.mocks.glMock
+      : this.canvas.getContext('webgl2', {
+        alpha: false,
+        premultipliedAlpha: false,
+        desynchronized: false, // Setting to true causes flickering on mobile devices
+        antialias: true,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer: true,
+        stencil: false,
+      });
+
+    // Check for WebGL Issues
+    if (gl === null) {
+      throw new Error('WebGL is not available. Contact your LAN Office or System Administrator.');
+    }
+
+    this.gl = gl;
+
+    gl.getExtension('EXT_frag_depth');
+    gl.enable(gl.DEPTH_TEST);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    if (!this.isFirstInit) {
+      this.isFirstInit = true;
+      Doris.getInstance().emit(CoreEngineEvents.WebGlAfterFirstInit, gl);
+    } else {
+      Doris.getInstance().emit(CoreEngineEvents.WebGlAfterInit, gl);
+    }
+
+    return gl;
+  }
+
+  handleCanvasBeforeResize(): void {
+    const gl = this.gl;
+
+    if (!gl) {
+      return;
+    }
+
+    if (!gl.canvas) {
+      // We lost the canvas - try to get it again
+      this.initializeWebGLContext();
+    }
+  }
+
+  setCursor(cursor: 'default' | 'pointer' | 'grab' | 'grabbing') {
+    this.canvas.style.cursor = cursor;
+  }
+
+  private resetGLState_(gl: WebGL2RenderingContext) {
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.useProgram(null);
+  }
+
+  private onContextLost_(e: WebGLContextEvent) {
+    e.preventDefault(); // allows the context to be restored
+    errorManagerInstance.info('WebGL Context Lost');
+    this.eventBus.emit(CoreEngineEvents.WebGlContextLost);
+  }
+
+  private onContextRestore_() {
+    if (this.gl) {
+      errorManagerInstance.info('WebGL Context Restored');
+      this.resetGLState_(this.gl);
+      this.eventBus.emit(CoreEngineEvents.WebGlContextRestored, this.gl);
+    }
   }
 }

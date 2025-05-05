@@ -1,5 +1,6 @@
-import { Engine } from '@app/doris/core/engine';
 import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { Renderer } from '@app/doris/rendering/renderer';
 import { ToastMsgType } from '@app/interfaces';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -14,12 +15,12 @@ import { Earth } from './draw-manager/earth';
 import { Ellipsoid } from './draw-manager/ellipsoid';
 import { Godrays } from './draw-manager/godrays';
 import { Moon } from './draw-manager/moon';
+import { PostProcessingManager } from './draw-manager/post-processing';
 import { SensorFovMeshFactory } from './draw-manager/sensor-fov-mesh-factory';
 import { SkyBoxSphere } from './draw-manager/skybox-sphere';
 import { Sun } from './draw-manager/sun';
 import { errorManagerInstance } from './errorManager';
-import { WebGLRenderer } from './webgl-renderer';
-import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { Engine } from '@app/doris/core/engine';
 
 export interface SceneParams {
   gl: WebGL2RenderingContext;
@@ -28,6 +29,7 @@ export interface SceneParams {
 
 export class Scene {
   static readonly id = 'Scene';
+  postProcessingManager: PostProcessingManager;
 
   private gl_: WebGL2RenderingContext;
   background: WebGLTexture;
@@ -48,6 +50,7 @@ export class Scene {
   updateVisualsBasedOnPerformanceTime_ = 0;
   primaryCovBubble: Ellipsoid;
   secondaryCovBubble: Ellipsoid;
+  isInitialized_ = false;
 
   constructor(params: SceneParams) {
     this.gl_ = params.gl;
@@ -64,6 +67,10 @@ export class Scene {
     this.secondaryCovBubble = new Ellipsoid(([0, 0, 0]));
     this.sensorFovFactory = new SensorFovMeshFactory();
     this.coneFactory = new ConeMeshFactory();
+    this.postProcessingManager = new PostProcessingManager();
+    Doris.getInstance().on(CoreEngineEvents.AssetLoadComplete, () => {
+      this.postProcessingManager.init(Doris.getInstance().getRenderer().gl);
+    });
   }
 
   init(gl: WebGL2RenderingContext): void {
@@ -71,6 +78,7 @@ export class Scene {
     this.skybox.init(settingsManager, gl);
 
     Doris.getInstance().on(CoreEngineEvents.Update, this.update.bind(this));
+    this.isInitialized_ = true;
   }
 
   update() {
@@ -89,21 +97,25 @@ export class Scene {
     this.coneFactory.updateAll();
   }
 
-  render(renderer: WebGLRenderer, camera: Camera): void {
+  render(renderer: Renderer, camera: Camera): void {
+    if (!this.isInitialized_) {
+      return;
+    }
+
     this.clear();
 
-    this.renderBackground(renderer, camera);
+    this.renderBackground(camera);
     this.renderOpaque(renderer, camera);
-    this.renderTransparent(renderer, camera);
+    this.renderTransparent(camera);
 
-    this.sensorFovFactory.drawAll(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
-    this.coneFactory.drawAll(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+    this.sensorFovFactory.drawAll(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
+    this.coneFactory.drawAll(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
   }
 
   averageDrawTime = 0;
   drawTimeArray: number[] = Array(150).fill(16);
 
-  renderBackground(renderer: WebGLRenderer, camera: Camera): void {
+  renderBackground(camera: Camera): void {
     this.drawTimeArray.push(Math.min(100, Doris.getInstance().deltaTime));
     if (this.drawTimeArray.length > 150) {
       this.drawTimeArray.shift();
@@ -120,7 +132,9 @@ export class Scene {
         this.sun.draw(this.earth.lightDirection, fb);
 
         // Draw a black earth mesh on top of the sun in the godrays frame buffer
-        this.earth.drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
+        if (this.postProcessingManager.isInitialized) {
+          this.earth.drawOcclusion(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
+        }
 
         // Draw a black object mesh on top of the sun in the godrays frame buffer
         if (
@@ -128,15 +142,17 @@ export class Scene {
           (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
           keepTrackApi.getMainCamera().camDistBuffer <= settingsManager.nearZoomLevel
         ) {
-          renderer.meshManager.drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
+          keepTrackApi.getMeshManager().drawOcclusion(
+            keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.programs.occlusion, this.frameBuffers.godrays,
+          );
         }
 
         // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
-        renderer.postProcessingManager.curBuffer = null;
-        this.godrays.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+        this.postProcessingManager.curBuffer = null;
+        this.godrays.draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
       }
 
-      this.skybox.render(renderer.postProcessingManager.curBuffer);
+      this.skybox.render(this.postProcessingManager.curBuffer);
 
       // Draw the moon
       if (!settingsManager.isDisableMoon) {
@@ -144,7 +160,7 @@ export class Scene {
       }
     }
 
-    renderer.postProcessingManager.curBuffer = null;
+    this.postProcessingManager.curBuffer = null;
   }
 
   private updateVisualsBasedOnPerformance_() {
@@ -205,32 +221,34 @@ export class Scene {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  renderOpaque(renderer: WebGLRenderer, camera: Camera): void {
+  renderOpaque(renderer: Renderer, camera: Camera): void {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
     const hoverManagerInstance = keepTrackApi.getHoverManager();
 
     // Draw Earth
-    this.earth.draw(renderer.postProcessingManager.curBuffer);
+    this.earth.draw(this.postProcessingManager.curBuffer);
 
     // Draw Dots
-    dotsManagerInstance.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
+    dotsManagerInstance.draw(renderer.projectionCameraMatrix, this.postProcessingManager.curBuffer);
 
-    orbitManagerInstance.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera);
+    orbitManagerInstance.draw(
+      keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera,
+    );
 
     keepTrackApi.getLineManager().draw(null);
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
     if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
       if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
-        renderer.meshManager.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+        keepTrackApi.getMeshManager().draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
       }
     }
   }
 
   // eslint-disable-next-line class-methods-use-this
-  renderTransparent(renderer: WebGLRenderer, camera: Camera): void {
+  renderTransparent(camera: Camera): void {
     const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
 
     if (!selectedSatelliteManager) {
@@ -238,11 +256,11 @@ export class Scene {
     }
 
     if (selectedSatelliteManager.selectedSat > -1) {
-      this.searchBox.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
-      this.primaryCovBubble.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+      this.searchBox.draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
+      this.primaryCovBubble.draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
     }
     if (selectedSatelliteManager.secondarySat > -1) {
-      this.secondaryCovBubble.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+      this.secondaryCovBubble.draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
     }
   }
 
@@ -277,7 +295,7 @@ export class Scene {
 
   async loadScene(): Promise<void> {
     try {
-      this.earth.init(settingsManager, this.gl_);
+      this.earth.init(this.gl_);
       await this.sun.init(this.gl_);
 
       if (!settingsManager.isDisableGodrays) {

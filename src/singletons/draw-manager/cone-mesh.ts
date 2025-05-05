@@ -89,7 +89,7 @@ export class ConeMesh extends CustomMesh {
     mat4.scale(this.mvMatrix_, this.mvMatrix_, [coneHeight, coneHeight, coneHeight]);
   }
 
-  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
+  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_) {
       return;
     }

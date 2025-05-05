@@ -229,12 +229,13 @@ export class LineManager {
   }
 
   runBeforeDraw(tgtBuffer = null as WebGLFramebuffer | null): void {
-    const { projectionMatrix, gl } = keepTrackApi.getRenderer();
+    const { gl } = keepTrackApi.getRenderer();
+    const { projectionMatrix, camMatrix } = keepTrackApi.getMainCamera();
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.program);
 
-    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, keepTrackApi.getMainCamera().camMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, projectionMatrix);
 
     gl.enableVertexAttribArray(this.attribs.a_position.location); // Enable

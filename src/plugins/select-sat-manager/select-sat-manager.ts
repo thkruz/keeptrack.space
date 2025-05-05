@@ -93,7 +93,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         keepTrackApi.getScene().primaryCovBubble.update(primarySat);
         Doris.getInstance().emit(KeepTrackApiEvents.onPrimarySatelliteUpdate, primarySat, primarySat.id);
       } else {
-        keepTrackApi.getScene().searchBox.update(null);
+        keepTrackApi.getScene()?.searchBox.update(null);
       }
 
       // If the secondary satellite is not the same as the last selected satellite, run the event

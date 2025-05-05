@@ -79,6 +79,12 @@ export class Godrays {
     gl.depthMask(true);
   }
 
+  reinitialize(): void {
+    if (this.gl_ && this.sun_) {
+      this.init(this.gl_, this.sun_);
+    }
+  }
+
   init(gl: WebGL2RenderingContext, sun: Sun): void {
     this.gl_ = gl;
     this.sun_ = sun;

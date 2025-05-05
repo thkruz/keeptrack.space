@@ -2,6 +2,7 @@
 import { AnalyticsInstance } from 'analytics';
 import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { keepTrackContainer } from './container';
+import { Renderer } from './doris/rendering/renderer';
 import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
 import { saveCsv, saveVariable } from './lib/saveVariable';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
@@ -24,7 +25,6 @@ import type { OrbitManager } from './singletons/orbitManager';
 import { Scene } from './singletons/scene';
 import type { TimeManager } from './singletons/time-manager';
 import type { UiManager } from './singletons/uiManager';
-import { WebGLRenderer } from './singletons/webgl-renderer';
 import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
 
@@ -226,7 +226,7 @@ export class KeepTrackApi {
   }
 
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);
-  getRenderer = () => keepTrackContainer.get<WebGLRenderer>(Singletons.WebGLRenderer);
+  getRenderer = () => keepTrackContainer.get<Renderer>(Singletons.WebGLRenderer);
   getScene = () => keepTrackContainer.get<Scene>(Singletons.Scene);
   getCatalogManager = () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
   getSensorManager = () => keepTrackContainer.get<SensorManager>(Singletons.SensorManager);

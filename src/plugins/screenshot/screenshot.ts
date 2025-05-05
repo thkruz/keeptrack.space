@@ -84,7 +84,9 @@ export class Screenshot extends KeepTrackPlugin {
     </ul>
   `;
 
-  saveHiResPhoto = (resolution: string) => {
+  private isClickedOnce = false;
+
+  saveHiResPhoto(resolution: string) {
     switch (resolution) {
       case 'hd':
         settingsManager.hiResWidth = 1920;
@@ -102,23 +104,20 @@ export class Screenshot extends KeepTrackPlugin {
         break;
     }
 
-    this.queuedScreenshot_ = true;
-  };
-
-  addJs(): void {
-    super.addJs();
-    Doris.getInstance().on(CoreEngineEvents.AfterRender, () => {
-      if (this.queuedScreenshot_) {
+    Doris.getInstance().once(CoreEngineEvents.BeforeRender, () => {
+      Doris.getInstance().getCanvasManager().forceCanvasResize(settingsManager.hiResWidth!, settingsManager.hiResHeight!);
+      this.isClickedOnce = false;
+    });
+    Doris.getInstance().once(CoreEngineEvents.AfterRender, () => {
+      if (!this.isClickedOnce) {
         this.takeScreenShot();
+        const { width, height } = Doris.getInstance().getCanvasManager().getCanvasSize();
+
+        Doris.getInstance().getCanvasManager().forceCanvasResize(width, height);
+        this.isClickedOnce = true;
       }
     });
   }
-
-  isQueuedScreenshot(): boolean {
-    return this.queuedScreenshot_;
-  }
-
-  private queuedScreenshot_ = false;
 
   /**
    * Take a screenshot of the current canvas
@@ -133,11 +132,10 @@ export class Screenshot extends KeepTrackPlugin {
 
     link.href = this.watermarkedDataUrl_();
     link.click();
-    this.queuedScreenshot_ = false;
   }
 
   private watermarkedDataUrl_() {
-    const canvas = keepTrackApi.getRenderer().domElement;
+    const canvas = keepTrackApi.getRenderer().canvas;
 
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');

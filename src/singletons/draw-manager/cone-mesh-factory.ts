@@ -11,7 +11,7 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
     color: [0.2, 1.0, 1.0, 0.15],
   };
 
-  drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
+  drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer | null = null) {
     this.meshes.forEach((mesh) => {
       mesh.draw(pMatrix, camMatrix, tgtBuffer);
     });

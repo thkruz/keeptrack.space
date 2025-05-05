@@ -30,6 +30,8 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import planetariumPng from '@public/img/icons/planetarium.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 
 export class Planetarium extends KeepTrackPlugin {
   readonly id = 'Planetarium';
@@ -43,13 +45,12 @@ export class Planetarium extends KeepTrackPlugin {
   isIconDisabled = true;
 
   onSetBottomIconToUnselected = (): void => {
-    const renderer = keepTrackApi.getRenderer();
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     keepTrackApi.getMainCamera().isPanReset = true;
     keepTrackApi.getMainCamera().isLocalRotateReset = true;
     settingsManager.fieldOfView = 0.6;
-    renderer.glInit();
+    Doris.getInstance().emit(CoreEngineEvents.WebGlFovChanged);
     uiManagerInstance.hideSideMenus();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 

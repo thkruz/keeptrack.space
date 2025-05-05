@@ -38,7 +38,20 @@ export enum CoreEngineEvents {
   AssetLoadStart = 'engine:assetLoadStart',
   AssetLoadProgress = 'engine:assetLoadProgress',
   AssetLoadComplete = 'engine:assetLoadComplete',
-  AssetLoadError = 'engine:assetLoadError'
+  AssetLoadError = 'engine:assetLoadError',
+
+  // Canvas events
+  CanvasBeforeResize = 'canvas:CanvasBeforeResize',
+  CanvasResize = 'canvas:CanvasSizeChanged',
+  CanvasAfterResize = 'canvas:CanvasAfterResize',
+
+  // WebGL events
+  WebGlAfterFirstInit = 'webgl:webGlFirstInit',
+  WebGlAfterInit = 'webgl:webGlInit',
+  WebGlContextLost = 'webgl:webGlContextLost',
+  WebGlContextRestored = 'webgl:webGlContextRestored',
+  WebGlNeedsInit = 'webgl:webGlNeedsInit',
+  WebGlFovChanged = 'webgl:webGlFovChanged',
 }
 
 /**
@@ -145,6 +158,19 @@ export interface EngineEventMap {
   [CoreEngineEvents.AssetLoadProgress]: [number, number]; // loaded, total
   [CoreEngineEvents.AssetLoadComplete]: [];
   [CoreEngineEvents.AssetLoadError]: [Error]; // error
+
+  // Canvas events
+  [CoreEngineEvents.CanvasBeforeResize]: [HTMLCanvasElement, number, number]; // width, height
+  [CoreEngineEvents.CanvasResize]: [number, number]; // width, height
+  [CoreEngineEvents.CanvasAfterResize]: [HTMLCanvasElement, number, number]; // width, height
+
+  // WebGL initialization
+  [CoreEngineEvents.WebGlAfterFirstInit]: [WebGL2RenderingContext]; // gl
+  [CoreEngineEvents.WebGlAfterInit]: [WebGL2RenderingContext]; // gl
+  [CoreEngineEvents.WebGlContextLost]: [];
+  [CoreEngineEvents.WebGlContextRestored]: [WebGL2RenderingContext]; // gl
+  [CoreEngineEvents.WebGlNeedsInit]: [];
+  [CoreEngineEvents.WebGlFovChanged]: [];
 }
 
 /**

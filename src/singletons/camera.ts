@@ -798,7 +798,7 @@ export class Camera {
     });
 
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
-      this.update(Doris.getInstance().deltaTime as Milliseconds);
+      this.update(Doris.getInstance().getTimeManager().getRealTimeDelta() as Milliseconds);
     });
 
     Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, this.validateProjectionMatrix_.bind(this));

@@ -1,3 +1,4 @@
+import { Engine } from '@app/doris/core/engine';
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { Renderer } from '@app/doris/rendering/renderer';
@@ -20,7 +21,6 @@ import { SensorFovMeshFactory } from './draw-manager/sensor-fov-mesh-factory';
 import { SkyBoxSphere } from './draw-manager/skybox-sphere';
 import { Sun } from './draw-manager/sun';
 import { errorManagerInstance } from './errorManager';
-import { Engine } from '@app/doris/core/engine';
 
 export interface SceneParams {
   gl: WebGL2RenderingContext;
@@ -116,7 +116,7 @@ export class Scene {
   drawTimeArray: number[] = Array(150).fill(16);
 
   renderBackground(camera: Camera): void {
-    this.drawTimeArray.push(Math.min(100, Doris.getInstance().deltaTime));
+    this.drawTimeArray.push(Math.min(100, Doris.getInstance().getTimeManager().getRealTimeDelta()));
     if (this.drawTimeArray.length > 150) {
       this.drawTimeArray.shift();
     }

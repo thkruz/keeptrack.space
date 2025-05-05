@@ -54,8 +54,10 @@ export abstract class UrlManager {
       paramSlices.push(`search=${currentSearch}`);
     }
 
-    if (timeManagerInstance.propRate < 0.99 || timeManagerInstance.propRate > 1.01) {
-      paramSlices.push(`rate=${timeManagerInstance.propRate}`);
+    const currentTimeScale = Doris.getInstance().getTimeManager().getTimeScale();
+
+    if (currentTimeScale < 0.99 || currentTimeScale > 1.01) {
+      paramSlices.push(`rate=${currentTimeScale}`);
     }
 
     if (timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {

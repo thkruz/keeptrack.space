@@ -69,6 +69,13 @@ export enum SceneEvents {
   CameraChanged = 'scene:cameraChanged'
 }
 
+export enum TimeEvents {
+  TimeUpdated = 'time:updated',
+  TimeScaleChanged = 'time:scaleChanged',
+  TimePaused = 'time:paused',
+  TimeResumed = 'time:resumed'
+}
+
 /**
  * Input-related events
  */
@@ -174,6 +181,17 @@ export interface EngineEventMap {
 }
 
 /**
+ * Type definitions for event arguments
+ * This enforces correct argument types for each event
+ */
+export interface TimeEventMap {
+  [TimeEvents.TimeUpdated]: [number, number]; // currentTime, deltaTime
+  [TimeEvents.TimeScaleChanged]: [number]; // timeScale
+  [TimeEvents.TimePaused]: [];
+  [TimeEvents.TimeResumed]: [];
+}
+
+/**
  * Type definitions for scene event arguments
  */
 export interface SceneEventMap {
@@ -246,6 +264,7 @@ export interface ApplicationEventMap {
  */
 export interface EventMap extends
   EngineEventMap,
+  TimeEventMap,
   SceneEventMap,
   InputEventMap,
   PluginEventMap,

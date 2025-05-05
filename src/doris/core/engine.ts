@@ -9,6 +9,7 @@ import { Renderer } from '../rendering/renderer';
 import { SceneManager } from '../scene/scene-manager';
 import { CanvasManager } from './canvas-manager';
 import { initializeSplashScreen } from './engine-splash-screen';
+import { TimeManager } from './time-manager';
 
 export interface EngineConfig {
   containerRoot: string;
@@ -22,11 +23,8 @@ export class Engine {
   private readonly inputSystem: InputSystem;
   private readonly pluginManager: PluginManager;
   private readonly canvasManager: CanvasManager;
-  private lastTimestamp = 0;
+  private readonly timeManager: TimeManager;
   private isRunning = false;
-  framesPerSecond: number = 0;
-  deltaTime: number;
-  simulationStep: number;
 
   constructor(private readonly config_: EngineConfig) {
     this.eventBus = new EventBus();
@@ -35,6 +33,7 @@ export class Engine {
     this.inputSystem = new InputSystem(this.eventBus);
     this.pluginManager = new PluginManager(this.eventBus);
     this.canvasManager = new CanvasManager(this.eventBus, getEl(this.config_.containerRoot));
+    this.timeManager = new TimeManager(this.eventBus);
   }
 
   initialize(): void {
@@ -83,7 +82,7 @@ export class Engine {
       return;
     }
     this.isRunning = true;
-    this.lastTimestamp = performance.now();
+    this.timeManager.reset(); // Reset timeManager state if needed
 
     this.eventBus.emit(CoreEngineEvents.Start);
     requestAnimationFrame(this.gameLoop_.bind(this));
@@ -94,33 +93,20 @@ export class Engine {
       return;
     }
 
-    this.deltaTime = timestamp - this.lastTimestamp;
+    this.timeManager.update(timestamp);
     requestAnimationFrame(this.gameLoop_.bind(this));
-    this.tick_(this.deltaTime);
-
-    this.lastTimestamp = timestamp;
+    this.tick_();
   }
 
-  private tick_(deltaTime: number) {
-    this.setFps(Engine.calculateFps(this.deltaTime));
-    this.setDeltaTime(deltaTime, keepTrackApi.getTimeManager().propRate);
-    this.eventBus.emit(CoreEngineEvents.BeforeUpdate, deltaTime);
-    this.eventBus.emit(CoreEngineEvents.Update, deltaTime);
-    this.eventBus.emit(CoreEngineEvents.AfterUpdate, deltaTime);
+  private tick_() {
+    this.eventBus.emit(CoreEngineEvents.BeforeUpdate, this.timeManager.getScaledTimeDelta());
+    this.eventBus.emit(CoreEngineEvents.Update, this.timeManager.getScaledTimeDelta());
+    this.eventBus.emit(CoreEngineEvents.AfterUpdate, this.timeManager.getScaledTimeDelta());
 
     this.eventBus.emit(CoreEngineEvents.BeforeRender);
     this.eventBus.emit(CoreEngineEvents.Render);
     this.renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
     this.eventBus.emit(CoreEngineEvents.AfterRender);
-  }
-
-  setDeltaTime(dt: number, propagationRate: number) {
-    this.simulationStep = (Math.min(dt / 1000.0, 1.0 / Math.max(propagationRate, 0.001)) * propagationRate);
-    this.framesPerSecond = Engine.calculateFps(dt);
-  }
-
-  setFps(fps: number) {
-    this.framesPerSecond = fps;
   }
 
   static calculateFps(dt: number): number {
@@ -181,5 +167,9 @@ export class Engine {
 
   getCanvasManager(): CanvasManager {
     return this.canvasManager;
+  }
+
+  getTimeManager(): TimeManager {
+    return this.timeManager;
   }
 }

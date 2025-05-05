@@ -62,16 +62,17 @@ export const initializeSplashScreen = () => {
 
   copyright.innerHTML =
     `DORIS &mdash; the Definitely Overengineered Render & Input System engine<br>
-      &copy; 2025 Kruczek Labs LLC. All rights reserved.<br>
-      Licensed under the GNU AGPL v3.0.<br>
-      See LICENSE for details. Unauthorized use is prohibited.`;
+    © 2025 Kruczek Labs LLC. All rights reserved.<br/>
+    This instance is operating without a commercial license or compensation.<br/>
+    Attribution and source code disclosures are required under AGPL v3.<br/>
+    See LICENSE for details.`;
   copyright.style.position = 'absolute';
   copyright.style.bottom = '12px';
   copyright.style.left = '0';
   copyright.style.width = '100%';
   copyright.style.textAlign = 'center';
   copyright.style.fontSize = '12px';
-  copyright.style.opacity = '0.5';
+  copyright.style.opacity = '0.7';
   copyright.style.pointerEvents = 'none';
 
   splashContent.appendChild(poweredBy);

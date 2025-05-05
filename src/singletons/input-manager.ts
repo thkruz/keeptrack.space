@@ -388,7 +388,7 @@ export class InputManager {
 
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
       // TODO: Reevaluate these conditions
-      if (Doris.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+      if (Doris.getInstance().getTimeManager().getFramesPerSecond() > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
         this.update();
       }
     });
@@ -554,11 +554,11 @@ export class InputManager {
 
     const tessaEngine = Doris.getInstance();
 
-    if (tessaEngine.framesPerSecond > 30) {
+    if (tessaEngine.getTimeManager().getRealTimeDelta() > 30) {
       if (this.updateHoverDelayLimit > 0) {
         --this.updateHoverDelayLimit;
       }
-    } else if (tessaEngine.framesPerSecond > 15) {
+    } else if (tessaEngine.getTimeManager().getRealTimeDelta() > 15) {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
     } else {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;

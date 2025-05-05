@@ -25,10 +25,6 @@ export class TimeManager {
   private lastTime = <Milliseconds>0;
   propFrozen = 0;
   propOffset = 0;
-  /**
-   * The rate of change applied to the dynamicOffset
-   */
-  propRate = <number>null;
   propRate0 = <number>null;
   /**
    * The time in the real world
@@ -80,14 +76,14 @@ export class TimeManager {
       return this.simulationTimeObj;
     }
 
-    if (this.propRate === 0) {
+    if (Doris.getInstance().getTimeManager().getTimeScale() === 0) {
       const simulationTime = this.dynamicOffsetEpoch + this.staticOffset;
 
       this.simulationTimeObj.setTime(simulationTime);
     } else {
       this.realTime = <Milliseconds>Date.now();
       this.dynamicOffset_ = this.realTime - this.dynamicOffsetEpoch;
-      const simulationTime = this.dynamicOffsetEpoch + this.staticOffset + this.dynamicOffset_ * this.propRate;
+      const simulationTime = this.dynamicOffsetEpoch + this.staticOffset + this.dynamicOffset_ * Doris.getInstance().getTimeManager().getTimeScale();
 
       this.simulationTimeObj.setTime(simulationTime);
     }
@@ -96,41 +92,49 @@ export class TimeManager {
   }
 
   changePropRate(propRate: number) {
-    if (this.propRate === propRate) {
+    if (Doris.getInstance().getTimeManager().getTimeScale() === propRate) {
       return;
     } // no change
+
+    Doris.getInstance().getTimeManager().setTimeScale(propRate);
 
     this.staticOffset = this.simulationTimeObj.getTime() - Date.now();
     // Changing propRate or dynamicOffsetEpoch before calculating the staticOffset will give incorrect results
     this.dynamicOffsetEpoch = Date.now();
-    this.propRate = propRate;
     this.calculateSimulationTime();
 
     this.synchronize();
 
     const toggleTimeDOM = getEl('toggle-time-rmb');
 
-    if (keepTrackApi.getTimeManager().propRate === 0) {
+    if (!toggleTimeDOM) {
+      errorManagerInstance.warn('Toggle time DOM not found');
+
+      return;
+    }
+
+    if (Doris.getInstance().getTimeManager().getTimeScale() === 0) {
       toggleTimeDOM.childNodes[0].textContent = 'Start Clock';
     } else {
       toggleTimeDOM.childNodes[0].textContent = 'Pause Clock';
     }
 
     const uiManagerInstance = keepTrackApi.getUiManager();
+    const currentTimeScale = Doris.getInstance().getTimeManager().getTimeScale();
 
-    if (!settingsManager.isAlwaysHidePropRate && this.propRate0 !== this.propRate) {
-      if (this.propRate > 1.01 || this.propRate < 0.99) {
-        if (this.propRate < 10) {
-          uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.standby);
+    if (!settingsManager.isAlwaysHidePropRate && this.propRate0 !== currentTimeScale) {
+      if (currentTimeScale > 1.01 || currentTimeScale < 0.99) {
+        if (currentTimeScale < 10) {
+          uiManagerInstance.toast(`Propagation Speed: ${currentTimeScale.toFixed(1)}x`, ToastMsgType.standby);
         }
-        if (this.propRate >= 10 && this.propRate < 60) {
-          uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.caution);
+        if (currentTimeScale >= 10 && currentTimeScale < 60) {
+          uiManagerInstance.toast(`Propagation Speed: ${currentTimeScale.toFixed(1)}x`, ToastMsgType.caution);
         }
-        if (this.propRate >= 60) {
-          uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.serious);
+        if (currentTimeScale >= 60) {
+          uiManagerInstance.toast(`Propagation Speed: ${currentTimeScale.toFixed(1)}x`, ToastMsgType.serious);
         }
       } else {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.normal);
+        uiManagerInstance.toast(`Propagation Speed: ${currentTimeScale.toFixed(1)}x`, ToastMsgType.normal);
       }
 
       if (!settingsManager.disableUI) {
@@ -200,7 +204,6 @@ export class TimeManager {
 
     this.propFrozen = Date.now(); // for when propRate 0
     this.realTime = <Milliseconds>this.propFrozen; // (initialized as Date.now)
-    this.propRate = 1.0; // time rate multiplier for propagation
 
     // Initialize
     this.calculateSimulationTime();
@@ -234,20 +237,22 @@ export class TimeManager {
       key: ',',
       callback: () => {
         this.calculateSimulationTime();
-        let newPropRate = this.propRate;
+        const currentTimeScale = Doris.getInstance().getTimeManager().getTimeScale();
 
-        if (this.propRate < 0.001 && this.propRate > -0.001) {
+        let newPropRate = currentTimeScale;
+
+        if (currentTimeScale < 0.001 && currentTimeScale > -0.001) {
           newPropRate = -0.001;
         }
 
-        if (this.propRate < -1000) {
+        if (currentTimeScale < -1000) {
           newPropRate = -1000;
         }
 
         if (newPropRate < 0) {
-          newPropRate = (this.propRate * 1.5);
+          newPropRate = (currentTimeScale * 1.5);
         } else {
-          newPropRate = ((this.propRate * 2) / 3);
+          newPropRate = ((currentTimeScale * 2) / 3);
         }
 
         const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
@@ -264,20 +269,21 @@ export class TimeManager {
       key: '.',
       callback: () => {
         this.calculateSimulationTime();
-        let newPropRate = this.propRate;
+        const currentTimeScale = Doris.getInstance().getTimeManager().getTimeScale();
+        let newPropRate = currentTimeScale;
 
-        if (this.propRate < 0.001 && this.propRate > -0.001) {
+        if (currentTimeScale < 0.001 && currentTimeScale > -0.001) {
           newPropRate = 0.001;
         }
 
-        if (this.propRate > 1000) {
+        if (currentTimeScale > 1000) {
           newPropRate = 1000;
         }
 
         if (newPropRate > 0) {
-          newPropRate = (this.propRate * 1.5);
+          newPropRate = (currentTimeScale * 1.5);
         } else {
-          newPropRate = ((this.propRate * 2) / 3);
+          newPropRate = ((currentTimeScale * 2) / 3);
         }
 
         const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
@@ -313,7 +319,7 @@ export class TimeManager {
       callback: () => {
         let newPropRate: number;
 
-        if (this.propRate === 1) {
+        if (Doris.getInstance().getTimeManager().getTimeScale() === 1) {
           newPropRate = 0;
         } else {
           newPropRate = 1;
@@ -358,27 +364,29 @@ export class TimeManager {
   }
 
   toggleTime() {
-    if (this.propRate === 0) {
+    const currentTimeScale = Doris.getInstance().getTimeManager().getTimeScale();
+
+    if (currentTimeScale === 0) {
       this.changePropRate(this.lastPropRate);
     } else {
-      this.lastPropRate = this.propRate;
+      this.lastPropRate = currentTimeScale;
       this.changePropRate(0);
     }
 
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    if (this.propRate > 1.01 || this.propRate < 0.99) {
-      if (this.propRate < 10) {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.standby);
+    if (currentTimeScale > 1.01 || currentTimeScale < 0.99) {
+      if (currentTimeScale < 10) {
+        uiManagerInstance.toast(`Propagation Speed: ${currentTimeScale.toFixed(1)}x`, ToastMsgType.standby);
       }
-      if (this.propRate >= 10 && this.propRate < 60) {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.caution);
+      if (currentTimeScale >= 10 && currentTimeScale < 60) {
+        uiManagerInstance.toast(`Propagation Speed: ${currentTimeScale.toFixed(1)}x`, ToastMsgType.caution);
       }
-      if (this.propRate >= 60) {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.serious);
+      if (currentTimeScale >= 60) {
+        uiManagerInstance.toast(`Propagation Speed: ${currentTimeScale.toFixed(1)}x`, ToastMsgType.serious);
       }
     } else {
-      uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.normal);
+      uiManagerInstance.toast(`Propagation Speed: ${currentTimeScale.toFixed(1)}x`, ToastMsgType.normal);
     }
   }
 
@@ -395,7 +403,7 @@ export class TimeManager {
             this.timeTextStr += this.simulationTimeSerialized_[this.iText - 1];
           }
         }
-        this.propRate0 = this.propRate;
+        this.propRate0 = Doris.getInstance().getTimeManager().getTimeScale();
       }
 
       // Avoid race condition
@@ -445,7 +453,7 @@ export class TimeManager {
       typ: CruncerMessageTypes.OFFSET,
       staticOffset: this.staticOffset,
       dynamicOffsetEpoch: this.dynamicOffsetEpoch,
-      propRate: this.propRate,
+      propRate: Doris.getInstance().getTimeManager().getTimeScale(),
     };
 
     catalogManagerInstance.satCruncher.postMessage(message);

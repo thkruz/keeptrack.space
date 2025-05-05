@@ -59,7 +59,7 @@ export class MouseInput {
     if (evt.button === 0) {
       if (settingsManager.isFreezePropRateOnDrag) {
         timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.lastPropRate = timeManagerInstance.propRate * 1;
+        timeManagerInstance.lastPropRate = Doris.getInstance().getTimeManager().getTimeScale();
         timeManagerInstance.changePropRate(0);
       }
     }

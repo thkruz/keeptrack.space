@@ -208,7 +208,7 @@ export class OrbitManager {
 
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
       // TODO: Reevaluate these conditions
-      if (Doris.getInstance().framesPerSecond > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
+      if (Doris.getInstance().getTimeManager().getFramesPerSecond() > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
         this.updateAllVisibleOrbits();
       }
     });
@@ -305,7 +305,7 @@ export class OrbitManager {
       id,
       dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
       staticOffset: timeManagerInstance.staticOffset,
-      rate: timeManagerInstance.propRate,
+      rate: Doris.getInstance().getTimeManager().getTimeScale(),
       tle1,
       tle2,
       isEcfOutput: settingsManager.isOrbitCruncherInEcf,
@@ -342,7 +342,7 @@ export class OrbitManager {
           id,
           dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
           staticOffset: timeManagerInstance.staticOffset,
-          propRate: timeManagerInstance.propRate,
+          propRate: Doris.getInstance().getTimeManager().getTimeScale(),
           // If we are updating a missile trajectory, we need to pass in the missile params
           latList: missileParams?.latList,
           lonList: missileParams?.lonList,
@@ -358,7 +358,7 @@ export class OrbitManager {
           id,
           dynamicOffsetEpoch: timeManagerInstance.dynamicOffsetEpoch,
           staticOffset: timeManagerInstance.staticOffset,
-          propRate: timeManagerInstance.propRate,
+          propRate: Doris.getInstance().getTimeManager().getTimeScale(),
           isEcfOutput: settingsManager.isOrbitCruncherInEcf,
         });
         this.inProgress_[id] = true;

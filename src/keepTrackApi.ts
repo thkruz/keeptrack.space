@@ -157,6 +157,7 @@ export class KeepTrackApi {
       plugins: {},
     }),
   } as unknown as AnalyticsInstance;
+  version = '11.0.0';
 
   unregisterAllPlugins() {
     this.loadedPlugins = [];

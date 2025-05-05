@@ -36,6 +36,14 @@ export abstract class SplashScreen {
           <span id="loader-text">Downloading Science...</span>
         </div>
         <div id="loading-hint">Hint: ${this.showHint()}</div>
+        <div id="version-text">v${keepTrackApi.version}</div>
+        <div id="copyright-notice">
+          This version of KeepTrack is provided under the GNU AGPL v3.0 license.<br/>
+          © 2025 Kruczek Labs LLC. All rights reserved.<br/>
+          This instance is operating without a commercial license or compensation.<br/>
+          Attribution and source code disclosures are required under AGPL v3.<br/>
+          See LICENSE for details.<br/>
+        </div>
       </div>`;
   }
 
@@ -64,6 +72,8 @@ export abstract class SplashScreen {
     if (settingsManager.isMobileModeEnabled) {
       SplashScreen.loadStr(SplashScreen.msg.math);
       hideEl('loading-screen');
+      hideEl('version-text');
+      hideEl('copyright-notice');
     } else {
       // Loading Screen Resized and Hidden
       setTimeout(() => {
@@ -78,6 +88,8 @@ export abstract class SplashScreen {
             getEl('logo-inner-container')?.classList.add('mini-loader');
             // We no longer need these elements
             hideEl('loading-screen');
+            hideEl('version-text');
+            hideEl('copyright-notice');
             hideEl('loading-hint');
             hideEl('logo-text');
             hideEl('logo-text-version');

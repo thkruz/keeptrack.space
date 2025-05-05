@@ -576,7 +576,7 @@ export class DotsManager {
       return;
     }
 
-    const simulationStep = Doris.getInstance().simulationStep;
+    const simulationStep = Doris.getInstance().getTimeManager().getSimulationStep();
 
     if (!settingsManager.lowPerf && simulationStep > settingsManager.minimumDrawDt) {
       if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {

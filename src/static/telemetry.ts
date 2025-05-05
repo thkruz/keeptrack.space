@@ -364,7 +364,7 @@ export class Telemetry {
     return {
       application: {
         renderState: {
-          fps: Doris.getInstance().framesPerSecond,
+          fps: Doris.getInstance().getTimeManager().getFramesPerSecond(),
         },
       },
     };

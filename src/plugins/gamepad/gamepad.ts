@@ -286,8 +286,8 @@ export class GamepadPlugin {
       case CameraType.DEFAULT:
       case CameraType.OFFSET:
       case CameraType.FIXED_TO_SAT:
-        zoomTarget += (zoomOut / 500) * tessaEngine.deltaTime;
-        zoomTarget -= (zoomIn / 500) * tessaEngine.deltaTime;
+        zoomTarget += (zoomOut / 500) * tessaEngine.getTimeManager().getRealTimeDelta();
+        zoomTarget -= (zoomIn / 500) * tessaEngine.getTimeManager().getRealTimeDelta();
         keepTrackApi.getMainCamera().zoomTarget = zoomTarget;
         keepTrackApi.getMainCamera().camZoomSnappedOnSat = false;
         keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
@@ -303,10 +303,10 @@ export class GamepadPlugin {
       case CameraType.PLANETARIUM:
       case CameraType.ASTRONOMY:
         if (zoomOut !== 0) {
-          keepTrackApi.getMainCamera().fpsVertSpeed += (zoomOut * 2) ** 3 * tessaEngine.deltaTime * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().fpsVertSpeed += (zoomOut * 2) ** 3 * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
         }
         if (zoomIn !== 0) {
-          keepTrackApi.getMainCamera().fpsVertSpeed -= (zoomIn * 2) ** 3 * tessaEngine.deltaTime * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().fpsVertSpeed -= (zoomIn * 2) ** 3 * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
         }
         break;
       default:
@@ -331,18 +331,18 @@ export class GamepadPlugin {
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().camAngleSnappedOnSat = false;
           keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
-          keepTrackApi.getMainCamera().camPitchSpeed -= (y ** 3 / 200) * tessaEngine.deltaTime * settingsManager.cameraMovementSpeed;
-          keepTrackApi.getMainCamera().camYawSpeed += (x ** 3 / 200) * tessaEngine.deltaTime * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().camPitchSpeed -= (y ** 3 / 200) * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().camYawSpeed += (x ** 3 / 200) * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
           break;
         case CameraType.FPS:
         case CameraType.SATELLITE:
         case CameraType.PLANETARIUM:
         case CameraType.ASTRONOMY:
           if (y > this.deadzone || y < -this.deadzone) {
-            keepTrackApi.getMainCamera().fpsForwardSpeed = -(y ** 3) * tessaEngine.deltaTime;
+            keepTrackApi.getMainCamera().fpsForwardSpeed = -(y ** 3) * tessaEngine.getTimeManager().getRealTimeDelta();
           }
           if (x > this.deadzone || x < -this.deadzone) {
-            keepTrackApi.getMainCamera().fpsSideSpeed = x ** 3 * tessaEngine.deltaTime;
+            keepTrackApi.getMainCamera().fpsSideSpeed = x ** 3 * tessaEngine.getTimeManager().getRealTimeDelta();
           }
           break;
         default:
@@ -376,8 +376,8 @@ export class GamepadPlugin {
         case CameraType.SATELLITE:
         case CameraType.PLANETARIUM:
         case CameraType.ASTRONOMY:
-          keepTrackApi.getMainCamera().camPitchSpeed += (y / 100) * tessaEngine.deltaTime * settingsManager.cameraMovementSpeed;
-          keepTrackApi.getMainCamera().camYawSpeed -= (x / 100) * tessaEngine.deltaTime * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().camPitchSpeed += (y / 100) * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().camYawSpeed -= (x / 100) * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
           break;
         default:
           // Do nothing

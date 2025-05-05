@@ -165,7 +165,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
 
     Doris.getInstance().on(CoreEngineEvents.Update, (): void => {
       if (this.isShowFPS) {
-        const fps = Doris.getInstance().framesPerSecond;
+        const fps = Doris.getInstance().getTimeManager().getFramesPerSecond();
 
         // eslint-disable-next-line no-console
         console.log(`FPS: ${fps}`);

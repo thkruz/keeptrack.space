@@ -4,7 +4,7 @@ import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CameraType } from '@app/singletons/camera';
+import { CameraType } from '@app/keeptrack/camera/legacy-camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

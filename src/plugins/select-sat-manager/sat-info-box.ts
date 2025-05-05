@@ -2,6 +2,7 @@
 import { country2flagIcon } from '@app/catalogs/countries';
 import { Doris } from '@app/doris/doris';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { TimeManager } from '@app/keeptrack/core/time-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
@@ -10,7 +11,6 @@ import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SearchManager } from '@app/singletons/search-manager';
-import { TimeManager } from '@app/singletons/time-manager';
 import { CatalogSearch } from '@app/static/catalog-search';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath, SunStatus } from '@app/static/sat-math';

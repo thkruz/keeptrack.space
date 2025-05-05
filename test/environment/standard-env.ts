@@ -3,12 +3,13 @@ import { Doris } from '@app/doris/doris';
 import { Renderer } from '@app/doris/rendering/renderer';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
+import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
+import { TimeManager } from '@app/keeptrack/core/time-manager';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from '@app/plugins/sensor/sensorManager';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
-import { OriginalCamera } from '@app/singletons/camera';
 import { SatLinkManager } from '@app/singletons/catalog-manager/satLinkManager';
 import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { DotsManager } from '@app/singletons/dots-manager';
@@ -18,7 +19,6 @@ import { GroupsManager } from '@app/singletons/groups-manager';
 import { InputManager } from '@app/singletons/input-manager';
 import { Scene } from '@app/singletons/scene';
 import { SearchManager } from '@app/singletons/search-manager';
-import { TimeManager } from '@app/singletons/time-manager';
 import { UiManager } from '@app/singletons/uiManager';
 import { BottomMenu } from '@app/static/bottom-menu';
 import { SensorMath } from '@app/static/sensor-math';
@@ -304,7 +304,7 @@ export const mockUiManager: UiManager = <UiManager>(<unknown>{
   updateSelectBox: jest.fn(),
 });
 
-export const mockCameraManager = <OriginalCamera>(<unknown>{
+export const mockCameraManager = <LegacyCamera>(<unknown>{
   camAngleSnappedOnSat: false,
   camMatrix: mat4.create().fill(0),
   camPitch: null,

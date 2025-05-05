@@ -7,11 +7,11 @@ import { Doris } from '@app/doris/doris';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Milliseconds, SpaceObjectType } from 'ootk';
+import { CameraType } from '../keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { BufferAttribute } from '../static/buffer-attribute';
 import { WebGlProgramHelper } from '../static/webgl-program';
-import { CameraType } from './camera';
 import { MissileObject } from './catalog-manager/MissileObject';
 
 declare module '@app/interfaces' {
@@ -140,6 +140,7 @@ export class DotsManager {
   starIndex1: number;
   starIndex2: number;
   velocityData: Float32Array;
+  gpuPickingFramebuffer: WebGLFramebuffer;
 
   /**
    * Draws dots on a WebGLFramebuffer.
@@ -226,7 +227,7 @@ export class DotsManager {
     const gl = keepTrackApi.getRenderer().gl;
 
     gl.useProgram(this.programs.picking.program);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.gpuPickingFramebuffer);
 
     gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
 
@@ -345,6 +346,11 @@ export class DotsManager {
     this.initProgramPicking();
 
     Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, () => this.updatePositionBuffer());
+    Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (camera, tgtBuffer) => {
+      const pMvCamMatrix = mat4.mul(mat4.create(), camera.projectionMatrix, camera.camMatrix);
+
+      this.draw(pMvCamMatrix, tgtBuffer);
+    });
   }
 
   /**
@@ -382,8 +388,14 @@ export class DotsManager {
     GlUtils.assignAttributes(this.programs.picking.attribs, gl, this.programs.picking.program, ['a_position', 'a_color', 'a_pickable']);
     GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvCamMatrix']);
 
-    keepTrackApi.getScene().frameBuffers.gpuPicking = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
+    this.gpuPickingFramebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.gpuPickingFramebuffer);
+
+    Doris.getInstance().on(CoreEngineEvents.BeforeClearRenderTarget, () => {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, this.gpuPickingFramebuffer);
+      gl.clearColor(0.0, 0.0, 0.0, 1.0); // This matters!
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    });
 
     this.pickingTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.pickingTexture);

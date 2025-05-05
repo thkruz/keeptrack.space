@@ -2,7 +2,7 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
-import { CameraType } from '../camera';
+import { CameraType } from '../../keeptrack/camera/legacy-camera';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 

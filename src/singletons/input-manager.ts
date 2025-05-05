@@ -229,7 +229,7 @@ export class InputManager {
     const { gl } = renderer;
 
     // NOTE: gl.readPixels is a huge bottleneck but readPixelsAsync doesn't work properly on mobile
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getDotsManager().gpuPickingFramebuffer);
     if (!isThisNode() && this.isAsyncWorking && !settingsManager.isDisableAsyncReadPixels) {
       this.readPixelsAsync(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
     }

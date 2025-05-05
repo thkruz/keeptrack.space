@@ -5,6 +5,7 @@ import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { BaseObject, DetailedSatellite, DetailedSensor, RaeVec3 } from 'ootk';
 
 import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
@@ -202,7 +203,7 @@ export class LineManager {
     }
   }
 
-  draw(tgtBuffer = null as WebGLFramebuffer | null): void {
+  render(tgtBuffer = null as WebGLFramebuffer | null): void {
     if (this.lines.length === 0) {
       return;
     }
@@ -258,6 +259,10 @@ export class LineManager {
 
         this.createSensorToSatFovAndSelectedOnly(sensor, obj);
       }
+    });
+
+    Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (_camera, buffer): void => {
+      this.render(buffer);
     });
   }
 

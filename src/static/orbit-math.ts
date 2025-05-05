@@ -1,7 +1,7 @@
 import { EciVec3, FormatTle, Kilometers, MINUTES_PER_DAY, Meters, RAD2DEG, TAU } from 'ootk';
+import { TimeManager } from '../keeptrack/core/time-manager';
 import { EARTHS_GRAV_CONST, MASS_OF_EARTH } from '../lib/constants';
 import { StringPad } from '../lib/stringPad';
-import { TimeManager } from '../singletons/time-manager';
 import { StringifiedNumber } from './sat-math';
 
 export abstract class OrbitMath {

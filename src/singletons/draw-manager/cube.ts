@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
@@ -128,8 +129,8 @@ export class Box {
     this.isLoaded_ = true;
   }
 
-  init(gl: WebGL2RenderingContext): void {
-    this.gl_ = gl;
+  init(): void {
+    this.gl_ = Doris.getInstance().getRenderer().gl;
     this.textureMap_.src = `${settingsManager.installDirectory}textures/moon-1024.jpg`;
 
     this.initProgram_();

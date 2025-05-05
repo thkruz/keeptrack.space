@@ -3,7 +3,6 @@ import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { isThisNode } from '@app/static/isThisNode';
 import { mat4 } from 'gl-matrix';
-import { OriginalCamera as OldCamera } from '../../singletons/camera';
 import type { Scene as OldScene } from '../../singletons/scene';
 import { Camera } from '../camera/camera';
 import { Doris } from '../doris';
@@ -67,13 +66,24 @@ export class Renderer {
     Doris.getInstance().emit(WebGlEvents.AfterInit, this.gl);
   }
 
-  render(scene: OldScene, camera: OldCamera): void {
+  render(scene: OldScene): void {
+    if (!scene.isInitialized_) {
+      return;
+    }
+
+    const camera = scene.activeCamera;
+
+    if (!camera) {
+      return;
+    }
+
     // Apply the camera matrix
     this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.projectionMatrix, camera.camMatrix);
 
+    Doris.getInstance().emit(CoreEngineEvents.BeforeClearRenderTarget);
+    this.clear(this.gl);
     Doris.getInstance().emit(CoreEngineEvents.BeforeRender);
-    scene.render(this, camera);
-    Doris.getInstance().emit(CoreEngineEvents.Render);
+    Doris.getInstance().emit(CoreEngineEvents.Render, scene, camera);
     Doris.getInstance().emit(CoreEngineEvents.AfterRender);
   }
 
@@ -126,6 +136,12 @@ export class Renderer {
 
   getContext(): WebGL2RenderingContext | null {
     return this.gl;
+  }
+
+  clear(gl: WebGL2RenderingContext): void {
+    // Switch back to the canvas
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   }
 
   initializeWebGLContext(domElement?: HTMLCanvasElement): WebGL2RenderingContext {

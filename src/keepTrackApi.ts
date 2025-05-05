@@ -4,12 +4,14 @@ import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { keepTrackContainer } from './container';
 import { Renderer } from './doris/rendering/renderer';
 import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
+import { LegacyCamera } from './keeptrack/camera/legacy-camera';
+import type { TimeManager } from './keeptrack/core/time-manager';
+import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
 import { saveCsv, saveVariable } from './lib/saveVariable';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import type { SensorManager } from './plugins/sensor/sensorManager';
 import { SoundManager } from './plugins/sounds/sound-manager';
 import { SettingsManager } from './settings/settings';
-import { OriginalCamera } from './singletons/camera';
 import type { CatalogManager } from './singletons/catalog-manager';
 import { MissileObject } from './singletons/catalog-manager/MissileObject';
 import type { ColorSchemeManager } from './singletons/color-scheme-manager';
@@ -23,7 +25,6 @@ import type { InputManager } from './singletons/input-manager';
 import { PanTouchEvent, TapTouchEvent } from './singletons/input-manager/touch-input';
 import type { OrbitManager } from './singletons/orbitManager';
 import { Scene } from './singletons/scene';
-import type { TimeManager } from './singletons/time-manager';
 import type { UiManager } from './singletons/uiManager';
 import { SatMath } from './static/sat-math';
 import { SensorMath } from './static/sensor-math';
@@ -227,7 +228,9 @@ export class KeepTrackApi {
   }
 
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);
+  /** Deprecate */
   getRenderer = () => keepTrackContainer.get<Renderer>(Singletons.WebGLRenderer);
+  getAppRenderer = () => keepTrackContainer.get<KeepTrackRenderer>(Singletons.WebGLRendererApp);
   getScene = () => keepTrackContainer.get<Scene>(Singletons.Scene);
   getCatalogManager = () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
   getSensorManager = () => keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
@@ -241,7 +244,7 @@ export class KeepTrackApi {
   getSensorMath = () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath);
   getLineManager = () => keepTrackContainer.get<LineManager>(Singletons.LineManager);
   getHoverManager = () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager);
-  getMainCamera = () => keepTrackContainer.get<OriginalCamera>(Singletons.MainCamera);
+  getMainCamera = () => keepTrackContainer.get<LegacyCamera>(Singletons.MainCamera);
   getMeshManager = () => keepTrackContainer.get<MeshManager>(Singletons.MeshManager);
 
   saveCsv = saveCsv;

@@ -287,7 +287,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
 
     settingsManager.isDrawSun = (<HTMLInputElement>getEl('settings-drawSun')).checked;
     if (settingsManager.isDrawSun) {
-      keepTrackApi.getScene().drawTimeArray = Array(150).fill(16);
+      keepTrackApi.getAppRenderer().resetDrawTimeArray();
     }
     const isBlackEarthChanged = settingsManager.isBlackEarth !== (<HTMLInputElement>getEl('settings-drawBlackEarth')).checked;
     const isDrawAtmosphereChanged = settingsManager.isDrawAtmosphere !== (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
@@ -316,7 +316,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isGraySkybox = (<HTMLInputElement>getEl('settings-graySkybox')).checked;
 
     if (isDrawMilkyWayChanged || isGraySkyboxChanged) {
-      keepTrackApi.getScene().skybox.init(settingsManager, keepTrackApi.getRenderer().gl);
+      keepTrackApi.getScene().skybox.init(settingsManager);
     }
 
     SettingsManager.preserveSettings();

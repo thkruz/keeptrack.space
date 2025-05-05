@@ -1,9 +1,9 @@
 import { sensors } from '@app/catalogs/sensors';
 import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { CameraType } from '@app/keeptrack/camera/legacy-camera';
 import { getClass } from '@app/lib/get-class';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import sensorPng from '@public/img/icons/sensor.png';

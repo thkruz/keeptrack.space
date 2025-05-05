@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Doris } from '@app/doris/doris';
 import { GLSL3 } from '@app/static/material';
 import { Mesh } from '@app/static/mesh';
 import { ShaderMaterial } from '@app/static/shader-material';
@@ -91,16 +92,16 @@ export class Moon {
   /**
    * This is run once per session to initialize the moon.
    */
-  async init(gl: WebGL2RenderingContext): Promise<void> {
-    this.gl_ = gl;
+  async init(): Promise<void> {
+    this.gl_ = Doris.getInstance().getRenderer().gl;
 
-    const geometry = new SphereGeometry(gl, {
+    const geometry = new SphereGeometry(this.gl_, {
       radius: this.DRAW_RADIUS,
       widthSegments: this.NUM_HEIGHT_SEGS,
       heightSegments: this.NUM_WIDTH_SEGS,
     });
-    const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/moon-1024.jpg`);
-    const material = new ShaderMaterial(gl, {
+    const texture = await GlUtils.initTexture(this.gl_, `${settingsManager.installDirectory}textures/moon-1024.jpg`);
+    const material = new ShaderMaterial(this.gl_, {
       uniforms: {
         sampler: null as unknown as WebGLUniformLocation,
         drawPosition: null as unknown as WebGLUniformLocation,
@@ -112,7 +113,7 @@ export class Moon {
       glslVersion: GLSL3,
     });
 
-    this.mesh = new Mesh(gl, geometry, material, {
+    this.mesh = new Mesh(this.gl_, geometry, material, {
       name: 'moon',
       precision: 'highp',
       disabledUniforms: {

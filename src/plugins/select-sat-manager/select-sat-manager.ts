@@ -1,7 +1,7 @@
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { CameraType } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { CameraType } from '@app/singletons/camera';
 
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';

@@ -1,3 +1,5 @@
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BufferAttribute } from '@app/static/buffer-attribute';
 import { FlatGeometry } from '@app/static/flat-geometry';
@@ -39,6 +41,7 @@ export class Godrays {
    * TODO: Verify we need a render buffer for godrays
    */
   renderBuffer: WebGLRenderbuffer;
+  godraysFramebuffer: WebGLFramebuffer;
 
   draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
     if (!this.isLoaded_ || settingsManager.isDisableGodrays) {
@@ -81,12 +84,13 @@ export class Godrays {
 
   reinitialize(): void {
     if (this.gl_ && this.sun_) {
-      this.init(this.gl_, this.sun_);
+      this.init(this.sun_);
     }
   }
 
-  init(gl: WebGL2RenderingContext, sun: Sun): void {
-    this.gl_ = gl;
+  init(sun: Sun): void {
+    this.gl_ = Doris.getInstance().getRenderer().gl;
+
     this.sun_ = sun;
 
     const geometry = new FlatGeometry(this.gl_, {
@@ -117,7 +121,7 @@ export class Godrays {
         u_weight: <WebGLUniformLocation><unknown>null,
         u_illuminationDecay: <WebGLUniformLocation><unknown>null,
       },
-      map: gl.createTexture(),
+      map: this.gl_.createTexture(),
       textureType: 'flat',
       vertexShader: this.shaders_.vert,
       fragmentShader: this.shaders_.frag,
@@ -163,8 +167,17 @@ export class Godrays {
   private initFrameBuffer_(): void {
     const gl = this.gl_;
 
-    keepTrackApi.getScene().frameBuffers.godrays = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.godrays);
+    this.godraysFramebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.godraysFramebuffer);
+
+    Doris.getInstance().on(CoreEngineEvents.BeforeClearRenderTarget, () => {
+      if (!settingsManager.isDisableGodrays) {
+        // Clear the godrays Frame Buffer
+        gl.bindFramebuffer(gl.FRAMEBUFFER, this.godraysFramebuffer);
+        gl.clearColor(0.0, 0.0, 0.0, 1.0); // This matters
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      }
+    });
 
     this.renderBuffer = gl.createRenderbuffer(); // create RB to store the depth buffer
     gl.bindRenderbuffer(gl.RENDERBUFFER, this.renderBuffer);

@@ -2,6 +2,7 @@ import { BufferAttribute } from '@app/static/buffer-attribute';
 import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, EciVec3 } from 'ootk';
+import { LegacyCamera } from '../../keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '../../keepTrackApi';
 import { GlUtils } from '../../static/gl-utils';
 
@@ -72,7 +73,7 @@ export class Ellipsoid {
     this.color_[3] = color[3];
   }
 
-  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
+  render(camera: LegacyCamera, tgtBuffer = null as WebGLFramebuffer | null) {
     if (!this.isLoaded_ || !settingsManager.isDrawCovarianceEllipsoid) {
       return;
     }
@@ -80,6 +81,8 @@ export class Ellipsoid {
       return;
     }
 
+    const pMatrix = camera.projectionMatrix;
+    const camMatrix = camera.camMatrix;
     const gl = this.gl_;
 
     gl.useProgram(this.program_);

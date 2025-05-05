@@ -6,12 +6,11 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
-import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
 import { GetSatType } from '../interfaces';
+import { CameraType, LegacyCamera } from '../keeptrack/camera/legacy-camera';
 import { setInnerHtml } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
-import { CameraType, OriginalCamera } from './camera';
 import { ColorSchemeManager } from './color-scheme-manager';
 import { LineManager } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
@@ -98,17 +97,17 @@ export class OrbitManager {
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
   }
 
-  draw(
-    pMatrix: mat4,
-    camMatrix: mat4,
+  render(
+    mainCameraInstance: LegacyCamera,
     tgtBuffer: WebGLFramebuffer | null,
-    hoverManagerInstance: HoverManager,
-    colorSchemeManagerInstance: ColorSchemeManager,
-    mainCameraInstance: OriginalCamera,
   ): void {
     if (!this.isInitialized_) {
       return;
     }
+    const camMatrix = mainCameraInstance.camMatrix;
+    const pMatrix = mainCameraInstance.projectionMatrix;
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const hoverManagerInstance = keepTrackApi.getHoverManager();
     const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
@@ -212,6 +211,11 @@ export class OrbitManager {
         this.updateAllVisibleOrbits();
       }
     });
+
+    Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (camera, tgtBuffer) => {
+      this.render(camera, tgtBuffer);
+    });
+
 
     this.isInitialized_ = true;
     Doris.getInstance().emit(KeepTrackApiEvents.orbitManagerInit);
@@ -485,7 +489,7 @@ export class OrbitManager {
     }
   }
 
-  private drawInViewObjectOrbit_(mainCameraInstance: OriginalCamera): void {
+  private drawInViewObjectOrbit_(mainCameraInstance: LegacyCamera): void {
     if (this.currentInView_.length >= 1) {
       // There might be some z-fighting
       if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {

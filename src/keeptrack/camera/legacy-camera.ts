@@ -32,13 +32,13 @@ import { mat4, quat, vec3, vec4 } from 'gl-matrix';
 import {
   BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
 } from 'ootk';
-import { keepTrackApi } from '../keepTrackApi';
-import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
-import { SettingsManager } from '../settings/settings';
-import { SatMath } from '../static/sat-math';
-import { MissileObject } from './catalog-manager/MissileObject';
-import { errorManagerInstance } from './errorManager';
-import type { OrbitManager } from './orbitManager';
+import { keepTrackApi } from '../../keepTrackApi';
+import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../../lib/transforms';
+import { SettingsManager } from '../../settings/settings';
+import { MissileObject } from '../../singletons/catalog-manager/MissileObject';
+import { errorManagerInstance } from '../../singletons/errorManager';
+import type { OrbitManager } from '../../singletons/orbitManager';
+import { SatMath } from '../../static/sat-math';
 
 /**
  * Represents the different types of cameras available.
@@ -58,7 +58,7 @@ export enum CameraType {
   OFFSET = 8,
 }
 
-export class OriginalCamera extends PerspectiveCamera {
+export class LegacyCamera extends PerspectiveCamera {
   static readonly id = 'Camera';
   /** Main source of projection matrix for rest of the application */
   projectionMatrix: mat4;
@@ -451,7 +451,7 @@ export class OriginalCamera extends PerspectiveCamera {
 
       this.isLocalRotateReset = true;
       this.settings_.fieldOfView = 0.6;
-      if (selectSatManagerInstance?.selectedSat > -1) {
+      if ((selectSatManagerInstance?.selectedSat ?? -1) > -1) {
         this.camZoomSnappedOnSat = true;
         this.cameraType = CameraType.FIXED_TO_SAT;
       } else {
@@ -785,7 +785,7 @@ export class OriginalCamera extends PerspectiveCamera {
   init(settings: SettingsManager) {
     this.settings_ = settings;
 
-    this.projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+    this.projectionMatrix = LegacyCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
 
     this.registerKeyboardEvents_();
 
@@ -795,7 +795,7 @@ export class OriginalCamera extends PerspectiveCamera {
 
     Doris.getInstance().on(KeepTrackApiEvents.canvasMouseDown, this.canvasMouseDown_.bind(this));
     Doris.getInstance().on(KeepTrackApiEvents.touchStart, this.touchStart_.bind(this));
-    Doris.getInstance().on(CoreEngineEvents.Render, () => {
+    Doris.getInstance().on(CoreEngineEvents.RenderOpaque, () => {
       this.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, KeepTrack.getInstance().sensorPos);
     });
 
@@ -1375,13 +1375,13 @@ export class OriginalCamera extends PerspectiveCamera {
   validateProjectionMatrix_() {
     if (!this.projectionMatrix) {
       errorManagerInstance.log('projectionMatrix is undefined - retrying');
-      this.projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+      this.projectionMatrix = LegacyCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
     }
 
     for (let i = 0; i < 16; i++) {
       if (isNaN(this.projectionMatrix[i])) {
         errorManagerInstance.log('projectionMatrix is NaN - retrying');
-        this.projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+        this.projectionMatrix = LegacyCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
       }
     }
 
@@ -1391,7 +1391,7 @@ export class OriginalCamera extends PerspectiveCamera {
       }
       if (i === 15) {
         errorManagerInstance.log('projectionMatrix is all zeros - retrying');
-        this.projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+        this.projectionMatrix = LegacyCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
       }
     }
   }
@@ -1797,7 +1797,7 @@ export class OriginalCamera extends PerspectiveCamera {
         this.panDif_.z = this.screenDragPoint[1] - this.mouseY;
 
         // Slow down the panning if a satellite is selected
-        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
+        if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
           this.panDif_.x /= 30;
           this.panDif_.y /= 30;
           this.panDif_.z /= 30;

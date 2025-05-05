@@ -2,7 +2,7 @@ import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, SpaceObjectType, Star } from 'ootk';
-import { CameraType } from '../camera';
+import { CameraType } from '../../keeptrack/camera/legacy-camera';
 import { DensityBin } from '../catalog-manager';
 import { MissileObject } from '../catalog-manager/MissileObject';
 

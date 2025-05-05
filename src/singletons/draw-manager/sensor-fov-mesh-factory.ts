@@ -1,16 +1,25 @@
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
-import { mat4 } from 'gl-matrix';
 import { DetailedSensor, GreenwichMeanSiderealTime, SpaceObjectType } from 'ootk';
+import { LegacyCamera } from '../../keeptrack/camera/legacy-camera';
 import { CustomMeshFactory } from './custom-mesh-factory';
 import { SensorFovMesh } from './sensor-fov-mesh';
 
 // TODO: Sensors should be indpeneent of the object they are attached to. This will remove minAz2 and maxAz2 type of properties
 
 export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
-  drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer | null = null) {
+  constructor() {
+    super();
+    Doris.getInstance().on(CoreEngineEvents.RenderTransparent, (camera: LegacyCamera, tgtBuffer: WebGLFramebuffer | null) => {
+      this.drawAll(camera, tgtBuffer);
+    });
+  }
+
+  drawAll(camera: LegacyCamera, tgtBuffer: WebGLFramebuffer | null = null) {
     let i = 0;
     let didWeDrawSomething = false;
     let lastSensorObjName = '';
@@ -28,6 +37,9 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
 
       if (sensors.length > 0) {
         didWeDrawSomething = true;
+        const pMatrix = camera.getProjectionMatrix();
+        const camMatrix = camera.camMatrix;
+
         mesh.draw(pMatrix, camMatrix, keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
         if (mesh.sensor.objName !== lastSensorObjName) {
           i++;

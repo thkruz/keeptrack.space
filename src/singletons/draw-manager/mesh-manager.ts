@@ -1,5 +1,8 @@
+import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { EciArr3, GetSatType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
 import { DownloadModelsOptions, Layout, Mesh, MeshMap, OBJ } from 'webgl-obj-loader';
@@ -458,6 +461,16 @@ export class MeshManager {
         this.meshes_ = models as unknown as KeepTrackMesh;
         this.initShaders();
         this.initBuffers();
+
+        Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (camera, buffer) => {
+          // Draw Satellite Model if a satellite is selected and meshManager is loaded
+          if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
+            if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
+              this.draw(camera.projectionMatrix, camera.camMatrix, buffer);
+            }
+          }
+        });
+
         this.isReady = true;
       });
     } catch {

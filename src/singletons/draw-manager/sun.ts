@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 /* eslint-disable camelcase */
+import { Doris } from '@app/doris/doris';
 import { EciArr3 } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { GlUtils } from '@app/static/gl-utils';
@@ -88,15 +89,15 @@ export class Sun {
   /**
    * This is run once per session to initialize the sun.
    */
-  async init(gl: WebGL2RenderingContext): Promise<void> {
-    this.gl_ = gl;
+  async init(): Promise<void> {
+    this.gl_ = Doris.getInstance().getRenderer().gl;
 
     const geometry = new SphereGeometry(this.gl_, {
       radius: this.DRAW_RADIUS,
       widthSegments: this.NUM_WIDTH_SEGS,
       heightSegments: this.NUM_HEIGHT_SEGS,
     });
-    const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun-1024.jpg`);
+    const texture = await GlUtils.initTexture(this.gl_, `${settingsManager.installDirectory}textures/sun-1024.jpg`);
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
         u_sampler: null as unknown as WebGLUniformLocation,

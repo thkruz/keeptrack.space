@@ -1,3 +1,5 @@
+import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
+import { Scene as OldScene } from '@app/singletons/scene';
 import { Camera } from '../camera/camera';
 import { Plugin } from '../plugins/plugin';
 
@@ -20,8 +22,12 @@ export enum CoreEngineEvents {
   AfterUpdate = 'engine:afterUpdate',
 
   // Rendering events
+  BeforeClearRenderTarget = 'engine:beforeClearRenderTarget', // Clearing other buffers
+  ClearRenderTarget = 'engine:clearRenderTarget', // Only for the main framebuffer
   BeforeRender = 'engine:beforeRender',
   Render = 'engine:render',
+  RenderOpaque = 'engine:renderOpaque',
+  RenderTransparent = 'engine:renderTransparent',
   AfterRender = 'engine:afterRender',
 
   // Window/canvas events
@@ -154,8 +160,12 @@ export interface EngineEventMap {
   [CoreEngineEvents.AfterUpdate]: [number]; // deltaTime
 
   // Rendering
+  [CoreEngineEvents.BeforeClearRenderTarget]: [];
+  [CoreEngineEvents.ClearRenderTarget]: [];
   [CoreEngineEvents.BeforeRender]: [];
-  [CoreEngineEvents.Render]: [];
+  [CoreEngineEvents.Render]: [OldScene, LegacyCamera]; // scene, camera
+  [CoreEngineEvents.RenderOpaque]: [LegacyCamera, WebGLBuffer | null]; // camera, buffer
+  [CoreEngineEvents.RenderTransparent]: [LegacyCamera, WebGLBuffer | null]; // camera, buffer
   [CoreEngineEvents.AfterRender]: [];
 
   // Window/canvas

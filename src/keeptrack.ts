@@ -47,6 +47,9 @@ import { Doris } from './doris/doris';
 import { CanvasEvents, CoreEngineEvents, WebGlEvents } from './doris/events/event-types';
 import { Renderer } from './doris/rendering/renderer';
 import { GetSatType, KeepTrackApiEvents, Singletons } from './interfaces';
+import { CameraType, LegacyCamera } from './keeptrack/camera/legacy-camera';
+import { TimeManager } from './keeptrack/core/time-manager';
+import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
 import { loadLocalization } from './locales/locales';
@@ -54,7 +57,6 @@ import { SensorManager } from './plugins/sensor/sensorManager';
 import { WatchlistPlugin } from './plugins/watchlist/watchlist';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
-import { CameraType, OriginalCamera } from './singletons/camera';
 import { CameraControlWidget } from './singletons/camera-control-widget';
 import { CatalogManager } from './singletons/catalog-manager';
 import { ColorSchemeManager } from './singletons/color-scheme-manager';
@@ -69,7 +71,6 @@ import { InputManager } from './singletons/input-manager';
 import { mobileManager } from './singletons/mobileManager';
 import { OrbitManager } from './singletons/orbitManager';
 import { Scene } from './singletons/scene';
-import { TimeManager } from './singletons/time-manager';
 import { UiManager } from './singletons/uiManager';
 import { BottomMenu } from './static/bottom-menu';
 import { CatalogLoader } from './static/catalog-loader';
@@ -99,7 +100,7 @@ export class KeepTrack {
   sensorManager: SensorManager;
   uiManager: UiManager;
   inputManager: InputManager;
-  mainCameraInstance: OriginalCamera;
+  mainCameraInstance: LegacyCamera;
   cameraControlWidget: CameraControlWidget;
 
   constructor(
@@ -158,9 +159,7 @@ export class KeepTrack {
     keepTrackContainer.registerSingleton(Singletons.MeshManager, meshManagerInstance);
 
     Doris.getInstance().once(WebGlEvents.AfterInit, () => {
-      const sceneInstance = new Scene({
-        gl: keepTrackApi.getRenderer().gl,
-      });
+      const sceneInstance = new Scene();
 
       keepTrackContainer.registerSingleton(Singletons.Scene, sceneInstance);
       this.renderer = Doris.getInstance().getRenderer();
@@ -183,7 +182,7 @@ export class KeepTrack {
     const sensorMathInstance = new SensorMath();
 
     keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
-    const mainCameraInstance = new OriginalCamera();
+    const mainCameraInstance = new LegacyCamera();
 
     const cameraControlWidget = new CameraControlWidget();
 
@@ -461,9 +460,12 @@ theodore.kruczek at gmail dot com.
          */
         renderer.initializeWebGLContext(getEl('keeptrack-canvas') as HTMLCanvasElement);
 
-        sceneInstance.init(renderer.gl);
+        const sceneRenderer = new KeepTrackRenderer(Doris.getInstance().getEventBus());
+
+        sceneRenderer.registerRenderer();
+        sceneInstance.initialize();
+        Doris.getInstance().on(CoreEngineEvents.AssetLoadComplete, sceneInstance.onAssetsLoaded.bind(sceneInstance));
         Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 3, 5);
-        sceneInstance.loadScene();
 
         dotsManagerInstance.init(settingsManager);
 
@@ -530,7 +532,7 @@ theodore.kruczek at gmail dot com.
       }
 
       gl.viewport(0, 0, width, height);
-      keepTrackApi.getMainCamera().projectionMatrix = OriginalCamera.calculatePMatrix(gl);
+      keepTrackApi.getMainCamera().projectionMatrix = LegacyCamera.calculatePMatrix(gl);
 
       // Fix the gpu picker texture size if it has already been created
       const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -540,11 +542,11 @@ theodore.kruczek at gmail dot com.
       }
 
       // Fix flat geometry if it has already been created
-      keepTrackApi.getScene().godrays?.init(gl, keepTrackApi.getScene().sun);
+      keepTrackApi.getScene().godrays?.init(keepTrackApi.getScene().sun);
     });
 
     Doris.getInstance().on(WebGlEvents.FovChanged, () => {
-      keepTrackApi.getMainCamera().projectionMatrix = OriginalCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+      keepTrackApi.getMainCamera().projectionMatrix = LegacyCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
       // Fix the gpu picker texture size if it has already been created
       const dotsManagerInstance = keepTrackApi.getDotsManager();
 

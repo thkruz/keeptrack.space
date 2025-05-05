@@ -269,6 +269,7 @@ export enum Singletons {
   Scene = 'Scene',
   MeshManager = 'MeshManager',
   DemoManager = 'DemoManager',
+  WebGLRendererApp = 'WebGLRendererApp',
 }
 
 /**

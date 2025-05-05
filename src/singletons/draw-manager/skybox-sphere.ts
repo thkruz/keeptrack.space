@@ -1,3 +1,4 @@
+import { Doris } from '@app/doris/doris';
 import { SettingsManager } from '@app/settings/settings';
 import { GlUtils } from '@app/static/gl-utils';
 import { GLSL3 } from '@app/static/material';
@@ -175,18 +176,19 @@ export class SkyBoxSphere {
     }
   }
 
-  init(settings: SettingsManager, gl: WebGL2RenderingContext): void {
-    this.gl_ = gl;
+  init(settings: SettingsManager): void {
+    this.gl_ = Doris.getInstance().getRenderer().gl;
+
     this.settings_ = settings;
 
-    const geometry = new SphereGeometry(gl, {
+    const geometry = new SphereGeometry(this.gl_, {
       radius: this.DRAW_RADIUS,
       widthSegments: this.NUM_WIDTH_SEGS,
       heightSegments: this.NUM_HEIGHT_SEGS,
     });
 
     this.initTextures_();
-    const material = new ShaderMaterial(gl, {
+    const material = new ShaderMaterial(this.gl_, {
       uniforms: {
         u_texMilkyWay: null as unknown as WebGLUniformLocation,
         u_texBoundaries: null as unknown as WebGLUniformLocation,
@@ -198,7 +200,7 @@ export class SkyBoxSphere {
       glslVersion: GLSL3,
     });
 
-    this.mesh = new Mesh(gl, geometry, material, {
+    this.mesh = new Mesh(this.gl_, geometry, material, {
       name: 'skybox',
       precision: 'highp',
       disabledUniforms: {

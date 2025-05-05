@@ -22,8 +22,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { CameraType } from '@app/keeptrack/camera/legacy-camera';
 import { getEl } from '@app/lib/get-el';
-import { CameraType } from '@app/singletons/camera';
 
 import { Doris } from '@app/doris/doris';
 import { WebGlEvents } from '@app/doris/events/event-types';

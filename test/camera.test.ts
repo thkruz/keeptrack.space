@@ -1,10 +1,10 @@
+import { CameraType, LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
-import { CameraType, OriginalCamera } from '@app/singletons/camera';
 import { SatMath } from '@app/static/sat-math';
 import { DEG2RAD, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
-const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: OriginalCamera) => {
+const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: LegacyCamera) => {
   cameraInstance.cameraType = CameraType.DEFAULT;
   expect(testFunc).not.toThrow();
   cameraInstance.cameraType = CameraType.OFFSET;
@@ -22,10 +22,10 @@ const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: Origin
 };
 
 describe('Camera Key Input', () => {
-  let cameraInstance: OriginalCamera;
+  let cameraInstance: LegacyCamera;
 
   beforeEach(() => {
-    cameraInstance = new OriginalCamera();
+    cameraInstance = new LegacyCamera();
   });
   it('should handle V', () => {
     const testFunc = () => cameraInstance.keyDownV_();
@@ -145,7 +145,7 @@ describe('Camera Key Input', () => {
 });
 
 describe('Camera Draw', () => {
-  let cameraInstance: OriginalCamera;
+  let cameraInstance: LegacyCamera;
   let sensorData = {
     x: 0,
     y: 0,
@@ -158,7 +158,7 @@ describe('Camera Draw', () => {
   beforeEach(() => {
     const now = new Date();
 
-    cameraInstance = new OriginalCamera();
+    cameraInstance = new LegacyCamera();
     const sensor = defaultSensor;
 
     const { gmst } = SatMath.calculateTimeVariables(now);
@@ -255,10 +255,10 @@ describe('Camera Draw', () => {
 });
 
 describe('Camera snapToSat', () => {
-  let cameraInstance: OriginalCamera;
+  let cameraInstance: LegacyCamera;
 
   beforeEach(() => {
-    cameraInstance = new OriginalCamera();
+    cameraInstance = new LegacyCamera();
   });
 
   // test snapToSat with no target
@@ -345,10 +345,10 @@ describe('Camera snapToSat', () => {
 
 // test Camera update with all camera types
 describe('Camera update', () => {
-  let cameraInstance: OriginalCamera;
+  let cameraInstance: LegacyCamera;
 
   beforeEach(() => {
-    cameraInstance = new OriginalCamera();
+    cameraInstance = new LegacyCamera();
   });
 
   it('test_update_all_camera_types', () => {
@@ -373,7 +373,7 @@ describe('Camera update', () => {
   });
 });
 
-const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: OriginalCamera) => {
+const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: LegacyCamera) => {
   cameraInstance.keyDownW_();
   testFunc();
 
@@ -439,7 +439,7 @@ const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: Original
   testFunc();
 };
 
-const testVariousKeyUpInputs = (testFunc: () => void, cameraInstance: OriginalCamera) => {
+const testVariousKeyUpInputs = (testFunc: () => void, cameraInstance: LegacyCamera) => {
   cameraInstance.keyUpW_();
   testFunc();
 
@@ -502,7 +502,7 @@ const testVariousKeyUpInputs = (testFunc: () => void, cameraInstance: OriginalCa
   testFunc();
 };
 
-const testVariousKeyCombinationInputs = (testFunc: () => void, cameraInstance: OriginalCamera) => {
+const testVariousKeyCombinationInputs = (testFunc: () => void, cameraInstance: LegacyCamera) => {
   // Combination of key presses and releases
   cameraInstance.keyDownW_();
   cameraInstance.keyUpA_();

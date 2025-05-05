@@ -2,11 +2,11 @@
 // eslint-disable-next-line max-classes-per-file
 import { Doris } from '@app/doris/doris';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { CameraType, LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
-import { CameraType, OriginalCamera } from '@app/singletons/camera';
 import { SatMath } from '@app/static/sat-math';
 import { UrlManager } from '@app/static/url-manager';
 import { DetailedSatellite, Kilometers, eci2lla } from 'ootk';
@@ -116,7 +116,7 @@ export class MouseInput {
     return numMenuItems;
   }
 
-  public canvasMouseMove(evt: MouseEvent, mainCameraInstance: OriginalCamera): void {
+  public canvasMouseMove(evt: MouseEvent, mainCameraInstance: LegacyCamera): void {
     if (this.mouseMoveTimeout === -1) {
       this.mouseMoveTimeout = window.setTimeout(() => {
         this.canvasMouseMoveFire(mainCameraInstance, evt);
@@ -124,7 +124,7 @@ export class MouseInput {
     }
   }
 
-  public canvasMouseMoveFire(mainCameraInstance: OriginalCamera, evt: MouseEvent) {
+  public canvasMouseMoveFire(mainCameraInstance: LegacyCamera, evt: MouseEvent) {
     mainCameraInstance.mouseX = evt.clientX - (keepTrackApi.containerRoot.scrollLeft - window.scrollX) - keepTrackApi.containerRoot.offsetLeft;
     mainCameraInstance.mouseY = evt.clientY - (keepTrackApi.containerRoot.scrollTop - window.scrollY) - keepTrackApi.containerRoot.offsetTop;
     if (

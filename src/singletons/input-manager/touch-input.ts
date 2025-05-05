@@ -1,8 +1,8 @@
 import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/interfaces';
+import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { OriginalCamera } from '@app/singletons/camera';
 import { UrlManager } from '@app/static/url-manager';
 import { MouseInput } from './mouse-input';
 
@@ -74,7 +74,7 @@ export class TouchInput {
     }
   }
 
-  public canvasTouchEnd(evt: TouchEvent, mainCameraInstance: OriginalCamera) {
+  public canvasTouchEnd(evt: TouchEvent, mainCameraInstance: LegacyCamera) {
     const touchTime = Date.now() - this.touchStartTime;
 
     if (!this.isPanning && !this.isPinching) {

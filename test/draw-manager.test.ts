@@ -1,6 +1,6 @@
 /* eslint-disable dot-notation */
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CameraType } from '@app/singletons/camera';
+import { CameraType } from '@app/keeptrack/camera/legacy-camera';
 import { Moon } from '@app/singletons/draw-manager/moon';
 import { WebGLRenderer } from '@app/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './environment/apiMocks';

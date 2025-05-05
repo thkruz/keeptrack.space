@@ -9,11 +9,11 @@ import { SatMath } from '@app/static/sat-math';
 
 import { launchSites } from '@app/catalogs/launch-sites';
 import { Doris } from '@app/doris/doris';
+import { TimeManager } from '@app/keeptrack/core/time-manager';
 import { t7e } from '@app/locales/keys';
 import { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
-import { TimeManager } from '@app/singletons/time-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';

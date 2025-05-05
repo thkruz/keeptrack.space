@@ -1,12 +1,12 @@
 import { Doris } from '@app/doris/doris';
 import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { TimeManager } from '@app/keeptrack/core/time-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
 import { showLoading } from '@app/lib/showLoading';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { TimeManager } from '@app/singletons/time-manager';
 import { SensorMath, TearrData, TearrType } from '@app/static/sensor-math';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, SpaceObjectType } from 'ootk';

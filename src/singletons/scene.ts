@@ -1,15 +1,8 @@
-import { Engine } from '@app/doris/core/engine';
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { Renderer } from '@app/doris/rendering/renderer';
-import { ToastMsgType } from '@app/interfaces';
-import { t7e } from '@app/locales/keys';
-import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SatMath } from '@app/static/sat-math';
-import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
-import { OriginalCamera } from './camera';
+import { LegacyCamera } from '../keeptrack/camera/legacy-camera';
 import { ConeMeshFactory } from './draw-manager/cone-mesh-factory';
 import { Box } from './draw-manager/cube';
 import { Earth } from './draw-manager/earth';
@@ -22,17 +15,10 @@ import { SkyBoxSphere } from './draw-manager/skybox-sphere';
 import { Sun } from './draw-manager/sun';
 import { errorManagerInstance } from './errorManager';
 
-export interface SceneParams {
-  gl: WebGL2RenderingContext;
-  background?: WebGLTexture;
-}
-
 export class Scene {
   static readonly id = 'Scene';
   postProcessingManager: PostProcessingManager;
 
-  private gl_: WebGL2RenderingContext;
-  background: WebGLTexture;
   skybox: SkyBoxSphere;
   isScene = true;
   earth: Earth;
@@ -43,21 +29,14 @@ export class Scene {
   coneFactory: ConeMeshFactory;
   /** The pizza box shaped search around a satellite. */
   searchBox: Box;
-  frameBuffers = {
-    gpuPicking: null as WebGLFramebuffer,
-    godrays: null as WebGLFramebuffer,
-  };
-  updateVisualsBasedOnPerformanceTime_ = 0;
   primaryCovBubble: Ellipsoid;
   secondaryCovBubble: Ellipsoid;
   isInitialized_ = false;
+  activeCamera: LegacyCamera | null = null;
 
-  constructor(params: SceneParams) {
-    this.gl_ = params.gl;
-    this.background = params?.background;
-
+  constructor() {
     this.skybox = new SkyBoxSphere();
-    this.earth = new Earth(this.gl_);
+    this.earth = new Earth();
     this.moon = new Moon();
     this.sun = new Sun();
     this.godrays = new Godrays();
@@ -68,17 +47,44 @@ export class Scene {
     this.sensorFovFactory = new SensorFovMeshFactory();
     this.coneFactory = new ConeMeshFactory();
     this.postProcessingManager = new PostProcessingManager();
-    Doris.getInstance().on(CoreEngineEvents.AssetLoadComplete, () => {
-      this.postProcessingManager.init(Doris.getInstance().getRenderer().gl);
-    });
   }
 
-  init(gl: WebGL2RenderingContext): void {
-    this.gl_ = gl;
-    this.skybox.init(settingsManager, gl);
+  initialize(): void {
+    try {
+      this.skybox.init(settingsManager);
+      this.earth.initialize();
+      this.sun.init().then(() => {
+        if (!settingsManager.isDisableGodrays) {
+          keepTrackApi.getScene().godrays?.init(this.sun);
+        }
+      });
 
+      if (!settingsManager.isDisableMoon) {
+        this.moon.init();
+      }
+
+      if (!settingsManager.isDisableSearchBox) {
+        this.searchBox.init();
+      }
+      if (!settingsManager.isDisableSkybox) {
+        this.skybox.init(settingsManager);
+      }
+      this.activeCamera = keepTrackApi.getMainCamera();
+      this.isInitialized_ = true;
+    } catch (error) {
+      errorManagerInstance.log(error);
+      // Errors aren't showing as toast messages
+    }
     Doris.getInstance().on(CoreEngineEvents.Update, this.update.bind(this));
-    this.isInitialized_ = true;
+  }
+
+  /**
+   * Call this when assets are loaded and the renderer is available.
+   */
+  onAssetsLoaded(): void {
+    const gl = Doris.getInstance().getRenderer().gl;
+
+    this.postProcessingManager.init(gl);
   }
 
   update() {
@@ -95,226 +101,5 @@ export class Scene {
 
     this.sensorFovFactory.updateAll(gmst);
     this.coneFactory.updateAll();
-  }
-
-  render(renderer: Renderer, camera: OriginalCamera): void {
-    if (!this.isInitialized_) {
-      return;
-    }
-
-    this.clear();
-
-    this.renderBackground(camera);
-    this.renderOpaque(renderer, camera);
-    this.renderTransparent(camera);
-
-    this.sensorFovFactory.drawAll(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
-    this.coneFactory.drawAll(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
-  }
-
-  averageDrawTime = 0;
-  drawTimeArray: number[] = Array(150).fill(16);
-
-  renderBackground(camera: OriginalCamera): void {
-    this.drawTimeArray.push(Math.min(100, Doris.getInstance().getTimeManager().getRealTimeDelta()));
-    if (this.drawTimeArray.length > 150) {
-      this.drawTimeArray.shift();
-    }
-    this.averageDrawTime = this.drawTimeArray.reduce((a, b) => a + b, 0) / this.drawTimeArray.length;
-
-    this.updateVisualsBasedOnPerformance_();
-
-    if (!settingsManager.isDrawLess) {
-      if (settingsManager.isDrawSun) {
-        const fb = settingsManager.isDisableGodrays ? null : this.frameBuffers.godrays;
-
-        // Draw the Sun to the Godrays Frame Buffer
-        this.sun.draw(this.earth.lightDirection, fb);
-
-        // Draw a black earth mesh on top of the sun in the godrays frame buffer
-        if (this.postProcessingManager.isInitialized) {
-          this.earth.drawOcclusion(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
-        }
-
-        // Draw a black object mesh on top of the sun in the godrays frame buffer
-        if (
-          !settingsManager.modelsOnSatelliteViewOverride &&
-          (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
-          keepTrackApi.getMainCamera().camDistBuffer <= settingsManager.nearZoomLevel
-        ) {
-          keepTrackApi.getMeshManager().drawOcclusion(
-            keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.programs.occlusion, this.frameBuffers.godrays,
-          );
-        }
-
-        // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
-        this.postProcessingManager.curBuffer = null;
-        this.godrays.draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
-      }
-
-      this.skybox.render(this.postProcessingManager.curBuffer);
-
-      // Draw the moon
-      if (!settingsManager.isDisableMoon) {
-        this.moon.draw(this.sun.position);
-      }
-    }
-
-    this.postProcessingManager.curBuffer = null;
-  }
-
-  private updateVisualsBasedOnPerformance_() {
-    if ((!settingsManager.isDisableMoon ||
-      !settingsManager.isDisableGodrays ||
-      settingsManager.isDrawSun ||
-      settingsManager.isDrawAurora ||
-      settingsManager.isDrawMilkyWay) &&
-      Date.now() - this.updateVisualsBasedOnPerformanceTime_ > 10000 && // Only check every 10 seconds
-      Engine.calculateFps(this.averageDrawTime as Milliseconds) < 30) {
-      let isSettingsLeftToDisable = true;
-
-      while (isSettingsLeftToDisable) {
-        if (!settingsManager.isDisableGodrays) {
-          settingsManager.isDisableGodrays = true;
-          settingsManager.sizeOfSun = 1.65;
-          settingsManager.isUseSunTexture = true;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingGodrays'), ToastMsgType.caution);
-          break;
-        }
-        if (settingsManager.isDrawAurora) {
-          settingsManager.isDrawAurora = false;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAurora'), ToastMsgType.caution);
-          break;
-        }
-        if (settingsManager.isDrawAtmosphere) {
-          settingsManager.isDrawAtmosphere = false;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAtmosphere'), ToastMsgType.caution);
-          break;
-        }
-        if (!settingsManager.isDisableMoon) {
-          settingsManager.isDisableMoon = true;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingMoon'), ToastMsgType.caution);
-          break;
-        }
-        if (settingsManager.isDrawMilkyWay) {
-          settingsManager.isDrawMilkyWay = false;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingMilkyWay'), ToastMsgType.caution);
-          break;
-        }
-        if (settingsManager.isDrawSun) {
-          settingsManager.isDrawSun = false;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingSun'), ToastMsgType.caution);
-          break;
-        }
-        isSettingsLeftToDisable = false;
-      }
-
-      // Create a timer that has to expire before the next performance check
-      this.updateVisualsBasedOnPerformanceTime_ = Date.now();
-
-      try {
-        SettingsMenuPlugin?.syncOnLoad();
-      } catch (error) {
-        errorManagerInstance.log(error);
-      }
-    }
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  renderOpaque(renderer: Renderer, camera: OriginalCamera): void {
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const hoverManagerInstance = keepTrackApi.getHoverManager();
-
-    // Draw Earth
-    this.earth.render(this.postProcessingManager.curBuffer);
-
-    // Draw Dots
-    dotsManagerInstance.draw(renderer.projectionCameraMatrix, this.postProcessingManager.curBuffer);
-
-    orbitManagerInstance.draw(
-      keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera,
-    );
-
-    keepTrackApi.getLineManager().draw(null);
-
-    // Draw Satellite Model if a satellite is selected and meshManager is loaded
-    if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-      if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
-        keepTrackApi.getMeshManager().draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
-      }
-    }
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  renderTransparent(camera: OriginalCamera): void {
-    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
-
-    if (!selectedSatelliteManager) {
-      return;
-    }
-
-    if (selectedSatelliteManager.selectedSat > -1) {
-      this.searchBox.draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
-      this.primaryCovBubble.draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
-    }
-    if (selectedSatelliteManager.secondarySat > -1) {
-      this.secondaryCovBubble.draw(keepTrackApi.getMainCamera().projectionMatrix, camera.camMatrix, this.postProcessingManager.curBuffer);
-    }
-  }
-
-  clear(): void {
-    const gl = this.gl_;
-    /*
-     * NOTE: clearColor is set here because two different colors are used. If you set it during
-     * frameBuffer init then the wrong color will be applied (this can break gpuPicking)
-     */
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.gpuPicking);
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    if (!settingsManager.isDisableGodrays) {
-      // Clear the godrays Frame Buffer
-      gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffers.godrays);
-      gl.clearColor(0.0, 0.0, 0.0, 1.0);
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    }
-
-    // Switch back to the canvas
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    /*
-     * Only needed when doing post processing - otherwise just stay where we are
-     * Setup Initial Frame Buffer for Offscreen Drawing
-     * gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
-     */
-  }
-
-  async loadScene(): Promise<void> {
-    try {
-      this.earth.initialize(this.gl_);
-      await this.sun.init(this.gl_);
-
-      if (!settingsManager.isDisableGodrays) {
-        keepTrackApi.getScene().godrays?.init(this.gl_, this.sun);
-      }
-
-      if (!settingsManager.isDisableMoon) {
-        await this.moon.init(this.gl_);
-      }
-
-      if (!settingsManager.isDisableSearchBox) {
-        this.searchBox.init(this.gl_);
-      }
-      if (!settingsManager.isDisableSkybox) {
-        this.skybox.init(settingsManager, this.gl_);
-      }
-    } catch (error) {
-      errorManagerInstance.log(error);
-      // Errors aren't showing as toast messages
-    }
   }
 }

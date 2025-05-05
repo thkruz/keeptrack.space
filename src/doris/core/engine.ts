@@ -1,3 +1,4 @@
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { EventBus } from '../events/event-bus';
 import { CoreEngineEvents, EventMap } from '../events/event-types';
@@ -9,7 +10,6 @@ import { SceneManager } from '../scene/scene-manager';
 import { CanvasManager } from './canvas-manager';
 import { initializeSplashScreen } from './engine-splash-screen';
 import { TimeManager } from './time-manager';
-import { keepTrackApi } from '@app/keepTrackApi';
 
 export interface EngineConfig {
   containerRoot: string;
@@ -104,8 +104,7 @@ export class Engine {
     this.eventBus.emit(CoreEngineEvents.AfterUpdate, this.timeManager.getScaledTimeDelta());
 
     this.eventBus.emit(CoreEngineEvents.BeforeRender);
-    this.eventBus.emit(CoreEngineEvents.Render);
-    this.renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
+    this.renderer.render(keepTrackApi.getScene());
     // this.renderer.newRender(this.sceneManager.activeScene);
     this.eventBus.emit(CoreEngineEvents.AfterRender);
   }

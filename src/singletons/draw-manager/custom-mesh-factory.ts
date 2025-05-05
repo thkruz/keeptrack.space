@@ -1,5 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
-import { mat4 } from 'gl-matrix';
+import { LegacyCamera } from '../../keeptrack/camera/legacy-camera';
 import { CustomMesh } from './custom-mesh';
 
 export abstract class CustomMeshFactory<T extends CustomMesh> {
@@ -30,5 +30,5 @@ export abstract class CustomMeshFactory<T extends CustomMesh> {
     this.create_(...args);
   }
   abstract checkCacheForMesh_(...args: unknown[]): CustomMesh;
-  abstract drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer): void;
+  abstract drawAll(camera: LegacyCamera, tgtBuffer: WebGLFramebuffer | null): void;
 }

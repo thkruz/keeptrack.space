@@ -21,6 +21,7 @@
 
 import { Component } from '@app/doris/components/component';
 import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
@@ -103,8 +104,10 @@ export class Earth extends Component {
      */
   }
 
-  constructor(gl: WebGL2RenderingContext) {
+  constructor() {
     super();
+    const gl = Doris.getInstance().getRenderer().gl;
+
     this.gl_ = gl;
     this.modelViewMatrix_ = mat4.create();
     this.isHiResReady = false;
@@ -161,6 +164,10 @@ export class Earth extends Component {
 
       this.initVaoVisible_();
       this.initVaoOcclusion_();
+
+      Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (_camera, buffer): void => {
+        this.render(buffer);
+      });
     } catch (error) {
       errorManagerInstance.debug(error);
     }
@@ -385,7 +392,7 @@ export class Earth extends Component {
     // Switch to GPU Picking Shader
     gl.useProgram(dotsManagerInstance.programs.picking.program);
     // Switch to the GPU Picking Frame Buffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getDotsManager().gpuPickingFramebuffer);
 
     gl.bindVertexArray(this.vaoOcclusion_);
 

@@ -1,7 +1,8 @@
 import { Doris } from '@app/doris/doris';
+import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees } from 'ootk';
+import { LegacyCamera } from '../../keeptrack/camera/legacy-camera';
 import { ConeMesh, ConeSettings } from './cone-mesh';
 import { CustomMeshFactory } from './custom-mesh-factory';
 
@@ -11,7 +12,17 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
     color: [0.2, 1.0, 1.0, 0.15],
   };
 
-  drawAll(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer | null = null) {
+  constructor() {
+    super();
+    Doris.getInstance().on(CoreEngineEvents.RenderTransparent, (camera: LegacyCamera, tgtBuffer: WebGLFramebuffer | null) => {
+      this.drawAll(camera, tgtBuffer);
+    });
+  }
+
+  drawAll(camera: LegacyCamera, tgtBuffer: WebGLFramebuffer | null = null) {
+    const pMatrix = camera.projectionMatrix;
+    const camMatrix = camera.camMatrix;
+
     this.meshes.forEach((mesh) => {
       mesh.draw(pMatrix, camMatrix, tgtBuffer);
     });

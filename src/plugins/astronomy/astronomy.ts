@@ -26,7 +26,7 @@ import { getEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
 import { Doris } from '@app/doris/doris';
-import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { WebGlEvents } from '@app/doris/events/event-types';
 import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import constellationPng from '@public/img/icons/constellation.png';
@@ -62,7 +62,7 @@ export class Astronomy extends KeepTrackPlugin {
       keepTrackApi.getMainCamera().isPanReset = true;
       keepTrackApi.getMainCamera().isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6;
-      Doris.getInstance().emit(CoreEngineEvents.WebGlFovChanged);
+      Doris.getInstance().emit(WebGlEvents.FovChanged);
       uiManagerInstance.hideSideMenus();
       keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
       // getEl('fov-text').innerHTML = ('');

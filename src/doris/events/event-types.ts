@@ -39,19 +39,28 @@ export enum CoreEngineEvents {
   AssetLoadProgress = 'engine:assetLoadProgress',
   AssetLoadComplete = 'engine:assetLoadComplete',
   AssetLoadError = 'engine:assetLoadError',
+}
 
-  // Canvas events
-  CanvasBeforeResize = 'canvas:CanvasBeforeResize',
-  CanvasResize = 'canvas:CanvasSizeChanged',
-  CanvasAfterResize = 'canvas:CanvasAfterResize',
 
-  // WebGL events
-  WebGlAfterFirstInit = 'webgl:webGlFirstInit',
-  WebGlAfterInit = 'webgl:webGlInit',
-  WebGlContextLost = 'webgl:webGlContextLost',
-  WebGlContextRestored = 'webgl:webGlContextRestored',
-  WebGlNeedsInit = 'webgl:webGlNeedsInit',
-  WebGlFovChanged = 'webgl:webGlFovChanged',
+/**
+ * Canvas events
+ */
+export enum CanvasEvents {
+  BeforeResize = 'canvas:beforeResize',
+  Resize = 'canvas:resize',
+  AfterResize = 'canvas:afterResize',
+}
+
+/**
+ * WebGL context events
+ */
+export enum WebGlEvents {
+  AfterFirstInit = 'webgl:firstInit',
+  AfterInit = 'webgl:init',
+  ContextLost = 'webgl:contextLost',
+  ContextRestored = 'webgl:contextRestored',
+  NeedsInit = 'webgl:needsInit',
+  FovChanged = 'webgl:fovChanged',
 }
 
 /**
@@ -167,17 +176,17 @@ export interface EngineEventMap {
   [CoreEngineEvents.AssetLoadError]: [Error]; // error
 
   // Canvas events
-  [CoreEngineEvents.CanvasBeforeResize]: [HTMLCanvasElement, number, number]; // width, height
-  [CoreEngineEvents.CanvasResize]: [number, number]; // width, height
-  [CoreEngineEvents.CanvasAfterResize]: [HTMLCanvasElement, number, number]; // width, height
+  [CanvasEvents.BeforeResize]: [HTMLCanvasElement, number, number]; // width, height
+  [CanvasEvents.Resize]: [number, number]; // width, height
+  [CanvasEvents.AfterResize]: [HTMLCanvasElement, number, number]; // width, height
 
   // WebGL initialization
-  [CoreEngineEvents.WebGlAfterFirstInit]: [WebGL2RenderingContext]; // gl
-  [CoreEngineEvents.WebGlAfterInit]: [WebGL2RenderingContext]; // gl
-  [CoreEngineEvents.WebGlContextLost]: [];
-  [CoreEngineEvents.WebGlContextRestored]: [WebGL2RenderingContext]; // gl
-  [CoreEngineEvents.WebGlNeedsInit]: [];
-  [CoreEngineEvents.WebGlFovChanged]: [];
+  [WebGlEvents.AfterFirstInit]: [WebGL2RenderingContext]; // gl
+  [WebGlEvents.AfterInit]: [WebGL2RenderingContext]; // gl
+  [WebGlEvents.ContextLost]: [];
+  [WebGlEvents.ContextRestored]: [WebGL2RenderingContext]; // gl
+  [WebGlEvents.NeedsInit]: [];
+  [WebGlEvents.FovChanged]: [];
 }
 
 /**

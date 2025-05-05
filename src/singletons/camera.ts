@@ -22,7 +22,7 @@
  */
 
 import { Doris } from '@app/doris/doris';
-import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { CoreEngineEvents, WebGlEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
@@ -542,7 +542,7 @@ export class Camera {
       if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) {
         settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
       }
-      Doris.getInstance().emit(CoreEngineEvents.WebGlFovChanged);
+      Doris.getInstance().emit(WebGlEvents.FovChanged);
     }
   }
 

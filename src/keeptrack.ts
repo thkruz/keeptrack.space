@@ -44,7 +44,7 @@ import eruda, { ErudaConsole } from 'eruda';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime } from 'ootk';
 import { keepTrackContainer } from './container';
 import { Doris } from './doris/doris';
-import { CoreEngineEvents } from './doris/events/event-types';
+import { CanvasEvents, CoreEngineEvents, WebGlEvents } from './doris/events/event-types';
 import { Renderer } from './doris/rendering/renderer';
 import { GetSatType, KeepTrackApiEvents, Singletons } from './interfaces';
 import { keepTrackApi } from './keepTrackApi';
@@ -157,7 +157,7 @@ export class KeepTrack {
 
     keepTrackContainer.registerSingleton(Singletons.MeshManager, meshManagerInstance);
 
-    Doris.getInstance().once(CoreEngineEvents.WebGlAfterInit, () => {
+    Doris.getInstance().once(WebGlEvents.AfterInit, () => {
       const sceneInstance = new Scene({
         gl: keepTrackApi.getRenderer().gl,
       });
@@ -493,7 +493,7 @@ theodore.kruczek at gmail dot com.
         Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 5, 5);
       });
 
-    Doris.getInstance().once(CoreEngineEvents.WebGlAfterFirstInit, (gl: WebGL2RenderingContext) => {
+    Doris.getInstance().once(WebGlEvents.AfterFirstInit, (gl: WebGL2RenderingContext) => {
       keepTrackApi.getScene().earth.reloadEarthHiResTextures(gl);
       keepTrackApi.getMeshManager().init(gl);
     });
@@ -522,7 +522,7 @@ theodore.kruczek at gmail dot com.
       Doris.getInstance().pause(50);
     });
 
-    Doris.getInstance().on(CoreEngineEvents.CanvasResize, (width: number, height: number) => {
+    Doris.getInstance().on(CanvasEvents.Resize, (width: number, height: number) => {
       const gl = Doris.getInstance().getRenderer().gl;
 
       if (!gl) {
@@ -543,7 +543,7 @@ theodore.kruczek at gmail dot com.
       keepTrackApi.getScene().godrays?.init(gl, keepTrackApi.getScene().sun);
     });
 
-    Doris.getInstance().on(CoreEngineEvents.WebGlFovChanged, () => {
+    Doris.getInstance().on(WebGlEvents.FovChanged, () => {
       keepTrackApi.getMainCamera().projectionMatrix = Camera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
       // Fix the gpu picker texture size if it has already been created
       const dotsManagerInstance = keepTrackApi.getDotsManager();

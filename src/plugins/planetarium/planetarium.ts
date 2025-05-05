@@ -25,13 +25,13 @@
 import { hideEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
+import { Doris } from '@app/doris/doris';
+import { WebGlEvents } from '@app/doris/events/event-types';
 import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import planetariumPng from '@public/img/icons/planetarium.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
-import { Doris } from '@app/doris/doris';
-import { CoreEngineEvents } from '@app/doris/events/event-types';
 
 export class Planetarium extends KeepTrackPlugin {
   readonly id = 'Planetarium';
@@ -50,7 +50,7 @@ export class Planetarium extends KeepTrackPlugin {
     keepTrackApi.getMainCamera().isPanReset = true;
     keepTrackApi.getMainCamera().isLocalRotateReset = true;
     settingsManager.fieldOfView = 0.6;
-    Doris.getInstance().emit(CoreEngineEvents.WebGlFovChanged);
+    Doris.getInstance().emit(WebGlEvents.FovChanged);
     uiManagerInstance.hideSideMenus();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 

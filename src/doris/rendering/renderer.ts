@@ -7,7 +7,7 @@ import type { Scene as OldScene } from '../../singletons/scene';
 import { Camera } from '../camera/camera';
 import { Doris } from '../doris';
 import { EventBus } from '../events/event-bus';
-import { CoreEngineEvents } from '../events/event-types';
+import { CanvasEvents, CoreEngineEvents, WebGlEvents } from '../events/event-types';
 import { Scene } from '../scene/scene';
 import { SceneNode } from '../scene/scene-node';
 
@@ -26,8 +26,8 @@ export class Renderer {
   ) {
     // Listen for resize events
     this.eventBus.on(CoreEngineEvents.Resize, this.handleResize.bind(this));
-    this.eventBus.on(CoreEngineEvents.CanvasBeforeResize, this.handleCanvasBeforeResize.bind(this));
-    this.eventBus.on(CoreEngineEvents.WebGlNeedsInit, this.initializeWebGLContext.bind(this));
+    this.eventBus.on(CanvasEvents.BeforeResize, this.handleCanvasBeforeResize.bind(this));
+    this.eventBus.on(WebGlEvents.NeedsInit, this.initializeWebGLContext.bind(this));
   }
 
   initialize(canvas: HTMLCanvasElement): void {
@@ -63,7 +63,7 @@ export class Renderer {
     // Set up initial viewport
     this.updateViewport();
 
-    Doris.getInstance().emit(CoreEngineEvents.WebGlAfterInit, this.gl);
+    Doris.getInstance().emit(WebGlEvents.AfterInit, this.gl);
   }
 
   render(scene: OldScene, camera: OldCamera): void {
@@ -163,9 +163,9 @@ export class Renderer {
 
     if (!this.isFirstInit) {
       this.isFirstInit = true;
-      Doris.getInstance().emit(CoreEngineEvents.WebGlAfterFirstInit, gl);
+      Doris.getInstance().emit(WebGlEvents.AfterFirstInit, gl);
     } else {
-      Doris.getInstance().emit(CoreEngineEvents.WebGlAfterInit, gl);
+      Doris.getInstance().emit(WebGlEvents.AfterInit, gl);
     }
 
     return gl;
@@ -199,14 +199,14 @@ export class Renderer {
   private onContextLost_(e: WebGLContextEvent) {
     e.preventDefault(); // allows the context to be restored
     errorManagerInstance.info('WebGL Context Lost');
-    this.eventBus.emit(CoreEngineEvents.WebGlContextLost);
+    this.eventBus.emit(WebGlEvents.ContextLost);
   }
 
   private onContextRestore_() {
     if (this.gl) {
       errorManagerInstance.info('WebGL Context Restored');
       this.resetGLState_(this.gl);
-      this.eventBus.emit(CoreEngineEvents.WebGlContextRestored, this.gl);
+      this.eventBus.emit(WebGlEvents.ContextRestored, this.gl);
     }
   }
 }

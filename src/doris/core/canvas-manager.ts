@@ -1,5 +1,5 @@
 import { EventBus } from '../events/event-bus';
-import { CoreEngineEvents } from '../events/event-types';
+import { CanvasEvents, CoreEngineEvents } from '../events/event-types';
 
 export interface CanvasInfo {
   width: number;
@@ -74,16 +74,16 @@ export class CanvasManager {
     const { width, height } = this.getCanvasSize(this.canvasContainer_);
 
     // Notify that we're about to resize the canvas
-    this.eventBus.emit(CoreEngineEvents.CanvasBeforeResize, this.canvas_, width, height);
+    this.eventBus.emit(CanvasEvents.BeforeResize, this.canvas_, width, height);
 
     // Update canvas dimensions
     this.setCanvasSize(height, width);
 
     // Notify that canvas size has changed
-    this.eventBus.emit(CoreEngineEvents.CanvasResize, width, height);
+    this.eventBus.emit(CanvasEvents.Resize, width, height);
 
     // Allow application code to respond to resize
-    this.eventBus.emit(CoreEngineEvents.CanvasAfterResize, this.canvas_, width, height);
+    this.eventBus.emit(CanvasEvents.AfterResize, this.canvas_, width, height);
   }
 
   /**
@@ -103,10 +103,10 @@ export class CanvasManager {
    * This is a simplified version that doesn't contain application-specific code
    */
   forceCanvasResize(width: number, height: number): void {
-    this.eventBus.emit(CoreEngineEvents.CanvasBeforeResize, this.canvas_, width, height);
+    this.eventBus.emit(CanvasEvents.BeforeResize, this.canvas_, width, height);
     this.setCanvasSize(height, width);
-    this.eventBus.emit(CoreEngineEvents.CanvasResize, width, height);
-    this.eventBus.emit(CoreEngineEvents.CanvasAfterResize, this.canvas_, width, height);
+    this.eventBus.emit(CanvasEvents.Resize, width, height);
+    this.eventBus.emit(CanvasEvents.AfterResize, this.canvas_, width, height);
   }
 
   /**

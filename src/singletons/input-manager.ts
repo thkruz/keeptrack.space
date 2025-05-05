@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { KeepTrackApiEvents } from '@app/interfaces';
+
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { mat4, vec3, vec4 } from 'gl-matrix';
@@ -9,6 +9,7 @@ import { getEl, hideEl, showEl } from '../lib/get-el';
 
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { lineManagerInstance } from './draw-manager/line-manager';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';

@@ -1,5 +1,5 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
@@ -8,6 +8,7 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
+
 
 describe('UpdateSatManager_class', () => {
   beforeEach(() => {

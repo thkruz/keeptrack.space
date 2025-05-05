@@ -1,6 +1,6 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -8,6 +8,7 @@ import { showLoading } from '@app/lib/showLoading';
 import rocketPng from '@public/img/icons/rocket.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from './missile-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class MissilePlugin extends KeepTrackPlugin {
   readonly id = 'MissilePlugin';

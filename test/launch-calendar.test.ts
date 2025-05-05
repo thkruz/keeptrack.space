@@ -1,10 +1,10 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { createColorbox } from '@app/lib/colorbox';
 import { LaunchCalendar } from '@app/plugins/launch-calendar/launch-calendar';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
+
 
 describe('launch_calendar_plugin', () => {
   let launchCalendarPlugin: LaunchCalendar;

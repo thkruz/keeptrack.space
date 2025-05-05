@@ -1,5 +1,5 @@
 import { Doris } from '@app/doris/doris';
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { GetSatType, MenuMode } from '@app/interfaces';
 import { TimeManager } from '@app/keeptrack/core/time-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
@@ -12,6 +12,7 @@ import tableChartPng from '@public/img/icons/table-chart.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, SpaceObjectType } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 type LookAngleData = TearrData & { canStationObserve: boolean };
 

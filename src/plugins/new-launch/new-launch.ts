@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { hideLoading, showLoadingSticky } from '@app/lib/showLoading';
@@ -20,6 +20,7 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';

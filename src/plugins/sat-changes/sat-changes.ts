@@ -1,15 +1,13 @@
 /* eslint-disable no-use-before-define */
+import { Doris } from '@app/doris/doris';
 import { isThisNode } from '@app/doris/utils/isThisNode';
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
-import satChngPng from '@public/img/icons/sats.png';
-
 import { dateFromJday } from '@app/lib/transforms';
-
-import { Doris } from '@app/doris/doris';
+import satChngPng from '@public/img/icons/sats.png';
 import './components/sat-changes.css';
 
 /**

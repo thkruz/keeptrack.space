@@ -25,7 +25,6 @@
 
 import { sensors } from '@app/catalogs/sensors';
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { openColorbox } from '@app/lib/colorbox';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
 import { getEl, setInnerHtml } from '@app/lib/get-el';
@@ -48,6 +47,8 @@ import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { LookAnglesPlugin } from './look-angles-plugin';
 import { SensorInfoPlugin } from './sensor-info-plugin';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+
 
 export class SensorManager {
   lastMultiSiteArray: TearrData[];

@@ -3,7 +3,7 @@ import sputnickPng from '@public/img/icons/sputnick.png';
 import './tracking-impact-predict.css';
 
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { SatMath } from '@app/static/sat-math';
@@ -11,6 +11,7 @@ import { RAD2DEG } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export interface TipMsg {
   'NORAD_CAT_ID': string,

@@ -1,14 +1,14 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+
+import { Doris } from '@app/doris/doris';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
-
 import { CatalogManager } from '@app/singletons/catalog-manager';
 import { StringifiedNumber } from '@app/static/sat-math';
 import { BaseObject, FormatTle, Tle } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class OrbitReferences extends KeepTrackPlugin {
   readonly id = 'OrbitReferences';

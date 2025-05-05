@@ -20,7 +20,7 @@
  */
 
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { CameraType } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -30,6 +30,7 @@ import viewInAirPng from '@public/img/icons/view-in-air.png';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
   readonly id = 'SatelliteViewPlugin';

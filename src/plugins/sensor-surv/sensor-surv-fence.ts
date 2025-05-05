@@ -20,13 +20,14 @@
  */
 
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fencePng from '@public/img/icons/fence.png';
 import { Sensor } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SensorSurvFence extends KeepTrackPlugin {
   readonly id = 'SensorSurvFence';

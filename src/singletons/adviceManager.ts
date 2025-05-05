@@ -19,7 +19,7 @@
  */
 
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { getEl } from '../lib/get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';
 

@@ -24,7 +24,7 @@
 import { PerspectiveCamera } from '@app/doris/camera/perspective-camera';
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents, WebGlEvents } from '@app/doris/events/event-types';
-import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/interfaces';
+import { SatShader, ToastMsgType } from '@app/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -39,6 +39,7 @@ import { MissileObject } from '../../singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '../../singletons/errorManager';
 import type { OrbitManager } from '../../singletons/orbitManager';
 import { SatMath } from '../../static/sat-math';
+import { KeepTrackApiEvents } from '../events/event-types';
 
 /**
  * Represents the different types of cameras available.

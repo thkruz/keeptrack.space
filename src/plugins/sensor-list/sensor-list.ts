@@ -1,6 +1,6 @@
 import { sensors } from '@app/catalogs/sensors';
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
 import { CameraType } from '@app/keeptrack/camera/legacy-camera';
 import { getClass } from '@app/lib/get-class';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
@@ -17,6 +17,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 // TODO: Add a search bar and filter for sensors
 

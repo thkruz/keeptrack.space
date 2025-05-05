@@ -1,7 +1,7 @@
 /* eslint-disable no-unreachable */
 // eslint-disable-next-line max-classes-per-file
 import { Doris } from '@app/doris/doris';
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, ToastMsgType } from '@app/interfaces';
 import { CameraType, LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -20,6 +20,7 @@ import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
 import { PersistenceManager, StorageKey } from '../persistence-manager';
 import { KeyboardInput } from './keyboard-input';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class MouseInput {
   private dragHasMoved = false;

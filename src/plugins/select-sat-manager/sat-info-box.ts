@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/catalogs/countries';
 import { Doris } from '@app/doris/doris';
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, ToastMsgType } from '@app/interfaces';
 import { TimeManager } from '@app/keeptrack/core/time-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
@@ -28,6 +28,7 @@ import { StereoMap } from '../stereo-map/stereo-map';
 import { WatchlistPlugin } from '../watchlist/watchlist';
 import './sat-info-box.css';
 import { SelectSatManager } from './select-sat-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 /**
  * This class controls all the functionality of the satellite info box.

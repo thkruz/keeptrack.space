@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { Doris } from '@app/doris/doris';
-import { ColorInformation, KeepTrackApiEvents, Pickable, rgbaArray } from '@app/interfaces';
+import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SunStatus } from '@app/static/sat-math';
@@ -8,6 +8,7 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { ColorScheme } from './color-scheme';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SunlightColorScheme extends ColorScheme {
   colorTheme: Record<string, rgbaArray>;

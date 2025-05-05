@@ -1,10 +1,11 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { BaseObject, Degrees } from 'ootk';
 import { LegacyCamera } from '../../keeptrack/camera/legacy-camera';
 import { ConeMesh, ConeSettings } from './cone-mesh';
 import { CustomMeshFactory } from './custom-mesh-factory';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+
 
 export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
   private defaultConeSettings_: ConeSettings = {

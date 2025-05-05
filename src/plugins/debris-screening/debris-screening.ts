@@ -1,4 +1,5 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { GetSatType, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -8,7 +9,7 @@ import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import { DetailedSatellite, Hours, Kilometers, Milliseconds, Minutes, PosVel, Seconds, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class DebrisScreening extends KeepTrackPlugin {
   readonly id = 'DebrisScreening';

@@ -1,5 +1,6 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';

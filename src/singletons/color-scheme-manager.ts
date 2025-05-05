@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorRuleSet, KeepTrackApiEvents } from '@app/interfaces';
+import { ColorRuleSet } from '@app/interfaces';
 import { ColorInformation, Pickable, rgbaArray } from '../interfaces';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
@@ -53,6 +53,7 @@ import { StarlinkColorScheme } from './color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from './color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
 import { PersistenceManager, StorageKey } from './persistence-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class ColorSchemeManager {
   static readonly id = 'ColorSchemeManager';

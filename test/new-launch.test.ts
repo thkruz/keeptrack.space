@@ -1,5 +1,4 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { NewLaunch } from '@app/plugins/new-launch/new-launch';
@@ -8,6 +7,7 @@ import { Degrees } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+
 
 describe('NewLaunch_class', () => {
   let newLaunchPlugin: NewLaunch;

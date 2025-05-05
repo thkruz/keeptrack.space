@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, ToastMsgType } from '@app/interfaces';
 import { CameraType } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
@@ -15,6 +15,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
 import { SatInfoBox } from './sat-info-box';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 /**
  * This is the class that manages the selection of objects.

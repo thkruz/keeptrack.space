@@ -1,5 +1,6 @@
 /* eslint-disable dot-notation */
-import { KeepTrackApiEvents } from '@app/interfaces';
+
+import { Doris } from '@app/doris/doris';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -7,7 +8,6 @@ import { ShortTermFences } from '@app/plugins/short-term-fences/short-term-fence
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
-import { Doris } from '@app/doris/doris';
 
 describe('ShortTermFences_class', () => {
   beforeEach(() => {

@@ -1,6 +1,5 @@
 /* eslint-disable max-depth */
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorMath } from '@app/static/sensor-math';
 import numeric from 'numeric';
@@ -9,6 +8,8 @@ import { TimeManager } from '../../keeptrack/core/time-manager';
 import { LineManager } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
 import { ControlSite } from './ControlSite';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+
 
 export enum SatConstellationString {
   Aehf = 'aehf',

@@ -1,9 +1,10 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/interfaces';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { hideEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class MobileManager {
   // eslint-disable-next-line require-await

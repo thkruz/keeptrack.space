@@ -1,5 +1,6 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode, Singletons } from '@app/interfaces';
+import { MenuMode, Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { t7e } from '@app/locales/keys';
 import { Localization } from '@app/locales/locales';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';

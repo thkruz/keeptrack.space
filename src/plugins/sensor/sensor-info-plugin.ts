@@ -1,5 +1,5 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { LineManager } from '@app/singletons/draw-manager/line-manager';
@@ -9,6 +9,7 @@ import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { RfSensor, SpaceObjectType } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   readonly id = 'SensorInfoPlugin';

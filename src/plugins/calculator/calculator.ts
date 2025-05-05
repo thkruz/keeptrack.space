@@ -1,13 +1,13 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
-import calculatorPng from '@public/img/icons/calculator.png';
-
 import { Doris } from '@app/doris/doris';
+import { MenuMode } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
+import calculatorPng from '@public/img/icons/calculator.png';
 import { Degrees, DetailedSensor, ecf2eci, eci2ecf, eci2rae, Kilometers, rae2eci, RaeVec3, Vector3D } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 enum CalculatorMode {
   ITRF = 'ITRF',

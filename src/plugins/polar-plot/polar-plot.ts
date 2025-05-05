@@ -1,10 +1,9 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
-
-
-import { Doris } from '@app/doris/doris';
 import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

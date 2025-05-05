@@ -4,7 +4,7 @@ import { showLoading } from '@app/lib/showLoading';
 import gpsPng from '@public/img/icons/gps.png';
 
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import type { GroupsManager } from '@app/singletons/groups-manager';
@@ -13,6 +13,7 @@ import { DopMath } from '@app/static/dop-math';
 import { SatMath } from '@app/static/sat-math';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';

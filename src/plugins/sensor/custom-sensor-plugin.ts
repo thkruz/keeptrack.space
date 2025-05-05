@@ -1,4 +1,5 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl } from '@app/lib/get-el';
 import { slideInRight } from '@app/lib/slide';
@@ -18,7 +19,7 @@ import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { SoundNames } from '../sounds/SoundNames';
 import { SensorInfoPlugin } from './sensor-info-plugin';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   readonly id = 'CustomSensorPlugin';

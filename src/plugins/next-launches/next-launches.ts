@@ -1,4 +1,5 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { dateFormat } from '@app/lib/dateFormat';
@@ -9,7 +10,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import calendar2Png from '@public/img/icons/calendar2.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 interface LaunchInfoData {
   window_start: string | number | Date;

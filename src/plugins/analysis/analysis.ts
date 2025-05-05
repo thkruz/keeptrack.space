@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, lookanglesRow, MenuMode, ToastMsgType } from '@app/interfaces';
+import { lookanglesRow, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -40,6 +40,7 @@ import folderCodePng from '@public/img/icons/folder-code.png';
 import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';

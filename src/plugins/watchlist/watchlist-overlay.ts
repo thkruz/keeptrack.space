@@ -1,6 +1,6 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { GetSatType, KeepTrackApiEvents, MenuMode, SatPassTimes, ToastMsgType } from '@app/interfaces';
+import { GetSatType, MenuMode, SatPassTimes, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
@@ -14,6 +14,7 @@ import { DetailedSatellite, MILLISECONDS_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from './watchlist';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class WatchlistOverlay extends KeepTrackPlugin {
   readonly id = 'WatchlistOverlay';

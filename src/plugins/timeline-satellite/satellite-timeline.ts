@@ -1,13 +1,13 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import viewTimelinePng from '@public/img/icons/view_timeline2.png';
-
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
+import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord, Seconds } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

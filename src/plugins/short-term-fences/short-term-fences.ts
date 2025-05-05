@@ -1,16 +1,16 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { slideInRight, slideOutLeft } from '@app/lib/slide';
-import wifiFindPng from '@public/img/icons/wifi-find.png';
-
-import { Doris } from '@app/doris/doris';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import wifiFindPng from '@public/img/icons/wifi-find.png';
 import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class ShortTermFences extends KeepTrackPlugin {
   readonly id = 'ShortTermFences';

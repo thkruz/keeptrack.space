@@ -2,7 +2,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-lines */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -22,6 +22,7 @@ import { SoundNames } from '../sounds/SoundNames';
 import { Doris } from '@app/doris/doris';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { fetchWeatherApi } from 'openmeteo';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 interface Pass {
   start: Date;

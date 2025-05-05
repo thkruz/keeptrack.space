@@ -1,9 +1,8 @@
 /* eslint-disable class-methods-use-this */
 import { AnalyticsInstance } from 'analytics';
-import { BaseObject, DetailedSatellite, DetailedSensor } from 'ootk';
 import { keepTrackContainer } from './container';
 import { Renderer } from './doris/rendering/renderer';
-import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
+import { Constructor, Singletons } from './interfaces';
 import { LegacyCamera } from './keeptrack/camera/legacy-camera';
 import type { TimeManager } from './keeptrack/core/time-manager';
 import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
@@ -14,7 +13,6 @@ import type { SensorManager } from './plugins/sensor/sensorManager';
 import { SoundManager } from './plugins/sounds/sound-manager';
 import { SettingsManager } from './settings/settings';
 import type { CatalogManager } from './singletons/catalog-manager';
-import { MissileObject } from './singletons/catalog-manager/MissileObject';
 import type { ColorSchemeManager } from './singletons/color-scheme-manager';
 import type { DotsManager } from './singletons/dots-manager';
 import type { LineManager } from './singletons/draw-manager/line-manager';
@@ -23,7 +21,6 @@ import { errorManagerInstance } from './singletons/errorManager';
 import type { GroupsManager } from './singletons/groups-manager';
 import type { HoverManager } from './singletons/hover-manager';
 import type { InputManager } from './singletons/input-manager';
-import { PanTouchEvent, TapTouchEvent } from './singletons/input-manager/touch-input';
 import type { OrbitManager } from './singletons/orbitManager';
 import type { UiManager } from './singletons/uiManager';
 import { SatMath } from './static/sat-math';
@@ -60,45 +57,6 @@ declare global {
         ARROW_DOWN: number;
       };
     }
-  }
-}
-
-declare module '@app/doris/events/event-types' {
-  export interface ApplicationEventMap {
-    [KeepTrackApiEvents.bottomMenuClick]: [string];
-    [KeepTrackApiEvents.hideSideMenus]: [];
-    [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture];
-    [KeepTrackApiEvents.orbitManagerInit]: [];
-    [KeepTrackApiEvents.rmbMenuActions]: [string, number];
-    [KeepTrackApiEvents.rightBtnMenuAdd]: [];
-    [KeepTrackApiEvents.updateDateTime]: [Date];
-    [KeepTrackApiEvents.updatePropRate]: [number];
-    [KeepTrackApiEvents.AfterHtmlInitialize]: [];
-    [KeepTrackApiEvents.resetSensor]: [];
-    [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
-    [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
-    [KeepTrackApiEvents.staticOffsetChange]: [number];
-    [KeepTrackApiEvents.onLineChange]: [LineManager];
-    [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
-    [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
-    [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];
-    [KeepTrackApiEvents.onCruncherMessage]: [];
-    [KeepTrackApiEvents.onCruncherReady]: [];
-    [KeepTrackApiEvents.onHelpMenuClick]: [];
-    [KeepTrackApiEvents.onKeepTrackReady]: [];
-    [KeepTrackApiEvents.selectSatData]: [DetailedSatellite | MissileObject | BaseObject, number];
-    [KeepTrackApiEvents.setSecondarySat]: [DetailedSatellite | null, number];
-    [KeepTrackApiEvents.HtmlInitialize]: [];
-    [KeepTrackApiEvents.BeforeHtmlInitialize]: [];
-    [KeepTrackApiEvents.updateSelectBox]: [DetailedSatellite | MissileObject];
-    [KeepTrackApiEvents.ConeMeshUpdate]: [];
-    [KeepTrackApiEvents.bottomMenuModeChange]: [];
-    [KeepTrackApiEvents.saveSettings]: [];
-    [KeepTrackApiEvents.loadSettings]: [];
-    [KeepTrackApiEvents.onPrimarySatelliteUpdate]: [BaseObject | null, number];
-    [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number];
-    [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number];
-    [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number];
   }
 }
 

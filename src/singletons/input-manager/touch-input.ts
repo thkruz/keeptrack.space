@@ -1,10 +1,11 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { UrlManager } from '@app/static/url-manager';
 import { MouseInput } from './mouse-input';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+
 
 export interface TapTouchEvent {
   x: number;

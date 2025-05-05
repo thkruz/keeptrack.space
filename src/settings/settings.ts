@@ -19,7 +19,7 @@
  */
 
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
+import { MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
 import type { KeepTrackPlugins } from '@app/plugins/plugins';
@@ -37,6 +37,7 @@ import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 import { sateliot } from './presets/sateliot';
 import { starTalk } from './presets/startalk';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SettingsManager {
   /**

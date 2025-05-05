@@ -1,4 +1,5 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { ColorScheme } from '@app/singletons/color-schemes/color-scheme';
@@ -6,7 +7,7 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import palettePng from '@public/img/icons/palette.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class ColorMenu extends KeepTrackPlugin {
   readonly id = 'ColorMenu';

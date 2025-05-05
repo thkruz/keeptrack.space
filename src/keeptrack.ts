@@ -47,7 +47,7 @@ import { Doris } from './doris/doris';
 import { CanvasEvents, CoreEngineEvents, WebGlEvents } from './doris/events/event-types';
 import { Renderer } from './doris/rendering/renderer';
 import { isThisNode } from './doris/utils/isThisNode';
-import { GetSatType, KeepTrackApiEvents, Singletons } from './interfaces';
+import { GetSatType, Singletons } from './interfaces';
 import { CameraType, LegacyCamera } from './keeptrack/camera/legacy-camera';
 import { TimeManager } from './keeptrack/core/time-manager';
 import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
@@ -77,6 +77,7 @@ import { BottomMenu } from './static/bottom-menu';
 import { CatalogLoader } from './static/catalog-loader';
 import { SensorMath } from './static/sensor-math';
 import { SplashScreen } from './static/splash-screen';
+import { KeepTrackApiEvents } from './keeptrack/events/event-types';
 
 export class KeepTrack {
   static readonly id = 'KeepTrack';

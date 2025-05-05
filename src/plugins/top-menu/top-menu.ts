@@ -1,5 +1,4 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
@@ -11,6 +10,8 @@ import soundOffPng from '@public/img/icons/sound-off.png';
 import soundOnPng from '@public/img/icons/sound-on.png';
 import { errorManagerInstance } from '../../singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+
 
 export class TopMenu extends KeepTrackPlugin {
   readonly id = 'TopMenu';

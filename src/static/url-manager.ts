@@ -1,9 +1,10 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { DetailedSatellite } from 'ootk';
 import { getEl } from '../lib/get-el';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export abstract class UrlManager {
   static parseGetVariables() {

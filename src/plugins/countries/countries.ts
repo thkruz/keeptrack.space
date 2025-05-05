@@ -1,7 +1,7 @@
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { GroupType } from '@app/singletons/object-group';
 import { StringExtractor } from '@app/static/string-extractor';
@@ -13,6 +13,7 @@ import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';

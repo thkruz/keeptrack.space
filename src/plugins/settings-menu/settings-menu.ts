@@ -1,5 +1,5 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ColorPick } from '@app/lib/color-pick';
 import { getEl, hideEl } from '@app/lib/get-el';
@@ -13,6 +13,7 @@ import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 import { TimeMachine } from '../time-machine/time-machine';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////

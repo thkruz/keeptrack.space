@@ -2,7 +2,7 @@
 
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
@@ -15,6 +15,7 @@ import { ColorSchemeManager } from './color-scheme-manager';
 import { LineManager } from './draw-manager/line-manager';
 import { errorManagerInstance } from './errorManager';
 import { HoverManager } from './hover-manager';
+
 
 export interface OrbitCruncherMessageMain {
   data: {

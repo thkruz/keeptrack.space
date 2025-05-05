@@ -13,14 +13,15 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 import { countryCodeList, countryNameList } from '@app/catalogs/countries';
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { t7e } from '@app/locales/keys';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 /**
  * Interface for TLE input parameters

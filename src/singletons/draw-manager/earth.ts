@@ -27,7 +27,6 @@ import { GLSL3 } from '@app/doris/webgl/material';
 import { Mesh } from '@app/doris/webgl/mesh';
 import { ShaderMaterial } from '@app/doris/webgl/shader-material';
 import { SphereGeometry } from '@app/doris/webgl/sphere-geometry';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { SettingsManager } from '@app/settings/settings';
@@ -35,6 +34,8 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
 import { errorManagerInstance } from '../errorManager';
 import { OcclusionProgram } from './post-processing';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+
 
 export enum EarthNightTextureQuality {
   POTATO = '512',

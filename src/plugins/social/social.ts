@@ -1,10 +1,11 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+
+import { Doris } from '@app/doris/doris';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import githubPng from '@public/img/icons/github.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SocialMedia extends KeepTrackPlugin {
   readonly id = 'SocialMedia';

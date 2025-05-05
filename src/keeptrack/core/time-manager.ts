@@ -1,6 +1,6 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/interfaces';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -8,6 +8,7 @@ import { getEl } from '../../lib/get-el';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
 import { errorManagerInstance } from '../../singletons/errorManager';
 import { UrlManager } from '../../static/url-manager';
+import { KeepTrackApiEvents } from '../events/event-types';
 
 export class TimeManager {
   static readonly id = 'TimeManager';

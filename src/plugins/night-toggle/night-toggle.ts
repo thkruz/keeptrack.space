@@ -1,8 +1,7 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { Doris } from '../../doris/doris';
-
 import dayNightPng from '@public/img/icons/day-night.png';
+import { Doris } from '../../doris/doris';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 

@@ -3,13 +3,14 @@ import CollisionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 import { t7e } from '@app/locales/keys';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {

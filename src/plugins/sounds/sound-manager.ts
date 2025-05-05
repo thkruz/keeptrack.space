@@ -1,5 +1,6 @@
 import { keepTrackContainer } from '@app/container';
-import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { Singletons } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import beep1Mp3 from '@public/audio/beep1.mp3';
 import buttonMp3 from '@public/audio/button.mp3';
@@ -60,7 +61,7 @@ import whoosh7Mp3 from '@public/audio/whoosh7.mp3';
 import whoosh8Mp3 from '@public/audio/whoosh8.mp3';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from './SoundNames';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SoundManager extends KeepTrackPlugin {
   readonly id = 'SoundManager';

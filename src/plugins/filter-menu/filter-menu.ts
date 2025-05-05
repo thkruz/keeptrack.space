@@ -1,5 +1,5 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
@@ -7,6 +7,7 @@ import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////

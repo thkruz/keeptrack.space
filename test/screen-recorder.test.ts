@@ -1,9 +1,9 @@
 /* eslint-disable dot-notation */
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { ScreenRecorder } from '@app/plugins/screen-recorder/screen-recorder';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
+
 
 describe('ScreenRecorder_class', () => {
   let screenRecorderPlugin: ScreenRecorder;

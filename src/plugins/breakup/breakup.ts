@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { GetSatType, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
@@ -15,6 +15,7 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class Breakup extends KeepTrackPlugin {
   readonly id = 'Breakup';

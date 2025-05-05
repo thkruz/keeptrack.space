@@ -8,7 +8,6 @@ import * as catalogLoader from '@app/static/catalog-loader';
 
 import googleAnalytics from '@analytics/google-analytics';
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import createAnalytics from 'analytics';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
@@ -73,6 +72,7 @@ import { TransponderChannelData } from './transponder-channel-data/transponder-c
 import { VideoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export type KeepTrackPlugins = {
   filterMenu?: boolean;

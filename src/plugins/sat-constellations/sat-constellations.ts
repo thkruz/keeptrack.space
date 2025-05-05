@@ -1,7 +1,8 @@
 import { getEl } from '@app/lib/get-el';
 import { showLoading } from '@app/lib/showLoading';
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatConstellationString } from '@app/singletons/catalog-manager/satLinkManager';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
@@ -9,7 +10,7 @@ import { GroupType } from '@app/singletons/object-group';
 import categoryPng from '@public/img/icons/category.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';

@@ -1,4 +1,5 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { Doris } from '@app/doris/doris';
+import { ToastMsgType } from '@app/interfaces';
 import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
@@ -12,7 +13,7 @@ import { UrlManager } from '../static/url-manager';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
 import type { UiManager } from './uiManager';
-import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export interface SearchResult {
   id: number; // Catalog Index

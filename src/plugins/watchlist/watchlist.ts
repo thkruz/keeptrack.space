@@ -24,7 +24,7 @@
 
 import { Doris } from '@app/doris/doris';
 import { isThisNode } from '@app/doris/utils/isThisNode';
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
@@ -39,6 +39,7 @@ import { CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];

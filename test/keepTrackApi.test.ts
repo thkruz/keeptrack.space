@@ -1,11 +1,11 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { isThisNode } from '@app/doris/utils/isThisNode';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from 'ootk';
 import { keepTrackApi } from '../src/keepTrackApi';
 import { defaultSat } from './environment/apiMocks';
+
 
 test('keepTrackApi Unit Testing', () => {
   expect(() => {

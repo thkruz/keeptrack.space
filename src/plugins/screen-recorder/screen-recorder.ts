@@ -1,9 +1,10 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import videocamPng from '@public/img/icons/videocam.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { StreamManager } from './stream-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class ScreenRecorder extends KeepTrackPlugin {
   readonly id = 'ScreenRecorder';

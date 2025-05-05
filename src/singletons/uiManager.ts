@@ -26,7 +26,7 @@
 
 import { Doris } from '@app/doris/doris';
 import { isThisNode } from '@app/doris/utils/isThisNode';
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import '@materializecss/materialize';
@@ -42,6 +42,7 @@ import { ColorScheme } from './color-schemes/color-scheme';
 import { errorManagerInstance } from './errorManager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;

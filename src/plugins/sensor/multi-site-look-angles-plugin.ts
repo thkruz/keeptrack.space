@@ -1,6 +1,6 @@
 import { sensors } from '@app/catalogs/sensors';
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { dateFormat } from '@app/lib/dateFormat';
 import { getEl } from '@app/lib/get-el';
@@ -24,6 +24,7 @@ import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../K
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { SensorManager } from './sensorManager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];

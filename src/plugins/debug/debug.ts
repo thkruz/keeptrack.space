@@ -2,7 +2,7 @@ import * as gremlins from 'gremlins.js';
 
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { GetSatType, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import debugPng from '@public/img/icons/debug.png';
 
@@ -16,6 +16,7 @@ import { Milliseconds } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class DebugMenuPlugin extends KeepTrackPlugin {
   readonly id = 'DebugMenuPlugin';

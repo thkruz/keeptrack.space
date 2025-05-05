@@ -3,13 +3,14 @@ import { getEl } from '@app/lib/get-el';
 import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import photoManagerPng from '@public/img/icons/photoManager.png';
 import { Degrees } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 interface DiscvrResponse {
   centroid_coordinates: {

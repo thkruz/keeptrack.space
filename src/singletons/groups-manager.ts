@@ -1,8 +1,9 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { settingsManager } from '@app/settings/settings';
 import { keepTrackApi } from '../keepTrackApi';
 import { GroupData, GroupType, ObjectGroup } from './object-group';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+
 
 /**
  * /////////////////////////////////////////////////////////////////////////////

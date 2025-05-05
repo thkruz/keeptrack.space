@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/interfaces';
 import { getEl } from '@app/lib/get-el';
 import { getUnique } from '@app/lib/get-unique';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
@@ -13,6 +13,7 @@ import { CatalogExporter } from '@app/static/catalog-exporter';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export interface SearchSatParams {
   argPe: Degrees;

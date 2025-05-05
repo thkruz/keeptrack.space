@@ -1,5 +1,4 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -7,6 +6,8 @@ import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { GroupType } from '@app/singletons/object-group';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+
 
 export class SettingsPresets {
   static loadPresetMillionYear(settings: SettingsManager) {

@@ -1,8 +1,8 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+
+import { Doris } from '@app/doris/doris';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { standardPluginSuite } from './generic-tests';
-import { Doris } from '@app/doris/doris';
 
 describe('Sound Manager', () => {
   let soundManagerPlugin: SoundManager;

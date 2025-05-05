@@ -26,7 +26,7 @@
  */
 
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MissileParams } from '@app/interfaces';
+import { MissileParams } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Degrees, DetailedSatellite, EciVec3, KilometersPerSecond, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
@@ -43,6 +43,7 @@ import { UrlManager } from '../static/url-manager';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
 import { errorManagerInstance } from './errorManager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 declare module '@app/interfaces' {
   interface SatCruncherMessageData {

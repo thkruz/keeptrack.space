@@ -1,5 +1,5 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { saveCsv } from '@app/lib/saveVariable';
@@ -10,6 +10,7 @@ import { BaseObject, DetailedSatellite } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 interface ChannelInfo {
   satellite: string;

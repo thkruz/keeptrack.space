@@ -1,6 +1,5 @@
 import { Doris } from '@app/doris/doris';
 import { isThisNode } from '@app/doris/utils/isThisNode';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { UrlManager } from '@app/static/url-manager';
@@ -8,6 +7,7 @@ import { getDayOfYear } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';

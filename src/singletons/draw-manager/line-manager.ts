@@ -1,7 +1,7 @@
 /* eslint-disable max-depth */
 /* eslint-disable complexity */
 /* eslint-disable camelcase */
-import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { Singletons } from '@app/interfaces';
 import { BaseObject, DetailedSatellite, DetailedSensor, RaeVec3 } from 'ootk';
 
 import { Doris } from '@app/doris/doris';
@@ -24,6 +24,7 @@ import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class LineManager {
   attribs = {

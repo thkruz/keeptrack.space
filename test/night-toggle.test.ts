@@ -1,8 +1,9 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
+
 
 describe('NightToggle_class', () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

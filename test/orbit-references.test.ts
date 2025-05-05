@@ -1,5 +1,4 @@
 import { Doris } from '@app/doris/doris';
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { OrbitReferences } from '@app/plugins/orbit-references/orbit-references';
@@ -8,6 +7,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
+
 
 // Create a short test for the OrbitReferences plugin
 describe('OrbitReferences', () => {

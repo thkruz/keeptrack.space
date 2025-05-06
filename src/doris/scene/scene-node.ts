@@ -54,11 +54,13 @@ export class SceneNode {
   }
 
   render(buffer: WebGLBuffer | null): void {
-    // Render all components
-    for (const component of this.components.values()) {
-      component.render(buffer);
-    }
-    // Render children
+    /*
+     * Render all components
+     * for (const component of this.components.values()) {
+     *   component.render(buffer);
+     * }
+     * Render children
+     */
     for (const child of this.children_) {
       child.render(buffer);
     }

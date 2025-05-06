@@ -78,7 +78,7 @@ export class Renderer {
     }
 
     // Apply the camera matrix
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.projectionMatrix, camera.camMatrix);
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.getProjectionMatrix(), camera.camMatrix);
 
     Doris.getInstance().emit(CoreEngineEvents.BeforeClearRenderTarget);
     this.clear(this.gl);
@@ -99,7 +99,7 @@ export class Renderer {
     }
 
     // Apply the camera matrix
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), keepTrackApi.getMainCamera().projectionMatrix, keepTrackApi.getMainCamera().camMatrix);
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), keepTrackApi.getMainCamera().getProjectionMatrix(), keepTrackApi.getMainCamera().camMatrix);
 
     if (!this.gl) {
       // TODO: Try to reinitialize the context
@@ -115,7 +115,7 @@ export class Renderer {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private renderNode(_node: SceneNode, _camera: Camera): void {
-    _node.render(null);
+    // _node.render(null);
   }
 
   private handleResize(): void {

@@ -92,9 +92,6 @@ export abstract class Component {
   // Update method called every frame when the component is enabled
   abstract update(deltaTime?: number): void;
 
-  // Draw method called every frame when the component is enabled
-  abstract render(buffer: WebGLBuffer | null): void;
-
   // Utility method to get another component from the same node
   getComponent<T extends Component>(type: string): T | null {
     if (!this._node) {

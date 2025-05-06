@@ -31,8 +31,13 @@ export class KeyboardHandler {
 
   /**
    * Update method called each frame - can be used for key repeat logic
+   * @param deltaTime Time elapsed since last update in milliseconds
    */
-  update(): void {
+  update(deltaTime: number): void {
+    if (deltaTime <= 0) {
+      // eslint-disable-next-line no-useless-return
+      return;
+    }
     /*
      * In a more complete implementation, this would handle key repeats
      * and other time-based input features

@@ -106,7 +106,7 @@ export class OrbitManager {
       return;
     }
     const camMatrix = mainCameraInstance.camMatrix;
-    const pMatrix = mainCameraInstance.projectionMatrix;
+    const pMatrix = mainCameraInstance.getProjectionMatrix();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const hoverManagerInstance = keepTrackApi.getHoverManager();
     const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;

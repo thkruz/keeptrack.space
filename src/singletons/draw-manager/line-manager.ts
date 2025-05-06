@@ -8,6 +8,7 @@ import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { BufferAttribute } from '@app/doris/webgl/buffer-attribute';
 import { WebGlProgramHelper } from '@app/doris/webgl/webgl-program';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { keepTrackContainer } from '../../container';
@@ -24,7 +25,6 @@ import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class LineManager {
   attribs = {
@@ -232,13 +232,13 @@ export class LineManager {
 
   runBeforeDraw(tgtBuffer = null as WebGLFramebuffer | null): void {
     const { gl } = keepTrackApi.getRenderer();
-    const { projectionMatrix, camMatrix } = keepTrackApi.getMainCamera();
+    const { camMatrix } = keepTrackApi.getMainCamera();
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.program);
 
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, projectionMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, keepTrackApi.getMainCamera().getProjectionMatrix());
 
     gl.enableVertexAttribArray(this.attribs.a_position.location); // Enable
   }

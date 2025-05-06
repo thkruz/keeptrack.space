@@ -126,7 +126,8 @@ export enum InputEvents {
   GamepadDisconnected = 'input:gamepadDisconnected',
   GamepadButtonDown = 'input:gamepadButtonDown',
   GamepadButtonUp = 'input:gamepadButtonUp',
-  GamepadAxisMove = 'input:gamepadAxisMove'
+  GamepadAxisMove = 'input:gamepadAxisMove',
+  InputReset = 'input:reset',
 }
 
 /**
@@ -261,6 +262,7 @@ export interface InputEventMap {
   [InputEvents.GamepadButtonDown]: [Gamepad, number, number]; // gamepad, buttonIndex, value
   [InputEvents.GamepadButtonUp]: [Gamepad, number]; // gamepad, buttonIndex
   [InputEvents.GamepadAxisMove]: [Gamepad, number, number]; // gamepad, axisIndex, value
+  [InputEvents.InputReset]: [];
 }
 
 /**

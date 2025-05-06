@@ -81,7 +81,7 @@ export class Ellipsoid {
       return;
     }
 
-    const pMatrix = camera.projectionMatrix;
+    const pMatrix = camera.getProjectionMatrix();
     const camMatrix = camera.camMatrix;
     const gl = this.gl_;
 

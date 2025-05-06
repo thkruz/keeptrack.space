@@ -466,7 +466,7 @@ export class MeshManager {
           // Draw Satellite Model if a satellite is selected and meshManager is loaded
           if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
             if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
-              this.draw(camera.projectionMatrix, camera.camMatrix, buffer);
+              this.draw(camera.getProjectionMatrix(), camera.camMatrix, buffer);
             }
           }
         });

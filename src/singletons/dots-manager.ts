@@ -347,7 +347,7 @@ export class DotsManager {
 
     Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, () => this.updatePositionBuffer());
     Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (camera, tgtBuffer) => {
-      const pMvCamMatrix = mat4.mul(mat4.create(), camera.projectionMatrix, camera.camMatrix);
+      const pMvCamMatrix = mat4.mul(mat4.create(), camera.getProjectionMatrix(), camera.camMatrix);
 
       this.draw(pMvCamMatrix, tgtBuffer);
     });

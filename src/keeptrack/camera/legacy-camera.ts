@@ -69,13 +69,13 @@ export enum CameraType {
 export class LegacyCamera extends PerspectiveCamera {
   cameraModes: Map<CameraType, CameraMode>;
   activeCameraMode: CameraMode | null = null;
+  private static readonly eciToOpenGlMat_: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+
   setCameraMode(cameraMode: CameraMode): void {
     this.activeCameraMode = cameraMode;
   }
 
   static readonly id = 'Camera';
-  /** Main source of projection matrix for rest of the application */
-  projectionMatrix: mat4;
   private chaseSpeed_ = 0.0005;
   earthCenteredPitch = <Radians>0;
   earthCenteredYaw = <Radians>0;
@@ -227,7 +227,8 @@ export class LegacyCamera extends PerspectiveCamera {
   camDistBuffer = <Kilometers>0;
 
   constructor() {
-    super();
+    super(settingsManager.fieldOfView, settingsManager.zNear, settingsManager.zFar, (window.innerWidth / window.innerHeight));
+
     this.settings_ = <SettingsManager>(<unknown>{
       autoPanSpeed: 1,
       autoRotateSpeed: 0.0075,
@@ -268,17 +269,29 @@ export class LegacyCamera extends PerspectiveCamera {
     this.activeCameraMode = fixedToEarthCameraMode;
   }
 
-  static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
-    const pMatrix = mat4.create();
-
-    mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
+  updateProjectionMatrix(): void {
+    mat4.perspective(
+      this.projectionMatrix,
+      this.fov,
+      this.aspectRatio,
+      this.near,
+      this.far,
+    );
+    this.isDirty = true;
 
     // This converts everything from 3D space to ECI (z and y planes are swapped)
-    const eciToOpenGlMat: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+    mat4.mul(this.projectionMatrix, this.projectionMatrix, LegacyCamera.eciToOpenGlMat_);
+  }
 
-    mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
+  updateViewMatrix(): void {
+    if (!this.isDirty) { // !this.node
+      return;
+    }
 
-    return pMatrix;
+    // Using this.camMatrix instead of this.viewMatrix
+    this.camMatrix = this.viewMatrix;
+
+    this.isDirty = false;
   }
 
   getScreenCoords(obj: BaseObject): {
@@ -741,7 +754,7 @@ export class LegacyCamera extends PerspectiveCamera {
   init(settings: SettingsManager) {
     this.settings_ = settings;
 
-    this.projectionMatrix = LegacyCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+    this.updateProjectionMatrix();
 
     this.registerKeyboardEvents_();
 
@@ -1263,6 +1276,8 @@ export class LegacyCamera extends PerspectiveCamera {
    * Calculate the camera's position and camera matrix
    */
   update() {
+    super.update();
+
     const dt = Doris.getInstance().getTimeManager().getRealTimeDelta() as Milliseconds;
 
     this.updatePan_(dt);
@@ -1333,13 +1348,13 @@ export class LegacyCamera extends PerspectiveCamera {
   validateProjectionMatrix_() {
     if (!this.projectionMatrix) {
       errorManagerInstance.log('projectionMatrix is undefined - retrying');
-      this.projectionMatrix = LegacyCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+      this.updateProjectionMatrix();
     }
 
     for (let i = 0; i < 16; i++) {
       if (isNaN(this.projectionMatrix[i])) {
         errorManagerInstance.log('projectionMatrix is NaN - retrying');
-        this.projectionMatrix = LegacyCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+        this.updateProjectionMatrix();
       }
     }
 
@@ -1349,7 +1364,7 @@ export class LegacyCamera extends PerspectiveCamera {
       }
       if (i === 15) {
         errorManagerInstance.log('projectionMatrix is all zeros - retrying');
-        this.projectionMatrix = LegacyCamera.calculatePMatrix(Doris.getInstance().getRenderer().gl);
+        this.updateProjectionMatrix();
       }
     }
   }

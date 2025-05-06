@@ -19,6 +19,10 @@ export class FixedToEarthOffsetCameraMode extends CameraMode {
     this.isInitialized_ = true;
   }
 
+  update(): void {
+    // No update logic needed for this camera mode
+  }
+
   render(): void {
     if (!this.isInitialized_) {
       this.initialize();

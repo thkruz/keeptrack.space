@@ -35,8 +35,12 @@ export class Transform {
     this._worldMatrixNeedsUpdate = true;
   }
 
-  setPosition(x: number, y: number, z: number): void {
-    vec3.set(this._position, x, y, z);
+  getPosition(): vec3 {
+    return vec3.clone(this._position);
+  }
+
+  setPosition(position: vec3): void {
+    vec3.copy(this._position, position);
     this._localMatrixNeedsUpdate = true;
     this._worldMatrixNeedsUpdate = true;
   }
@@ -47,13 +51,21 @@ export class Transform {
   }
 
   set rotation(value: quat) {
-    quat.copy(this._rotation, value);
-    this._localMatrixNeedsUpdate = true;
-    this._worldMatrixNeedsUpdate = true;
+    this.setRotation(value);
+  }
+
+  getRotation(): quat {
+    return quat.clone(this._rotation);
   }
 
   setRotationFromEuler(x: number, y: number, z: number): void {
     quat.fromEuler(this._rotation, x, y, z);
+    this._localMatrixNeedsUpdate = true;
+    this._worldMatrixNeedsUpdate = true;
+  }
+
+  setRotation(value: quat): void {
+    quat.copy(this._rotation, value);
     this._localMatrixNeedsUpdate = true;
     this._worldMatrixNeedsUpdate = true;
   }

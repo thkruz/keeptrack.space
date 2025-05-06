@@ -41,8 +41,13 @@ export class TouchHandler {
 
   /**
    * Update method called each frame
+   * @param deltaTime Time elapsed since last update in milliseconds
    */
-  update(): void {
+  update(deltaTime: number): void {
+    if (deltaTime <= 0) {
+      // eslint-disable-next-line no-useless-return
+      return;
+    }
     // Process ongoing touches if needed
   }
 

@@ -23,6 +23,10 @@ export class FixedToSatelliteCameraMode extends CameraMode {
     this.isInitialized_ = true;
   }
 
+  update(): void {
+    throw new Error('Method not implemented.');
+  }
+
   render(): void {
     if (!this.isInitialized_) {
       this.initialize();

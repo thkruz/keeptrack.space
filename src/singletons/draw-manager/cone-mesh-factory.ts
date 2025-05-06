@@ -1,10 +1,10 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { BaseObject, Degrees } from 'ootk';
 import { LegacyCamera } from '../../keeptrack/camera/legacy-camera';
 import { ConeMesh, ConeSettings } from './cone-mesh';
 import { CustomMeshFactory } from './custom-mesh-factory';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 
 export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
@@ -21,7 +21,7 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
   }
 
   drawAll(camera: LegacyCamera, tgtBuffer: WebGLFramebuffer | null = null) {
-    const pMatrix = camera.projectionMatrix;
+    const pMatrix = camera.getProjectionMatrix();
     const camMatrix = camera.camMatrix;
 
     this.meshes.forEach((mesh) => {

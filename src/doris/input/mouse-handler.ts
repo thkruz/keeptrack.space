@@ -37,8 +37,12 @@ export class MouseHandler {
 
   /**
    * Update method called each frame
+   * @param deltaTime Time elapsed since last update in milliseconds
    */
-  update(): void {
+  update(deltaTime: number): void {
+    if (deltaTime <= 0) {
+      return;
+    }
     // Store previous position for delta calculations
     this.prevMousePosition.x = this.mousePosition.x;
     this.prevMousePosition.y = this.mousePosition.y;

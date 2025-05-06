@@ -38,7 +38,7 @@ export class KeepTrackRenderer extends Renderer {
     }
 
     // Apply the camera matrix
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.projectionMatrix, camera.camMatrix);
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.getProjectionMatrix(), camera.camMatrix);
 
     Doris.getInstance().emit(CoreEngineEvents.BeforeClearRenderTarget);
     this.clear(Doris.getInstance().getRenderer().gl);
@@ -59,7 +59,7 @@ export class KeepTrackRenderer extends Renderer {
         scene.sun.draw(scene.earth.lightDirection, fb);
         if (scene.postProcessingManager.isInitialized) {
           scene.earth.drawOcclusion(
-            keepTrackApi.getMainCamera().projectionMatrix,
+            keepTrackApi.getMainCamera().getProjectionMatrix(),
             camera.camMatrix,
             scene.postProcessingManager.programs.occlusion,
             scene.godrays.godraysFramebuffer,
@@ -71,7 +71,7 @@ export class KeepTrackRenderer extends Renderer {
           keepTrackApi.getMainCamera().camDistBuffer <= settingsManager.nearZoomLevel
         ) {
           keepTrackApi.getMeshManager().drawOcclusion(
-            keepTrackApi.getMainCamera().projectionMatrix,
+            keepTrackApi.getMainCamera().getProjectionMatrix(),
             camera.camMatrix,
             scene.postProcessingManager.programs.occlusion,
             scene.godrays.godraysFramebuffer,
@@ -79,7 +79,7 @@ export class KeepTrackRenderer extends Renderer {
         }
         scene.postProcessingManager.curBuffer = null;
         scene.godrays.draw(
-          keepTrackApi.getMainCamera().projectionMatrix,
+          keepTrackApi.getMainCamera().getProjectionMatrix(),
           camera.camMatrix,
           scene.postProcessingManager.curBuffer,
         );
@@ -100,7 +100,7 @@ export class KeepTrackRenderer extends Renderer {
     }
     if (selectedSatelliteManager.selectedSat > -1) {
       scene.searchBox.draw(
-        keepTrackApi.getMainCamera().projectionMatrix,
+        keepTrackApi.getMainCamera().getProjectionMatrix(),
         camera.camMatrix,
         scene.postProcessingManager.curBuffer,
       );

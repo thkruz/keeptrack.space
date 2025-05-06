@@ -32,7 +32,14 @@ export class PluginManager {
       openSourcePath: '../plugins/initial-orbit/initial-orbit',
       proPath: '../plugins-pro/initial-orbit/initial-orbit',
     },
-    // Add more plugins here as needed
+    astronomy: {
+      openSourcePath: '../plugins/astronomy/astronomy',
+      proPath: '../plugins-pro/astronomy/astronomy',
+    },
+    planetarium: {
+      openSourcePath: '../plugins/planetarium/planetarium',
+      proPath: '../plugins-pro/planetarium/planetarium',
+    },
   };
 
   constructor(fileManager: FileSystemManager) {

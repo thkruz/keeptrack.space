@@ -11,8 +11,6 @@ import { Doris } from '@app/doris/doris';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import createAnalytics from 'analytics';
 import { getEl, hideEl, showEl } from '../lib/get-el';
-import { AstronomyPlugin } from '../plugins-pro/astronomy/astronomy';
-import { PlanetariumPlugin } from '../plugins-pro/planetarium/planetarium';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { AnalysisMenu } from './analysis/analysis';
 import { Breakup } from './breakup/breakup';
@@ -180,8 +178,20 @@ export const loadPlugins = (plugins: KeepTrackPlugins): void => {
       { init: () => new SensorSurvFence().init(), enabled: plugins.sensorSurv },
       { init: () => new SatelliteViewPlugin().init(), enabled: plugins.satelliteView },
       { init: () => new SatelliteFov().init(), enabled: plugins.satelliteFov },
-      { init: () => new PlanetariumPlugin().init(), enabled: plugins.planetarium },
-      { init: () => new AstronomyPlugin().init(), enabled: plugins.astronomy },
+      {
+        init: () => (async () => {
+          const planetariumPlugin = await import('../plugins/planetarium/planetarium');
+
+          new planetariumPlugin.PlanetariumPlugin().init();
+        })(), enabled: plugins.planetarium,
+      },
+      {
+        init: () => (async () => {
+          const astronomyPlugin = await import('../plugins/astronomy/astronomy');
+
+          new astronomyPlugin.AstronomyPlugin().init();
+        })(), enabled: plugins.astronomy,
+      },
       { init: () => new NightToggle().init(), enabled: plugins.nightToggle },
       { init: () => new DopsPlugin().init(), enabled: plugins.dops },
       { init: () => new SatConstellations().init(), enabled: plugins.constellations },

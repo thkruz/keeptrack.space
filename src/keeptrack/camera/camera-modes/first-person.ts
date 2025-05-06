@@ -27,10 +27,12 @@ export class FirstPersonCameraMode extends CameraMode {
       this.initialize();
     }
 
+    const viewMatrix = this.camera.getViewMatrix();
+
     // Rotate the camera
-    mat4.rotate(this.camera.camMatrix, this.camera.camMatrix, -this.camera.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(this.camera.camMatrix, this.camera.camMatrix, this.camera.fpsYaw * DEG2RAD, [0, 0, 1]);
+    mat4.rotate(viewMatrix, viewMatrix, -this.camera.fpsPitch * DEG2RAD, [1, 0, 0]);
+    mat4.rotate(viewMatrix, viewMatrix, this.camera.fpsYaw * DEG2RAD, [0, 0, 1]);
     // Move the camera to the FPS position
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, [this.camera.fpsPos[0], this.camera.fpsPos[1], -this.camera.fpsPos[2]]);
+    mat4.translate(viewMatrix, viewMatrix, [this.camera.fpsPos[0], this.camera.fpsPos[1], -this.camera.fpsPos[2]]);
   }
 }

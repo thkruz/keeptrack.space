@@ -79,7 +79,7 @@ export class Earth extends Component {
   /**
    * This is run once per frame to render the earth in godrays buffer.
    */
-  drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLFramebuffer): void {
+  drawOcclusion(pMatrix: mat4, viewMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLFramebuffer): void {
     if (settingsManager.isDisableGodrays) {
       return;
     }
@@ -94,7 +94,7 @@ export class Earth extends Component {
     occlusionPrgm.attrSetup(this.mesh.geometry.getCombinedBuffer());
 
     // Set the uniforms
-    occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, camMatrix);
+    occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, viewMatrix);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -396,7 +396,7 @@ export class Earth extends Component {
 
     gl.bindVertexArray(this.vaoOcclusion_);
 
-    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, keepTrackApi.getMainCamera().projectionCameraMatrix);
+    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvviewMatrix, false, keepTrackApi.getMainCamera().projectionCameraMatrix);
 
     /*
      * no reason to render 100000s of pixels when

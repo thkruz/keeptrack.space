@@ -36,7 +36,7 @@ export const initProgram = (gl: WebGL2RenderingContext) => {
   // Assign Attributes
   tools.program.a_position = gl.getAttribLocation(tools.program, 'a_position');
   tools.program.u_pMatrix = gl.getUniformLocation(tools.program, 'u_pMatrix');
-  tools.program.u_camMatrix = gl.getUniformLocation(tools.program, 'u_camMatrix');
+  tools.program.u_viewMatrix = gl.getUniformLocation(tools.program, 'u_viewMatrix');
   tools.program.u_mvMatrix = gl.getUniformLocation(tools.program, 'u_mvMatrix');
   tools.program.u_nMatrix = gl.getUniformLocation(tools.program, 'u_nMatrix');
   tools.program.u_drawPosition = gl.getUniformLocation(tools.program, 'u_drawPosition');
@@ -117,10 +117,10 @@ export const update = () => {
   glm.mat4.identity(tools.mvMatrix);
   glm.mat4.translate(tools.mvMatrix, tools.mvMatrix, glm.vec3.fromValues(tools.drawPosition[0], tools.drawPosition[1], tools.drawPosition[2]));
 };
-export const draw = function (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer?: WebGLFramebuffer) {
+export const draw = function (pMatrix: glm.mat4, viewMatrix: glm.mat4, tgtBuffer?: WebGLFramebuffer) {
   const { gl } = keepTrackApi.programs.drawManager;
   tools.pMatrix = pMatrix;
-  tools.camMatrix = camMatrix;
+  tools.viewMatrix = viewMatrix;
   if (!tools.isLoaded) return;
 
   update();
@@ -135,7 +135,7 @@ export const draw = function (pMatrix: glm.mat4, camMatrix: glm.mat4, tgtBuffer?
   gl.uniformMatrix3fv(tools.program.u_nMatrix, false, tools.nMatrix);
   gl.uniformMatrix4fv(tools.program.u_mvMatrix, false, tools.mvMatrix);
   gl.uniformMatrix4fv(tools.program.u_pMatrix, false, pMatrix);
-  gl.uniformMatrix4fv(tools.program.u_camMatrix, false, camMatrix);
+  gl.uniformMatrix4fv(tools.program.u_viewMatrix, false, viewMatrix);
   gl.uniform1f(tools.program.u_drawPosition, Math.sqrt(tools.drawPosition[0] ** 2 + tools.drawPosition[1] ** 2 + tools.drawPosition[2] ** 2));
 
   gl.bindVertexArray(tools.vao);
@@ -167,7 +167,7 @@ const shaders = {
       `,
     vert: `#version 300 es
       uniform mat4 u_pMatrix;
-      uniform mat4 u_camMatrix;
+      uniform mat4 u_viewMatrix;
       uniform mat4 u_mvMatrix;
       uniform mat3 u_nMatrix;
       uniform float u_drawPosition;
@@ -176,7 +176,7 @@ const shaders = {
 
       void main(void) {
           vec4 position = u_mvMatrix * vec4(a_position, 1.0);
-          gl_Position = u_pMatrix * u_camMatrix * position;
+          gl_Position = u_pMatrix * u_viewMatrix * position;
       }
       `,
   },
@@ -192,12 +192,12 @@ export const tools = {
   program: {
     a_position: <number>null,
     u_pMatrix: null as unknown as WebGLUniformLocation,
-    u_camMatrix: null as unknown as WebGLUniformLocation,
+    u_viewMatrix: null as unknown as WebGLUniformLocation,
     u_mvMatrix: null as unknown as WebGLUniformLocation,
     u_nMatrix: null as unknown as WebGLUniformLocation,
     u_drawPosition: null as unknown as WebGLUniformLocation,
   },
-  camMatrix: glm.mat4.create(),
+  viewMatrix: glm.mat4.create(),
   mvMatrix: glm.mat4.create(),
   pMatrix: glm.mat4.create(),
   nMatrix: glm.mat3.create(),

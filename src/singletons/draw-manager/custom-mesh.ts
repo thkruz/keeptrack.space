@@ -33,11 +33,11 @@ export abstract class CustomMesh {
 
   protected uniforms_: {
     u_pMatrix: WebGLUniformLocation | null;
-    u_camMatrix: WebGLUniformLocation | null;
+    u_viewMatrix: WebGLUniformLocation | null;
     u_mvMatrix: WebGLUniformLocation | null;
   } = {
       u_pMatrix: null,
-      u_camMatrix: null,
+      u_viewMatrix: null,
       u_mvMatrix: null,
     };
 

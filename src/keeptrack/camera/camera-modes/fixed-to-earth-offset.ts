@@ -38,16 +38,18 @@ export class FixedToEarthOffsetCameraMode extends CameraMode {
       return;
     }
 
+    const viewMatrix = this.camera.getViewMatrix();
+
     // Rotate the camera
-    mat4.rotateX(this.camera.camMatrix, this.camera.camMatrix, -this.camera.localRotateCurrent.pitch);
-    mat4.rotateY(this.camera.camMatrix, this.camera.camMatrix, -this.camera.localRotateCurrent.roll);
-    mat4.rotateZ(this.camera.camMatrix, this.camera.camMatrix, -this.camera.localRotateCurrent.yaw);
+    mat4.rotateX(viewMatrix, viewMatrix, -this.camera.localRotateCurrent.pitch);
+    mat4.rotateY(viewMatrix, viewMatrix, -this.camera.localRotateCurrent.roll);
+    mat4.rotateZ(viewMatrix, viewMatrix, -this.camera.localRotateCurrent.yaw);
     // Adjust for panning
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, [this.camera.panCurrent.x, this.camera.panCurrent.y, this.camera.panCurrent.z]);
+    mat4.translate(viewMatrix, viewMatrix, [this.camera.panCurrent.x, this.camera.panCurrent.y, this.camera.panCurrent.z]);
     // Back away from the earth
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, [settingsManager.offsetCameraModeX, this.camera.getCameraDistance(), settingsManager.offsetCameraModeZ]);
+    mat4.translate(viewMatrix, viewMatrix, [settingsManager.offsetCameraModeX, this.camera.getCameraDistance(), settingsManager.offsetCameraModeZ]);
     // Adjust for FPS style rotation
-    mat4.rotateX(this.camera.camMatrix, this.camera.camMatrix, this.camera.earthCenteredPitch);
-    mat4.rotateZ(this.camera.camMatrix, this.camera.camMatrix, -this.camera.earthCenteredYaw);
+    mat4.rotateX(viewMatrix, viewMatrix, this.camera.earthCenteredPitch);
+    mat4.rotateZ(viewMatrix, viewMatrix, -this.camera.earthCenteredYaw);
   }
 }

@@ -306,7 +306,7 @@ export const mockUiManager: UiManager = <UiManager>(<unknown>{
 
 export const mockCameraManager = <LegacyCamera>(<unknown>{
   camAngleSnappedOnSat: false,
-  camMatrix: mat4.create().fill(0),
+  viewMatrix: mat4.create().fill(0),
   camPitch: null,
   camPitchSpeed: 0,
   camPitchTarget: null,

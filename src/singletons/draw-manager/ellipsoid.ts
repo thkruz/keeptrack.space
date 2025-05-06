@@ -43,7 +43,7 @@ export class Ellipsoid {
   private readonly uniforms_ = {
     u_nMatrix: <WebGLUniformLocation><unknown>null,
     u_pMatrix: <WebGLUniformLocation><unknown>null,
-    u_camMatrix: <WebGLUniformLocation><unknown>null,
+    u_viewMatrix: <WebGLUniformLocation><unknown>null,
     u_mvMatrix: <WebGLUniformLocation><unknown>null,
     u_color: <WebGLUniformLocation><unknown>null,
   };
@@ -81,8 +81,6 @@ export class Ellipsoid {
       return;
     }
 
-    const pMatrix = camera.getProjectionMatrix();
-    const camMatrix = camera.camMatrix;
     const gl = this.gl_;
 
     gl.useProgram(this.program_);
@@ -92,9 +90,9 @@ export class Ellipsoid {
 
     gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
-    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, camera.getProjectionMatrix());
     gl.uniform4fv(this.uniforms_.u_color, this.color_);
-    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_viewMatrix, false, camera.getViewMatrix());
 
     gl.enable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
@@ -169,7 +167,7 @@ export class Ellipsoid {
     this.gl_.useProgram(this.program_);
 
     GlUtils.assignAttributes(this.attribs_, gl, this.program_, ['a_position', 'a_normal']);
-    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_color']);
+    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_viewMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_color']);
   }
 
   private initVao_() {
@@ -204,7 +202,7 @@ export class Ellipsoid {
     `,
     vert: keepTrackApi.glsl`#version 300 es
       uniform mat4 u_pMatrix;
-      uniform mat4 u_camMatrix;
+      uniform mat4 u_viewMatrix;
       uniform mat4 u_mvMatrix;
       uniform mat3 u_nMatrix;
 
@@ -215,7 +213,7 @@ export class Ellipsoid {
 
       void main(void) {
         vec4 position = u_mvMatrix * vec4(a_position, 1.0);
-        gl_Position = u_pMatrix * u_camMatrix * position;
+        gl_Position = u_pMatrix * u_viewMatrix * position;
         v_normal = u_nMatrix * a_normal;
       }
     `,

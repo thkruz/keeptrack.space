@@ -37,10 +37,8 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
 
       if (sensors.length > 0) {
         didWeDrawSomething = true;
-        const pMatrix = camera.getProjectionMatrix();
-        const camMatrix = camera.camMatrix;
 
-        mesh.draw(pMatrix, camMatrix, keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
+        mesh.draw(camera.getProjectionMatrix(), camera.getViewMatrix(), keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
         if (mesh.sensor.objName !== lastSensorObjName) {
           i++;
           lastSensorObjName = mesh.sensor.objName as string; // It is NOT optional in KeepTrack even though ootk allows it to be

@@ -119,7 +119,6 @@ export class LegacyCamera extends PerspectiveCamera {
   private zoomTarget_ = settingsManager.initZoomLevel ?? 0.6925;
 
   camAngleSnappedOnSat = false;
-  camMatrix = mat4.create().fill(0);
   /**
    * This was used when there was only one camera mode and the camera was always centered on the earth
    * It is the overall pitch of the camera?
@@ -289,9 +288,6 @@ export class LegacyCamera extends PerspectiveCamera {
       return;
     }
 
-    // Using this.camMatrix instead of this.viewMatrix
-    this.viewMatrix = this.camMatrix;
-
     this.isDirty = false;
   }
 
@@ -302,7 +298,6 @@ export class LegacyCamera extends PerspectiveCamera {
     error: boolean;
   } {
     const pMatrix = this.projectionMatrix;
-    const camMatrix = this.camMatrix;
     const screenPos = { x: 0, y: 0, z: 0, error: false };
 
     try {
@@ -314,7 +309,7 @@ export class LegacyCamera extends PerspectiveCamera {
 
       const posVec4 = <[number, number, number, number]>vec4.fromValues(pos.x, pos.y, pos.z, 1);
 
-      vec4.transformMat4(posVec4, posVec4, camMatrix);
+      vec4.transformMat4(posVec4, posVec4, this.viewMatrix);
       vec4.transformMat4(posVec4, posVec4, pMatrix);
 
       screenPos.x = posVec4[0] / posVec4[3];
@@ -619,7 +614,7 @@ export class LegacyCamera extends PerspectiveCamera {
     }
 
     this.drawPreValidate_(sensorPos);
-    mat4.identity(this.camMatrix);
+    mat4.identity(this.viewMatrix);
 
     if (!this.activeCameraMode) {
       // TODO: This shouldn't be possible
@@ -677,12 +672,12 @@ export class LegacyCamera extends PerspectiveCamera {
   }
 
   /**
-   * Calculates the ECI of the Camera based on the camMatrix
+   * Calculates the ECI of the Camera based on the viewMatrix
    *
    * Used in RayCasting
    */
   getCamPos(): vec3 {
-    vec3.transformMat4(this.position, this.position, this.camMatrix);
+    vec3.transformMat4(this.position, this.position, this.viewMatrix);
 
     return this.position;
   }
@@ -746,7 +741,7 @@ export class LegacyCamera extends PerspectiveCamera {
     const inverted = mat4.create();
     const forward = vec3.create();
 
-    mat4.invert(inverted, this.camMatrix);
+    mat4.invert(inverted, this.viewMatrix);
     vec3.transformMat4(forward, forward, inverted);
 
     return forward;
@@ -1352,7 +1347,7 @@ export class LegacyCamera extends PerspectiveCamera {
       }
     }
 
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), this.projectionMatrix, this.camMatrix);
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), this.projectionMatrix, this.viewMatrix);
   }
 
   validateProjectionMatrix_() {

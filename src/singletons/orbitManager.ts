@@ -105,8 +105,6 @@ export class OrbitManager {
     if (!this.isInitialized_) {
       return;
     }
-    const camMatrix = mainCameraInstance.camMatrix;
-    const pMatrix = mainCameraInstance.getProjectionMatrix();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const hoverManagerInstance = keepTrackApi.getHoverManager();
     const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
@@ -123,7 +121,7 @@ export class OrbitManager {
         gl.enable(gl.DEPTH_TEST);
       }
 
-      this.lineManagerInstance_.setWorldUniforms(camMatrix, pMatrix);
+      this.lineManagerInstance_.setWorldUniforms(mainCameraInstance.getViewMatrix(), mainCameraInstance.getProjectionMatrix());
 
       this.drawGroupObjectOrbit(hoverManagerInstance, colorSchemeManagerInstance);
       this.drawInViewObjectOrbit_(mainCameraInstance);

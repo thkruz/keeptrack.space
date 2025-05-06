@@ -61,6 +61,7 @@ export class FixedToSatelliteCameraMode extends CameraMode {
     }
 
     const targetPosition = target.id !== -1 ? vec3.fromValues(-target.position?.x, -target.position?.y, -target.position?.z) : vec3.fromValues(0, 0, 0);
+    const viewMatrix = this.camera.getViewMatrix();
 
     /*
      * mat4 commands are run in reverse order
@@ -71,17 +72,17 @@ export class FixedToSatelliteCameraMode extends CameraMode {
      * 5. Adjust for panning
      * 6. Rotate the camera FPS style
      */
-    mat4.rotateX(this.camera.camMatrix, this.camera.camMatrix, -this.camera.localRotateCurrent.pitch);
-    mat4.rotateY(this.camera.camMatrix, this.camera.camMatrix, -this.camera.localRotateCurrent.roll);
-    mat4.rotateZ(this.camera.camMatrix, this.camera.camMatrix, -this.camera.localRotateCurrent.yaw);
+    mat4.rotateX(viewMatrix, viewMatrix, -this.camera.localRotateCurrent.pitch);
+    mat4.rotateY(viewMatrix, viewMatrix, -this.camera.localRotateCurrent.roll);
+    mat4.rotateZ(viewMatrix, viewMatrix, -this.camera.localRotateCurrent.yaw);
 
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, [this.camera.panCurrent.x, this.camera.panCurrent.y, this.camera.panCurrent.z]);
+    mat4.translate(viewMatrix, viewMatrix, [this.camera.panCurrent.x, this.camera.panCurrent.y, this.camera.panCurrent.z]);
 
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, [0, this.camera.getCameraRadius(target.position), 0]);
+    mat4.translate(viewMatrix, viewMatrix, [0, this.camera.getCameraRadius(target.position), 0]);
 
-    mat4.rotateX(this.camera.camMatrix, this.camera.camMatrix, this.camera.ftsPitch);
-    mat4.rotateZ(this.camera.camMatrix, this.camera.camMatrix, -this.camera.ftsYaw);
+    mat4.rotateX(viewMatrix, viewMatrix, this.camera.ftsPitch);
+    mat4.rotateZ(viewMatrix, viewMatrix, -this.camera.ftsYaw);
 
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, targetPosition);
+    mat4.translate(viewMatrix, viewMatrix, targetPosition);
   }
 }

@@ -91,7 +91,7 @@ export class DotsManager {
         }),
       },
       uniforms: {
-        u_pMvCamMatrix: <WebGLUniformLocation><unknown>null,
+        u_pMvviewMatrix: <WebGLUniformLocation><unknown>null,
         u_minSize: <WebGLUniformLocation><unknown>null,
         u_maxSize: <WebGLUniformLocation><unknown>null,
       },
@@ -117,7 +117,7 @@ export class DotsManager {
         }),
       },
       uniforms: {
-        u_pMvCamMatrix: <WebGLUniformLocation><unknown>null,
+        u_pMvviewMatrix: <WebGLUniformLocation><unknown>null,
         u_minSize: <WebGLUniformLocation><unknown>null,
         u_maxSize: <WebGLUniformLocation><unknown>null,
       },
@@ -144,10 +144,10 @@ export class DotsManager {
 
   /**
    * Draws dots on a WebGLFramebuffer.
-   * @param pMvCamMatrix - The projection matrix.
+   * @param pMvviewMatrix - The projection matrix.
    * @param tgtBuffer - The WebGLFramebuffer to draw on.
    */
-  draw(pMvCamMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
+  draw(pMvviewMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
     if (!this.isReady || !settingsManager.cruncherReady) {
       return;
     }
@@ -156,7 +156,7 @@ export class DotsManager {
     if (!colorSchemeManagerInstance.colorBuffer) {
       return;
     }
-    if (!pMvCamMatrix) {
+    if (!pMvviewMatrix) {
       return;
     }
 
@@ -164,7 +164,7 @@ export class DotsManager {
 
     gl.useProgram(this.programs.dots.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
-    gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
+    gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvviewMatrix, false, pMvviewMatrix);
 
     if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       gl.uniform1f(this.programs.dots.uniforms.u_minSize, this.settings_.satShader.minSizePlanetarium);
@@ -206,16 +206,16 @@ export class DotsManager {
     gl.disable(gl.BLEND);
 
     // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-    this.drawGpuPickingFrameBuffer(pMvCamMatrix, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+    this.drawGpuPickingFrameBuffer(pMvviewMatrix, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
   }
 
   /**
    * Draws the GPU picking frame buffer.
-   * @param pMvCamMatrix - The projection, model view, and camera matrix.
+   * @param pMvviewMatrix - The projection, model view, and camera matrix.
    * @param mouseX - The x-coordinate of the mouse.
    * @param mouseY - The y-coordinate of the mouse.
    */
-  drawGpuPickingFrameBuffer(pMvCamMatrix: mat4, mouseX: number, mouseY: number) {
+  drawGpuPickingFrameBuffer(pMvviewMatrix: mat4, mouseX: number, mouseY: number) {
     if (!this.isReady || !settingsManager.cruncherReady) {
       return;
     }
@@ -229,7 +229,7 @@ export class DotsManager {
     gl.useProgram(this.programs.picking.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.gpuPickingFramebuffer);
 
-    gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
+    gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvviewMatrix, false, pMvviewMatrix);
 
     // no reason to render 100000s of pixels when we're only going to read one
     if (!settingsManager.isMobileModeEnabled) {
@@ -384,7 +384,7 @@ export class DotsManager {
     this.programs.picking.program = new WebGlProgramHelper(gl, this.shaders_.picking.vert, this.shaders_.picking.frag).program;
 
     GlUtils.assignAttributes(this.programs.picking.attribs, gl, this.programs.picking.program, ['a_position', 'a_color', 'a_pickable']);
-    GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvCamMatrix']);
+    GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvviewMatrix']);
 
     this.gpuPickingFramebuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.gpuPickingFramebuffer);
@@ -713,7 +713,7 @@ export class DotsManager {
           uniform float u_minSize;
           uniform float u_maxSize;
 
-          uniform mat4 u_pMvCamMatrix;
+          uniform mat4 u_pMvviewMatrix;
 
           out vec4 vColor;
           out float vStar;
@@ -727,7 +727,7 @@ export class DotsManager {
           }
 
           void main(void) {
-              vec4 position = u_pMvCamMatrix * vec4(a_position, 1.0);
+              vec4 position = u_pMvviewMatrix * vec4(a_position, 1.0);
               float drawSize = 0.0;
               float dist = distance(vec3(0.0, 0.0, 0.0),a_position.xyz);
 
@@ -760,12 +760,12 @@ export class DotsManager {
                 in vec3 a_color;
                 in float a_pickable;
 
-                uniform mat4 u_pMvCamMatrix;
+                uniform mat4 u_pMvviewMatrix;
 
                 out vec3 vColor;
 
                 void main(void) {
-                vec4 position = u_pMvCamMatrix * vec4(a_position, 1.0);
+                vec4 position = u_pMvviewMatrix * vec4(a_position, 1.0);
                 gl_Position = position;
                 gl_PointSize = ${settingsManager.pickingDotSize} * a_pickable;
                 vColor = a_color * a_pickable;

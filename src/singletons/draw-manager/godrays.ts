@@ -43,12 +43,12 @@ export class Godrays {
   renderBuffer: WebGLRenderbuffer;
   godraysFramebuffer: WebGLFramebuffer;
 
-  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
+  draw(pMatrix: mat4, viewMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
     if (!this.isLoaded_ || settingsManager.isDisableGodrays) {
       return;
     }
     // Calculate sun position immediately before drawing godrays
-    const screenPosition = this.getScreenCoords_(pMatrix, camMatrix);
+    const screenPosition = this.getScreenCoords_(pMatrix, viewMatrix);
 
     if (isNaN(screenPosition[0]) || isNaN(screenPosition[1])) {
       return;
@@ -149,10 +149,10 @@ export class Godrays {
     this.isLoaded_ = true;
   }
 
-  private getScreenCoords_(pMatrix: mat4, camMatrix: mat4): vec2 {
+  private getScreenCoords_(pMatrix: mat4, viewMatrix: mat4): vec2 {
     const posVec4 = vec4.fromValues(this.sun_.position[0], this.sun_.position[1], this.sun_.position[2], 1);
 
-    vec4.transformMat4(posVec4, posVec4, camMatrix);
+    vec4.transformMat4(posVec4, posVec4, viewMatrix);
     vec4.transformMat4(posVec4, posVec4, pMatrix);
 
     // In 0.0 to 1.0 space

@@ -151,7 +151,7 @@ export const keepTrackApiStubs = {
       adviceArray: [],
     },
     mainCamera: {
-      camMatrix: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      viewMatrix: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       cameraType: {
         current: 1,
         Default: 0,
@@ -284,7 +284,7 @@ export const keepTrackApiStubs = {
       positionBuffer: null,
       sizeBuffer: null,
       loaded: true,
-      pMvCamMatrix: null,
+      pMvviewMatrix: null,
       drawProgram: null,
       positionBufferOneTime: null,
       positionData: new Float32Array([0, 0, 0]),
@@ -306,7 +306,7 @@ export const keepTrackApiStubs = {
       drawGpuPickingFrameBuffer: jest.fn(),
       updatePositionBuffer: jest.fn(),
       updateSizeBuffer: jest.fn(),
-      updatePMvCamMatrix: jest.fn(),
+      updatePMvviewMatrix: jest.fn(),
       sizeBufferOneTime: null,
       sizeData: new Float32Array([1, 0, 0]),
       starIndex2: null,
@@ -379,7 +379,7 @@ export const keepTrackApiStubs = {
       attribs: {
         aPos: 0,
         uColor: [0, 0, 0, 0],
-        uCamMatrix: [0, 0, 0, 0],
+        uviewMatrix: [0, 0, 0, 0],
         uPMatrix: [0, 0, 0, 0],
         uMvMatrix: [0, 0, 0, 0],
       },

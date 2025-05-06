@@ -21,11 +21,8 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
   }
 
   drawAll(camera: LegacyCamera, tgtBuffer: WebGLFramebuffer | null = null) {
-    const pMatrix = camera.getProjectionMatrix();
-    const camMatrix = camera.camMatrix;
-
     this.meshes.forEach((mesh) => {
-      mesh.draw(pMatrix, camMatrix, tgtBuffer);
+      mesh.draw(camera.getProjectionMatrix(), camera.getViewMatrix(), tgtBuffer);
     });
   }
 

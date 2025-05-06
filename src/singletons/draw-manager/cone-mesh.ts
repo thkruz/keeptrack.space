@@ -20,7 +20,7 @@ export interface ConeSettings {
 export class ConeMesh extends CustomMesh {
   uniforms_ = {
     u_pMatrix: null as unknown as WebGLUniformLocation,
-    u_camMatrix: null as unknown as WebGLUniformLocation,
+    u_viewMatrix: null as unknown as WebGLUniformLocation,
     u_mvMatrix: null as unknown as WebGLUniformLocation,
     u_color: null as unknown as WebGLUniformLocation,
   };
@@ -89,7 +89,7 @@ export class ConeMesh extends CustomMesh {
     mat4.scale(this.mvMatrix_, this.mvMatrix_, [coneHeight, coneHeight, coneHeight]);
   }
 
-  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer: WebGLFramebuffer | null = null) {
+  draw(pMatrix: mat4, viewMatrix: mat4, tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_) {
       return;
     }
@@ -104,7 +104,7 @@ export class ConeMesh extends CustomMesh {
     // Set the uniforms
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_viewMatrix, false, viewMatrix);
     gl.uniform4fv(this.uniforms_.u_color, this.color);
 
     gl.enable(gl.BLEND);
@@ -176,13 +176,13 @@ export class ConeMesh extends CustomMesh {
     `,
     vert: keepTrackApi.glsl`#version 300 es
       uniform mat4 u_pMatrix;
-      uniform mat4 u_camMatrix;
+      uniform mat4 u_viewMatrix;
       uniform mat4 u_mvMatrix;
 
       in vec3 a_position;
 
       void main(void) {
-        gl_Position = u_pMatrix * u_camMatrix * u_mvMatrix * vec4(a_position, 1.0);
+        gl_Position = u_pMatrix * u_viewMatrix * u_mvMatrix * vec4(a_position, 1.0);
       }
     `,
   };

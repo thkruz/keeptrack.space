@@ -203,11 +203,9 @@ export class InputManager {
     const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
     const glScreenY = 1.0 - (y / gl.drawingBufferHeight) * 2;
     const screenVec = <vec4>[glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
-
     const comboPMat = mat4.create();
-    const { camMatrix } = keepTrackApi.getMainCamera();
 
-    mat4.mul(comboPMat, keepTrackApi.getMainCamera().getProjectionMatrix(), camMatrix);
+    mat4.mul(comboPMat, keepTrackApi.getMainCamera().getProjectionMatrix(), keepTrackApi.getMainCamera().getViewMatrix());
     const invMat = mat4.create();
 
     mat4.invert(invMat, comboPMat);

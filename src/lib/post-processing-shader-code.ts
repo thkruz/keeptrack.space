@@ -127,14 +127,14 @@ export const postProcessingShaderCode = {
     vert: keepTrackApi.glsl`#version 300 es
                 in vec3 a_position;
 
-                uniform mat4 uCamMatrix;
+                uniform mat4 uviewMatrix;
                 uniform mat4 uMvMatrix;
                 uniform mat4 uPMatrix;
 
                 void main(void) {
                   float scale = 0.99;
                   mat4 scaleMatrix = mat4(vec4(scale, 0.0, 0.0, 0.0),vec4(0.0, scale, 0.0, 0.0),vec4(0.0, 0.0, scale, 0.0),vec4(0.0, 0.0, 0.0, 1.0));
-                  gl_Position = uPMatrix * uCamMatrix *  uMvMatrix * scaleMatrix * vec4(a_position, 1.0);
+                  gl_Position = uPMatrix * uviewMatrix *  uMvMatrix * scaleMatrix * vec4(a_position, 1.0);
                 }
             `,
     frag: keepTrackApi.glsl`#version 300 es

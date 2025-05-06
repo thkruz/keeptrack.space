@@ -38,11 +38,12 @@ export abstract class SplashScreen {
         <div id="loading-hint">Hint: ${this.showHint()}</div>
         <div id="version-text">v${keepTrackApi.version}</div>
         <div id="copyright-notice">
-          This version of KeepTrack is provided under the GNU AGPL v3.0 license.<br/>
-          © 2025 Kruczek Labs LLC. All rights reserved.<br/>
-          This instance is operating without a commercial license or compensation.<br/>
-          Attribution and source code disclosures are required under AGPL v3.<br/>
-          See LICENSE for details.<br/>
+KeepTrack™ and KeepTrack.Space™ are unregistered trademarks of Kruczek Labs LLC.<br>
+This software is provided under the terms of the GNU AGPL v3.0.<br>
+Attribution, visibility of this notice, and access to the complete corresponding source code are required.<br>
+This instance is deployed without a commercial license and without compensation to the rights holder.<br>
+Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>
+© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.
         </div>
       </div>`;
   }

@@ -56,7 +56,7 @@ export class CustomMesh {
       `,
     vert: keepTrackApi.glsl`#version 300 es
       uniform mat4 u_pMatrix;
-      uniform mat4 u_camMatrix;
+      uniform mat4 u_viewMatrix;
       uniform mat4 u_mvMatrix;
       uniform mat3 u_nMatrix;
 
@@ -67,7 +67,7 @@ export class CustomMesh {
 
       void main(void) {
           vec4 position = u_mvMatrix * vec4(a_position, 1.0);
-          gl_Position = u_pMatrix * u_camMatrix * position;
+          gl_Position = u_pMatrix * u_viewMatrix * position;
           v_normal = u_nMatrix * a_normal;
       }
       `,
@@ -76,7 +76,7 @@ export class CustomMesh {
   private uniforms_ = {
     u_nMatrix: null as unknown as WebGLUniformLocation,
     u_pMatrix: null as unknown as WebGLUniformLocation,
-    u_camMatrix: null as unknown as WebGLUniformLocation,
+    u_viewMatrix: null as unknown as WebGLUniformLocation,
     u_mvMatrix: null as unknown as WebGLUniformLocation,
   };
 
@@ -84,7 +84,7 @@ export class CustomMesh {
 
   public eci: Ootk.EciVec3;
 
-  public draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
+  public draw(pMatrix: mat4, viewMatrix: mat4, tgtBuffer?: WebGLFramebuffer) {
     if (!this.isLoaded_) {
       return;
     }
@@ -100,7 +100,7 @@ export class CustomMesh {
     gl.uniformMatrix3fv(this.uniforms_.u_nMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_viewMatrix, false, viewMatrix);
 
     gl.disable(gl.DEPTH_TEST); // Enable depth testing
     // gl.depthFunc(gl.LEQUAL); // Near things obscure far things
@@ -183,7 +183,7 @@ export class CustomMesh {
 
     // Assign Attributes
     GlUtils.assignAttributes(this.attribs_, gl, this.program_, ['a_position', 'a_normal']);
-    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix']);
+    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_viewMatrix', 'u_mvMatrix', 'u_nMatrix']);
   }
 
   private initVao_() {

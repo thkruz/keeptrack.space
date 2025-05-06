@@ -70,7 +70,7 @@ export class Box {
   private uniforms_ = {
     u_nMatrix: <WebGLUniformLocation><unknown>null,
     u_pMatrix: <WebGLUniformLocation><unknown>null,
-    u_camMatrix: <WebGLUniformLocation><unknown>null,
+    u_viewMatrix: <WebGLUniformLocation><unknown>null,
     u_mvMatrix: <WebGLUniformLocation><unknown>null,
     u_color: <WebGLUniformLocation><unknown>null,
   };
@@ -89,7 +89,7 @@ export class Box {
     this.color_[3] = color[3];
   }
 
-  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
+  draw(pMatrix: mat4, viewMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
     if (!this.isLoaded_) {
       return;
     }
@@ -109,7 +109,7 @@ export class Box {
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
     gl.uniform4fv(this.uniforms_.u_color, this.color_);
-    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_viewMatrix, false, viewMatrix);
 
     // Enable alpha blending
     gl.enable(gl.BLEND);
@@ -191,7 +191,7 @@ export class Box {
 
     // Assign Attributes
     GlUtils.assignAttributes(this.attribs_, gl, this.program_, ['a_position', 'a_normal']);
-    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_color']);
+    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_viewMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_color']);
   }
 
   private initVao_() {
@@ -227,7 +227,7 @@ export class Box {
     `,
     vert: keepTrackApi.glsl`#version 300 es
       uniform mat4 u_pMatrix;
-      uniform mat4 u_camMatrix;
+      uniform mat4 u_viewMatrix;
       uniform mat4 u_mvMatrix;
       uniform mat3 u_nMatrix;
 
@@ -238,7 +238,7 @@ export class Box {
 
       void main(void) {
           vec4 position = u_mvMatrix * vec4(a_position, 1.0);
-          gl_Position = u_pMatrix * u_camMatrix * position;
+          gl_Position = u_pMatrix * u_viewMatrix * position;
           v_normal = u_nMatrix * a_normal;
       }
       `,

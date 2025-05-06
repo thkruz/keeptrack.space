@@ -40,8 +40,9 @@ export class SatelliteViewCameraMode extends CameraMode {
     }
 
     const targetPositionTemp = vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
+    const viewMatrix = this.camera.getViewMatrix();
 
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, targetPositionTemp);
+    mat4.translate(viewMatrix, viewMatrix, targetPositionTemp);
     vec3.normalize(this.camera.normUp, targetPositionTemp);
     vec3.normalize(this.camera.normForward, [target.velocity.x, target.velocity.y, target.velocity.z]);
     vec3.transformQuat(this.camera.normLeft, this.camera.normUp, quat.fromValues(this.camera.normForward[0], this.camera.normForward[1], this.camera.normForward[2], 90 * DEG2RAD));
@@ -51,13 +52,13 @@ export class SatelliteViewCameraMode extends CameraMode {
       target.position.z + target.velocity.z,
     );
 
-    mat4.lookAt(this.camera.camMatrix, targetNextPosition, targetPositionTemp, this.camera.normUp);
+    mat4.lookAt(viewMatrix, targetNextPosition, targetPositionTemp, this.camera.normUp);
 
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, [target.position.x, target.position.y, target.position.z]);
+    mat4.translate(viewMatrix, viewMatrix, [target.position.x, target.position.y, target.position.z]);
 
-    mat4.rotate(this.camera.camMatrix, this.camera.camMatrix, this.camera.fpsPitch * DEG2RAD, this.camera.normLeft);
-    mat4.rotate(this.camera.camMatrix, this.camera.camMatrix, -this.camera.fpsYaw * DEG2RAD, this.camera.normUp);
+    mat4.rotate(viewMatrix, viewMatrix, this.camera.fpsPitch * DEG2RAD, this.camera.normLeft);
+    mat4.rotate(viewMatrix, viewMatrix, -this.camera.fpsYaw * DEG2RAD, this.camera.normUp);
 
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, targetPositionTemp);
+    mat4.translate(viewMatrix, viewMatrix, targetPositionTemp);
   }
 }

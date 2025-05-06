@@ -38,18 +38,20 @@ export class FixedToEarthCameraMode extends CameraMode {
       return;
     }
 
+    const viewMatrix = this.camera.getViewMatrix();
+
     // 4. Rotate the camera around the new local origin
-    mat4.rotateX(this.camera.camMatrix, this.camera.camMatrix, -this.camera.localRotateCurrent.pitch);
-    mat4.rotateY(this.camera.camMatrix, this.camera.camMatrix, -this.camera.localRotateCurrent.roll);
-    mat4.rotateZ(this.camera.camMatrix, this.camera.camMatrix, -this.camera.localRotateCurrent.yaw);
+    mat4.rotateX(viewMatrix, viewMatrix, -this.camera.localRotateCurrent.pitch);
+    mat4.rotateY(viewMatrix, viewMatrix, -this.camera.localRotateCurrent.roll);
+    mat4.rotateZ(viewMatrix, viewMatrix, -this.camera.localRotateCurrent.yaw);
 
     // 3. Adjust for panning
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, [this.camera.panCurrent.x, this.camera.panCurrent.y, this.camera.panCurrent.z]);
+    mat4.translate(viewMatrix, viewMatrix, [this.camera.panCurrent.x, this.camera.panCurrent.y, this.camera.panCurrent.z]);
 
     // 2. Back away from the earth in the Y direction (depth)
-    mat4.translate(this.camera.camMatrix, this.camera.camMatrix, [0, this.camera.getCameraDistance(), 0]);
+    mat4.translate(viewMatrix, viewMatrix, [0, this.camera.getCameraDistance(), 0]);
     // 1. Rotate around the earth (0,0,0)
-    mat4.rotateX(this.camera.camMatrix, this.camera.camMatrix, this.camera.earthCenteredPitch);
-    mat4.rotateZ(this.camera.camMatrix, this.camera.camMatrix, -this.camera.earthCenteredYaw);
+    mat4.rotateX(viewMatrix, viewMatrix, this.camera.earthCenteredPitch);
+    mat4.rotateZ(viewMatrix, viewMatrix, -this.camera.earthCenteredYaw);
   }
 }

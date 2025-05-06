@@ -84,7 +84,7 @@ export class MeshManager {
 
   private uniforms_ = {
     uPMatrix: <WebGLUniformLocation><unknown>null,
-    uCamMatrix: <WebGLUniformLocation><unknown>null,
+    uviewMatrix: <WebGLUniformLocation><unknown>null,
     uMvMatrix: <WebGLUniformLocation><unknown>null,
     uNormalMatrix: <WebGLUniformLocation><unknown>null,
     uLightDirection: <WebGLUniformLocation><unknown>null,
@@ -197,7 +197,7 @@ export class MeshManager {
     return false;
   }
 
-  draw(pMatrix: mat4, camMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
+  draw(pMatrix: mat4, viewMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
     // Meshes aren't finished loading
     if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) {
       return;
@@ -229,7 +229,7 @@ export class MeshManager {
     gl.uniformMatrix3fv(this.uniforms_.uNormalMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.uMvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.uPMatrix, false, pMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.uCamMatrix, false, camMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.uviewMatrix, false, viewMatrix);
     gl.uniform1f(this.uniforms_.uInSun, this.currentMeshObject.inSun);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.currentMeshObject.model.mesh.vertexBuffer);
@@ -243,7 +243,7 @@ export class MeshManager {
     gl.disable(gl.BLEND);
   }
 
-  drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLBuffer) {
+  drawOcclusion(pMatrix: mat4, viewMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLBuffer) {
     if (settingsManager.disableUI || settingsManager.isDrawLess) {
       return;
     }
@@ -266,7 +266,7 @@ export class MeshManager {
       occlusionPrgm.attrSetup(this.currentMeshObject.model.mesh.vertexBuffer, 80);
 
       // Set the uniforms
-      occlusionPrgm.uniformSetup(this.mvMatrix_, pMatrix, camMatrix);
+      occlusionPrgm.uniformSetup(this.mvMatrix_, pMatrix, viewMatrix);
 
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.currentMeshObject.model.mesh.indexBuffer);
       gl.drawElements(gl.TRIANGLES, this.currentMeshObject.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
@@ -466,7 +466,7 @@ export class MeshManager {
           // Draw Satellite Model if a satellite is selected and meshManager is loaded
           if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
             if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
-              this.draw(camera.getProjectionMatrix(), camera.camMatrix, buffer);
+              this.draw(camera.getProjectionMatrix(), camera.getViewMatrix(), buffer);
             }
           }
         });
@@ -822,7 +822,7 @@ export class MeshManager {
     };
 
     this.uniforms_.uPMatrix = gl.getUniformLocation(this.program_, 'uPMatrix') as WebGLUniformLocation;
-    this.uniforms_.uCamMatrix = gl.getUniformLocation(this.program_, 'uCamMatrix') as WebGLUniformLocation;
+    this.uniforms_.uviewMatrix = gl.getUniformLocation(this.program_, 'uviewMatrix') as WebGLUniformLocation;
     this.uniforms_.uMvMatrix = gl.getUniformLocation(this.program_, 'uMvMatrix') as WebGLUniformLocation;
     this.uniforms_.uNormalMatrix = gl.getUniformLocation(this.program_, 'uNormalMatrix') as WebGLUniformLocation;
     this.uniforms_.uLightDirection = gl.getUniformLocation(this.program_, 'uLightDirection') as WebGLUniformLocation;
@@ -874,7 +874,7 @@ export class MeshManager {
     in vec2 aTextureCoord;
 
     uniform mat4 uPMatrix;
-    uniform mat4 uCamMatrix;
+    uniform mat4 uviewMatrix;
     uniform mat4 uMvMatrix;
     uniform mat3 uNormalMatrix;
     uniform vec3 uLightDirection;
@@ -899,7 +899,7 @@ export class MeshManager {
       vSpecularExponent = aSpecularExponent;
       vInSun = uInSun;
 
-      vPosition = uCamMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
+      vPosition = uviewMatrix * uMvMatrix * vec4(aVertexPosition, 1.0);
       gl_Position = uPMatrix * vPosition;
       vTextureCoord = aTextureCoord;
       vTransformedNormal  = uNormalMatrix * aVertexNormal;

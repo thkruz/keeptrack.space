@@ -23,11 +23,11 @@ export type OcclusionProgram = {
   uniform: {
     uPMatrix: WebGLUniformLocation;
     uMvMatrix: WebGLUniformLocation;
-    uCamMatrix: WebGLUniformLocation;
+    uviewMatrix: WebGLUniformLocation;
   };
   attrSetup: (vertPosBuf: WebGLBuffer, stride?: number) => void;
   attrOff: () => void;
-  uniformSetup: (mvMatrix: mat4, pMatrix: mat4, camMatrix: mat4) => void;
+  uniformSetup: (mvMatrix: mat4, pMatrix: mat4, viewMatrix: mat4) => void;
 };
 
 export class PostProcessingManager {
@@ -45,11 +45,11 @@ export class PostProcessingManager {
       uniform: {
         uPMatrix: <WebGLUniformLocation><unknown>null,
         uMvMatrix: <WebGLUniformLocation><unknown>null,
-        uCamMatrix: <WebGLUniformLocation><unknown>null,
+        uviewMatrix: <WebGLUniformLocation><unknown>null,
       },
       attrSetup: null as unknown as (combinedBuf: WebGLBuffer, stride: number) => void,
       attrOff: null as unknown as () => void,
-      uniformSetup: null as unknown as (mvMatrix: vec4, pMatrix: vec4, camMatrix: vec4) => void,
+      uniformSetup: null as unknown as (mvMatrix: vec4, pMatrix: vec4, viewMatrix: vec4) => void,
     },
   };
 
@@ -104,7 +104,7 @@ export class PostProcessingManager {
       position: gl.getAttribLocation(this.programs.occlusion.program, 'a_position'),
     };
     const uPMatrixLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uPMatrix');
-    const cameraMatrixLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uCamMatrix');
+    const cameraMatrixLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uviewMatrix');
     const mvMatrixLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uMvMatrix');
 
     if (!uPMatrixLocation || !cameraMatrixLocation || !mvMatrixLocation) {
@@ -113,7 +113,7 @@ export class PostProcessingManager {
 
     this.programs.occlusion.uniform = {
       uPMatrix: uPMatrixLocation,
-      uCamMatrix: cameraMatrixLocation,
+      uviewMatrix: cameraMatrixLocation,
       uMvMatrix: mvMatrixLocation,
     };
     this.programs.occlusion.attrSetup = (combinedBuf: WebGLBuffer, stride = Float32Array.BYTES_PER_ELEMENT * 8): void => {
@@ -124,10 +124,10 @@ export class PostProcessingManager {
     this.programs.occlusion.attrOff = (): void => {
       gl.disableVertexAttribArray(this.programs.occlusion.attr.position);
     };
-    this.programs.occlusion.uniformSetup = (mvMatrix: mat4, pMatrix: mat4, camMatrix: mat4): void => {
+    this.programs.occlusion.uniformSetup = (mvMatrix: mat4, pMatrix: mat4, viewMatrix: mat4): void => {
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uMvMatrix, false, mvMatrix);
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uPMatrix, false, pMatrix);
-      gl.uniformMatrix4fv(this.programs.occlusion.uniform.uCamMatrix, false, camMatrix);
+      gl.uniformMatrix4fv(this.programs.occlusion.uniform.uviewMatrix, false, viewMatrix);
     };
   }
 

@@ -53,8 +53,8 @@ export class KeepTrackRenderer extends Renderer {
         scene.sun.draw(scene.earth.lightDirection, fb);
         if (scene.postProcessingManager.isInitialized) {
           scene.earth.drawOcclusion(
-            keepTrackApi.getMainCamera().getProjectionMatrix(),
-            camera.camMatrix,
+            camera.getProjectionMatrix(),
+            camera.getViewMatrix(),
             scene.postProcessingManager.programs.occlusion,
             scene.godrays.godraysFramebuffer,
           );
@@ -65,16 +65,16 @@ export class KeepTrackRenderer extends Renderer {
           keepTrackApi.getMainCamera().camDistBuffer <= settingsManager.nearZoomLevel
         ) {
           keepTrackApi.getMeshManager().drawOcclusion(
-            keepTrackApi.getMainCamera().getProjectionMatrix(),
-            camera.camMatrix,
+            camera.getProjectionMatrix(),
+            camera.getViewMatrix(),
             scene.postProcessingManager.programs.occlusion,
             scene.godrays.godraysFramebuffer,
           );
         }
         scene.postProcessingManager.curBuffer = null;
         scene.godrays.draw(
-          keepTrackApi.getMainCamera().getProjectionMatrix(),
-          camera.camMatrix,
+          camera.getProjectionMatrix(),
+          camera.getViewMatrix(),
           scene.postProcessingManager.curBuffer,
         );
       }
@@ -94,8 +94,8 @@ export class KeepTrackRenderer extends Renderer {
     }
     if (selectedSatelliteManager.selectedSat > -1) {
       scene.searchBox.draw(
-        keepTrackApi.getMainCamera().getProjectionMatrix(),
-        camera.camMatrix,
+        camera.getProjectionMatrix(),
+        camera.getViewMatrix(),
         scene.postProcessingManager.curBuffer,
       );
       scene.primaryCovBubble.render(

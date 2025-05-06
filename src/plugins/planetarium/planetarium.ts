@@ -32,6 +32,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import planetariumPng from '@public/img/icons/planetarium.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { Astronomy } from '../astronomy/astronomy';
+import { CameraMode } from '@app/keeptrack/camera/camera-modes/camera-mode';
 
 export class Planetarium extends KeepTrackPlugin {
   readonly id = 'Planetarium';
@@ -56,7 +57,8 @@ export class Planetarium extends KeepTrackPlugin {
 
     orbitManagerInstance.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
     if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
-      keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT;
+      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH;
+      keepTrackApi.getMainCamera().activeCameraMode = keepTrackApi.getMainCamera().cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
     }
 
     /*

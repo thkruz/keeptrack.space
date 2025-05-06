@@ -22,6 +22,7 @@
 import { Doris } from '@app/doris/doris';
 import { MenuMode, ToastMsgType } from '@app/interfaces';
 import { CameraType } from '@app/keeptrack/camera/legacy-camera';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { shake } from '@app/lib/shake';
@@ -30,7 +31,7 @@ import viewInAirPng from '@public/img/icons/view-in-air.png';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+import { CameraMode } from '@app/keeptrack/camera/camera-modes/camera-mode';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
   readonly id = 'SatelliteViewPlugin';
@@ -67,6 +68,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
 
       uiManagerInstance.hideSideMenus();
       keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT; // Back to normal Camera Mode
+      keepTrackApi.getMainCamera().activeCameraMode = keepTrackApi.getMainCamera().cameraModes.get(CameraType.FIXED_TO_SAT) as CameraMode;
       getEl(this.bottomIconElementName)!.classList.remove('bmenu-item-selected');
     } else if (this.selectSatManager_.selectedSat !== -1) {
       keepTrackApi.getMainCamera().cameraType = CameraType.SATELLITE; // Activate Satellite Camera Mode

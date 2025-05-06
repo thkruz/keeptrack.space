@@ -28,6 +28,7 @@ import { getEl } from '@app/lib/get-el';
 import { Doris } from '@app/doris/doris';
 import { WebGlEvents } from '@app/doris/events/event-types';
 import { MenuMode } from '@app/interfaces';
+import { CameraMode } from '@app/keeptrack/camera/camera-modes/camera-mode';
 import { keepTrackApi } from '@app/keepTrackApi';
 import constellationPng from '@public/img/icons/constellation.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -64,7 +65,8 @@ export class Astronomy extends KeepTrackPlugin {
       settingsManager.fieldOfView = 0.6;
       Doris.getInstance().emit(WebGlEvents.FovChanged);
       uiManagerInstance.hideSideMenus();
-      keepTrackApi.getMainCamera().cameraType = CameraType.DEFAULT; // Back to normal Camera Mode
+      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH; // Back to normal Camera Mode
+      keepTrackApi.getMainCamera().activeCameraMode = keepTrackApi.getMainCamera().cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
       // getEl('fov-text').innerHTML = ('');
       getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-selected');
     }

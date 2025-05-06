@@ -5,6 +5,7 @@ import { getEl, hideEl, showEl } from '@app/lib/get-el';
 
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { UrlManager } from '@app/static/url-manager';
@@ -15,7 +16,7 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
 import { SatInfoBox } from './sat-info-box';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+import { CameraMode } from '@app/keeptrack/camera/camera-modes/camera-mode';
 
 /**
  * This is the class that manages the selection of objects.
@@ -249,7 +250,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
       Doris.getInstance().emit(KeepTrackApiEvents.sensorDotSelected, sensor);
     }
@@ -332,9 +333,10 @@ export class SelectSatManager extends KeepTrackPlugin {
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
       keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
+      keepTrackApi.getMainCamera().activeCameraMode = keepTrackApi.getMainCamera().cameraModes.get(CameraType.FIXED_TO_SAT) as CameraMode;
     }
 
     // If we deselect an object but had previously selected one then disable/hide stuff

@@ -5,10 +5,10 @@ import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '@app/keeptrack/camera/legacy-camera';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class GamepadPlugin {
   readonly id = 'GamepadPlugin';
@@ -284,7 +284,7 @@ export class GamepadPlugin {
     let zoomTarget = keepTrackApi.getMainCamera().zoomLevel();
 
     switch (keepTrackApi.getMainCamera().cameraType) {
-      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_EARTH:
       case CameraType.OFFSET:
       case CameraType.FIXED_TO_SAT:
         zoomTarget += (zoomOut / 500) * tessaEngine.getTimeManager().getRealTimeDelta();
@@ -327,7 +327,7 @@ export class GamepadPlugin {
       settingsManager.lastGamepadMovement = Date.now();
 
       switch (keepTrackApi.getMainCamera().cameraType) {
-        case CameraType.DEFAULT:
+        case CameraType.FIXED_TO_EARTH:
         case CameraType.OFFSET:
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().camAngleSnappedOnSat = false;
@@ -366,7 +366,7 @@ export class GamepadPlugin {
     if (y > this.deadzone || y < -this.deadzone || x > this.deadzone || x < -this.deadzone) {
       keepTrackApi.getMainCamera().autoRotate(false);
       switch (keepTrackApi.getMainCamera().cameraType) {
-        case CameraType.DEFAULT:
+        case CameraType.FIXED_TO_EARTH:
         case CameraType.OFFSET:
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().isLocalRotateOverride = true;

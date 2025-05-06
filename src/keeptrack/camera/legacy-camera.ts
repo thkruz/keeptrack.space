@@ -27,8 +27,6 @@ import { CoreEngineEvents, WebGlEvents } from '@app/doris/events/event-types';
 import { SatShader, ToastMsgType } from '@app/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
-import { AstronomyCameraMode } from '@app/plugins-pro/astronomy/astronomy-camera-mode';
-import { PlanetariumCameraMode } from '@app/plugins-pro/planetarium/planetarium-camera-mode';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3, vec4 } from 'gl-matrix';
 import {
@@ -254,15 +252,11 @@ export class LegacyCamera extends PerspectiveCamera {
     const fixedToEarthCameraMode = new FixedToEarthCameraMode(this);
     const fixedToSatelliteCameraMode = new FixedToSatelliteCameraMode(this);
     const firstPersonCameraMode = new FirstPersonCameraMode(this);
-    const planetariumCameraMode = new PlanetariumCameraMode(this); // Placeholder, should be replaced with actual implementation
-    const astronomyCameraMode = new AstronomyCameraMode(this); // Placeholder, should be replaced with actual implementation
 
     this.cameraModes = new Map<CameraType, CameraMode>();
     this.cameraModes.set(CameraType.FIXED_TO_EARTH, fixedToEarthCameraMode);
     this.cameraModes.set(CameraType.FIXED_TO_SAT, fixedToSatelliteCameraMode);
     this.cameraModes.set(CameraType.FPS, firstPersonCameraMode);
-    this.cameraModes.set(CameraType.PLANETARIUM, planetariumCameraMode);
-    this.cameraModes.set(CameraType.ASTRONOMY, astronomyCameraMode);
 
     // Set the default active camera mode
     this.activeCameraMode = fixedToEarthCameraMode;

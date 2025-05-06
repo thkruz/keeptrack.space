@@ -44,6 +44,7 @@ import { KeepTrackApiEvents } from '../events/event-types';
 import { CameraMode } from './camera-modes/camera-mode';
 import { FirstPersonCameraMode } from './camera-modes/first-person';
 import { FixedToEarthCameraMode } from './camera-modes/fixed-to-earth';
+import { FixedToEarthOffsetCameraMode } from './camera-modes/fixed-to-earth-offset';
 import { FixedToSatelliteCameraMode } from './camera-modes/fixed-to-satellite';
 
 /**
@@ -250,11 +251,13 @@ export class LegacyCamera extends PerspectiveCamera {
 
     // Store all camera modes in a map for easy access and extensibility
     const fixedToEarthCameraMode = new FixedToEarthCameraMode(this);
+    const fixedToEarthOffsetCameraMode = new FixedToEarthOffsetCameraMode(this);
     const fixedToSatelliteCameraMode = new FixedToSatelliteCameraMode(this);
     const firstPersonCameraMode = new FirstPersonCameraMode(this);
 
     this.cameraModes = new Map<CameraType, CameraMode>();
     this.cameraModes.set(CameraType.FIXED_TO_EARTH, fixedToEarthCameraMode);
+    this.cameraModes.set(CameraType.OFFSET, fixedToEarthOffsetCameraMode);
     this.cameraModes.set(CameraType.FIXED_TO_SAT, fixedToSatelliteCameraMode);
     this.cameraModes.set(CameraType.FPS, firstPersonCameraMode);
 
@@ -622,7 +625,8 @@ export class LegacyCamera extends PerspectiveCamera {
       this.cameraType !== CameraType.FIXED_TO_SAT &&
       this.cameraType !== CameraType.FPS &&
       this.cameraType !== CameraType.ASTRONOMY &&
-      this.cameraType !== CameraType.PLANETARIUM
+      this.cameraType !== CameraType.PLANETARIUM &&
+      this.cameraType !== CameraType.OFFSET
     ) {
       this.activeCameraMode = null;
     }
@@ -632,9 +636,6 @@ export class LegacyCamera extends PerspectiveCamera {
       this.activeCameraMode.render();
     } else {
       switch (this.cameraType) {
-        case CameraType.OFFSET: // pivot around the earth with earth offset to the bottom right
-          this.drawOffsetOfEarth_();
-          break;
         case CameraType.SATELLITE: {
           if (keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj) {
             this.drawSatellite_(keepTrackApi.getPlugin(SelectSatManager)!.primarySatObj);
@@ -1395,20 +1396,6 @@ export class LegacyCamera extends PerspectiveCamera {
 
   setZoomLevel(zoomLevel: number) {
     this.zoomLevel_ = zoomLevel;
-  }
-
-  private drawOffsetOfEarth_() {
-    // Rotate the camera
-    mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
-    mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
-    // Adjust for panning
-    mat4.translate(this.camMatrix, this.camMatrix, [this.panCurrent.x, this.panCurrent.y, this.panCurrent.z]);
-    // Back away from the earth
-    mat4.translate(this.camMatrix, this.camMatrix, [this.settings_.offsetCameraModeX, this.getCameraDistance(), this.settings_.offsetCameraModeZ]);
-    // Adjust for FPS style rotation
-    mat4.rotateX(this.camMatrix, this.camMatrix, this.earthCenteredPitch);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.earthCenteredYaw);
   }
 
   private drawPreValidate_(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null) {

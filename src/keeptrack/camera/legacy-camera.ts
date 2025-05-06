@@ -42,8 +42,9 @@ import type { OrbitManager } from '../../singletons/orbitManager';
 import { SatMath } from '../../static/sat-math';
 import { KeepTrackApiEvents } from '../events/event-types';
 import { CameraMode } from './camera-modes/camera-mode';
-import { FixedToEarth } from './camera-modes/fixed-to-earth';
-import { FixedToSatellite } from './camera-modes/fixed-to-satellite';
+import { FirstPersonCameraMode } from './camera-modes/first-person';
+import { FixedToEarthCameraMode } from './camera-modes/fixed-to-earth';
+import { FixedToSatelliteCameraMode } from './camera-modes/fixed-to-satellite';
 
 /**
  * Represents the different types of cameras available.
@@ -77,7 +78,7 @@ export class LegacyCamera extends PerspectiveCamera {
   earthCenteredPitch = <Radians>0;
   earthCenteredYaw = <Radians>0;
   private fpsLastTime_ = <Milliseconds>0;
-  private fpsPos_ = <vec3>[0, 25000, 0];
+  fpsPos = <vec3>[0, 25000, 0];
   ftsYaw = <Radians>0;
   private isAutoRotate_ = true;
   private isFPSForwardSpeedLock_ = false;
@@ -248,12 +249,14 @@ export class LegacyCamera extends PerspectiveCamera {
     });
 
     // Store all camera modes in a map for easy access and extensibility
-    const fixedToEarthCameraMode = new FixedToEarth(this);
-    const fixedToSatelliteCameraMode = new FixedToSatellite(this);
+    const fixedToEarthCameraMode = new FixedToEarthCameraMode(this);
+    const fixedToSatelliteCameraMode = new FixedToSatelliteCameraMode(this);
+    const firstPersonCameraMode = new FirstPersonCameraMode(this);
 
     this.cameraModes = new Map<CameraType, CameraMode>();
     this.cameraModes.set(CameraType.FIXED_TO_EARTH, fixedToEarthCameraMode);
     this.cameraModes.set(CameraType.FIXED_TO_SAT, fixedToSatelliteCameraMode);
+    this.cameraModes.set(CameraType.FPS, firstPersonCameraMode);
 
     // Set the default active camera mode
     this.activeCameraMode = fixedToEarthCameraMode;
@@ -441,6 +444,7 @@ export class LegacyCamera extends PerspectiveCamera {
         break;
       case CameraType.FIXED_TO_SAT:
         this.cameraType = CameraType.FPS;
+        this.activeCameraMode = this.cameraModes.get(CameraType.FPS) as CameraMode;
         break;
       case CameraType.FPS:
         this.cameraType = CameraType.SATELLITE;
@@ -612,7 +616,11 @@ export class LegacyCamera extends PerspectiveCamera {
      */
 
     // TODO: This is just for testing as we migrate to the new camera system
-    if (this.cameraType !== CameraType.FIXED_TO_EARTH && this.cameraType !== CameraType.FIXED_TO_SAT) {
+    if (
+      this.cameraType !== CameraType.FIXED_TO_EARTH &&
+      this.cameraType !== CameraType.FIXED_TO_SAT &&
+      this.cameraType !== CameraType.FPS
+    ) {
       this.activeCameraMode = null;
     }
 
@@ -623,9 +631,6 @@ export class LegacyCamera extends PerspectiveCamera {
       switch (this.cameraType) {
         case CameraType.OFFSET: // pivot around the earth with earth offset to the bottom right
           this.drawOffsetOfEarth_();
-          break;
-        case CameraType.FPS: // FPS style movement
-          this.drawFirstPersonView_();
           break;
         case CameraType.PLANETARIUM: {
           /*
@@ -1416,9 +1421,9 @@ export class LegacyCamera extends PerspectiveCamera {
 
     const sensorPosU = vec3.fromValues(-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01);
 
-    this.fpsPos_[0] = sensorPos.x;
-    this.fpsPos_[1] = sensorPos.y;
-    this.fpsPos_[2] = sensorPos.z;
+    this.fpsPos[0] = sensorPos.x;
+    this.fpsPos[1] = sensorPos.y;
+    this.fpsPos[2] = sensorPos.z;
 
     mat4.rotate(this.camMatrix, this.camMatrix, this.fpsPitch + -this.fpsPitch * DEG2RAD, [1, 0, 0]);
     mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsRotate * DEG2RAD, [0, 1, 0]);
@@ -1434,14 +1439,6 @@ export class LegacyCamera extends PerspectiveCamera {
      * mat4.fromQuat(newrot, q);
      * mat4.multiply(this.camMatrix, newrot, this.camMatrix);
      */
-  }
-
-  private drawFirstPersonView_() {
-    // Rotate the camera
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsYaw * DEG2RAD, [0, 0, 1]);
-    // Move the camera to the FPS position
-    mat4.translate(this.camMatrix, this.camMatrix, [this.fpsPos_[0], this.fpsPos_[1], -this.fpsPos_[2]]);
   }
 
   private drawOffsetOfEarth_() {
@@ -1523,15 +1520,15 @@ export class LegacyCamera extends PerspectiveCamera {
   private resetFpsPos_(): void {
     this.fpsPitch = <Degrees>0;
     this.fpsYaw = <Degrees>0;
-    this.fpsPos_[0] = 0;
+    this.fpsPos[0] = 0;
 
     // Move out from the center of the Earth in FPS Mode
     if (this.cameraType === CameraType.FPS) {
-      this.fpsPos_[1] = 25000;
+      this.fpsPos[1] = 25000;
     } else {
-      this.fpsPos_[1] = 0;
+      this.fpsPos[1] = 0;
     }
-    this.fpsPos_[2] = 0;
+    this.fpsPos[2] = 0;
   }
 
   private updateCameraSnapMode(dt: Milliseconds) {
@@ -1597,16 +1594,16 @@ export class LegacyCamera extends PerspectiveCamera {
 
       if (this.cameraType === CameraType.FPS) {
         if (this.fpsForwardSpeed !== 0) {
-          this.fpsPos_[0] -= Math.sin(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
-          this.fpsPos_[1] -= Math.cos(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
-          this.fpsPos_[2] += Math.sin(this.fpsPitch * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
+          this.fpsPos[0] -= Math.sin(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
+          this.fpsPos[1] -= Math.cos(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
+          this.fpsPos[2] += Math.sin(this.fpsPitch * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
         }
         if (this.fpsVertSpeed !== 0) {
-          this.fpsPos_[2] -= this.fpsVertSpeed * this.fpsRun * fpsElapsed;
+          this.fpsPos[2] -= this.fpsVertSpeed * this.fpsRun * fpsElapsed;
         }
         if (this.fpsSideSpeed !== 0) {
-          this.fpsPos_[0] -= Math.cos(-this.fpsYaw * DEG2RAD) * this.fpsSideSpeed * this.fpsRun * fpsElapsed;
-          this.fpsPos_[1] -= Math.sin(-this.fpsYaw * DEG2RAD) * this.fpsSideSpeed * this.fpsRun * fpsElapsed;
+          this.fpsPos[0] -= Math.cos(-this.fpsYaw * DEG2RAD) * this.fpsSideSpeed * this.fpsRun * fpsElapsed;
+          this.fpsPos[1] -= Math.sin(-this.fpsYaw * DEG2RAD) * this.fpsSideSpeed * this.fpsRun * fpsElapsed;
         }
       }
 
@@ -1801,9 +1798,9 @@ export class LegacyCamera extends PerspectiveCamera {
       this.panCurrent.x += panResetModifier * this.panMovementSpeed_ * this.panDif_.x;
       // If we are moving like an FPS then Y and Z are based on the angle of the this
       if (this.isWorldPan) {
-        this.fpsPos_[1] = <Radians>(this.fpsPos_[1] - Math.cos(this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
-        this.fpsPos_[2] = <Radians>(this.fpsPos_[1] + Math.sin(this.localRotateCurrent.pitch) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
-        this.fpsPos_[1] = <Radians>(this.fpsPos_[1] - Math.sin(-this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.x);
+        this.fpsPos[1] = <Radians>(this.fpsPos[1] - Math.cos(this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
+        this.fpsPos[2] = <Radians>(this.fpsPos[1] + Math.sin(this.localRotateCurrent.pitch) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
+        this.fpsPos[1] = <Radians>(this.fpsPos[1] - Math.sin(-this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.x);
       }
       // If we are moving the screen then Z is always up and Y is not relevant
       if (this.isScreenPan || this.isPanReset) {
@@ -1813,9 +1810,9 @@ export class LegacyCamera extends PerspectiveCamera {
       }
 
       if (this.isPanReset) {
-        this.fpsPos_[0] -= this.fpsPos_[0] / 25;
-        this.fpsPos_[1] -= this.fpsPos_[1] / 25;
-        this.fpsPos_[2] -= this.fpsPos_[2] / 25;
+        this.fpsPos[0] -= this.fpsPos[0] / 25;
+        this.fpsPos[1] -= this.fpsPos[1] / 25;
+        this.fpsPos[2] -= this.fpsPos[2] / 25;
 
         if (this.panCurrent.x > -0.5 && this.panCurrent.x < 0.5) {
           this.panCurrent.x = 0;
@@ -1826,17 +1823,17 @@ export class LegacyCamera extends PerspectiveCamera {
         if (this.panCurrent.z > -0.5 && this.panCurrent.z < 0.5) {
           this.panCurrent.z = 0;
         }
-        if (this.fpsPos_[0] > -0.5 && this.fpsPos_[0] < 0.5) {
-          this.fpsPos_[0] = 0;
+        if (this.fpsPos[0] > -0.5 && this.fpsPos[0] < 0.5) {
+          this.fpsPos[0] = 0;
         }
-        if (this.fpsPos_[1] > -0.5 && this.fpsPos_[1] < 0.5) {
-          this.fpsPos_[1] = 0;
+        if (this.fpsPos[1] > -0.5 && this.fpsPos[1] < 0.5) {
+          this.fpsPos[1] = 0;
         }
-        if (this.fpsPos_[2] > -0.5 && this.fpsPos_[2] < 0.5) {
-          this.fpsPos_[2] = 0;
+        if (this.fpsPos[2] > -0.5 && this.fpsPos[2] < 0.5) {
+          this.fpsPos[2] = 0;
         }
 
-        if (this.panCurrent.x === 0 && this.panCurrent.y === 0 && this.panCurrent.z === 0 && this.fpsPos_[0] === 0 && this.fpsPos_[1] === 0 && this.fpsPos_[2] === 0) {
+        if (this.panCurrent.x === 0 && this.panCurrent.y === 0 && this.panCurrent.z === 0 && this.fpsPos[0] === 0 && this.fpsPos[1] === 0 && this.fpsPos[2] === 0) {
           this.isPanReset = false;
         }
       }

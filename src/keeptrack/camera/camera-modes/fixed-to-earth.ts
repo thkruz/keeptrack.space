@@ -4,7 +4,7 @@ import { mat4 } from 'gl-matrix';
 import { CameraType, LegacyCamera } from '../legacy-camera';
 import { CameraMode } from './camera-mode';
 
-export class FixedToEarth extends CameraMode {
+export class FixedToEarthCameraMode extends CameraMode {
   isInitialized_ = false;
 
   constructor(camera: LegacyCamera) {

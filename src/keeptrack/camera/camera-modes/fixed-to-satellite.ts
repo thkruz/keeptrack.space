@@ -8,7 +8,7 @@ import { GreenwichMeanSiderealTime, RADIUS_OF_EARTH } from 'ootk';
 import { CameraType, LegacyCamera } from '../legacy-camera';
 import { CameraMode } from './camera-mode';
 
-export class FixedToSatellite extends CameraMode {
+export class FixedToSatelliteCameraMode extends CameraMode {
   isInitialized_ = false;
 
   constructor(camera: LegacyCamera) {

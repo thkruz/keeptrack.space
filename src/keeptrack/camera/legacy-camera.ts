@@ -28,13 +28,14 @@ import { SatShader, ToastMsgType } from '@app/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { mat4, quat, vec3, vec4 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 import {
   BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians,
   Star, TAU, ZoomValue, eci2lla,
 } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../../lib/transforms';
+import { SatelliteViewCameraMode } from '../../plugins/satellite-view/satellite-view-camera-mode';
 import { SettingsManager } from '../../settings/settings';
 import { MissileObject } from '../../singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '../../singletons/errorManager';
@@ -254,12 +255,14 @@ export class LegacyCamera extends PerspectiveCamera {
     const fixedToEarthOffsetCameraMode = new FixedToEarthOffsetCameraMode(this);
     const fixedToSatelliteCameraMode = new FixedToSatelliteCameraMode(this);
     const firstPersonCameraMode = new FirstPersonCameraMode(this);
+    const satelliteViewCameraMode = new SatelliteViewCameraMode(this);
 
     this.cameraModes = new Map<CameraType, CameraMode>();
     this.cameraModes.set(CameraType.FIXED_TO_EARTH, fixedToEarthCameraMode);
     this.cameraModes.set(CameraType.OFFSET, fixedToEarthOffsetCameraMode);
     this.cameraModes.set(CameraType.FIXED_TO_SAT, fixedToSatelliteCameraMode);
     this.cameraModes.set(CameraType.FPS, firstPersonCameraMode);
+    this.cameraModes.set(CameraType.SATELLITE, satelliteViewCameraMode);
 
     // Set the default active camera mode
     this.activeCameraMode = fixedToEarthCameraMode;
@@ -597,58 +600,19 @@ export class LegacyCamera extends PerspectiveCamera {
    * Splitting it into subfunctions would not be optimal
    */
   draw(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-
-    if (!timeManagerInstance.simulationTimeObj) {
+    if (!keepTrackApi.getTimeManager().simulationTimeObj) {
       return;
     }
 
     this.drawPreValidate_(sensorPos);
     mat4.identity(this.camMatrix);
 
-    /*
-     * if (this.cameraType === CameraType.SATELLITE) {
-     *   if (target.id === -1 || target.type === SpaceObjectType.STAR) {
-     *     this.cameraType = CameraType.FIXED_TO_EARTH;
-     *   }
-     * }
-     */
-
-    /*
-     * For FPS style movement rotate the this and then translate it
-     * for traditional view, move the this and then rotate it
-     */
-
-    // TODO: This is just for testing as we migrate to the new camera system
-    if (
-      this.cameraType !== CameraType.FIXED_TO_EARTH &&
-      this.cameraType !== CameraType.FIXED_TO_SAT &&
-      this.cameraType !== CameraType.FPS &&
-      this.cameraType !== CameraType.ASTRONOMY &&
-      this.cameraType !== CameraType.PLANETARIUM &&
-      this.cameraType !== CameraType.OFFSET
-    ) {
-      this.activeCameraMode = null;
+    if (!this.activeCameraMode) {
+      // TODO: This shouldn't be possible
+      throw new Error('No active camera mode');
     }
 
-
-    if (this.activeCameraMode) {
-      this.activeCameraMode.render();
-    } else {
-      switch (this.cameraType) {
-        case CameraType.SATELLITE: {
-          if (keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj) {
-            this.drawSatellite_(keepTrackApi.getPlugin(SelectSatManager)!.primarySatObj);
-          } else {
-            this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
-            this.activeCameraMode.render();
-          }
-          break;
-        }
-        default:
-          break;
-      }
-    }
+    this.activeCameraMode.render();
   }
 
   exitFixedToSat(): void {
@@ -1431,25 +1395,6 @@ export class LegacyCamera extends PerspectiveCamera {
       this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
       errorManagerInstance.debug('A sensor should be selected first if this mode is allowed to be planetarium or astronmy.');
     }
-  }
-
-  private drawSatellite_(target: DetailedSatellite | MissileObject) {
-    const targetPositionTemp = vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
-
-    mat4.translate(this.camMatrix, this.camMatrix, targetPositionTemp);
-    vec3.normalize(this.normUp, targetPositionTemp);
-    vec3.normalize(this.normForward, [target.velocity.x, target.velocity.y, target.velocity.z]);
-    vec3.transformQuat(this.normLeft, this.normUp, quat.fromValues(this.normForward[0], this.normForward[1], this.normForward[2], 90 * DEG2RAD));
-    const targetNextPosition = vec3.fromValues(target.position.x + target.velocity.x, target.position.y + target.velocity.y, target.position.z + target.velocity.z);
-
-    mat4.lookAt(this.camMatrix, targetNextPosition, targetPositionTemp, this.normUp);
-
-    mat4.translate(this.camMatrix, this.camMatrix, [target.position.x, target.position.y, target.position.z]);
-
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsPitch * DEG2RAD, this.normLeft);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsYaw * DEG2RAD, this.normUp);
-
-    mat4.translate(this.camMatrix, this.camMatrix, targetPositionTemp);
   }
 
   private resetFpsPos_(): void {

@@ -20,6 +20,7 @@
 
 import { Doris } from '@app/doris/doris';
 import { MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
 import type { KeepTrackPlugins } from '@app/plugins/plugins';
@@ -37,7 +38,6 @@ import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 import { sateliot } from './presets/sateliot';
 import { starTalk } from './presets/startalk';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SettingsManager {
   /**
@@ -997,11 +997,11 @@ export class SettingsManager {
     /**
      * The minimum size of objects in the shader when in planetarium mode.
      */
-    minSizePlanetarium: 20.0,
+    minSizePlanetarium: 5.5,
     /**
      * The maximum size of objects in the shader when in planetarium mode.
      */
-    maxSizePlanetarium: 20.0,
+    maxSizePlanetarium: 10.0,
     /**
      * The maximum allowed size of objects in the shader.
      * This value is dynamically changed based on zoom level.

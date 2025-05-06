@@ -27,6 +27,8 @@ import { CoreEngineEvents, WebGlEvents } from '@app/doris/events/event-types';
 import { SatShader, ToastMsgType } from '@app/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
+import { AstronomyCameraMode } from '@app/plugins-pro/astronomy/astronomy-camera-mode';
+import { PlanetariumCameraMode } from '@app/plugins-pro/planetarium/planetarium-camera-mode';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3, vec4 } from 'gl-matrix';
 import {
@@ -92,9 +94,9 @@ export class LegacyCamera extends PerspectiveCamera {
     yaw: <Radians>0,
   };
 
-  private normForward_ = vec3.create();
-  private normLeft_ = vec3.create();
-  private normUp_ = vec3.create();
+  normForward = vec3.create();
+  normLeft = vec3.create();
+  normUp = vec3.create();
   private panDif_ = {
     x: 0,
     y: 0,
@@ -252,11 +254,15 @@ export class LegacyCamera extends PerspectiveCamera {
     const fixedToEarthCameraMode = new FixedToEarthCameraMode(this);
     const fixedToSatelliteCameraMode = new FixedToSatelliteCameraMode(this);
     const firstPersonCameraMode = new FirstPersonCameraMode(this);
+    const planetariumCameraMode = new PlanetariumCameraMode(this); // Placeholder, should be replaced with actual implementation
+    const astronomyCameraMode = new AstronomyCameraMode(this); // Placeholder, should be replaced with actual implementation
 
     this.cameraModes = new Map<CameraType, CameraMode>();
     this.cameraModes.set(CameraType.FIXED_TO_EARTH, fixedToEarthCameraMode);
     this.cameraModes.set(CameraType.FIXED_TO_SAT, fixedToSatelliteCameraMode);
     this.cameraModes.set(CameraType.FPS, firstPersonCameraMode);
+    this.cameraModes.set(CameraType.PLANETARIUM, planetariumCameraMode);
+    this.cameraModes.set(CameraType.ASTRONOMY, astronomyCameraMode);
 
     // Set the default active camera mode
     this.activeCameraMode = fixedToEarthCameraMode;
@@ -451,6 +457,7 @@ export class LegacyCamera extends PerspectiveCamera {
         break;
       case CameraType.SATELLITE:
         this.cameraType = CameraType.FIXED_TO_EARTH;
+        this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
         break;
       default:
         this.cameraType = CameraType.MAX_CAMERA_TYPES;
@@ -619,7 +626,9 @@ export class LegacyCamera extends PerspectiveCamera {
     if (
       this.cameraType !== CameraType.FIXED_TO_EARTH &&
       this.cameraType !== CameraType.FIXED_TO_SAT &&
-      this.cameraType !== CameraType.FPS
+      this.cameraType !== CameraType.FPS &&
+      this.cameraType !== CameraType.ASTRONOMY &&
+      this.cameraType !== CameraType.PLANETARIUM
     ) {
       this.activeCameraMode = null;
     }
@@ -632,17 +641,6 @@ export class LegacyCamera extends PerspectiveCamera {
         case CameraType.OFFSET: // pivot around the earth with earth offset to the bottom right
           this.drawOffsetOfEarth_();
           break;
-        case CameraType.PLANETARIUM: {
-          /*
-           * Pitch is the opposite of the angle to the latitude
-           * Yaw is 90 degrees to the left of the angle to the longitude
-           */
-          if (!sensorPos) {
-            throw new Error('Sensor Position is undefined');
-          }
-          this.drawPlanetarium_(sensorPos);
-          break;
-        }
         case CameraType.SATELLITE: {
           if (keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj) {
             this.drawSatellite_(keepTrackApi.getPlugin(SelectSatManager)!.primarySatObj);
@@ -650,17 +648,6 @@ export class LegacyCamera extends PerspectiveCamera {
             this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
             this.activeCameraMode.render();
           }
-          break;
-        }
-        case CameraType.ASTRONOMY: {
-          /*
-           * Pitch is the opposite of the angle to the latitude
-           * Yaw is 90 degrees to the left of the angle to the longitude
-           */
-          if (!sensorPos) {
-            throw new Error('Sensor Position is undefined');
-          }
-          this.drawAstronomy_(sensorPos);
           break;
         }
         default:
@@ -1326,7 +1313,7 @@ export class LegacyCamera extends PerspectiveCamera {
 
     this.camRotateSpeed -= this.camRotateSpeed * dt * this.settings_.cameraMovementSpeed;
 
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
+    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY || this.cameraType === CameraType.PLANETARIUM) {
       this.updateFpsMovement_(dt);
     } else {
       if (this.camPitchSpeed !== 0) {
@@ -1416,31 +1403,6 @@ export class LegacyCamera extends PerspectiveCamera {
     this.zoomLevel_ = zoomLevel;
   }
 
-  private drawAstronomy_(sensorPos: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
-    this.fpsPitch = <Degrees>(-1 * sensorPos.lat * DEG2RAD);
-
-    const sensorPosU = vec3.fromValues(-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01);
-
-    this.fpsPos[0] = sensorPos.x;
-    this.fpsPos[1] = sensorPos.y;
-    this.fpsPos[2] = sensorPos.z;
-
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsPitch + -this.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsRotate * DEG2RAD, [0, 1, 0]);
-    vec3.normalize(this.normUp_, sensorPosU);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsYaw * DEG2RAD, this.normUp_);
-
-    mat4.translate(this.camMatrix, this.camMatrix, [-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01]);
-
-    /*
-     * const q = quat.create();
-     * const newrot = mat4.create();
-     * quat.fromEuler(q, this.ftsPitch * RAD2DEG, 0, -this.ftsYaw_ * RAD2DEG);
-     * mat4.fromQuat(newrot, q);
-     * mat4.multiply(this.camMatrix, newrot, this.camMatrix);
-     */
-  }
-
   private drawOffsetOfEarth_() {
     // Rotate the camera
     mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
@@ -1453,14 +1415,6 @@ export class LegacyCamera extends PerspectiveCamera {
     // Adjust for FPS style rotation
     mat4.rotateX(this.camMatrix, this.camMatrix, this.earthCenteredPitch);
     mat4.rotateZ(this.camMatrix, this.camMatrix, -this.earthCenteredYaw);
-  }
-
-  private drawPlanetarium_(sensorPos: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
-    this.fpsPitch = <Degrees>(-1 * sensorPos.lat * DEG2RAD);
-    this.fpsRotate = <Degrees>((90 - sensorPos.lon) * DEG2RAD - sensorPos.gmst);
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsPitch, [1, 0, 0]);
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsRotate, [0, 0, 1]);
-    mat4.translate(this.camMatrix, this.camMatrix, [-sensorPos.x, -sensorPos.y, -sensorPos.z]);
   }
 
   private drawPreValidate_(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null) {
@@ -1502,17 +1456,17 @@ export class LegacyCamera extends PerspectiveCamera {
     const targetPositionTemp = vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
 
     mat4.translate(this.camMatrix, this.camMatrix, targetPositionTemp);
-    vec3.normalize(this.normUp_, targetPositionTemp);
-    vec3.normalize(this.normForward_, [target.velocity.x, target.velocity.y, target.velocity.z]);
-    vec3.transformQuat(this.normLeft_, this.normUp_, quat.fromValues(this.normForward_[0], this.normForward_[1], this.normForward_[2], 90 * DEG2RAD));
+    vec3.normalize(this.normUp, targetPositionTemp);
+    vec3.normalize(this.normForward, [target.velocity.x, target.velocity.y, target.velocity.z]);
+    vec3.transformQuat(this.normLeft, this.normUp, quat.fromValues(this.normForward[0], this.normForward[1], this.normForward[2], 90 * DEG2RAD));
     const targetNextPosition = vec3.fromValues(target.position.x + target.velocity.x, target.position.y + target.velocity.y, target.position.z + target.velocity.z);
 
-    mat4.lookAt(this.camMatrix, targetNextPosition, targetPositionTemp, this.normUp_);
+    mat4.lookAt(this.camMatrix, targetNextPosition, targetPositionTemp, this.normUp);
 
     mat4.translate(this.camMatrix, this.camMatrix, [target.position.x, target.position.y, target.position.z]);
 
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsPitch * DEG2RAD, this.normLeft_);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsYaw * DEG2RAD, this.normUp_);
+    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsPitch * DEG2RAD, this.normLeft);
+    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsYaw * DEG2RAD, this.normUp);
 
     mat4.translate(this.camMatrix, this.camMatrix, targetPositionTemp);
   }

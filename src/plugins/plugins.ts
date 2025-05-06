@@ -8,11 +8,13 @@ import * as catalogLoader from '@app/static/catalog-loader';
 
 import googleAnalytics from '@analytics/google-analytics';
 import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import createAnalytics from 'analytics';
 import { getEl, hideEl, showEl } from '../lib/get-el';
+import { AstronomyPlugin } from '../plugins-pro/astronomy/astronomy';
+import { PlanetariumPlugin } from '../plugins-pro/planetarium/planetarium';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { AnalysisMenu } from './analysis/analysis';
-import { Astronomy } from './astronomy/astronomy';
 import { Breakup } from './breakup/breakup';
 import { Calculator } from './calculator/calculator';
 import { ClassificationBar } from './classification-bar/classification-bar';
@@ -34,7 +36,6 @@ import { NewLaunch } from './new-launch/new-launch';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
 import { OrbitReferences } from './orbit-references/orbit-references';
-import { Planetarium } from './planetarium/planetarium';
 import { EcfPlot } from './plot-analysis/ecf-plots';
 import { EciPlot } from './plot-analysis/eci-plots';
 import { Inc2AltPlots } from './plot-analysis/inc2alt';
@@ -72,7 +73,6 @@ import { TransponderChannelData } from './transponder-channel-data/transponder-c
 import { VideoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export type KeepTrackPlugins = {
   filterMenu?: boolean;
@@ -180,8 +180,8 @@ export const loadPlugins = (plugins: KeepTrackPlugins): void => {
       { init: () => new SensorSurvFence().init(), enabled: plugins.sensorSurv },
       { init: () => new SatelliteViewPlugin().init(), enabled: plugins.satelliteView },
       { init: () => new SatelliteFov().init(), enabled: plugins.satelliteFov },
-      { init: () => new Planetarium().init(), enabled: plugins.planetarium },
-      { init: () => new Astronomy().init(), enabled: plugins.astronomy },
+      { init: () => new PlanetariumPlugin().init(), enabled: plugins.planetarium },
+      { init: () => new AstronomyPlugin().init(), enabled: plugins.astronomy },
       { init: () => new NightToggle().init(), enabled: plugins.nightToggle },
       { init: () => new DopsPlugin().init(), enabled: plugins.dops },
       { init: () => new SatConstellations().init(), enabled: plugins.constellations },

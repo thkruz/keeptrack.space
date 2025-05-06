@@ -1,5 +1,6 @@
 import { Doris } from '@app/doris/doris';
 import { MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl } from '@app/lib/get-el';
 import { slideInRight } from '@app/lib/slide';
@@ -12,14 +13,13 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import sensorAddPng from '@public/img/icons/sensor-add.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
-import { Astronomy } from '../astronomy/astronomy';
+import { AstronomyPlugin } from '../../plugins-pro/astronomy/astronomy';
+import { PlanetariumPlugin } from '../../plugins-pro/planetarium/planetarium';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
-import { Planetarium } from '../planetarium/planetarium';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { SoundNames } from '../sounds/SoundNames';
 import { SensorInfoPlugin } from './sensor-info-plugin';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   readonly id = 'CustomSensorPlugin';
@@ -283,8 +283,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(PlanetariumPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(AstronomyPlugin)?.setBottomIconToUnselected();
 
     (<HTMLInputElement>getEl('sensor-type')).value = (<HTMLInputElement>getEl('cs-type')).value.replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
     getEl('sensor-info-title')!.innerHTML = 'Custom Sensor';

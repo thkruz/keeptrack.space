@@ -25,6 +25,7 @@
 
 import { sensors } from '@app/catalogs/sensors';
 import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { openColorbox } from '@app/lib/colorbox';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
 import { getEl, setInnerHtml } from '@app/lib/get-el';
@@ -41,13 +42,12 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from 'ootk';
 import { sensorGroups } from '../../catalogs/sensor-groups';
 import { keepTrackApi } from '../../keepTrackApi';
-import { Astronomy } from '../astronomy/astronomy';
-import { Planetarium } from '../planetarium/planetarium';
+import { AstronomyPlugin } from '../../plugins-pro/astronomy/astronomy';
+import { PlanetariumPlugin } from '../../plugins-pro/planetarium/planetarium';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { LookAnglesPlugin } from './look-angles-plugin';
 import { SensorInfoPlugin } from './sensor-info-plugin';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 
 export class SensorManager {
@@ -283,8 +283,8 @@ export class SensorManager {
     keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(PlanetariumPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(AstronomyPlugin)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToDisabled();
     keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
@@ -293,10 +293,10 @@ export class SensorManager {
     keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToDisabled();
     keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToDisabled();
-    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToDisabled();
-    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(PlanetariumPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(PlanetariumPlugin)?.setBottomIconToDisabled();
+    keepTrackApi.getPlugin(AstronomyPlugin)?.setBottomIconToUnselected();
+    keepTrackApi.getPlugin(AstronomyPlugin)?.setBottomIconToDisabled();
 
     setTimeout(() => {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -479,8 +479,8 @@ export class SensorManager {
         keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
         keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
         keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
-        keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
-        keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(PlanetariumPlugin)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(AstronomyPlugin)?.setBottomIconToUnselected();
 
         if (getEl('reset-sensor-button', true)) {
           (getEl('reset-sensor-button') as HTMLButtonElement).disabled = false;

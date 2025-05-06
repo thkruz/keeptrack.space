@@ -1,7 +1,7 @@
-import { Planetarium } from '@app/plugins/planetarium/planetarium';
+import { PlanetariumPlugin } from '@app/plugins-pro/planetarium/planetarium';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 
 describe('planetarium plugin', () => {
-  standardPluginSuite(Planetarium, 'planetarium');
-  standardPluginMenuButtonTests(Planetarium, 'planetarium');
+  standardPluginSuite(PlanetariumPlugin, 'planetarium');
+  standardPluginMenuButtonTests(PlanetariumPlugin, 'planetarium');
 });

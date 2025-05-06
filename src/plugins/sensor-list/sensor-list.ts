@@ -10,9 +10,9 @@ import { PersistenceManager, StorageKey } from '@app/singletons/persistence-mana
 import sensorPng from '@public/img/icons/sensor.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
+import { PlanetariumPlugin } from '../../plugins-pro/planetarium/planetarium';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
-import { Planetarium } from '../planetarium/planetarium';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -28,7 +28,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
-      if (keepTrackApi.getPlugin(Planetarium)?.isMenuButtonActive) {
+      if (keepTrackApi.getPlugin(PlanetariumPlugin)?.isMenuButtonActive) {
         getClass('sensor-top-link').forEach((el) => {
           el.style.display = 'none';
         });

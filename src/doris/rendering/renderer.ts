@@ -1,8 +1,6 @@
 import { isThisNode } from '@app/doris/utils/isThisNode';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { mat4 } from 'gl-matrix';
 import type { SpaceScene as OldScene } from '../../keeptrack/scene/space-scene';
 import { Camera } from '../camera/camera';
 import { Doris } from '../doris';
@@ -18,7 +16,6 @@ export class Renderer {
   private height: number;
   /** A canvas where the renderer draws its output. */
   canvas: HTMLCanvasElement;
-  projectionCameraMatrix: mat4;
   private isFirstInit = false;
 
   constructor(
@@ -77,9 +74,6 @@ export class Renderer {
       return;
     }
 
-    // Apply the camera matrix
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.getProjectionMatrix(), camera.camMatrix);
-
     Doris.getInstance().emit(CoreEngineEvents.BeforeClearRenderTarget);
     this.clear(this.gl);
     Doris.getInstance().emit(CoreEngineEvents.BeforeRender);
@@ -97,9 +91,6 @@ export class Renderer {
     if (!camera) {
       // return;
     }
-
-    // Apply the camera matrix
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), keepTrackApi.getMainCamera().getProjectionMatrix(), keepTrackApi.getMainCamera().camMatrix);
 
     if (!this.gl) {
       // TODO: Try to reinitialize the context

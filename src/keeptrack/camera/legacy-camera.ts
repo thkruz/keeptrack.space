@@ -70,6 +70,7 @@ export class LegacyCamera extends PerspectiveCamera {
   cameraModes: Map<CameraType, CameraMode>;
   activeCameraMode: CameraMode | null = null;
   private static readonly eciToOpenGlMat_: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+  projectionCameraMatrix: mat4;
 
   setCameraMode(cameraMode: CameraMode): void {
     this.activeCameraMode = cameraMode;
@@ -289,7 +290,7 @@ export class LegacyCamera extends PerspectiveCamera {
     }
 
     // Using this.camMatrix instead of this.viewMatrix
-    this.camMatrix = this.viewMatrix;
+    this.viewMatrix = this.camMatrix;
 
     this.isDirty = false;
   }
@@ -1290,14 +1291,21 @@ export class LegacyCamera extends PerspectiveCamera {
     if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY || this.cameraType === CameraType.PLANETARIUM) {
       this.updateFpsMovement_(dt);
     } else {
-      if (this.camPitchSpeed !== 0) {
+      // Account for floating point errors by clamping very small values to zero
+      if (Math.abs(this.camPitchSpeed) > 1e-8) {
         this.camPitch = <Radians>(this.camPitch + this.camPitchSpeed * dt);
+      } else {
+        this.camPitchSpeed = 0;
       }
-      if (this.camYawSpeed !== 0) {
+      if (Math.abs(this.camYawSpeed) > 1e-8) {
         this.camYaw = <Radians>(this.camYaw + this.camYawSpeed * dt);
+      } else {
+        this.camYawSpeed = 0;
       }
-      if (this.camRotateSpeed !== 0) {
+      if (Math.abs(this.camRotateSpeed) > 1e-8) {
         this.fpsRotate = <Degrees>(this.fpsRotate + this.camRotateSpeed * dt);
+      } else {
+        this.camRotateSpeed = 0;
       }
     }
 
@@ -1343,6 +1351,8 @@ export class LegacyCamera extends PerspectiveCamera {
         this.earthCenteredYaw = <Radians>(this.earthCenteredYaw + TAU);
       }
     }
+
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), this.projectionMatrix, this.camMatrix);
   }
 
   validateProjectionMatrix_() {
@@ -1566,7 +1576,7 @@ export class LegacyCamera extends PerspectiveCamera {
       }
     }
 
-    if (this.cameraType === CameraType.FIXED_TO_SAT) {
+    if (this.activeCameraMode instanceof FixedToSatelliteCameraMode) {
       this.camPitch = normalizeAngle(this.camPitch);
       this.ftsPitch = this.camPitch;
       this.ftsYaw = this.camYaw;
@@ -1805,8 +1815,16 @@ export class LegacyCamera extends PerspectiveCamera {
        * Most applications like Goolge Earth or STK do not have this effect as pronounced
        * It makes KeepTrack feel more like a game and less like a toolkit
        */
-      this.camPitchSpeed -= this.camPitchSpeed * dt * this.settings_.cameraMovementSpeed * this.settings_.cameraDecayFactor; // decay speeds when globe is "thrown"
-      this.camYawSpeed -= this.camYawSpeed * dt * this.settings_.cameraMovementSpeed * this.settings_.cameraDecayFactor;
+      if (Math.abs(this.camPitchSpeed) > 0.01) {
+        this.camPitchSpeed -= this.camPitchSpeed * dt * this.settings_.cameraMovementSpeed * this.settings_.cameraDecayFactor; // decay speeds when globe is "thrown"
+      } else {
+        this.camPitchSpeed = 0;
+      }
+      if (Math.abs(this.camYawSpeed) > 0.01) {
+        this.camYawSpeed -= this.camYawSpeed * dt * this.settings_.cameraMovementSpeed * this.settings_.cameraDecayFactor;
+      } else {
+        this.camYawSpeed = 0;
+      }
       /*
        * NOTE: this could be used for motion blur
        * this.camPitchAccel *= 0.95;
@@ -1821,8 +1839,11 @@ export class LegacyCamera extends PerspectiveCamera {
    * this code might be better if applied directly to the shader versus a multiplier effect
    */
   private updateZoom_(dt: number) {
-    if (this.zoomLevel_ !== this.zoomTarget_) {
+    // Allow a small margin of error for floating point comparison
+    if (Math.abs(this.zoomLevel_ - this.zoomTarget_) > 1e-5) {
       this.updateSatShaderSizes();
+    } else {
+      this.zoomLevel_ = this.zoomTarget_;
     }
 
     if (this.settings_.isAutoZoomIn || this.settings_.isAutoZoomOut) {
@@ -1860,7 +1881,7 @@ export class LegacyCamera extends PerspectiveCamera {
 
     if (this.isAutoPitchYawToTarget) {
       this.zoomLevel_ += (this.zoomTarget_ - this.zoomLevel_) * dt * this.settings_.zoomSpeed; // Just keep zooming
-    } else {
+    } else if (this.zoomLevel_ !== this.zoomTarget_) {
       const inOrOut = this.zoomLevel_ > this.zoomTarget_ ? -1 : 1;
 
       this.zoomLevel_ += inOrOut * dt * this.settings_.zoomSpeed * Math.abs(this.zoomTarget_ - this.zoomLevel_);

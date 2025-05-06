@@ -22,7 +22,11 @@
 
 import { Doris } from './doris/doris';
 import { KeepTrack } from './keeptrack';
+import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
 
+Doris.getInstance({
+  Renderer: KeepTrackRenderer,
+});
 KeepTrack.getInstance(window.settingsOverride)
   .registerAssets(); // Register assets with the engine
 

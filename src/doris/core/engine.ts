@@ -14,12 +14,13 @@ import { TimeManager } from './time-manager';
 export interface EngineConfig {
   containerRoot: string;
   canvasId: string;
+  Renderer?: new (eventBus: EventBus) => Renderer;
 }
 
 export class Engine {
   private readonly eventBus: EventBus;
   private readonly sceneManager: SceneManager;
-  private readonly renderer: Renderer;
+  private renderer: Renderer;
   private readonly inputSystem: InputSystem;
   private readonly pluginManager: PluginManager;
   private readonly canvasManager: CanvasManager;
@@ -29,7 +30,7 @@ export class Engine {
   constructor(private readonly config_: EngineConfig) {
     this.eventBus = new EventBus();
     this.sceneManager = new SceneManager(this.eventBus);
-    this.renderer = new Renderer(this.eventBus);
+    this.renderer = config_.Renderer ? new config_.Renderer(this.eventBus) : new Renderer(this.eventBus);
     this.inputSystem = new InputSystem(this.eventBus);
     this.pluginManager = new PluginManager(this.eventBus);
     this.canvasManager = new CanvasManager(this.eventBus, getEl(this.config_.containerRoot));
@@ -103,10 +104,11 @@ export class Engine {
     this.eventBus.emit(CoreEngineEvents.Update, this.timeManager.getScaledTimeDelta());
     this.eventBus.emit(CoreEngineEvents.AfterUpdate, this.timeManager.getScaledTimeDelta());
 
-    this.eventBus.emit(CoreEngineEvents.BeforeRender);
+    // this.eventBus.emit(CoreEngineEvents.BeforeRender);
     this.renderer.render(keepTrackApi.getScene());
     // this.renderer.newRender(this.sceneManager.activeScene);
-    this.eventBus.emit(CoreEngineEvents.AfterRender);
+
+    // this.eventBus.emit(CoreEngineEvents.AfterRender);
   }
 
   static calculateFps(dt: number): number {
@@ -163,6 +165,10 @@ export class Engine {
 
   getRenderer(): Renderer {
     return this.renderer;
+  }
+
+  setRenderer(renderer: Renderer): void {
+    this.renderer = renderer;
   }
 
   getEventBus(): EventBus {

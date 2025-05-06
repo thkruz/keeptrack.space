@@ -118,7 +118,7 @@ export class SkyBoxSphere {
   private setUniforms_(gl: WebGL2RenderingContext) {
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.mvMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getMainCamera().projectionCameraMatrix);
 
     if (!this.settings_.isDrawMilkyWay && !this.settings_.isDrawConstellationBoundaries && !this.settings_.isDrawNasaConstellations) {
       gl.uniform1i(this.mesh.material.uniforms.u_texMilkyWay, 0);

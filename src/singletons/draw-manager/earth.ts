@@ -27,6 +27,7 @@ import { GLSL3 } from '@app/doris/webgl/material';
 import { Mesh } from '@app/doris/webgl/mesh';
 import { ShaderMaterial } from '@app/doris/webgl/shader-material';
 import { SphereGeometry } from '@app/doris/webgl/sphere-geometry';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { SettingsManager } from '@app/settings/settings';
@@ -34,7 +35,6 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
 import { errorManagerInstance } from '../errorManager';
 import { OcclusionProgram } from './post-processing';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 
 export enum EarthNightTextureQuality {
@@ -184,7 +184,6 @@ export class Earth extends Component {
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
     this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
-    // this.modelViewMatrix_ = mat4.mul(this.modelViewMatrix_, keepTrackApi.getMainCamera().camMatrix, this.modelViewMatrix_);
     mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, gmst);
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
 
@@ -397,7 +396,7 @@ export class Earth extends Component {
 
     gl.bindVertexArray(this.vaoOcclusion_);
 
-    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, keepTrackApi.getMainCamera().projectionCameraMatrix);
 
     /*
      * no reason to render 100000s of pixels when
@@ -452,7 +451,7 @@ export class Earth extends Component {
    * This is run once per frame to set the uniforms for the earth.
    */
   private setUniforms_(gl: WebGL2RenderingContext) {
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getMainCamera().projectionCameraMatrix);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());

@@ -7,7 +7,6 @@ import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { mat4 } from 'gl-matrix';
 import { Milliseconds } from 'ootk';
 import { Renderer } from '../../doris/rendering/renderer';
 import { LegacyCamera } from '../camera/legacy-camera';
@@ -22,10 +21,6 @@ export class KeepTrackRenderer extends Renderer {
   private averageDrawTime_ = 0;
   private updateVisualsBasedOnPerformanceTime_ = 0;
 
-  registerRenderer(): void {
-    Doris.getInstance().on(CoreEngineEvents.Render, this.render.bind(this));
-  }
-
   render(scene: SpaceScene): void {
     if (!scene.isInitialized_) {
       return;
@@ -37,9 +32,6 @@ export class KeepTrackRenderer extends Renderer {
       return;
     }
 
-    // Apply the camera matrix
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), camera.getProjectionMatrix(), camera.camMatrix);
-
     Doris.getInstance().emit(CoreEngineEvents.BeforeClearRenderTarget);
     this.clear(Doris.getInstance().getRenderer().gl);
     Doris.getInstance().emit(CoreEngineEvents.BeforeRender);
@@ -49,6 +41,8 @@ export class KeepTrackRenderer extends Renderer {
     Doris.getInstance().emit(CoreEngineEvents.RenderOpaque, camera, scene.postProcessingManager.curBuffer);
     this.renderTransparent(scene, camera);
     Doris.getInstance().emit(CoreEngineEvents.RenderTransparent, camera, scene.postProcessingManager.curBuffer);
+
+    Doris.getInstance().emit(CoreEngineEvents.AfterRender);
   }
 
   renderBackground(scene: SpaceScene, camera: LegacyCamera): void {

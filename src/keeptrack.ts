@@ -51,7 +51,6 @@ import { GetSatType, Singletons } from './interfaces';
 import { CameraType, LegacyCamera } from './keeptrack/camera/legacy-camera';
 import { TimeManager } from './keeptrack/core/time-manager';
 import { KeepTrackApiEvents } from './keeptrack/events/event-types';
-import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
 import { SpaceScene } from './keeptrack/scene/space-scene';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
@@ -461,9 +460,6 @@ theodore.kruczek at gmail dot com.
          */
         renderer.initializeWebGLContext(getEl('keeptrack-canvas') as HTMLCanvasElement);
 
-        const sceneRenderer = new KeepTrackRenderer(Doris.getInstance().getEventBus());
-
-        sceneRenderer.registerRenderer();
         sceneInstance.initialize();
         Doris.getInstance().on(CoreEngineEvents.AssetLoadComplete, sceneInstance.onAssetsLoaded.bind(sceneInstance));
         Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 3, 5);

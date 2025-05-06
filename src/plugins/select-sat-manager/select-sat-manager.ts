@@ -5,6 +5,7 @@ import { getEl, hideEl, showEl } from '@app/lib/get-el';
 
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { CameraMode } from '@app/keeptrack/camera/camera-modes/camera-mode';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -16,7 +17,6 @@ import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
 import { SatInfoBox } from './sat-info-box';
-import { CameraMode } from '@app/keeptrack/camera/camera-modes/camera-mode';
 
 /**
  * This is the class that manages the selection of objects.
@@ -68,7 +68,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       // If the primary satellite is an object, update it
       if (this.primarySatObj.id !== -1) {
         const timeManagerInstance = keepTrackApi.getTimeManager();
-        const primarySat = keepTrackApi.getCatalogManager().getObject(this.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
+        const primarySat = keepTrackApi.getCatalogManager().getObject(this.primarySatObj.id, GetSatType.DEFAULT) as DetailedSatellite | MissileObject;
 
         keepTrackApi.getMeshManager().update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
         keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);

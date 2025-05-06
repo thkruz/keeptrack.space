@@ -505,7 +505,7 @@ export class MeshManager {
     // Rotate the Satellite to Face Nadir if needed
     if (this.currentMeshObject.isRotationStable !== null) {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const sat = catalogManagerInstance.getObject(this.currentMeshObject.id, GetSatType.POSITION_ONLY);
+      const sat = catalogManagerInstance.getObject(this.currentMeshObject.id, GetSatType.SKIP_POS_VEL);
 
       if (sat === null) {
         return;

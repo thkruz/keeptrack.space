@@ -72,6 +72,10 @@ export abstract class Camera extends Component {
     this.isDirty = true;
   }
 
+  checkIfDirty(): boolean {
+    return this.isDirty;
+  }
+
   protected onAttach(): void {
     super.onAttach();
     this.updateProjectionMatrix();

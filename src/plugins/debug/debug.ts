@@ -8,6 +8,7 @@ import debugPng from '@public/img/icons/debug.png';
 
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -16,7 +17,6 @@ import { Milliseconds } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class DebugMenuPlugin extends KeepTrackPlugin {
   readonly id = 'DebugMenuPlugin';
@@ -125,7 +125,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
             return;
           }
 
-          const sat = keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.POSITION_ONLY);
+          const sat = keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.SKIP_POS_VEL);
 
           if (sat) {
             const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());

@@ -1,5 +1,7 @@
 import { isThisNode } from '@app/doris/utils/isThisNode';
 import { Engine } from './core/engine';
+import { EventBus } from './events/event-bus';
+import { Renderer } from './rendering/renderer';
 
 export class Doris {
   static readonly id = 'Doris';
@@ -9,11 +11,16 @@ export class Doris {
   private static readonly browserContainer: string = 'keeptrack-root';
   static instance: Engine | null = null; // NOSONAR
 
-  static getInstance() {
+  static getInstance({
+    Renderer,
+  }: {
+    Renderer?: new (eventBus: EventBus) => Renderer;
+  } = {}) {
     if (!Doris.instance) {
       Doris.instance = new Engine({
         canvasId: isThisNode() ? Doris.nodeCanvas : Doris.browserCanvas,
         containerRoot: isThisNode() ? Doris.nodeContainer : Doris.browserContainer,
+        Renderer,
       });
 
       Doris.printConsoleMessage_();

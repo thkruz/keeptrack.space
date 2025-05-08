@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Doris } from '@app/doris/doris';
 import { MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { hideLoading, showLoading } from '@app/lib/showLoading';
@@ -11,7 +12,6 @@ import { PersistenceManager, StorageKey } from '@app/singletons/persistence-mana
 import displaySettingsPng from '@public/img/icons/display-settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////

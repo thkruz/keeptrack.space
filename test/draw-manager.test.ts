@@ -1,6 +1,6 @@
 /* eslint-disable dot-notation */
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CameraType } from '@app/keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '@app/keeptrack/camera/legacy-camera';
 import { Moon } from '@app/singletons/draw-manager/moon';
 import { WebGLRenderer } from '@app/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
@@ -22,7 +22,7 @@ describe('drawManager', () => {
     setupDefaultHtml();
     drawManagerInstance.isDrawOrbitsAbove = false;
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
-    keepTrackApi.getMainCamera().cameraType = CameraType.PLANETARIUM;
+    keepTrackApi.getMainCamera().activeCameraType = CameraControllerType.PLANETARIUM;
     keepTrackApi.getSensorManager().currentSensors = [defaultSensor];
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
     drawManagerInstance.isDrawOrbitsAbove = true;

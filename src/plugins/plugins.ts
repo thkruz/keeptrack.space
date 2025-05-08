@@ -180,14 +180,14 @@ export const loadPlugins = (plugins: KeepTrackPlugins): void => {
       { init: () => new SatelliteFov().init(), enabled: plugins.satelliteFov },
       {
         init: () => (async () => {
-          const planetariumPlugin = await import('../plugins/planetarium/planetarium');
+          const planetariumPlugin = await import('../plugins-pro/planetarium/planetarium');
 
           new planetariumPlugin.PlanetariumPlugin().init();
         })(), enabled: plugins.planetarium,
       },
       {
         init: () => (async () => {
-          const astronomyPlugin = await import('../plugins/astronomy/astronomy');
+          const astronomyPlugin = await import('../plugins-pro/astronomy/astronomy');
 
           new astronomyPlugin.AstronomyPlugin().init();
         })(), enabled: plugins.astronomy,
@@ -204,7 +204,7 @@ export const loadPlugins = (plugins: KeepTrackPlugins): void => {
       { init: () => new ScreenRecorder().init(), enabled: plugins.screenRecorder },
       {
         init: () => (async () => {
-          const ioPlugin = await import('../plugins/initial-orbit/initial-orbit');
+          const ioPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
 
           new ioPlugin.InitialOrbitDeterminationPlugin().init();
         })(), enabled: plugins.initialOrbit,

@@ -43,7 +43,7 @@ export class PerspectiveCamera extends Camera {
   updateProjectionMatrix(): void {
     mat4.perspective(
       this.projectionMatrix,
-      this.fov * (Math.PI / 180), // Convert degrees to radians
+      this.fov, // radians
       this.aspectRatio,
       this.near,
       this.far,

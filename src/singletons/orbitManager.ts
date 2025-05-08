@@ -9,7 +9,7 @@ import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
 import { isThisNode } from '../doris/utils/isThisNode';
 import { GetSatType } from '../interfaces';
-import { CameraType, LegacyCamera } from '../keeptrack/camera/legacy-camera';
+import { CameraControllerType, KeepTrackMainCamera } from '../keeptrack/camera/legacy-camera';
 import { setInnerHtml } from '../lib/get-el';
 import { ColorSchemeManager } from './color-scheme-manager';
 import { LineManager } from './draw-manager/line-manager';
@@ -99,7 +99,7 @@ export class OrbitManager {
   }
 
   render(
-    mainCameraInstance: LegacyCamera,
+    mainCameraInstance: KeepTrackMainCamera,
     tgtBuffer: WebGLFramebuffer | null,
   ): void {
     if (!this.isInitialized_) {
@@ -488,10 +488,10 @@ export class OrbitManager {
     }
   }
 
-  private drawInViewObjectOrbit_(mainCameraInstance: LegacyCamera): void {
+  private drawInViewObjectOrbit_(mainCameraInstance: KeepTrackMainCamera): void {
     if (this.currentInView_.length >= 1) {
       // There might be some z-fighting
-      if (mainCameraInstance.cameraType === CameraType.PLANETARIUM) {
+      if (mainCameraInstance.activeCameraType === CameraControllerType.PLANETARIUM) {
         this.lineManagerInstance_.setColorUniforms(settingsManager.orbitPlanetariumColor);
       } else {
         this.lineManagerInstance_.setColorUniforms(settingsManager.orbitInViewColor);

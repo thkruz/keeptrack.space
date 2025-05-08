@@ -1,3 +1,4 @@
+import { settingsManager } from '@app/settings/settings';
 /* eslint-disable complexity */
 /* eslint-disable max-lines */
 /**
@@ -21,72 +22,61 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { CameraController } from '@app/doris/camera/controllers/camera-controller';
 import { PerspectiveCamera } from '@app/doris/camera/perspective-camera';
 import { Doris } from '@app/doris/doris';
-import { CoreEngineEvents, WebGlEvents } from '@app/doris/events/event-types';
-import { SatShader, ToastMsgType } from '@app/interfaces';
-import { KeepTrack } from '@app/keeptrack';
+import { CameraSystemEvents, CoreEngineEvents, WebGlEvents } from '@app/doris/events/event-types';
+import { ToastMsgType } from '@app/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import {
-  BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians,
-  Star, TAU, ZoomValue, eci2lla,
+  BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3,
+  Kilometers, Milliseconds, Radians,
+  Star, TAU, ZoomValue,
 } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../../lib/transforms';
-import { SatelliteViewCameraMode } from '../../plugins/satellite-view/satellite-view-camera-mode';
-import { SettingsManager } from '../../settings/settings';
 import { MissileObject } from '../../singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '../../singletons/errorManager';
-import type { OrbitManager } from '../../singletons/orbitManager';
 import { SatMath } from '../../static/sat-math';
 import { KeepTrackApiEvents } from '../events/event-types';
-import { CameraMode } from './camera-modes/camera-mode';
-import { FirstPersonCameraMode } from './camera-modes/first-person';
-import { FixedToEarthCameraMode } from './camera-modes/fixed-to-earth';
-import { FixedToEarthOffsetCameraMode } from './camera-modes/fixed-to-earth-offset';
-import { FixedToSatelliteCameraMode } from './camera-modes/fixed-to-satellite';
+import { EarthCenteredOrbitalController } from './controllers/earth-centered-camera-controller';
+import { FirstPersonCameraController } from './controllers/first-person-camera-controller';
+import { SatelliteOrbitalCameraController } from './controllers/satellite-orbital-camera-controller';
+import { LegacyCameraKeyHandler } from './legacy-camera-keyhandler';
 
 /**
  * Represents the different types of cameras available.
  *
  * TODO: This should be replaced with different camera classes
  */
-export enum CameraType {
-  CURRENT = 0,
-  FIXED_TO_EARTH = 1,
-  FIXED_TO_SAT = 2,
-  FPS = 3,
-  PLANETARIUM = 4,
-  SATELLITE = 5,
-  ASTRONOMY = 6,
-  MAX_CAMERA_TYPES = 7,
-  /** @deprecated */
-  OFFSET = 8,
+// Use a string enum and allow plugins to extend via declaration merging
+export enum CameraControllerType {
+  EARTH_CENTERED_ORBITAL = 'EARTH_CENTERED_ORBITAL',
+  SATELLITE_CENTERED_ORBITAL = 'SATELLITE_CENTERED_ORBITAL',
+  FIRST_PERSON = 'FIRST_PERSON',
+  SATELLITE_FIRST_PERSON = 'SATELLITE_FIRST_PERSON',
+  // Plugins can extend this enum via declaration merging
 }
 
-export class LegacyCamera extends PerspectiveCamera {
-  cameraModes: Map<CameraType, CameraMode>;
-  activeCameraMode: CameraMode | null = null;
+export class KeepTrackMainCamera extends PerspectiveCamera {
+  cameraControllers: Map<CameraControllerType, CameraController> = new Map();
+  activeCameraController: CameraController = new EarthCenteredOrbitalController(this, Doris.getInstance().getEventBus());
   private static readonly eciToOpenGlMat_: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
   projectionCameraMatrix: mat4;
-
-  setCameraMode(cameraMode: CameraMode): void {
-    this.activeCameraMode = cameraMode;
-  }
+  keyHandler: LegacyCameraKeyHandler = new LegacyCameraKeyHandler(this);
 
   static readonly id = 'Camera';
-  private chaseSpeed_ = 0.0005;
   earthCenteredPitch = <Radians>0;
   earthCenteredYaw = <Radians>0;
   private fpsLastTime_ = <Milliseconds>0;
   fpsPos = <vec3>[0, 25000, 0];
   ftsYaw = <Radians>0;
   private isAutoRotate_ = true;
-  private isFPSForwardSpeedLock_ = false;
-  private isFPSSideSpeedLock_ = false;
-  private isFPSVertSpeedLock_ = false;
+  isFPSForwardSpeedLock = false;
+  isFPSSideSpeedLock = false;
+  isFPSVertSpeedLock = false;
   private isRayCastingEarth_ = false;
   private localRotateMovementSpeed_ = 0.00005;
   private localRotateTarget_ = {
@@ -95,9 +85,6 @@ export class LegacyCamera extends PerspectiveCamera {
     yaw: <Radians>0,
   };
 
-  normForward = vec3.create();
-  normLeft = vec3.create();
-  normUp = vec3.create();
   private panDif_ = {
     x: 0,
     y: 0,
@@ -111,7 +98,6 @@ export class LegacyCamera extends PerspectiveCamera {
     z: 0,
   };
 
-  private yawErr_ = <Radians>0;
   /**
    * Percentage of the distance to maxZoomDistance from the minZoomDistance
    */
@@ -148,7 +134,6 @@ export class LegacyCamera extends PerspectiveCamera {
   camYawTarget = <Radians>0;
   camYawSpeed = 0;
   camZoomSnappedOnSat = false;
-  cameraType: CameraType = CameraType.FIXED_TO_EARTH;
   dragStartPitch = <Radians>0;
   dragStartYaw = <Radians>0;
   earthCenteredLastZoom = 0.6925;
@@ -220,70 +205,51 @@ export class LegacyCamera extends PerspectiveCamera {
 
   position = <vec3>[0, 0, 0];
   screenDragPoint = [0, 0];
-  settings_: SettingsManager;
   speedModifier = 1;
   startMouseX = 0;
   startMouseY = 0;
   camDistBuffer = <Kilometers>0;
+  private activeCameraType_: CameraControllerType = CameraControllerType.EARTH_CENTERED_ORBITAL;
+  get activeCameraType(): CameraControllerType {
+    return this.activeCameraType_;
+  }
+
+  /**
+   * Don't do this! Use the switchCameraController method!!!
+   * @deprecated
+   */
+  set activeCameraType(value: CameraControllerType) {
+    this.switchCameraController(value);
+  }
 
   constructor() {
     super(settingsManager.fieldOfView, settingsManager.zNear, settingsManager.zFar, (window.innerWidth / window.innerHeight));
 
-    this.settings_ = <SettingsManager>(<unknown>{
-      autoPanSpeed: 1,
-      autoRotateSpeed: 0.0075,
-      cameraDecayFactor: 0.0005,
-      cameraMovementSpeed: 0.003,
-      fieldOfView: 0.6,
-      fpsForwardSpeed: 0.005,
-      fpsSideSpeed: 0.005,
-      fpsVertSpeed: 0.005,
-      isMobileModeEnabled: false,
-      maxZoomDistance: <Kilometers>100000,
-      minZoomDistance: <Kilometers>(RADIUS_OF_EARTH + 50),
-      offsetCameraModeX: 0.5,
-      satShader: {
-        largeObjectMaxZoom: 0.5,
-        largeObjectMinZoom: 0.1,
-        maxAllowedSize: 0.5,
-        maxSize: 0.1,
-      } as SatShader,
-      zoomSpeed: 0.0005,
-    });
-
     // Store all camera modes in a map for easy access and extensibility
-    const fixedToEarthCameraMode = new FixedToEarthCameraMode(this);
-    const fixedToEarthOffsetCameraMode = new FixedToEarthOffsetCameraMode(this);
-    const fixedToSatelliteCameraMode = new FixedToSatelliteCameraMode(this);
-    const firstPersonCameraMode = new FirstPersonCameraMode(this);
-    const satelliteViewCameraMode = new SatelliteViewCameraMode(this);
+    const earthCenteredCameraMode = new EarthCenteredOrbitalController(this, Doris.getInstance().getEventBus());
+    const fixedToSatelliteCameraMode = new SatelliteOrbitalCameraController(this, Doris.getInstance().getEventBus());
+    const firstPersonCameraMode = new FirstPersonCameraController(this, Doris.getInstance().getEventBus());
 
-    this.cameraModes = new Map<CameraType, CameraMode>();
-    this.cameraModes.set(CameraType.FIXED_TO_EARTH, fixedToEarthCameraMode);
-    this.cameraModes.set(CameraType.OFFSET, fixedToEarthOffsetCameraMode);
-    this.cameraModes.set(CameraType.FIXED_TO_SAT, fixedToSatelliteCameraMode);
-    this.cameraModes.set(CameraType.FPS, firstPersonCameraMode);
-    this.cameraModes.set(CameraType.SATELLITE, satelliteViewCameraMode);
+    this.cameraControllers.set(CameraControllerType.EARTH_CENTERED_ORBITAL, earthCenteredCameraMode);
+    this.cameraControllers.set(CameraControllerType.SATELLITE_CENTERED_ORBITAL, fixedToSatelliteCameraMode);
+    this.cameraControllers.set(CameraControllerType.FIRST_PERSON, firstPersonCameraMode);
 
-    // Set the default active camera mode
-    this.activeCameraMode = fixedToEarthCameraMode;
+    /*
+     * This needs to be initialized earlier
+     * Doris.getInstance().on(CoreEngineEvents.AssetLoadComplete, this.initialize.bind(this));
+     */
+    Doris.getInstance().on(CameraSystemEvents.Reset, this.reset.bind(this));
   }
 
   updateProjectionMatrix(): void {
-    mat4.perspective(
-      this.projectionMatrix,
-      this.fov,
-      this.aspectRatio,
-      this.near,
-      this.far,
-    );
-    this.isDirty = true;
+    super.updateProjectionMatrix();
 
     // This converts everything from 3D space to ECI (z and y planes are swapped)
-    mat4.mul(this.projectionMatrix, this.projectionMatrix, LegacyCamera.eciToOpenGlMat_);
+    mat4.mul(this.projectionMatrix, this.projectionMatrix, KeepTrackMainCamera.eciToOpenGlMat_);
   }
 
   updateViewMatrix(): void {
+    // KeepTrack Camera isn't attached to a node yet TODO
     if (!this.isDirty) { // !this.node
       return;
     }
@@ -333,8 +299,6 @@ export class LegacyCamera extends PerspectiveCamera {
     }
     this.zoomTarget = 0.6925;
     this.isAutoPitchYawToTarget = !!isHardReset;
-    this.cameraType = CameraType.FIXED_TO_EARTH;
-    this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
     this.isDragging = false;
     this.isLocalRotateReset = !!isHardReset;
     this.isLocalRotateOverride = false;
@@ -382,11 +346,11 @@ export class LegacyCamera extends PerspectiveCamera {
   }
 
   resetRotation() {
-    if (this.cameraType !== CameraType.FPS) {
+    if (this.activeCameraType_ !== CameraControllerType.FIRST_PERSON) {
       this.isPanReset = true;
     }
     this.isLocalRotateReset = true;
-    if (this.cameraType === CameraType.FIXED_TO_SAT) {
+    if (this.activeCameraType_ === CameraControllerType.SATELLITE_CENTERED_ORBITAL) {
       this.ftsRotateReset = true;
     }
   }
@@ -422,8 +386,8 @@ export class LegacyCamera extends PerspectiveCamera {
   }
 
   autoRotate(val?: boolean): void {
-    if (this.settings_.autoRotateSpeed === 0) {
-      this.settings_.autoRotateSpeed = 0.0075;
+    if (settingsManager.autoRotateSpeed === 0) {
+      settingsManager.autoRotateSpeed = 0.0075;
     }
 
     if (typeof val === 'undefined') {
@@ -444,66 +408,40 @@ export class LegacyCamera extends PerspectiveCamera {
     this.isAutoPitchYawToTarget = true;
   }
 
-  changeCameraType(orbitManager: OrbitManager) {
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+  switchCameraController(controllerType?: CameraControllerType) {
+    // Switch to the type provided
+    let newCameraController = controllerType ? this.cameraControllers.get(controllerType) : null;
+    let nextControllerType: CameraControllerType | undefined | null = controllerType;
 
-    if (this.cameraType === CameraType.PLANETARIUM) {
-      orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
-    }
+    if (!newCameraController) {
+      // Rotate to the next available controller
+      nextControllerType = this.getNextControllerType(this.activeCameraType_);
+      const nextCameraController = nextControllerType ? this.cameraControllers.get(nextControllerType) : null;
 
-    switch (this.cameraType) {
-      case CameraType.FIXED_TO_EARTH:
-        this.cameraType = CameraType.FIXED_TO_SAT;
-        this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_SAT) as CameraMode;
-        break;
-      case CameraType.FIXED_TO_SAT:
-        this.cameraType = CameraType.FPS;
-        this.activeCameraMode = this.cameraModes.get(CameraType.FPS) as CameraMode;
-        break;
-      case CameraType.FPS:
-        this.cameraType = CameraType.SATELLITE;
-        break;
-      case CameraType.SATELLITE:
-        this.cameraType = CameraType.FIXED_TO_EARTH;
-        this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
-        break;
-      default:
-        this.cameraType = CameraType.MAX_CAMERA_TYPES;
-        break;
-    }
-
-    if ((this.cameraType === CameraType.FIXED_TO_SAT && !selectSatManagerInstance) || selectSatManagerInstance?.selectedSat === -1) {
-      this.cameraType++;
-    }
-    if (this.cameraType === CameraType.FPS) {
-      this.resetFpsPos_();
-    }
-    if (this.cameraType === CameraType.PLANETARIUM && !sensorManagerInstance.isSensorSelected()) {
-      this.cameraType++;
-    }
-
-    if (this.cameraType === CameraType.SATELLITE && selectSatManagerInstance?.selectedSat === -1) {
-      this.cameraType++;
-    }
-
-    if (this.cameraType === CameraType.ASTRONOMY && !sensorManagerInstance.isSensorSelected()) {
-      this.cameraType++;
-    }
-
-    if (this.cameraType >= CameraType.MAX_CAMERA_TYPES) {
-
-      this.isLocalRotateReset = true;
-      this.settings_.fieldOfView = 0.6;
-      if ((selectSatManagerInstance?.selectedSat ?? -1) > -1) {
-        this.camZoomSnappedOnSat = true;
-        this.cameraType = CameraType.FIXED_TO_SAT;
-        this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_SAT) as CameraMode;
-      } else {
-        this.cameraType = CameraType.FIXED_TO_EARTH;
-        this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
+      if (nextCameraController) {
+        newCameraController = nextCameraController;
       }
     }
+
+    if (newCameraController && newCameraController !== this.activeCameraController) {
+      this.activeCameraController.deactivate();
+      this.activeCameraController = newCameraController;
+      this.activeCameraController.activate();
+      this.activeCameraType_ = nextControllerType!;
+    }
+  }
+
+  getNextControllerType(currentType: CameraControllerType): CameraControllerType | null {
+    const types = Array.from(this.cameraControllers.keys());
+    const currentIndex = types.indexOf(currentType);
+
+    if (currentIndex === -1 || types.length === 0) {
+      return null;
+    }
+    const nextIndex = (currentIndex + 1) % types.length;
+
+
+    return types[nextIndex];
   }
 
   zoomWheel(delta: number): void {
@@ -517,71 +455,75 @@ export class LegacyCamera extends PerspectiveCamera {
       this.autoRotate(false);
     }
 
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
-    const isCameraCloseToSatellite = this.camDistBuffer < settingsManager.nearZoomLevel;
-    const maxCovarianceDistance = Math.min((keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
-    const isCameraCloseToCovarianceBubble = settingsManager.isDrawCovarianceEllipsoid &&
-      this.camDistBuffer < maxCovarianceDistance;
+    if (this.activeCameraType_ === CameraControllerType.PLANETARIUM || this.activeCameraType_ === CameraControllerType.FIRST_PERSON ||
+      this.activeCameraType_ === CameraControllerType.SATELLITE_FIRST_PERSON || this.activeCameraType_ === CameraControllerType.ASTRONOMY) {
+      this.zoomWheelFov_(delta);
+    } else {
+      const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+      const isCameraCloseToSatellite = this.camDistBuffer < settingsManager.nearZoomLevel;
+      const maxCovarianceDistance = Math.min((keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
+      const isCameraCloseToCovarianceBubble = settingsManager.isDrawCovarianceEllipsoid &&
+        this.camDistBuffer < maxCovarianceDistance;
 
-    if (settingsManager.isZoomStopsSnappedOnSat || !selectSatManagerInstance || selectSatManagerInstance?.selectedSat === -1) {
-      this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
-      this.earthCenteredLastZoom = this.zoomTarget_;
-      this.camZoomSnappedOnSat = false;
-    } else if ((isCameraCloseToSatellite || isCameraCloseToCovarianceBubble) ||
-      this.zoomLevel_ === -1) {
-      // Inside camDistBuffer
-      settingsManager.selectedColor = [0, 0, 0, 0];
+      if (settingsManager.isZoomStopsSnappedOnSat || !selectSatManagerInstance || selectSatManagerInstance?.selectedSat === -1) {
+        this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
+        this.earthCenteredLastZoom = this.zoomTarget_;
+        this.camZoomSnappedOnSat = false;
+      } else if ((isCameraCloseToSatellite || isCameraCloseToCovarianceBubble) ||
+        this.zoomLevel_ === -1) {
+        // Inside camDistBuffer
+        settingsManager.selectedColor = [0, 0, 0, 0];
 
-      /*
-       * Slowly zoom in/out, scaling speed with camDistBuffer (farther = faster)
-       * Exponential scaling for smoother zoom near the satellite
-       */
-      const scale = Math.max(0.01, (this.camDistBuffer / 100) ** 1.15); // Exponential factor > 1 for faster scaling as distance increases
+        /*
+         * Slowly zoom in/out, scaling speed with camDistBuffer (farther = faster)
+         * Exponential scaling for smoother zoom near the satellite
+         */
+        const scale = Math.max(0.01, (this.camDistBuffer / 100) ** 1.15); // Exponential factor > 1 for faster scaling as distance increases
 
-      this.camDistBuffer = <Kilometers>(this.camDistBuffer + (delta / 5) * scale); // delta is +/- 100
+        this.camDistBuffer = <Kilometers>(this.camDistBuffer + (delta / 5) * scale); // delta is +/- 100
 
-      // Clamping camDistBuffer to be between minDistanceFromSatellite and maxZoomDistance
-      this.camDistBuffer = <Kilometers>Math.min(
-        Math.max(
-          this.camDistBuffer,
-          this.settings_.minDistanceFromSatellite,
-        ),
-        Math.max(
-          settingsManager.nearZoomLevel,
-          maxCovarianceDistance,
-        ),
-      );
-    } else if (this.camDistBuffer >= settingsManager.nearZoomLevel) {
-      // Outside camDistBuffer
-      settingsManager.selectedColor = settingsManager.selectedColorFallback;
-      this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
-      this.earthCenteredLastZoom = this.zoomTarget;
-      this.camZoomSnappedOnSat = false;
+        // Clamping camDistBuffer to be between minDistanceFromSatellite and maxZoomDistance
+        this.camDistBuffer = <Kilometers>Math.min(
+          Math.max(
+            this.camDistBuffer,
+            settingsManager.minDistanceFromSatellite,
+          ),
+          Math.max(
+            settingsManager.nearZoomLevel,
+            maxCovarianceDistance,
+          ),
+        );
+      } else if (this.camDistBuffer >= settingsManager.nearZoomLevel) {
+        // Outside camDistBuffer
+        settingsManager.selectedColor = settingsManager.selectedColorFallback;
+        this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
+        this.earthCenteredLastZoom = this.zoomTarget;
+        this.camZoomSnappedOnSat = false;
 
-      // calculate camera distance from target
-      const target = selectSatManagerInstance.getSelectedSat();
+        // calculate camera distance from target
+        const target = selectSatManagerInstance.getSelectedSat();
 
-      if (target) {
-        const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
-        const curMinZoomLevel = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
+        if (target) {
+          const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
+          const curMinZoomLevel = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
 
-        if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
-          this.camZoomSnappedOnSat = true;
+          if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
+            this.camZoomSnappedOnSat = true;
 
-          if (this.settings_.isDrawCovarianceEllipsoid) {
-            this.camDistBuffer = <Kilometers>(Math.max(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), maxCovarianceDistance) - 1);
-          } else {
-            this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), this.settings_.minDistanceFromSatellite);
+            if (settingsManager.isDrawCovarianceEllipsoid) {
+              this.camDistBuffer = <Kilometers>(Math.max(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), maxCovarianceDistance) - 1);
+            } else {
+              this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), settingsManager.minDistanceFromSatellite);
+            }
           }
         }
       }
     }
-
-    this.zoomWheelFov_(delta);
   }
 
   private zoomWheelFov_(delta: number) {
-    if (this.cameraType === CameraType.PLANETARIUM || this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
+    if (this.activeCameraType_ === CameraControllerType.PLANETARIUM || this.activeCameraType_ === CameraControllerType.FIRST_PERSON ||
+      this.activeCameraType_ === CameraControllerType.SATELLITE_FIRST_PERSON || this.activeCameraType_ === CameraControllerType.ASTRONOMY) {
       settingsManager.fieldOfView += delta * 0.0002;
       // getEl('fov-text').innerHTML = 'FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg';
       if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) {
@@ -590,6 +532,8 @@ export class LegacyCamera extends PerspectiveCamera {
       if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) {
         settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
       }
+
+      this.fov = settingsManager.fieldOfView;
       Doris.getInstance().emit(WebGlEvents.FovChanged);
     }
   }
@@ -608,24 +552,19 @@ export class LegacyCamera extends PerspectiveCamera {
    * This is intentionally complex to reduce object creation and GC
    * Splitting it into subfunctions would not be optimal
    */
-  draw(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
+  draw(): void {
     if (!keepTrackApi.getTimeManager().simulationTimeObj) {
       return;
     }
 
-    this.drawPreValidate_(sensorPos);
+    this.drawPreValidate_();
     mat4.identity(this.viewMatrix);
 
-    if (!this.activeCameraMode) {
-      // TODO: This shouldn't be possible
-      throw new Error('No active camera mode');
-    }
-
-    this.activeCameraMode.render();
+    this.activeCameraController?.render(this);
   }
 
   exitFixedToSat(): void {
-    if (this.cameraType !== CameraType.FIXED_TO_SAT) {
+    if (this.activeCameraType_ !== CameraControllerType.SATELLITE_CENTERED_ORBITAL) {
       return;
     }
 
@@ -635,8 +574,7 @@ export class LegacyCamera extends PerspectiveCamera {
 
     // If within 9000km then we want to move further back to feel less jarring
     if (cameraDistance > 9000) {
-      this.cameraType = CameraType.FIXED_TO_EARTH;
-      this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
+      this.switchCameraController(CameraControllerType.EARTH_CENTERED_ORBITAL);
 
       this.zoomTarget = this.getZoomFromDistance(cameraDistance) + 0.005;
       this.camPitch = this.earthCenteredPitch;
@@ -658,7 +596,7 @@ export class LegacyCamera extends PerspectiveCamera {
   }
 
   getZoomFromDistance(distance: Kilometers): number {
-    return ((distance - this.settings_.minZoomDistance) / (this.settings_.maxZoomDistance - this.settings_.minZoomDistance)) ** (1 / ZOOM_EXP);
+    return ((distance - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
   }
 
   /**
@@ -667,8 +605,12 @@ export class LegacyCamera extends PerspectiveCamera {
    * Zoom level is ALWAYS raised to the power of ZOOM_EXP to ensure that zooming out is faster than zooming in
    * TODO: This should be handled before getting the zoomLevel_ value
    */
-  getCameraDistance(): Kilometers {
-    return <Kilometers>(this.zoomLevel_ ** ZOOM_EXP * (this.settings_.maxZoomDistance - this.settings_.minZoomDistance) + this.settings_.minZoomDistance);
+  getCameraDistance(zoom?: number): Kilometers {
+    if (zoom) {
+      return <Kilometers>(zoom ** ZOOM_EXP * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance);
+    }
+
+    return <Kilometers>(this.zoomLevel_ ** ZOOM_EXP * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance);
   }
 
   /**
@@ -692,22 +634,12 @@ export class LegacyCamera extends PerspectiveCamera {
   /**
    * This is the direction the camera is facing
    */
-  getCameraOrientation() {
-    if (this.cameraType === CameraType.FIXED_TO_SAT) {
-      const xRot = Math.sin(-this.ftsYaw) * Math.cos(this.ftsPitch);
-      const yRot = Math.cos(this.ftsYaw) * Math.cos(this.ftsPitch);
-      const zRot = Math.sin(-this.ftsPitch);
-
-
-      return vec3.fromValues(xRot, yRot, zRot);
+  getCameraOrientation(): vec3 {
+    if (this.activeCameraType_ === CameraControllerType.SATELLITE_CENTERED_ORBITAL) {
+      return (this.activeCameraController as SatelliteOrbitalCameraController).getCameraOrientation();
     }
-    if (this.cameraType === CameraType.FIXED_TO_EARTH) {
-      const xRot = Math.sin(-this.camYaw) * Math.cos(this.camPitch);
-      const yRot = Math.cos(this.camYaw) * Math.cos(this.camPitch);
-      const zRot = Math.sin(-this.camPitch);
-
-
-      return vec3.fromValues(xRot, yRot, zRot);
+    if (this.activeCameraType_ === CameraControllerType.EARTH_CENTERED_ORBITAL) {
+      return (this.activeCameraController as EarthCenteredOrbitalController).getCameraOrientation();
     }
 
     return vec3.fromValues(0, 0, 0);
@@ -737,22 +669,9 @@ export class LegacyCamera extends PerspectiveCamera {
     return radius;
   }
 
-  getForwardVector(): vec3 {
-    const inverted = mat4.create();
-    const forward = vec3.create();
-
-    mat4.invert(inverted, this.viewMatrix);
-    vec3.transformMat4(forward, forward, inverted);
-
-    return forward;
-  }
-
-  init(settings: SettingsManager) {
-    this.settings_ = settings;
-
+  initialize() {
     this.updateProjectionMatrix();
-
-    this.registerKeyboardEvents_();
+    this.keyHandler.initialize();
 
     Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (): void => {
       this.isAutoPitchYawToTarget = false;
@@ -761,7 +680,7 @@ export class LegacyCamera extends PerspectiveCamera {
     Doris.getInstance().on(KeepTrackApiEvents.canvasMouseDown, this.canvasMouseDown_.bind(this));
     Doris.getInstance().on(KeepTrackApiEvents.touchStart, this.touchStart_.bind(this));
     Doris.getInstance().on(CoreEngineEvents.RenderOpaque, () => {
-      this.draw(KeepTrack.getInstance().sensorPos);
+      this.draw();
     });
 
     Doris.getInstance().on(CoreEngineEvents.Update, () => {
@@ -769,45 +688,6 @@ export class LegacyCamera extends PerspectiveCamera {
     });
 
     Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, this.validateProjectionMatrix_.bind(this));
-  }
-
-  private registerKeyboardEvents_() {
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-    const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-
-    keysDown.forEach((key) => {
-      keyboardManager.registerKeyDownEvent({
-        key,
-        callback: this[`keyDown${key}_`].bind(this),
-      });
-    });
-    keysUp.forEach((key) => {
-      keyboardManager.registerKeyUpEvent({
-        key,
-        callback: this[`keyUp${key}_`].bind(this),
-      });
-    });
-
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
-      keyboardManager.registerKeyDownEvent({
-        key: code.replace('Numpad', ''),
-        code,
-        callback: this[`keyDown${code}_`].bind(this),
-      });
-    });
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
-      keyboardManager.registerKeyUpEvent({
-        key: code.replace('Numpad', ''),
-        code,
-        callback: this[`keyUp${code}_`].bind(this),
-      });
-    });
-
-    keyboardManager.registerKeyEvent({
-      key: '`',
-      callback: this.resetRotation.bind(this),
-    });
   }
 
   canvasMouseDown_(evt: MouseEvent) {
@@ -843,273 +723,6 @@ export class LegacyCamera extends PerspectiveCamera {
     }
   }
 
-  keyDownArrowDown_() {
-    if (!this.settings_.isAutoPanD) {
-      this.panDown();
-    }
-  }
-
-  keyDownArrowLeft_() {
-    if (!this.settings_.isAutoPanL) {
-      this.panLeft();
-    }
-  }
-
-  keyDownArrowRight_() {
-    if (!this.settings_.isAutoPanR) {
-      this.panRight();
-    }
-  }
-
-  keyDownArrowUp_() {
-    if (!this.settings_.isAutoPanU) {
-      this.panUp();
-    }
-  }
-
-  keyUpArrowDown_() {
-    if (this.settings_.isAutoPanD) {
-      this.panDown();
-    }
-  }
-
-  keyUpArrowLeft_() {
-    if (this.settings_.isAutoPanL) {
-      this.panLeft();
-    }
-  }
-
-  keyUpArrowRight_() {
-    if (this.settings_.isAutoPanR) {
-      this.panRight();
-    }
-  }
-
-  keyUpArrowUp_() {
-    if (this.settings_.isAutoPanU) {
-      this.panUp();
-    }
-  }
-
-  keyDownV_() {
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
-
-    this.changeCameraType(orbitManagerInstance);
-
-    switch (this.cameraType) {
-      case CameraType.FIXED_TO_EARTH:
-        uiManagerInstance.toast('Earth Centered Camera Mode', ToastMsgType.standby);
-        this.zoomTarget = 0.5;
-        break;
-      case CameraType.OFFSET:
-        uiManagerInstance.toast('Offset Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.FIXED_TO_SAT:
-        uiManagerInstance.toast('Fixed to Satellite Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.FPS:
-        uiManagerInstance.toast('Free Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.PLANETARIUM:
-        uiManagerInstance.toast('Planetarium Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.SATELLITE:
-        uiManagerInstance.toast('Satellite Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.ASTRONOMY:
-        uiManagerInstance.toast('Astronomy Camera Mode', ToastMsgType.standby);
-        break;
-      default:
-        errorManagerInstance.log(`Invalid Camera Type: ${this.cameraType}`);
-        break;
-    }
-  }
-
-  keyDownA_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsSideSpeed = -settingsManager.fpsSideSpeed;
-      this.isFPSSideSpeedLock_ = true;
-    }
-  }
-
-  keyDownD_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsSideSpeed = settingsManager.fpsSideSpeed;
-      this.isFPSSideSpeedLock_ = true;
-    }
-  }
-
-  keyDownE_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsVertSpeed = settingsManager.fpsVertSpeed;
-      this.isFPSVertSpeedLock_ = true;
-    }
-    if (this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = -settingsManager.fpsRotateRate / this.speedModifier;
-    }
-  }
-
-  keyDownNumpad8_() {
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsPitchRate = settingsManager.fpsPitchRate / this.speedModifier;
-    }
-  }
-
-  keyDownNumpad4_() {
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE) {
-      this.fpsYawRate = -settingsManager.fpsYawRate / this.speedModifier;
-    }
-    if (this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
-    }
-  }
-
-  keyDownNumpad2_() {
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsPitchRate = -settingsManager.fpsPitchRate / this.speedModifier;
-    }
-  }
-
-  keyDownNumpad6_() {
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE) {
-      this.fpsYawRate = settingsManager.fpsYawRate / this.speedModifier;
-    }
-    if (this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = -settingsManager.fpsRotateRate / this.speedModifier;
-    }
-  }
-
-  keyDownQ_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsVertSpeed = -settingsManager.fpsVertSpeed;
-      this.isFPSVertSpeedLock_ = true;
-    }
-    if (this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
-    }
-  }
-
-  keyDownR_() {
-    this.autoRotate();
-  }
-
-  keyDownS_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsForwardSpeed = -settingsManager.fpsForwardSpeed;
-      this.isFPSForwardSpeedLock_ = true;
-    }
-  }
-
-  keyDownShiftRight_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsRun = 3;
-    }
-  }
-
-  keyDownShift_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsRun = 0.05;
-    }
-    this.speedModifier = 8;
-    settingsManager.cameraMovementSpeed = 0.003 / 8;
-    settingsManager.cameraMovementSpeedMin = 0.005 / 8;
-  }
-
-  keyDownW_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsForwardSpeed = settingsManager.fpsForwardSpeed;
-      this.isFPSForwardSpeedLock_ = true;
-    }
-  }
-
-  keyUpA_() {
-    if (this.fpsSideSpeed === -settingsManager.fpsSideSpeed) {
-      this.isFPSSideSpeedLock_ = false;
-    }
-  }
-
-  keyUpD_() {
-    if (this.fpsSideSpeed === settingsManager.fpsSideSpeed) {
-      this.isFPSSideSpeedLock_ = false;
-    }
-  }
-
-  keyUpE_() {
-    if (this.fpsVertSpeed === settingsManager.fpsVertSpeed) {
-      this.isFPSVertSpeedLock_ = false;
-    }
-    this.fpsRotateRate = 0;
-  }
-
-  keyUpNumpad8_() {
-    this.fpsPitchRate = 0;
-  }
-
-  // Intentionally the same as keyUpI_
-  keyUpNumpad2_() {
-    this.fpsPitchRate = 0;
-  }
-
-  keyUpNumpad4_() {
-    if (this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = 0;
-    } else {
-      this.fpsYawRate = 0;
-    }
-  }
-
-  // Intentionally the same as keyUpJ_
-  keyUpNumpad6_() {
-    if (this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = 0;
-    } else {
-      this.fpsYawRate = 0;
-    }
-  }
-
-  keyUpQ_() {
-    if (this.fpsVertSpeed === -settingsManager.fpsVertSpeed) {
-      this.isFPSVertSpeedLock_ = false;
-    }
-    this.fpsRotateRate = 0;
-  }
-
-  keyUpS_() {
-    if (this.fpsForwardSpeed === -settingsManager.fpsForwardSpeed) {
-      this.isFPSForwardSpeedLock_ = false;
-    }
-  }
-
-  keyUpShiftRight_() {
-    this.fpsRun = 1;
-    settingsManager.cameraMovementSpeed = 0.003;
-    settingsManager.cameraMovementSpeedMin = 0.005;
-    this.speedModifier = 1;
-  }
-
-  keyUpShift_() {
-    this.fpsRun = 1;
-    settingsManager.cameraMovementSpeed = 0.003;
-    settingsManager.cameraMovementSpeedMin = 0.005;
-    this.speedModifier = 1;
-    if (!this.isFPSForwardSpeedLock_) {
-      this.fpsForwardSpeed = 0;
-    }
-    if (!this.isFPSSideSpeedLock_) {
-      this.fpsSideSpeed = 0;
-    }
-    if (!this.isFPSVertSpeedLock_) {
-      this.fpsVertSpeed = 0;
-    }
-  }
-
-  keyUpW_() {
-    if (this.fpsForwardSpeed === settingsManager.fpsForwardSpeed) {
-      this.isFPSForwardSpeedLock_ = false;
-    }
-  }
-
   /**
    * Sets the camera to look at a specific latitude and longitude with a given zoom level.
    */
@@ -1118,46 +731,9 @@ export class LegacyCamera extends PerspectiveCamera {
     this.camSnap(lat2pitch(lat), lon2yaw(lon, date));
   }
 
-  lookAtPosition(pos: EciVec3, isFaceEarth: boolean, selectedDate: Date): void {
-    const gmst = SatMath.calculateTimeVariables(selectedDate).gmst;
-    const lla = eci2lla(pos, gmst);
-    const latModifier = isFaceEarth ? 1 : -1;
-    const lonModifier = isFaceEarth ? 0 : 180;
-
-    this.camSnap(lat2pitch(<Degrees>(lla.lat * latModifier)), lon2yaw(<Degrees>(lla.lon + lonModifier), selectedDate));
-  }
-
   lookAtStar(c: Star): void {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const lineManagerInstance = keepTrackApi.getLineManager();
-
-    // Try with the pname
-    const satId = catalogManagerInstance.starName2Id(c.name, dotsManagerInstance.starIndex1, dotsManagerInstance.starIndex2);
-    const sat = catalogManagerInstance.getObject(satId);
-
-    if (sat === null) {
-      throw new Error('Star not found');
-    }
-
-    lineManagerInstance.clear();
-    this.cameraType = CameraType.FIXED_TO_EARTH; // Earth will block the view of the star
-    this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
-    this.lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
-  }
-
-  setCameraType(val: CameraType) {
-    if (typeof val !== 'number') {
-      throw new TypeError();
-    }
-    if (val > 6 || val < 0) {
-      throw new RangeError();
-    }
-
-    this.cameraType = val;
-    this.activeCameraMode = this.cameraModes.get(val) ?? null;
-    this.resetFpsPos_();
+    this.switchCameraController(CameraControllerType.EARTH_CENTERED_ORBITAL);
+    (this.activeCameraController as EarthCenteredOrbitalController).lookAtStar(c);
   }
 
   /**
@@ -1209,14 +785,14 @@ export class LegacyCamera extends PerspectiveCamera {
         this.camZoomSnappedOnSat = false;
         this.camAngleSnappedOnSat = false;
       }
-      if (this.cameraType === CameraType.PLANETARIUM) {
+      if (this.activeCameraType_ === CameraControllerType.PLANETARIUM) {
         // camSnap(-pitch, -yaw)
       } else {
         this.camSnap(this.camSnapToSat.pitch, this.camSnapToSat.yaw);
       }
     }
 
-    if (this.camZoomSnappedOnSat && !this.settings_.isAutoZoomIn && !this.settings_.isAutoZoomOut) {
+    if (this.camZoomSnappedOnSat && !settingsManager.isAutoZoomIn && !settingsManager.isAutoZoomOut) {
       if (sat.active) {
         // if this is a satellite not a missile
         const { gmst } = SatMath.calculateTimeVariables(simulationTime);
@@ -1232,40 +808,25 @@ export class LegacyCamera extends PerspectiveCamera {
         this.camAngleSnappedOnSat = false;
       }
 
-      this.camSnapToSat.camDistTarget = this.camSnapToSat.camDistTarget < this.settings_.minZoomDistance ? this.settings_.minZoomDistance + 10 : this.camSnapToSat.camDistTarget;
+      this.camSnapToSat.camDistTarget = this.camSnapToSat.camDistTarget < settingsManager.minZoomDistance ? settingsManager.minZoomDistance + 10 : this.camSnapToSat.camDistTarget;
 
-      this.zoomTarget = ((this.camSnapToSat.camDistTarget - this.settings_.minZoomDistance) / (this.settings_.maxZoomDistance - this.settings_.minZoomDistance)) ** (1 / ZOOM_EXP);
+      this.zoomTarget =
+        ((this.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
       settingsManager.selectedColor = [0, 0, 0, 0];
       // errorManagerInstance.debug(`Zoom Target: ${this.zoomTarget_}`);
       this.earthCenteredLastZoom = this.zoomTarget_ + 0.1;
 
       // Only Zoom in Once on Mobile
-      if (this.settings_.isMobileModeEnabled) {
+      if (settingsManager.isMobileModeEnabled) {
         this.camZoomSnappedOnSat = false;
       }
     }
 
     this.updateSatShaderSizes();
 
-    if (this.cameraType === CameraType.PLANETARIUM) {
+    if (this.activeCameraType_ === CameraControllerType.PLANETARIUM) {
       this.zoomTarget = 0.01;
     }
-  }
-
-  panUp() {
-    this.settings_.isAutoPanU = !this.settings_.isAutoPanU;
-  }
-
-  panDown() {
-    this.settings_.isAutoPanD = !this.settings_.isAutoPanD;
-  }
-
-  panLeft() {
-    this.settings_.isAutoPanL = !this.settings_.isAutoPanL;
-  }
-
-  panRight() {
-    this.settings_.isAutoPanR = !this.settings_.isAutoPanR;
   }
 
   /**
@@ -1281,9 +842,9 @@ export class LegacyCamera extends PerspectiveCamera {
     this.updatePitchYawSpeeds_(dt);
     this.updateFtsRotation_(dt);
 
-    this.camRotateSpeed -= this.camRotateSpeed * dt * this.settings_.cameraMovementSpeed;
+    this.camRotateSpeed -= this.camRotateSpeed * dt * settingsManager.cameraMovementSpeed;
 
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY || this.cameraType === CameraType.PLANETARIUM) {
+    if (this.activeCameraController instanceof FirstPersonCameraController) {
       this.updateFpsMovement_(dt);
     } else {
       // Account for floating point errors by clamping very small values to zero
@@ -1305,25 +866,25 @@ export class LegacyCamera extends PerspectiveCamera {
     }
 
     if (this.isAutoRotate_) {
-      if (this.settings_.isAutoRotateL) {
-        this.camYaw = <Radians>(this.camYaw - this.settings_.autoRotateSpeed * dt);
+      if (settingsManager.isAutoRotateL) {
+        this.camYaw = <Radians>(this.camYaw - settingsManager.autoRotateSpeed * dt);
       }
-      if (this.settings_.isAutoRotateR) {
-        this.camYaw = <Radians>(this.camYaw + this.settings_.autoRotateSpeed * dt);
+      if (settingsManager.isAutoRotateR) {
+        this.camYaw = <Radians>(this.camYaw + settingsManager.autoRotateSpeed * dt);
       }
-      if (this.settings_.isAutoRotateU) {
-        this.camPitch = <Radians>(this.camPitch + (this.settings_.autoRotateSpeed / 2) * dt);
+      if (settingsManager.isAutoRotateU) {
+        this.camPitch = <Radians>(this.camPitch + (settingsManager.autoRotateSpeed / 2) * dt);
       }
-      if (this.settings_.isAutoRotateD) {
-        this.camPitch = <Radians>(this.camPitch - (this.settings_.autoRotateSpeed / 2) * dt);
+      if (settingsManager.isAutoRotateD) {
+        this.camPitch = <Radians>(this.camPitch - (settingsManager.autoRotateSpeed / 2) * dt);
       }
     }
 
     this.updateZoom_(dt);
 
-    this.updateCameraSnapMode(dt);
+    this.updateCameraSnapMode();
 
-    if (this.cameraType !== CameraType.FIXED_TO_SAT) {
+    if (this.activeCameraType_ !== CameraControllerType.SATELLITE_CENTERED_ORBITAL) {
       if (this.camPitch > TAU / 4) {
         this.camPitch = <Radians>(TAU / 4);
       }
@@ -1339,7 +900,7 @@ export class LegacyCamera extends PerspectiveCamera {
       this.camYaw = <Radians>(this.camYaw + TAU);
     }
 
-    if (this.cameraType === CameraType.FIXED_TO_EARTH || this.cameraType === CameraType.OFFSET) {
+    if (this.activeCameraType_ === CameraControllerType.EARTH_CENTERED_ORBITAL) {
       this.earthCenteredPitch = this.camPitch;
       this.earthCenteredYaw = this.camYaw;
       if (this.earthCenteredYaw < 0) {
@@ -1382,7 +943,7 @@ export class LegacyCamera extends PerspectiveCamera {
     this.zoomLevel_ = zoomLevel;
   }
 
-  private drawPreValidate_(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null) {
+  private drawPreValidate_() {
     if (
       Number.isNaN(this.camPitch) ||
       Number.isNaN(this.camYaw) ||
@@ -1398,7 +959,7 @@ export class LegacyCamera extends PerspectiveCamera {
         errorManagerInstance.debug(`camYawTarget: ${this.camYawTarget}`);
         errorManagerInstance.debug(`zoomLevel: ${this.zoomLevel_}`);
         errorManagerInstance.debug(`_zoomTarget: ${this.zoomTarget_}`);
-        errorManagerInstance.debug(`this.settings_.cameraMovementSpeed: ${this.settings_.cameraMovementSpeed}`);
+        errorManagerInstance.debug(`settingsManager.cameraMovementSpeed: ${settingsManager.cameraMovementSpeed}`);
       } catch (e) {
         errorManagerInstance.info('Camera Math Error');
       }
@@ -1409,12 +970,6 @@ export class LegacyCamera extends PerspectiveCamera {
       this.camYawTarget = <Radians>0;
       this.zoomTarget = 0.5;
     }
-
-    if (!sensorPos && (this.cameraType === CameraType.PLANETARIUM || this.cameraType === CameraType.ASTRONOMY)) {
-      this.cameraType = CameraType.FIXED_TO_EARTH;
-      this.activeCameraMode = this.cameraModes.get(CameraType.FIXED_TO_EARTH) as CameraMode;
-      errorManagerInstance.debug('A sensor should be selected first if this mode is allowed to be planetarium or astronmy.');
-    }
   }
 
   private resetFpsPos_(): void {
@@ -1423,7 +978,7 @@ export class LegacyCamera extends PerspectiveCamera {
     this.fpsPos[0] = 0;
 
     // Move out from the center of the Earth in FPS Mode
-    if (this.cameraType === CameraType.FPS) {
+    if (this.activeCameraType_ === CameraControllerType.FIRST_PERSON) {
       this.fpsPos[1] = 25000;
     } else {
       this.fpsPos[1] = 0;
@@ -1431,12 +986,10 @@ export class LegacyCamera extends PerspectiveCamera {
     this.fpsPos[2] = 0;
   }
 
-  private updateCameraSnapMode(dt: Milliseconds) {
+  private updateCameraSnapMode() {
     if (this.isAutoPitchYawToTarget) {
-      this.camPitch = <Radians>(this.camPitch + (this.camPitchTarget - this.camPitch) * this.chaseSpeed_ * dt);
-
-      this.yawErr_ = normalizeAngle(<Radians>(this.camYawTarget - this.camYaw));
-      this.camYaw = <Radians>(this.camYaw + this.yawErr_ * this.chaseSpeed_ * dt);
+      this.camPitch = this.camPitchTarget;
+      this.camYaw = this.camYawTarget;
     }
   }
 
@@ -1474,25 +1027,25 @@ export class LegacyCamera extends PerspectiveCamera {
     if (this.fpsLastTime_ !== 0) {
       const fpsElapsed = <Milliseconds>(fpsTimeNow - this.fpsLastTime_);
 
-      if (this.isFPSForwardSpeedLock_ && this.fpsForwardSpeed < 0) {
-        this.fpsForwardSpeed = Math.max(this.fpsForwardSpeed + Math.min(this.fpsForwardSpeed * -1.02 * fpsElapsed, -0.2), -this.settings_.fpsForwardSpeed);
-      } else if (this.isFPSForwardSpeedLock_ && this.fpsForwardSpeed > 0) {
-        this.fpsForwardSpeed = Math.min(this.fpsForwardSpeed + Math.max(this.fpsForwardSpeed * 1.02 * fpsElapsed, 0.2), this.settings_.fpsForwardSpeed);
+      if (this.isFPSForwardSpeedLock && this.fpsForwardSpeed < 0) {
+        this.fpsForwardSpeed = Math.max(this.fpsForwardSpeed + Math.min(this.fpsForwardSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsForwardSpeed);
+      } else if (this.isFPSForwardSpeedLock && this.fpsForwardSpeed > 0) {
+        this.fpsForwardSpeed = Math.min(this.fpsForwardSpeed + Math.max(this.fpsForwardSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsForwardSpeed);
       }
 
-      if (this.isFPSSideSpeedLock_ && this.fpsSideSpeed < 0) {
-        this.fpsSideSpeed = Math.max(this.fpsSideSpeed + Math.min(this.fpsSideSpeed * -1.02 * fpsElapsed, -0.2), -this.settings_.fpsSideSpeed);
-      } else if (this.isFPSSideSpeedLock_ && this.fpsSideSpeed > 0) {
-        this.fpsSideSpeed = Math.min(this.fpsSideSpeed + Math.max(this.fpsSideSpeed * 1.02 * fpsElapsed, 0.2), this.settings_.fpsSideSpeed);
+      if (this.isFPSSideSpeedLock && this.fpsSideSpeed < 0) {
+        this.fpsSideSpeed = Math.max(this.fpsSideSpeed + Math.min(this.fpsSideSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsSideSpeed);
+      } else if (this.isFPSSideSpeedLock && this.fpsSideSpeed > 0) {
+        this.fpsSideSpeed = Math.min(this.fpsSideSpeed + Math.max(this.fpsSideSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsSideSpeed);
       }
 
-      if (this.isFPSVertSpeedLock_ && this.fpsVertSpeed < 0) {
-        this.fpsVertSpeed = Math.max(this.fpsVertSpeed + Math.min(this.fpsVertSpeed * -1.02 * fpsElapsed, -0.2), -this.settings_.fpsVertSpeed);
-      } else if (this.isFPSVertSpeedLock_ && this.fpsVertSpeed > 0) {
-        this.fpsVertSpeed = Math.min(this.fpsVertSpeed + Math.max(this.fpsVertSpeed * 1.02 * fpsElapsed, 0.2), this.settings_.fpsVertSpeed);
+      if (this.isFPSVertSpeedLock && this.fpsVertSpeed < 0) {
+        this.fpsVertSpeed = Math.max(this.fpsVertSpeed + Math.min(this.fpsVertSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsVertSpeed);
+      } else if (this.isFPSVertSpeedLock && this.fpsVertSpeed > 0) {
+        this.fpsVertSpeed = Math.min(this.fpsVertSpeed + Math.max(this.fpsVertSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsVertSpeed);
       }
 
-      if (this.cameraType === CameraType.FPS) {
+      if (this.activeCameraType_ === CameraControllerType.FIRST_PERSON) {
         if (this.fpsForwardSpeed !== 0) {
           this.fpsPos[0] -= Math.sin(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
           this.fpsPos[1] -= Math.cos(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
@@ -1507,13 +1060,13 @@ export class LegacyCamera extends PerspectiveCamera {
         }
       }
 
-      if (!this.isFPSForwardSpeedLock_) {
+      if (!this.isFPSForwardSpeedLock) {
         this.fpsForwardSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
       }
-      if (!this.isFPSSideSpeedLock_) {
+      if (!this.isFPSSideSpeedLock) {
         this.fpsSideSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
       }
-      if (!this.isFPSVertSpeedLock_) {
+      if (!this.isFPSVertSpeedLock) {
         this.fpsVertSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
       }
 
@@ -1536,7 +1089,7 @@ export class LegacyCamera extends PerspectiveCamera {
 
   private updateFtsRotation_(dt: number) {
     if (this.ftsRotateReset) {
-      if (this.cameraType !== CameraType.FIXED_TO_SAT) {
+      if (this.activeCameraType_ !== CameraControllerType.SATELLITE_CENTERED_ORBITAL) {
         this.ftsRotateReset = false;
         this.ftsPitch = 0;
         this.camPitchSpeed = 0;
@@ -1553,7 +1106,7 @@ export class LegacyCamera extends PerspectiveCamera {
       } else {
         const upOrDown = this.camPitch - this.earthCenteredPitch > 0 ? -1 : 1;
 
-        this.camPitchSpeed = (dt * upOrDown * this.settings_.cameraMovementSpeed) / 50;
+        this.camPitchSpeed = (dt * upOrDown * settingsManager.cameraMovementSpeed) / 50;
       }
 
       if (this.camYaw >= this.earthCenteredYaw - marginOfError && this.camYaw <= this.earthCenteredYaw + marginOfError) {
@@ -1563,7 +1116,7 @@ export class LegacyCamera extends PerspectiveCamera {
         // Figure out the shortest distance back to this.earthCenteredYaw_ from this.camYaw
         const leftOrRight = this.camYaw - this.earthCenteredYaw > 0 ? -1 : 1;
 
-        this.camYawSpeed = (dt * leftOrRight * this.settings_.cameraMovementSpeed) / 50;
+        this.camYawSpeed = (dt * leftOrRight * settingsManager.cameraMovementSpeed) / 50;
       }
 
       if (this.camYaw === this.earthCenteredYaw && this.camPitch === this.earthCenteredPitch) {
@@ -1571,7 +1124,7 @@ export class LegacyCamera extends PerspectiveCamera {
       }
     }
 
-    if (this.activeCameraMode instanceof FixedToSatelliteCameraMode) {
+    if (this.activeCameraController instanceof SatelliteOrbitalCameraController) {
       this.camPitch = normalizeAngle(this.camPitch);
       this.ftsPitch = this.camPitch;
       this.ftsYaw = this.camYaw;
@@ -1590,26 +1143,26 @@ export class LegacyCamera extends PerspectiveCamera {
       // If user is actively moving
       if (this.isLocalRotateRoll || this.isLocalRotateYaw) {
         this.localRotateDif.pitch = <Radians>(this.screenDragPoint[1] - this.mouseY);
-        this.localRotateTarget_.pitch = <Radians>(this.localRotateStartPosition.pitch + this.localRotateDif.pitch * -this.settings_.cameraMovementSpeed);
-        this.localRotateSpeed.pitch = normalizeAngle(<Radians>(this.localRotateCurrent.pitch - this.localRotateTarget_.pitch)) * -this.settings_.cameraMovementSpeed;
+        this.localRotateTarget_.pitch = <Radians>(this.localRotateStartPosition.pitch + this.localRotateDif.pitch * -settingsManager.cameraMovementSpeed);
+        this.localRotateSpeed.pitch = normalizeAngle(<Radians>(this.localRotateCurrent.pitch - this.localRotateTarget_.pitch)) * -settingsManager.cameraMovementSpeed;
 
         if (this.isLocalRotateRoll) {
           this.localRotateDif.roll = <Radians>(this.screenDragPoint[0] - this.mouseX);
-          this.localRotateTarget_.roll = <Radians>(this.localRotateStartPosition.roll + this.localRotateDif.roll * this.settings_.cameraMovementSpeed);
-          this.localRotateSpeed.roll = normalizeAngle(<Radians>(this.localRotateCurrent.roll - this.localRotateTarget_.roll)) * -this.settings_.cameraMovementSpeed;
+          this.localRotateTarget_.roll = <Radians>(this.localRotateStartPosition.roll + this.localRotateDif.roll * settingsManager.cameraMovementSpeed);
+          this.localRotateSpeed.roll = normalizeAngle(<Radians>(this.localRotateCurrent.roll - this.localRotateTarget_.roll)) * -settingsManager.cameraMovementSpeed;
         }
         if (this.isLocalRotateYaw) {
           this.localRotateDif.yaw = <Radians>(this.screenDragPoint[0] - this.mouseX);
-          this.localRotateTarget_.yaw = <Radians>(this.localRotateStartPosition.yaw + this.localRotateDif.yaw * this.settings_.cameraMovementSpeed);
-          this.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.localRotateCurrent.yaw - this.localRotateTarget_.yaw)) * -this.settings_.cameraMovementSpeed;
+          this.localRotateTarget_.yaw = <Radians>(this.localRotateStartPosition.yaw + this.localRotateDif.yaw * settingsManager.cameraMovementSpeed);
+          this.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.localRotateCurrent.yaw - this.localRotateTarget_.yaw)) * -settingsManager.cameraMovementSpeed;
         }
       }
 
       if (this.isLocalRotateOverride) {
-        this.localRotateTarget_.pitch = <Radians>(this.localRotateStartPosition.pitch + this.localRotateDif.pitch * -this.settings_.cameraMovementSpeed);
-        this.localRotateSpeed.pitch = normalizeAngle(<Radians>(this.localRotateCurrent.pitch - this.localRotateTarget_.pitch)) * -this.settings_.cameraMovementSpeed;
-        this.localRotateTarget_.yaw = <Radians>(this.localRotateStartPosition.yaw + this.localRotateDif.yaw * this.settings_.cameraMovementSpeed);
-        this.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.localRotateCurrent.yaw - this.localRotateTarget_.yaw)) * -this.settings_.cameraMovementSpeed;
+        this.localRotateTarget_.pitch = <Radians>(this.localRotateStartPosition.pitch + this.localRotateDif.pitch * -settingsManager.cameraMovementSpeed);
+        this.localRotateSpeed.pitch = normalizeAngle(<Radians>(this.localRotateCurrent.pitch - this.localRotateTarget_.pitch)) * -settingsManager.cameraMovementSpeed;
+        this.localRotateTarget_.yaw = <Radians>(this.localRotateStartPosition.yaw + this.localRotateDif.yaw * settingsManager.cameraMovementSpeed);
+        this.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.localRotateCurrent.yaw - this.localRotateTarget_.yaw)) * -settingsManager.cameraMovementSpeed;
       }
 
       if (this.isLocalRotateReset) {
@@ -1738,24 +1291,24 @@ export class LegacyCamera extends PerspectiveCamera {
         }
       }
     }
-    if (this.settings_.isAutoPanD || this.settings_.isAutoPanU || this.settings_.isAutoPanL || this.settings_.isAutoPanR) {
-      if (this.settings_.isAutoPanD) {
-        this.panCurrent.z += this.settings_.autoPanSpeed * dt;
+    if (settingsManager.isAutoPanD || settingsManager.isAutoPanU || settingsManager.isAutoPanL || settingsManager.isAutoPanR) {
+      if (settingsManager.isAutoPanD) {
+        this.panCurrent.z += settingsManager.autoPanSpeed * dt;
       }
-      if (this.settings_.isAutoPanU) {
-        this.panCurrent.z -= this.settings_.autoPanSpeed * dt;
+      if (settingsManager.isAutoPanU) {
+        this.panCurrent.z -= settingsManager.autoPanSpeed * dt;
       }
-      if (this.settings_.isAutoPanL) {
-        this.panCurrent.x += this.settings_.autoPanSpeed * dt;
+      if (settingsManager.isAutoPanL) {
+        this.panCurrent.x += settingsManager.autoPanSpeed * dt;
       }
-      if (this.settings_.isAutoPanR) {
-        this.panCurrent.x -= this.settings_.autoPanSpeed * dt;
+      if (settingsManager.isAutoPanR) {
+        this.panCurrent.x -= settingsManager.autoPanSpeed * dt;
       }
     }
   }
 
   private updatePitchYawSpeeds_(dt: Milliseconds) {
-    if ((this.isDragging && !this.settings_.isMobileModeEnabled) || (this.isDragging && this.settings_.isMobileModeEnabled && (this.mouseX !== 0 || this.mouseY !== 0))) {
+    if ((this.isDragging && !settingsManager.isMobileModeEnabled) || (this.isDragging && settingsManager.isMobileModeEnabled && (this.mouseX !== 0 || this.mouseY !== 0))) {
       /*
        * Disable Raycasting for Performance
        * dragTarget = getEarthScreenPoint(mouseX, mouseY)
@@ -1764,19 +1317,19 @@ export class LegacyCamera extends PerspectiveCamera {
        */
       if (
         !this.isRayCastingEarth_ ||
-        this.cameraType === CameraType.FPS ||
-        this.cameraType === CameraType.SATELLITE ||
-        this.cameraType === CameraType.ASTRONOMY ||
-        this.settings_.isMobileModeEnabled
+        this.activeCameraType_ === CameraControllerType.FIRST_PERSON ||
+        this.activeCameraType_ === CameraControllerType.SATELLITE_FIRST_PERSON ||
+        this.activeCameraType_ === CameraControllerType.ASTRONOMY ||
+        settingsManager.isMobileModeEnabled
       ) {
         // random screen drag
         const xDif = this.screenDragPoint[0] - this.mouseX;
         const yDif = this.screenDragPoint[1] - this.mouseY;
-        const yawTarget = <Radians>(this.dragStartYaw + xDif * this.settings_.cameraMovementSpeed);
-        const pitchTarget = <Radians>(this.dragStartPitch + yDif * -this.settings_.cameraMovementSpeed);
+        const yawTarget = <Radians>(this.dragStartYaw + xDif * settingsManager.cameraMovementSpeed);
+        const pitchTarget = <Radians>(this.dragStartPitch + yDif * -settingsManager.cameraMovementSpeed);
 
-        this.camPitchSpeed = normalizeAngle(<Radians>(this.camPitch - pitchTarget)) * -this.settings_.cameraMovementSpeed;
-        this.camYawSpeed = normalizeAngle(<Radians>(this.camYaw - yawTarget)) * -this.settings_.cameraMovementSpeed;
+        this.camPitchSpeed = normalizeAngle(<Radians>(this.camPitch - pitchTarget)) * -settingsManager.cameraMovementSpeed;
+        this.camYawSpeed = normalizeAngle(<Radians>(this.camYaw - yawTarget)) * -settingsManager.cameraMovementSpeed;
         /*
          * NOTE: this could be used for motion blur
          * this.camPitchAccel = this.camPitchSpeedLast - this.camPitchSpeed;
@@ -1799,8 +1352,8 @@ export class LegacyCamera extends PerspectiveCamera {
          * // dragTargetLat = Math.atan2(dragTarget[2], dragTargetR);
          * // pitchDif = dragPointLat - dragTargetLat;
          * // yawDif = normalizeAngle(dragPointLon - dragTargetLon);
-         * // this.camPitchSpeed = pitchDif * this.settings_.cameraMovementSpeed;
-         * // this.camYawSpeed = yawDif * this.settings_.cameraMovementSpeed;
+         * // this.camPitchSpeed = pitchDif * settingsManager.cameraMovementSpeed;
+         * // this.camYawSpeed = yawDif * settingsManager.cameraMovementSpeed;
          */
       }
       this.isAutoPitchYawToTarget = false;
@@ -1811,12 +1364,12 @@ export class LegacyCamera extends PerspectiveCamera {
        * It makes KeepTrack feel more like a game and less like a toolkit
        */
       if (Math.abs(this.camPitchSpeed) > 0.01) {
-        this.camPitchSpeed -= this.camPitchSpeed * dt * this.settings_.cameraMovementSpeed * this.settings_.cameraDecayFactor; // decay speeds when globe is "thrown"
+        this.camPitchSpeed -= this.camPitchSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor; // decay speeds when globe is "thrown"
       } else {
         this.camPitchSpeed = 0;
       }
       if (Math.abs(this.camYawSpeed) > 0.01) {
-        this.camYawSpeed -= this.camYawSpeed * dt * this.settings_.cameraMovementSpeed * this.settings_.cameraDecayFactor;
+        this.camYawSpeed -= this.camYawSpeed * dt * settingsManager.cameraMovementSpeed * settingsManager.cameraDecayFactor;
       } else {
         this.camYawSpeed = 0;
       }
@@ -1841,45 +1394,45 @@ export class LegacyCamera extends PerspectiveCamera {
       this.zoomLevel_ = this.zoomTarget_;
     }
 
-    if (this.settings_.isAutoZoomIn || this.settings_.isAutoZoomOut) {
+    if (settingsManager.isAutoZoomIn || settingsManager.isAutoZoomOut) {
       const cameraDistance = this.getCameraDistance();
 
       if (cameraDistance > 140000) {
-        this.settings_.satShader.minSize = 7;
+        settingsManager.satShader.minSize = 7;
       }
       if (cameraDistance > 180000) {
-        this.settings_.satShader.minSize = 6;
+        settingsManager.satShader.minSize = 6;
       }
       if (cameraDistance > 220000) {
-        this.settings_.satShader.minSize = 5;
+        settingsManager.satShader.minSize = 5;
       }
       if (cameraDistance > 280000) {
-        this.settings_.satShader.minSize = 4;
+        settingsManager.satShader.minSize = 4;
       }
       if (cameraDistance > 350000) {
-        this.settings_.satShader.minSize = 3;
+        settingsManager.satShader.minSize = 3;
       }
       if (cameraDistance > 400000) {
-        this.settings_.satShader.minSize = 2;
+        settingsManager.satShader.minSize = 2;
       }
       if (cameraDistance > 450000) {
-        this.settings_.satShader.minSize = 1;
+        settingsManager.satShader.minSize = 1;
       }
 
-      if (this.settings_.isAutoZoomIn) {
-        this.zoomTarget_ -= dt * this.settings_.autoZoomSpeed;
+      if (settingsManager.isAutoZoomIn) {
+        this.zoomTarget_ -= dt * settingsManager.autoZoomSpeed;
       }
-      if (this.settings_.isAutoZoomOut) {
-        this.zoomTarget_ += dt * this.settings_.autoZoomSpeed;
+      if (settingsManager.isAutoZoomOut) {
+        this.zoomTarget_ += dt * settingsManager.autoZoomSpeed;
       }
     }
 
     if (this.isAutoPitchYawToTarget) {
-      this.zoomLevel_ += (this.zoomTarget_ - this.zoomLevel_) * dt * this.settings_.zoomSpeed; // Just keep zooming
+      this.zoomLevel_ += (this.zoomTarget_ - this.zoomLevel_) * dt * settingsManager.zoomSpeed; // Just keep zooming
     } else if (this.zoomLevel_ !== this.zoomTarget_) {
       const inOrOut = this.zoomLevel_ > this.zoomTarget_ ? -1 : 1;
 
-      this.zoomLevel_ += inOrOut * dt * this.settings_.zoomSpeed * Math.abs(this.zoomTarget_ - this.zoomLevel_);
+      this.zoomLevel_ += inOrOut * dt * settingsManager.zoomSpeed * Math.abs(this.zoomTarget_ - this.zoomLevel_);
 
       if ((this.zoomLevel_ > this.zoomTarget_ && !this.isZoomIn) || (this.zoomLevel_ < this.zoomTarget_ && this.isZoomIn)) {
         this.zoomTarget_ = this.zoomLevel_; // If we change direction then consider us at the target
@@ -1891,7 +1444,8 @@ export class LegacyCamera extends PerspectiveCamera {
     this.zoomLevel_ = this.zoomLevel_ < 0 ? 0.0001 : this.zoomLevel_;
 
     // Try to stay out of the earth
-    if (this.cameraType === CameraType.FIXED_TO_EARTH || this.cameraType === CameraType.OFFSET || this.cameraType === CameraType.FIXED_TO_SAT) {
+    if (this.activeCameraType_ === CameraControllerType.EARTH_CENTERED_ORBITAL ||
+      this.activeCameraType_ === CameraControllerType.SATELLITE_CENTERED_ORBITAL) {
       if (this.getDistFromEarth() < RADIUS_OF_EARTH + 30) {
         this.zoomTarget = this.zoomLevel_ + 0.001;
       }
@@ -1899,12 +1453,12 @@ export class LegacyCamera extends PerspectiveCamera {
   }
 
   updateSatShaderSizes() {
-    if (this.zoomLevel_ > this.settings_.satShader.largeObjectMaxZoom) {
-      this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize * 1.5;
-    } else if (this.zoomLevel_ < this.settings_.satShader.largeObjectMinZoom) {
-      this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize / 3;
+    if (this.zoomLevel_ > settingsManager.satShader.largeObjectMaxZoom) {
+      settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize * 1.5;
+    } else if (this.zoomLevel_ < settingsManager.satShader.largeObjectMinZoom) {
+      settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize / 3;
     } else {
-      this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize;
+      settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize;
     }
   }
 }

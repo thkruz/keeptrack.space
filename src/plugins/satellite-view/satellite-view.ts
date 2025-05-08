@@ -21,8 +21,7 @@
 
 import { Doris } from '@app/doris/doris';
 import { MenuMode, ToastMsgType } from '@app/interfaces';
-import { CameraMode } from '@app/keeptrack/camera/camera-modes/camera-mode';
-import { CameraType } from '@app/keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '@app/keeptrack/camera/legacy-camera';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
@@ -32,6 +31,7 @@ import viewInAirPng from '@public/img/icons/view-in-air.png';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { SatelliteViewCameraMode } from './satellite-view-camera-mode';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
   readonly id = 'SatelliteViewPlugin';
@@ -49,6 +49,15 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
   bottomIconImg = viewInAirPng;
   isIconDisabledOnLoad = true;
 
+  init(): void {
+    super.init();
+
+    const legacyCamera = keepTrackApi.getMainCamera();
+    const satelliteViewCameraMode = new SatelliteViewCameraMode(legacyCamera, Doris.getInstance().getEventBus());
+
+    legacyCamera.cameraControllers.set(CameraControllerType.SATELLITE_FIRST_PERSON, satelliteViewCameraMode);
+  }
+
   addJs(): void {
     super.addJs();
 
@@ -63,16 +72,14 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
 
 
   bottomIconCallback = () => {
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.SATELLITE_FIRST_PERSON) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
       uiManagerInstance.hideSideMenus();
-      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT; // Back to normal Camera Mode
-      keepTrackApi.getMainCamera().activeCameraMode = keepTrackApi.getMainCamera().cameraModes.get(CameraType.FIXED_TO_SAT) as CameraMode;
+      keepTrackApi.getMainCamera().switchCameraController(CameraControllerType.SATELLITE_CENTERED_ORBITAL); // Back to normal Camera Mode
       getEl(this.bottomIconElementName)!.classList.remove('bmenu-item-selected');
     } else if (this.selectSatManager_.selectedSat !== -1) {
-      keepTrackApi.getMainCamera().cameraType = CameraType.SATELLITE; // Activate Satellite Camera Mode
-      keepTrackApi.getMainCamera().activeCameraMode = keepTrackApi.getMainCamera().cameraModes.get(CameraType.SATELLITE) as CameraMode;
+      keepTrackApi.getMainCamera().switchCameraController(CameraControllerType.SATELLITE_FIRST_PERSON); // Activate Satellite Camera Mode
       getEl(this.bottomIconElementName)!.classList.add('bmenu-item-selected');
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();

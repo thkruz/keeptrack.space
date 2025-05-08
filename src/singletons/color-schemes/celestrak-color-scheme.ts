@@ -2,7 +2,7 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType, Star } from 'ootk';
-import { CameraType } from '../../keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '../../keeptrack/camera/legacy-camera';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { errorManagerInstance } from '../errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
@@ -70,7 +70,7 @@ export class CelestrakColorScheme extends ColorScheme {
     }
 
     // If we are in astronomy mode, hide everything that isn't a star (above)
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.ASTRONOMY) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -87,7 +87,7 @@ export class CelestrakColorScheme extends ColorScheme {
       return this.getMarkerColor_();
     }
 
-    if (obj.isSensor() && (this.objectTypeFlags.celestrakDefaultSensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
+    if (obj.isSensor() && (this.objectTypeFlags.celestrakDefaultSensor === false || keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -137,7 +137,7 @@ export class CelestrakColorScheme extends ColorScheme {
         sat.type === SpaceObjectType.PAYLOAD &&
         sat.status !== PayloadStatus.NONOPERATIONAL && sat.status !== PayloadStatus.UNKNOWN &&
         this.objectTypeFlags.celestrakDefaultActivePayload === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
+      (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM &&
         sat.type === SpaceObjectType.PAYLOAD &&
         sat.status !== PayloadStatus.NONOPERATIONAL && sat.status !== PayloadStatus.UNKNOWN &&
         this.objectTypeFlags.celestrakDefaultActivePayload === false) ||
@@ -158,7 +158,7 @@ export class CelestrakColorScheme extends ColorScheme {
         sat.type === SpaceObjectType.PAYLOAD &&
         (sat.status === PayloadStatus.NONOPERATIONAL || sat.status === PayloadStatus.UNKNOWN) &&
         this.objectTypeFlags.celestrakDefaultInactivePayload === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
+      (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM &&
         sat.type === SpaceObjectType.PAYLOAD &&
         (sat.status === PayloadStatus.NONOPERATIONAL || sat.status === PayloadStatus.UNKNOWN) &&
         this.objectTypeFlags.celestrakDefaultInactivePayload === false) ||
@@ -178,7 +178,7 @@ export class CelestrakColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.UNKNOWN &&
         this.objectTypeFlags.celestrakDefaultUnknown === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
+      (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM &&
         sat.type === SpaceObjectType.UNKNOWN &&
         this.objectTypeFlags.celestrakDefaultUnknown === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
@@ -196,7 +196,7 @@ export class CelestrakColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.ROCKET_BODY &&
         this.objectTypeFlags.celestrakDefaultRocketBody === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY &&
+      (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY &&
         this.objectTypeFlags.celestrakDefaultRocketBody === false) || (catalogManagerInstance.isSensorManagerLoaded &&
           sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
           typeof sat.vmag === 'undefined' &&
@@ -212,7 +212,8 @@ export class CelestrakColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.DEBRIS &&
         this.objectTypeFlags.celestrakDefaultDebris === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.celestrakDefaultDebris === false) ||
+      (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS &&
+        this.objectTypeFlags.celestrakDefaultDebris === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
@@ -226,14 +227,14 @@ export class CelestrakColorScheme extends ColorScheme {
     }
 
     if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.celestrakDefaultFov === false &&
-      keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+      keepTrackApi.getMainCamera().activeCameraType !== CameraControllerType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && keepTrackApi.getMainCamera().activeCameraType !== CameraControllerType.PLANETARIUM) {
       if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
         // Intentional
       } else {

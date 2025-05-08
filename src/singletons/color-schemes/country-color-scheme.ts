@@ -2,7 +2,7 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
-import { CameraType } from '../../keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '../../keeptrack/camera/legacy-camera';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
@@ -42,7 +42,7 @@ export class CountryColorScheme extends ColorScheme {
   }
 
   update(obj: BaseObject): ColorInformation {
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -82,7 +82,7 @@ export class CountryColorScheme extends ColorScheme {
   }
 
   updateGroup(obj: BaseObject): ColorInformation {
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,

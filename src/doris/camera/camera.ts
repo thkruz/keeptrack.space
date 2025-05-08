@@ -12,6 +12,9 @@ export abstract class Camera extends Component {
 
   protected projectionMatrix = mat4.create();
   protected viewMatrix = mat4.create();
+  normalizedCameraForward = vec3.create();
+  normalizedCameraLeft = vec3.create();
+  normalizedCameraUp = vec3.create();
   protected aspectRatio = 1.0;
   protected isDirty = true;
 
@@ -63,6 +66,16 @@ export abstract class Camera extends Component {
 
   getProjectionMatrix(): mat4 {
     return this.projectionMatrix;
+  }
+
+  getForwardVector(): vec3 {
+    const inverted = mat4.create();
+    const forward = vec3.create();
+
+    mat4.invert(inverted, this.viewMatrix);
+    vec3.transformMat4(forward, forward, inverted);
+
+    return forward;
   }
 
   /**

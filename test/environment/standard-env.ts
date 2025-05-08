@@ -3,7 +3,7 @@ import { Doris } from '@app/doris/doris';
 import { Renderer } from '@app/doris/rendering/renderer';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
-import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
+import { KeepTrackMainCamera } from '@app/keeptrack/camera/legacy-camera';
 import { TimeManager } from '@app/keeptrack/core/time-manager';
 import { SpaceScene } from '@app/keeptrack/scene/space-scene';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
@@ -304,7 +304,7 @@ export const mockUiManager: UiManager = <UiManager>(<unknown>{
   updateSelectBox: jest.fn(),
 });
 
-export const mockCameraManager = <LegacyCamera>(<unknown>{
+export const mockCameraManager = <KeepTrackMainCamera>(<unknown>{
   camAngleSnappedOnSat: false,
   viewMatrix: mat4.create().fill(0),
   camPitch: null,

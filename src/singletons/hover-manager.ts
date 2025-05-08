@@ -1,7 +1,7 @@
 import { country2flagIcon } from '@app/catalogs/countries';
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { CameraType } from '@app/keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -45,7 +45,12 @@ export class HoverManager {
       if (Doris.getInstance().getTimeManager().getFramesPerSecond() > 5 && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
         // Only update hover if we are not on mobile
         if (!settingsManager.isMobileModeEnabled) {
-          this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+          const inputManager = keepTrackApi.getInputManager();
+          const inputSystem = Doris.getInstance().getInputSystem();
+          const mouseSat = inputManager.mouse.mouseSat;
+          const mousePos = inputSystem.getMousePosition();
+
+          this.setHoverId(mouseSat, mousePos.x, mousePos.y);
         }
       }
     });
@@ -181,7 +186,7 @@ export class HoverManager {
   }
 
   private planetariumView_(satId: number) {
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM && !settingsManager.isDemoModeOn) {
       this.satHoverBoxDOM.style.display = 'none';
 
       const renderer = keepTrackApi.getRenderer();

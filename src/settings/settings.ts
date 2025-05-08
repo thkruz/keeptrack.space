@@ -36,7 +36,6 @@ import { ClassificationString } from '../static/classification';
 import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
-import { sateliot } from './presets/sateliot';
 import { starTalk } from './presets/startalk';
 
 export class SettingsManager {
@@ -1499,9 +1498,6 @@ export class SettingsManager {
                 break;
               case 'startalk':
                 starTalk(settingsManager);
-                break;
-              case 'sateliot':
-                sateliot(settingsManager);
                 break;
               case 'million-year':
                 SettingsPresets.loadPresetMillionYear(this);

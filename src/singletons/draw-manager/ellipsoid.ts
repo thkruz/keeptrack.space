@@ -3,7 +3,7 @@ import { WebGlProgramHelper } from '@app/doris/webgl/webgl-program';
 import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, EciVec3 } from 'ootk';
 import { GlUtils } from '../../doris/webgl/gl-utils';
-import { LegacyCamera } from '../../keeptrack/camera/legacy-camera';
+import { KeepTrackMainCamera } from '../../keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '../../keepTrackApi';
 
 /* eslint-disable no-useless-escape */
@@ -73,7 +73,7 @@ export class Ellipsoid {
     this.color_[3] = color[3];
   }
 
-  render(camera: LegacyCamera, tgtBuffer = null as WebGLFramebuffer | null) {
+  render(camera: KeepTrackMainCamera, tgtBuffer = null as WebGLFramebuffer | null) {
     if (!this.isLoaded_ || !settingsManager.isDrawCovarianceEllipsoid) {
       return;
     }

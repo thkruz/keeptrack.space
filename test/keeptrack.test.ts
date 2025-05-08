@@ -87,7 +87,7 @@ const setupStandardEnvironment = () => {
   keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
   keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.MainCamera, mockCameraManager);
+  keepTrackContainer.registerSingleton(Singletons.CameraSystem, mockCameraManager);
 };
 
 describe('code_snippet', () => {

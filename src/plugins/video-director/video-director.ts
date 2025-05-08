@@ -1,11 +1,11 @@
 import { Doris } from '@app/doris/doris';
 import { MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -166,7 +166,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
       getEl('video-director-form')!.addEventListener('submit', VideoDirectorPlugin.onSubmit);
       getEl('video-director-rotate')!.addEventListener('click', () => {
         keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
-        keepTrackApi.getMainCamera().autoRotate(true);
+        Doris.getInstance().emit(KeepTrackApiEvents.enableAutoRotate);
       });
     });
   }

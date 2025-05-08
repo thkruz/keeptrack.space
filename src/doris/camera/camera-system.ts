@@ -1,165 +1,196 @@
-import { System } from '../system/system';
+// app/doris/camera/camera-system.ts
+import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { System } from '@app/doris/system/system';
+import { EventBus } from '../events/event-bus';
 import { Camera } from './camera';
-import { CameraController } from './camera-controller';
+import { CameraController } from './controllers/camera-controller';
+import { vec3 } from 'gl-matrix';
 
-/**
- * Manages multiple cameras in a scene and camera controllers.
- */
+export enum CameraNames {
+  MAIN = 'main',
+  PIP = 'pictureInPicture',
+}
+
 export class CameraSystem extends System {
-  /**
-   * All registered cameras
-   */
-  private cameras: Map<string, Camera> = new Map();
+  // Map of cameras by ID
+  private readonly cameras: Map<string, Camera> = new Map();
 
-  /**
-   * All registered camera controllers
-   */
-  private controllers: Map<string, CameraController> = new Map();
+  // Map of controllers by camera ID and controller type
+  private readonly controllers: Map<string, Map<number, CameraController>> = new Map();
 
-  /**
-   * Currently active camera
-   */
-  private activeCamera: Camera | null = null;
+  // Currently active camera/controller pairs
+  private readonly activeCameras: Map<string, number> = new Map();
 
-  /**
-   * Currently active controller
-   */
-  private activeController: CameraController | null = null;
+  // TODO: Information that belongs in the node
+  cameraOrigin: vec3 = vec3.create();
 
-  constructor() {
+  constructor(eventBus: EventBus) {
     super();
+
+    this.eventBus = eventBus;
+    this.eventBus.on(CoreEngineEvents.Update, (deltaTime) => {
+      this.update(deltaTime);
+    });
   }
 
-  /**
-   * Registers a camera with the system
-   */
-  registerCamera(id: string, camera: Camera): void {
-    this.cameras.set(id, camera);
+  // Update all active cameras and controllers
+  update(deltaTime: number): void {
+    // Update each active camera's controller
+    this.activeCameras.forEach((controllerType, cameraId) => {
+      const camera = this.cameras.get(cameraId);
+      const controllerMap = this.controllers.get(cameraId);
 
-    // If this is the first camera, make it active
-    if (this.cameras.size === 1) {
-      this.setActiveCamera(id);
+      if (camera && controllerMap) {
+        const controller = controllerMap.get(controllerType);
+
+        if (controller) {
+          controller.update(deltaTime);
+        }
+
+        // Update the camera itself
+        camera.update();
+      }
+    });
+  }
+
+  render(): void {
+    // Render each active camera's controller
+    this.activeCameras.forEach((controllerType, cameraId) => {
+      const camera = this.cameras.get(cameraId);
+      const controllerMap = this.controllers.get(cameraId);
+
+      if (camera && controllerMap) {
+        const controller = controllerMap.get(controllerType);
+
+        if (controller) {
+          controller.render(camera);
+        }
+      }
+    });
+  }
+
+  renderCamera(cameraId: string): void {
+    // Render a specific camera's controller
+    const camera = this.cameras.get(cameraId);
+    const controllerMap = this.controllers.get(cameraId);
+    const controllerType = this.activeCameras.get(cameraId);
+
+    if (camera && controllerMap && controllerType) {
+      const controller = controllerMap.get(controllerType);
+
+      if (controller) {
+        controller.render(camera);
+      }
     }
   }
 
-  /**
-   * Registers a camera controller with the system
-   */
-  registerController(id: string, controller: CameraController): void {
-    this.controllers.set(id, controller);
-  }
-
-  /**
-   * Sets the active camera
-   */
-  setActiveCamera(id: string): boolean {
-    const camera = this.cameras.get(id);
-
-    if (!camera) {
-      console.warn(`Camera with id "${id}" not found`);
-
-      return false;
+  getCamera(id?: string): Camera | undefined {
+    if (!id) {
+      // If no ID is provided, return the first camera
+      return this.cameras.values().next().value;
     }
 
-    this.activeCamera = camera;
-
-    return true;
-  }
-
-  /**
-   * Sets the active camera controller
-   */
-  setActiveController(id: string): boolean {
-    const controller = this.controllers.get(id);
-
-    if (!controller) {
-      console.warn(`Camera controller with id "${id}" not found`);
-
-      return false;
-    }
-
-    // Deactivate current controller
-    if (this.activeController) {
-      this.activeController.deactivate();
-    }
-
-    // Activate new controller
-    this.activeController = controller;
-    this.activeController.activate();
-
-    return true;
-  }
-
-  /**
-   * Gets the active camera
-   */
-  getActiveCamera(): Camera | null {
-    return this.activeCamera;
-  }
-
-  /**
-   * Gets the active controller
-   */
-  getActiveController(): CameraController | null {
-    return this.activeController;
-  }
-
-  /**
-   * Gets a camera by ID
-   */
-  getCamera(id: string): Camera | undefined {
+    // If an ID is provided, return the camera with that ID
     return this.cameras.get(id);
   }
 
-  /**
-   * Gets a controller by ID
-   */
-  getController(id: string): CameraController | undefined {
-    return this.controllers.get(id);
+  getControllerType(cameraId: string): number | undefined {
+    // Get the active controller type for the specified camera
+    return this.activeCameras.get(cameraId);
   }
 
-  /**
-   * Removes a camera from the system
-   */
+  // Set active controller for a camera
+  setCameraController(cameraId: string, type: number): boolean {
+    // Get the camera's controller map
+    const controllerMap = this.controllers.get(cameraId);
+
+    if (!controllerMap) {
+      return false;
+    }
+
+    // Get the previous controller type for this camera
+    const prevType = this.activeCameras.get(cameraId);
+
+    // If there was a previous controller, deactivate it
+    if (prevType) {
+      const prevController = controllerMap.get(prevType);
+
+      if (prevController) {
+        prevController.deactivate();
+      }
+    }
+
+    // Activate the new controller
+    const newController = controllerMap.get(type);
+
+    if (newController) {
+      newController.activate();
+      this.activeCameras.set(cameraId, type);
+
+      return true;
+    }
+
+    return false;
+  }
+
+  addController(id: string, type: number, controller: CameraController): boolean {
+    // Get the camera's controller map
+    const controllerMap = this.controllers.get(id);
+
+    if (!controllerMap) {
+      return false;
+    }
+    // Add the controller to the map
+    controllerMap.set(type, controller);
+    // If this is the first controller, set it as the active controller
+    if (controllerMap.size === 1) {
+      this.setCameraController(id, type);
+    }
+
+    return true;
+  }
+
+  // Add a camera to the manager with controllers
+  addCamera(id: string, camera: Camera, controllers: Map<number, CameraController>, defaultControllerType?: number): void {
+    this.cameras.set(id, camera);
+
+    // Store the controllers
+    this.controllers.set(id, controllers);
+
+    // Set the default camera controller if provided
+    if (defaultControllerType && controllers.has(defaultControllerType)) {
+      this.setCameraController(id, defaultControllerType);
+    } else if (controllers.size > 0) {
+      // Otherwise set the first available controller as default
+      const firstControllerType = controllers.keys().next().value;
+
+      this.setCameraController(id, firstControllerType);
+    }
+  }
+
+  // Remove a camera from the manager
   removeCamera(id: string): boolean {
-    if (!this.cameras.has(id)) {
-      return false;
+    // Deactivate any active controller for this camera
+    const controllerType = this.activeCameras.get(id);
+
+    if (controllerType) {
+      const controllerMap = this.controllers.get(id);
+
+      if (controllerMap) {
+        const controller = controllerMap.get(controllerType);
+
+        if (controller) {
+          controller.deactivate();
+        }
+      }
+
+      this.activeCameras.delete(id);
     }
 
-    if (this.activeCamera === this.cameras.get(id)) {
-      this.activeCamera = null;
-    }
+    // Remove controller map
+    this.controllers.delete(id);
 
+    // Remove camera
     return this.cameras.delete(id);
-  }
-
-  /**
-   * Removes a controller from the system
-   */
-  removeController(id: string): boolean {
-    if (!this.controllers.has(id)) {
-      return false;
-    }
-
-    if (this.activeController === this.controllers.get(id)) {
-      this.activeController = null;
-    }
-
-    return this.controllers.delete(id);
-  }
-
-  /**
-   * Updates all cameras and active controller
-   */
-  update(deltaTime: number): void {
-    // Update active controller
-    if (this.activeController) {
-      this.activeController.update(deltaTime);
-    }
-
-    // Update all cameras
-    this.cameras.forEach((camera) => {
-      camera.update();
-    });
   }
 }

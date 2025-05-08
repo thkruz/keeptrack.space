@@ -1,5 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
+import { CameraSystem } from '../camera/camera-system';
 import { EventBus } from '../events/event-bus';
 import { CoreEngineEvents, EventMap } from '../events/event-types';
 import { InputSystem } from '../input/input-system';
@@ -20,6 +21,7 @@ export interface EngineConfig {
 export class Engine {
   private readonly eventBus: EventBus;
   private readonly sceneManager: SceneManager;
+  private readonly cameraSystem: CameraSystem;
   private renderer: Renderer;
   private readonly inputSystem: InputSystem;
   private readonly pluginManager: PluginManager;
@@ -32,6 +34,7 @@ export class Engine {
     this.sceneManager = new SceneManager(this.eventBus);
     this.renderer = config_.Renderer ? new config_.Renderer(this.eventBus) : new Renderer(this.eventBus);
     this.inputSystem = new InputSystem(this.eventBus);
+    this.cameraSystem = new CameraSystem(this.eventBus);
     this.pluginManager = new PluginManager(this.eventBus);
     this.canvasManager = new CanvasManager(this.eventBus, getEl(this.config_.containerRoot));
     this.timeManager = new TimeManager(this.eventBus);
@@ -173,6 +176,14 @@ export class Engine {
 
   getEventBus(): EventBus {
     return this.eventBus;
+  }
+
+  getCameraSystem(): CameraSystem {
+    return this.cameraSystem;
+  }
+
+  getInputSystem(): InputSystem {
+    return this.inputSystem;
   }
 
   getSceneManager(): SceneManager {

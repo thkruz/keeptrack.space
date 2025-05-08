@@ -1,5 +1,5 @@
 import { ToastMsgType } from '@app/interfaces';
-import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
+import { KeepTrackMainCamera } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -216,7 +216,7 @@ export class KeyboardInput {
     }
   }
 
-  private releaseShiftKey(mainCameraInstance: LegacyCamera) {
+  private releaseShiftKey(mainCameraInstance: KeepTrackMainCamera) {
     setTimeout(() => {
       this.isShiftPressed = false;
       mainCameraInstance.fpsRun = 1;

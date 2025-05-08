@@ -9,7 +9,7 @@ import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Milliseconds, SpaceObjectType } from 'ootk';
 import { BufferAttribute } from '../doris/webgl/buffer-attribute';
 import { WebGlProgramHelper } from '../doris/webgl/webgl-program';
-import { CameraType } from '../keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '../keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '../keepTrackApi';
 import { SettingsManager } from '../settings/settings';
 import { MissileObject } from './catalog-manager/MissileObject';
@@ -166,7 +166,7 @@ export class DotsManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvviewMatrix, false, pMvviewMatrix);
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM) {
       gl.uniform1f(this.programs.dots.uniforms.u_minSize, this.settings_.satShader.minSizePlanetarium);
       gl.uniform1f(this.programs.dots.uniforms.u_maxSize, this.settings_.satShader.maxSizePlanetarium);
     } else {

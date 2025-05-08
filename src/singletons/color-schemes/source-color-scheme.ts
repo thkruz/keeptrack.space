@@ -2,7 +2,7 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
-import { CameraType } from '../../keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '../../keeptrack/camera/legacy-camera';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 
@@ -45,7 +45,7 @@ export class SourceColorScheme extends ColorScheme {
   }
 
   update(obj: BaseObject): ColorInformation {
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,

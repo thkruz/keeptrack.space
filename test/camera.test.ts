@@ -1,31 +1,31 @@
-import { CameraType, LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
+import { CameraControllerType, KeepTrackMainCamera } from '@app/keeptrack/camera/legacy-camera';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
 import { SatMath } from '@app/static/sat-math';
 import { DEG2RAD, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
-const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: LegacyCamera) => {
-  cameraInstance.cameraType = CameraType.FIXED_TO_EARTH;
+const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: KeepTrackMainCamera) => {
+  cameraInstance.activeCameraType = CameraControllerType.EARTH_CENTERED_ORBITAL;
   expect(testFunc).not.toThrow();
-  cameraInstance.cameraType = CameraType.OFFSET;
+  cameraInstance.activeCameraType = CameraControllerType.OFFSET;
   expect(testFunc).not.toThrow();
-  cameraInstance.cameraType = CameraType.FPS;
+  cameraInstance.activeCameraType = CameraControllerType.FIRST_PERSON;
   expect(testFunc).not.toThrow();
-  cameraInstance.cameraType = CameraType.SATELLITE;
+  cameraInstance.activeCameraType = CameraControllerType.SATELLITE_FIRST_PERSON;
   expect(testFunc).not.toThrow();
-  cameraInstance.cameraType = CameraType.ASTRONOMY;
+  cameraInstance.activeCameraType = CameraControllerType.ASTRONOMY;
   expect(testFunc).not.toThrow();
-  cameraInstance.cameraType = CameraType.PLANETARIUM;
+  cameraInstance.activeCameraType = CameraControllerType.PLANETARIUM;
   expect(testFunc).not.toThrow();
-  cameraInstance.cameraType = CameraType.FIXED_TO_SAT;
+  cameraInstance.activeCameraType = CameraControllerType.SATELLITE_CENTERED_ORBITAL;
   expect(testFunc).not.toThrow();
 };
 
 describe('Camera Key Input', () => {
-  let cameraInstance: LegacyCamera;
+  let cameraInstance: KeepTrackMainCamera;
 
   beforeEach(() => {
-    cameraInstance = new LegacyCamera();
+    cameraInstance = new KeepTrackMainCamera();
   });
   it('should handle V', () => {
     const testFunc = () => cameraInstance.keyDownV_();
@@ -34,20 +34,20 @@ describe('Camera Key Input', () => {
       expect(testFunc).not.toThrow();
     }
 
-    cameraInstance.changeCameraType = () => {
-      cameraInstance.cameraType = CameraType.SATELLITE;
+    cameraInstance.switchCameraController = () => {
+      cameraInstance.activeCameraType = CameraControllerType.SATELLITE_FIRST_PERSON;
     };
     for (let i = 0; i < 5; i++) {
       expect(testFunc).not.toThrow();
     }
-    cameraInstance.changeCameraType = () => {
-      cameraInstance.cameraType = CameraType.ASTRONOMY;
+    cameraInstance.switchCameraController = () => {
+      cameraInstance.activeCameraType = CameraControllerType.ASTRONOMY;
     };
     for (let i = 0; i < 5; i++) {
       expect(testFunc).not.toThrow();
     }
-    cameraInstance.changeCameraType = () => {
-      cameraInstance.cameraType = CameraType.PLANETARIUM;
+    cameraInstance.switchCameraController = () => {
+      cameraInstance.activeCameraType = CameraControllerType.PLANETARIUM;
     };
     for (let i = 0; i < 5; i++) {
       expect(testFunc).not.toThrow();
@@ -145,7 +145,7 @@ describe('Camera Key Input', () => {
 });
 
 describe('Camera Draw', () => {
-  let cameraInstance: LegacyCamera;
+  let cameraInstance: KeepTrackMainCamera;
   let sensorData = {
     x: 0,
     y: 0,
@@ -158,7 +158,7 @@ describe('Camera Draw', () => {
   beforeEach(() => {
     const now = new Date();
 
-    cameraInstance = new LegacyCamera();
+    cameraInstance = new KeepTrackMainCamera();
     const sensor = defaultSensor;
 
     const { gmst } = SatMath.calculateTimeVariables(now);
@@ -255,10 +255,10 @@ describe('Camera Draw', () => {
 });
 
 describe('Camera snapToSat', () => {
-  let cameraInstance: LegacyCamera;
+  let cameraInstance: KeepTrackMainCamera;
 
   beforeEach(() => {
-    cameraInstance = new LegacyCamera();
+    cameraInstance = new KeepTrackMainCamera();
   });
 
   // test snapToSat with no target
@@ -345,10 +345,10 @@ describe('Camera snapToSat', () => {
 
 // test Camera update with all camera types
 describe('Camera update', () => {
-  let cameraInstance: LegacyCamera;
+  let cameraInstance: KeepTrackMainCamera;
 
   beforeEach(() => {
-    cameraInstance = new LegacyCamera();
+    cameraInstance = new KeepTrackMainCamera();
   });
 
   it('test_update_all_camera_types', () => {
@@ -360,7 +360,7 @@ describe('Camera update', () => {
   // test update with various key presses
   it('test_update_key_presses', () => {
     const testFunc = () => {
-      cameraInstance.cameraType = CameraType.FPS;
+      cameraInstance.activeCameraType = CameraControllerType.FIRST_PERSON;
       cameraInstance.update(16 as Milliseconds);
     };
     const testFunc2 = () => {
@@ -373,7 +373,7 @@ describe('Camera update', () => {
   });
 });
 
-const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: LegacyCamera) => {
+const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: KeepTrackMainCamera) => {
   cameraInstance.keyDownW_();
   testFunc();
 
@@ -439,7 +439,7 @@ const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: LegacyCa
   testFunc();
 };
 
-const testVariousKeyUpInputs = (testFunc: () => void, cameraInstance: LegacyCamera) => {
+const testVariousKeyUpInputs = (testFunc: () => void, cameraInstance: KeepTrackMainCamera) => {
   cameraInstance.keyUpW_();
   testFunc();
 
@@ -502,7 +502,7 @@ const testVariousKeyUpInputs = (testFunc: () => void, cameraInstance: LegacyCame
   testFunc();
 };
 
-const testVariousKeyCombinationInputs = (testFunc: () => void, cameraInstance: LegacyCamera) => {
+const testVariousKeyCombinationInputs = (testFunc: () => void, cameraInstance: KeepTrackMainCamera) => {
   // Combination of key presses and releases
   cameraInstance.keyDownW_();
   cameraInstance.keyUpA_();

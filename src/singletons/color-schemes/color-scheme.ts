@@ -2,7 +2,7 @@ import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, SpaceObjectType, Star } from 'ootk';
-import { CameraType } from '../../keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '../../keeptrack/camera/legacy-camera';
 import { DensityBin } from '../catalog-manager';
 import { MissileObject } from '../catalog-manager/MissileObject';
 
@@ -166,7 +166,7 @@ export abstract class ColorScheme {
       case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
       case SpaceObjectType.PAYLOAD_MANUFACTURER:
         // If the facility flag is off then we don't want to show this
-        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM) {
           return {
             color: this.colorTheme.deselected,
             pickable: Pickable.No,
@@ -185,7 +185,7 @@ export abstract class ColorScheme {
       case SpaceObjectType.LAUNCH_FACILITY:
       case SpaceObjectType.CONTROL_FACILITY:
         // If the facility flag is off then we don't want to show this
-        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM) {
           return {
             color: this.colorTheme.deselected,
             pickable: Pickable.No,

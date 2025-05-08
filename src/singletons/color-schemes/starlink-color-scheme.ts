@@ -2,7 +2,7 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, SpaceObjectType } from 'ootk';
-import { CameraType } from '../../keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '../../keeptrack/camera/legacy-camera';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { ColorScheme } from './color-scheme';
 
@@ -42,7 +42,7 @@ export class StarlinkColorScheme extends ColorScheme {
       return this.getMarkerColor_();
     }
 
-    if (obj.isSensor() && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
+    if (obj.isSensor() && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,

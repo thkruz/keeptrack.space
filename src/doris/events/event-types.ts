@@ -1,4 +1,4 @@
-import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
+import { KeepTrackMainCamera } from '@app/keeptrack/camera/legacy-camera';
 import { SpaceScene as OldScene } from '@app/keeptrack/scene/space-scene';
 import { Camera } from '../camera/camera';
 import { Plugin } from '../plugins/plugin';
@@ -91,6 +91,10 @@ export enum TimeEvents {
   TimeResumed = 'time:resumed'
 }
 
+export enum CameraSystemEvents {
+  Reset = 'camera:reset',
+}
+
 /**
  * Input-related events
  */
@@ -164,9 +168,9 @@ export interface EngineEventMap {
   [CoreEngineEvents.BeforeClearRenderTarget]: [];
   [CoreEngineEvents.ClearRenderTarget]: [];
   [CoreEngineEvents.BeforeRender]: [];
-  [CoreEngineEvents.Render]: [OldScene, LegacyCamera]; // scene, camera
-  [CoreEngineEvents.RenderOpaque]: [LegacyCamera, WebGLBuffer | null]; // camera, buffer
-  [CoreEngineEvents.RenderTransparent]: [LegacyCamera, WebGLBuffer | null]; // camera, buffer
+  [CoreEngineEvents.Render]: [OldScene, KeepTrackMainCamera]; // scene, camera
+  [CoreEngineEvents.RenderOpaque]: [KeepTrackMainCamera, WebGLBuffer | null]; // camera, buffer
+  [CoreEngineEvents.RenderTransparent]: [KeepTrackMainCamera, WebGLBuffer | null]; // camera, buffer
   [CoreEngineEvents.AfterRender]: [];
 
   // Window/canvas
@@ -224,6 +228,10 @@ export interface SceneEventMap {
   [SceneEvents.ComponentAdded]: [string, string, string]; // sceneId, nodeId, componentType
   [SceneEvents.ComponentRemoved]: [string, string, string]; // sceneId, nodeId, componentType
   [SceneEvents.CameraChanged]: [string, Camera]; // sceneId, camera
+}
+
+export interface CameraEventMap {
+  [CameraSystemEvents.Reset]: [];
 }
 
 /**
@@ -287,6 +295,7 @@ export interface EventMap extends
   EngineEventMap,
   TimeEventMap,
   SceneEventMap,
+  CameraEventMap,
   InputEventMap,
   PluginEventMap,
   ApplicationEventMap { }

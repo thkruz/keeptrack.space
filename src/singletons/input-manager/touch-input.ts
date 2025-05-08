@@ -1,10 +1,10 @@
 import { Doris } from '@app/doris/doris';
-import { LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
+import { KeepTrackMainCamera } from '@app/keeptrack/camera/legacy-camera';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { UrlManager } from '@app/static/url-manager';
 import { MouseInput } from './mouse-input';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 
 export interface TapTouchEvent {
@@ -75,7 +75,7 @@ export class TouchInput {
     }
   }
 
-  public canvasTouchEnd(evt: TouchEvent, mainCameraInstance: LegacyCamera) {
+  public canvasTouchEnd(evt: TouchEvent, mainCameraInstance: KeepTrackMainCamera) {
     const touchTime = Date.now() - this.touchStartTime;
 
     if (!this.isPanning && !this.isPinching) {

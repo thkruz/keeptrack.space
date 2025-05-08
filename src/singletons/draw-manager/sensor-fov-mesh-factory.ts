@@ -5,7 +5,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { DetailedSensor, GreenwichMeanSiderealTime, SpaceObjectType } from 'ootk';
-import { LegacyCamera } from '../../keeptrack/camera/legacy-camera';
+import { KeepTrackMainCamera } from '../../keeptrack/camera/legacy-camera';
 import { CustomMeshFactory } from './custom-mesh-factory';
 import { SensorFovMesh } from './sensor-fov-mesh';
 
@@ -14,12 +14,12 @@ import { SensorFovMesh } from './sensor-fov-mesh';
 export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
   constructor() {
     super();
-    Doris.getInstance().on(CoreEngineEvents.RenderTransparent, (camera: LegacyCamera, tgtBuffer: WebGLFramebuffer | null) => {
+    Doris.getInstance().on(CoreEngineEvents.RenderTransparent, (camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null) => {
       this.drawAll(camera, tgtBuffer);
     });
   }
 
-  drawAll(camera: LegacyCamera, tgtBuffer: WebGLFramebuffer | null = null) {
+  drawAll(camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null = null) {
     let i = 0;
     let didWeDrawSomething = false;
     let lastSensorObjName = '';

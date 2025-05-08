@@ -69,7 +69,8 @@ export enum KeepTrackApiEvents {
   onPrimarySatelliteUpdate = 'onPrimarySatelliteUpdate',
   onPrimarySatelliteChange = 'onPrimarySatelliteChange',
   onSecondarySatelliteUpdate = 'onSecondarySatelliteUpdate',
-  onSecondarySatelliteChange = 'onSecondarySatelliteChange'
+  onSecondarySatelliteChange = 'onSecondarySatelliteChange',
+  enableAutoRotate = 'enableAutoRotate'
 }
 
 declare module '@app/doris/events/event-types' {
@@ -108,6 +109,7 @@ declare module '@app/doris/events/event-types' {
     [KeepTrackApiEvents.onPrimarySatelliteChange]: [BaseObject | null, number];
     [KeepTrackApiEvents.onSecondarySatelliteUpdate]: [BaseObject | null, number];
     [KeepTrackApiEvents.onSecondarySatelliteChange]: [BaseObject | null, number];
+    [KeepTrackApiEvents.enableAutoRotate]: [boolean?];
   }
 }
 

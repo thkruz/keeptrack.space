@@ -43,12 +43,13 @@ import 'material-icons/iconfont/material-icons.css';
 import eruda, { ErudaConsole } from 'eruda';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime } from 'ootk';
 import { keepTrackContainer } from './container';
+import { CameraSystem } from './doris/camera/camera-system';
 import { Doris } from './doris/doris';
 import { CanvasEvents, CoreEngineEvents, WebGlEvents } from './doris/events/event-types';
 import { Renderer } from './doris/rendering/renderer';
 import { isThisNode } from './doris/utils/isThisNode';
 import { GetSatType, Singletons } from './interfaces';
-import { CameraType, LegacyCamera } from './keeptrack/camera/legacy-camera';
+import { CameraControllerType, KeepTrackMainCamera } from './keeptrack/camera/legacy-camera';
 import { TimeManager } from './keeptrack/core/time-manager';
 import { KeepTrackApiEvents } from './keeptrack/events/event-types';
 import { SpaceScene } from './keeptrack/scene/space-scene';
@@ -100,7 +101,8 @@ export class KeepTrack {
   sensorManager: SensorManager;
   uiManager: UiManager;
   inputManager: InputManager;
-  mainCameraInstance: LegacyCamera;
+  mainCameraInstance: KeepTrackMainCamera;
+  cameraManagerInstance: CameraSystem;
   cameraControlWidget: CameraControlWidget;
 
   constructor(
@@ -182,7 +184,7 @@ export class KeepTrack {
     const sensorMathInstance = new SensorMath();
 
     keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
-    const mainCameraInstance = new LegacyCamera();
+    const mainCameraInstance = new KeepTrackMainCamera();
 
     const cameraControlWidget = new CameraControlWidget();
 
@@ -437,7 +439,7 @@ theodore.kruczek at gmail dot com.
           errorManagerInstance.error(e.error, 'Global Error Trapper', e.message);
         });
 
-        keepTrackApi.getMainCamera().init(settingsManager);
+        keepTrackApi.getMainCamera().initialize();
 
         Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 1, 5);
         mobileManager.init();
@@ -598,8 +600,8 @@ theodore.kruczek at gmail dot com.
     const watchlistPluginInstance = keepTrackApi.getPlugin(WatchlistPlugin);
 
     if (
-      keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY ||
-      keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM ||
+      keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.ASTRONOMY ||
+      keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM ||
       watchlistPluginInstance?.hasAnyInView()
     ) {
       // Catch race condition where sensor has been reset but camera hasn't been updated
@@ -622,7 +624,7 @@ theodore.kruczek at gmail dot com.
         return;
       }
       // Previously called showOrbitsAbove();
-      if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
+      if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().activeCameraType !== CameraControllerType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
         if (this.isSatMiniBoxInUse_) {
           this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
 
@@ -657,7 +659,7 @@ theodore.kruczek at gmail dot com.
        * @body Currently are writing and deleting the nodes every draw element. Reusuing them with a transition effect will make it smoother
        */
       this.hoverBoxOnSatMiniElements_!.innerHTML = '';
-      if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+      if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM) {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         for (let i = 0; i < catalogManagerInstance.orbitalSats && this.labelCount_ < settingsManager.maxLabels; i++) {
@@ -796,7 +798,7 @@ theodore.kruczek at gmail dot com.
     }
 
     // Hide satMiniBoxes When Not in Use
-    if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
+    if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().activeCameraType !== CameraControllerType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
       if (this.isSatMiniBoxInUse_) {
         const satMiniBox = getEl('sat-minibox');
 

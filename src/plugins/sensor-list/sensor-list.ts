@@ -1,7 +1,7 @@
 import { sensors } from '@app/catalogs/sensors';
 import { Doris } from '@app/doris/doris';
 import { MenuMode } from '@app/interfaces';
-import { CameraType } from '@app/keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '@app/keeptrack/camera/legacy-camera';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { getClass } from '@app/lib/get-class';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
@@ -175,16 +175,6 @@ export class SensorListPlugin extends KeepTrackPlugin {
       if (sensorManagerInstance.currentSensors.length === 0) {
         throw new Error('No sensors found');
       }
-      const timeManagerInstance = keepTrackApi.getTimeManager();
-
-      keepTrackApi
-        .getMainCamera()
-        .lookAtLatLon(
-          sensorManagerInstance.currentSensors[0].lat,
-          sensorManagerInstance.currentSensors[0].lon,
-          sensorManagerInstance.currentSensors[0].zoom ?? ZoomValue.GEO,
-          timeManagerInstance.selectedDate,
-        );
     });
 
     Doris.getInstance().on(KeepTrackApiEvents.onCruncherReady, () => {
@@ -200,7 +190,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       callback: () => {
         // If a sensor is selected rotate the camera to it
         if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&
-          (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH)) {
+          (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.EARTH_CENTERED_ORBITAL)) {
           const sensor = keepTrackApi.getSensorManager().currentSensors[0];
 
           keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, keepTrackApi.getTimeManager().selectedDate);

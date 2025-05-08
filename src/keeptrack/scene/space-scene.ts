@@ -13,7 +13,7 @@ import { SensorFovMeshFactory } from '../../singletons/draw-manager/sensor-fov-m
 import { SkyBoxSphere } from '../../singletons/draw-manager/skybox-sphere';
 import { Sun } from '../../singletons/draw-manager/sun';
 import { errorManagerInstance } from '../../singletons/errorManager';
-import { LegacyCamera } from '../camera/legacy-camera';
+import { KeepTrackMainCamera } from '../camera/legacy-camera';
 
 export class SpaceScene {
   static readonly id = 'SpaceScene';
@@ -32,7 +32,7 @@ export class SpaceScene {
   primaryCovBubble: Ellipsoid;
   secondaryCovBubble: Ellipsoid;
   isInitialized_ = false;
-  activeCamera: LegacyCamera | null = null;
+  activeCamera: KeepTrackMainCamera | null = null;
 
   constructor() {
     this.skybox = new SkyBoxSphere();

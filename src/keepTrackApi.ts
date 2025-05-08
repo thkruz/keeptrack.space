@@ -1,9 +1,10 @@
 /* eslint-disable class-methods-use-this */
 import { AnalyticsInstance } from 'analytics';
 import { keepTrackContainer } from './container';
+import { Doris } from './doris/doris';
 import { Renderer } from './doris/rendering/renderer';
 import { Constructor, Singletons } from './interfaces';
-import { LegacyCamera } from './keeptrack/camera/legacy-camera';
+import { KeepTrackMainCamera } from './keeptrack/camera/legacy-camera';
 import type { TimeManager } from './keeptrack/core/time-manager';
 import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
 import { SpaceScene } from './keeptrack/scene/space-scene';
@@ -188,7 +189,7 @@ export class KeepTrackApi {
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);
   /** Deprecate */
   getRenderer = () => keepTrackContainer.get<Renderer>(Singletons.WebGLRenderer);
-  getAppRenderer = () => keepTrackContainer.get<KeepTrackRenderer>(Singletons.WebGLRendererApp);
+  getAppRenderer = () => Doris.getInstance().getRenderer() as KeepTrackRenderer;
   getScene = () => keepTrackContainer.get<SpaceScene>(Singletons.Scene);
   getCatalogManager = () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);
   getSensorManager = () => keepTrackContainer.get<SensorManager>(Singletons.SensorManager);
@@ -202,7 +203,7 @@ export class KeepTrackApi {
   getSensorMath = () => keepTrackContainer.get<SensorMath>(Singletons.SensorMath);
   getLineManager = () => keepTrackContainer.get<LineManager>(Singletons.LineManager);
   getHoverManager = () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager);
-  getMainCamera = () => keepTrackContainer.get<LegacyCamera>(Singletons.MainCamera);
+  getMainCamera = () => keepTrackContainer.get<KeepTrackMainCamera>(Singletons.MainCamera);
   getMeshManager = () => keepTrackContainer.get<MeshManager>(Singletons.MeshManager);
 
   saveCsv = saveCsv;

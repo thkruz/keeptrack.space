@@ -4,7 +4,7 @@ import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CameraType } from '@app/keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '@app/keeptrack/camera/legacy-camera';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Radians } from 'ootk';
@@ -283,10 +283,10 @@ export class GamepadPlugin {
 
     let zoomTarget = keepTrackApi.getMainCamera().zoomLevel();
 
-    switch (keepTrackApi.getMainCamera().cameraType) {
-      case CameraType.FIXED_TO_EARTH:
-      case CameraType.OFFSET:
-      case CameraType.FIXED_TO_SAT:
+    switch (keepTrackApi.getMainCamera().activeCameraType) {
+      case CameraControllerType.EARTH_CENTERED_ORBITAL:
+      case CameraControllerType.OFFSET:
+      case CameraControllerType.SATELLITE_CENTERED_ORBITAL:
         zoomTarget += (zoomOut / 500) * tessaEngine.getTimeManager().getRealTimeDelta();
         zoomTarget -= (zoomIn / 500) * tessaEngine.getTimeManager().getRealTimeDelta();
         keepTrackApi.getMainCamera().zoomTarget = zoomTarget;
@@ -299,10 +299,10 @@ export class GamepadPlugin {
           keepTrackApi.getMainCamera().isZoomIn = false;
         }
         break;
-      case CameraType.FPS:
-      case CameraType.SATELLITE:
-      case CameraType.PLANETARIUM:
-      case CameraType.ASTRONOMY:
+      case CameraControllerType.FIRST_PERSON:
+      case CameraControllerType.SATELLITE_FIRST_PERSON:
+      case CameraControllerType.PLANETARIUM:
+      case CameraControllerType.ASTRONOMY:
         if (zoomOut !== 0) {
           keepTrackApi.getMainCamera().fpsVertSpeed += (zoomOut * 2) ** 3 * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
         }
@@ -326,19 +326,19 @@ export class GamepadPlugin {
 
       settingsManager.lastGamepadMovement = Date.now();
 
-      switch (keepTrackApi.getMainCamera().cameraType) {
-        case CameraType.FIXED_TO_EARTH:
-        case CameraType.OFFSET:
-        case CameraType.FIXED_TO_SAT:
+      switch (keepTrackApi.getMainCamera().activeCameraType) {
+        case CameraControllerType.EARTH_CENTERED_ORBITAL:
+        case CameraControllerType.OFFSET:
+        case CameraControllerType.SATELLITE_CENTERED_ORBITAL:
           keepTrackApi.getMainCamera().camAngleSnappedOnSat = false;
           keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
           keepTrackApi.getMainCamera().camPitchSpeed -= (y ** 3 / 200) * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
           keepTrackApi.getMainCamera().camYawSpeed += (x ** 3 / 200) * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
           break;
-        case CameraType.FPS:
-        case CameraType.SATELLITE:
-        case CameraType.PLANETARIUM:
-        case CameraType.ASTRONOMY:
+        case CameraControllerType.FIRST_PERSON:
+        case CameraControllerType.SATELLITE_FIRST_PERSON:
+        case CameraControllerType.PLANETARIUM:
+        case CameraControllerType.ASTRONOMY:
           if (y > this.deadzone || y < -this.deadzone) {
             keepTrackApi.getMainCamera().fpsForwardSpeed = -(y ** 3) * tessaEngine.getTimeManager().getRealTimeDelta();
           }
@@ -365,18 +365,18 @@ export class GamepadPlugin {
     keepTrackApi.getMainCamera().isLocalRotateOverride = false;
     if (y > this.deadzone || y < -this.deadzone || x > this.deadzone || x < -this.deadzone) {
       keepTrackApi.getMainCamera().autoRotate(false);
-      switch (keepTrackApi.getMainCamera().cameraType) {
-        case CameraType.FIXED_TO_EARTH:
-        case CameraType.OFFSET:
-        case CameraType.FIXED_TO_SAT:
+      switch (keepTrackApi.getMainCamera().activeCameraType) {
+        case CameraControllerType.EARTH_CENTERED_ORBITAL:
+        case CameraControllerType.OFFSET:
+        case CameraControllerType.SATELLITE_CENTERED_ORBITAL:
           keepTrackApi.getMainCamera().isLocalRotateOverride = true;
           keepTrackApi.getMainCamera().localRotateDif.pitch = <Radians>(-y * 200);
           keepTrackApi.getMainCamera().localRotateDif.yaw = <Radians>(-x * 200);
           break;
-        case CameraType.FPS:
-        case CameraType.SATELLITE:
-        case CameraType.PLANETARIUM:
-        case CameraType.ASTRONOMY:
+        case CameraControllerType.FIRST_PERSON:
+        case CameraControllerType.SATELLITE_FIRST_PERSON:
+        case CameraControllerType.PLANETARIUM:
+        case CameraControllerType.ASTRONOMY:
           keepTrackApi.getMainCamera().camPitchSpeed += (y / 100) * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
           keepTrackApi.getMainCamera().camYawSpeed -= (x / 100) * tessaEngine.getTimeManager().getRealTimeDelta() * settingsManager.cameraMovementSpeed;
           break;

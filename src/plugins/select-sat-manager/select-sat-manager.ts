@@ -1,11 +1,10 @@
 import { GetSatType, ToastMsgType } from '@app/interfaces';
-import { CameraType } from '@app/keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '@app/keeptrack/camera/legacy-camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { CameraMode } from '@app/keeptrack/camera/camera-modes/camera-mode';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -77,8 +76,8 @@ export class SelectSatManager extends KeepTrackPlugin {
         }
 
         // If in satellite view the orbit buffer needs to be updated every time
-        if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE ||
-          keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)
+        if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.SATELLITE_FIRST_PERSON ||
+          keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.SATELLITE_CENTERED_ORBITAL)
         ) {
           keepTrackApi.getOrbitManager().updateOrbitBuffer(this.primarySatObj.id);
           const firstPointOut = [
@@ -243,14 +242,13 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
 
     // stop rotation if it is on
-    keepTrackApi.getMainCamera().autoRotate(false);
     keepTrackApi.getMainCamera().panCurrent = {
       x: 0,
       y: 0,
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.EARTH_CENTERED_ORBITAL) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
       Doris.getInstance().emit(KeepTrackApiEvents.sensorDotSelected, sensor);
     }
@@ -333,10 +331,9 @@ export class SelectSatManager extends KeepTrackPlugin {
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.EARTH_CENTERED_ORBITAL) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
-      keepTrackApi.getMainCamera().activeCameraMode = keepTrackApi.getMainCamera().cameraModes.get(CameraType.FIXED_TO_SAT) as CameraMode;
+      Doris.getInstance().getCameraSystem().setCameraController(this.id, CameraControllerType.SATELLITE_CENTERED_ORBITAL);
     }
 
     // If we deselect an object but had previously selected one then disable/hide stuff

@@ -1,8 +1,10 @@
 /* eslint-disable no-unreachable */
 // eslint-disable-next-line max-classes-per-file
 import { Doris } from '@app/doris/doris';
+import { CameraSystemEvents } from '@app/doris/events/event-types';
 import { GetSatType, ToastMsgType } from '@app/interfaces';
-import { CameraType, LegacyCamera } from '@app/keeptrack/camera/legacy-camera';
+import { CameraControllerType, KeepTrackMainCamera } from '@app/keeptrack/camera/legacy-camera';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
@@ -20,7 +22,6 @@ import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
 import { PersistenceManager, StorageKey } from '../persistence-manager';
 import { KeyboardInput } from './keyboard-input';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class MouseInput {
   private dragHasMoved = false;
@@ -117,7 +118,7 @@ export class MouseInput {
     return numMenuItems;
   }
 
-  public canvasMouseMove(evt: MouseEvent, mainCameraInstance: LegacyCamera): void {
+  public canvasMouseMove(evt: MouseEvent, mainCameraInstance: KeepTrackMainCamera): void {
     if (this.mouseMoveTimeout === -1) {
       this.mouseMoveTimeout = window.setTimeout(() => {
         this.canvasMouseMoveFire(mainCameraInstance, evt);
@@ -125,7 +126,7 @@ export class MouseInput {
     }
   }
 
-  public canvasMouseMoveFire(mainCameraInstance: LegacyCamera, evt: MouseEvent) {
+  public canvasMouseMoveFire(mainCameraInstance: KeepTrackMainCamera, evt: MouseEvent) {
     mainCameraInstance.mouseX = evt.clientX - (keepTrackApi.containerRoot.scrollLeft - window.scrollX) - keepTrackApi.containerRoot.offsetLeft;
     mainCameraInstance.mouseY = evt.clientY - (keepTrackApi.containerRoot.scrollTop - window.scrollY) - keepTrackApi.containerRoot.offsetTop;
     if (
@@ -173,7 +174,7 @@ export class MouseInput {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
         // Left Mouse Button Clicked
-        if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
+        if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.SATELLITE_FIRST_PERSON) {
           if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY).isStatic()) {
             keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
           }
@@ -195,10 +196,6 @@ export class MouseInput {
     if (settingsManager.isFreezePropRateOnDrag) {
       timeManagerInstance.calculateSimulationTime();
       timeManagerInstance.changePropRate(timeManagerInstance.lastPropRate);
-    }
-
-    if (!settingsManager.disableUI) {
-      keepTrackApi.getMainCamera().autoRotate(false);
     }
   }
 
@@ -476,11 +473,7 @@ export class MouseInput {
         keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
         break;
       case 'reset-camera-rmb':
-        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat !== -1) {
-          keepTrackApi.getMainCamera().resetRotation();
-        } else {
-          keepTrackApi.getMainCamera().reset();
-        }
+        Doris.getInstance().emit(CameraSystemEvents.Reset);
         break;
       case 'clear-lines-rmb':
         lineManagerInstance.clear();

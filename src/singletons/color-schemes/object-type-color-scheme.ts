@@ -2,7 +2,7 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from 'ootk';
-import { CameraType } from '../../keeptrack/camera/legacy-camera';
+import { CameraControllerType } from '../../keeptrack/camera/legacy-camera';
 import { MissileObject } from '../catalog-manager/MissileObject';
 import { errorManagerInstance } from '../errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
@@ -79,7 +79,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
     }
 
     // If we are in astronomy mode, hide everything that isn't a star (above)
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY) {
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.ASTRONOMY) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -96,7 +96,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       return this.getMarkerColor_();
     }
 
-    if (obj.isSensor() && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
+    if (obj.isSensor() && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -145,7 +145,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.PAYLOAD &&
         this.objectTypeFlags.payload === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
+      (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
@@ -161,7 +161,8 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.ROCKET_BODY &&
         this.objectTypeFlags.rocketBody === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
+      (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM &&
+        sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
@@ -177,7 +178,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.DEBRIS &&
         this.objectTypeFlags.debris === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
+      (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
@@ -195,7 +196,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
+      (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM &&
         (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
@@ -210,14 +211,15 @@ export class ObjectTypeColorScheme extends ColorScheme {
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.inFOV === false && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.inFOV === false &&
+      keepTrackApi.getMainCamera().activeCameraType !== CameraControllerType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && keepTrackApi.getMainCamera().activeCameraType !== CameraControllerType.PLANETARIUM) {
       if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
         // Intentional
       } else {
@@ -267,7 +269,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
 
   updateGroup(obj: BaseObject): ColorInformation {
     // Show Things in the Group
-    if (keepTrackApi.getGroupsManager().selectedGroup.hasObject(obj.id)) {
+    if (keepTrackApi.getGroupsManager().selectedGroup?.hasObject(obj.id)) {
       if (obj.isMissile()) {
         return this.missileColor_(obj as MissileObject);
       }

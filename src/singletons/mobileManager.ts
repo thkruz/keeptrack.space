@@ -1,10 +1,10 @@
 import { Doris } from '@app/doris/doris';
 import { ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { hideEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class MobileManager {
   // eslint-disable-next-line require-await
@@ -30,7 +30,7 @@ export class MobileManager {
           settingsManager.enableHoverOverlay = false;
 
           if (settingsManager.isUseHigherFOVonMobile) {
-            settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+            settingsManager.fieldOfView = 1.2;
           } else {
             settingsManager.fieldOfView = 0.6;
           }
@@ -92,7 +92,7 @@ export class MobileManager {
           settingsManager.cameraMovementSpeed = 0.003;
           settingsManager.cameraMovementSpeedMin = 0.005;
           if (settingsManager.isUseHigherFOVonMobile) {
-            settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+            settingsManager.fieldOfView = 1.2;
           } else {
             settingsManager.fieldOfView = 0.6;
           }

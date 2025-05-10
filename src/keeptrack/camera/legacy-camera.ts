@@ -25,18 +25,19 @@ import { settingsManager } from '@app/settings/settings';
 import { CameraController } from '@app/doris/camera/controllers/camera-controller';
 import { PerspectiveCamera } from '@app/doris/camera/perspective-camera';
 import { Doris } from '@app/doris/doris';
-import { CameraSystemEvents, CoreEngineEvents, WebGlEvents } from '@app/doris/events/event-types';
+import { CameraSystemEvents, CoreEngineEvents } from '@app/doris/events/event-types';
 import { ToastMsgType } from '@app/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import {
-  BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3,
+  BaseObject,
+  Degrees, DetailedSatellite, EciVec3,
   Kilometers, Milliseconds, Radians,
   Star, TAU, ZoomValue,
 } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
-import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../../lib/transforms';
+import { lat2pitch, lon2yaw, normalizeAngle } from '../../lib/transforms';
 import { MissileObject } from '../../singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '../../singletons/errorManager';
 import { SatMath } from '../../static/sat-math';
@@ -70,9 +71,7 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
   static readonly id = 'Camera';
   earthCenteredPitch = <Radians>0;
   earthCenteredYaw = <Radians>0;
-  private fpsLastTime_ = <Milliseconds>0;
-  fpsPos = <vec3>[0, 25000, 0];
-  ftsYaw = <Radians>0;
+  ftsYaw = 0;
   private isAutoRotate_ = true;
   isFPSForwardSpeedLock = false;
   isFPSSideSpeedLock = false;
@@ -203,7 +202,7 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     z: 0,
   };
 
-  position = <vec3>[0, 0, 0];
+  position = <vec3>[0, 25000, 0];
   screenDragPoint = [0, 0];
   speedModifier = 1;
   startMouseX = 0;
@@ -390,6 +389,11 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       settingsManager.autoRotateSpeed = 0.0075;
     }
 
+    if (!settingsManager.isAutoRotateD && !settingsManager.isAutoRotateU && !settingsManager.isAutoRotateL && !settingsManager.isAutoRotateR) {
+      // Ensure at least one axis is rotating
+      settingsManager.isAutoRotateL = true;
+    }
+
     if (typeof val === 'undefined') {
       this.isAutoRotate_ = !this.isAutoRotate_;
 
@@ -415,7 +419,7 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
 
     if (!newCameraController) {
       // Rotate to the next available controller
-      nextControllerType = this.getNextControllerType(this.activeCameraType_);
+      nextControllerType = this.getNextControllerType_(this.activeCameraType_);
       const nextCameraController = nextControllerType ? this.cameraControllers.get(nextControllerType) : null;
 
       if (nextCameraController) {
@@ -431,7 +435,7 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     }
   }
 
-  getNextControllerType(currentType: CameraControllerType): CameraControllerType | null {
+  private getNextControllerType_(currentType: CameraControllerType): CameraControllerType | null {
     const types = Array.from(this.cameraControllers.keys());
     const currentIndex = types.indexOf(currentType);
 
@@ -440,119 +444,34 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     }
     const nextIndex = (currentIndex + 1) % types.length;
 
+    // Get the next controller
+    const nextControllerType = types[nextIndex];
+    const nextCameraController = this.cameraControllers.get(nextControllerType)!;
 
-    return types[nextIndex];
+    if (!nextCameraController.validate()) {
+      // Try the next one
+      return this.getNextControllerType_(nextControllerType);
+    }
+
+    return nextControllerType;
   }
 
   zoomWheel(delta: number): void {
-    if (delta < 0) {
-      this.isZoomIn = true;
-    } else {
-      this.isZoomIn = false;
-    }
+    this.isZoomIn = delta < 0;
 
     if (settingsManager.isZoomStopsRotation) {
       this.autoRotate(false);
     }
-
-    if (this.activeCameraType_ === CameraControllerType.PLANETARIUM || this.activeCameraType_ === CameraControllerType.FIRST_PERSON ||
-      this.activeCameraType_ === CameraControllerType.SATELLITE_FIRST_PERSON || this.activeCameraType_ === CameraControllerType.ASTRONOMY) {
-      this.zoomWheelFov_(delta);
-    } else {
-      const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
-      const isCameraCloseToSatellite = this.camDistBuffer < settingsManager.nearZoomLevel;
-      const maxCovarianceDistance = Math.min((keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
-      const isCameraCloseToCovarianceBubble = settingsManager.isDrawCovarianceEllipsoid &&
-        this.camDistBuffer < maxCovarianceDistance;
-
-      if (settingsManager.isZoomStopsSnappedOnSat || !selectSatManagerInstance || selectSatManagerInstance?.selectedSat === -1) {
-        this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
-        this.earthCenteredLastZoom = this.zoomTarget_;
-        this.camZoomSnappedOnSat = false;
-      } else if ((isCameraCloseToSatellite || isCameraCloseToCovarianceBubble) ||
-        this.zoomLevel_ === -1) {
-        // Inside camDistBuffer
-        settingsManager.selectedColor = [0, 0, 0, 0];
-
-        /*
-         * Slowly zoom in/out, scaling speed with camDistBuffer (farther = faster)
-         * Exponential scaling for smoother zoom near the satellite
-         */
-        const scale = Math.max(0.01, (this.camDistBuffer / 100) ** 1.15); // Exponential factor > 1 for faster scaling as distance increases
-
-        this.camDistBuffer = <Kilometers>(this.camDistBuffer + (delta / 5) * scale); // delta is +/- 100
-
-        // Clamping camDistBuffer to be between minDistanceFromSatellite and maxZoomDistance
-        this.camDistBuffer = <Kilometers>Math.min(
-          Math.max(
-            this.camDistBuffer,
-            settingsManager.minDistanceFromSatellite,
-          ),
-          Math.max(
-            settingsManager.nearZoomLevel,
-            maxCovarianceDistance,
-          ),
-        );
-      } else if (this.camDistBuffer >= settingsManager.nearZoomLevel) {
-        // Outside camDistBuffer
-        settingsManager.selectedColor = settingsManager.selectedColorFallback;
-        this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
-        this.earthCenteredLastZoom = this.zoomTarget;
-        this.camZoomSnappedOnSat = false;
-
-        // calculate camera distance from target
-        const target = selectSatManagerInstance.getSelectedSat();
-
-        if (target) {
-          const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
-          const curMinZoomLevel = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
-
-          if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
-            this.camZoomSnappedOnSat = true;
-
-            if (settingsManager.isDrawCovarianceEllipsoid) {
-              this.camDistBuffer = <Kilometers>(Math.max(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), maxCovarianceDistance) - 1);
-            } else {
-              this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), settingsManager.minDistanceFromSatellite);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  private zoomWheelFov_(delta: number) {
-    if (this.activeCameraType_ === CameraControllerType.PLANETARIUM || this.activeCameraType_ === CameraControllerType.FIRST_PERSON ||
-      this.activeCameraType_ === CameraControllerType.SATELLITE_FIRST_PERSON || this.activeCameraType_ === CameraControllerType.ASTRONOMY) {
-      settingsManager.fieldOfView += delta * 0.0002;
-      // getEl('fov-text').innerHTML = 'FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg';
-      if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) {
-        settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
-      }
-      if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) {
-        settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
-      }
-
-      this.fov = settingsManager.fieldOfView;
-      Doris.getInstance().emit(WebGlEvents.FovChanged);
-    }
   }
 
   changeZoom(zoom: ZoomValue | number): void {
-    if (typeof zoom !== 'number') {
-      throw new Error('Invalid Zoom Value');
-    }
-    if (zoom > 1 || zoom < 0) {
-      throw new Error('Invalid Zoom Value');
-    }
     this.zoomTarget = zoom;
   }
 
   /*
-   * This is intentionally complex to reduce object creation and GC
-   * Splitting it into subfunctions would not be optimal
+   * This is called every frame to update the camera
    */
-  draw(): void {
+  render(): void {
     if (!keepTrackApi.getTimeManager().simulationTimeObj) {
       return;
     }
@@ -567,6 +486,7 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     if (this.activeCameraType_ !== CameraControllerType.SATELLITE_CENTERED_ORBITAL) {
       return;
     }
+    this.switchCameraController(CameraControllerType.EARTH_CENTERED_ORBITAL);
 
     const cameraDistance = this.getCameraDistance();
 
@@ -580,14 +500,6 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       this.camPitch = this.earthCenteredPitch;
       this.camYaw = this.earthCenteredYaw;
       this.isAutoPitchYawToTarget = true;
-
-      // eslint-disable-next-line multiline-comment-style
-      // this.camPitch = this.earthCenteredPitch_;
-      // this.camYaw = this.earthCenteredYaw_;
-      // // External to Local Rotation
-      // this.localRotateCurrent.pitch = <Radians>(this.ftsPitch * -1);
-      // this.localRotateCurrent.yaw = <Radians>(this.ftsYaw_ * -1);
-      // this.isLocalRotateReset = true;
     } else {
       this.camPitch = this.earthCenteredPitch;
       this.camYaw = this.earthCenteredYaw;
@@ -680,11 +592,11 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     Doris.getInstance().on(KeepTrackApiEvents.canvasMouseDown, this.canvasMouseDown_.bind(this));
     Doris.getInstance().on(KeepTrackApiEvents.touchStart, this.touchStart_.bind(this));
     Doris.getInstance().on(CoreEngineEvents.RenderOpaque, () => {
-      this.draw();
+      this.render();
     });
 
-    Doris.getInstance().on(CoreEngineEvents.Update, () => {
-      this.update();
+    Doris.getInstance().on(CoreEngineEvents.Update, (delta: number) => {
+      this.update(delta as Milliseconds);
     });
 
     Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, this.validateProjectionMatrix_.bind(this));
@@ -813,6 +725,9 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       this.zoomTarget =
         ((this.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
       settingsManager.selectedColor = [0, 0, 0, 0];
+
+      this.zoomLevel_ = Math.max(this.zoomLevel_, this.zoomTarget_);
+
       // errorManagerInstance.debug(`Zoom Target: ${this.zoomTarget_}`);
       this.earthCenteredLastZoom = this.zoomTarget_ + 0.1;
 
@@ -823,43 +738,33 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     }
 
     this.updateSatShaderSizes();
-
-    if (this.activeCameraType_ === CameraControllerType.PLANETARIUM) {
-      this.zoomTarget = 0.01;
-    }
   }
 
   /**
    * Calculate the camera's position and camera matrix
    */
-  update() {
-    super.update();
+  onUpdate(deltaTime: Milliseconds): void {
+    this.updatePan_(deltaTime);
+    this.updateLocalRotation_(deltaTime);
+    this.updatePitchYawSpeeds_(deltaTime);
+    this.updateFtsRotation_(deltaTime);
 
-    const dt = Doris.getInstance().getTimeManager().getRealTimeDelta() as Milliseconds;
+    this.camRotateSpeed -= this.camRotateSpeed * deltaTime * settingsManager.cameraMovementSpeed;
 
-    this.updatePan_(dt);
-    this.updateLocalRotation_(dt);
-    this.updatePitchYawSpeeds_(dt);
-    this.updateFtsRotation_(dt);
-
-    this.camRotateSpeed -= this.camRotateSpeed * dt * settingsManager.cameraMovementSpeed;
-
-    if (this.activeCameraController instanceof FirstPersonCameraController) {
-      this.updateFpsMovement_(dt);
-    } else {
+    if (!(this.activeCameraController instanceof FirstPersonCameraController)) {
       // Account for floating point errors by clamping very small values to zero
       if (Math.abs(this.camPitchSpeed) > 1e-8) {
-        this.camPitch = <Radians>(this.camPitch + this.camPitchSpeed * dt);
+        this.camPitch = <Radians>(this.camPitch + this.camPitchSpeed * deltaTime);
       } else {
         this.camPitchSpeed = 0;
       }
       if (Math.abs(this.camYawSpeed) > 1e-8) {
-        this.camYaw = <Radians>(this.camYaw + this.camYawSpeed * dt);
+        this.camYaw = <Radians>(this.camYaw + this.camYawSpeed * deltaTime);
       } else {
         this.camYawSpeed = 0;
       }
       if (Math.abs(this.camRotateSpeed) > 1e-8) {
-        this.fpsRotate = <Degrees>(this.fpsRotate + this.camRotateSpeed * dt);
+        this.fpsRotate = <Degrees>(this.fpsRotate + this.camRotateSpeed * deltaTime);
       } else {
         this.camRotateSpeed = 0;
       }
@@ -867,20 +772,20 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
 
     if (this.isAutoRotate_) {
       if (settingsManager.isAutoRotateL) {
-        this.camYaw = <Radians>(this.camYaw - settingsManager.autoRotateSpeed * dt);
+        this.camYaw = <Radians>(this.camYaw - settingsManager.autoRotateSpeed * deltaTime);
       }
       if (settingsManager.isAutoRotateR) {
-        this.camYaw = <Radians>(this.camYaw + settingsManager.autoRotateSpeed * dt);
+        this.camYaw = <Radians>(this.camYaw + settingsManager.autoRotateSpeed * deltaTime);
       }
       if (settingsManager.isAutoRotateU) {
-        this.camPitch = <Radians>(this.camPitch + (settingsManager.autoRotateSpeed / 2) * dt);
+        this.camPitch = <Radians>(this.camPitch + (settingsManager.autoRotateSpeed / 2) * deltaTime);
       }
       if (settingsManager.isAutoRotateD) {
-        this.camPitch = <Radians>(this.camPitch - (settingsManager.autoRotateSpeed / 2) * dt);
+        this.camPitch = <Radians>(this.camPitch - (settingsManager.autoRotateSpeed / 2) * deltaTime);
       }
     }
 
-    this.updateZoom_(dt);
+    this.updateZoom_(deltaTime);
 
     this.updateCameraSnapMode();
 
@@ -909,6 +814,8 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     }
 
     this.projectionCameraMatrix = mat4.mul(mat4.create(), this.projectionMatrix, this.viewMatrix);
+
+    this.activeCameraController.update(deltaTime);
   }
 
   validateProjectionMatrix_() {
@@ -975,15 +882,15 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
   private resetFpsPos_(): void {
     this.fpsPitch = <Degrees>0;
     this.fpsYaw = <Degrees>0;
-    this.fpsPos[0] = 0;
+    this.position[0] = 0;
 
     // Move out from the center of the Earth in FPS Mode
     if (this.activeCameraType_ === CameraControllerType.FIRST_PERSON) {
-      this.fpsPos[1] = 25000;
+      this.position[1] = 25000;
     } else {
-      this.fpsPos[1] = 0;
+      this.position[1] = 0;
     }
-    this.fpsPos[2] = 0;
+    this.position[2] = 0;
   }
 
   private updateCameraSnapMode() {
@@ -991,100 +898,6 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       this.camPitch = this.camPitchTarget;
       this.camYaw = this.camYawTarget;
     }
-  }
-
-  /*
-   * This is intentionally complex to reduce object creation and GC
-   * Splitting it into subfunctions would not be optimal
-   */
-  private updateFpsMovement_(dt: Milliseconds): void {
-    this.fpsPitch = <Degrees>(this.fpsPitch - 20 * this.camPitchSpeed * dt);
-    this.fpsYaw = <Degrees>(this.fpsYaw - 20 * this.camYawSpeed * dt);
-    this.fpsRotate = <Degrees>(this.fpsRotate - 20 * this.camRotateSpeed * dt);
-
-    // Prevent Over Rotation
-    if (this.fpsPitch > 90) {
-      this.fpsPitch = <Degrees>90;
-    }
-    if (this.fpsPitch < -90) {
-      this.fpsPitch = <Degrees>-90;
-    }
-    if (this.fpsRotate > 360) {
-      this.fpsRotate = <Degrees>(this.fpsRotate - 360);
-    }
-    if (this.fpsRotate < 0) {
-      this.fpsRotate = <Degrees>(this.fpsRotate + 360);
-    }
-    if (this.fpsYaw > 360) {
-      this.fpsYaw = <Degrees>(this.fpsYaw - 360);
-    }
-    if (this.fpsYaw < 0) {
-      this.fpsYaw = <Degrees>(this.fpsYaw + 360);
-    }
-
-    const fpsTimeNow = <Milliseconds>Date.now();
-
-    if (this.fpsLastTime_ !== 0) {
-      const fpsElapsed = <Milliseconds>(fpsTimeNow - this.fpsLastTime_);
-
-      if (this.isFPSForwardSpeedLock && this.fpsForwardSpeed < 0) {
-        this.fpsForwardSpeed = Math.max(this.fpsForwardSpeed + Math.min(this.fpsForwardSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsForwardSpeed);
-      } else if (this.isFPSForwardSpeedLock && this.fpsForwardSpeed > 0) {
-        this.fpsForwardSpeed = Math.min(this.fpsForwardSpeed + Math.max(this.fpsForwardSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsForwardSpeed);
-      }
-
-      if (this.isFPSSideSpeedLock && this.fpsSideSpeed < 0) {
-        this.fpsSideSpeed = Math.max(this.fpsSideSpeed + Math.min(this.fpsSideSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsSideSpeed);
-      } else if (this.isFPSSideSpeedLock && this.fpsSideSpeed > 0) {
-        this.fpsSideSpeed = Math.min(this.fpsSideSpeed + Math.max(this.fpsSideSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsSideSpeed);
-      }
-
-      if (this.isFPSVertSpeedLock && this.fpsVertSpeed < 0) {
-        this.fpsVertSpeed = Math.max(this.fpsVertSpeed + Math.min(this.fpsVertSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsVertSpeed);
-      } else if (this.isFPSVertSpeedLock && this.fpsVertSpeed > 0) {
-        this.fpsVertSpeed = Math.min(this.fpsVertSpeed + Math.max(this.fpsVertSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsVertSpeed);
-      }
-
-      if (this.activeCameraType_ === CameraControllerType.FIRST_PERSON) {
-        if (this.fpsForwardSpeed !== 0) {
-          this.fpsPos[0] -= Math.sin(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
-          this.fpsPos[1] -= Math.cos(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
-          this.fpsPos[2] += Math.sin(this.fpsPitch * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
-        }
-        if (this.fpsVertSpeed !== 0) {
-          this.fpsPos[2] -= this.fpsVertSpeed * this.fpsRun * fpsElapsed;
-        }
-        if (this.fpsSideSpeed !== 0) {
-          this.fpsPos[0] -= Math.cos(-this.fpsYaw * DEG2RAD) * this.fpsSideSpeed * this.fpsRun * fpsElapsed;
-          this.fpsPos[1] -= Math.sin(-this.fpsYaw * DEG2RAD) * this.fpsSideSpeed * this.fpsRun * fpsElapsed;
-        }
-      }
-
-      if (!this.isFPSForwardSpeedLock) {
-        this.fpsForwardSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-      if (!this.isFPSSideSpeedLock) {
-        this.fpsSideSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-      if (!this.isFPSVertSpeedLock) {
-        this.fpsVertSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-
-      if (this.fpsForwardSpeed < 0.01 && this.fpsForwardSpeed > -0.01) {
-        this.fpsForwardSpeed = 0;
-      }
-      if (this.fpsSideSpeed < 0.01 && this.fpsSideSpeed > -0.01) {
-        this.fpsSideSpeed = 0;
-      }
-      if (this.fpsVertSpeed < 0.01 && this.fpsVertSpeed > -0.01) {
-        this.fpsVertSpeed = 0;
-      }
-
-      this.fpsPitch = <Degrees>(this.fpsPitch + this.fpsPitchRate * fpsElapsed);
-      this.fpsRotate = <Degrees>(this.fpsRotate + this.fpsRotateRate * fpsElapsed);
-      this.fpsYaw = <Degrees>(this.fpsYaw + this.fpsYawRate * fpsElapsed);
-    }
-    this.fpsLastTime_ = fpsTimeNow;
   }
 
   private updateFtsRotation_(dt: number) {
@@ -1106,7 +919,7 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       } else {
         const upOrDown = this.camPitch - this.earthCenteredPitch > 0 ? -1 : 1;
 
-        this.camPitchSpeed = (dt * upOrDown * settingsManager.cameraMovementSpeed) / 50;
+        this.camPitchSpeed = (dt * upOrDown * settingsManager.cameraMovementSpeed) / 200;
       }
 
       if (this.camYaw >= this.earthCenteredYaw - marginOfError && this.camYaw <= this.earthCenteredYaw + marginOfError) {
@@ -1116,7 +929,7 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
         // Figure out the shortest distance back to this.earthCenteredYaw_ from this.camYaw
         const leftOrRight = this.camYaw - this.earthCenteredYaw > 0 ? -1 : 1;
 
-        this.camYawSpeed = (dt * leftOrRight * settingsManager.cameraMovementSpeed) / 50;
+        this.camYawSpeed = (dt * leftOrRight * settingsManager.cameraMovementSpeed) / 200;
       }
 
       if (this.camYaw === this.earthCenteredYaw && this.camPitch === this.earthCenteredPitch) {
@@ -1126,8 +939,11 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
 
     if (this.activeCameraController instanceof SatelliteOrbitalCameraController) {
       this.camPitch = normalizeAngle(this.camPitch);
-      this.ftsPitch = this.camPitch;
-      this.ftsYaw = this.camYaw;
+      // Smoothly move ftsPitch and ftsYaw towards camPitch and camYaw
+      const smoothing = 0.1;
+
+      this.ftsPitch += (this.camPitch - this.ftsPitch) * smoothing;
+      this.ftsYaw += (this.camYaw - this.ftsYaw) * smoothing;
     }
   }
 
@@ -1251,9 +1067,9 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       this.panCurrent.x += panResetModifier * this.panMovementSpeed_ * this.panDif_.x;
       // If we are moving like an FPS then Y and Z are based on the angle of the this
       if (this.isWorldPan) {
-        this.fpsPos[1] = <Radians>(this.fpsPos[1] - Math.cos(this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
-        this.fpsPos[2] = <Radians>(this.fpsPos[1] + Math.sin(this.localRotateCurrent.pitch) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
-        this.fpsPos[1] = <Radians>(this.fpsPos[1] - Math.sin(-this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.x);
+        this.position[1] = <Radians>(this.position[1] - Math.cos(this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
+        this.position[2] = <Radians>(this.position[1] + Math.sin(this.localRotateCurrent.pitch) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
+        this.position[1] = <Radians>(this.position[1] - Math.sin(-this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.x);
       }
       // If we are moving the screen then Z is always up and Y is not relevant
       if (this.isScreenPan || this.isPanReset) {
@@ -1263,9 +1079,9 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       }
 
       if (this.isPanReset) {
-        this.fpsPos[0] -= this.fpsPos[0] / 25;
-        this.fpsPos[1] -= this.fpsPos[1] / 25;
-        this.fpsPos[2] -= this.fpsPos[2] / 25;
+        this.position[0] -= this.position[0] / 25;
+        this.position[1] -= this.position[1] / 25;
+        this.position[2] -= this.position[2] / 25;
 
         if (this.panCurrent.x > -0.5 && this.panCurrent.x < 0.5) {
           this.panCurrent.x = 0;
@@ -1276,17 +1092,17 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
         if (this.panCurrent.z > -0.5 && this.panCurrent.z < 0.5) {
           this.panCurrent.z = 0;
         }
-        if (this.fpsPos[0] > -0.5 && this.fpsPos[0] < 0.5) {
-          this.fpsPos[0] = 0;
+        if (this.position[0] > -0.5 && this.position[0] < 0.5) {
+          this.position[0] = 0;
         }
-        if (this.fpsPos[1] > -0.5 && this.fpsPos[1] < 0.5) {
-          this.fpsPos[1] = 0;
+        if (this.position[1] > -0.5 && this.position[1] < 0.5) {
+          this.position[1] = 0;
         }
-        if (this.fpsPos[2] > -0.5 && this.fpsPos[2] < 0.5) {
-          this.fpsPos[2] = 0;
+        if (this.position[2] > -0.5 && this.position[2] < 0.5) {
+          this.position[2] = 0;
         }
 
-        if (this.panCurrent.x === 0 && this.panCurrent.y === 0 && this.panCurrent.z === 0 && this.fpsPos[0] === 0 && this.fpsPos[1] === 0 && this.fpsPos[2] === 0) {
+        if (this.panCurrent.x === 0 && this.panCurrent.y === 0 && this.panCurrent.z === 0 && this.position[0] === 0 && this.position[1] === 0 && this.position[2] === 0) {
           this.isPanReset = false;
         }
       }

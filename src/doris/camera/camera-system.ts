@@ -1,10 +1,10 @@
 // app/doris/camera/camera-system.ts
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { System } from '@app/doris/system/system';
+import { vec3 } from 'gl-matrix';
 import { EventBus } from '../events/event-bus';
 import { Camera } from './camera';
 import { CameraController } from './controllers/camera-controller';
-import { vec3 } from 'gl-matrix';
 
 export enum CameraNames {
   MAIN = 'main',
@@ -48,7 +48,7 @@ export class CameraSystem extends System {
         }
 
         // Update the camera itself
-        camera.update();
+        camera.update(deltaTime);
       }
     });
   }

@@ -1,75 +1,228 @@
-import { Camera } from '@app/doris/camera/camera';
 import { CameraController } from '@app/doris/camera/controllers/camera-controller';
+import { Doris } from '@app/doris/doris';
 import { EventBus } from '@app/doris/events/event-bus';
-import { InputEvents } from '@app/doris/events/event-types';
+import { InputEvents, WebGlEvents } from '@app/doris/events/event-types';
 import { mat4 } from 'gl-matrix';
-import { DEG2RAD } from 'ootk';
+import { DEG2RAD, Degrees } from 'ootk';
 import { KeepTrackMainCamera } from '../legacy-camera';
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
 export class FirstPersonCameraController extends CameraController {
   // Camera state
-  private fpsYaw: number = 0;
-  private fpsPitch: number = 0;
-  private moveForward: boolean = false;
-  private moveBackward: boolean = false;
-  private moveLeft: boolean = false;
-  private moveRight: boolean = false;
-  private moveUp: boolean = false;
-  private moveDown: boolean = false;
-  private speedMultiplier: number = 1;
+  camera: KeepTrackMainCamera;
+  private pitch_: number = 0;
+  private yaw_: number = 0;
+  private rotate_: number = 0;
+  forwardSpeed: number = 0;
+  sideSpeed: number = 0;
+  vertSpeed: number = 0;
+  private readonly runMovementSpeed_: number = 3;
+  forwardSpeedLock: boolean = false;
+  sideSpeedLock: boolean = false;
+  vertSpeedLock: boolean = false;
+  private fastMultiplier_: number = 1;
+  lastMouseX: number = 0;
+  lastMouseY: number = 0;
+  private smoothedPitchDelta_: number = 0;
+  private smoothedYawDelta_: number = 0;
+  private smoothedRotateDelta_: number = 0;
 
-  constructor(camera: Camera, eventBus: EventBus) {
+  constructor(camera: KeepTrackMainCamera, eventBus: EventBus) {
     super(camera, eventBus);
+    this.camera = camera;
   }
 
-  protected updateInternal(): void {
-    /*
-     * Update camera position based on movement inputs
-     * Adapted from LegacyCamera.updateFpsMovement_
-     */
+  protected onActivate(): void {
+    super.onActivate?.();
+    this.camera.position = [0, 35000, 0];
+    this.camera.setFov(0.6);
+  }
+
+  protected updateInternal(delta: number): void {
+    this.clampCameraOrientation_();
+    this.handleKeyStates_();
+    this.clampSpeed_(delta);
+    this.updateCameraPosition_(delta);
+  }
+
+  private isKeyDown_(key: string): boolean {
+    return Doris.getInstance().getInputSystem().isKeyDown(key);
+  }
+
+  private handleKeyStates_() {
+    // If shift is pressed, set fastMultiplier to 3, otherwise set it to 1
+    this.fastMultiplier_ = this.isKeyDown_('shift') ? this.runMovementSpeed_ : 1;
+
+    // Handle key state for movement
+    if (this.isKeyDown_('w') && this.isKeyDown_('s')) {
+      this.forwardSpeed = 0;
+      this.forwardSpeedLock = false;
+    } else if (this.isKeyDown_('w')) {
+      this.forwardSpeed = -(settingsManager.fpsForwardSpeed ?? 3);
+      this.forwardSpeedLock = true;
+    } else if (this.isKeyDown_('s')) {
+      this.forwardSpeed = settingsManager.fpsForwardSpeed ?? 3;
+      this.forwardSpeedLock = true;
+    } else {
+      this.forwardSpeedLock = false;
+    }
+
+    if (this.isKeyDown_('a') && this.isKeyDown_('d')) {
+      this.sideSpeed = 0;
+      this.sideSpeedLock = false;
+    } else if (this.isKeyDown_('a')) {
+      this.sideSpeed = settingsManager.fpsSideSpeed ?? 2;
+      this.sideSpeedLock = true;
+    } else if (this.isKeyDown_('d')) {
+      this.sideSpeed = -(settingsManager.fpsSideSpeed ?? 2);
+      this.sideSpeedLock = true;
+    } else {
+      this.sideSpeedLock = false;
+    }
+
+    if (this.isKeyDown_('q') && this.isKeyDown_('e')) {
+      this.vertSpeed = 0;
+      this.vertSpeedLock = false;
+    } else if (this.isKeyDown_('q')) {
+      this.vertSpeed = settingsManager.fpsVertSpeed ?? 2;
+      this.vertSpeedLock = true;
+    } else if (this.isKeyDown_('e')) {
+      this.vertSpeed = -(settingsManager.fpsVertSpeed ?? 2);
+      this.vertSpeedLock = true;
+    } else {
+      this.vertSpeedLock = false;
+    }
+  }
+
+  private clampSpeed_(delta: number) {
+    if (!this.forwardSpeedLock) {
+      this.forwardSpeed *= Math.min(0.90 * delta, 0.90);
+    }
+    if (!this.sideSpeedLock) {
+      this.sideSpeed *= Math.min(0.90 * delta, 0.90);
+    }
+    if (!this.vertSpeedLock) {
+      this.vertSpeed *= Math.min(0.90 * delta, 0.90);
+    }
+
+    if (this.forwardSpeed < 0.01 && this.forwardSpeed > -0.01) {
+      this.forwardSpeed = 0;
+    }
+    if (this.sideSpeed < 0.01 && this.sideSpeed > -0.01) {
+      this.sideSpeed = 0;
+    }
+    if (this.vertSpeed < 0.01 && this.vertSpeed > -0.01) {
+      this.vertSpeed = 0;
+    }
+  }
+
+  private updateCameraPosition_(delta: number) {
+    if (this.forwardSpeed !== 0) {
+      this.camera.position[0] += Math.sin(this.yaw_ * DEG2RAD) * this.forwardSpeed * this.fastMultiplier_ * delta;
+      this.camera.position[1] += Math.cos(this.yaw_ * DEG2RAD) * this.forwardSpeed * this.fastMultiplier_ * delta;
+      this.camera.position[2] -= Math.sin(this.pitch_ * DEG2RAD) * this.forwardSpeed * this.fastMultiplier_ * delta;
+    }
+    if (this.vertSpeed !== 0) {
+      this.camera.position[2] += this.vertSpeed * this.fastMultiplier_ * delta;
+    }
+    if (this.sideSpeed !== 0) {
+      this.camera.position[0] += Math.cos(-this.yaw_ * DEG2RAD) * this.sideSpeed * this.fastMultiplier_ * delta;
+      this.camera.position[1] += Math.sin(-this.yaw_ * DEG2RAD) * this.sideSpeed * this.fastMultiplier_ * delta;
+    }
+  }
+
+  private clampCameraOrientation_() {
+    // Prevent Over Rotation
+    if (this.pitch_ > 90) {
+      this.pitch_ = <Degrees>90;
+    }
+    if (this.pitch_ < -90) {
+      this.pitch_ = <Degrees>-90;
+    }
+    if (this.rotate_ > 360) {
+      this.rotate_ = <Degrees>(this.rotate_ - 360);
+    }
+    if (this.rotate_ < 0) {
+      this.rotate_ = <Degrees>(this.rotate_ + 360);
+    }
+    if (this.yaw_ > 360) {
+      this.yaw_ = <Degrees>(this.yaw_ - 360);
+    }
+    if (this.yaw_ < 0) {
+      this.yaw_ = <Degrees>(this.yaw_ + 360);
+    }
   }
 
   protected renderInternal(camera: KeepTrackMainCamera): void {
     const viewMatrix = camera.getViewMatrix();
 
     // Rotate the camera
-    mat4.rotate(viewMatrix, viewMatrix, -camera.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(viewMatrix, viewMatrix, camera.fpsYaw * DEG2RAD, [0, 0, 1]);
+    mat4.rotate(viewMatrix, viewMatrix, -this.pitch_ * DEG2RAD, [1, 0, 0]);
+    mat4.rotate(viewMatrix, viewMatrix, this.yaw_ * DEG2RAD, [0, 0, 1]);
+    mat4.rotate(viewMatrix, viewMatrix, this.rotate_ * DEG2RAD, [0, 1, 0]);
     // Move the camera to the FPS position
-    mat4.translate(viewMatrix, viewMatrix, [camera.fpsPos[0], camera.fpsPos[1], -camera.fpsPos[2]]);
+    mat4.translate(viewMatrix, viewMatrix, [camera.position[0], camera.position[1], -camera.position[2]]);
   }
 
   protected registerInputEvents(): void {
-    this.eventBus.on(InputEvents.MouseDown, this.handleMouseDown.bind(this));
+    this.eventBus.on(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
     this.eventBus.on(InputEvents.MouseMove, this.handleMouseMove.bind(this));
+    this.eventBus.on(InputEvents.MouseDown, this.handleMouseDown.bind(this));
     this.eventBus.on(InputEvents.MouseUp, this.handleMouseUp.bind(this));
-    this.eventBus.on(InputEvents.KeyDown, this.handleKeyDown.bind(this));
-    this.eventBus.on(InputEvents.KeyUp, this.handleKeyUp.bind(this));
   }
 
   protected unregisterInputEvents(): void {
-    this.eventBus.removeListener(InputEvents.MouseDown, this.handleMouseDown.bind(this));
+    this.eventBus.removeListener(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
     this.eventBus.removeListener(InputEvents.MouseMove, this.handleMouseMove.bind(this));
+    this.eventBus.removeListener(InputEvents.MouseDown, this.handleMouseDown.bind(this));
     this.eventBus.removeListener(InputEvents.MouseUp, this.handleMouseUp.bind(this));
-    this.eventBus.removeListener(InputEvents.KeyDown, this.handleKeyDown.bind(this));
-    this.eventBus.removeListener(InputEvents.KeyUp, this.handleKeyUp.bind(this));
   }
 
-  // Implement handlers similar to EarthCenteredCameraController but for first-person movement
-  protected handleMouseDown(event: MouseEvent, x: number, y: number, button: number): void {
-    // Handle mouse down events for FPS camera
+  protected handleMouseWheel(_event: WheelEvent, _x: number, _y: number, delta: number): void {
+    this.camera.setFov(this.camera.fov + delta * 0.0002);
+    Doris.getInstance().emit(WebGlEvents.FovChanged);
   }
-  protected handleMouseMove(event: MouseEvent, x: number, y: number, deltaX: number, deltaY: number): void {
-    // Handle mouse move events for FPS camera
+
+  protected handleMouseMove(event: MouseEvent, x: number, y: number): void {
+    /*
+     * Only update deltas while mouse button is held (like FPS games)
+     * Calculate deltas
+     */
+    const deltaX = x - this.lastMouseX;
+    const deltaY = y - this.lastMouseY;
+
+    // Smoothing factor (between 0 and 1, lower is smoother)
+    const smoothing = 0.2;
+
+    // Store previous values for interpolation
+    this.smoothedPitchDelta_ ??= 0;
+    this.smoothedYawDelta_ ??= 0;
+    this.smoothedRotateDelta_ ??= 0;
+
+    if (event.buttons === 1) {
+      // Left mouse button: pitch/yaw
+      this.smoothedPitchDelta_ += ((-deltaY * 0.1) - this.smoothedPitchDelta_) * smoothing;
+      this.smoothedYawDelta_ += ((deltaX * 0.1) - this.smoothedYawDelta_) * smoothing;
+      this.pitch_ += this.smoothedPitchDelta_;
+      this.yaw_ += this.smoothedYawDelta_;
+    } else if (event.buttons === 4) {
+      // Middle mouse button: rotate
+      this.smoothedRotateDelta_ += ((-deltaX * 0.1) - this.smoothedRotateDelta_) * smoothing;
+      this.rotate_ += this.smoothedRotateDelta_;
+    } else {
+      // Decay deltas when not dragging
+      this.smoothedPitchDelta_ *= 0.8;
+      this.smoothedYawDelta_ *= 0.8;
+      this.smoothedRotateDelta_ *= 0.8;
+    }
+    this.lastMouseX = x;
+    this.lastMouseY = y;
   }
-  protected handleMouseUp(event: MouseEvent, x: number, y: number, button: number): void {
-    // Handle mouse up events for FPS camera
+  protected handleMouseDown(_event: MouseEvent, x: number, y: number): void {
+    this.lastMouseX = x;
+    this.lastMouseY = y;
   }
-  protected handleKeyDown(event: KeyboardEvent): void {
-    // Handle key down events for FPS camera
-  }
-  protected handleKeyUp(event: KeyboardEvent): void {
-    // Handle key up events for FPS camera
+  protected handleMouseUp(_event: MouseEvent, x: number, y: number): void {
+    this.lastMouseX = x;
+    this.lastMouseY = y;
   }
 }

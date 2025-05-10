@@ -1,4 +1,5 @@
 import { mat4 } from 'gl-matrix';
+import { Milliseconds } from 'ootk';
 import { EventBus } from '../events/event-bus';
 import { Camera } from './camera';
 
@@ -6,7 +7,7 @@ import { Camera } from './camera';
  * A perspective camera implementation using a perspective projection matrix.
  * Suitable for 3D rendering with depth perception.
  */
-export class PerspectiveCamera extends Camera {
+export abstract class PerspectiveCamera extends Camera {
   /**
    * Creates a new perspective camera
    *
@@ -31,11 +32,15 @@ export class PerspectiveCamera extends Camera {
   /**
    * Updates the camera for the current frame
    */
-  update(): void {
+  update(deltaTime: Milliseconds): void {
     if (this.isDirty) {
       this.updateViewMatrix();
     }
+
+    this.onUpdate?.(deltaTime);
   }
+
+  abstract onUpdate?(deltaTime: Milliseconds): void;
 
   /**
    * Recalculates the projection matrix based on camera parameters
@@ -59,6 +64,12 @@ export class PerspectiveCamera extends Camera {
       return;
     }
     this.fov = fov;
+    if (this.fov > 1.2) {
+      this.fov = 0.04;
+    }
+    if (this.fov < 0.01) {
+      this.fov = 0.01;
+    }
     this.updateProjectionMatrix();
   }
 

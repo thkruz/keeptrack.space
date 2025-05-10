@@ -181,7 +181,7 @@ describe('Camera Draw', () => {
   // test normal draw
   it('test_normal_draw', () => {
     const testResult = () => {
-      cameraInstance.draw(defaultSat, sensorData);
+      cameraInstance.render(defaultSat, sensorData);
     };
 
     expect(testResult).not.toThrow();
@@ -190,7 +190,7 @@ describe('Camera Draw', () => {
   // test draw with no target
   it('test_draw_no_target', () => {
     const testResult = () => {
-      cameraInstance.draw(null, sensorData);
+      cameraInstance.render(null, sensorData);
     };
 
     expect(testResult).not.toThrow();
@@ -199,7 +199,7 @@ describe('Camera Draw', () => {
   // test draw with no sensor
   it('test_draw_no_sensor', () => {
     const testResult = () => {
-      cameraInstance.draw(defaultSat, null);
+      cameraInstance.render(defaultSat, null);
     };
 
     expect(testResult).not.toThrow();
@@ -208,7 +208,7 @@ describe('Camera Draw', () => {
   // test draw with no target and no sensor
   it('test_draw_no_target_no_sensor', () => {
     const testResult = () => {
-      cameraInstance.draw(null, null);
+      cameraInstance.render(null, null);
     };
 
     expect(testResult).not.toThrow();
@@ -218,7 +218,7 @@ describe('Camera Draw', () => {
   it('test_draw_bad_cam_pitch', () => {
     const testResult = () => {
       cameraInstance.camPitch = NaN as unknown as Radians;
-      cameraInstance.draw(defaultSat, sensorData);
+      cameraInstance.render(defaultSat, sensorData);
     };
 
     expect(testResult).not.toThrow();
@@ -228,28 +228,28 @@ describe('Camera Draw', () => {
   it('test_draw_bad_cam_yaw', () => {
     let testResult = () => {
       cameraInstance.camYaw = NaN as unknown as Radians;
-      cameraInstance.draw(defaultSat, sensorData);
+      cameraInstance.render(defaultSat, sensorData);
     };
 
     testFuncWithAllCameraTypes(testResult, cameraInstance);
 
     testResult = () => {
       cameraInstance.camYaw = NaN as unknown as Radians;
-      cameraInstance.draw(defaultSat);
+      cameraInstance.render(defaultSat);
     };
     testFuncWithAllCameraTypes(testResult, cameraInstance);
   });
 
   // test draw with all camera types
   it('test_draw_all_camera_types', () => {
-    let testFunc = () => cameraInstance.draw(defaultSat, sensorData);
+    let testFunc = () => cameraInstance.render(defaultSat, sensorData);
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.draw(defaultSat, null);
+    testFunc = () => cameraInstance.render(defaultSat, null);
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.draw(null);
+    testFunc = () => cameraInstance.render(null);
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.draw(null, null);
+    testFunc = () => cameraInstance.render(null, null);
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
 });

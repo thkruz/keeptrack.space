@@ -16,8 +16,14 @@ export class KeyboardHandler {
    * Initialize keyboard event listeners
    */
   initialize(): void {
-    window.addEventListener('keydown', this.handleKeyDown.bind(this));
-    window.addEventListener('keyup', this.handleKeyUp.bind(this));
+    window.addEventListener('keydown', this.handleKeyDown.bind(this), {
+      passive: false,
+      capture: true,
+    });
+    window.addEventListener('keyup', this.handleKeyUp.bind(this), {
+      passive: true,
+      capture: true,
+    });
   }
 
   /**
@@ -58,6 +64,14 @@ export class KeyboardHandler {
   private handleKeyDown(event: KeyboardEvent): void {
     const key = event.key.toLowerCase();
     const isRepeat = this.keyStates.get(key) || false;
+
+    /*
+     * Prevent default browser behavior for handled keys
+     * Don't prevent default for function keys (F1-F12)
+     */
+    if (!(/^f\d{1,2}$/iu).test(key)) {
+      event.preventDefault();
+    }
 
     this.keyStates.set(key, true);
 

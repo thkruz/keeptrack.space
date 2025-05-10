@@ -99,7 +99,7 @@ export class EarthCenteredOrbitalController extends OrbitalController {
 
       // TODO: This should be caught somewhere else
       this.camera.switchCameraController();
-      this.camera.draw();
+      this.camera.render();
 
       return;
     }
@@ -246,20 +246,14 @@ export class EarthCenteredOrbitalController extends OrbitalController {
     return vec3.fromValues(xRot, yRot, zRot);
   }
 
-  protected onActivate(): void {
-    // throw new Error('Method not implemented.');
-  }
-  protected onDeactivate(): void {
-    // throw new Error('Method not implemented.');
-  }
-
-  private handleMouseUp(_event: MouseEvent, _x: number, _y: number, button: number): void {
+  protected handleMouseUp(_event: MouseEvent, _x: number, _y: number, button: number): void {
     if (button === 0) {
       this.isDragging_ = false;
     }
   }
 
-  private handleMouseWheel(_event: WheelEvent, _x: number, _y: number, delta: number): void {
+  protected handleMouseWheel(_event: WheelEvent, _x: number, _y: number, delta: number): void {
+    super.handleMouseWheel(_event, _x, _y, delta);
     /*
      * Mouse wheel changes zoomTarget_ only; actual zoom is updated in updateInternal
      * Exponential scaling: zoom faster when farther from current zoom level

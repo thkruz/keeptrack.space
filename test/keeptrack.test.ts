@@ -111,7 +111,7 @@ describe('code_snippet', () => {
         const drawManagerInstance = keepTrackApi.getRenderer();
 
         drawManagerInstance.update = jest.fn();
-        keepTrackApi.getMainCamera().draw = jest.fn();
+        keepTrackApi.getMainCamera().render = jest.fn();
       });
       await Doris.getInstance().start();
 
@@ -144,11 +144,11 @@ describe('code_snippet', () => {
     Doris.getInstance().start();
 
     drawManagerInstance.update = jest.fn();
-    keepTrackApi.getMainCamera().draw = jest.fn();
+    keepTrackApi.getMainCamera().render = jest.fn();
     settingsManager.cruncherReady = true;
     Doris.getInstance()['tick_'](performance.now() as Milliseconds);
     expect(drawManagerInstance.update).toHaveBeenCalled();
-    expect(keepTrackApi.getMainCamera().draw).toHaveBeenCalled();
+    expect(keepTrackApi.getMainCamera().render).toHaveBeenCalled();
   });
 
   // Test if isPreventDefaultHtml disabled

@@ -613,20 +613,6 @@ export class SettingsManager {
    */
   enableLimitedUI = true;
   /**
-   * @deprecated
-   * The maximum value for the field of view setting.
-   *
-   * TODO: Implement this for FPS, Planetarium, Astronomy, and Satellite View
-   */
-  fieldOfViewMax = 1.2;
-  /**
-   * @deprecated
-   * The minimum value for the field of view setting.
-   *
-   * * TODO: Implement this for FPS, Planetarium, Astronomy, and Satellite View
-   */
-  fieldOfViewMin = 0.04;
-  /**
    * Number of steps to fit TLEs in the Initial Orbit plugin
    */
   fitTleSteps = 3; // Increasing this will kill performance
@@ -645,7 +631,7 @@ export class SettingsManager {
   /**
    * Speed at which the camera moves in the X direction when in FPS mode.
    */
-  fpsSideSpeed = 3;
+  fpsSideSpeed = 2;
   /**
    * Minimum fps or sun/moon are skipped
    */
@@ -657,7 +643,7 @@ export class SettingsManager {
   /**
    * Speed at which the camera moves in the Y direction when in FPS mode.
    */
-  fpsVertSpeed = 3;
+  fpsVertSpeed = 2;
   /**
    * Speed at which the camera twists (yaws) when in FPS mode.
    */

@@ -1,13 +1,15 @@
 import { EventBus } from '@app/doris/events/event-bus';
+import { ToastMsgType } from '@app/interfaces';
 import { FirstPersonCameraController } from '@app/keeptrack/camera/controllers/first-person-camera-controller';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { DEG2RAD } from 'ootk';
+import { BaseObject, DEG2RAD, Milliseconds } from 'ootk';
 import { CameraControllerType, KeepTrackMainCamera } from '../../keeptrack/camera/legacy-camera';
 
-export class SatelliteViewCameraMode extends FirstPersonCameraController {
+export class SatelliteViewCameraController extends FirstPersonCameraController {
   isInitialized_ = false;
+  targetObject_: BaseObject | null = null;
   camera: KeepTrackMainCamera;
 
   constructor(camera: KeepTrackMainCamera, eventBus: EventBus) {
@@ -23,26 +25,37 @@ export class SatelliteViewCameraMode extends FirstPersonCameraController {
     this.isInitialized_ = true;
   }
 
-  updateInternal(): void {
-    // No update logic needed for this camera mode
+  protected onActivate(): void {
+    super.onActivate?.();
+    if (this.onValidate()) {
+      keepTrackApi.getUiManager().toast('Camera Mode: Satellite Orbital', ToastMsgType.normal);
+    }
+  }
+
+  protected onValidate(): boolean {
+    this.targetObject_ = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj ?? null;
+    if ((this.targetObject_?.id ?? -1) === -1) {
+      return false;
+    }
+
+    return true;
+  }
+
+  protected updateInternal(delta: number): void {
+    super.updateInternal?.(delta);
+    if (!this.onValidate()) {
+      this.camera.switchCameraController(CameraControllerType.EARTH_CENTERED_ORBITAL);
+      this.camera.update(delta as Milliseconds); // Tell the camera to update its new controller
+    }
   }
 
   renderInternal(): void {
-    const target = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
-
-    if ((target?.id ?? -1) === -1) {
-      this.camera.switchCameraController();
-      this.camera.draw();
-
-      return;
-    }
-
-    const targetPositionTemp = vec3.fromValues(-target!.position.x, -target!.position.y, -target!.position.z);
+    const targetPositionTemp = vec3.fromValues(-this.targetObject_!.position.x, -this.targetObject_!.position.y, -this.targetObject_!.position.z);
     const viewMatrix = this.camera.getViewMatrix();
 
     mat4.translate(viewMatrix, viewMatrix, targetPositionTemp);
     vec3.normalize(this.camera.normalizedCameraUp, targetPositionTemp);
-    vec3.normalize(this.camera.normalizedCameraForward, [target!.velocity.x, target!.velocity.y, target!.velocity.z]);
+    vec3.normalize(this.camera.normalizedCameraForward, [this.targetObject_!.velocity.x, this.targetObject_!.velocity.y, this.targetObject_!.velocity.z]);
     vec3.transformQuat(
       this.camera.normalizedCameraLeft,
       this.camera.normalizedCameraUp,
@@ -50,14 +63,14 @@ export class SatelliteViewCameraMode extends FirstPersonCameraController {
     );
 
     const targetNextPosition = vec3.fromValues(
-      target!.position.x + target!.velocity.x,
-      target!.position.y + target!.velocity.y,
-      target!.position.z + target!.velocity.z,
+      this.targetObject_!.position.x + this.targetObject_!.velocity.x,
+      this.targetObject_!.position.y + this.targetObject_!.velocity.y,
+      this.targetObject_!.position.z + this.targetObject_!.velocity.z,
     );
 
     mat4.lookAt(viewMatrix, targetNextPosition, targetPositionTemp, this.camera.normalizedCameraUp);
 
-    mat4.translate(viewMatrix, viewMatrix, [target!.position.x, target!.position.y, target!.position.z]);
+    mat4.translate(viewMatrix, viewMatrix, [this.targetObject_!.position.x, this.targetObject_!.position.y, this.targetObject_!.position.z]);
 
     mat4.rotate(viewMatrix, viewMatrix, this.camera.fpsPitch * DEG2RAD, this.camera.normalizedCameraLeft);
     mat4.rotate(viewMatrix, viewMatrix, -this.camera.fpsYaw * DEG2RAD, this.camera.normalizedCameraUp);

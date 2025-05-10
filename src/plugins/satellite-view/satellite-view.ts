@@ -31,7 +31,7 @@ import viewInAirPng from '@public/img/icons/view-in-air.png';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SatelliteViewCameraMode } from './satellite-view-camera-mode';
+import { SatelliteViewCameraController } from './satellite-view-camera-controller';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
   readonly id = 'SatelliteViewPlugin';
@@ -53,7 +53,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     super.init();
 
     const legacyCamera = keepTrackApi.getMainCamera();
-    const satelliteViewCameraMode = new SatelliteViewCameraMode(legacyCamera, Doris.getInstance().getEventBus());
+    const satelliteViewCameraMode = new SatelliteViewCameraController(legacyCamera, Doris.getInstance().getEventBus());
 
     legacyCamera.cameraControllers.set(CameraControllerType.SATELLITE_FIRST_PERSON, satelliteViewCameraMode);
   }

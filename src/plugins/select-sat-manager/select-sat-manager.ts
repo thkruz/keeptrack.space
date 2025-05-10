@@ -63,6 +63,8 @@ export class SelectSatManager extends KeepTrackPlugin {
       if (this.selectedSat !== this.lastSelectedPrimarySatId()) {
         Doris.getInstance().emit(KeepTrackApiEvents.onPrimarySatelliteChange, this.primarySatObj, this.selectedSat);
       }
+      // Record the last selected sat
+      this.lastSelectedPrimarySatId(this.selectedSat);
 
       // If the primary satellite is an object, update it
       if (this.primarySatObj.id !== -1) {
@@ -228,9 +230,6 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // Run any other callbacks
     Doris.getInstance().emit(KeepTrackApiEvents.selectSatData, spaceObj, spaceObj?.id);
-
-    // Record the last selected sat
-    this.lastSelectedPrimarySatId(this.selectedSat);
   }
 
   private selectSensorObject_(sensor: DetailedSensor) {

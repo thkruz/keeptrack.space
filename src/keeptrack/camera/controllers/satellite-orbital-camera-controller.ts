@@ -1,14 +1,16 @@
 import { OrbitalController, OrbitalControllerParams } from '@app/doris/camera/controllers/orbital-controller';
 import { EventBus } from '@app/doris/events/event-bus';
 import { InputEvents } from '@app/doris/events/event-types';
+import { ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ZOOM_EXP } from '@app/lib/constants';
 import { alt2zoom, normalizeAngle } from '@app/lib/transforms';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SatMath } from '@app/static/sat-math';
 import { mat4, vec3 } from 'gl-matrix';
-import { BaseObject, EciVec3, Kilometers, RADIUS_OF_EARTH, Radians, TAU } from 'ootk';
-import { KeepTrackMainCamera } from '../legacy-camera';
+import { BaseObject, EciVec3, Kilometers, Milliseconds, RADIUS_OF_EARTH, Radians, TAU } from 'ootk';
+import { CameraControllerType, KeepTrackMainCamera } from '../legacy-camera';
 
 export interface SatelliteCameraControllerParams extends OrbitalControllerParams {
   isMomentumEnabled?: boolean;
@@ -17,24 +19,55 @@ export interface SatelliteCameraControllerParams extends OrbitalControllerParams
 export class SatelliteOrbitalCameraController extends OrbitalController {
   distanceBuffer = 2;
   protected camera: KeepTrackMainCamera;
+  targetObject_: BaseObject | null = null;
 
   constructor(camera: KeepTrackMainCamera, eventBus: EventBus, params?: SatelliteCameraControllerParams) {
     super(camera, eventBus, params);
 
     this.isMomentumEnabled_ = params?.isMomentumEnabled ?? true;
+    this.eventBus.on(KeepTrackApiEvents.onPrimarySatelliteChange, this.onSatelliteSelect.bind(this));
   }
 
-  protected updateInternal(dt: number): void {
-    if (this.isAutoRotateEnabled_) {
-      this.updateAutoRotate(dt);
-    } else if (this.isAutoPitchYawToTarget_) {
-      this.autoMovement(dt);
-      this.updateCameraZoom_(dt);
-    } else {
-      this.adjustCameraMomentum_(dt);
-      this.updateCameraRotation_(dt);
-      this.updateCameraZoom_(dt);
+  protected onActivate(): void {
+    super.onActivate?.();
+    if (this.onValidate()) {
+      keepTrackApi.getUiManager().toast('Camera Mode: Satellite Orbital', ToastMsgType.normal);
+      this.zoom_ = Math.max(this.zoomTarget_, this.zoom_);
+      this.camera.setZoomLevel(Math.max(this.camera.zoomTarget, this.camera.zoomLevel()));
     }
+  }
+
+  private onSatelliteSelect(): void {
+    this.zoom_ = Math.max(this.zoomTarget_, this.zoom_);
+    this.camera.setZoomLevel(Math.max(this.camera.zoomTarget, this.camera.zoomLevel()));
+  }
+
+  protected updateInternal(deltaTime: Milliseconds): void {
+    if (!this.onValidate()) {
+      this.camera.switchCameraController(CameraControllerType.EARTH_CENTERED_ORBITAL);
+      this.camera.onUpdate?.(deltaTime); // Tell the camera to update its new controller
+
+      return;
+    }
+
+    if (this.isAutoRotateEnabled_) {
+      this.updateAutoRotate(deltaTime);
+    } else if (this.isAutoPitchYawToTarget_) {
+      this.autoMovement(deltaTime);
+      this.updateCameraZoom_(deltaTime);
+    } else {
+      this.adjustCameraMomentum_(deltaTime);
+      this.updateCameraRotation_(deltaTime);
+      this.updateCameraZoom_(deltaTime);
+    }
+  }
+  protected onValidate(): boolean {
+    this.targetObject_ = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj ?? null;
+    if ((this.targetObject_?.id ?? -1) === -1) {
+      return false;
+    }
+
+    return true;
   }
 
   protected updateAutoRotate(dt: number): void {
@@ -92,18 +125,10 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
     return <Kilometers>((zoomLevel ?? this.zoom_) ** ZOOM_EXP * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance);
   }
 
+  // TODO: We need to use internal variables instead of legacy camera ones
   protected renderInternal(camera: KeepTrackMainCamera): void {
-    const target = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
-
-    if ((target?.id ?? -1) === -1) {
-      this.camera.switchCameraController();
-      this.camera.draw();
-
-      return;
-    }
-
     const gmst = SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst;
-    const satAlt = SatMath.getAlt(target!.position, gmst);
+    const satAlt = SatMath.getAlt(this.targetObject_!.position, gmst);
 
     if (camera.getCameraDistance() < satAlt + RADIUS_OF_EARTH + settingsManager.minDistanceFromSatellite) {
       this.zoomTarget_ = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
@@ -111,7 +136,10 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
     }
 
     const viewMatrix = camera.getViewMatrix();
-    const targetPosition = vec3.fromValues(-target!.position?.x, -target!.position?.y, -target!.position?.z);
+    const targetPosition = vec3.fromValues(
+      -this.targetObject_!.position?.x,
+      -this.targetObject_!.position?.y,
+      -this.targetObject_!.position?.z);
 
     /*
      * mat4 commands are run in reverse order
@@ -128,7 +156,7 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
 
     mat4.translate(viewMatrix, viewMatrix, [camera.panCurrent.x, camera.panCurrent.y, camera.panCurrent.z]);
 
-    mat4.translate(viewMatrix, viewMatrix, [0, this.camera.getCameraRadius(target!.position), 0]);
+    mat4.translate(viewMatrix, viewMatrix, [0, this.camera.getCameraRadius(this.targetObject_!.position), 0]);
 
     mat4.rotateX(viewMatrix, viewMatrix, this.camera.ftsPitch);
     mat4.rotateZ(viewMatrix, viewMatrix, -this.camera.ftsYaw);
@@ -152,13 +180,6 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
     this.eventBus.removeListener(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
     this.eventBus.removeListener(InputEvents.KeyDown, this.handleKeyDown.bind(this));
     this.eventBus.removeListener(InputEvents.KeyUp, this.handleKeyUp.bind(this));
-  }
-
-  protected onActivate(): void {
-    // throw new Error('Method not implemented.');
-  }
-  protected onDeactivate(): void {
-    // throw new Error('Method not implemented.');
   }
 
   private handleMouseDown(_event: MouseEvent, x: number, y: number, button: number): void {
@@ -191,13 +212,14 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
     }
   }
 
-  private handleMouseUp(_event: MouseEvent, _x: number, _y: number, button: number): void {
+  protected handleMouseUp(_event: MouseEvent, _x: number, _y: number, button: number): void {
     if (button === 0) {
       this.isDragging_ = false;
     }
   }
 
-  private handleMouseWheel(_event: WheelEvent, _x: number, _y: number, delta: number): void {
+  protected handleMouseWheel(_event: WheelEvent, _x: number, _y: number, delta: number): void {
+    super.handleMouseWheel(_event, _x, _y, delta);
     const sensitivity = 0.0001;
     const scale = Math.max(1, Math.abs(this.zoomTarget_ - this.zoom_) * 10);
     const zoomDelta = delta * sensitivity * scale;

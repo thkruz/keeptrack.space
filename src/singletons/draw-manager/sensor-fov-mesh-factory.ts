@@ -4,7 +4,7 @@ import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
-import { DetailedSensor, GreenwichMeanSiderealTime, SpaceObjectType } from 'ootk';
+import { DetailedSensor, SpaceObjectType } from 'ootk';
 import { KeepTrackMainCamera } from '../../keeptrack/camera/legacy-camera';
 import { CustomMeshFactory } from './custom-mesh-factory';
 import { SensorFovMesh } from './sensor-fov-mesh';
@@ -100,8 +100,9 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     return true;
   }
 
-  updateAll(gmst: GreenwichMeanSiderealTime) {
+  updateAll() {
     const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
+    const gmst = keepTrackApi.getTimeManager().gmst;
 
     this.meshes.forEach((mesh) => {
       const isNeeded = this.checkIfNeeded_(activeSensors, mesh);

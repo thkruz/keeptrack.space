@@ -554,16 +554,20 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       return (this.activeCameraController as EarthCenteredOrbitalController).getCameraOrientation();
     }
 
-    return vec3.fromValues(0, 0, 0);
+    return this.position;
   }
 
   getCameraPosition(target?: EciVec3, orientation: vec3 = this.getCameraOrientation()) {
-    const centerOfEarth = vec3.fromValues(0, 0, 0);
+    if (this.activeCameraType_ !== CameraControllerType.SATELLITE_CENTERED_ORBITAL && this.activeCameraType_ !== CameraControllerType.EARTH_CENTERED_ORBITAL) {
+      return this.position;
+    }
+
+    const centerOfEarth = keepTrackApi.getScene().earth.node.transform.position;
 
     const radius = this.getCameraRadius(target);
 
 
-    return vec3.fromValues(centerOfEarth[0] - orientation[0] * radius, centerOfEarth[1] - orientation[1] * radius, centerOfEarth[2] - orientation[2] * radius);
+    return vec3.fromValues(centerOfEarth[0] + orientation[0] * radius, centerOfEarth[1] + orientation[1] * radius, centerOfEarth[2] - orientation[2] * radius);
   }
 
   getCameraRadius(target?: EciVec3) {
@@ -814,6 +818,10 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     }
 
     this.projectionCameraMatrix = mat4.mul(mat4.create(), this.projectionMatrix, this.viewMatrix);
+
+    const cameraPosition = this.getCameraPosition();
+
+    this.node.transform.setPosition(cameraPosition);
 
     this.activeCameraController.update(deltaTime);
   }
@@ -1135,7 +1143,6 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
         !this.isRayCastingEarth_ ||
         this.activeCameraType_ === CameraControllerType.FIRST_PERSON ||
         this.activeCameraType_ === CameraControllerType.SATELLITE_FIRST_PERSON ||
-        this.activeCameraType_ === CameraControllerType.ASTRONOMY ||
         settingsManager.isMobileModeEnabled
       ) {
         // random screen drag

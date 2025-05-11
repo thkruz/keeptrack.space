@@ -1,6 +1,6 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
-import { SatMath } from '@app/static/sat-math';
+import { SceneNode } from '@app/doris/scene/scene-node';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ConeMeshFactory } from '../../singletons/draw-manager/cone-mesh-factory';
 import { Box } from '../../singletons/draw-manager/cube';
@@ -51,23 +51,15 @@ export class SpaceScene {
 
   initialize(): void {
     try {
-      this.skybox.init(settingsManager);
-      this.earth.initialize();
-      this.sun.init().then(() => {
-        if (!settingsManager.isDisableGodrays) {
-          keepTrackApi.getScene().godrays?.init(this.sun);
-        }
-      });
-
-      if (!settingsManager.isDisableMoon) {
-        this.moon.init();
+      if (!settingsManager.isDisableGodrays) {
+        keepTrackApi.getScene().godrays?.init();
       }
 
       if (!settingsManager.isDisableSearchBox) {
         this.searchBox.init();
       }
       if (!settingsManager.isDisableSkybox) {
-        this.skybox.init(settingsManager);
+        this.skybox.initialize();
       }
       this.activeCamera = keepTrackApi.getMainCamera();
       this.isInitialized_ = true;
@@ -76,6 +68,39 @@ export class SpaceScene {
       // Errors aren't showing as toast messages
     }
     Doris.getInstance().on(CoreEngineEvents.Update, this.update.bind(this));
+
+    const sunNode = new SceneNode('Sun');
+
+    sunNode.addComponent(this.sun);
+    this.sun.node = sunNode;
+
+    const earthNode = new SceneNode('Earth');
+
+    earthNode.addComponent(this.earth);
+    this.earth.node = earthNode;
+
+    const moonNode = new SceneNode('Moon');
+
+    moonNode.addComponent(this.moon);
+    this.moon.node = moonNode;
+
+    const skyboxNode = new SceneNode('Skybox');
+
+    skyboxNode.addComponent(this.skybox);
+    this.skybox.node = skyboxNode;
+
+    const dotsNode = new SceneNode('Dots');
+    const mainCameraNode = Doris.getInstance().getSceneManager().activeScene!.findNode('MainCamera')!;
+
+    mainCameraNode.addChild(sunNode);
+    mainCameraNode.addChild(skyboxNode);
+    earthNode.addChild(moonNode);
+    earthNode.addChild(dotsNode);
+    Doris.getInstance().getSceneManager().activeScene?.root.addChild(earthNode);
+
+    Doris.getInstance().once(CoreEngineEvents.Update, () => {
+      this.earth.reloadEarthHiResTextures();
+    });
   }
 
   /**
@@ -87,19 +112,12 @@ export class SpaceScene {
     this.postProcessingManager.init(gl);
   }
 
-  update() {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const simulationTime = timeManagerInstance.simulationTimeObj;
-    const { gmst, j } = SatMath.calculateTimeVariables(simulationTime);
-
-    this.sun.update(j);
-    this.earth.update(gmst);
-    this.moon.update(simulationTime);
-    this.skybox.update();
+  update(deltaTime: number): void {
+    Doris.getInstance().getSceneManager().activeScene?.update(deltaTime);
 
     keepTrackApi.getLineManager().update();
 
-    this.sensorFovFactory.updateAll(gmst);
+    this.sensorFovFactory.updateAll();
     this.coneFactory.updateAll();
   }
 }

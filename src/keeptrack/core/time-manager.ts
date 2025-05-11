@@ -1,8 +1,9 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { ToastMsgType } from '@app/interfaces';
+import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { getDayOfYear, Milliseconds } from 'ootk';
+import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl } from '../../lib/get-el';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
@@ -57,6 +58,24 @@ export class TimeManager {
   private dynamicOffset_: number;
   isCreateClockDOMOnce_ = false;
   private isUpdateTimeThrottle_ = false;
+  j: number;
+  gmst: GreenwichMeanSiderealTime;
+
+  constructor() {
+    Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, () => {
+      const timeManagerInstance = keepTrackApi.getTimeManager();
+      const simulationTime = timeManagerInstance.simulationTimeObj;
+
+      if (!simulationTime) {
+        // TODO this happens at startup but should be prevented by not running the update loop until all components are ready
+        return;
+      }
+      const { gmst, j } = SatMath.calculateTimeVariables(simulationTime);
+
+      this.gmst = gmst;
+      this.j = j;
+    });
+  }
 
   static currentEpoch(currentDate: Date): [string, string] {
     const currentDateObj = new Date(currentDate);

@@ -47,6 +47,7 @@ import { CameraSystem } from './doris/camera/camera-system';
 import { Doris } from './doris/doris';
 import { CanvasEvents, CoreEngineEvents, WebGlEvents } from './doris/events/event-types';
 import { Renderer } from './doris/rendering/renderer';
+import { SceneNode } from './doris/scene/scene-node';
 import { isThisNode } from './doris/utils/isThisNode';
 import { GetSatType, Singletons } from './interfaces';
 import { CameraControllerType, KeepTrackMainCamera } from './keeptrack/camera/legacy-camera';
@@ -439,7 +440,10 @@ theodore.kruczek at gmail dot com.
           errorManagerInstance.error(e.error, 'Global Error Trapper', e.message);
         });
 
-        keepTrackApi.getMainCamera().initialize();
+        const cameraNode = new SceneNode('MainCamera');
+
+        Doris.getInstance().getSceneManager().activeScene?.root.addChild(cameraNode);
+        cameraNode.addComponent(keepTrackApi.getMainCamera());
 
         Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 1, 5);
         mobileManager.init();
@@ -495,7 +499,6 @@ theodore.kruczek at gmail dot com.
       });
 
     Doris.getInstance().once(WebGlEvents.AfterFirstInit, (gl: WebGL2RenderingContext) => {
-      keepTrackApi.getScene().earth.reloadEarthHiResTextures(gl);
       keepTrackApi.getMeshManager().init(gl);
     });
 
@@ -541,7 +544,7 @@ theodore.kruczek at gmail dot com.
       }
 
       // Fix flat geometry if it has already been created
-      keepTrackApi.getScene().godrays?.init(keepTrackApi.getScene().sun);
+      keepTrackApi.getScene().godrays?.init();
     });
 
     Doris.getInstance().on(WebGlEvents.FovChanged, () => {

@@ -4,7 +4,7 @@ import { UUID } from '../utils/uuid';
 
 export class SceneNode {
   readonly id: string = UUID.generate();
-  readonly transform: Transform = new Transform();
+  readonly transform: Transform = new Transform(this);
 
   private readonly components: Map<string, Component> = new Map();
   private parent_: SceneNode | null = null;
@@ -42,27 +42,26 @@ export class SceneNode {
   }
 
   update(deltaTime: number): void {
+    if (this.name === 'root') {
+      // Check if the root node needs transform updates
+      this.transform.validateWorldMatrix();
+    }
+
     // Update all components
     for (const component of this.components.values()) {
+      if (!component.isEnabled) {
+        continue;
+      }
+      if (!component.isInitialized) {
+        continue;
+      }
+      // Update the component
       component.update(deltaTime);
     }
 
     // Update children
     for (const child of this.children_) {
       child.update(deltaTime);
-    }
-  }
-
-  render(buffer: WebGLBuffer | null): void {
-    /*
-     * Render all components
-     * for (const component of this.components.values()) {
-     *   component.render(buffer);
-     * }
-     * Render children
-     */
-    for (const child of this.children_) {
-      child.render(buffer);
     }
   }
 

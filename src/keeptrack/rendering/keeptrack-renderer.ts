@@ -52,7 +52,7 @@ export class KeepTrackRenderer extends Renderer {
 
         scene.sun.draw(scene.earth.lightDirection, fb);
         if (scene.postProcessingManager.isInitialized) {
-          scene.earth.drawOcclusion(
+          scene.earth.renderOcclusion(
             camera.getProjectionMatrix(),
             camera.getViewMatrix(),
             scene.postProcessingManager.programs.occlusion,
@@ -79,9 +79,7 @@ export class KeepTrackRenderer extends Renderer {
         );
       }
       scene.skybox.render(scene.postProcessingManager.curBuffer);
-      if (!settingsManager.isDisableMoon) {
-        scene.moon.draw(scene.sun.position);
-      }
+      scene.moon.render(scene.sun.node.transform.position);
     }
     scene.postProcessingManager.curBuffer = null;
   }

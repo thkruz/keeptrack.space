@@ -12,9 +12,6 @@ export abstract class Camera extends Component {
 
   protected projectionMatrix = mat4.create();
   protected viewMatrix = mat4.create();
-  normalizedCameraForward = vec3.create();
-  normalizedCameraLeft = vec3.create();
-  normalizedCameraUp = vec3.create();
   protected aspectRatio = 1.0;
   protected isDirty = true;
 

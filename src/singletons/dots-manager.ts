@@ -148,7 +148,7 @@ export class DotsManager {
    * @param tgtBuffer - The WebGLFramebuffer to draw on.
    */
   draw(pMvviewMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
-    if (!this.isReady || !settingsManager.cruncherReady) {
+    if (!this.isReady || !settingsManager.cruncherReady || !settingsManager.isDrawDots) {
       return;
     }
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -539,7 +539,7 @@ export class DotsManager {
    * @param i The index of the satellite in the `positionData` and `velocityData` arrays.
    */
   updatePosVel(object: BaseObject, i: number): void {
-    if (!this.velocityData) {
+    if (!this.velocityData || !settingsManager.isDrawDots) {
       return;
     }
 

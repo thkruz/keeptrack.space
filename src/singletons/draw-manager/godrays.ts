@@ -7,7 +7,6 @@ import { Mesh } from '@app/doris/webgl/mesh';
 import { ShaderMaterial } from '@app/doris/webgl/shader-material';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec2, vec4 } from 'gl-matrix';
-import { Sun } from './sun';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -34,7 +33,6 @@ import { Sun } from './sun';
 
 export class Godrays {
   mesh: Mesh;
-  private sun_: Sun;
   private gl_: WebGL2RenderingContext;
   private isLoaded_ = false;
   /**
@@ -83,15 +81,13 @@ export class Godrays {
   }
 
   reinitialize(): void {
-    if (this.gl_ && this.sun_) {
-      this.init(this.sun_);
+    if (this.gl_) {
+      this.init();
     }
   }
 
-  init(sun: Sun): void {
+  init(): void {
     this.gl_ = Doris.getInstance().getRenderer().gl;
-
-    this.sun_ = sun;
 
     const geometry = new FlatGeometry(this.gl_, {
       attributes: {
@@ -150,7 +146,8 @@ export class Godrays {
   }
 
   private getScreenCoords_(pMatrix: mat4, viewMatrix: mat4): vec2 {
-    const posVec4 = vec4.fromValues(this.sun_.position[0], this.sun_.position[1], this.sun_.position[2], 1);
+    const sunPosition = keepTrackApi.getScene().sun.node.transform.position;
+    const posVec4 = vec4.fromValues(sunPosition[0], sunPosition[1], sunPosition[2], 1);
 
     vec4.transformMat4(posVec4, posVec4, viewMatrix);
     vec4.transformMat4(posVec4, posVec4, pMatrix);

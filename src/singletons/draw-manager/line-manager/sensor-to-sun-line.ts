@@ -4,7 +4,7 @@ import { DetailedSensor } from 'ootk';
 import { Line, LineColors } from './line';
 
 export class SensorToSunLine extends Line {
-  private sensor_: DetailedSensor;
+  private readonly sensor_: DetailedSensor;
 
   constructor(sensor: DetailedSensor) {
     super();
@@ -17,6 +17,6 @@ export class SensorToSunLine extends Line {
     const eci = this.sensor_.eci(keepTrackApi.getTimeManager().simulationTimeObj);
     const eciArr = [eci.x, eci.y, eci.z] as EciArr3;
 
-    this.updateVertBuf(eciArr, keepTrackApi.getScene().sun.position as EciArr3);
+    this.updateVertBuf(eciArr, keepTrackApi.getScene().sun.node.transform.position as EciArr3);
   }
 }

@@ -64,8 +64,8 @@ export abstract class PerspectiveCamera extends Camera {
       return;
     }
     this.fov = fov;
-    if (this.fov > 1.2) {
-      this.fov = 0.04;
+    if (this.fov > 1.4) {
+      this.fov = 1.4;
     }
     if (this.fov < 0.01) {
       this.fov = 0.01;

@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 /* eslint-disable camelcase */
+import { Component } from '@app/doris/components/component';
 import { Doris } from '@app/doris/doris';
 import { GlUtils } from '@app/doris/webgl/gl-utils';
 import { GLSL3 } from '@app/doris/webgl/material';
@@ -31,7 +32,7 @@ import { SatMath } from '@app/static/sat-math';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EciVec3, Kilometers } from 'ootk';
 
-export class Sun {
+export class Sun extends Component {
   /** The radius of the sun. */
   private readonly DRAW_RADIUS = 1500;
   /** The number of height segments for the sun. */
@@ -39,71 +40,38 @@ export class Sun {
   /** The number of width segments for the sun. */
   private readonly NUM_WIDTH_SEGS = 32;
   /** The distance scalar for the sun. */
-  private readonly SCALAR_DISTANCE = 220000;
-
-  /** The WebGL context. */
-  private gl_: WebGL2RenderingContext;
-  /** Whether the sun has been loaded. */
-  private isLoaded_ = false;
-  /** The model view matrix. */
-  private modelViewMatrix_: mat4;
+  private readonly SCALAR_DISTANCE = 200000;
   /** The normal matrix. */
   private readonly normalMatrix_ = mat3.create();
 
   /** The position of the sun in ECI coordinates. */
   eci: EciVec3;
   /** The mesh for the sun. */
-  mesh: Mesh;
-  /** The position of the sun in WebGL coordinates. */
-  position = [0, 0, 0] as vec3;
-  sizeRandomFactor_ = 0.0;
+  private mesh_: Mesh;
+  private sizeRandomFactor_ = 0.0;
   /**
    * Keeps the last 1 sun direction calculations in memory to avoid unnecessary calculations.
    */
   sunDirectionCache: { jd: number; sunDirection: EciArr3; } = { jd: 0, sunDirection: [0, 0, 0] };
 
   /**
-   * This is run once per frame to render the sun.
-   */
-  draw(earthLightDirection: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
-    if (!this.isLoaded_) {
-      return;
-    }
-    const gl = this.gl_;
-
-    this.mesh.program.use();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
-
-    this.setUniforms_(earthLightDirection);
-
-    if (this.mesh.material.map) {
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
-    }
-
-    gl.bindVertexArray(this.mesh.geometry.vao);
-    gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
-    gl.bindVertexArray(null);
-  }
-
-  /**
    * This is run once per session to initialize the sun.
    */
-  async init(): Promise<void> {
-    this.gl_ = Doris.getInstance().getRenderer().gl;
+  async initialize(): Promise<void> {
+    const gl = Doris.getInstance().getRenderer().gl;
 
-    const geometry = new SphereGeometry(this.gl_, {
+    const geometry = new SphereGeometry(gl, {
       radius: this.DRAW_RADIUS,
       widthSegments: this.NUM_WIDTH_SEGS,
       heightSegments: this.NUM_HEIGHT_SEGS,
     });
-    const texture = await GlUtils.initTexture(this.gl_, `${settingsManager.installDirectory}textures/sun-1024.jpg`);
-    const material = new ShaderMaterial(this.gl_, {
+    const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun-1024.jpg`);
+    const material = new ShaderMaterial(gl, {
       uniforms: {
         u_sampler: null as unknown as WebGLUniformLocation,
         u_lightDirection: null as unknown as WebGLUniformLocation,
         u_sizeOfSun: null as unknown as WebGLUniformLocation,
-        u_sunDistance: null as unknown as WebGLUniformLocation,
+        u_distanceFromOrigin: null as unknown as WebGLUniformLocation,
         u_isTexture: null as unknown as WebGLUniformLocation,
       },
       map: texture,
@@ -112,7 +80,7 @@ export class Sun {
       glslVersion: GLSL3,
     });
 
-    this.mesh = new Mesh(this.gl_, geometry, material, {
+    this.mesh_ = new Mesh(gl, geometry, material, {
       name: 'sun',
       precision: 'highp',
       disabledUniforms: {
@@ -122,38 +90,71 @@ export class Sun {
       },
     });
 
-    this.mesh.geometry.initVao(this.mesh.program);
-    this.isLoaded_ = true;
+    // Set the local matrix based on the geometry
+    mat4.copy(this.node.transform.localMatrix, this.mesh_.geometry.localMvMatrix);
+
+    this.mesh_.geometry.initVao(this.mesh_.program);
   }
 
   /**
    * This is run once per frame to update the sun's position.
    */
-  update(j: number) {
+  update() {
+    this.updateEciPosition_();
+
+    mat4.translate(this.node.transform.worldMatrix, this.node.transform.worldMatrix, this.node.transform.position);
+    mat3.normalFromMat4(this.normalMatrix_, this.node.transform.worldMatrix);
+  }
+
+  /**
+   * Updates the ECI (Earth-Centered Inertial) position of the moon and then scale it down to fit the camera's max distance.
+   */
+  private updateEciPosition_() {
+    const j = keepTrackApi.getTimeManager().j;
     const eci = SatMath.getSunDirection(j);
 
     this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
 
     const sunMaxDist = Math.max(Math.max(Math.abs(eci[0]), Math.abs(eci[1])), Math.abs(eci[2]));
 
-    this.position[0] = (eci[0] / sunMaxDist) * this.SCALAR_DISTANCE;
-    this.position[1] = (eci[1] / sunMaxDist) * this.SCALAR_DISTANCE;
-    this.position[2] = (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE;
+    this.node.transform.setPosition([
+      (eci[0] / sunMaxDist) * this.SCALAR_DISTANCE - this.node.parent!.transform.position[0],
+      (eci[1] / sunMaxDist) * this.SCALAR_DISTANCE - this.node.parent!.transform.position[1],
+      (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE + this.node.parent!.transform.position[2],
+    ]);
+  }
 
-    this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
-    mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
-    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
+  /**
+   * This is run once per frame to render the sun.
+   */
+  draw(earthLightDirection: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
+    if (!this.isInitialized_ || !settingsManager.isDrawSun) {
+      return;
+    }
+    const gl = Doris.getInstance().getRenderer().gl;
+
+    this.mesh_.program.use();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+
+    this.setUniforms_(gl, earthLightDirection);
+
+    if (this.mesh_.material.map) {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.mesh_.material.map);
+    }
+
+    gl.bindVertexArray(this.mesh_.geometry.vao);
+    gl.drawElements(gl.TRIANGLES, this.mesh_.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
+    gl.bindVertexArray(null);
   }
 
   /**
    * This is run once per frame to set the uniforms for the sun.
    */
-  private setUniforms_(earthLightDirection: vec3) {
-    const gl = this.gl_;
-
-    gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getMainCamera().projectionCameraMatrix);
+  private setUniforms_(gl: WebGL2RenderingContext, earthLightDirection: vec3) {
+    gl.uniformMatrix3fv(this.mesh_.material.uniforms.normalMatrix, false, this.normalMatrix_);
+    gl.uniformMatrix4fv(this.mesh_.material.uniforms.modelViewMatrix, false, this.node.transform.worldMatrix);
+    gl.uniformMatrix4fv(this.mesh_.material.uniforms.projectionMatrix, false, keepTrackApi.getMainCamera().projectionCameraMatrix);
     // Apply a random factor to the sun size (±0.1% per frame, clamped to ±5% total)
 
     // Add a small random change (±0.25%)
@@ -162,11 +163,17 @@ export class Sun {
     this.sizeRandomFactor_ = Math.max(0.85, Math.min(1.15, this.sizeRandomFactor_));
     const adjustedSize = settingsManager.sizeOfSun * this.sizeRandomFactor_;
 
-    gl.uniform3fv(this.mesh.material.uniforms.u_sizeOfSun, [adjustedSize, adjustedSize, adjustedSize]);
-    gl.uniform3fv(this.mesh.material.uniforms.u_lightDirection, earthLightDirection);
-    gl.uniform1f(this.mesh.material.uniforms.u_sunDistance, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
-    gl.uniform1i(this.mesh.material.uniforms.u_sampler, 0);
-    gl.uniform1i(this.mesh.material.uniforms.u_isTexture, settingsManager.isUseSunTexture ? 1 : 0);
+    gl.uniform3fv(this.mesh_.material.uniforms.u_sizeOfSun, [adjustedSize, adjustedSize, adjustedSize]);
+    gl.uniform3fv(this.mesh_.material.uniforms.u_lightDirection, earthLightDirection);
+    const distanceFromOrigin = Math.sqrt(
+      this.node.transform.position[0] ** 2 +
+      this.node.transform.position[1] ** 2 +
+      this.node.transform.position[2] ** 2,
+    );
+
+    gl.uniform1f(this.mesh_.material.uniforms.u_distanceFromOrigin, distanceFromOrigin);
+    gl.uniform1i(this.mesh_.material.uniforms.u_sampler, 0);
+    gl.uniform1i(this.mesh_.material.uniforms.u_isTexture, settingsManager.isUseSunTexture ? 1 : 0);
   }
 
   /**
@@ -209,7 +216,7 @@ export class Sun {
         }`,
     vert: keepTrackApi.glsl`
         uniform vec3 u_sizeOfSun;
-        uniform float u_sunDistance;
+        uniform float u_distanceFromOrigin;
 
         out vec2 v_texcoord;
         out vec3 v_normal;
@@ -219,7 +226,7 @@ export class Sun {
             vec4 worldPosition = modelViewMatrix * vec4(position * u_sizeOfSun, 1.0);
             gl_Position = projectionMatrix * worldPosition;
 
-            v_dist = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) / u_sunDistance;
+            v_dist = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) / u_distanceFromOrigin;
 
             v_texcoord = uv;
             v_normal = normalMatrix * normal;

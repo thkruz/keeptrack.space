@@ -54,12 +54,12 @@ export class SatelliteViewCameraController extends FirstPersonCameraController {
     const viewMatrix = this.camera.getViewMatrix();
 
     mat4.translate(viewMatrix, viewMatrix, targetPositionTemp);
-    vec3.normalize(this.camera.normalizedCameraUp, targetPositionTemp);
-    vec3.normalize(this.camera.normalizedCameraForward, [this.targetObject_!.velocity.x, this.targetObject_!.velocity.y, this.targetObject_!.velocity.z]);
+    vec3.normalize(this.camera.normalizedZenith, targetPositionTemp);
+    vec3.normalize(this.camera.normalizedNadir, [this.targetObject_!.velocity.x, this.targetObject_!.velocity.y, this.targetObject_!.velocity.z]);
     vec3.transformQuat(
       this.camera.normalizedCameraLeft,
-      this.camera.normalizedCameraUp,
-      quat.fromValues(this.camera.normalizedCameraForward[0], this.camera.normalizedCameraForward[1], this.camera.normalizedCameraForward[2], 90 * DEG2RAD),
+      this.camera.normalizedZenith,
+      quat.fromValues(this.camera.normalizedNadir[0], this.camera.normalizedNadir[1], this.camera.normalizedNadir[2], 90 * DEG2RAD),
     );
 
     const targetNextPosition = vec3.fromValues(
@@ -68,12 +68,12 @@ export class SatelliteViewCameraController extends FirstPersonCameraController {
       this.targetObject_!.position.z + this.targetObject_!.velocity.z,
     );
 
-    mat4.lookAt(viewMatrix, targetNextPosition, targetPositionTemp, this.camera.normalizedCameraUp);
+    mat4.lookAt(viewMatrix, targetNextPosition, targetPositionTemp, this.camera.normalizedZenith);
 
     mat4.translate(viewMatrix, viewMatrix, [this.targetObject_!.position.x, this.targetObject_!.position.y, this.targetObject_!.position.z]);
 
     mat4.rotate(viewMatrix, viewMatrix, this.camera.fpsPitch * DEG2RAD, this.camera.normalizedCameraLeft);
-    mat4.rotate(viewMatrix, viewMatrix, -this.camera.fpsYaw * DEG2RAD, this.camera.normalizedCameraUp);
+    mat4.rotate(viewMatrix, viewMatrix, -this.camera.fpsYaw * DEG2RAD, this.camera.normalizedZenith);
 
     mat4.translate(viewMatrix, viewMatrix, targetPositionTemp);
   }

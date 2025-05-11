@@ -129,6 +129,7 @@ export class SettingsManager {
   isPreserveSettings = true;
   isMobileModeBlocked = false;
   isShowDistance = false;
+  isDrawDots = true;
 
 
   static preserveSettings() {
@@ -351,8 +352,8 @@ export class SettingsManager {
    * Disables Toasts During Time Machine
    */
   isDisableTimeMachineToasts = false;
-  isDrawConstellationBoundaries = null;
-  isDrawNasaConstellations = null;
+  isDrawConstellationBoundaries = false;
+  isDrawNasaConstellations = false;
   /**
    * Determines whether or not to draw the sun in the application.
    */

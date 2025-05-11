@@ -8,11 +8,11 @@ export abstract class Component {
   type: string = 'Component';
 
   // Reference to the node this component is attached to
-  private _node: SceneNode | null = null;
+  private node_: SceneNode | null = null;
 
   // Lifecycle flags
-  private _isEnabled: boolean = true;
-  private _isInitialized: boolean = false;
+  private isEnabled_: boolean = true;
+  protected isInitialized_: boolean = false;
 
   // Type getter for component lookup
   getType(): string {
@@ -21,40 +21,51 @@ export abstract class Component {
 
   // Node getter/setter with proper typing
   get node(): SceneNode {
-    if (!this._node) {
+    if (!this.node_) {
       throw new Error('Component is not attached to a node');
     }
 
-    return this._node;
+    return this.node_;
   }
 
   set node(value: SceneNode) {
-    if (this._node && this._node !== value) {
+    if (this.node_ && this.node_ !== value) {
       this.onDetach();
     }
 
-    this._node = value;
+    this.node_ = value;
 
-    if (this._node && !this._isInitialized) {
-      this.initialize();
-      this._isInitialized = true;
+    if (this.node_ && !this.isInitialized_) {
+      const initPromise = this.initialize();
+
+      if (initPromise instanceof Promise) {
+        initPromise
+          .then(() => {
+            this.isInitialized_ = true;
+          })
+          .catch((error) => {
+            console.error('Error initializing component:', error);
+          });
+      } else {
+        this.isInitialized_ = true;
+      }
     }
 
-    if (this._node) {
+    if (this.node_) {
       this.onAttach();
     }
   }
 
   // Enable/disable the component
   get isEnabled(): boolean {
-    return this._isEnabled;
+    return this.isEnabled_;
   }
 
   set isEnabled(value: boolean) {
-    if (this._isEnabled !== value) {
-      this._isEnabled = value;
+    if (this.isEnabled_ !== value) {
+      this.isEnabled_ = value;
 
-      if (this._isEnabled) {
+      if (this.isEnabled_) {
         this.onEnable();
       } else {
         this.onDisable();
@@ -62,10 +73,21 @@ export abstract class Component {
     }
   }
 
+  get isInitialized(): boolean {
+    return this.isInitialized_;
+  }
+
+  set isInitialized(value: boolean) {
+    if (value) {
+      this.initialize();
+    }
+    this.isInitialized_ = value;
+  }
+
   // Lifecycle methods that derived classes can override
 
   // Called when the component is first initialized
-  protected initialize(): void {
+  protected initialize(): Promise<void> | void {
     // Derived classes should override this
   }
 
@@ -94,22 +116,22 @@ export abstract class Component {
 
   // Utility method to get another component from the same node
   getComponent<T extends Component>(type: string): T | null {
-    if (!this._node) {
+    if (!this.node_) {
       return null;
     }
 
-    return this._node.getComponent<T>(type) ?? null;
+    return this.node_.getComponent<T>(type) ?? null;
   }
 
   // Clean up resources when the component is destroyed
   destroy(): void {
-    if (this._node) {
+    if (this.node_) {
       // Remove from node (implementation depends on SceneNode)
       this.onDetach();
-      this._node = null;
+      this.node_ = null;
     }
 
-    this._isEnabled = false;
-    this._isInitialized = false;
+    this.isEnabled_ = false;
+    this.isInitialized_ = false;
   }
 }

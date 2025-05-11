@@ -37,6 +37,6 @@ describe('drawManager', () => {
     const updateResults = () => moon['updateEciPosition_'](date);
 
     expect(() => updateResults()).not.toThrow();
-    expect(moon.position).toMatchSnapshot();
+    expect(moon.node.transform.position).toMatchSnapshot();
   });
 });

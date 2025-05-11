@@ -317,7 +317,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isGraySkybox = (<HTMLInputElement>getEl('settings-graySkybox')).checked;
 
     if (isDrawMilkyWayChanged || isGraySkyboxChanged) {
-      keepTrackApi.getScene().skybox.init(settingsManager);
+      keepTrackApi.getScene().skybox.initialize(settingsManager);
     }
 
     SettingsManager.preserveSettings();

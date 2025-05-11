@@ -7,9 +7,9 @@ import { SceneNode } from './scene-node';
  * Represents a complete scene graph
  */
 export class Scene {
-  private readonly _root: SceneNode;
-  private _activeCamera: Camera | null = null;
-  private readonly _cameras: Map<string, Camera> = new Map();
+  private readonly root_: SceneNode;
+  private activeCamera_: Camera | null = null;
+  private readonly cameras_: Map<string, Camera> = new Map();
 
   /**
    * Create a new scene
@@ -21,21 +21,21 @@ export class Scene {
     private readonly eventBus: EventBus,
   ) {
     // Create root node for scene graph
-    this._root = new SceneNode('root');
+    this.root_ = new SceneNode('root');
   }
 
   /**
    * Get the root node of the scene graph
    */
   get root(): SceneNode {
-    return this._root;
+    return this.root_;
   }
 
   /**
    * Get the active camera for this scene
    */
   get activeCamera(): Camera | null {
-    return this._activeCamera;
+    return this.activeCamera_;
   }
 
   /**
@@ -48,7 +48,7 @@ export class Scene {
     const node = new SceneNode(name);
 
     // Add to parent or root if no parent specified
-    (parent || this._root).addChild(node);
+    (parent || this.root_).addChild(node);
 
     return node;
   }
@@ -59,14 +59,14 @@ export class Scene {
    * @param camera The camera component to register
    */
   registerCamera(name: string, camera: Camera): void {
-    if (this._cameras.has(name)) {
+    if (this.cameras_.has(name)) {
       throw new Error(`Camera with name "${name}" already exists in scene`);
     }
 
-    this._cameras.set(name, camera);
+    this.cameras_.set(name, camera);
 
     // Set as active camera if no active camera exists
-    if (!this._activeCamera) {
+    if (!this.activeCamera_) {
       this.setActiveCamera(camera);
     }
   }
@@ -79,7 +79,7 @@ export class Scene {
     let camera: Camera | null = null;
 
     if (typeof cameraOrName === 'string') {
-      camera = this._cameras.get(cameraOrName) ?? null;
+      camera = this.cameras_.get(cameraOrName) ?? null;
       if (!camera) {
         throw new Error(`Camera with name "${cameraOrName}" not found in scene`);
       }
@@ -87,14 +87,14 @@ export class Scene {
       camera = cameraOrName;
 
       // Register camera if not already registered
-      if (!Array.from(this._cameras.values()).includes(camera)) {
-        const name = `camera_${this._cameras.size}`;
+      if (!Array.from(this.cameras_.values()).includes(camera)) {
+        const name = `camera_${this.cameras_.size}`;
 
-        this._cameras.set(name, camera);
+        this.cameras_.set(name, camera);
       }
     }
 
-    this._activeCamera = camera;
+    this.activeCamera_ = camera;
     this.eventBus.emit(SceneEvents.CameraChanged, this.id, camera);
   }
 
@@ -104,7 +104,7 @@ export class Scene {
    * @returns The node or null if not found
    */
   findNode(name: string): SceneNode | null {
-    return this.findNodeRecursive(this._root, name);
+    return this.findNodeRecursive_(this.root_, name);
   }
 
   /**
@@ -113,7 +113,20 @@ export class Scene {
    */
   update(deltaTime: number): void {
     // Update entire scene graph
-    this._root.update(deltaTime);
+    this.root_.update(deltaTime);
+  }
+
+  logSceneGraph(): void {
+    // Console log all nodes in the scene graph, with indentation
+    const logNode = (node: SceneNode, depth: number) => {
+      const indent = ' '.repeat(depth * 2);
+
+      console.log(`${indent}- ${node.name}`);
+      node.children.forEach((child) => logNode(child, depth + 1));
+    };
+
+    console.log(`Scene Graph for ${this.id}:`);
+    logNode(this.root_, 0);
   }
 
   /**
@@ -122,13 +135,13 @@ export class Scene {
    * @param name The name to search for
    * @returns The found node or null
    */
-  private findNodeRecursive(node: SceneNode, name: string): SceneNode | null {
+  private findNodeRecursive_(node: SceneNode, name: string): SceneNode | null {
     if (node.name === name) {
       return node;
     }
 
     for (const child of node.children) {
-      const found = this.findNodeRecursive(child, name);
+      const found = this.findNodeRecursive_(child, name);
 
       if (found) {
         return found;

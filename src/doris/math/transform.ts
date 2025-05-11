@@ -1,4 +1,5 @@
 import { mat4, quat, vec3 } from 'gl-matrix';
+import { SceneNode } from '../scene/scene-node';
 
 export class Transform {
   // Local transform properties
@@ -18,10 +19,12 @@ export class Transform {
   // Flags for matrix recalculation
   private _localMatrixNeedsUpdate: boolean = true;
   private _worldMatrixNeedsUpdate: boolean = true;
+  node_: SceneNode | null;
 
-  constructor() {
+  constructor(node: SceneNode | null = null) {
     // Initialize to identity
     quat.identity(this._rotation);
+    this.node_ = node;
   }
 
   // Position
@@ -87,7 +90,13 @@ export class Transform {
     this._worldMatrixNeedsUpdate = true;
   }
 
-  // Matrix operations
+  /**
+   * Retrieves the local transformation matrix of the object.
+   * If the local matrix is marked as needing an update, it triggers
+   * the update process before returning the matrix.
+   *
+   * @returns {mat4} The local transformation matrix.
+   */
   get localMatrix(): mat4 {
     if (this._localMatrixNeedsUpdate) {
       this.updateLocalMatrix();
@@ -106,14 +115,22 @@ export class Transform {
     this._localMatrixNeedsUpdate = false;
   }
 
-  // World transform properties (calculated from parent)
+  /**
+   * Retrieves the world transformation matrix of the current object.
+   * If the matrix needs to be updated, it calculates the world matrix
+   * by copying the parent's world matrix (if available) or the local matrix.
+   * The method also decomposes the world matrix to extract position, rotation,
+   * and scale components.
+   *
+   * TODO:
+   * This appears to be synonymous with the modelView matrix when orbiting 0,0,0.
+   * It is unclear how the viewMatrix comes into play when not orbiting 0,0,0.
+   *
+   * @returns {mat4} The 4x4 world transformation matrix.
+   */
   get worldMatrix(): mat4 {
     if (this._worldMatrixNeedsUpdate) {
-      /*
-       * Note: In actual implementation, this would use the parent's worldMatrix
-       * For now, worldMatrix is the same as localMatrix
-       */
-      mat4.copy(this._worldMatrix, this.localMatrix);
+      mat4.copy(this._worldMatrix, this.node_?.parent?.transform?.worldMatrix ?? this.localMatrix);
       this._worldMatrixNeedsUpdate = false;
 
       // Extract world position, rotation, and scale
@@ -121,6 +138,12 @@ export class Transform {
     }
 
     return this._worldMatrix;
+  }
+
+  validateWorldMatrix(): void {
+    if (this._worldMatrixNeedsUpdate) {
+      this.updateWorldMatrix();
+    }
   }
 
   // Update world matrix based on parent (called by SceneNode)
@@ -137,6 +160,13 @@ export class Transform {
 
     this._worldMatrixNeedsUpdate = false;
     this.decomposeWorldMatrix();
+
+    // Notify children to update their world matrices
+    if (this.node_?.children) {
+      for (const child of this.node_.children) {
+        child.transform.updateWorldMatrix(this._worldMatrix);
+      }
+    }
   }
 
   private decomposeWorldMatrix(): void {

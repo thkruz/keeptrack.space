@@ -31,8 +31,8 @@ import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { SettingsManager } from '@app/settings/settings';
-import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
+import { mat3, mat4, quat, vec3 } from 'gl-matrix';
+import { EpochUTC, Sun } from 'ootk';
 import { errorManagerInstance } from '../errorManager';
 import { OcclusionProgram } from './post-processing';
 
@@ -54,37 +54,113 @@ export enum EarthDayTextureQuality {
 }
 
 export class Earth extends Component {
-  private gl_: WebGL2RenderingContext;
   private glowDirection_ = 1;
   private glowNumber_ = 0;
-  private isBumpTextureReady_ = false;
-  private isDayTextureReady_ = false;
-  private isNightTextureReady_ = false;
-  private isSpecularTextureReady_ = false;
-  private isTexturesReady_ = false;
-  private modelViewMatrix_: mat4;
   private readonly normalMatrix_: mat3 = mat3.create();
-  private textureBump_: WebGLTexture;
   textureDay: WebGLTexture;
   textureNight: WebGLTexture;
-  private textureSpec_: WebGLTexture;
-  private vaoOcclusion_: WebGLVertexArrayObject;
-  isHiResReady: boolean;
-  isUseHiRes: boolean;
+  private textureBump_: WebGLTexture | null = null;
+  private textureSpec_: WebGLTexture | null = null;
+  private vaoOcclusion_: WebGLVertexArrayObject | null = null;
+  isHiResReady = false;
+  isUseHiRes = false;
   /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
   mesh: Mesh;
   imageCache: Record<string, HTMLImageElement> = {};
+  /** Cache the last camera position to avoid flickering of the atmosphere on camera controller changes */
+  lastCameraPosition_: vec3;
+
+  /**
+   * This is run once per session to initialize the earth.
+   */
+  async initialize(): Promise<void> {
+    const gl = Doris.getInstance().getRenderer().gl;
+
+    await this.initTextures_();
+    const geometry = new SphereGeometry(gl, {
+      radius: RADIUS_OF_EARTH,
+      widthSegments: settingsManager.earthNumLatSegs,
+      heightSegments: settingsManager.earthNumLonSegs,
+    });
+    const material = new ShaderMaterial(gl, {
+      uniforms: {
+        uGlow: <WebGLUniformLocation><unknown>null,
+        uIsDrawAtmosphere: <WebGLUniformLocation><unknown>null,
+        uIsDrawAurora: <WebGLUniformLocation><unknown>null,
+        uLightDirection: <WebGLUniformLocation><unknown>null,
+        uDayMap: <WebGLUniformLocation><unknown>null,
+        uNightMap: <WebGLUniformLocation><unknown>null,
+        uBumpMap: <WebGLUniformLocation><unknown>null,
+        uSpecMap: <WebGLUniformLocation><unknown>null,
+      },
+      vertexShader: this.shaders_.vert,
+      fragmentShader: this.shaders_.frag,
+      glslVersion: GLSL3,
+    });
+
+    this.mesh = new Mesh(gl, geometry, material, {
+      name: 'earth',
+      precision: 'highp',
+      disabledUniforms: {
+        modelMatrix: true,
+        viewMatrix: true,
+      },
+    });
+
+    // Set the local matrix based on the geometry
+    mat4.copy(this.node.transform.localMatrix, this.mesh.geometry.localMvMatrix);
+
+    this.initVaoVisible_();
+    this.initVaoOcclusion_();
+
+    Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (_camera, buffer): void => {
+      this.render(buffer);
+    });
+  }
+
+  /**
+   * This is run once per frame to update the earth.
+   */
+  update(): void {
+    const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+    const gmst = keepTrackApi.getTimeManager().gmst;
+    const gmstRotation = quat.fromEuler(quat.create(), 0, 0, gmst);
+
+    this.lightDirection = [pos.x, pos.y, pos.z];
+    vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
+
+    this.node.transform.setRotation(gmstRotation);
+    mat3.normalFromMat4(this.normalMatrix_, this.node.transform.localMatrix);
+
+    // Update the aurora glow
+    this.glowNumber_ += 0.0025 * this.glowDirection_;
+    this.glowDirection_ = this.glowNumber_ > 1 ? -1 : this.glowDirection_;
+    this.glowDirection_ = this.glowNumber_ < 0 ? 1 : this.glowDirection_;
+
+    this.lastCameraPosition_ = keepTrackApi.getMainCamera().getForwardVector();
+  }
+
+  /**
+   * This is run once per frame to render the earth.
+   */
+  render(tgtBuffer: WebGLFramebuffer | null) {
+    if (!this.isInitialized_) {
+      return;
+    }
+    this.drawColoredEarth_(tgtBuffer);
+    this.drawBlackGpuPickingEarth_();
+  }
 
   /**
    * This is run once per frame to render the earth in godrays buffer.
    */
-  drawOcclusion(pMatrix: mat4, viewMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLFramebuffer): void {
+  renderOcclusion(pMatrix: mat4, viewMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLFramebuffer): void {
     if (settingsManager.isDisableGodrays) {
       return;
     }
 
-    const gl = this.gl_;
+    const gl = Doris.getInstance().getRenderer().gl;
     // Change to the earth shader
 
     gl.useProgram(occlusionPrgm.program);
@@ -94,7 +170,7 @@ export class Earth extends Component {
     occlusionPrgm.attrSetup(this.mesh.geometry.getCombinedBuffer());
 
     // Set the uniforms
-    occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, viewMatrix);
+    occlusionPrgm.uniformSetup(this.node.transform.localMatrix, pMatrix, viewMatrix);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -105,110 +181,12 @@ export class Earth extends Component {
      */
   }
 
-  constructor() {
-    super();
-    const gl = Doris.getInstance().getRenderer().gl;
-
-    this.gl_ = gl;
-    this.modelViewMatrix_ = mat4.create();
-    this.isHiResReady = false;
-    this.isUseHiRes = false;
-    this.textureDay = null as unknown as WebGLTexture;
-    this.textureNight = null as unknown as WebGLTexture;
-    this.textureBump_ = null as unknown as WebGLTexture;
-    this.textureSpec_ = null as unknown as WebGLTexture;
-
-    this.isTexturesReady_ = false;
-    this.initialize(gl);
-  }
-
-  /**
-   * This is run once per session to initialize the earth.
-   */
-  initialize(gl?: WebGL2RenderingContext): void {
-    try {
-      if (!gl && !this.gl_) {
-        throw new Error('No WebGL context found');
-      }
-      this.gl_ ??= gl!;
-
-      this.initTextures_();
-      const geometry = new SphereGeometry(this.gl_, {
-        radius: RADIUS_OF_EARTH,
-        widthSegments: settingsManager.earthNumLatSegs,
-        heightSegments: settingsManager.earthNumLonSegs,
-      });
-      const material = new ShaderMaterial(this.gl_, {
-        uniforms: {
-          uGlow: <WebGLUniformLocation><unknown>null,
-          uIsDrawAtmosphere: <WebGLUniformLocation><unknown>null,
-          uIsDrawAurora: <WebGLUniformLocation><unknown>null,
-          uLightDirection: <WebGLUniformLocation><unknown>null,
-          uDayMap: <WebGLUniformLocation><unknown>null,
-          uNightMap: <WebGLUniformLocation><unknown>null,
-          uBumpMap: <WebGLUniformLocation><unknown>null,
-          uSpecMap: <WebGLUniformLocation><unknown>null,
-        },
-        vertexShader: this.shaders_.vert,
-        fragmentShader: this.shaders_.frag,
-        glslVersion: GLSL3,
-      });
-
-      this.mesh = new Mesh(this.gl_, geometry, material, {
-        name: 'earth',
-        precision: 'highp',
-        disabledUniforms: {
-          modelMatrix: true,
-          viewMatrix: true,
-        },
-      });
-
-      this.initVaoVisible_();
-      this.initVaoOcclusion_();
-
-      Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (_camera, buffer): void => {
-        this.render(buffer);
-      });
-    } catch (error) {
-      errorManagerInstance.debug(error);
-    }
-  }
-
-  /**
-   * This is run once per frame to update the earth.
-   */
-  update(gmst: GreenwichMeanSiderealTime): void {
-    const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
-
-    this.lightDirection = [pos.x, pos.y, pos.z];
-    vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
-
-    this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
-    mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, gmst);
-    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
-
-    // Update the aurora glow
-    this.glowNumber_ += 0.0025 * this.glowDirection_;
-    this.glowDirection_ = this.glowNumber_ > 1 ? -1 : this.glowDirection_;
-    this.glowDirection_ = this.glowNumber_ < 0 ? 1 : this.glowDirection_;
-  }
-
-  /**
-   * This is run once per frame to render the earth.
-   */
-  render(tgtBuffer: WebGLFramebuffer | null) {
-    if (!this.isTexturesReady_ || !keepTrackApi.getMainCamera()) {
-      return;
-    }
-    this.drawColoredEarth_(tgtBuffer);
-    this.drawBlackGpuPickingEarth_();
-  }
-
   /**
    * Helper function to load the high resolution earth textures.
    */
   loadHiRes(texture: WebGLTexture, src: string, cb?: (() => void)): void {
     try {
+      const gl = Doris.getInstance().getRenderer().gl;
       let img = this.imageCache[src];
 
       if (!img) {
@@ -216,13 +194,10 @@ export class Earth extends Component {
 
         img.onload = () => {
           if (!settingsManager.isBlackEarth) {
-            GlUtils.bindImageToTexture(this.gl_, texture, img);
+            GlUtils.bindImageToTexture(gl, texture, img);
           }
 
-          this.isDayTextureReady_ = true;
           this.isHiResReady = true;
-          this.onImageLoaded_();
-
           if (cb) {
             cb();
           }
@@ -232,7 +207,7 @@ export class Earth extends Component {
         this.isUseHiRes = true;
       } else {
         if (!settingsManager.isBlackEarth) {
-          GlUtils.bindImageToTexture(this.gl_, texture, img);
+          GlUtils.bindImageToTexture(gl, texture, img);
         }
 
         if (cb) {
@@ -249,8 +224,8 @@ export class Earth extends Component {
    * This is run once per session to initialize the high resolution earth textures.
    * It can be run multiple times to reload the textures.
    */
-  reloadEarthHiResTextures(gl: WebGL2RenderingContext): void {
-    this.initialize(gl);
+  reloadEarthHiResTextures(): void {
+    this.initialize();
     this.loadHiRes(this.textureDay, Earth.getSrcHiResDay_(settingsManager));
     this.loadHiRes(this.textureNight, Earth.getSrcHiResNight_(settingsManager));
   }
@@ -386,7 +361,7 @@ export class Earth extends Component {
    * This is run once per frame to render a black earth in the GPU picking buffer.
    */
   private drawBlackGpuPickingEarth_() {
-    const gl = this.gl_;
+    const gl = Doris.getInstance().getRenderer().gl;
     const dotsManagerInstance = keepTrackApi.getDotsManager();
 
     // Switch to GPU Picking Shader
@@ -430,7 +405,7 @@ export class Earth extends Component {
    * This is run once per frame to render the earth.
    */
   private drawColoredEarth_(tgtBuffer: WebGLFramebuffer | null) {
-    const gl = this.gl_;
+    const gl = Doris.getInstance().getRenderer().gl;
 
     this.mesh.program.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
@@ -452,9 +427,9 @@ export class Earth extends Component {
    */
   private setUniforms_(gl: WebGL2RenderingContext) {
     gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getMainCamera().projectionCameraMatrix);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.node.transform.worldMatrix);
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
-    gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+    gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, this.lastCameraPosition_);
 
     gl.uniform1f(this.mesh.material.uniforms.uGlow, this.glowNumber_);
     gl.uniform3fv(this.mesh.material.uniforms.uLightDirection, this.lightDirection);
@@ -462,97 +437,20 @@ export class Earth extends Component {
     gl.uniform1f(this.mesh.material.uniforms.uIsDrawAurora, settingsManager.isDrawAurora ? 1.0 : 0.0);
   }
 
-  private initTextureBump_(): void {
-    this.isBumpTextureReady_ = false;
-    this.textureBump_ = this.gl_.createTexture();
-    const img = new Image();
+  private async initTextures_(): Promise<void> {
+    const gl = Doris.getInstance().getRenderer().gl;
 
-    img.onload = () => {
-      if (settingsManager.isDrawBumpMap && !settingsManager.isBlackEarth && !settingsManager.politicalImages) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureBump_, img);
-      } else {
-        // Bind a blank texture
-        this.gl_.bindTexture(this.gl_.TEXTURE_2D, this.textureSpec_);
-      }
-
-      this.isBumpTextureReady_ = true;
-      this.onImageLoaded_();
-    };
-    img.src = Earth.getSrcBump_(settingsManager);
-  }
-
-  private initTextureDay_(): void {
-    this.textureDay = this.gl_.createTexture();
-    const img = new Image();
-
-    img.onload = () => {
-      if (!settingsManager.isBlackEarth) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureDay, img);
-      } else {
-        // Delete the texture
-        this.textureDay = null as unknown as WebGLTexture;
-      }
-
-      this.isDayTextureReady_ = true;
-      this.onImageLoaded_();
-    };
-    img.src = Earth.getSrcDay_(settingsManager);
-  }
-
-  private initTextureNight_(): void {
-    this.textureNight = this.gl_.createTexture();
-    const img = new Image();
-
-    img.onload = () => {
-      if (!settingsManager.isBlackEarth) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureNight, img);
-      } else {
-        // Delete the texture
-        this.textureNight = null as unknown as WebGLTexture;
-      }
-
-      this.isNightTextureReady_ = true;
-      this.onImageLoaded_();
-    };
-    img.src = Earth.getSrcNight_(settingsManager);
-  }
-
-  private initTextureSpec_(): void {
-    this.isSpecularTextureReady_ = false;
-    this.textureSpec_ = this.gl_.createTexture();
-    const img = new Image();
-
-    img.onload = () => {
-      if (settingsManager.isDrawSpecMap && !settingsManager.isBlackEarth && !settingsManager.politicalImages) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureSpec_, img);
-      } else {
-        // Bind a blank texture
-        this.gl_.bindTexture(this.gl_.TEXTURE_2D, this.textureSpec_);
-      }
-
-      this.isSpecularTextureReady_ = true;
-      this.onImageLoaded_();
-    };
-    img.src = Earth.getSrcSpec_(settingsManager);
-
-    /*
-     * DEBUG:
-     * `${settingsManager.installDirectory}textures/earthspec1k.jpg`;
-     */
-  }
-
-  private initTextures_(): void {
     if (!this.textureDay || settingsManager.isBlackEarth) {
-      this.initTextureDay_();
+      this.textureDay = await GlUtils.initTexture(gl, Earth.getSrcDay_(settingsManager));
     }
     if (!this.textureNight || settingsManager.isBlackEarth) {
-      this.initTextureNight_();
+      this.textureNight = await GlUtils.initTexture(gl, Earth.getSrcNight_(settingsManager));
     }
     if (!this.textureBump_ || settingsManager.isBlackEarth) {
-      this.initTextureBump_();
+      this.textureBump_ = await GlUtils.initTexture(gl, Earth.getSrcBump_(settingsManager));
     }
     if (!this.textureSpec_ || settingsManager.isBlackEarth) {
-      this.initTextureSpec_();
+      this.textureSpec_ = await GlUtils.initTexture(gl, Earth.getSrcSpec_(settingsManager));
     }
   }
 
@@ -560,7 +458,7 @@ export class Earth extends Component {
    * This is run once per session to initialize the earth occulsion vao.
    */
   private initVaoOcclusion_() {
-    const gl = this.gl_;
+    const gl = Doris.getInstance().getRenderer().gl;
     const dotsManagerInstance = keepTrackApi.getDotsManager();
 
     this.vaoOcclusion_ = gl.createVertexArray();
@@ -590,7 +488,7 @@ export class Earth extends Component {
    * This is run once per session to initialize the earth vao.
    */
   private initVaoVisible_() {
-    const gl = this.gl_;
+    const gl = Doris.getInstance().getRenderer().gl;
 
     this.mesh.geometry.vao = gl.createVertexArray();
     gl.bindVertexArray(this.mesh.geometry.vao);
@@ -609,15 +507,6 @@ export class Earth extends Component {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
 
     gl.bindVertexArray(null);
-  }
-
-  /**
-   * This is run after each texture is loaded to determine if all textures are loaded.
-   */
-  private onImageLoaded_(): void {
-    if (this.isDayTextureReady_ && this.isNightTextureReady_ && this.isBumpTextureReady_ && this.isSpecularTextureReady_) {
-      this.isTexturesReady_ = true;
-    }
   }
 
   /**
@@ -675,7 +564,7 @@ export class Earth extends Component {
    *
    * NOTE: Keep these at the bottom of the file to ensure proper syntax highlighting.
    */
-  private shaders_ = {
+  private readonly shaders_ = {
     frag: keepTrackApi.glsl`
     uniform float uGlow;
     uniform vec3 uLightDirection;

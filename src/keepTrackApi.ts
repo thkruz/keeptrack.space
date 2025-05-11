@@ -205,6 +205,7 @@ export class KeepTrackApi {
   getHoverManager = () => keepTrackContainer.get<HoverManager>(Singletons.HoverManager);
   getMainCamera = () => keepTrackContainer.get<KeepTrackMainCamera>(Singletons.MainCamera);
   getMeshManager = () => keepTrackContainer.get<MeshManager>(Singletons.MeshManager);
+  getDoris = () => Doris.getInstance();
 
   saveCsv = saveCsv;
   saveVariable = saveVariable;

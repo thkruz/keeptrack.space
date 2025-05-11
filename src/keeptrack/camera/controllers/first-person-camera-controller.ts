@@ -8,10 +8,10 @@ import { KeepTrackMainCamera } from '../legacy-camera';
 
 export class FirstPersonCameraController extends CameraController {
   // Camera state
-  camera: KeepTrackMainCamera;
-  private pitch_: number = 0;
-  private yaw_: number = 0;
-  private rotate_: number = 0;
+  protected camera: KeepTrackMainCamera;
+  protected pitch_: number = 0;
+  protected yaw_: number = 0;
+  protected rotate_: number = 0;
   forwardSpeed: number = 0;
   sideSpeed: number = 0;
   vertSpeed: number = 0;

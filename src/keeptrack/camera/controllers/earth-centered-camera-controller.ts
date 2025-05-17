@@ -4,7 +4,7 @@ import { EventBus } from '@app/doris/events/event-bus';
 import { InputEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { lat2pitch, lon2yaw, normalizeAngle } from '@app/lib/transforms';
+import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SatMath } from '@app/static/sat-math';
 import { mat4, vec3 } from 'gl-matrix';
@@ -71,25 +71,6 @@ export class EarthCenteredOrbitalController extends OrbitalController {
     }
   }
 
-  protected autoMovement(dt: number): void {
-    const pitchDiff = normalizeAngle((this.pitch_ - this.pitchTarget_) as Radians);
-    const yawDiff = normalizeAngle((this.yaw_ - this.yawTarget_) as Radians);
-    const pitchSpeed = Math.abs(pitchDiff) > 0.0001 ? pitchDiff * dt * this.cameraMovementSpeed_ : 0;
-    const yawSpeed = Math.abs(yawDiff) > 0.0001 ? yawDiff * dt * this.cameraMovementSpeed_ : 0;
-
-    this.pitch_ -= pitchSpeed;
-    this.yaw_ -= yawSpeed;
-    if (this.pitch_ > Math.PI / 2) {
-      this.pitch_ = Math.PI / 2;
-    }
-    if (this.pitch_ < -Math.PI / 2) {
-      this.pitch_ = -Math.PI / 2;
-    }
-    if (Math.abs(pitchDiff) < 0.0001 && Math.abs(yawDiff) < 0.0001) {
-      this.isAutoPitchYawToTarget_ = false;
-    }
-  }
-
 
   protected renderInternal(): void {
     const target = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
@@ -115,10 +96,14 @@ export class EarthCenteredOrbitalController extends OrbitalController {
     mat4.translate(viewMatrix, viewMatrix, [this.camera.panCurrent.x, this.camera.panCurrent.y, this.camera.panCurrent.z]);
 
     // 2. Back away from the earth in the Y direction (depth)
-    mat4.translate(viewMatrix, viewMatrix, [0, this.camera.getCameraDistance(), 0]);
+    mat4.translate(viewMatrix, viewMatrix, [0, this.getCameraDistance(), 0]);
     // 1. Rotate around the earth (0,0,0)
-    mat4.rotateX(viewMatrix, viewMatrix, this.camera.earthCenteredPitch);
-    mat4.rotateZ(viewMatrix, viewMatrix, -this.camera.earthCenteredYaw);
+    mat4.rotateX(viewMatrix, viewMatrix, this.pitch_);
+    mat4.rotateZ(viewMatrix, viewMatrix, -this.yaw_);
+  }
+
+  private getCameraDistance(): number {
+    return (this.zoom_ ** 3 * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance);
   }
 
   resetInternal(): void {
@@ -162,19 +147,17 @@ export class EarthCenteredOrbitalController extends OrbitalController {
 
 
   protected registerInputEvents(): void {
+    super.registerInputEvents();
     this.eventBus.on(InputEvents.MouseDown, this.handleMouseDown.bind(this));
-    this.eventBus.on(InputEvents.MouseMove, this.handleMouseMove.bind(this));
     this.eventBus.on(InputEvents.MouseUp, this.handleMouseUp.bind(this));
-    this.eventBus.on(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
     this.eventBus.on(InputEvents.KeyDown, this.handleKeyDown.bind(this));
     this.eventBus.on(InputEvents.KeyUp, this.handleKeyUp.bind(this));
   }
 
   protected unregisterInputEvents(): void {
+    super.registerInputEvents();
     this.eventBus.removeListener(InputEvents.MouseDown, this.handleMouseDown.bind(this));
-    this.eventBus.removeListener(InputEvents.MouseMove, this.handleMouseMove.bind(this));
     this.eventBus.removeListener(InputEvents.MouseUp, this.handleMouseUp.bind(this));
-    this.eventBus.removeListener(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
     this.eventBus.removeListener(InputEvents.KeyDown, this.handleKeyDown.bind(this));
     this.eventBus.removeListener(InputEvents.KeyUp, this.handleKeyUp.bind(this));
   }
@@ -210,31 +193,6 @@ export class EarthCenteredOrbitalController extends OrbitalController {
     settingsManager.isAutoRotateD = false;
 
     this.isAutoPitchYawToTarget_ = false; // Disable auto movement when zooming
-  }
-
-  private handleMouseMove(_event: MouseEvent, x: number, y: number): void {
-    if (this.isDragging_) {
-      // Calculate drag difference using current mouse position and drag start
-      const xDif = this.dragStartPosition_.x - x;
-      const yDif = this.dragStartPosition_.y - y;
-
-      // Compute target yaw and pitch based on drag
-      const yawTarget = <Radians>(this.dragStartYaw_ + xDif * this.cameraMovementSpeed_);
-      const pitchTarget = <Radians>(this.dragStartPitch_ + yDif * -this.cameraMovementSpeed_);
-
-      if (this.isMomentumEnabled_) {
-        // Update camera speeds using normalized angle difference
-        this.pitchSpeed_ = normalizeAngle(<Radians>(this.pitch_ - pitchTarget)) * -this.cameraMovementSpeed_;
-        this.yawSpeed_ = normalizeAngle(<Radians>(this.yaw_ - yawTarget)) * -this.cameraMovementSpeed_;
-      } else {
-        // Smoothly interpolate camera angles to reduce jitter
-        const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-        const smoothing = 0.2; // Adjust between 0 (no movement) and 1 (instant)
-
-        this.pitch_ = lerp(this.pitch_, pitchTarget, smoothing);
-        this.yaw_ = lerp(this.yaw_, yawTarget, smoothing);
-      }
-    }
   }
 
   getCameraOrientation(): vec3 {

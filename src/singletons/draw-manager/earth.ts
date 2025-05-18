@@ -31,7 +31,7 @@ import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { SettingsManager } from '@app/settings/settings';
-import { mat3, mat4, quat, vec3 } from 'gl-matrix';
+import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, Sun } from 'ootk';
 import { errorManagerInstance } from '../errorManager';
 import { OcclusionProgram } from './post-processing';
@@ -125,13 +125,16 @@ export class Earth extends Component {
   update(): void {
     const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
     const gmst = keepTrackApi.getTimeManager().gmst;
-    const gmstRotation = quat.fromEuler(quat.create(), 0, 0, gmst);
 
     this.lightDirection = [pos.x, pos.y, pos.z];
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
-    this.node.transform.setRotation(gmstRotation);
-    mat3.normalFromMat4(this.normalMatrix_, this.node.transform.localMatrix);
+    // Set the local matrix based on the geometry
+    mat4.copy(this.node.transform.worldMatrix, this.mesh.geometry.localMvMatrix);
+    // Rotate the earth based on the GMST
+    mat4.rotateZ(this.node.transform.worldMatrix, this.node.transform.worldMatrix, gmst);
+
+    mat3.normalFromMat4(this.normalMatrix_, this.node.transform.worldMatrix);
 
     // Update the aurora glow
     this.glowNumber_ += 0.0025 * this.glowDirection_;
@@ -661,7 +664,6 @@ export class Earth extends Component {
 
             fragColor.rgb += auroraColor * auroraIntensity * auroraStrength;
         }
-        // }
     }
     `,
     vert: keepTrackApi.glsl`

@@ -11,6 +11,7 @@ export class MouseHandler {
   private isDragging = false;
   private dragButton = -1;
   private element: HTMLElement;
+  private mouseMoveTimeout = -1;
 
   constructor(
     private readonly eventBus: EventBus,
@@ -128,29 +129,37 @@ export class MouseHandler {
    * Handle mouse move events
    */
   private handleMouseMove(event: MouseEvent): void {
-    const rect = this.element.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    if (this.mouseMoveTimeout === -1) {
+      // Avoid running the event handler too often, no more than 60 FPS
+      this.mouseMoveTimeout = window.setTimeout(() => {
+        const rect = this.element.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
 
-    const deltaX = x - this.mousePosition.x;
-    const deltaY = y - this.mousePosition.y;
+        const deltaX = x - this.mousePosition.x;
+        const deltaY = y - this.mousePosition.y;
 
-    this.mousePosition.x = x;
-    this.mousePosition.y = y;
+        this.mousePosition.x = x;
+        this.mousePosition.y = y;
 
-    this.eventBus.emit(InputEvents.MouseMove, event, x, y, deltaX, deltaY);
+        this.eventBus.emit(InputEvents.MouseMove, event, x, y, deltaX, deltaY);
 
-    // Emit drag event if dragging
-    if (this.isDragging) {
-      this.eventBus.emit(
-        InputEvents.MouseDrag,
-        event,
-        x,
-        y,
-        deltaX,
-        deltaY,
-        this.dragButton,
-      );
+        // Emit drag event if dragging
+        if (this.isDragging) {
+          this.eventBus.emit(
+            InputEvents.MouseDrag,
+            event,
+            x,
+            y,
+            deltaX,
+            deltaY,
+            this.dragButton,
+          );
+        }
+
+        // Clear the timeout
+        this.mouseMoveTimeout = -1;
+      }, 16);
     }
   }
 

@@ -63,14 +63,11 @@ export class TimeManager {
 
   constructor() {
     Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, () => {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
-      const simulationTime = timeManagerInstance.simulationTimeObj;
-
-      if (!simulationTime) {
+      if (!this.simulationTimeObj) {
         // TODO this happens at startup but should be prevented by not running the update loop until all components are ready
         return;
       }
-      const { gmst, j } = SatMath.calculateTimeVariables(simulationTime);
+      const { gmst, j } = SatMath.calculateTimeVariables(this.simulationTimeObj);
 
       this.gmst = gmst;
       this.j = j;

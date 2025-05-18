@@ -71,7 +71,6 @@ export class Sun extends Component {
         u_sampler: null as unknown as WebGLUniformLocation,
         u_lightDirection: null as unknown as WebGLUniformLocation,
         u_sizeOfSun: null as unknown as WebGLUniformLocation,
-        u_distanceFromOrigin: null as unknown as WebGLUniformLocation,
         u_isTexture: null as unknown as WebGLUniformLocation,
       },
       map: texture,
@@ -116,12 +115,13 @@ export class Sun extends Component {
     this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
 
     const sunMaxDist = Math.max(Math.max(Math.abs(eci[0]), Math.abs(eci[1])), Math.abs(eci[2]));
-
-    this.node.transform.setPosition([
+    const sunPositionRelative = vec3.fromValues(
       (eci[0] / sunMaxDist) * this.SCALAR_DISTANCE - this.node.parent!.transform.position[0],
       (eci[1] / sunMaxDist) * this.SCALAR_DISTANCE - this.node.parent!.transform.position[1],
       (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE + this.node.parent!.transform.position[2],
-    ]);
+    );
+
+    this.node.transform.setPosition(sunPositionRelative);
   }
 
   /**
@@ -165,13 +165,6 @@ export class Sun extends Component {
 
     gl.uniform3fv(this.mesh_.material.uniforms.u_sizeOfSun, [adjustedSize, adjustedSize, adjustedSize]);
     gl.uniform3fv(this.mesh_.material.uniforms.u_lightDirection, earthLightDirection);
-    const distanceFromOrigin = Math.sqrt(
-      this.node.transform.position[0] ** 2 +
-      this.node.transform.position[1] ** 2 +
-      this.node.transform.position[2] ** 2,
-    );
-
-    gl.uniform1f(this.mesh_.material.uniforms.u_distanceFromOrigin, distanceFromOrigin);
     gl.uniform1i(this.mesh_.material.uniforms.u_sampler, 0);
     gl.uniform1i(this.mesh_.material.uniforms.u_isTexture, settingsManager.isUseSunTexture ? 1 : 0);
   }
@@ -188,17 +181,11 @@ export class Sun extends Component {
         uniform sampler2D u_sampler;
 
         in vec3 v_normal;
-        in float v_dist;
         in vec2 v_texcoord;
 
         out vec4 fragColor;
 
         void main(void) {
-            // Hide the Back Side of the Sphere to prevent duplicate suns
-            if (v_dist > 1.0) {
-            discard;
-            }
-
             if (u_isTexture) {
               fragColor = texture(u_sampler, v_texcoord);
             } else {
@@ -216,17 +203,13 @@ export class Sun extends Component {
         }`,
     vert: keepTrackApi.glsl`
         uniform vec3 u_sizeOfSun;
-        uniform float u_distanceFromOrigin;
 
         out vec2 v_texcoord;
         out vec3 v_normal;
-        out float v_dist;
 
         void main(void) {
             vec4 worldPosition = modelViewMatrix * vec4(position * u_sizeOfSun, 1.0);
             gl_Position = projectionMatrix * worldPosition;
-
-            v_dist = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) / u_distanceFromOrigin;
 
             v_texcoord = uv;
             v_normal = normalMatrix * normal;

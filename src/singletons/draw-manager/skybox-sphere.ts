@@ -259,7 +259,7 @@ export class SkyBoxSphere extends Component {
    *
    * Keep this at the bottom of the file for glsl color coding
    */
-  private shaders_ = {
+  private readonly shaders_ = {
     frag: keepTrackApi.glsl`
         uniform sampler2D u_texMilkyWay;
         uniform sampler2D u_texBoundaries;

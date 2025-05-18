@@ -67,8 +67,6 @@ export class SpaceScene {
       errorManagerInstance.log(error);
       // Errors aren't showing as toast messages
     }
-    Doris.getInstance().on(CoreEngineEvents.Update, this.update.bind(this));
-
     const sunNode = new SceneNode('Sun');
 
     sunNode.addComponent(this.sun);
@@ -101,6 +99,7 @@ export class SpaceScene {
     Doris.getInstance().once(CoreEngineEvents.Update, () => {
       this.earth.reloadEarthHiResTextures();
     });
+    Doris.getInstance().on(CoreEngineEvents.Update, this.update.bind(this));
   }
 
   /**
@@ -112,9 +111,7 @@ export class SpaceScene {
     this.postProcessingManager.init(gl);
   }
 
-  update(deltaTime: number): void {
-    Doris.getInstance().getSceneManager().activeScene?.update(deltaTime);
-
+  update(): void {
     keepTrackApi.getLineManager().update();
 
     this.sensorFovFactory.updateAll();

@@ -87,6 +87,11 @@ export abstract class CameraController {
     this.resetInternal?.();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  lookAtAngle(_pitch: number, _yaw: number): void {
+    // Implementation for looking at a specific angle
+  }
+
   protected updateInternal?(deltaTime: number): void;
   protected renderInternal?(camera: Camera): void;
   protected resetInternal?(): void;

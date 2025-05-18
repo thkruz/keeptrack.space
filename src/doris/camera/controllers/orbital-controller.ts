@@ -6,7 +6,8 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { alt2zoom } from '@app/lib/transforms';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SatMath } from '@app/static/sat-math';
-import { Kilometers } from 'ootk';
+import { mat4, vec3 } from 'gl-matrix';
+import { Kilometers, Radians } from 'ootk';
 import { Camera } from '../camera';
 
 // Interface for controller settings
@@ -34,6 +35,8 @@ export abstract class OrbitalController extends CameraController {
 
   protected minZoomThreshold = 0.0001;
   protected maxZoomThreshold = 1;
+  protected minZoomDistance = 10;
+  protected maxZoomDistance = 100000;
   protected cameraMovementSpeed_ = 0.003;
   protected cameraDecayFactor_ = 5;
 
@@ -61,9 +64,38 @@ export abstract class OrbitalController extends CameraController {
     }
   }
 
-  protected abstract updateAutoRotate(dt: number): void;
-  protected abstract autoMovement(dt: number): void;
+  protected autoMovement(dt: number): void {
+    const pitchDiff = this.normalizeAngle((this.pitch_ - this.pitchTarget_) as Radians);
+    const yawDiff = this.normalizeAngle((this.yaw_ - this.yawTarget_) as Radians);
+    const pitchSpeed = Math.abs(pitchDiff) > 0.0001 ? pitchDiff * dt * settingsManager.cameraMovementSpeed : 0;
+    const yawSpeed = Math.abs(yawDiff) > 0.0001 ? yawDiff * dt * settingsManager.cameraMovementSpeed : 0;
 
+    this.pitch_ -= pitchSpeed;
+    this.yaw_ -= yawSpeed;
+    if (this.pitch_ > Math.PI / 2) {
+      this.pitch_ = Math.PI / 2;
+    }
+    if (this.pitch_ < -Math.PI / 2) {
+      this.pitch_ = -Math.PI / 2;
+    }
+    if (Math.abs(pitchDiff) < 0.0001 && Math.abs(yawDiff) < 0.0001) {
+      this.isAutoPitchYawToTarget_ = false;
+    }
+  }
+
+  protected normalizeAngle(angle: number): number {
+    // Normalize the angle to be within the range of -PI to PI
+    while (angle > Math.PI) {
+      angle -= 2 * Math.PI;
+    }
+    while (angle < -Math.PI) {
+      angle += 2 * Math.PI;
+    }
+
+    return angle;
+  }
+
+  protected abstract updateAutoRotate(dt: number): void;
   protected readonly maxPitchSpeed = 0.002; // radians per second
   protected readonly maxYawSpeed = 0.002; // radians per second
 
@@ -72,12 +104,12 @@ export abstract class OrbitalController extends CameraController {
     const pitchSpeed = Math.max(-this.maxPitchSpeed, Math.min(this.maxPitchSpeed, this.pitchSpeed_ ?? 0));
     const yawSpeed = Math.max(-this.maxYawSpeed, Math.min(this.maxYawSpeed, this.yawSpeed_ ?? 0));
 
-    if (Math.abs(pitchSpeed) > 1e-8) {
+    if (Math.abs(pitchSpeed) > 1e-9) {
       this.pitch_ += pitchSpeed * dt;
     } else {
       this.pitchSpeed_ = 0;
     }
-    if (Math.abs(yawSpeed) > 1e-8) {
+    if (Math.abs(yawSpeed) > 1e-9) {
       this.yaw_ += yawSpeed * dt;
     } else {
       this.yawSpeed_ = 0;
@@ -95,12 +127,12 @@ export abstract class OrbitalController extends CameraController {
       return;
     }
     // Use decay logic from the original controller for momentum dampening
-    if (Math.abs(this.pitchSpeed_) > 0.0001) {
+    if (Math.abs(this.pitchSpeed_) > 1e-9) {
       this.pitchSpeed_ -= this.pitchSpeed_ * dt * this.cameraMovementSpeed_ * this.cameraDecayFactor_;
     } else {
       this.pitchSpeed_ = 0;
     }
-    if (Math.abs(this.yawSpeed_) > 0.0001) {
+    if (Math.abs(this.yawSpeed_) > 1e-9) {
       this.yawSpeed_ -= this.yawSpeed_ * dt * this.cameraMovementSpeed_ * this.cameraDecayFactor_;
     } else {
       this.yawSpeed_ = 0;
@@ -108,20 +140,77 @@ export abstract class OrbitalController extends CameraController {
   }
 
   protected updateCameraZoom_(dt: number): void {
-    if (Math.abs(this.zoomTarget_ - this.zoom_) > 0.0001) {
+    if (Math.abs(this.zoomTarget_ - this.zoom_) > 1e-9) {
       this.zoom_ += (this.zoomTarget_ - this.zoom_) * dt * this.cameraMovementSpeed_;
     }
-    if (Math.abs(this.zoomTarget_ - this.zoom_) < 0.0001) {
+    if (Math.abs(this.zoomTarget_ - this.zoom_) < 1e-9) {
       this.zoom_ = this.zoomTarget_;
     }
   }
 
+  getCameraPosition(center = vec3.create()): vec3 {
+
+    // Apply pitch (rotation around X axis)
+    const pitchMatrix = mat4.create();
+
+    mat4.rotateX(pitchMatrix, pitchMatrix, this.pitch_);
+
+    // Apply yaw (rotation around Z axis)
+    const yawMatrix = mat4.create();
+
+    mat4.rotateZ(yawMatrix, yawMatrix, -this.yaw_);
+
+    // Combine rotations: yaw then pitch
+    const transform = mat4.create();
+
+    mat4.multiply(transform, yawMatrix, pitchMatrix);
+
+    // Back away from the center in the Y direction (depth)
+    const cameraDistance = this.zoom_ ** 3 * (this.maxZoomDistance - this.minZoomDistance) + this.minZoomDistance;
+    const offset = vec3.fromValues(0, cameraDistance, 0);
+
+    // Transform the offset by the combined rotation
+    vec3.transformMat4(offset, offset, transform);
+
+    // Camera position is center + offset
+    vec3.add(center, center, offset);
+
+    return center;
+  }
+
   protected registerInputEvents(): void {
     this.eventBus.on(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
+    this.eventBus.on(InputEvents.MouseMove, this.handleMouseMove.bind(this));
   }
 
   protected unregisterInputEvents(): void {
     this.eventBus.removeListener(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
+    this.eventBus.removeListener(InputEvents.MouseMove, this.handleMouseMove.bind(this));
+  }
+
+  protected handleMouseMove(_event: MouseEvent, x: number, y: number): void {
+    if (this.isDragging_) {
+      // Calculate drag difference using current mouse position and drag start
+      const xDif = this.dragStartPosition_.x - x;
+      const yDif = this.dragStartPosition_.y - y;
+
+      // Compute target yaw and pitch based on drag
+      const yawTarget = <Radians>(this.dragStartYaw_ + xDif * this.cameraMovementSpeed_);
+      const pitchTarget = <Radians>(this.dragStartPitch_ + yDif * -this.cameraMovementSpeed_);
+
+      if (this.isMomentumEnabled_) {
+        // Update camera speeds using normalized angle difference
+        this.pitchSpeed_ = this.normalizeAngle(<Radians>(this.pitch_ - pitchTarget)) * -this.cameraMovementSpeed_;
+        this.yawSpeed_ = this.normalizeAngle(<Radians>(this.yaw_ - yawTarget)) * -this.cameraMovementSpeed_;
+      } else {
+        // Smoothly interpolate camera angles to reduce jitter
+        const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+        const smoothing = 0.2; // Adjust between 0 (no movement) and 1 (instant)
+
+        this.pitch_ = lerp(this.pitch_, pitchTarget, smoothing);
+        this.yaw_ = lerp(this.yaw_, yawTarget, smoothing);
+      }
+    }
   }
 
   protected handleMouseWheel(event: WheelEvent, x: number, y: number, delta: number): void {

@@ -5,11 +5,11 @@ import { ToastMsgType } from '@app/interfaces';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ZOOM_EXP } from '@app/lib/constants';
-import { alt2zoom, normalizeAngle } from '@app/lib/transforms';
+import { alt2zoom } from '@app/lib/transforms';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SatMath } from '@app/static/sat-math';
 import { mat4, vec3 } from 'gl-matrix';
-import { BaseObject, EciVec3, Kilometers, Milliseconds, RADIUS_OF_EARTH, Radians, TAU } from 'ootk';
+import { BaseObject, Kilometers, Milliseconds, RADIUS_OF_EARTH, Radians, TAU } from 'ootk';
 import { CameraControllerType, KeepTrackMainCamera } from '../legacy-camera';
 
 export interface SatelliteCameraControllerParams extends OrbitalControllerParams {
@@ -17,6 +17,8 @@ export interface SatelliteCameraControllerParams extends OrbitalControllerParams
 }
 
 export class SatelliteOrbitalCameraController extends OrbitalController {
+  private zoomSnapped_ = false;
+  private angleSnapped_ = false;
   distanceBuffer = 2;
   protected camera: KeepTrackMainCamera;
   targetObject_: BaseObject | null = null;
@@ -40,6 +42,8 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
   private onSatelliteSelect(): void {
     this.zoom_ = Math.max(this.zoomTarget_, this.zoom_);
     this.camera.setZoomLevel(Math.max(this.camera.zoomTarget, this.camera.zoomLevel()));
+    this.angleSnapped_ = true;
+    this.zoomSnapped_ = true;
   }
 
   protected updateInternal(deltaTime: Milliseconds): void {
@@ -86,32 +90,17 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
     }
   }
 
-  protected autoMovement(dt: number): void {
-    // Move pitch/yaw to target values
-    const pitchDiff = normalizeAngle((this.pitch_ - this.pitchTarget_) as Radians);
-    const yawDiff = normalizeAngle((this.yaw_ - this.yawTarget_) as Radians);
-    const pitchSpeed = Math.abs(pitchDiff) > 0.0001 ? pitchDiff * dt * settingsManager.cameraMovementSpeed : 0;
-    const yawSpeed = Math.abs(yawDiff) > 0.0001 ? yawDiff * dt * settingsManager.cameraMovementSpeed : 0;
-
-    this.pitch_ -= pitchSpeed;
-    this.yaw_ -= yawSpeed;
-    if (this.pitch_ > Math.PI / 2) {
-      this.pitch_ = Math.PI / 2;
-    }
-    if (this.pitch_ < -Math.PI / 2) {
-      this.pitch_ = -Math.PI / 2;
-    }
-    if (Math.abs(pitchDiff) < 0.0001 && Math.abs(yawDiff) < 0.0001) {
-      this.isAutoPitchYawToTarget_ = false;
-    }
-  }
-
-  getCameraRadius(target?: EciVec3) {
+  getCameraRadius(center: vec3) {
     let targetDistanceFromEarth = 0;
 
-    if (target) {
+    if (center) {
       const { gmst } = SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj);
-      const altitude = SatMath.getAlt(target, gmst);
+      const positionEci = {
+        x: center[0] as Kilometers,
+        y: center[1] as Kilometers,
+        z: center[2] as Kilometers,
+      };
+      const altitude = SatMath.getAlt(positionEci, gmst);
 
       targetDistanceFromEarth = altitude + RADIUS_OF_EARTH;
     }
@@ -156,28 +145,29 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
 
     mat4.translate(viewMatrix, viewMatrix, [camera.panCurrent.x, camera.panCurrent.y, camera.panCurrent.z]);
 
-    mat4.translate(viewMatrix, viewMatrix, [0, this.camera.getCameraRadius(this.targetObject_!.position), 0]);
+    const satellitePosition = this.targetObject_!.position;
+    const center = vec3.fromValues(satellitePosition.x, satellitePosition.y, satellitePosition.z);
 
-    mat4.rotateX(viewMatrix, viewMatrix, this.camera.ftsPitch);
-    mat4.rotateZ(viewMatrix, viewMatrix, -this.camera.ftsYaw);
+    mat4.translate(viewMatrix, viewMatrix, [0, this.getCameraRadius(center), 0]);
+
+    mat4.rotateX(viewMatrix, viewMatrix, this.pitch_);
+    mat4.rotateZ(viewMatrix, viewMatrix, -this.yaw_);
 
     mat4.translate(viewMatrix, viewMatrix, targetPosition);
   }
 
   protected registerInputEvents(): void {
+    super.registerInputEvents();
     this.eventBus.on(InputEvents.MouseDown, this.handleMouseDown.bind(this));
-    this.eventBus.on(InputEvents.MouseMove, this.handleMouseMove.bind(this));
     this.eventBus.on(InputEvents.MouseUp, this.handleMouseUp.bind(this));
-    this.eventBus.on(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
     this.eventBus.on(InputEvents.KeyDown, this.handleKeyDown.bind(this));
     this.eventBus.on(InputEvents.KeyUp, this.handleKeyUp.bind(this));
   }
 
   protected unregisterInputEvents(): void {
+    super.unregisterInputEvents();
     this.eventBus.removeListener(InputEvents.MouseDown, this.handleMouseDown.bind(this));
-    this.eventBus.removeListener(InputEvents.MouseMove, this.handleMouseMove.bind(this));
     this.eventBus.removeListener(InputEvents.MouseUp, this.handleMouseUp.bind(this));
-    this.eventBus.removeListener(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
     this.eventBus.removeListener(InputEvents.KeyDown, this.handleKeyDown.bind(this));
     this.eventBus.removeListener(InputEvents.KeyUp, this.handleKeyUp.bind(this));
   }
@@ -192,26 +182,6 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
     }
   }
 
-  private handleMouseMove(_event: MouseEvent, x: number, y: number): void {
-    if (this.isDragging_) {
-      const xDif = this.dragStartPosition_.x - x;
-      const yDif = this.dragStartPosition_.y - y;
-      const yawTarget = this.dragStartYaw_ + xDif * settingsManager.cameraMovementSpeed;
-      const pitchTarget = this.dragStartPitch_ + yDif * -settingsManager.cameraMovementSpeed;
-
-      if (this.isMomentumEnabled_) {
-        this.pitchSpeed_ = normalizeAngle((this.pitch_ - pitchTarget) as Radians) * -settingsManager.cameraMovementSpeed;
-        this.yawSpeed_ = normalizeAngle((this.yaw_ - yawTarget) as Radians) * -settingsManager.cameraMovementSpeed;
-      } else {
-        const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-        const smoothing = 0.2;
-
-        this.pitch_ = lerp(this.pitch_, pitchTarget, smoothing);
-        this.yaw_ = lerp(this.yaw_, yawTarget, smoothing);
-      }
-    }
-  }
-
   protected handleMouseUp(_event: MouseEvent, _x: number, _y: number, button: number): void {
     if (button === 0) {
       this.isDragging_ = false;
@@ -220,18 +190,53 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
 
   protected handleMouseWheel(_event: WheelEvent, _x: number, _y: number, delta: number): void {
     super.handleMouseWheel(_event, _x, _y, delta);
-    const sensitivity = 0.0001;
-    const scale = Math.max(1, Math.abs(this.zoomTarget_ - this.zoom_) * 10);
-    const zoomDelta = delta * sensitivity * scale;
 
-    this.zoomTarget_ = Math.max(this.minZoomThreshold, Math.min(this.maxZoomThreshold, this.zoomTarget_ + zoomDelta));
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+
+    if (settingsManager.isZoomStopsSnappedOnSat || !selectSatManagerInstance || selectSatManagerInstance?.selectedSat === -1) {
+      this.zoomTarget_ += delta / 100 / 25; // delta is +/- 100
+      this.zoomSnapped_ = false;
+    } else if ((this.distanceBuffer < settingsManager.nearZoomLevel || this.distanceBuffer < (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25) ||
+      this.zoom_ === -1) {
+      // Inside distanceBuffer
+      settingsManager.selectedColor = [0, 0, 0, 0];
+      this.distanceBuffer = <Kilometers>(this.distanceBuffer + delta / 100); // delta is +/- 100
+      this.distanceBuffer = <Kilometers>Math.min(
+        Math.max(
+          this.distanceBuffer,
+          settingsManager.minDistanceFromSatellite,
+        ),
+        Math.max(
+          settingsManager.nearZoomLevel,
+          (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25,
+        ),
+      );
+    } else if (this.distanceBuffer >= settingsManager.nearZoomLevel) {
+      // Outside distanceBuffer
+      settingsManager.selectedColor = settingsManager.selectedColorFallback;
+      this.zoomTarget_ += delta / 100 / 25; // delta is +/- 100
+      this.zoomSnapped_ = false;
+
+      // calculate camera distance from target
+      const target = selectSatManagerInstance.getSelectedSat();
+
+      if (target) {
+        const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
+        const curMinZoomLevel = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
+
+        if (this.zoomTarget_ < this.zoom_ && this.zoomTarget_ < curMinZoomLevel) {
+          this.zoomSnapped_ = true;
+          this.distanceBuffer = <Kilometers>Math.min(Math.max(this.distanceBuffer, settingsManager.nearZoomLevel), settingsManager.minDistanceFromSatellite);
+        }
+      }
+    }
+
+    // Clamp zoomTarget_ to min and max thresholds
+    this.zoomTarget_ = Math.max(this.minZoomThreshold, Math.min(this.maxZoomThreshold, this.zoomTarget_));
     this.disableAutoRotation();
   }
 
   protected resetInternal(): void {
-    this.pitch_ = 0;
-    this.yaw_ = 0;
-    this.zoom_ = 1;
     this.pitchTarget_ = 0;
     this.yawTarget_ = 0;
     this.zoomTarget_ = 1;
@@ -246,32 +251,68 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
 
   snapToSat(target: BaseObject, simulationTime: Date): void {
     // Snap to the angle of the target
-    const pos = target.position;
-    const radius = Math.sqrt(pos.x ** 2 + pos.y ** 2);
-    const yaw = <Radians>(Math.atan2(pos.y, pos.x) + TAU / 4);
-    const pitch = <Radians>Math.atan2(pos.z, radius);
+    if (this.angleSnapped_) {
+      const pos = target.position;
+      const radius = Math.sqrt(pos.x ** 2 + pos.y ** 2);
 
-    this.target(pitch, yaw);
+      const yaw = <Radians>(Math.atan2(pos.y, pos.x) + TAU / 4);
+      const pitch = <Radians>Math.atan2(pos.z, radius);
+
+      this.target(pitch, yaw);
+    }
 
     // Snap to the zoom level
-    let camDistTarget = 1;
-    const { gmst } = SatMath.calculateTimeVariables(simulationTime);
-    const altitude = SatMath.getAlt(target.position, gmst);
+    if (this.zoomSnapped_) {
+      let camDistTarget = 1;
+      const { gmst } = SatMath.calculateTimeVariables(simulationTime);
+      const altitude = SatMath.getAlt(target.position, gmst);
 
-    camDistTarget = altitude + RADIUS_OF_EARTH + this.distanceBuffer;
-    camDistTarget = camDistTarget < settingsManager.minZoomDistance ? settingsManager.minZoomDistance + 10 : camDistTarget;
+      camDistTarget = altitude + RADIUS_OF_EARTH + this.distanceBuffer;
+      camDistTarget = camDistTarget < settingsManager.minZoomDistance ? settingsManager.minZoomDistance + 10 : camDistTarget;
 
-    this.zoomTarget_ = ((camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
+      this.zoomTarget_ = ((camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
+    }
+
+    // Only Zoom in Once on Mobile
+    if (settingsManager.isMobileModeEnabled) {
+      this.zoomSnapped_ = false;
+    }
+
+    if (this.zoom_ > settingsManager.satShader.largeObjectMaxZoom) {
+      settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize * 1.5;
+    } else if (this.zoom_ < settingsManager.satShader.largeObjectMinZoom) {
+      settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize / 3;
+    } else {
+      settingsManager.satShader.maxSize = settingsManager.satShader.maxAllowedSize;
+    }
 
     settingsManager.selectedColor = [0, 0, 0, 0];
   }
 
+  protected handleMouseMove(event: MouseEvent, x: number, y: number): void {
+    super.handleMouseMove(event, x, y);
+
+    if (this.isDragging_) {
+      this.angleSnapped_ = false;
+    }
+  }
+
   getCameraOrientation(): vec3 {
-    const xRot = Math.sin(-this.camera.ftsYaw) * Math.cos(this.camera.ftsPitch);
-    const yRot = Math.cos(this.camera.ftsYaw) * Math.cos(this.camera.ftsPitch);
-    const zRot = Math.sin(-this.camera.ftsPitch);
+    const xRot = Math.sin(-this.yaw_) * Math.cos(this.pitch_);
+    const yRot = Math.cos(this.yaw_) * Math.cos(this.pitch_);
+    const zRot = Math.sin(-this.pitch_);
 
     return vec3.fromValues(xRot, yRot, zRot);
+  }
+
+  getCameraPosition(): vec3 {
+    const center = vec3.fromValues(this.targetObject_!.position.x, this.targetObject_!.position.y, this.targetObject_!.position.z);
+    const orientation: vec3 = this.getCameraOrientation();
+
+    const radius = this.getCameraRadius(center);
+
+
+    return vec3.fromValues(center[0] + orientation[0] * radius, center[1] + orientation[1] * radius, center[2] - orientation[2] * radius);
   }
 
   protected handleKeyDown(): void {

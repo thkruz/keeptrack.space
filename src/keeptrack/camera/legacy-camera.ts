@@ -403,6 +403,8 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
   }
 
   camSnap(pitch: Radians, yaw: Radians): void {
+    this.activeCameraController.lookAtAngle(pitch, yaw);
+
     // this.isPanReset = true
     this.camPitchTarget = pitch;
     this.camYawTarget = normalizeAngle(yaw);
@@ -557,17 +559,15 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     return this.position;
   }
 
-  getCameraPosition(target?: EciVec3, orientation: vec3 = this.getCameraOrientation()) {
-    if (this.activeCameraType_ !== CameraControllerType.SATELLITE_CENTERED_ORBITAL && this.activeCameraType_ !== CameraControllerType.EARTH_CENTERED_ORBITAL) {
-      return this.position;
+  getCameraPosition() {
+    if (this.activeCameraController instanceof EarthCenteredOrbitalController) {
+      return this.activeCameraController.getCameraPosition(vec3.fromValues(0, 0, 0));
+    }
+    if (this.activeCameraController instanceof SatelliteOrbitalCameraController) {
+      return this.activeCameraController.getCameraPosition();
     }
 
-    const centerOfEarth = keepTrackApi.getScene().earth.node.transform.position;
-
-    const radius = this.getCameraRadius(target);
-
-
-    return vec3.fromValues(centerOfEarth[0] + orientation[0] * radius, centerOfEarth[1] + orientation[1] * radius, centerOfEarth[2] - orientation[2] * radius);
+    return this.position;
   }
 
   getCameraRadius(target?: EciVec3) {
@@ -597,10 +597,6 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
     Doris.getInstance().on(KeepTrackApiEvents.touchStart, this.touchStart_.bind(this));
     Doris.getInstance().on(CoreEngineEvents.RenderOpaque, () => {
       this.render();
-    });
-
-    Doris.getInstance().on(CoreEngineEvents.Update, (delta: number) => {
-      this.update(delta as Milliseconds);
     });
 
     Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, this.validateProjectionMatrix_.bind(this));
@@ -741,6 +737,10 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       }
     }
 
+    if (this.activeCameraController instanceof SatelliteOrbitalCameraController) {
+      this.activeCameraController.snapToSat(sat, simulationTime);
+    }
+
     this.updateSatShaderSizes();
   }
 
@@ -821,9 +821,8 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
 
     const cameraPosition = this.getCameraPosition();
 
-    this.node.transform.setPosition(cameraPosition);
-
     this.activeCameraController.update(deltaTime);
+    this.node.transform.setPosition(cameraPosition);
   }
 
   validateProjectionMatrix_() {
@@ -885,20 +884,6 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
       this.camYawTarget = <Radians>0;
       this.zoomTarget = 0.5;
     }
-  }
-
-  private resetFpsPos_(): void {
-    this.fpsPitch = <Degrees>0;
-    this.fpsYaw = <Degrees>0;
-    this.position[0] = 0;
-
-    // Move out from the center of the Earth in FPS Mode
-    if (this.activeCameraType_ === CameraControllerType.FIRST_PERSON) {
-      this.position[1] = 25000;
-    } else {
-      this.position[1] = 0;
-    }
-    this.position[2] = 0;
   }
 
   private updateCameraSnapMode() {

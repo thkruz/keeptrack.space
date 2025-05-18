@@ -346,7 +346,7 @@ export class DotsManager {
     this.initProgramPicking();
 
     Doris.getInstance().on(CoreEngineEvents.BeforeUpdate, () => this.updatePositionBuffer());
-    Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (camera, tgtBuffer) => {
+    Doris.getInstance().on(CoreEngineEvents.RenderTransparent, (camera, tgtBuffer) => {
       this.draw(camera.projectionCameraMatrix, tgtBuffer);
     });
   }
@@ -682,27 +682,32 @@ export class DotsManager {
             }
 
             void main(void) {
-            vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
-            float r = 0.0;
-            float alpha = 0.0;
-            // If not a star and not on the ground
-            r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-            alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+              // If inside the earth discard
+              if (vDist < 6300.0) {
+                  discard;
+              }
 
-            // If on the ground
-            r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
-            alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 6471.0);
+              vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
+              float r = 0.0;
+              float alpha = 0.0;
+              // If not a star and not on the ground
+              r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+              alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
 
-            // If a star
-            r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
-            alpha += (2.0 * r - ${settingsManager.satShader.blurFactor4}) * when_ge(vDist, 200000.0);
+              // If on the ground
+              r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
+              alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 6471.0);
 
-            alpha = min(alpha, 1.0);
-            if (alpha == 0.0) discard;
-            fragColor = vec4(vColor.rgb, vColor.a * alpha);
+              // If a star
+              r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
+              alpha += (2.0 * r - ${settingsManager.satShader.blurFactor4}) * when_ge(vDist, 200000.0);
 
-            // Reduce Flickering from Depth Fighting
-            gl_FragDepth = gl_FragCoord.z * 0.99999975;
+              alpha = min(alpha, 1.0);
+              if (alpha == 0.0) discard;
+              fragColor = vec4(vColor.rgb, vColor.a * alpha);
+
+              // Reduce Flickering from Depth Fighting
+              gl_FragDepth = gl_FragCoord.z * 0.99999975;
             }
           `,
         vert: `#version 300 es

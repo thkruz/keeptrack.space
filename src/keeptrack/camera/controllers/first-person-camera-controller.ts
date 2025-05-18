@@ -3,7 +3,7 @@ import { Doris } from '@app/doris/doris';
 import { EventBus } from '@app/doris/events/event-bus';
 import { InputEvents, WebGlEvents } from '@app/doris/events/event-types';
 import { mat4 } from 'gl-matrix';
-import { DEG2RAD, Degrees } from 'ootk';
+import { DEG2RAD } from 'ootk';
 import { KeepTrackMainCamera } from '../legacy-camera';
 
 export class FirstPersonCameraController extends CameraController {
@@ -12,6 +12,11 @@ export class FirstPersonCameraController extends CameraController {
   protected pitch_: number = 0;
   protected yaw_: number = 0;
   protected rotate_: number = 0;
+
+  protected targetPitch_: number = 0;
+  protected targetYaw_: number = 0;
+  protected targetRotate_: number = 0;
+
   forwardSpeed: number = 0;
   sideSpeed: number = 0;
   vertSpeed: number = 0;
@@ -38,10 +43,20 @@ export class FirstPersonCameraController extends CameraController {
   }
 
   protected updateInternal(delta: number): void {
+    this.interpolateOrientation_(delta);
     this.clampCameraOrientation_();
     this.handleKeyStates_();
     this.clampSpeed_(delta);
     this.updateCameraPosition_(delta);
+  }
+
+  private interpolateOrientation_(delta: number) {
+    // Interpolation speed (adjust as needed)
+    const interpSpeed = 0.003 * delta;
+
+    this.pitch_ += (this.targetPitch_ - this.pitch_) * interpSpeed;
+    this.yaw_ += (this.targetYaw_ - this.yaw_) * interpSpeed;
+    this.rotate_ += (this.targetRotate_ - this.rotate_) * interpSpeed;
   }
 
   private isKeyDown_(key: string): boolean {
@@ -131,24 +146,53 @@ export class FirstPersonCameraController extends CameraController {
   }
 
   private clampCameraOrientation_() {
-    // Prevent Over Rotation
+    // Decay deltas when not dragging
+    this.smoothedPitchDelta_ *= 0.8;
+    this.smoothedYawDelta_ *= 0.8;
+    this.smoothedRotateDelta_ *= 0.8;
+
+    // Clamp targets
+    if (this.targetPitch_ > 90) {
+      this.targetPitch_ = 90;
+    }
+    if (this.targetPitch_ < -90) {
+      this.targetPitch_ = -90;
+    }
+    if (this.targetRotate_ > 360) {
+      this.targetRotate_ -= 360;
+      this.rotate_ -= 360;
+    }
+    if (this.targetRotate_ < -360) {
+      this.targetRotate_ += 360;
+      this.rotate_ += 360;
+    }
+    if (this.targetYaw_ > 360) {
+      this.targetYaw_ -= 360;
+      this.yaw_ -= 360;
+    }
+    if (this.targetYaw_ < -360) {
+      this.targetYaw_ += 360;
+      this.yaw_ += 360;
+    }
+
+    // Clamp actuals (optional, for safety)
     if (this.pitch_ > 90) {
-      this.pitch_ = <Degrees>90;
+      this.pitch_ = 90;
     }
     if (this.pitch_ < -90) {
-      this.pitch_ = <Degrees>-90;
+      this.pitch_ = -90;
     }
     if (this.rotate_ > 360) {
-      this.rotate_ = <Degrees>(this.rotate_ - 360);
+      this.rotate_ -= 360;
     }
-    if (this.rotate_ < 0) {
-      this.rotate_ = <Degrees>(this.rotate_ + 360);
+    if (this.rotate_ < -360) {
+      this.rotate_ += 360;
     }
     if (this.yaw_ > 360) {
-      this.yaw_ = <Degrees>(this.yaw_ - 360);
+      this.yaw_ -= 360;
     }
-    if (this.yaw_ < 0) {
-      this.yaw_ = <Degrees>(this.yaw_ + 360);
+    if (this.yaw_ < -360) {
+      this.yaw_ += 360;
     }
   }
 
@@ -165,14 +209,14 @@ export class FirstPersonCameraController extends CameraController {
 
   protected registerInputEvents(): void {
     this.eventBus.on(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
-    this.eventBus.on(InputEvents.MouseMove, this.handleMouseMove.bind(this));
+    this.eventBus.on(InputEvents.MouseMove, this.handleMouseDrag.bind(this));
     this.eventBus.on(InputEvents.MouseDown, this.handleMouseDown.bind(this));
     this.eventBus.on(InputEvents.MouseUp, this.handleMouseUp.bind(this));
   }
 
   protected unregisterInputEvents(): void {
     this.eventBus.removeListener(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
-    this.eventBus.removeListener(InputEvents.MouseMove, this.handleMouseMove.bind(this));
+    this.eventBus.removeListener(InputEvents.MouseMove, this.handleMouseDrag.bind(this));
     this.eventBus.removeListener(InputEvents.MouseDown, this.handleMouseDown.bind(this));
     this.eventBus.removeListener(InputEvents.MouseUp, this.handleMouseUp.bind(this));
   }
@@ -182,7 +226,7 @@ export class FirstPersonCameraController extends CameraController {
     Doris.getInstance().emit(WebGlEvents.FovChanged);
   }
 
-  protected handleMouseMove(event: MouseEvent, x: number, y: number): void {
+  protected handleMouseDrag(event: MouseEvent, x: number, y: number): void {
     /*
      * Only update deltas while mouse button is held (like FPS games)
      * Calculate deltas
@@ -193,30 +237,23 @@ export class FirstPersonCameraController extends CameraController {
     // Smoothing factor (between 0 and 1, lower is smoother)
     const smoothing = 0.2;
 
-    // Store previous values for interpolation
-    this.smoothedPitchDelta_ ??= 0;
-    this.smoothedYawDelta_ ??= 0;
-    this.smoothedRotateDelta_ ??= 0;
-
+    // Left mouse button: pitch/yaw
     if (event.buttons === 1) {
       // Left mouse button: pitch/yaw
       this.smoothedPitchDelta_ += ((-deltaY * 0.1) - this.smoothedPitchDelta_) * smoothing;
       this.smoothedYawDelta_ += ((deltaX * 0.1) - this.smoothedYawDelta_) * smoothing;
-      this.pitch_ += this.smoothedPitchDelta_;
-      this.yaw_ += this.smoothedYawDelta_;
+      this.targetPitch_ += this.smoothedPitchDelta_;
+      this.targetYaw_ += this.smoothedYawDelta_;
     } else if (event.buttons === 4) {
       // Middle mouse button: rotate
       this.smoothedRotateDelta_ += ((-deltaX * 0.1) - this.smoothedRotateDelta_) * smoothing;
-      this.rotate_ += this.smoothedRotateDelta_;
-    } else {
-      // Decay deltas when not dragging
-      this.smoothedPitchDelta_ *= 0.8;
-      this.smoothedYawDelta_ *= 0.8;
-      this.smoothedRotateDelta_ *= 0.8;
+      this.targetRotate_ += this.smoothedRotateDelta_;
     }
     this.lastMouseX = x;
     this.lastMouseY = y;
   }
+
+
   protected handleMouseDown(_event: MouseEvent, x: number, y: number): void {
     this.lastMouseX = x;
     this.lastMouseY = y;

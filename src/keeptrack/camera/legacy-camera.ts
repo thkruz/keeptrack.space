@@ -272,7 +272,13 @@ export class KeepTrackMainCamera extends PerspectiveCamera {
         throw new Error(`No Position for Sat ${obj.id}`);
       }
 
-      const posVec4 = <[number, number, number, number]>vec4.fromValues(pos.x, pos.y, pos.z, 1);
+      const centerVec3 = keepTrackApi.getCenterVec3();
+      const posVec4 = <[number, number, number, number]>vec4.fromValues(
+        pos.x + centerVec3[0],
+        pos.y + centerVec3[1],
+        pos.z + centerVec3[2],
+        1,
+      );
 
       vec4.transformMat4(posVec4, posVec4, this.viewMatrix);
       vec4.transformMat4(posVec4, posVec4, pMatrix);

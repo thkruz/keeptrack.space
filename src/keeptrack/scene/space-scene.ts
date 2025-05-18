@@ -1,6 +1,9 @@
+import { keepTrackContainer } from '@app/container';
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { SceneNode } from '@app/doris/scene/scene-node';
+import { Singletons } from '@app/interfaces';
+import { MeshManager } from '@app/singletons/draw-manager/mesh-manager';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ConeMeshFactory } from '../../singletons/draw-manager/cone-mesh-factory';
 import { Box } from '../../singletons/draw-manager/cube';
@@ -76,6 +79,14 @@ export class SpaceScene {
 
     earthNode.addComponent(this.earth);
     this.earth.node = earthNode;
+
+    const meshManagerInstance = new MeshManager();
+    const satelliteMeshNode = new SceneNode('SatelliteMesh');
+
+    keepTrackContainer.registerSingleton(Singletons.MeshManager, meshManagerInstance);
+    satelliteMeshNode.addComponent(meshManagerInstance);
+    meshManagerInstance.node = satelliteMeshNode;
+    Doris.getInstance().getSceneManager().activeScene?.root.addChild(satelliteMeshNode);
 
     const moonNode = new SceneNode('Moon');
 

@@ -130,9 +130,9 @@ export class Earth extends Component {
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
     // Set the local matrix based on the geometry
-    mat4.copy(this.node.transform.worldMatrix, this.mesh.geometry.localMvMatrix);
+    mat4.copy(this.node.transform.localMatrix, this.mesh.geometry.localMvMatrix);
     // Rotate the earth based on the GMST
-    mat4.rotateZ(this.node.transform.worldMatrix, this.node.transform.worldMatrix, gmst);
+    mat4.rotateZ(this.node.transform.localMatrix, this.node.transform.localMatrix, gmst);
 
     mat3.normalFromMat4(this.normalMatrix_, this.node.transform.worldMatrix);
 

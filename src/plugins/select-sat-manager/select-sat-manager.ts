@@ -71,7 +71,6 @@ export class SelectSatManager extends KeepTrackPlugin {
         const timeManagerInstance = keepTrackApi.getTimeManager();
         const primarySat = keepTrackApi.getCatalogManager().getObject(this.primarySatObj.id, GetSatType.DEFAULT) as DetailedSatellite | MissileObject;
 
-        keepTrackApi.getMeshManager().update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
         keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
         if (primarySat.isMissile()) {
           keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
@@ -82,13 +81,9 @@ export class SelectSatManager extends KeepTrackPlugin {
           keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.SATELLITE_CENTERED_ORBITAL)
         ) {
           keepTrackApi.getOrbitManager().updateOrbitBuffer(this.primarySatObj.id);
-          const firstPointOut = [
-            keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3],
-            keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3 + 1],
-            keepTrackApi.getDotsManager().positionData[this.primarySatObj.id * 3 + 2],
-          ];
+          const rootNodePosition = keepTrackApi.getCenterVec3Negative();
 
-          keepTrackApi.getOrbitManager().updateFirstPointOut(this.primarySatObj.id, firstPointOut);
+          keepTrackApi.getOrbitManager().updateFirstPointOut(this.primarySatObj.id, [rootNodePosition[0], rootNodePosition[1], rootNodePosition[2]]);
         }
 
         keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);

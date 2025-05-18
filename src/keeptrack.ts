@@ -67,7 +67,6 @@ import { ColorSchemeManager } from './singletons/color-scheme-manager';
 import { DemoManager } from './singletons/demo-mode';
 import { DotsManager } from './singletons/dots-manager';
 import { LineManager, lineManagerInstance } from './singletons/draw-manager/line-manager';
-import { MeshManager } from './singletons/draw-manager/mesh-manager';
 import { ErrorManager, errorManagerInstance } from './singletons/errorManager';
 import { GroupsManager } from './singletons/groups-manager';
 import { HoverManager } from './singletons/hover-manager';
@@ -157,9 +156,6 @@ export class KeepTrack {
     keepTrackContainer.registerSingleton(Singletons.TimeManager, timeManagerInstance);
 
     keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, Doris.getInstance().getRenderer());
-    const meshManagerInstance = new MeshManager();
-
-    keepTrackContainer.registerSingleton(Singletons.MeshManager, meshManagerInstance);
 
     Doris.getInstance().once(WebGlEvents.AfterInit, () => {
       const sceneInstance = new SpaceScene();
@@ -497,10 +493,6 @@ theodore.kruczek at gmail dot com.
 
         Doris.getInstance().emit(CoreEngineEvents.AssetLoadProgress, 5, 5);
       });
-
-    Doris.getInstance().once(WebGlEvents.AfterFirstInit, (gl: WebGL2RenderingContext) => {
-      keepTrackApi.getMeshManager().init(gl);
-    });
 
     Doris.getInstance().on(CoreEngineEvents.AssetLoadProgress, (progress: number, total: number) => {
       switch (progress) {

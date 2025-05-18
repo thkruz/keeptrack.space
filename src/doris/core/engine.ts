@@ -103,9 +103,9 @@ export class Engine {
   }
 
   private tick_() {
-    this.eventBus.emit(CoreEngineEvents.BeforeUpdate, this.timeManager.getScaledTimeDelta());
-    this.eventBus.emit(CoreEngineEvents.Update, this.timeManager.getScaledTimeDelta());
-    this.eventBus.emit(CoreEngineEvents.AfterUpdate, this.timeManager.getScaledTimeDelta());
+    this.eventBus.emit(CoreEngineEvents.BeforeUpdate, this.timeManager.getScaledTimeDelta(), this.timeManager.getRealTimeDelta());
+    this.eventBus.emit(CoreEngineEvents.Update, this.timeManager.getScaledTimeDelta(), this.timeManager.getRealTimeDelta());
+    this.eventBus.emit(CoreEngineEvents.AfterUpdate, this.timeManager.getScaledTimeDelta(), this.timeManager.getRealTimeDelta());
 
     // this.eventBus.emit(CoreEngineEvents.BeforeRender);
     this.renderer.render(keepTrackApi.getScene());

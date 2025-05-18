@@ -75,6 +75,8 @@ export class EarthCenteredOrbitalController extends OrbitalController {
 
       if (this.zoom_ > this.maxZoomThreshold / 2) {
         this.camera.setNearFar(100, this.camera.far);
+      } else {
+        this.camera.setNearFar(settingsManager.zNear, settingsManager.zFar);
       }
 
       // Apply limits to pitch/yaw regardless of control mode
@@ -210,7 +212,6 @@ export class EarthCenteredOrbitalController extends OrbitalController {
     this.eventBus.on(InputEvents.MouseUp, this.handleMouseUp.bind(this));
     this.eventBus.on(InputEvents.KeyDown, this.handleKeyDown.bind(this));
     this.eventBus.on(InputEvents.KeyUp, this.handleKeyUp.bind(this));
-    // this.eventBus.on(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
     this.eventBus.on(InputEvents.MouseDrag, this.handleMouseDrag.bind(this));
   }
 
@@ -220,7 +221,6 @@ export class EarthCenteredOrbitalController extends OrbitalController {
     this.eventBus.removeListener(InputEvents.MouseUp, this.handleMouseUp.bind(this));
     this.eventBus.removeListener(InputEvents.KeyDown, this.handleKeyDown.bind(this));
     this.eventBus.removeListener(InputEvents.KeyUp, this.handleKeyUp.bind(this));
-    // this.eventBus.removeListener(InputEvents.MouseWheel, this.handleMouseWheel.bind(this));
     this.eventBus.removeListener(InputEvents.MouseDrag, this.handleMouseDrag.bind(this));
   }
 

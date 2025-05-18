@@ -45,7 +45,10 @@ export class Sun extends Component {
   private readonly normalMatrix_ = mat3.create();
 
   /** The position of the sun in ECI coordinates. */
-  eci: EciVec3;
+  eci_: EciVec3;
+  get eci(): EciVec3 {
+    return this.eci_ ?? SatMath.getSunDirection(keepTrackApi.getTimeManager().j);
+  }
   /** The mesh for the sun. */
   private mesh_: Mesh;
   private sizeRandomFactor_ = 0.0;
@@ -112,7 +115,7 @@ export class Sun extends Component {
     const j = keepTrackApi.getTimeManager().j;
     const eci = SatMath.getSunDirection(j);
 
-    this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
+    this.eci_ = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
 
     const sunMaxDist = Math.max(Math.max(Math.abs(eci[0]), Math.abs(eci[1])), Math.abs(eci[2]));
     const cameraPos = this.node.parent!.transform.position;

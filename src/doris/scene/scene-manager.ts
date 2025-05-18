@@ -94,11 +94,11 @@ export class SceneManager {
 
   /**
    * Updates the active scene
-   * @param deltaTime Time elapsed since last update in milliseconds
+   * @param realDelta Time elapsed since last update in milliseconds
    */
-  private update(deltaTime: number): void {
+  private update(_scaledDelta: number, realDelta: number): void {
     if (this._activeScene) {
-      this._activeScene.update(deltaTime);
+      this._activeScene.update(realDelta);
     }
   }
 }

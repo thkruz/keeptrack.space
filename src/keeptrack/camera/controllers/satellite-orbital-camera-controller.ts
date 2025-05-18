@@ -1,4 +1,5 @@
 import { OrbitalController, OrbitalControllerParams } from '@app/doris/camera/controllers/orbital-controller';
+import { Doris } from '@app/doris/doris';
 import { EventBus } from '@app/doris/events/event-bus';
 import { InputEvents } from '@app/doris/events/event-types';
 import { ToastMsgType } from '@app/interfaces';
@@ -36,7 +37,19 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
       keepTrackApi.getUiManager().toast('Camera Mode: Satellite Orbital', ToastMsgType.normal);
       this.zoom_ = Math.max(this.zoomTarget_, this.zoom_);
       this.camera.setZoomLevel(Math.max(this.camera.zoomTarget, this.camera.zoomLevel()));
+      this.camera.setFov(0.4);
     }
+  }
+
+  protected onDeactivate(): void {
+    const targetPosition = vec3.fromValues(0, 0, 0);
+
+    const rootNode = Doris.getInstance().getSceneManager().activeScene?.root;
+
+    rootNode!.transform.setPosition(targetPosition);
+    rootNode!.transform.updateWorldMatrix(); // This won't happen automatically
+
+    this.camera.setFov(settingsManager.fieldOfView);
   }
 
   private onSatelliteSelect(): void {
@@ -64,6 +77,16 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
       this.updateCameraRotation_(deltaTime);
       this.updateCameraZoom_(deltaTime);
     }
+
+    const targetPosition = vec3.fromValues(
+      -this.targetObject_!.position?.x,
+      -this.targetObject_!.position?.y,
+      -this.targetObject_!.position?.z);
+
+    const rootNode = Doris.getInstance().getSceneManager().activeScene?.root;
+
+    rootNode!.transform.setPosition(targetPosition);
+    rootNode!.transform.updateWorldMatrix(); // This won't happen automatically
   }
   protected onValidate(): boolean {
     this.targetObject_ = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj ?? null;
@@ -125,10 +148,6 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
     }
 
     const viewMatrix = camera.getViewMatrix();
-    const targetPosition = vec3.fromValues(
-      -this.targetObject_!.position?.x,
-      -this.targetObject_!.position?.y,
-      -this.targetObject_!.position?.z);
 
     /*
      * mat4 commands are run in reverse order
@@ -153,7 +172,7 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
     mat4.rotateX(viewMatrix, viewMatrix, this.pitch_);
     mat4.rotateZ(viewMatrix, viewMatrix, -this.yaw_);
 
-    mat4.translate(viewMatrix, viewMatrix, targetPosition);
+    // mat4.translate(viewMatrix, viewMatrix, targetPosition);
   }
 
   protected registerInputEvents(): void {

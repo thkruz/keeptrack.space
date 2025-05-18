@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { AnalyticsInstance } from 'analytics';
+import { vec3 } from 'gl-matrix';
 import { keepTrackContainer } from './container';
 import { Doris } from './doris/doris';
 import { Renderer } from './doris/rendering/renderer';
@@ -185,6 +186,16 @@ export class KeepTrackApi {
 
     return str;
   }
+
+  getCenterVec3 = (): vec3 => Doris.getInstance().getSceneManager().activeScene!.root.transform.getPosition();
+  getCenterVec3Negative = (): vec3 => {
+    const rootNodePosition = Doris.getInstance().getSceneManager().activeScene!.root.transform.getPosition();
+    const centerVec3 = vec3.create();
+
+    vec3.negate(centerVec3, rootNodePosition);
+
+    return centerVec3;
+  };
 
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);
   /** Deprecate */

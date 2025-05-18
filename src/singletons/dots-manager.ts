@@ -94,6 +94,7 @@ export class DotsManager {
         u_pMvviewMatrix: <WebGLUniformLocation><unknown>null,
         u_minSize: <WebGLUniformLocation><unknown>null,
         u_maxSize: <WebGLUniformLocation><unknown>null,
+        u_offset: <WebGLUniformLocation><unknown>null,
       },
       vao: <WebGLVertexArrayObject><unknown>null,
     },
@@ -118,8 +119,7 @@ export class DotsManager {
       },
       uniforms: {
         u_pMvviewMatrix: <WebGLUniformLocation><unknown>null,
-        u_minSize: <WebGLUniformLocation><unknown>null,
-        u_maxSize: <WebGLUniformLocation><unknown>null,
+        u_offset: <WebGLUniformLocation><unknown>null,
       },
       vao: <WebGLVertexArrayObject><unknown>null,
     },
@@ -165,6 +165,9 @@ export class DotsManager {
     gl.useProgram(this.programs.dots.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvviewMatrix, false, pMvviewMatrix);
+    const rootNodePosition = Doris.getInstance().getSceneManager().activeScene!.root.transform.getPosition();
+
+    gl.uniform3fv(this.programs.dots.uniforms.u_offset, rootNodePosition);
 
     if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.PLANETARIUM) {
       gl.uniform1f(this.programs.dots.uniforms.u_minSize, this.settings_.satShader.minSizePlanetarium);
@@ -230,6 +233,9 @@ export class DotsManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.gpuPickingFramebuffer);
 
     gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvviewMatrix, false, pMvviewMatrix);
+    const rootNodePosition = Doris.getInstance().getSceneManager().activeScene!.root.transform.getPosition();
+
+    gl.uniform3fv(this.programs.picking.uniforms.u_offset, rootNodePosition);
 
     // no reason to render 100000s of pixels when we're only going to read one
     if (!settingsManager.isMobileModeEnabled) {
@@ -384,7 +390,7 @@ export class DotsManager {
     this.programs.picking.program = new WebGlProgramHelper(gl, this.shaders_.picking.vert, this.shaders_.picking.frag).program;
 
     GlUtils.assignAttributes(this.programs.picking.attribs, gl, this.programs.picking.program, ['a_position', 'a_color', 'a_pickable']);
-    GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvviewMatrix']);
+    GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvviewMatrix', 'u_offset']);
 
     this.gpuPickingFramebuffer = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, this.gpuPickingFramebuffer);
@@ -666,49 +672,49 @@ export class DotsManager {
     this.shaders_ = {
       dots: {
         frag: `#version 300 es
-            precision mediump float;
+          precision mediump float;
 
-            in vec4 vColor;
-            in float vStar;
-            in float vDist;
+          in vec4 vColor;
+          in float vStar;
+          in float vDist;
 
-            out vec4 fragColor;
+          out vec4 fragColor;
 
-            float when_lt(float x, float y) {
-            return max(sign(y - x), 0.0);
+          float when_lt(float x, float y) {
+          return max(sign(y - x), 0.0);
+          }
+          float when_ge(float x, float y) {
+          return 1.0 - when_lt(x, y);
+          }
+
+          void main(void) {
+            // If inside the earth discard
+            if (vDist < 6300.0) {
+              discard;
             }
-            float when_ge(float x, float y) {
-            return 1.0 - when_lt(x, y);
-            }
 
-            void main(void) {
-              // If inside the earth discard
-              if (vDist < 6300.0) {
-                  discard;
-              }
+            vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
+            float r = 0.0;
+            float alpha = 0.0;
+            // If not a star and not on the ground
+            r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+            alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
 
-              vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
-              float r = 0.0;
-              float alpha = 0.0;
-              // If not a star and not on the ground
-              r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-              alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+            // If on the ground
+            r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
+            alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 6471.0);
 
-              // If on the ground
-              r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
-              alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 6471.0);
+            // If a star
+            r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
+            alpha += (2.0 * r - ${settingsManager.satShader.blurFactor4}) * when_ge(vDist, 200000.0);
 
-              // If a star
-              r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
-              alpha += (2.0 * r - ${settingsManager.satShader.blurFactor4}) * when_ge(vDist, 200000.0);
+            alpha = min(alpha, 1.0);
+            if (alpha == 0.0) discard;
+            fragColor = vec4(vColor.rgb, vColor.a * alpha);
 
-              alpha = min(alpha, 1.0);
-              if (alpha == 0.0) discard;
-              fragColor = vec4(vColor.rgb, vColor.a * alpha);
-
-              // Reduce Flickering from Depth Fighting
-              gl_FragDepth = gl_FragCoord.z * 0.99999975;
-            }
+            // Reduce Flickering from Depth Fighting
+            gl_FragDepth = gl_FragCoord.z * 0.99999975;
+          }
           `,
         vert: `#version 300 es
           in vec3 a_position;
@@ -719,74 +725,78 @@ export class DotsManager {
           uniform float u_maxSize;
 
           uniform mat4 u_pMvviewMatrix;
+          uniform vec3 u_offset;
 
           out vec4 vColor;
           out float vStar;
           out float vDist;
 
           float when_lt(float x, float y) {
-              return max(sign(y - x), 0.0);
+            return max(sign(y - x), 0.0);
           }
           float when_ge(float x, float y) {
-              return 1.0 - when_lt(x, y);
+            return 1.0 - when_lt(x, y);
           }
 
           void main(void) {
-              vec4 position = u_pMvviewMatrix * vec4(a_position, 1.0);
-              float drawSize = 0.0;
-              float dist = distance(vec3(0.0, 0.0, 0.0),a_position.xyz);
+            vec3 pos = a_position + u_offset;
+            vec4 position = u_pMvviewMatrix * vec4(pos, 1.0);
+            float drawSize = 0.0;
+            float dist = distance(u_offset, pos);
 
-              // Satellite
-              drawSize +=
-              when_lt(a_star, 0.5) *
-              (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), u_minSize * 0.9), u_maxSize) * 1.0);
+            // Satellite
+            drawSize +=
+            when_lt(a_star, 0.5) *
+            (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} / position.z, 2.1), u_minSize * 0.9), u_maxSize) * 1.0);
 
-              // Something on the ground
-              drawSize +=
-              when_ge(a_star, 0.5) * when_lt(dist, 6421.0) *
-              (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), u_minSize * 0.75), u_maxSize) * 1.0);
+            // Something on the ground
+            drawSize +=
+            when_ge(a_star, 0.5) * when_lt(dist, 6421.0) *
+            (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} / position.z, 2.1), u_minSize * 0.75), u_maxSize) * 1.0);
 
-              // Star or Searched Object
-              drawSize +=
-              when_ge(a_star, 0.5) * when_ge(dist, 6421.0) *
-              (min(max(${settingsManager.satShader.starSize} * 100000.0 \/ dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.0));
+            // Star or Searched Object
+            drawSize +=
+            when_ge(a_star, 0.5) * when_ge(dist, 6421.0) *
+            (min(max(${settingsManager.satShader.starSize} * 100000.0 / dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.0));
 
-              gl_PointSize = drawSize;
-              gl_Position = position;
-              vColor = a_color;
-              vStar = a_star * 1.0;
-              vDist = dist;
+            gl_PointSize = drawSize;
+            gl_Position = position;
+            vColor = a_color;
+            vStar = a_star * 1.0;
+            vDist = dist;
           }
         `,
       },
       picking: {
         vert: `#version 300 es
-                in vec3 a_position;
-                in vec3 a_color;
-                in float a_pickable;
+          in vec3 a_position;
+          in vec3 a_color;
+          in float a_pickable;
 
-                uniform mat4 u_pMvviewMatrix;
+          uniform mat4 u_pMvviewMatrix;
+          uniform vec3 u_offset;
 
-                out vec3 vColor;
+          out vec3 vColor;
 
-                void main(void) {
-                vec4 position = u_pMvviewMatrix * vec4(a_position, 1.0);
-                gl_Position = position;
-                gl_PointSize = ${settingsManager.pickingDotSize} * a_pickable;
-                vColor = a_color * a_pickable;
-                }
-            `,
+          void main(void) {
+            vec3 pos = a_position + u_offset;
+            vec4 position = u_pMvviewMatrix * vec4(pos, 1.0);
+            gl_Position = position;
+            gl_PointSize = ${settingsManager.pickingDotSize} * a_pickable;
+            vColor = a_color * a_pickable;
+          }
+        `,
         frag: `#version 300 es
-                precision mediump float;
+          precision mediump float;
 
-                in vec3 vColor;
+          in vec3 vColor;
 
-                out vec4 fragColor;
+          out vec4 fragColor;
 
-                void main(void) {
-                    fragColor = vec4(vColor, 1.0);
-                }
-            `,
+          void main(void) {
+            fragColor = vec4(vColor, 1.0);
+          }
+        `,
       },
     };
   }

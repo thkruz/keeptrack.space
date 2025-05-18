@@ -1,6 +1,8 @@
+import { Component } from '@app/doris/components/component';
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { EciArr3, GetSatType } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat3, mat4, vec3 } from 'gl-matrix';
@@ -35,7 +37,7 @@ export interface MeshObject {
   isRotationStable: boolean;
 }
 
-export class MeshManager {
+export class MeshManager extends Component {
   private attrIndices_ = {};
   private attribs_: {
     aVertexPosition: string;
@@ -91,6 +93,11 @@ export class MeshManager {
     uInSun: <WebGLUniformLocation><unknown>null,
   };
 
+  constructor() {
+    super();
+    Doris.getInstance().on(KeepTrackApiEvents.onPrimarySatelliteUpdate, this.onPrimarySatelliteUpdate.bind(this));
+  }
+
   calculateNadirYaw_: () => Radians;
   currentMeshObject: MeshObject = {
     id: -1,
@@ -143,8 +150,7 @@ export class MeshManager {
     sateliotsat2: null,
   };
 
-  private mvMatrix_: mat4;
-  private nMatrix_: mat3;
+  private readonly normalMatrix_: mat3 = mat3.create();
 
   checkIfNameKnown(name: string): boolean {
     // TODO: Currently all named models aim at nadir - that isn't always true
@@ -197,7 +203,7 @@ export class MeshManager {
     return false;
   }
 
-  draw(pMatrix: mat4, viewMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null) {
+  render(tgtBuffer = null as WebGLFramebuffer | null) {
     // Meshes aren't finished loading
     if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) {
       return;
@@ -226,10 +232,10 @@ export class MeshManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
     gl.uniform3fv(this.uniforms_.uLightDirection, keepTrackApi.getScene().earth.lightDirection);
-    gl.uniformMatrix3fv(this.uniforms_.uNormalMatrix, false, this.nMatrix_);
-    gl.uniformMatrix4fv(this.uniforms_.uMvMatrix, false, this.mvMatrix_);
-    gl.uniformMatrix4fv(this.uniforms_.uPMatrix, false, pMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.uviewMatrix, false, viewMatrix);
+    gl.uniformMatrix3fv(this.uniforms_.uNormalMatrix, false, this.normalMatrix_);
+    gl.uniformMatrix4fv(this.uniforms_.uMvMatrix, false, this.node.transform.worldMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.uPMatrix, false, keepTrackApi.getMainCamera().getProjectionMatrix());
+    gl.uniformMatrix4fv(this.uniforms_.uviewMatrix, false, keepTrackApi.getMainCamera().getViewMatrix());
     gl.uniform1f(this.uniforms_.uInSun, this.currentMeshObject.inSun);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.currentMeshObject.model.mesh.vertexBuffer);
@@ -266,7 +272,7 @@ export class MeshManager {
       occlusionPrgm.attrSetup(this.currentMeshObject.model.mesh.vertexBuffer, 80);
 
       // Set the uniforms
-      occlusionPrgm.uniformSetup(this.mvMatrix_, pMatrix, viewMatrix);
+      occlusionPrgm.uniformSetup(this.node.transform.worldMatrix, pMatrix, viewMatrix);
 
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.currentMeshObject.model.mesh.indexBuffer);
       gl.drawElements(gl.TRIANGLES, this.currentMeshObject.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
@@ -434,7 +440,9 @@ export class MeshManager {
     this.currentMeshObject.model = this.models.sat2;
   }
 
-  init(gl: WebGL2RenderingContext): void {
+  async initialize(): Promise<void> {
+    const gl = Doris.getInstance().getRenderer().gl;
+
     try {
       if (settingsManager.disableUI || settingsManager.isDrawLess || settingsManager.noMeshManager) {
         return;
@@ -450,29 +458,29 @@ export class MeshManager {
       // Don't Continue until you have populated the mesh list
       this.populateFileList();
 
-      OBJ.downloadModels(this.fileList_).then((models: MeshMap) => {
-        /*
-         * DEBUG:
-         * for (var [name, mesh] of Object.entries(models)) {
-         *   console.debug('Name:', name);
-         *   console.debug('Mesh:', mesh);
-         * }
-         */
-        this.meshes_ = models as unknown as KeepTrackMesh;
-        this.initShaders();
-        this.initBuffers();
+      const models: MeshMap = await OBJ.downloadModels(this.fileList_);
+      /*
+       * DEBUG:
+       * for (var [name, mesh] of Object.entries(models)) {
+       *   console.debug('Name:', name);
+       *   console.debug('Mesh:', mesh);
+       * }
+       */
 
-        Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (camera, buffer) => {
-          // Draw Satellite Model if a satellite is selected and meshManager is loaded
-          if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-            if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
-              this.draw(camera.getProjectionMatrix(), camera.getViewMatrix(), buffer);
-            }
+      this.meshes_ = models as unknown as KeepTrackMesh;
+      this.initShaders();
+      this.initBuffers();
+
+      Doris.getInstance().on(CoreEngineEvents.RenderOpaque, (camera, buffer) => {
+        // Draw Satellite Model if a satellite is selected and meshManager is loaded
+        if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
+          if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
+            this.render(buffer);
           }
-        });
-
-        this.isReady = true;
+        }
       });
+
+      this.isReady = true;
     } catch {
       errorManagerInstance.warn('Meshes failed to load!');
     }
@@ -483,26 +491,12 @@ export class MeshManager {
     this.currentMeshObject.model = model;
   }
 
-  update(selectedDate: Date, sat: DetailedSatellite | MissileObject) {
-    if (!sat.isSatellite() && !sat.isMissile()) {
-      return;
-    }
-
-    this.updateModel_(selectedDate, sat);
-
-    const posData = keepTrackApi.getDotsManager().positionData;
-    const position = {
-      x: posData[sat.id * 3],
-      y: posData[sat.id * 3 + 1],
-      z: posData[sat.id * 3 + 2],
-    };
-    const drawPosition = [position.x, position.y, position.z] as EciArr3;
-
-    // Move the mesh to its location in world space
-    this.mvMatrix_ = mat4.create();
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, drawPosition);
+  update() {
+    const drawPosition = [0, 0, 0] as EciArr3;
 
     // Rotate the Satellite to Face Nadir if needed
+    mat4.identity(this.node.transform.worldMatrix);
+
     if (this.currentMeshObject.isRotationStable !== null) {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const sat = catalogManagerInstance.getObject(this.currentMeshObject.id, GetSatType.SKIP_POS_VEL);
@@ -512,38 +506,93 @@ export class MeshManager {
       }
 
       // Calculate a position to look at along the satellite's velocity vector
-      const lookAtPos = [drawPosition[0] + sat.velocity.x, drawPosition[1] + sat.velocity.y, drawPosition[2] + sat.velocity.z];
+      const lookAtPos = [sat.velocity.x, sat.velocity.y, sat.velocity.z];
 
       let up: vec3;
 
       if (sat.isSatellite()) {
-        up = vec3.normalize(vec3.create(), drawPosition);
+        up = vec3.normalize(vec3.create(), vec3.fromValues(sat.position.x, sat.position.y, sat.position.z));
       } else {
         // Up is perpendicular to the velocity vector
         up = vec3.cross(vec3.create(), vec3.fromValues(0, 1, 0), vec3.fromValues(sat.velocity.x, sat.velocity.y, sat.velocity.z));
       }
 
-      mat4.targetTo(this.mvMatrix_, drawPosition, lookAtPos, up);
+      mat4.targetTo(this.node.transform.worldMatrix, drawPosition, lookAtPos, up);
     }
 
     if (this.currentMeshObject.rotation?.x) {
-      mat4.rotateX(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.x * DEG2RAD);
+      mat4.rotateX(this.node.transform.worldMatrix, this.node.transform.worldMatrix, this.currentMeshObject.rotation.x * DEG2RAD);
     }
     if (this.currentMeshObject.rotation?.y) {
-      mat4.rotateY(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.y * DEG2RAD);
+      mat4.rotateY(this.node.transform.worldMatrix, this.node.transform.worldMatrix, this.currentMeshObject.rotation.y * DEG2RAD);
     }
     if (this.currentMeshObject.rotation?.z) {
-      mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, this.currentMeshObject.rotation.z * DEG2RAD);
+      mat4.rotateZ(this.node.transform.worldMatrix, this.node.transform.worldMatrix, this.currentMeshObject.rotation.z * DEG2RAD);
     }
 
     // Allow Manual Rotation of Meshes
-    mat4.rotateX(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.x * DEG2RAD);
-    mat4.rotateY(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.y * DEG2RAD);
-    mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, settingsManager.meshRotation.z * DEG2RAD);
+    mat4.rotateX(this.node.transform.worldMatrix, this.node.transform.worldMatrix, settingsManager.meshRotation.x * DEG2RAD);
+    mat4.rotateY(this.node.transform.worldMatrix, this.node.transform.worldMatrix, settingsManager.meshRotation.y * DEG2RAD);
+    mat4.rotateZ(this.node.transform.worldMatrix, this.node.transform.worldMatrix, settingsManager.meshRotation.z * DEG2RAD);
 
-    // Assign the normal matrix the opposite of the this.mvMatrix_
-    this.nMatrix_ = mat3.create();
-    mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
+    // Assign the normal matrix the opposite of the this.node.transform.worldMatrix
+    mat3.normalFromMat4(this.normalMatrix_, this.node.transform.worldMatrix);
+  }
+
+  onPrimarySatelliteUpdate(sat: DetailedSatellite | MissileObject) {
+    if (!sat.isSatellite() && !sat.isMissile()) {
+      return;
+    }
+
+    const selectedDate = keepTrackApi.getTimeManager().simulationTimeObj;
+
+    this.updateModel_(selectedDate, sat);
+  }
+
+  /**
+   * Scales the mesh model by a given factor.
+   * @deprecated WIP
+   * @param scale The scale factor.
+   * @returns
+   */
+  scaleMeshModel(scale: number) {
+    if (this.currentMeshObject.model === null) {
+      return;
+    }
+
+    const model = this.currentMeshObject.model.mesh;
+
+    if (model.vertexBuffer) {
+      const layout = model.vertexBuffer.layout;
+      // Get the original vertex data
+      const vertexData = model.makeBufferData(layout);
+
+      for (let i = 0; i < model.vertexBuffer.numItems; i++) {
+        const positionAttr = layout.attributeMap[OBJ.Layout.POSITION.key];
+
+        this.gl_.bindBuffer(this.gl_.ARRAY_BUFFER, model.vertexBuffer);
+
+        if (positionAttr) {
+          /*
+           * vertexData is a Float32Array
+           * For each vertex, scale the position components
+           */
+          const vertexArray = new Float32Array(vertexData);
+
+          for (let i = 0; i < vertexArray.length; i += layout.stride / 4) {
+            // positionAttr.offset is in bytes, convert to floats
+            const posOffset = positionAttr.offset / 4;
+
+            vertexArray[i + posOffset + 0] *= scale;
+            vertexArray[i + posOffset + 1] *= scale;
+            vertexArray[i + posOffset + 2] *= scale;
+          }
+        }
+      }
+
+      // Create a new buffer with the scaled vertex data
+      this.gl_.bufferData(this.gl_.ARRAY_BUFFER, vertexData, this.gl_.STATIC_DRAW);
+    }
   }
 
   private updateModel_(selectedDate: Date, obj: BaseObject) {

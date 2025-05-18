@@ -39,6 +39,7 @@ export class LineManager {
     u_color: null as unknown as WebGLUniformLocation,
     u_viewMatrix: null as unknown as WebGLUniformLocation,
     u_pMatrix: null as unknown as WebGLUniformLocation,
+    u_offset: null as unknown as WebGLUniformLocation,
   };
   program: WebGLProgram;
 
@@ -239,6 +240,9 @@ export class LineManager {
 
     gl.uniformMatrix4fv(this.uniforms_.u_viewMatrix, false, activeCamera.getViewMatrix());
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, activeCamera.getProjectionMatrix());
+    const rootNodePosition = Doris.getInstance().getSceneManager().activeScene!.root.transform.getPosition();
+
+    gl.uniform3fv(this.uniforms_.u_offset, rootNodePosition);
 
     gl.enableVertexAttribArray(this.attribs.a_position.location); // Enable
   }
@@ -270,6 +274,10 @@ export class LineManager {
   setAttribsAndDrawLineStrip(buffer: WebGLBuffer, segments: number) {
     const gl = keepTrackApi.getRenderer().gl;
 
+    const rootNodePosition = Doris.getInstance().getSceneManager().activeScene!.root.transform.getPosition();
+
+    gl.uniform3fv(this.uniforms_.u_offset, rootNodePosition);
+
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(this.attribs.a_position.location, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(this.attribs.a_position.location);
@@ -290,7 +298,7 @@ export class LineManager {
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
   }
 
-  private shaders_ = {
+  private readonly shaders_ = {
     frag: keepTrackApi.glsl`#version 300 es
       precision mediump float;
 
@@ -309,15 +317,16 @@ export class LineManager {
       uniform vec4 u_color;
       uniform mat4 u_viewMatrix;
       uniform mat4 u_pMatrix;
+      uniform vec3 u_offset;
 
       out vec4 vColor;
       out float vAlpha;
 
       void main(void) {
-          vec4 position = u_pMatrix * u_viewMatrix * vec4(a_position[0],a_position[1],a_position[2], 1.0);
-          gl_Position = position;
-          vColor = u_color;
-          vAlpha = a_position[3];
+        vec3 pos = vec3(a_position[0],a_position[1],a_position[2]) + u_offset;
+        gl_Position = u_pMatrix * u_viewMatrix * vec4(pos, 1.0);
+        vColor = u_color;
+        vAlpha = a_position[3];
       }
       `,
   };

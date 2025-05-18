@@ -3,6 +3,7 @@ import { country2flagIcon } from '@app/catalogs/countries';
 import { Doris } from '@app/doris/doris';
 import { GetSatType, ToastMsgType } from '@app/interfaces';
 import { TimeManager } from '@app/keeptrack/core/time-manager';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
@@ -28,7 +29,6 @@ import { StereoMap } from '../stereo-map/stereo-map';
 import { WatchlistPlugin } from '../watchlist/watchlist';
 import './sat-info-box.css';
 import { SelectSatManager } from './select-sat-manager';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 /**
  * This class controls all the functionality of the satellite info box.
@@ -1083,7 +1083,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             <div id="sun-angle-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
             data-tooltip="Visualize Angle to Sun">Draw sat to sun line...</div>
             <div id="ric-angle-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
-            data-tooltip="Visualize RIC Vector">Draw sat to RIC line...</div>
+            data-tooltip="Visualize RIC Vector">Draw sat RIC frame...</div>
             <div id="nadir-angle-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
             data-tooltip="Visualize Angle to Earth">Draw sat to nadir line...</div>
             <div id="sec-angle-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"

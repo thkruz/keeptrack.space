@@ -160,9 +160,9 @@ export interface EngineEventMap {
   [CoreEngineEvents.Destroy]: [];
 
   // Main loop
-  [CoreEngineEvents.BeforeUpdate]: [number]; // deltaTime
-  [CoreEngineEvents.Update]: [number]; // deltaTime
-  [CoreEngineEvents.AfterUpdate]: [number]; // deltaTime
+  [CoreEngineEvents.BeforeUpdate]: [number, number]; // deltaTime, realTime
+  [CoreEngineEvents.Update]: [number, number]; // deltaTime, realTime
+  [CoreEngineEvents.AfterUpdate]: [number, number]; // deltaTime, realTime
 
   // Rendering
   [CoreEngineEvents.BeforeClearRenderTarget]: [];

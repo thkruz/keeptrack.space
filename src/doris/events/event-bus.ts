@@ -113,7 +113,7 @@ export class EventBus {
     // Filter out the matching callback
     const filteredListeners = listeners.filter((listener) =>
       // Use any to avoid type checking issues when comparing functions
-      listener.callback === callback,
+      listener.callback.toString() !== callback.toString(),
     );
 
     if (filteredListeners.length === initialLength) {

@@ -41,7 +41,8 @@ export const lon2yaw = (lon: Degrees, selectedDate: Date): Radians => {
   realTime.setUTCHours(0, 0, 0, 0);
   const longOffset = (((propTime.getTime() - realTime.getTime()) / 60 / 60 / 1000) % 24) * 15; // 15 Degress Per Hour longitude Offset
 
-  return normalizeAngle(<Radians>((lon + longOffset) * DEG2RAD));
+  // Use negatives to move the camera the opposite direction
+  return normalizeAngle(<Radians>((-lon - longOffset) * DEG2RAD));
 };
 /**
  * This function converts latitude in degrees to pitch in radians.

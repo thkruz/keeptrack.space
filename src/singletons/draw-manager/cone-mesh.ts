@@ -7,14 +7,16 @@ import { CustomMesh } from './custom-mesh';
 export interface ConeSettings {
   /** The field of view of the cone in degrees, default is 3 */
   fieldOfView: Degrees;
+  /** The target point of the cone, default is [0, 0, 0] */
+  target: vec3;
+  /**
+   * The Id of the target if it exists, default is -1
+   * Each update cycle the target position will be updated
+   * to match the target object's position.
+   */
+  targetId?: number;
   /** The color of the cone, default is [0.2, 1.0, 1.0, 1.0] */
   color?: [number, number, number, number];
-  /**
-   * @deprecated
-   * The range of the cone in kilometers, default is the distance to Earth from the attachmentPoint
-   * This is not implemented yet
-   */
-  range?: Kilometers;
 }
 
 export class ConeMesh extends CustomMesh {
@@ -28,8 +30,9 @@ export class ConeMesh extends CustomMesh {
   private indicesTmp_: number[] = [];
   /** The angle of the cone mesh. Tied to the object's FOV */
   fieldOfView: number;
+  targetId: number = -1;
+  target: vec3 = vec3.fromValues(0, 0, 0);
   color: [number, number, number, number] = [0.2, 1.0, 1.0, 1.0];
-  range: Kilometers = 0 as Kilometers;
   pos: vec3 = vec3.create();
   offsetDistance: number = (RADIUS_OF_EARTH + settingsManager.coneDistanceFromEarth) as Kilometers;
   obj: BaseObject;
@@ -39,8 +42,9 @@ export class ConeMesh extends CustomMesh {
     super();
     this.obj = obj;
     this.fieldOfView = settings.fieldOfView;
-    this.color = settings.color || this.color;
-    this.range = settings.range || this.range;
+    this.targetId = settings.targetId ?? -1;
+    this.target = settings.target ?? this.target;
+    this.color = settings.color ?? this.color;
 
     this.updatePosition_();
   }
@@ -51,8 +55,9 @@ export class ConeMesh extends CustomMesh {
       this.init(this.gl_);
     }
 
-    this.color = settings.color || this.color;
-    this.range = settings.range || this.range;
+    this.color = settings.color ?? this.color;
+    this.target = settings.target ?? this.target;
+    this.targetId = settings.targetId ?? this.targetId;
   }
 
   private updatePosition_() {
@@ -60,6 +65,10 @@ export class ConeMesh extends CustomMesh {
     const id = this.obj.id;
 
     this.pos = vec3.fromValues(positionData[id * 3], positionData[id * 3 + 1], positionData[id * 3 + 2]);
+
+    if (this.targetId !== -1) {
+      this.target = vec3.fromValues(positionData[this.targetId * 3], positionData[this.targetId * 3 + 1], positionData[this.targetId * 3 + 2]);
+    }
   }
 
   update() {
@@ -68,19 +77,19 @@ export class ConeMesh extends CustomMesh {
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
 
-    // Calculate the height of the cone
-    const satDistance = vec3.length(this.pos);
-    const coneHeight = satDistance - this.offsetDistance;
+    // Compute direction vector from target to satellite position
+    const direction = vec3.subtract(vec3.create(), this.pos, this.target);
+    const coneHeight = vec3.length(direction);
 
-    // Translate RADIUS_OF_EARTH units along the satellite's position vector
-    const normalizedPositionScaled = vec3.scale(vec3.create(), vec3.normalize(vec3.create(), this.pos), this.offsetDistance);
+    // Normalize direction for rotation calculation
+    const directionNorm = vec3.normalize(vec3.create(), direction);
 
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, normalizedPositionScaled);
+    // Translate to the target position
+    mat4.translate(this.mvMatrix_, this.mvMatrix_, this.target);
 
-    // Create a rotation matrix to align the cone with the satellite's position
-    const rotationMatrix = mat4.create();
-
-    mat4.fromQuat(rotationMatrix, quat.rotationTo(quat.create(), [0, 0, 1], vec3.normalize(vec3.create(), this.pos)));
+    // Create a rotation matrix to align the cone with the direction vector
+    const rotationQuat = quat.rotationTo(quat.create(), [0, 0, 1], directionNorm);
+    const rotationMatrix = mat4.fromQuat(mat4.create(), rotationQuat);
 
     // Apply the rotation
     mat4.multiply(this.mvMatrix_, this.mvMatrix_, rotationMatrix);

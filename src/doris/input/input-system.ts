@@ -42,9 +42,6 @@ export class InputSystem extends System {
   initialize(targetElement: HTMLElement = document.body): void {
     this.targetElement = targetElement;
 
-    // Initialize keyboard handler
-    this.keyboardHandler.initialize();
-
     /*
      * For mouse and touch handlers, we need to provide canvas element
      * If targetElement is a canvas, use it directly
@@ -52,6 +49,9 @@ export class InputSystem extends System {
     const canvas = this.targetElement instanceof HTMLCanvasElement
       ? this.targetElement
       : this.findOrCreateCanvas();
+
+    // Initialize keyboard handler
+    this.keyboardHandler.initialize(canvas);
 
     // Initialize mouse and touch handlers with the canvas
     this.mouseHandler.initialize(canvas);

@@ -20,16 +20,18 @@
  */
 
 import { Doris } from '@app/doris/doris';
+import { InputEvents } from '@app/doris/events/event-types';
 import { MenuMode, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
+import { vec3 } from 'gl-matrix';
 import { BaseObject, Degrees } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class SatelliteFov extends KeepTrackPlugin {
   readonly id = 'SatelliteFov';
@@ -61,12 +63,6 @@ export class SatelliteFov extends KeepTrackPlugin {
             style="text-align: center;"
           />
           <label for="sat-fov-default-fov-angle" class="active">Field of View (Degrees)</label>
-      </div>
-      <div class="input-field col s12">
-          <input id="sat-fov-default-range" value="Unlimited" type="text" data-position="bottom" data-delay="50" data-tooltip="Maximum Range of the Sensor" disabled
-            style="text-align: center;"
-          />
-          <label for="sat-fov-default-fov-angle" class="active">Range (Kilometers)</label>
       </div>
     </div>
     <div class="row">
@@ -118,11 +114,10 @@ export class SatelliteFov extends KeepTrackPlugin {
           <label for="sat-fov-fov-angle" class="active">Field of View (Degrees)</label>
       </div>
       <div class="input-field col s12">
-          <input id="sat-fov-range" value="Unlimited" type="text" data-position="bottom" data-delay="50" data-tooltip="Maximum Range of the Sensor" disabled
-            style="text-align: center;"
-          />
-          <label for="sat-fov-fov-angle" class="active">Range (Kilometers)</label>
-      </div>
+        <input id="sat-fov-target-sccnum" value="0" type="text" data-position="bottom" data-delay="50" data-tooltip="Target Satellite - use -1 for no target"
+          style="text-align: center;"
+        />
+        <label for="sat-fov-target-sccnum" class="active">Target Satellite</label>
     </div>
     <div class="divider"></div>
     <div class="row">
@@ -161,18 +156,18 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     super.addHtml();
     Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
-      getEl('sat-fov-settings-form').addEventListener('change', this.handleFormChange_.bind(this));
-      getEl('sat-fov-settings-form').addEventListener('submit', this.handleFormChange_.bind(this));
+      getEl('sat-fov-settings-form')!.addEventListener('change', this.handleFormChange_.bind(this));
+      getEl('sat-fov-settings-form')!.addEventListener('submit', this.handleFormChange_.bind(this));
 
-      getEl('sat-fov-settings-default-form').addEventListener('change', this.handleDefaultFormChange_.bind(this));
-      getEl('sat-fov-settings-default-form').addEventListener('submit', this.handleDefaultFormChange_.bind(this));
+      getEl('sat-fov-settings-default-form')!.addEventListener('change', this.handleDefaultFormChange_.bind(this));
+      getEl('sat-fov-settings-default-form')!.addEventListener('submit', this.handleDefaultFormChange_.bind(this));
     });
 
     Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, () => {
-      getEl('reset-sat-fov-cones-button').addEventListener('click', () => {
+      getEl('reset-sat-fov-cones-button')!.addEventListener('click', () => {
         keepTrackApi.getScene().coneFactory.clear();
         keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
-        getEl('reset-sat-fov-cones-button').setAttribute('disabled', 'true');
+        getEl('reset-sat-fov-cones-button')!.setAttribute('disabled', 'true');
       });
     });
   }
@@ -180,30 +175,25 @@ export class SatelliteFov extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+    Doris.getInstance().on(InputEvents.KeyDown, (_event?: KeyboardEvent, key?: string) => {
+      if (key === 'c') {
+        const currentSat = keepTrackApi.getPlugin(SelectSatManager)!.getSelectedSat();
 
-    keyboardManager.registerKeyEvent({
-      key: 'C',
-      callback: () => {
-        if (keyboardManager.isShiftPressed) {
-          const currentSat = keepTrackApi.getPlugin(SelectSatManager).getSelectedSat();
+        if (currentSat) {
+          const coneFactory = keepTrackApi.getScene().coneFactory;
 
-          if (currentSat) {
-            const coneFactory = keepTrackApi.getScene().coneFactory;
+          // See if it is already in the scene
+          const cone = coneFactory.checkCacheForMesh_(currentSat);
 
-            // See if it is already in the scene
-            const cone = coneFactory.checkCacheForMesh_(currentSat);
-
-            if (cone) {
-              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
-              coneFactory.remove(cone.id);
-            } else {
-              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
-              coneFactory.generateMesh(currentSat);
-            }
+          if (cone) {
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+            coneFactory.remove(cone.id);
+          } else {
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+            coneFactory.generateMesh(currentSat);
           }
         }
-      },
+      }
     });
 
     Doris.getInstance().on(KeepTrackApiEvents.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
@@ -219,8 +209,12 @@ export class SatelliteFov extends KeepTrackPlugin {
   }
 
   private handleFormChange_() {
+    const targetSccNumber = parseInt((getEl('sat-fov-target-sccnum') as HTMLInputElement).value, 10);
+    const target = keepTrackApi.getCatalogManager().sccNum2Sat(targetSccNumber);
     const coneSettings = {
       fieldOfView: parseFloat((getEl('sat-fov-fov-angle') as HTMLInputElement).value) as Degrees,
+      targetId: target ? target.id : -1,
+      target: vec3.fromValues(0, 0, 0),
       color: [
         parseFloat((getEl('sat-fov-red') as HTMLInputElement).value),
         parseFloat((getEl('sat-fov-green') as HTMLInputElement).value),
@@ -229,7 +223,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       ] as [number, number, number, number],
     };
 
-    const currentSat = keepTrackApi.getPlugin(SelectSatManager).getSelectedSat();
+    const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
     const coneFactory = keepTrackApi.getScene().coneFactory;
 
     if (currentSat) {
@@ -286,6 +280,7 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     const coneSettings = {
       fieldOfView: fovAngle as Degrees,
+      target: vec3.fromValues(0, 0, 0),
       color: [red, green, blue, opacity] as [number, number, number, number],
     };
 
@@ -296,15 +291,15 @@ export class SatelliteFov extends KeepTrackPlugin {
     const meshes = keepTrackApi.getScene().coneFactory.meshes;
 
     if (meshes.length === 0) {
-      getEl('reset-sat-fov-cones-button').setAttribute('disabled', 'true');
+      getEl('reset-sat-fov-cones-button')!.setAttribute('disabled', 'true');
     } else {
-      getEl('reset-sat-fov-cones-button').removeAttribute('disabled');
+      getEl('reset-sat-fov-cones-button')!.removeAttribute('disabled');
     }
 
-    getEl('sat-fov-active-cones').innerHTML = meshes
+    getEl('sat-fov-active-cones')!.innerHTML = meshes
       .sort((a, b) => a.obj.id - b.obj.id)
       .map((mesh) => {
-        const currentSat = keepTrackApi.getPlugin(SelectSatManager).getSelectedSat();
+        const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
         let nameSpan = '';
 
         if (currentSat && mesh.obj.id === currentSat.id) {
@@ -333,7 +328,7 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     removeIcons.forEach((icon) => {
       icon.addEventListener('click', (e) => {
-        const id = parseInt((e.target as HTMLElement).dataset.id, 10);
+        const id = parseInt((e.target as HTMLElement).dataset.id!, 10);
 
         keepTrackApi.getScene().coneFactory.removeByObjectId(id);
         keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
@@ -342,18 +337,18 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     activeCones.forEach((cone) => {
       cone.addEventListener('click', (e) => {
-        let id = parseInt((e.target as HTMLElement).dataset.id);
+        let id = parseInt((e.target as HTMLElement).dataset.id ?? '', 10);
 
         // If not found try the parent
         if (!id) {
-          id = parseInt((e.target as HTMLElement).parentElement.dataset.id);
+          id = parseInt((e.target as HTMLElement).parentElement!.dataset.id!, 10);
         }
 
         if (!id) {
           return;
         }
 
-        keepTrackApi.getPlugin(SelectSatManager).selectSat(id);
+        keepTrackApi.getPlugin(SelectSatManager)!.selectSat(id);
       });
     });
   }

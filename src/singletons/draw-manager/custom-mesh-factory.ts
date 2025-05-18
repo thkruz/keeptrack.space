@@ -29,6 +29,6 @@ export abstract class CustomMeshFactory<T extends CustomMesh> {
     }
     this.create_(...args);
   }
-  abstract checkCacheForMesh_(...args: unknown[]): CustomMesh;
-  abstract drawAll(camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null): void;
+  protected abstract checkCacheForMesh_(...args: unknown[]): CustomMesh | undefined;
+  abstract render(camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null): void;
 }

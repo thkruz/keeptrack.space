@@ -199,7 +199,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
       settingsManager.isDrawSun = true;
       if (settingsManager.isBlackEarth) {
         settingsManager.isBlackEarth = false;
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
+        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
       }
       settingsManager.isDrawAtmosphere = true;
       settingsManager.isDrawAurora = true;
@@ -298,7 +298,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDrawAtmosphere = (<HTMLInputElement>getEl('settings-drawAtmosphere')).checked;
     settingsManager.isDrawAurora = (<HTMLInputElement>getEl('settings-drawAurora')).checked;
     if (isBlackEarthChanged || isDrawAtmosphereChanged || isDrawAuroraChanged) {
-      keepTrackApi.getScene().earth.reloadEarthHiResTextures(Doris.getInstance().getRenderer().gl);
+      keepTrackApi.getScene().earth.reloadEarthHiResTextures();
     }
 
     // Must come after the above checks
@@ -317,7 +317,7 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isGraySkybox = (<HTMLInputElement>getEl('settings-graySkybox')).checked;
 
     if (isDrawMilkyWayChanged || isGraySkyboxChanged) {
-      keepTrackApi.getScene().skybox.initialize(settingsManager);
+      keepTrackApi.getScene().skybox.initialize();
     }
 
     SettingsManager.preserveSettings();
@@ -469,27 +469,27 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
   private loadGodraySettings_() {
     try {
       settingsManager.godraysSamples = parseInt(
-        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES) ||
+        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES) ??
         GodraySamples.OFF.toString(),
       );
       settingsManager.godraysDecay = parseFloat(
-        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY) ||
+        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY) ??
         '0.983',
       );
       settingsManager.godraysExposure = parseFloat(
-        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE) ||
+        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE) ??
         '0.5',
       );
       settingsManager.godraysDensity = parseFloat(
-        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY) ||
+        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY) ??
         '1.8',
       );
       settingsManager.godraysWeight = parseFloat(
-        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT) ||
+        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT) ??
         '0.085',
       );
       settingsManager.godraysIlluminationDecay = parseFloat(
-        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY) ||
+        PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY) ??
         '2.5',
       );
 

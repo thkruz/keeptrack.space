@@ -1,6 +1,7 @@
 import { Doris } from '@app/doris/doris';
 import { CoreEngineEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
+import { vec3 } from 'gl-matrix';
 import { BaseObject, Degrees } from 'ootk';
 import { KeepTrackMainCamera } from '../../keeptrack/camera/legacy-camera';
 import { ConeMesh, ConeSettings } from './cone-mesh';
@@ -10,23 +11,24 @@ import { CustomMeshFactory } from './custom-mesh-factory';
 export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
   private defaultConeSettings_: ConeSettings = {
     fieldOfView: 3 as Degrees,
+    target: vec3.fromValues(0, 0, 0),
     color: [0.2, 1.0, 1.0, 0.15],
   };
 
   constructor() {
     super();
     Doris.getInstance().on(CoreEngineEvents.RenderTransparent, (camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null) => {
-      this.drawAll(camera, tgtBuffer);
+      this.render(camera, tgtBuffer);
     });
   }
 
-  drawAll(camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null = null) {
+  render(camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null = null) {
     this.meshes.forEach((mesh) => {
-      mesh.draw(camera.getProjectionMatrix(), camera.getViewMatrix(), tgtBuffer);
+      mesh.render(camera.getProjectionMatrix(), camera.getViewMatrix(), tgtBuffer);
     });
   }
 
-  updateAll() {
+  update() {
     this.meshes.forEach((mesh) => {
       mesh.update();
     });

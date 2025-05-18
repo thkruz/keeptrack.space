@@ -83,8 +83,6 @@ export class MouseHandler {
    * Handle mouse down events
    */
   private handleMouseDown(event: MouseEvent): void {
-    event.preventDefault();
-
     const rect = this.element.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;

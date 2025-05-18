@@ -7,6 +7,7 @@ import { InputEvents } from '../events/event-types';
  */
 export class KeyboardHandler {
   private readonly keyStates: Map<string, boolean> = new Map();
+  container: HTMLElement;
 
   constructor(private readonly eventBus: EventBus) {
     // Initialize keyboard event listeners
@@ -15,7 +16,9 @@ export class KeyboardHandler {
   /**
    * Initialize keyboard event listeners
    */
-  initialize(): void {
+  initialize(container: HTMLElement = document.body): void {
+    this.container = container;
+
     window.addEventListener('keydown', this.handleKeyDown.bind(this), {
       passive: false,
       capture: true,
@@ -62,6 +65,11 @@ export class KeyboardHandler {
    * Handle keydown events
    */
   private handleKeyDown(event: KeyboardEvent): void {
+    // Ignore keydown events if the event target is not in the container
+    if (!(event.target as HTMLElement)?.contains(this.container as Node)) {
+      return;
+    }
+
     const key = event.key.toLowerCase();
     const isRepeat = this.keyStates.get(key) || false;
 
@@ -89,6 +97,11 @@ export class KeyboardHandler {
    * Handle keyup events
    */
   private handleKeyUp(event: KeyboardEvent): void {
+    // Ignore keydown events if the event target is not in the container
+    if (!(event.target as HTMLElement)?.contains(this.container as Node)) {
+      return;
+    }
+
     const key = event.key.toLowerCase();
 
     this.keyStates.set(key, false);

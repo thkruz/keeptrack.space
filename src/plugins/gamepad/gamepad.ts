@@ -13,11 +13,11 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class GamepadPlugin {
   readonly id = 'GamepadPlugin';
   dependencies_: string[] = [];
-  currentController: Gamepad;
+  currentController: Gamepad | null = null;
   deadzone = 0.55;
   buttonsPressedHistory: number[] = [];
   buttonsPressed: boolean[] = [];
-  previouslyReportedGamepads = [];
+  previouslyReportedGamepads = [] as string[];
 
   init(): void {
     window.addEventListener('gamepadconnected', (e: GamepadEvent) => {
@@ -86,7 +86,7 @@ export class GamepadPlugin {
 
 
   private updateButtons_(): void {
-    const buttons = this.currentController.buttons;
+    const buttons = this.currentController!.buttons;
 
     buttons.forEach((button, index) => {
       // if the button is pressed and wasnt pressed before
@@ -273,8 +273,8 @@ export class GamepadPlugin {
   }
 
   private updateZoom_(): void {
-    const zoomOut = this.currentController.buttons[6].value;
-    const zoomIn = this.currentController.buttons[7].value;
+    const zoomOut = this.currentController!.buttons[6].value;
+    const zoomIn = this.currentController!.buttons[7].value;
 
     if (zoomOut === 0 && zoomIn === 0) {
       return;
@@ -285,7 +285,6 @@ export class GamepadPlugin {
 
     switch (keepTrackApi.getMainCamera().activeCameraType) {
       case CameraControllerType.EARTH_CENTERED_ORBITAL:
-      case CameraControllerType.OFFSET:
       case CameraControllerType.SATELLITE_CENTERED_ORBITAL:
         zoomTarget += (zoomOut / 500) * tessaEngine.getTimeManager().getRealTimeDelta();
         zoomTarget -= (zoomIn / 500) * tessaEngine.getTimeManager().getRealTimeDelta();
@@ -317,8 +316,8 @@ export class GamepadPlugin {
   }
 
   private updateLeftStick_(): void {
-    const x = this.currentController.axes[0];
-    const y = this.currentController.axes[1];
+    const x = this.currentController!.axes[0];
+    const y = this.currentController!.axes[1];
 
     if (x > this.deadzone || x < -this.deadzone || y > this.deadzone || y < -this.deadzone) {
       keepTrackApi.getMainCamera().autoRotate(false);
@@ -328,7 +327,6 @@ export class GamepadPlugin {
 
       switch (keepTrackApi.getMainCamera().activeCameraType) {
         case CameraControllerType.EARTH_CENTERED_ORBITAL:
-        case CameraControllerType.OFFSET:
         case CameraControllerType.SATELLITE_CENTERED_ORBITAL:
           keepTrackApi.getMainCamera().camAngleSnappedOnSat = false;
           keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
@@ -358,8 +356,8 @@ export class GamepadPlugin {
       return;
     }
 
-    const x = this.currentController.axes[2];
-    const y = this.currentController.axes[3];
+    const x = this.currentController!.axes[2];
+    const y = this.currentController!.axes[3];
     const tessaEngine = Doris.getInstance();
 
     keepTrackApi.getMainCamera().isLocalRotateOverride = false;
@@ -367,7 +365,6 @@ export class GamepadPlugin {
       keepTrackApi.getMainCamera().autoRotate(false);
       switch (keepTrackApi.getMainCamera().activeCameraType) {
         case CameraControllerType.EARTH_CENTERED_ORBITAL:
-        case CameraControllerType.OFFSET:
         case CameraControllerType.SATELLITE_CENTERED_ORBITAL:
           keepTrackApi.getMainCamera().isLocalRotateOverride = true;
           keepTrackApi.getMainCamera().localRotateDif.pitch = <Radians>(-y * 200);
@@ -393,7 +390,7 @@ export class GamepadPlugin {
     }
 
     this.currentController.vibrationActuator.playEffect('dual-rumble', {
-      duration: vibrateTime || 300,
+      duration: vibrateTime ?? 300,
       strongMagnitude: 1.0,
       weakMagnitude: 1.0,
       startDelay: 0,

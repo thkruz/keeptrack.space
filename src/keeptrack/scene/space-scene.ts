@@ -92,14 +92,14 @@ export class SpaceScene {
 
     mainCameraNode.addChild(sunNode);
     mainCameraNode.addChild(skyboxNode);
-    earthNode.addChild(moonNode);
+    mainCameraNode.addChild(moonNode);
     earthNode.addChild(dotsNode);
     Doris.getInstance().getSceneManager().activeScene?.root.addChild(earthNode);
 
     Doris.getInstance().once(CoreEngineEvents.Update, () => {
       this.earth.reloadEarthHiResTextures();
     });
-    Doris.getInstance().on(CoreEngineEvents.Update, this.update.bind(this));
+    Doris.getInstance().on(CoreEngineEvents.AfterUpdate, this.afterUpdate.bind(this));
   }
 
   /**
@@ -111,10 +111,9 @@ export class SpaceScene {
     this.postProcessingManager.init(gl);
   }
 
-  update(): void {
+  afterUpdate(): void {
     keepTrackApi.getLineManager().update();
-
-    this.sensorFovFactory.updateAll();
-    this.coneFactory.updateAll();
+    this.sensorFovFactory.update();
+    this.coneFactory.update();
   }
 }

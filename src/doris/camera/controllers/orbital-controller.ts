@@ -213,7 +213,7 @@ export abstract class OrbitalController extends CameraController {
     }
   }
 
-  protected handleMouseWheel(event: WheelEvent, x: number, y: number, delta: number): void {
+  protected handleMouseWheel(_event: WheelEvent, _x: number, _y: number, delta: number): void {
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
     const mainCamera = this.camera as KeepTrackMainCamera;
     const isCameraCloseToSatellite = mainCamera.camDistBuffer < settingsManager.nearZoomLevel;

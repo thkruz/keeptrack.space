@@ -35,7 +35,7 @@ export class Moon extends Component {
   /** The radius of the moon. */
   private readonly DRAW_RADIUS = 2000;
   /** The distance scalar for the moon. */
-  private readonly SCALAR_DISTANCE = 200000;
+  private readonly SCALAR_DISTANCE = 300000;
   /** The number of height segments for the moon. */
   private readonly NUM_HEIGHT_SEGS = 16;
   /** The number of width segments for the moon. */
@@ -63,7 +63,6 @@ export class Moon extends Component {
     const material = new ShaderMaterial(gl, {
       uniforms: {
         u_sampler: null as unknown as WebGLUniformLocation,
-        u_distanceFromOrigin: null as unknown as WebGLUniformLocation,
         sunPos: null as unknown as WebGLUniformLocation,
       },
       map: texture,
@@ -107,12 +106,13 @@ export class Moon extends Component {
 
     if (eci.x && eci.y && eci.z) {
       const scaleFactor = this.SCALAR_DISTANCE / Math.max(Math.max(Math.abs(eci.x), Math.abs(eci.y)), Math.abs(eci.z));
-      const earthPosition = this.node.parent!.transform.position;
+      const earthPosition = keepTrackApi.getScene().earth.node.transform.position;
+      const cameraPosition = this.node.parent!.transform.position;
 
       this.node.transform.setPosition([
-        earthPosition[0] + eci.x * scaleFactor,
-        earthPosition[1] + eci.y * scaleFactor,
-        earthPosition[2] + eci.z * scaleFactor,
+        earthPosition[0] + eci.x * scaleFactor - cameraPosition[0],
+        earthPosition[1] + eci.y * scaleFactor - cameraPosition[1],
+        earthPosition[2] + eci.z * scaleFactor + cameraPosition[2],
       ]);
     }
   }
@@ -147,13 +147,6 @@ export class Moon extends Component {
     gl.uniformMatrix4fv(this.mesh_.material.uniforms.modelViewMatrix, false, this.node.transform.worldMatrix);
     gl.uniformMatrix4fv(this.mesh_.material.uniforms.projectionMatrix, false, keepTrackApi.getMainCamera().projectionCameraMatrix);
     gl.uniform3fv(this.mesh_.material.uniforms.sunPos, vec3.fromValues(sunPosition[0] * 100, sunPosition[1] * 100, sunPosition[2] * 100));
-    const distanceFromOrigin = Math.sqrt(
-      this.node.transform.position[0] ** 2 +
-      this.node.transform.position[1] ** 2 +
-      this.node.transform.position[2] ** 2,
-    );
-
-    gl.uniform1f(this.mesh_.material.uniforms.u_distanceFromOrigin, distanceFromOrigin);
     gl.uniform1i(this.mesh_.material.uniforms.u_sampler, 0);
   }
 
@@ -167,16 +160,10 @@ export class Moon extends Component {
 
       in vec2 v_texcoord;
       in vec3 v_normal;
-      in float v_dist;
 
       out vec4 fragColor;
 
       void main(void) {
-        // Don't draw the back of the sphere
-        if (v_dist > 1.0) {
-          discard;
-        }
-
         // sun is shining opposite of its direction from the center of the earth
         vec3 lightDirection = sunPos - vec3(0.0,0.0,0.0);
 
@@ -194,19 +181,12 @@ export class Moon extends Component {
       }
       `,
     vert: keepTrackApi.glsl`
-      uniform float u_distanceFromOrigin;
-
       out vec2 v_texcoord;
       out vec3 v_normal;
-      out float v_dist;
 
       void main(void) {
           vec4 worldPosition = modelViewMatrix * vec4(position, 1.0);
           gl_Position = projectionMatrix * worldPosition;
-
-          // Ratio of the vertex distance compared to the center of the sphere
-          // This lets us figure out which verticies are on the back half
-          v_dist = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) \/ u_distanceFromOrigin;
 
           v_texcoord = uv;
           v_normal = normalMatrix * normal;

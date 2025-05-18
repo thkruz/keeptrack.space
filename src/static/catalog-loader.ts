@@ -394,6 +394,15 @@ export class CatalogLoader {
         });
 
         tempObjData.push(sensor);
+      } else if (staticSat.ra) {
+        dotsManagerInstance.starIndex1 ??= i + catalogManagerInstance.orbitalSats;
+        dotsManagerInstance.starIndex2 = i + catalogManagerInstance.orbitalSats;
+        const star = new Star({
+          id: tempObjData.length,
+          ...staticSat,
+        });
+
+        tempObjData.push(star);
       } else {
         const landObj = new LandObject({
           id: tempObjData.length,

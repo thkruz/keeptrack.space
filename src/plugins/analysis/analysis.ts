@@ -31,6 +31,7 @@ import { showLoading } from '@app/lib/showLoading';
 import { SatMath } from '@app/static/sat-math';
 
 import { Doris } from '@app/doris/doris';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { getUnique } from '@app/lib/get-unique';
 import { saveCsv } from '@app/lib/saveVariable';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -40,7 +41,6 @@ import folderCodePng from '@public/img/icons/folder-code.png';
 import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
@@ -548,9 +548,9 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
             const scene = keepTrackApi.getScene();
             const sunRae = eci2rae(now, {
-              x: scene.sun.position[0] as Kilometers,
-              y: scene.sun.position[1] as Kilometers,
-              z: scene.sun.position[2] as Kilometers,
+              x: scene.sun.eci.x,
+              y: scene.sun.eci.y,
+              z: scene.sun.eci.z,
             }, sensor);
 
             // Last Line of Coverage

@@ -54,7 +54,7 @@ export class SensorFovMesh extends CustomMesh {
     mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, gmst);
   }
 
-  draw(pMatrix: mat4, viewMatrix: mat4, color: [number, number, number, number], tgtBuffer: WebGLFramebuffer | null = null) {
+  render(pMatrix: mat4, viewMatrix: mat4, color: [number, number, number, number], tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_) {
       return;
     }
@@ -101,7 +101,6 @@ export class SensorFovMesh extends CustomMesh {
 
     gl.depthMask(true); // Re-enable depth writing
     gl.disable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.POLYGON_OFFSET_FILL);
   }
 

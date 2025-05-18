@@ -128,7 +128,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           const sat = keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.SKIP_POS_VEL);
 
           if (sat) {
-            const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition(sat.position, keepTrackApi.getMainCamera().getCameraOrientation());
+            const offsetFromSat = keepTrackApi.getMainCamera().getCameraPosition();
             const camPos = [sat.position.x + offsetFromSat[0], sat.position.y + offsetFromSat[1], sat.position.z + offsetFromSat[2]];
 
             lineManagerInstance.createRef2Ref([camPos[0], camPos[1], camPos[2]], [sat.position.x, sat.position.y, sat.position.z], LineColors.PURPLE);
@@ -181,10 +181,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
       const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
 
       if (camera && selectSatManagerInstance) {
-        const selectedSat = selectSatManagerInstance.selectedSat;
-        const sat = selectedSat !== -1 ? keepTrackApi.getCatalogManager().getObject(selectedSat, GetSatType.POSITION_ONLY) : null;
-
-        const position = camera.getCameraPosition(sat?.position);
+        const position = camera.getCameraPosition();
 
         setInnerHtml('debug-camera-position-x', `X: ${position[0].toFixed(2)}`);
         setInnerHtml('debug-camera-position-y', `Y: ${position[1].toFixed(2)}`);

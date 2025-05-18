@@ -7,6 +7,7 @@ import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { errorManagerInstance } from '@app/singletons/errorManager';
+import { vec3 } from 'gl-matrix';
 import { Milliseconds } from 'ootk';
 import { Renderer } from '../../doris/rendering/renderer';
 import { KeepTrackMainCamera } from '../camera/legacy-camera';
@@ -79,7 +80,7 @@ export class KeepTrackRenderer extends Renderer {
         );
       }
       scene.skybox.render(scene.postProcessingManager.curBuffer);
-      scene.moon.render(scene.sun.node.transform.position);
+      scene.moon.render(vec3.fromValues(scene.sun.eci.x, scene.sun.eci.y, scene.sun.eci.z));
     }
     scene.postProcessingManager.curBuffer = null;
   }

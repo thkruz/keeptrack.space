@@ -115,10 +115,12 @@ export class Sun extends Component {
     this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
 
     const sunMaxDist = Math.max(Math.max(Math.abs(eci[0]), Math.abs(eci[1])), Math.abs(eci[2]));
+    const cameraPos = this.node.parent!.transform.position;
+
     const sunPositionRelative = vec3.fromValues(
-      (eci[0] / sunMaxDist) * this.SCALAR_DISTANCE - this.node.parent!.transform.position[0],
-      (eci[1] / sunMaxDist) * this.SCALAR_DISTANCE - this.node.parent!.transform.position[1],
-      (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE + this.node.parent!.transform.position[2],
+      (eci[0] / sunMaxDist) * this.SCALAR_DISTANCE - cameraPos[0],
+      (eci[1] / sunMaxDist) * this.SCALAR_DISTANCE - cameraPos[1],
+      (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE + cameraPos[2],
     );
 
     this.node.transform.setPosition(sunPositionRelative);

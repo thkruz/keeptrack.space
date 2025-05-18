@@ -6,6 +6,7 @@ import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { DetailedSensor, SpaceObjectType } from 'ootk';
 import { KeepTrackMainCamera } from '../../keeptrack/camera/legacy-camera';
+import { CustomMesh } from './custom-mesh';
 import { CustomMeshFactory } from './custom-mesh-factory';
 import { SensorFovMesh } from './sensor-fov-mesh';
 
@@ -15,11 +16,30 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
   constructor() {
     super();
     Doris.getInstance().on(CoreEngineEvents.RenderTransparent, (camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null) => {
-      this.drawAll(camera, tgtBuffer);
+      this.render(camera, tgtBuffer);
     });
   }
 
-  drawAll(camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null = null) {
+  update() {
+    const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
+    const gmst = keepTrackApi.getTimeManager().gmst;
+
+    this.meshes.forEach((mesh) => {
+      const isNeeded = this.checkIfNeeded_(activeSensors, mesh);
+
+      if (!isNeeded) {
+        return;
+      }
+
+      const sensor = activeSensors.find((s) => s.objName === mesh.sensor.objName);
+
+      if (sensor) {
+        mesh.update(gmst);
+      }
+    });
+  }
+
+  render(camera: KeepTrackMainCamera, tgtBuffer: WebGLFramebuffer | null = null) {
     let i = 0;
     let didWeDrawSomething = false;
     let lastSensorObjName = '';
@@ -38,7 +58,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
       if (sensors.length > 0) {
         didWeDrawSomething = true;
 
-        mesh.draw(camera.getProjectionMatrix(), camera.getViewMatrix(), keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
+        mesh.render(camera.getProjectionMatrix(), camera.getViewMatrix(), keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
         if (mesh.sensor.objName !== lastSensorObjName) {
           i++;
           lastSensorObjName = mesh.sensor.objName as string; // It is NOT optional in KeepTrack even though ootk allows it to be
@@ -55,7 +75,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     if (!didWeDrawSomething) {
       const sensorFovPlugin = keepTrackApi.getPlugin(SensorFov);
 
-      if (sensorFovPlugin && sensorFovPlugin.isMenuButtonActive) {
+      if (sensorFovPlugin?.isMenuButtonActive) {
         keepTrackApi.getUiManager().toast('No valid FOV to draw! We can\'t draw multiple Deep Space sensors at once.', ToastMsgType.caution);
         sensorFovPlugin.disableFovView();
       }
@@ -100,25 +120,6 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     return true;
   }
 
-  updateAll() {
-    const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
-    const gmst = keepTrackApi.getTimeManager().gmst;
-
-    this.meshes.forEach((mesh) => {
-      const isNeeded = this.checkIfNeeded_(activeSensors, mesh);
-
-      if (!isNeeded) {
-        return;
-      }
-
-      const sensor = activeSensors.find((s) => s.objName === mesh.sensor.objName);
-
-      if (sensor) {
-        mesh.update(gmst);
-      }
-    });
-  }
-
   generateSensorFovMesh(sensor: DetailedSensor) {
     const foundSensorFovMesh = this.checkCacheForMesh_(sensor);
 
@@ -145,7 +146,9 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     }
   }
 
-  checkCacheForMesh_(sensor: DetailedSensor) {
+  protected checkCacheForMesh_(...args: unknown[]): CustomMesh | undefined {
+    const sensor = args[0] as DetailedSensor;
+
     return this.meshes.find((mesh) => {
       if (mesh instanceof SensorFovMesh) {
         return mesh.sensor === sensor;
@@ -155,7 +158,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     });
   }
 
-  create_(sensor: DetailedSensor) {
+  protected create_(sensor: DetailedSensor) {
     const sensorFovMesh = new SensorFovMesh(sensor);
 
     this.add(sensorFovMesh);

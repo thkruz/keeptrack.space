@@ -89,7 +89,7 @@ export class ConeMesh extends CustomMesh {
     mat4.scale(this.mvMatrix_, this.mvMatrix_, [coneHeight, coneHeight, coneHeight]);
   }
 
-  draw(pMatrix: mat4, viewMatrix: mat4, tgtBuffer: WebGLFramebuffer | null = null) {
+  render(pMatrix: mat4, viewMatrix: mat4, tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_) {
       return;
     }
@@ -124,7 +124,6 @@ export class ConeMesh extends CustomMesh {
 
     gl.depthMask(true); // Re-enable depth writing
     gl.disable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.POLYGON_OFFSET_FILL);
   }
 

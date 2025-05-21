@@ -47,7 +47,17 @@ export class Sun extends Component {
   /** The position of the sun in ECI coordinates. */
   eci_: EciVec3;
   get eci(): EciVec3 {
-    return this.eci_ ?? SatMath.getSunDirection(keepTrackApi.getTimeManager().j);
+    if (this.eci_) {
+      return this.eci_;
+    }
+    const eciArr = SatMath.getSunDirection(keepTrackApi.getTimeManager().j);
+
+
+    return {
+      x: eciArr[0] as Kilometers,
+      y: eciArr[1] as Kilometers,
+      z: eciArr[2] as Kilometers,
+    };
   }
   /** The mesh for the sun. */
   private mesh_: Mesh;

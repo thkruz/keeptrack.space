@@ -1,4 +1,5 @@
 import { Doris } from '@app/doris/doris';
+import { InputEvents } from '@app/doris/events/event-types';
 import { MenuMode } from '@app/interfaces';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -88,24 +89,21 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     Doris.getInstance().on(KeepTrackApiEvents.selectSatData, (obj: BaseObject): void => {
       if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
-        getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+        getEl(this.bottomIconElementName)!.classList.remove('bmenu-item-disabled');
         this.isIconDisabled = false;
         // If it is open then refresh the plot
         if (this.isMenuButtonActive) {
           this.updatePlot_();
         }
       } else {
-        getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+        getEl(this.bottomIconElementName)!.classList.add('bmenu-item-disabled');
         this.isIconDisabled = true;
       }
     });
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyUpEvent({
-      key: 'P',
-      callback: () => {
-        if (keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
+    Doris.getInstance().on(InputEvents.KeyUp, (_event: KeyboardEvent, key: string) => {
+      if (key === 'P') {
+        if (keepTrackApi.getPlugin(SelectSatManager)!.selectedSat === -1) {
           return;
         }
 
@@ -123,7 +121,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
           this.setBottomIconToUnselected();
           keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
         }
-      },
+      }
     });
   }
 

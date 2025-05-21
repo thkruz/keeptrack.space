@@ -122,6 +122,10 @@ export class InputSystem extends System {
     return this.keyboardHandler.isKeyDown(key);
   }
 
+  getKeysState(): Map<string, boolean> {
+    return this.keyboardHandler.getKeysState();
+  }
+
   getMousePosition(): { x: number, y: number } {
     return this.mouseHandler.getPosition();
   }

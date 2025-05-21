@@ -5,6 +5,7 @@ import gpsPng from '@public/img/icons/gps.png';
 
 import { Doris } from '@app/doris/doris';
 import { MenuMode, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import type { GroupsManager } from '@app/singletons/groups-manager';
@@ -13,7 +14,6 @@ import { DopMath } from '@app/static/dop-math';
 import { SatMath } from '@app/static/sat-math';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
-import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';
@@ -100,8 +100,8 @@ export class DopsPlugin extends KeepTrackPlugin {
     switch (targetId) {
       case 'dops-curdops-rmb': {
         {
-          let latLon = keepTrackApi.getInputManager().mouse.latLon;
-          const dragPosition = keepTrackApi.getInputManager().mouse.dragPosition;
+          let latLon = keepTrackApi.getInputManager().latLon;
+          const dragPosition = keepTrackApi.getInputManager().dragPosition;
 
           if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
             errorManagerInstance.debug('latLon undefined!');
@@ -126,7 +126,7 @@ export class DopsPlugin extends KeepTrackPlugin {
         break;
       }
       case 'dops-24dops-rmb': {
-        const latLon = keepTrackApi.getInputManager().mouse.latLon;
+        const latLon = keepTrackApi.getInputManager().latLon;
 
         if (!this.isMenuButtonActive) {
           (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);

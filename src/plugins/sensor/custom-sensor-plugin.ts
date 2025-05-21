@@ -150,7 +150,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const mouseInputInstance = keepTrackApi.getInputManager().mouse;
+    const inputController = keepTrackApi.getInputManager();
 
     switch (targetId) {
       case 'create-observer-rmb':
@@ -161,8 +161,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           getEl('cs-telescope')?.click();
         }
         (<HTMLInputElement>getEl('cs-uiName')).value = 'Observer';
-        (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
-        (<HTMLInputElement>getEl('cs-lon')).value = mouseInputInstance.latLon.lon.toString();
+        (<HTMLInputElement>getEl('cs-lat')).value = inputController.latLon.lat.toString();
+        (<HTMLInputElement>getEl('cs-lon')).value = inputController.latLon.lon.toString();
         (<HTMLInputElement>getEl('cs-hei')).value = '0';
         (<HTMLInputElement>getEl('cs-type')).value = 'Observer';
         triggerSubmit(<HTMLFormElement>getEl('customSensor'));
@@ -187,8 +187,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
             getEl('cs-telescope')!.click();
           }
           (<HTMLInputElement>getEl('cs-uiName')).value = 'Custom Sensor';
-          (<HTMLInputElement>getEl('cs-lat')).value = mouseInputInstance.latLon.lat.toString();
-          (<HTMLInputElement>getEl('cs-lon')).value = mouseInputInstance.latLon.lon.toString();
+          (<HTMLInputElement>getEl('cs-lat')).value = inputController.latLon.lat.toString();
+          (<HTMLInputElement>getEl('cs-lon')).value = inputController.latLon.lon.toString();
           (<HTMLInputElement>getEl('cs-hei')).value = '0';
           (<HTMLInputElement>getEl('cs-type')).value = 'Phased Array Radar';
           (<HTMLInputElement>getEl('cs-minaz')).value = '0';

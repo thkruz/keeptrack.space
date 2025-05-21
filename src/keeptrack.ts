@@ -53,6 +53,7 @@ import { GetSatType, Singletons } from './interfaces';
 import { CameraControllerType, KeepTrackMainCamera } from './keeptrack/camera/legacy-camera';
 import { TimeManager } from './keeptrack/core/time-manager';
 import { KeepTrackApiEvents } from './keeptrack/events/event-types';
+import { KeyboardController } from './keeptrack/input/keyboard-controller';
 import { SpaceScene } from './keeptrack/scene/space-scene';
 import { keepTrackApi } from './keepTrackApi';
 import { getEl } from './lib/get-el';
@@ -486,7 +487,7 @@ theodore.kruczek at gmail dot com.
 
         groupsManagerInstance.init();
 
-        this.inputManager.init();
+        this.inputManager.initialize();
         this.demoManager.init();
 
         keepTrackApi.getHoverManager().init();
@@ -806,6 +807,8 @@ theodore.kruczek at gmail dot com.
   }
 
   private postStart_() {
+    KeyboardController.getInstance().initialize();
+
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     UiManager.postStart();
 

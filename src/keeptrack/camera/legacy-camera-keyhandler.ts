@@ -1,5 +1,6 @@
+import { Doris } from '@app/doris/doris';
+import { CameraSystemEvents, InputEvents } from '@app/doris/events/event-types';
 import { CameraControllerType, KeepTrackMainCamera } from '@app/keeptrack/camera/legacy-camera';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { FirstPersonCameraController } from './controllers/first-person-camera-controller';
 
 export class LegacyCameraKeyHandler {
@@ -19,41 +20,24 @@ export class LegacyCameraKeyHandler {
   }
 
   private registerKeyboardEvents_() {
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-    const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'];
+    const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'];
 
-    keysDown.forEach((key) => {
-      keyboardManager.registerKeyDownEvent({
-        key,
-        callback: this[`keyDown${key}_`].bind(this),
-      });
+    Doris.getInstance().on(InputEvents.KeyDown, (_event, key) => {
+      if (keysDown.includes(key)) {
+        this[`keyDown${key}_`].bind(this)();
+      }
     });
-    keysUp.forEach((key) => {
-      keyboardManager.registerKeyUpEvent({
-        key,
-        callback: this[`keyUp${key}_`].bind(this),
-      });
+    Doris.getInstance().on(InputEvents.KeyUp, (_event, key) => {
+      if (keysUp.includes(key)) {
+        this[`keyUp${key}_`].bind(this)();
+      }
     });
 
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
-      keyboardManager.registerKeyDownEvent({
-        key: code.replace('Numpad', ''),
-        code,
-        callback: this[`keyDown${code}_`].bind(this),
-      });
-    });
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
-      keyboardManager.registerKeyUpEvent({
-        key: code.replace('Numpad', ''),
-        code,
-        callback: this[`keyUp${code}_`].bind(this),
-      });
-    });
-
-    keyboardManager.registerKeyEvent({
-      key: '`',
-      callback: this.camera_.resetRotation.bind(this.camera_),
+    Doris.getInstance().on(InputEvents.KeyDown, (_event, key) => {
+      if (key === '`') {
+        Doris.getInstance().emit(CameraSystemEvents.Reset);
+      }
     });
   }
 

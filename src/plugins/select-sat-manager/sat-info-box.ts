@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/catalogs/countries';
 import { Doris } from '@app/doris/doris';
+import { InputEvents } from '@app/doris/events/event-types';
 import { GetSatType, ToastMsgType } from '@app/interfaces';
 import { TimeManager } from '@app/keeptrack/core/time-manager';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
@@ -93,17 +94,14 @@ export class SatInfoBox extends KeepTrackPlugin {
       SatInfoBox.updateObjectData_(obj);
     });
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyDownEvent({
-      key: 'i',
-      callback: () => {
+    Doris.getInstance().on(InputEvents.KeyDown, (_e: KeyboardEvent, key: string) => {
+      if (key === 'i') {
         if (this.isVisible_) {
           this.hide();
         } else {
           this.show();
         }
-      },
+      }
     });
 
     Doris.getInstance().on(KeepTrackApiEvents.AfterHtmlInitialize, this.uiManagerFinal_.bind(this));

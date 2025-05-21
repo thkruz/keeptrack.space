@@ -61,6 +61,7 @@ export enum KeepTrackApiEvents {
    */
   sensorDotSelected = 'sensorDotSelected',
   canvasMouseDown = 'canvasMouseDown',
+  canvasMouseUp = 'canvasMouseUp',
   touchStart = 'touchStart',
   ConeMeshUpdate = 'ConeMeshUpdate',
   bottomMenuModeChange = 'bottomMenuModeChange',
@@ -91,6 +92,7 @@ declare module '@app/doris/events/event-types' {
     [KeepTrackApiEvents.onLineChange]: [LineManager];
     [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
     [KeepTrackApiEvents.canvasMouseDown]: [MouseEvent];
+    [KeepTrackApiEvents.canvasMouseUp]: [MouseEvent];
     [KeepTrackApiEvents.touchStart]: [TapTouchEvent | PanTouchEvent];
     [KeepTrackApiEvents.onCruncherMessage]: [];
     [KeepTrackApiEvents.onCruncherReady]: [];

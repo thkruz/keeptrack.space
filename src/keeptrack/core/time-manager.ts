@@ -1,5 +1,5 @@
 import { Doris } from '@app/doris/doris';
-import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { CoreEngineEvents, InputEvents } from '@app/doris/events/event-types';
 import { ToastMsgType } from '@app/interfaces';
 import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
@@ -240,135 +240,115 @@ export class TimeManager {
   }
 
   private initializeKeyboardBindings_() {
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+    Doris.getInstance().on(InputEvents.KeyDown, (_e: KeyboardEvent, key: string) => {
+      switch (key) {
+        case 't':
+          keepTrackApi.getUiManager().toast('Time Set to Real Time', ToastMsgType.normal);
+          this.changeStaticOffset(0); // Reset to Current Time
+          break;
+        case ',':
+          {
+            this.calculateSimulationTime();
+            const currentTimeScale = Doris.getInstance().getTimeManager().getTimeScale();
 
-    keyboardManager.registerKeyEvent({
-      key: 't',
-      callback: () => {
-        keepTrackApi.getUiManager().toast('Time Set to Real Time', ToastMsgType.normal);
-        this.changeStaticOffset(0); // Reset to Current Time
-      },
-    });
+            let newPropRate = currentTimeScale;
 
-    keyboardManager.registerKeyDownEvent({
-      key: ',',
-      callback: () => {
-        this.calculateSimulationTime();
-        const currentTimeScale = Doris.getInstance().getTimeManager().getTimeScale();
+            if (currentTimeScale < 0.001 && currentTimeScale > -0.001) {
+              newPropRate = -0.001;
+            }
 
-        let newPropRate = currentTimeScale;
+            if (currentTimeScale < -1000) {
+              newPropRate = -1000;
+            }
 
-        if (currentTimeScale < 0.001 && currentTimeScale > -0.001) {
-          newPropRate = -0.001;
-        }
+            if (newPropRate < 0) {
+              newPropRate = (currentTimeScale * 1.5);
+            } else {
+              newPropRate = ((currentTimeScale * 2) / 3);
+            }
 
-        if (currentTimeScale < -1000) {
-          newPropRate = -1000;
-        }
+            const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
 
-        if (newPropRate < 0) {
-          newPropRate = (currentTimeScale * 1.5);
-        } else {
-          newPropRate = ((currentTimeScale * 2) / 3);
-        }
+            if (calendarInstance) {
+              calendarInstance.updatePropRate(newPropRate);
+            } else {
+              this.changePropRate(newPropRate);
+            }
+          }
+          break;
+        case '.':
+          {
+            this.calculateSimulationTime();
+            const currentTimeScale = Doris.getInstance().getTimeManager().getTimeScale();
+            let newPropRate = currentTimeScale;
 
-        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+            if (currentTimeScale < 0.001 && currentTimeScale > -0.001) {
+              newPropRate = 0.001;
+            }
 
-        if (calendarInstance) {
-          calendarInstance.updatePropRate(newPropRate);
-        } else {
-          this.changePropRate(newPropRate);
-        }
-      },
-    });
+            if (currentTimeScale > 1000) {
+              newPropRate = 1000;
+            }
 
-    keyboardManager.registerKeyDownEvent({
-      key: '.',
-      callback: () => {
-        this.calculateSimulationTime();
-        const currentTimeScale = Doris.getInstance().getTimeManager().getTimeScale();
-        let newPropRate = currentTimeScale;
+            if (newPropRate > 0) {
+              newPropRate = (currentTimeScale * 1.5);
+            } else {
+              newPropRate = ((currentTimeScale * 2) / 3);
+            }
 
-        if (currentTimeScale < 0.001 && currentTimeScale > -0.001) {
-          newPropRate = 0.001;
-        }
+            const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
 
-        if (currentTimeScale > 1000) {
-          newPropRate = 1000;
-        }
+            if (calendarInstance) {
+              calendarInstance.updatePropRate(newPropRate);
+            } else {
+              this.changePropRate(newPropRate);
+            }
+          }
+          break;
+        case '<':
+          this.calculateSimulationTime();
+          this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountBig);
+          Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+          break;
+        case '>':
+          this.calculateSimulationTime();
+          this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountBig);
+          Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+          break;
+        case '/':
+          {
+            let newPropRate: number;
 
-        if (newPropRate > 0) {
-          newPropRate = (currentTimeScale * 1.5);
-        } else {
-          newPropRate = ((currentTimeScale * 2) / 3);
-        }
+            if (Doris.getInstance().getTimeManager().getTimeScale() === 1) {
+              newPropRate = 0;
+            } else {
+              newPropRate = 1;
+            }
 
-        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+            const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
 
-        if (calendarInstance) {
-          calendarInstance.updatePropRate(newPropRate);
-        } else {
-          this.changePropRate(newPropRate);
-        }
-      },
-    });
-
-    keyboardManager.registerKeyEvent({
-      key: '<',
-      callback: () => {
-        this.calculateSimulationTime();
-        this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountBig);
-        Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
-    });
-
-    keyboardManager.registerKeyEvent({
-      key: '>',
-      callback: () => {
-        this.calculateSimulationTime();
-        this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountBig);
-        Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
-    });
-
-    keyboardManager.registerKeyEvent({
-      key: '/',
-      callback: () => {
-        let newPropRate: number;
-
-        if (Doris.getInstance().getTimeManager().getTimeScale() === 1) {
-          newPropRate = 0;
-        } else {
-          newPropRate = 1;
-        }
-
-        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
-
-        if (calendarInstance) {
-          calendarInstance.updatePropRate(newPropRate);
-        } else {
-          this.changePropRate(newPropRate);
-        }
-        this.calculateSimulationTime();
-      },
-    });
-
-    keyboardManager.registerKeyEvent({
-      key: 'Equal',
-      callback: () => {
-        this.calculateSimulationTime();
-        this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountSmall);
-        Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
-    });
-
-    keyboardManager.registerKeyEvent({
-      key: 'Minus',
-      callback: () => {
-        this.calculateSimulationTime();
-        this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall);
-        Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
+            if (calendarInstance) {
+              calendarInstance.updatePropRate(newPropRate);
+            } else {
+              this.changePropRate(newPropRate);
+            }
+            this.calculateSimulationTime();
+          }
+          break;
+        case '=':
+          this.calculateSimulationTime();
+          this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountSmall);
+          Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+          break;
+        case '-':
+          this.calculateSimulationTime();
+          this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall);
+          Doris.getInstance().emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+          break;
+        default:
+          // Do nothing
+          break;
+      }
     });
   }
 

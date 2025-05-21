@@ -196,7 +196,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     `;
 
   BottomMenu.createBottomMenu();
-  inputManagerInstance.init();
+  inputManagerInstance.initialize();
   catalogManagerInstance.staticSet = [defaultSensor];
 
   window.M = {

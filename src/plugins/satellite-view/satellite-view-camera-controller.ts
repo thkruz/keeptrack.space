@@ -11,6 +11,9 @@ export class SatelliteViewCameraController extends FirstPersonCameraController {
   isInitialized_ = false;
   targetObject_: BaseObject | null = null;
   camera: KeepTrackMainCamera;
+  normalizedZenith: vec3 = vec3.create();
+  normalizedNadir: vec3 = vec3.create();
+  normalizedCameraLeft: vec3 = vec3.create();
 
   constructor(camera: KeepTrackMainCamera, eventBus: EventBus) {
     super(camera, eventBus);
@@ -54,12 +57,12 @@ export class SatelliteViewCameraController extends FirstPersonCameraController {
     const viewMatrix = this.camera.getViewMatrix();
 
     mat4.translate(viewMatrix, viewMatrix, targetPositionTemp);
-    vec3.normalize(this.camera.normalizedZenith, targetPositionTemp);
-    vec3.normalize(this.camera.normalizedNadir, [this.targetObject_!.velocity.x, this.targetObject_!.velocity.y, this.targetObject_!.velocity.z]);
+    vec3.normalize(this.normalizedZenith, targetPositionTemp);
+    vec3.normalize(this.normalizedNadir, [this.targetObject_!.velocity.x, this.targetObject_!.velocity.y, this.targetObject_!.velocity.z]);
     vec3.transformQuat(
-      this.camera.normalizedCameraLeft,
-      this.camera.normalizedZenith,
-      quat.fromValues(this.camera.normalizedNadir[0], this.camera.normalizedNadir[1], this.camera.normalizedNadir[2], 90 * DEG2RAD),
+      this.normalizedCameraLeft,
+      this.normalizedZenith,
+      quat.fromValues(this.normalizedNadir[0], this.normalizedNadir[1], this.normalizedNadir[2], 90 * DEG2RAD),
     );
 
     const targetNextPosition = vec3.fromValues(
@@ -68,12 +71,12 @@ export class SatelliteViewCameraController extends FirstPersonCameraController {
       this.targetObject_!.position.z + this.targetObject_!.velocity.z,
     );
 
-    mat4.lookAt(viewMatrix, targetNextPosition, targetPositionTemp, this.camera.normalizedZenith);
+    mat4.lookAt(viewMatrix, targetNextPosition, targetPositionTemp, this.normalizedZenith);
 
     mat4.translate(viewMatrix, viewMatrix, [this.targetObject_!.position.x, this.targetObject_!.position.y, this.targetObject_!.position.z]);
 
-    mat4.rotate(viewMatrix, viewMatrix, this.camera.fpsPitch * DEG2RAD, this.camera.normalizedCameraLeft);
-    mat4.rotate(viewMatrix, viewMatrix, -this.camera.fpsYaw * DEG2RAD, this.camera.normalizedZenith);
+    mat4.rotate(viewMatrix, viewMatrix, this.pitch_ * DEG2RAD, this.normalizedCameraLeft);
+    mat4.rotate(viewMatrix, viewMatrix, -this.yaw_ * DEG2RAD, this.normalizedZenith);
 
     mat4.translate(viewMatrix, viewMatrix, targetPositionTemp);
   }

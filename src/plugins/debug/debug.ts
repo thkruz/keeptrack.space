@@ -7,7 +7,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import debugPng from '@public/img/icons/debug.png';
 
 import { Doris } from '@app/doris/doris';
-import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { CoreEngineEvents, InputEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
@@ -90,6 +90,9 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
         <div class="center-align row">
           <button id="debug-toggle-fps" class="btn btn-ui waves-effect waves-light" type="button">Toggle FPS in Console &#9658;</button>
         </div>
+        <div class="center-align row">
+          <button id="debug-toggle-keyboard" class="btn btn-ui waves-effect waves-light" type="button">Toggle Keyboard Overlay &#9658;</button>
+        </div>
     </div>
   `;
 
@@ -98,6 +101,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
     delay: 5,
   };
   isShowFPS = false;
+  isKeyboardOverlayVisible: boolean = false;
 
   addHtml(): void {
     super.addHtml();
@@ -114,6 +118,8 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
       getEl('debug-toggle-fps')!.addEventListener('click', () => {
         this.isShowFPS = !this.isShowFPS;
       });
+
+      getEl('debug-toggle-keyboard')!.addEventListener('click', this.keyboardOverlay_.bind(this));
 
       getEl('debug-cam-to-sat')?.addEventListener('click', () => {
         const camera = keepTrackApi.getMainCamera();
@@ -205,23 +211,18 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
       }
     });
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyDownEvent({
-      key: 'F12',
-      callback: () => {
-        if (keyboardManager.isShiftPressed) {
-          if (this.isErudaVisible) {
-            eruda.hide();
-            this.isErudaVisible = false;
-            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
-          } else {
-            eruda.show();
-            this.isErudaVisible = true;
-            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
-          }
+    Doris.getInstance().on(InputEvents.KeyDown, (_e: KeyboardEvent, key: string, _isRepeat: boolean, _isCtrlPressed: boolean, isShiftPressed: boolean) => {
+      if (key === 'F12' && isShiftPressed) {
+        if (this.isErudaVisible) {
+          eruda.hide();
+          this.isErudaVisible = false;
+          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+        } else {
+          eruda.show();
+          this.isErudaVisible = true;
+          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
         }
-      },
+      }
     });
   }
 
@@ -291,6 +292,95 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
         strategies: [distributionStrategy],
       })
       .unleash();
+  }
+
+  private keyboardOverlay_() {
+    this.isKeyboardOverlayVisible = !this.isKeyboardOverlayVisible;
+
+    if (this.isKeyboardOverlayVisible) {
+      const overlay = document.createElement('div');
+
+      overlay.id = 'keyboard-overlay';
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100vw';
+      overlay.style.height = '100vh';
+      overlay.style.background = 'rgba(0,0,0,0.8)';
+      overlay.style.color = '#fff';
+      overlay.style.zIndex = '9999';
+      overlay.style.overflow = 'auto';
+      overlay.style.fontFamily = 'monospace';
+      overlay.style.fontSize = '16px';
+      overlay.style.padding = '32px';
+      overlay.style.display = 'flex';
+      overlay.style.flexDirection = 'column';
+      overlay.style.alignItems = 'center';
+
+      const closeBtn = document.createElement('button');
+
+      closeBtn.textContent = 'Close Overlay';
+      closeBtn.style.marginBottom = '24px';
+      closeBtn.className = 'btn btn-ui waves-effect waves-light';
+      closeBtn.onclick = () => {
+        overlay.remove();
+        clearInterval(watchKeys);
+        this.isKeyboardOverlayVisible = false;
+      };
+
+      const charsTable = document.createElement('table');
+
+      charsTable.id = 'chars-table';
+      charsTable.style.borderCollapse = 'collapse';
+      charsTable.style.background = 'rgba(30,30,30,0.95)';
+      charsTable.style.margin = '0 auto';
+
+      for (let i = 0; i < 8; i++) {
+        const row = document.createElement('tr');
+
+        for (let j = 0; j < 16; j++) {
+          const code = i * 16 + j;
+          const cell = document.createElement('td');
+
+          cell.style.border = '1px solid #444';
+          cell.style.padding = '6px 10px';
+          cell.style.textAlign = 'center';
+          cell.innerHTML = `
+            <span style="color:#aaa;">${code.toString().padStart(3, '0')}</span>
+            <br>
+            <span id="chars-table-key-${String.fromCharCode(code)}" style="font-size:20px;">${String.fromCharCode(code)}</span>`;
+          row.appendChild(cell);
+        }
+        charsTable.appendChild(row);
+      }
+
+      overlay.appendChild(closeBtn);
+      overlay.appendChild(charsTable);
+      document.body.appendChild(overlay);
+
+      const watchKeys = setInterval(() => {
+        const currentKeyStates = Doris.getInstance().getInputSystem().getKeysState();
+
+        for (const key of currentKeyStates) {
+          // Change the background color of the key if it is pressed
+          const keyChar = key[0]; // This is a string character
+          // const keyCode = keyChar.charCodeAt(0); // This is the keyCode
+          const keyState = key[1]; // This is a boolean value
+          // Find the cell element where the text matches the keyCode
+          const cellElement = document.getElementById(`chars-table-key-${keyChar}`)?.parentElement;
+
+          if (cellElement) {
+            if (keyState) {
+              cellElement.style.backgroundColor = '#444';
+              cellElement.style.color = '#fff';
+            } else {
+              cellElement.style.backgroundColor = 'rgba(30,30,30,0.95)';
+              cellElement.style.color = '#aaa';
+            }
+          }
+        }
+      }, 16);
+    }
   }
 
   runGremlins() {

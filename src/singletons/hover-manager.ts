@@ -47,7 +47,7 @@ export class HoverManager {
         if (!settingsManager.isMobileModeEnabled) {
           const inputManager = keepTrackApi.getInputManager();
           const inputSystem = Doris.getInstance().getInputSystem();
-          const mouseSat = inputManager.mouse.mouseSat;
+          const mouseSat = inputManager.mouseSat;
           const mousePos = inputSystem.getMousePosition();
 
           this.setHoverId(mouseSat, mousePos.x, mousePos.y);

@@ -100,16 +100,16 @@ export class CameraSystem extends System {
   }
 
   // Set active controller for a camera
-  setCameraController(cameraId: string, type: number): boolean {
+  setCameraController(controllerId: string, type: number): boolean {
     // Get the camera's controller map
-    const controllerMap = this.controllers.get(cameraId);
+    const controllerMap = this.controllers.get(controllerId);
 
     if (!controllerMap) {
       return false;
     }
 
     // Get the previous controller type for this camera
-    const prevType = this.activeCameras.get(cameraId);
+    const prevType = this.activeCameras.get(controllerId);
 
     // If there was a previous controller, deactivate it
     if (prevType) {
@@ -125,7 +125,7 @@ export class CameraSystem extends System {
 
     if (newController) {
       newController.activate();
-      this.activeCameras.set(cameraId, type);
+      this.activeCameras.set(controllerId, type);
 
       return true;
     }

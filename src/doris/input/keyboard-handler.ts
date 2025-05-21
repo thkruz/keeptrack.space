@@ -70,14 +70,15 @@ export class KeyboardHandler {
       return;
     }
 
-    const key = event.key;
+    const key = event.key; // TODO: Should we handle keyCode as well?
     const isRepeat = this.keyStates.get(key) || false;
 
     /*
      * Prevent default browser behavior for handled keys
      * Don't prevent default for function keys (F1-F12)
+     * when Shift is pressed
      */
-    if (!(/^f\d{1,2}$/iu).test(key)) {
+    if (!(/^f\d{1,2}$/iu).test(key) && !event.shiftKey) {
       event.preventDefault();
     }
 

@@ -4,6 +4,7 @@ import dayNightPng from '@public/img/icons/day-night.png';
 import { Doris } from '../../doris/doris';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
+import { InputEvents } from '@app/doris/events/event-types';
 
 export class NightToggle extends KeepTrackPlugin {
   readonly id = 'NightToggle';
@@ -21,9 +22,8 @@ export class NightToggle extends KeepTrackPlugin {
       }
     });
 
-    keepTrackApi.getInputManager().keyboard.registerKeyUpEvent({
-      key: 'N',
-      callback: () => {
+    Doris.getInstance().on(InputEvents.KeyUp, (_event: KeyboardEvent, key: string) => {
+      if (key === 'N') {
         if (!this.isMenuButtonActive) {
           keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
           this.setBottomIconToSelected();
@@ -31,7 +31,7 @@ export class NightToggle extends KeepTrackPlugin {
           keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
           this.setBottomIconToUnselected();
         }
-      },
+      }
     });
   }
 }

@@ -149,15 +149,6 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
 
     const viewMatrix = camera.getViewMatrix();
 
-    /*
-     * mat4 commands are run in reverse order
-     * 1. Move to the satellite position
-     * 2. Twist the camera around Z-axis
-     * 3. Pitch the camera around X-axis (this may have moved because of the Z-axis rotation)
-     * 4. Back away from the satellite
-     * 5. Adjust for panning
-     * 6. Rotate the camera FPS style
-     */
     mat4.rotateX(viewMatrix, viewMatrix, -camera.localRotateCurrent.pitch);
     mat4.rotateY(viewMatrix, viewMatrix, -camera.localRotateCurrent.roll);
     mat4.rotateZ(viewMatrix, viewMatrix, -camera.localRotateCurrent.yaw);
@@ -219,16 +210,20 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
       this.zoom_ === -1) {
       // Inside distanceBuffer
       settingsManager.selectedColor = [0, 0, 0, 0];
-      this.distanceBuffer = <Kilometers>(this.distanceBuffer + delta / 100); // delta is +/- 100
+      // Adjust the distance buffer based on scroll delta
+      this.distanceBuffer = <Kilometers>(this.distanceBuffer + delta / 100);
+
+      // Calculate minimum and maximum allowed distance buffer
+      const minDistance = settingsManager.minDistanceFromSatellite;
+      const covMatrixZ = (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25;
+      const nearZoomLevel = settingsManager.nearZoomLevel;
+      const cameraNear = this.camera.near;
+      const maxDistance = Math.max(nearZoomLevel, covMatrixZ, cameraNear);
+
+      // Clamp the distance buffer within allowed range
       this.distanceBuffer = <Kilometers>Math.min(
-        Math.max(
-          this.distanceBuffer,
-          settingsManager.minDistanceFromSatellite,
-        ),
-        Math.max(
-          settingsManager.nearZoomLevel,
-          (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25,
-        ),
+        Math.max(this.distanceBuffer, minDistance),
+        maxDistance,
       );
     } else if (this.distanceBuffer >= settingsManager.nearZoomLevel) {
       // Outside distanceBuffer
@@ -325,7 +320,14 @@ export class SatelliteOrbitalCameraController extends OrbitalController {
   }
 
   getCameraPosition(): vec3 {
-    const center = vec3.fromValues(this.targetObject_!.position.x, this.targetObject_!.position.y, this.targetObject_!.position.z);
+    if (!this.targetObject_) {
+      this.camera.switchCameraController(CameraControllerType.EARTH_CENTERED_ORBITAL);
+      this.camera.update(0 as Milliseconds);
+
+      return this.camera.node.transform.position;
+    }
+
+    const center = vec3.fromValues(this.targetObject_?.position.x, this.targetObject_?.position.y, this.targetObject_?.position.z);
     const orientation: vec3 = this.getCameraOrientation();
 
     const radius = this.getCameraRadius(center);

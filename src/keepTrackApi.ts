@@ -4,7 +4,7 @@ import { vec3 } from 'gl-matrix';
 import { keepTrackContainer } from './container';
 import { Doris } from './doris/doris';
 import { Renderer } from './doris/rendering/renderer';
-import { Constructor, Singletons } from './interfaces';
+import { Constructor, Singletons, ToastMsgType } from './interfaces';
 import { KeepTrackMainCamera } from './keeptrack/camera/legacy-camera';
 import type { TimeManager } from './keeptrack/core/time-manager';
 import { KeepTrackRenderer } from './keeptrack/rendering/keeptrack-renderer';
@@ -185,6 +185,10 @@ export class KeepTrackApi {
     str += literals[literals.length - 1];
 
     return str;
+  }
+
+  toast(toastText: string, type: ToastMsgType, isLong = false) {
+    this.getUiManager().toast(toastText, type, isLong);
   }
 
   getCenterVec3 = (): vec3 => Doris.getInstance().getSceneManager().activeScene!.root.transform.getPosition();

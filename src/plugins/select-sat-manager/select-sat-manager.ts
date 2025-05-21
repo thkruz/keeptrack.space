@@ -4,7 +4,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 
 import { Doris } from '@app/doris/doris';
-import { CoreEngineEvents } from '@app/doris/events/event-types';
+import { CoreEngineEvents, InputEvents } from '@app/doris/events/event-types';
 import { KeepTrackApiEvents } from '@app/keeptrack/events/event-types';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
@@ -325,16 +325,6 @@ export class SelectSatManager extends KeepTrackPlugin {
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.EARTH_CENTERED_ORBITAL) {
-      keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      Doris.getInstance().getCameraSystem().setCameraController(this.id, CameraControllerType.SATELLITE_CENTERED_ORBITAL);
-    }
-
-    // If we deselect an object but had previously selected one then disable/hide stuff
-    keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
-    keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
-    keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
-
     if (sat instanceof DetailedSatellite) {
       keepTrackApi.analytics.track('select_satellite', {
         id: sat.id,
@@ -344,6 +334,17 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
 
     this.setSelectedSat_(sat.id);
+    this.primarySatObj = sat;
+
+    if (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.EARTH_CENTERED_ORBITAL) {
+      keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
+      keepTrackApi.getMainCamera().switchCameraController(CameraControllerType.SATELLITE_CENTERED_ORBITAL);
+    }
+
+    // If we deselect an object but had previously selected one then disable/hide stuff
+    keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
+    keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
+    keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
   }
 
   private static selectOwnerManufacturer_(obj: LandObject) {
@@ -362,7 +363,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (searchStr.length === 0) {
       keepTrackApi.getUiManager().toast('No satellites found for this owner/manufacturer', ToastMsgType.caution, false);
     } else {
-      keepTrackApi.getUiManager().searchManager.doSearch(searchStr);
+      keepTrackApi.getUiManager().searchManager?.doSearch(searchStr);
       keepTrackApi.getMainCamera().changeZoom(0.9);
     }
   }
@@ -509,19 +510,24 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private registerKeyboardEvents_() {
-    const inputManagerInstance = keepTrackApi.getInputManager();
-
-    inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: ']',
-      callback: () => {
-        this.switchPrimarySecondary();
-      },
-    });
-    inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: '[',
-      callback: () => {
-        this.switchPrimarySecondary();
-      },
+    Doris.getInstance().on(InputEvents.KeyDown, (_e: KeyboardEvent, key: string) => {
+      switch (key) {
+        case ']':
+          this.switchPrimarySecondary();
+          break;
+        case '[':
+          this.switchPrimarySecondary();
+          break;
+        case '{':
+          this.selectPrevSat();
+          break;
+        case '}':
+          this.selectNextSat();
+          break;
+        default:
+          // Do nothing
+          break;
+      }
     });
   }
 }

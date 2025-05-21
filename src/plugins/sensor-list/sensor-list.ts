@@ -18,6 +18,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
+import { InputEvents } from '@app/doris/events/event-types';
 
 // TODO: Add a search bar and filter for sensors
 
@@ -183,11 +184,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
       }
     });
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyUpEvent({
-      key: 'Home',
-      callback: () => {
+    Doris.getInstance().on(InputEvents.KeyDown, (_event: KeyboardEvent, key: string) => {
+      if (key === 'Home') {
         // If a sensor is selected rotate the camera to it
         if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&
           (keepTrackApi.getMainCamera().activeCameraType === CameraControllerType.EARTH_CENTERED_ORBITAL)) {
@@ -196,7 +194,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
           keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, keepTrackApi.getTimeManager().selectedDate);
           keepTrackApi.getSoundManager().play(SoundNames.WHOOSH);
         }
-      },
+      }
     });
   }
 

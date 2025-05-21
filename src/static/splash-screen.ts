@@ -30,13 +30,35 @@ export abstract class SplashScreen {
         <div id="logo-inner-container" class="valign">
           <div style="display: flex;">
             <!-- <span id="logo-text" class="logo-font">KEEP TRACK</span> -->
-            <img src="img/textLogoMd.png" alt="Keep Track" id="logo-text" class="logo-font">
+            <img src="img/logo.png" alt="Keep Track" id="logo-text" class="logo-font">
             <!-- <span id="logo-text-version" class="logo-font">10</span> -->
           </div>
           <span id="loader-text">Downloading Science...</span>
         </div>
         <div id="loading-hint">Hint: ${this.showHint()}</div>
+        <div id="version-text">v10.5.2</div>
+        <div id="copyright-notice">
+KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>
+This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible.<br>
+No commercial license has been granted, and no compensation has been provided to the rights holder.<br>
+Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>
+© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.
+        </div>
       </div>`;
+
+    // If this is the official website, update the copyright notice
+    if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'localhost') {
+      const copyrightNotice = getEl('copyright-notice');
+
+      if (copyrightNotice) {
+        copyrightNotice.innerHTML = `
+          KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>
+          This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible.<br>
+          Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>
+          © 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.
+        `;
+      }
+    }
   }
 
   static showHint(): string {

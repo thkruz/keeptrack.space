@@ -176,9 +176,9 @@ export class KeyboardInput {
         if (this.isShiftPressed) {
           settingsManager.isOrbitCruncherInEcf = !settingsManager.isOrbitCruncherInEcf;
           if (settingsManager.isOrbitCruncherInEcf) {
-            uiManagerInstance.toast('Orbits displayed in ECF', ToastMsgType.normal);
+            uiManagerInstance.toast('GEO Orbits displayed in ECF', ToastMsgType.normal);
           } else {
-            uiManagerInstance.toast('Orbits displayed in ECI', ToastMsgType.standby);
+            uiManagerInstance.toast('GEO Orbits displayed in ECI', ToastMsgType.standby);
           }
           SettingsMenuPlugin.syncOnLoad();
         }

@@ -693,10 +693,10 @@ export class ProximityOps extends KeepTrackPlugin {
     const uiManagerInstance = keepTrackApi.getUiManager();
 
     if (!settingsManager.isOrbitCruncherInEcf && (this.selectSatManagerInstance.primarySatObj as DetailedSatellite).perigee > 6000) {
-      uiManagerInstance.toast('Orbits displayed in ECF', ToastMsgType.normal);
+      uiManagerInstance.toast('GEO Orbits displayed in ECF', ToastMsgType.normal);
       settingsManager.isOrbitCruncherInEcf = true;
     } else if (settingsManager.isOrbitCruncherInEcf) {
-      uiManagerInstance.toast('Orbits displayed in ECI', ToastMsgType.standby);
+      uiManagerInstance.toast('GEO Orbits displayed in ECI', ToastMsgType.standby);
       settingsManager.isOrbitCruncherInEcf = false;
     }
     SettingsMenuPlugin.syncOnLoad();

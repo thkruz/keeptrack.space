@@ -1,5 +1,5 @@
 import { ObjDataJson } from '@app/singletons/orbitManager';
-import { DEG2RAD, Degrees, EciVec3, Kilometers, Sgp4, TAU, ecf2eci } from 'ootk';
+import { DEG2RAD, Degrees, EciVec3, Kilometers, Sgp4, TAU, eci2ecf } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { jday } from '../lib/transforms';
 import { OrbitCruncherCachedObject } from './constants';
@@ -130,7 +130,7 @@ export const onmessageProcessing = (m: {
     propRate = m.data.propRate;
 
     const id = m.data.id;
-    const isEcfOutput = m.data.isEcfOutput || false;
+    let isEcfOutput = m.data.isEcfOutput || false;
     const pointsOut = new Float32Array((numberOfSegments + 1) * 4);
 
     const len = numberOfSegments + 1;
@@ -166,6 +166,8 @@ export const onmessageProcessing = (m: {
       // If a ECF output and  Geostationary orbit, then we can draw multiple orbits
       if (isEcfOutput && objCache[id].satrec.no < 0.01) {
         timeslice *= numberOfOrbitsToDraw;
+      } else {
+        isEcfOutput = false;
       }
 
       if (orbitType === OrbitDrawTypes.ORBIT) {
@@ -247,7 +249,7 @@ const drawOrbitSegmentTrail_ = (now: number, i: number, timeslice: number, id: n
   let pos = sv.position as EciVec3;
 
   if (isEcfOutput) {
-    pos = ecf2eci(pos, (-i * timeslice * TAU) / period);
+    pos = eci2ecf(pos, (i * timeslice * TAU) / period);
   }
   pointsOut[i * 4] = pos.x;
   pointsOut[i * 4 + 1] = pos.y;
@@ -271,7 +273,7 @@ const drawOrbitSegment_ = (now: number, i: number, timeslice: number, id: number
   let pos = sv.position as EciVec3;
 
   if (isEcfOutput) {
-    pos = ecf2eci(pos, (-i * timeslice * TAU) / period);
+    pos = eci2ecf(pos, (i * timeslice * TAU) / period);
   }
   pointsOut[i * 4] = pos.x;
   pointsOut[i * 4 + 1] = pos.y;

@@ -436,9 +436,9 @@ export class SettingsManager {
    */
   isDragging = false;
   /**
-   * Show orbits in ECF vs ECI
+   * Show GEO Orbits in ECF vs ECI
    */
-  isOrbitCruncherInEcf = false;
+  isOrbitCruncherInEcf = true;
   lastSearch: string | string[] = '';
   isGroupOverlayDisabled: boolean | null = null;
   /**

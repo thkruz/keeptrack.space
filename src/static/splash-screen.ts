@@ -47,7 +47,7 @@ Unauthorized use, rebranding, or removal of attribution may violate trademark an
       </div>`;
 
     // If this is the official website, update the copyright notice
-    if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'localhost') {
+    if (window.location.hostname === 'app.keeptrack.space') {
       const copyrightNotice = getEl('copyright-notice');
 
       if (copyrightNotice) {

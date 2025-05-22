@@ -123,6 +123,3 @@ stats.json
 
 # Local env files
 .env
-
-# Pro Plugins
-src/plugins-pro

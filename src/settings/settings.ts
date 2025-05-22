@@ -47,7 +47,7 @@ export class SettingsManager {
   plugins = <KeepTrackPlugins>{
     debug: true,
     satInfoboxCore: true,
-    aboutManager: false,
+    aboutManager: true,
     collisions: true,
     trackingImpactPredict: true,
     dops: true,

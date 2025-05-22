@@ -27,7 +27,7 @@ const settingsOverride = {
   plugins: {
     debug: false,
     satInfoboxCore: true,
-    aboutManager: false,
+    aboutManager: true,
     collisions: true,
     trackingImpactPredict: true,
     dops: false,
@@ -41,7 +41,7 @@ const settingsOverride = {
     satChanges: false,
     stereoMap: true,
     timeMachine: false,
-    initialOrbit: false,
+    initialOrbit: true,
     missile: false,
     breakup: false,
     editSat: true,

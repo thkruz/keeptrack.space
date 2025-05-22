@@ -50,8 +50,21 @@
   padding: 0;
   z-index: 101;
   text-align: center;
-  background: #274059;
+  background: #000000;
   color: white;
+  /* Apply filter only to background image, not text */
+  /* Use a pseudo-element for background image and filter */
+  position: relative;
+}
+
+#loading-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: inherit;
+  filter: brightness(0.85) contrast(1.05);
+  pointer-events: none;
 }
 
 .full-loader {
@@ -184,7 +197,7 @@
   padding-left: 5%;
   padding-top: 5px;
   padding-bottom: 5px;
-  bottom: 10%;
+  bottom: 15%;
   text-shadow:
     0px 0px 8px rgb(0 0 0),
     0px 0px 8px rgb(0 0 0);

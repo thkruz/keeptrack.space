@@ -28,6 +28,10 @@ export class PluginManager {
    * **Add new Pro plugins here to make them available in the application.**
    */
   private readonly pluginPaths: Record<string, PluginPathMapping> = {
+    'about-menu': {
+      openSourcePath: '../plugins/about-menu/about-menu',
+      proPath: '../plugins-pro/about-menu/about-menu',
+    },
     'initial-orbit': {
       openSourcePath: '../plugins/initial-orbit/initial-orbit',
       proPath: '../plugins-pro/initial-orbit/initial-orbit',

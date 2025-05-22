@@ -11,8 +11,6 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import createAnalytics from 'analytics';
 import { KeepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
-import { Astronomy } from '../plugins-pro/astronomy/astronomy';
-import { Planetarium } from '../plugins-pro/planetarium/planetarium';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { AnalysisMenu } from './analysis/analysis';
 import { Breakup } from './breakup/breakup';
@@ -180,8 +178,20 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new SensorSurvFence().init(), enabled: plugins.sensorSurv },
       { init: () => new SatelliteViewPlugin().init(), enabled: plugins.satelliteView },
       { init: () => new SatelliteFov().init(), enabled: plugins.satelliteFov },
-      { init: () => new Planetarium().init(), enabled: plugins.planetarium },
-      { init: () => new Astronomy().init(), enabled: plugins.astronomy },
+      {
+        init: () => (async () => {
+          const proPlugin = await import('../plugins-pro/planetarium/planetarium');
+
+          new proPlugin.Planetarium().init();
+        })(), enabled: plugins.planetarium,
+      },
+      {
+        init: () => (async () => {
+          const proPlugin = await import('../plugins-pro/astronomy/astronomy');
+
+          new proPlugin.Astronomy().init();
+        })(), enabled: plugins.astronomy,
+      },
       { init: () => new NightToggle().init(), enabled: plugins.nightToggle },
       { init: () => new DopsPlugin().init(), enabled: plugins.dops },
       { init: () => new SatConstellations().init(), enabled: plugins.constellations },
@@ -193,6 +203,13 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new SatellitePhotos().init(), enabled: plugins.photoManager },
       { init: () => new ScreenRecorder().init(), enabled: plugins.screenRecorder },
       { init: () => new AnalysisMenu().init(), enabled: plugins.analysis },
+      {
+        init: () => (async () => {
+          const proPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
+
+          new proPlugin.InitialOrbitDeterminationPlugin().init();
+        })(), enabled: plugins.initialOrbit,
+      },
       { init: () => new Calculator().init(), enabled: plugins.calculator },
       { init: () => new EciPlot().init(), enabled: plugins.plotAnalysis },
       { init: () => new EcfPlot().init(), enabled: plugins.plotAnalysis },
@@ -206,6 +223,13 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new GraphicsMenuPlugin().init(), enabled: plugins.graphicsMenu },
       { init: () => new GamepadPlugin().init(), enabled: plugins.gamepad },
       { init: () => new VideoDirectorPlugin().init(), enabled: plugins.videoDirector },
+      {
+        init: () => (async () => {
+          const proPlugin = await import('../plugins-pro/about-menu/about-menu');
+
+          new proPlugin.AboutMenu().init();
+        })(), enabled: plugins.aboutManager,
+      },
     ];
 
     for (const { init, enabled } of pluginList) {

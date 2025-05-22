@@ -11,9 +11,10 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import createAnalytics from 'analytics';
 import { KeepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
+import { Astronomy } from '../plugins-pro/astronomy/astronomy';
+import { Planetarium } from '../plugins-pro/planetarium/planetarium';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { AnalysisMenu } from './analysis/analysis';
-import { Astronomy } from './astronomy/astronomy';
 import { Breakup } from './breakup/breakup';
 import { Calculator } from './calculator/calculator';
 import { ClassificationBar } from './classification-bar/classification-bar';
@@ -35,7 +36,6 @@ import { NewLaunch } from './new-launch/new-launch';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
 import { OrbitReferences } from './orbit-references/orbit-references';
-import { Planetarium } from './planetarium/planetarium';
 import { EcfPlot } from './plot-analysis/ecf-plots';
 import { EciPlot } from './plot-analysis/eci-plots';
 import { Inc2AltPlots } from './plot-analysis/inc2alt';
@@ -323,3 +323,4 @@ export const uiManagerFinal = (): void => {
 
 // Create common import for all plugins
 export { StreamManager as CanvasRecorder, catalogLoader };
+

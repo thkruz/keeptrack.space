@@ -63,7 +63,16 @@ declare global {
   }
 }
 
+export enum InputEventType {
+  KeyUp = 'inputEvent:keyup',
+  KeyDown = 'inputEvent:keydown',
+  KeyPress = 'inputEvent:keypress',
+}
+
+type EventBusEvent = KeepTrackApiEvents | InputEventType;
+
 type KeepTrackApiEventArguments = {
+  [KeepTrackApiEvents.update]: [number];
   [KeepTrackApiEvents.bottomMenuClick]: [string];
   [KeepTrackApiEvents.hideSideMenus]: [];
   [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture];
@@ -101,9 +110,12 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.bottomMenuModeChange]: [];
   [KeepTrackApiEvents.saveSettings]: [];
   [KeepTrackApiEvents.loadSettings]: [];
+  [InputEventType.KeyDown]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
+  [InputEventType.KeyUp]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
+  [InputEventType.KeyPress]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
 };
 
-interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {
+interface KeepTrackApiRegisterParams<T extends EventBusEvent> {
   event: T;
   cb: (...args: KeepTrackApiEventArguments[T]) => void;
 }
@@ -185,7 +197,7 @@ export class KeepTrackApi {
     altCanvasResize: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.altCanvasResize>[],
     nightToggle: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.nightToggle>[],
   } as {
-      [K in KeepTrackApiEvents]: KeepTrackApiRegisterParams<K>[];
+      [K in EventBusEvent]: KeepTrackApiRegisterParams<K>[];
     };
 
   methods = {
@@ -195,7 +207,7 @@ export class KeepTrackApi {
     altCanvasResize: (): boolean => this.events.altCanvasResize.some((cb) => cb.cb()),
   };
 
-  emit<T extends KeepTrackApiEvents>(event: T, ...args: KeepTrackApiEventArguments[T]) {
+  emit<T extends EventBusEvent>(event: T, ...args: KeepTrackApiEventArguments[T]) {
     this.verifyEvent_(event);
 
     if (event === KeepTrackApiEvents.bottomMenuClick) {
@@ -206,7 +218,7 @@ export class KeepTrackApi {
   }
 
   /** If the callback does not exist, create it */
-  private verifyEvent_(event: KeepTrackApiEvents) {
+  private verifyEvent_(event: EventBusEvent) {
     if (typeof this.events[event] === 'undefined') {
       this.events[event] = [];
     }
@@ -277,7 +289,7 @@ export class KeepTrackApi {
    * @param params.cb - The callback function to register.
    * @throws An error if the event is invalid.
    */
-  on<T extends KeepTrackApiEvents>(event: T, cb: (...args: KeepTrackApiEventArguments[T]) => void) {
+  on<T extends EventBusEvent>(event: T, cb: (...args: KeepTrackApiEventArguments[T]) => void) {
     this.verifyEvent_(event);
 
     // Add the callback

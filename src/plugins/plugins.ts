@@ -21,7 +21,6 @@ import { ColorMenu } from './colors-menu/colors-menu';
 import { CreateSat } from './create-sat/create-sat';
 import { DateTimeManager } from './date-time-manager/date-time-manager';
 import { DebrisScreening } from './debris-screening/debris-screening';
-import { DebugMenuPlugin } from './debug/debug';
 import { DopsPlugin } from './dops/dops';
 import { EditSat } from './edit-sat/edit-sat';
 import { FilterMenuPlugin } from './filter-menu/filter-menu';
@@ -142,7 +141,13 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
     const pluginList = [
       { init: () => new SelectSatManager().init(), enabled: true },
       { init: () => new TopMenu().init(), enabled: plugins.topMenu },
-      { init: () => new DebugMenuPlugin().init(), enabled: plugins.debug },
+      {
+        init: () => (async () => {
+          const proPlugin = await import('../plugins-pro/debug/debug');
+
+          new proPlugin.DebugMenuPlugin().init();
+        })(), enabled: plugins.debug,
+      },
       { init: () => new SatInfoBox().init(), enabled: plugins.satInfoboxCore },
       { init: () => new DateTimeManager().init(), enabled: plugins.datetime },
       { init: () => new SocialMedia().init(), enabled: plugins.social },

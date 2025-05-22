@@ -1,15 +1,18 @@
 import { ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
-import { Camera } from '@app/singletons/camera';
 import { errorManagerInstance } from '../errorManager';
 import { KeyEvent } from '../input-manager';
 
 export class KeyboardInput {
   isCtrlPressed = false;
   isShiftPressed = false;
+  keyStates = new Map<string, boolean>();
+  keyEvents = <KeyEvent[]>[];
+  keyUpEvents = <KeyEvent[]>[];
+  keyDownEvents = <KeyEvent[]>[];
 
   init() {
     if (settingsManager.isDisableKeyboard) {
@@ -20,12 +23,10 @@ export class KeyboardInput {
 
     window.addEventListener('blur', () => {
       this.isCtrlPressed = false;
-      this.releaseShiftKey(keepTrackApi.getMainCamera());
     });
 
     window.addEventListener('focus', () => {
       this.isCtrlPressed = false;
-      this.releaseShiftKey(keepTrackApi.getMainCamera());
     });
 
     window.addEventListener('keydown', (e: KeyboardEvent) => {
@@ -43,16 +44,6 @@ export class KeyboardInput {
       if (e.shiftKey === false) {
         this.isShiftPressed = false;
       }
-    });
-
-    this.registerKeyDownEvent({
-      key: 'F2',
-      callback: () => {
-        if (this.isShiftPressed) {
-          uiManagerInstance.hideUi();
-          this.releaseShiftKey(keepTrackApi.getMainCamera());
-        }
-      },
     });
 
     if (!settingsManager.disableUI) {
@@ -85,9 +76,9 @@ export class KeyboardInput {
     }
   }
 
-  keyEvents = <KeyEvent[]>[];
-  keyUpEvents = <KeyEvent[]>[];
-  keyDownEvents = <KeyEvent[]>[];
+  getKeyStates() {
+    return Array.from(this.keyStates.entries());
+  }
 
   // TODO: shfit and ctrl should be added to the keyEvents parameters
 
@@ -107,28 +98,103 @@ export class KeyboardInput {
     this.keyUpEvents.push({ key: key.toUpperCase(), code, callback });
   }
 
-  registerKeyDownEvent({ key, code, callback }: { key: string; code?: string; callback: () => void }) {
-    if (this.keyDownEvents.find((event) => event.key === key.toUpperCase() || (code && event.code === code))) {
-      errorManagerInstance.debug(`Key '${key}' or Code '${code}' is already registered (KeyDown)`);
+  keyUpHandler(evt: KeyboardEvent) {
+    const key = evt.key;
+    const code = evt.code;
+
+    this.keyStates.set(key, false);
+
+    /*
+     * Prevent default browser behavior for handled keys
+     * Don't prevent default for function keys (F1-F12)
+     * when Shift is pressed
+     */
+    if (!(/^f\d{1,2}$/iu).test(key) && !evt.shiftKey) {
+      evt.preventDefault();
     }
 
-    this.keyDownEvents.push({ key: key.toUpperCase(), code, callback });
-  }
-
-  keyUpHandler(evt: KeyboardEvent) {
     this.keyUpEvents
-      .filter((event) => event.key === evt.key?.toUpperCase() && (!event.code || event.code === evt.code))
+      .filter((event) => event.key === key?.toUpperCase() && (!event.code || event.code === code))
       .forEach((event) => {
         event.callback();
       });
+
+    keepTrackApi.emit(InputEventType.KeyUp, key, code, false, this.isShiftPressed, this.isCtrlPressed);
+
+    if (key === 'Shift') {
+      // Loop through all uppercase letters and change them to lowercase when the shift key is released
+      for (let i = 97; i <= 122; i++) {
+        const lower = String.fromCharCode(i);
+        const upper = lower.toUpperCase();
+
+        if (this.keyStates.get(upper)) {
+          this.keyStates.set(upper, false);
+          this.keyStates.set(lower, true);
+          this.keyUpEvents
+            .filter((event) => event.key === upper)
+            .forEach((event) => {
+              event.callback();
+            });
+          keepTrackApi.emit(InputEventType.KeyUp, upper, code, false, this.isShiftPressed, this.isCtrlPressed);
+          this.keyDownEvents
+            .filter((event) => event.key === lower)
+            .forEach((event) => {
+              event.callback();
+            });
+          keepTrackApi.emit(InputEventType.KeyDown, lower, code, false, this.isShiftPressed, this.isCtrlPressed);
+        }
+      }
+    }
   }
 
   keyDownHandler(evt: KeyboardEvent) {
+    const key = evt.key;
+    const isRepeat = this.keyStates.get(key) || false;
+    const code = evt.code;
+
+    this.keyStates.set(key, true);
+
+    /*
+     * Prevent default browser behavior for handled keys
+     * Don't prevent default for function keys (F1-F12)
+     * when Shift is pressed
+     */
+    if (!(/^f\d{1,2}$/iu).test(key) && !evt.shiftKey) {
+      evt.preventDefault();
+    }
+
     this.keyDownEvents
-      .filter((event) => event.key === evt.key?.toUpperCase() && (!event.code || event.code === evt.code))
+      .filter((event) => event.key === key?.toUpperCase() && (!event.code || event.code === code))
       .forEach((event) => {
         event.callback();
       });
+
+    keepTrackApi.emit(InputEventType.KeyDown, key, code, isRepeat, this.isShiftPressed, this.isCtrlPressed);
+
+    if (key === 'Shift') {
+      // Loop through all uppercase letters and change them to lowercase when the shift key is released
+      for (let i = 97; i <= 122; i++) {
+        const lower = String.fromCharCode(i);
+        const upper = lower.toUpperCase();
+
+        if (this.keyStates.get(lower)) {
+          this.keyStates.set(lower, false);
+          this.keyStates.set(upper, true);
+          this.keyUpEvents
+            .filter((event) => event.key === lower)
+            .forEach((event) => {
+              event.callback();
+            });
+          keepTrackApi.emit(InputEventType.KeyUp, lower, code, isRepeat, this.isShiftPressed, this.isCtrlPressed);
+          this.keyDownEvents
+            .filter((event) => event.key === upper)
+            .forEach((event) => {
+              event.callback();
+            });
+          keepTrackApi.emit(InputEventType.KeyDown, upper, code, isRepeat, this.isShiftPressed, this.isCtrlPressed);
+        }
+      }
+    }
   }
 
   // eslint-disable-next-line complexity
@@ -153,13 +219,11 @@ export class KeyboardInput {
           setTimeout(() => {
             getEl('search')?.focus();
           }, 1000);
-          this.releaseShiftKey(keepTrackApi.getMainCamera());
         }
         break;
       // Close the bottom menu
       case 'B':
         uiManagerInstance.toggleBottomMenu();
-        this.releaseShiftKey(keepTrackApi.getMainCamera());
         break;
       // Show - Hide orbits
       case 'L':
@@ -214,15 +278,5 @@ export class KeyboardInput {
           });
         break;
     }
-  }
-
-  private releaseShiftKey(mainCameraInstance: Camera) {
-    setTimeout(() => {
-      this.isShiftPressed = false;
-      mainCameraInstance.fpsRun = 1;
-      settingsManager.cameraMovementSpeed = 0.003;
-      settingsManager.cameraMovementSpeedMin = 0.005;
-      mainCameraInstance.speedModifier = 1;
-    }, 100);
   }
 }

@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, Milliseconds } from 'ootk';
-import { keepTrackApi } from '../keepTrackApi';
+import { InputEventType, keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { DateTimeManager } from '../plugins/date-time-manager/date-time-manager';
 import { UrlManager } from '../static/url-manager';
@@ -205,19 +205,15 @@ export class TimeManager {
   }
 
   private initializeKeyboardBindings_() {
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyEvent({
-      key: 't',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 't' && !isRepeat) {
         keepTrackApi.getUiManager().toast('Time Set to Real Time', ToastMsgType.normal);
         this.changeStaticOffset(0); // Reset to Current Time
-      },
+      }
     });
 
-    keyboardManager.registerKeyDownEvent({
-      key: ',',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === ',' && !isRepeat) {
         this.calculateSimulationTime();
         let newPropRate = this.propRate;
 
@@ -242,12 +238,11 @@ export class TimeManager {
         } else {
           this.changePropRate(newPropRate);
         }
-      },
+      }
     });
 
-    keyboardManager.registerKeyDownEvent({
-      key: '.',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === '.' && !isRepeat) {
         this.calculateSimulationTime();
         let newPropRate = this.propRate;
 
@@ -272,30 +267,27 @@ export class TimeManager {
         } else {
           this.changePropRate(newPropRate);
         }
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: '<',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === '<' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountBig);
         keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: '>',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === '>' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountBig);
         keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: '/',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === '/' && !isRepeat) {
         let newPropRate: number;
 
         if (this.propRate === 1) {
@@ -312,25 +304,23 @@ export class TimeManager {
           this.changePropRate(newPropRate);
         }
         this.calculateSimulationTime();
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: 'Equal',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
+      if (code === 'Equal' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountSmall);
         keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: 'Minus',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
+      if (code === 'Minus' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall);
         keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
+      }
     });
   }
 

@@ -26,7 +26,7 @@ import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/lib/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla } from 'ootk';
-import { keepTrackApi } from '../keepTrackApi';
+import { InputEventType, keepTrackApi } from '../keepTrackApi';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../lib/transforms';
 import { SettingsManager } from '../settings/settings';
 import { SatMath } from '../static/sat-math';
@@ -202,6 +202,12 @@ export class Camera {
   startMouseX = 0;
   startMouseY = 0;
   camDistBuffer = <Kilometers>0;
+  /**
+   * 1 = off
+   *
+   * 5 = on
+   */
+  isHoldingDownAKey: number = 1;
 
   constructor() {
     this.settings_ = <SettingsManager>(<unknown>{
@@ -328,6 +334,11 @@ export class Camera {
     if (typeof val === 'undefined') {
       this.isAutoRotate_ = !this.isAutoRotate_;
 
+      // If all auto rotate settings are off, set auto rotate left to true
+      if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR && !this.settings_.isAutoRotateU) {
+        this.settings_.isAutoRotateL = true;
+      }
+
       return;
     }
     this.isAutoRotate_ = val;
@@ -403,11 +414,7 @@ export class Camera {
   }
 
   zoomWheel(delta: number): void {
-    if (delta < 0) {
-      this.isZoomIn = true;
-    } else {
-      this.isZoomIn = false;
-    }
+    this.isZoomIn = delta < 0;
 
     if (settingsManager.isZoomStopsRotation) {
       this.autoRotate(false);
@@ -711,6 +718,14 @@ export class Camera {
     });
     keepTrackApi.on(KeepTrackApiEvents.canvasMouseDown, this.canvasMouseDown_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.touchStart, this.touchStart_.bind(this));
+    keepTrackApi.on(InputEventType.KeyUp, (key: string, _code, _isRepeat: boolean, isShift: boolean) => {
+      if (key === 'Shift' && !isShift) {
+        this.fpsRun = 1;
+        settingsManager.cameraMovementSpeed = 0.003;
+        settingsManager.cameraMovementSpeedMin = 0.005;
+        this.speedModifier = 1;
+      }
+    });
   }
 
   private registerKeyboardEvents_() {
@@ -718,31 +733,37 @@ export class Camera {
     const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
     const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
-    keysDown.forEach((key) => {
-      keyboardManager.registerKeyDownEvent({
-        key,
-        callback: this[`keyDown${key}_`].bind(this),
+    keysDown.forEach((keyForFunc) => {
+      keepTrackApi.on(InputEventType.KeyDown, (key: string) => {
+        if (key === keyForFunc) {
+          this[`keyDown${key}_`].bind(this)();
+        } else if (['w', 'a', 's', 'd', 'q', 'e'].includes(key)) {
+          this[`keyDown${key.toUpperCase()}_`].bind(this)();
+        }
       });
     });
-    keysUp.forEach((key) => {
-      keyboardManager.registerKeyUpEvent({
-        key,
-        callback: this[`keyUp${key}_`].bind(this),
+    keysUp.forEach((keyForFunc) => {
+      keepTrackApi.on(InputEventType.KeyUp, (key: string) => {
+        if (key === keyForFunc) {
+          this[`keyUp${key}_`].bind(this)();
+        } else if (['w', 'a', 's', 'd', 'q', 'e'].includes(key)) {
+          this[`keyUp${key.toUpperCase()}_`].bind(this)();
+        }
       });
     });
 
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
-      keyboardManager.registerKeyDownEvent({
-        key: code.replace('Numpad', ''),
-        code,
-        callback: this[`keyDown${code}_`].bind(this),
+    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6', 'NumpadAdd', 'NumpadSubtract'].forEach((codeForFunc) => {
+      keepTrackApi.on(InputEventType.KeyDown, (_key: string, code: string) => {
+        if (code === codeForFunc) {
+          this[`keyDown${code}_`].bind(this)();
+        }
       });
     });
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((code) => {
-      keyboardManager.registerKeyUpEvent({
-        key: code.replace('Numpad', ''),
-        code,
-        callback: this[`keyUp${code}_`].bind(this),
+    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((codeForFunc) => {
+      keepTrackApi.on(InputEventType.KeyUp, (_key: string, code: string) => {
+        if (code === codeForFunc) {
+          this[`keyUp${code}_`].bind(this)();
+        }
       });
     });
 
@@ -893,33 +914,93 @@ export class Camera {
   }
 
   keyDownNumpad8_() {
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsPitchRate = settingsManager.fpsPitchRate / this.speedModifier;
-    }
-  }
-
-  keyDownNumpad4_() {
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE) {
-      this.fpsYawRate = -settingsManager.fpsYawRate / this.speedModifier;
-    }
-    if (this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
+    switch (this.cameraType) {
+      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_SAT:
+        this.settings_.isAutoRotateU = true;
+        this.isAutoRotate_ = true;
+        this.isHoldingDownAKey = 5;
+        break;
+      case CameraType.FPS:
+      case CameraType.SATELLITE:
+      case CameraType.PLANETARIUM:
+      case CameraType.ASTRONOMY:
+        this.fpsPitchRate = settingsManager.fpsPitchRate / this.speedModifier;
+        break;
+      default:
+        break;
     }
   }
 
   keyDownNumpad2_() {
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsPitchRate = -settingsManager.fpsPitchRate / this.speedModifier;
+    switch (this.cameraType) {
+      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_SAT:
+        this.settings_.isAutoRotateD = true;
+        this.isHoldingDownAKey = 5;
+        this.isAutoRotate_ = true;
+        break;
+      case CameraType.FPS:
+      case CameraType.SATELLITE:
+      case CameraType.PLANETARIUM:
+      case CameraType.ASTRONOMY:
+        this.fpsPitchRate = settingsManager.fpsPitchRate / this.speedModifier;
+        break;
+      default:
+        break;
+    }
+  }
+
+  keyDownNumpad4_() {
+    switch (this.cameraType) {
+      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_SAT:
+        this.settings_.isAutoRotateL = true;
+        this.isHoldingDownAKey = 5;
+        this.isAutoRotate_ = true;
+        break;
+      case CameraType.FPS:
+      case CameraType.SATELLITE:
+        this.fpsYawRate = -settingsManager.fpsYawRate / this.speedModifier;
+        break;
+      case CameraType.PLANETARIUM:
+      case CameraType.ASTRONOMY:
+        this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
+        break;
+      default:
+        break;
     }
   }
 
   keyDownNumpad6_() {
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE) {
-      this.fpsYawRate = settingsManager.fpsYawRate / this.speedModifier;
+    switch (this.cameraType) {
+      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_SAT:
+        this.settings_.isAutoRotateR = true;
+        this.isHoldingDownAKey = 5;
+        this.isAutoRotate_ = true;
+        break;
+      case CameraType.FPS:
+      case CameraType.SATELLITE:
+        this.fpsYawRate = settingsManager.fpsYawRate / this.speedModifier;
+        break;
+      case CameraType.PLANETARIUM:
+      case CameraType.ASTRONOMY:
+        this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
+        break;
+      default:
+        break;
     }
-    if (this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = -settingsManager.fpsRotateRate / this.speedModifier;
-    }
+  }
+
+  keyDownNumpadAdd_() {
+    this.isZoomIn = true;
+    this.zoomTarget -= 0.02;
+  }
+
+  keyDownNumpadSubtract_() {
+    this.isZoomIn = false;
+    this.zoomTarget += 0.02;
   }
 
   keyDownQ_() {
@@ -985,12 +1066,22 @@ export class Camera {
   }
 
   keyUpNumpad8_() {
+    this.settings_.isAutoRotateU = false;
     this.fpsPitchRate = 0;
+    if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateU && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR) {
+      this.isHoldingDownAKey = 1;
+      this.autoRotate(false);
+    }
   }
 
   // Intentionally the same as keyUpI_
   keyUpNumpad2_() {
+    this.settings_.isAutoRotateD = false;
     this.fpsPitchRate = 0;
+    if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateU && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR) {
+      this.isHoldingDownAKey = 1;
+      this.autoRotate(false);
+    }
   }
 
   keyUpNumpad4_() {
@@ -998,6 +1089,11 @@ export class Camera {
       this.fpsRotateRate = 0;
     } else {
       this.fpsYawRate = 0;
+    }
+    this.settings_.isAutoRotateL = false;
+    if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateU && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR) {
+      this.isHoldingDownAKey = 1;
+      this.autoRotate(false);
     }
   }
 
@@ -1007,6 +1103,11 @@ export class Camera {
       this.fpsRotateRate = 0;
     } else {
       this.fpsYawRate = 0;
+    }
+    this.settings_.isAutoRotateR = false;
+    if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateU && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR) {
+      this.isHoldingDownAKey = 1;
+      this.autoRotate(false);
     }
   }
 
@@ -1156,7 +1257,7 @@ export class Camera {
       }
     }
 
-    if (this.camZoomSnappedOnSat && !this.settings_.isAutoZoomIn && !this.settings_.isAutoZoomOut) {
+    if (this.camZoomSnappedOnSat && !settingsManager.isAutoZoomIn && !settingsManager.isAutoZoomOut) {
       if (sat.active) {
         // if this is a satellite not a missile
         const { gmst } = SatMath.calculateTimeVariables(simulationTime);
@@ -1172,24 +1273,24 @@ export class Camera {
         this.camAngleSnappedOnSat = false;
       }
 
-      this.camSnapToSat.camDistTarget = this.camSnapToSat.camDistTarget < this.settings_.minZoomDistance ? this.settings_.minZoomDistance + 10 : this.camSnapToSat.camDistTarget;
+      this.camSnapToSat.camDistTarget = this.camSnapToSat.camDistTarget < settingsManager.minZoomDistance ? settingsManager.minZoomDistance + 10 : this.camSnapToSat.camDistTarget;
 
-      this.zoomTarget = ((this.camSnapToSat.camDistTarget - this.settings_.minZoomDistance) / (this.settings_.maxZoomDistance - this.settings_.minZoomDistance)) ** (1 / ZOOM_EXP);
+      this.zoomTarget =
+        ((this.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
       settingsManager.selectedColor = [0, 0, 0, 0];
+
+      this.zoomLevel_ = Math.max(this.zoomLevel_, this.zoomTarget_);
+
       // errorManagerInstance.debug(`Zoom Target: ${this.zoomTarget_}`);
       this.earthCenteredLastZoom = this.zoomTarget_ + 0.1;
 
       // Only Zoom in Once on Mobile
-      if (this.settings_.isMobileModeEnabled) {
+      if (settingsManager.isMobileModeEnabled) {
         this.camZoomSnappedOnSat = false;
       }
     }
 
     this.updateSatShaderSizes();
-
-    if (this.cameraType === CameraType.PLANETARIUM) {
-      this.zoomTarget = 0.01;
-    }
   }
 
   panUp() {
@@ -1235,16 +1336,16 @@ export class Camera {
 
     if (this.isAutoRotate_) {
       if (this.settings_.isAutoRotateL) {
-        this.camYaw = <Radians>(this.camYaw - this.settings_.autoRotateSpeed * dt);
+        this.camYaw = <Radians>(this.camYaw - this.settings_.autoRotateSpeed * dt * (this.isHoldingDownAKey));
       }
       if (this.settings_.isAutoRotateR) {
-        this.camYaw = <Radians>(this.camYaw + this.settings_.autoRotateSpeed * dt);
+        this.camYaw = <Radians>(this.camYaw + this.settings_.autoRotateSpeed * dt * (this.isHoldingDownAKey));
       }
       if (this.settings_.isAutoRotateU) {
-        this.camPitch = <Radians>(this.camPitch + (this.settings_.autoRotateSpeed / 2) * dt);
+        this.camPitch = <Radians>(this.camPitch + (this.settings_.autoRotateSpeed / 2) * dt * (this.isHoldingDownAKey));
       }
       if (this.settings_.isAutoRotateD) {
-        this.camPitch = <Radians>(this.camPitch - (this.settings_.autoRotateSpeed / 2) * dt);
+        this.camPitch = <Radians>(this.camPitch - (this.settings_.autoRotateSpeed / 2) * dt * (this.isHoldingDownAKey));
       }
     }
 

@@ -338,4 +338,5 @@ export enum KeepTrackApiEvents {
   bottomMenuModeChange = 'bottomMenuModeChange',
   saveSettings = 'saveSettings',
   loadSettings = 'loadSettings',
+  update = 'update',
 }

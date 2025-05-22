@@ -1,5 +1,5 @@
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
@@ -434,19 +434,10 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private registerKeyboardEvents_() {
-    const inputManagerInstance = keepTrackApi.getInputManager();
-
-    inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: ']',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if ((key === '[' || key === ']') && !isRepeat) {
         this.switchPrimarySecondary();
-      },
-    });
-    inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: '[',
-      callback: () => {
-        this.switchPrimarySecondary();
-      },
+      }
     });
   }
 }

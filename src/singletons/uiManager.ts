@@ -25,7 +25,7 @@
  */
 
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { isThisNode } from '@app/static/isThisNode';
 import '@materializecss/materialize';
@@ -262,6 +262,12 @@ export class UiManager {
 
     // Initialize Navigation and Select Menus
     const elems = document.querySelectorAll('.dropdown-button');
+
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
+      if (key === 'F2' && isShift && !isRepeat) {
+        this.hideUi();
+      }
+    });
 
     window.M.Dropdown.init(elems);
     this.isInitialized_ = true;

@@ -36,6 +36,10 @@ export class PluginManager {
       openSourcePath: '../plugins/initial-orbit/initial-orbit',
       proPath: '../plugins-pro/initial-orbit/initial-orbit',
     },
+    debug: {
+      openSourcePath: '../plugins/debug/debug',
+      proPath: '../plugins-pro/debug/debug',
+    },
     astronomy: {
       openSourcePath: '../plugins/astronomy/astronomy',
       proPath: '../plugins-pro/astronomy/astronomy',

@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/catalogs/countries';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
@@ -75,44 +75,27 @@ export class SatInfoBox extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    /*
-     * NOTE: This has to go first.
-     * Register orbital element data
-     */
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
-      this.orbitalData.bind(this),
-    );
-
-    // Register sensor data
+    // NOTE: This has to go first.
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.orbitalData.bind(this));
+    // -------------------------------------------------
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSensorInfo_.bind(this));
-
-    // Register launch data
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateLaunchData_.bind(this));
-
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyDownEvent({
-      key: 'i',
-      callback: () => {
-        if (this.isVisible_) {
-          this.hide();
-        } else {
-          this.show();
-        }
-      },
-    });
-
-    // Register mission data
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
-      SatInfoBox.updateSatMissionData_.bind(this),
-    );
-
-    // Register object data
+    keepTrackApi.on(InputEventType.KeyDown, this.onKeyDownLowerI_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSatMissionData_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateObjectData_.bind(this));
-
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+  }
+
+  private onKeyDownLowerI_(key: string): void {
+    if (key !== 'i') {
+      return;
+    }
+
+    if (this.isVisible_) {
+      this.hide();
+    } else {
+      this.show();
+    }
   }
 
   addJs(): void {

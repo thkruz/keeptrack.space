@@ -65,16 +65,14 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      this.uiManagerFinal_.bind(this),
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherMessage,
+      () => {
         if (this.selectSatIdOnCruncher_ !== null) {
           // If selectedSatManager is loaded, set the selected sat to the one that was just added
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
@@ -82,7 +80,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
           this.selectSatIdOnCruncher_ = null;
         }
       },
-    });
+    );
   }
 
   private uiManagerFinal_() {
@@ -95,7 +93,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
       showLoading(() => {
         // Might be better code for this.
-        const hiddenRow = el.dataset?.row || null;
+        const hiddenRow = el.dataset?.row ?? null;
 
         if (hiddenRow !== null) {
           this.eventClicked_(parseInt(hiddenRow));
@@ -260,7 +258,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     TrackingImpactPredict.createCell_(tr, gammaDegrees);
     TrackingImpactPredict.createCell_(tr, rcs);
     TrackingImpactPredict.createCell_(tr, age);
-    TrackingImpactPredict.createCell_(tr, sat?.dryMass ? sat.dryMass : 'Reentered');
+    TrackingImpactPredict.createCell_(tr, sat?.dryMass ?? 'Reentered');
     TrackingImpactPredict.createCell_(tr, volume);
 
     return tr;

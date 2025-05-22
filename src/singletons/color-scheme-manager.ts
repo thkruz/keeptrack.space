@@ -227,10 +227,9 @@ export class ColorSchemeManager {
     this.pickableBuffer = renderer.gl.createBuffer();
 
     // Create the color buffers as soon as the position cruncher is ready
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'colorSchemeManager',
-      cb: (): void => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherReady,
+      (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
         let possibleColorScheme: ColorScheme | null = null;
@@ -253,18 +252,14 @@ export class ColorSchemeManager {
         this.isReady = true;
 
         // This helps keep the inview colors up to date
-        keepTrackApi.register({
-          event: KeepTrackApiEvents.staticOffsetChange,
-          cbName: 'colorSchemeManager',
-          cb: () => {
-            setTimeout(() => {
-              this.calcColorBufsNextCruncher();
-            }, 1000);
-          },
+        keepTrackApi.on(KeepTrackApiEvents.staticOffsetChange, () => {
+          setTimeout(() => {
+            this.calcColorBufsNextCruncher();
+          }, 1000);
         });
 
       },
-    });
+    );
 
     LegendManager.change(this.currentColorScheme.id);
   }

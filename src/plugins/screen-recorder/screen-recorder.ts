@@ -44,17 +44,16 @@ export class ScreenRecorder extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerOnReady,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerOnReady,
+      () => {
         try {
           this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));
         } catch (e) {
           errorManagerInstance.warn(`Compatibility Error with Recording: ${e}`);
         }
       },
-    });
+    );
   }
 
   getRecorderObject(): StreamManager {

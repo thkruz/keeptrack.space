@@ -50,8 +50,8 @@ describe('NewLaunch_form', () => {
       },
     };
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, defaultSat.id);
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
+    keepTrackApi.emit(KeepTrackApiEvents.selectSatData, defaultSat, defaultSat.id);
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
 
     expect(() => getEl(`${newLaunchPlugin.sideMenuElementName}-submit`).click()).not.toThrow();
     jest.advanceTimersByTime(1000);

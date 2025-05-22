@@ -25,23 +25,23 @@ describe('SensorSurvFence_class', () => {
   it('test_bottom_menu_click', () => {
     websiteInit(sensorSurvFencePlugin);
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
 
     const sensorManagerInstance = new SensorManager();
 
     sensorManagerInstance.isSensorSelected = jest.fn().mockReturnValue(true);
     keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
   });
 
   // Test changing sensor
   it('test_change_sensor', () => {
     websiteInit(sensorSurvFencePlugin);
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, 'sensor', 1)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 0)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 2)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.setSensor, 'sensor', 1)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.setSensor, defaultSensor, 0)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.setSensor, defaultSensor, 2)).not.toThrow();
   });
 });

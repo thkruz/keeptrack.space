@@ -125,11 +125,7 @@ export class KeepTrack {
       KeepTrack.getDefaultBodyHtml();
       BottomMenu.init();
 
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.uiManagerFinal,
-        cbName: 'addBottomMenuFilterButtons',
-        cb: () => BottomMenu.addBottomMenuFilterButtons(),
-      });
+      keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, () => BottomMenu.addBottomMenuFilterButtons());
 
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
         KeepTrack.loadSplashScreen_();
@@ -463,7 +459,7 @@ theodore.kruczek at gmail dot com.
       this.demoManager.update();
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, dt);
+    keepTrackApi.emit(KeepTrackApiEvents.endOfDraw, dt);
   }
 
   async run(): Promise<void> {
@@ -568,7 +564,7 @@ theodore.kruczek at gmail dot com.
       }
 
       // Update any CSS now that we know what is loaded
-      keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+      keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
 
       if (settingsManager.plugins.debug) {
         const erudaDom = getEl('eruda');
@@ -607,12 +603,12 @@ theodore.kruczek at gmail dot com.
       }
 
       window.addEventListener('resize', () => {
-        keepTrackApi.runEvent(KeepTrackApiEvents.resize);
+        keepTrackApi.emit(KeepTrackApiEvents.resize);
       });
-      keepTrackApi.runEvent(KeepTrackApiEvents.resize);
+      keepTrackApi.emit(KeepTrackApiEvents.resize);
 
       keepTrackApi.isInitialized = true;
-      keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+      keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
       if (settingsManager.onLoadCb) {
         settingsManager.onLoadCb();
       }

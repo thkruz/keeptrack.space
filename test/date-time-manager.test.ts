@@ -14,8 +14,8 @@ describe('DateTimeManager_class', () => {
     setupStandardEnvironment([TopMenu]);
     dtm = new DateTimeManager();
     dtm.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
   });
 
   standardPluginSuite(DateTimeManager, 'DateTimeManager');

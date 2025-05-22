@@ -10,11 +10,10 @@ export class SocialMedia extends KeepTrackPlugin {
   dependencies_ = [TopMenu.name];
   addHtml() {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: SocialMedia.uiManagerFinal_,
-    });
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      SocialMedia.uiManagerFinal_,
+    );
   }
 
   private static uiManagerFinal_(): void {

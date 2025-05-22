@@ -24,8 +24,8 @@ describe('TopMenu_class', () => {
     const topMenu = new TopMenu();
 
     topMenu.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
 
     errorManagerInstance.warn = jest.fn();
@@ -39,8 +39,8 @@ describe('TopMenu_class', () => {
     const topMenu = new TopMenu();
 
     topMenu.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
 
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     const soundIcon = getEl('sound-icon') as HTMLImageElement;

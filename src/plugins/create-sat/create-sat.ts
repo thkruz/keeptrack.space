@@ -153,11 +153,7 @@ export class CreateSat extends KeepTrackPlugin {
    */
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'createSat',
-      cb: () => this.uiManagerFinal_(),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   /**

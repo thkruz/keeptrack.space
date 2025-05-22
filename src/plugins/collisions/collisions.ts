@@ -65,39 +65,31 @@ export class Collisions extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.id,
-      cb: () => {
-        if (this.selectSatIdOnCruncher_ !== null) {
-          // If selectedSatManager is loaded, set the selected sat to the one that was just added
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+    keepTrackApi.on(KeepTrackApiEvents.onCruncherMessage, () => {
+      if (this.selectSatIdOnCruncher_ !== null) {
+        // If selectedSatManager is loaded, set the selected sat to the one that was just added
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
 
-          this.selectSatIdOnCruncher_ = null;
-        }
-      },
+        this.selectSatIdOnCruncher_ = null;
+      }
     });
   }
 
   private uiManagerFinal_() {
-    getEl(this.sideMenuElementName).addEventListener('click', (evt: MouseEvent) => {
+    getEl(this.sideMenuElementName)!.addEventListener('click', (evt: MouseEvent) => {
       showLoading(() => {
         const el = (<HTMLElement>evt.target).parentElement;
 
-        if (!el.classList.contains('collisions-object')) {
+        if (!el!.classList.contains('collisions-object')) {
           return;
         }
         // Might be better code for this.
-        const hiddenRow = el.dataset?.row;
+        const hiddenRow = el!.dataset?.row;
 
         if (hiddenRow !== null) {
-          this.eventClicked_(parseInt(hiddenRow));
+          this.eventClicked_(parseInt(hiddenRow!));
         }
       });
     });

@@ -34,43 +34,41 @@ export class CountriesMenu extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.id,
-      cb: () => {
-        getEl('country-list').innerHTML = CountriesMenu.generateCountryList_();
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherReady,
+      () => {
+        getEl('country-list')!.innerHTML = CountriesMenu.generateCountryList_();
       },
-    });
+    );
   }
 
   addJs() {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
-        getEl('country-menu')
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        getEl('country-menu')!
           .querySelectorAll('li')
           .forEach((element) => {
             element.addEventListener('click', () => {
               keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
-              CountriesMenu.countryMenuClick_(element.getAttribute('data-group'));
+              CountriesMenu.countryMenuClick_(element.getAttribute('data-group') ?? '');
             });
           });
 
         clickAndDragWidth(getEl(this.sideMenuElementName));
       },
-    });
+    );
   }
 
   private static generateCountryList_(): string {
     const header = keepTrackApi.html`
-    <h5 class="center-align">${Localization.plugins.CountriesMenu.bottomIconLabel}</h5>
+    <h5 class="center-align">${Localization.plugins.CountriesMenu.bottomIconLabel!}</h5>
     <li class="divider"></li>
     <br/>`;
 
-    const countryCodeList = [];
+    const countryCodeList = [] as string[];
 
     keepTrackApi.getCatalogManager().getSats().forEach((sat) => {
       if (sat.country && !countryCodeList.includes(sat.country) && sat.country !== 'ANALSAT') {

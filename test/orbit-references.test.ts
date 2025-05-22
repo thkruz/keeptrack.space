@@ -20,9 +20,9 @@ describe('OrbitReferences', () => {
     const orbitReferences = new OrbitReferences();
 
     expect(() => orbitReferences.init()).not.toThrow();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, defaultSat, 0)).not.toThrow();
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.selectSatData, defaultSat, 0)).not.toThrow();
 
     keepTrackApi.getCatalogManager().analSatSet = [defaultSat];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);

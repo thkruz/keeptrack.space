@@ -303,7 +303,7 @@ export class SensorManager {
       colorSchemeManagerInstance.calculateColorBuffers(true);
     }, 2000);
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.resetSensor);
+    keepTrackApi.emit(KeepTrackApiEvents.resetSensor);
   }
 
   setCurrentSensor(sensor: DetailedSensor[] | null): void {
@@ -438,7 +438,7 @@ export class SensorManager {
     }
 
     // Run any callbacks
-    keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, selectedSensor, sensorId ?? null);
+    keepTrackApi.emit(KeepTrackApiEvents.setSensor, selectedSensor, sensorId ?? null);
 
     for (const sensor of this.currentSensors) {
       keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);

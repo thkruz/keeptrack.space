@@ -95,10 +95,9 @@ export abstract class UrlManager {
   }
 
   private static handleIntldesParam_(val: string) {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onKeepTrackReady,
-      cbName: 'getVariableSat',
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onKeepTrackReady,
+      () => {
         const uiManagerInstance = keepTrackApi.getUiManager();
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.intlDes2id(val.toUpperCase());
@@ -109,14 +108,13 @@ export abstract class UrlManager {
           uiManagerInstance.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
         }
       },
-    });
+    );
   }
 
   private static handleSatParam_(val: string) {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onKeepTrackReady,
-      cbName: 'getVariableSat',
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onKeepTrackReady,
+      () => {
         const uiManagerInstance = keepTrackApi.getUiManager();
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
@@ -127,7 +125,7 @@ export abstract class UrlManager {
           uiManagerInstance.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
         }
       },
-    });
+    );
   }
 
   private static handleMislParam_(val: string) {

@@ -25,10 +25,9 @@ export class OrbitReferences extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj?: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj?: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
           hideEl('orbit-references-link');
@@ -38,18 +37,24 @@ export class OrbitReferences extends KeepTrackPlugin {
         showEl('orbit-references-link');
 
         if (!this.doOnce) {
-          getEl('actions-section').insertAdjacentHTML(
+          const actionsSectionElement = getEl('actions-section');
+
+          if (!actionsSectionElement) {
+            return;
+          }
+
+          actionsSectionElement.insertAdjacentHTML(
             'beforeend',
             keepTrackApi.html`
                 <div id="orbit-references-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                       data-tooltip="Create Analyst Satellites in Orbit">Generate Orbit Reference Satellites...</div>
               `,
           );
-          getEl('orbit-references-link').addEventListener('click', this.orbitReferencesLinkClick.bind(this));
+          getEl('orbit-references-link')!.addEventListener('click', this.orbitReferencesLinkClick.bind(this));
           this.doOnce = true;
         }
       },
-    });
+    );
   }
 
   orbitReferencesLinkClick() {
@@ -87,6 +92,12 @@ export class OrbitReferences extends KeepTrackPlugin {
       // Get the next available ID
       const a5 = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString().padStart(5, '0'));
       const id = catalogManagerInstance.sccNum2Id(a5);
+
+      if (typeof id !== 'number') {
+        // If the ID is not a number, skip this iteration
+        continue;
+      }
+
       const analystSat = catalogManagerInstance.addAnalystSat(tle1, tle2, id, a5);
 
       if (analystSat) {

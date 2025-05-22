@@ -360,16 +360,14 @@ export class SettingsPresets {
     settings.colors.debris = [0.5, 0.5, 0.5, 0.1];
     settings.colors.unknown = [0.5, 0.5, 0.5, 0.1];
     settings.colors.pink = [0.5, 0.5, 0.5, 0.1];
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'satFromsettings: SettingsManager',
-      cb: () => {
-        keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherReady,
+      () => {
         setTimeout(() => {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(43721) ?? -1);
           settings.isDisableSelectSat = true;
         }, 5000);
       },
-    });
+    );
   }
 }

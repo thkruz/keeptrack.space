@@ -258,10 +258,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
         getEl('settings-form')?.addEventListener('submit', SettingsMenuPlugin.onSubmit_);
         getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.resetToDefaults);
@@ -362,18 +361,12 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
         });
         this.isNotColorPickerInitialSetup = true;
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
-        SettingsMenuPlugin.syncOnLoad();
-      },
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, SettingsMenuPlugin.syncOnLoad);
   }
 
   static syncOnLoad() {

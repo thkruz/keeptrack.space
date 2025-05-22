@@ -49,17 +49,16 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj) => {
         if (obj instanceof DetailedSatellite) {
           this.setBottomIconToEnabled();
         } else {
           this.setBottomIconToDisabled();
         }
       },
-    });
+    );
   }
 
 

@@ -67,7 +67,7 @@ export class MouseInput {
 
     UrlManager.updateURL();
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.canvasMouseDown, evt);
+    keepTrackApi.emit(KeepTrackApiEvents.canvasMouseDown, evt);
   }
 
   public static earthClicked({ numMenuItems, clickedSatId }: { numMenuItems: number; clickedSatId: number }) {
@@ -578,7 +578,7 @@ export class MouseInput {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
         break;
       default:
-        keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
+        keepTrackApi.emit(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
         break;
     }
     keepTrackApi.getSoundManager().play(SoundNames.CLICK);

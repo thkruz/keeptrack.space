@@ -43,7 +43,7 @@ export class AdviceManager {
     this.tutIconDOM = getEl('tutorial-icon');
 
     this.tutIconDOM.addEventListener('click', () => {
-      keepTrackApi.runEvent(KeepTrackApiEvents.onHelpMenuClick);
+      keepTrackApi.emit(KeepTrackApiEvents.onHelpMenuClick);
     });
 
     // TODO: This should be registered with the keyboard class
@@ -54,7 +54,7 @@ export class AdviceManager {
           this.isAdviceOpen = false;
           this.helpOuterDOM.style.display = 'none';
         } else {
-          keepTrackApi.runEvent(KeepTrackApiEvents.onHelpMenuClick);
+          keepTrackApi.emit(KeepTrackApiEvents.onHelpMenuClick);
         }
       }
     };

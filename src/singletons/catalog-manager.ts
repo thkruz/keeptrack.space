@@ -587,7 +587,7 @@ export class CatalogManager {
     this.updateCruncherBuffers(mData);
 
     // Run any callbacks for a normal position cruncher message
-    keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherMessage);
+    keepTrackApi.emit(KeepTrackApiEvents.onCruncherMessage);
 
     // Only do this once after satData, positionData, and velocityData are all received/processed from the cruncher
     if (!settingsManager.cruncherReady && this.objectCache && keepTrackApi.getDotsManager().positionData && keepTrackApi.getDotsManager().velocityData) {
@@ -614,7 +614,7 @@ export class CatalogManager {
     this.buildOrbitDensityMatrix_();
 
     // Run any functions registered with the API
-    keepTrackApi.runEvent(KeepTrackApiEvents.onCruncherReady);
+    keepTrackApi.emit(KeepTrackApiEvents.onCruncherReady);
 
     settingsManager.cruncherReady = true;
   }

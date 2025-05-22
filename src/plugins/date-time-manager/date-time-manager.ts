@@ -19,33 +19,19 @@ export class DateTimeManager extends KeepTrackPlugin {
   init(): void {
     super.init();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.id,
-      cb: this.uiManagerInit.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.updateDateTime, this.updateDateTime.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: this.uiManagerFinal.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateDateTime,
-      cbName: this.id,
-      cb: this.updateDateTime.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateSelectBox,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.updateSelectBox,
+      () => {
         const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
 
-        getEl('jday').innerHTML = jday.toString();
+        getEl('jday')!.innerHTML = jday.toString();
       },
-    });
+    );
   }
 
   updateDateTime(date: Date) {
@@ -63,7 +49,7 @@ export class DateTimeManager extends KeepTrackPlugin {
   datetimeTextClick(): void {
     const simulationDateObj = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, simulationDateObj);
+    keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, simulationDateObj);
     this.calendar.setDate(simulationDateObj);
     this.calendar.toggleDatePicker();
 
@@ -116,7 +102,8 @@ export class DateTimeManager extends KeepTrackPlugin {
         if (this.isEditTimeOpen) {
           const datetimeInputElement = document.getElementById('datetime-input');
 
-          if (!datetimeInputElement) {
+          // TODO: Why was this originally !datetimeInputElement???
+          if (datetimeInputElement) {
             datetimeInputElement.style.display = 'none';
           }
           setTimeout(() => {

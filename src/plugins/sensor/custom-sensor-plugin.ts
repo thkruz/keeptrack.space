@@ -229,17 +229,16 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         CustomSensorPlugin.httpsCheck_();
         CustomSensorPlugin.addCustomSensorFormSubmitListener();
         CustomSensorPlugin.addTelescopeClickListener_();
         CustomSensorPlugin.addCustomSensorBtnCLickListener_();
         CustomSensorPlugin.addClearCustomSensorListener_();
       },
-    });
+    );
   }
 
   private static httpsCheck_() {

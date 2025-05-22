@@ -25,7 +25,7 @@ describe('NightToggle_class', () => {
 
     nightToggle.init();
     expect(() => keepTrackApi.methods.nightToggle(global.mocks.glMock, null as unknown as WebGLTexture, null as unknown as WebGLTexture)).not.toThrow();
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'menu-day-night');
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, 'menu-day-night');
     expect(() => keepTrackApi.methods.nightToggle(global.mocks.glMock, null as unknown as WebGLTexture, null as unknown as WebGLTexture)).not.toThrow();
   });
 });

@@ -132,7 +132,7 @@ export class Scene {
         this.moon.draw(this.sun.position);
       }
 
-      keepTrackApi.runEvent(KeepTrackApiEvents.drawOptionalScenery);
+      keepTrackApi.emit(KeepTrackApiEvents.drawOptionalScenery);
     }
 
     renderer.postProcessingManager.curBuffer = null;
@@ -269,7 +269,7 @@ export class Scene {
   async loadScene(): Promise<void> {
     try {
       this.earth.init(settingsManager, this.gl_);
-      keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
+      keepTrackApi.emit(KeepTrackApiEvents.drawManagerLoadScene);
       await this.sun.init(this.gl_);
 
       if (!settingsManager.isDisableGodrays) {

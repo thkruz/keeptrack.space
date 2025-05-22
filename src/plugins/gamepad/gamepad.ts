@@ -10,22 +10,18 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 export class GamepadPlugin {
   readonly id = 'GamepadPlugin';
   dependencies_: string[] = [];
-  currentController: Gamepad;
+  currentController: Gamepad | null = null;
   deadzone = 0.55;
   buttonsPressedHistory: number[] = [];
   buttonsPressed: boolean[] = [];
-  previouslyReportedGamepads = [];
+  previouslyReportedGamepads = [] as string[];
 
   init(): void {
     window.addEventListener('gamepadconnected', (e: GamepadEvent) => {
       if (settingsManager.cruncherReady) {
         this.initializeGamepad(e.gamepad);
       } else {
-        keepTrackApi.register({
-          event: KeepTrackApiEvents.uiManagerInit,
-          cbName: this.id,
-          cb: () => this.initializeGamepad(e.gamepad),
-        });
+        keepTrackApi.once(KeepTrackApiEvents.uiManagerInit, () => this.initializeGamepad(e.gamepad));
       }
     });
     window.addEventListener('gamepaddisconnected', () => {
@@ -39,11 +35,7 @@ export class GamepadPlugin {
 
     // Only initialize once
     if (!this.currentController) {
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.updateLoop,
-        cbName: this.id,
-        cb: this.updateGamepad.bind(this),
-      });
+      keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.updateGamepad.bind(this));
     }
 
     this.currentController = gamepad;
@@ -92,6 +84,10 @@ export class GamepadPlugin {
 
 
   private updateButtons_(): void {
+    if (!this.currentController) {
+      return;
+    }
+
     const buttons = this.currentController.buttons;
 
     buttons.forEach((button, index) => {
@@ -279,6 +275,10 @@ export class GamepadPlugin {
   }
 
   private updateZoom_(): void {
+    if (!this.currentController) {
+      return;
+    }
+
     const zoomOut = this.currentController.buttons[6].value;
     const zoomIn = this.currentController.buttons[7].value;
 
@@ -291,7 +291,6 @@ export class GamepadPlugin {
 
     switch (keepTrackApi.getMainCamera().cameraType) {
       case CameraType.DEFAULT:
-      case CameraType.OFFSET:
       case CameraType.FIXED_TO_SAT:
         zoomTarget += (zoomOut / 500) * renderer.dt;
         zoomTarget -= (zoomIn / 500) * renderer.dt;
@@ -323,6 +322,10 @@ export class GamepadPlugin {
   }
 
   private updateLeftStick_(): void {
+    if (!this.currentController) {
+      return;
+    }
+
     const x = this.currentController.axes[0];
     const y = this.currentController.axes[1];
 
@@ -334,7 +337,6 @@ export class GamepadPlugin {
 
       switch (keepTrackApi.getMainCamera().cameraType) {
         case CameraType.DEFAULT:
-        case CameraType.OFFSET:
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().camAngleSnappedOnSat = false;
           keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
@@ -360,7 +362,7 @@ export class GamepadPlugin {
   }
 
   private updateRightStick_(): void {
-    if (settingsManager.isLimitedGamepadControls) {
+    if (settingsManager.isLimitedGamepadControls || !this.currentController) {
       return;
     }
 
@@ -373,7 +375,6 @@ export class GamepadPlugin {
       keepTrackApi.getMainCamera().autoRotate(false);
       switch (keepTrackApi.getMainCamera().cameraType) {
         case CameraType.DEFAULT:
-        case CameraType.OFFSET:
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().isLocalRotateOverride = true;
           keepTrackApi.getMainCamera().localRotateDif.pitch = <Radians>(-y * 200);
@@ -399,7 +400,7 @@ export class GamepadPlugin {
     }
 
     this.currentController.vibrationActuator.playEffect('dual-rumble', {
-      duration: vibrateTime || 300,
+      duration: vibrateTime ?? 300,
       strongMagnitude: 1.0,
       weakMagnitude: 1.0,
       startDelay: 0,

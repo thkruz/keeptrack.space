@@ -50,11 +50,7 @@ export class SearchManager {
     searchResults.id = TopMenu.SEARCH_RESULT_ID;
     uiWrapper!.prepend(searchResults);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'Search Manager',
-      cb: this.addListeners_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.addListeners_.bind(this));
   }
 
   private addListeners_() {

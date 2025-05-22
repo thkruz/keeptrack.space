@@ -47,7 +47,7 @@ export class SettingsManager {
   plugins = <KeepTrackPlugins>{
     debug: true,
     satInfoboxCore: true,
-    aboutManager: true,
+    aboutManager: false,
     collisions: true,
     trackingImpactPredict: true,
     dops: true,
@@ -61,7 +61,7 @@ export class SettingsManager {
     satChanges: false,
     stereoMap: true,
     timeMachine: true,
-    initialOrbit: true,
+    initialOrbit: false,
     missile: true,
     breakup: true,
     editSat: true,
@@ -161,7 +161,7 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality.toString());
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.saveSettings);
+    keepTrackApi.emit(KeepTrackApiEvents.saveSettings);
   }
 
   colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
@@ -1525,10 +1525,9 @@ export class SettingsManager {
             this.isEnableJscCatalog = val === 'true';
             break;
           case 'sat':
-            keepTrackApi.register({
-              event: KeepTrackApiEvents.onCruncherReady,
-              cbName: 'satFromSettings',
-              cb: () => {
+            keepTrackApi.on(
+              KeepTrackApiEvents.onCruncherReady,
+              () => {
                 setTimeout(() => {
                   if (typeof val === 'string') {
                     const sccNum = parseInt(val);
@@ -1547,7 +1546,7 @@ export class SettingsManager {
                   }
                 }, 2000);
               },
-            });
+            );
             break;
           case 'debug':
             this.plugins.debug = true;

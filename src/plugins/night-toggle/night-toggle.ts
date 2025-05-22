@@ -13,17 +13,16 @@ export class NightToggle extends KeepTrackPlugin {
   addJs() {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.nightToggle,
-      cbName: this.id,
-      cb: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture): void => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.nightToggle,
+      (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture): void => {
         if (!this.isMenuButtonActive) {
           gl.bindTexture(gl.TEXTURE_2D, nightTexture);
         } else {
           gl.bindTexture(gl.TEXTURE_2D, texture);
         }
       },
-    });
+    );
 
     keepTrackApi.getInputManager().keyboard.registerKeyUpEvent({
       key: 'N',

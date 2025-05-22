@@ -167,7 +167,7 @@ export class TouchInput {
     // TODO: Make updateUrl() a setting that is disabled by default
     UrlManager.updateURL();
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.touchStart, evt);
+    keepTrackApi.emit(KeepTrackApiEvents.touchStart, evt);
   }
 
   tap(evt: TapTouchEvent) {

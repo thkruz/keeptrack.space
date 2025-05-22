@@ -131,7 +131,7 @@ export class DopsPlugin extends KeepTrackPlugin {
           (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
           (<HTMLInputElement>getEl('dops-alt')).value = '0';
           (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
-          keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
         } else {
           showLoading(DopsPlugin.updateSideMenu);
           this.setBottomIconToEnabled();
@@ -147,16 +147,15 @@ export class DopsPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('dops-form')!.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           DopsPlugin.updateSideMenu();
         });
       },
-    });
+    );
   }
 
   static updateSideMenu(): void {

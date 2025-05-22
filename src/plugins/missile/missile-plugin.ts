@@ -180,22 +180,14 @@ export class MissilePlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'missile',
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {
     super.addJs();
 
-    // Missile oribts have to be updated every draw or they quickly become innacurate
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: 'updateMissileOrbits',
-      cb: this.updateLoop_.bind(this),
-    });
+    // Missile orbits have to be updated every draw or they quickly become inaccurate
+    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.updateLoop_.bind(this));
   }
 
   private searchForRvs_() {

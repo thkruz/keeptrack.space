@@ -324,10 +324,9 @@ export class NewLaunch extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', () => {
           const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
@@ -337,12 +336,11 @@ export class NewLaunch extends KeepTrackPlugin {
           this.preValidate_(sat);
         });
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         if (obj?.isSatellite()) {
           const sat = obj as DetailedSatellite;
 
@@ -353,7 +351,7 @@ export class NewLaunch extends KeepTrackPlugin {
           this.setBottomIconToDisabled();
         }
       },
-    });
+    );
   }
 
   private preValidate_(sat: DetailedSatellite): void {

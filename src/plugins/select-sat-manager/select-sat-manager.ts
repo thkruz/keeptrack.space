@@ -43,11 +43,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     this.registerKeyboardEvents_();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: this.id,
-      cb: this.checkIfSelectSatVisible.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.checkIfSelectSatVisible.bind(this));
   }
 
   checkIfSelectSatVisible() {
@@ -161,7 +157,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.primarySatObj = spaceObj ?? this.noSatObj_;
 
     // Run any other callbacks
-    keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, spaceObj, spaceObj?.id);
+    keepTrackApi.emit(KeepTrackApiEvents.selectSatData, spaceObj, spaceObj?.id);
 
     // Record the last selected sat
     this.lastSelectedSat(this.selectedSat);
@@ -185,7 +181,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.runEvent(KeepTrackApiEvents.sensorDotSelected, sensor);
+      keepTrackApi.emit(KeepTrackApiEvents.sensorDotSelected, sensor);
     }
 
     this.setSelectedSat_(-1);
@@ -407,7 +403,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       keepTrackApi.getOrbitManager().clearSelectOrbit(false);
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.setSecondarySat, this.secondarySatObj, id);
+    keepTrackApi.emit(KeepTrackApiEvents.setSecondarySat, this.secondarySatObj, id);
   }
 
   private setSelectedSat_(id: number): void {

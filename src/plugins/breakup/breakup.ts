@@ -154,21 +154,19 @@ export class Breakup extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('breakup')!.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           showLoading(() => this.onSubmit_());
         });
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (sat: BaseObject) => {
         if (!sat?.isSatellite()) {
           if (this.isMenuButtonActive) {
             this.closeSideMenu();
@@ -189,7 +187,7 @@ export class Breakup extends KeepTrackPlugin {
           }
         }
       },
-    });
+    );
   }
 
   private updateSccNumInMenu_() {

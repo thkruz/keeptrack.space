@@ -169,16 +169,15 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', this.onFormChange_.bind(this));
         getEl(`${this.sideMenuElementName}-reset-btn`)?.addEventListener('click', this.resetToDefaults_.bind(this));
 
         this.syncOnLoad_();
       },
-    });
+    );
   }
 
   addJs(): void {

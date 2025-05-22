@@ -94,10 +94,9 @@ export class ColorMenu extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('colors-menu')
           ?.querySelectorAll('li')
           .forEach((element) => {
@@ -108,7 +107,7 @@ export class ColorMenu extends KeepTrackPlugin {
             });
           });
       },
-    });
+    );
   }
 
   static readonly colorsMenuClick = (colorName: string) => {

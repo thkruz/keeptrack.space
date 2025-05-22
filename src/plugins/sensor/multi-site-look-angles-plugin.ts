@@ -117,13 +117,12 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         this.checkIfCanBeEnabled_(obj);
       },
-    });
+    );
   }
 
   private checkIfCanBeEnabled_(obj: BaseObject) {
@@ -142,10 +141,9 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.staticOffsetChange,
+      () => {
         const sat = this.selectSatManager_?.getSelectedSat();
 
         if (!sat?.isSatellite()) {
@@ -153,7 +151,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
         }
         this.refreshSideMenuData(sat as DetailedSatellite);
       },
-    });
+    );
   }
 
   private refreshSideMenuData(sat: DetailedSatellite) {

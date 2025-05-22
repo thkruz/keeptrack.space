@@ -139,10 +139,9 @@ export class WebGLRenderer {
       throw new Error('The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.');
     }
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.resize,
-      cbName: 'webgl-Renderer',
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.resize,
+      () => {
         // Clear any existing resize timer
         clearTimeout(this.lastResizeTime);
 
@@ -155,7 +154,7 @@ export class WebGLRenderer {
           this.resizeCanvas();
         }, 100);
       },
-    });
+    );
 
     // Try to prevent crashes
     if (this.domElement?.addEventListener) {
@@ -666,7 +665,7 @@ export class WebGLRenderer {
      * ]);
      */
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
+    keepTrackApi.emit(KeepTrackApiEvents.updateLoop);
   }
 
   getCurrentViewport(target?: vec4): vec4 {

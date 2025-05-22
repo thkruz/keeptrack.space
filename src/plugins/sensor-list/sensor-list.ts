@@ -71,10 +71,9 @@ export class SensorListPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerInit,
+      () => {
         getEl('nav-mobile')?.insertAdjacentHTML(
           'beforeend',
           keepTrackApi.html`
@@ -86,13 +85,12 @@ export class SensorListPlugin extends KeepTrackPlugin {
           `,
         );
       },
-    });
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    );
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {
-          keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
           keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
         });
 
@@ -119,12 +117,11 @@ export class SensorListPlugin extends KeepTrackPlugin {
           this.sensorListContentClick(sensorClick ?? '');
         });
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
           hideEl('sensors-in-fov-link');
@@ -162,16 +159,15 @@ export class SensorListPlugin extends KeepTrackPlugin {
           this.isSensorLinksAdded = true;
         }
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.sensorDotSelected,
+      (obj: BaseObject) => {
         if (settingsManager.isMobileModeEnabled) {
           return;
         }
@@ -199,17 +195,16 @@ export class SensorListPlugin extends KeepTrackPlugin {
             timeManagerInstance.selectedDate,
           );
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherReady,
+      () => {
         if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
           SensorListPlugin.reloadLastSensor_();
         }
       },
-    });
+    );
 
     const keyboardManager = keepTrackApi.getInputManager().keyboard;
 

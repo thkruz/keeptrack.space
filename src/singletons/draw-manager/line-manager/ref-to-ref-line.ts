@@ -3,8 +3,8 @@ import { vec3, vec4 } from 'gl-matrix';
 import { Line } from './line';
 
 export class RefToRefLine extends Line {
-  private ref1_: vec3;
-  private ref2_: vec3;
+  private readonly ref1_: vec3;
+  private readonly ref2_: vec3;
   color: vec4;
 
   constructor(ref1: vec3, ref2: vec3, color: vec4) {

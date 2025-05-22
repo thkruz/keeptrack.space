@@ -95,10 +95,9 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: (): void => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      (): void => {
         getEl('debug-console')?.addEventListener('click', () => {
           this.toggleEruda();
         });
@@ -138,7 +137,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           }
         });
       },
-    });
+    );
   }
 
   delayForCameraUpdates = <Milliseconds>1000;
@@ -157,10 +156,9 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: this.id,
-      cb: (): void => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.updateLoop,
+      (): void => {
         if (new Date().getTime() - this.lastCameraUpdate < this.delayForCameraUpdates) {
           return;
         }
@@ -194,7 +192,7 @@ export class DebugMenuPlugin extends KeepTrackPlugin {
           setInnerHtml('debug-sat-position-z', `Z: ${position.z.toFixed(2)}`);
         }
       },
-    });
+    );
 
     const keyboardManager = keepTrackApi.getInputManager().keyboard;
 

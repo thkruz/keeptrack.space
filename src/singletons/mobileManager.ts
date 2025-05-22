@@ -59,21 +59,19 @@ export class MobileManager {
           settingsManager.isDisableLaunchSites = true;
           settingsManager.isDisableControlSites = true;
 
-          keepTrackApi.register({
-            event: KeepTrackApiEvents.selectSatData,
-            cbName: 'MobileManager.selectSatData',
-            cb: () => {
+          keepTrackApi.on(
+            KeepTrackApiEvents.selectSatData,
+            () => {
               keepTrackApi.getUiManager().searchManager.closeSearch();
             },
-          });
+          );
 
-          keepTrackApi.register({
-            event: KeepTrackApiEvents.uiManagerFinal,
-            cbName: 'MobileManager.uiManagerFinal',
-            cb: () => {
+          keepTrackApi.on(
+            KeepTrackApiEvents.uiManagerFinal,
+            () => {
               hideEl('tutorial-btn');
             },
-          });
+          );
 
           settingsManager.maxAnalystSats = 1;
           settingsManager.maxFieldOfViewMarkers = 1;

@@ -81,11 +81,10 @@ export class SatLinkManager {
   }
 
   init(controlSiteList: ControlSite[]) {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'satLinkManager',
-      cb: () => this.onCruncher_(controlSiteList),
-    });
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherReady,
+      () => this.onCruncher_(controlSiteList),
+    );
   }
 
   private onCruncher_(controlSiteList: ControlSite[]) {

@@ -46,11 +46,11 @@ describe('UrlManager_class', () => {
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);
@@ -91,7 +91,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
   });
@@ -126,7 +126,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(uiManagerInstance.toast).toHaveBeenCalled();
   });
@@ -161,7 +161,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(uiManagerInstance.toast).toHaveBeenCalled();
   });
@@ -199,7 +199,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).not.toHaveBeenCalledWith(expectedCurrentSearch);
@@ -240,7 +240,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables();
-    keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+    keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);

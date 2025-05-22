@@ -37,10 +37,9 @@ export class SunlightColorScheme extends ColorScheme {
     this.objectTypeFlags = {
       ...this.objectTypeFlags, ...SunlightColorScheme.uniqueObjectTypeFlags,
     };
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onKeepTrackReady,
-      cbName: 'SunlightColorScheme',
-      cb: (): void => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onKeepTrackReady,
+      (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
@@ -51,7 +50,7 @@ export class SunlightColorScheme extends ColorScheme {
           });
         }
       },
-    });
+    );
   }
 
   onSelected(): void {

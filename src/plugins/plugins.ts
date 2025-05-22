@@ -248,16 +248,15 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
     }
 
     // Load any settings from local storage after all plugins are loaded
-    keepTrackApi.runEvent(KeepTrackApiEvents.loadSettings);
+    keepTrackApi.emit(KeepTrackApiEvents.loadSettings);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'core',
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         uiManagerFinal();
         KeepTrackPlugin.hideUnusedMenuModes();
       },
-    });
+    );
   } catch (e) {
     errorManagerInstance.info(`Error loading core plugins:${e.message}`);
   }

@@ -28,15 +28,15 @@ describe('SatInfoBoxCore_class2', () => {
     const selectSatManager = new SelectSatManager();
 
     selectSatManager.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerOnReady);
     selectSatManager.selectSat(0);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 2);
+    keepTrackApi.emit(KeepTrackApiEvents.setSensor, defaultSensor, 2);
     keepTrackApi.getCatalogManager().isSensorManagerLoaded = true;
     selectSatManager.selectSat(0);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.updateSelectBox, defaultSat)).not.toThrow();
   });
 });

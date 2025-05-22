@@ -10,11 +10,7 @@ import sciencePng from '@public/img/icons/science.png';
 
 export class BottomMenu {
   static init() {
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: BottomMenu.name,
-      cb: BottomMenu.createBottomMenu,
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, BottomMenu.createBottomMenu);
   }
   static createBottomMenu(): void {
     const bottomMenuNode = document.createElement('div');
@@ -58,7 +54,7 @@ export class BottomMenu {
           </div>
         `;
 
-    getEl('nav-footer').appendChild(bottomMenuNode);
+    getEl('nav-footer')!.appendChild(bottomMenuNode);
   }
 
   private static deselectAllBottomMenuFilterButtons_() {
@@ -81,7 +77,7 @@ export class BottomMenu {
     settingsManager.menuMode = menuMode;
     this.deselectAllBottomMenuFilterButtons_();
     menuButtonDom.classList.add('bmenu-item-selected');
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuModeChange);
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuModeChange);
   }
 
   static addBottomMenuFilterButtons() {
@@ -98,7 +94,7 @@ export class BottomMenu {
       menuExperimentalDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuExperimentalDom, MenuMode.EXPERIMENTAL));
       menuAllDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuAllDom, MenuMode.ALL));
 
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuModeChange);
+      keepTrackApi.emit(KeepTrackApiEvents.bottomMenuModeChange);
     } else {
       errorManagerInstance.warn('Failed to find all bottom menu filter buttons');
     }

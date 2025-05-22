@@ -260,19 +260,17 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('filter-form')?.addEventListener('change', this.onFormChange_.bind(this));
         getEl('filter-reset')?.addEventListener('click', this.resetToDefaults.bind(this));
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerInit,
+      () => {
         getEl('nav-mobile2')?.insertAdjacentHTML(
           'afterbegin',
           keepTrackApi.html`
@@ -287,43 +285,29 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
           `,
         );
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('top-menu-filter-btn')?.addEventListener('click', () => {
-          keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
         });
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         this.syncOnLoad_();
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.saveSettings,
-      cbName: this.id,
-      cb: () => {
-        this.saveSettings_();
-      },
-    });
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.loadSettings,
-      cbName: this.id,
-      cb: () => {
-        this.loadSettings_();
-      },
-    });
+    keepTrackApi.on(KeepTrackApiEvents.saveSettings, this.saveSettings_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.loadSettings, this.loadSettings_.bind(this));
   }
   private saveSettings_() {
     const persistenceManagerInstance = PersistenceManager.getInstance();

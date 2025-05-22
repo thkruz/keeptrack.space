@@ -79,25 +79,16 @@ export class SatInfoBox extends KeepTrackPlugin {
      * NOTE: This has to go first.
      * Register orbital element data
      */
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_orbitalData`,
-      cb: this.orbitalData.bind(this),
-    });
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      this.orbitalData.bind(this),
+    );
 
     // Register sensor data
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_sensorInfo`,
-      cb: SatInfoBox.updateSensorInfo_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSensorInfo_.bind(this));
 
     // Register launch data
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_launchData`,
-      cb: SatInfoBox.updateLaunchData_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateLaunchData_.bind(this));
 
     const keyboardManager = keepTrackApi.getInputManager().keyboard;
 
@@ -113,33 +104,23 @@ export class SatInfoBox extends KeepTrackPlugin {
     });
 
     // Register mission data
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_satMissionData`,
-      cb: SatInfoBox.updateSatMissionData_.bind(this),
-    });
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      SatInfoBox.updateSatMissionData_.bind(this),
+    );
 
     // Register object data
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_objectData`,
-      cb: SatInfoBox.updateObjectData_,
-    });
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateObjectData_.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateSelectBox,
-      cbName: this.id,
+    keepTrackApi.on(
+      KeepTrackApiEvents.updateSelectBox,
       // eslint-disable-next-line complexity, max-statements
-      cb: (obj: BaseObject) => {
+      (obj: BaseObject) => {
         if (!keepTrackApi.isInitialized) {
           return;
         }
@@ -351,12 +332,11 @@ export class SatInfoBox extends KeepTrackPlugin {
           errorManagerInstance.debug('Error updating satellite info!');
         }
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.id,
-      cb: (watchlistList: { id: number, inView: boolean }[]) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onWatchlistUpdated,
+      (watchlistList: { id: number, inView: boolean }[]) => {
         let isOnList = false;
 
         watchlistList.forEach(({ id }) => {
@@ -377,13 +357,9 @@ export class SatInfoBox extends KeepTrackPlugin {
           }
         }
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: this.selectSat_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.selectSat_.bind(this));
   }
 
   private updateSatelliteTearrData_(obj: BaseObject, sensorManagerInstance: SensorManager, timeManagerInstance: TimeManager) {

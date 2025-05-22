@@ -43,12 +43,12 @@ export class LineManager {
 
   clear(): void {
     this.lines = [];
-    keepTrackApi.runEvent(KeepTrackApiEvents.onLineAdded, keepTrackApi.getLineManager());
+    keepTrackApi.emit(KeepTrackApiEvents.onLineAdded, keepTrackApi.getLineManager());
   }
 
   add(line: Line): void {
     this.lines.push(line);
-    keepTrackApi.runEvent(KeepTrackApiEvents.onLineAdded, this);
+    keepTrackApi.emit(KeepTrackApiEvents.onLineAdded, this);
   }
 
   createSatRicFrame(sat: DetailedSatellite | MissileObject | null): void {
@@ -167,7 +167,7 @@ export class LineManager {
     }
   }
 
-  createGrid(type: 'x' | 'y' | 'z', color?: LineColor, scalar = 1): void {
+  createGrid(type: 'x' | 'y' | 'z', color: LineColor, scalar = 1): void {
     if (type !== 'x' && type !== 'y' && type !== 'z') {
       throw new Error('Invalid type');
     }
@@ -250,17 +250,16 @@ export class LineManager {
 
     this.program = new WebGlProgramHelper(gl, this.shaders_.vert, this.shaders_.frag, this.attribs, this.uniforms_).program;
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: 'LineManager',
-      cb: (sat: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (sat: BaseObject) => {
         if (sat) {
           const sensor = keepTrackApi.getSensorManager().getSensor();
 
           this.createSensorToSatFovAndSelectedOnly(sensor, sat as DetailedSatellite);
         }
       },
-    });
+    );
   }
 
   setAttribsAndDrawLineStrip(buffer: WebGLBuffer, segments: number) {

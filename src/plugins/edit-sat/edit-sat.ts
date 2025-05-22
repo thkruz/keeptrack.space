@@ -121,10 +121,9 @@ export class EditSat extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'editSat',
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('editSat-newTLE')!.addEventListener('click', this.editSatNewTleClick_.bind(this));
 
         getEl('editSat')!.addEventListener('submit', (e: Event) => {
@@ -173,16 +172,15 @@ export class EditSat extends KeepTrackPlugin {
           getEl(`${EditSat.elementPrefix}-error`)!.style.display = 'none';
         });
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         if (!obj) {
           if (this.isMenuButtonActive) {
             this.closeSideMenu();
@@ -192,7 +190,7 @@ export class EditSat extends KeepTrackPlugin {
           this.populateSideMenu_();
         }
       },
-    });
+    );
   }
 
   static readonly elementPrefix = 'es';

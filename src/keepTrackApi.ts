@@ -105,7 +105,6 @@ type KeepTrackApiEventArguments = {
 
 interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {
   event: T;
-  cbName: string;
   cb: (...args: KeepTrackApiEventArguments[T]) => void;
 }
 
@@ -196,7 +195,7 @@ export class KeepTrackApi {
     altCanvasResize: (): boolean => this.events.altCanvasResize.some((cb) => cb.cb()),
   };
 
-  runEvent<T extends KeepTrackApiEvents>(event: T, ...args: KeepTrackApiEventArguments[T]) {
+  emit<T extends KeepTrackApiEvents>(event: T, ...args: KeepTrackApiEventArguments[T]) {
     this.verifyEvent_(event);
 
     if (event === KeepTrackApiEvents.bottomMenuClick) {
@@ -278,26 +277,45 @@ export class KeepTrackApi {
    * @param params.cb - The callback function to register.
    * @throws An error if the event is invalid.
    */
-  register<T extends KeepTrackApiEvents>(params: { event: T; cbName: string; cb: (...args: KeepTrackApiEventArguments[T]) => void }) {
-    this.verifyEvent_(params.event);
+  on<T extends KeepTrackApiEvents>(event: T, cb: (...args: KeepTrackApiEventArguments[T]) => void) {
+    this.verifyEvent_(event);
 
     // Add the callback
-    this.events[params.event].push({
-      cbName: params.cbName, cb: params.cb,
+    this.events[event].push({
+      cb,
       event: <T><unknown>null,
     });
   }
 
-  unregister(params: { event: KeepTrackApiEvents; cbName: string }) {
-    for (let i = 0; i < this.events[params.event].length; i++) {
-      if (this.events[params.event][i].cbName === params.cbName) {
-        this.events[params.event].splice(i, 1);
+  /**
+   * Registers a callback function for a specific event that will be called only once.
+   * @param {KeepTrackApiEvents} params.event - The name of the event to register the callback for.
+   * @param {string} params.cbName - The name of the callback function.
+   * @param params.cb - The callback function to register.
+   * @throws An error if the event is invalid.
+   */
+  once<T extends KeepTrackApiEvents>(event: T, cb: (...args: KeepTrackApiEventArguments[T]) => void) {
+    this.verifyEvent_(event);
+    // Add the callback
+    this.events[event].push({
+      cb: (...args: KeepTrackApiEventArguments[T]) => {
+        cb(...args);
+        this.unregister(event, cb);
+      },
+      event: <T><unknown>null,
+    });
+  }
+
+  unregister<T extends KeepTrackApiEvents>(event: T, cb: (...args: KeepTrackApiEventArguments[T]) => void) {
+    for (let i = 0; i < this.events[event].length; i++) {
+      if (this.events[event][i].cb === cb) {
+        this.events[event].splice(i, 1);
 
         return;
       }
     }
     // If we got this far, it means we couldn't find the callback
-    errorManagerInstance.error(new Error(`Callback "${params.cbName} not found"!`), 'keepTrackApi.unregister');
+    errorManagerInstance.error(new Error('Callback not found!'), 'keepTrackApi.unregister');
   }
 
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);

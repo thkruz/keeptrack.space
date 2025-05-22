@@ -165,7 +165,7 @@ export class TimeManager {
     this.staticOffset = staticOffset;
     this.calculateSimulationTime();
     this.synchronize();
-    keepTrackApi.runEvent(KeepTrackApiEvents.staticOffsetChange, this.staticOffset);
+    keepTrackApi.emit(KeepTrackApiEvents.staticOffsetChange, this.staticOffset);
   }
 
   getOffsetTimeObj(offset: number) {
@@ -280,7 +280,7 @@ export class TimeManager {
       callback: () => {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountBig);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+        keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       },
     });
 
@@ -289,7 +289,7 @@ export class TimeManager {
       callback: () => {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountBig);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+        keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       },
     });
 
@@ -320,7 +320,7 @@ export class TimeManager {
       callback: () => {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountSmall);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+        keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       },
     });
 
@@ -329,7 +329,7 @@ export class TimeManager {
       callback: () => {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+        keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       },
     });
   }

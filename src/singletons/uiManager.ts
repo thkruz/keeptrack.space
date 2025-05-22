@@ -256,7 +256,7 @@ export class UiManager {
       getEl('logo-secondary')?.classList.remove('start-hidden');
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
 
     UiManager.initBottomMenuResizing_();
 
@@ -396,13 +396,12 @@ export class UiManager {
     LegendManager.legendColorsChange();
 
     // Run any plugins code
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerOnReady);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'uiManager',
-      cb: () => {
-        this.bottomIconPress = (el: HTMLElement) => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, el.id);
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        this.bottomIconPress = (el: HTMLElement) => keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, el.id);
         const BottomIcons = getEl('bottom-icons');
 
         BottomIcons?.addEventListener('click', (evt: Event) => {
@@ -430,10 +429,10 @@ export class UiManager {
         });
         this.hideSideMenus = () => {
           closeColorbox();
-          keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
+          keepTrackApi.emit(KeepTrackApiEvents.hideSideMenus);
         };
       },
-    });
+    );
   }
 
   toast(toastText: string, type: ToastMsgType, isLong = false) {
@@ -479,7 +478,7 @@ export class UiManager {
     const sat = obj as DetailedSatellite;
 
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
-      keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, sat);
+      keepTrackApi.emit(KeepTrackApiEvents.updateSelectBox, sat);
       keepTrackApi.getTimeManager().lastBoxUpdateTime = realTime;
     }
   }

@@ -312,36 +312,34 @@ export class Calculator extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'calculator',
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         // Nothing to do here
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: Calculator.name,
-      cb: () => {
-        getEl('calculator-itrf').addEventListener('click', () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        getEl('calculator-itrf')!.addEventListener('click', () => {
           this.changeToITRF_();
         });
 
-        getEl('calculator-j2000').addEventListener('click', () => {
+        getEl('calculator-j2000')!.addEventListener('click', () => {
           this.changeToJ2000_();
         });
 
-        getEl('calculator-rae').addEventListener('click', () => {
+        getEl('calculator-rae')!.addEventListener('click', () => {
           this.changeToRAE_();
         });
 
         this.addRemovableListeners();
       },
-    });
+    );
   }
 
   /**
@@ -356,11 +354,11 @@ export class Calculator extends KeepTrackPlugin {
    * @private
    */
   private addRemovableListeners() {
-    getEl('calculator-draw-line').addEventListener('click', () => {
+    getEl('calculator-draw-line')!.addEventListener('click', () => {
       this.drawLine_();
     });
 
-    getEl('calculator-submit').addEventListener('click', (e) => {
+    getEl('calculator-submit')!.addEventListener('click', (e) => {
       e.preventDefault();
       this.handleSubmit_();
     });
@@ -500,7 +498,7 @@ export class Calculator extends KeepTrackPlugin {
   private changeToITRF_(): void {
     this.currentMode = CalculatorMode.ITRF;
 
-    getEl('calculator-content-wrapper').innerHTML = this.itrfHtml;
+    getEl('calculator-content-wrapper')!.innerHTML = this.itrfHtml;
     this.addRemovableListeners();
 
     const x = getEl('calc-itrf-x-input') as HTMLInputElement;
@@ -515,7 +513,7 @@ export class Calculator extends KeepTrackPlugin {
   private changeToJ2000_(): void {
     this.currentMode = CalculatorMode.J2000;
 
-    getEl('calculator-content-wrapper').innerHTML = this.j2000Html;
+    getEl('calculator-content-wrapper')!.innerHTML = this.j2000Html;
     this.addRemovableListeners();
 
     const x = getEl('calc-itrf-x-input') as HTMLInputElement;
@@ -530,7 +528,7 @@ export class Calculator extends KeepTrackPlugin {
   private changeToRAE_(): void {
     this.currentMode = CalculatorMode.RAE;
 
-    getEl('calculator-content-wrapper').innerHTML = this.raeHtml;
+    getEl('calculator-content-wrapper')!.innerHTML = this.raeHtml;
     this.addRemovableListeners();
 
     const x = getEl('calc-itrf-x-input') as HTMLInputElement;

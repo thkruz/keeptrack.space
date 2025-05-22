@@ -48,10 +48,9 @@ export class SensorFov extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: this.id,
-      cb: (sensor): void => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.setSensor,
+      (sensor): void => {
         if (sensor) {
           getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
@@ -62,12 +61,11 @@ export class SensorFov extends KeepTrackPlugin {
           getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
         }
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.id,
-      cb: (sensor): void => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.sensorDotSelected,
+      (sensor): void => {
         if (sensor) {
           getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
           this.isIconDisabled = false;
@@ -78,11 +76,11 @@ export class SensorFov extends KeepTrackPlugin {
           getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
         }
       },
-    });
+    );
   }
 
   disableFovView() {
-    keepTrackApi.runEvent(KeepTrackApiEvents.changeSensorMarkers, this.id);
+    keepTrackApi.emit(KeepTrackApiEvents.changeSensorMarkers, this.id);
     this.setBottomIconToUnselected(false);
   }
 

@@ -105,21 +105,19 @@ export class Screenshot extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.altCanvasResize,
-      cbName: this.id,
-      cb: () => this.queuedScreenshot_,
-    });
+    keepTrackApi.on(
+      KeepTrackApiEvents.altCanvasResize,
+      () => this.queuedScreenshot_,
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.endOfDraw,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.endOfDraw,
+      () => {
         if (this.queuedScreenshot_) {
           this.takeScreenShot();
         }
       },
-    });
+    );
   }
 
   private queuedScreenshot_ = false;

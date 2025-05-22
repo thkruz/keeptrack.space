@@ -15,8 +15,8 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   readonly id = 'PolarPlotPlugin';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
-  passStartTime_: Date;
-  passStopTime_: Date;
+  passStartTime_: Date | null = null;
+  passStopTime_: Date | null = null;
 
   private readonly plotDuration_ = 3;
 
@@ -64,11 +64,10 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
-        getEl('polar-plot-save').addEventListener('click', () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        getEl('polar-plot-save')!.addEventListener('click', () => {
           const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
           const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
           const link = document.createElement('a');
@@ -78,46 +77,44 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
           link.click();
         });
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.staticOffsetChange,
+      () => {
         if (this.isMenuButtonActive) {
           this.updatePlot_();
         }
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+          getEl(this.bottomIconElementName)!.classList.remove('bmenu-item-disabled');
           this.isIconDisabled = false;
           // If it is open then refresh the plot
           if (this.isMenuButtonActive) {
             this.updatePlot_();
           }
         } else {
-          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+          getEl(this.bottomIconElementName)!.classList.add('bmenu-item-disabled');
           this.isIconDisabled = true;
         }
       },
-    });
+    );
 
     const keyboardManager = keepTrackApi.getInputManager().keyboard;
 
     keyboardManager.registerKeyUpEvent({
       key: 'P',
       callback: () => {
-        if (keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
+        if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
           return;
         }
 
@@ -150,7 +147,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       showEl('polar-plot-warning');
       hideEl('polar-plot');
       hideEl('polar-plot-save');
-      getEl('polar-plot-warning').innerHTML = `Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours`;
+      getEl('polar-plot-warning')!.innerHTML = `Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours`;
     }
   }
 
@@ -176,17 +173,19 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     }
 
     this.plotData_ = [];
-    let now: Date = null;
+    let now: Date | null = null;
 
     for (let i = 0; i < this.plotDuration_ * secondsPerDay; i++) {
       now = keepTrackApi.getTimeManager().getOffsetTimeObj(i * MILLISECONDS_PER_SECOND);
       const inView = sensor.isSatInFov(sat, now);
 
       if (inView) {
-        if (!this.passStartTime_) {
-          this.passStartTime_ = now;
-        }
+        this.passStartTime_ ??= now;
         const rae = sensor.rae(sat, now);
+
+        if (!rae) {
+          continue;
+        }
 
         this.plotData_.push([rae.az, rae.el]);
         isSomethingInView = true;
@@ -213,9 +212,9 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.ctx_.fillStyle = 'rgb(255, 255, 255)';
     this.ctx_.textAlign = 'left';
     this.ctx_.textBaseline = 'top';
-    const sensorName = keepTrackApi.getSensorManager().getSensor().name;
+    const sensorName = keepTrackApi.getSensorManager().getSensor()?.name ?? 'Unknown Sensor';
     const satNum = (this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum;
-    const timeRange = `${this.passStartTime_.toISOString().slice(11, 19)} - ${this.passStopTime_.toISOString().slice(11, 19)}`;
+    const timeRange = `${this.passStartTime_?.toISOString().slice(11, 19) ?? 'Unknown Start Time'} - ${this.passStopTime_?.toISOString().slice(11, 19) ?? 'Unknown Stop Time'}`;
 
     this.ctx_.fillText(sensorName, 10, 10);
     this.ctx_.fillText(`Satellite ${satNum}`, 10, this.canvasSize_ * 0.035 + 15);
@@ -231,7 +230,12 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       return;
     }
 
-    this.ctx_ = canvas.getContext('2d');
+    this.ctx_ = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+    if (!this.ctx_) {
+      return;
+    }
+
     this.canvasSize_ = Math.min(this.ctx_.canvas.width, this.ctx_.canvas.height);
 
     this.ctx_.imageSmoothingEnabled = true;

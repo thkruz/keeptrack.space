@@ -8,7 +8,7 @@ describe('astronomy plugin', () => {
   standardPluginSuite(Astronomy);
   standardPluginMenuButtonTests(Astronomy);
 
-  keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 0);
+  keepTrackApi.emit(KeepTrackApiEvents.setSensor, defaultSensor, 0);
   keepTrackApi.getCatalogManager().isStarManagerLoaded = true;
   standardPluginMenuButtonTests(Astronomy);
 });

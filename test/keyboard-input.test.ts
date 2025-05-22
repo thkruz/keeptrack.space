@@ -1,3 +1,4 @@
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { KeyboardInput } from '@app/singletons/input-manager/keyboard-input';
 import { keepTrackContainer } from '../src/container';
 import { Singletons } from '../src/interfaces';
@@ -91,14 +92,16 @@ describe('KeyboardInput_class', () => {
   // Tests that registerKeyEvent adds a new KeyEvent object to the keyEvents array
   it('test_register_key_event', () => {
     const keyboardInput = new KeyboardInput();
+    let test = false;
 
     keyboardInput.init();
-    keyboardInput.registerKeyEvent({
-      key: 'R',
-      callback: () => {
-        // Do nothing
-      },
+    keepTrackApi.on(InputEventType.KeyDown, (key: string) => {
+      if (key === 'R') {
+        test = true;
+      }
     });
-    expect(keyboardInput.keyEvents).toHaveLength(1);
+    keepTrackApi.emit(InputEventType.KeyDown, 'R', 'KeyR', false, false, false);
+
+    expect(test).toBe(true);
   });
 });

@@ -438,6 +438,12 @@ export class SelectSatManager extends KeepTrackPlugin {
       if ((key === '[' || key === ']') && !isRepeat) {
         this.switchPrimarySecondary();
       }
+      if (key === '{' && !isRepeat) {
+        this.selectPrevSat();
+      }
+      if (key === '}' && !isRepeat) {
+        this.selectNextSat();
+      }
     });
   }
 }

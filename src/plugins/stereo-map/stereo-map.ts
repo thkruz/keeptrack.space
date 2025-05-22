@@ -43,7 +43,7 @@
  */
 
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { getEl, showEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import mapPng from '@public/img/icons/map.png';
@@ -155,11 +155,8 @@ export class StereoMap extends KeepTrackPlugin {
       },
     );
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyUpEvent({
-      key: 'M',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'M' && !isRepeat) {
         if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
           return;
         }
@@ -174,7 +171,7 @@ export class StereoMap extends KeepTrackPlugin {
           this.setBottomIconToUnselected();
           keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
         }
-      },
+      }
     });
   }
 

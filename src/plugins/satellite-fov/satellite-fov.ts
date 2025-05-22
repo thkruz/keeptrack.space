@@ -20,7 +20,7 @@
  */
 
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
@@ -184,30 +184,25 @@ export class SatelliteFov extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'C' && !isRepeat) {
+        const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
 
-    keyboardManager.registerKeyEvent({
-      key: 'C',
-      callback: () => {
-        if (keyboardManager.isShiftPressed) {
-          const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
+        if (currentSat) {
+          const coneFactory = keepTrackApi.getScene().coneFactory;
 
-          if (currentSat) {
-            const coneFactory = keepTrackApi.getScene().coneFactory;
+          // See if it is already in the scene
+          const cone = coneFactory.checkCacheForMesh_(currentSat);
 
-            // See if it is already in the scene
-            const cone = coneFactory.checkCacheForMesh_(currentSat);
-
-            if (cone) {
-              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
-              coneFactory.remove(cone.id);
-            } else {
-              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
-              coneFactory.generateMesh(currentSat);
-            }
+          if (cone) {
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+            coneFactory.remove(cone.id);
+          } else {
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+            coneFactory.generateMesh(currentSat);
           }
         }
-      },
+      }
     });
 
     keepTrackApi.on(

@@ -729,7 +729,6 @@ export class Camera {
   }
 
   private registerKeyboardEvents_() {
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
     const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
     const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
@@ -767,9 +766,10 @@ export class Camera {
       });
     });
 
-    keyboardManager.registerKeyEvent({
-      key: '`',
-      callback: this.resetRotation.bind(this),
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === '`' && !isRepeat) {
+        this.resetRotation();
+      }
     });
   }
 
@@ -994,13 +994,11 @@ export class Camera {
   }
 
   keyDownNumpadAdd_() {
-    this.isZoomIn = true;
-    this.zoomTarget -= 0.02;
+    this.zoomIn();
   }
 
   keyDownNumpadSubtract_() {
-    this.isZoomIn = false;
-    this.zoomTarget += 0.02;
+    this.zoomOut();
   }
 
   keyDownQ_() {

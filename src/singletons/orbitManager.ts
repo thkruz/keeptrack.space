@@ -1,8 +1,9 @@
 /* */
 
-import { KeepTrackApiEvents } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
@@ -133,14 +134,14 @@ export class OrbitManager {
     gl.enable(gl.DEPTH_TEST);
 
     if (settingsManager.enableConstantSelectedSatRedraw) {
-      if (selectSatManagerInstance?.selectedSat > -1) {
+      if ((selectSatManagerInstance?.selectedSat ?? -1) > -1) {
         this.clearSelectOrbit(false);
-        this.setSelectOrbit(selectSatManagerInstance?.selectedSat, false);
+        this.setSelectOrbit(selectSatManagerInstance?.selectedSat ?? -1, false);
       }
 
-      if (selectSatManagerInstance?.secondarySat > -1) {
+      if ((selectSatManagerInstance?.secondarySat ?? -1) > -1) {
         this.clearSelectOrbit(true);
-        this.setSelectOrbit(selectSatManagerInstance?.secondarySat, true);
+        this.setSelectOrbit(selectSatManagerInstance?.secondarySat ?? -1, true);
       }
     }
   }
@@ -204,7 +205,42 @@ export class OrbitManager {
     });
     this.isInitialized_ = true;
 
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (!isRepeat) {
+        switch (key) {
+          case 'L':
+            this.toggleOrbitLines_();
+            SettingsMenuPlugin.syncOnLoad();
+            break;
+          case 'E':
+            this.toggleEciToEcf_();
+            SettingsMenuPlugin.syncOnLoad();
+            break;
+          default:
+            break;
+        }
+      }
+    });
+
     keepTrackApi.emit(KeepTrackApiEvents.orbitManagerInit);
+  }
+
+  private toggleOrbitLines_() {
+    settingsManager.isDrawOrbits = !settingsManager.isDrawOrbits;
+    if (settingsManager.isDrawOrbits) {
+      keepTrackApi.getUiManager().toast('Orbits On', ToastMsgType.normal);
+    } else {
+      keepTrackApi.getUiManager().toast('Orbits Off', ToastMsgType.standby);
+    }
+  }
+
+  private toggleEciToEcf_() {
+    settingsManager.isOrbitCruncherInEcf = !settingsManager.isOrbitCruncherInEcf;
+    if (settingsManager.isOrbitCruncherInEcf) {
+      keepTrackApi.getUiManager().toast('GEO Orbits displayed in ECF', ToastMsgType.normal);
+    } else {
+      keepTrackApi.getUiManager().toast('GEO Orbits displayed in ECI', ToastMsgType.standby);
+    }
   }
 
   private startCruncher_(orbitWorker?: Worker) {

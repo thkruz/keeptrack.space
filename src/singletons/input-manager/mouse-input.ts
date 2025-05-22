@@ -181,7 +181,7 @@ export class MouseInput {
       }
       if (evt.button === 2) {
         // Right Mouse Button Clicked
-        if (!this.keyboard_.isCtrlPressed && !this.keyboard_.isShiftPressed) {
+        if (!this.keyboard_.getKey('Ctrl') && !this.keyboard_.getKey('Shift')) {
           keepTrackApi.getInputManager().openRmbMenu(this.clickedSat);
         }
       }
@@ -206,7 +206,8 @@ export class MouseInput {
     }
 
     const isFullScreen = keepTrackApi.containerRoot.clientWidth === window.innerWidth && keepTrackApi.containerRoot.clientHeight === window.innerHeight;
-    const { isCtrlPressed, isShiftPressed } = keepTrackApi.getInputManager().keyboard;
+    const isCtrlPressed = keepTrackApi.getInputManager().keyboard.getKey('Ctrl');
+    const isShiftPressed = keepTrackApi.getInputManager().keyboard.getKey('Shift');
 
     if (!isFullScreen && !isCtrlPressed && !isShiftPressed) {
       return;
@@ -235,7 +236,7 @@ export class MouseInput {
 
     if (settingsManager.disableZoomControls || settingsManager.disableNormalEvents) {
       const stopWheelZoom = (event: Event) => {
-        if (this.keyboard_.isCtrlPressed) {
+        if (this.keyboard_.getKey('Ctrl')) {
           event.preventDefault();
         }
       };
@@ -355,7 +356,7 @@ export class MouseInput {
          */
         if (evt.button === 1) {
           keepTrackApi.getMainCamera().localRotateStartPosition = keepTrackApi.getMainCamera().localRotateCurrent;
-          if (this.keyboard_.isShiftPressed) {
+          if (this.keyboard_.getKey('Shift')) {
             keepTrackApi.getMainCamera().isLocalRotateRoll = true;
             keepTrackApi.getMainCamera().isLocalRotateYaw = false;
           } else {
@@ -366,9 +367,9 @@ export class MouseInput {
         }
 
         // Right Mouse Button RMB
-        if (evt.button === 2 && (this.keyboard_.isShiftPressed || this.keyboard_.isCtrlPressed)) {
+        if (evt.button === 2 && (this.keyboard_.getKey('Shift') || this.keyboard_.getKey('Ctrl'))) {
           keepTrackApi.getMainCamera().panStartPosition = keepTrackApi.getMainCamera().panCurrent;
-          if (this.keyboard_.isShiftPressed) {
+          if (this.keyboard_.getKey('Shift')) {
             keepTrackApi.getMainCamera().isScreenPan = false;
             keepTrackApi.getMainCamera().isWorldPan = true;
           } else {

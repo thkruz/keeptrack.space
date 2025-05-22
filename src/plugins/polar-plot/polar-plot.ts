@@ -1,5 +1,5 @@
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
 
@@ -109,11 +109,8 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       },
     );
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyUpEvent({
-      key: 'P',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'P' && !isRepeat) {
         if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
           return;
         }
@@ -132,7 +129,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
           this.setBottomIconToUnselected();
           keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
         }
-      },
+      }
     });
   }
 

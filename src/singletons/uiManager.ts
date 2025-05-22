@@ -269,6 +269,12 @@ export class UiManager {
       }
     });
 
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'B' && !isRepeat) {
+        this.toggleBottomMenu();
+      }
+    });
+
     window.M.Dropdown.init(elems);
     this.isInitialized_ = true;
   }

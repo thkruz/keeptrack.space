@@ -4,7 +4,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
 import { DetailedSatellite, SpaceObjectType, Star } from 'ootk';
-import { keepTrackApi } from '../keepTrackApi';
+import { InputEventType, keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { slideInDown, slideOutUp } from '../lib/slide';
 import { TopMenu } from '../plugins/top-menu/top-menu';
@@ -51,6 +51,19 @@ export class SearchManager {
     uiWrapper!.prepend(searchResults);
 
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.addListeners_.bind(this));
+  }
+
+  init() {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'F' && !isRepeat) {
+        this.toggleSearch();
+        if (this.isSearchOpen) {
+          setTimeout(() => {
+            getEl('search')?.focus();
+          }, 1000);
+        }
+      }
+    });
   }
 
   private addListeners_() {

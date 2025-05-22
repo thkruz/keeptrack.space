@@ -14,7 +14,7 @@ import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
-import { keepTrackApi } from './../../keepTrackApi';
+import { InputEventType, keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
 
 // TODO: Add a search bar and filter for sensors
@@ -206,11 +206,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     );
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyUpEvent({
-      key: 'Home',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'Home' && !isRepeat) {
         // If a sensor is selected rotate the camera to it
         if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&
           (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT)) {
@@ -219,7 +216,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
           keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, keepTrackApi.getTimeManager().selectedDate);
           keepTrackApi.getSoundManager().play(SoundNames.WHOOSH);
         }
-      },
+      }
     });
   }
 

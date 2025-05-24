@@ -234,7 +234,7 @@ export class KeepTrack {
     keepTrackApi.containerRoot.id = 'keeptrack-root';
     keepTrackApi.containerRoot.innerHTML += keepTrackApi.html`
       <header>
-        <div id="keeptrack-header"></div>
+        <div id="keeptrack-header" class="start-hidden"></div>
       </header>
       <main>
         <div id="rmb-wrapper"></div>

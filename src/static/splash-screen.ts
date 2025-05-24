@@ -86,6 +86,7 @@ Unauthorized use, rebranding, or removal of attribution may violate trademark an
     if (settingsManager.isMobileModeEnabled) {
       SplashScreen.loadStr(SplashScreen.msg.math);
       hideEl('loading-screen');
+      showEl('keeptrack-header');
     } else {
       // Loading Screen Resized and Hidden
       setTimeout(() => {
@@ -93,6 +94,7 @@ Unauthorized use, rebranding, or removal of attribution may violate trademark an
         getEl('loading-screen')?.classList.add('mini-loader-container');
         getEl('logo-inner-container')?.classList.add('mini-loader');
         hideEl('loading-screen');
+        showEl('keeptrack-header');
         SplashScreen.loadStr(SplashScreen.msg.math);
       }, 100);
     }

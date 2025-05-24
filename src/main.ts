@@ -22,10 +22,24 @@
 
 import { KeepTrack } from './keeptrack';
 
-// Check if the browser is safari
-const isSafari = (/^(?:(?!chrome|android).)*safari/iu).test(navigator.userAgent);
+const isSafari = (): boolean => {
+  const ua = navigator.userAgent;
 
-if (isSafari) {
+  // Immediately reject if any third-party browser identifier is found
+  if ((/(?:CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|Brave|Focus|Chrome|Firefox|Edge|Opera)/iu).test(ua)) {
+    return false;
+  }
+
+  /*
+   * Check for Safari-specific pattern
+   * Safari has "Version/X.X" followed by "Safari/XXX.X.X" at the end
+   */
+  const safariPattern = /Version\/[\d.]+ .*Safari\/[\d.]+$/u;
+
+  return safariPattern.test(ua);
+};
+
+if (isSafari()) {
   // Safari is not supported
   // eslint-disable-next-line no-alert
   alert(

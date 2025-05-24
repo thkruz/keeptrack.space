@@ -6,7 +6,7 @@ describe('plugins', () => {
     loadPlugins(keepTrackApi, {
       debug: false,
       satInfoboxCore: true,
-      aboutManager: true,
+      AboutMenuPlugin: true,
       collisions: true,
       DopsPlugin: true,
       findSat: true,

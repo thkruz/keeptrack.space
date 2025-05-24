@@ -175,8 +175,8 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
         init: () => (async () => {
           const proPlugin = await import('../plugins-pro/about-menu/about-menu');
 
-          new proPlugin.AboutMenu().init();
-        })(), config: plugins.aboutManager,
+          new proPlugin.AboutMenuPlugin().init();
+        })(), config: plugins.AboutMenuPlugin,
       },
     ];
 

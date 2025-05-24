@@ -19,7 +19,7 @@ export type KeepTrackPluginsConfiguration = {
   nightToggle?: PluginConfiguration;
   countries?: PluginConfiguration;
   screenRecorder?: PluginConfiguration;
-  aboutManager?: PluginConfiguration;
+  AboutMenuPlugin?: PluginConfiguration;
   settingsMenu?: PluginConfiguration;
   soundManager?: PluginConfiguration;
   analysis?: PluginConfiguration;

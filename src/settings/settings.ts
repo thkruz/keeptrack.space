@@ -56,8 +56,9 @@ export class SettingsManager {
     satInfoboxCore: {
       enabled: true,
     },
-    aboutManager: {
+    AboutMenuPlugin: {
       enabled: false,
+      order: 101,
     },
     collisions: {
       enabled: true,

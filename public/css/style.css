@@ -1,5 +1,4 @@
 :root {
-  --bottom-menu-height: 120px;
   --bottom-menu-top: 0px;
   --bottom-icon-height: 75px;
   --bottom-icon-width: 115px;
@@ -1096,7 +1095,7 @@ input:focus {
   padding-bottom: 10px;
   z-index: 11;
   overflow-y: auto;
-  height: var(--bottom-menu-height);
+  max-height: var(--bottom-menu-height);
 }
 
 .bmenu-item {

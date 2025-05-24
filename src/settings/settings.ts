@@ -51,7 +51,23 @@ export class SettingsManager {
     },
     SensorListPlugin: {
       enabled: true,
-      order: 1,
+      order: 10,
+    },
+    SensorInfoPlugin: {
+      enabled: true,
+      order: 11,
+    },
+    CustomSensorPlugin: {
+      enabled: true,
+      order: 12,
+    },
+    LookAnglesPlugin: {
+      enabled: true,
+      order: 20,
+    },
+    MultiSiteLookAnglesPlugin: {
+      enabled: true,
+      order: 21,
     },
     satInfoboxCore: {
       enabled: true,

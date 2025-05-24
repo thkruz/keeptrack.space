@@ -8,6 +8,10 @@ export type PluginConfiguration = {
 export type KeepTrackPluginsConfiguration = {
   DebugMenuPlugin?: PluginConfiguration;
   SensorListPlugin?: PluginConfiguration;
+  SensorInfoPlugin?: PluginConfiguration;
+  CustomSensorPlugin?: PluginConfiguration;
+  LookAnglesPlugin?: PluginConfiguration;
+  MultiSiteLookAnglesPlugin?: PluginConfiguration;
   filterMenu?: PluginConfiguration;
   transponderChannelData?: PluginConfiguration;
   videoDirector?: PluginConfiguration;

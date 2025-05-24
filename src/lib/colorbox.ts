@@ -40,7 +40,10 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
   showLoading(() => {
     colorboxDom.style.display = 'block';
     if (options.image) {
-      setupImageColorbox_(url);
+      setupImageColorbox_(url, () => {
+        slideInRight(getEl('colorbox-container'), 750);
+        hideLoading();
+      });
     } else {
       setupIframeColorbox_(url, () => {
         slideInRight(getEl('colorbox-container'), 750);
@@ -150,7 +153,7 @@ const setupIframeColorbox_ = (url: string, onLoadCb: () => void) => {
 /**
  * Sets the colorbox to display an image
  */
-const setupImageColorbox_ = (url: string) => {
+const setupImageColorbox_ = (url: string, onLoadCb: () => void) => {
   const colorboxContainerDom = getEl('colorbox-container');
 
   if (!colorboxContainerDom) {
@@ -161,11 +164,16 @@ const setupImageColorbox_ = (url: string) => {
 
   colorboxContainerDom.style.transform = 'translateX(-200%)';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'none';
-  (<HTMLImageElement>getEl('colorbox-img')).style.display = 'block';
+  const colorboxImage = <HTMLImageElement>getEl('colorbox-img');
+
+  colorboxImage.style.display = 'block';
+  colorboxImage.onload = () => {
+    onLoadCb();
+  };
   // Catch failures to load images
-  (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {
+  colorboxImage.onerror = () => {
     errorManagerInstance.warn(`Failed to load image: ${url}`);
     closeColorbox();
   };
-  (<HTMLImageElement>getEl('colorbox-img')).src = url;
+  colorboxImage.src = url;
 };

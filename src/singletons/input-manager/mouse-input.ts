@@ -21,7 +21,7 @@ import { KeyboardInput } from './keyboard-input';
 
 export class MouseInput {
   private dragHasMoved = false;
-  private keyboard_: KeyboardInput;
+  private readonly keyboard_: KeyboardInput;
   private mouseTimeout = -1;
 
   public canvasClick = null;
@@ -82,9 +82,6 @@ export class MouseInput {
           ++numMenuItems;
         }
       });
-
-    getEl('earth-nasa-rmb')!.style.display = 'block';
-    getEl('earth-flat-rmb')!.style.display = 'block';
 
     return numMenuItems;
   }
@@ -205,8 +202,6 @@ export class MouseInput {
     const clearScreenDOM = getEl('clear-screen-rmb');
     const clearLinesDOM = getEl('clear-lines-rmb');
     const toggleTimeDOM = getEl('toggle-time-rmb');
-    const rightBtnDrawDOM = getEl('draw-rmb');
-    const rightBtnEarthDOM = getEl('earth-rmb');
 
     if (settingsManager.disableZoomControls || settingsManager.disableNormalEvents) {
       const stopWheelZoom = (event: Event) => {
@@ -264,15 +259,6 @@ export class MouseInput {
         });
       }
 
-      const rightBtnDrawDOMDropdown = () => {
-        InputManager.clearRMBSubMenu();
-        InputManager.showDropdownSubMenu(rightBtnMenuDOM, rightBtnDrawMenuDOM, canvasDOM);
-      };
-      const rightBtnEarthDOMDropdown = () => {
-        InputManager.clearRMBSubMenu();
-        InputManager.showDropdownSubMenu(rightBtnMenuDOM, rightBtnEarthMenuDOM, canvasDOM);
-      };
-
       // Create Event Listeners for Right Menu Buttons
       keepTrackApi.rmbMenuItems
         .map(({ elementIdL2 }) => getEl(elementIdL2))
@@ -300,22 +286,10 @@ export class MouseInput {
         });
       });
 
-      rightBtnDrawDOM?.addEventListener('mouseenter', () => {
-        rightBtnDrawDOMDropdown();
-      });
-      rightBtnDrawDOM?.addEventListener('click', () => {
-        rightBtnDrawDOMDropdown();
-      });
       rightBtnDrawMenuDOM?.addEventListener('mouseleave', () => {
         rightBtnDrawMenuDOM.style.display = 'none';
       });
 
-      rightBtnEarthDOM?.addEventListener('mouseenter', () => {
-        rightBtnEarthDOMDropdown();
-      });
-      rightBtnEarthDOM?.addEventListener('click', () => {
-        rightBtnEarthDOMDropdown();
-      });
       rightBtnEarthMenuDOM?.addEventListener('mouseleave', () => {
         rightBtnEarthMenuDOM.style.display = 'none';
       });

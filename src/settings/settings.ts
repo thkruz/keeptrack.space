@@ -45,8 +45,13 @@ export class SettingsManager {
   activeMenuMode: MenuMode = MenuMode.BASIC;
   // This controls which of the built-in plugins are loaded
   plugins = <KeepTrackPluginsConfiguration>{
-    debug: {
+    DebugMenuPlugin: {
       enabled: true,
+      order: 0,
+    },
+    SensorListPlugin: {
+      enabled: true,
+      order: 1,
     },
     satInfoboxCore: {
       enabled: true,
@@ -1648,7 +1653,7 @@ export class SettingsManager {
             );
             break;
           case 'debug':
-            this.plugins.debug = { enabled: true };
+            this.plugins.DebugMenuPlugin = { enabled: true };
             break;
           case 'nomarkers':
             this.maxFieldOfViewMarkers = 1;

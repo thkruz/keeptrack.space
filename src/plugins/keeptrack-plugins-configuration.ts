@@ -2,9 +2,12 @@
 export type PluginConfiguration = {
   enabled: boolean;
   menuMode?: number[];
+  order?: number;
 };
 
 export type KeepTrackPluginsConfiguration = {
+  DebugMenuPlugin?: PluginConfiguration;
+  SensorListPlugin?: PluginConfiguration;
   filterMenu?: PluginConfiguration;
   transponderChannelData?: PluginConfiguration;
   videoDirector?: PluginConfiguration;
@@ -30,7 +33,6 @@ export type KeepTrackPluginsConfiguration = {
   constellations?: PluginConfiguration;
   countriesMenu?: PluginConfiguration;
   datetime?: PluginConfiguration;
-  debug?: PluginConfiguration;
   DopsPlugin?: PluginConfiguration;
   editSat?: PluginConfiguration;
   gamepad?: PluginConfiguration;

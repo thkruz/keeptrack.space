@@ -557,7 +557,7 @@ theodore.kruczek at gmail dot com.
        * Create Container Div
        * NOTE: This needs to be done before uiManagerFinal
        */
-      if (settingsManager.plugins.debug) {
+      if (settingsManager.plugins.DebugMenuPlugin) {
         const uiWrapperDom = getEl('ui-wrapper');
 
         if (uiWrapperDom) {
@@ -568,7 +568,7 @@ theodore.kruczek at gmail dot com.
       // Update any CSS now that we know what is loaded
       keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
 
-      if (settingsManager.plugins.debug) {
+      if (settingsManager.plugins.DebugMenuPlugin) {
         const erudaDom = getEl('eruda');
 
         if (erudaDom) {

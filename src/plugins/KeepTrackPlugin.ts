@@ -49,7 +49,7 @@ export abstract class KeepTrackPlugin {
   static readonly iconSelectedClassString = 'bmenu-item-selected';
   static readonly iconDisabledClassString = 'bmenu-item-disabled';
 
-  abstract id: string;
+  id: string;
 
   /**
    * The dependencies of the plugin.
@@ -216,6 +216,7 @@ export abstract class KeepTrackPlugin {
    * @default 'settings'
    */
   secondaryMenuIcon = 'settings';
+  bottomIconOrder: number | null = null;
 
   /**
    * Creates a new instance of the KeepTrackPlugin class.
@@ -256,6 +257,8 @@ export abstract class KeepTrackPlugin {
     if (settingsManager.plugins[this.id]?.menuMode) {
       this.menuMode = settingsManager.plugins[this.id].menuMode;
     }
+
+    this.bottomIconOrder = settingsManager.plugins?.[this.id]?.order ?? null;
 
     this.addHtml();
     this.addJs();
@@ -622,6 +625,8 @@ export abstract class KeepTrackPlugin {
         const button = document.createElement('div');
 
         button.id = this.bottomIconElementName;
+        // embed an order id to allow for sorting
+        button.setAttribute('data-order', this.bottomIconOrder?.toString() ?? '100');
         button.classList.add('bmenu-item');
         if (isDisabled) {
           button.classList.add('bmenu-item-disabled');

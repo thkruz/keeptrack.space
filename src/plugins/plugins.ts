@@ -80,17 +80,17 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new TopMenu().init(), config: plugins.topMenu },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/debug/debug');
+          const proPlugin = await import('../plugins-pro/debug/debug');
 
           new proPlugin.DebugMenuPlugin().init();
-        })(), config: plugins.debug,
+        })(), config: plugins.DebugMenuPlugin,
       },
       { init: () => new SatInfoBox().init(), config: plugins.satInfoboxCore },
       { init: () => new DateTimeManager().init(), config: plugins.datetime },
       { init: () => new SocialMedia().init(), config: plugins.social },
       { init: () => new ClassificationBar().init(), config: plugins.classificationBar },
       { init: () => new SoundManager().init(), config: plugins.soundManager },
-      { init: () => new SensorListPlugin().init(), config: plugins.sensor },
+      { init: () => new SensorListPlugin().init(), config: plugins.SensorListPlugin },
       { init: () => new SensorInfoPlugin().init(), config: plugins.sensor },
       { init: () => new CustomSensorPlugin().init(), config: plugins.sensor },
       { init: () => new LookAnglesPlugin().init(), config: plugins.sensor },
@@ -122,14 +122,14 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new SatelliteFov().init(), config: plugins.satelliteFov },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/planetarium/planetarium');
+          const proPlugin = await import('../plugins-pro/planetarium/planetarium');
 
           new proPlugin.Planetarium().init();
         })(), config: plugins.planetarium,
       },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/astronomy/astronomy');
+          const proPlugin = await import('../plugins-pro/astronomy/astronomy');
 
           new proPlugin.Astronomy().init();
         })(), config: plugins.astronomy,
@@ -147,7 +147,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new AnalysisMenu().init(), config: plugins.analysis },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/initial-orbit/initial-orbit');
+          const proPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
 
           new proPlugin.InitialOrbitDeterminationPlugin().init();
         })(), config: plugins.initialOrbit,
@@ -164,7 +164,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new SettingsMenuPlugin().init(), config: plugins.settingsMenu },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/graphics-menu/graphics-menu');
+          const proPlugin = await import('../plugins-pro/graphics-menu/graphics-menu');
 
           new proPlugin.GraphicsMenuPlugin().init();
         })(), config: plugins.graphicsMenu,
@@ -173,7 +173,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new VideoDirectorPlugin().init(), config: plugins.videoDirector },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/about-menu/about-menu');
+          const proPlugin = await import('../plugins-pro/about-menu/about-menu');
 
           new proPlugin.AboutMenu().init();
         })(), config: plugins.aboutManager,

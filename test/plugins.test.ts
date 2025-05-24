@@ -38,7 +38,6 @@ describe('plugins', () => {
       Astronomy: true,
       screenshot: true,
       WatchlistPlugin: true,
-      sensor: true,
       settingsMenu: true,
       datetime: true,
       social: true,

@@ -57,7 +57,6 @@ export type KeepTrackPluginsConfiguration = {
   satChanges?: PluginConfiguration;
   SatelliteViewPlugin?: PluginConfiguration;
   screenshot?: PluginConfiguration;
-  sensor?: PluginConfiguration;
   SensorFov?: PluginConfiguration;
   SensorSurvFence?: PluginConfiguration;
   ShortTermFences?: PluginConfiguration;

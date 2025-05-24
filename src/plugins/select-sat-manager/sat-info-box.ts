@@ -1718,7 +1718,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private static updateSensorInfo_(obj: BaseObject) {
-    if (obj === null || typeof obj === 'undefined' || !settingsManager.plugins.sensor) {
+    if (obj === null || typeof obj === 'undefined' || settingsManager.isDisableSensors) {
       return;
     }
     const sensorManagerInstance = keepTrackApi.getSensorManager();
@@ -1727,7 +1727,7 @@ export class SatInfoBox extends KeepTrackPlugin {
      * If we are using the sensor manager plugin then we should hide the sensor to satellite
      * info when there is no sensor selected
      */
-    if (settingsManager.plugins.sensor) {
+    if (!settingsManager.isDisableSensors) {
       if (sensorManagerInstance.isSensorSelected()) {
         showEl('sensor-sat-info');
       } else {

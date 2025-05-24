@@ -113,9 +113,17 @@ export class SettingsManager {
       enabled: true,
       order: 71,
     },
-    MissilePlugin: {
+    NewLaunch: {
       enabled: true,
       order: 72,
+    },
+    Breakup: {
+      enabled: true,
+      order: 73,
+    },
+    MissilePlugin: {
+      enabled: true,
+      order: 74,
     },
     FindSatPlugin: {
       enabled: true,
@@ -136,18 +144,43 @@ export class SettingsManager {
     satInfoboxCore: {
       enabled: true,
     },
+    StereoMap: {
+      enabled: true,
+      order: 150,
+    },
+    SatelliteViewPlugin: {
+      enabled: true,
+      order: 151,
+    },
+    Planetarium: {
+      enabled: true,
+      order: 155,
+    },
+    Astronomy: {
+      enabled: true,
+      order: 156,
+    },
+    SatConstellations: {
+      enabled: true,
+      order: 230,
+    },
+    CountriesMenu: {
+      enabled: true,
+      order: 231,
+    },
+    ColorMenu: {
+      enabled: true,
+      order: 232,
+    },
     AboutMenuPlugin: {
       enabled: false,
-      order: 101,
+      order: 301,
     },
     DopsPlugin: {
       enabled: true,
       menuMode: [MenuMode.ANALYSIS],
     },
     launchCalendar: {
-      enabled: true,
-    },
-    newLaunch: {
       enabled: true,
     },
     nextLaunch: {
@@ -165,26 +198,11 @@ export class SettingsManager {
     satChanges: {
       enabled: false,
     },
-    stereoMap: {
-      enabled: true,
-    },
     timeMachine: {
       enabled: true,
     },
     initialOrbit: {
       enabled: false,
-    },
-    breakup: {
-      enabled: true,
-    },
-    constellations: {
-      enabled: true,
-    },
-    countries: {
-      enabled: true,
-    },
-    colorsMenu: {
-      enabled: true,
     },
     orbitReferences: {
       enabled: true,
@@ -192,19 +210,35 @@ export class SettingsManager {
     analysis: {
       enabled: true,
     },
-    plotAnalysis: {
+    EciPlot: {
       enabled: true,
+      order: 260,
+    },
+    EcfPlot: {
+      enabled: true,
+      order: 261,
+    },
+    RicPlot: {
+      enabled: true,
+      order: 262,
+    },
+    Time2LonPlots: {
+      enabled: true,
+      order: 263,
+    },
+    Lat2LonPlots: {
+      enabled: true,
+      order: 264,
+    },
+    Inc2AltPlots: {
+      enabled: true,
+      order: 265,
+    },
+    Inc2LonPlots: {
+      enabled: true,
+      order: 266,
     },
     satelliteFov: {
-      enabled: true,
-    },
-    satelliteView: {
-      enabled: true,
-    },
-    planetarium: {
-      enabled: true,
-    },
-    astronomy: {
       enabled: true,
     },
     screenshot: {

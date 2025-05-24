@@ -110,35 +110,35 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new OrbitReferences().init(), config: plugins.orbitReferences },
       { init: () => new Collisions().init(), config: plugins.Collisions },
       { init: () => new TrackingImpactPredict().init(), config: plugins.TrackingImpactPredict },
-      { init: () => new Breakup().init(), config: plugins.breakup },
+      { init: () => new Breakup().init(), config: plugins.Breakup },
       { init: () => new DebrisScreening().init(), config: plugins.debrisScreening },
       { init: () => new TransponderChannelData().init(), config: plugins.transponderChannelData },
       { init: () => new CreateSat().init(), config: plugins.CreateSat },
       { init: () => new EditSat().init(), config: plugins.EditSat },
+      { init: () => new NewLaunch().init(), config: plugins.NewLaunch },
       { init: () => new MissilePlugin().init(), config: plugins.MissilePlugin },
-      { init: () => new NewLaunch().init(), config: plugins.newLaunch },
-      { init: () => new StereoMap().init(), config: plugins.stereoMap },
-      { init: () => new SatelliteViewPlugin().init(), config: plugins.satelliteView },
+      { init: () => new SatelliteViewPlugin().init(), config: plugins.SatelliteViewPlugin },
       { init: () => new SatelliteFov().init(), config: plugins.satelliteFov },
+      { init: () => new StereoMap().init(), config: plugins.StereoMap },
       {
         init: () => (async () => {
           const proPlugin = await import('../plugins-pro/planetarium/planetarium');
 
           new proPlugin.Planetarium().init();
-        })(), config: plugins.planetarium,
+        })(), config: plugins.Planetarium,
       },
       {
         init: () => (async () => {
           const proPlugin = await import('../plugins-pro/astronomy/astronomy');
 
           new proPlugin.Astronomy().init();
-        })(), config: plugins.astronomy,
+        })(), config: plugins.Astronomy,
       },
       { init: () => new NightToggle().init(), config: plugins.nightToggle },
       { init: () => new DopsPlugin().init(), config: plugins.DopsPlugin },
-      { init: () => new SatConstellations().init(), config: plugins.constellations },
-      { init: () => new CountriesMenu().init(), config: plugins.countries },
-      { init: () => new ColorMenu().init(), config: plugins.colorsMenu },
+      { init: () => new SatConstellations().init(), config: plugins.SatConstellations },
+      { init: () => new CountriesMenu().init(), config: plugins.CountriesMenu },
+      { init: () => new ColorMenu().init(), config: plugins.ColorMenu },
       { init: () => new Screenshot().init(), config: plugins.screenshot },
       { init: () => new LaunchCalendar().init(), config: plugins.launchCalendar },
       { init: () => new TimeMachine().init(), config: plugins.timeMachine },
@@ -153,13 +153,13 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
         })(), config: plugins.initialOrbit,
       },
       { init: () => new Calculator().init(), config: plugins.calculator },
-      { init: () => new EciPlot().init(), config: plugins.plotAnalysis },
-      { init: () => new EcfPlot().init(), config: plugins.plotAnalysis },
-      { init: () => new RicPlot().init(), config: plugins.plotAnalysis },
-      { init: () => new Time2LonPlots().init(), config: plugins.plotAnalysis },
-      { init: () => new Lat2LonPlots().init(), config: plugins.plotAnalysis },
-      { init: () => new Inc2AltPlots().init(), config: plugins.plotAnalysis },
-      { init: () => new Inc2LonPlots().init(), config: plugins.plotAnalysis },
+      { init: () => new EciPlot().init(), config: plugins.EciPlot },
+      { init: () => new EcfPlot().init(), config: plugins.EcfPlot },
+      { init: () => new RicPlot().init(), config: plugins.RicPlot },
+      { init: () => new Time2LonPlots().init(), config: plugins.Time2LonPlots },
+      { init: () => new Lat2LonPlots().init(), config: plugins.Lat2LonPlots },
+      { init: () => new Inc2AltPlots().init(), config: plugins.Inc2AltPlots },
+      { init: () => new Inc2LonPlots().init(), config: plugins.Inc2LonPlots },
       { init: () => new FilterMenuPlugin().init(), config: plugins.filterMenu },
       { init: () => new SettingsMenuPlugin().init(), config: plugins.settingsMenu },
       {

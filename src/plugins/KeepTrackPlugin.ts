@@ -626,7 +626,7 @@ export abstract class KeepTrackPlugin {
 
         button.id = this.bottomIconElementName;
         // embed an order id to allow for sorting
-        button.setAttribute('data-order', this.bottomIconOrder?.toString() ?? '100');
+        button.setAttribute('data-order', this.bottomIconOrder?.toString() ?? '300');
         button.classList.add('bmenu-item');
         if (isDisabled) {
           button.classList.add('bmenu-item-disabled');

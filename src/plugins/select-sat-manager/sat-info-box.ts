@@ -214,7 +214,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           }
 
           if (
-            settingsManager.plugins?.stereoMap &&
+            settingsManager.plugins?.StereoMap &&
             keepTrackApi.getPlugin(StereoMap)?.isMenuButtonActive &&
             timeManagerInstance.realTime > settingsManager.lastMapUpdateTime + 30000
           ) {

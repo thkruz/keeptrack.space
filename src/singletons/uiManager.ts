@@ -284,8 +284,8 @@ export class UiManager {
   private sortBottomIcons() {
     const bottomIcons = document.querySelectorAll('#bottom-icons > div');
     const sortedIcons = Array.from(bottomIcons).sort((a, b) => {
-      const aOrder = parseInt(a.getAttribute('data-order') ?? '100', 10);
-      const bOrder = parseInt(b.getAttribute('data-order') ?? '100', 10);
+      const aOrder = parseInt(a.getAttribute('data-order') ?? '300', 10);
+      const bOrder = parseInt(b.getAttribute('data-order') ?? '300', 10);
 
       return aOrder - bOrder;
     });

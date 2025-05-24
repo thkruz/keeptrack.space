@@ -172,8 +172,13 @@ export class SettingsManager {
     screenshot: {
       enabled: true,
     },
-    watchlist: {
+    WatchlistPlugin: {
       enabled: true,
+      order: 40,
+    },
+    WatchlistOverlay: {
+      enabled: true,
+      order: 41,
     },
     sensor: {
       enabled: true,
@@ -214,11 +219,13 @@ export class SettingsManager {
     polarPlot: {
       enabled: true,
     },
-    timeline: {
+    SensorTimeline: {
       enabled: true,
+      order: 30,
     },
-    timelineAlt: {
+    SatelliteTimeline: {
       enabled: true,
+      order: 31,
     },
     transponderChannelData: {
       enabled: true,

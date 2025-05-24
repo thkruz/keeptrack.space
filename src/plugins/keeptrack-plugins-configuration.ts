@@ -61,12 +61,13 @@ export type KeepTrackPluginsConfiguration = {
   timeMachine?: PluginConfiguration;
   topMenu?: PluginConfiguration;
   updateSelectBox?: PluginConfiguration;
-  watchlist?: PluginConfiguration;
+  WatchlistPlugin?: PluginConfiguration;
+  WatchlistOverlay?: PluginConfiguration;
   reports?: PluginConfiguration;
   polarPlot?: PluginConfiguration;
   graphicsMenu?: PluginConfiguration;
-  timeline?: PluginConfiguration;
-  timelineAlt?: PluginConfiguration;
+  SensorTimeline?: PluginConfiguration;
+  SatelliteTimeline?: PluginConfiguration;
   calculator?: PluginConfiguration;
   createSat?: PluginConfiguration;
   RPOCalculator?: PluginConfiguration;

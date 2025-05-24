@@ -1107,6 +1107,7 @@ input:focus {
   flex-direction: column;
   flex-wrap: nowrap;
   height: 100%;
+  max-width: var(--bottom-icon-width);
 }
 
 .bmenu-filter-item {

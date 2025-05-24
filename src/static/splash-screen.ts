@@ -101,6 +101,8 @@ Unauthorized use, rebranding, or removal of attribution may violate trademark an
     hideEl('loading-hint');
     hideEl('logo-text');
     hideEl('logo-text-version');
+    hideEl('copyright-notice');
+    hideEl('version-text');
   }
 
   static loadStr(str: string) {

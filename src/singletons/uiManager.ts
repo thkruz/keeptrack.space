@@ -258,6 +258,8 @@ export class UiManager {
 
     keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
 
+    this.sortBottomIcons();
+
     UiManager.initBottomMenuResizing_();
 
     // Initialize Navigation and Select Menus
@@ -277,6 +279,25 @@ export class UiManager {
 
     window.M.Dropdown.init(elems);
     this.isInitialized_ = true;
+  }
+
+  private sortBottomIcons() {
+    const bottomIcons = document.querySelectorAll('#bottom-icons > div');
+    const sortedIcons = Array.from(bottomIcons).sort((a, b) => {
+      const aOrder = parseInt(a.getAttribute('data-order') ?? '100', 10);
+      const bOrder = parseInt(b.getAttribute('data-order') ?? '100', 10);
+
+      return aOrder - bOrder;
+    });
+    const bottomIconsContainer = getEl('bottom-icons');
+
+    if (bottomIconsContainer) {
+      // Clear the container before appending sorted icons
+      bottomIconsContainer.innerHTML = '';
+      sortedIcons.forEach((icon) => {
+        bottomIconsContainer.appendChild(icon);
+      });
+    }
   }
 
   initMenuController() {

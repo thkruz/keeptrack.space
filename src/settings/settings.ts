@@ -61,6 +61,18 @@ export class SettingsManager {
       enabled: true,
       order: 12,
     },
+    SensorFov: {
+      enabled: true,
+      order: 13,
+    },
+    SensorSurvFence: {
+      enabled: true,
+      order: 14,
+    },
+    ShortTermFences: {
+      enabled: true,
+      order: 15,
+    },
     LookAnglesPlugin: {
       enabled: true,
       order: 20,
@@ -69,6 +81,58 @@ export class SettingsManager {
       enabled: true,
       order: 21,
     },
+    SensorTimeline: {
+      enabled: true,
+      order: 30,
+    },
+    SatelliteTimeline: {
+      enabled: true,
+      order: 31,
+    },
+    WatchlistPlugin: {
+      enabled: true,
+      order: 40,
+    },
+    WatchlistOverlay: {
+      enabled: true,
+      order: 41,
+    },
+    ReportsPlugin: {
+      enabled: true,
+      order: 50,
+    },
+    PolarPlotPlugin: {
+      enabled: true,
+      order: 60,
+    },
+    CreateSat: {
+      enabled: true,
+      order: 70,
+    },
+    EditSat: {
+      enabled: true,
+      order: 71,
+    },
+    MissilePlugin: {
+      enabled: true,
+      order: 72,
+    },
+    FindSatPlugin: {
+      enabled: true,
+      order: 80,
+    },
+    ProximityOps: {
+      enabled: true,
+      order: 81,
+    },
+    Collisions: {
+      enabled: true,
+      order: 90,
+    },
+    TrackingImpactPredict: {
+      enabled: true,
+      order: 91,
+    },
     satInfoboxCore: {
       enabled: true,
     },
@@ -76,20 +140,9 @@ export class SettingsManager {
       enabled: false,
       order: 101,
     },
-    Collisions: {
-      enabled: true,
-      order: 80,
-    },
-    TrackingImpactPredict: {
-      enabled: true,
-      order: 81,
-    },
     DopsPlugin: {
       enabled: true,
       menuMode: [MenuMode.ANALYSIS],
-    },
-    findSat: {
-      enabled: true,
     },
     launchCalendar: {
       enabled: true,
@@ -121,13 +174,7 @@ export class SettingsManager {
     initialOrbit: {
       enabled: false,
     },
-    missile: {
-      enabled: true,
-    },
     breakup: {
-      enabled: true,
-    },
-    editSat: {
       enabled: true,
     },
     constellations: {
@@ -139,9 +186,6 @@ export class SettingsManager {
     colorsMenu: {
       enabled: true,
     },
-    shortTermFences: {
-      enabled: true,
-    },
     orbitReferences: {
       enabled: true,
     },
@@ -149,12 +193,6 @@ export class SettingsManager {
       enabled: true,
     },
     plotAnalysis: {
-      enabled: true,
-    },
-    sensorFov: {
-      enabled: true,
-    },
-    sensorSurv: {
       enabled: true,
     },
     satelliteFov: {
@@ -171,14 +209,6 @@ export class SettingsManager {
     },
     screenshot: {
       enabled: true,
-    },
-    WatchlistPlugin: {
-      enabled: true,
-      order: 40,
-    },
-    WatchlistOverlay: {
-      enabled: true,
-      order: 41,
     },
     sensor: {
       enabled: true,
@@ -213,33 +243,13 @@ export class SettingsManager {
     videoDirector: {
       enabled: true,
     },
-    reports: {
-      enabled: true,
-    },
-    polarPlot: {
-      enabled: true,
-    },
-    SensorTimeline: {
-      enabled: true,
-      order: 30,
-    },
-    SatelliteTimeline: {
-      enabled: true,
-      order: 31,
-    },
     transponderChannelData: {
       enabled: true,
     },
     calculator: {
       enabled: true,
     },
-    createSat: {
-      enabled: true,
-    },
     filterMenu: {
-      enabled: true,
-    },
-    RPOCalculator: {
       enabled: true,
     },
   };
@@ -1395,11 +1405,11 @@ export class SettingsManager {
 
     // Disable resource intense plugins if lowPerf is enabled
     if (this.lowPerf) {
-      if (this.plugins.sensorFov) {
-        this.plugins.sensorFov.enabled = false;
+      if (this.plugins.SensorFov) {
+        this.plugins.SensorFov.enabled = false;
       }
-      if (this.plugins.sensorSurv) {
-        this.plugins.sensorSurv.enabled = false;
+      if (this.plugins.SensorSurvFence) {
+        this.plugins.SensorSurvFence.enabled = false;
       }
       if (this.plugins.satelliteFov) {
         this.plugins.satelliteFov.enabled = false;

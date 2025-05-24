@@ -192,8 +192,8 @@ export class LineManager {
         break;
       case 'z':
         for (let i = min; i <= max; i++) {
+          this.add(new RefToRefLine([i * num1, 0, num2], [i * num1, 0, -num2], color));
           this.add(new RefToRefLine([num2, 0, i * num1], [-num2, 0, i * num1], color));
-          this.add(new RefToRefLine([i * num1, num2, 0], [i * num1, -num2, 0], color));
         }
         break;
       default:

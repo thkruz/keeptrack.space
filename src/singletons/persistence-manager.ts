@@ -121,6 +121,12 @@ export class PersistenceManager {
   }
 
   saveItem(key: string, value: string): void {
+    if (value === null || typeof value === 'undefined') {
+      this.removeItem(key);
+
+      return;
+    }
+
     PersistenceManager.verifyKey_(key);
     try {
       this.storage_.setItem(key, value);

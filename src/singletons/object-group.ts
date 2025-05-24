@@ -37,7 +37,7 @@ export type GroupData = {
 export class ObjectGroup<T extends GroupType> {
   ids: number[] = [];
 
-  constructor(type: T, data: GroupData[T]) {
+  constructor(type: T, data: GroupData[T] | null = null) {
     const objData = keepTrackApi.getCatalogManager().objectCache;
 
     switch (type) {

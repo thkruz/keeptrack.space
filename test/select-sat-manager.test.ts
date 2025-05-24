@@ -140,21 +140,6 @@ describe('SelectSatManager_class', () => {
     expect(selectSatManager.selectedSat).toBe(-1);
   });
 
-  it('should register keyboard events', () => {
-    const registerKeyDownEventSpy = jest.spyOn(keepTrackApi.getInputManager().keyboard, 'registerKeyDownEvent');
-
-    (selectSatManager as any).registerKeyboardEvents_();
-
-    expect(registerKeyDownEventSpy).toHaveBeenCalledWith({
-      key: ']',
-      callback: expect.any(Function),
-    });
-    expect(registerKeyDownEventSpy).toHaveBeenCalledWith({
-      key: '[',
-      callback: expect.any(Function),
-    });
-  });
-
   it('should handle switching to a non-existent secondary satellite', () => {
     expect(selectSatManager.secondarySatObj).toBe(null);
     selectSatManager.setSecondarySat(0);

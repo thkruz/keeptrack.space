@@ -292,13 +292,8 @@ export class InputManager {
         </div>
         <div id="earth-rmb-menu" class="right-btn-menu">
           <ul class='dropdown-contents'>
-            <li id="earth-blue-rmb"><a href="#">Blue Map</a></li>
-            <li id="earth-nasa-rmb"><a href="#">NASA Map</a></li>
-            <li id="earth-brown-rmb"><a href="#">Brown Earth Map</a></li>
-            <li id="earth-low-rmb"><a href="#">Low Resolution Map</a></li>
-            <li id="earth-high-no-clouds-rmb"><a href="#">High Resoultion Map</a></li>
-            <li id="earth-vec-rmb"><a href="#">Vector Image Map</a></li>
-            <li id="earth-political-rmb"><a href="#">Political Map</a></li>
+            <li id="earth-nasa-rmb"><a href="#">Satellite Images</a></li>
+            <li id="earth-flat-rmb"><a href="#">Flat Color Map</a></li>
           </ul>
         </div>
       `,
@@ -423,7 +418,7 @@ export class InputManager {
     hideEl('earth-low-rmb');
     hideEl('earth-high-rmb');
     hideEl('earth-vec-rmb');
-    hideEl('earth-political-rmb');
+    hideEl('earth-flat-rmb');
 
     if (lineManagerInstance.lines.length > 0) {
       getEl('clear-lines-rmb')!.style.display = 'block';

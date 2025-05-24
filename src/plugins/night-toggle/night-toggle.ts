@@ -1,4 +1,3 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 
 import dayNightPng from '@public/img/icons/day-night.png';
@@ -12,17 +11,6 @@ export class NightToggle extends KeepTrackPlugin {
 
   addJs() {
     super.addJs();
-
-    keepTrackApi.on(
-      KeepTrackApiEvents.nightToggle,
-      (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture): void => {
-        if (!this.isMenuButtonActive) {
-          gl.bindTexture(gl.TEXTURE_2D, nightTexture);
-        } else {
-          gl.bindTexture(gl.TEXTURE_2D, texture);
-        }
-      },
-    );
 
     keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'N' && !isRepeat) {

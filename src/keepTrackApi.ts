@@ -75,7 +75,6 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.update]: [number];
   [KeepTrackApiEvents.bottomMenuClick]: [string];
   [KeepTrackApiEvents.hideSideMenus]: [];
-  [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture];
   [KeepTrackApiEvents.orbitManagerInit]: [];
   [KeepTrackApiEvents.drawManagerLoadScene]: [];
   [KeepTrackApiEvents.drawOptionalScenery]: [];
@@ -113,6 +112,7 @@ type KeepTrackApiEventArguments = {
   [InputEventType.KeyDown]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [InputEventType.KeyUp]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [InputEventType.KeyPress]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
+  [KeepTrackApiEvents.parseGetVariables]: [string[]]; // params
 };
 
 interface KeepTrackApiRegisterParams<T extends EventBusEvent> {
@@ -195,15 +195,11 @@ export class KeepTrackApi {
   rmbMenuItems = <rmbMenuItem[]>[];
   events = {
     altCanvasResize: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.altCanvasResize>[],
-    nightToggle: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.nightToggle>[],
   } as {
       [K in EventBusEvent]: KeepTrackApiRegisterParams<K>[];
     };
 
   methods = {
-    nightToggle: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => {
-      this.events.nightToggle.forEach((cb) => cb.cb(gl, nightTexture, texture));
-    },
     altCanvasResize: (): boolean => this.events.altCanvasResize.some((cb) => cb.cb()),
   };
 

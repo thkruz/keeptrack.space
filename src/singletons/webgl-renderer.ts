@@ -199,7 +199,7 @@ export class WebGLRenderer {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
 
     this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
-    keepTrackApi.getHoverManager().init();
+    keepTrackApi.getHoverManager()?.init();
     this.startWithOrbits();
 
     // Reinitialize the canvas on mobile rotation
@@ -207,7 +207,7 @@ export class WebGLRenderer {
       this.isRotationEvent_ = true;
     });
 
-    keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+    keepTrackApi.getScene().earth.init();
   }
 
   /**

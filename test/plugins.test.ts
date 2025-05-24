@@ -8,7 +8,7 @@ describe('plugins', () => {
       satInfoboxCore: true,
       aboutManager: true,
       collisions: true,
-      dops: true,
+      DopsPlugin: true,
       findSat: true,
       launchCalendar: true,
       newLaunch: true,

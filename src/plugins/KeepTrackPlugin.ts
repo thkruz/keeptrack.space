@@ -246,6 +246,17 @@ export abstract class KeepTrackPlugin {
    */
   init(): void {
     this.checkDependencies();
+
+    if (settingsManager.plugins[this.id]?.isEnabled === false) {
+      errorManagerInstance.debug(`${this.id} is disabled in the settings.`);
+
+      return;
+    }
+
+    if (settingsManager.plugins[this.id]?.menuMode) {
+      this.menuMode = settingsManager.plugins[this.id].menuMode;
+    }
+
     this.addHtml();
     this.addJs();
 
@@ -535,7 +546,7 @@ export abstract class KeepTrackPlugin {
   registerMenuMode(): void {
     keepTrackApi.on(KeepTrackApiEvents.bottomMenuModeChange, (): void => {
       this.hideBottomIcon();
-      if (this.menuMode.includes(settingsManager.menuMode)) {
+      if (this.menuMode.includes(settingsManager.activeMenuMode)) {
         this.showBottomIcon();
       }
     });

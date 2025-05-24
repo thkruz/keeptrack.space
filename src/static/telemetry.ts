@@ -1,4 +1,5 @@
 import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackPluginsConfiguration } from '@app/plugins/keeptrack-plugins-configuration';
 import type { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { VERSION } from '@app/settings/version';
 
@@ -77,7 +78,7 @@ interface WebGLTelemetryData {
     primarySatObj?: object;
     secondarySatObj?: object | null;
     currentSensor?: object[];
-    plugins: Record<string, boolean>;
+    plugins: KeepTrackPluginsConfiguration;
     simulationTime?: object;
     [key: string]: unknown; // Additional custom data
   };

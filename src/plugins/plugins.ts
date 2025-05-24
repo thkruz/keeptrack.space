@@ -25,7 +25,7 @@ import { DopsPlugin } from './dops/dops';
 import { EditSat } from './edit-sat/edit-sat';
 import { FilterMenuPlugin } from './filter-menu/filter-menu';
 import { GamepadPlugin } from './gamepad/gamepad';
-import { GraphicsMenuPlugin } from './graphics-menu/graphics-menu';
+import { KeepTrackPluginsConfiguration } from './keeptrack-plugins-configuration';
 import { KeepTrackPlugin } from './KeepTrackPlugin';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
 import { MissilePlugin } from './missile/missile-plugin';
@@ -71,174 +71,117 @@ import { VideoDirectorPlugin } from './video-director/video-director';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 
-export type KeepTrackPlugins = {
-  filterMenu?: boolean;
-  transponderChannelData?: boolean;
-  videoDirector?: boolean;
-  debrisScreening?: boolean;
-  satInfoboxCore?: boolean;
-  findSat?: boolean;
-  collisions?: boolean;
-  satelliteFov?: boolean;
-  nightToggle?: boolean;
-  countries?: boolean;
-  screenRecorder?: boolean;
-  aboutManager?: boolean;
-  settingsMenu?: boolean;
-  soundManager?: boolean;
-  analysis?: boolean;
-  astronomy?: boolean;
-  breakup?: boolean;
-  catalogLoader?: boolean;
-  classificationBar?: boolean;
-  Collisions?: boolean;
-  trackingImpactPredict?: boolean;
-  colorsMenu?: boolean;
-  constellations?: boolean;
-  countriesMenu?: boolean;
-  datetime?: boolean;
-  debug?: boolean;
-  dops?: boolean;
-  editSat?: boolean;
-  gamepad?: boolean;
-  initialOrbit?: boolean;
-  launchCalendar?: boolean;
-  missile?: boolean;
-  newLaunch?: boolean;
-  nextLaunch?: boolean;
-  orbitReferences?: boolean;
-  photoManager?: boolean;
-  planetarium?: boolean;
-  plotAnalysis?: boolean;
-  satChanges?: boolean;
-  satelliteView?: boolean;
-  screenshot?: boolean;
-  sensor?: boolean;
-  sensorFov?: boolean;
-  sensorSurv?: boolean;
-  shortTermFences?: boolean;
-  social?: boolean;
-  sounds?: boolean;
-  stereoMap?: boolean;
-  timeMachine?: boolean;
-  topMenu?: boolean;
-  updateSelectBox?: boolean;
-  watchlist?: boolean;
-  reports?: boolean;
-  polarPlot?: boolean;
-  graphicsMenu?: boolean;
-  timeline?: boolean;
-  timelineAlt?: boolean;
-  calculator?: boolean;
-  createSat?: boolean;
-  RPOCalculator?: boolean;
-};
-
 // Register all core modules
-export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugins): void => {
-  plugins ??= <KeepTrackPlugins>{};
+export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPluginsConfiguration): void => {
+  plugins ??= <KeepTrackPluginsConfiguration>{};
   try {
-    const pluginList = [
-      { init: () => new SelectSatManager().init(), enabled: true },
-      { init: () => new TopMenu().init(), enabled: plugins.topMenu },
+    const pluginList: { init: () => void, config?: { enabled: boolean } }[] = [
+      { init: () => new SelectSatManager().init(), config: { enabled: true } },
+      { init: () => new TopMenu().init(), config: plugins.topMenu },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins-pro/debug/debug');
+          const proPlugin = await import('../plugins/debug/debug');
 
           new proPlugin.DebugMenuPlugin().init();
-        })(), enabled: plugins.debug,
+        })(), config: plugins.debug,
       },
-      { init: () => new SatInfoBox().init(), enabled: plugins.satInfoboxCore },
-      { init: () => new DateTimeManager().init(), enabled: plugins.datetime },
-      { init: () => new SocialMedia().init(), enabled: plugins.social },
-      { init: () => new ClassificationBar().init(), enabled: plugins.classificationBar },
-      { init: () => new SoundManager().init(), enabled: plugins.soundManager },
-      { init: () => new SensorListPlugin().init(), enabled: plugins.sensor },
-      { init: () => new SensorInfoPlugin().init(), enabled: plugins.sensor },
-      { init: () => new CustomSensorPlugin().init(), enabled: plugins.sensor },
-      { init: () => new LookAnglesPlugin().init(), enabled: plugins.sensor },
-      { init: () => new MultiSiteLookAnglesPlugin().init(), enabled: plugins.sensor },
-      { init: () => new SensorTimeline().init(), enabled: plugins.timeline },
-      { init: () => new SatelliteTimeline().init(), enabled: plugins.timelineAlt },
-      { init: () => new WatchlistPlugin().init(), enabled: plugins.watchlist },
-      { init: () => new WatchlistOverlay().init(), enabled: plugins.watchlist },
-      { init: () => new ReportsPlugin().init(), enabled: plugins.reports },
-      { init: () => new PolarPlotPlugin().init(), enabled: plugins.polarPlot },
-      { init: () => new NextLaunchesPlugin().init(), enabled: plugins.nextLaunch },
-      { init: () => new FindSatPlugin().init(), enabled: plugins.findSat },
-      { init: () => new ProximityOps().init(), enabled: plugins.RPOCalculator },
-      { init: () => new ShortTermFences().init(), enabled: plugins.shortTermFences },
-      { init: () => new OrbitReferences().init(), enabled: plugins.orbitReferences },
-      { init: () => new Collisions().init(), enabled: plugins.collisions },
-      { init: () => new TrackingImpactPredict().init(), enabled: plugins.trackingImpactPredict },
-      { init: () => new Breakup().init(), enabled: plugins.breakup },
-      { init: () => new DebrisScreening().init(), enabled: plugins.debrisScreening },
-      { init: () => new TransponderChannelData().init(), enabled: plugins.transponderChannelData },
-      { init: () => new CreateSat().init(), enabled: plugins.createSat },
-      { init: () => new EditSat().init(), enabled: plugins.editSat },
-      { init: () => new NewLaunch().init(), enabled: plugins.newLaunch },
-      { init: () => new MissilePlugin().init(), enabled: plugins.missile },
-      { init: () => new StereoMap().init(), enabled: plugins.stereoMap },
-      { init: () => new SensorFov().init(), enabled: plugins.sensorFov },
-      { init: () => new SensorSurvFence().init(), enabled: plugins.sensorSurv },
-      { init: () => new SatelliteViewPlugin().init(), enabled: plugins.satelliteView },
-      { init: () => new SatelliteFov().init(), enabled: plugins.satelliteFov },
+      { init: () => new SatInfoBox().init(), config: plugins.satInfoboxCore },
+      { init: () => new DateTimeManager().init(), config: plugins.datetime },
+      { init: () => new SocialMedia().init(), config: plugins.social },
+      { init: () => new ClassificationBar().init(), config: plugins.classificationBar },
+      { init: () => new SoundManager().init(), config: plugins.soundManager },
+      { init: () => new SensorListPlugin().init(), config: plugins.sensor },
+      { init: () => new SensorInfoPlugin().init(), config: plugins.sensor },
+      { init: () => new CustomSensorPlugin().init(), config: plugins.sensor },
+      { init: () => new LookAnglesPlugin().init(), config: plugins.sensor },
+      { init: () => new MultiSiteLookAnglesPlugin().init(), config: plugins.sensor },
+      { init: () => new SensorTimeline().init(), config: plugins.timeline },
+      { init: () => new SatelliteTimeline().init(), config: plugins.timelineAlt },
+      { init: () => new WatchlistPlugin().init(), config: plugins.watchlist },
+      { init: () => new WatchlistOverlay().init(), config: plugins.watchlist },
+      { init: () => new ReportsPlugin().init(), config: plugins.reports },
+      { init: () => new PolarPlotPlugin().init(), config: plugins.polarPlot },
+      { init: () => new NextLaunchesPlugin().init(), config: plugins.nextLaunch },
+      { init: () => new FindSatPlugin().init(), config: plugins.findSat },
+      { init: () => new ProximityOps().init(), config: plugins.RPOCalculator },
+      { init: () => new ShortTermFences().init(), config: plugins.shortTermFences },
+      { init: () => new OrbitReferences().init(), config: plugins.orbitReferences },
+      { init: () => new Collisions().init(), config: plugins.collisions },
+      { init: () => new TrackingImpactPredict().init(), config: plugins.trackingImpactPredict },
+      { init: () => new Breakup().init(), config: plugins.breakup },
+      { init: () => new DebrisScreening().init(), config: plugins.debrisScreening },
+      { init: () => new TransponderChannelData().init(), config: plugins.transponderChannelData },
+      { init: () => new CreateSat().init(), config: plugins.createSat },
+      { init: () => new EditSat().init(), config: plugins.editSat },
+      { init: () => new NewLaunch().init(), config: plugins.newLaunch },
+      { init: () => new MissilePlugin().init(), config: plugins.missile },
+      { init: () => new StereoMap().init(), config: plugins.stereoMap },
+      { init: () => new SensorFov().init(), config: plugins.sensorFov },
+      { init: () => new SensorSurvFence().init(), config: plugins.sensorSurv },
+      { init: () => new SatelliteViewPlugin().init(), config: plugins.satelliteView },
+      { init: () => new SatelliteFov().init(), config: plugins.satelliteFov },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins-pro/planetarium/planetarium');
+          const proPlugin = await import('../plugins/planetarium/planetarium');
 
           new proPlugin.Planetarium().init();
-        })(), enabled: plugins.planetarium,
+        })(), config: plugins.planetarium,
       },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins-pro/astronomy/astronomy');
+          const proPlugin = await import('../plugins/astronomy/astronomy');
 
           new proPlugin.Astronomy().init();
-        })(), enabled: plugins.astronomy,
+        })(), config: plugins.astronomy,
       },
-      { init: () => new NightToggle().init(), enabled: plugins.nightToggle },
-      { init: () => new DopsPlugin().init(), enabled: plugins.dops },
-      { init: () => new SatConstellations().init(), enabled: plugins.constellations },
-      { init: () => new CountriesMenu().init(), enabled: plugins.countries },
-      { init: () => new ColorMenu().init(), enabled: plugins.colorsMenu },
-      { init: () => new Screenshot().init(), enabled: plugins.screenshot },
-      { init: () => new LaunchCalendar().init(), enabled: plugins.launchCalendar },
-      { init: () => new TimeMachine().init(), enabled: plugins.timeMachine },
-      { init: () => new SatellitePhotos().init(), enabled: plugins.photoManager },
-      { init: () => new ScreenRecorder().init(), enabled: plugins.screenRecorder },
-      { init: () => new AnalysisMenu().init(), enabled: plugins.analysis },
+      { init: () => new NightToggle().init(), config: plugins.nightToggle },
+      { init: () => new DopsPlugin().init(), config: plugins.DopsPlugin },
+      { init: () => new SatConstellations().init(), config: plugins.constellations },
+      { init: () => new CountriesMenu().init(), config: plugins.countries },
+      { init: () => new ColorMenu().init(), config: plugins.colorsMenu },
+      { init: () => new Screenshot().init(), config: plugins.screenshot },
+      { init: () => new LaunchCalendar().init(), config: plugins.launchCalendar },
+      { init: () => new TimeMachine().init(), config: plugins.timeMachine },
+      { init: () => new SatellitePhotos().init(), config: plugins.photoManager },
+      { init: () => new ScreenRecorder().init(), config: plugins.screenRecorder },
+      { init: () => new AnalysisMenu().init(), config: plugins.analysis },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
+          const proPlugin = await import('../plugins/initial-orbit/initial-orbit');
 
           new proPlugin.InitialOrbitDeterminationPlugin().init();
-        })(), enabled: plugins.initialOrbit,
+        })(), config: plugins.initialOrbit,
       },
-      { init: () => new Calculator().init(), enabled: plugins.calculator },
-      { init: () => new EciPlot().init(), enabled: plugins.plotAnalysis },
-      { init: () => new EcfPlot().init(), enabled: plugins.plotAnalysis },
-      { init: () => new RicPlot().init(), enabled: plugins.plotAnalysis },
-      { init: () => new Time2LonPlots().init(), enabled: plugins.plotAnalysis },
-      { init: () => new Lat2LonPlots().init(), enabled: plugins.plotAnalysis },
-      { init: () => new Inc2AltPlots().init(), enabled: plugins.plotAnalysis },
-      { init: () => new Inc2LonPlots().init(), enabled: plugins.plotAnalysis },
-      { init: () => new FilterMenuPlugin().init(), enabled: plugins.filterMenu },
-      { init: () => new SettingsMenuPlugin().init(), enabled: plugins.settingsMenu },
-      { init: () => new GraphicsMenuPlugin().init(), enabled: plugins.graphicsMenu },
-      { init: () => new GamepadPlugin().init(), enabled: plugins.gamepad },
-      { init: () => new VideoDirectorPlugin().init(), enabled: plugins.videoDirector },
+      { init: () => new Calculator().init(), config: plugins.calculator },
+      { init: () => new EciPlot().init(), config: plugins.plotAnalysis },
+      { init: () => new EcfPlot().init(), config: plugins.plotAnalysis },
+      { init: () => new RicPlot().init(), config: plugins.plotAnalysis },
+      { init: () => new Time2LonPlots().init(), config: plugins.plotAnalysis },
+      { init: () => new Lat2LonPlots().init(), config: plugins.plotAnalysis },
+      { init: () => new Inc2AltPlots().init(), config: plugins.plotAnalysis },
+      { init: () => new Inc2LonPlots().init(), config: plugins.plotAnalysis },
+      { init: () => new FilterMenuPlugin().init(), config: plugins.filterMenu },
+      { init: () => new SettingsMenuPlugin().init(), config: plugins.settingsMenu },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins-pro/about-menu/about-menu');
+          const proPlugin = await import('../plugins/graphics-menu/graphics-menu');
+
+          new proPlugin.GraphicsMenuPlugin().init();
+        })(), config: plugins.graphicsMenu,
+      },
+      { init: () => new GamepadPlugin().init(), config: plugins.gamepad },
+      { init: () => new VideoDirectorPlugin().init(), config: plugins.videoDirector },
+      {
+        init: () => (async () => {
+          const proPlugin = await import('../plugins/about-menu/about-menu');
 
           new proPlugin.AboutMenu().init();
-        })(), enabled: plugins.aboutManager,
+        })(), config: plugins.aboutManager,
       },
     ];
 
-    for (const { init, enabled } of pluginList) {
-      if (enabled) {
+    for (const { init, config } of pluginList) {
+      if (config?.enabled) {
         try {
           init();
         } catch (e) {

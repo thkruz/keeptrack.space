@@ -101,6 +101,13 @@ a,
   font-weight: bold;
 }
 
+#keeptrack-header {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  z-index: 105;
+}
+
 footer {
   padding-top: 5px !important;
   position: absolute !important;

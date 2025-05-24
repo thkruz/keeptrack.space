@@ -27,8 +27,15 @@ import { Mesh } from '@app/static/mesh';
 import { SatMath } from '@app/static/sat-math';
 import { ShaderMaterial } from '@app/static/shader-material';
 import { SphereGeometry } from '@app/static/sphere-geometry';
-import { mat3, mat4, vec3 } from 'gl-matrix';
+import { mat3, mat4, vec2, vec3 } from 'gl-matrix';
 import { EciVec3, Kilometers } from 'ootk';
+
+export enum SunTextureQuality {
+  POTATO = '512',
+  LOW = '1k',
+  MEDIUM = '2k',
+  HIGH = '4k',
+}
 
 export class Sun {
   /** The radius of the sun. */
@@ -60,6 +67,7 @@ export class Sun {
    * Keeps the last 1 sun direction calculations in memory to avoid unnecessary calculations.
    */
   sunDirectionCache: { jd: number; sunDirection: EciArr3; } = { jd: 0, sunDirection: [0, 0, 0] };
+  textureDirection = [0, 0] as vec2;
 
   /**
    * This is run once per frame to render the sun.
@@ -96,7 +104,8 @@ export class Sun {
       widthSegments: this.NUM_WIDTH_SEGS,
       heightSegments: this.NUM_HEIGHT_SEGS,
     });
-    const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun-1024.jpg`);
+    const sunTextureQuality = settingsManager.sunTextureQuality ?? SunTextureQuality.LOW;
+    const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun${sunTextureQuality}.jpg`);
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
         u_sampler: null as unknown as WebGLUniformLocation,
@@ -140,6 +149,8 @@ export class Sun {
     this.position[2] = (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE;
 
     this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
+
+    // Translate the sphere to the sun position
     mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
   }
@@ -156,10 +167,10 @@ export class Sun {
     // Apply a random factor to the sun size (±0.1% per frame, clamped to ±5% total)
 
     // Add a small random change (±0.25%)
-    this.sizeRandomFactor_ += (Math.random() - 0.5) * 0.005;
+    this.sizeRandomFactor_ += (Math.random() - 0.5) * 0.01;
     // Clamp to ±5% range
     this.sizeRandomFactor_ = Math.max(0.85, Math.min(1.15, this.sizeRandomFactor_));
-    const adjustedSize = settingsManager.sizeOfSun * this.sizeRandomFactor_;
+    const adjustedSize = settingsManager.isUseSunTexture ? settingsManager.sizeOfSun * 1.5 : settingsManager.sizeOfSun * this.sizeRandomFactor_;
 
     gl.uniform3fv(this.mesh.material.uniforms.u_sizeOfSun, [adjustedSize, adjustedSize, adjustedSize]);
     gl.uniform3fv(this.mesh.material.uniforms.u_lightDirection, earthLightDirection);
@@ -181,18 +192,18 @@ export class Sun {
 
         in vec3 v_normal;
         in float v_dist;
-        in vec2 v_texcoord;
+        in vec2 vUv;
 
         out vec4 fragColor;
 
         void main(void) {
-            // Hide the Back Side of the Sphere to prevent duplicate suns
+            // Hide the Back Side of the Sphere to prevent duplicate suns and z-fighting
             if (v_dist > 1.0) {
-            discard;
+              discard;
             }
 
             if (u_isTexture) {
-              fragColor = texture(u_sampler, v_texcoord);
+              fragColor = texture(u_sampler, vUv);
             } else {
               // Improved sun appearance with smoother gradient
               float a = max(dot(v_normal, -u_lightDirection), 0.1);
@@ -210,7 +221,7 @@ export class Sun {
         uniform vec3 u_sizeOfSun;
         uniform float u_sunDistance;
 
-        out vec2 v_texcoord;
+        out vec2 vUv;
         out vec3 v_normal;
         out float v_dist;
 
@@ -220,7 +231,7 @@ export class Sun {
 
             v_dist = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) / u_sunDistance;
 
-            v_texcoord = uv;
+            vUv = uv;
             v_normal = normalMatrix * normal;
         }`,
   };

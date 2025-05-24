@@ -8,7 +8,7 @@ import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
 import { ConeMeshFactory } from './draw-manager/cone-mesh-factory';
 import { Box } from './draw-manager/cube';
-import { Earth } from './draw-manager/earth';
+import { AtmosphereSettings, Earth } from './draw-manager/earth';
 import { Ellipsoid } from './draw-manager/ellipsoid';
 import { Godrays } from './draw-manager/godrays';
 import { Moon } from './draw-manager/moon';
@@ -161,8 +161,8 @@ export class Scene {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAurora'), ToastMsgType.caution);
           break;
         }
-        if (settingsManager.isDrawAtmosphere) {
-          settingsManager.isDrawAtmosphere = false;
+        if (settingsManager.isDrawAtmosphere > 0) {
+          settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAtmosphere'), ToastMsgType.caution);
           break;
         }
@@ -268,7 +268,7 @@ export class Scene {
 
   async loadScene(): Promise<void> {
     try {
-      this.earth.init(settingsManager, this.gl_);
+      this.earth.init(this.gl_);
       keepTrackApi.emit(KeepTrackApiEvents.drawManagerLoadScene);
       await this.sun.init(this.gl_);
 

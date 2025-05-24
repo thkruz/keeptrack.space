@@ -27,9 +27,11 @@
 
 import logoPrimaryPng from '@public/img/logo-primary.png';
 import logoSecondaryPng from '@public/img/logo-secondary.png';
+import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
 import earthJpg from '@public/img/wallpaper/Earth.jpg';
 import issJpg from '@public/img/wallpaper/iss.jpg';
+import moonJpg from '@public/img/wallpaper/moon.jpg';
 import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
 import rocketJpg from '@public/img/wallpaper/rocket.jpg';
 import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
@@ -78,7 +80,7 @@ import { SplashScreen } from './static/splash-screen';
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
   private static readonly splashScreenImgList_ =
-    [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
+    [blueMarbleJpg, moonJpg, observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
 
   isReady = false;
   private isUpdateTimeThrottle_: boolean;
@@ -471,6 +473,7 @@ theodore.kruczek at gmail dot com.
       const dotsManagerInstance = keepTrackApi.getDotsManager();
       const uiManagerInstance = keepTrackApi.getUiManager();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+      const inputManagerInstance = keepTrackApi.getInputManager();
 
       // Upodate the version number and date
       settingsManager.versionNumber = VERSION;
@@ -530,7 +533,7 @@ theodore.kruczek at gmail dot com.
 
       dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer!);
 
-      this.inputManager.init();
+      inputManagerInstance.init();
 
       await renderer.init(settingsManager);
       renderer.meshManager.init(renderer.gl);

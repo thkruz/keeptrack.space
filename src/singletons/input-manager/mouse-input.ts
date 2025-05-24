@@ -11,13 +11,12 @@ import { UrlManager } from '@app/static/url-manager';
 import { DetailedSatellite, Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
-import { showLoading } from '../../lib/showLoading';
 import { MissileObject } from '../catalog-manager/MissileObject';
+import { EarthTextureStyle } from '../draw-manager/earth';
 import { lineManagerInstance } from '../draw-manager/line-manager';
 import { LineColors } from '../draw-manager/line-manager/line';
 import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
-import { PersistenceManager, StorageKey } from '../persistence-manager';
 import { KeyboardInput } from './keyboard-input';
 
 export class MouseInput {
@@ -71,7 +70,7 @@ export class MouseInput {
   }
 
   public static earthClicked({ numMenuItems, clickedSatId }: { numMenuItems: number; clickedSatId: number }) {
-    getEl('line-eci-axis-rmb').style.display = 'block';
+    getEl('line-eci-axis-rmb')!.style.display = 'block';
     keepTrackApi.rmbMenuItems
       .filter((item) => item.isRmbOnEarth || (item.isRmbOnSat && clickedSatId !== -1))
       .sort((a, b) => a.order - b.order)
@@ -84,33 +83,8 @@ export class MouseInput {
         }
       });
 
-    getEl('earth-nasa-rmb').style.display = 'block';
-    getEl('earth-blue-rmb').style.display = 'block';
-    getEl('earth-low-rmb').style.display = 'block';
-    getEl('earth-high-no-clouds-rmb').style.display = 'block';
-    getEl('earth-vec-rmb').style.display = 'block';
-    getEl('earth-political-rmb').style.display = 'block';
-    if (settingsManager.nasaImages) {
-      getEl('earth-nasa-rmb').style.display = 'none';
-    }
-    if (settingsManager.brownEarthImages) {
-      getEl('earth-brown-rmb').style.display = 'none';
-    }
-    if (settingsManager.blueImages) {
-      getEl('earth-blue-rmb').style.display = 'none';
-    }
-    if (settingsManager.lowresImages) {
-      getEl('earth-low-rmb').style.display = 'none';
-    }
-    if (settingsManager.hiresNoCloudsImages) {
-      getEl('earth-high-no-clouds-rmb').style.display = 'none';
-    }
-    if (settingsManager.vectorImages) {
-      getEl('earth-vec-rmb').style.display = 'none';
-    }
-    if (settingsManager.politicalImages) {
-      getEl('earth-political-rmb').style.display = 'none';
-    }
+    getEl('earth-nasa-rmb')!.style.display = 'block';
+    getEl('earth-flat-rmb')!.style.display = 'block';
 
     return numMenuItems;
   }
@@ -510,57 +484,11 @@ export class MouseInput {
       case 'line-sat-sun-rmb':
         lineManagerInstance.createSat2Sun(clickSatObj);
         break;
-      case 'earth-blue-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.blueImages = true;
-        MouseInput.saveMapToLocalStorage('blue');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        break;
       case 'earth-nasa-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.nasaImages = true;
-        MouseInput.saveMapToLocalStorage('nasa');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.BLUE_MARBLE);
         break;
-      case 'earth-brown-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.brownEarthImages = true;
-        MouseInput.saveMapToLocalStorage('brown');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        break;
-      case 'earth-low-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.lowresImages = true;
-        MouseInput.saveMapToLocalStorage('low');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        break;
-      case 'earth-high-rmb':
-        showLoading(() => {
-          MouseInput.resetCurrentEarthTexture();
-          settingsManager.hiresImages = true;
-          MouseInput.saveMapToLocalStorage('high');
-          keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        });
-        break;
-      case 'earth-high-no-clouds-rmb':
-        showLoading(() => {
-          MouseInput.resetCurrentEarthTexture();
-          settingsManager.hiresNoCloudsImages = true;
-          MouseInput.saveMapToLocalStorage('high-nc');
-          keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        });
-        break;
-      case 'earth-vec-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.vectorImages = true;
-        MouseInput.saveMapToLocalStorage('vec');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        break;
-      case 'earth-political-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.politicalImages = true;
-        MouseInput.saveMapToLocalStorage('political'); // TODO: Verify this
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+      case 'earth-flat-rmb':
+        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
         break;
       case 'toggle-time-rmb':
         timeManagerInstance.toggleTime();
@@ -586,20 +514,5 @@ export class MouseInput {
 
     getEl('right-btn-menu').style.display = 'none';
     InputManager.clearRMBSubMenu();
-  }
-
-  private static resetCurrentEarthTexture() {
-    settingsManager.blueImages = false;
-    settingsManager.nasaImages = false;
-    settingsManager.brownEarthImages = false;
-    settingsManager.lowresImages = false;
-    settingsManager.hiresImages = false;
-    settingsManager.hiresNoCloudsImages = false;
-    settingsManager.vectorImages = false;
-    settingsManager.politicalImages = false;
-  }
-
-  private static saveMapToLocalStorage(name: string) {
-    PersistenceManager.getInstance().saveItem(StorageKey.LAST_MAP, name);
   }
 }

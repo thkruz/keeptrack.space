@@ -21,11 +21,12 @@
 import { KeepTrackApiEvents, MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
-import type { KeepTrackPlugins } from '@app/plugins/plugins';
+import type { KeepTrackPluginsConfiguration } from '@app/plugins/keeptrack-plugins-configuration';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
-import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
+import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
+import { SunTextureQuality } from '@app/singletons/draw-manager/sun';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
@@ -34,7 +35,6 @@ import { isThisNode } from '../static/isThisNode';
 import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
-import { sateliot } from './presets/sateliot';
 import { starTalk } from './presets/startalk';
 
 export class SettingsManager {
@@ -42,69 +42,184 @@ export class SettingsManager {
    * A variable to hold a classification string, set to `null` when unused
    */
   classificationStr = null as ClassificationString | null;
-  menuMode: MenuMode = MenuMode.BASIC;
+  activeMenuMode: MenuMode = MenuMode.BASIC;
   // This controls which of the built-in plugins are loaded
-  plugins = <KeepTrackPlugins>{
-    debug: true,
-    satInfoboxCore: true,
-    aboutManager: false,
-    collisions: true,
-    trackingImpactPredict: true,
-    dops: true,
-    findSat: true,
-    launchCalendar: true,
-    newLaunch: true,
-    nextLaunch: true,
-    nightToggle: true,
-    photoManager: true,
-    screenRecorder: true,
-    satChanges: false,
-    stereoMap: true,
-    timeMachine: true,
-    initialOrbit: false,
-    missile: true,
-    breakup: true,
-    editSat: true,
-    constellations: true,
-    countries: true,
-    colorsMenu: true,
-    shortTermFences: true,
-    orbitReferences: true,
-    analysis: true,
-    plotAnalysis: true,
-    sensorFov: true,
-    sensorSurv: true,
-    satelliteFov: true,
-    satelliteView: true,
-    planetarium: true,
-    astronomy: true,
-    screenshot: true,
-    watchlist: true,
-    sensor: true,
-    settingsMenu: true,
-    graphicsMenu: true,
-    datetime: true,
-    social: true,
-    topMenu: true,
-    classificationBar: true,
-    soundManager: true,
-    gamepad: true,
-    debrisScreening: true,
-    videoDirector: true,
-    reports: true,
-    polarPlot: true,
-    timeline: true,
-    timelineAlt: true,
-    transponderChannelData: true,
-    calculator: true,
-    createSat: true,
-    filterMenu: true,
-    RPOCalculator: true,
+  plugins = <KeepTrackPluginsConfiguration>{
+    debug: {
+      enabled: true,
+    },
+    satInfoboxCore: {
+      enabled: true,
+    },
+    aboutManager: {
+      enabled: false,
+    },
+    collisions: {
+      enabled: true,
+    },
+    trackingImpactPredict: {
+      enabled: true,
+    },
+    DopsPlugin: {
+      enabled: true,
+      menuMode: [MenuMode.ANALYSIS],
+    },
+    findSat: {
+      enabled: true,
+    },
+    launchCalendar: {
+      enabled: true,
+    },
+    newLaunch: {
+      enabled: true,
+    },
+    nextLaunch: {
+      enabled: true,
+    },
+    nightToggle: {
+      enabled: true,
+    },
+    photoManager: {
+      enabled: true,
+    },
+    screenRecorder: {
+      enabled: true,
+    },
+    satChanges: {
+      enabled: false,
+    },
+    stereoMap: {
+      enabled: true,
+    },
+    timeMachine: {
+      enabled: true,
+    },
+    initialOrbit: {
+      enabled: false,
+    },
+    missile: {
+      enabled: true,
+    },
+    breakup: {
+      enabled: true,
+    },
+    editSat: {
+      enabled: true,
+    },
+    constellations: {
+      enabled: true,
+    },
+    countries: {
+      enabled: true,
+    },
+    colorsMenu: {
+      enabled: true,
+    },
+    shortTermFences: {
+      enabled: true,
+    },
+    orbitReferences: {
+      enabled: true,
+    },
+    analysis: {
+      enabled: true,
+    },
+    plotAnalysis: {
+      enabled: true,
+    },
+    sensorFov: {
+      enabled: true,
+    },
+    sensorSurv: {
+      enabled: true,
+    },
+    satelliteFov: {
+      enabled: true,
+    },
+    satelliteView: {
+      enabled: true,
+    },
+    planetarium: {
+      enabled: true,
+    },
+    astronomy: {
+      enabled: true,
+    },
+    screenshot: {
+      enabled: true,
+    },
+    watchlist: {
+      enabled: true,
+    },
+    sensor: {
+      enabled: true,
+    },
+    settingsMenu: {
+      enabled: true,
+    },
+    graphicsMenu: {
+      enabled: true,
+    },
+    datetime: {
+      enabled: true,
+    },
+    social: {
+      enabled: true,
+    },
+    topMenu: {
+      enabled: true,
+    },
+    classificationBar: {
+      enabled: true,
+    },
+    soundManager: {
+      enabled: true,
+    },
+    gamepad: {
+      enabled: true,
+    },
+    debrisScreening: {
+      enabled: true,
+    },
+    videoDirector: {
+      enabled: true,
+    },
+    reports: {
+      enabled: true,
+    },
+    polarPlot: {
+      enabled: true,
+    },
+    timeline: {
+      enabled: true,
+    },
+    timelineAlt: {
+      enabled: true,
+    },
+    transponderChannelData: {
+      enabled: true,
+    },
+    calculator: {
+      enabled: true,
+    },
+    createSat: {
+      enabled: true,
+    },
+    filterMenu: {
+      enabled: true,
+    },
+    RPOCalculator: {
+      enabled: true,
+    },
   };
   changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
   changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute
-  earthDayTextureQuality = EarthDayTextureQuality.MEDIUM;
-  earthNightTextureQuality = EarthNightTextureQuality.MEDIUM;
+  earthDayTextureQuality;
+  earthNightTextureQuality;
+  earthSpecTextureQuality;
+  earthBumpTextureQuality;
+  earthCloudTextureQuality;
+  earthPoliticalTextureQuality;
   filter: FilterPluginSettings = {};
   /**
    * This enables/disable the mission data section of the sat-info-box. There is no value if your data set contains no mission data.
@@ -125,6 +240,12 @@ export class SettingsManager {
    * Flag to determine if the covariance ellipsoid should be drawn.
    */
   isDrawCovarianceEllipsoid = false;
+  isDrawPoliticalMap = true;
+  isDrawCloudsMap = true;
+  sunTextureQuality: SunTextureQuality;
+  earthTextureStyle: EarthTextureStyle;
+  isEarthGrayScale = false;
+  isEarthAmbientLighting = true;
 
 
   static preserveSettings() {
@@ -158,8 +279,8 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY, settingsManager.godraysDensity.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT, settingsManager.godraysWeight.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY, settingsManager.godraysIlluminationDecay.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality?.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality?.toString());
 
     keepTrackApi.emit(KeepTrackApiEvents.saveSettings);
   }
@@ -489,10 +610,6 @@ export class SettingsManager {
    */
   autoRotateSpeed = 0.000075;
   /**
-   * Determines whether or not to use lighter blue texture for the Earth.
-   */
-  blueImages = false;
-  /**
    * The speed at which the camera decays.
    *
    * Reduce this give momentum to camera changes
@@ -663,14 +780,6 @@ export class SettingsManager {
    */
   gpsElevationMask = <Degrees>15;
   /**
-   * Determines whether to use default high resolution texture for the Earth.
-   */
-  hiresImages = false;
-  /**
-   * Determines whether to use default high resolution texture for the Earth minus clouds.
-   */
-  hiresNoCloudsImages = false;
-  /**
    * Color of the dot when hovering over an object.
    */
   hoverColor = <[number, number, number, number]>[1.0, 1.0, 0.0, 1.0]; // Yellow
@@ -724,8 +833,11 @@ export class SettingsManager {
   isDrawBumpMap = true;
   /**
    * Determines whether the atmosphere should be drawn or not.
+   * 0 = No atmosphere
+   * 1 = Thin white atmosphere
+   * 2 = Colored atmosphere
    */
-  isDrawAtmosphere = true;
+  isDrawAtmosphere: AtmosphereSettings = AtmosphereSettings.COLORFUL;
   /**
    * Determines whether or not to draw the Aurora effect.
    */
@@ -818,10 +930,6 @@ export class SettingsManager {
   lkVerify = 0;
   lowPerf = false;
   /**
-   * Determines whether to use default low resolution texture for the Earth.
-   */
-  lowresImages = false;
-  /**
    * Preallocate the maximum number of analyst satellites that can be manipulated
    *
    * NOTE: This mainly applies to breakup scenarios
@@ -901,10 +1009,6 @@ export class SettingsManager {
    */
   nameOfSpecialSats = 'Special Sats';
   /**
-   * Determines whether or not to use NASA Blue Marble texture for the Earth.
-   */
-  nasaImages = false;
-  /**
    * The number of passes to consider when determining lookangles.
    */
   nextNPassesCount = 5;
@@ -955,10 +1059,6 @@ export class SettingsManager {
    * Color of secondary object orbit.
    */
   orbitSelectColor2 = <[number, number, number, number]>[0.0, 0.4, 1.0, 0.9];
-  /**
-   * Determines whether or not to use political map texture for the Earth.
-   */
-  politicalImages = false;
   pTime = [];
   /**
    * Global flag for determining if a screenshot is queued
@@ -1065,7 +1165,6 @@ export class SettingsManager {
    * Automatically display all of the orbits
    */
   startWithOrbitsDisplayed = false;
-  brownEarthImages = false;
   /**
    * How many draw calls to wait before updating orbit overlay if last draw time was greater than 50ms
    */
@@ -1074,10 +1173,6 @@ export class SettingsManager {
    * How many draw calls to wait before updating orbit overlay if last draw time was greater than 20ms
    */
   updateHoverDelayLimitSmall = 3;
-  /**
-   * Determines whether to use vector map texture for the Earth.
-   */
-  vectorImages = false;
   /**
    * Size of the dot vertex shader
    */
@@ -1202,7 +1297,7 @@ export class SettingsManager {
     this.isDrawSun = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_SUN, this.isDrawSun) as boolean;
     this.isDrawCovarianceEllipsoid = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, this.isDrawCovarianceEllipsoid) as boolean;
     this.isBlackEarth = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_BLACK_EARTH, this.isBlackEarth) as boolean;
-    this.isDrawAtmosphere = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ATMOSPHERE, this.isDrawAtmosphere) as boolean;
+    this.isDrawAtmosphere = parseInt(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE) ?? '0') as AtmosphereSettings;
     this.isDrawAurora = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_AURORA, this.isDrawAurora) as boolean;
     this.isDrawMilkyWay = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_MILKY_WAY, this.isDrawMilkyWay) as boolean;
     this.isGraySkybox = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_GRAY_SKYBOX, this.isGraySkybox) as boolean;
@@ -1257,6 +1352,7 @@ export class SettingsManager {
     const params = this.loadOverridesFromUrl_();
 
     this.initParseFromGETVariables_(params);
+    keepTrackApi.emit(KeepTrackApiEvents.parseGetVariables, params);
 
     // If No UI Reduce Overhead
     if (this.disableUI) {
@@ -1268,9 +1364,15 @@ export class SettingsManager {
 
     // Disable resource intense plugins if lowPerf is enabled
     if (this.lowPerf) {
-      this.plugins.sensorFov = false;
-      this.plugins.sensorSurv = false;
-      this.plugins.satelliteFov = false;
+      if (this.plugins.sensorFov) {
+        this.plugins.sensorFov.enabled = false;
+      }
+      if (this.plugins.sensorSurv) {
+        this.plugins.sensorSurv.enabled = false;
+      }
+      if (this.plugins.satelliteFov) {
+        this.plugins.satelliteFov.enabled = false;
+      }
       this.maxFieldOfViewMarkers = 1;
     }
 
@@ -1489,9 +1591,6 @@ export class SettingsManager {
               case 'startalk':
                 starTalk(settingsManager);
                 break;
-              case 'sateliot':
-                sateliot(settingsManager);
-                break;
               case 'million-year':
                 SettingsPresets.loadPresetMillionYear(this);
                 break;
@@ -1549,7 +1648,7 @@ export class SettingsManager {
             );
             break;
           case 'debug':
-            this.plugins.debug = true;
+            this.plugins.debug = { enabled: true };
             break;
           case 'nomarkers':
             this.maxFieldOfViewMarkers = 1;
@@ -1605,11 +1704,8 @@ export class SettingsManager {
           case 'hires-milky-way':
             this.hiresMilkWay = true;
             break;
-          case 'vec':
-            this.vectorImages = true;
-            break;
           case 'political':
-            this.politicalImages = true;
+            this.earthTextureStyle = EarthTextureStyle.FLAT;
             break;
           case 'offline':
             this.offline = true;
@@ -1672,51 +1768,9 @@ export class SettingsManager {
     if (this.isLoadLastMap && !this.isDrawLess) {
       const lastMap = PersistenceManager.getInstance().getItem(StorageKey.LAST_MAP);
 
-      switch (lastMap) {
-        case 'blue':
-          this.blueImages = true;
-          break;
-        case 'nasa':
-          this.nasaImages = true;
-          break;
-        case 'low':
-          this.lowresImages = true;
-          break;
-        case 'brown':
-          this.brownEarthImages = true;
-          break;
-        case 'high':
-          this.hiresImages = true;
-          break;
-        case 'high-nc':
-          this.hiresNoCloudsImages = true;
-          break;
-        case 'vec':
-          this.vectorImages = true;
-          break;
-        case 'political':
-          this.politicalImages = true;
-          break;
-        // file deepcode ignore DuplicateCaseBody: The default image could change in the future
-        default:
-          this.lowresImages = true;
-          break;
+      if (lastMap) {
+        settingsManager.earthTextureStyle = lastMap as EarthTextureStyle;
       }
-    }
-
-    // Make sure there is some map loaded!
-    if (
-      !this.blueImages &&
-      !this.nasaImages &&
-      !this.lowresImages &&
-      !this.brownEarthImages &&
-      !this.hiresImages &&
-      !this.hiresNoCloudsImages &&
-      !this.vectorImages &&
-      !this.politicalImages &&
-      !this.smallImages
-    ) {
-      this.lowresImages = true;
     }
   }
 
@@ -1739,7 +1793,6 @@ export class SettingsManager {
       this.enableHoverOrbits = true;
       this.isDrawLess = true;
       this.smallImages = true;
-      this.hiresNoCloudsImages = false;
       this.updateHoverDelayLimitSmall = 25;
       this.updateHoverDelayLimitBig = 45;
     }

@@ -217,6 +217,7 @@ export enum MenuMode {
   ADVANCED,
   ANALYSIS,
   EXPERIMENTAL,
+  PRO,
   ALL,
 }
 
@@ -291,7 +292,6 @@ export enum KeepTrackApiEvents {
   uiManagerOnReady = 'uiManagerOnReady',
   bottomMenuClick = 'bottomMenuClick',
   hideSideMenus = 'hideSideMenus',
-  nightToggle = 'nightToggle',
   orbitManagerInit = 'orbitManagerInit',
   drawManagerLoadScene = 'drawManagerLoadScene',
   drawOptionalScenery = 'drawOptionalScenery',
@@ -339,4 +339,5 @@ export enum KeepTrackApiEvents {
   saveSettings = 'saveSettings',
   loadSettings = 'loadSettings',
   update = 'update',
+  parseGetVariables = 'parseGetVariables',
 }

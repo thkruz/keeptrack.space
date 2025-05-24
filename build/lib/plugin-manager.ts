@@ -48,6 +48,10 @@ export class PluginManager {
       openSourcePath: '../plugins/planetarium/planetarium',
       proPath: '../plugins-pro/planetarium/planetarium',
     },
+    'graphics-menu': {
+      openSourcePath: '../plugins/graphics-menu/graphics-menu',
+      proPath: '../plugins-pro/graphics-menu/graphics-menu',
+    },
   };
 
   constructor(fileManager: FileSystemManager) {

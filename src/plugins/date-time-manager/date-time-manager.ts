@@ -21,7 +21,6 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.updateDateTime, this.updateDateTime.bind(this));
 
     keepTrackApi.on(
@@ -100,12 +99,14 @@ export class DateTimeManager extends KeepTrackPlugin {
     if (datetimeInputTb && !isThisNode()) {
       datetimeInputTb.addEventListener('change', () => {
         if (this.isEditTimeOpen) {
-          const datetimeInputElement = document.getElementById('datetime-input');
+          // const datetimeInputElement = document.getElementById('datetime-input');
 
-          // TODO: Why was this originally !datetimeInputElement???
-          if (datetimeInputElement) {
-            datetimeInputElement.style.display = 'none';
-          }
+          /*
+           * TODO: Why was this originally !datetimeInputElement???
+           * if (datetimeInputElement) {
+           * datetimeInputElement.style.display = 'none';
+           * }
+           */
           setTimeout(() => {
             this.isEditTimeOpen = false;
           }, 500);

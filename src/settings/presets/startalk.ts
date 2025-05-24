@@ -1,4 +1,5 @@
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
@@ -13,8 +14,8 @@ export const starTalk = (settingsManager: SettingsManager) => {
   const RESTART_ROTATE_TIME = 5; // Restart auto rotate after this many seconds
 
   settingsManager.disableAllPlugins();
-  settingsManager.plugins.timeMachine = true;
-  settingsManager.plugins.topMenu = false;
+  settingsManager.plugins.timeMachine = { enabled: true };
+  settingsManager.plugins.topMenu = { enabled: false };
 
   settingsManager.isDisableAsciiCatalog = true;
 
@@ -25,7 +26,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
   settingsManager.noMeshManager = true;
   settingsManager.isLoadLastMap = false;
   settingsManager.isShowAgencies = false;
-  settingsManager.lowresImages = true;
+  settingsManager.earthTextureStyle = EarthTextureStyle.BLUE_MARBLE;
   settingsManager.isAllowRightClick = false;
   settingsManager.isDisableSelectSat = false;
   settingsManager.isDisableSensors = true;
@@ -80,7 +81,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
     const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
     const debrisSpan = '<span style="color: rgb(102, 102, 102);">Debris </span>';
 
-    getEl('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+    getEl('textOverlay')!.innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
 
     return `${english}`;
   };
@@ -109,7 +110,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
     style.appendChild(document.createTextNode(toastCss));
     document.head.appendChild(style);
 
-    getEl('textOverlay').style.cssText = `
+    getEl('textOverlay')!.style.cssText = `
                     border-radius: 2px;
                     bottom: 125px;
                     right: 150px;
@@ -137,7 +138,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
     const startTimeMachine = () => {
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
       setTimeout(() => {
-        (keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
+        (keepTrackApi.getPlugin(TimeMachine)!).historyOfSatellitesPlay(); // Start Time Machine
         keepTrackApi.getMainCamera().zoomTarget = 1; // Reset Zoom to Default
         keepTrackApi.getMainCamera().camSnap(lat2pitch(DEFAULT_LATITUDE), lon2yaw(DEFAULT_LONGITUDE, new Date())); // Reset Camera to Default
       }, 100);
@@ -162,16 +163,16 @@ export const starTalk = (settingsManager: SettingsManager) => {
       setInterval(() => {
         if (Date.now() - settingsManager.lastInteractionTime > RESTART_ROTATE_TIME * 1000) {
           // If Time Machine is Off
-          if (!(keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning) {
+          if (!(keepTrackApi.getPlugin(TimeMachine)!).isTimeMachineRunning) {
             startTimeMachine();
-          } else if ((keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesRunCount >= 67) {
+          } else if ((keepTrackApi.getPlugin(TimeMachine)!).historyOfSatellitesRunCount >= 67) {
             setTimeout(() => {
               startTimeMachine();
             }, settingsManager.timeMachineDelay);
           }
           // If Time Machine is Running
-        } else if ((keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning) {
-          (keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning = false; // Stop Time Machine
+        } else if ((keepTrackApi.getPlugin(TimeMachine)!).isTimeMachineRunning) {
+          (keepTrackApi.getPlugin(TimeMachine)!).isTimeMachineRunning = false; // Stop Time Machine
 
           settingsManager.colors.transparent = keepTrackApi.getOrbitManager().tempTransColor;
 

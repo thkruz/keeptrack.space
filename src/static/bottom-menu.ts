@@ -74,7 +74,7 @@ export class BottomMenu {
 
   private static onBottomMenuFilterClick_(menuButtonDom: HTMLElement, menuMode: MenuMode) {
     keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-    settingsManager.menuMode = menuMode;
+    settingsManager.activeMenuMode = menuMode;
     this.deselectAllBottomMenuFilterButtons_();
     menuButtonDom.classList.add('bmenu-item-selected');
     keepTrackApi.emit(KeepTrackApiEvents.bottomMenuModeChange);

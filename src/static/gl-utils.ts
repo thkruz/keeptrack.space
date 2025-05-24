@@ -95,11 +95,16 @@ export abstract class GlUtils {
 
     img.decoding = 'async';
     img.src = url;
-    img.onload = () => {
-      GlUtils.bindImageToTexture(gl, texture, img);
-    };
 
-    return texture;
+    return new Promise<WebGLTexture>((resolve, reject) => {
+      img.onload = () => {
+        GlUtils.bindImageToTexture(gl, texture, img);
+        resolve(texture);
+      };
+      img.onerror = () => {
+        reject(new Error(`Failed to load image: ${url}`));
+      };
+    });
   }
 
   /**
@@ -117,11 +122,23 @@ export abstract class GlUtils {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
 
     if (GlUtils.isPowerOf2(img.width) && GlUtils.isPowerOf2(img.height)) {
-      // Yes, it's a power of 2. Generate mips.
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAX_LEVEL, 0);
+      // Yes, it's a power of 2. Generate mips. Set up trilinear filtering (mipmap + linear)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+      // Repeat the texture if it's a power of 2
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+
+      const ext = gl.getExtension('EXT_texture_filter_anisotropic');
+
+      if (ext) {
+        const maxAnisotropy = gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+
+        gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+      }
+
+      // Generate mipmaps
       gl.generateMipmap(gl.TEXTURE_2D);
     } else {
       // eslint-disable-next-line no-console

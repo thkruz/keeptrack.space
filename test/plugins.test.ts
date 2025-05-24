@@ -7,7 +7,7 @@ describe('plugins', () => {
       debug: false,
       satInfoboxCore: true,
       AboutMenuPlugin: true,
-      collisions: true,
+      Collisions: true,
       DopsPlugin: true,
       findSat: true,
       launchCalendar: true,

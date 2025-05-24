@@ -37,13 +37,13 @@ export class Collisions extends KeepTrackPlugin {
 
   bottomIconElementName: string = 'menu-satellite-collision';
   bottomIconImg = CollisionsPng;
-  sideMenuElementName: string = 'collisions-menu';
+  sideMenuElementName: string = `${this.id}-menu`;
   sideMenuElementHtml = keepTrackApi.html`
-  <div id="collisions-menu" class="side-menu-parent start-hidden text-select">
-    <div id="collisions-content" class="side-menu">
+  <div id="${this.id}-menu" class="side-menu-parent start-hidden text-select">
+    <div id="${this.id}-content" class="side-menu">
       <div class="row">
         <h5 class="center-align">Possible Collisions</h5>
-        <table id="collisions-table" class="center-align"></table>
+        <table id="${this.id}-table" class="center-align"></table>
       </div>
     </div>
   </div>`;
@@ -82,7 +82,7 @@ export class Collisions extends KeepTrackPlugin {
       showLoading(() => {
         const el = (<HTMLElement>evt.target).parentElement;
 
-        if (!el!.classList.contains('collisions-object')) {
+        if (!el!.classList.contains(`${this.id}-object`)) {
           return;
         }
         // Might be better code for this.
@@ -128,7 +128,7 @@ export class Collisions extends KeepTrackPlugin {
 
   private createTable_(): void {
     try {
-      const tbl = <HTMLTableElement>getEl('collisions-table'); // Identify the table to update
+      const tbl = <HTMLTableElement>getEl(`${this.id}-table`); // Identify the table to update
 
       tbl.innerHTML = ''; // Clear the table from old object data
 
@@ -162,7 +162,7 @@ export class Collisions extends KeepTrackPlugin {
     // Create a new row
     const tr = tbl.insertRow();
 
-    tr.setAttribute('class', 'collisions-object link');
+    tr.setAttribute('class', `${this.id}-object link`);
     tr.setAttribute('data-row', i.toString());
 
     // Populate the table with the data

@@ -14,7 +14,6 @@ export type KeepTrackPluginsConfiguration = {
   debrisScreening?: PluginConfiguration;
   satInfoboxCore?: PluginConfiguration;
   findSat?: PluginConfiguration;
-  collisions?: PluginConfiguration;
   satelliteFov?: PluginConfiguration;
   nightToggle?: PluginConfiguration;
   countries?: PluginConfiguration;
@@ -28,7 +27,7 @@ export type KeepTrackPluginsConfiguration = {
   catalogLoader?: PluginConfiguration;
   classificationBar?: PluginConfiguration;
   Collisions?: PluginConfiguration;
-  trackingImpactPredict?: PluginConfiguration;
+  TrackingImpactPredict?: PluginConfiguration;
   colorsMenu?: PluginConfiguration;
   constellations?: PluginConfiguration;
   countriesMenu?: PluginConfiguration;

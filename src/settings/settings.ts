@@ -60,11 +60,13 @@ export class SettingsManager {
       enabled: false,
       order: 101,
     },
-    collisions: {
+    Collisions: {
       enabled: true,
+      order: 80,
     },
-    trackingImpactPredict: {
+    TrackingImpactPredict: {
       enabled: true,
+      order: 81,
     },
     DopsPlugin: {
       enabled: true,

@@ -2,6 +2,7 @@ import { KeepTrackApiEvents, MenuMode, Singletons } from '@app/interfaces';
 import { t7e } from '@app/locales/keys';
 import { Localization } from '@app/locales/locales';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
+import { BottomMenu } from '@app/static/bottom-menu';
 import Module from 'module';
 import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
@@ -511,11 +512,12 @@ export abstract class KeepTrackPlugin {
     this.isJsAdded = true;
   }
 
-  static registeredMenus = {
+  static readonly registeredMenus = {
     [MenuMode.BASIC]: [] as string[],
     [MenuMode.ADVANCED]: [] as string[],
     [MenuMode.ANALYSIS]: [] as string[],
     [MenuMode.EXPERIMENTAL]: [] as string[],
+    [MenuMode.SETTINGS]: [] as string[],
     [MenuMode.ALL]: [] as string[],
   };
 
@@ -527,16 +529,19 @@ export abstract class KeepTrackPlugin {
         if (menuElements.length === 0) {
           switch (parseInt(menuMode)) {
             case MenuMode.BASIC:
-              hideEl('menu-filter-basic');
+              hideEl(BottomMenu.basicMenuId);
               break;
             case MenuMode.ADVANCED:
-              hideEl('menu-filter-advanced');
+              hideEl(BottomMenu.advancedMenuId);
               break;
             case MenuMode.ANALYSIS:
-              hideEl('menu-filter-analysis');
+              hideEl(BottomMenu.analysisMenuId);
+              break;
+            case MenuMode.SETTINGS:
+              hideEl(BottomMenu.settingsMenuId);
               break;
             case MenuMode.EXPERIMENTAL:
-              hideEl('menu-filter-experimental');
+              hideEl(BottomMenu.experimentalMenuId);
               break;
             default:
               break;

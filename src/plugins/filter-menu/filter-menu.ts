@@ -77,7 +77,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   readonly id = 'FilterMenuPlugin';
   dependencies_ = [TopMenu.name];
 
-  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.SETTINGS, MenuMode.ALL];
 
   static filters: Filters[] = [
     {

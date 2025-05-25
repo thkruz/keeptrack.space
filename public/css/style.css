@@ -1402,7 +1402,16 @@ input:focus {
 }
 
 .dropdown-content {
-  max-height: 770% !important;
+  max-height: 40vh !important;
+}
+
+/* scroll bar coloring under .dropdown-content */
+.dropdown-content::-webkit-scrollbar-thumb {
+  background-color: var(--color-dark-text-accent) !important;
+}
+
+.dropdown-content::-webkit-scrollbar-track {
+  background-color: transparent !important;
 }
 
 #help-screen {

@@ -5,6 +5,7 @@ import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager, settingsManager } from '@app/settings/settings';
 import { AtmosphereSettings, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
+import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians } from 'ootk';
 import { getEl } from '../lib/get-el';
 
@@ -126,7 +127,21 @@ export abstract class UrlManager {
           isUsingParsedVariables = true;
           break;
         case 'ecf':
-          settingsManager.isOrbitCruncherInEcf = kv[key] === 'true';
+          {
+            const ecfValue = parseInt(kv[key], 10);
+
+            if (!isNaN(ecfValue) && ecfValue >= 0 && ecfValue <= 10) {
+              settingsManager.isOrbitCruncherInEcf = !!ecfValue;
+              settingsManager.numberOfEcfOrbitsToDraw = ecfValue;
+
+              keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+                keepTrackApi.getOrbitManager().orbitWorker.postMessage({
+                  typ: OrbitCruncherType.SETTINGS_UPDATE,
+                  numberOfOrbitsToDraw: settingsManager.numberOfEcfOrbitsToDraw,
+                });
+              });
+            }
+          }
           break;
         case 'color':
           UrlManager.assignColorScheme_(kv, settingsManager);
@@ -251,7 +266,7 @@ export abstract class UrlManager {
     }
 
     if (settingsManager.isOrbitCruncherInEcf) {
-      paramSlices.push('ecf=true');
+      paramSlices.push(`ecf=${settingsManager.numberOfEcfOrbitsToDraw}`);
     }
 
     if (isMaxData || timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {

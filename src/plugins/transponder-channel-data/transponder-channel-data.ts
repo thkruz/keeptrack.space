@@ -51,7 +51,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
     this.lastLoadedSat_ = selectedSat.id;
   };
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   isIconDisabledOnLoad = true;
   isIconDisabled = true;

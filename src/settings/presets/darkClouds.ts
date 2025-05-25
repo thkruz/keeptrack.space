@@ -14,7 +14,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
   settingsManager.disableAllPlugins();
   settingsManager.plugins.timeMachine = { enabled: true };
-  settingsManager.plugins.topMenu = { enabled: false };
+  settingsManager.plugins.TopMenu = { enabled: false };
 
   settingsManager.isDisableAsciiCatalog = true;
 

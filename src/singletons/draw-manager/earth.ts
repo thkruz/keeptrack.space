@@ -214,7 +214,7 @@ export class Earth {
       }
       this.gl_ ??= gl!;
 
-      if (!settingsManager.plugins.graphicsMenu) {
+      if (!settingsManager.plugins.GraphicsMenuPlugin) {
         settingsManager.earthBumpTextureQuality ??= EarthBumpTextureQuality.OFF;
         settingsManager.earthSpecTextureQuality ??= EarthSpecTextureQuality.OFF;
         settingsManager.earthDayTextureQuality ??= EarthDayTextureQuality.MEDIUM;

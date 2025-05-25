@@ -361,7 +361,7 @@ export class TimeManager {
     this.selectedDate = selectedDate;
 
     // This function only applies when datetime plugin is enabled
-    if (settingsManager.plugins.datetime) {
+    if (settingsManager.plugins.DateTimeManager) {
       if (this.lastTime - this.simulationTimeObj.getTime() < <Milliseconds>300) {
         this.simulationTimeSerialized_ = this.simulationTimeObj.toJSON();
         this.timeTextStr = this.timeTextStrEmpty_;
@@ -401,7 +401,7 @@ export class TimeManager {
       this.lastTime - this.simulationTimeObj.getTime() < 300 &&
       ((keepTrackApi.getPlugin(DateTimeManager))?.isEditTimeOpen || !settingsManager.cruncherReady || !keepTrackApi.getPlugin(DateTimeManager))
     ) {
-      if (settingsManager.plugins.datetime) {
+      if (settingsManager.plugins.DateTimeManager) {
         if (!this.datetimeInputDOM) {
           this.datetimeInputDOM = <HTMLInputElement>getEl('datetime-input-tb', true);
         }

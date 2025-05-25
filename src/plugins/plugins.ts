@@ -80,7 +80,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
   try {
     const pluginList: { init: () => void, config?: { enabled: boolean } }[] = [
       { init: () => new SelectSatManager().init(), config: { enabled: true } },
-      { init: () => new TopMenu().init(), config: plugins.topMenu },
+      { init: () => new TopMenu().init(), config: plugins.TopMenu },
       {
         init: () => (async () => {
           const proPlugin = await import('../plugins-pro/debug/debug');
@@ -89,10 +89,10 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
         })(), config: plugins.DebugMenuPlugin,
       },
       { init: () => new SatInfoBox().init(), config: plugins.satInfoboxCore },
-      { init: () => new DateTimeManager().init(), config: plugins.datetime },
-      { init: () => new SocialMedia().init(), config: plugins.social },
-      { init: () => new ClassificationBar().init(), config: plugins.classificationBar },
-      { init: () => new SoundManager().init(), config: plugins.soundManager },
+      { init: () => new DateTimeManager().init(), config: plugins.DateTimeManager },
+      { init: () => new SocialMedia().init(), config: plugins.SocialMedia },
+      { init: () => new ClassificationBar().init(), config: plugins.ClassificationBar },
+      { init: () => new SoundManager().init(), config: plugins.SoundManager },
       { init: () => new SensorListPlugin().init(), config: plugins.SensorListPlugin },
       { init: () => new SensorInfoPlugin().init(), config: plugins.SensorInfoPlugin },
       { init: () => new CustomSensorPlugin().init(), config: plugins.CustomSensorPlugin },
@@ -163,16 +163,16 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new Lat2LonPlots().init(), config: plugins.Lat2LonPlots },
       { init: () => new Inc2AltPlots().init(), config: plugins.Inc2AltPlots },
       { init: () => new Inc2LonPlots().init(), config: plugins.Inc2LonPlots },
-      { init: () => new FilterMenuPlugin().init(), config: plugins.filterMenu },
-      { init: () => new SettingsMenuPlugin().init(), config: plugins.settingsMenu },
+      { init: () => new FilterMenuPlugin().init(), config: plugins.FilterMenuPlugin },
+      { init: () => new SettingsMenuPlugin().init(), config: plugins.SettingsMenuPlugin },
       {
         init: () => (async () => {
           const proPlugin = await import('../plugins-pro/graphics-menu/graphics-menu');
 
           new proPlugin.GraphicsMenuPlugin().init();
-        })(), config: plugins.graphicsMenu,
+        })(), config: plugins.GraphicsMenuPlugin,
       },
-      { init: () => new GamepadPlugin().init(), config: plugins.gamepad },
+      { init: () => new GamepadPlugin().init(), config: plugins.GamepadPlugin },
       { init: () => new VideoDirectorPlugin().init(), config: plugins.videoDirector },
       {
         init: () => (async () => {
@@ -196,7 +196,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       }
     }
 
-    if (!plugins.topMenu) {
+    if (!plugins.TopMenu) {
       // Set --nav-bar-height of :root to 0px if topMenu is not enabled and ensure it overrides any other value
       document.documentElement.style.setProperty('--nav-bar-height', '0px');
     }

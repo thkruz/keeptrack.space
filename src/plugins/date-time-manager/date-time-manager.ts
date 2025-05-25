@@ -86,7 +86,7 @@ export class DateTimeManager extends KeepTrackPlugin {
   }
 
   uiManagerFinal() {
-    if (!settingsManager.plugins.topMenu) {
+    if (!settingsManager.plugins.TopMenu) {
       return;
     }
 

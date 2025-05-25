@@ -283,7 +283,7 @@ export class SettingsPresets {
     settings.isShowSplashScreen = true;
     settings.isEPFL = true;
     settings.disableAllPlugins();
-    settings.plugins.gamepad = { enabled: true };
+    settings.plugins.GamepadPlugin = { enabled: true };
     settings.isLoadLastMap = false;
     settings.isShowRocketBodies = true;
     settings.isShowDebris = true;

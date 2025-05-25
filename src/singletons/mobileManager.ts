@@ -37,9 +37,9 @@ export class MobileManager {
             settingsManager.plugins[key] = false;
           });
           settingsManager.plugins.satInfoboxCore = cachePlugins.satInfoboxCore;
-          settingsManager.plugins.topMenu = cachePlugins.topMenu;
-          settingsManager.plugins.datetime = cachePlugins.datetime;
-          settingsManager.plugins.soundManager = cachePlugins.soundManager;
+          settingsManager.plugins.TopMenu = cachePlugins.TopMenu;
+          settingsManager.plugins.DateTimeManager = cachePlugins.DateTimeManager;
+          settingsManager.plugins.SoundManager = cachePlugins.SoundManager;
           settingsManager.defaultColorScheme = 'CelestrakColorScheme';
 
           settingsManager.isDisableGodrays = true;

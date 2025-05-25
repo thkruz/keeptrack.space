@@ -137,36 +137,6 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     menuMode: [MenuMode.ANALYSIS],
   },
-  launchCalendar: {
-    enabled: true,
-  },
-  nextLaunch: {
-    enabled: true,
-  },
-  nightToggle: {
-    enabled: true,
-  },
-  photoManager: {
-    enabled: true,
-  },
-  screenRecorder: {
-    enabled: true,
-  },
-  satChanges: {
-    enabled: false,
-  },
-  timeMachine: {
-    enabled: true,
-  },
-  initialOrbit: {
-    enabled: false,
-  },
-  orbitReferences: {
-    enabled: true,
-  },
-  analysis: {
-    enabled: true,
-  },
   EciPlot: {
     enabled: true,
     order: 260,
@@ -201,32 +171,17 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   screenshot: {
     enabled: true,
   },
-  sensor: {
+  SettingsMenuPlugin: {
     enabled: true,
+    order: 290,
   },
-  settingsMenu: {
+  GraphicsMenuPlugin: {
     enabled: true,
+    order: 291,
   },
-  graphicsMenu: {
+  FilterMenuPlugin: {
     enabled: true,
-  },
-  datetime: {
-    enabled: true,
-  },
-  social: {
-    enabled: true,
-  },
-  topMenu: {
-    enabled: true,
-  },
-  classificationBar: {
-    enabled: true,
-  },
-  soundManager: {
-    enabled: true,
-  },
-  gamepad: {
-    enabled: true,
+    order: 292,
   },
   debrisScreening: {
     enabled: true,
@@ -240,9 +195,56 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   calculator: {
     enabled: true,
   },
-  filterMenu: {
+  launchCalendar: {
     enabled: true,
   },
+  nextLaunch: {
+    enabled: true,
+  },
+  nightToggle: {
+    enabled: true,
+  },
+  photoManager: {
+    enabled: true,
+  },
+  screenRecorder: {
+    enabled: true,
+  },
+  satChanges: {
+    enabled: false,
+  },
+  timeMachine: {
+    enabled: true,
+  },
+  initialOrbit: {
+    enabled: false,
+  },
+  orbitReferences: {
+    enabled: true,
+  },
+  analysis: {
+    enabled: true,
+  },
+  // Non-Menu plugins
+  TopMenu: {
+    enabled: true,
+  },
+  SocialMedia: {
+    enabled: true,
+  },
+  DateTimeManager: {
+    enabled: true,
+  },
+  ClassificationBar: {
+    enabled: true,
+  },
+  SoundManager: {
+    enabled: true,
+  },
+  GamepadPlugin: {
+    enabled: true,
+  },
+  // RMB plugins
   EarthPresetsPlugin: {
     enabled: true,
   },

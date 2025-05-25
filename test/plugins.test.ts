@@ -38,13 +38,13 @@ describe('plugins', () => {
       Astronomy: true,
       screenshot: true,
       WatchlistPlugin: true,
-      settingsMenu: true,
-      datetime: true,
-      social: true,
-      topMenu: true,
-      classificationBar: true,
-      soundManager: true,
-      gamepad: true,
+      SettingsMenuPlugin: true,
+      DateTimeManager: true,
+      SocialMedia: true,
+      TopMenu: true,
+      ClassificationBar: true,
+      SoundManager: true,
+      GamepadPlugin: true,
     });
   });
 });

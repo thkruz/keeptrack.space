@@ -4,6 +4,7 @@ import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
+import { SettingsManager } from '@app/settings/settings';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
@@ -211,10 +212,12 @@ export class OrbitManager {
           case 'L':
             this.toggleOrbitLines_();
             SettingsMenuPlugin.syncOnLoad();
+            SettingsManager.preserveSettings();
             break;
           case 'E':
             this.toggleEciToEcf_();
             SettingsMenuPlugin.syncOnLoad();
+            SettingsManager.preserveSettings();
             break;
           default:
             break;

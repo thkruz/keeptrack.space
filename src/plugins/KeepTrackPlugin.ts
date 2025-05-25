@@ -218,6 +218,11 @@ export abstract class KeepTrackPlugin {
    */
   secondaryMenuIcon = 'settings';
   bottomIconOrder: number | null = null;
+  /**
+   * The maximum order for the bottom icon.
+   * This is used to ensure that the bottom icons are sorted correctly.
+   */
+  static readonly MAX_BOTTOM_ICON_ORDER: number = 600;
 
   /**
    * Creates a new instance of the KeepTrackPlugin class.
@@ -631,7 +636,7 @@ export abstract class KeepTrackPlugin {
 
         button.id = this.bottomIconElementName;
         // embed an order id to allow for sorting
-        button.setAttribute('data-order', this.bottomIconOrder?.toString() ?? '300');
+        button.setAttribute('data-order', this.bottomIconOrder?.toString() ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString());
         button.classList.add('bmenu-item');
         if (isDisabled) {
           button.classList.add('bmenu-item-disabled');

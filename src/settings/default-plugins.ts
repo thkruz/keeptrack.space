@@ -1,4 +1,3 @@
-import { MenuMode } from '@app/interfaces';
 import { KeepTrackPluginsConfiguration } from '@app/plugins/keeptrack-plugins-configuration';
 
 export const defaultPlugins = <KeepTrackPluginsConfiguration>{
@@ -135,7 +134,6 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   },
   DopsPlugin: {
     enabled: true,
-    menuMode: [MenuMode.ANALYSIS],
   },
   EciPlot: {
     enabled: true,
@@ -173,15 +171,15 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   },
   SettingsMenuPlugin: {
     enabled: true,
-    order: 290,
+    order: 590,
   },
   GraphicsMenuPlugin: {
     enabled: true,
-    order: 291,
+    order: 591,
   },
   FilterMenuPlugin: {
     enabled: true,
-    order: 292,
+    order: 592,
   },
   debrisScreening: {
     enabled: true,

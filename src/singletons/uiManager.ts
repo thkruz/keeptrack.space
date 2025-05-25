@@ -26,6 +26,7 @@
 
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { isThisNode } from '@app/static/isThisNode';
 import '@materializecss/materialize';
@@ -284,8 +285,8 @@ export class UiManager {
   private sortBottomIcons() {
     const bottomIcons = document.querySelectorAll('#bottom-icons > div');
     const sortedIcons = Array.from(bottomIcons).sort((a, b) => {
-      const aOrder = parseInt(a.getAttribute('data-order') ?? '300', 10);
-      const bOrder = parseInt(b.getAttribute('data-order') ?? '300', 10);
+      const aOrder = parseInt(a.getAttribute('data-order') ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString(), 10);
+      const bOrder = parseInt(b.getAttribute('data-order') ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString(), 10);
 
       return aOrder - bOrder;
     });

@@ -1,6 +1,5 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
@@ -66,30 +65,6 @@ export const parseGetVariables = (params: string[], settingsManager: SettingsMan
         break;
       case 'jsc':
         settingsManager.isEnableJscCatalog = val === 'true';
-        break;
-      case 'sat':
-        keepTrackApi.on(
-          KeepTrackApiEvents.onCruncherReady,
-          () => {
-            setTimeout(() => {
-              if (typeof val === 'string') {
-                const sccNum = parseInt(val);
-
-                if (sccNum >= 0) {
-                  const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
-
-                  if (id && id >= 0) {
-                    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
-                  } else {
-                    keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
-                  }
-                } else {
-                  keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
-                }
-              }
-            }, 2000);
-          },
-        );
         break;
       case 'debug':
         settingsManager.plugins.DebugMenuPlugin = { enabled: true };

@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { DetailedSatellite } from 'ootk';
+import { DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians } from 'ootk';
 import { getEl } from '../lib/get-el';
 
 export abstract class UrlManager {
@@ -31,6 +31,12 @@ export abstract class UrlManager {
 
     keepTrackApi.on(KeepTrackApiEvents.updateDateTime, () => {
       this.updateURL();
+    });
+
+    keepTrackApi.on(InputEventType.KeyDown, (key) => {
+      if (key === 'U') {
+        this.updateURL();
+      }
     });
   }
 
@@ -62,24 +68,81 @@ export abstract class UrlManager {
     return params;
   }
 
-  static parseGetVariables() {
-    const queryStr = window.location?.search?.substring(1) || '';
-    const params = queryStr.split('&');
+  static getKeyValuePairs(): Record<string, string> {
+    const params = this.getParams();
+    const keyValuePairs: Record<string, string> = {};
 
-    if (params.length === 0 || params[0] === '') {
+    params.forEach((param) => {
+      const [key, val] = param.split('=');
+
+      if (key && val) {
+        keyValuePairs[key] = decodeURIComponent(val.replace(/\+/gu, ' '));
+      }
+    });
+
+    return keyValuePairs;
+  }
+
+  static parseGetVariables() {
+    const kv = this.getKeyValuePairs();
+
+    if (Object.keys(kv).length === 0) {
       return;
     }
 
-    // Do Searches First
-    UrlManager.getVariableSearch_(params);
+    // Do searches first
+    if (kv.search && !settingsManager.disableUI) {
+      const uiManagerInstance = keepTrackApi.getUiManager();
+
+      uiManagerInstance.doSearch(kv.search);
+      if (settingsManager.lastSearchResults.length === 0) {
+        keepTrackApi.toast(`Search for "${kv.search}" found nothing!`, ToastMsgType.caution, true);
+        uiManagerInstance.searchManager.hideResults();
+      }
+    }
 
     // Then Do Other Stuff
-    UrlManager.getVariableActions_(params);
+    Object.keys(kv).forEach((key) => {
+      if (key === 'search') {
+        return; // Already handled above
+      }
+      switch (key) {
+        case 'intldes':
+          this.handleIntldesParam_(kv[key]);
+          break;
+        case 'sat':
+          this.handleSatParam_(kv[key]);
+          break;
+        case 'misl':
+          this.handleMislParam_(kv[key]);
+          break;
+        case 'date':
+          this.handleDateParam_(kv[key]);
+          break;
+        case 'pitch':
+        case 'yaw':
+          this.handlePitchYawParam_(kv.pitch, kv.yaw);
+          break;
+        case 'lat':
+        case 'lon':
+          this.handleLatLonParam_(kv.lat, kv.lon, kv.zoom, kv.date ?? null);
+          break;
+        case 'rate':
+          this.handleRateParam_(kv[key]);
+          break;
+        case 'zoom':
+          this.handleZoomParam_(kv[key], kv.camDistBuffer ?? null);
+          break;
+        default:
+          console.warn(`Unknown URL parameter: ${key}`);
+      }
+    });
   }
 
   static updateURL() {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
+    const mainCamera = keepTrackApi.getMainCamera();
 
     if (!uiManagerInstance.searchManager) {
       return;
@@ -109,6 +172,15 @@ export abstract class UrlManager {
       paramSlices.push(`rate=${this.propRate_}`);
     }
 
+    paramSlices.push(`pitch=${(mainCamera.camPitch * RAD2DEG).toFixed(2)}`);
+    paramSlices.push(`yaw=${(mainCamera.camYaw * RAD2DEG).toFixed(2)}`);
+
+    paramSlices.push(`zoom=${mainCamera.zoomLevel()}`);
+
+    if (this.selectedSat_) {
+      paramSlices.push(`camDistBuffer=${mainCamera.camDistBuffer}`);
+    }
+
     if (timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
       paramSlices.push(`date=${(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset).toString()}`);
     }
@@ -120,48 +192,23 @@ export abstract class UrlManager {
     if (url !== window.location.href) {
       setTimeout(() => {
         // Find any # in the URL and replace it with an empty string
-        console.debug('Updating URL to:', url);
         url = url.replace(/#/gu, '');
-        console.debug('Final URL:', url);
         window.history.replaceState(null, '', url);
       }, 100);
     }
-  }
-
-  /**
-   * Parses the URL parameters and performs actions based on the parameter key.
-   * @param params - An array of URL parameters.
-   */
-  private static getVariableActions_(params: string[]) {
-    const actions = {
-      intldes: (val: string) => UrlManager.handleIntldesParam_(val),
-      sat: (val: string) => UrlManager.handleSatParam_(val),
-      misl: (val: string) => UrlManager.handleMislParam_(val),
-      date: (val: string) => UrlManager.handleDateParam_(val),
-      rate: (val: string) => UrlManager.handleRateParam_(val),
-    };
-
-    params.forEach((param) => {
-      const [key, val] = param.split('=');
-
-      if (actions[key]) {
-        actions[key](val);
-      }
-    });
   }
 
   private static handleIntldesParam_(val: string) {
     keepTrackApi.on(
       KeepTrackApiEvents.onKeepTrackReady,
       () => {
-        const uiManagerInstance = keepTrackApi.getUiManager();
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.intlDes2id(val.toUpperCase());
 
-        if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId).active) {
+        if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId)?.active) {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
         } else {
-          uiManagerInstance.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+          keepTrackApi.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
         }
       },
     );
@@ -171,14 +218,13 @@ export abstract class UrlManager {
     keepTrackApi.on(
       KeepTrackApiEvents.onKeepTrackReady,
       () => {
-        const uiManagerInstance = keepTrackApi.getUiManager();
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
 
         if (urlSatId !== null) {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
         } else {
-          uiManagerInstance.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+          keepTrackApi.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
         }
       },
     );
@@ -191,35 +237,32 @@ export abstract class UrlManager {
     (<HTMLSelectElement>getEl('ms-attacker')).value = subVal[1].toString();
     (<HTMLSelectElement>getEl('ms-target')).value = subVal[2].toString();
     (<HTMLButtonElement>getEl('missile')).click();
-    const uiManagerInstance = keepTrackApi.getUiManager();
 
-    uiManagerInstance.toast('Missile launched!', ToastMsgType.normal, false);
+    keepTrackApi.toast('Missile launched!', ToastMsgType.normal, false);
   }
 
   private static handleDateParam_(val: string) {
-    const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
 
     if (isNaN(parseInt(val))) {
-      uiManagerInstance.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+      keepTrackApi.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
 
       return;
     }
 
-    uiManagerInstance.toast('Simulation time will be updated once catalog finishes processing!', ToastMsgType.normal, true);
+    keepTrackApi.toast('Simulation time will be updated once catalog finishes processing!', ToastMsgType.normal, true);
     setTimeout(() => {
-      uiManagerInstance.toast('Simulation time updated!', ToastMsgType.normal, true);
+      keepTrackApi.toast('Simulation time updated!', ToastMsgType.normal, true);
       timeManagerInstance.changeStaticOffset(Number(val) - Date.now());
     }, 10000);
   }
 
   private static handleRateParam_(val: string) {
-    const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     let rate = parseFloat(val);
 
     if (isNaN(rate)) {
-      uiManagerInstance.toast(`Propagation rate of "${rate}" is not a valid float!`, ToastMsgType.caution, true);
+      keepTrackApi.toast(`Propagation rate of "${rate}" is not a valid float!`, ToastMsgType.caution, true);
 
       return;
     }
@@ -229,25 +272,89 @@ export abstract class UrlManager {
     timeManagerInstance.changePropRate(Number(rate));
   }
 
-  /**
-   * Parses the search parameter from the URL and performs a search if the search parameter is present.
-   * @param params - An array of URL parameters.
-   */
-  private static getVariableSearch_(params: string[]) {
-    params.forEach((param) => {
-      const [key, val] = param.split('=');
+  private static handleZoomParam_(val: string, camDistBuffer: string) {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onKeepTrackReady,
+      () => {
+        const zoom = parseFloat(val);
+        const camDistBufferValue = parseFloat(camDistBuffer);
 
-      if (key === 'search' && !settingsManager.disableUI) {
-        const decodedVal = decodeURIComponent(val.replace(/\+/gu, ' '));
+        if (isNaN(zoom)) {
+          keepTrackApi.toast(`Zoom value of "${val}" is not a valid float!`, ToastMsgType.caution, true);
 
-        const uiManagerInstance = keepTrackApi.getUiManager();
-
-        uiManagerInstance.doSearch(decodedVal);
-        if (settingsManager.lastSearchResults.length === 0) {
-          uiManagerInstance.toast(`Search for "${val}" found nothing!`, ToastMsgType.caution, true);
-          uiManagerInstance.searchManager.hideResults();
+          return;
         }
-      }
-    });
+
+        if (zoom < 0.1 || zoom > 100) {
+          keepTrackApi.toast(`Zoom value of "${val}" is out of bounds!`, ToastMsgType.caution, true);
+
+          return;
+        }
+
+        keepTrackApi.getMainCamera().camZoomSnappedOnSat = false;
+        keepTrackApi.getMainCamera().changeZoom(zoom);
+        // if camDistBuffer is not a number, set it to just outside the min zoom distance for close zoom
+        keepTrackApi.getMainCamera().camDistBuffer = isNaN(camDistBufferValue)
+          ? settingsManager.minZoomDistance + 1 as Kilometers
+          : camDistBufferValue as Kilometers;
+      });
+  }
+
+  private static handlePitchYawParam_(pitch: string, yaw: string) {
+    const pitchNum = parseFloat(pitch);
+    const yawNum = parseFloat(yaw);
+
+    if (isNaN(pitchNum) || isNaN(yawNum)) {
+      keepTrackApi.toast('Pitch or Yaw value is not a valid float!', ToastMsgType.caution, true);
+
+      return;
+    }
+    if (pitchNum < -90 || pitchNum > 90) {
+      keepTrackApi.toast('Pitch value is out of bounds!', ToastMsgType.caution, true);
+
+      return;
+    }
+    if (yawNum < -360 || yawNum > 360) {
+      keepTrackApi.toast('Yaw value is out of bounds!', ToastMsgType.caution, true);
+
+      return;
+    }
+    keepTrackApi.getMainCamera().autoRotate(false);
+    keepTrackApi.getMainCamera().camSnap(pitchNum * DEG2RAD as Radians, yawNum * DEG2RAD as Radians);
+  }
+
+  private static handleLatLonParam_(lat: string, lon: string, zoom: string, date: string | null) {
+    const latNum = parseFloat(lat) as Degrees;
+    const lonNum = parseFloat(lon) as Degrees;
+    const zoomNum = parseFloat(zoom);
+
+
+    if (isNaN(zoomNum)) {
+      keepTrackApi.toast(`Zoom value of "${zoom}" is not a valid float!`, ToastMsgType.caution, true);
+
+      return;
+    }
+
+    if (isNaN(latNum) || isNaN(lonNum)) {
+      keepTrackApi.toast('Latitude or Longitude value is not a valid float!', ToastMsgType.caution, true);
+
+      return;
+    }
+
+    if (latNum < -90 || latNum > 90 || lonNum < -360 || lonNum > 360) {
+      keepTrackApi.toast('Latitude or Longitude value is out of bounds!', ToastMsgType.caution, true);
+
+      return;
+    }
+
+    keepTrackApi.getMainCamera().autoRotate(false);
+
+    if (date !== null && !isNaN(parseInt(date))) {
+      setTimeout(() => {
+        keepTrackApi.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
+      }, 10500);
+    } else {
+      keepTrackApi.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
+    }
   }
 }

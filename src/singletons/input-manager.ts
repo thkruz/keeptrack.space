@@ -414,12 +414,6 @@ export class InputManager {
     hideEl('line-sat-sat-rmb');
     hideEl('line-sat-sun-rmb');
 
-    // Earth
-    hideEl('earth-low-rmb');
-    hideEl('earth-high-rmb');
-    hideEl('earth-vec-rmb');
-    hideEl('earth-flat-rmb');
-
     if (lineManagerInstance.lines.length > 0) {
       getEl('clear-lines-rmb')!.style.display = 'block';
       numMenuItems++;

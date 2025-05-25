@@ -340,4 +340,5 @@ export enum KeepTrackApiEvents {
   loadSettings = 'loadSettings',
   update = 'update',
   parseGetVariables = 'parseGetVariables',
+  rightBtnMenuOpen = 'rightBtnMenuOpen',
 }

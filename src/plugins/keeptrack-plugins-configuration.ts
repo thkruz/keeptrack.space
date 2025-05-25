@@ -76,4 +76,7 @@ export type KeepTrackPluginsConfiguration = {
   calculator?: PluginConfiguration;
   CreateSat?: PluginConfiguration;
   ProximityOps?: PluginConfiguration;
+  EarthPresetsPlugin?: PluginConfiguration;
+  DrawLinesPlugin?: PluginConfiguration;
+  ViewInfoRmbPlugin?: PluginConfiguration;
 };

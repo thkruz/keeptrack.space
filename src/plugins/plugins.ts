@@ -22,6 +22,8 @@ import { CreateSat } from './create-sat/create-sat';
 import { DateTimeManager } from './date-time-manager/date-time-manager';
 import { DebrisScreening } from './debris-screening/debris-screening';
 import { DopsPlugin } from './dops/dops';
+import { DrawLinesPlugin } from './draw-lines/draw-lines';
+import { EarthPresetsPlugin } from './earth-presets/earth-presets';
 import { EditSat } from './edit-sat/edit-sat';
 import { FilterMenuPlugin } from './filter-menu/filter-menu';
 import { GamepadPlugin } from './gamepad/gamepad';
@@ -68,6 +70,7 @@ import { SensorTimeline } from './timeline-sensor/sensor-timeline';
 import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact-predict';
 import { TransponderChannelData } from './transponder-channel-data/transponder-channel-data';
 import { VideoDirectorPlugin } from './video-director/video-director';
+import { ViewInfoRmbPlugin } from './view-info-rmb/view-info-rmb';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 
@@ -178,6 +181,9 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
           new proPlugin.AboutMenuPlugin().init();
         })(), config: plugins.AboutMenuPlugin,
       },
+      { init: () => new EarthPresetsPlugin().init(), config: plugins.EarthPresetsPlugin },
+      { init: () => new DrawLinesPlugin().init(), config: plugins.DrawLinesPlugin },
+      { init: () => new ViewInfoRmbPlugin().init(), config: plugins.ViewInfoRmbPlugin },
     ];
 
     for (const { init, config } of pluginList) {

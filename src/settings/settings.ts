@@ -286,6 +286,15 @@ export class SettingsManager {
     filterMenu: {
       enabled: true,
     },
+    EarthPresetsPlugin: {
+      enabled: true,
+    },
+    DrawLinesPlugin: {
+      enabled: true,
+    },
+    ViewInfoRmbPlugin: {
+      enabled: true,
+    },
   };
   changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
   changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute

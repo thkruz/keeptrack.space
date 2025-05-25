@@ -3,9 +3,9 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
 import { mat4, vec3, vec4 } from 'gl-matrix';
-import { Degrees, Kilometers, Milliseconds, SpaceObjectType } from 'ootk';
+import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { KeepTrack } from '../keeptrack';
-import { getEl, hideEl, showEl } from '../lib/get-el';
+import { getEl, hideEl } from '../lib/get-el';
 import { isThisNode } from '../static/isThisNode';
 
 import { lineManagerInstance } from './draw-manager/line-manager';
@@ -245,11 +245,7 @@ export class InputManager {
         'beforeend',
         keepTrackApi.html`
       <div id="right-btn-menu" class="right-btn-menu">
-        <ul id="right-btn-menu-ul" class='dropdown-contents'>
-          <li class="rmb-menu-item" id="view-rmb"><a href="#">View &#x27A4;</a></li>
-          <li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>
-          <li class="rmb-menu-item" id="earth-rmb"><a href="#">Earth &#x27A4;</a></li>
-        </ul>
+        <ul id="right-btn-menu-ul" class='dropdown-contents'></ul>
       </div>
       `,
       );
@@ -266,65 +262,6 @@ export class InputManager {
         <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
         `,
       );
-
-      getEl('rmb-wrapper')!.insertAdjacentHTML(
-        'beforeend',
-        keepTrackApi.html`
-        <div id="view-rmb-menu" class="right-btn-menu">
-          <ul class='dropdown-contents'>
-            <li id="view-info-rmb"><a href="#">Earth Info</a></li>
-            <li id="view-sensor-info-rmb"><a href="#">Sensor Info</a></li>
-            <li id="view-sat-info-rmb"><a href="#">Satellite Info</a></li>
-            <li id="view-related-sats-rmb"><a href="#">Related Satellites</a></li>
-          </ul>
-        </div>
-        <div id="draw-rmb-menu" class="right-btn-menu">
-          <ul class='dropdown-contents'>
-            <li id="line-eci-axis-rmb"><a href="#">ECI Axes</a></li>
-            <li id="line-eci-xgrid-rmb"><a href="#">X Axes Grid</a></li>
-            <li id="line-eci-ygrid-rmb"><a href="#">Y Axes Grid</a></li>
-            <li id="line-eci-zgrid-rmb"><a href="#">Z Axes Grid</a></li>
-            <li id="line-earth-sat-rmb"><a href="#">Earth to Satellite</a></li>
-            <li id="line-sensor-sat-rmb"><a href="#">Sensor to Satellite</a></li>
-            <li id="line-sat-sat-rmb"><a href="#">Satellite to Satellite</a></li>
-            <li id="line-sat-sun-rmb"><a href="#">Satellite to Sun</a></li>
-          </ul>
-        </div>
-        <div id="earth-rmb-menu" class="right-btn-menu">
-          <ul class='dropdown-contents'>
-            <li id="earth-nasa-rmb"><a href="#">Satellite Images</a></li>
-            <li id="earth-flat-rmb"><a href="#">Flat Color Map</a></li>
-          </ul>
-        </div>
-      `,
-      );
-
-      keepTrackApi.rmbMenuItems.push({
-        elementIdL1: 'view-rmb',
-        elementIdL2: 'view-rmb-menu',
-        order: 1,
-        isRmbOnEarth: false,
-        isRmbOffEarth: false,
-        isRmbOnSat: true,
-      });
-
-      keepTrackApi.rmbMenuItems.push({
-        elementIdL1: 'draw-rmb',
-        elementIdL2: 'draw-rmb-menu',
-        order: 5,
-        isRmbOnEarth: true,
-        isRmbOffEarth: true,
-        isRmbOnSat: false,
-      });
-
-      keepTrackApi.rmbMenuItems.push({
-        elementIdL1: 'earth-rmb',
-        elementIdL2: 'earth-rmb-menu',
-        order: 15,
-        isRmbOnEarth: true,
-        isRmbOffEarth: false,
-        isRmbOnSat: false,
-      });
 
       // sort getEl('rmb-wrapper').children by order in rmbMenuItems
       const rmbWrapper = getEl('right-btn-menu-ul');
@@ -385,15 +322,9 @@ export class InputManager {
 
     this.isRmbMenuOpen = true;
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-
     const canvasDOM = getEl('keeptrack-canvas');
     const rightBtnMenuDOM = getEl('right-btn-menu');
     const satHoverBoxDOM = getEl('sat-hoverbox');
-
-    // Reset and Clear are always visible
-    let numMenuItems = 2;
 
     keepTrackApi.rmbMenuItems.forEach((item) => {
       hideEl(item.elementIdL1);
@@ -401,65 +332,16 @@ export class InputManager {
 
     hideEl('clear-lines-rmb');
 
-    // View
-    hideEl('view-info-rmb');
-    hideEl('view-sensor-info-rmb');
-    hideEl('view-sat-info-rmb');
-    hideEl('view-related-sats-rmb');
-
-    // Draw
-    hideEl('line-eci-axis-rmb');
-    hideEl('line-sensor-sat-rmb');
-    hideEl('line-earth-sat-rmb');
-    hideEl('line-sat-sat-rmb');
-    hideEl('line-sat-sun-rmb');
-
     if (lineManagerInstance.lines.length > 0) {
       getEl('clear-lines-rmb')!.style.display = 'block';
-      numMenuItems++;
     }
 
     if (this.mouse.mouseSat !== -1 || clickedSatId !== -1) {
-      if (typeof this.mouse.clickedSat === 'undefined') {
-        return;
-      }
-      const sat = catalogManagerInstance.getObject(this.mouse.clickedSat);
-
-      if (typeof sat === 'undefined' || sat === null) {
-        return;
-      }
-
-      if (!sat.isStatic()) {
-        showEl('view-sat-info-rmb');
-        showEl('view-related-sats-rmb');
-
-        if (sensorManagerInstance.isSensorSelected() && sensorManagerInstance.whichRadar !== 'CUSTOM') {
-          getEl('line-sensor-sat-rmb')!.style.display = 'block';
-        }
-
-        if (!settingsManager.isMobileModeEnabled) {
-          getEl('line-earth-sat-rmb')!.style.display = 'block';
-        }
-        if (!settingsManager.isMobileModeEnabled) {
-          getEl('line-sat-sat-rmb')!.style.display = 'block';
-        }
-        if (!settingsManager.isMobileModeEnabled) {
-          getEl('line-sat-sun-rmb')!.style.display = 'block';
-        }
-      } else {
-        switch (sat.type) {
-          case SpaceObjectType.PHASED_ARRAY_RADAR:
-          case SpaceObjectType.OPTICAL:
-          case SpaceObjectType.MECHANICAL:
-          case SpaceObjectType.GROUND_SENSOR_STATION:
-            getEl('view-sensor-info-rmb')!.style.display = 'block';
-            break;
-          default:
-        }
-      }
+      // Empty on purpose
     } else {
       // Intentional
     }
+    let isEarth = false;
 
     if (typeof this.mouse.latLon === 'undefined' || isNaN(this.mouse.latLon.lat) || isNaN(this.mouse.latLon.lon)) {
       // Not Earth
@@ -470,19 +352,31 @@ export class InputManager {
 
           if (dom) {
             dom.style.display = 'block';
-            numMenuItems++;
           }
         });
     } else {
       // This is the Earth
-      numMenuItems = MouseInput.earthClicked({
-        numMenuItems,
+      isEarth = true;
+      MouseInput.earthClicked({
         clickedSatId,
       });
     }
 
     rightBtnMenuDOM!.style.display = 'block';
     satHoverBoxDOM!.style.display = 'none';
+
+    keepTrackApi.emit(KeepTrackApiEvents.rightBtnMenuOpen, isEarth, clickedSatId);
+
+    // Loop through all the menu items and determine how many are visible
+    let numMenuItems = 0;
+
+    keepTrackApi.rmbMenuItems.forEach((item) => {
+      const dom = getEl(item.elementIdL1);
+
+      if (dom && dom.style.display !== 'none') {
+        numMenuItems++;
+      }
+    });
 
     /*
      * Offset size is based on size in style.css

@@ -80,6 +80,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.drawOptionalScenery]: [];
   [KeepTrackApiEvents.updateLoop]: [];
   [KeepTrackApiEvents.rmbMenuActions]: [string, number];
+  [KeepTrackApiEvents.rightBtnMenuOpen]: [boolean, number];
   [KeepTrackApiEvents.rightBtnMenuAdd]: [];
   [KeepTrackApiEvents.updateDateTime]: [Date];
   [KeepTrackApiEvents.updatePropRate]: [number];

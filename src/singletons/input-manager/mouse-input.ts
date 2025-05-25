@@ -1,6 +1,6 @@
 /* eslint-disable no-unreachable */
 // eslint-disable-next-line max-classes-per-file
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
@@ -8,14 +8,10 @@ import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { SatMath } from '@app/static/sat-math';
 import { UrlManager } from '@app/static/url-manager';
-import { DetailedSatellite, Kilometers, eci2lla } from 'ootk';
+import { Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
-import { MissileObject } from '../catalog-manager/MissileObject';
-import { EarthTextureStyle } from '../draw-manager/earth';
 import { lineManagerInstance } from '../draw-manager/line-manager';
-import { LineColors } from '../draw-manager/line-manager/line';
-import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
 import { KeyboardInput } from './keyboard-input';
 
@@ -69,8 +65,7 @@ export class MouseInput {
     keepTrackApi.emit(KeepTrackApiEvents.canvasMouseDown, evt);
   }
 
-  public static earthClicked({ numMenuItems, clickedSatId }: { numMenuItems: number; clickedSatId: number }) {
-    getEl('line-eci-axis-rmb')!.style.display = 'block';
+  public static earthClicked({ clickedSatId }: { clickedSatId: number }) {
     keepTrackApi.rmbMenuItems
       .filter((item) => item.isRmbOnEarth || (item.isRmbOnSat && clickedSatId !== -1))
       .sort((a, b) => a.order - b.order)
@@ -79,11 +74,8 @@ export class MouseInput {
 
         if (dom) {
           dom.style.display = 'block';
-          ++numMenuItems;
         }
       });
-
-    return numMenuItems;
   }
 
   public canvasMouseMove(evt: MouseEvent, mainCameraInstance: Camera): void {
@@ -196,8 +188,6 @@ export class MouseInput {
   init(canvasDOM: HTMLCanvasElement) {
     const rightBtnMenuDOM = getEl('right-btn-menu');
     const satHoverBoxDOM = getEl('sat-hoverbox');
-    const rightBtnDrawMenuDOM = getEl('draw-rmb-menu');
-    const rightBtnEarthMenuDOM = getEl('earth-rmb-menu');
     const resetCameraDOM = getEl('reset-camera-rmb');
     const clearScreenDOM = getEl('clear-screen-rmb');
     const clearLinesDOM = getEl('clear-lines-rmb');
@@ -262,7 +252,7 @@ export class MouseInput {
       // Create Event Listeners for Right Menu Buttons
       keepTrackApi.rmbMenuItems
         .map(({ elementIdL2 }) => getEl(elementIdL2))
-        .concat([toggleTimeDOM, rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
+        .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
             // If the element is hiddeen ignore the click
@@ -284,14 +274,6 @@ export class MouseInput {
         el2?.addEventListener('mouseleave', () => {
           el2.style.display = 'none';
         });
-      });
-
-      rightBtnDrawMenuDOM?.addEventListener('mouseleave', () => {
-        rightBtnDrawMenuDOM.style.display = 'none';
-      });
-
-      rightBtnEarthMenuDOM?.addEventListener('mouseleave', () => {
-        rightBtnEarthMenuDOM.style.display = 'none';
       });
     }
 
@@ -364,8 +346,6 @@ export class MouseInput {
     if (settingsManager.disableUI) {
       return;
     }
-
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -380,45 +360,7 @@ export class MouseInput {
       targetId = (<HTMLElement>target.firstChild).id;
     }
 
-    let clickSatObj: DetailedSatellite | MissileObject | null = null;
-
-    if (this.clickedSat !== -1) {
-      const obj = catalogManagerInstance.getObject(this.mouseSat);
-
-      if ((obj instanceof DetailedSatellite) || (obj instanceof MissileObject)) {
-        clickSatObj = obj;
-      }
-    }
-
     switch (targetId) {
-      case 'view-info-rmb':
-        if (typeof this.latLon === 'undefined' || isNaN(this.latLon.lat) || isNaN(this.latLon.lon)) {
-          errorManagerInstance.debug('latLon undefined!');
-          const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
-
-          this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
-        }
-        uiManagerInstance.toast(`Lat: ${this.latLon.lat.toFixed(3)}<br>Lon: ${this.latLon.lon.toFixed(3)}`, ToastMsgType.normal, true);
-        break;
-      case 'view-sat-info-rmb':
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
-        break;
-      case 'view-sensor-info-rmb':
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
-        getEl('menu-sensor-info').click();
-        break;
-      case 'view-related-sats-rmb':
-        {
-          const intldes = catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY)?.intlDes;
-
-          if (!intldes) {
-            uiManagerInstance.toast('Time 1 is Invalid!', ToastMsgType.serious);
-          }
-          const searchStr = intldes.slice(0, 8);
-
-          uiManagerInstance.doSearch(searchStr);
-        }
-        break;
       case 'set-sec-sat-rmb':
         keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
         break;
@@ -431,38 +373,6 @@ export class MouseInput {
         break;
       case 'clear-lines-rmb':
         lineManagerInstance.clear();
-        break;
-      case 'line-eci-axis-rmb':
-        lineManagerInstance.createRef2Ref([0, 0, 0], [25000, 0, 0], LineColors.RED);
-        lineManagerInstance.createRef2Ref([0, 0, 0], [0, 25000, 0], LineColors.GREEN);
-        lineManagerInstance.createRef2Ref([0, 0, 0], [0, 0, 25000], LineColors.BLUE);
-        break;
-      case 'line-eci-xgrid-rmb':
-        lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 1], 1);
-        break;
-      case 'line-eci-ygrid-rmb':
-        lineManagerInstance.createGrid('y', [0.2, 0.6, 0.2, 1], 1);
-        break;
-      case 'line-eci-zgrid-rmb':
-        lineManagerInstance.createGrid('z', [0.2, 0.2, 0.6, 1], 1);
-        break;
-      case 'line-earth-sat-rmb':
-        lineManagerInstance.createSatToRef(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, [0, 0, 0], LineColors.PURPLE);
-        break;
-      case 'line-sensor-sat-rmb':
-        lineManagerInstance.createSensorToSat(keepTrackApi.getSensorManager().getSensor(), clickSatObj, LineColors.GREEN);
-        break;
-      case 'line-sat-sat-rmb':
-        lineManagerInstance.createObjToObj(clickSatObj, keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, LineColors.BLUE);
-        break;
-      case 'line-sat-sun-rmb':
-        lineManagerInstance.createSat2Sun(clickSatObj);
-        break;
-      case 'earth-nasa-rmb':
-        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.BLUE_MARBLE);
-        break;
-      case 'earth-flat-rmb':
-        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
         break;
       case 'toggle-time-rmb':
         timeManagerInstance.toggleTime();

@@ -2,7 +2,7 @@
 import { AnalyticsInstance } from 'analytics';
 import { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
-import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
+import { Constructor, KeepTrackApiEvents, Singletons, ToastMsgType } from './interfaces';
 import { saveCsv, saveVariable } from './lib/saveVariable';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import type { SensorManager } from './plugins/sensor/sensorManager';
@@ -276,6 +276,10 @@ export class KeepTrackApi {
     str += literals[literals.length - 1];
 
     return str;
+  }
+
+  toast(toastText: string, type: ToastMsgType, isLong = false) {
+    this.getUiManager().toast(toastText, type, isLong);
   }
 
   /**

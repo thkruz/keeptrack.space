@@ -83,7 +83,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.rightBtnMenuOpen]: [boolean, number];
   [KeepTrackApiEvents.rightBtnMenuAdd]: [];
   [KeepTrackApiEvents.updateDateTime]: [Date];
-  [KeepTrackApiEvents.updatePropRate]: [number];
+  [KeepTrackApiEvents.propRateChanged]: [number];
   [KeepTrackApiEvents.uiManagerFinal]: [];
   [KeepTrackApiEvents.resetSensor]: [];
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
@@ -114,6 +114,7 @@ type KeepTrackApiEventArguments = {
   [InputEventType.KeyUp]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [InputEventType.KeyPress]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [KeepTrackApiEvents.parseGetVariables]: [string[]]; // params
+  [KeepTrackApiEvents.searchUpdated]: [string]; // search term
 };
 
 interface KeepTrackApiRegisterParams<T extends EventBusEvent> {

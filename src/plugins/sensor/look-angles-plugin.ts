@@ -330,7 +330,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       // Create click listener
       tr.addEventListener('click', () => {
         timeManagerInstance.changeStaticOffset(new Date(`${dateFormat(entry.time, 'isoDateTime', false)}z`).getTime() - timeManagerInstance.realTime);
-        keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
       });
 
       if (tdType) {

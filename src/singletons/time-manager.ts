@@ -4,7 +4,6 @@ import { getDayOfYear, Milliseconds } from 'ootk';
 import { InputEventType, keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { DateTimeManager } from '../plugins/date-time-manager/date-time-manager';
-import { UrlManager } from '../static/url-manager';
 import { errorManagerInstance } from './errorManager';
 
 export class TimeManager {
@@ -147,7 +146,7 @@ export class TimeManager {
       }
     }
 
-    UrlManager.updateURL();
+    keepTrackApi.emit(KeepTrackApiEvents.propRateChanged, this.propRate);
   }
 
   static isLeapYear(dateIn: Date) {
@@ -274,7 +273,6 @@ export class TimeManager {
       if (key === '<' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountBig);
-        keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       }
     });
 
@@ -282,7 +280,6 @@ export class TimeManager {
       if (key === '>' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountBig);
-        keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       }
     });
 
@@ -311,7 +308,6 @@ export class TimeManager {
       if (code === 'Equal' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountSmall);
-        keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       }
     });
 
@@ -319,7 +315,6 @@ export class TimeManager {
       if (code === 'Minus' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall);
-        keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
       }
     });
   }
@@ -415,6 +410,8 @@ export class TimeManager {
   synchronize() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
+    keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
 
     const message = {
       typ: CruncerMessageTypes.OFFSET,

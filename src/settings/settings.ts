@@ -25,6 +25,7 @@ import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme'
 import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 import { SunTextureQuality } from '@app/singletons/draw-manager/sun';
+import { UrlManager } from '@app/static/url-manager';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
@@ -1265,29 +1266,7 @@ export class SettingsManager {
    * @returns An array of query string parameters.
    */
   private loadOverridesFromUrl_() {
-    let queryStr = window.location.search.substring(1);
-
-    // if queryStr includes '#' it will break params, so we need to remove it and retry
-    const hashIndex = window.location.hash.indexOf('#');
-
-    if (hashIndex !== -1) {
-      queryStr = window.location.hash.split('#')[1]; // Get the part after the hash
-      queryStr = queryStr.split('?')[1]; // Remove any query string after the hash
-    }
-
-    // URI Encode all %22 to ensure url is not broken
-    const params = queryStr
-      .split('%22')
-      .map((item, index) => {
-        if (index % 2 === 0) {
-          return item;
-        }
-
-        return encodeURIComponent(item);
-
-      })
-      .join('')
-      .split('&');
+    const params = UrlManager.getParams();
 
     const plugins = this.plugins;
 

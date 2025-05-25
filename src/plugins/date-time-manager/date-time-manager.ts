@@ -2,7 +2,6 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { isThisNode } from '@app/static/isThisNode';
-import { UrlManager } from '@app/static/url-manager';
 import { getDayOfYear } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
@@ -34,21 +33,20 @@ export class DateTimeManager extends KeepTrackPlugin {
   }
 
   updateDateTime(date: Date) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
     const dateTimeInputTb = document.getElementById(this.dateTimeInputTbId_) as HTMLInputElement;
 
     if (dateTimeInputTb && !isThisNode()) {
       dateTimeInputTb.value = date.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
     }
-
-    timeManagerInstance.synchronize();
-    UrlManager.updateURL();
   }
 
   datetimeTextClick(): void {
     const simulationDateObj = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, simulationDateObj);
+    timeManagerInstance.synchronize();
+
+    this.updateDateTime(simulationDateObj);
     this.calendar.setDate(simulationDateObj);
     this.calendar.toggleDatePicker();
 

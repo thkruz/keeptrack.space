@@ -7,7 +7,6 @@ import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { SatMath } from '@app/static/sat-math';
-import { UrlManager } from '@app/static/url-manager';
 import { Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
@@ -59,8 +58,6 @@ export class MouseInput {
     }
 
     keepTrackApi.getInputManager().hidePopUps();
-
-    UrlManager.updateURL();
 
     keepTrackApi.emit(KeepTrackApiEvents.canvasMouseDown, evt);
   }

@@ -5,6 +5,63 @@ import { DetailedSatellite } from 'ootk';
 import { getEl } from '../lib/get-el';
 
 export abstract class UrlManager {
+  private static selectedSat_: DetailedSatellite | null = null;
+  private static searchString_: string = '';
+  private static propRate_: number;
+
+  static {
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, (sat) => {
+      if (sat instanceof DetailedSatellite) {
+        this.selectedSat_ = sat;
+      } else {
+        this.selectedSat_ = null;
+      }
+      this.updateURL();
+    });
+
+    keepTrackApi.on(KeepTrackApiEvents.propRateChanged, (propRate) => {
+      this.propRate_ = propRate;
+      this.updateURL();
+    });
+
+    keepTrackApi.on(KeepTrackApiEvents.searchUpdated, (searchString: string) => {
+      this.searchString_ = searchString;
+      this.updateURL();
+    });
+
+    keepTrackApi.on(KeepTrackApiEvents.updateDateTime, () => {
+      this.updateURL();
+    });
+  }
+
+  static getParams(): string[] {
+    let queryStr = window.location.search.substring(1);
+
+    // if queryStr includes '#' it will break params, so we need to remove it and retry
+    const hashIndex = window.location.hash.indexOf('#');
+
+    if (hashIndex !== -1) {
+      queryStr = window.location.hash.split('#')[1]; // Get the part after the hash
+      queryStr = queryStr.split('?')[1]; // Remove any query string after the hash
+    }
+
+    // URI Encode all %22 to ensure url is not broken
+    const params = queryStr
+      .split('%22')
+      .map((item, index) => {
+        if (index % 2 === 0) {
+          return item;
+        }
+
+        return encodeURIComponent(item);
+
+      })
+      .join('')
+      .split('&');
+
+    return params;
+  }
+
   static parseGetVariables() {
     const queryStr = window.location?.search?.substring(1) || '';
     const params = queryStr.split('&');
@@ -21,40 +78,35 @@ export abstract class UrlManager {
   }
 
   static updateURL() {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     if (!uiManagerInstance.searchManager) {
       return;
     }
-    const currentSearch = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
-
     if (settingsManager.isDisableUrlBar) {
       return;
     }
 
     const arr = window.location.href.split('?');
     let url = arr[0];
-    const paramSlices = [];
+    const paramSlices = [] as string[];
 
-    const selectedSat = selectSatManagerInstance?.getSelectedSat() as DetailedSatellite;
-
-    if (selectedSat?.isSatellite() && selectedSat.sccNum) {
+    if (this.selectedSat_?.sccNum) {
       // TODO: This doesn't work for VIMPEL objects
-      const scc = selectedSat.sccNum;
+      const scc = this.selectedSat_.sccNum;
 
       if (scc !== '') {
         paramSlices.push(`sat=${scc}`);
       }
     }
 
-    if (currentSearch !== '') {
-      paramSlices.push(`search=${currentSearch}`);
+    if (this.searchString_ !== '') {
+      paramSlices.push(`search=${this.searchString_}`);
     }
 
-    if (timeManagerInstance.propRate < 0.99 || timeManagerInstance.propRate > 1.01) {
-      paramSlices.push(`rate=${timeManagerInstance.propRate}`);
+    if (this.propRate_ < 0.99 || this.propRate_ > 1.01) {
+      paramSlices.push(`rate=${this.propRate_}`);
     }
 
     if (timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
@@ -67,6 +119,10 @@ export abstract class UrlManager {
 
     if (url !== window.location.href) {
       setTimeout(() => {
+        // Find any # in the URL and replace it with an empty string
+        console.debug('Updating URL to:', url);
+        url = url.replace(/#/gu, '');
+        console.debug('Final URL:', url);
         window.history.replaceState(null, '', url);
       }, 100);
     }

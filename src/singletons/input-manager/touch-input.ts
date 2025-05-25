@@ -2,7 +2,6 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Camera } from '@app/singletons/camera';
-import { UrlManager } from '@app/static/url-manager';
 import { MouseInput } from './mouse-input';
 
 export interface TapTouchEvent {
@@ -163,9 +162,6 @@ export class TouchInput {
 
     // If you hit the canvas hide any popups
     keepTrackApi.getInputManager().hidePopUps();
-
-    // TODO: Make updateUrl() a setting that is disabled by default
-    UrlManager.updateURL();
 
     keepTrackApi.emit(KeepTrackApiEvents.touchStart, evt);
   }

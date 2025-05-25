@@ -8,7 +8,6 @@ import { InputEventType, keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { slideInDown, slideOutUp } from '../lib/slide';
 import { TopMenu } from '../plugins/top-menu/top-menu';
-import { UrlManager } from '../static/url-manager';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
 import type { UiManager } from './uiManager';
@@ -192,6 +191,7 @@ export class SearchManager {
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     if (searchString === '') {
       this.hideResults();
+      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString);
 
       return;
     }
@@ -209,6 +209,7 @@ export class SearchManager {
       dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
       (<HTMLInputElement>getEl('search')).value = '';
       this.hideResults();
+      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString);
 
       return;
     }
@@ -226,6 +227,9 @@ export class SearchManager {
     if (searchString.length <= settingsManager.minimumSearchCharacters && searchString !== 'RV_') {
       return;
     }
+
+    // Emit the search before it is modified
+    keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString);
 
     // Uppercase to make this search not case sensitive
     searchString = searchString.toUpperCase();
@@ -277,12 +281,7 @@ export class SearchManager {
         uiManagerInstance.toast('No Results Found', ToastMsgType.serious, false);
       }
       this.hideResults();
-
-      return;
     }
-
-    // Don't let the search overlap with the legend
-    UrlManager.updateURL();
   }
 
   private static doRegularSearch_(searchString: string) {

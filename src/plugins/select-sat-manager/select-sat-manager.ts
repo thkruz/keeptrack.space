@@ -5,7 +5,6 @@ import { CameraType } from '@app/singletons/camera';
 
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { UrlManager } from '@app/static/url-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
@@ -211,8 +210,6 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (id === -1 && this.lastSelectedSat_ > -1) {
       keepTrackApi.getOrbitManager().clearSelectOrbit();
     }
-
-    UrlManager.updateURL();
   }
 
   private selectSatReset_() {

@@ -631,6 +631,9 @@ export class Earth {
 
       fragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
 
+      // Political map (Draw before clouds and atmosphere)
+      fragColor += textureLod(uPoliticalMap, vUv, 1.0);
+
       // ................................................
       // Clouds
       // Add the clouds to the fragColor
@@ -664,9 +667,6 @@ export class Earth {
         fragToCameraAngle = pow(fragToCameraAngle, 7.0); //Curve the change, Make the fresnel thinner
         fragColor.rgb += vec3(1.0, 1.0, 1.0) * fragToCameraAngle;
       } // If 0 then no atmosphere
-
-      // Political map
-      fragColor += textureLod(uPoliticalMap, vUv, 1.0);
 
       // Gray scale the color
       if (uisGrayScale > 0.5) {

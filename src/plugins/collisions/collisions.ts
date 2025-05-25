@@ -44,6 +44,7 @@ export class Collisions extends KeepTrackPlugin {
       <div class="row">
         <h5 class="center-align">Possible Collisions</h5>
         <table id="${this.id}-table" class="center-align"></table>
+        <sub class="center-align">*Collision data provided by CelesTrak via <a href="https://celestrak.org/SOCRATES/" target="_blank" rel="noreferrer">SOCRATES</a>.</sub>
       </div>
     </div>
   </div>`;

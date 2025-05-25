@@ -45,17 +45,17 @@ export class BottomMenu {
                 </div>
                 <span class="bmenu-filter-title">Analysis Menu</span>
               </div>
-              <div id="${BottomMenu.experimentalMenuId}" class="bmenu-filter-item">
-                <div class="bmenu-filter-item-inner">
-                  <img alt="Experimental Menu" src="" delayedsrc="${sciencePng}" />
-                </div>
-                <span class="bmenu-filter-title">Experimental Menu</span>
-              </div>
               <div id="${BottomMenu.settingsMenuId}" class="bmenu-filter-item">
                 <div class="bmenu-filter-item-inner">
                   <img alt="Settings Menu" src="" delayedsrc="${settingsPng}" />
                 </div>
                 <span class="bmenu-filter-title">Settings Menu</span>
+              </div>
+              <div id="${BottomMenu.experimentalMenuId}" class="bmenu-filter-item">
+                <div class="bmenu-filter-item-inner">
+                  <img alt="Experimental Menu" src="" delayedsrc="${sciencePng}" />
+                </div>
+                <span class="bmenu-filter-title">Experimental Menu</span>
               </div>
               <div id="${BottomMenu.allMenuId}" class="bmenu-filter-item">
                 <div class="bmenu-filter-item-inner">

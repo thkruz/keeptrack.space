@@ -18,11 +18,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, SensorGeolocation } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
-import type { KeepTrackPluginsConfiguration } from '@app/plugins/keeptrack-plugins-configuration';
-import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
@@ -34,8 +32,8 @@ import { ClassificationString } from '../static/classification';
 import { isThisNode } from '../static/isThisNode';
 import { defaultColorSettings } from './default-color-settings';
 import { defaultPlugins } from './default-plugins';
+import { parseGetVariables } from './parse-get-variables';
 import { SettingsPresets } from './presets/presets';
-import { starTalk } from './presets/startalk';
 
 export class SettingsManager {
   /**
@@ -1188,7 +1186,9 @@ export class SettingsManager {
 
     const params = this.loadOverridesFromUrl_();
 
-    this.initParseFromGETVariables_(params);
+    if (!this.disableUI) {
+      parseGetVariables(params, this);
+    }
     keepTrackApi.emit(KeepTrackApiEvents.parseGetVariables, params);
 
     // If No UI Reduce Overhead
@@ -1316,204 +1316,6 @@ export class SettingsManager {
     Object.keys(this.plugins).forEach((key) => {
       this.plugins[key] = false;
     });
-  }
-
-  /**
-   * This is an initial parse of the GET variables to determine
-   * critical settings. Other variables are checked later during catalogManagerInstance.init
-   */
-  // eslint-disable-next-line complexity
-  private initParseFromGETVariables_(params: string[]) {
-    if (!this.disableUI) {
-      for (const param of params) {
-        const key = param.split('=')[0];
-        const val = param.split('=')[1];
-
-        switch (key) {
-          case 'preset':
-            switch (val) {
-              case 'ops-center':
-                SettingsPresets.loadPresetOpsCenter(this);
-                break;
-              case 'education':
-                SettingsPresets.loadPresetEducation(this);
-                break;
-              case 'outreach':
-                SettingsPresets.loadPresetOutreach(this);
-                break;
-              case 'debris':
-                SettingsPresets.loadPresetDebris(this);
-                break;
-              case 'dark-clouds':
-                darkClouds(settingsManager);
-                break;
-              case 'startalk':
-                starTalk(settingsManager);
-                break;
-              case 'million-year':
-                SettingsPresets.loadPresetMillionYear(this);
-                break;
-              case 'million-year2':
-                SettingsPresets.loadPresetMillionYear2(this);
-                break;
-              case 'facsat2':
-                SettingsPresets.loadPresetFacSat2(this);
-                break;
-              case 'altitudes':
-                SettingsPresets.loadPresetAltitudes_(this);
-                break;
-              case 'starlink':
-                SettingsPresets.loadPresetStarlink(this);
-                break;
-              default:
-                break;
-            }
-            break;
-          case 'external-only':
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'gp':
-            this.dataSources.tle = decodeURIComponent(val);
-            break;
-          case 'tle':
-            // Decode from UTF-8
-            this.dataSources.externalTLEs = decodeURIComponent(val);
-            break;
-          case 'jsc':
-            this.isEnableJscCatalog = val === 'true';
-            break;
-          case 'sat':
-            keepTrackApi.on(
-              KeepTrackApiEvents.onCruncherReady,
-              () => {
-                setTimeout(() => {
-                  if (typeof val === 'string') {
-                    const sccNum = parseInt(val);
-
-                    if (sccNum >= 0) {
-                      const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
-
-                      if (id && id >= 0) {
-                        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
-                      } else {
-                        keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
-                      }
-                    } else {
-                      keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
-                    }
-                  }
-                }, 2000);
-              },
-            );
-            break;
-          case 'debug':
-            this.plugins.DebugMenuPlugin = { enabled: true };
-            break;
-          case 'nomarkers':
-            this.maxFieldOfViewMarkers = 1;
-            break;
-          case 'noorbits':
-            this.isDrawOrbits = false;
-            break;
-          case 'searchLimit':
-            if (parseInt(val) > 0) {
-              this.searchLimit = parseInt(val);
-            } else {
-              keepTrackApi.getUiManager().toast(`Invalid search limit: ${val}`, ToastMsgType.error);
-            }
-            break;
-          case 'console':
-            this.isEnableConsole = true;
-            break;
-          case 'godrays':
-            this.godraysSamples = GetVariables.godrays(val);
-            break;
-          case 'smallImages':
-            this.smallImages = true;
-            break;
-          case 'lowperf':
-            this.isShowSplashScreen = false;
-            this.isDrawMilkyWay = false;
-            this.isDrawLess = true;
-            this.zFar = 250000.0;
-            this.noMeshManager = true;
-            this.maxFieldOfViewMarkers = 1;
-            this.smallImages = true;
-            break;
-          case 'hires':
-            this.earthNumLatSegs = 128;
-            this.earthNumLonSegs = 128;
-            break;
-          case 'nostars':
-            this.isDisableStars = true;
-            this.isDrawMilkyWay = false;
-            break;
-          case 'draw-less':
-            this.isDrawMilkyWay = false;
-            this.isDrawLess = true;
-            this.zFar = 250000.0;
-            this.noMeshManager = true;
-            break;
-          case 'draw-more':
-            this.isDrawLess = false;
-            this.noMeshManager = false;
-            this.smallImages = false;
-            this.isDrawMilkyWay = true;
-            break;
-          case 'hires-milky-way':
-            this.hiresMilkWay = true;
-            break;
-          case 'political':
-            this.earthTextureStyle = EarthTextureStyle.FLAT;
-            break;
-          case 'offline':
-            this.offline = true;
-            this.dataSources.tle = '/tle/tle.json';
-            this.dataSources.vimpel = '/tle/vimpel.json';
-            break;
-          case 'notmtoast':
-            this.isDisableTimeMachineToasts = true;
-            break;
-          case 'cpo':
-            this.copyrightOveride = true;
-            break;
-          case 'logo':
-            this.isShowPrimaryLogo = true;
-            break;
-          case 'noPropRate':
-            this.isAlwaysHidePropRate = true;
-            break;
-          case 'supplement-data':
-            this.dataSources.isSupplementExternal = true;
-            break;
-          case 'latest-sats':
-            this.dataSources.tle = `https://api.keeptrack.space/v3/sats/latest/${val}`;
-            this.isEnableJscCatalog = false;
-            break;
-          case 'CATNR':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'NAME':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?NAME=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'INTDES':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?INTDES=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'GROUP':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'SPECIAL':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?SPECIAL=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          default:
-        }
-      }
-    }
   }
 
   /**

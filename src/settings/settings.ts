@@ -32,8 +32,7 @@ import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
 import { ClassificationString } from '../static/classification';
 import { isThisNode } from '../static/isThisNode';
-import { GetVariables } from './getVariables';
-import { darkClouds } from './presets/darkClouds';
+import { defaultColorSettings } from './default-color-settings';
 import { SettingsPresets } from './presets/presets';
 import { starTalk } from './presets/startalk';
 
@@ -1505,93 +1504,7 @@ export class SettingsManager {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
     if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.6') {
-      this.colors = {
-        version: '1.4.6',
-        length: 0,
-        facility: [0.0, 0.64, 0.64, 1.0],
-        sunlight100: [1.0, 1.0, 1.0, 0.7],
-        sunlight80: [1.0, 1.0, 1.0, 0.4],
-        sunlight60: [1.0, 1.0, 1.0, 0.1],
-        starHi: [1.0, 1.0, 1.0, 1.0],
-        starMed: [1.0, 1.0, 1.0, 0.85],
-        starLow: [1.0, 1.0, 1.0, 0.65],
-        sensor: [1.0, 0.0, 0.0, 1.0],
-        sensorAlt: [0.0, 0.0, 1.0, 1.0],
-        marker: [
-          [0.2, 1.0, 1.0, 1.0],
-          [1.0, 0.2, 1.0, 1.0],
-          [1.0, 1.0, 0.2, 1.0],
-          [0.2, 0.2, 1.0, 1.0],
-          [0.2, 1.0, 0.2, 1.0],
-          [1.0, 0.2, 0.2, 1.0],
-          [0.5, 0.6, 1.0, 1.0],
-          [0.6, 0.5, 1.0, 1.0],
-          [1.0, 0.6, 0.5, 1.0],
-          [1.0, 1.0, 1.0, 1.0],
-          [0.2, 1.0, 1.0, 1.0],
-          [1.0, 0.2, 1.0, 1.0],
-          [1.0, 1.0, 0.2, 1.0],
-          [0.2, 0.2, 1.0, 1.0],
-          [0.2, 1.0, 0.2, 1.0],
-          [1.0, 0.2, 0.2, 1.0],
-          [0.5, 0.6, 1.0, 1.0],
-          [0.6, 0.5, 1.0, 1.0],
-        ],
-        deselected: [1.0, 1.0, 1.0, 0],
-        inFOV: [0.85, 0.5, 0.0, 1.0],
-        inFOVAlt: [0.2, 0.4, 1.0, 1],
-        payload: [0.2, 1.0, 0.0, 0.5],
-        rocketBody: [0.2, 0.4, 1.0, 1],
-        debris: [0.5, 0.5, 0.5, 1],
-        unknown: [0.5, 0.5, 0.5, 0.85],
-        pink: [1.0, 0.0, 0.6, 1.0],
-        analyst: [1.0, 1.0, 1.0, 0.8],
-        missile: [1.0, 1.0, 0.0, 1.0],
-        missileInview: [1.0, 0.0, 0.0, 1.0],
-        transparent: [1.0, 1.0, 1.0, 0.1],
-        satHi: [1.0, 1.0, 1.0, 1.0],
-        satMed: [1.0, 1.0, 1.0, 0.8],
-        satLow: [1.0, 1.0, 1.0, 0.6],
-        sunlightInview: [0.85, 0.5, 0.0, 1.0],
-        penumbral: [1.0, 1.0, 1.0, 0.3],
-        umbral: [1.0, 1.0, 1.0, 0.1],
-        /*
-         * DEBUG Colors
-         * sunlight = [0.2, 0.4, 1.0, 1]
-         * penumbral = [0.5, 0.5, 0.5, 0.85]
-         * umbral = [0.2, 1.0, 0.0, 0.5]
-         */
-        gradientAmt: 0,
-        /*
-         * Gradients Must be Edited in color-scheme.js
-         * apogeeGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
-         * velGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
-         */
-        satSmall: [0.2, 1.0, 0.0, 0.65],
-        confidenceHi: [0.0, 1.0, 0.0, 0.65],
-        confidenceMed: [1.0, 0.4, 0.0, 0.65],
-        confidenceLow: [1.0, 0.0, 0.0, 0.65],
-        rcsXXSmall: [1.0, 0, 0, 0.6],
-        rcsXSmall: [1.0, 0.2, 0, 0.6],
-        rcsSmall: [1.0, 0.4, 0, 0.6],
-        rcsMed: [0.2, 0.4, 1.0, 1],
-        rcsLarge: [0, 1.0, 0, 0.6],
-        rcsUnknown: [1.0, 1.0, 0, 0.6],
-        lostobjects: [1, 0, 0, 0.8],
-        inGroup: [1.0, 0.0, 0.0, 1.0],
-        countryPRC: [1.0, 0, 0, 0.6],
-        countryUS: [0.2, 0.4, 1.0, 1],
-        countryCIS: [1.0, 1.0, 1.0, 1.0],
-        countryOther: [0, 1.0, 0, 0.6],
-        densityPayload: [0.15, 0.7, 0.8, 1.0],
-        spatialDensityHi: [1, 0, 0, 1],
-        spatialDensityMed: [1, 0.4, 0, 1],
-        spatialDensityLow: [1, 1, 0, 0.9],
-        spatialDensityOther: [0.8, 0.8, 0.8, 0.3],
-        notional: [1, 0, 0, 0.8],
-        starlink: [0.0, 0.8, 0.0, 0.8],
-        starlinkNot: [0.8, 0.0, 0.0, 0.8],
-      };
+      this.colors = defaultColorSettings;
 
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));
     }

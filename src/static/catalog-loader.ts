@@ -196,7 +196,7 @@ export class CatalogLoader {
           CatalogLoader.setupGetVariables();
         }
         // If using v3 switch to v2
-        if (settingsManager.dataSources.tle.includes('v3')) {
+        if (settingsManager.dataSources.tle.includes('v2') || settingsManager.limitSats.length > 0) {
           settingsManager.dataSources.tle = settingsManager.dataSources.tle.replace(/\/v3\//u, '/v2/');
         }
 

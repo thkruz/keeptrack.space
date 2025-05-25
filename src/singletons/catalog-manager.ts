@@ -38,7 +38,6 @@ import { isThisNode } from '../static/isThisNode';
 import { SatMath } from '../static/sat-math';
 import { SplashScreen } from '../static/splash-screen';
 import { StringExtractor } from '../static/string-extractor';
-import { UrlManager } from '../static/url-manager';
 import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
@@ -599,8 +598,6 @@ export class CatalogManager {
       keepTrackApi.getDotsManager().starIndex2 = stars[stars.length - 1].id;
       keepTrackApi.getDotsManager().updateSizeBuffer();
     }
-
-    UrlManager.parseGetVariables();
 
     this.buildOrbitDensityMatrix_();
 

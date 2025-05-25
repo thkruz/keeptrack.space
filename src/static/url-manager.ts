@@ -1,6 +1,10 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { GodraySamples } from '@app/plugins-pro/graphics-menu/graphics-menu';
+import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { SettingsManager, settingsManager } from '@app/settings/settings';
+import { AtmosphereSettings, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 import { DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians } from 'ootk';
 import { getEl } from '../lib/get-el';
 
@@ -8,6 +12,23 @@ export abstract class UrlManager {
   private static selectedSat_: DetailedSatellite | null = null;
   private static searchString_: string = '';
   private static propRate_: number;
+  private static readonly colorSchemeDefinitions_ = {
+    'objecttype': 'ObjectTypeColorScheme',
+    'type': 'ObjectTypeColorScheme',
+    'celestrak': 'CelestrakColorScheme',
+    'country': 'CountryColorScheme',
+    'rcs': 'RcsColorScheme',
+    'mission': 'MissionColorScheme',
+    'confidence': 'ConfidenceColorScheme',
+    'orbitalplane': 'OrbitalPlaneDensityColorScheme',
+    'spatial': 'SpatialDensityColorScheme',
+    'sunlight': 'SunlightColorScheme',
+    'gpage': 'GpAgeColorScheme',
+    'source': 'SourceColorScheme',
+    'velocity': 'VelocityColorScheme',
+    'starlink': 'StarlinkColorScheme',
+    'smallsat': 'SmallSatColorScheme',
+  };
 
   static {
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, (sat) => {
@@ -35,7 +56,7 @@ export abstract class UrlManager {
 
     keepTrackApi.on(InputEventType.KeyDown, (key) => {
       if (key === 'U') {
-        this.updateURL();
+        this.updateURL(true);
       }
     });
   }
@@ -83,63 +104,96 @@ export abstract class UrlManager {
     return keyValuePairs;
   }
 
-  static parseGetVariables() {
+  static parseGetVariables(settingsManager: SettingsManager): boolean {
+    let isUsingParsedVariables = false;
     const kv = this.getKeyValuePairs();
 
     if (Object.keys(kv).length === 0) {
-      return;
-    }
-
-    // Do searches first
-    if (kv.search && !settingsManager.disableUI) {
-      const uiManagerInstance = keepTrackApi.getUiManager();
-
-      uiManagerInstance.doSearch(kv.search);
-      if (settingsManager.lastSearchResults.length === 0) {
-        keepTrackApi.toast(`Search for "${kv.search}" found nothing!`, ToastMsgType.caution, true);
-        uiManagerInstance.searchManager.hideResults();
-      }
+      return false;
     }
 
     // Then Do Other Stuff
     Object.keys(kv).forEach((key) => {
-      if (key === 'search') {
-        return; // Already handled above
-      }
+
+      // Handle things that happen before loading (remember other components might not be ready yet)
       switch (key) {
-        case 'intldes':
-          this.handleIntldesParam_(kv[key]);
+        case 'earth':
+          this.handleEarthParam_(kv[key]);
+          isUsingParsedVariables = true;
           break;
-        case 'sat':
-          this.handleSatParam_(kv[key]);
+        case 'sun':
+          this.handleSunParam_(kv[key]);
+          isUsingParsedVariables = true;
           break;
-        case 'misl':
-          this.handleMislParam_(kv[key]);
+        case 'ecf':
+          settingsManager.isOrbitCruncherInEcf = kv[key] === 'true';
           break;
-        case 'date':
-          this.handleDateParam_(kv[key]);
-          break;
-        case 'pitch':
-        case 'yaw':
-          this.handlePitchYawParam_(kv.pitch, kv.yaw);
-          break;
-        case 'lat':
-        case 'lon':
-          this.handleLatLonParam_(kv.lat, kv.lon, kv.zoom, kv.date ?? null);
-          break;
-        case 'rate':
-          this.handleRateParam_(kv[key]);
-          break;
-        case 'zoom':
-          this.handleZoomParam_(kv[key], kv.camDistBuffer ?? null);
+        case 'color':
+          UrlManager.assignColorScheme_(kv, settingsManager);
+          isUsingParsedVariables = true;
           break;
         default:
-          console.warn(`Unknown URL parameter: ${key}`);
+          // Do nothing for other keys, they will be handled in the keepTrackApi.onKeepTrackReady event
+          break;
       }
+
+      keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+        switch (key) {
+          case 'search':
+            if (!settingsManager.disableUI) {
+              const uiManagerInstance = keepTrackApi.getUiManager();
+
+              uiManagerInstance.doSearch(kv.search);
+              if (settingsManager.lastSearchResults.length === 0) {
+                keepTrackApi.toast(`Search for "${kv.search}" found nothing!`, ToastMsgType.caution, true);
+                uiManagerInstance.searchManager.hideResults();
+              }
+            }
+            break;
+          case 'intldes':
+            this.handleIntldesParam_(kv[key]);
+            break;
+          case 'sat':
+            this.handleSatParam_(kv[key]);
+            break;
+          case 'misl':
+            this.handleMislParam_(kv[key]);
+            break;
+          case 'date':
+            this.handleDateParam_(kv[key]);
+            break;
+          case 'pitch':
+          case 'yaw':
+            this.handlePitchYawParam_(kv);
+            break;
+          case 'lat':
+          case 'lon':
+            this.handleLatLonParam_(kv.lat, kv.lon, kv.zoom, kv.date ?? null);
+            break;
+          case 'rate':
+            this.handleRateParam_(kv[key]);
+            break;
+          case 'zoom':
+            this.handleZoomParam_(kv[key], kv.camDistBuffer ?? null);
+            break;
+          default:
+            console.warn(`Unknown URL parameter: ${key}`);
+        }
+      });
     });
+
+    return isUsingParsedVariables;
   }
 
-  static updateURL() {
+  private static assignColorScheme_(kv: Record<string, string>, settingsManager: SettingsManager) {
+    const colorParam = kv.color?.toLowerCase();
+
+    if (colorParam && UrlManager.colorSchemeDefinitions_[colorParam]) {
+      settingsManager.defaultColorScheme = UrlManager.colorSchemeDefinitions_[colorParam];
+    }
+  }
+
+  static updateURL(isMaxData: boolean = false): void {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const mainCamera = keepTrackApi.getMainCamera();
@@ -172,16 +226,35 @@ export abstract class UrlManager {
       paramSlices.push(`rate=${this.propRate_}`);
     }
 
-    paramSlices.push(`pitch=${(mainCamera.camPitch * RAD2DEG).toFixed(2)}`);
-    paramSlices.push(`yaw=${(mainCamera.camYaw * RAD2DEG).toFixed(2)}`);
+    if (this.selectedSat_?.sccNum && !(mainCamera.ftsPitch > -0.01 && mainCamera.ftsPitch < 0.01 && mainCamera.ftsYaw > -0.01 && mainCamera.ftsYaw < 0.01)) {
+      paramSlices.push(`pitch=${(mainCamera.ftsPitch * RAD2DEG).toFixed(3)}`);
+      paramSlices.push(`yaw=${(mainCamera.ftsYaw * RAD2DEG).toFixed(3)}`);
+    } else if (mainCamera.camPitch > -0.01 && mainCamera.camPitch < 0.01 && mainCamera.camYaw > -0.01 && mainCamera.camYaw < 0.01) {
+      // If pitch and yaw are close to zero, we don't need to include them in the URL
+    } else {
+      paramSlices.push(`pitch=${(mainCamera.camPitch * RAD2DEG).toFixed(3)}`);
+      paramSlices.push(`yaw=${(mainCamera.camYaw * RAD2DEG).toFixed(3)}`);
+    }
 
-    paramSlices.push(`zoom=${mainCamera.zoomLevel()}`);
+    paramSlices.push(`zoom=${mainCamera.zoomLevel().toFixed(2)}`);
 
     if (this.selectedSat_) {
       paramSlices.push(`camDistBuffer=${mainCamera.camDistBuffer}`);
     }
 
-    if (timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
+    if (keepTrackApi.getColorSchemeManager().currentColorScheme.id !== 'CelestrakColorScheme') {
+      const shorthandFromDefinition = Object.keys(UrlManager.colorSchemeDefinitions_).find(
+        (key) => UrlManager.colorSchemeDefinitions_[key] === keepTrackApi.getColorSchemeManager().currentColorScheme.id,
+      );
+
+      paramSlices.push(`color=${shorthandFromDefinition}`);
+    }
+
+    if (settingsManager.isOrbitCruncherInEcf) {
+      paramSlices.push('ecf=true');
+    }
+
+    if (isMaxData || timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
       paramSlices.push(`date=${(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset).toString()}`);
     }
 
@@ -199,35 +272,25 @@ export abstract class UrlManager {
   }
 
   private static handleIntldesParam_(val: string) {
-    keepTrackApi.on(
-      KeepTrackApiEvents.onKeepTrackReady,
-      () => {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const urlSatId = catalogManagerInstance.intlDes2id(val.toUpperCase());
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const urlSatId = catalogManagerInstance.intlDes2id(val.toUpperCase());
 
-        if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId)?.active) {
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
-        } else {
-          keepTrackApi.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
-        }
-      },
-    );
+    if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId)?.active) {
+      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
+    } else {
+      keepTrackApi.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+    }
   }
 
   private static handleSatParam_(val: string) {
-    keepTrackApi.on(
-      KeepTrackApiEvents.onKeepTrackReady,
-      () => {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
 
-        if (urlSatId !== null) {
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
-        } else {
-          keepTrackApi.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
-        }
-      },
-    );
+    if (urlSatId !== null) {
+      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
+    } else {
+      keepTrackApi.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+    }
   }
 
   private static handleMislParam_(val: string) {
@@ -273,36 +336,32 @@ export abstract class UrlManager {
   }
 
   private static handleZoomParam_(val: string, camDistBuffer: string) {
-    keepTrackApi.on(
-      KeepTrackApiEvents.onKeepTrackReady,
-      () => {
-        const zoom = parseFloat(val);
-        const camDistBufferValue = parseFloat(camDistBuffer);
+    const zoom = parseFloat(val);
+    const camDistBufferValue = parseFloat(camDistBuffer);
 
-        if (isNaN(zoom)) {
-          keepTrackApi.toast(`Zoom value of "${val}" is not a valid float!`, ToastMsgType.caution, true);
+    if (isNaN(zoom)) {
+      keepTrackApi.toast(`Zoom value of "${val}" is not a valid float!`, ToastMsgType.caution, true);
 
-          return;
-        }
+      return;
+    }
 
-        if (zoom < 0.1 || zoom > 100) {
-          keepTrackApi.toast(`Zoom value of "${val}" is out of bounds!`, ToastMsgType.caution, true);
+    if (zoom < 0.1 || zoom > 100) {
+      keepTrackApi.toast(`Zoom value of "${val}" is out of bounds!`, ToastMsgType.caution, true);
 
-          return;
-        }
+      return;
+    }
 
-        keepTrackApi.getMainCamera().camZoomSnappedOnSat = false;
-        keepTrackApi.getMainCamera().changeZoom(zoom);
-        // if camDistBuffer is not a number, set it to just outside the min zoom distance for close zoom
-        keepTrackApi.getMainCamera().camDistBuffer = isNaN(camDistBufferValue)
-          ? settingsManager.minZoomDistance + 1 as Kilometers
-          : camDistBufferValue as Kilometers;
-      });
+    keepTrackApi.getMainCamera().camZoomSnappedOnSat = false;
+    keepTrackApi.getMainCamera().changeZoom(zoom);
+    // if camDistBuffer is not a number, set it to just outside the min zoom distance for close zoom
+    keepTrackApi.getMainCamera().camDistBuffer = isNaN(camDistBufferValue)
+      ? settingsManager.minZoomDistance + 1 as Kilometers
+      : camDistBufferValue as Kilometers;
   }
 
-  private static handlePitchYawParam_(pitch: string, yaw: string) {
-    const pitchNum = parseFloat(pitch);
-    const yawNum = parseFloat(yaw);
+  private static handlePitchYawParam_(kv: Record<string, string>) {
+    const pitchNum = parseFloat(kv.pitch);
+    const yawNum = parseFloat(kv.yaw);
 
     if (isNaN(pitchNum) || isNaN(yawNum)) {
       keepTrackApi.toast('Pitch or Yaw value is not a valid float!', ToastMsgType.caution, true);
@@ -319,8 +378,16 @@ export abstract class UrlManager {
 
       return;
     }
-    keepTrackApi.getMainCamera().autoRotate(false);
-    keepTrackApi.getMainCamera().camSnap(pitchNum * DEG2RAD as Radians, yawNum * DEG2RAD as Radians);
+    const mainCameraInstance = keepTrackApi.getMainCamera();
+
+    mainCameraInstance.autoRotate(false);
+    mainCameraInstance.camSnap(pitchNum * DEG2RAD as Radians, yawNum * DEG2RAD as Radians);
+
+    if (kv.sat) {
+      mainCameraInstance.camAngleSnappedOnSat = false;
+      mainCameraInstance.ftsPitch = pitchNum * DEG2RAD as Radians;
+      mainCameraInstance.ftsYaw = yawNum * DEG2RAD as Radians;
+    }
   }
 
   private static handleLatLonParam_(lat: string, lon: string, zoom: string, date: string | null) {
@@ -355,6 +422,99 @@ export abstract class UrlManager {
       }, 10500);
     } else {
       keepTrackApi.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
+    }
+  }
+
+  static handleEarthParam_(val: string) {
+    switch (val) {
+      case 'satellite':
+        settingsManager.earthTextureStyle = EarthTextureStyle.BLUE_MARBLE;
+        settingsManager.isDrawCloudsMap = true;
+        settingsManager.isDrawBumpMap = true;
+        settingsManager.isDrawSpecMap = true;
+        settingsManager.isEarthGrayScale = false;
+        settingsManager.isDrawPoliticalMap = true;
+        settingsManager.isDrawAurora = true;
+        settingsManager.isDrawAtmosphere = AtmosphereSettings.COLORFUL;
+        settingsManager.isEarthAmbientLighting = true;
+        break;
+      case 'engineer':
+        settingsManager.earthTextureStyle = EarthTextureStyle.BLUE_MARBLE;
+        settingsManager.isDrawCloudsMap = false;
+        settingsManager.isDrawBumpMap = false;
+        settingsManager.isDrawSpecMap = false;
+        settingsManager.isEarthGrayScale = false;
+        settingsManager.isDrawPoliticalMap = false;
+        settingsManager.isDrawAurora = false;
+        settingsManager.isDrawAtmosphere = AtmosphereSettings.WHITE;
+        settingsManager.isEarthAmbientLighting = false;
+        keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+          keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+        });
+        break;
+      case 'opscenter':
+        settingsManager.earthTextureStyle = EarthTextureStyle.FLAT;
+        settingsManager.isDrawCloudsMap = false;
+        settingsManager.isDrawBumpMap = false;
+        settingsManager.isDrawSpecMap = false;
+        settingsManager.isEarthGrayScale = true;
+        settingsManager.isDrawPoliticalMap = true;
+        settingsManager.isDrawAurora = false;
+        settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
+        settingsManager.isEarthAmbientLighting = false;
+        keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+          keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+        });
+        break;
+      case '90s':
+        settingsManager.earthTextureStyle = EarthTextureStyle.FLAT;
+        settingsManager.isDrawCloudsMap = false;
+        settingsManager.isDrawBumpMap = false;
+        settingsManager.isDrawSpecMap = false;
+        settingsManager.isEarthGrayScale = false;
+        settingsManager.isDrawPoliticalMap = false;
+        settingsManager.isDrawAurora = false;
+        settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
+        settingsManager.isEarthAmbientLighting = false;
+        keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+          keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
+  private static handleSunParam_(val: string) {
+    settingsManager.isDrawSun = true;
+    settingsManager.isUseSunTexture = false;
+    settingsManager.isDisableGodrays = false;
+
+    switch (val) {
+      case 'off':
+        settingsManager.isDrawSun = false;
+        settingsManager.isUseSunTexture = false;
+        settingsManager.isDisableGodrays = true;
+        break;
+      case 'potato':
+        settingsManager.godraysSamples = GodraySamples.OFF;
+        settingsManager.isUseSunTexture = true;
+        settingsManager.isDisableGodrays = true;
+        break;
+      case 'low':
+        settingsManager.godraysSamples = GodraySamples.LOW;
+        break;
+      case 'medium':
+        settingsManager.godraysSamples = GodraySamples.MEDIUM;
+        break;
+      case 'high':
+        settingsManager.godraysSamples = GodraySamples.HIGH;
+        break;
+      case 'ultra':
+        settingsManager.godraysSamples = GodraySamples.ULTRA;
+        break;
+      default:
+        console.warn(`Unknown sun parameter: ${val}`);
     }
   }
 }

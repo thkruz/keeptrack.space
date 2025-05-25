@@ -30,6 +30,7 @@ import { errorManagerInstance } from './errorManager';
 
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { UrlManager } from '@app/static/url-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
@@ -187,6 +188,7 @@ export class ColorSchemeManager {
 
       // Save the color scheme if needed
       if (this.currentColorScheme?.id && this.lastColorScheme?.id !== this.currentColorScheme?.id) {
+        UrlManager.updateURL();
         PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
         // Note the colorscheme for next time
         this.lastColorScheme = this.currentColorScheme;

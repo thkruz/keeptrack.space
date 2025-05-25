@@ -78,6 +78,7 @@ export class SettingsManager {
   earthTextureStyle: EarthTextureStyle;
   isEarthGrayScale = false;
   isEarthAmbientLighting = true;
+  isBlockPersistence = false;
 
 
   static preserveSettings() {
@@ -1168,6 +1169,16 @@ export class SettingsManager {
   }
 
   init(settingsOverride?: SettingsManagerOverride) {
+    /*
+     * Export settingsManager to everyone else
+     * window.settingsManager = this;
+     * Expose these to node if running in node
+     */
+    if (global) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (<any>global).settingsManager = this;
+    }
+
     this.pTime = [];
 
     this.checkIfIframe_();
@@ -1175,22 +1186,25 @@ export class SettingsManager {
     this.setMobileSettings_();
     this.setEmbedOverrides_();
     this.setColorSettings_();
-    /**
-     * Load Order:
-     * URL Params > Local Storage > Default
-     */
-    this.loadPersistedSettings();
-
-    if (settingsOverride) {
-      this.loadOverrides_(settingsOverride);
-    }
 
     const params = this.loadOverridesFromUrl_();
 
     if (!this.disableUI) {
       parseGetVariables(params, this);
     }
-    keepTrackApi.emit(KeepTrackApiEvents.parseGetVariables, params);
+    settingsManager.isBlockPersistence = UrlManager.parseGetVariables(this) ?? settingsManager.isBlockPersistence;
+
+    if (!settingsManager.isBlockPersistence) {
+      /**
+       * Load Order:
+       * URL Params > Local Storage > Default
+       */
+      this.loadPersistedSettings();
+
+      if (settingsOverride) {
+        this.loadOverrides_(settingsOverride);
+      }
+    }
 
     // If No UI Reduce Overhead
     if (this.disableUI) {
@@ -1215,16 +1229,6 @@ export class SettingsManager {
     }
 
     this.loadLastMapTexture_();
-
-    /*
-     * Export settingsManager to everyone else
-     * window.settingsManager = this;
-     * Expose these to node if running in node
-     */
-    if (global) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (<any>global).settingsManager = this;
-    }
   }
 
   private checkIfIframe_() {

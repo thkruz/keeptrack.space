@@ -58,7 +58,6 @@ export class Camera {
   private earthCenteredYaw_ = <Radians>0;
   private fpsLastTime_ = <Milliseconds>0;
   private fpsPos_ = <vec3>[0, 25000, 0];
-  private ftsYaw_ = <Radians>0;
   private isAutoRotate_ = true;
   private isFPSForwardSpeedLock_ = false;
   private isFPSSideSpeedLock_ = false;
@@ -140,6 +139,7 @@ export class Camera {
   fpsYaw = <Degrees>0;
   fpsYawRate = 0;
   ftsPitch = 0;
+  ftsYaw = <Radians>0;
   ftsRotateReset = true;
   isAutoPitchYawToTarget = false;
   isDragging = false;
@@ -655,8 +655,8 @@ export class Camera {
    */
   getCameraOrientation() {
     if (this.cameraType === CameraType.FIXED_TO_SAT) {
-      const xRot = Math.sin(-this.ftsYaw_) * Math.cos(this.ftsPitch);
-      const yRot = Math.cos(this.ftsYaw_) * Math.cos(this.ftsPitch);
+      const xRot = Math.sin(-this.ftsYaw) * Math.cos(this.ftsPitch);
+      const yRot = Math.cos(this.ftsYaw) * Math.cos(this.ftsPitch);
       const zRot = Math.sin(-this.ftsPitch);
 
 
@@ -1448,7 +1448,7 @@ export class Camera {
     mat4.translate(this.camMatrix, this.camMatrix, [0, this.getCameraRadius(target.position), 0]);
 
     mat4.rotateX(this.camMatrix, this.camMatrix, this.ftsPitch);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.ftsYaw_);
+    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.ftsYaw);
 
     mat4.translate(this.camMatrix, this.camMatrix, targetPosition);
   }
@@ -1685,7 +1685,7 @@ export class Camera {
     if (this.cameraType === CameraType.FIXED_TO_SAT) {
       this.camPitch = normalizeAngle(this.camPitch);
       this.ftsPitch = this.camPitch;
-      this.ftsYaw_ = this.camYaw;
+      this.ftsYaw = this.camYaw;
     }
   }
 

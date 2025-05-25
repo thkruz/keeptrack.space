@@ -135,6 +135,12 @@ export class PersistenceManager {
     }
   }
 
+  clear(): void {
+    for (const key of Object.values(StorageKey)) {
+      this.storage_.removeItem(key);
+    }
+  }
+
   removeItem(key: string): void {
     PersistenceManager.verifyKey_(key);
     this.storage_.removeItem(key);

@@ -1515,7 +1515,15 @@ export class SettingsManager {
    * @returns An array of query string parameters.
    */
   private loadOverridesFromUrl_() {
-    const queryStr = window.location.search.substring(1);
+    let queryStr = window.location.search.substring(1);
+
+    // if queryStr includes '#' it will break params, so we need to remove it and retry
+    const hashIndex = window.location.hash.indexOf('#');
+
+    if (hashIndex !== -1) {
+      queryStr = window.location.hash.split('#')[1]; // Get the part after the hash
+      queryStr = queryStr.split('?')[1]; // Remove any query string after the hash
+    }
 
     // URI Encode all %22 to ensure url is not broken
     const params = queryStr

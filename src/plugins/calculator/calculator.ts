@@ -4,7 +4,6 @@ import calculatorPng from '@public/img/icons/calculator.png';
 
 import { getEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
 import { Degrees, DetailedSensor, ecf2eci, eci2ecf, eci2rae, Kilometers, rae2eci, RaeVec3, Vector3D } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -393,7 +392,7 @@ export class Calculator extends KeepTrackPlugin {
 
     const ecf = new Vector3D<Kilometers>(Number(x.value) as Kilometers, Number(y.value) as Kilometers, Number(z.value) as Kilometers);
     const date = keepTrackApi.getTimeManager().simulationTimeObj;
-    const gmst = SatMath.calculateTimeVariables(date).gmst;
+    const gmst = keepTrackApi.getTimeManager().gmst;
     const eci = ecf2eci(ecf, gmst);
 
     (getEl('calc-j2000-x-input') as HTMLInputElement).value = eci.x.toString();
@@ -432,7 +431,7 @@ export class Calculator extends KeepTrackPlugin {
 
     const eci = new Vector3D<Kilometers>(Number(x.value) as Kilometers, Number(y.value) as Kilometers, Number(z.value) as Kilometers);
     const date = keepTrackApi.getTimeManager().simulationTimeObj;
-    const gmst = SatMath.calculateTimeVariables(date).gmst;
+    const gmst = keepTrackApi.getTimeManager().gmst;
     const ecf = eci2ecf(eci, gmst);
 
     (getEl('calc-itrf-x-input') as HTMLInputElement).value = ecf.x.toString();
@@ -482,13 +481,13 @@ export class Calculator extends KeepTrackPlugin {
       az: Number(a.value) as Degrees,
       el: Number(e.value) as Degrees,
     } as RaeVec3<Kilometers>;
-    const eci = rae2eci(rae, sensor.lla(), SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
+    const eci = rae2eci(rae, sensor.lla(), keepTrackApi.getTimeManager().gmst);
 
     (getEl('calc-j2000-x-input') as HTMLInputElement).value = eci.x.toString();
     (getEl('calc-j2000-y-input') as HTMLInputElement).value = eci.y.toString();
     (getEl('calc-j2000-z-input') as HTMLInputElement).value = eci.z.toString();
 
-    const ecf = eci2ecf(eci, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
+    const ecf = eci2ecf(eci, keepTrackApi.getTimeManager().gmst);
 
     (getEl('calc-itrf-x-input') as HTMLInputElement).value = ecf.x.toString();
     (getEl('calc-itrf-y-input') as HTMLInputElement).value = ecf.y.toString();

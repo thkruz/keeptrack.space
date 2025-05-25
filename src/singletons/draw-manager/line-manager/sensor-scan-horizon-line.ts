@@ -1,6 +1,5 @@
 import { EciArr3 } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SatMath } from '@app/static/sat-math';
 import { vec4 } from 'gl-matrix';
 import { Degrees, DetailedSensor, ecf2eci, rae2ecf } from 'ootk';
 import { Line, LineColors } from './line';
@@ -72,7 +71,7 @@ export class SensorScanHorizonLine extends Line {
           alt: lla.alt + 30,
         },
       ),
-      SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst,
+      keepTrackApi.getTimeManager().gmst,
     );
 
     return [eci.x, eci.y, eci.z] as EciArr3;

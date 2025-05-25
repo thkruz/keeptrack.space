@@ -1,6 +1,7 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { getDayOfYear, Milliseconds } from 'ootk';
+import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { InputEventType, keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { DateTimeManager } from '../plugins/date-time-manager/date-time-manager';
@@ -55,6 +56,8 @@ export class TimeManager {
    */
   private dynamicOffset_: number;
   isCreateClockDOMOnce_ = false;
+  gmst: GreenwichMeanSiderealTime = 0 as GreenwichMeanSiderealTime;
+  j: number;
 
   static currentEpoch(currentDate: Date): [string, string] {
     const currentDateObj = new Date(currentDate);
@@ -201,6 +204,13 @@ export class TimeManager {
     this.calculateSimulationTime();
     this.setSelectedDate(this.simulationTimeObj);
     this.initializeKeyboardBindings_();
+  }
+
+  update() {
+    const { gmst, j } = SatMath.calculateTimeVariables(this.simulationTimeObj);
+
+    this.gmst = gmst;
+    this.j = j;
   }
 
   private initializeKeyboardBindings_() {

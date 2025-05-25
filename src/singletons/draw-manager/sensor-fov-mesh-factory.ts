@@ -3,7 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { mat4 } from 'gl-matrix';
-import { DetailedSensor, GreenwichMeanSiderealTime, SpaceObjectType } from 'ootk';
+import { DetailedSensor, SpaceObjectType } from 'ootk';
 import { CustomMeshFactory } from './custom-mesh-factory';
 import { SensorFovMesh } from './sensor-fov-mesh';
 
@@ -90,7 +90,8 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     return true;
   }
 
-  updateAll(gmst: GreenwichMeanSiderealTime) {
+  updateAll() {
+    const gmst = keepTrackApi.getTimeManager().gmst;
     const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
 
     this.meshes.forEach((mesh) => {

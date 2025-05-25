@@ -687,7 +687,7 @@ export class Camera {
     let targetDistanceFromEarth = 0;
 
     if (target) {
-      const { gmst } = SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj);
+      const gmst = keepTrackApi.getTimeManager().gmst;
 
       this.camSnapToSat.altitude = SatMath.getAlt(target, gmst);
       targetDistanceFromEarth = this.camSnapToSat.altitude + RADIUS_OF_EARTH;

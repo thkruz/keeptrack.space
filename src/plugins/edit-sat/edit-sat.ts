@@ -345,7 +345,7 @@ export class EditSat extends KeepTrackPlugin {
 
       const mainsat = obj as DetailedSatellite;
       // Launch Points are the Satellites Current Location
-      const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+      const gmst = keepTrackApi.getTimeManager().gmst;
       const lla = eci2lla(mainsat.position, gmst);
       const launchLon = lla.lon;
       const launchLat = lla.lat;

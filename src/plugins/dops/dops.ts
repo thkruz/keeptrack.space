@@ -9,7 +9,6 @@ import { errorManagerInstance } from '@app/singletons/errorManager';
 import type { GroupsManager } from '@app/singletons/groups-manager';
 import { GroupType } from '@app/singletons/object-group';
 import { DopMath } from '@app/static/dop-math';
-import { SatMath } from '@app/static/sat-math';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 
@@ -103,7 +102,7 @@ export class DopsPlugin extends KeepTrackPlugin {
 
           if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
             errorManagerInstance.debug('latLon undefined!');
-            const gmst = SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst;
+            const gmst = keepTrackApi.getTimeManager().gmst;
 
             latLon = eci2lla(
               {

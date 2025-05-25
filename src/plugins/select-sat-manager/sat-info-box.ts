@@ -152,7 +152,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               isInView = false;
             }
 
-            const lla = eci2lla(sat.position, SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst);
+            const lla = eci2lla(sat.position, keepTrackApi.getTimeManager().gmst);
             const currentTearr: TearrData = {
               time: timeManagerInstance.simulationTimeObj.toISOString(),
               az: rae.az,
@@ -171,7 +171,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             this.currentTEARR = missileManager.getMissileTEARR(obj as MissileObject);
           }
 
-          const { gmst } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
+          const gmst = keepTrackApi.getTimeManager().gmst;
           const lla = eci2lla(obj.position, gmst);
 
           const satLonElement = getEl('sat-longitude');
@@ -229,8 +229,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
             if (obj.isSatellite()) {
               const sat = obj as DetailedSatellite;
-              const { gmst } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
-
+              const gmst = keepTrackApi.getTimeManager().gmst;
 
               satAltitudeElement.innerHTML = `${SatMath.getAlt(sat.position, gmst).toFixed(2)} km`;
               satVelocityElement.innerHTML = `${sat.totalVelocity.toFixed(2)} km/s`;

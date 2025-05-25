@@ -3,7 +3,7 @@ import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
-import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
+import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
 import { ConeMeshFactory } from './draw-manager/cone-mesh-factory';
@@ -66,15 +66,15 @@ export class Scene {
     this.skybox.init(settingsManager, gl);
   }
 
-  update(simulationTime: Date, gmst: GreenwichMeanSiderealTime, j: number) {
-    this.sun.update(j);
-    this.earth.update(gmst);
+  update(simulationTime: Date) {
+    this.sun.update();
+    this.earth.update();
     this.moon.update(simulationTime);
     this.skybox.update();
 
     keepTrackApi.getLineManager().update();
 
-    this.sensorFovFactory.updateAll(gmst);
+    this.sensorFovFactory.updateAll();
     this.coneFactory.updateAll();
   }
 

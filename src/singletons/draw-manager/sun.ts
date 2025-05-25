@@ -137,7 +137,8 @@ export class Sun {
   /**
    * This is run once per frame to update the sun's position.
    */
-  update(j: number) {
+  update() {
+    const j = keepTrackApi.getTimeManager().j;
     const eci = SatMath.getSunDirection(j);
 
     this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };

@@ -629,6 +629,8 @@ theodore.kruczek at gmail dot com.
     renderer.dt = dt;
     renderer.dtAdjusted = <Milliseconds>(Math.min(renderer.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
 
+    this.timeManager.update();
+
     keepTrackApi.emit(KeepTrackApiEvents.update, dt);
 
     // Update official time for everyone else

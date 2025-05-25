@@ -219,7 +219,7 @@ export class Breakup extends KeepTrackPlugin {
     const origsat = mainsat;
 
     // Launch Points are the Satellites Current Location
-    const gmst = SatMath.calculateTimeVariables(simulationTimeObj).gmst;
+    const gmst = keepTrackApi.getTimeManager().gmst;
     const lla = eci2lla(mainsat.position, gmst);
     const launchLat = lla.lat;
     const launchLon = lla.lon;

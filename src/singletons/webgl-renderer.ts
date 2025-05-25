@@ -8,7 +8,6 @@ import { GetSatType } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SettingsManager } from '../settings/settings';
 import { isThisNode } from '../static/isThisNode';
-import { SatMath } from '../static/sat-math';
 import { Camera, CameraType } from './camera';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { MeshManager } from './draw-manager/mesh-manager';
@@ -47,7 +46,6 @@ export class WebGLRenderer {
    * Main source of glContext for rest of the application
    */
   gl: WebGL2RenderingContext;
-  gmst: GreenwichMeanSiderealTime;
   isDrawOrbitsAbove: boolean;
   isPostProcessingResizeNeeded: boolean;
   isShowDistance = false;
@@ -649,11 +647,7 @@ export class WebGLRenderer {
     this.updateSecondarySatellite_();
     keepTrackApi.getMainCamera().update(this.dt);
 
-    const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
-
-    this.gmst = gmst;
-
-    keepTrackApi.getScene().update(timeManagerInstance.simulationTimeObj, gmst, j);
+    keepTrackApi.getScene().update(timeManagerInstance.simulationTimeObj);
 
     this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
 

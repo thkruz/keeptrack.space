@@ -6,7 +6,6 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
-import { SatMath } from '@app/static/sat-math';
 import { Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
@@ -44,7 +43,7 @@ export class MouseInput {
     if (evt.button === 2) {
       this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
 
-      const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+      const gmst = keepTrackApi.getTimeManager().gmst;
 
       this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
     }

@@ -5,7 +5,6 @@ import { openColorbox } from '@app/lib/colorbox';
 import { hideEl } from '@app/lib/get-el';
 import { LaunchSite } from '@app/singletons/catalog-manager/LaunchFacility';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
 import { DetailedSatellite, DetailedSensor, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -41,7 +40,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
 
           if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
             errorManagerInstance.debug('latLon undefined!');
-            const gmst = SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst;
+            const gmst = keepTrackApi.getTimeManager().gmst;
 
             latLon = eci2lla({ x: dragPosition[0], y: dragPosition[1], z: dragPosition[2] }, gmst);
           }

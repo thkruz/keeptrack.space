@@ -29,7 +29,7 @@ import { ShaderMaterial } from '@app/static/shader-material';
 import { SphereGeometry } from '@app/static/sphere-geometry';
 import { SplashScreen } from '@app/static/splash-screen';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
+import { EpochUTC, Sun } from 'ootk';
 import { errorManagerInstance } from '../errorManager';
 import { PersistenceManager, StorageKey } from '../persistence-manager';
 import { OcclusionProgram } from './post-processing';
@@ -274,7 +274,8 @@ export class Earth {
   /**
    * This is run once per frame to update the earth.
    */
-  update(gmst: GreenwichMeanSiderealTime): void {
+  update(): void {
+    const gmst = keepTrackApi.getTimeManager().gmst;
     const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
 
     this.lightDirection = [pos.x, pos.y, pos.z];

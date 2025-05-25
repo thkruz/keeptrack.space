@@ -1,25 +1,25 @@
+import { LaunchSite } from '@app/singletons/catalog-manager/LaunchFacility';
 import { Degrees } from 'ootk';
+import { AFETRList } from './launch-sites/afetr-list';
+import { AFWTRList } from './launch-sites/afwtr-list';
 
 export const launchSites = {
-  AFETR: {
-    name: 'AFETR',
-    lat: 28.46,
-    lon: 279.45,
+  ...AFETRList,
+  ...AFWTRList,
+  ANDSP: {
+    name: 'Andøya Spaceport',
+    lat: 69.108709,
+    lon: 15.588761,
   },
-  AFWTR: {
-    name: 'AFWTR',
-    lat: 34.77,
-    lon: 239.4,
+  BOS: {
+    name: 'Bowen Orbital Spaceport',
+    lat: -19.958148641067815,
+    lon: 148.11360161948667,
   },
   CAS: {
-    name: 'CAS',
-    lat: 28.1,
-    lon: 344.6,
-  },
-  ERAS: {
-    name: 'ERAS',
-    lat: 28.46,
-    lon: 279.45,
+    name: 'Gran Canaria Airport Runway 03/21',
+    lat: 27.932009,
+    lon: -15.385444,
   },
   FRGUI: {
     name: 'FRGUI',
@@ -61,7 +61,7 @@ export const launchSites = {
     lat: 34.42,
     lon: 127.52,
   },
-  OREN: {
+  OREN: { // Also called Dombrovsky Launch Site
     name: 'OREN',
     lat: 51.2,
     lon: 59.85,
@@ -141,11 +141,6 @@ export const launchSites = {
     lat: -30.95,
     lon: 136.5,
   },
-  WRAS: {
-    name: 'WRAS',
-    lat: 34.77,
-    lon: 239.4,
-  },
   WSC: {
     name: 'WSC',
     lat: 19.61,
@@ -179,4 +174,27 @@ export const launchSites = {
     lat: -2.373056,
     lon: -44.396389,
   },
-} as unknown as { [key: string]: { name: string; lat: Degrees; lon: Degrees } };
+} as unknown as {
+  [key: string]: {
+    name: string;
+    lat: Degrees;
+    lon: Degrees
+    site: string;
+    country: string;
+    wikiUrl: null;
+  }
+};
+
+
+export const launchSiteObjects = Object.entries(launchSites).map(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ([_key, value]) => new LaunchSite({
+    name: value.name,
+    lat: value.lat,
+    lon: value.lon,
+    alt: 0, // Altitude is not provided in the original data
+    country: value.country ?? 'Unknown Country', // Default to 'Unknown Country' if country is not provided
+    site: value.site ?? 'Unknown Site', // Default to 'Unknown Site' if site is not provided
+    wikiUrl: value.wikiUrl ?? null, // Default to null if wikiUrl is not provided
+  }),
+);

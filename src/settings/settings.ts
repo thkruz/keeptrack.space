@@ -432,7 +432,11 @@ export class SettingsManager {
   isDisableAsciiCatalog = true;
   settingsManager = null;
   /**
-   * Indicates whether or not Launch Agency and Payload Owners/Manufacturers should be displayed on globe.
+   * Indicates whether or not Launch Agency should be displayed on globe.
+   */
+  isShowLaunchSites = true;
+  /**
+   * Indicates whether or not Payload Owners/Manufacturers should be displayed on globe.
    *
    * TODO: This needs to be revamped. Most agencies are not linked to any satellites!
    */

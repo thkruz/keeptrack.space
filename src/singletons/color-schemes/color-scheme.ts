@@ -165,6 +165,8 @@ export abstract class ColorScheme {
       case SpaceObjectType.PAYLOAD_OWNER:
       case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
       case SpaceObjectType.PAYLOAD_MANUFACTURER:
+      case SpaceObjectType.LAUNCH_AGENCY:
+      case SpaceObjectType.CONTROL_FACILITY:
         // If the facility flag is off then we don't want to show this
         if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
           return {
@@ -179,13 +181,11 @@ export abstract class ColorScheme {
           pickable: Pickable.Yes,
         };
 
-      case SpaceObjectType.LAUNCH_AGENCY:
       case SpaceObjectType.LAUNCH_SITE:
       case SpaceObjectType.LAUNCH_POSITION:
       case SpaceObjectType.LAUNCH_FACILITY:
-      case SpaceObjectType.CONTROL_FACILITY:
         // If the facility flag is off then we don't want to show this
-        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+        if (!settingsManager.isShowLaunchSites || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
           return {
             color: this.colorTheme.deselected,
             pickable: Pickable.No,

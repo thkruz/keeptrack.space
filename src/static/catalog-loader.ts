@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { StringPad } from '@app/lib/stringPad';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
+import { LaunchSite } from '@app/singletons/catalog-manager/LaunchFacility';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCruncher';
@@ -390,6 +391,8 @@ export class CatalogLoader {
         });
 
         tempObjData.push(sensor);
+      } else if (staticSat instanceof LaunchSite) {
+        tempObjData.push(staticSat);
       } else {
         const landObj = new LandObject({
           id: tempObjData.length,

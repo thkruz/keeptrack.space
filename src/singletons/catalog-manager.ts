@@ -30,7 +30,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Degrees, DetailedSatellite, EciVec3, KilometersPerSecond, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
 import { controlSites } from '../catalogs/control-sites';
-import { launchSites } from '../catalogs/launch-sites';
+import { launchSiteObjects, launchSites } from '../catalogs/launch-sites';
 import { sensors } from '../catalogs/sensors';
 import { stars } from '../catalogs/stars';
 import { GetSatType, SatCruncherMessageData } from '../interfaces';
@@ -39,6 +39,7 @@ import { SatMath } from '../static/sat-math';
 import { SplashScreen } from '../static/splash-screen';
 import { StringExtractor } from '../static/string-extractor';
 import { UrlManager } from '../static/url-manager';
+import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
 import { errorManagerInstance } from './errorManager';
@@ -431,20 +432,10 @@ export class CatalogManager {
 
     // Create Launch Sites
     if (!settingsManager.isDisableLaunchSites) {
-      for (const launchSiteName in launchSites) {
-        if (!Object.prototype.hasOwnProperty.call(launchSites, launchSiteName)) {
-          continue;
+      for (const launchSiteName in launchSiteObjects) {
+        if (launchSiteObjects[launchSiteName] instanceof LaunchSite) {
+          this.staticSet.push(launchSiteObjects[launchSiteName]);
         }
-        const launchSite = launchSites[launchSiteName];
-
-        this.staticSet.push({
-          isStatic: () => true,
-          type: SpaceObjectType.LAUNCH_FACILITY,
-          name: launchSite.name,
-          lat: launchSite.lat,
-          lon: launchSite.lon,
-          // alt: launchSite.alt,
-        });
       }
       this.launchSites = launchSites;
       this.isLaunchSiteManagerLoaded = true;

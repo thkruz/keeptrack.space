@@ -7,6 +7,7 @@ import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, Spac
 import { getEl } from '../lib/get-el';
 import { SensorMath } from '../static/sensor-math';
 import { StringExtractor } from '../static/string-extractor';
+import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
 
@@ -132,6 +133,12 @@ export class HoverManager {
 
       renderer.setCursor('pointer');
     }
+  }
+
+  private launchSite_(launchSite: LaunchSite) {
+    this.satHoverBoxNode1.textContent = launchSite.name ?? 'Unknown Launch Site';
+    this.satHoverBoxNode2.textContent = launchSite.site ?? 'Unknown Site';
+    this.satHoverBoxNode3.textContent = launchSite.country ?? 'Unknown Country';
   }
 
   private launchFacility_(landObj: LandObject) {
@@ -336,7 +343,9 @@ export class HoverManager {
   }
 
   private staticObj_(obj: DetailedSensor | LandObject | Star) {
-    if (obj.type === SpaceObjectType.LAUNCH_FACILITY) {
+    if (obj.type === SpaceObjectType.LAUNCH_SITE) {
+      this.launchSite_(obj as LandObject);
+    } else if (obj.type === SpaceObjectType.LAUNCH_FACILITY) {
       this.launchFacility_(obj as LandObject);
     } else if (obj.type === SpaceObjectType.CONTROL_FACILITY) {
       this.controlFacility_(obj as LandObject);

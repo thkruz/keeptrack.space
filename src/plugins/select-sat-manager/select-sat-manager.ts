@@ -320,7 +320,11 @@ export class SelectSatManager extends KeepTrackPlugin {
   private updateDotSizeAndColor_(i: number) {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const { gl } = keepTrackApi.getRenderer();
+    const { gl, isContextLost } = keepTrackApi.getRenderer();
+
+    if (isContextLost) {
+      return;
+    }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
     // If Old Select Sat Picked Color it Correct Color

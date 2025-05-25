@@ -27,7 +27,7 @@ export class WebGLRenderer {
   private satLabelModeLastTime_ = 0;
   private satMiniBox_: HTMLDivElement;
   private settings_: SettingsManager;
-  private isContextLost_ = false;
+  isContextLost = false;
 
   /** A canvas where the renderer draws its output. */
   domElement: HTMLCanvasElement;
@@ -90,7 +90,7 @@ export class WebGLRenderer {
   private isAltCanvasSize_ = false;
 
   render(scene: Scene, camera: Camera): void {
-    if (this.isContextLost_) {
+    if (this.isContextLost) {
       return;
     }
 
@@ -121,13 +121,13 @@ export class WebGLRenderer {
   private onContextLost_(e: WebGLContextEvent) {
     e.preventDefault(); // allows the context to be restored
     errorManagerInstance.info('WebGL Context Lost');
-    this.isContextLost_ = true;
+    this.isContextLost = true;
   }
 
   private onContextRestore_() {
     errorManagerInstance.info('WebGL Context Restored');
     this.resetGLState_();
-    this.isContextLost_ = false;
+    this.isContextLost = false;
   }
 
   // eslint-disable-next-line require-await

@@ -678,7 +678,6 @@ export class WebGLRenderer {
     return target;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   getPixelRatio(): number {
     return window.devicePixelRatio;
   }

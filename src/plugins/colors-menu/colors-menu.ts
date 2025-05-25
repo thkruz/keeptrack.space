@@ -72,7 +72,6 @@ export class ColorMenu extends KeepTrackPlugin {
     return html;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   rmbCallback: (targetId: string | null, clickedSat?: number) => void = (targetId: string | null) => {
     for (const colorScheme in keepTrackApi.getColorSchemeManager().colorSchemeInstances) {
       if (targetId === `colors-${colorScheme}-rmb`) {

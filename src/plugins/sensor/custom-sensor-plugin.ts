@@ -143,7 +143,6 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
   </ul>`;
 
-  // eslint-disable-next-line class-methods-use-this
   rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();

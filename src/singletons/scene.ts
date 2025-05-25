@@ -195,7 +195,6 @@ export class Scene {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   renderOpaque(renderer: WebGLRenderer, camera: Camera): void {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -220,7 +219,6 @@ export class Scene {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   renderTransparent(renderer: WebGLRenderer, camera: Camera): void {
     const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
 

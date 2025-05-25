@@ -267,7 +267,6 @@ export class KeepTrackApi {
    * example: keepTrackApi.glsl\`uniform float example\`
    * TODO: This should be a static method
    */
-  // eslint-disable-next-line class-methods-use-this
   glsl(literals: TemplateStringsArray, ...placeholders): string {
     let str = '';
 

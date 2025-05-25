@@ -110,7 +110,6 @@ export class MobileManager {
     return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu).test(navigator.userAgent);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   init() {
     MobileManager.checkMobileMode();
   }

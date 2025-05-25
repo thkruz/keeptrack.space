@@ -43,7 +43,6 @@ export class GroupsManager {
     this.stopUpdatingInViewSoon = false;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   selectGroupNoOverlay(): void {
     settingsManager.isGroupOverlayDisabled = true;
 

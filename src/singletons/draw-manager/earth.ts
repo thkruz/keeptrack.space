@@ -666,7 +666,7 @@ export class Earth {
       } // If 0 then no atmosphere
 
       // Political map
-      fragColor += textureLod(uPoliticalMap, vUv, -1.0);
+      fragColor += textureLod(uPoliticalMap, vUv, 1.0);
 
       // Gray scale the color
       if (uisGrayScale > 0.5) {

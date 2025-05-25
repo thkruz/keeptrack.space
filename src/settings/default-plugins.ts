@@ -81,6 +81,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 74,
   },
+  SatelliteFov: {
+    enabled: true,
+    order: 75,
+  },
   FindSatPlugin: {
     enabled: true,
     order: 80,
@@ -165,31 +169,12 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 310,
   },
-  satelliteFov: {
-    enabled: true,
-  },
-  SettingsMenuPlugin: {
-    enabled: true,
-    order: 590,
-  },
-  GraphicsMenuPlugin: {
-    enabled: true,
-    order: 591,
-  },
-  FilterMenuPlugin: {
-    enabled: true,
-    order: 592,
-  },
   DebrisScreening: {
     enabled: true,
     order: 280,
   },
   transponderChannelData: {
     enabled: true,
-  },
-  Calculator: {
-    enabled: true,
-    order: 400,
   },
   NextLaunchesPlugin: {
     enabled: true,
@@ -198,6 +183,18 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   LaunchCalendar: {
     enabled: true,
     order: 351,
+  },
+  Calculator: {
+    enabled: true,
+    order: 400,
+  },
+  InitialOrbitDeterminationPlugin: {
+    enabled: false,
+    order: 410,
+  },
+  AnalysisMenu: {
+    enabled: true,
+    order: 420,
   },
   Screenshot: {
     enabled: true,
@@ -211,21 +208,25 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 500,
   },
+  SatChangesPlugin: {
+    enabled: false, // Backend no longer supports this
+    order: 501, // TODO: Update when backend is ready
+  },
   VideoDirectorPlugin: {
     enabled: true,
     order: 510,
   },
-  satChanges: {
-    enabled: false,
-  },
-  initialOrbit: {
-    enabled: false,
-  },
-  orbitReferences: {
+  SettingsMenuPlugin: {
     enabled: true,
+    order: 590,
   },
-  analysis: {
+  GraphicsMenuPlugin: {
     enabled: true,
+    order: 591,
+  },
+  FilterMenuPlugin: {
+    enabled: true,
+    order: 592,
   },
   AboutMenuPlugin: {
     enabled: false,
@@ -245,6 +246,9 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
   },
   ClassificationBar: {
+    enabled: true,
+  },
+  OrbitReferences: {
     enabled: true,
   },
   SoundManager: {

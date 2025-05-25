@@ -110,7 +110,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new NextLaunchesPlugin().init(), config: plugins.NextLaunchesPlugin },
       { init: () => new FindSatPlugin().init(), config: plugins.FindSatPlugin },
       { init: () => new ProximityOps().init(), config: plugins.ProximityOps },
-      { init: () => new OrbitReferences().init(), config: plugins.orbitReferences },
+      { init: () => new OrbitReferences().init(), config: plugins.OrbitReferences },
       { init: () => new Collisions().init(), config: plugins.Collisions },
       { init: () => new TrackingImpactPredict().init(), config: plugins.TrackingImpactPredict },
       { init: () => new Breakup().init(), config: plugins.Breakup },
@@ -121,7 +121,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new NewLaunch().init(), config: plugins.NewLaunch },
       { init: () => new MissilePlugin().init(), config: plugins.MissilePlugin },
       { init: () => new SatelliteViewPlugin().init(), config: plugins.SatelliteViewPlugin },
-      { init: () => new SatelliteFov().init(), config: plugins.satelliteFov },
+      { init: () => new SatelliteFov().init(), config: plugins.SatelliteFov },
       { init: () => new StereoMap().init(), config: plugins.StereoMap },
       {
         init: () => (async () => {
@@ -147,13 +147,13 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new TimeMachine().init(), config: plugins.TimeMachine },
       { init: () => new SatellitePhotos().init(), config: plugins.SatellitePhotos },
       { init: () => new ScreenRecorder().init(), config: plugins.ScreenRecorder },
-      { init: () => new AnalysisMenu().init(), config: plugins.analysis },
+      { init: () => new AnalysisMenu().init(), config: plugins.AnalysisMenu },
       {
         init: () => (async () => {
           const proPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
 
           new proPlugin.InitialOrbitDeterminationPlugin().init();
-        })(), config: plugins.initialOrbit,
+        })(), config: plugins.InitialOrbitDeterminationPlugin,
       },
       { init: () => new Calculator().init(), config: plugins.Calculator },
       { init: () => new EciPlot().init(), config: plugins.EciPlot },

@@ -1207,8 +1207,8 @@ export class SettingsManager {
       if (this.plugins.SensorSurvFence) {
         this.plugins.SensorSurvFence.enabled = false;
       }
-      if (this.plugins.satelliteFov) {
-        this.plugins.satelliteFov.enabled = false;
+      if (this.plugins.SatelliteFov) {
+        this.plugins.SatelliteFov.enabled = false;
       }
       this.maxFieldOfViewMarkers = 1;
     }

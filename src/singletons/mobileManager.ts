@@ -36,7 +36,7 @@ export class MobileManager {
           Object.keys(settingsManager.plugins).forEach((key) => {
             settingsManager.plugins[key] = false;
           });
-          settingsManager.plugins.satInfoboxCore = cachePlugins.satInfoboxCore;
+          settingsManager.plugins.SatInfoBox = cachePlugins.SatInfoBox;
           settingsManager.plugins.TopMenu = cachePlugins.TopMenu;
           settingsManager.plugins.DateTimeManager = cachePlugins.DateTimeManager;
           settingsManager.plugins.SoundManager = cachePlugins.SoundManager;

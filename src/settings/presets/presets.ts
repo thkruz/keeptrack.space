@@ -25,7 +25,7 @@ export class SettingsPresets {
     settings.maxFieldOfViewMarkers = 1;
     settings.isEPFL = true;
     settings.disableAllPlugins();
-    settings.plugins.timeMachine = { enabled: true };
+    settings.plugins.TimeMachine = { enabled: true };
     settings.loopTimeMachine = true;
     settings.timeMachineDelay = <Milliseconds>6000;
     settings.timeMachineDelayAtPresentDay = <Milliseconds>(1000 * 60 * 4); // 4 Minutes
@@ -160,7 +160,7 @@ export class SettingsPresets {
     settings.maxZoomDistance = <Kilometers>2000000;
     settings.satShader.minSize = 8.0;
     settings.isDisableAsciiCatalog = true;
-    settings.plugins.videoDirector = { enabled: true };
+    settings.plugins.VideoDirectorPlugin = { enabled: true };
     settings.zFar = 1250000.0;
     settings.isDisableMoon = false;
 

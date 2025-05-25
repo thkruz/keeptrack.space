@@ -88,7 +88,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
           new proPlugin.DebugMenuPlugin().init();
         })(), config: plugins.DebugMenuPlugin,
       },
-      { init: () => new SatInfoBox().init(), config: plugins.satInfoboxCore },
+      { init: () => new SatInfoBox().init(), config: plugins.SatInfoBox },
       { init: () => new DateTimeManager().init(), config: plugins.DateTimeManager },
       { init: () => new SocialMedia().init(), config: plugins.SocialMedia },
       { init: () => new ClassificationBar().init(), config: plugins.ClassificationBar },
@@ -107,14 +107,14 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new WatchlistOverlay().init(), config: plugins.WatchlistOverlay },
       { init: () => new ReportsPlugin().init(), config: plugins.ReportsPlugin },
       { init: () => new PolarPlotPlugin().init(), config: plugins.PolarPlotPlugin },
-      { init: () => new NextLaunchesPlugin().init(), config: plugins.nextLaunch },
+      { init: () => new NextLaunchesPlugin().init(), config: plugins.NextLaunchesPlugin },
       { init: () => new FindSatPlugin().init(), config: plugins.FindSatPlugin },
       { init: () => new ProximityOps().init(), config: plugins.ProximityOps },
       { init: () => new OrbitReferences().init(), config: plugins.orbitReferences },
       { init: () => new Collisions().init(), config: plugins.Collisions },
       { init: () => new TrackingImpactPredict().init(), config: plugins.TrackingImpactPredict },
       { init: () => new Breakup().init(), config: plugins.Breakup },
-      { init: () => new DebrisScreening().init(), config: plugins.debrisScreening },
+      { init: () => new DebrisScreening().init(), config: plugins.DebrisScreening },
       { init: () => new TransponderChannelData().init(), config: plugins.transponderChannelData },
       { init: () => new CreateSat().init(), config: plugins.CreateSat },
       { init: () => new EditSat().init(), config: plugins.EditSat },
@@ -137,16 +137,16 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
           new proPlugin.Astronomy().init();
         })(), config: plugins.Astronomy,
       },
-      { init: () => new NightToggle().init(), config: plugins.nightToggle },
+      { init: () => new NightToggle().init(), config: plugins.NightToggle },
       { init: () => new DopsPlugin().init(), config: plugins.DopsPlugin },
       { init: () => new SatConstellations().init(), config: plugins.SatConstellations },
       { init: () => new CountriesMenu().init(), config: plugins.CountriesMenu },
       { init: () => new ColorMenu().init(), config: plugins.ColorMenu },
-      { init: () => new Screenshot().init(), config: plugins.screenshot },
-      { init: () => new LaunchCalendar().init(), config: plugins.launchCalendar },
-      { init: () => new TimeMachine().init(), config: plugins.timeMachine },
-      { init: () => new SatellitePhotos().init(), config: plugins.photoManager },
-      { init: () => new ScreenRecorder().init(), config: plugins.screenRecorder },
+      { init: () => new Screenshot().init(), config: plugins.Screenshot },
+      { init: () => new LaunchCalendar().init(), config: plugins.LaunchCalendar },
+      { init: () => new TimeMachine().init(), config: plugins.TimeMachine },
+      { init: () => new SatellitePhotos().init(), config: plugins.SatellitePhotos },
+      { init: () => new ScreenRecorder().init(), config: plugins.ScreenRecorder },
       { init: () => new AnalysisMenu().init(), config: plugins.analysis },
       {
         init: () => (async () => {
@@ -155,7 +155,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
           new proPlugin.InitialOrbitDeterminationPlugin().init();
         })(), config: plugins.initialOrbit,
       },
-      { init: () => new Calculator().init(), config: plugins.calculator },
+      { init: () => new Calculator().init(), config: plugins.Calculator },
       { init: () => new EciPlot().init(), config: plugins.EciPlot },
       { init: () => new EcfPlot().init(), config: plugins.EcfPlot },
       { init: () => new RicPlot().init(), config: plugins.RicPlot },
@@ -173,7 +173,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
         })(), config: plugins.GraphicsMenuPlugin,
       },
       { init: () => new GamepadPlugin().init(), config: plugins.GamepadPlugin },
-      { init: () => new VideoDirectorPlugin().init(), config: plugins.videoDirector },
+      { init: () => new VideoDirectorPlugin().init(), config: plugins.VideoDirectorPlugin },
       {
         init: () => (async () => {
           const proPlugin = await import('../plugins-pro/about-menu/about-menu');

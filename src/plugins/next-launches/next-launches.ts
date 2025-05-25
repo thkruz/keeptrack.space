@@ -82,7 +82,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     minWidth: 450,
   };
 
-  menuMode: MenuMode[] = [MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   sideMenuElementName: string = 'nextLaunch-menu';
   sideMenuElementHtml: string = keepTrackApi.html`

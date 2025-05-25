@@ -97,9 +97,6 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 91,
   },
-  satInfoboxCore: {
-    enabled: true,
-  },
   StereoMap: {
     enabled: true,
     order: 150,
@@ -128,12 +125,13 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 232,
   },
-  AboutMenuPlugin: {
-    enabled: false,
-    order: 301,
-  },
-  DopsPlugin: {
+  SatellitePhotos: {
     enabled: true,
+    order: 240,
+  },
+  TimeMachine: {
+    enabled: true,
+    order: 250,
   },
   EciPlot: {
     enabled: true,
@@ -163,10 +161,11 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 266,
   },
-  satelliteFov: {
+  NightToggle: {
     enabled: true,
+    order: 310,
   },
-  screenshot: {
+  satelliteFov: {
     enabled: true,
   },
   SettingsMenuPlugin: {
@@ -181,38 +180,43 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 592,
   },
-  debrisScreening: {
+  DebrisScreening: {
     enabled: true,
-  },
-  videoDirector: {
-    enabled: true,
+    order: 280,
   },
   transponderChannelData: {
     enabled: true,
   },
-  calculator: {
+  Calculator: {
     enabled: true,
+    order: 400,
   },
-  launchCalendar: {
+  NextLaunchesPlugin: {
     enabled: true,
+    order: 350,
   },
-  nextLaunch: {
+  LaunchCalendar: {
     enabled: true,
+    order: 351,
   },
-  nightToggle: {
+  Screenshot: {
     enabled: true,
+    order: 450,
   },
-  photoManager: {
+  ScreenRecorder: {
     enabled: true,
+    order: 451,
   },
-  screenRecorder: {
+  DopsPlugin: {
     enabled: true,
+    order: 500,
+  },
+  VideoDirectorPlugin: {
+    enabled: true,
+    order: 510,
   },
   satChanges: {
     enabled: false,
-  },
-  timeMachine: {
-    enabled: true,
   },
   initialOrbit: {
     enabled: false,
@@ -223,7 +227,14 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   analysis: {
     enabled: true,
   },
+  AboutMenuPlugin: {
+    enabled: false,
+    order: 601,
+  },
   // Non-Menu plugins
+  SatInfoBox: {
+    enabled: true,
+  },
   TopMenu: {
     enabled: true,
   },

@@ -270,7 +270,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
           hideEl(getEl('settings-confidence-levels')!.parentElement!.parentElement!);
         }
 
-        if (!settingsManager.plugins.timeMachine) {
+        if (!settingsManager.plugins.TimeMachine) {
           hideEl(getEl('settings-time-machine-toasts')!.parentElement!.parentElement!);
         }
 

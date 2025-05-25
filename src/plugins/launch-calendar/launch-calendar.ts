@@ -35,7 +35,7 @@ export class LaunchCalendar extends KeepTrackPlugin {
   bottomIconImg = calendarPng;
   isForceHideSideMenus = true;
 
-  menuMode: MenuMode[] = [MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconCallback = () => {
     if (this.isMenuButtonActive) {
@@ -54,7 +54,7 @@ export class LaunchCalendar extends KeepTrackPlugin {
   private closeColorbox_() {
     if (this.isMenuButtonActive) {
       this.isMenuButtonActive = false;
-      getEl(this.bottomIconElementName).classList.remove('bmenu-item-selected');
+      getEl(this.bottomIconElementName)!.classList.remove('bmenu-item-selected');
     }
   }
 }

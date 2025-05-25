@@ -13,7 +13,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   const RESTART_ROTATE_TIME = 10; // Restart auto rotate after this many seconds
 
   settingsManager.disableAllPlugins();
-  settingsManager.plugins.timeMachine = { enabled: true };
+  settingsManager.plugins.TimeMachine = { enabled: true };
   settingsManager.plugins.TopMenu = { enabled: false };
 
   settingsManager.isDisableAsciiCatalog = true;

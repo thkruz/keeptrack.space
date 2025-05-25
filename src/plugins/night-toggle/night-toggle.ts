@@ -1,5 +1,6 @@
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 
+import { MenuMode } from '@app/interfaces';
 import dayNightPng from '@public/img/icons/day-night.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
@@ -8,6 +9,8 @@ export class NightToggle extends KeepTrackPlugin {
   readonly id = 'NightToggle';
   dependencies_ = [];
   bottomIconImg = dayNightPng;
+
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   addJs() {
     super.addJs();

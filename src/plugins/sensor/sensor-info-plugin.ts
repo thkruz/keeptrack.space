@@ -19,7 +19,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     this.checkIfLinesVisible_(keepTrackApi.getLineManager());
   };
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconLabel = 'Sensor Info';
   bottomIconImg = sensorInfoPng;

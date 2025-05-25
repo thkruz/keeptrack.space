@@ -123,7 +123,7 @@ export class ColorSchemeManager {
         keepTrackApi.getColorSchemeManager().calculateColorBuffers();
       },
       validationFunc: (m: PositionCruncherOutgoingMsg) => (!!((m.satInView?.length && m.satInView?.length > 0))),
-      isSkipFirst: true,
+      skipNumber: 2,
       isRunCbOnFailure: true,
       maxRetries: 5,
     });

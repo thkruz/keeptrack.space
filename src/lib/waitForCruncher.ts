@@ -16,10 +16,10 @@ interface WaitForCruncherParams {
   error?: () => void;
   /** The current retry count. */
   retryCount?: number;
-  /** Shoudld we skip the first message? This is useful if we want to wait for the cruncher to sync with the main thread.*/
-  isSkipFirst?: boolean;
-  /** Is this the first message? */
-  isFirst?: boolean;
+  /** How many messages shhould we skip? This is useful if we want to wait for the cruncher to sync with the main thread.*/
+  skipNumber?: number;
+  /** How many times has the message passed our test */
+  passCount?: number;
   /** Run the cb on failure? */
   isRunCbOnFailure?: boolean;
   /** How many times to retry. */
@@ -37,8 +37,8 @@ export const waitForCruncher = (params: WaitForCruncherParams): void => {
     validationFunc,
     error = DEFAULT_ERROR,
     retryCount = 0,
-    isSkipFirst = false,
-    isFirst = true,
+    skipNumber = 0,
+    passCount = 0,
     isRunCbOnFailure = false,
     maxRetries = 5,
   } = params;
@@ -49,8 +49,8 @@ export const waitForCruncher = (params: WaitForCruncherParams): void => {
       // Is this the message we are waiting for?
       if (validationFunc(m.data)) {
         // If this is the first message and we are skipping it, wait for the next valid message.
-        if (isFirst && isSkipFirst) {
-          waitForCruncher({ ...params, isFirst: false });
+        if (passCount < skipNumber) {
+          waitForCruncher({ ...params, passCount: passCount + 1 });
 
           return;
         }

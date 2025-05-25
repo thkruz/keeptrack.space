@@ -317,7 +317,7 @@ export class NewLaunch extends KeepTrackPlugin {
         hideLoading();
         uiManagerInstance.toast('Cruncher failed to meet requirement after multiple tries! Is this launch even possible?', ToastMsgType.critical);
       },
-      isSkipFirst: true,
+      skipNumber: 2,
       maxRetries: 50,
     });
   };

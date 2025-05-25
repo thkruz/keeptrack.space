@@ -465,7 +465,7 @@ export class SensorManager {
 
         return false;
       },
-      isSkipFirst: true,
+      skipNumber: 2,
       isRunCbOnFailure: true,
       maxRetries: 5,
     });

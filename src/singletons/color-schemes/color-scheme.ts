@@ -185,7 +185,7 @@ export abstract class ColorScheme {
       case SpaceObjectType.LAUNCH_POSITION:
       case SpaceObjectType.LAUNCH_FACILITY:
         // If the facility flag is off then we don't want to show this
-        if (!settingsManager.isShowLaunchSites || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+        if (settingsManager.isDisableLaunchSites || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
           return {
             color: this.colorTheme.deselected,
             pickable: Pickable.No,

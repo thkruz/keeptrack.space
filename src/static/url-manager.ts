@@ -126,6 +126,14 @@ export abstract class UrlManager {
           this.handleSunParam_(kv[key]);
           isUsingParsedVariables = true;
           break;
+        case 'sensors':
+          settingsManager.isDisableSensors = kv[key].toLowerCase() === 'false';
+          isUsingParsedVariables = true;
+          break;
+        case 'launchSites':
+          settingsManager.isDisableLaunchSites = kv[key].toLowerCase() === 'false';
+          isUsingParsedVariables = true;
+          break;
         case 'ecf':
           {
             const ecfValue = parseInt(kv[key], 10);
@@ -271,6 +279,15 @@ export abstract class UrlManager {
 
     if (isMaxData || timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
       paramSlices.push(`date=${(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset).toString()}`);
+    }
+
+    if (isMaxData) {
+      if (settingsManager.isDisableSensors) {
+        paramSlices.push('sensors=false');
+      }
+      if (settingsManager.isDisableLaunchSites) {
+        paramSlices.push('launchSites=false');
+      }
     }
 
     if (paramSlices.length > 0) {

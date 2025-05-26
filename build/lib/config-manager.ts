@@ -5,6 +5,8 @@ import { existsSync } from 'fs';
 import { BuildError, ConsoleStyles, ErrorCodes, logWithStyle } from './build-error';
 
 export interface BuildConfig {
+  primaryLogoPath: string;
+  secondaryLogoPath: string;
   mode: 'none' | 'development' | 'production';
   isWatch: boolean;
   settingsPath: string;
@@ -31,6 +33,8 @@ export class ConfigManager {
       textLogoPath: 'public/img/logo.png',
       styleCssPath: 'public/css/style.css',
       loadingScreenCssPath: 'public/css/loading-screen.css',
+      primaryLogoPath: 'public/img/logo-primary.png',
+      secondaryLogoPath: 'public/img/logo-secondary.png',
       isPro: false,
     };
   }
@@ -111,6 +115,8 @@ export class ConfigManager {
     this.config.textLogoPath = process.env.TEXT_LOGO_PATH ?? envVars.TEXT_LOGO_PATH ?? this.config.textLogoPath;
     this.config.styleCssPath = process.env.STYLE_CSS_PATH ?? envVars.STYLE_CSS_PATH ?? this.config.styleCssPath;
     this.config.loadingScreenCssPath = process.env.LOADING_SCREEN_CSS_PATH ?? envVars.LOADING_SCREEN_CSS_PATH ?? this.config.loadingScreenCssPath;
+    this.config.primaryLogoPath = process.env.PRIMARY_LOGO_PATH ?? envVars.PRIMARY_LOGO_PATH ?? this.config.primaryLogoPath;
+    this.config.secondaryLogoPath = process.env.SECONDARY_LOGO_PATH ?? envVars.SECONDARY_LOGO_PATH ?? this.config.secondaryLogoPath;
 
     // Parse isPro as boolean
     const isPro = process.env.IS_PRO ?? envVars.IS_PRO;
@@ -130,6 +136,8 @@ export class ConfigManager {
     logWithStyle(`Text logo path: ${this.config.textLogoPath}`, ConsoleStyles.DEBUG);
     logWithStyle(`Style CSS path: ${this.config.styleCssPath}`, ConsoleStyles.DEBUG);
     logWithStyle(`Loading screen CSS path: ${this.config.loadingScreenCssPath}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Primary logo path: ${this.config.primaryLogoPath}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Secondary logo path: ${this.config.secondaryLogoPath}`, ConsoleStyles.DEBUG);
     logWithStyle(`Pro features: ${this.config.isPro ? 'Enabled' : 'Disabled'}`, this.config.isPro ? ConsoleStyles.SUCCESS : ConsoleStyles.INFO);
   }
 }

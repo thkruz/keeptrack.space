@@ -25,8 +25,6 @@
 
 /* eslint-disable no-unreachable */
 
-import logoPrimaryPng from '@public/img/logo-primary.png';
-import logoSecondaryPng from '@public/img/logo-secondary.png';
 import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
 import earthJpg from '@public/img/wallpaper/Earth.jpg';
@@ -241,12 +239,12 @@ export class KeepTrack {
         <div id="canvas-holder">
         <div id="logo-primary" class="start-hidden">
             <a href="https://keeptrack.space" target="_blank">
-              <img src="${logoPrimaryPng}" alt="KeepTrack">
+              <img src="${settingsManager.installDirectory}img/logo-primary.png" alt="KeepTrack">
             </a>
           </div>
           <div id="logo-secondary" class="start-hidden">
             <a href="https://celestrak.org" target="_blank">
-              <img src="${logoSecondaryPng}" alt="Celestrak">
+              <img src="${settingsManager.installDirectory}img/logo-secondary.png" alt="Celestrak">
             </a>
           </div>
           <canvas id="keeptrack-canvas"></canvas>

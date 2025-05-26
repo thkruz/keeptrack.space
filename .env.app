@@ -6,4 +6,6 @@ FAVICON_PATH=public/img/favicons/favicon.ico
 LOADING_SCREEN_CSS_PATH=public/css/loading-screen.css
 STYLE_CSS_PATH=public/css/style.css
 TEXT_LOGO_PATH=public/img/logo.png
+PRIMARY_LOGO_PATH=public/img/logo-primary.png
+SECONDARY_LOGO_PATH=public/img/logo-secondary.png
 IS_PRO=true

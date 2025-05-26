@@ -44,6 +44,13 @@ class BuildManager {
       if (config.textLogoPath) {
         fileManager.copyFile(config.textLogoPath, './dist/img/logo.png', { force: true });
       }
+      if (config.primaryLogoPath) {
+        fileManager.copyFile(config.primaryLogoPath, './dist/img/logo-primary.png', { force: true });
+      }
+
+      if (config.secondaryLogoPath) {
+        fileManager.copyFile(config.secondaryLogoPath, './dist/img/logo-secondary.png', { force: true });
+      }
 
       if (config.styleCssPath) {
         // Verify the file exists

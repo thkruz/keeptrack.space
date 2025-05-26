@@ -256,7 +256,7 @@ export class CreateSat extends KeepTrackPlugin {
     // Set date-related values
     const date = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
     const year = date.getFullYear().toString().slice(2, 4);
-    const currentJday = this.getUTCDayOfYear_(date);
+    const currentJday = keepTrackApi.getTimeManager().getUTCDayOfYear(date);
     const currentTime = (date.getUTCHours() * 3600 + date.getUTCMinutes() * 60 + date.getUTCSeconds()) / 86400;
     const day = (currentJday + currentTime).toFixed(8).padStart(12, '0');
 
@@ -453,39 +453,5 @@ export class CreateSat extends KeepTrackPlugin {
       errorManagerInstance.error(error as Error, 'create-sat.ts', 'Failed to export TLE');
       keepTrackApi.getUiManager().toast('Failed to export TLE', ToastMsgType.error, true);
     }
-  }
-
-  /**
-   * Check if a year is a leap year
-   */
-  private isLeapYear_(date: Date): boolean {
-    const year = date.getUTCFullYear();
-
-    if ((year & 3) !== 0) {
-      return false;
-    }
-
-    return year % 100 !== 0 || year % 400 === 0;
-  }
-
-  /**
-   * Get the day of year (1-366)
-   */
-  private getUTCDayOfYear_(date: Date): number {
-    const month = date.getUTCMonth();
-    const day = date.getUTCDate();
-    const dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-    let dayOfYear = dayCount[month] + day;
-
-    // Adjust for leap year
-    if (month > 1 && this.isLeapYear_(date)) {
-      dayOfYear++;
-    }
-
-    // Ensure value is between 1-366
-    const maxDays = this.isLeapYear_(date) ? 366 : 365;
-
-
-    return Math.min(dayOfYear, maxDays);
   }
 }

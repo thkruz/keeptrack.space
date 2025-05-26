@@ -394,11 +394,6 @@ export class TimeManager {
 
       // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
       this.dateDOM.textContent = this.timeTextStr;
-
-      // Load the current JDAY
-      const jday = getDayOfYear(this.simulationTimeObj);
-
-      getEl('jday').innerHTML = jday.toString();
     }
 
     // Passing datetimeInput eliminates needing jQuery in main module
@@ -439,5 +434,49 @@ export class TimeManager {
     if (orbitManagerInstance.orbitWorker) {
       orbitManagerInstance.orbitWorker.postMessage(message);
     }
+  }
+
+  private isLeapYear(date: Date): boolean {
+    const year = date.getUTCFullYear();
+
+    if ((year & 3) !== 0) {
+      return false;
+    }
+
+    return year % 100 !== 0 || year % 400 === 0;
+  }
+
+  getUTCDayOfYear(doy: Date) {
+    const mn = doy.getUTCMonth();
+    const dn = doy.getUTCDate();
+    const dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    let dayInYear = 365;
+    let dayOfYear = dayCount[mn] + dn;
+
+    if (mn > 1 && this.isLeapYear(doy)) {
+      dayOfYear++;
+      dayInYear++;
+    }
+
+    return dayOfYear % dayInYear;
+  }
+
+  getUTCDateFromDayOfYear(year: number, dayOfYear: number): Date {
+    const isLeapYear = this.isLeapYear(this.createUTCDate(year, 0, 1));
+    const daysInMonth = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let month = 0;
+
+    while (dayOfYear > daysInMonth[month]) {
+      dayOfYear -= daysInMonth[month];
+      month++;
+    }
+
+    return this.createUTCDate(year, month, dayOfYear);
+  }
+
+  private createUTCDate(year: number, month?: number, day?: number, hours?: number, minutes?: number, seconds?: number): Date {
+    const date = new Date(Date.UTC(year, month ?? 0, day ?? 1, hours ?? 0, minutes ?? 0, seconds ?? 0));
+
+    return date;
   }
 }

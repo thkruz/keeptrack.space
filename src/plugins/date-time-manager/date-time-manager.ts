@@ -2,7 +2,6 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { isThisNode } from '@app/static/isThisNode';
-import { getDayOfYear } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
@@ -21,15 +20,6 @@ export class DateTimeManager extends KeepTrackPlugin {
     keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.updateDateTime, this.updateDateTime.bind(this));
-
-    keepTrackApi.on(
-      KeepTrackApiEvents.updateSelectBox,
-      () => {
-        const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
-
-        getEl('jday')!.innerHTML = jday.toString();
-      },
-    );
   }
 
   updateDateTime(date: Date) {
@@ -37,6 +27,19 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     if (dateTimeInputTb && !isThisNode()) {
       dateTimeInputTb.value = date.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
+    }
+
+    //  Jday isn't initalized right away, so we need to check if it exists
+    if (!getEl('jday')) {
+      return;
+    }
+
+    if (settingsManager.isUseJdayOnTopMenu) {
+      const jday = keepTrackApi.getTimeManager().getUTCDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
+
+      getEl('jday')!.innerHTML = jday.toString();
+    } else {
+      getEl('jday')!.innerHTML = keepTrackApi.getTimeManager().simulationTimeObj.toLocaleDateString();
     }
   }
 

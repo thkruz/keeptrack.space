@@ -79,6 +79,8 @@ export class SettingsManager {
   isEarthGrayScale = false;
   isEarthAmbientLighting = true;
   isBlockPersistence = false;
+  /** Center on a satellite when it is selected. */
+  isFocusOnSatelliteWhenSelected = true;
 
 
   static preserveSettings() {

@@ -66,10 +66,17 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
             <h5 class="center-align">General Settings</h5>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable this to hide the camera widget">
-                <input id="settings-drawCameraWidget" type="checkbox" checked/>
+              <label data-position="top" data-delay="50" data-tooltip="Show more information when hovering over a satellite.">
+                <input id="settings-enableHoverOverlay" type="checkbox" checked/>
                 <span class="lever"></span>
-                Show Camera Widget
+                Show Info On Hover
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Zoom in on the satellite when selected.">
+                <input id="settings-focusOnSatelliteWhenSelected" type="checkbox" checked/>
+                <span class="lever"></span>
+                Focus on Satellite When Selected
               </label>
             </div>
             <div class="switch row">
@@ -130,6 +137,13 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
                 <input id="settings-hos" type="checkbox" />
                 <span class="lever"></span>
                 Hide Other Satellites
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Disable this to hide the camera widget">
+                <input id="settings-drawCameraWidget" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Camera Widget
               </label>
             </div>
             <div class="switch row">
@@ -387,6 +401,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       { id: 'settings-drawEcf', setting: 'isOrbitCruncherInEcf' },
       { id: 'settings-numberOfEcfOrbitsToDraw', setting: 'numberOfEcfOrbitsToDraw' },
       { id: 'settings-isDrawInCoverageLines', setting: 'isDrawInCoverageLines' },
+      { id: 'settings-enableHoverOverlay', setting: 'enableHoverOverlay' },
+      { id: 'settings-focusOnSatelliteWhenSelected', setting: 'isFocusOnSatelliteWhenSelected' },
       { id: 'settings-isDrawCovarianceEllipsoid', setting: 'isDrawCovarianceEllipsoid' },
       { id: 'settings-eciOnHover', setting: 'isEciOnHover' },
       { id: 'settings-hos', setting: 'colors.transparent[3] === 0' },
@@ -449,6 +465,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-drawEcf':
       case 'settings-numberOfEcfOrbitsToDraw':
       case 'settings-isDrawInCoverageLines':
+      case 'settings-enableHoverOverlay':
+      case 'settings-focusOnSatelliteWhenSelected':
       case 'settings-isDrawCovarianceEllipsoid':
       case 'settings-drawSun':
       case 'settings-drawBlackEarth':
@@ -497,6 +515,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDrawTrailingOrbits = false;
     settingsManager.isOrbitCruncherInEcf = false;
     settingsManager.isDrawInCoverageLines = true;
+    settingsManager.enableHoverOverlay = true;
+    settingsManager.isFocusOnSatelliteWhenSelected = true;
     settingsManager.isEciOnHover = false;
     settingsManager.isDemoModeOn = false;
     settingsManager.isSatLabelModeOn = true;
@@ -530,6 +550,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
     settingsManager.numberOfEcfOrbitsToDraw = numberOfEcfOrbitsToDraw;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
+    settingsManager.enableHoverOverlay = (<HTMLInputElement>getEl('settings-enableHoverOverlay')).checked;
+    settingsManager.isFocusOnSatelliteWhenSelected = (<HTMLInputElement>getEl('settings-focusOnSatelliteWhenSelected')).checked;
     settingsManager.isDrawCovarianceEllipsoid = (<HTMLInputElement>getEl('settings-isDrawCovarianceEllipsoid')).checked;
     settingsManager.drawCameraWidget = (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked;
     const ccWidgetCanvas = getEl('camera-control-widget');

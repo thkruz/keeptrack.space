@@ -257,15 +257,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
-      keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
-    }
-
-    // If we deselect an object but had previously selected one then disable/hide stuff
-    keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
-    keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
-    keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
+    this.switchToSatCenteredCamera_();
 
     if (sat instanceof DetailedSatellite) {
       keepTrackApi.analytics.track('select_satellite', {
@@ -276,6 +268,22 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
 
     this.setSelectedSat_(sat.id);
+  }
+
+  private switchToSatCenteredCamera_() {
+    if (!settingsManager.isFocusOnSatelliteWhenSelected) {
+      return;
+    }
+
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
+      keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
+      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
+    }
+
+    // If we deselect an object but had previously selected one then disable/hide stuff
+    keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
+    keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
+    keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
   }
 
   private static selectOwnerManufacturer_(obj: LandObject) {

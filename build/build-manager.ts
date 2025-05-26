@@ -84,7 +84,7 @@ class BuildManager {
       versionManager.generateVersionFile('./package.json', 'src/settings/version.js');
 
       // Generate webpack configuration
-      const webpackConfig = WebpackManager.createConfig(config.mode) as MultiRspackOptions;
+      const webpackConfig = WebpackManager.createConfig(config) as MultiRspackOptions;
 
       // Create compiler
       const compiler = rspack(webpackConfig);

@@ -3695,8 +3695,6 @@ a.ui-button:active,
 [data-tooltip]:before,
 [data-tooltip]:after {
   visibility: hidden;
-  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=0)';
-  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=0);
   opacity: 0;
   pointer-events: none;
 }
@@ -3746,8 +3744,6 @@ a.ui-button:active,
 [data-tooltip]:hover:before,
 [data-tooltip]:hover:after {
   visibility: visible;
-  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';
-  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
 

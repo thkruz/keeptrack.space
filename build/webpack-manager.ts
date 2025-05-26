@@ -1,19 +1,22 @@
 import { Configuration, CopyRspackPlugin, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
-import dotenv from 'dotenv';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import WebpackBar from 'webpackbar/rspack';
+import { BuildConfig } from './lib/config-manager';
 
 export class WebpackManager {
   static readonly DEFAULT_MODE = 'development';
   static readonly DEFAULT_WATCH = false;
+  private static config: BuildConfig;
 
-  static createConfig(mode: 'development' | 'production' | 'none' = 'development', isWatch: boolean = false): Configuration[] {
+  static createConfig(config: BuildConfig, isWatch: boolean = false): Configuration[] {
+    this.config = config;
     const fileName = fileURLToPath(import.meta.url);
     const dirName = dirname(fileName);
     const webpackConfig = [] as Configuration[];
     let baseConfig = this.createBaseConfig_(dirName);
+    const mode: 'development' | 'production' | 'none' = config.mode ?? 'development';
 
     switch (mode) {
       case 'development':
@@ -85,29 +88,8 @@ export class WebpackManager {
    * Returns the base configuration for webpack.
    */
   private static createBaseConfig_(dirName: string): Configuration {
-    // Load .env to get STYLE_CSS_PATH
-    let styleCssPath: string;
-    let loadingScreenCssPath: string;
-
-    try {
-      // Dynamically import dotenv only if running in Node.js
-      const env = dotenv.config({ path: './.env' });
-
-      styleCssPath = env.parsed && env.parsed.STYLE_CSS_PATH
-        ? env.parsed.STYLE_CSS_PATH
-        : 'public/css/style.css';
-
-      loadingScreenCssPath = env.parsed && env.parsed.LOADING_SCREEN_CSS_PATH
-        ? env.parsed.LOADING_SCREEN_CSS_PATH
-        : 'public/css/loading-screen.css';
-
-    } catch {
-      styleCssPath = 'public/css/style.css';
-      loadingScreenCssPath = 'public/css/loading-screen.css';
-    }
-
-    console.log(`styleCssPath: ${styleCssPath}`);
-    console.log(`loadingScreenCssPath: ${loadingScreenCssPath}`);
+    console.log(`styleCssPath: ${this.config.styleCssPath}`);
+    console.log(`loadingScreenCssPath: ${this.config.loadingScreenCssPath}`);
 
     return {
       resolve: {
@@ -115,8 +97,8 @@ export class WebpackManager {
         alias: {
           '@app': `${dirName}/../src`,
           '@public': `${dirName}/../public`,
-          '@css/style.css': `${dirName}/../${styleCssPath}`,
-          '@css/loading-screen.css': `${dirName}/../${loadingScreenCssPath}`,
+          '@css/style.css': `${dirName}/../${this.config.styleCssPath}`,
+          '@css/loading-screen.css': `${dirName}/../${this.config.loadingScreenCssPath}`,
           '@css': `${dirName}/../public/css`,
         },
       },

@@ -22,7 +22,6 @@
   background: -moz-linear-gradient(45deg, var(--color-dark-background), var(--color-dark-background));
   background: -webkit-linear-gradient(45deg, var(--color-dark-background), var(--color-dark-background));
   background: linear-gradient(45deg, var(--color-dark-background), var(--color-dark-background));
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='var(--color-dark-background)', endColorstr='#4096ee', GradientType=1);
 }
 
 .ui-icon-minus {
@@ -93,7 +92,6 @@
   background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
   background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
   background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='var(--color-dark-background)', endColorstr='#4096ee', GradientType=1);
   -moz-background-clip: padding;
   /* Firefox 3.6 */
   -webkit-background-clip: padding;

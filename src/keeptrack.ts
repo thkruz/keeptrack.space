@@ -124,8 +124,6 @@ export class KeepTrack {
       KeepTrack.getDefaultBodyHtml();
       BottomMenu.init();
 
-      keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, () => BottomMenu.addBottomMenuFilterButtons());
-
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
         KeepTrack.loadSplashScreen_();
       }

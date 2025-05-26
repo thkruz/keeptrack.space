@@ -293,7 +293,7 @@ const settingsOverride = {
     },
   },
   dataSources: {
-    tle: 'https://api.keeptrack.space/v2/sats/celestrak',
+    tle: 'https://api.keeptrack.space/v3/sats',
     externalTLEsOnly: false,
     tleDebris: 'https://app.keeptrack.space/tle/TLEdebris.json',
     vimpel: 'https://r2.keeptrack.space/vimpel.json',
@@ -309,14 +309,19 @@ const settingsOverride = {
   isAllowRightClick: false,
   isShowLoadingHints: false,
   isBlockPersistence: true,
+  isDisableBottomMenu: true,
   isDrawSun: false,
+  isDrawMilkyWay: false,
+  isDisableGodrays: true,
+  godraysSamples: -1,
   isDisableMoon: true,
-  earthDayTextureQuality: '1k',
-  earthNightTextureQuality: '1k',
+  earthDayTextureQuality: '512',
+  earthNightTextureQuality: 'off',
   earthSpecTextureQuality: '512',
+  isDrawBumpMap: false,
   earthBumpTextureQuality: '512',
-  earthCloudTextureQuality: '1k',
-  earthPoliticalTextureQuality: '1k',
+  earthCloudTextureQuality: '512',
+  earthPoliticalTextureQuality: '512',
   earthTextureStyle: 'earthmap', // 'earthmap' or 'flat'
   satShader: {
     /**

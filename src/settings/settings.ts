@@ -84,6 +84,11 @@ export class SettingsManager {
   isUseJdayOnTopMenu = false;
   /** Flag to determine if loading hints are shown on splash screen*/
   isShowLoadingHints = true;
+  /**
+   * Flag to determine if the bottom menu is disabled. Do not enable this unless you have disabled
+   * plugins that use the bottom menu.
+   */
+  isDisableBottomMenu = false;
 
 
   static preserveSettings() {
@@ -1197,7 +1202,7 @@ export class SettingsManager {
     if (!this.disableUI) {
       parseGetVariables(params, this);
     }
-    settingsManager.isBlockPersistence = UrlManager.parseGetVariables(this) ?? settingsManager.isBlockPersistence;
+    settingsManager.isBlockPersistence = UrlManager.parseGetVariables(this) || settingsManager.isBlockPersistence;
 
     if (!settingsManager.isBlockPersistence) {
       /**

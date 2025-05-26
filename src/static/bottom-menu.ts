@@ -1,6 +1,6 @@
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
@@ -18,57 +18,78 @@ export class BottomMenu {
   static readonly allMenuId = 'menu-filter-all';
 
   static init() {
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, BottomMenu.createBottomMenu);
+    if (!settingsManager.isDisableBottomMenu) {
+      keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, BottomMenu.createBottomMenu);
+      keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, BottomMenu.addBottomMenuFilterButtons);
+    }
+    BottomMenu.updateBottomMenuVisibility_();
+
   }
   static createBottomMenu(): void {
     const bottomMenuNode = document.createElement('div');
 
     bottomMenuNode.id = 'nav-footer';
     bottomMenuNode.innerHTML = keepTrackApi.html`
-          <div id="bottom-icons-container">
-            <div id="bottom-icons-filter">
-              <div id="${BottomMenu.basicMenuId}" class="bmenu-filter-item bmenu-item-selected">
-                <div class="bmenu-filter-item-inner">
-                  <img alt="Basic Menu" src="" delayedsrc="${localCafePng}" />
-                </div>
-                <span class="bmenu-filter-title">Basic Menu</span>
-              </div>
-              <div id="${BottomMenu.advancedMenuId}" class="bmenu-filter-item">
-                <div class="bmenu-filter-item-inner">
-                  <img alt="Advanced Menu" src="" delayedsrc="${developerModePng}" />
-                </div>
-                <span class="bmenu-filter-title">Advanced Menu</span>
-              </div>
-              <div id="${BottomMenu.analysisMenuId}" class="bmenu-filter-item">
-                <div class="bmenu-filter-item-inner">
-                  <img alt="Analysis Menu" src="" delayedsrc="${barChart4BarsPng}" />
-                </div>
-                <span class="bmenu-filter-title">Analysis Menu</span>
-              </div>
-              <div id="${BottomMenu.settingsMenuId}" class="bmenu-filter-item">
-                <div class="bmenu-filter-item-inner">
-                  <img alt="Settings Menu" src="" delayedsrc="${settingsPng}" />
-                </div>
-                <span class="bmenu-filter-title">Settings Menu</span>
-              </div>
-              <div id="${BottomMenu.experimentalMenuId}" class="bmenu-filter-item">
-                <div class="bmenu-filter-item-inner">
-                  <img alt="Experimental Menu" src="" delayedsrc="${sciencePng}" />
-                </div>
-                <span class="bmenu-filter-title">Experimental Menu</span>
-              </div>
-              <div id="${BottomMenu.allMenuId}" class="bmenu-filter-item">
-                <div class="bmenu-filter-item-inner">
-                  <img alt="All Plugins" src="" delayedsrc="${developerModePng}" />
-                </div>
-                <span class="bmenu-filter-title">All Plugins</span>
-              </div>
+      <div id="bottom-icons-container">
+        <div id="bottom-icons-filter">
+          <div id="${BottomMenu.basicMenuId}" class="bmenu-filter-item bmenu-item-selected">
+            <div class="bmenu-filter-item-inner">
+              <img alt="Basic Menu" src="" delayedsrc="${localCafePng}" />
             </div>
-            <div id="bottom-icons"></div>
+            <span class="bmenu-filter-title">Basic Menu</span>
           </div>
-        `;
-
+          <div id="${BottomMenu.advancedMenuId}" class="bmenu-filter-item">
+            <div class="bmenu-filter-item-inner">
+              <img alt="Advanced Menu" src="" delayedsrc="${developerModePng}" />
+            </div>
+            <span class="bmenu-filter-title">Advanced Menu</span>
+          </div>
+          <div id="${BottomMenu.analysisMenuId}" class="bmenu-filter-item">
+            <div class="bmenu-filter-item-inner">
+              <img alt="Analysis Menu" src="" delayedsrc="${barChart4BarsPng}" />
+            </div>
+            <span class="bmenu-filter-title">Analysis Menu</span>
+          </div>
+          <div id="${BottomMenu.settingsMenuId}" class="bmenu-filter-item">
+            <div class="bmenu-filter-item-inner">
+              <img alt="Settings Menu" src="" delayedsrc="${settingsPng}" />
+            </div>
+            <span class="bmenu-filter-title">Settings Menu</span>
+          </div>
+          <div id="${BottomMenu.experimentalMenuId}" class="bmenu-filter-item">
+            <div class="bmenu-filter-item-inner">
+              <img alt="Experimental Menu" src="" delayedsrc="${sciencePng}" />
+            </div>
+            <span class="bmenu-filter-title">Experimental Menu</span>
+          </div>
+          <div id="${BottomMenu.allMenuId}" class="bmenu-filter-item">
+            <div class="bmenu-filter-item-inner">
+              <img alt="All Plugins" src="" delayedsrc="${developerModePng}" />
+            </div>
+            <span class="bmenu-filter-title">All Plugins</span>
+          </div>
+        </div>
+        <div id="bottom-icons"></div>
+      </div>
+    `;
     getEl('nav-footer')!.appendChild(bottomMenuNode);
+  }
+
+  private static updateBottomMenuVisibility_() {
+    if (settingsManager.isDisableBottomMenu || (getEl('bottom-icons') && getEl('bottom-icons')!.innerText === '')) {
+      getEl('nav-footer')!.style.visibility = 'hidden';
+      hideEl('nav-footer');
+    } else {
+      showEl('nav-footer');
+    }
+
+    const bottomContainer = getEl('bottom-icons-container');
+
+    if (bottomContainer) {
+      const bottomHeight = bottomContainer.offsetHeight;
+
+      document.documentElement.style.setProperty('--bottom-menu-top', `${bottomHeight}px`);
+    }
   }
 
   private static deselectAllBottomMenuFilterButtons_() {
@@ -114,5 +135,28 @@ export class BottomMenu {
     } else {
       errorManagerInstance.warn('Failed to find all bottom menu filter buttons');
     }
+
+    const wheel = (dom: EventTarget, deltaY: number) => {
+      const domEl = dom as HTMLElement;
+      const step = 0.15;
+      const pos = domEl.scrollTop;
+      const nextPos = pos + step * deltaY;
+
+      domEl.scrollTop = nextPos;
+    };
+
+    ['bottom-icons', 'bottom-icons-filter'].forEach((divIdWithScroll) => {
+
+      getEl(divIdWithScroll)!.addEventListener(
+        'wheel',
+        (event: WheelEvent) => {
+          event.preventDefault(); // Prevent default scroll behavior
+          if (event.currentTarget) {
+            wheel(event.currentTarget, event.deltaY);
+          }
+        },
+        { passive: false }, // Must be false to allow preventDefault()
+      );
+    });
   }
 }

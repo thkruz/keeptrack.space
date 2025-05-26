@@ -10,7 +10,7 @@ import googleAnalytics from '@analytics/google-analytics';
 import { KeepTrackApiEvents } from '@app/interfaces';
 import createAnalytics from 'analytics';
 import { KeepTrackApi } from '../keepTrackApi';
-import { getEl, hideEl, showEl } from '../lib/get-el';
+import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { AnalysisMenu } from './analysis/analysis';
 import { Breakup } from './breakup/breakup';
@@ -240,21 +240,6 @@ export const uiManagerFinal = (): void => {
    * }
    */
 
-  if (getEl('bottom-icons') && getEl('bottom-icons')!.innerText === '') {
-    getEl('nav-footer')!.style.visibility = 'hidden';
-    hideEl('nav-footer');
-  } else {
-    showEl('nav-footer');
-  }
-
-  const bottomContainer = getEl('bottom-icons-container');
-
-  if (bottomContainer) {
-    const bottomHeight = bottomContainer.offsetHeight;
-
-    document.documentElement.style.setProperty('--bottom-menu-top', `${bottomHeight}px`);
-  }
-
   // Only turn on analytics if on keeptrack.space ()
   if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
     const analytics = createAnalytics({
@@ -272,29 +257,6 @@ export const uiManagerFinal = (): void => {
       keepTrackApi.analytics.page();
     }
   }
-
-  const wheel = (dom: EventTarget, deltaY: number) => {
-    const domEl = dom as HTMLElement;
-    const step = 0.15;
-    const pos = domEl.scrollTop;
-    const nextPos = pos + step * deltaY;
-
-    domEl.scrollTop = nextPos;
-  };
-
-  ['bottom-icons', 'bottom-icons-filter'].forEach((divIdWithScroll) => {
-
-    getEl(divIdWithScroll)!.addEventListener(
-      'wheel',
-      (event: WheelEvent) => {
-        event.preventDefault(); // Prevent default scroll behavior
-        if (event.currentTarget) {
-          wheel(event.currentTarget, event.deltaY);
-        }
-      },
-      { passive: false }, // Must be false to allow preventDefault()
-    );
-  });
 };
 
 

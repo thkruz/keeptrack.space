@@ -303,7 +303,7 @@ export class Earth {
     let src = `${settingsManager.installDirectory}textures/${base}${resolution}.${extension}`;
 
     if (settingsManager.smallImages || settingsManager.isMobileModeEnabled) {
-      src = `${settingsManager.installDirectory}textures/${base}256.${extension}`;
+      src = `${settingsManager.installDirectory}textures/${base}512.${extension}`;
     }
 
     return src;

@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
-import { hideEl } from '../lib/get-el';
+import { getEl, hideEl } from '../lib/get-el';
 import { errorManagerInstance } from './errorManager';
 
 export class MobileManager {
@@ -11,10 +11,6 @@ export class MobileManager {
       // Don't become mobile after initialization
       if (!keepTrackApi.isInitialized) {
         if (MobileManager.checkIfMobileDevice()) {
-          if (!settingsManager.isMobileModeEnabled) {
-            keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
-              ToastMsgType.normal);
-          }
           settingsManager.isMobileModeEnabled = true;
 
           settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
@@ -41,6 +37,17 @@ export class MobileManager {
           settingsManager.plugins.DateTimeManager = cachePlugins.DateTimeManager;
           settingsManager.plugins.SoundManager = cachePlugins.SoundManager;
           settingsManager.defaultColorScheme = 'CelestrakColorScheme';
+
+          // Get the size of keeptrack-root
+          const keeptrackRoot = getEl('keeptrack-root');
+
+          if (keeptrackRoot?.clientWidth ?? 601 < 600) {
+            settingsManager.isShowPrimaryLogo = false;
+            settingsManager.isShowSecondaryLogo = false;
+          } else if (!settingsManager.isMobileModeEnabled) {
+            keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
+              ToastMsgType.normal);
+          }
 
           settingsManager.isDisableGodrays = true;
           settingsManager.isDisableSkybox = true;

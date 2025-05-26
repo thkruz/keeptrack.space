@@ -41,6 +41,9 @@ class BuildManager {
       });
 
       // Apply custom configurations
+      fileManager.copyDirectory('src/plugins-pro/embeded', 'dist/embeded', { isOptional: true, recursive: true });
+
+      // Apply custom configurations
       if (config.textLogoPath) {
         fileManager.copyFile(config.textLogoPath, './dist/img/logo.png', { force: true });
       }

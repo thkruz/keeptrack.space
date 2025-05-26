@@ -108,11 +108,16 @@ export class FileSystemManager {
    * @param destPath The destination directory path
    * @param options Copy options
    */
-  public copyDirectory(sourcePath: string, destPath: string, options: { recursive?: boolean, preserveTimestamps?: boolean } = {}): void {
+  public copyDirectory(sourcePath: string, destPath: string, options: { isOptional?: boolean, recursive?: boolean, preserveTimestamps?: boolean } = {}): void {
     const fullSourcePath = this.resolvePath(sourcePath);
     const fullDestPath = this.resolvePath(destPath);
 
     if (!existsSync(fullSourcePath)) {
+      if (options.isOptional) {
+        logWithStyle(`Source directory does not exist (optional): ${sourcePath}`, ConsoleStyles.WARNING);
+
+        return;
+      }
       throw new BuildError(`Source directory does not exist: ${sourcePath}`, ErrorCodes.FILE_OPERATION);
     }
 

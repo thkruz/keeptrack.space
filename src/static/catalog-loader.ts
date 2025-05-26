@@ -190,7 +190,7 @@ export class CatalogLoader {
     try {
       // TODO: Which sources can use this should be definied in the settings (Celestrak Rebase)
       if (
-        (/^https?:\/\/(?:api\.keeptrack\.space|localhost:8787)\/v[23]\/sats$/u).test(settingsManager.dataSources.tle)
+        (/^https?:\/\/(?:api\.keeptrack\.space|localhost:8787)\/v[23]\/sats(?:\/celestrak)?$/u).test(settingsManager.dataSources.tle)
       ) {
         if (!settingsManager.limitSats) {
           CatalogLoader.setupGetVariables();

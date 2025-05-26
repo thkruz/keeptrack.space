@@ -1190,6 +1190,10 @@ export class SettingsManager {
 
     const params = this.loadOverridesFromUrl_();
 
+    if (settingsOverride) {
+      this.loadOverrides_(settingsOverride);
+    }
+
     if (!this.disableUI) {
       parseGetVariables(params, this);
     }
@@ -1202,9 +1206,6 @@ export class SettingsManager {
        */
       this.loadPersistedSettings();
 
-      if (settingsOverride) {
-        this.loadOverrides_(settingsOverride);
-      }
     }
 
     // If No UI Reduce Overhead

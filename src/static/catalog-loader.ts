@@ -192,9 +192,6 @@ export class CatalogLoader {
       if (
         (/^https?:\/\/(?:api\.keeptrack\.space|localhost:8787)\/v[23]\/sats(?:\/celestrak)?$/u).test(settingsManager.dataSources.tle)
       ) {
-        if (!settingsManager.limitSats) {
-          CatalogLoader.setupGetVariables();
-        }
         // If using v3 switch to v2
         if (settingsManager.dataSources.tle.includes('v2') || settingsManager.limitSats.length > 0) {
           settingsManager.dataSources.tle = settingsManager.dataSources.tle.replace(/\/v3\//u, '/v2/');
@@ -334,35 +331,6 @@ export class CatalogLoader {
         isLowPerf: settingsManager.lowPerf,
       });
     });
-  }
-
-  /**
-   * Parses GET variables for SatCruncher initialization
-   * @returns An array of strings containing the limitSats values
-   */
-  static setupGetVariables() {
-    let limitSatsArray: string[] = [];
-    /** Parses GET variables for SatCruncher initialization */
-    // This should be somewhere else!!
-    const queryStr = window.location.search.substring(1);
-    const params = queryStr.split('&');
-
-    for (const param of params) {
-      const key = param.split('=')[0];
-      const val = param.split('=')[1];
-
-      switch (key) {
-        case 'limitSats':
-          settingsManager.limitSats = val;
-          limitSatsArray = val.split(',');
-          break;
-        case 'future use':
-        default:
-          break;
-      }
-    }
-
-    return limitSatsArray;
   }
 
   /**

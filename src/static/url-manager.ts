@@ -14,7 +14,6 @@ export abstract class UrlManager {
   private static searchString_: string = '';
   private static propRate_: number;
   private static readonly colorSchemeDefinitions_ = {
-    'objecttype': 'ObjectTypeColorScheme',
     'type': 'ObjectTypeColorScheme',
     'celestrak': 'CelestrakColorScheme',
     'country': 'CountryColorScheme',
@@ -118,6 +117,9 @@ export abstract class UrlManager {
 
       // Handle things that happen before loading (remember other components might not be ready yet)
       switch (key) {
+        case 'limitSats':
+          settingsManager.limitSats = kv[key];
+          break;
         case 'earth':
           this.handleEarthParam_(kv[key]);
           isUsingParsedVariables = true;
@@ -232,6 +234,10 @@ export abstract class UrlManager {
     let url = arr[0];
     const paramSlices = [] as string[];
 
+    if (settingsManager.limitSats) {
+      paramSlices.push(`limitSats=${settingsManager.limitSats}`);
+    }
+
     if (this.selectedSat_?.sccNum) {
       // TODO: This doesn't work for VIMPEL objects
       const scc = this.selectedSat_.sccNum;
@@ -249,7 +255,7 @@ export abstract class UrlManager {
       paramSlices.push(`rate=${this.propRate_}`);
     }
 
-    if (this.selectedSat_?.sccNum && !(mainCamera.ftsPitch > -0.01 && mainCamera.ftsPitch < 0.01 && mainCamera.ftsYaw > -0.01 && mainCamera.ftsYaw < 0.01)) {
+    if (this.selectedSat_?.sccNum && !(mainCamera.ftsPitch > -0.1 && mainCamera.ftsPitch < 0.1 && mainCamera.ftsYaw > -0.1 && mainCamera.ftsYaw < 0.1)) {
       paramSlices.push(`pitch=${(mainCamera.ftsPitch * RAD2DEG).toFixed(3)}`);
       paramSlices.push(`yaw=${(mainCamera.ftsYaw * RAD2DEG).toFixed(3)}`);
     } else if (mainCamera.camPitch > -0.01 && mainCamera.camPitch < 0.01 && mainCamera.camYaw > -0.01 && mainCamera.camYaw < 0.01) {
@@ -389,6 +395,11 @@ export abstract class UrlManager {
     keepTrackApi.getMainCamera().camDistBuffer = isNaN(camDistBufferValue)
       ? settingsManager.minZoomDistance + 1 as Kilometers
       : camDistBufferValue as Kilometers;
+
+    if (camDistBufferValue >= settingsManager.nearZoomLevel) {
+      // Outside camDistBuffer
+      settingsManager.selectedColor = settingsManager.selectedColorFallback;
+    }
   }
 
   private static handlePitchYawParam_(kv: Record<string, string>) {

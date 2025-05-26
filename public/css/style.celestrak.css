@@ -45,6 +45,13 @@ input:-webkit-autofill {
   cursor: pointer;
 }
 
+nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
 a,
 .link {
   cursor: pointer;

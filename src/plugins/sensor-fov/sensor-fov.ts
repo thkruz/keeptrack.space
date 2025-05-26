@@ -38,7 +38,7 @@ export class SensorFov extends KeepTrackPlugin {
     }
   };
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = fovPng;
   isIconDisabledOnLoad = true;

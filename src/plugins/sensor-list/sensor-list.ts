@@ -45,7 +45,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     maxWidth: 800,
   };
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = sensorPng;
 

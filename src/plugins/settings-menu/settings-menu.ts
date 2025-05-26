@@ -45,7 +45,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   readonly id = 'SettingsMenuPlugin';
   dependencies_ = [];
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.SETTINGS, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.SETTINGS, MenuMode.ALL];
 
   bottomIconElementName: string = 'settings-menu-icon';
   bottomIconImg = settingsPng;

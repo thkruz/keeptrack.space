@@ -47,7 +47,7 @@ export class CreateSat extends KeepTrackPlugin {
   readonly id = 'CreateSat';
   dependencies_ = [SelectSatManager.name];
 
-  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   isRequireSatelliteSelected = false;
   isIconDisabledOnLoad = false;

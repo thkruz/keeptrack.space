@@ -308,6 +308,7 @@ const settingsOverride = {
   isDisableKeyboard: true,
   isAllowRightClick: false,
   isShowLoadingHints: false,
+  isBlockPersistence: true,
   isDrawSun: false,
   isDisableMoon: true,
   earthDayTextureQuality: '1k',

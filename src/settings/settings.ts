@@ -82,6 +82,8 @@ export class SettingsManager {
   /** Center on a satellite when it is selected. */
   isFocusOnSatelliteWhenSelected = true;
   isUseJdayOnTopMenu = false;
+  /** Flag to determine if loading hints are shown on splash screen*/
+  isShowLoadingHints = true;
 
 
   static preserveSettings() {

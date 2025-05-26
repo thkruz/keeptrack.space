@@ -59,6 +59,10 @@ Unauthorized use, rebranding, or removal of attribution may violate trademark an
         `;
       }
     }
+
+    if (!settingsManager.isShowLoadingHints) {
+      hideEl('loading-hint');
+    }
   }
 
   static showHint(): string {

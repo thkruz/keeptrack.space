@@ -124,12 +124,12 @@ export class BottomMenu {
     const menuAllDom = getEl(BottomMenu.allMenuId);
 
     if (menuBasicDom && menuAdvancedDom && menuAnalysisDom && menuAllDom && menuExperimentalDom && menuSettingsDom) {
-      menuBasicDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuBasicDom, MenuMode.BASIC));
-      menuAdvancedDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuAdvancedDom, MenuMode.ADVANCED));
-      menuAnalysisDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuAnalysisDom, MenuMode.ANALYSIS));
-      menuExperimentalDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuExperimentalDom, MenuMode.EXPERIMENTAL));
-      menuSettingsDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuSettingsDom, MenuMode.SETTINGS));
-      menuAllDom.addEventListener('click', () => this.onBottomMenuFilterClick_(menuAllDom, MenuMode.ALL));
+      menuBasicDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuBasicDom, MenuMode.BASIC));
+      menuAdvancedDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuAdvancedDom, MenuMode.ADVANCED));
+      menuAnalysisDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuAnalysisDom, MenuMode.ANALYSIS));
+      menuExperimentalDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuExperimentalDom, MenuMode.EXPERIMENTAL));
+      menuSettingsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuSettingsDom, MenuMode.SETTINGS));
+      menuAllDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuAllDom, MenuMode.ALL));
 
       keepTrackApi.emit(KeepTrackApiEvents.bottomMenuModeChange);
     } else {

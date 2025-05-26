@@ -20,6 +20,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.updateDateTime, this.updateDateTime.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => this.updateDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
   }
 
   updateDateTime(date: Date) {

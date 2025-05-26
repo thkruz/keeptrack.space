@@ -445,6 +445,10 @@ export class DotsManager {
    * Resets the inSunData array to all zeros.
    */
   resetSatInSun(): void {
+    if (!this.inSunData) {
+      return;
+    }
+
     this.inSunData = new Int8Array(this.inSunData.length);
     this.inSunData.fill(0);
   }
@@ -453,6 +457,10 @@ export class DotsManager {
    * Resets the inViewData array to all zeroes.
    */
   resetSatInView(): void {
+    if (!this.inViewData) {
+      return;
+    }
+
     this.inViewData = new Int8Array(this.inViewData.length);
     this.inViewData.fill(0);
   }

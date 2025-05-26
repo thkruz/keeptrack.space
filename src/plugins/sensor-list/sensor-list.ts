@@ -56,7 +56,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
         <div id="sensor-list-content" class="side-menu">
         <div class="row">
           <ul id="reset-sensor-text" class="sensor-reset-menu">
-            <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button">Reset Sensor &#9658;</button>
+            <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button" disabled>Reset Sensor &#9658;</button>
           </ul>
           <ul id="list-of-sensors">` +
     this.sensorGroups_.map((sensorGroup) => this.genericSensors_(sensorGroup.name)).join('') +
@@ -77,7 +77,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
         getEl('nav-mobile')?.insertAdjacentHTML(
           'beforeend',
           keepTrackApi.html`
-          <div id="sensor-selected-container">
+          <div id="sensor-selected-container" class="start-hidden">
             <div id="sensor-selected" class="waves-effect waves-light">
 
             </div>

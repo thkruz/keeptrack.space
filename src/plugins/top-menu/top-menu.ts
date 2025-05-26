@@ -131,10 +131,10 @@ export class TopMenu extends KeepTrackPlugin {
 
       // If this.sensorTitle is empty hide the div
       if (!sensorTitle || sensorTitle === '') {
-        sensorSelectedDom.style.display = 'none';
+        sensorSelectedDom.parentElement!.style.display = 'none';
       } else {
         sensorSelectedDom.innerText = sensorTitle;
-        sensorSelectedDom.style.display = 'block';
+        sensorSelectedDom.parentElement!.style.display = 'block';
       }
     }
   }

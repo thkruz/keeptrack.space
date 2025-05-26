@@ -89,6 +89,8 @@ export class SettingsManager {
    * plugins that use the bottom menu.
    */
   isDisableBottomMenu = false;
+  /** The initial time offset */
+  staticOffset: number = 0; // in seconds
 
 
   static preserveSettings() {

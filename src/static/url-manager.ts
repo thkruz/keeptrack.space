@@ -117,6 +117,23 @@ export abstract class UrlManager {
 
       // Handle things that happen before loading (remember other components might not be ready yet)
       switch (key) {
+        case 'date':
+          this.handleDateParam_(kv[key]);
+          break;
+        case 'bottomMenu':
+          settingsManager.isDisableBottomMenu = kv[key].toLowerCase() === 'false';
+          isUsingParsedVariables = true;
+          break;
+        case 'external-only':
+          settingsManager.dataSources.externalTLEsOnly = true;
+          break;
+        case 'gp':
+          settingsManager.dataSources.tle = decodeURIComponent(kv[key]);
+          break;
+        case 'tle':
+          // Decode from UTF-8
+          settingsManager.dataSources.externalTLEs = decodeURIComponent(kv[key]);
+          break;
         case 'limitSats':
           settingsManager.limitSats = kv[key];
           break;
@@ -184,9 +201,6 @@ export abstract class UrlManager {
           case 'misl':
             this.handleMislParam_(kv[key]);
             break;
-          case 'date':
-            this.handleDateParam_(kv[key]);
-            break;
           case 'pitch':
           case 'yaw':
             this.handlePitchYawParam_(kv);
@@ -238,6 +252,13 @@ export abstract class UrlManager {
       paramSlices.push(`limitSats=${settingsManager.limitSats}`);
     }
 
+    if (settingsManager.dataSources.externalTLEsOnly) {
+      paramSlices.push(`tle="${encodeURIComponent(settingsManager.dataSources.externalTLEs)}"`);
+      paramSlices.push('external-only=true');
+    } else if (!settingsManager.dataSources.tle.includes('keeptrack.space') && isMaxData) {
+      paramSlices.push(`tle="${encodeURIComponent(settingsManager.dataSources.tle)}"`);
+    }
+
     if (this.selectedSat_?.sccNum) {
       // TODO: This doesn't work for VIMPEL objects
       const scc = this.selectedSat_.sccNum;
@@ -287,13 +308,15 @@ export abstract class UrlManager {
       paramSlices.push(`date=${(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset).toString()}`);
     }
 
-    if (isMaxData) {
-      if (settingsManager.isDisableSensors) {
-        paramSlices.push('sensors=false');
-      }
-      if (settingsManager.isDisableLaunchSites) {
-        paramSlices.push('launchSites=false');
-      }
+    if (settingsManager.isDisableSensors) {
+      paramSlices.push('sensors=false');
+    }
+    if (settingsManager.isDisableLaunchSites) {
+      paramSlices.push('launchSites=false');
+    }
+
+    if (settingsManager.isDisableBottomMenu) {
+      paramSlices.push('bottomMenu=false');
     }
 
     if (paramSlices.length > 0) {
@@ -343,19 +366,12 @@ export abstract class UrlManager {
   }
 
   private static handleDateParam_(val: string) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-
     if (isNaN(parseInt(val))) {
       keepTrackApi.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
 
       return;
     }
-
-    keepTrackApi.toast('Simulation time will be updated once catalog finishes processing!', ToastMsgType.normal, true);
-    setTimeout(() => {
-      keepTrackApi.toast('Simulation time updated!', ToastMsgType.normal, true);
-      timeManagerInstance.changeStaticOffset(Number(val) - Date.now());
-    }, 10000);
+    settingsManager.staticOffset = Number(val) - Date.now();
   }
 
   private static handleRateParam_(val: string) {

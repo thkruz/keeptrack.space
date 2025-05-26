@@ -41,7 +41,7 @@ export class TimeManager {
   /**
    * The time offset ignoring propRate (ex. New Launch)
    */
-  staticOffset = 0;
+  staticOffset = settingsManager.staticOffset ?? 0;
   private simulationTimeSerialized_ = <string>null;
   timeTextStr = <string>null;
   /**

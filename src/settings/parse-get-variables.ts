@@ -53,16 +53,6 @@ export const parseGetVariables = (params: string[], settingsManager: SettingsMan
             break;
         }
         break;
-      case 'external-only':
-        settingsManager.dataSources.externalTLEsOnly = true;
-        break;
-      case 'gp':
-        settingsManager.dataSources.tle = decodeURIComponent(val);
-        break;
-      case 'tle':
-        // Decode from UTF-8
-        settingsManager.dataSources.externalTLEs = decodeURIComponent(val);
-        break;
       case 'jsc':
         settingsManager.isEnableJscCatalog = val === 'true';
         break;

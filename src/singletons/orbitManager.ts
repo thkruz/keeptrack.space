@@ -34,7 +34,7 @@ export interface ObjDataJson {
 export class OrbitManager {
   private currentInView_ = <number[]>[];
   private currentSelectId_ = -1;
-  private glBuffers_ = <WebGLBuffer[]>[];
+  private readonly glBuffers_ = <WebGLBuffer[]>[];
   private gl_: WebGL2RenderingContext;
   private hoverOrbitBuf_: WebGLBuffer;
   private inProgress_ = <boolean[]>[];

@@ -83,7 +83,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new TopMenu().init(), config: plugins.TopMenu },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/debug/debug');
+          const proPlugin = await import('../plugins-pro/debug/debug');
 
           new proPlugin.DebugMenuPlugin().init();
         })(), config: plugins.DebugMenuPlugin,
@@ -125,14 +125,14 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new StereoMap().init(), config: plugins.StereoMap },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/planetarium/planetarium');
+          const proPlugin = await import('../plugins-pro/planetarium/planetarium');
 
           new proPlugin.Planetarium().init();
         })(), config: plugins.Planetarium,
       },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/astronomy/astronomy');
+          const proPlugin = await import('../plugins-pro/astronomy/astronomy');
 
           new proPlugin.Astronomy().init();
         })(), config: plugins.Astronomy,
@@ -150,7 +150,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new AnalysisMenu().init(), config: plugins.AnalysisMenu },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/initial-orbit/initial-orbit');
+          const proPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
 
           new proPlugin.InitialOrbitDeterminationPlugin().init();
         })(), config: plugins.InitialOrbitDeterminationPlugin,
@@ -167,7 +167,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new SettingsMenuPlugin().init(), config: plugins.SettingsMenuPlugin },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/graphics-menu/graphics-menu');
+          const proPlugin = await import('../plugins-pro/graphics-menu/graphics-menu');
 
           new proPlugin.GraphicsMenuPlugin().init();
         })(), config: plugins.GraphicsMenuPlugin,
@@ -176,7 +176,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new VideoDirectorPlugin().init(), config: plugins.VideoDirectorPlugin },
       {
         init: () => (async () => {
-          const proPlugin = await import('../plugins/about-menu/about-menu');
+          const proPlugin = await import('../plugins-pro/about-menu/about-menu');
 
           new proPlugin.AboutMenuPlugin().init();
         })(), config: plugins.AboutMenuPlugin,

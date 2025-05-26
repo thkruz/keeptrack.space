@@ -1,5 +1,5 @@
 import { ObjDataJson } from '@app/singletons/orbitManager';
-import { DEG2RAD, Degrees, EciVec3, Kilometers, Sgp4, TAU, eci2ecf } from 'ootk';
+import { DEG2RAD, Degrees, EciVec3, Kilometers, SatelliteRecord, Sgp4, TAU, eci2ecf } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { jday } from '../lib/transforms';
 import { OrbitCruncherCachedObject } from './constants';
@@ -44,7 +44,7 @@ try {
 export const onmessageProcessing = (m: {
   data: {
     typ: OrbitCruncherType;
-    id?: number;
+    id: number;
     // Init Only
     objData?: string;
     numSegs: number;
@@ -157,14 +157,15 @@ export const onmessageProcessing = (m: {
       const nowJ =
         jday(nowDate.getUTCFullYear(), nowDate.getUTCMonth() + 1, nowDate.getUTCDate(), nowDate.getUTCHours(), nowDate.getUTCMinutes(), nowDate.getUTCSeconds()) +
         nowDate.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-      const now = (nowJ - objCache[id].satrec.jdsatepoch) * 1440.0; // in minutes
+      const satrec = objCache[id].satrec as SatelliteRecord;
+      const now = (nowJ - satrec.jdsatepoch) * 1440.0; // in minutes
 
       // Calculate Satellite Orbits
-      const period = (2 * Math.PI) / objCache[id].satrec.no; // convert rads/min to min
+      const period = (2 * Math.PI) / satrec.no; // convert rads/min to min
       let timeslice = period / numberOfSegments;
 
       // If a ECF output and  Geostationary orbit, then we can draw multiple orbits
-      if (isEcfOutput && objCache[id].satrec.no < 0.01) {
+      if (isEcfOutput && period > 1420 && period < 1460 && satrec.ecco < 0.05) {
         timeslice *= numberOfOrbitsToDraw;
       } else {
         isEcfOutput = false;

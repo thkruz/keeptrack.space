@@ -109,7 +109,7 @@ jobs:
           timezoneLinux: 'America/New_York'
       # Unit Tests
       - name: Test
-        run: npm test
+        run: git submodule update --init --recursive && npm test
   build:
     needs: [eslint, unit-tests]
     name: Build
@@ -142,7 +142,7 @@ jobs:
         run: npm ci --ignore-scripts
       # Build
       - name: Build
-        run: npm run build
+        run: git submodule update --init --recursive && npm run build
 
       # - name: Save build folder
       #   uses: actions/upload-artifact@v3.1.3

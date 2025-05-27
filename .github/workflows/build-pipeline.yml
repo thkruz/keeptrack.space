@@ -100,13 +100,10 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       # Set up SSH for deploy key
-      - name: Set up SSH for deploy key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.ACTIONS_DEPLOY_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-        shell: bash
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
 
       - name: Update submodules
         run: git submodule update --init --recursive
@@ -152,13 +149,10 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
       # Set up SSH for deploy key
-      - name: Set up SSH for deploy key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.ACTIONS_DEPLOY_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-        shell: bash
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
 
       - name: Update submodules
         run: git submodule update --init --recursive

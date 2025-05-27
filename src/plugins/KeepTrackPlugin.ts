@@ -11,7 +11,7 @@ import { getEl, hideEl } from '../lib/get-el';
 import { shake } from '../lib/shake';
 import { slideInRight, slideOutLeft } from '../lib/slide';
 import { errorManagerInstance } from '../singletons/errorManager';
-import { SelectSatManager } from './select-sat-manager/select-sat-manager';
+import type { SelectSatManager } from './select-sat-manager/select-sat-manager';
 import { SoundNames } from './sounds/SoundNames';
 
 export interface ClickDragOptions {
@@ -727,7 +727,7 @@ export abstract class KeepTrackPlugin {
      * const searchDom = getEl('search', true);
      * if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
      */
-    if (!((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1)) {
+    if (!(((keepTrackApi.getPluginByName('SelectSatManager') as SelectSatManager)?.selectedSat ?? -1) > -1)) {
       errorManagerInstance.warn(t7e('errorMsgs.SelectSatelliteFirst'), true);
       shake(getEl(this.bottomIconElementName));
 

@@ -65,7 +65,7 @@ export abstract class UrlManager {
     let queryStr = window.location.search.substring(1);
 
     // if queryStr includes '#' it will break params, so we need to remove it and retry
-    const hashIndex = window.location.hash.indexOf('#');
+    const hashIndex = window.location.hash?.indexOf('#') ?? -1;
 
     if (hashIndex !== -1) {
       queryStr = window.location.hash.split('#')[1]; // Get the part after the hash

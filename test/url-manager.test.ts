@@ -49,7 +49,7 @@ describe('UrlManager_class', () => {
     keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
     keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
 
-    UrlManager.parseGetVariables();
+    UrlManager.parseGetVariables(settingsManager);
     keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
@@ -90,7 +90,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
-    UrlManager.parseGetVariables();
+    UrlManager.parseGetVariables(settingsManager);
     keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
@@ -125,7 +125,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
-    UrlManager.parseGetVariables();
+    UrlManager.parseGetVariables(settingsManager);
     keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(uiManagerInstance.toast).toHaveBeenCalled();
@@ -160,7 +160,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
-    UrlManager.parseGetVariables();
+    UrlManager.parseGetVariables(settingsManager);
     keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(uiManagerInstance.toast).toHaveBeenCalled();
@@ -198,7 +198,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
-    UrlManager.parseGetVariables();
+    UrlManager.parseGetVariables(settingsManager);
     keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
@@ -239,7 +239,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
-    UrlManager.parseGetVariables();
+    UrlManager.parseGetVariables(settingsManager);
     keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);

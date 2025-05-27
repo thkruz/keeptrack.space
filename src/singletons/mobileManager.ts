@@ -2,17 +2,20 @@ import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl } from '../lib/get-el';
+import { EarthTextureStyle } from './draw-manager/earth';
 import { errorManagerInstance } from './errorManager';
 
 export class MobileManager {
   // eslint-disable-next-line require-await
-  public static async checkMobileMode() {
+  static async checkMobileMode() {
     try {
       // Don't become mobile after initialization
       if (!keepTrackApi.isInitialized) {
         if (MobileManager.checkIfMobileDevice()) {
           settingsManager.isMobileModeEnabled = true;
-
+          settingsManager.disableWindowTouchMove = false;
+          settingsManager.isShowLoadingHints = false;
+          settingsManager.isDisableBottomMenu = true;
           settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
           settingsManager.enableHoverOverlay = false;
           settingsManager.cameraMovementSpeed = 0.0025;
@@ -49,27 +52,55 @@ export class MobileManager {
               ToastMsgType.normal);
           }
 
-          settingsManager.isDisableGodrays = true;
-          settingsManager.isDisableSkybox = true;
-          settingsManager.isDisableMoon = true;
-          settingsManager.isDisableSearchBox = true;
-          settingsManager.isDrawCovarianceEllipsoid = false;
+          Object.assign(settingsManager, {
+            isEnableJscCatalog: true,
+            noMeshManager: false,
+            isShowSplashScreen: false,
+            // isDisableSelectSat: true,
+            isDisableKeyboard: true,
+            isAllowRightClick: false,
+            isShowLoadingHints: false,
+            isBlockPersistence: true,
+            isDisableBottomMenu: true,
+            isDrawSun: false,
+            isDrawMilkyWay: false,
+            isDisableGodrays: true,
+            godraysSamples: -1,
+            isDisableMoon: true,
+            earthDayTextureQuality: '1K',
+            earthNightTextureQuality: '1K',
+            isDrawNightAsDay: true,
+            // earthSpecTextureQuality: '1K',
+            isDrawSpecMap: false,
+            // earthBumpTextureQuality: '1K',
+            isDrawBumpMap: false,
+            // earthCloudTextureQuality: '1K',
+            isDrawCloudsMap: false,
+            // earthPoliticalTextureQuality: '1K',
+            isDrawPoliticalMap: false,
+            earthTextureStyle: EarthTextureStyle.BLUE_MARBLE,
+            isDisableSkybox: true,
+            isDisableSearchBox: true,
+            isDrawCovarianceEllipsoid: false,
+            isDisableAsyncReadPixels: true,
+            pickingDotSize: '32.0',
+            isDisableStars: true,
+            isDisableControlSites: true,
+            isDisableSensors: true,
+            isDisableLaunchSites: true,
+          });
 
-          settingsManager.isDisableAsyncReadPixels = true;
-
-          settingsManager.satShader.minSize = 8;
-          settingsManager.satShader.maxAllowedSize = 45;
-          settingsManager.pickingDotSize = '32.0';
-          settingsManager.satShader.maxSize = 70;
-
-          settingsManager.isDisableStars = true;
-          settingsManager.isDisableLaunchSites = true;
-          settingsManager.isDisableControlSites = true;
+          Object.assign(settingsManager.satShader, {
+            minSize: 8,
+            maxAllowedSize: 45,
+            maxSize: 70,
+          });
 
           keepTrackApi.on(
             KeepTrackApiEvents.selectSatData,
             () => {
               keepTrackApi.getUiManager().searchManager.closeSearch();
+              hideEl('actions-section');
             },
           );
 
@@ -113,12 +144,8 @@ export class MobileManager {
     }
   }
 
-  public static checkIfMobileDevice() {
+  static checkIfMobileDevice() {
     return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu).test(navigator.userAgent);
-  }
-
-  init() {
-    MobileManager.checkMobileMode();
   }
 }
 

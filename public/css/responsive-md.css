@@ -5,12 +5,17 @@
     border: 5px solid var(--color-dark-border);
   }
 
+  #copyright-notice {
+    font-size: 12px;
+  }
+
   .search-slide-down {
     width: 250px;
   }
 
   #ui-datepicker-div {
     top: var(--top-menu-height) !important;
+    border: 5px solid var(--color-dark-border);
     left: 0px !important;
     border-radius: 0px;
     bottom: unset;

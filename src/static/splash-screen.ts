@@ -38,11 +38,7 @@ export abstract class SplashScreen {
         <div id="loading-hint">Hint: ${this.showHint()}</div>
         <div id="version-text">v10.5.2</div>
         <div id="copyright-notice">
-KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>
-This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible.<br>
-No commercial license has been granted, and no compensation has been provided to the rights holder.<br>
-Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>
-© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.
+          ${settingsManager.isMobileModeEnabled ? t7e('loadingScreenMsgs.copyrightNoticeMobile') : t7e('loadingScreenMsgs.copyrightNotice')}
         </div>
       </div>`;
 

@@ -1006,8 +1006,8 @@ input:focus {
 }
 
 #ui-datepicker-div {
-  border: 5px solid var(--color-dark-border);
-  top: 50px;
+  border: none;
+  top: var(--top-menu-height);
   left: 0px;
   width: 100%;
   border-radius: 0px;
@@ -1312,7 +1312,7 @@ input:focus {
   font-family: var(--font-family);
   position: absolute;
   left: 12px;
-  bottom: 12px;
+  top: 12px;
   width: 100%;
   text-align: left;
   font-size: 14px;
@@ -1330,7 +1330,7 @@ input:focus {
   bottom: 12px;
   width: 100%;
   text-align: center;
-  font-size: 12px;
+  font-size: 10px;
   color: white;
   pointer-events: none;
   background: none;

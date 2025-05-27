@@ -426,8 +426,9 @@ export class Camera {
       this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
       this.earthCenteredLastZoom = this.zoomTarget_;
       this.camZoomSnappedOnSat = false;
-    } else if ((this.camDistBuffer < settingsManager.nearZoomLevel || this.camDistBuffer < (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25) ||
-      this.zoomLevel_ === -1) {
+    } else if (!settingsManager.isMobileModeEnabled &&
+      ((this.camDistBuffer < settingsManager.nearZoomLevel || this.camDistBuffer < (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25) ||
+        this.zoomLevel_ === -1)) {
       // Inside camDistBuffer
       settingsManager.selectedColor = [0, 0, 0, 0];
       this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 100); // delta is +/- 100
@@ -1275,7 +1276,12 @@ export class Camera {
 
       this.zoomTarget =
         ((this.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
-      settingsManager.selectedColor = [0, 0, 0, 0];
+
+      if (!settingsManager.isMobileModeEnabled) {
+        settingsManager.selectedColor = [0, 0, 0, 0];
+      } else {
+        settingsManager.selectedColor = settingsManager.selectedColorFallback;
+      }
 
       this.zoomLevel_ = Math.max(this.zoomLevel_, this.zoomTarget_);
 

@@ -63,7 +63,6 @@ import { ErrorManager, errorManagerInstance } from './singletons/errorManager';
 import { GroupsManager } from './singletons/groups-manager';
 import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
-import { mobileManager } from './singletons/mobileManager';
 import { OrbitManager } from './singletons/orbitManager';
 import { Scene } from './singletons/scene';
 import { TimeManager } from './singletons/time-manager';
@@ -488,7 +487,6 @@ theodore.kruczek at gmail dot com.
       keepTrackApi.getMainCamera().init(settingsManager);
 
       SplashScreen.loadStr(SplashScreen.msg.science);
-      mobileManager.init();
 
       // Load all the plugins now that we have the API initialized
       await import('./plugins/plugins')

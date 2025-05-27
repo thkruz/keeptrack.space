@@ -25,6 +25,7 @@ import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme'
 import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 import { SunTextureQuality } from '@app/singletons/draw-manager/sun';
+import { MobileManager } from '@app/singletons/mobileManager';
 import { UrlManager } from '@app/static/url-manager';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
@@ -1192,7 +1193,7 @@ export class SettingsManager {
 
     this.checkIfIframe_();
     this.setInstallDirectory_();
-    this.setMobileSettings_();
+    MobileManager.checkMobileMode();
     this.setEmbedOverrides_();
     this.setColorSettings_();
 
@@ -1349,22 +1350,6 @@ export class SettingsManager {
       this.smallImages = true;
       this.updateHoverDelayLimitSmall = 25;
       this.updateHoverDelayLimitBig = 45;
-    }
-  }
-
-  /**
-   * Sets the mobile settings based on the current window width.
-   * If the window width is less than or equal to the desktop minimum width,
-   * mobile mode is enabled and certain settings are adjusted accordingly.
-   */
-  private setMobileSettings_() {
-    if (window.innerWidth <= this.desktopMinimumWidth) {
-      this.disableWindowTouchMove = false;
-      /*
-       * this.maxFieldOfViewMarkers = 20000;
-       * this.isDrawLess = true;
-       * this.noMeshManager = true;
-       */
     }
   }
 

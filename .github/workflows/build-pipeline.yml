@@ -81,6 +81,9 @@ jobs:
       # Checkout code
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          token: ${{ secrets.GITHUB_TOKEN }}
       # Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -109,7 +112,7 @@ jobs:
           timezoneLinux: 'America/New_York'
       # Unit Tests
       - name: Test
-        run: git submodule update --init --recursive && npm test
+        run: npm test
   build:
     needs: [eslint, unit-tests]
     name: Build
@@ -119,6 +122,9 @@ jobs:
       # Checkout code
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          token: ${{ secrets.GITHUB_TOKEN }}
       # Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -142,7 +148,7 @@ jobs:
         run: npm ci --ignore-scripts
       # Build
       - name: Build
-        run: git submodule update --init --recursive && npm run build
+        run: npm run build
 
       # - name: Save build folder
       #   uses: actions/upload-artifact@v3.1.3

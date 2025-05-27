@@ -183,20 +183,12 @@ export class SourceColorScheme extends ColorScheme {
   static readonly legendHtml = keepTrackApi.html`
   <ul id="legend-list-dataSource">
     <li>
-      <div class="Square-Box legend-sourceAldoria-box"></div>
-      Aldoria
-    </li>
-    <li>
-      <div class="Square-Box legend-sourceUssf-box"></div>
-      18 SDS
-    </li>
-    <li>
       <div class="Square-Box legend-sourceCelestrak-box"></div>
       Celestrak
     </li>
     <li>
-      <div class="Square-Box legend-sourcePrismnet-box"></div>
-      Prismnet
+      <div class="Square-Box legend-sourceUssf-box"></div>
+      18 SDS
     </li>
     <li>
       <div class="Square-Box legend-sourceVimpel-box"></div>

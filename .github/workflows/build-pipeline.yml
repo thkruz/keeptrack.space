@@ -78,6 +78,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Set up SSH for deploy key
+      - name: Set up SSH for deploy key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ACTIONS_DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+        shell: bash
+
       # Checkout code
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -116,6 +125,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Set up SSH for deploy key
       - name: Set up SSH for deploy key
         run: |
           mkdir -p ~/.ssh

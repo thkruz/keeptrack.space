@@ -11,8 +11,6 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import sensorAddPng from '@public/img/icons/sensor-add.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
-import { Astronomy } from '../../plugins-pro/astronomy/astronomy';
-import { Planetarium } from '../../plugins-pro/planetarium/planetarium';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
@@ -283,8 +281,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+    keepTrackApi.getPluginByName('Planetarium')?.setBottomIconToUnselected();
+    keepTrackApi.getPluginByName('Astronomy')?.setBottomIconToUnselected();
 
     (<HTMLInputElement>getEl('sensor-type')).value = (<HTMLInputElement>getEl('cs-type')).value.replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
     getEl('sensor-info-title')!.innerHTML = 'Custom Sensor';

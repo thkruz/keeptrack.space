@@ -302,6 +302,7 @@ const settingsOverride = {
   },
   isBlockPersistence: true,
   isShowSecondaryLogo: true,
+  isUseJdayOnTopMenu: false,
   satShader: {
     /**
      * The minimum zoom level at which large objects are displayed.

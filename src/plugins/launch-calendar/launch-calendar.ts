@@ -54,7 +54,7 @@ export class LaunchCalendar extends KeepTrackPlugin {
   private closeColorbox_() {
     if (this.isMenuButtonActive) {
       this.isMenuButtonActive = false;
-      getEl(this.bottomIconElementName)!.classList.remove('bmenu-item-selected');
+      getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-selected');
     }
   }
 }

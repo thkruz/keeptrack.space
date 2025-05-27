@@ -120,6 +120,19 @@ export abstract class UrlManager {
         case 'date':
           this.handleDateParam_(kv[key]);
           break;
+        case 'plugins':
+          {
+            const plugins = kv[key].split(',');
+
+            // Disable all plugins first
+            settingsManager.plugins = {};
+
+            plugins.forEach((plugin) => {
+              settingsManager.plugins[plugin] = { enabled: true };
+            });
+            isUsingParsedVariables = true;
+          }
+          break;
         case 'bottomMenu':
           settingsManager.isDisableBottomMenu = kv[key].toLowerCase() === 'false';
           isUsingParsedVariables = true;

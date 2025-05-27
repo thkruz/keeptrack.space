@@ -68,10 +68,10 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
 
       uiManagerInstance.hideSideMenus();
       keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT; // Back to normal Camera Mode
-      getEl(this.bottomIconElementName)!.classList.remove('bmenu-item-selected');
+      getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-selected');
     } else if (this.selectSatManager_.selectedSat !== -1) {
       keepTrackApi.getMainCamera().cameraType = CameraType.SATELLITE; // Activate Satellite Camera Mode
-      getEl(this.bottomIconElementName)!.classList.add('bmenu-item-selected');
+      getEl(this.bottomIconElementName)?.classList.add('bmenu-item-selected');
     } else {
       const uiManagerInstance = keepTrackApi.getUiManager();
 

@@ -1,3 +1,4 @@
+
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -105,10 +106,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
       KeepTrackApiEvents.selectSatData,
       (obj: BaseObject) => {
         if (obj?.isSatellite()) {
-          getEl(this.bottomIconElementName)!.classList.remove('bmenu-item-disabled');
+          getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-disabled');
           this.isIconDisabled = false;
         } else {
-          getEl(this.bottomIconElementName)!.classList.add('bmenu-item-disabled');
+          getEl(this.bottomIconElementName)?.classList.add('bmenu-item-disabled');
           this.isIconDisabled = true;
         }
       },

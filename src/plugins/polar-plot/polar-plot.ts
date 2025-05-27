@@ -96,14 +96,14 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       KeepTrackApiEvents.selectSatData,
       (obj: BaseObject) => {
         if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
-          getEl(this.bottomIconElementName)!.classList.remove('bmenu-item-disabled');
+          getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-disabled');
           this.isIconDisabled = false;
           // If it is open then refresh the plot
           if (this.isMenuButtonActive) {
             this.updatePlot_();
           }
         } else {
-          getEl(this.bottomIconElementName)!.classList.add('bmenu-item-disabled');
+          getEl(this.bottomIconElementName)?.classList.add('bmenu-item-disabled');
           this.isIconDisabled = true;
         }
       },

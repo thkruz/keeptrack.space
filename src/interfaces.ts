@@ -217,9 +217,8 @@ export enum MenuMode {
   ADVANCED,
   ANALYSIS,
   EXPERIMENTAL,
-  PRO,
-  ALL,
   SETTINGS,
+  ALL,
 }
 
 export type ColorInformation = {

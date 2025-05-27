@@ -1,6 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl } from '@app/lib/get-el';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
@@ -68,6 +68,18 @@ export class TopMenu extends KeepTrackPlugin {
             </nav>
           `,
         );
+
+        // Advice only applies to things in the bottom menu
+        if (settingsManager.isDisableBottomMenu) {
+          keepTrackApi.on(
+            KeepTrackApiEvents.uiManagerFinal,
+            () => {
+              hideEl('tutorial-btn');
+            },
+          );
+
+          return;
+        }
 
         keepTrackApi.containerRoot?.insertAdjacentHTML(
           'beforeend',

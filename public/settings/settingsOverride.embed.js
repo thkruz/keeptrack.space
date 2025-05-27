@@ -301,9 +301,11 @@ const settingsOverride = {
     isSupplementExternal: false,
   },
   isShowSecondaryLogo: false,
-  isEnableJscCatalog: false,
+  isEnableJscCatalog: true,
+  noMeshManager: true,
   isShowSplashScreen: false,
   isDisableSensors: true,
+  isDisableSelectSat: true,
   isDisableLaunchSites: true,
   isDisableKeyboard: true,
   isAllowRightClick: false,
@@ -315,79 +317,18 @@ const settingsOverride = {
   isDisableGodrays: true,
   godraysSamples: -1,
   isDisableMoon: true,
-  earthDayTextureQuality: '512',
-  earthNightTextureQuality: 'off',
-  earthSpecTextureQuality: '512',
+  earthDayTextureQuality: '1K',
+  earthNightTextureQuality: '1K',
+  isDrawNightAsDay: true,
+  // earthSpecTextureQuality: '1K',
+  isDrawSpecMap: false,
+  // earthBumpTextureQuality: '1K',
   isDrawBumpMap: false,
-  earthBumpTextureQuality: '512',
-  earthCloudTextureQuality: '512',
-  earthPoliticalTextureQuality: '512',
+  // earthCloudTextureQuality: '1K',
+  isDrawCloudsMap: false,
+  // earthPoliticalTextureQuality: '1K',
+  isDrawPoliticalMap: false,
   earthTextureStyle: 'earthmap', // 'earthmap' or 'flat'
-  satShader: {
-    /**
-     * The minimum zoom level at which large objects are displayed.
-     */
-    largeObjectMinZoom: 0.37,
-    /**
-     * The maximum zoom level at which large objects are displayed.
-     */
-    largeObjectMaxZoom: 0.58,
-    /**
-     * The minimum size of objects in the shader.
-     */
-    minSize: 15.0,
-    /**
-     * The minimum size of objects in the shader when in planetarium mode.
-     */
-    minSizePlanetarium: 20.0,
-    /**
-     * The maximum size of objects in the shader when in planetarium mode.
-     */
-    maxSizePlanetarium: 20.0,
-    /**
-     * The maximum allowed size of objects in the shader.
-     * This value is dynamically changed based on zoom level.
-     */
-    maxAllowedSize: 35.0,
-    /**
-     * Whether or not to use dynamic sizing for objects in the shader.
-     */
-    isUseDynamicSizing: false,
-    /**
-     * The scalar value used for dynamic sizing of objects in the shader.
-     */
-    dynamicSizeScalar: 1.0,
-    /**
-     * The size of stars and searched objects in the shader.
-     */
-    starSize: '20.0',
-    /**
-     * The distance at which objects start to grow in kilometers.
-     * Must be a float as a string for the GPU to read.
-     * This makes stars bigger than satellites.
-     */
-    distanceBeforeGrow: '14000.0',
-    /**
-     * The blur radius factor used for satellites.
-     */
-    blurFactor1: '0.76',
-    /**
-     * The blur alpha factor used for satellites.
-     */
-    blurFactor2: '0.4',
-    /**
-     * The blur radius factor used for stars.
-     */
-    blurFactor3: '0.43',
-    /**
-     * The blur alpha factor used for stars.
-     */
-    blurFactor4: '0.25',
-    /**
-     * The maximum size of objects in the shader.
-     */
-    maxSize: 70.0,
-  },
 };
 
 // Expose these to the console

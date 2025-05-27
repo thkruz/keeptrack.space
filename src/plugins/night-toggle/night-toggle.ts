@@ -19,9 +19,11 @@ export class NightToggle extends KeepTrackPlugin {
       if (key === 'N' && !isRepeat) {
         if (!this.isMenuButtonActive) {
           keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+          settingsManager.isDrawNightAsDay = true;
           this.setBottomIconToSelected();
         } else {
           keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+          settingsManager.isDrawNightAsDay = false;
           this.setBottomIconToUnselected();
         }
       }

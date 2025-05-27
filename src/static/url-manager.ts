@@ -168,6 +168,9 @@ export abstract class UrlManager {
           settingsManager.isDisableLaunchSites = kv[key].toLowerCase() === 'false';
           isUsingParsedVariables = true;
           break;
+        case 'dots':
+          isUsingParsedVariables = this.handleDotsParam_(kv[key]) || isUsingParsedVariables;
+          break;
         case 'ecf':
           {
             const ecfValue = parseInt(kv[key], 10);
@@ -589,6 +592,33 @@ export abstract class UrlManager {
         break;
       default:
         console.warn(`Unknown sun parameter: ${val}`);
+    }
+  }
+
+  private static handleDotsParam_(val: string): boolean {
+    switch (val) {
+      case 'large':
+        settingsManager.satShader = {
+          minSize: 15.0,
+          maxSize: 70.0,
+          largeObjectMinZoom: 0.37,
+          largeObjectMaxZoom: 0.58,
+          minSizePlanetarium: 20.0,
+          maxSizePlanetarium: 20.0,
+          maxAllowedSize: 35.0,
+          isUseDynamicSizing: false,
+          dynamicSizeScalar: 1.0,
+          starSize: '20.0',
+          distanceBeforeGrow: '14000.0',
+          blurFactor1: '0.76',
+          blurFactor2: '0.4',
+          blurFactor3: '0.43',
+          blurFactor4: '0.25',
+        };
+
+        return true;
+      default:
+        return false;
     }
   }
 }

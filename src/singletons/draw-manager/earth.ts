@@ -21,7 +21,6 @@
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
-import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { GlUtils } from '@app/static/gl-utils';
 import { GLSL3 } from '@app/static/material';
 import { Mesh } from '@app/static/mesh';
@@ -516,7 +515,7 @@ export class Earth {
     if ((!this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality] &&
       !this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]) || settingsManager.isBlackEarth) {
       gl.bindTexture(gl.TEXTURE_2D, null);
-    } else if (!keepTrackApi.getPlugin(NightToggle)?.isMenuButtonActive && this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]) {
+    } else if (!settingsManager.isDrawNightAsDay && this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]);
     } else if (this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality] && !settingsManager.isBlackEarth) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]);

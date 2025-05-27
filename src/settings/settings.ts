@@ -91,6 +91,7 @@ export class SettingsManager {
   isDisableBottomMenu = false;
   /** The initial time offset */
   staticOffset: number = 0; // in seconds
+  isDrawNightAsDay = false;
 
 
   static preserveSettings() {
@@ -1391,13 +1392,10 @@ export class SettingsManager {
     // override values in this with overrides
 
     for (const key of Object.keys(overrides)) {
-      if (key in this) {
-        if (key === 'colors' || key === 'plugins') {
-          // Merge the colors object
-          this[key] = { ...this[key], ...overrides[key] };
-        } else {
-          this[key] = overrides[key];
-        }
+      if (typeof overrides[key] === 'object' && overrides[key] !== null) {
+        this[key] = { ...this[key], ...overrides[key] };
+      } else {
+        this[key] = overrides[key];
       }
     }
   }

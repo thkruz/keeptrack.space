@@ -696,7 +696,7 @@ export class SettingsManager {
   /**
    * Disables the loading of control site data
    */
-  isDisableControlSites = false;
+  isDisableControlSites = true;
   /**
    * Disables the loading of launch site data
    */

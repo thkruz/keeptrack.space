@@ -342,4 +342,5 @@ export enum KeepTrackApiEvents {
   parseGetVariables = 'parseGetVariables',
   rightBtnMenuOpen = 'rightBtnMenuOpen',
   searchUpdated = 'searchUpdated',
+  legendUpdated = 'legendUpdated',
 }

@@ -1,6 +1,7 @@
 /* eslint-disable complexity */
-import { ColorInformation, Pickable, rgbaArray } from '@app/interfaces';
+import { ColorInformation, KeepTrackApiEvents, Pickable, rgbaArray } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { hideEl } from '@app/lib/get-el';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../camera';
 import { MissileObject } from '../catalog-manager/MissileObject';
@@ -49,6 +50,32 @@ export class CelestrakColorScheme extends ColorScheme {
     this.objectTypeFlags = {
       ...this.objectTypeFlags, ...CelestrakColorScheme.uniqueObjectTypeFlags,
     };
+
+    keepTrackApi.on(KeepTrackApiEvents.legendUpdated, () => {
+      if (settingsManager.isDisableSensors) {
+        this.objectTypeFlags.celestrakDefaultSensor = false;
+        this.objectTypeFlags.celestrakDefaultFov = false;
+        const sensorBox = document.querySelector('.legend-celestrakDefaultSensor-box')?.parentElement as HTMLElement;
+        const inFOVBox = document.querySelector('.legend-celestrakDefaultFov-box')?.parentElement as HTMLElement;
+
+        if (sensorBox) {
+          hideEl(sensorBox);
+        }
+
+        if (inFOVBox) {
+          hideEl(inFOVBox);
+        }
+      }
+
+      if (settingsManager.isDisableLaunchSites) {
+        this.objectTypeFlags.facility = false;
+        const launchSiteBox = document.querySelector('.legend-facility-box')?.parentElement as HTMLElement;
+
+        if (launchSiteBox) {
+          hideEl(launchSiteBox);
+        }
+      }
+    });
   }
 
   update(obj: BaseObject): ColorInformation {
@@ -314,6 +341,10 @@ export class CelestrakColorScheme extends ColorScheme {
     <li>
       <div class="Square-Box legend-celestrakDefaultSensor-box"></div>
       Sensor
+    </li>
+    <li>
+      <div class="Square-Box legend-facility-box"></div>
+      Launch Site
     </li>
   </ul>
   `.trim();

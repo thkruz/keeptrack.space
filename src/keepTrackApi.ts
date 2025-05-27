@@ -115,6 +115,7 @@ type KeepTrackApiEventArguments = {
   [InputEventType.KeyPress]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [KeepTrackApiEvents.parseGetVariables]: [string[]]; // params
   [KeepTrackApiEvents.searchUpdated]: [string]; // search term
+  [KeepTrackApiEvents.legendUpdated]: [string]; // legend name
 };
 
 interface KeepTrackApiRegisterParams<T extends EventBusEvent> {

@@ -23,17 +23,13 @@ export class SourceColorScheme extends ColorScheme {
 
   static readonly uniqueObjectTypeFlags = {
     sourceUssf: true,
-    sourceAldoria: true,
     sourceCelestrak: true,
-    sourcePrismnet: true,
     sourceVimpel: true,
   };
 
   static readonly uniqueColorTheme = {
     sourceUssf: [0.2, 1.0, 1.0, 0.7] as rgbaArray,
-    sourceAldoria: [0.2, 0.4, 1.0, 1] as rgbaArray,
-    sourceCelestrak: [1.0, 0.75, 0.0, 0.65] as rgbaArray,
-    sourcePrismnet: [1.0, 1.0, 1.0, 0.8] as rgbaArray,
+    sourceCelestrak: [0, 0.2, 1.0, 0.85] as rgbaArray,
     sourceVimpel: [1.0, 0, 0, 0.6] as rgbaArray,
   };
 
@@ -100,19 +96,6 @@ export class SourceColorScheme extends ColorScheme {
             pickable: Pickable.Yes,
           };
 
-        case 'Aldoria':
-          if (this.objectTypeFlags.sourceAldoria === false) {
-            return {
-              color: this.colorTheme.deselected,
-              pickable: Pickable.No,
-            };
-          }
-
-          return {
-            color: this.colorTheme.sourceAldoria,
-            pickable: Pickable.Yes,
-          };
-
         case 'Celestrak':
           if (this.objectTypeFlags.sourceCelestrak === false) {
             return {
@@ -125,20 +108,6 @@ export class SourceColorScheme extends ColorScheme {
             color: this.colorTheme.sourceCelestrak,
             pickable: Pickable.Yes,
           };
-
-        case 'Prismnet':
-          if (this.objectTypeFlags.sourcePrismnet === false) {
-            return {
-              color: this.colorTheme.deselected,
-              pickable: Pickable.No,
-            };
-          }
-
-          return {
-            color: this.colorTheme.sourcePrismnet,
-            pickable: Pickable.Yes,
-          };
-
 
         case 'JSC Vimpel':
           if (this.objectTypeFlags.sourceVimpel === false) {

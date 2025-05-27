@@ -1,3 +1,4 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
 import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { ObjectTypeColorScheme } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { keepTrackApi } from '../keepTrackApi';
@@ -66,6 +67,7 @@ export abstract class LegendManager {
     // Update Legend Colors
     LegendManager.legendColorsChange();
     settingsManager.currentLegend = menu;
+    keepTrackApi.emit(KeepTrackApiEvents.legendUpdated, menu);
   }
 
   static legendColorsChange(): void {

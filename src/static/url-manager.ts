@@ -1,6 +1,5 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
-import { GodraySamples } from '@app/plugins-pro/graphics-menu/graphics-menu';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager, settingsManager } from '@app/settings/settings';
@@ -574,21 +573,21 @@ export abstract class UrlManager {
         settingsManager.isDisableGodrays = true;
         break;
       case 'potato':
-        settingsManager.godraysSamples = GodraySamples.OFF;
+        settingsManager.godraysSamples = -1; // GodraySamples.OFF
         settingsManager.isUseSunTexture = true;
         settingsManager.isDisableGodrays = true;
         break;
       case 'low':
-        settingsManager.godraysSamples = GodraySamples.LOW;
+        settingsManager.godraysSamples = 16; // GodraySamples.LOW
         break;
       case 'medium':
-        settingsManager.godraysSamples = GodraySamples.MEDIUM;
+        settingsManager.godraysSamples = 32; // GodraySamples.MEDIUM
         break;
       case 'high':
-        settingsManager.godraysSamples = GodraySamples.HIGH;
+        settingsManager.godraysSamples = 64; // GodraySamples.HIGH
         break;
       case 'ultra':
-        settingsManager.godraysSamples = GodraySamples.ULTRA;
+        settingsManager.godraysSamples = 128; // GodraySamples.ULTRA
         break;
       default:
         console.warn(`Unknown sun parameter: ${val}`);

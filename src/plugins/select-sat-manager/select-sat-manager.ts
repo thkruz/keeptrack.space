@@ -233,10 +233,12 @@ export class SelectSatManager extends KeepTrackPlugin {
       this.selectSatChange_(sat);
       if (sat.id >= 0 && sat instanceof DetailedSatellite) {
         const covMatrix = createSampleCovarianceFromTle(sat.tle1, sat.tle2).matrix.elements;
+
+        // Cap radii at 1200 km (radial), 1000 km (cross-track), and 5000 km (in-track) to avoid huge bubbles
         const radii = [
-          Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, // Radial
-          Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, // Cross-track
-          Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, // In-track
+          Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
+          Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
+          Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
         ] as vec3;
 
         this.primarySatCovMatrix = radii;
@@ -391,10 +393,12 @@ export class SelectSatManager extends KeepTrackPlugin {
 
       if ((this.secondarySatObj?.id ?? -1) >= 0 && this.secondarySatObj instanceof DetailedSatellite) {
         const covMatrix = createSampleCovarianceFromTle(this.secondarySatObj.tle1, this.secondarySatObj.tle2).matrix.elements;
+
+        // Cap radii at 1200 km (radial), 1000 km (cross-track), and 5000 km (in-track) to avoid huge bubbles
         const radii = [
-          Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, // Radial
-          Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, // Cross-track
-          Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, // In-track
+          Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
+          Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
+          Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
         ] as vec3;
 
         this.secondarySatCovMatrix = radii;

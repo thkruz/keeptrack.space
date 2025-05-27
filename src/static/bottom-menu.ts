@@ -22,7 +22,7 @@ export class BottomMenu {
       keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, BottomMenu.createBottomMenu);
       keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, BottomMenu.addBottomMenuFilterButtons);
     }
-    BottomMenu.updateBottomMenuVisibility_();
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, BottomMenu.updateBottomMenuVisibility_);
 
   }
   static createBottomMenu(): void {

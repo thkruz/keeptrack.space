@@ -82,7 +82,7 @@ export class SettingsManager {
   isBlockPersistence = false;
   /** Center on a satellite when it is selected. */
   isFocusOnSatelliteWhenSelected = true;
-  isUseJdayOnTopMenu = false;
+  isUseJdayOnTopMenu = true;
   /** Flag to determine if loading hints are shown on splash screen*/
   isShowLoadingHints = true;
   /**

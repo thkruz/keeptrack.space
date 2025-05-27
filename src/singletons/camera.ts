@@ -422,43 +422,63 @@ export class Camera {
 
     const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
+    // Updated zoom logic for satellite/covariance bubble proximity
+    const mainCamera = this as Camera;
+    const isCameraCloseToSatellite = mainCamera.camDistBuffer < settingsManager.nearZoomLevel;
+    const maxCovarianceDistance = Math.min((keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
+    const isCameraCloseToCovarianceBubble = settingsManager.isDrawCovarianceEllipsoid &&
+      mainCamera.camDistBuffer < maxCovarianceDistance;
+
     if (settingsManager.isZoomStopsSnappedOnSat || !selectSatManagerInstance || selectSatManagerInstance?.selectedSat === -1) {
-      this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
-      this.earthCenteredLastZoom = this.zoomTarget_;
-      this.camZoomSnappedOnSat = false;
-    } else if (!settingsManager.isMobileModeEnabled &&
-      ((this.camDistBuffer < settingsManager.nearZoomLevel || this.camDistBuffer < (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25) ||
-        this.zoomLevel_ === -1)) {
+      mainCamera.zoomTarget += delta / 100 / 25 / mainCamera.speedModifier; // delta is +/- 100
+      mainCamera.earthCenteredLastZoom = mainCamera.zoomTarget;
+      mainCamera.camZoomSnappedOnSat = false;
+    } else if ((isCameraCloseToSatellite || isCameraCloseToCovarianceBubble) ||
+      mainCamera.zoomLevel() === -1) {
       // Inside camDistBuffer
       settingsManager.selectedColor = [0, 0, 0, 0];
-      this.camDistBuffer = <Kilometers>(this.camDistBuffer + delta / 100); // delta is +/- 100
-      this.camDistBuffer = <Kilometers>Math.min(
+
+      /*
+       * Slowly zoom in/out, scaling speed with camDistBuffer (farther = faster)
+       * Exponential scaling for smoother zoom near the satellite
+       */
+      const scale = Math.max(0.01, (mainCamera.camDistBuffer / 100) ** 1.15); // Exponential factor > 1 for faster scaling as distance increases
+
+      mainCamera.camDistBuffer = <Kilometers>(mainCamera.camDistBuffer + (delta / 5) * scale); // delta is +/- 100
+
+      // Clamping camDistBuffer to be between minDistanceFromSatellite and maxZoomDistance
+      mainCamera.camDistBuffer = <Kilometers>Math.min(
         Math.max(
-          this.camDistBuffer,
-          this.settings_.minDistanceFromSatellite,
+          mainCamera.camDistBuffer,
+          settingsManager.minDistanceFromSatellite,
         ),
         Math.max(
           settingsManager.nearZoomLevel,
-          (keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix[2] ?? 0) * 2.25,
+          maxCovarianceDistance,
         ),
       );
-    } else if (this.camDistBuffer >= settingsManager.nearZoomLevel) {
+    } else if (mainCamera.camDistBuffer >= settingsManager.nearZoomLevel) {
       // Outside camDistBuffer
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
-      this.zoomTarget += delta / 100 / 25 / this.speedModifier; // delta is +/- 100
-      this.earthCenteredLastZoom = this.zoomTarget;
-      this.camZoomSnappedOnSat = false;
+      mainCamera.zoomTarget += delta / 100 / 25 / mainCamera.speedModifier; // delta is +/- 100
+      mainCamera.earthCenteredLastZoom = mainCamera.zoomTarget;
+      mainCamera.camZoomSnappedOnSat = false;
 
       // calculate camera distance from target
       const target = selectSatManagerInstance.getSelectedSat();
 
       if (target) {
         const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
-        const curMinZoomLevel = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
+        const curMinZoomLevel = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
 
-        if (this.zoomTarget < this.zoomLevel_ && this.zoomTarget < curMinZoomLevel) {
-          this.camZoomSnappedOnSat = true;
-          this.camDistBuffer = <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), this.settings_.minDistanceFromSatellite);
+        if (mainCamera.zoomTarget < mainCamera.zoomLevel() && mainCamera.zoomTarget < curMinZoomLevel) {
+          mainCamera.camZoomSnappedOnSat = true;
+
+          if (settingsManager.isDrawCovarianceEllipsoid) {
+            mainCamera.camDistBuffer = <Kilometers>(Math.max(Math.max(mainCamera.camDistBuffer, settingsManager.nearZoomLevel), maxCovarianceDistance) - 1);
+          } else {
+            mainCamera.camDistBuffer = <Kilometers>Math.min(Math.max(mainCamera.camDistBuffer, settingsManager.nearZoomLevel), settingsManager.minDistanceFromSatellite);
+          }
         }
       }
     }

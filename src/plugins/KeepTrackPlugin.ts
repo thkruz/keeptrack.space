@@ -55,7 +55,7 @@ export abstract class KeepTrackPlugin {
   /**
    * The dependencies of the plugin.
    */
-  protected abstract dependencies_: string[];
+  protected dependencies_: string[] = [];
   /**
    * Whether the plugin's HTML has been added.
    */

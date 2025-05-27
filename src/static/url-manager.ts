@@ -146,6 +146,8 @@ export abstract class UrlManager {
         case 'tle':
           // Decode from UTF-8
           settingsManager.dataSources.externalTLEs = decodeURIComponent(kv[key]);
+          settingsManager.dataSources.isSupplementExternal = true;
+          settingsManager.isMissionDataEnabled = false;
           break;
         case 'limitSats':
           settingsManager.limitSats = kv[key];

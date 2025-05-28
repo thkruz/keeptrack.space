@@ -1,4 +1,3 @@
----
 name: Build Pipeline
 
 on:
@@ -8,165 +7,123 @@ on:
       - main
       - develop
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   lint-yml:
-    name: Yaml Lint
+    name: YAML Lint
     runs-on: ubuntu-latest
     steps:
-      # Checkout Code
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      # Lint Yaml Code
+      - uses: actions/checkout@v4
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3.1.1
         with:
-          file_or_dir: |
-            ${{ github.workspace }}/.github/workflows/build-pipeline.yml
+          file_or_dir: ${{ github.workspace }}
+            /.github/workflows/build-pipeline.yml
+
   compliance:
     needs: lint-yml
-    name: NPM Audit Report
+    name: NPM Audit
     runs-on: ubuntu-latest
     steps:
-      # Checkout Code
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      # Audit Package.json
-      - name: NPM Audit Action
-        uses: oke-py/npm-audit-action@main
+      - uses: ./.github/actions/node-setup
+      - name: NPM Audit
+        uses: oke-py/npm-audit-action@v3.0.0
         with:
           issue_assignees: thkruz
           issue_labels: Security
           dedupe_issues: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
-  eslint:
+
+  lint-and-test:
     needs: compliance
-    name: Lint
+    name: Lint and Test
     runs-on: ubuntu-latest
-
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [eslint, unit-test]
     steps:
-      # Checkout code
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      # Setup Node
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      # Get Node Modules from Cache
-      - name: Cache node modules
-        uses: actions/cache@v4.2.3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
-      # Ensure Node Modules Setup
-      - name: Install Dependencies
-        run: npm ci --ignore-scripts
-      # Run ESLint
-      - name: ESLint
-        run: npx eslint . --ignore-path .gitignore --ext js,ts,tsx
-  unit-tests:
-    needs: compliance
-    name: Unit Tests
-    runs-on: ubuntu-latest
+      - uses: ./.github/actions/node-setup
 
-    steps:
-      # Checkout code
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      # Setup Node
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      # Get Node Modules from Cache
-      - name: Cache node modules
-        uses: actions/cache@v4.2.3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
-      # Set up SSH for deploy key
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-
-      - name: Update submodules
-        run: git submodule update --init --recursive
-      # Ensure Node Modules Setup
-      - name: Install Dependencies
-        run: npm ci --ignore-scripts
-      # Set Timezone to match snapshots
       - name: Set Timezone
+        if: matrix.task == 'unit-test'
         uses: szenius/set-timezone@v1.2
         with:
           timezoneLinux: 'America/New_York'
-      # Unit Tests
-      - name: Test
-        run: npm test
+
+      - name: ESLint
+        if: matrix.task == 'eslint'
+        run: |
+          echo "Running ESLint..."
+          npx eslint . --ignore-path .gitignore --ext js,ts,tsx \
+            | tee eslint-report.txt
+          echo "### ESLint Summary" >> $GITHUB_STEP_SUMMARY
+          tail -n 20 eslint-report.txt >> $GITHUB_STEP_SUMMARY
+
+      - name: Unit Tests
+        if: matrix.task == 'unit-test'
+        run: |
+          echo "Running Unit Tests..."
+          npm test | tee test-report.txt
+          echo "### Unit Test Summary" >> $GITHUB_STEP_SUMMARY
+          tail -n 20 test-report.txt >> $GITHUB_STEP_SUMMARY
+
   build:
-    needs: [eslint, unit-tests]
+    needs: lint-and-test
     name: Build
     runs-on: ubuntu-latest
-
     steps:
-      # Checkout code
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      # Setup Node
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      # Get Node Modules from Cache
-      - name: Cache node modules
-        uses: actions/cache@v4.2.3
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
-      # Set up SSH for deploy key
-      - name: Set up SSH
+      - uses: ./.github/actions/node-setup
+
+      - name: Set up SSH for submodules
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+
       - name: Update submodules
         run: git submodule update --init --recursive
-      # Ensure Node Modules Setup
-      - name: Install Dependencies
-        run: npm ci --ignore-scripts
-      # Build
+
       - name: Build
-        run: npm run build
+        run: |
+          echo "Running Build..."
+          npm run build
+          echo "### Build Complete" >> $GITHUB_STEP_SUMMARY
+          echo "Build on $(date)" >> $GITHUB_STEP_SUMMARY
+
   trufflehog:
     needs: build
     name: TruffleHog
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: TruffleHog OSS
         uses: trufflesecurity/trufflehog@v3.82.6
-  codeQl:
+        continue-on-error: true
+
+  codeql:
     needs: build
     name: CodeQL
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      # CodeQL
+      - uses: actions/checkout@v4
+
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
-          languages: javascript
+          languages: typescript
 
       - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@v3
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+      - name: Analyze with CodeQL
+        uses: github/codeql-action/analyze@v3

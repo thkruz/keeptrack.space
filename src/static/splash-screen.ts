@@ -43,16 +43,19 @@ export abstract class SplashScreen {
       </div>`;
 
     // If this is the official website, update the copyright notice
-    if (window.location.hostname === 'app.keeptrack.space') {
+    if (window.location.hostname.endsWith('keeptrack.space')) {
       const copyrightNotice = getEl('copyright-notice');
 
+      // TODO: Handle this better, elsewhere, and with other languages
       if (copyrightNotice) {
-        copyrightNotice.innerHTML = `
-          KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>
-          This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible.<br>
-          Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>
-          © 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.
-        `;
+        copyrightNotice.innerHTML = copyrightNotice.innerHTML.replace(
+          ' No commercial license has been granted. No compensation has been provided to the rights holder.',
+          '',
+        );
+        copyrightNotice.innerHTML = copyrightNotice.innerHTML.replace(
+          '<br>No commercial license has been granted, and no compensation has been provided to the rights holder.',
+          '',
+        );
       }
     }
 

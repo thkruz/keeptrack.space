@@ -43,7 +43,9 @@ export abstract class SplashScreen {
       </div>`;
 
     // If this is the official website, update the copyright notice
-    if (window.location.hostname.endsWith('keeptrack.space')) {
+    const trustedDomains = ['keeptrack.space', 'www.keeptrack.space', 'app.keeptrack.space', 'embed.keeptrack.space'];
+
+    if (trustedDomains.includes(window.location.hostname)) {
       const copyrightNotice = getEl('copyright-notice');
 
       // TODO: Handle this better, elsewhere, and with other languages

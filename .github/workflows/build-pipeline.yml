@@ -125,6 +125,9 @@ jobs:
       - name: Update submodules
         run: git submodule update --init --recursive
 
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+
       - name: Build
         run: npm run build
   trufflehog:

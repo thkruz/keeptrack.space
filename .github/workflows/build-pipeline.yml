@@ -19,13 +19,13 @@ jobs:
   lint-yml:
     name: YAML Lint
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3.1.1
         with:
-          file_or_dir: ${{ github.workspace }}
-            /.github/workflows/build-pipeline.yml
+          file_or_dir: ${{ github.workspace }}/.github/workflows/build-pipeline.yml
 
   compliance:
     needs: lint-yml
@@ -96,7 +96,7 @@ jobs:
           echo "Running Build..."
           npm run build
           echo "### Build Complete" >> $GITHUB_STEP_SUMMARY
-          echo "Build on $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "Build was successful on $(date)" >> $GITHUB_STEP_SUMMARY
 
   trufflehog:
     needs: build

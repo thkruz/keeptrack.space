@@ -67,6 +67,13 @@ jobs:
           key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
 
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+      - name: Update submodules
+        run: git submodule update --init --recursive
+
       - name: Install Dependencies
         run: npm ci --ignore-scripts
 

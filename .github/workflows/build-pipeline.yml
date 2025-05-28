@@ -1,3 +1,4 @@
+---
 name: Build Pipeline
 
 on:
@@ -7,123 +8,145 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+  issues: write
+  actions: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-  issues: write
-
 jobs:
   lint-yml:
-    name: YAML Lint
+    name: Yaml Lint
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
       - name: YAML Lint
         uses: ibiqlik/action-yamllint@v3.1.1
         with:
-          file_or_dir: ${{ github.workspace }}/.github/workflows/build-pipeline.yml
-
+          file_or_dir: .github/workflows/build-pipeline.yml
   compliance:
     needs: lint-yml
-    name: NPM Audit
+    name: NPM Audit Report
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/node-setup
-      - name: NPM Audit
-        uses: oke-py/npm-audit-action@v3.0.0
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      - name: NPM Audit Action
+        uses: oke-py/npm-audit-action@main
         with:
           issue_assignees: thkruz
           issue_labels: Security
           dedupe_issues: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
-
   lint-and-test:
     needs: compliance
-    name: Lint and Test
+    name: Lint and Unit Tests
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         task: [eslint, unit-test]
     steps:
-      - uses: ./.github/actions/node-setup
+      - uses: actions/checkout@v4
 
-      - name: Set Timezone
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Cache node modules
+        uses: actions/cache@v4.2.3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
+
+      - name: Install Dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Set Timezone (only for tests)
         if: matrix.task == 'unit-test'
         uses: szenius/set-timezone@v1.2
         with:
           timezoneLinux: 'America/New_York'
 
-      - name: ESLint
+      - name: Run ESLint
         if: matrix.task == 'eslint'
         run: |
           echo "Running ESLint..."
-          npx eslint . --ignore-path .gitignore --ext js,ts,tsx \
-            | tee eslint-report.txt
-          echo "### ESLint Summary" >> $GITHUB_STEP_SUMMARY
-          tail -n 20 eslint-report.txt >> $GITHUB_STEP_SUMMARY
+          npx eslint . --ignore-path .gitignore --ext js,ts,tsx
+          echo '### ESLint Passed' >> $GITHUB_STEP_SUMMARY
 
-      - name: Unit Tests
+      - name: Run Unit Tests
         if: matrix.task == 'unit-test'
         run: |
           echo "Running Unit Tests..."
-          npm test | tee test-report.txt
-          echo "### Unit Test Summary" >> $GITHUB_STEP_SUMMARY
-          tail -n 20 test-report.txt >> $GITHUB_STEP_SUMMARY
-
+          npm test
+          echo '### Unit Tests Passed' >> $GITHUB_STEP_SUMMARY
   build:
-    needs: lint-and-test
+    needs: [lint-and-test]
     name: Build
     runs-on: ubuntu-latest
-    steps:
-      - uses: ./.github/actions/node-setup
 
-      - name: Set up SSH for submodules
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+
+        with:
+          node-version: '18'
+      - name: Cache node modules
+        uses: actions/cache@v4.2.3
+
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
+
+      - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-
       - name: Update submodules
         run: git submodule update --init --recursive
 
       - name: Build
-        run: |
-          echo "Running Build..."
-          npm run build
-          echo "### Build Complete" >> $GITHUB_STEP_SUMMARY
-          echo "Build was successful on $(date)" >> $GITHUB_STEP_SUMMARY
-
+        run: npm run build
   trufflehog:
     needs: build
-    name: TruffleHog
+    name: TruffleHog Secrets Scan
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: TruffleHog OSS
+
+      - name: Run TruffleHog
         uses: trufflesecurity/trufflehog@v3.82.6
-        continue-on-error: true
 
   codeql:
     needs: build
-    name: CodeQL
+    name: CodeQL Security Scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
-          languages: typescript
+          languages: javascript
 
       - name: Autobuild
         uses: github/codeql-action/autobuild@v3
 
-      - name: Analyze with CodeQL
+      - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

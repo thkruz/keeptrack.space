@@ -137,7 +137,7 @@ export abstract class UrlManager {
           isUsingParsedVariables = true;
           break;
         case 'vimpel':
-          settingsManager.isShowVimpelSats = kv[key].toLowerCase() === 'true';
+          settingsManager.isEnableJscCatalog = kv[key].toLowerCase() === 'true';
           break;
         case 'external-only':
           settingsManager.dataSources.externalTLEsOnly = true;

@@ -231,10 +231,6 @@ export class SettingsManager {
    */
   isShowNotionalSats = true;
   /**
-   * Determines whether or not to show Vimpel satellites in the application.
-   */
-  isShowVimpelSats = true;
-  /**
    * Determines whether or not to show Starlink satellites in the application.
    */
   isShowStarlinkSats = true;

@@ -136,6 +136,9 @@ export abstract class UrlManager {
           settingsManager.isDisableBottomMenu = kv[key].toLowerCase() === 'false';
           isUsingParsedVariables = true;
           break;
+        case 'vimpel':
+          settingsManager.isEnableJscCatalog = kv[key].toLowerCase() === 'true';
+          break;
         case 'external-only':
           settingsManager.dataSources.externalTLEsOnly = true;
           break;

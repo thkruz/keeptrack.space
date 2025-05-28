@@ -55,17 +55,11 @@ jobs:
           node-version: '18'
       # Get Node Modules from Cache
       - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
+        uses: actions/cache@v4.2.3
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
-              ${{hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
       # Ensure Node Modules Setup
       - name: Install Dependencies
         run: npm ci --ignore-scripts
@@ -88,17 +82,11 @@ jobs:
           node-version: '18'
       # Get Node Modules from Cache
       - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
+        uses: actions/cache@v4.2.3
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
-              ${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
       # Set up SSH for deploy key
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
@@ -124,18 +112,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Set up SSH for deploy key
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-
       # Checkout code
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
-          token: ${{ secrets.GITHUB_TOKEN }}
       # Setup Node
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -143,17 +122,16 @@ jobs:
           node-version: '18'
       # Get Node Modules from Cache
       - name: Cache node modules
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-node-modules
+        uses: actions/cache@v4.2.3
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build- ${{ env.cache-name }}-
-              ${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
+          key: ${{ runner.os }}-build-node-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: ${{ runner.os }}-build-node-modules-${{ runner.os }}-
+      # Set up SSH for deploy key
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Update submodules
         run: git submodule update --init --recursive
       # Ensure Node Modules Setup
@@ -162,13 +140,6 @@ jobs:
       # Build
       - name: Build
         run: npm run build
-
-      # - name: Save build folder
-      #   uses: actions/upload-artifact@v3.1.3
-      #   with:
-      #     name: build
-      #     if-no-files-found: error
-      #     path: dist
   trufflehog:
     needs: build
     name: TruffleHog

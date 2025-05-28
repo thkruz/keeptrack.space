@@ -43,7 +43,7 @@
  */
 
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { getEl, showEl } from '@app/lib/get-el';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import mapPng from '@public/img/icons/map.png';
@@ -53,7 +53,6 @@ import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
 
 import { dateFormat } from '@app/lib/dateFormat';
-import { SatMath } from '@app/static/sat-math';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LlaVec3, calcGmst, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -109,10 +108,9 @@ export class StereoMap extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         this.canvas_ = <HTMLCanvasElement>getEl('map-2d');
 
         this.resize2DMap_();
@@ -134,21 +132,19 @@ export class StereoMap extends KeepTrackPlugin {
           this.mapMenuClick_(evt);
         });
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.id,
-      cb: this.onCruncherMessage_.bind(this),
-    });
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherMessage,
+      this.onCruncherMessage_.bind(this),
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {
           return;
         }
@@ -156,13 +152,10 @@ export class StereoMap extends KeepTrackPlugin {
           this.updateMap();
         }
       },
-    });
+    );
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyUpEvent({
-      key: 'M',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'M' && !isRepeat) {
         if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
           return;
         }
@@ -177,7 +170,7 @@ export class StereoMap extends KeepTrackPlugin {
           this.setBottomIconToUnselected();
           keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
         }
-      },
+      }
     });
   }
 
@@ -214,7 +207,13 @@ export class StereoMap extends KeepTrackPlugin {
     const time = dateFormat(now, 'isoDateTime', true);
     let overallView: boolean = false;
     const { gmst } = calcGmst(now);
-    const lla = eci2lla(sat.eci(now).position, gmst);
+    const eci = sat.eci(now);
+
+    if (!eci) {
+      return { lla: { lat: 0 as Degrees, lon: 0 as Degrees, alt: 0 as Kilometers }, overallView, time };
+    }
+
+    const lla = eci2lla(eci.position, gmst);
 
     for (const sensor of sensorList) {
       if (sensor.isSatInFov(sat, now)) {
@@ -325,7 +324,7 @@ export class StereoMap extends KeepTrackPlugin {
 
     if (settingsManager.classificationStr !== '') {
       ctx.font = '24px nasalization';
-      textWidth = ctx.measureText(settingsManager.classificationStr).width;
+      textWidth = ctx.measureText(settingsManager.classificationStr ?? '').width;
       ctx.globalAlpha = 1.0;
       switch (settingsManager.classificationStr) {
         case 'Top Secret//SCI':
@@ -389,7 +388,6 @@ export class StereoMap extends KeepTrackPlugin {
 
   private updateSatPosition_() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
 
     const sat = catalogManagerInstance.getObject(this.selectSatManager_?.selectedSat ?? -1);
 
@@ -397,7 +395,7 @@ export class StereoMap extends KeepTrackPlugin {
       return;
     }
 
-    const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+    const gmst = keepTrackApi.getTimeManager().gmst;
     const lla = eci2lla(sat.position, gmst);
     const map = {
       x: ((lla.lon + 180) / 360) * settingsManager.mapWidth,

@@ -100,7 +100,9 @@
     "coloring": "Färbe innerhalb der Linien...",
     "elsets": "Lokalisiere GPs...",
     "models": "Erstelle 3D-Modelle...",
-    "cunningPlan": "Erstelle einen hinterhältigen Plan..."
+    "cunningPlan": "Erstelle einen hinterhältigen Plan...",
+    "copyrightNotice": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben.<br>Es wurde keine kommerzielle Lizenz erteilt und dem Rechteinhaber wurde keine Vergütung gewährt.<br>Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen.",
+    "copyrightNoticeMobile": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben. Es wurde keine kommerzielle Lizenz erteilt. Dem Rechteinhaber wurde keine Vergütung gewährt. Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen."
   },
   "splashScreens": {
     "1": "Satellitenmodelle erscheinen größer als sie in Wirklichkeit sind. Alles andere ist maßstabsgetreu.",

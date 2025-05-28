@@ -38,11 +38,7 @@ export abstract class SplashScreen {
         <div id="loading-hint">Hint: ${this.showHint()}</div>
         <div id="version-text">v10.5.2</div>
         <div id="copyright-notice">
-KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>
-This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible.<br>
-No commercial license has been granted, and no compensation has been provided to the rights holder.<br>
-Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>
-© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.
+          ${settingsManager.isMobileModeEnabled ? t7e('loadingScreenMsgs.copyrightNoticeMobile') : t7e('loadingScreenMsgs.copyrightNotice')}
         </div>
       </div>`;
 
@@ -58,6 +54,10 @@ Unauthorized use, rebranding, or removal of attribution may violate trademark an
           © 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.
         `;
       }
+    }
+
+    if (!settingsManager.isShowLoadingHints) {
+      hideEl('loading-hint');
     }
   }
 
@@ -86,6 +86,7 @@ Unauthorized use, rebranding, or removal of attribution may violate trademark an
     if (settingsManager.isMobileModeEnabled) {
       SplashScreen.loadStr(SplashScreen.msg.math);
       hideEl('loading-screen');
+      showEl('keeptrack-header');
     } else {
       // Loading Screen Resized and Hidden
       setTimeout(() => {
@@ -93,6 +94,7 @@ Unauthorized use, rebranding, or removal of attribution may violate trademark an
         getEl('loading-screen')?.classList.add('mini-loader-container');
         getEl('logo-inner-container')?.classList.add('mini-loader');
         hideEl('loading-screen');
+        showEl('keeptrack-header');
         SplashScreen.loadStr(SplashScreen.msg.math);
       }, 100);
     }
@@ -101,6 +103,8 @@ Unauthorized use, rebranding, or removal of attribution may violate trademark an
     hideEl('loading-hint');
     hideEl('logo-text');
     hideEl('logo-text-version');
+    hideEl('copyright-notice');
+    hideEl('version-text');
   }
 
   static loadStr(str: string) {

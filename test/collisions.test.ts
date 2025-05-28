@@ -32,7 +32,7 @@ describe('CollisionsPlugin_class', () => {
 
   it('should have clickable objects', () => {
     websiteInit(satConstellationsPlugin);
-    getEl('collisions-menu').click();
+    getEl(`${satConstellationsPlugin.id}-menu`)!.click();
     satConstellationsPlugin['collisionList_'] = [
       {
         ID: 1,

@@ -146,10 +146,9 @@ export class ProximityOps extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
 
         getEl('submit')!.addEventListener('click', (e) => {
           this.onSubmit_(e);
@@ -183,21 +182,20 @@ export class ProximityOps extends KeepTrackPlugin {
 
         getEl(`${this.sideMenuElementName}-secondary-btn`)!.style.color = 'var(--statusDarkDisabled)';
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         if (this.isMenuButtonActive && obj?.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl('proximity-ops-norad')).value) {
           this.updateNoradId_();
         }
       },
-    });
+    );
   }
 
   bottomIconCallback = (): void => {

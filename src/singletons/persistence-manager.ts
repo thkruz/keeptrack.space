@@ -97,6 +97,9 @@ export class PersistenceManager {
   }
 
   getItem(key: string): string | null {
+    if (settingsManager.isBlockPersistence) {
+      return null;
+    }
     PersistenceManager.verifyKey_(key);
 
     const value = this.storage_.getItem(key);
@@ -121,11 +124,27 @@ export class PersistenceManager {
   }
 
   saveItem(key: string, value: string): void {
+    if (settingsManager.isBlockPersistence) {
+      return;
+    }
+
+    if (value === null || typeof value === 'undefined') {
+      this.removeItem(key);
+
+      return;
+    }
+
     PersistenceManager.verifyKey_(key);
     try {
       this.storage_.setItem(key, value);
     } catch {
       errorManagerInstance.debug(`Failed to save to local storage: ${key}=${value}`);
+    }
+  }
+
+  clear(): void {
+    for (const key of Object.values(StorageKey)) {
+      this.storage_.removeItem(key);
     }
   }
 

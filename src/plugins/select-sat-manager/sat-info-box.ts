@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/catalogs/countries';
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
@@ -75,71 +75,35 @@ export class SatInfoBox extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    /*
-     * NOTE: This has to go first.
-     * Register orbital element data
-     */
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_orbitalData`,
-      cb: this.orbitalData.bind(this),
-    });
+    // NOTE: This has to go first.
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.orbitalData.bind(this));
+    // -------------------------------------------------
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSensorInfo_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateLaunchData_.bind(this));
+    keepTrackApi.on(InputEventType.KeyDown, this.onKeyDownLowerI_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSatMissionData_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateObjectData_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+  }
 
-    // Register sensor data
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_sensorInfo`,
-      cb: SatInfoBox.updateSensorInfo_.bind(this),
-    });
+  private onKeyDownLowerI_(key: string): void {
+    if (key !== 'i') {
+      return;
+    }
 
-    // Register launch data
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_launchData`,
-      cb: SatInfoBox.updateLaunchData_.bind(this),
-    });
-
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyDownEvent({
-      key: 'i',
-      callback: () => {
-        if (this.isVisible_) {
-          this.hide();
-        } else {
-          this.show();
-        }
-      },
-    });
-
-    // Register mission data
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_satMissionData`,
-      cb: SatInfoBox.updateSatMissionData_.bind(this),
-    });
-
-    // Register object data
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: `${this.id}_objectData`,
-      cb: SatInfoBox.updateObjectData_,
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    if (this.isVisible_) {
+      this.hide();
+    } else {
+      this.show();
+    }
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateSelectBox,
-      cbName: this.id,
+    keepTrackApi.on(
+      KeepTrackApiEvents.updateSelectBox,
       // eslint-disable-next-line complexity, max-statements
-      cb: (obj: BaseObject) => {
+      (obj: BaseObject) => {
         if (!keepTrackApi.isInitialized) {
           return;
         }
@@ -188,7 +152,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               isInView = false;
             }
 
-            const lla = eci2lla(sat.position, SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst);
+            const lla = eci2lla(sat.position, keepTrackApi.getTimeManager().gmst);
             const currentTearr: TearrData = {
               time: timeManagerInstance.simulationTimeObj.toISOString(),
               az: rae.az,
@@ -207,7 +171,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             this.currentTEARR = missileManager.getMissileTEARR(obj as MissileObject);
           }
 
-          const { gmst } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
+          const gmst = keepTrackApi.getTimeManager().gmst;
           const lla = eci2lla(obj.position, gmst);
 
           const satLonElement = getEl('sat-longitude');
@@ -250,7 +214,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           }
 
           if (
-            settingsManager.plugins?.stereoMap &&
+            settingsManager.plugins?.StereoMap &&
             keepTrackApi.getPlugin(StereoMap)?.isMenuButtonActive &&
             timeManagerInstance.realTime > settingsManager.lastMapUpdateTime + 30000
           ) {
@@ -265,8 +229,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
             if (obj.isSatellite()) {
               const sat = obj as DetailedSatellite;
-              const { gmst } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
-
+              const gmst = keepTrackApi.getTimeManager().gmst;
 
               satAltitudeElement.innerHTML = `${SatMath.getAlt(sat.position, gmst).toFixed(2)} km`;
               satVelocityElement.innerHTML = `${sat.totalVelocity.toFixed(2)} km/s`;
@@ -351,12 +314,11 @@ export class SatInfoBox extends KeepTrackPlugin {
           errorManagerInstance.debug('Error updating satellite info!');
         }
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.id,
-      cb: (watchlistList: { id: number, inView: boolean }[]) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onWatchlistUpdated,
+      (watchlistList: { id: number, inView: boolean }[]) => {
         let isOnList = false;
 
         watchlistList.forEach(({ id }) => {
@@ -377,13 +339,9 @@ export class SatInfoBox extends KeepTrackPlugin {
           }
         }
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: this.selectSat_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.selectSat_.bind(this));
   }
 
   private updateSatelliteTearrData_(obj: BaseObject, sensorManagerInstance: SensorManager, timeManagerInstance: TimeManager) {
@@ -1759,7 +1717,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private static updateSensorInfo_(obj: BaseObject) {
-    if (obj === null || typeof obj === 'undefined' || !settingsManager.plugins.sensor) {
+    if (obj === null || typeof obj === 'undefined' || settingsManager.isDisableSensors) {
       return;
     }
     const sensorManagerInstance = keepTrackApi.getSensorManager();
@@ -1768,7 +1726,7 @@ export class SatInfoBox extends KeepTrackPlugin {
      * If we are using the sensor manager plugin then we should hide the sensor to satellite
      * info when there is no sensor selected
      */
-    if (settingsManager.plugins.sensor) {
+    if (!settingsManager.isDisableSensors) {
       if (sensorManagerInstance.isSensorSelected()) {
         showEl('sensor-sat-info');
       } else {

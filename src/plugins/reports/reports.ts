@@ -1,3 +1,4 @@
+
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -91,30 +92,28 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
-        getEl('aer-report-btn').addEventListener('click', () => this.generateAzElRng_());
-        getEl('coes-report-btn').addEventListener('click', () => this.generateClasicalOrbElJ2000_());
-        getEl('eci-report-btn').addEventListener('click', () => this.generateEci_());
-        getEl('lla-report-btn').addEventListener('click', () => this.generateLla_());
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        getEl('aer-report-btn')!.addEventListener('click', () => this.generateAzElRng_());
+        getEl('coes-report-btn')!.addEventListener('click', () => this.generateClasicalOrbElJ2000_());
+        getEl('eci-report-btn')!.addEventListener('click', () => this.generateEci_());
+        getEl('lla-report-btn')!.addEventListener('click', () => this.generateLla_());
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         if (obj?.isSatellite()) {
-          getEl(this.bottomIconElementName).classList.remove('bmenu-item-disabled');
+          getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-disabled');
           this.isIconDisabled = false;
         } else {
-          getEl(this.bottomIconElementName).classList.add('bmenu-item-disabled');
+          getEl(this.bottomIconElementName)?.classList.add('bmenu-item-disabled');
           this.isIconDisabled = true;
         }
       },
-    });
+    );
   }
 
   private generateAzElRng_() {
@@ -338,7 +337,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     return time;
   }
 
-  private getSat_(): DetailedSatellite {
+  private getSat_(): DetailedSatellite | null {
     const sat = this.selectSatManager_.primarySatObj as DetailedSatellite;
 
     if (!sat) {
@@ -356,7 +355,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     return sat;
   }
 
-  private getSensor_(): DetailedSensor {
+  private getSensor_(): DetailedSensor | null {
     const sensorManager = keepTrackApi.getSensorManager();
 
     if (!sensorManager.isSensorSelected()) {

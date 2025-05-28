@@ -2,7 +2,7 @@
 import { AnalyticsInstance } from 'analytics';
 import { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
-import { Constructor, KeepTrackApiEvents, Singletons } from './interfaces';
+import { Constructor, KeepTrackApiEvents, Singletons, ToastMsgType } from './interfaces';
 import { saveCsv, saveVariable } from './lib/saveVariable';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import type { SensorManager } from './plugins/sensor/sensorManager';
@@ -63,18 +63,27 @@ declare global {
   }
 }
 
+export enum InputEventType {
+  KeyUp = 'inputEvent:keyup',
+  KeyDown = 'inputEvent:keydown',
+  KeyPress = 'inputEvent:keypress',
+}
+
+type EventBusEvent = KeepTrackApiEvents | InputEventType;
+
 type KeepTrackApiEventArguments = {
+  [KeepTrackApiEvents.update]: [number];
   [KeepTrackApiEvents.bottomMenuClick]: [string];
   [KeepTrackApiEvents.hideSideMenus]: [];
-  [KeepTrackApiEvents.nightToggle]: [WebGL2RenderingContext, WebGLTexture, WebGLTexture];
   [KeepTrackApiEvents.orbitManagerInit]: [];
   [KeepTrackApiEvents.drawManagerLoadScene]: [];
   [KeepTrackApiEvents.drawOptionalScenery]: [];
   [KeepTrackApiEvents.updateLoop]: [];
   [KeepTrackApiEvents.rmbMenuActions]: [string, number];
+  [KeepTrackApiEvents.rightBtnMenuOpen]: [boolean, number];
   [KeepTrackApiEvents.rightBtnMenuAdd]: [];
   [KeepTrackApiEvents.updateDateTime]: [Date];
-  [KeepTrackApiEvents.updatePropRate]: [number];
+  [KeepTrackApiEvents.propRateChanged]: [number];
   [KeepTrackApiEvents.uiManagerFinal]: [];
   [KeepTrackApiEvents.resetSensor]: [];
   [KeepTrackApiEvents.setSensor]: [DetailedSensor | string | null, number | null];
@@ -101,11 +110,16 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.bottomMenuModeChange]: [];
   [KeepTrackApiEvents.saveSettings]: [];
   [KeepTrackApiEvents.loadSettings]: [];
+  [InputEventType.KeyDown]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
+  [InputEventType.KeyUp]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
+  [InputEventType.KeyPress]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
+  [KeepTrackApiEvents.parseGetVariables]: [string[]]; // params
+  [KeepTrackApiEvents.searchUpdated]: [string]; // search term
+  [KeepTrackApiEvents.legendUpdated]: [string]; // legend name
 };
 
-interface KeepTrackApiRegisterParams<T extends KeepTrackApiEvents> {
+interface KeepTrackApiRegisterParams<T extends EventBusEvent> {
   event: T;
-  cbName: string;
   cb: (...args: KeepTrackApiEventArguments[T]) => void;
 }
 
@@ -184,19 +198,15 @@ export class KeepTrackApi {
   rmbMenuItems = <rmbMenuItem[]>[];
   events = {
     altCanvasResize: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.altCanvasResize>[],
-    nightToggle: [] as KeepTrackApiRegisterParams<KeepTrackApiEvents.nightToggle>[],
   } as {
-      [K in KeepTrackApiEvents]: KeepTrackApiRegisterParams<K>[];
+      [K in EventBusEvent]: KeepTrackApiRegisterParams<K>[];
     };
 
   methods = {
-    nightToggle: (gl: WebGL2RenderingContext, nightTexture: WebGLTexture, texture: WebGLTexture) => {
-      this.events.nightToggle.forEach((cb) => cb.cb(gl, nightTexture, texture));
-    },
     altCanvasResize: (): boolean => this.events.altCanvasResize.some((cb) => cb.cb()),
   };
 
-  runEvent<T extends KeepTrackApiEvents>(event: T, ...args: KeepTrackApiEventArguments[T]) {
+  emit<T extends EventBusEvent>(event: T, ...args: KeepTrackApiEventArguments[T]) {
     this.verifyEvent_(event);
 
     if (event === KeepTrackApiEvents.bottomMenuClick) {
@@ -207,7 +217,7 @@ export class KeepTrackApi {
   }
 
   /** If the callback does not exist, create it */
-  private verifyEvent_(event: KeepTrackApiEvents) {
+  private verifyEvent_(event: EventBusEvent) {
     if (typeof this.events[event] === 'undefined') {
       this.events[event] = [];
     }
@@ -258,7 +268,6 @@ export class KeepTrackApi {
    * example: keepTrackApi.glsl\`uniform float example\`
    * TODO: This should be a static method
    */
-  // eslint-disable-next-line class-methods-use-this
   glsl(literals: TemplateStringsArray, ...placeholders): string {
     let str = '';
 
@@ -271,6 +280,10 @@ export class KeepTrackApi {
     return str;
   }
 
+  toast(toastText: string, type: ToastMsgType, isLong = false) {
+    this.getUiManager().toast(toastText, type, isLong);
+  }
+
   /**
    * Registers a callback function for a specific event.
    * @param {KeepTrackApiEvents} params.event - The name of the event to register the callback for.
@@ -278,26 +291,45 @@ export class KeepTrackApi {
    * @param params.cb - The callback function to register.
    * @throws An error if the event is invalid.
    */
-  register<T extends KeepTrackApiEvents>(params: { event: T; cbName: string; cb: (...args: KeepTrackApiEventArguments[T]) => void }) {
-    this.verifyEvent_(params.event);
+  on<T extends EventBusEvent>(event: T, cb: (...args: KeepTrackApiEventArguments[T]) => void) {
+    this.verifyEvent_(event);
 
     // Add the callback
-    this.events[params.event].push({
-      cbName: params.cbName, cb: params.cb,
+    this.events[event].push({
+      cb,
       event: <T><unknown>null,
     });
   }
 
-  unregister(params: { event: KeepTrackApiEvents; cbName: string }) {
-    for (let i = 0; i < this.events[params.event].length; i++) {
-      if (this.events[params.event][i].cbName === params.cbName) {
-        this.events[params.event].splice(i, 1);
+  /**
+   * Registers a callback function for a specific event that will be called only once.
+   * @param {KeepTrackApiEvents} params.event - The name of the event to register the callback for.
+   * @param {string} params.cbName - The name of the callback function.
+   * @param params.cb - The callback function to register.
+   * @throws An error if the event is invalid.
+   */
+  once<T extends KeepTrackApiEvents>(event: T, cb: (...args: KeepTrackApiEventArguments[T]) => void) {
+    this.verifyEvent_(event);
+    // Add the callback
+    this.events[event].push({
+      cb: (...args: KeepTrackApiEventArguments[T]) => {
+        cb(...args);
+        this.unregister(event, cb);
+      },
+      event: <T><unknown>null,
+    });
+  }
+
+  unregister<T extends KeepTrackApiEvents>(event: T, cb: (...args: KeepTrackApiEventArguments[T]) => void) {
+    for (let i = 0; i < this.events[event].length; i++) {
+      if (this.events[event][i].cb === cb) {
+        this.events[event].splice(i, 1);
 
         return;
       }
     }
     // If we got this far, it means we couldn't find the callback
-    errorManagerInstance.error(new Error(`Callback "${params.cbName} not found"!`), 'keepTrackApi.unregister');
+    errorManagerInstance.error(new Error('Callback not found!'), 'keepTrackApi.unregister');
   }
 
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);

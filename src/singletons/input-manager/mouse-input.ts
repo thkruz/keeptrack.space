@@ -1,28 +1,21 @@
 /* eslint-disable no-unreachable */
 // eslint-disable-next-line max-classes-per-file
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
-import { SatMath } from '@app/static/sat-math';
-import { UrlManager } from '@app/static/url-manager';
-import { DetailedSatellite, Kilometers, eci2lla } from 'ootk';
+import { Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
-import { showLoading } from '../../lib/showLoading';
-import { MissileObject } from '../catalog-manager/MissileObject';
 import { lineManagerInstance } from '../draw-manager/line-manager';
-import { LineColors } from '../draw-manager/line-manager/line';
-import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
-import { PersistenceManager, StorageKey } from '../persistence-manager';
 import { KeyboardInput } from './keyboard-input';
 
 export class MouseInput {
   private dragHasMoved = false;
-  private keyboard_: KeyboardInput;
+  private readonly keyboard_: KeyboardInput;
   private mouseTimeout = -1;
 
   public canvasClick = null;
@@ -50,7 +43,7 @@ export class MouseInput {
     if (evt.button === 2) {
       this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
 
-      const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
+      const gmst = keepTrackApi.getTimeManager().gmst;
 
       this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
     }
@@ -65,13 +58,10 @@ export class MouseInput {
 
     keepTrackApi.getInputManager().hidePopUps();
 
-    UrlManager.updateURL();
-
-    keepTrackApi.runEvent(KeepTrackApiEvents.canvasMouseDown, evt);
+    keepTrackApi.emit(KeepTrackApiEvents.canvasMouseDown, evt);
   }
 
-  public static earthClicked({ numMenuItems, clickedSatId }: { numMenuItems: number; clickedSatId: number }) {
-    getEl('line-eci-axis-rmb').style.display = 'block';
+  public static earthClicked({ clickedSatId }: { clickedSatId: number }) {
     keepTrackApi.rmbMenuItems
       .filter((item) => item.isRmbOnEarth || (item.isRmbOnSat && clickedSatId !== -1))
       .sort((a, b) => a.order - b.order)
@@ -80,39 +70,8 @@ export class MouseInput {
 
         if (dom) {
           dom.style.display = 'block';
-          ++numMenuItems;
         }
       });
-
-    getEl('earth-nasa-rmb').style.display = 'block';
-    getEl('earth-blue-rmb').style.display = 'block';
-    getEl('earth-low-rmb').style.display = 'block';
-    getEl('earth-high-no-clouds-rmb').style.display = 'block';
-    getEl('earth-vec-rmb').style.display = 'block';
-    getEl('earth-political-rmb').style.display = 'block';
-    if (settingsManager.nasaImages) {
-      getEl('earth-nasa-rmb').style.display = 'none';
-    }
-    if (settingsManager.brownEarthImages) {
-      getEl('earth-brown-rmb').style.display = 'none';
-    }
-    if (settingsManager.blueImages) {
-      getEl('earth-blue-rmb').style.display = 'none';
-    }
-    if (settingsManager.lowresImages) {
-      getEl('earth-low-rmb').style.display = 'none';
-    }
-    if (settingsManager.hiresNoCloudsImages) {
-      getEl('earth-high-no-clouds-rmb').style.display = 'none';
-    }
-    if (settingsManager.vectorImages) {
-      getEl('earth-vec-rmb').style.display = 'none';
-    }
-    if (settingsManager.politicalImages) {
-      getEl('earth-political-rmb').style.display = 'none';
-    }
-
-    return numMenuItems;
   }
 
   public canvasMouseMove(evt: MouseEvent, mainCameraInstance: Camera): void {
@@ -181,7 +140,7 @@ export class MouseInput {
       }
       if (evt.button === 2) {
         // Right Mouse Button Clicked
-        if (!this.keyboard_.isCtrlPressed && !this.keyboard_.isShiftPressed) {
+        if (!this.keyboard_.getKey('Ctrl') && !this.keyboard_.getKey('Shift')) {
           keepTrackApi.getInputManager().openRmbMenu(this.clickedSat);
         }
       }
@@ -206,7 +165,8 @@ export class MouseInput {
     }
 
     const isFullScreen = keepTrackApi.containerRoot.clientWidth === window.innerWidth && keepTrackApi.containerRoot.clientHeight === window.innerHeight;
-    const { isCtrlPressed, isShiftPressed } = keepTrackApi.getInputManager().keyboard;
+    const isCtrlPressed = keepTrackApi.getInputManager().keyboard.getKey('Ctrl');
+    const isShiftPressed = keepTrackApi.getInputManager().keyboard.getKey('Shift');
 
     if (!isFullScreen && !isCtrlPressed && !isShiftPressed) {
       return;
@@ -224,18 +184,14 @@ export class MouseInput {
   init(canvasDOM: HTMLCanvasElement) {
     const rightBtnMenuDOM = getEl('right-btn-menu');
     const satHoverBoxDOM = getEl('sat-hoverbox');
-    const rightBtnDrawMenuDOM = getEl('draw-rmb-menu');
-    const rightBtnEarthMenuDOM = getEl('earth-rmb-menu');
     const resetCameraDOM = getEl('reset-camera-rmb');
     const clearScreenDOM = getEl('clear-screen-rmb');
     const clearLinesDOM = getEl('clear-lines-rmb');
     const toggleTimeDOM = getEl('toggle-time-rmb');
-    const rightBtnDrawDOM = getEl('draw-rmb');
-    const rightBtnEarthDOM = getEl('earth-rmb');
 
     if (settingsManager.disableZoomControls || settingsManager.disableNormalEvents) {
       const stopWheelZoom = (event: Event) => {
-        if (this.keyboard_.isCtrlPressed) {
+        if (this.keyboard_.getKey('Ctrl')) {
           event.preventDefault();
         }
       };
@@ -289,19 +245,10 @@ export class MouseInput {
         });
       }
 
-      const rightBtnDrawDOMDropdown = () => {
-        InputManager.clearRMBSubMenu();
-        InputManager.showDropdownSubMenu(rightBtnMenuDOM, rightBtnDrawMenuDOM, canvasDOM);
-      };
-      const rightBtnEarthDOMDropdown = () => {
-        InputManager.clearRMBSubMenu();
-        InputManager.showDropdownSubMenu(rightBtnMenuDOM, rightBtnEarthMenuDOM, canvasDOM);
-      };
-
       // Create Event Listeners for Right Menu Buttons
       keepTrackApi.rmbMenuItems
         .map(({ elementIdL2 }) => getEl(elementIdL2))
-        .concat([toggleTimeDOM, rightBtnDrawMenuDOM, rightBtnEarthMenuDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
+        .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
           el?.addEventListener('click', (e: MouseEvent) => {
             // If the element is hiddeen ignore the click
@@ -324,26 +271,6 @@ export class MouseInput {
           el2.style.display = 'none';
         });
       });
-
-      rightBtnDrawDOM?.addEventListener('mouseenter', () => {
-        rightBtnDrawDOMDropdown();
-      });
-      rightBtnDrawDOM?.addEventListener('click', () => {
-        rightBtnDrawDOMDropdown();
-      });
-      rightBtnDrawMenuDOM?.addEventListener('mouseleave', () => {
-        rightBtnDrawMenuDOM.style.display = 'none';
-      });
-
-      rightBtnEarthDOM?.addEventListener('mouseenter', () => {
-        rightBtnEarthDOMDropdown();
-      });
-      rightBtnEarthDOM?.addEventListener('click', () => {
-        rightBtnEarthDOMDropdown();
-      });
-      rightBtnEarthMenuDOM?.addEventListener('mouseleave', () => {
-        rightBtnEarthMenuDOM.style.display = 'none';
-      });
     }
 
     if (!settingsManager.disableCameraControls) {
@@ -355,7 +282,7 @@ export class MouseInput {
          */
         if (evt.button === 1) {
           keepTrackApi.getMainCamera().localRotateStartPosition = keepTrackApi.getMainCamera().localRotateCurrent;
-          if (this.keyboard_.isShiftPressed) {
+          if (this.keyboard_.getKey('Shift')) {
             keepTrackApi.getMainCamera().isLocalRotateRoll = true;
             keepTrackApi.getMainCamera().isLocalRotateYaw = false;
           } else {
@@ -366,9 +293,9 @@ export class MouseInput {
         }
 
         // Right Mouse Button RMB
-        if (evt.button === 2 && (this.keyboard_.isShiftPressed || this.keyboard_.isCtrlPressed)) {
+        if (evt.button === 2 && (this.keyboard_.getKey('Shift') || this.keyboard_.getKey('Ctrl'))) {
           keepTrackApi.getMainCamera().panStartPosition = keepTrackApi.getMainCamera().panCurrent;
-          if (this.keyboard_.isShiftPressed) {
+          if (this.keyboard_.getKey('Shift')) {
             keepTrackApi.getMainCamera().isScreenPan = false;
             keepTrackApi.getMainCamera().isWorldPan = true;
           } else {
@@ -415,8 +342,6 @@ export class MouseInput {
     if (settingsManager.disableUI) {
       return;
     }
-
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -431,45 +356,7 @@ export class MouseInput {
       targetId = (<HTMLElement>target.firstChild).id;
     }
 
-    let clickSatObj: DetailedSatellite | MissileObject | null = null;
-
-    if (this.clickedSat !== -1) {
-      const obj = catalogManagerInstance.getObject(this.mouseSat);
-
-      if ((obj instanceof DetailedSatellite) || (obj instanceof MissileObject)) {
-        clickSatObj = obj;
-      }
-    }
-
     switch (targetId) {
-      case 'view-info-rmb':
-        if (typeof this.latLon === 'undefined' || isNaN(this.latLon.lat) || isNaN(this.latLon.lon)) {
-          errorManagerInstance.debug('latLon undefined!');
-          const gmst = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
-
-          this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
-        }
-        uiManagerInstance.toast(`Lat: ${this.latLon.lat.toFixed(3)}<br>Lon: ${this.latLon.lon.toFixed(3)}`, ToastMsgType.normal, true);
-        break;
-      case 'view-sat-info-rmb':
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
-        break;
-      case 'view-sensor-info-rmb':
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
-        getEl('menu-sensor-info').click();
-        break;
-      case 'view-related-sats-rmb':
-        {
-          const intldes = catalogManagerInstance.getSat(this.clickedSat, GetSatType.EXTRA_ONLY)?.intlDes;
-
-          if (!intldes) {
-            uiManagerInstance.toast('Time 1 is Invalid!', ToastMsgType.serious);
-          }
-          const searchStr = intldes.slice(0, 8);
-
-          uiManagerInstance.doSearch(searchStr);
-        }
-        break;
       case 'set-sec-sat-rmb':
         keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
         break;
@@ -482,84 +369,6 @@ export class MouseInput {
         break;
       case 'clear-lines-rmb':
         lineManagerInstance.clear();
-        break;
-      case 'line-eci-axis-rmb':
-        lineManagerInstance.createRef2Ref([0, 0, 0], [25000, 0, 0], LineColors.RED);
-        lineManagerInstance.createRef2Ref([0, 0, 0], [0, 25000, 0], LineColors.GREEN);
-        lineManagerInstance.createRef2Ref([0, 0, 0], [0, 0, 25000], LineColors.BLUE);
-        break;
-      case 'line-eci-xgrid-rmb':
-        lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 1], 1);
-        break;
-      case 'line-eci-ygrid-rmb':
-        lineManagerInstance.createGrid('y', [0.2, 0.6, 0.2, 1], 1);
-        break;
-      case 'line-eci-zgrid-rmb':
-        lineManagerInstance.createGrid('z', [0.2, 0.2, 0.6, 1], 1);
-        break;
-      case 'line-earth-sat-rmb':
-        lineManagerInstance.createSatToRef(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, [0, 0, 0], LineColors.PURPLE);
-        break;
-      case 'line-sensor-sat-rmb':
-        lineManagerInstance.createSensorToSat(keepTrackApi.getSensorManager().getSensor(), clickSatObj, LineColors.GREEN);
-        break;
-      case 'line-sat-sat-rmb':
-        lineManagerInstance.createObjToObj(clickSatObj, keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, LineColors.BLUE);
-        break;
-      case 'line-sat-sun-rmb':
-        lineManagerInstance.createSat2Sun(clickSatObj);
-        break;
-      case 'earth-blue-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.blueImages = true;
-        MouseInput.saveMapToLocalStorage('blue');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        break;
-      case 'earth-nasa-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.nasaImages = true;
-        MouseInput.saveMapToLocalStorage('nasa');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        break;
-      case 'earth-brown-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.brownEarthImages = true;
-        MouseInput.saveMapToLocalStorage('brown');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        break;
-      case 'earth-low-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.lowresImages = true;
-        MouseInput.saveMapToLocalStorage('low');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        break;
-      case 'earth-high-rmb':
-        showLoading(() => {
-          MouseInput.resetCurrentEarthTexture();
-          settingsManager.hiresImages = true;
-          MouseInput.saveMapToLocalStorage('high');
-          keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        });
-        break;
-      case 'earth-high-no-clouds-rmb':
-        showLoading(() => {
-          MouseInput.resetCurrentEarthTexture();
-          settingsManager.hiresNoCloudsImages = true;
-          MouseInput.saveMapToLocalStorage('high-nc');
-          keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        });
-        break;
-      case 'earth-vec-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.vectorImages = true;
-        MouseInput.saveMapToLocalStorage('vec');
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
-        break;
-      case 'earth-political-rmb':
-        MouseInput.resetCurrentEarthTexture();
-        settingsManager.politicalImages = true;
-        MouseInput.saveMapToLocalStorage('political'); // TODO: Verify this
-        keepTrackApi.getScene().earth.reloadEarthHiResTextures();
         break;
       case 'toggle-time-rmb':
         timeManagerInstance.toggleTime();
@@ -578,27 +387,12 @@ export class MouseInput {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
         break;
       default:
-        keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
+        keepTrackApi.emit(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
         break;
     }
     keepTrackApi.getSoundManager().play(SoundNames.CLICK);
 
     getEl('right-btn-menu').style.display = 'none';
     InputManager.clearRMBSubMenu();
-  }
-
-  private static resetCurrentEarthTexture() {
-    settingsManager.blueImages = false;
-    settingsManager.nasaImages = false;
-    settingsManager.brownEarthImages = false;
-    settingsManager.lowresImages = false;
-    settingsManager.hiresImages = false;
-    settingsManager.hiresNoCloudsImages = false;
-    settingsManager.vectorImages = false;
-    settingsManager.politicalImages = false;
-  }
-
-  private static saveMapToLocalStorage(name: string) {
-    PersistenceManager.getInstance().saveItem(StorageKey.LAST_MAP, name);
   }
 }

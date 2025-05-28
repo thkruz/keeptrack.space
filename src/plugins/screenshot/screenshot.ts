@@ -24,9 +24,9 @@
 
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
-import logoPng from '@public/img/logo-primary.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 
 export class Screenshot extends KeepTrackPlugin {
@@ -37,10 +37,27 @@ export class Screenshot extends KeepTrackPlugin {
   };
 
   logo: HTMLImageElement;
+  secondaryLogo: HTMLImageElement;
+
   constructor() {
     super();
-    this.logo = new Image();
-    this.logo.src = logoPng;
+    try {
+      this.logo = new Image();
+      this.logo.onerror = () => {
+        errorManagerInstance.warn('Failed to load primary logo image.');
+      };
+      this.logo.src = `${settingsManager.installDirectory}img/logo-primary.png`;
+
+      if (settingsManager.isShowSecondaryLogo) {
+        this.secondaryLogo = new Image();
+        this.secondaryLogo.onerror = () => {
+          errorManagerInstance.warn('Failed to load secondary logo image.');
+        };
+        this.secondaryLogo.src = `${settingsManager.installDirectory}img/logo-secondary.png`;
+      }
+    } catch {
+      // If the logo fails to load, we will still continue without it.
+    }
   }
 
   // This is 'disabled' since it does not turn green after being clicked like other buttons.
@@ -105,21 +122,19 @@ export class Screenshot extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.altCanvasResize,
-      cbName: this.id,
-      cb: () => this.queuedScreenshot_,
-    });
+    keepTrackApi.on(
+      KeepTrackApiEvents.altCanvasResize,
+      () => this.queuedScreenshot_,
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.endOfDraw,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.endOfDraw,
+      () => {
         if (this.queuedScreenshot_) {
           this.takeScreenShot();
         }
       },
-    });
+    );
   }
 
   private queuedScreenshot_ = false;
@@ -145,18 +160,38 @@ export class Screenshot extends KeepTrackPlugin {
 
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
+
+    if (!tempCtx) {
+      errorManagerInstance.warn('Failed to get 2D context for temporary canvas. Unable to create screenshot.');
+
+      return '';
+    }
+
+
     const cw = tempCanvas.width;
     const ch = tempCanvas.height;
-    const logoWidth = 200;
-    const logoHeight = 200;
-    const logoX = canvas.width - logoWidth - 50;
-    const logoY = canvas.height - logoHeight - 50;
 
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
 
+    const logoHeight = 200;
+    let logoWidth: number; // with will be calculated based on height
+    const padding = 50;
+
     tempCtx.drawImage(canvas, 0, 0);
-    tempCtx.drawImage(this.logo, logoX, logoY, logoWidth, logoHeight);
+
+    if (settingsManager.isShowSecondaryLogo && this.secondaryLogo) {
+      // Draw secondary logo on the left
+      logoWidth = this.secondaryLogo.width * (logoHeight / this.secondaryLogo.height);
+      tempCtx.drawImage(this.secondaryLogo, padding, canvas.height - logoHeight - padding, logoWidth, logoHeight);
+      // Draw primary logo to the right of secondary logo
+      logoWidth = this.logo.width * (logoHeight / this.logo.height);
+      tempCtx.drawImage(this.logo, padding + logoWidth + padding, canvas.height - logoHeight - padding, logoWidth, logoHeight);
+    } else {
+      // Draw only primary logo on the right
+      logoWidth = this.logo.width * (logoHeight / this.logo.height);
+      tempCtx.drawImage(this.logo, canvas.width - logoWidth - padding, canvas.height - logoHeight - padding, logoWidth, logoHeight);
+    }
 
     const { classificationstr, classificationColor } = Screenshot.calculateClassificationText_();
 
@@ -175,7 +210,7 @@ export class Screenshot extends KeepTrackPlugin {
     keepTrackApi.containerRoot.appendChild(tempCanvas);
     const image = tempCanvas.toDataURL();
 
-    tempCanvas.parentNode.removeChild(tempCanvas);
+    tempCanvas.parentNode!.removeChild(tempCanvas);
 
     return image;
   }
@@ -186,7 +221,7 @@ export class Screenshot extends KeepTrackPlugin {
     }
 
     return {
-      classificationstr: settingsManager.classificationStr,
+      classificationstr: settingsManager.classificationStr ?? '',
       classificationColor: Classification.getColors(settingsManager.classificationStr).backgroundColor,
     };
 

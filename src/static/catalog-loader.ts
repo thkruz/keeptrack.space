@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { StringPad } from '@app/lib/stringPad';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
+import { LaunchSite } from '@app/singletons/catalog-manager/LaunchFacility';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCruncher';
@@ -189,13 +190,10 @@ export class CatalogLoader {
     try {
       // TODO: Which sources can use this should be definied in the settings (Celestrak Rebase)
       if (
-        (/^https?:\/\/(?:api\.keeptrack\.space|localhost:8787)\/v[23]\/sats$/u).test(settingsManager.dataSources.tle)
+        (/^https?:\/\/(?:api\.keeptrack\.space|localhost:8787)\/v[23]\/sats(?:\/celestrak)?$/u).test(settingsManager.dataSources.tle)
       ) {
-        if (!settingsManager.limitSats) {
-          CatalogLoader.setupGetVariables();
-        }
         // If using v3 switch to v2
-        if (settingsManager.dataSources.tle.includes('v3')) {
+        if (settingsManager.dataSources.tle.includes('v2') || settingsManager.limitSats.length > 0) {
           settingsManager.dataSources.tle = settingsManager.dataSources.tle.replace(/\/v3\//u, '/v2/');
         }
 
@@ -336,35 +334,6 @@ export class CatalogLoader {
   }
 
   /**
-   * Parses GET variables for SatCruncher initialization
-   * @returns An array of strings containing the limitSats values
-   */
-  static setupGetVariables() {
-    let limitSatsArray: string[] = [];
-    /** Parses GET variables for SatCruncher initialization */
-    // This should be somewhere else!!
-    const queryStr = window.location.search.substring(1);
-    const params = queryStr.split('&');
-
-    for (const param of params) {
-      const key = param.split('=')[0];
-      const val = param.split('=')[1];
-
-      switch (key) {
-        case 'limitSats':
-          settingsManager.limitSats = val;
-          limitSatsArray = val.split(',');
-          break;
-        case 'future use':
-        default:
-          break;
-      }
-    }
-
-    return limitSatsArray;
-  }
-
-  /**
    * Adds non-satellite objects to the catalog manager instance.
    * @param catalogManagerInstance - The catalog manager instance to add the objects to.
    * @param tempObjData - An array of temporary satellite data.
@@ -390,6 +359,8 @@ export class CatalogLoader {
         });
 
         tempObjData.push(sensor);
+      } else if (staticSat instanceof LaunchSite) {
+        tempObjData.push(staticSat);
       } else {
         const landObj = new LandObject({
           id: tempObjData.length,

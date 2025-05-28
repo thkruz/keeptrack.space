@@ -20,9 +20,9 @@ describe('launch_calendar_plugin', () => {
 
   test('close_colorbox', () => {
     launchCalendarPlugin.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
     jest.advanceTimersByTime(4000);
     // eslint-disable-next-line dot-notation
     expect(() => launchCalendarPlugin['closeColorbox_']()).not.toThrow();

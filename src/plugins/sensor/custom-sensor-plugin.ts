@@ -11,9 +11,7 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import sensorAddPng from '@public/img/icons/sensor-add.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
-import { Astronomy } from '../astronomy/astronomy';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
-import { Planetarium } from '../planetarium/planetarium';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { SoundNames } from '../sounds/SoundNames';
@@ -143,7 +141,6 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>
   </ul>`;
 
-  // eslint-disable-next-line class-methods-use-this
   rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
     const sensorManagerInstance = keepTrackApi.getSensorManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -229,17 +226,16 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         CustomSensorPlugin.httpsCheck_();
         CustomSensorPlugin.addCustomSensorFormSubmitListener();
         CustomSensorPlugin.addTelescopeClickListener_();
         CustomSensorPlugin.addCustomSensorBtnCLickListener_();
         CustomSensorPlugin.addClearCustomSensorListener_();
       },
-    });
+    );
   }
 
   private static httpsCheck_() {
@@ -285,8 +281,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
     keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Planetarium)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(Astronomy)?.setBottomIconToUnselected();
+    keepTrackApi.getPluginByName('Planetarium')?.setBottomIconToUnselected();
+    keepTrackApi.getPluginByName('Astronomy')?.setBottomIconToUnselected();
 
     (<HTMLInputElement>getEl('sensor-type')).value = (<HTMLInputElement>getEl('cs-type')).value.replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
     getEl('sensor-info-title')!.innerHTML = 'Custom Sensor';

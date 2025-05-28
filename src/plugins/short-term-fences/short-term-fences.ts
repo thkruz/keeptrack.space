@@ -93,10 +93,9 @@ export class ShortTermFences extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
           hideEl('stf-on-object-link');
@@ -117,16 +116,15 @@ export class ShortTermFences extends KeepTrackPlugin {
           this.isAddStfLinksOnce = true;
         }
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('stfForm')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
@@ -196,18 +194,13 @@ export class ShortTermFences extends KeepTrackPlugin {
           (<HTMLInputElement>getEl('stf-elExtKm')).value = elKm.toFixed(1);
         });
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.resetSensor,
-      cbName: 'shortTermFences',
-      cb: this.closeAndDisable_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.resetSensor, this.closeAndDisable_.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: 'shortTermFences',
-      cb: (sensor, id): void => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.setSensor,
+      (sensor, id): void => {
         if (sensor === null && id === null) {
           this.closeAndDisable_();
           slideOutLeft(getEl(this.sideMenuElementName), 1000);
@@ -215,7 +208,7 @@ export class ShortTermFences extends KeepTrackPlugin {
           this.setBottomIconToEnabled();
         }
       },
-    });
+    );
   }
 
   private closeAndDisable_(): void {

@@ -25,7 +25,8 @@
  */
 
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { isThisNode } from '@app/static/isThisNode';
 import '@materializecss/materialize';
@@ -256,15 +257,48 @@ export class UiManager {
       getEl('logo-secondary')?.classList.remove('start-hidden');
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+
+    this.sortBottomIcons();
 
     UiManager.initBottomMenuResizing_();
 
     // Initialize Navigation and Select Menus
     const elems = document.querySelectorAll('.dropdown-button');
 
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
+      if (key === 'F2' && isShift && !isRepeat) {
+        this.hideUi();
+      }
+    });
+
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'B' && !isRepeat) {
+        this.toggleBottomMenu();
+      }
+    });
+
     window.M.Dropdown.init(elems);
     this.isInitialized_ = true;
+  }
+
+  private sortBottomIcons() {
+    const bottomIcons = document.querySelectorAll('#bottom-icons > div');
+    const sortedIcons = Array.from(bottomIcons).sort((a, b) => {
+      const aOrder = parseInt(a.getAttribute('data-order') ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString(), 10);
+      const bOrder = parseInt(b.getAttribute('data-order') ?? KeepTrackPlugin.MAX_BOTTOM_ICON_ORDER.toString(), 10);
+
+      return aOrder - bOrder;
+    });
+    const bottomIconsContainer = getEl('bottom-icons');
+
+    if (bottomIconsContainer) {
+      // Clear the container before appending sorted icons
+      bottomIconsContainer.innerHTML = '';
+      sortedIcons.forEach((icon) => {
+        bottomIconsContainer.appendChild(icon);
+      });
+    }
   }
 
   initMenuController() {
@@ -396,13 +430,12 @@ export class UiManager {
     LegendManager.legendColorsChange();
 
     // Run any plugins code
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerOnReady);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'uiManager',
-      cb: () => {
-        this.bottomIconPress = (el: HTMLElement) => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, el.id);
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        this.bottomIconPress = (el: HTMLElement) => keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, el.id);
         const BottomIcons = getEl('bottom-icons');
 
         BottomIcons?.addEventListener('click', (evt: Event) => {
@@ -430,10 +463,10 @@ export class UiManager {
         });
         this.hideSideMenus = () => {
           closeColorbox();
-          keepTrackApi.runEvent(KeepTrackApiEvents.hideSideMenus);
+          keepTrackApi.emit(KeepTrackApiEvents.hideSideMenus);
         };
       },
-    });
+    );
   }
 
   toast(toastText: string, type: ToastMsgType, isLong = false) {
@@ -479,7 +512,7 @@ export class UiManager {
     const sat = obj as DetailedSatellite;
 
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
-      keepTrackApi.runEvent(KeepTrackApiEvents.updateSelectBox, sat);
+      keepTrackApi.emit(KeepTrackApiEvents.updateSelectBox, sat);
       keepTrackApi.getTimeManager().lastBoxUpdateTime = realTime;
     }
   }

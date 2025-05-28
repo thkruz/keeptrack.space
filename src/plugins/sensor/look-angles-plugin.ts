@@ -114,10 +114,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('look-angles-length').addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
           this.refreshSideMenuData_();
@@ -134,33 +133,21 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
         this.checkIfCanBeEnabled_(sat);
       },
+    );
+
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, (obj: BaseObject) => {
+      this.checkIfCanBeEnabled_(obj);
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
-        this.checkIfCanBeEnabled_(obj);
-      },
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.resetSensor,
-      cbName: this.id,
-      cb: () => {
-        this.checkIfCanBeEnabled_(null);
-      },
+    keepTrackApi.on(KeepTrackApiEvents.resetSensor, () => {
+      this.checkIfCanBeEnabled_(null);
     });
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.staticOffsetChange,
-      cbName: this.id,
-      cb: () => {
-        this.refreshSideMenuData_();
-      },
+    keepTrackApi.on(KeepTrackApiEvents.staticOffsetChange, () => {
+      this.refreshSideMenuData_();
     });
   }
 
@@ -343,7 +330,6 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       // Create click listener
       tr.addEventListener('click', () => {
         timeManagerInstance.changeStaticOffset(new Date(`${dateFormat(entry.time, 'isoDateTime', false)}z`).getTime() - timeManagerInstance.realTime);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
       });
 
       if (tdType) {

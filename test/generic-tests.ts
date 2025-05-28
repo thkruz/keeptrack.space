@@ -65,8 +65,8 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
 
   expect(plugin.init).toBeDefined();
   expect(() => plugin.init()).not.toThrow();
-  expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit)).not.toThrow();
-  expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal)).not.toThrow();
+  expect(() => keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit)).not.toThrow();
+  expect(() => keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal)).not.toThrow();
 
   if (plugin.bottomIconElementName) {
     expect(getEl(plugin.bottomIconElementName)).toBeDefined();
@@ -84,9 +84,9 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
   BottomMenu.createBottomMenu();
   // clearAllCallbacks();
   plugin.init();
-  keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-  keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
-  keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerOnReady);
+  keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+  keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+  keepTrackApi.emit(KeepTrackApiEvents.uiManagerOnReady);
   keepTrackApi.getCatalogManager().satCruncher = {
     addEventListener: jest.fn(),
     postMessage: jest.fn(),
@@ -113,7 +113,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, 'random-icon');
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, 'random-icon');
   });
 
   // Tests that clicking on the bottom icon toggles
@@ -126,13 +126,13 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled || plugin.isRequireSatelliteSelected || plugin.isRequireSensorSelected) {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
   });
@@ -153,14 +153,14 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
         expect(toggleButton!.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeTruthy();
       }
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeFalsy();
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
 
@@ -179,13 +179,13 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled || plugin.isRequireSensorSelected) {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
 
@@ -206,13 +206,13 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled) {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+      keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
   });
@@ -254,9 +254,9 @@ export const standardPluginRmbTests = (Plugin: Constructor<KeepTrackPlugin>, plu
         const plugin = new Plugin();
 
         websiteInit(plugin);
-        expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, rmbOption, -1)).not.toThrow();
+        expect(() => keepTrackApi.emit(KeepTrackApiEvents.rmbMenuActions, rmbOption, -1)).not.toThrow();
         jest.advanceTimersByTime(1000);
-        expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.rmbMenuActions, rmbOption, -1)).not.toThrow();
+        expect(() => keepTrackApi.emit(KeepTrackApiEvents.rmbMenuActions, rmbOption, -1)).not.toThrow();
         jest.advanceTimersByTime(1000);
       });
     });

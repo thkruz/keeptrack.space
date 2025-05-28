@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
+import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 import { GroupType } from '@app/singletons/object-group';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
@@ -24,7 +25,7 @@ export class SettingsPresets {
     settings.maxFieldOfViewMarkers = 1;
     settings.isEPFL = true;
     settings.disableAllPlugins();
-    settings.plugins.timeMachine = true;
+    settings.plugins.TimeMachine = { enabled: true };
     settings.loopTimeMachine = true;
     settings.timeMachineDelay = <Milliseconds>6000;
     settings.timeMachineDelayAtPresentDay = <Milliseconds>(1000 * 60 * 4); // 4 Minutes
@@ -159,14 +160,13 @@ export class SettingsPresets {
     settings.maxZoomDistance = <Kilometers>2000000;
     settings.satShader.minSize = 8.0;
     settings.isDisableAsciiCatalog = true;
-    settings.plugins.videoDirector = true;
+    settings.plugins.VideoDirectorPlugin = { enabled: true };
     settings.zFar = 1250000.0;
     settings.isDisableMoon = false;
 
     settings.hiresMilkWay = true;
     settings.earthNumLatSegs = 128;
     settings.earthNumLonSegs = 128;
-    settings.hiresImages = true;
 
     settings.autoZoomSpeed = 0.001;
     settings.autoRotateSpeed = 0.000025;
@@ -236,7 +236,6 @@ export class SettingsPresets {
     settings.isShowDebris = true;
     settings.isShowPayloads = false;
     settings.isShowAgencies = false;
-    settings.lowresImages = true;
     settings.isAllowRightClick = false;
     settings.isDisableSelectSat = false;
     settings.isDisableSensors = true;
@@ -260,11 +259,15 @@ export class SettingsPresets {
   }
 
   static loadPresetOpsCenter(settings: SettingsManager) {
-    settings.politicalImages = true;
+    settings.earthTextureStyle = EarthTextureStyle.FLAT;
     settings.isDrawSun = false;
     settings.isDisableStars = true;
-    settings.isDrawAtmosphere = false;
+    settings.isDrawAtmosphere = AtmosphereSettings.OFF;
     settings.isDrawAurora = false;
+    settings.isEarthGrayScale = true;
+    settings.isEarthAmbientLighting = false;
+    settings.isDrawCloudsMap = false;
+    settings.isDrawPoliticalMap = true;
     settings.isShowRocketBodies = false;
     settings.isShowDebris = false;
     settings.isDrawBumpMap = false;
@@ -280,14 +283,15 @@ export class SettingsPresets {
     settings.isShowSplashScreen = true;
     settings.isEPFL = true;
     settings.disableAllPlugins();
-    settings.plugins.gamepad = true;
+    settings.plugins.GamepadPlugin = { enabled: true };
     settings.isLoadLastMap = false;
     settings.isShowRocketBodies = true;
     settings.isShowDebris = true;
+    settings.isDrawCloudsMap = true;
+    settings.earthCloudTextureQuality = EarthCloudTextureQuality.MEDIUM;
     settings.isShowPayloads = true;
     settings.isShowAgencies = false;
     settings.isShowNotionalSats = false;
-    settings.lowresImages = true;
     settings.isAllowRightClick = false;
     settings.isDisableSelectSat = true;
     settings.isDisableSensors = true;
@@ -305,6 +309,8 @@ export class SettingsPresets {
     settings.disableAllPlugins();
     settings.isDisableStars = true;
     settings.isDrawCovarianceEllipsoid = false;
+    settings.isDrawCloudsMap = true;
+    settings.earthCloudTextureQuality = EarthCloudTextureQuality.MEDIUM;
     settings.maxAnalystSats = 1;
     settings.maxMissiles = 1;
     settings.maxFieldOfViewMarkers = 1;
@@ -314,7 +320,7 @@ export class SettingsPresets {
     settings.isShowDebris = true;
     settings.isShowPayloads = true;
     settings.isShowAgencies = false;
-    settings.nasaImages = true;
+    settings.earthTextureStyle = EarthTextureStyle.BLUE_MARBLE;
     settings.isAllowRightClick = false;
     settings.isDisableSelectSat = false;
     settings.isDisableSensors = true;
@@ -348,7 +354,7 @@ export class SettingsPresets {
     settings.isShowDebris = true;
     settings.isShowPayloads = true;
     settings.isShowAgencies = false;
-    settings.lowresImages = true;
+    settings.earthTextureStyle = EarthTextureStyle.BLUE_MARBLE;
     settings.isAllowRightClick = false;
     settings.isDisableSensors = true;
     settings.isEnableJscCatalog = false;
@@ -360,16 +366,14 @@ export class SettingsPresets {
     settings.colors.debris = [0.5, 0.5, 0.5, 0.1];
     settings.colors.unknown = [0.5, 0.5, 0.5, 0.1];
     settings.colors.pink = [0.5, 0.5, 0.5, 0.1];
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'satFromsettings: SettingsManager',
-      cb: () => {
-        keepTrackApi.getTimeManager().changeStaticOffset(1672588802000 - Date.now());
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherReady,
+      () => {
         setTimeout(() => {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(43721) ?? -1);
           settings.isDisableSelectSat = true;
         }, 5000);
       },
-    });
+    );
   }
 }

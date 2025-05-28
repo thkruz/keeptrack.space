@@ -18,7 +18,7 @@ export class ClassificationBar extends KeepTrackPlugin {
 
   init(): void {
     super.init();
-    this.classificationString_ = settingsManager.classificationStr || '';
+    this.classificationString_ = settingsManager.classificationStr ?? '';
   }
 
   updateString(classificationString: ClassificationString = this.classificationString_, backgroundColor = '#ffffff', color = '#000000'): void {
@@ -56,11 +56,7 @@ export class ClassificationBar extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.id,
-      cb: this.uiManagerInit_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit_.bind(this));
   }
 
   private createContainer_(): void {

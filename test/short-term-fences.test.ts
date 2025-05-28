@@ -28,8 +28,8 @@ describe('ShortTermFences_class', () => {
     const stf = new ShortTermFences();
 
     websiteInit(stf);
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.setSensor, defaultSensor, 1)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.setSensor, defaultSensor, 1)).not.toThrow();
   });
 
   // test stfFormOnSubmit static method

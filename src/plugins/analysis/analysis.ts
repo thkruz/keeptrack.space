@@ -210,10 +210,9 @@ export class AnalysisMenu extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'analysis',
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('analysis-bpt')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           AnalysisMenu.analysisBptSumbit_();
@@ -260,17 +259,13 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
         clickAndDragWidth(getEl('analysis-menu'));
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: this.id,
-      cb: (sensor) => {
-        if (!sensor) {
-          return;
-        }
-        AnalysisMenu.setSensor_(sensor);
-      },
+    keepTrackApi.on(KeepTrackApiEvents.setSensor, (sensor) => {
+      if (!sensor) {
+        return;
+      }
+      AnalysisMenu.setSensor_(sensor);
     });
   }
 

@@ -72,7 +72,6 @@ export class ColorMenu extends KeepTrackPlugin {
     return html;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   rmbCallback: (targetId: string | null, clickedSat?: number) => void = (targetId: string | null) => {
     for (const colorScheme in keepTrackApi.getColorSchemeManager().colorSchemeInstances) {
       if (targetId === `colors-${colorScheme}-rmb`) {
@@ -94,10 +93,9 @@ export class ColorMenu extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('colors-menu')
           ?.querySelectorAll('li')
           .forEach((element) => {
@@ -108,7 +106,7 @@ export class ColorMenu extends KeepTrackPlugin {
             });
           });
       },
-    });
+    );
   }
 
   static readonly colorsMenuClick = (colorName: string) => {

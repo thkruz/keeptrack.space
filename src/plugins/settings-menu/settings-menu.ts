@@ -45,7 +45,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   readonly id = 'SettingsMenuPlugin';
   dependencies_ = [];
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.SETTINGS, MenuMode.ALL];
 
   bottomIconElementName: string = 'settings-menu-icon';
   bottomIconImg = settingsPng;
@@ -66,10 +66,17 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
             <h5 class="center-align">General Settings</h5>
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="Disable this to hide the camera widget">
-                <input id="settings-drawCameraWidget" type="checkbox" checked/>
+              <label data-position="top" data-delay="50" data-tooltip="Show more information when hovering over a satellite.">
+                <input id="settings-enableHoverOverlay" type="checkbox" checked/>
                 <span class="lever"></span>
-                Show Camera Widget
+                Show Info On Hover
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Zoom in on the satellite when selected.">
+                <input id="settings-focusOnSatelliteWhenSelected" type="checkbox" checked/>
+                <span class="lever"></span>
+                Focus on Satellite When Selected
               </label>
             </div>
             <div class="switch row">
@@ -130,6 +137,13 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
                 <input id="settings-hos" type="checkbox" />
                 <span class="lever"></span>
                 Hide Other Satellites
+              </label>
+            </div>
+            <div class="switch row">
+              <label data-position="top" data-delay="50" data-tooltip="Disable this to hide the camera widget">
+                <input id="settings-drawCameraWidget" type="checkbox" checked/>
+                <span class="lever"></span>
+                Show Camera Widget
               </label>
             </div>
             <div class="switch row">
@@ -258,10 +272,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
         getEl('settings-form')?.addEventListener('submit', SettingsMenuPlugin.onSubmit_);
         getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.resetToDefaults);
@@ -271,7 +284,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
           hideEl(getEl('settings-confidence-levels')!.parentElement!.parentElement!);
         }
 
-        if (!settingsManager.plugins.timeMachine) {
+        if (!settingsManager.plugins.TimeMachine) {
           hideEl(getEl('settings-time-machine-toasts')!.parentElement!.parentElement!);
         }
 
@@ -362,18 +375,12 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
         });
         this.isNotColorPickerInitialSetup = true;
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
-        SettingsMenuPlugin.syncOnLoad();
-      },
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, SettingsMenuPlugin.syncOnLoad);
   }
 
   static syncOnLoad() {
@@ -394,6 +401,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       { id: 'settings-drawEcf', setting: 'isOrbitCruncherInEcf' },
       { id: 'settings-numberOfEcfOrbitsToDraw', setting: 'numberOfEcfOrbitsToDraw' },
       { id: 'settings-isDrawInCoverageLines', setting: 'isDrawInCoverageLines' },
+      { id: 'settings-enableHoverOverlay', setting: 'enableHoverOverlay' },
+      { id: 'settings-focusOnSatelliteWhenSelected', setting: 'isFocusOnSatelliteWhenSelected' },
       { id: 'settings-isDrawCovarianceEllipsoid', setting: 'isDrawCovarianceEllipsoid' },
       { id: 'settings-eciOnHover', setting: 'isEciOnHover' },
       { id: 'settings-hos', setting: 'colors.transparent[3] === 0' },
@@ -456,6 +465,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-drawEcf':
       case 'settings-numberOfEcfOrbitsToDraw':
       case 'settings-isDrawInCoverageLines':
+      case 'settings-enableHoverOverlay':
+      case 'settings-focusOnSatelliteWhenSelected':
       case 'settings-isDrawCovarianceEllipsoid':
       case 'settings-drawSun':
       case 'settings-drawBlackEarth':
@@ -504,6 +515,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isDrawTrailingOrbits = false;
     settingsManager.isOrbitCruncherInEcf = false;
     settingsManager.isDrawInCoverageLines = true;
+    settingsManager.enableHoverOverlay = true;
+    settingsManager.isFocusOnSatelliteWhenSelected = true;
     settingsManager.isEciOnHover = false;
     settingsManager.isDemoModeOn = false;
     settingsManager.isSatLabelModeOn = true;
@@ -537,6 +550,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
     settingsManager.numberOfEcfOrbitsToDraw = numberOfEcfOrbitsToDraw;
     settingsManager.isDrawInCoverageLines = (<HTMLInputElement>getEl('settings-isDrawInCoverageLines')).checked;
+    settingsManager.enableHoverOverlay = (<HTMLInputElement>getEl('settings-enableHoverOverlay')).checked;
+    settingsManager.isFocusOnSatelliteWhenSelected = (<HTMLInputElement>getEl('settings-focusOnSatelliteWhenSelected')).checked;
     settingsManager.isDrawCovarianceEllipsoid = (<HTMLInputElement>getEl('settings-isDrawCovarianceEllipsoid')).checked;
     settingsManager.drawCameraWidget = (<HTMLInputElement>getEl('settings-drawCameraWidget')).checked;
     const ccWidgetCanvas = getEl('camera-control-widget');

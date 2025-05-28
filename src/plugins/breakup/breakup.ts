@@ -29,7 +29,7 @@ export class Breakup extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = streamPng;
   private readonly maxDifApogeeVsPerigee_ = 1000;
@@ -154,21 +154,19 @@ export class Breakup extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('breakup')!.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           showLoading(() => this.onSubmit_());
         });
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (sat: BaseObject) => {
         if (!sat?.isSatellite()) {
           if (this.isMenuButtonActive) {
             this.closeSideMenu();
@@ -189,7 +187,7 @@ export class Breakup extends KeepTrackPlugin {
           }
         }
       },
-    });
+    );
   }
 
   private updateSccNumInMenu_() {
@@ -221,7 +219,7 @@ export class Breakup extends KeepTrackPlugin {
     const origsat = mainsat;
 
     // Launch Points are the Satellites Current Location
-    const gmst = SatMath.calculateTimeVariables(simulationTimeObj).gmst;
+    const gmst = keepTrackApi.getTimeManager().gmst;
     const lla = eci2lla(mainsat.position, gmst);
     const launchLat = lla.lat;
     const launchLon = lla.lon;

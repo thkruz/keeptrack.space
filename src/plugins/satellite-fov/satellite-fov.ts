@@ -20,7 +20,7 @@
  */
 
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
@@ -158,72 +158,59 @@ export class SatelliteFov extends KeepTrackPlugin {
   addHtml(): void {
 
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
-        getEl('sat-fov-settings-form').addEventListener('change', this.handleFormChange_.bind(this));
-        getEl('sat-fov-settings-form').addEventListener('submit', this.handleFormChange_.bind(this));
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        getEl('sat-fov-settings-form')!.addEventListener('change', this.handleFormChange_.bind(this));
+        getEl('sat-fov-settings-form')!.addEventListener('submit', this.handleFormChange_.bind(this));
 
-        getEl('sat-fov-settings-default-form').addEventListener('change', this.handleDefaultFormChange_.bind(this));
-        getEl('sat-fov-settings-default-form').addEventListener('submit', this.handleDefaultFormChange_.bind(this));
+        getEl('sat-fov-settings-default-form')!.addEventListener('change', this.handleDefaultFormChange_.bind(this));
+        getEl('sat-fov-settings-default-form')!.addEventListener('submit', this.handleDefaultFormChange_.bind(this));
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
-        getEl('reset-sat-fov-cones-button').addEventListener('click', () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        getEl('reset-sat-fov-cones-button')!.addEventListener('click', () => {
           keepTrackApi.getScene().coneFactory.clear();
           keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
-          getEl('reset-sat-fov-cones-button').setAttribute('disabled', 'true');
+          getEl('reset-sat-fov-cones-button')!.setAttribute('disabled', 'true');
         });
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'C' && !isRepeat) {
+        const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
 
-    keyboardManager.registerKeyEvent({
-      key: 'C',
-      callback: () => {
-        if (keyboardManager.isShiftPressed) {
-          const currentSat = keepTrackApi.getPlugin(SelectSatManager).getSelectedSat();
+        if (currentSat) {
+          const coneFactory = keepTrackApi.getScene().coneFactory;
 
-          if (currentSat) {
-            const coneFactory = keepTrackApi.getScene().coneFactory;
+          // See if it is already in the scene
+          const cone = coneFactory.checkCacheForMesh_(currentSat);
 
-            // See if it is already in the scene
-            const cone = coneFactory.checkCacheForMesh_(currentSat);
-
-            if (cone) {
-              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
-              coneFactory.remove(cone.id);
-            } else {
-              keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
-              coneFactory.generateMesh(currentSat);
-            }
+          if (cone) {
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+            coneFactory.remove(cone.id);
+          } else {
+            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+            coneFactory.generateMesh(currentSat);
           }
         }
-      },
+      }
     });
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.ConeMeshUpdate,
-      cbName: SatelliteFov.name,
-      cb: () => {
-        this.updateListOfFovMeshes_();
-      },
-    });
+    keepTrackApi.on(
+      KeepTrackApiEvents.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: SatelliteFov.name,
-      cb: (sat: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (sat: BaseObject) => {
         this.updateListOfFovMeshes_();
 
         if (sat?.isSatellite()) {
@@ -232,7 +219,7 @@ export class SatelliteFov extends KeepTrackPlugin {
           this.isSettingsMenuEnabled_ = false;
         }
       },
-    });
+    );
   }
 
   private handleFormChange_() {
@@ -246,7 +233,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       ] as [number, number, number, number],
     };
 
-    const currentSat = keepTrackApi.getPlugin(SelectSatManager).getSelectedSat();
+    const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
     const coneFactory = keepTrackApi.getScene().coneFactory;
 
     if (currentSat) {
@@ -313,15 +300,15 @@ export class SatelliteFov extends KeepTrackPlugin {
     const meshes = keepTrackApi.getScene().coneFactory.meshes;
 
     if (meshes.length === 0) {
-      getEl('reset-sat-fov-cones-button').setAttribute('disabled', 'true');
+      getEl('reset-sat-fov-cones-button')!.setAttribute('disabled', 'true');
     } else {
-      getEl('reset-sat-fov-cones-button').removeAttribute('disabled');
+      getEl('reset-sat-fov-cones-button')!.removeAttribute('disabled');
     }
 
-    getEl('sat-fov-active-cones').innerHTML = meshes
+    getEl('sat-fov-active-cones')!.innerHTML = meshes
       .sort((a, b) => a.obj.id - b.obj.id)
       .map((mesh) => {
-        const currentSat = keepTrackApi.getPlugin(SelectSatManager).getSelectedSat();
+        const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
         let nameSpan = '';
 
         if (currentSat && mesh.obj.id === currentSat.id) {
@@ -350,7 +337,7 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     removeIcons.forEach((icon) => {
       icon.addEventListener('click', (e) => {
-        const id = parseInt((e.target as HTMLElement).dataset.id, 10);
+        const id = parseInt((e.target as HTMLElement).dataset.id ?? '-1', 10);
 
         keepTrackApi.getScene().coneFactory.removeByObjectId(id);
         keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
@@ -359,18 +346,18 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     activeCones.forEach((cone) => {
       cone.addEventListener('click', (e) => {
-        let id = parseInt((e.target as HTMLElement).dataset.id);
+        let id = parseInt((e.target as HTMLElement).dataset.id ?? '-1', 10);
 
         // If not found try the parent
         if (!id) {
-          id = parseInt((e.target as HTMLElement).parentElement.dataset.id);
+          id = parseInt((e.target as HTMLElement).parentElement?.dataset.id ?? '-1', 10);
         }
 
         if (!id) {
           return;
         }
 
-        keepTrackApi.getPlugin(SelectSatManager).selectSat(id);
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
       });
     });
   }

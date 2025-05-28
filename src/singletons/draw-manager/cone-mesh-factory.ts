@@ -45,12 +45,12 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
     const sensorFovMesh = new ConeMesh(coneAttachPoint, settings);
 
     this.add(sensorFovMesh);
-    keepTrackApi.runEvent(KeepTrackApiEvents.ConeMeshUpdate);
+    keepTrackApi.emit(KeepTrackApiEvents.ConeMeshUpdate);
   }
 
   remove(id: number) {
     this.meshes.splice(id, 1);
-    keepTrackApi.runEvent(KeepTrackApiEvents.ConeMeshUpdate);
+    keepTrackApi.emit(KeepTrackApiEvents.ConeMeshUpdate);
   }
 
   removeByObjectId(id: number) {
@@ -60,6 +60,6 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
       this.remove(index);
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.ConeMeshUpdate);
+    keepTrackApi.emit(KeepTrackApiEvents.ConeMeshUpdate);
   }
 }

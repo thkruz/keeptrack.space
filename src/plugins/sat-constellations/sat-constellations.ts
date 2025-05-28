@@ -14,7 +14,12 @@ export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
   dependencies_: string[] = [SelectSatManager.name];
 
-  private additionalConstellations_ = [];
+  private readonly additionalConstellations_ = [] as {
+    groupName: string;
+    groupType: GroupType;
+    groupValue: number[] | RegExp;
+    groupSlug: string;
+  }[];
 
   menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
@@ -51,27 +56,26 @@ export class SatConstellations extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'constellations',
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         // Add additional constellations
-        getEl('constellations-menu').querySelector('ul').insertAdjacentHTML(
+        getEl('constellations-menu')!.querySelector('ul')!.insertAdjacentHTML(
           'beforeend',
           this.additionalConstellations_
             .map((constellation) => `<li class="menu-selectable" data-group="${constellation.groupSlug}">${constellation.groupName}</li>`)
             .join(''),
         );
 
-        getEl('constellation-menu')
+        getEl('constellation-menu')!
           .querySelectorAll('li')
           .forEach((element) => {
             element.addEventListener('click', (evt: Event) => {
-              this.constellationMenuClick_((evt.target as HTMLElement).dataset.group);
+              this.constellationMenuClick_((evt.target as HTMLElement).dataset.group!);
             });
           });
       },
-    });
+    );
   }
 
   addConstellation(groupName: string, groupType: GroupType, groupValue: number[] | RegExp) {
@@ -210,6 +214,11 @@ export class SatConstellations extends KeepTrackPlugin {
     }
 
     const searchDOM = getEl('search');
+
+    if (!searchDOM) {
+      // If no searchDOM, there is no need to continue
+      return;
+    }
 
     groupManagerInstance.selectGroup(groupManagerInstance.groupList[groupName]);
 

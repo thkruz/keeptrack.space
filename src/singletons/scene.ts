@@ -3,12 +3,12 @@ import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
-import { GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
+import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
 import { Camera } from './camera';
 import { ConeMeshFactory } from './draw-manager/cone-mesh-factory';
 import { Box } from './draw-manager/cube';
-import { Earth } from './draw-manager/earth';
+import { AtmosphereSettings, Earth } from './draw-manager/earth';
 import { Ellipsoid } from './draw-manager/ellipsoid';
 import { Godrays } from './draw-manager/godrays';
 import { Moon } from './draw-manager/moon';
@@ -66,15 +66,15 @@ export class Scene {
     this.skybox.init(settingsManager, gl);
   }
 
-  update(simulationTime: Date, gmst: GreenwichMeanSiderealTime, j: number) {
-    this.sun.update(j);
-    this.earth.update(gmst);
+  update(simulationTime: Date) {
+    this.sun.update();
+    this.earth.update();
     this.moon.update(simulationTime);
     this.skybox.update();
 
     keepTrackApi.getLineManager().update();
 
-    this.sensorFovFactory.updateAll(gmst);
+    this.sensorFovFactory.updateAll();
     this.coneFactory.updateAll();
   }
 
@@ -132,7 +132,7 @@ export class Scene {
         this.moon.draw(this.sun.position);
       }
 
-      keepTrackApi.runEvent(KeepTrackApiEvents.drawOptionalScenery);
+      keepTrackApi.emit(KeepTrackApiEvents.drawOptionalScenery);
     }
 
     renderer.postProcessingManager.curBuffer = null;
@@ -161,8 +161,8 @@ export class Scene {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAurora'), ToastMsgType.caution);
           break;
         }
-        if (settingsManager.isDrawAtmosphere) {
-          settingsManager.isDrawAtmosphere = false;
+        if (settingsManager.isDrawAtmosphere > 0) {
+          settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAtmosphere'), ToastMsgType.caution);
           break;
         }
@@ -195,7 +195,6 @@ export class Scene {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   renderOpaque(renderer: WebGLRenderer, camera: Camera): void {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -220,7 +219,6 @@ export class Scene {
     }
   }
 
-  // eslint-disable-next-line class-methods-use-this
   renderTransparent(renderer: WebGLRenderer, camera: Camera): void {
     const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
 
@@ -268,8 +266,8 @@ export class Scene {
 
   async loadScene(): Promise<void> {
     try {
-      this.earth.init(settingsManager, this.gl_);
-      keepTrackApi.runEvent(KeepTrackApiEvents.drawManagerLoadScene);
+      this.earth.init(this.gl_);
+      keepTrackApi.emit(KeepTrackApiEvents.drawManagerLoadScene);
       await this.sun.init(this.gl_);
 
       if (!settingsManager.isDisableGodrays) {

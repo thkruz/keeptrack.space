@@ -57,11 +57,11 @@ describe('SatelliteViewPlugin_class', () => {
   // Tests that the addHtml method adds the correct HTML element to the DOM
   it('test_addHtml_method', () => {
     const plugin = new SatelliteViewPlugin();
-    const registerSpy = jest.spyOn(keepTrackApi, 'register');
+    const registerSpy = jest.spyOn(keepTrackApi, 'on');
 
     plugin.addHtml();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
     expect(registerSpy).toHaveBeenCalled();
     expect(getEl('bottom-icons')?.innerHTML).toContain('satellite-view-bottom-icon');
   });
@@ -73,10 +73,10 @@ describe('SatelliteViewPlugin_class', () => {
 
     selectSatManagerInstance.selectedSat = -1;
     plugin.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
     keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).toHaveBeenCalledWith(t7e('errorMsgs.SelectSatelliteFirst'), ToastMsgType.serious, true);
   });
 
@@ -87,10 +87,10 @@ describe('SatelliteViewPlugin_class', () => {
 
     selectSatManagerInstance.selectedSat = 1;
     plugin.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
     keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
 
@@ -101,12 +101,12 @@ describe('SatelliteViewPlugin_class', () => {
 
     selectSatManagerInstance.selectedSat = 1;
     plugin.init();
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
     const tempMockCamera = { ...mockCameraManager, cameraType: CameraType.SATELLITE } as Camera;
 
     keepTrackContainer.registerSingleton<Camera>(Singletons.MainCamera, tempMockCamera);
-    keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
 });

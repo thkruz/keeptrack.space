@@ -2,6 +2,7 @@ import { EChartsData, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/in
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { t7e } from '@app/locales/keys';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMathApi } from '@app/singletons/sat-math-api';
 import scatterPlot3Png from '@public/img/icons/scatter-plot3.png';
 import * as echarts from 'echarts';
@@ -69,10 +70,9 @@ export class RicPlot extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSecondarySat,
-      cbName: this.id,
-      cb: (obj: BaseObject | null) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.setSecondarySat,
+      (obj: BaseObject | null) => {
         if (!obj || this.selectSatManager_.selectedSat === -1) {
           if (this.isMenuButtonActive) {
             this.hideSideMenus();
@@ -82,12 +82,11 @@ export class RicPlot extends KeepTrackPlugin {
           this.setBottomIconToEnabled();
         }
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         if (!obj || this.selectSatManager_.secondarySat === -1) {
           if (this.isMenuButtonActive) {
             this.hideSideMenus();
@@ -97,7 +96,7 @@ export class RicPlot extends KeepTrackPlugin {
           this.setBottomIconToEnabled();
         }
       },
-    });
+    );
   }
 
   createPlot(data: EChartsData, chartDom: HTMLElement) {
@@ -254,6 +253,12 @@ export class RicPlot extends KeepTrackPlugin {
 
     const satP = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
     const satS = this.selectSatManager_.secondarySatObj;
+
+    if (!satP || !satS) {
+      errorManagerInstance.warn('Missing satellite data for RIC plot');
+
+      return [];
+    }
 
     // Time management
     const now = keepTrackApi.getTimeManager().simulationTimeObj.getTime();

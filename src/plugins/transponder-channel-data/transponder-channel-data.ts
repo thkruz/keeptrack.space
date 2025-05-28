@@ -51,7 +51,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
     this.lastLoadedSat_ = selectedSat.id;
   };
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
@@ -62,18 +62,16 @@ export class TransponderChannelData extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerInit,
+      () => {
         keepTrackApi.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_.map((sccNum) => parseInt(sccNum)));
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         const exportLaunchInfo = getEl('export-channel-info');
 
         if (exportLaunchInfo) {
@@ -82,16 +80,15 @@ export class TransponderChannelData extends KeepTrackPlugin {
           });
         }
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         if (
           !obj ||
           obj.id === -1 ||
@@ -113,7 +110,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
           }
         }
       },
-    });
+    );
   }
 
   bottomIconElementName: string = 'menu-transponderChannelData';
@@ -145,10 +142,12 @@ export class TransponderChannelData extends KeepTrackPlugin {
     const selectedObj = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
     let selectedSat: DetailedSatellite;
 
-    if (selectedObj.isSatellite()) {
+    if (selectedObj?.isSatellite()) {
       selectedSat = selectedObj as DetailedSatellite;
     } else {
       errorManagerInstance.warn('Selected object is not a satellite');
+
+      return;
     }
 
     // First try with satellite name

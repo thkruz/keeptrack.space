@@ -217,6 +217,7 @@ export enum MenuMode {
   ADVANCED,
   ANALYSIS,
   EXPERIMENTAL,
+  SETTINGS,
   ALL,
 }
 
@@ -291,7 +292,6 @@ export enum KeepTrackApiEvents {
   uiManagerOnReady = 'uiManagerOnReady',
   bottomMenuClick = 'bottomMenuClick',
   hideSideMenus = 'hideSideMenus',
-  nightToggle = 'nightToggle',
   orbitManagerInit = 'orbitManagerInit',
   drawManagerLoadScene = 'drawManagerLoadScene',
   drawOptionalScenery = 'drawOptionalScenery',
@@ -305,7 +305,7 @@ export enum KeepTrackApiEvents {
    */
   rightBtnMenuAdd = 'rightBtnMenuAdd',
   updateDateTime = 'updateDateTime',
-  updatePropRate = 'updatePropRate',
+  propRateChanged = 'propRateChanged',
   uiManagerFinal = 'uiManagerFinal',
   resetSensor = 'resetSensor',
   /**
@@ -338,4 +338,9 @@ export enum KeepTrackApiEvents {
   bottomMenuModeChange = 'bottomMenuModeChange',
   saveSettings = 'saveSettings',
   loadSettings = 'loadSettings',
+  update = 'update',
+  parseGetVariables = 'parseGetVariables',
+  rightBtnMenuOpen = 'rightBtnMenuOpen',
+  searchUpdated = 'searchUpdated',
+  legendUpdated = 'legendUpdated',
 }

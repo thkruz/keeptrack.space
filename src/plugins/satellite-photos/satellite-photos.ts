@@ -45,10 +45,9 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('meteosat9-link')!.addEventListener('click', () => {
           // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
           SatellitePhotos.loadPic_(28912, 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg');
@@ -67,15 +66,14 @@ export class SatellitePhotos extends KeepTrackPlugin {
           SatellitePhotos.loadPic_(51850, 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg');
         });
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onKeepTrackReady,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onKeepTrackReady,
+      () => {
         this.initDISCOVR_();
       },
-    });
+    );
   }
 
   /**

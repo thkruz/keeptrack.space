@@ -104,17 +104,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.id,
-      cb: this.onCruncherReady_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.onCruncherReady, this.onCruncherReady_.bind(this));
   }
 
   /**
@@ -298,7 +289,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       watchlistElement.innerHTML = watchlistListHTML;
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.onWatchlistUpdated, this.watchlistList);
+    keepTrackApi.emit(KeepTrackApiEvents.onWatchlistUpdated, this.watchlistList);
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       // No duplicates

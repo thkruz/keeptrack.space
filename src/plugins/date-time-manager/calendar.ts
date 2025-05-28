@@ -1,6 +1,5 @@
 import { ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { t7e } from '@app/locales/keys';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
@@ -294,7 +293,7 @@ export class Calendar {
             isSelected ? 'ui-datepicker-current-day' : '',
           ].filter(Boolean).join(' ');
 
-          const jday = this.getUTCDayOfYear(new Date(this.calendarDate.getUTCFullYear(), this.calendarDate.getUTCMonth(), dayCount));
+          const jday = keepTrackApi.getTimeManager().getUTCDayOfYear(new Date(this.calendarDate.getUTCFullYear(), this.calendarDate.getUTCMonth(), dayCount));
 
           const dayCountPadded = dayCount.toString().padStart(2, '0');
           const jdayPadded = jday.toString().padStart(3, '0');
@@ -317,50 +316,6 @@ export class Calendar {
     }
 
     return dayHtml;
-  }
-
-  private isLeapYear(date: Date): boolean {
-    const year = date.getUTCFullYear();
-
-    if ((year & 3) !== 0) {
-      return false;
-    }
-
-    return year % 100 !== 0 || year % 400 === 0;
-  }
-
-  private getUTCDayOfYear(doy: Date) {
-    const mn = doy.getUTCMonth();
-    const dn = doy.getUTCDate();
-    const dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
-    let dayInYear = 365;
-    let dayOfYear = dayCount[mn] + dn;
-
-    if (mn > 1 && this.isLeapYear(doy)) {
-      dayOfYear++;
-      dayInYear++;
-    }
-
-    return dayOfYear % dayInYear;
-  }
-
-  private getUTCDateFromDayOfYear(year: number, dayOfYear: number): Date {
-    const isLeapYear = this.isLeapYear(this.createUTCDate(year, 0, 1));
-    const daysInMonth = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    let month = 0;
-
-    while (dayOfYear > daysInMonth[month]) {
-      dayOfYear -= daysInMonth[month];
-      month++;
-    }
-
-    return this.createUTCDate(year, month, dayOfYear);
-  }
-
-  private createUTCDate(year: number, month?: number, day?: number, hours?: number, minutes?: number, seconds?: number): Date {
-    const date = new Date(Date.UTC(year, month ?? 0, day ?? 1, hours ?? 0, minutes ?? 0, seconds ?? 0));
-
-    return date;
   }
 
   private renderTimePicker(): string {
@@ -510,7 +465,7 @@ export class Calendar {
       return;
     }
 
-    const selectedDate = this.getUTCDateFromDayOfYear(this.calendarDate.getUTCFullYear(), dayOfYear);
+    const selectedDate = keepTrackApi.getTimeManager().getUTCDateFromDayOfYear(this.calendarDate.getUTCFullYear(), dayOfYear);
 
     selectedDate.setUTCHours(this.simulationDate.getUTCHours());
     selectedDate.setUTCMinutes(this.simulationDate.getUTCMinutes());
@@ -659,13 +614,7 @@ export class Calendar {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     const today = new Date();
-    const jday = this.getUTCDayOfYear(timeManagerInstance.simulationTimeObj);
 
-    const jdayElement = getEl('jday');
-
-    if (jdayElement) {
-      jdayElement.innerHTML = jday.toString();
-    }
     timeManagerInstance.changeStaticOffset(this.simulationDate.getTime() - today.getTime());
     colorSchemeManagerInstance.calculateColorBuffers(true);
     timeManagerInstance.calculateSimulationTime();

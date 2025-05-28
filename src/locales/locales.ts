@@ -3,6 +3,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import de from './de.json';
 import en from './en.json';
 import es from './es.json';
+import fr from './fr.json';
 import ja from './ja.json';
 import { t7e } from './keys';
 import ko from './ko.json';
@@ -24,6 +25,9 @@ const opts: InitOptions = {
     },
     en: {
       translation: en, // English
+    },
+    fr: {
+      translation: fr, // French
     },
     es: {
       translation: es, // Spanish

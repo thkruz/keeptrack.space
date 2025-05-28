@@ -30,6 +30,7 @@ import { errorManagerInstance } from './errorManager';
 
 import { waitForCruncher } from '@app/lib/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { UrlManager } from '@app/static/url-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { LegendManager } from '../static/legend-manager';
@@ -123,7 +124,7 @@ export class ColorSchemeManager {
         keepTrackApi.getColorSchemeManager().calculateColorBuffers();
       },
       validationFunc: (m: PositionCruncherOutgoingMsg) => (!!((m.satInView?.length && m.satInView?.length > 0))),
-      isSkipFirst: true,
+      skipNumber: 2,
       isRunCbOnFailure: true,
       maxRetries: 5,
     });
@@ -187,6 +188,7 @@ export class ColorSchemeManager {
 
       // Save the color scheme if needed
       if (this.currentColorScheme?.id && this.lastColorScheme?.id !== this.currentColorScheme?.id) {
+        UrlManager.updateURL();
         PersistenceManager.getInstance().saveItem(StorageKey.COLOR_SCHEME, this.currentColorScheme.id);
         // Note the colorscheme for next time
         this.lastColorScheme = this.currentColorScheme;
@@ -227,10 +229,9 @@ export class ColorSchemeManager {
     this.pickableBuffer = renderer.gl.createBuffer();
 
     // Create the color buffers as soon as the position cruncher is ready
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: 'colorSchemeManager',
-      cb: (): void => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherReady,
+      (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
         let possibleColorScheme: ColorScheme | null = null;
@@ -253,18 +254,14 @@ export class ColorSchemeManager {
         this.isReady = true;
 
         // This helps keep the inview colors up to date
-        keepTrackApi.register({
-          event: KeepTrackApiEvents.staticOffsetChange,
-          cbName: 'colorSchemeManager',
-          cb: () => {
-            setTimeout(() => {
-              this.calcColorBufsNextCruncher();
-            }, 1000);
-          },
+        keepTrackApi.on(KeepTrackApiEvents.staticOffsetChange, () => {
+          setTimeout(() => {
+            this.calcColorBufsNextCruncher();
+          }, 1000);
         });
 
       },
-    });
+    );
 
     LegendManager.change(this.currentColorScheme.id);
   }

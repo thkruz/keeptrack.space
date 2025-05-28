@@ -445,6 +445,10 @@ export class DotsManager {
    * Resets the inSunData array to all zeros.
    */
   resetSatInSun(): void {
+    if (!this.inSunData) {
+      return;
+    }
+
     this.inSunData = new Int8Array(this.inSunData.length);
     this.inSunData.fill(0);
   }
@@ -453,6 +457,10 @@ export class DotsManager {
    * Resets the inViewData array to all zeroes.
    */
   resetSatInView(): void {
+    if (!this.inViewData) {
+      return;
+    }
+
     this.inViewData = new Int8Array(this.inViewData.length);
     this.inViewData.fill(0);
   }
@@ -725,8 +733,8 @@ export class DotsManager {
 
               // Something on the ground
               drawSize +=
-              when_ge(a_star, 0.5) * when_lt(dist, 6421.0) *
-              (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), u_minSize * 0.75), u_maxSize) * 1.0);
+              when_lt(a_star, 0.5) * when_lt(dist, 6421.0) *
+              (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), u_minSize * 0.5), u_maxSize) * 1.0);
 
               // Star or Searched Object
               drawSize +=
@@ -767,6 +775,9 @@ export class DotsManager {
 
                 void main(void) {
                     fragColor = vec4(vColor, 1.0);
+
+                    // Reduce Flickering from Depth Fighting while picking
+                    gl_FragDepth = gl_FragCoord.z * 0.99999975;
                 }
             `,
       },

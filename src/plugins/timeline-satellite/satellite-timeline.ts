@@ -117,51 +117,48 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
         this.ctx_ = this.canvas_.getContext('2d');
         this.ctxStatic_ = this.canvasStatic_.getContext('2d');
 
-        getEl('satellite-timeline-setting-total-length').addEventListener('change', () => {
+        getEl('satellite-timeline-setting-total-length')!.addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-total-length')).value) as Hours;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
 
-        getEl('satellite-timeline-setting-interval').addEventListener('change', () => {
+        getEl('satellite-timeline-setting-interval')!.addEventListener('change', () => {
           this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-interval')).value) as Seconds;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
 
-        getEl('satellite-timeline-setting-bad-length').addEventListener('change', () => {
+        getEl('satellite-timeline-setting-bad-length')!.addEventListener('change', () => {
           this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-bad-length')).value) as Seconds;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
 
-        getEl('satellite-timeline-setting-avg-length').addEventListener('change', () => {
+        getEl('satellite-timeline-setting-avg-length')!.addEventListener('change', () => {
           this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-avg-length')).value) as Seconds;
           this.ctxStatic_.reset();
           this.updateTimeline();
         });
       },
-    });
-
+    );
   }
 
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
-        if (!sat && keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0) {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (sat: BaseObject) => {
+        if (!sat && keepTrackApi.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
           this.setBottomIconToDisabled();
         } else if (this.verifySensorSelected(false)) {
           this.setBottomIconToEnabled();
@@ -175,22 +172,13 @@ export class SatelliteTimeline extends KeepTrackPlugin {
           }
         }
       },
-    });
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onWatchlistUpdated,
-      cbName: this.id,
-      cb: this.onWatchlistUpdated_.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.resize,
-      cbName: this.id,
-      cb: this.resizeCanvas_.bind(this),
-    });
+    );
+    keepTrackApi.on(KeepTrackApiEvents.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.resize, this.resizeCanvas_.bind(this));
   }
 
   private onWatchlistUpdated_(watchlistList: number[]) {
-    if (watchlistList.length === 0 && keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
+    if (watchlistList.length === 0 && keepTrackApi.getPlugin(SelectSatManager)?.selectedSat === -1) {
       this.setBottomIconToDisabled();
     } else if (this.verifySensorSelected(false)) {
       this.setBottomIconToEnabled();
@@ -440,7 +428,6 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
             timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
             timeManagerInstance.calculateSimulationTime();
-            keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
             keepTrackApi.getPlugin(SelectSatManager).selectSat(satellitePass.satellite.id);
           }
         });

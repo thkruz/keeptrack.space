@@ -2,7 +2,7 @@ import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
 import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
+import { hideLoading, showLoading } from '@app/lib/showLoading';
 import rocketPng from '@public/img/icons/rocket.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from './missile-manager';
@@ -14,13 +14,13 @@ export class MissilePlugin extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = rocketPng;
-  sideMenuElementName: string = 'missile-menu';
+  sideMenuElementName: string = `${this.id}-menu`;
   sideMenuElementHtml: string = keepTrackApi.html`
-  <div id="missile-menu" class="side-menu-parent start-hidden text-select">
-    <div id="missile-content" class="side-menu">
+  <div id="${this.id}-menu" class="side-menu-parent start-hidden text-select">
+    <div id="${this.id}-content" class="side-menu">
       <div class="row">
         <h5 class="center-align">Create Missile Attack</h5>
-        <form id="missile" class="col s12">
+        <form id="${this.id}-form" class="col s12">
           <div class="input-field col s12">
             <select id="ms-type">
               <option value="0">Custom Missile</option>
@@ -180,22 +180,14 @@ export class MissilePlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'missile',
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {
     super.addJs();
 
-    // Missile oribts have to be updated every draw or they quickly become innacurate
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: 'updateMissileOrbits',
-      cb: this.updateLoop_.bind(this),
-    });
+    // Missile orbits have to be updated every draw or they quickly become inaccurate
+    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.updateLoop_.bind(this));
   }
 
   private searchForRvs_() {
@@ -210,7 +202,7 @@ export class MissilePlugin extends KeepTrackPlugin {
       const timeManagerInstance = keepTrackApi.getTimeManager();
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      getEl('ms-error').style.display = 'none';
+      getEl('ms-error')!.style.display = 'none';
       const type = parseFloat((<HTMLInputElement>getEl('ms-type')).value);
       const attacker = parseFloat((<HTMLInputElement>getEl('ms-attacker')).value);
       let lauLat = parseFloat((<HTMLInputElement>getEl('ms-lat-lau')).value);
@@ -258,13 +250,13 @@ export class MissilePlugin extends KeepTrackPlugin {
           // Custom Target
           if (isNaN(tgtLat)) {
             uiManagerInstance.toast('Invalid Target Latitude!', ToastMsgType.critical);
-            getEl('loading-screen').style.display = 'none';
+            hideLoading();
 
             return;
           }
           if (isNaN(tgtLon)) {
             uiManagerInstance.toast('Invalid Target Longitude!', ToastMsgType.critical);
-            getEl('loading-screen').style.display = 'none';
+            hideLoading();
 
             return;
           }
@@ -277,13 +269,13 @@ export class MissilePlugin extends KeepTrackPlugin {
         if (this.isSub_) {
           if (isNaN(lauLat)) {
             uiManagerInstance.toast('Invalid Launch Latitude!', ToastMsgType.critical);
-            getEl('loading-screen').style.display = 'none';
+            hideLoading();
 
             return;
           }
           if (isNaN(lauLon)) {
             uiManagerInstance.toast('Invalid Launch Longitude!', ToastMsgType.critical);
-            getEl('loading-screen').style.display = 'none';
+            hideLoading();
 
             return;
           }
@@ -461,21 +453,21 @@ export class MissilePlugin extends KeepTrackPlugin {
         uiManagerInstance.toast(missileManager.lastMissileError, missileManager.lastMissileErrorType);
         uiManagerInstance.doSearch('RV_');
       }
-      getEl('loading-screen').style.display = 'none';
+      hideLoading();
     });
   }
 
   private uiManagerFinal_(): void {
-    clickAndDragWidth(getEl('missile-menu'));
-    getEl('missile').addEventListener('submit', (e: Event): void => {
+    clickAndDragWidth(getEl(`${this.id}-menu`));
+    getEl(`${this.id}-form`)!.addEventListener('submit', (e: Event): void => {
       e.preventDefault();
       this.missileSubmit_();
     });
-    getEl('ms-attacker').addEventListener('change', this.msAttackerChange_);
-    getEl('ms-target').addEventListener('change', this.msTargetChange_);
-    getEl('ms-error').addEventListener('click', this.msErrorClick_);
-    getEl('missile').addEventListener('change', this.missileChange_);
-    getEl('searchRvBtn').addEventListener('click', this.searchForRvs_);
+    getEl('ms-attacker')!.addEventListener('change', this.msAttackerChange_);
+    getEl('ms-target')!.addEventListener('change', this.msTargetChange_);
+    getEl('ms-error')!.addEventListener('click', this.msErrorClick_);
+    getEl(`${this.id}-form`)!.addEventListener('change', this.missileChange_);
+    getEl('searchRvBtn')!.addEventListener('click', this.searchForRvs_);
 
     this.msAttackerChange_();
     this.msTargetChange_();
@@ -493,21 +485,21 @@ export class MissilePlugin extends KeepTrackPlugin {
 
   private missileChange_(): void {
     if (parseFloat((<HTMLInputElement>getEl('ms-type')).value) !== 0) {
-      getEl('ms-custom-opt').style.display = 'none';
+      getEl('ms-custom-opt')!.style.display = 'none';
     } else {
-      getEl('ms-custom-opt').style.display = 'block';
+      getEl('ms-custom-opt')!.style.display = 'block';
     }
   }
   private msErrorClick_(): void {
-    getEl('ms-error').style.display = 'none';
+    getEl('ms-error')!.style.display = 'none';
   }
   private msTargetChange_() {
     if (parseInt((<HTMLInputElement>getEl('ms-target')).value) !== -1) {
-      getEl('ms-tgt-holder-lat').style.display = 'none';
-      getEl('ms-tgt-holder-lon').style.display = 'none';
+      getEl('ms-tgt-holder-lat')!.style.display = 'none';
+      getEl('ms-tgt-holder-lon')!.style.display = 'none';
     } else {
-      getEl('ms-tgt-holder-lat').style.display = 'block';
-      getEl('ms-tgt-holder-lon').style.display = 'block';
+      getEl('ms-tgt-holder-lat')!.style.display = 'block';
+      getEl('ms-tgt-holder-lon')!.style.display = 'block';
     }
   }
 
@@ -515,17 +507,17 @@ export class MissilePlugin extends KeepTrackPlugin {
     this.isSub_ = false;
     const subList = [100, 600, 213, 214, 215, 321, 500, 400];
 
-    for (let i = 0; i < subList.length; i++) {
-      if (subList[i] === parseInt((<HTMLInputElement>getEl('ms-attacker')).value)) {
+    for (const sub of subList) {
+      if (sub === parseInt((<HTMLInputElement>getEl('ms-attacker')).value)) {
         this.isSub_ = true;
       }
     }
     if (!this.isSub_) {
-      getEl('ms-lau-holder-lat').style.display = 'none';
-      getEl('ms-lau-holder-lon').style.display = 'none';
+      getEl('ms-lau-holder-lat')!.style.display = 'none';
+      getEl('ms-lau-holder-lon')!.style.display = 'none';
     } else {
-      getEl('ms-lau-holder-lat').style.display = 'block';
-      getEl('ms-lau-holder-lon').style.display = 'block';
+      getEl('ms-lau-holder-lat')!.style.display = 'block';
+      getEl('ms-lau-holder-lon')!.style.display = 'block';
     }
   }
 }

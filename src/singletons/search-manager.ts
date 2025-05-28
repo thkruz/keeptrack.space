@@ -4,11 +4,10 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
 import { DetailedSatellite, SpaceObjectType, Star } from 'ootk';
-import { keepTrackApi } from '../keepTrackApi';
+import { InputEventType, keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { slideInDown, slideOutUp } from '../lib/slide';
 import { TopMenu } from '../plugins/top-menu/top-menu';
-import { UrlManager } from '../static/url-manager';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { errorManagerInstance } from './errorManager';
 import type { UiManager } from './uiManager';
@@ -50,10 +49,19 @@ export class SearchManager {
     searchResults.id = TopMenu.SEARCH_RESULT_ID;
     uiWrapper!.prepend(searchResults);
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: 'Search Manager',
-      cb: this.addListeners_.bind(this),
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.addListeners_.bind(this));
+  }
+
+  init() {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'F' && !isRepeat) {
+        this.toggleSearch();
+        if (this.isSearchOpen) {
+          setTimeout(() => {
+            getEl('search')?.focus();
+          }, 1000);
+        }
+      }
     });
   }
 
@@ -183,6 +191,7 @@ export class SearchManager {
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     if (searchString === '') {
       this.hideResults();
+      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString);
 
       return;
     }
@@ -200,6 +209,7 @@ export class SearchManager {
       dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
       (<HTMLInputElement>getEl('search')).value = '';
       this.hideResults();
+      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString);
 
       return;
     }
@@ -217,6 +227,9 @@ export class SearchManager {
     if (searchString.length <= settingsManager.minimumSearchCharacters && searchString !== 'RV_') {
       return;
     }
+
+    // Emit the search before it is modified
+    keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString);
 
     // Uppercase to make this search not case sensitive
     searchString = searchString.toUpperCase();
@@ -268,12 +281,7 @@ export class SearchManager {
         uiManagerInstance.toast('No Results Found', ToastMsgType.serious, false);
       }
       this.hideResults();
-
-      return;
     }
-
-    // Don't let the search overlap with the legend
-    UrlManager.updateURL();
   }
 
   private static doRegularSearch_(searchString: string) {

@@ -37,13 +37,14 @@ export class Collisions extends KeepTrackPlugin {
 
   bottomIconElementName: string = 'menu-satellite-collision';
   bottomIconImg = CollisionsPng;
-  sideMenuElementName: string = 'collisions-menu';
+  sideMenuElementName: string = `${this.id}-menu`;
   sideMenuElementHtml = keepTrackApi.html`
-  <div id="collisions-menu" class="side-menu-parent start-hidden text-select">
-    <div id="collisions-content" class="side-menu">
+  <div id="${this.id}-menu" class="side-menu-parent start-hidden text-select">
+    <div id="${this.id}-content" class="side-menu">
       <div class="row">
         <h5 class="center-align">Possible Collisions</h5>
-        <table id="collisions-table" class="center-align"></table>
+        <table id="${this.id}-table" class="center-align"></table>
+        <sub class="center-align">*Collision data provided by CelesTrak via <a href="https://celestrak.org/SOCRATES/" target="_blank" rel="noreferrer">SOCRATES</a>.</sub>
       </div>
     </div>
   </div>`;
@@ -65,39 +66,31 @@ export class Collisions extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherMessage,
-      cbName: this.id,
-      cb: () => {
-        if (this.selectSatIdOnCruncher_ !== null) {
-          // If selectedSatManager is loaded, set the selected sat to the one that was just added
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+    keepTrackApi.on(KeepTrackApiEvents.onCruncherMessage, () => {
+      if (this.selectSatIdOnCruncher_ !== null) {
+        // If selectedSatManager is loaded, set the selected sat to the one that was just added
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
 
-          this.selectSatIdOnCruncher_ = null;
-        }
-      },
+        this.selectSatIdOnCruncher_ = null;
+      }
     });
   }
 
   private uiManagerFinal_() {
-    getEl(this.sideMenuElementName).addEventListener('click', (evt: MouseEvent) => {
+    getEl(this.sideMenuElementName)!.addEventListener('click', (evt: MouseEvent) => {
       showLoading(() => {
         const el = (<HTMLElement>evt.target).parentElement;
 
-        if (!el.classList.contains('collisions-object')) {
+        if (!el!.classList.contains(`${this.id}-object`)) {
           return;
         }
         // Might be better code for this.
-        const hiddenRow = el.dataset?.row;
+        const hiddenRow = el!.dataset?.row;
 
         if (hiddenRow !== null) {
-          this.eventClicked_(parseInt(hiddenRow));
+          this.eventClicked_(parseInt(hiddenRow!));
         }
       });
     });
@@ -136,7 +129,7 @@ export class Collisions extends KeepTrackPlugin {
 
   private createTable_(): void {
     try {
-      const tbl = <HTMLTableElement>getEl('collisions-table'); // Identify the table to update
+      const tbl = <HTMLTableElement>getEl(`${this.id}-table`); // Identify the table to update
 
       tbl.innerHTML = ''; // Clear the table from old object data
 
@@ -170,7 +163,7 @@ export class Collisions extends KeepTrackPlugin {
     // Create a new row
     const tr = tbl.insertRow();
 
-    tr.setAttribute('class', 'collisions-object link');
+    tr.setAttribute('class', `${this.id}-object link`);
     tr.setAttribute('data-row', i.toString());
 
     // Populate the table with the data

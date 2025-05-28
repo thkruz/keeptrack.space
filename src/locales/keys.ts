@@ -80,6 +80,8 @@ export const Keys = [
   'loadingScreenMsgs.elsets',
   'loadingScreenMsgs.models',
   'loadingScreenMsgs.cunningPlan',
+  'loadingScreenMsgs.copyrightNotice',
+  'loadingScreenMsgs.copyrightNoticeMobile',
   'splashScreens.1',
   'splashScreens.2',
   'splashScreens.3',

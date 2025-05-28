@@ -2,8 +2,6 @@ import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
 import { isThisNode } from '@app/static/isThisNode';
-import { UrlManager } from '@app/static/url-manager';
-import { getDayOfYear } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
@@ -19,51 +17,40 @@ export class DateTimeManager extends KeepTrackPlugin {
   init(): void {
     super.init();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.id,
-      cb: this.uiManagerInit.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: this.uiManagerFinal.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateDateTime,
-      cbName: this.id,
-      cb: this.updateDateTime.bind(this),
-    });
-
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateSelectBox,
-      cbName: this.id,
-      cb: () => {
-        const jday = getDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
-
-        getEl('jday').innerHTML = jday.toString();
-      },
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.updateDateTime, this.updateDateTime.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => this.updateDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
   }
 
   updateDateTime(date: Date) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
     const dateTimeInputTb = document.getElementById(this.dateTimeInputTbId_) as HTMLInputElement;
 
     if (dateTimeInputTb && !isThisNode()) {
       dateTimeInputTb.value = date.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
     }
 
-    timeManagerInstance.synchronize();
-    UrlManager.updateURL();
+    //  Jday isn't initalized right away, so we need to check if it exists
+    if (!getEl('jday')) {
+      return;
+    }
+
+    if (settingsManager.isUseJdayOnTopMenu) {
+      const jday = keepTrackApi.getTimeManager().getUTCDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
+
+      getEl('jday')!.innerHTML = jday.toString();
+    } else {
+      getEl('jday')!.innerHTML = keepTrackApi.getTimeManager().simulationTimeObj.toLocaleDateString();
+    }
   }
 
   datetimeTextClick(): void {
     const simulationDateObj = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
+    const timeManagerInstance = keepTrackApi.getTimeManager();
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, simulationDateObj);
+    timeManagerInstance.synchronize();
+
+    this.updateDateTime(simulationDateObj);
     this.calendar.setDate(simulationDateObj);
     this.calendar.toggleDatePicker();
 
@@ -101,7 +88,7 @@ export class DateTimeManager extends KeepTrackPlugin {
   }
 
   uiManagerFinal() {
-    if (!settingsManager.plugins.topMenu) {
+    if (!settingsManager.plugins.TopMenu) {
       return;
     }
 
@@ -114,11 +101,14 @@ export class DateTimeManager extends KeepTrackPlugin {
     if (datetimeInputTb && !isThisNode()) {
       datetimeInputTb.addEventListener('change', () => {
         if (this.isEditTimeOpen) {
-          const datetimeInputElement = document.getElementById('datetime-input');
+          // const datetimeInputElement = document.getElementById('datetime-input');
 
-          if (!datetimeInputElement) {
-            datetimeInputElement.style.display = 'none';
-          }
+          /*
+           * TODO: Why was this originally !datetimeInputElement???
+           * if (datetimeInputElement) {
+           * datetimeInputElement.style.display = 'none';
+           * }
+           */
           setTimeout(() => {
             this.isEditTimeOpen = false;
           }, 500);

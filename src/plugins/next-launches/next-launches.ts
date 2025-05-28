@@ -82,7 +82,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
     minWidth: 450,
   };
 
-  menuMode: MenuMode[] = [MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   sideMenuElementName: string = 'nextLaunch-menu';
   sideMenuElementHtml: string = keepTrackApi.html`
@@ -104,16 +104,15 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('export-launch-info')!.addEventListener('click', () => {
           keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
           saveCsv(this.launchList as unknown as Array<Record<string, unknown>>, 'launchList');
         });
       },
-    });
+    );
   }
 
   showTable() {
@@ -238,12 +237,12 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
   static initTable(tbl: HTMLTableElement, launchList: LaunchInfoObject[]) {
     NextLaunchesPlugin.makeTableHeaders(tbl);
 
-    for (let i = 0; i < launchList.length; i++) {
+    for (const launchEvent of launchList) {
       const tr = tbl.insertRow();
 
       // Time Cells
       const tdT = tr.insertCell();
-      const timeText = launchList[i].windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24 ? 'TBD' : `${dateFormat(launchList[i].windowStart, 'isoDateTime', true)} UTC`;
+      const timeText = launchEvent.windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24 ? 'TBD' : `${dateFormat(launchEvent.windowStart, 'isoDateTime', true)} UTC`;
 
       tdT.appendChild(document.createTextNode(timeText));
 
@@ -251,33 +250,33 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
       const tdN = tr.insertCell();
 
       // Mission Name Text
-      const nameText = launchList[i]?.missionName || 'Unknown';
+      const nameText = launchEvent?.missionName || 'Unknown';
       // Mission Name HTML Setup
       const nameHTML =
-        !launchList[i]?.missionURL || launchList[i].missionURL === ''
+        !launchEvent?.missionURL || launchEvent.missionURL === ''
           ? `${truncateString(nameText, 15)}`
-          : `<a class='iframe' href="${launchList[i].missionURL}">${truncateString(nameText, 15)}</a>`;
+          : `<a class='iframe' href="${launchEvent.missionURL}">${truncateString(nameText, 15)}</a>`;
 
       // Rocket Name HTML Setup
-      const rocketHTML = !launchList[i]?.rocketURL ? `${launchList[i].rocket}` : `<a class='iframe' href="${launchList[i].rocketURL}">${launchList[i].rocket}</a>`;
+      const rocketHTML = !launchEvent?.rocketURL ? `${launchEvent.rocket}` : `<a class='iframe' href="${launchEvent.rocketURL}">${launchEvent.rocket}</a>`;
 
       // Set Name and Rocket HTML
       tdN.innerHTML = `${nameHTML}<br />${rocketHTML}`;
 
       // Location Name HTML Setup
       const locationHTML =
-        !launchList[i]?.locationURL || launchList[i]?.locationURL === ''
-          ? `${truncateString(launchList[i].location, 25)}`
-          : `<a class='iframe' href="${launchList[i].locationURL}">${truncateString(launchList[i].location, 25)}</a>`;
+        !launchEvent?.locationURL || launchEvent?.locationURL === ''
+          ? `${truncateString(launchEvent.location, 25)}`
+          : `<a class='iframe' href="${launchEvent.locationURL}">${truncateString(launchEvent.location, 25)}</a>`;
 
       const tdL = tr.insertCell();
 
       tdL.innerHTML = locationHTML;
 
       // Agency Name HTML Setup
-      const agencyHTML = !launchList[i]?.agencyURL
-        ? `${truncateString(launchList[i].agency, 30)}`
-        : `<a class='iframe' href="${launchList[i].agencyURL}">${truncateString(launchList[i].agency, 30)}</a>`;
+      const agencyHTML = !launchEvent?.agencyURL
+        ? `${truncateString(launchEvent.agency, 30)}`
+        : `<a class='iframe' href="${launchEvent.agencyURL}">${truncateString(launchEvent.agency, 30)}</a>`;
 
       const tdA = tr.insertCell();
 
@@ -286,7 +285,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
       // Country Cell
       const tdC = tr.insertCell();
 
-      tdC.innerHTML = `<span class="badge dark-gray-badge" data-badge-caption="${launchList[i].country}"></span>`;
+      tdC.innerHTML = `<span class="badge dark-gray-badge" data-badge-caption="${launchEvent.country}"></span>`;
     }
   }
 }

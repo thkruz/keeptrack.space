@@ -123,24 +123,23 @@ export class DebrisScreening extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
-        getEl(`${this.sideMenuElementName}-form`).addEventListener('submit', (e: Event) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        getEl(`${this.sideMenuElementName}-form`)!.addEventListener('submit', (e: Event) => {
           e.preventDefault();
           showLoading(() => this.onFormSubmit());
         });
-        getEl(`${this.sideMenuElementName}-vis`).addEventListener('click', (e: Event) => {
+        getEl(`${this.sideMenuElementName}-vis`)!.addEventListener('click', (e: Event) => {
           e.preventDefault();
           showLoading(() => this.onVisClick());
         });
-        getEl(`${this.sideMenuElementName}-clear-vis`).addEventListener('click', (e: Event) => {
+        getEl(`${this.sideMenuElementName}-clear-vis`)!.addEventListener('click', (e: Event) => {
           e.preventDefault();
           showLoading(() => DebrisScreening.onClearVisClick());
         });
       },
-    });
+    );
   }
 
   onVisClick(): void {

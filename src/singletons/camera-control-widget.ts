@@ -52,11 +52,7 @@ export class CameraControlWidget {
     document.addEventListener('mouseup', this.onMouseUp.bind(this));
     this.canvas.addEventListener('click', this.onClick.bind(this));
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: 'cameraControlWidget',
-      cb: this.draw.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.draw.bind(this));
   }
 
   private onMouseDown(event: MouseEvent) {

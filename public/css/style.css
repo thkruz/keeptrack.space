@@ -1,5 +1,4 @@
 :root {
-  --bottom-menu-height: 120px;
   --bottom-menu-top: 0px;
   --bottom-icon-height: 75px;
   --bottom-icon-width: 115px;
@@ -44,6 +43,13 @@ input:-webkit-autofill {
 
 .pointable {
   cursor: pointer;
+}
+
+nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
 }
 
 a,
@@ -99,6 +105,13 @@ a,
   text-align: center;
   font-size: 12px;
   font-weight: bold;
+}
+
+#keeptrack-header {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  z-index: 105;
 }
 
 footer {
@@ -1000,8 +1013,8 @@ input:focus {
 }
 
 #ui-datepicker-div {
-  border: 5px solid var(--color-dark-border);
-  top: 50px;
+  border: none;
+  top: var(--top-menu-height);
   left: 0px;
   width: 100%;
   border-radius: 0px;
@@ -1089,7 +1102,7 @@ input:focus {
   padding-bottom: 10px;
   z-index: 11;
   overflow-y: auto;
-  height: var(--bottom-menu-height);
+  max-height: var(--bottom-menu-height);
 }
 
 .bmenu-item {
@@ -1100,6 +1113,7 @@ input:focus {
   flex-direction: column;
   flex-wrap: nowrap;
   height: 100%;
+  max-width: var(--bottom-icon-width);
 }
 
 .bmenu-filter-item {
@@ -1307,7 +1321,7 @@ input:focus {
   font-family: var(--font-family);
   position: absolute;
   left: 12px;
-  bottom: 12px;
+  top: 12px;
   width: 100%;
   text-align: left;
   font-size: 14px;
@@ -1325,7 +1339,7 @@ input:focus {
   bottom: 12px;
   width: 100%;
   text-align: center;
-  font-size: 12px;
+  font-size: 10px;
   color: white;
   pointer-events: none;
   background: none;
@@ -1395,7 +1409,16 @@ input:focus {
 }
 
 .dropdown-content {
-  max-height: 770% !important;
+  max-height: 40vh !important;
+}
+
+/* scroll bar coloring under .dropdown-content */
+.dropdown-content::-webkit-scrollbar-thumb {
+  background-color: var(--color-dark-text-accent) !important;
+}
+
+.dropdown-content::-webkit-scrollbar-track {
+  background-color: transparent !important;
 }
 
 #help-screen {
@@ -3690,8 +3713,6 @@ a.ui-button:active,
 [data-tooltip]:before,
 [data-tooltip]:after {
   visibility: hidden;
-  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=0)';
-  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=0);
   opacity: 0;
   pointer-events: none;
 }
@@ -3741,8 +3762,6 @@ a.ui-button:active,
 [data-tooltip]:hover:before,
 [data-tooltip]:hover:after {
   visibility: visible;
-  -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=100)';
-  filter: progid: DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
 

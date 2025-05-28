@@ -43,7 +43,6 @@ export class GroupsManager {
     this.stopUpdatingInViewSoon = false;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   selectGroupNoOverlay(): void {
     settingsManager.isGroupOverlayDisabled = true;
 
@@ -64,7 +63,7 @@ export class GroupsManager {
    *
    * Do not include a name if the group is temporary or will change
    */
-  createGroup<T extends GroupType>(type: GroupType, data?: GroupData[T], name?: string): ObjectGroup<T> {
+  createGroup<T extends GroupType>(type: GroupType, data: GroupData[T] | null = null, name: string | null = null): ObjectGroup<T> {
     // Seee if this group already exists and return it
     if (name) {
       if (this.groupList[name]) {

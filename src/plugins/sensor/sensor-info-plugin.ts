@@ -19,7 +19,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     this.checkIfLinesVisible_(keepTrackApi.getLineManager());
   };
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconLabel = 'Sensor Info';
   bottomIconImg = sensorInfoPng;
@@ -99,22 +99,20 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         this.addSensorToSunBtnListener_();
         this.addSensorToMoonBtnListener();
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onLineAdded,
-      cbName: this.id,
-      cb: (lineManager: LineManager) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onLineAdded,
+      (lineManager: LineManager) => {
         this.checkIfLinesVisible_(lineManager);
       },
-    });
+    );
   }
 
   private checkIfLinesVisible_(lineManager: LineManager) {

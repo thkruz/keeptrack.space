@@ -46,7 +46,7 @@ export const uiManagerInit = () => {
   );
 
   // Bottom Icon
-  getEl('bottom-icons').insertAdjacentHTML(
+  getEl('bottom-icons')?.insertAdjacentHTML(
     'beforeend',
     keepTrackApi.html`
         <div id="menu-satChng" class="bmenu-item">
@@ -61,30 +61,12 @@ export const uiManagerInit = () => {
 
 export const init = (): void => {
   // Add HTML
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.uiManagerInit,
-    cbName: 'satChanges',
-    cb: uiManagerInit,
-  });
-
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.uiManagerFinal,
-    cbName: 'satChanges',
-    cb: uiManagerFinal,
-  });
+  keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, uiManagerInit);
+  keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, uiManagerFinal);
 
   // Add JavaScript
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.bottomMenuClick,
-    cbName: 'satChanges',
-    cb: bottomMenuClick,
-  });
-
-  keepTrackApi.register({
-    event: KeepTrackApiEvents.hideSideMenus,
-    cbName: 'satChanges',
-    cb: hideSideMenus,
-  });
+  keepTrackApi.on(KeepTrackApiEvents.bottomMenuClick, bottomMenuClick);
+  keepTrackApi.on(KeepTrackApiEvents.hideSideMenus, hideSideMenus);
 };
 
 const uiManagerFinal = () => {
@@ -93,7 +75,7 @@ const uiManagerFinal = () => {
     maxWidth: 600,
   });
 
-  getEl('satChng-menu').addEventListener('click', (evt: Event) => {
+  getEl('satChng-menu')!.addEventListener('click', (evt: Event) => {
     if (!(<HTMLElement>evt.target).classList.contains('satChng-object')) {
       return;
     }

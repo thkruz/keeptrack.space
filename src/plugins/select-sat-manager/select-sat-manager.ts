@@ -1,11 +1,10 @@
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { UrlManager } from '@app/static/url-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
@@ -43,11 +42,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     this.registerKeyboardEvents_();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.updateLoop,
-      cbName: this.id,
-      cb: this.checkIfSelectSatVisible.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.checkIfSelectSatVisible.bind(this));
   }
 
   checkIfSelectSatVisible() {
@@ -161,7 +156,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.primarySatObj = spaceObj ?? this.noSatObj_;
 
     // Run any other callbacks
-    keepTrackApi.runEvent(KeepTrackApiEvents.selectSatData, spaceObj, spaceObj?.id);
+    keepTrackApi.emit(KeepTrackApiEvents.selectSatData, spaceObj, spaceObj?.id);
 
     // Record the last selected sat
     this.lastSelectedSat(this.selectedSat);
@@ -185,7 +180,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.runEvent(KeepTrackApiEvents.sensorDotSelected, sensor);
+      keepTrackApi.emit(KeepTrackApiEvents.sensorDotSelected, sensor);
     }
 
     this.setSelectedSat_(-1);
@@ -215,8 +210,6 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (id === -1 && this.lastSelectedSat_ > -1) {
       keepTrackApi.getOrbitManager().clearSelectOrbit();
     }
-
-    UrlManager.updateURL();
   }
 
   private selectSatReset_() {
@@ -240,10 +233,12 @@ export class SelectSatManager extends KeepTrackPlugin {
       this.selectSatChange_(sat);
       if (sat.id >= 0 && sat instanceof DetailedSatellite) {
         const covMatrix = createSampleCovarianceFromTle(sat.tle1, sat.tle2).matrix.elements;
+
+        // Cap radii at 1200 km (radial), 1000 km (cross-track), and 5000 km (in-track) to avoid huge bubbles
         const radii = [
-          Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, // Radial
-          Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, // Cross-track
-          Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, // In-track
+          Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
+          Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
+          Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
         ] as vec3;
 
         this.primarySatCovMatrix = radii;
@@ -264,15 +259,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
-      keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
-    }
-
-    // If we deselect an object but had previously selected one then disable/hide stuff
-    keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
-    keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
-    keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
+    this.switchToSatCenteredCamera_();
 
     if (sat instanceof DetailedSatellite) {
       keepTrackApi.analytics.track('select_satellite', {
@@ -283,6 +270,22 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
 
     this.setSelectedSat_(sat.id);
+  }
+
+  private switchToSatCenteredCamera_() {
+    if (!settingsManager.isFocusOnSatelliteWhenSelected) {
+      return;
+    }
+
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
+      keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
+      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
+    }
+
+    // If we deselect an object but had previously selected one then disable/hide stuff
+    keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
+    keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
+    keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
   }
 
   private static selectOwnerManufacturer_(obj: LandObject) {
@@ -324,7 +327,11 @@ export class SelectSatManager extends KeepTrackPlugin {
   private updateDotSizeAndColor_(i: number) {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const { gl } = keepTrackApi.getRenderer();
+    const { gl, isContextLost } = keepTrackApi.getRenderer();
+
+    if (isContextLost) {
+      return;
+    }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
     // If Old Select Sat Picked Color it Correct Color
@@ -386,10 +393,12 @@ export class SelectSatManager extends KeepTrackPlugin {
 
       if ((this.secondarySatObj?.id ?? -1) >= 0 && this.secondarySatObj instanceof DetailedSatellite) {
         const covMatrix = createSampleCovarianceFromTle(this.secondarySatObj.tle1, this.secondarySatObj.tle2).matrix.elements;
+
+        // Cap radii at 1200 km (radial), 1000 km (cross-track), and 5000 km (in-track) to avoid huge bubbles
         const radii = [
-          Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, // Radial
-          Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, // Cross-track
-          Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, // In-track
+          Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
+          Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
+          Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
         ] as vec3;
 
         this.secondarySatCovMatrix = radii;
@@ -407,7 +416,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       keepTrackApi.getOrbitManager().clearSelectOrbit(false);
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.setSecondarySat, this.secondarySatObj, id);
+    keepTrackApi.emit(KeepTrackApiEvents.setSecondarySat, this.secondarySatObj, id);
   }
 
   private setSelectedSat_(id: number): void {
@@ -438,19 +447,16 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private registerKeyboardEvents_() {
-    const inputManagerInstance = keepTrackApi.getInputManager();
-
-    inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: ']',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if ((key === '[' || key === ']') && !isRepeat) {
         this.switchPrimarySecondary();
-      },
-    });
-    inputManagerInstance.keyboard.registerKeyDownEvent({
-      key: '[',
-      callback: () => {
-        this.switchPrimarySecondary();
-      },
+      }
+      if (key === '{' && !isRepeat) {
+        this.selectPrevSat();
+      }
+      if (key === '}' && !isRepeat) {
+        this.selectNextSat();
+      }
     });
   }
 }

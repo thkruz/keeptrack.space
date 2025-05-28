@@ -1,6 +1,5 @@
 import { EciArr3 } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SatMath } from '@app/static/sat-math';
 import { vec4 } from 'gl-matrix';
 import { DetailedSensor, rae2eci, RaeVec3 } from 'ootk';
 import { Line, LineColors } from './line';
@@ -21,7 +20,7 @@ export class SensorToRaeLine extends Line {
     const id = this.sensor.id;
     const sensorEciArr = [posData[id * 3], posData[id * 3 + 1], posData[id * 3 + 2]] as EciArr3;
 
-    const gmst = SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst;
+    const gmst = keepTrackApi.getTimeManager().gmst;
 
     const raeInEci = rae2eci(this.rae, this.sensor.lla(), gmst);
     const eciArr = [raeInEci.x, raeInEci.y, raeInEci.z] as EciArr3;

@@ -100,7 +100,9 @@
     "coloring": "正在线内着色...",
     "elsets": "正在定位轨道参数...",
     "models": "正在构建3D模型...",
-    "cunningPlan": "正在制定狡猾的计划..."
+    "cunningPlan": "正在制定狡猾的计划...",
+    "copyrightNotice": "KeepTrack™ 和 KeepTrack.Space™ 是 Kruczek Labs LLC 的商标。<br>本实例根据 GNU AGPL v3.0 授权。必须保留署名、源码访问权和本声明。<br>未授予商业许可，权利人未获得任何补偿。<br>未经授权的使用、重命名或移除署名可能违反商标和开源许可条款。<br>© 2025 Kruczek Labs LLC。保留所有权利。完整条款请参见 LICENSE。",
+    "copyrightNoticeMobile": "KeepTrack™ 和 KeepTrack.Space™ 是 Kruczek Labs LLC 的商标。<br>本实例根据 GNU AGPL v3.0 授权。必须保留署名、源码访问权和本声明。未授予商业许可，权利人未获得任何补偿。未经授权的使用、重命名或移除署名可能违反商标和开源许可条款。<br>© 2025 Kruczek Labs LLC。保留所有权利。完整条款请参见 LICENSE。"
   },
   "splashScreens": {
     "1": "卫星模型看起来比实际大小要大。其他一切都是按比例显示的。",
@@ -135,34 +137,34 @@
   },
   "plugins": {
     "SensorListPlugin": {
-      "bottomIconLabel": "Sensors",
-      "title": "Sensor List Menu",
-      "helpBody": "The Sensors menu allows you to select a sensor for use in calculations and other menu's functions. Sensors are in groups based on the networks they primarily support. On the left side of the menu is the name of the sensor and on the right side is the country/organization that owns it. <br><br> Selecting an \"All...Sensors\" option will select all sensors in that group. This is useful for visualizing the networks coverage, but currently does not work for all calculations. If you are trying to calculate look angles for a network it is best to use the multi-site look angles tool or to use look angles for each of the individual sensors in the network. <br><br> Sensors on this list include Mechanical and Phased Array Radars, in addition to Optical sensors: <ul style=\"margin-left: 40px;\"> <li> Phased Array Radars typically are limited to Low Earth Orbit (LEO). </li> <li> Mechanical Radars can be used for both LEO and Geostationary Orbit (GEO). </li> <li> Optical sensors are typically used for GEO, but can also be used for LEO. </li> <li> Optical sensors are limited to night time observations in clear skies, whereas radars can be used for both day and night. </li> </ul> <br> Sensor information is based on publicly available data and can be verified in the Sensor Info menu. If you have public data on additional sensors or corrections to existing sensor information please contact me at <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
+      "bottomIconLabel": "传感器",
+      "title": "传感器列表菜单",
+      "helpBody": "传感器菜单允许您选择用于计算和其他菜单功能的传感器。传感器根据其主要支持的网络分组。菜单左侧显示传感器名称，右侧显示所属国家/组织。<br><br>选择“全部...传感器”选项将选择该组中的所有传感器。这对于可视化网络覆盖范围很有用，但目前并非所有计算都支持。如果您想为网络计算观测角度，建议使用多站点观测角工具，或分别为网络中的每个传感器计算观测角。<br><br>此列表中的传感器包括机械和相控阵雷达，以及光学传感器：<ul style=\"margin-left: 40px;\"> <li>相控阵雷达通常仅限于近地轨道（LEO）。</li> <li>机械雷达可用于LEO和地球同步轨道（GEO）。</li> <li>光学传感器通常用于GEO，但也可用于LEO。</li> <li>光学传感器仅限于晴朗夜晚观测，而雷达可用于昼夜。</li> </ul><br>传感器信息基于公开数据，可在传感器信息菜单中验证。如果您有更多公开传感器数据或修正建议，请联系<a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>。"
     },
     "SensorInfoPlugin": {
-      "bottomIconLabel": "Sensor Info",
-      "title": "Sensor Info Menu",
-      "helpBody": "Sensor Info provides information about the currently selected sensor. The information is based on publicly available data and may not always be 100% accurate. If you have public data on additional sensors or corrections to existing sensor information please contact me at <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> The information provided includes: <ul style=\"margin-left: 40px;\"> <li> Sensor Name </li> <li> Sensor Owner </li> <li> Sensor Type </li> <li> Sensor Field of View </li> </ul> <br> Additionally, lines can be quickly created from the sensor to the sun or moon from this menu."
+      "bottomIconLabel": "传感器信息",
+      "title": "传感器信息菜单",
+      "helpBody": "传感器信息提供当前选中传感器的相关信息。信息基于公开数据，可能并非100%准确。如果您有更多公开传感器数据或修正建议，请联系<a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>。<br><br>提供的信息包括：<ul style=\"margin-left: 40px;\"> <li>传感器名称</li> <li>传感器所属</li> <li>传感器类型</li> <li>传感器视场</li> </ul><br>此外，可从此菜单快速创建传感器到太阳或月亮的连线。"
     },
     "CustomSensorPlugin": {
-      "bottomIconLabel": "Custom Sensor",
-      "title": "Custom Sensor Menu",
-      "helpBody": "This allows you to create a custom sensor for use in calculations and other menu's functions. This can be a completely original sensor or a modification of an existing sensor. <br><br> After setting the latitude, longitude, and altitude of the sensor, you can set the sensor's field of view. Selecting telescope will create a 360 degree field of view with an elevation mask of 10 degrees and unlimited range. Deselecting the telescope option will allow you to set the field of view manually. <br><br> If you are trying to edit an existing sensor, you can select it from the sensor list first and the custom sensor will be updated with the selected sensor's information."
+      "bottomIconLabel": "自定义传感器",
+      "title": "自定义传感器菜单",
+      "helpBody": "此功能允许您创建用于计算和其他菜单功能的自定义传感器。可以是全新传感器，也可以基于现有传感器修改。<br><br>设置传感器的纬度、经度和高度后，可设置视场。选择望远镜选项将创建360度视场，仰角遮罩为10度，范围无限。取消选择望远镜选项可手动设置视场。<br><br>如需编辑现有传感器，可先在传感器列表中选择，之后自定义传感器将更新为所选传感器信息。"
     },
     "LookAnglesPlugin": {
-      "bottomIconLabel": "Look Angles",
-      "title": "Look Angles Menu",
-      "helpBody": "The Look Angles menu allows you to calculate the range, azimuth, and elevation angles between a sensor and a satellite. A satellite and sensor must first be selected before the menu can be used. <br><br> The toggle only rise and set times will only calculate the rise and set times of the satellite. This is useful for quickly determining when a satellite will be visible to a sensor. <br><br> The search range can be modified by changing the length and interval options."
+      "bottomIconLabel": "观测角",
+      "title": "观测角菜单",
+      "helpBody": "观测角菜单允许您计算传感器与卫星之间的距离、方位角和仰角。使用前需先选择卫星和传感器。<br><br>仅计算升起和落下时间的切换功能可快速判断卫星何时可被传感器观测。搜索范围可通过更改时长和间隔选项调整。"
     },
     "MultiSiteLookAnglesPlugin": {
-      "bottomIconLabel": "Multi-Site Looks",
-      "title": "Multi-Site Look Angles Menu",
-      "helpBody": "The Multi-Site Look Angles menu allows you to calculate the range, azimuth, and elevation angles between a satellite and multiple sensors. A satellite must first be selected before the menu can be used. <br><br> By default the menu will calculate the look angles for all sensors in the Space Surveillance Netowrk. If you would like to calculate the look angles for additional sensors, you can export a csv file at the bottom of the menu. The csv file will contain look angles for all sensors. <br><br> Clicking on a row in the table will select the sensor and change the simulation time to the time of the look angle."
+      "bottomIconLabel": "多站观测",
+      "title": "多站观测角菜单",
+      "helpBody": "多站观测角菜单允许您计算一颗卫星与多个传感器之间的距离、方位角和仰角。使用前需先选择卫星。<br><br>默认情况下，菜单会计算空间监视网络中所有传感器的观测角。如需计算其他传感器的观测角，可在菜单底部导出csv文件，文件将包含所有传感器的观测角。<br><br>点击表格中的一行将选中该传感器并将仿真时间切换到该观测角时间点。"
     },
     "SensorTimeline": {
-      "bottomIconLabel": "Sensor Timeline",
-      "title": "Sensor Timeline Menu",
-      "helpBody": "The Sensor Timeline menu shows when a list of sensors have visibility of one satellite. The timeline is color-coded to show the quality of the pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to change the sensor and time to that pass. <br><br> The timeline can be modified by changing the start and end time of the simulation. Additionally, the timeline can be modified by changing the length and interval options."
+      "bottomIconLabel": "传感器时间线",
+      "title": "传感器时间线菜单",
+      "helpBody": "传感器时间线菜单显示多个传感器对一颗卫星的可见性。时间线按颜色区分观测质量：红色为差，黄色为一般，绿色为好。点击某次观测可切换到对应传感器和时间。<br><br>可通过更改仿真的起止时间，以及长度和间隔选项来调整时间线。"
     },
     "ProximityOps": {
       "bottomIconLabel": "交会与近距离操作",
@@ -184,214 +186,214 @@
       "ignoreVimpelRsoTooltip": "忽略来自Vimpel目录的RSO"
     },
     "SatelliteTimeline": {
-      "bottomIconLabel": "Satellite Timeline",
-      "title": "Satellite Timeline Menu",
-      "helpBody": "The Satellite Timeline menu shows when a single sensor has visibility of a list of satellites. The timeline is color-coded to show the quality of the pass. Red is a bad pass, yellow is an average pass, and green is a good pass. Click on a pass to change the satellite and time to that pass. <br><br> The timeline can be modified by changing the start and end time of the simulation. Additionally, the timeline can be modified by changing the length and interval options."
+      "bottomIconLabel": "卫星时间线",
+      "title": "卫星时间线菜单",
+      "helpBody": "卫星时间线菜单显示单个传感器对一组卫星的可见性。时间线按颜色区分通过质量：红色为差，黄色为一般，绿色为好。点击某次通过可切换到对应卫星和时间。<br><br>可通过更改仿真的起止时间，以及长度和间隔选项来调整时间线。"
     },
     "WatchlistPlugin": {
-      "bottomIconLabel": "Watchlist",
-      "title": "Watchlist Menu",
-      "helpBody": "The Watchlist menu allows you to create a list of priority satellites to track. This allows you to quickly retrieve the satellites you are most interested in. The list is saved in your browser's local storage and will be available the next time you visit the site. <br><br> When satellites on the watchlist enter the selected sensor's field of view a notification will be displayed, a line will be drawn from the sensor to the satellite, and the satellite's number will be displayed on the globe. <br><br> The overlay feature relies on the watchlist being populated."
+      "bottomIconLabel": "关注列表",
+      "title": "关注列表菜单",
+      "helpBody": "关注列表菜单允许您创建优先跟踪的卫星列表，便于快速检索感兴趣的卫星。该列表保存在浏览器本地存储，下次访问网站时仍可用。<br><br>当关注列表中的卫星进入所选传感器视场时，会显示通知，从传感器到卫星会绘制一条连线，并在地球上显示卫星编号。<br><br>叠加功能依赖于关注列表已被填充。"
     },
     "WatchlistOverlay": {
-      "bottomIconLabel": "Overlay",
-      "title": "Overlay Menu",
-      "helpBody": "<p> The Watchlist Overlay shows the next pass time for each satellite in your watchlist. The overlay is updated every 10 seconds. </p> <p> The overlay is color coded to show the time to the next pass. The colors are as follows: </p> <ul> <li>Yellow - In View</li> <li>Blue - Time to Next Pass is up to 30 minutes after the current time or 10 minutes before the current time</li> <li>White - Any future pass not fitting the above requirements</li> </ul> <p> Clicking on a satellite in the overlay will center the map on that satellite. </p>"
+      "bottomIconLabel": "叠加",
+      "title": "叠加菜单",
+      "helpBody": "<p>关注列表叠加显示关注卫星的下次通过时间，每10秒更新一次。</p><p>叠加颜色表示距离下次通过的时间：</p><ul><li>黄色 - 可见中</li><li>蓝色 - 距当前时间30分钟内或提前10分钟的通过</li><li>白色 - 其他未来通过</li></ul><p>点击叠加中的卫星会将地图中心定位到该卫星。</p>"
     },
     "ReportsPlugin": {
-      "bottomIconLabel": "Reports",
-      "title": "Reports Menu",
-      "helpBody": "The Reports Menu is a collection of tools to help you analyze and understand the data you are viewing."
+      "bottomIconLabel": "报告",
+      "title": "报告菜单",
+      "helpBody": "报告菜单包含多种工具，帮助您分析和理解当前查看的数据。"
     },
     "PolarPlotPlugin": {
-      "bottomIconLabel": "Polar Plot",
-      "title": "Polar Plot Menu",
-      "helpBody": "The Polar Plot Menu is used to generate a 2D polar plot of the satellite's azimuth and elevation over time."
+      "bottomIconLabel": "极坐标图",
+      "title": "极坐标图菜单",
+      "helpBody": "极坐标图菜单用于生成卫星方位角和仰角随时间变化的二维极坐标图。"
     },
     "NextLaunchesPlugin": {
-      "bottomIconLabel": "Next Launches",
-      "title": "Next Launches Menu",
-      "helpBody": "The Next Launches Menu pulls data from <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a> to display upcoming launches."
+      "bottomIconLabel": "下次发射",
+      "title": "下次发射菜单",
+      "helpBody": "下次发射菜单从<a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a>获取即将进行的发射信息。"
     },
     "FindSatPlugin": {
-      "bottomIconLabel": "Find Satellite",
-      "title": "Find Satellite Menu",
-      "helpBody": "The Find Satellite Menu is used for finding satellites by orbital parameters or satellite characteristics. <br><br> For most parameters, you type in the target value on the left and then a margin of error on the right. For example, if you wanted to find all satellites in a 51-52 degree inclination, you can type 51.5 in the left box and 0.5 in the right box. The search will then find all satellites within those inclinations and display them in the search bar."
+      "bottomIconLabel": "查找卫星",
+      "title": "查找卫星菜单",
+      "helpBody": "查找卫星菜单用于按轨道参数或卫星特性查找卫星。<br><br>大多数参数输入左侧为目标值，右侧为误差范围。例如，查找51-52度倾角的卫星，可在左侧输入51.5，右侧输入0.5，搜索结果会显示所有在该范围内的卫星。"
     },
     "ShortTermFences": {
-      "bottomIconLabel": "Short Term Fence",
-      "title": "Short Term Fences (STF) Menu",
-      "helpBody": "The Short Term Fences (STF) Menu is used for visualizing sensor search boxes. <br><br> This is unlikely to be very helpful unless you own/operate a sensor with a search box functionality."
+      "bottomIconLabel": "短期搜索框",
+      "title": "短期搜索框（STF）菜单",
+      "helpBody": "短期搜索框（STF）菜单用于可视化传感器搜索区域。<br><br>除非您拥有/操作带有搜索框功能的传感器，否则该功能可能用处不大。"
     },
     "Collisions": {
-      "bottomIconLabel": "Collisions",
-      "title": "Collisions Menu",
-      "helpBody": "The Collisions Menu shows satellites with a high probability of collision. <br><br> Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision."
+      "bottomIconLabel": "碰撞",
+      "title": "碰撞菜单",
+      "helpBody": "碰撞菜单显示高碰撞概率的卫星。<br><br>点击某一行会选中涉及碰撞的两颗卫星，并将时间切换到碰撞发生时刻。"
     },
     "TrackingImpactPredict": {
-      "bottomIconLabel": "Reentry Prediction",
-      "title": "Tracking and Impact Prediction Menu",
-      "helpBody": "The Tracking and Impact Prediction (TIP) menu displays the latest tracking and impact prediction messages for satellites. The table shows the following columns:<br><br> <b>NORAD</b>: The NORAD catalog ID of the satellite.<br><br> <b>Decay Date</b>: The date of the predicted decay of the satellite.<br><br> <b>Latitude</b>: The latitude of the satellite at decay time.<br><br> <b>Longitude</b>: The longitude of the satellite at decay time.<br><br> <b>Window (min)</b>: The time window in minutes for the prediction.<br><br> <b>Next Report (hrs)</b>: The time in hours until the next report.<br><br> <b>Reentry Angle (deg)</b>: The reentry angle of the satellite in degrees.<br><br> <b>RCS (m²)</b>: The Radar Cross Section of the satellite in square meters.<br><br> <b>GP Age (hrs)</b>: The age of the latest element set in hours.<br><br> <b>Dry Mass (kg)</b>: The dry mass of the satellite in kilograms.<br><br> <b>Volume (m³)</b>: The estimated volume of the satellite in cubic meters.<br><br>"
+      "bottomIconLabel": "再入预测",
+      "title": "跟踪与再入预测菜单",
+      "helpBody": "跟踪与再入预测（TIP）菜单显示卫星的最新跟踪与再入预测信息。表格包含以下列：<br><br><b>NORAD</b>：卫星的NORAD目录编号。<br><br><b>衰减日期</b>：预测的卫星衰减日期。<br><br><b>纬度</b>：卫星衰减时的纬度。<br><br><b>经度</b>：卫星衰减时的经度。<br><br><b>窗口（分钟）</b>：预测时间窗口（分钟）。<br><br><b>下次报告（小时）</b>：距离下次报告的时间（小时）。<br><br><b>再入角（度）</b>：卫星再入角度（度）。<br><br><b>雷达截面积（平方米）</b>：卫星的雷达截面积。<br><br><b>GP数据龄（小时）</b>：最新轨道参数集的时效（小时）。<br><br><b>干质量（千克）</b>：卫星干质量。<br><br><b>体积（立方米）</b>：卫星估算体积。"
     },
     "Breakup": {
-      "bottomIconLabel": "Create Breakup",
-      "title": "Breakup Menu",
-      "helpBody": "The Breakup Menu is a tool for simulating the breakup of a satellite. <br><br> By modifying duplicating and modifying a satellite's orbit we can model the breakup of a satellite. After selecting a satellite and opening the menu, the user can select: <ul style=\"margin-left: 40px;\"> <li>Inclination Variation</li> <li>RAAN Variation</li> <li>Period Variation</li> <li>Number of Breakup Pieces</li> </ul> The larger the variation the bigger the spread in the simulated breakup. The default variations are sufficient to simulate a breakup with a reasonable spread."
+      "bottomIconLabel": "创建解体",
+      "title": "解体菜单",
+      "helpBody": "解体菜单用于模拟卫星解体。<br><br>通过复制并修改卫星轨道，可对卫星解体进行建模。选择卫星并打开菜单后，可设置：<ul style=\"margin-left: 40px;\"> <li>倾角变化</li> <li>升交点赤经变化</li> <li>周期变化</li> <li>解体碎片数量</li> </ul>变化越大，模拟解体的碎片分布越广。默认参数足以模拟合理的解体分布。"
     },
     "DebrisScreening": {
-      "bottomIconLabel": "Debris Screening",
-      "title": "Debris Screening Menu",
-      "helpBody": "The Debris Screening menu is used to generate a list of debris objects that could potentially be seen by a satellite. The list is generated by calculating the orbital parameters of the debris objects and comparing them to the orbital parameters of the satellite. The user can choose to generate the list using either the TLE or the SGP4 propagator. The user can also choose to filter the list by the debris object's size and the debris object's magnitude. The user can also choose to filter the list by the debris object's size and the debris object's magnitude. The user can also choose to generate the list using either the TLE or the SGP4 propagator. The user can also choose to filter the list by the debris object's size and the debris object's magnitude."
+      "bottomIconLabel": "碎片筛查",
+      "title": "碎片筛查菜单",
+      "helpBody": "碎片筛查菜单用于生成可能被卫星观测到的碎片对象列表。通过计算碎片的轨道参数并与卫星轨道参数比较生成列表。用户可选择使用TLE或SGP4预报器生成列表，也可按碎片大小和星等进行筛选。"
     },
     "TransponderChannelData": {
-      "bottomIconLabel": "Transponder and Channel Info",
-      "title": "Satellite Transponder and Channel Info",
-      "helpBody": "<p>This table contains technical details for satellite channels, including TV, radio, and other communication services:</p><ul><li><strong>satellite:</strong> Name of the satellite broadcasting the channel</li><li><strong>tvchannel:</strong> Name of the TV/radio channel or communication service</li><li><strong>beam:</strong> Satellite beam direction (e.g., West hemi)</li><li><strong>freq:</strong> Transponder frequency and polarity (e.g., 3840 V)</li><li><strong>system:</strong> Broadcasting system (e.g., DVB-S2 8PSK)</li><li><strong>SRFEC:</strong> Symbol rate and FEC ratio (e.g., 30000 3/4)</li><li><strong>video:</strong> Video/data compression format (e.g., MPEG-4/HD)</li><li><strong>lang:</strong> Available audio/communication languages (e.g., Eng, Chi)</li><li><strong>encryption:</strong> Encryption system used (e.g., PowerVu)</li></ul><p>This information is useful for satellite communication professionals, technicians, enthusiasts, and anyone setting up or troubleshooting satellite reception equipment.</p>"
+      "bottomIconLabel": "转发器与频道信息",
+      "title": "卫星转发器与频道信息",
+      "helpBody": "<p>本表包含卫星频道的技术细节，包括电视、广播及其他通信服务：</p><ul><li><strong>卫星：</strong> 播出频道的卫星名称</li><li><strong>频道：</strong> 电视/广播频道或通信服务名称</li><li><strong>波束：</strong> 卫星波束方向（如西半球）</li><li><strong>频率：</strong> 转发器频率及极化（如3840 V）</li><li><strong>系统：</strong> 播出系统（如DVB-S2 8PSK）</li><li><strong>符号率/FEC：</strong> 符号率及FEC比（如30000 3/4）</li><li><strong>视频：</strong> 视频/数据压缩格式（如MPEG-4/HD）</li><li><strong>语言：</strong> 可用音频/通信语言（如英语、中文）</li><li><strong>加密：</strong> 使用的加密系统（如PowerVu）</li></ul><p>这些信息适用于卫星通信专业人士、技术人员、爱好者及任何需要设置或排查卫星接收设备的人。</p>"
     },
     "EditSat": {
-      "bottomIconLabel": "Edit Satellite",
-      "title": "Edit Satellite Menu",
-      "helpBody": "The Edit Satellite Menu is used to edit the satellite data. <br><br> <ul> <li> Satellite SCC# - A unique number assigned to each satellite by the US Space Force. </li> <li> Epoch Year - The year of the satellite's last orbital update. </li> <li> Epoch Day - The day of the year of the satellite's last orbital update. </li> <li> Inclination - The angle between the satellite's orbital plane and the equatorial plane. </li> <li> Right Ascension - The angle between the ascending node and the satellite's position at the time of the last orbital update. </li> <li> Eccentricity - The amount by which the satellite's orbit deviates from a perfect circle. </li> <li> Argument of Perigee - The angle between the ascending node and the satellite's closest point to the earth. </li> <li> Mean Anomaly - The angle between the satellite's position at the time of the last orbital update and the satellite's closest point to the earth. </li> <li> Mean Motion - The rate at which the satellite's mean anomaly changes. </li> </ul>"
+      "bottomIconLabel": "编辑卫星",
+      "title": "编辑卫星菜单",
+      "helpBody": "编辑卫星菜单用于编辑卫星数据。<br><br><ul><li>卫星SCC# - 美国太空军分配的唯一编号</li><li>历元年份 - 卫星最后一次轨道更新的年份</li><li>历元日 - 卫星最后一次轨道更新的儒略日</li><li>倾角 - 卫星轨道面与赤道面的夹角</li><li>升交点赤经 - 升交点与卫星最后一次轨道更新位置的夹角</li><li>偏心率 - 卫星轨道偏离圆形的程度</li><li>近地点幅角 - 升交点与卫星近地点的夹角</li><li>平近点角 - 卫星当前位置与近地点的夹角</li><li>平均运动 - 卫星平近点角变化速率</li></ul>"
     },
     "NewLaunch": {
-      "bottomIconLabel": "New Launch",
-      "title": "New Launch Menu",
-      "helpBody": "The New Launch Menu is used for generating notional orbital launches by modifying existing satellites with similar parameters. <br><br> After selecting a satellite, you can select a launch location and a north/south azimuth. The selected satellite will be modified to align it with the launch site. The clock is then changed to 00:00:00 to represent relative time after the launch. This can be helpful in calculating sensor coverage relative to launch time. The objects relationship with other orbital objects will be incorrect."
+      "bottomIconLabel": "新发射",
+      "title": "新发射菜单",
+      "helpBody": "新发射菜单用于通过修改具有相似参数的现有卫星，生成假想轨道发射。<br><br>选择卫星后，可选择发射地点和南/北方位角。所选卫星将被调整以与发射场对齐，时间将重置为00:00:00，表示发射后的相对时间。这有助于计算发射时刻的传感器覆盖。与其他轨道物体的关系可能不准确。"
     },
     "MissilePlugin": {
-      "bottomIconLabel": "Missile",
-      "title": "Missile Menu",
-      "helpBody": "The Missile Menu is used for generating notional missile launches between countries. <br><br> When you using submarine launched missiles, the launch point is a custom latitude and longitude. When you are using land based missiles, the launch point is a fix latitude and longitude based on open source reporting. <br><br> In addition to custom missiles, a few predefined scenarios involving hundreds of missiles are available. <br><br> All missile launches are notional and are not intended to represent real world events. The launch trajectories are all based on the same ballistic model, but use different minimum and maximum ranges."
+      "bottomIconLabel": "导弹",
+      "title": "导弹菜单",
+      "helpBody": "导弹菜单用于生成国家间的假想导弹发射。<br><br>使用潜射导弹时，发射点为自定义经纬度；使用陆基导弹时，发射点为公开报道的固定经纬度。<br><br>除自定义导弹外，还提供若干涉及数百枚导弹的预设场景。<br><br>所有导弹发射均为假想，不代表真实世界事件。发射轨迹均基于同一弹道模型，但最小和最大射程不同。"
     },
     "StereoMap": {
-      "bottomIconLabel": "Stereo Map",
-      "title": "Stereographic Map Menu",
-      "helpBody": "The Stereographic Map Menu is used for visualizing satellite ground traces in a stereographic projection. <br/><br/> You can click on a spot along the ground trace to change the time of the simulation to when the satellite reaches that spot. <br/><br/> The yellow dots indicate when the satellite is in view of the sensor. The red dots indicate when the satellite is not in view of the sensor. The dot closest to the satellite is the current time."
+      "bottomIconLabel": "立体地图",
+      "title": "立体投影地图菜单",
+      "helpBody": "立体投影地图菜单用于以立体投影方式可视化卫星地面轨迹。<br/><br/>可点击轨迹上的任意点，将仿真时间切换到卫星到达该点的时刻。<br/><br/>黄色点表示卫星在传感器视场内，红色点表示不在视场内，距离卫星最近的点为当前时间。"
     },
     "SensorFov": {
-      "bottomIconLabel": "Sensor FOV"
+      "bottomIconLabel": "传感器视场"
     },
     "SensorSurvFence": {
-      "bottomIconLabel": "Sensor Fence"
+      "bottomIconLabel": "传感器搜索框"
     },
     "SatelliteViewPlugin": {
-      "bottomIconLabel": "Satellite View"
+      "bottomIconLabel": "卫星视图"
     },
     "SatelliteFov": {
-      "bottomIconLabel": "Satellite FOV",
-      "title": "Satellite Field of View Menu",
-      "helpBody": "The Satellite Field of View plugin allows you to control the field of view of a satellite."
+      "bottomIconLabel": "卫星视场",
+      "title": "卫星视场菜单",
+      "helpBody": "卫星视场插件允许您控制卫星的视场。"
     },
     "Planetarium": {
-      "bottomIconLabel": "Planetarium View"
+      "bottomIconLabel": "天文馆视图"
     },
     "NightToggle": {
-      "bottomIconLabel": "Night Toggle"
+      "bottomIconLabel": "夜间切换"
     },
     "SatConstellations": {
-      "bottomIconLabel": "Constellations",
-      "title": "Constellations Menu",
-      "helpBody": "The Constellations menu allows you to view groups of satellites. <br><br> For some constellations, notional uplink/downlinks and/or crosslinks will be drawn between satellites in the constellation."
+      "bottomIconLabel": "星座",
+      "title": "星座菜单",
+      "helpBody": "星座菜单允许您查看卫星群。<br><br>对于某些星座，将在星座内的卫星之间绘制假想的上/下行链路和/或星间链路。"
     },
     "CountriesMenu": {
-      "bottomIconLabel": "Countries",
-      "title": "Countries Menu",
-      "helpBody": "The Countries Menu allows you to filter the satellites by country of origin."
+      "bottomIconLabel": "国家",
+      "title": "国家菜单",
+      "helpBody": "国家菜单允许您按原籍国筛选卫星。"
     },
     "ColorMenu": {
-      "bottomIconLabel": "Color Schemes",
-      "title": "Color Scheme Menu",
-      "helpBody": "The Colors Menu is a place to change the color theme used to render the objects. <br><br> The various themes can change the colors based on the objects' orbits, objects' characteristics, or the objects' relation to sun and/or earth."
+      "bottomIconLabel": "配色方案",
+      "title": "配色方案菜单",
+      "helpBody": "配色菜单用于更改渲染对象时使用的配色主题。<br><br>不同主题可根据对象轨道、特性或与太阳/地球的关系改变颜色。"
     },
     "Screenshot": {
-      "bottomIconLabel": "Take Photo"
+      "bottomIconLabel": "拍照"
     },
     "LaunchCalendar": {
-      "bottomIconLabel": "Launch Calendar"
+      "bottomIconLabel": "发射日历"
     },
     "TimeMachine": {
-      "bottomIconLabel": "Time Machine"
+      "bottomIconLabel": "时间机器"
     },
     "SatellitePhotos": {
-      "bottomIconLabel": "Satellite Photos",
-      "title": "Satellite Photos Menu",
-      "helpBody": "The Satellite Photos Menu is used for displaying live photos from select satellites. <br><br> Note - changes in the image API may cause the wrong satellite to be selected in KeepTrack."
+      "bottomIconLabel": "卫星照片",
+      "title": "卫星照片菜单",
+      "helpBody": "卫星照片菜单用于显示部分卫星的实时照片。<br><br>注意：图像API的更改可能导致KeepTrack中选择了错误的卫星。"
     },
     "ScreenRecorder": {
-      "bottomIconLabel": "Record Video"
+      "bottomIconLabel": "录制视频"
     },
     "Astronomy": {
-      "bottomIconLabel": "Astronomy"
+      "bottomIconLabel": "天文"
     },
     "Calculator": {
-      "bottomIconLabel": "Reference Frame Transforms",
-      "title": "Reference Frame Transforms Menu",
-      "helpBody": "The Reference Frame Transforms Menu is used to convert between different reference frames. <br><br> The menu allows you to convert between the following reference frames: <ul style=\"margin-left: 40px;\"> <li> ECI - Earth Centered Inertial </li> <li> ECEF - Earth Centered Earth Fixed </li> <li> Geodetic </li> <li> Topocentric </li> </ul>"
+      "bottomIconLabel": "参考系转换",
+      "title": "参考系转换菜单",
+      "helpBody": "参考系转换菜单用于在不同参考系之间转换。<br><br>菜单允许您在以下参考系之间转换：<ul style=\"margin-left: 40px;\"><li>ECI - 地心惯性系</li><li>ECEF - 地心地固系</li><li>大地坐标系</li><li>地方坐标系</li></ul>"
     },
     "AnalysisMenu": {
-      "bottomIconLabel": "Analysis",
-      "title": "Analysis Menu",
-      "helpBody": "The Analysis Menu provides a number of tools to help you analyze the data in the current view. The tools are: <ul style=\"margin-left: 40px;\"> <li>Export Official TLEs - Export real two line element sets.</li> <li>Export 3LES - Export three line element sets.</li> <li>Export KeepTrack TLEs - Export All KeepTrack two line element sets including analysts.</li> <li>Export KeepTrack 3LES - Export All KeepTrack three line element sets including analysts.</li> <li>Find Close Objects - Find objects that are close to each other.</li> <li>Find Reentries - Find objects that are likely to reenter the atmosphere.</li> <li>Best Passes - Find the best passes for a satellite based on the currently selected sensor.</li> </ul>"
+      "bottomIconLabel": "分析",
+      "title": "分析菜单",
+      "helpBody": "分析菜单提供多种工具，帮助您分析当前视图中的数据。工具包括：<ul style=\"margin-left: 40px;\"><li>导出官方TLE - 导出真实的两行元数据。</li><li>导出3LES - 导出三行元数据。</li><li>导出KeepTrack TLE - 导出所有KeepTrack两行元数据（含分析员数据）。</li><li>导出KeepTrack 3LES - 导出所有KeepTrack三行元数据（含分析员数据）。</li><li>查找近距离物体 - 查找彼此接近的物体。</li><li>查找再入 - 查找可能再入大气层的物体。</li><li>最佳过境 - 基于当前选中传感器查找卫星的最佳过境。</li></ul>"
     },
     "SettingsMenuPlugin": {
-      "bottomIconLabel": "Settings",
-      "title": "Settings Menu",
-      "helpBody": "The Settings menu allows you to configure the application."
+      "bottomIconLabel": "设置",
+      "title": "设置菜单",
+      "helpBody": "设置菜单允许您配置应用程序。"
     },
     "VideoDirectorPlugin": {
-      "bottomIconLabel": "Video Director",
-      "title": "Video Director Menu",
-      "helpBody": "The Video Director Menu is used to manipulate the camera and objects in the scene to create a video."
+      "bottomIconLabel": "视频导演",
+      "title": "视频导演菜单",
+      "helpBody": "视频导演菜单用于操作场景中的摄像机和对象以创建视频。"
     },
     "CreateSat": {
-      "bottomIconLabel": "Create Satellite",
-      "title": "Create Satellite",
-      "helpBody": "The Create Satellite menu is used to create a satellite from its keplerian elements"
+      "bottomIconLabel": "创建卫星",
+      "title": "创建卫星",
+      "helpBody": "创建卫星菜单用于根据开普勒元素创建卫星。"
     },
     "DopsPlugin": {
-      "bottomIconLabel": "View DOPs",
-      "title": "Dilution of Precision Menu",
-      "helpBody": "The Dilution of Precision (DOP) menu is used to calculate the DOP values for a satellite and sensor. <br><br> The DOP values are: <ul style=\"margin-left: 40px;\"> <li> GDOP - Geometric Dilution of Precision </li> <li> PDOP - Position Dilution of Precision </li> <li> HDOP - Horizontal Dilution of Precision </li> <li> VDOP - Vertical Dilution of Precision </li> <li> TDOP - Time Dilution of Precision </li> <li> NDOP - Number of Satellites Dilution of Precision </li> </ul>"
+      "bottomIconLabel": "查看DOP",
+      "title": "精度因子菜单",
+      "helpBody": "精度因子（DOP）菜单用于计算卫星和传感器的DOP值。<br><br>DOP值包括：<ul style=\"margin-left: 40px;\"><li>GDOP - 几何精度因子</li><li>PDOP - 位置精度因子</li><li>HDOP - 水平精度因子</li><li>VDOP - 垂直精度因子</li><li>TDOP - 时间精度因子</li><li>NDOP - 卫星数量精度因子</li></ul>"
     },
     "EciPlot": {
-      "bottomIconLabel": "ECI Plot",
-      "title": "ECI Plot Menu",
-      "helpBody": "The ECI Plot Menu is used to plot the satellite's position in the Earth Centered Inertial (ECI) reference frame."
+      "bottomIconLabel": "ECI绘图",
+      "title": "ECI绘图菜单",
+      "helpBody": "ECI绘图菜单用于绘制卫星在地心惯性系（ECI）中的位置。"
     },
     "EcfPlot": {
-      "bottomIconLabel": "ECF Plot",
-      "title": "ECF Plot Menu",
-      "helpBody": "The ECF Plot Menu is used to plot the satellite's position in the Earth Centered Earth Fixed (ECF) reference frame."
+      "bottomIconLabel": "ECF绘图",
+      "title": "ECF绘图菜单",
+      "helpBody": "ECF绘图菜单用于绘制卫星在地心地固系（ECF）中的位置。"
     },
     "RicPlot": {
-      "bottomIconLabel": "RIC Plot",
-      "title": "RIC Plot Menu",
-      "helpBody": "The RIC Plot Menu is used to plot the satellite's position in the Radial, In-Track, and Cross-Track (RIC) reference frame."
+      "bottomIconLabel": "RIC绘图",
+      "title": "RIC绘图菜单",
+      "helpBody": "RIC绘图菜单用于绘制卫星在径向、轨道内和轨道横向（RIC）参考系中的位置。"
     },
     "Time2LonPlots": {
-      "bottomIconLabel": "Waterfall Plot",
-      "title": "Waterfall Menu",
-      "helpBody": "The Time to Longitude (Waterfall) Plot Menu is used to plot the satellite's longitude over time."
+      "bottomIconLabel": "瀑布图",
+      "title": "瀑布菜单",
+      "helpBody": "经度随时间（瀑布）绘图菜单用于绘制卫星经度随时间的变化。"
     },
     "Lat2LonPlots": {
-      "bottomIconLabel": "Lat vs Lon Plot",
-      "title": "Latitude to Longitude Plot Menu",
-      "helpBody": "The Latitude vs Longitude Plot Menu is used for plotting the latitude vs longitude in the GEO belt."
+      "bottomIconLabel": "纬度-经度图",
+      "title": "纬度-经度绘图菜单",
+      "helpBody": "纬度-经度绘图菜单用于绘制GEO带内的纬度与经度关系。"
     },
     "Inc2AltPlots": {
-      "bottomIconLabel": "Inc vs Alt Plot",
-      "title": "Inclination to Altitude Plot Menu",
-      "helpBody": "The Inclination to Altitude Plot Menu is used to plot the satellite's inclination against its altitude."
+      "bottomIconLabel": "倾角-高度图",
+      "title": "倾角-高度绘图菜单",
+      "helpBody": "倾角-高度绘图菜单用于绘制卫星倾角与高度的关系。"
     },
     "Inc2LonPlots": {
-      "bottomIconLabel": "Inc Vs Lon Plot",
-      "title": "Inclination to Longitude Plot Menu",
-      "helpBody": "The Inc Vs Lon Plot Menu is used for plotting the inclination vs longitude in the GEO belt."
+      "bottomIconLabel": "倾角-经度图",
+      "title": "倾角-经度绘图菜单",
+      "helpBody": "倾角-经度绘图菜单用于绘制GEO带内的倾角与经度关系。"
     },
     "GraphicsMenuPlugin": {
-      "bottomIconLabel": "Graphics Menu",
-      "title": "Graphics Menu",
-      "helpBody": "The Graphics Menu is used to change the graphics settings of the application."
+      "bottomIconLabel": "图形菜单",
+      "title": "图形菜单",
+      "helpBody": "图形菜单用于更改应用程序的图形设置。"
     }
   }
 }

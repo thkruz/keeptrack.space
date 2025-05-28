@@ -237,10 +237,9 @@ export class SensorTimeline extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
         this.ctx_ = this.canvas_.getContext('2d') as CanvasRenderingContext2D;
@@ -282,7 +281,7 @@ export class SensorTimeline extends KeepTrackPlugin {
           this.updateTimeline();
         });
       },
-    });
+    );
 
   }
 
@@ -290,10 +289,9 @@ export class SensorTimeline extends KeepTrackPlugin {
     super.addJs();
 
     // We need to wait for the sensorIds to be assigned before we can use them. Once they are ready we will reload the users last selected sensors
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherReady,
+      () => {
         const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
         let enabledSensors = [] as number[];
 
@@ -311,12 +309,11 @@ export class SensorTimeline extends KeepTrackPlugin {
 
         }
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (sat: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {
           return;
         }
@@ -327,7 +324,7 @@ export class SensorTimeline extends KeepTrackPlugin {
           this.canvas_.style.display = 'block';
         }
       },
-    });
+    );
   }
 
   async updateTimeline(): Promise<void> {
@@ -1128,7 +1125,6 @@ export class SensorTimeline extends KeepTrackPlugin {
 
           timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
           timeManagerInstance.calculateSimulationTime();
-          keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset));
 
           const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
           const currentSatId = selectSatManagerInstance.selectedSat;

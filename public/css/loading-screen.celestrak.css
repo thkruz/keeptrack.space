@@ -1,0 +1,211 @@
+:root {
+  /* Bright blue from the star */
+  --colorTertiary: #046eb6 !important;
+  /* Deep navy background for contrast */
+  --color-dark-background: #002d47 !important;
+  /* Complementary to primary */
+  --color-dark-border: #004270 !important;
+  /* Light blue as highlight */
+  --color-dark-text-accent: #add8e6 !important;
+  /* Neutral gray for muted text */
+  --color-dark-text-muted: #6b6b6b !important;
+  /* Bright blue from the star */
+  --color-primary: #046eb6 !important;
+  /* Light blue accent */
+  --color-primary-light: #add8e6 !important;
+  /* Deep blue for accents */
+  --color-primary-dark: #023456 !important;
+}
+
+#keeptrack-root {
+  overflow: hidden;
+  font-family: 'Open Sans', sans-serif;
+  color: white;
+  background: var(--color-dark-background);
+  background: -moz-linear-gradient(45deg, var(--color-dark-background), var(--color-dark-background));
+  background: -webkit-linear-gradient(45deg, var(--color-dark-background), var(--color-dark-background));
+  background: linear-gradient(45deg, var(--color-dark-background), var(--color-dark-background));
+}
+
+.ui-icon-minus {
+  margin: auto !important;
+}
+
+.ui-icon-plus {
+  margin: auto !important;
+}
+
+.ui-datepicker td a {
+  text-align: center !important;
+}
+
+#canvas-holder {
+  display: none;
+  /* Display none till loading is complete main.js -227 */
+}
+
+#loading-screen {
+  display: flex;
+  padding: 0;
+  z-index: 101;
+  text-align: center;
+  background: #000000;
+  color: white;
+  /* Apply filter only to background image, not text */
+  /* Use a pseudo-element for background image and filter */
+  position: relative;
+}
+
+#loading-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: inherit;
+  filter: brightness(0.85) contrast(1.05);
+  pointer-events: none;
+}
+
+.full-loader {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  overflow: hidden;
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.mini-loader-container {
+  background: rgba(0, 0, 0, 0) !important;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.mini-loader {
+  border-radius: 35px;
+  z-index: 101;
+  border: 5px solid rgba(0, 0, 0, 0.3);
+  width: 300px;
+  padding-top: 25px;
+  padding-bottom: 5px;
+  overflow: hidden;
+  background: var(--color-dark-background);
+  background: -moz-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  background: -webkit-linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  background: linear-gradient(45deg, var(--colorTertiaryDarken4), var(--colorTertiary));
+  -moz-background-clip: padding;
+  /* Firefox 3.6 */
+  -webkit-background-clip: padding;
+  /* Safari 4? Chrome 6? */
+  background-clip: padding-box;
+  /* Firefox 4, Safari 5, Opera 10, IE 9 */
+}
+
+#logo-inner-container {
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  height: 150px;
+  z-index: 1;
+}
+
+#logo-text {
+  display: block;
+  font-size: 9vh;
+  max-width: 60%;
+  margin: auto;
+  /* Large black drop shadow */
+  -webkit-filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 10px rgba(0, 0, 0, 0.75));
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 10px rgba(0, 0, 0, 0.75));
+}
+
+#logo-text-version {
+  display: block;
+  font-size: 9vh;
+  padding-left: 50px;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+  color: var(--colorPrimaryLighten2) !important;
+}
+
+#sponsor-text {
+  display: block;
+  font-size: 2em;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+#sponsor-img {
+  background: white;
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+@font-face {
+  font-family: 'nasalization';
+  font-style: normal;
+  font-weight: 400;
+  src:
+    url('fonts/nasalization-rg.woff2') format('woff2'),
+    url('fonts/nasalization-rg.woff') format('woff'),
+    url('fonts/nasalization-rg.ttf') format('truetype');
+}
+
+.logo-font {
+  font-family: 'nasalization', sans-serif;
+  font-size: 8em;
+  text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 800px) {
+  #logo-text {
+    font-size: 3em;
+  }
+
+  #logo-text-version {
+    font-size: 3em;
+  }
+}
+
+#loader-text {
+  display: block;
+  line-height: 50px;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+#loading-hint {
+  text-align: left;
+  z-index: 1;
+  position: absolute;
+  width: 100%;
+  font-size: 1.2em;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding-left: 5%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  bottom: 15%;
+  text-shadow:
+    0px 0px 8px rgb(0 0 0),
+    0px 0px 8px rgb(0 0 0);
+}
+
+#mobile-start-button {
+  display: none;
+  margin-top: 10px;
+}
+
+.start-hidden {
+  display: none;
+}

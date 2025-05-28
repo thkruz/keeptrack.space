@@ -21,7 +21,6 @@
 
 import { keepTrackApi } from '@app/keepTrackApi';
 import { RADIUS_OF_EARTH } from '@app/lib/constants';
-import { SettingsManager } from '@app/settings/settings';
 import { GlUtils } from '@app/static/gl-utils';
 import { GLSL3 } from '@app/static/material';
 import { Mesh } from '@app/static/mesh';
@@ -29,17 +28,10 @@ import { ShaderMaterial } from '@app/static/shader-material';
 import { SphereGeometry } from '@app/static/sphere-geometry';
 import { SplashScreen } from '@app/static/splash-screen';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EpochUTC, GreenwichMeanSiderealTime, Sun } from 'ootk';
+import { EpochUTC, Sun } from 'ootk';
 import { errorManagerInstance } from '../errorManager';
+import { PersistenceManager, StorageKey } from '../persistence-manager';
 import { OcclusionProgram } from './post-processing';
-
-export enum EarthNightTextureQuality {
-  POTATO = '512',
-  LOW = '1K',
-  MEDIUM = '2k',
-  HIGH = '4k',
-  ULTRA = '16k',
-}
 
 export enum EarthDayTextureQuality {
   POTATO = '512',
@@ -49,22 +41,109 @@ export enum EarthDayTextureQuality {
   ULTRA = '16k',
 }
 
+export enum EarthNightTextureQuality {
+  POTATO = '512',
+  LOW = '1K',
+  MEDIUM = '2k',
+  HIGH = '4k',
+  ULTRA = '16k',
+}
+
+export enum EarthSpecTextureQuality {
+  OFF = 'off',
+  POTATO = '512',
+  LOW = '1K',
+  MEDIUM = '2k',
+  HIGH = '4k',
+  ULTRA = '16k',
+}
+
+export enum EarthBumpTextureQuality {
+  OFF = 'off',
+  LOW = '256',
+  MEDIUM = '4k',
+  HIGH = '8k',
+}
+
+export enum EarthCloudTextureQuality {
+  OFF = 'off',
+  POTATO = '512',
+  LOW = '1K',
+  MEDIUM = '2k',
+  HIGH = '4k',
+  ULTRA = '8k',
+}
+
+export enum EarthPoliticalTextureQuality {
+  OFF = 'off',
+  POTATO = '1K',
+  LOW = '2K',
+  MEDIUM = '4k',
+  HIGH = '8k',
+  ULTRA = '16k',
+}
+
+export enum EarthTextureStyle {
+  BLUE_MARBLE = 'earthmap',
+  FLAT = 'flat',
+}
+
+export enum AtmosphereSettings {
+  OFF = 0,
+  WHITE = 1,
+  COLORFUL = 2,
+}
+
 export class Earth {
   private gl_: WebGL2RenderingContext;
   private glowDirection_ = 1;
   private glowNumber_ = 0;
-  private isBumpTextureReady_ = false;
-  private isDayTextureReady_ = false;
-  private isNightTextureReady_ = false;
-  private isSpecularTextureReady_ = false;
-  private isTexturesReady_ = false;
   private modelViewMatrix_: mat4;
   private readonly normalMatrix_: mat3 = mat3.create();
-  private settings_: SettingsManager;
-  private textureBump_: WebGLTexture;
-  textureDay: WebGLTexture;
-  textureNight: WebGLTexture;
-  private textureSpec_: WebGLTexture;
+  textureDay: Record<string, WebGLTexture> = {
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.POTATO]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.LOW]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.HIGH]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+  };
+  textureNight: Record<string, WebGLTexture> = {
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.POTATO]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.LOW]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.HIGH]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+  };
+  textureSpec: Record<EarthSpecTextureQuality, WebGLTexture> = {
+    [EarthSpecTextureQuality.OFF]: <WebGLTexture><unknown>null,
+    [EarthSpecTextureQuality.POTATO]: <WebGLTexture><unknown>null,
+    [EarthSpecTextureQuality.LOW]: <WebGLTexture><unknown>null,
+    [EarthSpecTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
+    [EarthSpecTextureQuality.HIGH]: <WebGLTexture><unknown>null,
+    [EarthSpecTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+  };
+  textureBump: Record<EarthBumpTextureQuality, WebGLTexture> = {
+    [EarthBumpTextureQuality.OFF]: <WebGLTexture><unknown>null,
+    [EarthBumpTextureQuality.LOW]: <WebGLTexture><unknown>null,
+    [EarthBumpTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
+    [EarthBumpTextureQuality.HIGH]: <WebGLTexture><unknown>null,
+  };
+  texturePolitical: Record<EarthPoliticalTextureQuality, WebGLTexture> = {
+    [EarthPoliticalTextureQuality.OFF]: <WebGLTexture><unknown>null,
+    [EarthPoliticalTextureQuality.POTATO]: <WebGLTexture><unknown>null,
+    [EarthPoliticalTextureQuality.LOW]: <WebGLTexture><unknown>null,
+    [EarthPoliticalTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
+    [EarthPoliticalTextureQuality.HIGH]: <WebGLTexture><unknown>null,
+    [EarthPoliticalTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+  };
+  textureClouds: Record<EarthCloudTextureQuality, WebGLTexture> = {
+    [EarthCloudTextureQuality.OFF]: <WebGLTexture><unknown>null,
+    [EarthCloudTextureQuality.POTATO]: <WebGLTexture><unknown>null,
+    [EarthCloudTextureQuality.LOW]: <WebGLTexture><unknown>null,
+    [EarthCloudTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
+    [EarthCloudTextureQuality.HIGH]: <WebGLTexture><unknown>null,
+    [EarthCloudTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+  };
   private vaoOcclusion_: WebGLVertexArrayObject;
   isHiResReady: boolean;
   isUseHiRes: boolean;
@@ -72,16 +151,27 @@ export class Earth {
   lightDirection = <vec3>[0, 0, 0];
   mesh: Mesh;
   imageCache: Record<string, HTMLImageElement> = {};
+  cloudPosition_: number = Math.random() * 8192; // Randomize the cloud position
+
+  private readonly BUMP_SRC_BASE = 'earthbump';
+  private readonly SPEC_SRC_BASE = 'earthspec';
+  private readonly POLITICAL_SRC_BASE = 'boundaries';
+  private readonly CLOUDS_SRC_BASE = 'clouds';
 
   /**
    * This is run once per frame to render the earth.
    */
   draw(tgtBuffer: WebGLFramebuffer | null) {
-    if (!this.isTexturesReady_) {
-      return;
-    }
     this.drawColoredEarth_(tgtBuffer);
     this.drawBlackGpuPickingEarth_();
+  }
+
+  changeEarthTextureStyle(style: EarthTextureStyle) {
+    settingsManager.earthTextureStyle = style;
+    // Reinit the current textures
+    this.initTextures_();
+
+    PersistenceManager.getInstance().saveItem(StorageKey.LAST_MAP, style);
   }
 
   /**
@@ -116,114 +206,81 @@ export class Earth {
   /**
    * This is run once per session to initialize the earth.
    */
-  init(settings: SettingsManager, gl?: WebGL2RenderingContext): void {
+  init(gl?: WebGL2RenderingContext): void {
     try {
       if (!gl && !this.gl_) {
         throw new Error('No WebGL context found');
       }
       this.gl_ ??= gl!;
-      this.settings_ = settings;
+
+      if (!settingsManager.plugins.GraphicsMenuPlugin) {
+        settingsManager.earthBumpTextureQuality ??= EarthBumpTextureQuality.OFF;
+        settingsManager.earthSpecTextureQuality ??= EarthSpecTextureQuality.OFF;
+        settingsManager.earthDayTextureQuality ??= EarthDayTextureQuality.MEDIUM;
+        settingsManager.earthNightTextureQuality ??= EarthNightTextureQuality.MEDIUM;
+        settingsManager.earthPoliticalTextureQuality ??= EarthPoliticalTextureQuality.OFF;
+        settingsManager.earthCloudTextureQuality ??= EarthCloudTextureQuality.OFF;
+      }
 
       this.initTextures_();
-      const geometry = new SphereGeometry(this.gl_, {
-        radius: RADIUS_OF_EARTH,
-        widthSegments: this.settings_.earthNumLatSegs,
-        heightSegments: this.settings_.earthNumLonSegs,
-      });
-      const material = new ShaderMaterial(this.gl_, {
-        uniforms: {
-          uGlow: <WebGLUniformLocation><unknown>null,
-          uIsDrawAtmosphere: <WebGLUniformLocation><unknown>null,
-          uIsDrawAurora: <WebGLUniformLocation><unknown>null,
-          uLightDirection: <WebGLUniformLocation><unknown>null,
-          uDayMap: <WebGLUniformLocation><unknown>null,
-          uNightMap: <WebGLUniformLocation><unknown>null,
-          uBumpMap: <WebGLUniformLocation><unknown>null,
-          uSpecMap: <WebGLUniformLocation><unknown>null,
-        },
-        vertexShader: this.shaders_.vert,
-        fragmentShader: this.shaders_.frag,
-        glslVersion: GLSL3,
-      });
 
-      this.mesh = new Mesh(this.gl_, geometry, material, {
-        name: 'earth',
-        precision: 'highp',
-        disabledUniforms: {
-          modelMatrix: true,
-          viewMatrix: true,
-        },
-      });
+      // We only need to make the mesh once
+      if (!this.mesh) {
+        const geometry = new SphereGeometry(this.gl_, {
+          radius: RADIUS_OF_EARTH,
+          widthSegments: settingsManager.earthNumLatSegs,
+          heightSegments: settingsManager.earthNumLonSegs,
+        });
+        const material = new ShaderMaterial(this.gl_, {
+          uniforms: {
+            uIsAmbientLighting: <WebGLUniformLocation><unknown>null,
+            uGlow: <WebGLUniformLocation><unknown>null,
+            uZoomLevel: <WebGLUniformLocation><unknown>null,
+            uisGrayScale: <WebGLUniformLocation><unknown>null,
+            uCloudPosition: <WebGLUniformLocation><unknown>null,
+            uAtmosphereType: <WebGLUniformLocation><unknown>null,
+            uIsDrawAurora: <WebGLUniformLocation><unknown>null,
+            uLightDirection: <WebGLUniformLocation><unknown>null,
+            uDayMap: <WebGLUniformLocation><unknown>null,
+            uNightMap: <WebGLUniformLocation><unknown>null,
+            uBumpMap: <WebGLUniformLocation><unknown>null,
+            uSpecMap: <WebGLUniformLocation><unknown>null,
+            uPoliticalMap: <WebGLUniformLocation><unknown>null,
+            uCloudsMap: <WebGLUniformLocation><unknown>null,
+          },
+          vertexShader: this.shaders_.vert,
+          fragmentShader: this.shaders_.frag,
+          glslVersion: GLSL3,
+        });
 
-      this.initVaoVisible_();
-      this.initVaoOcclusion_();
+        this.mesh = new Mesh(this.gl_, geometry, material, {
+          name: 'earth',
+          precision: 'highp',
+          disabledUniforms: {
+            modelMatrix: true,
+            viewMatrix: true,
+          },
+        });
+
+        this.initVaoVisible_();
+        this.initVaoOcclusion_();
+      }
     } catch (error) {
       errorManagerInstance.debug(error);
     }
   }
 
   /**
-   * Helper function to load the high resolution earth textures.
-   */
-  loadHiRes(texture: WebGLTexture, src: string, cb?: (() => void)): void {
-    try {
-      let img = this.imageCache[src];
-
-      if (!img) {
-        img = new Image();
-
-        img.onload = () => {
-          if (!this.settings_.isBlackEarth) {
-            GlUtils.bindImageToTexture(this.gl_, texture, img);
-          }
-
-          this.isDayTextureReady_ = true;
-          this.isHiResReady = true;
-          this.onImageLoaded_();
-
-          if (cb) {
-            cb();
-          }
-        };
-        img.src = src;
-        this.imageCache[src] = img;
-        this.isUseHiRes = true;
-      } else {
-        if (!this.settings_.isBlackEarth) {
-          GlUtils.bindImageToTexture(this.gl_, texture, img);
-        }
-
-        if (cb) {
-          cb();
-        }
-      }
-
-    } catch (e) {
-      errorManagerInstance.warn(`Failed to load texture: ${src}`);
-    }
-  }
-
-  /**
-   * This is run once per session to initialize the high resolution earth textures.
-   * It can be run multiple times to reload the textures.
-   */
-  reloadEarthHiResTextures() {
-    this.init(settingsManager, this.gl_);
-    this.loadHiRes(this.textureDay, Earth.getSrcHiResDay_(this.settings_));
-    this.loadHiRes(this.textureNight, Earth.getSrcHiResNight_(this.settings_));
-  }
-
-  /**
    * This is run once per frame to update the earth.
    */
-  update(gmst: GreenwichMeanSiderealTime): void {
+  update(): void {
+    const gmst = keepTrackApi.getTimeManager().gmst;
     const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
 
     this.lightDirection = [pos.x, pos.y, pos.z];
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
     this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
-    // this.modelViewMatrix_ = mat4.mul(this.modelViewMatrix_, keepTrackApi.getMainCamera().camMatrix, this.modelViewMatrix_);
     mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, gmst);
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
 
@@ -231,131 +288,22 @@ export class Earth {
     this.glowNumber_ += 0.0025 * this.glowDirection_;
     this.glowDirection_ = this.glowNumber_ > 1 ? -1 : this.glowDirection_;
     this.glowDirection_ = this.glowNumber_ < 0 ? 1 : this.glowDirection_;
+
+    // Update the cloud position
+    this.cloudPosition_ += 0.00000025 * keepTrackApi.getTimeManager().propRate; // Slowly drift the clouds, but enough to see the effect
+    this.cloudPosition_ = this.cloudPosition_ > 8192 ? 0 : this.cloudPosition_; // Reset the cloud position when it reaches 8192 - the width of the texture
   }
 
-  /**
-   * Determines the url to the bump map based on the settings.
-   */
-  private static getSrcBump_(settings: SettingsManager): string {
-    if (!settings.installDirectory) {
-      throw new Error('settings.installDirectory is undefined');
+  private getSrc_(base: string, resolution: string, extension = 'jpg'): string {
+    if (!settingsManager.installDirectory) {
+      throw new Error('settingsManager.installDirectory is undefined');
     }
 
-    let src = `${settings.installDirectory}textures/earthbump8k.jpg`;
+    let src = `${settingsManager.installDirectory}textures/${base}${resolution}.${extension}`;
 
-    if (settings.smallImages || settings.isMobileModeEnabled) {
-      src = `${settings.installDirectory}textures/earthbump256.jpg`;
+    if (settingsManager.smallImages || settingsManager.isMobileModeEnabled) {
+      src = `${settingsManager.installDirectory}textures/${base}512.${extension}`;
     }
-    // if (settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthbump4k.jpg`;
-
-    return src;
-  }
-
-  /**
-   * Determines the url to the day texture based on the settings.
-   */
-  private static getSrcDay_(settings: SettingsManager): string {
-    if (!settings.installDirectory) {
-      throw new Error('settings.installDirectory is undefined');
-    }
-
-    const src = `${settings.installDirectory}textures/earthmap512.jpg`;
-
-    return src;
-  }
-
-  /**
-   * Determines the url to the high resolution day texture based on the settings.
-   */
-  private static getSrcHiResDay_(settings: SettingsManager): string {
-    if (!settings.installDirectory) {
-      throw new Error('settings.installDirectory is undefined');
-    }
-
-    const quality = settings.earthDayTextureQuality;
-
-    let src = `${settings.installDirectory}textures/earthmap${quality}.jpg`;
-
-    if (settings.smallImages) {
-      src = `${settings.installDirectory}textures/earthmap512.jpg`;
-    }
-    if (settings.nasaImages) {
-      src = `${settings.installDirectory}textures/mercator-tex.jpg`;
-    }
-    if (settings.brownEarthImages) {
-      src = `${settings.installDirectory}textures/trusatvector-4096.jpg`;
-    }
-    if (settings.blueImages) {
-      src = `${settings.installDirectory}textures/world_blue-2048.png`;
-    }
-    if (settings.vectorImages) {
-      src = `${settings.installDirectory}textures/dayearthvector-4096.jpg`;
-    }
-    if (settings.politicalImages) {
-      src = `${settings.installDirectory}textures/political8k-gray.jpg`;
-    }
-    if (settings.hiresImages) {
-      src = `${settings.installDirectory}textures/earthmap16k.jpg`;
-    }
-    if (settings.hiresNoCloudsImages) {
-      src = `${settings.installDirectory}textures/earthmap16k.jpg`;
-    }
-
-    return src;
-  }
-
-  /**
-   * Determines the url to the high resolution night texture based on the settings.
-   */
-  private static getSrcHiResNight_(settings: SettingsManager): string {
-    if (!settings.installDirectory) {
-      throw new Error('settings.installDirectory is undefined');
-    }
-
-    const quality = settings.earthNightTextureQuality;
-
-    let src = `${settings.installDirectory}textures/earthlights${quality}.jpg`;
-
-    if (settings.vectorImages) {
-      src = `${settings.installDirectory}textures/dayearthvector-4096.jpg`;
-    }
-    if (settings.politicalImages) {
-      src = `${settings.installDirectory}textures/political8k-gray-night.jpg`;
-    }
-    if (settings.hiresImages || settings.hiresNoCloudsImages) {
-      src = `${settings.installDirectory}textures/earthlights16k.jpg`;
-    }
-
-    return src;
-  }
-
-  /**
-   * Determines the url to the night texture based on the settings.
-   */
-  private static getSrcNight_(settings: SettingsManager): string {
-    if (!settings.installDirectory) {
-      throw new Error('settings.installDirectory is undefined');
-    }
-
-    const src = `${settings.installDirectory}textures/earthlights512.jpg`;
-
-    return src;
-  }
-
-  /**
-   * Determines the url to the specular map based on the settings.
-   */
-  private static getSrcSpec_(settings: SettingsManager): string {
-    if (!settings.installDirectory) {
-      throw new Error('settings.installDirectory is undefined');
-    }
-
-    let src = `${settings.installDirectory}textures/earthspec8k.jpg`;
-
-    if (settings.smallImages || settings.isMobileModeEnabled) {
-      src = `${settings.installDirectory}textures/earthspec256.jpg`;
-    }
-    // if (settings.isMobileModeEnabled) src = `${settings.installDirectory}textures/earthspec4k.jpg`;
 
     return src;
   }
@@ -380,7 +328,7 @@ export class Earth {
      * no reason to render 100000s of pixels when
      * we're only going to read one
      */
-    if (!this.settings_.isMobileModeEnabled) {
+    if (!settingsManager.isMobileModeEnabled) {
       gl.enable(gl.SCISSOR_TEST);
       gl.scissor(
         keepTrackApi.getMainCamera().mouseX,
@@ -392,7 +340,7 @@ export class Earth {
 
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
 
-    if (!this.settings_.isMobileModeEnabled) {
+    if (!settingsManager.isMobileModeEnabled) {
       gl.disable(gl.SCISSOR_TEST);
     }
 
@@ -434,104 +382,61 @@ export class Earth {
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
 
+    gl.uniform1f(this.mesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
     gl.uniform1f(this.mesh.material.uniforms.uGlow, this.glowNumber_);
+    gl.uniform1f(this.mesh.material.uniforms.uZoomLevel, keepTrackApi.getMainCamera().zoomLevel() ?? 1);
+    gl.uniform1f(this.mesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
+    gl.uniform1f(this.mesh.material.uniforms.uCloudPosition, this.cloudPosition_);
     gl.uniform3fv(this.mesh.material.uniforms.uLightDirection, this.lightDirection);
-    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAtmosphere, this.settings_.isDrawAtmosphere ? 1.0 : 0.0);
-    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAurora, this.settings_.isDrawAurora ? 1.0 : 0.0);
-  }
-
-  private initTextureBump_(): void {
-    this.isBumpTextureReady_ = false;
-    this.textureBump_ = this.gl_.createTexture();
-    const img = new Image();
-
-    img.onload = () => {
-      if (this.settings_.isDrawBumpMap && !this.settings_.isBlackEarth && !this.settings_.politicalImages) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureBump_, img);
-      } else {
-        // Bind a blank texture
-        this.gl_.bindTexture(this.gl_.TEXTURE_2D, this.textureSpec_);
-      }
-
-      this.isBumpTextureReady_ = true;
-      this.onImageLoaded_();
-    };
-    img.src = Earth.getSrcBump_(this.settings_);
-  }
-
-  private initTextureDay_(): void {
-    SplashScreen.loadStr(SplashScreen.msg.painting);
-    this.textureDay = this.gl_.createTexture();
-    const img = new Image();
-
-    img.onload = () => {
-      if (!this.settings_.isBlackEarth) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureDay, img);
-      } else {
-        // Delete the texture
-        this.textureDay = null as unknown as WebGLTexture;
-      }
-
-      this.isDayTextureReady_ = true;
-      this.onImageLoaded_();
-    };
-    img.src = Earth.getSrcDay_(this.settings_);
-  }
-
-  private initTextureNight_(): void {
-    this.textureNight = this.gl_.createTexture();
-    const img = new Image();
-
-    img.onload = () => {
-      if (!this.settings_.isBlackEarth) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureNight, img);
-      } else {
-        // Delete the texture
-        this.textureNight = null as unknown as WebGLTexture;
-      }
-
-      this.isNightTextureReady_ = true;
-      this.onImageLoaded_();
-    };
-    img.src = Earth.getSrcNight_(this.settings_);
-  }
-
-  private initTextureSpec_(): void {
-    this.isSpecularTextureReady_ = false;
-    this.textureSpec_ = this.gl_.createTexture();
-    const img = new Image();
-
-    img.onload = () => {
-      if (this.settings_.isDrawSpecMap && !this.settings_.isBlackEarth && !this.settings_.politicalImages) {
-        GlUtils.bindImageToTexture(this.gl_, this.textureSpec_, img);
-      } else {
-        // Bind a blank texture
-        this.gl_.bindTexture(this.gl_.TEXTURE_2D, this.textureSpec_);
-      }
-
-      this.isSpecularTextureReady_ = true;
-      this.onImageLoaded_();
-    };
-    img.src = Earth.getSrcSpec_(this.settings_);
-
-    /*
-     * DEBUG:
-     * `${this.settings_.installDirectory}textures/earthspec1k.jpg`;
-     */
+    gl.uniform1f(this.mesh.material.uniforms.uAtmosphereType, settingsManager.isDrawAtmosphere);
+    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAurora, settingsManager.isDrawAurora ? 1.0 : 0.0);
   }
 
   private initTextures_(): void {
-    if (!this.textureDay || this.settings_.isBlackEarth) {
-      this.initTextureDay_();
+    const sm = settingsManager;
+
+    sm.earthTextureStyle ??= EarthTextureStyle.BLUE_MARBLE;
+
+    if (!this.textureDay[sm.earthTextureStyle + sm.earthDayTextureQuality]) {
+      SplashScreen.loadStr(SplashScreen.msg.painting);
+      this.textureDay[sm.earthTextureStyle + sm.earthDayTextureQuality] = this.gl_.createTexture();
+      GlUtils.initTexture(this.gl_, `${this.getSrc_(sm.earthTextureStyle, sm.earthDayTextureQuality)}`).then((texture) => {
+        this.textureDay[sm.earthTextureStyle + sm.earthDayTextureQuality] = texture;
+      });
     }
-    if (!this.textureNight || this.settings_.isBlackEarth) {
-      this.initTextureNight_();
+    if (!this.textureNight[sm.earthTextureStyle + sm.earthNightTextureQuality]) {
+      this.textureNight[sm.earthTextureStyle + sm.earthNightTextureQuality] = this.gl_.createTexture();
+      const nightTextureStyle = `${sm.earthTextureStyle}-night`;
+
+      GlUtils.initTexture(this.gl_, `${this.getSrc_(nightTextureStyle, sm.earthNightTextureQuality)}`).then((texture) => {
+        this.textureNight[sm.earthTextureStyle + sm.earthNightTextureQuality] = texture;
+      }).catch(() => {
+        delete this.textureNight[sm.earthTextureStyle + sm.earthNightTextureQuality];
+      });
     }
-    if (!this.textureBump_ || this.settings_.isBlackEarth) {
-      this.initTextureBump_();
+    if (!this.textureBump[sm.earthBumpTextureQuality] && sm.earthBumpTextureQuality && sm.earthBumpTextureQuality !== EarthBumpTextureQuality.OFF) {
+      this.textureBump[sm.earthBumpTextureQuality] = this.gl_.createTexture();
+      GlUtils.initTexture(this.gl_, `${this.getSrc_(this.BUMP_SRC_BASE, sm.earthBumpTextureQuality)}`).then((texture) => {
+        this.textureBump[sm.earthBumpTextureQuality] = texture;
+      });
     }
-    if (!this.textureSpec_ || this.settings_.isBlackEarth) {
-      this.initTextureSpec_();
+    if (!this.textureSpec[sm.earthSpecTextureQuality] && sm.earthSpecTextureQuality && sm.earthSpecTextureQuality !== EarthSpecTextureQuality.OFF) {
+      this.textureSpec[sm.earthSpecTextureQuality] = this.gl_.createTexture();
+      GlUtils.initTexture(this.gl_, `${this.getSrc_(this.SPEC_SRC_BASE, sm.earthSpecTextureQuality)}`).then((texture) => {
+        this.textureSpec[sm.earthSpecTextureQuality] = texture;
+      });
+    }
+    if (!this.texturePolitical[sm.earthPoliticalTextureQuality] && sm.earthPoliticalTextureQuality && sm.earthPoliticalTextureQuality !== EarthPoliticalTextureQuality.OFF) {
+      this.texturePolitical[sm.earthPoliticalTextureQuality] = this.gl_.createTexture();
+      GlUtils.initTexture(this.gl_, `${this.getSrc_(this.POLITICAL_SRC_BASE, sm.earthPoliticalTextureQuality, 'png')}`).then((texture) => {
+        this.texturePolitical[sm.earthPoliticalTextureQuality] = texture;
+      });
+    }
+    if (!this.textureClouds[sm.earthCloudTextureQuality] && sm.earthCloudTextureQuality && sm.earthCloudTextureQuality !== EarthCloudTextureQuality.OFF) {
+      this.textureClouds[sm.earthCloudTextureQuality] = this.gl_.createTexture();
+      GlUtils.initTexture(this.gl_, `${this.getSrc_(this.CLOUDS_SRC_BASE, sm.earthCloudTextureQuality)}`).then((texture) => {
+        this.textureClouds[sm.earthCloudTextureQuality] = texture;
+      });
     }
   }
 
@@ -591,45 +496,36 @@ export class Earth {
   }
 
   /**
-   * This is run after each texture is loaded to determine if all textures are loaded.
-   */
-  private onImageLoaded_(): void {
-    if (this.isDayTextureReady_ && this.isNightTextureReady_ && this.isBumpTextureReady_ && this.isSpecularTextureReady_) {
-      this.isTexturesReady_ = true;
-    }
-  }
-
-  /**
    * This is run once per frame to set the textures for the earth.
    */
   private setTextures_(gl: WebGL2RenderingContext) {
     // Day Map
     gl.uniform1i(this.mesh.material.uniforms.uDayMap, 0);
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.textureDay);
+    if (this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthDayTextureQuality] && !settingsManager.isBlackEarth) {
+      gl.bindTexture(gl.TEXTURE_2D, this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthDayTextureQuality]);
+    } else {
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
 
     // Night Map
     gl.uniform1i(this.mesh.material.uniforms.uNightMap, 1);
     gl.activeTexture(gl.TEXTURE1);
 
-    // If there are no callbacks, just use the night texture
-    const altNightTexBind = keepTrackApi.events.nightToggle.length > 0 ? keepTrackApi.methods.nightToggle : null;
-
-    if (!altNightTexBind) {
-      gl.bindTexture(gl.TEXTURE_2D, this.textureNight);
-    } else {
-      /*
-       * If there are callbacks use those to determine which texture to use
-       * This is primarily used for the night mode toggle
-       */
-      altNightTexBind(gl, this.textureNight, this.textureDay);
+    if ((!this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality] &&
+      !this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]) || settingsManager.isBlackEarth) {
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    } else if (!settingsManager.isDrawNightAsDay && this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]) {
+      gl.bindTexture(gl.TEXTURE_2D, this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]);
+    } else if (this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality] && !settingsManager.isBlackEarth) {
+      gl.bindTexture(gl.TEXTURE_2D, this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]);
     }
 
     // Bump Map
     gl.uniform1i(this.mesh.material.uniforms.uBumpMap, 2);
     gl.activeTexture(gl.TEXTURE2);
-    if (this.settings_.isDrawBumpMap) {
-      gl.bindTexture(gl.TEXTURE_2D, this.textureBump_);
+    if (settingsManager.isDrawBumpMap && this.textureBump[settingsManager.earthBumpTextureQuality]) {
+      gl.bindTexture(gl.TEXTURE_2D, this.textureBump[settingsManager.earthBumpTextureQuality]);
     } else {
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
@@ -637,8 +533,26 @@ export class Earth {
     // Specular Map
     gl.uniform1i(this.mesh.material.uniforms.uSpecMap, 3);
     gl.activeTexture(gl.TEXTURE3);
-    if (this.settings_.isDrawSpecMap) {
-      gl.bindTexture(gl.TEXTURE_2D, this.textureSpec_);
+    if (settingsManager.isDrawSpecMap && this.textureSpec[settingsManager.earthSpecTextureQuality]) {
+      gl.bindTexture(gl.TEXTURE_2D, this.textureSpec[settingsManager.earthSpecTextureQuality]);
+    } else {
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+    // Political Map
+    gl.uniform1i(this.mesh.material.uniforms.uPoliticalMap, 4);
+    gl.activeTexture(gl.TEXTURE4);
+    if (settingsManager.isDrawPoliticalMap && this.texturePolitical[settingsManager.earthPoliticalTextureQuality]) {
+      gl.bindTexture(gl.TEXTURE_2D, this.texturePolitical[settingsManager.earthPoliticalTextureQuality]);
+    } else {
+      gl.bindTexture(gl.TEXTURE_2D, null);
+    }
+
+    // Clouds Map
+    gl.uniform1i(this.mesh.material.uniforms.uCloudsMap, 5);
+    gl.activeTexture(gl.TEXTURE5);
+    if (settingsManager.isDrawCloudsMap && this.textureClouds[settingsManager.earthCloudTextureQuality]) {
+      gl.bindTexture(gl.TEXTURE_2D, this.textureClouds[settingsManager.earthCloudTextureQuality]);
     } else {
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
@@ -649,12 +563,18 @@ export class Earth {
    *
    * NOTE: Keep these at the bottom of the file to ensure proper syntax highlighting.
    */
-  private shaders_ = {
+  private readonly shaders_ = {
     frag: keepTrackApi.glsl`
+    precision highp float;
+
+    uniform float uIsAmbientLighting;
     uniform float uGlow;
+    uniform float uCloudPosition;
     uniform vec3 uLightDirection;
-    uniform float uIsDrawAtmosphere;
+    uniform float uAtmosphereType;
     uniform float uIsDrawAurora;
+    uniform float uZoomLevel;
+    uniform float uisGrayScale;
 
     in vec2 vUv;
     in vec3 vNormal;
@@ -667,6 +587,8 @@ export class Earth {
     uniform sampler2D uNightMap;
     uniform sampler2D uBumpMap;
     uniform sampler2D uSpecMap;
+    uniform sampler2D uPoliticalMap;
+    uniform sampler2D uCloudsMap;
 
     const float latitudeCenter = 67.5; // The latitude at which the Aurora Borealis appears
     const float latitudeMargin = 7.0; // The margin around the center latitude where the Aurora Borealis is visible
@@ -688,65 +610,88 @@ export class Earth {
 
       // .................................................
       // Diffuse lighting
-        float diffuse = max(dot(vNormal, uLightDirection), 0.0);
+      float diffuse = 0.0;
+      if (uIsAmbientLighting > 0.5) {
+        diffuse = max(dot(vNormal, uLightDirection), 0.0);
+      }
 
       //.................................................
       // Bump mapping
-        vec3 bumpTexColor = texture(uBumpMap, vUv).rgb * diffuse * 0.4;
+      vec3 bumpTexColor = textureLod(uBumpMap, vUv, -1.0).rgb * diffuse * 0.4;
 
-        //................................................
-        // Specular lighting
-        vec3 specLightColor = texture(uSpecMap, vUv).rgb * diffuse * 0.1;
+      //................................................
+      // Specular lighting
+      vec3 specLightColor = textureLod(uSpecMap, vUv, -1.0).rgb * diffuse * 0.1;
 
-        //................................................
-        // Final color
-        vec3 dayColor = (ambientLightColor + directionalLightColor) * diffuse;
-        vec3 dayTexColor = texture(uDayMap, vUv).rgb * dayColor;
-        vec3 nightColor = 0.5 * texture(uNightMap, vUv).rgb * pow(1.0 - diffuse, 2.0);
+      //................................................
+      // Final color
+      vec3 dayColor = (ambientLightColor + directionalLightColor) * diffuse;
+      vec3 dayTexColor = textureLod(uDayMap, vUv, -1.0).rgb * dayColor;
+      vec3 nightColor = 0.5 * textureLod(uNightMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);
 
-        fragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
+      fragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
 
-        // ...............................................
-        // Atmosphere
+      // Political map (Draw before clouds and atmosphere)
+      fragColor += textureLod(uPoliticalMap, vUv, 1.0);
 
-        if (uIsDrawAtmosphere > 0.5) {
-          float sunAmount = max(dot(vNormal, uLightDirection), 0.1);
-          float darkAmount = max(dot(vNormal, -uLightDirection), 0.0);
-          float r = 1.0 - sunAmount;
-          float g = max(1.0 - sunAmount, 0.85) - darkAmount;
-          float b = max(sunAmount, 0.9) - darkAmount;
-          vec3 atmosphereColor = vec3(r,g,b);
+      // ................................................
+      // Clouds
+      // Add the clouds to the fragColor
+      // Slowly drift the clouds to the left
+        vec2 uv = vUv;
+        uv.x -= uCloudPosition;
 
-          float fragToCameraAngle = (1.0 - dot(fragToCamera, vNormal));
-          fragToCameraAngle = pow(fragToCameraAngle, 3.8); //Curve the change, Make the fresnel thinner
+        vec3 cloudsColor = textureLod(uCloudsMap, uv, -1.0).rgb;
+        fragColor.rgb += cloudsColor * 0.8 * pow(uZoomLevel, 2.5);
 
-          fragColor.rgb += (atmosphereColor * fragToCameraAngle * smoothstep(0.25, 0.5, fragToLightAngle));
-        } else {
-          // Draw thin white line around the Earth no matter what fragToLightAngle is
-          float fragToCameraAngle = (1.0 - dot(fragToCamera, vNormal));
-          fragToCameraAngle = pow(fragToCameraAngle, 7.0); //Curve the change, Make the fresnel thinner
-          fragColor.rgb += vec3(1.0, 1.0, 1.0) * fragToCameraAngle;
-        }
+      // ...............................................
+      // Atmosphere
 
-        // ...............................................
-        // Aurora
-        if (uIsDrawAurora > 0.5) {
-          float latitude = vUv.y * 180.0 - 90.0; // Convert texture coordinate to latitude (-90 to 90)
-          // if (latitude >= latitudeMin && latitude <= latitudeMax || latitude >= -latitudeMin && latitude <= -latitudeMax){
-            float noise = uGlow;
+      // If 2 then draw the colorful atmosphere
+      if (uAtmosphereType > 1.5 && uAtmosphereType < 2.5) {
+        float sunAmount = max(dot(vNormal, uLightDirection), 0.1);
+        float darkAmount = max(dot(vNormal, -uLightDirection), 0.0);
+        float r = 1.0 - sunAmount;
+        float g = max(1.0 - sunAmount, 0.85) - darkAmount;
+        float b = max(sunAmount, 0.9) - darkAmount;
+        vec3 atmosphereColor = vec3(r,g,b);
 
-            // Calculate the intensity of the Aurora Borealis at the current latitude
-            float auroraIntensity = calculateAuroraIntensity(abs(latitude), noise / 2.0);
+        float fragToCameraAngle = (1.0 - dot(fragToCamera, vNormal));
+        fragToCameraAngle = pow(fragToCameraAngle, 3.8); //Curve the change, Make the fresnel thinner
 
-            // Calculate the strength of the Aurora Borealis based on the Sun direction. It should only be visible on the dark side of the Earth
-            float auroraStrength = max(dot(vNormal, -uLightDirection), 0.0) * (0.75 + (noise / 10.0));
+        fragColor.rgb += (atmosphereColor * fragToCameraAngle * smoothstep(0.25, 0.5, fragToLightAngle));
+      } else if (uAtmosphereType > 0.5 && uAtmosphereType < 1.5) {
+        // If 1 then draw the white atmosphere
+        // Draw thin white line around the Earth no matter what fragToLightAngle is
+        float fragToCameraAngle = (1.0 - dot(fragToCamera, vNormal));
+        fragToCameraAngle = pow(fragToCameraAngle, 7.0); //Curve the change, Make the fresnel thinner
+        fragColor.rgb += vec3(1.0, 1.0, 1.0) * fragToCameraAngle;
+      } // If 0 then no atmosphere
 
-            // Combine the Earth color and the Aurora Borealis color based on the intensity and strength
-            vec3 auroraColor = vec3(0.0, 0.8, 0.55 + noise / 20.0); // Color of the Aurora Borealis
+      // Gray scale the color
+      if (uisGrayScale > 0.5) {
+        float gray = dot(fragColor.rgb, vec3(0.299, 0.587, 0.114));
+        fragColor.rgb = vec3(gray);
+      }
 
-            fragColor.rgb += auroraColor * auroraIntensity * auroraStrength;
-        }
-        // }
+      // ...............................................
+      // Aurora
+      if (uIsDrawAurora > 0.5) {
+        float latitude = vUv.y * 180.0 - 90.0; // Convert texture coordinate to latitude (-90 to 90)
+        float noise = uGlow;
+
+        // Calculate the intensity of the Aurora Borealis at the current latitude
+        float auroraIntensity = calculateAuroraIntensity(abs(latitude), noise / 2.0);
+
+        // Calculate the strength of the Aurora Borealis based on the Sun direction. It should only be visible on the dark side of the Earth
+        float auroraStrength = max(dot(vNormal, -uLightDirection), 0.0) * (0.75 + (noise / 10.0));
+
+        // Combine the Earth color and the Aurora Borealis color based on the intensity and strength
+        vec3 auroraColor = vec3(0.0, 0.8, 0.55 + noise / 20.0); // Color of the Aurora Borealis
+
+        fragColor.rgb += auroraColor * auroraIntensity * auroraStrength;
+      }
+
     }
     `,
     vert: keepTrackApi.glsl`

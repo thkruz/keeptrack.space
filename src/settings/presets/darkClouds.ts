@@ -13,8 +13,8 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   const RESTART_ROTATE_TIME = 10; // Restart auto rotate after this many seconds
 
   settingsManager.disableAllPlugins();
-  settingsManager.plugins.timeMachine = true;
-  settingsManager.plugins.topMenu = false;
+  settingsManager.plugins.TimeMachine = { enabled: true };
+  settingsManager.plugins.TopMenu = { enabled: false };
 
   settingsManager.isDisableAsciiCatalog = true;
 
@@ -25,7 +25,6 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   settingsManager.noMeshManager = true;
   settingsManager.isLoadLastMap = false;
   settingsManager.isShowAgencies = false;
-  settingsManager.lowresImages = true;
   settingsManager.isAllowRightClick = false;
   settingsManager.isDisableSelectSat = false;
   settingsManager.isDisableSensors = true;
@@ -83,7 +82,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
     const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
     const debrisSpan = '<span style="color: rgb(255, 255, 35);">Debris </span>';
 
-    getEl('textOverlay').innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+    getEl('textOverlay')!.innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
 
     return `${english}`;
   };
@@ -110,7 +109,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
     style.appendChild(document.createTextNode(toastCss));
     document.head.appendChild(style);
 
-    getEl('textOverlay').style.cssText = `
+    getEl('textOverlay')!.style.cssText = `
                     border-radius: 2px;
                     bottom: 125px;
                     right: 150px;

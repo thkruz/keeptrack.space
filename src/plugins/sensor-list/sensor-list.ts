@@ -10,11 +10,10 @@ import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
-import { Planetarium } from '../planetarium/planetarium';
 import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
-import { keepTrackApi } from './../../keepTrackApi';
+import { InputEventType, keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
 
 // TODO: Add a search bar and filter for sensors
@@ -26,7 +25,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
-      if (keepTrackApi.getPlugin(Planetarium)?.isMenuButtonActive) {
+      if (keepTrackApi.getPluginByName('Planetarium')?.isMenuButtonActive) {
         getClass('sensor-top-link').forEach((el) => {
           el.style.display = 'none';
         });
@@ -45,7 +44,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     maxWidth: 800,
   };
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = sensorPng;
 
@@ -56,7 +55,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
         <div id="sensor-list-content" class="side-menu">
         <div class="row">
           <ul id="reset-sensor-text" class="sensor-reset-menu">
-            <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button">Reset Sensor &#9658;</button>
+            <button id="reset-sensor-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button" disabled>Reset Sensor &#9658;</button>
           </ul>
           <ul id="list-of-sensors">` +
     this.sensorGroups_.map((sensorGroup) => this.genericSensors_(sensorGroup.name)).join('') +
@@ -71,14 +70,13 @@ export class SensorListPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerInit,
+      () => {
         getEl('nav-mobile')?.insertAdjacentHTML(
           'beforeend',
           keepTrackApi.html`
-          <div id="sensor-selected-container">
+          <div id="sensor-selected-container" class="start-hidden">
             <div id="sensor-selected" class="waves-effect waves-light">
 
             </div>
@@ -86,13 +84,12 @@ export class SensorListPlugin extends KeepTrackPlugin {
           `,
         );
       },
-    });
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    );
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {
-          keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
           keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
         });
 
@@ -119,12 +116,11 @@ export class SensorListPlugin extends KeepTrackPlugin {
           this.sensorListContentClick(sensorClick ?? '');
         });
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
           hideEl('sensors-in-fov-link');
@@ -162,16 +158,15 @@ export class SensorListPlugin extends KeepTrackPlugin {
           this.isSensorLinksAdded = true;
         }
       },
-    });
+    );
   }
 
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.sensorDotSelected,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.sensorDotSelected,
+      (obj: BaseObject) => {
         if (settingsManager.isMobileModeEnabled) {
           return;
         }
@@ -199,23 +194,19 @@ export class SensorListPlugin extends KeepTrackPlugin {
             timeManagerInstance.selectedDate,
           );
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.onCruncherReady,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.onCruncherReady,
+      () => {
         if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
           SensorListPlugin.reloadLastSensor_();
         }
       },
-    });
+    );
 
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
-
-    keyboardManager.registerKeyUpEvent({
-      key: 'Home',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'Home' && !isRepeat) {
         // If a sensor is selected rotate the camera to it
         if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&
           (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT)) {
@@ -224,7 +215,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
           keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, keepTrackApi.getTimeManager().selectedDate);
           keepTrackApi.getSoundManager().play(SoundNames.WHOOSH);
         }
-      },
+      }
     });
   }
 

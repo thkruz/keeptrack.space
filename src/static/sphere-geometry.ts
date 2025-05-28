@@ -120,7 +120,7 @@ export class SphereGeometry extends BufferGeometry {
    * Generate a uvsphere bottom up, CCW order
    */
   private calculateCombinedArray(isSkipTexture: boolean) {
-    const combinedArray = [];
+    const combinedArray = [] as number[];
 
     for (let heightSegment = 0; heightSegment <= this.heightSegments; heightSegment++) {
       const theta = this.thetaStart + ((this.thetaStart + this.thetaLength) / this.heightSegments) * heightSegment - Math.PI / 2;
@@ -175,7 +175,7 @@ export class SphereGeometry extends BufferGeometry {
    * Calculate the vertex draw order for the sphere
    */
   private calculateVertIndicies_() {
-    const index = [];
+    const index = [] as number[];
 
     for (let heightSegment = 0; heightSegment < this.heightSegments; heightSegment++) {
       // this is for each QUAD, not each vertex, so <

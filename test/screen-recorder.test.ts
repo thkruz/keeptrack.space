@@ -33,7 +33,7 @@ describe('ScreenRecorder_class', () => {
       // Do nothing
     };
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
 
   // Tests error handling
@@ -44,6 +44,6 @@ describe('ScreenRecorder_class', () => {
       throw new Error('test');
     };
 
-    expect(() => keepTrackApi.runEvent(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
 });

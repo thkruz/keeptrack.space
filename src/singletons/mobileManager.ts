@@ -1,22 +1,21 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { Kilometers } from 'ootk';
 import { keepTrackApi } from '../keepTrackApi';
-import { hideEl } from '../lib/get-el';
+import { getEl, hideEl } from '../lib/get-el';
+import { EarthTextureStyle } from './draw-manager/earth';
 import { errorManagerInstance } from './errorManager';
 
 export class MobileManager {
   // eslint-disable-next-line require-await
-  public static async checkMobileMode() {
+  static async checkMobileMode() {
     try {
       // Don't become mobile after initialization
       if (!keepTrackApi.isInitialized) {
         if (MobileManager.checkIfMobileDevice()) {
-          if (!settingsManager.isMobileModeEnabled) {
-            keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
-              ToastMsgType.normal);
-          }
           settingsManager.isMobileModeEnabled = true;
-
+          settingsManager.disableWindowTouchMove = false;
+          settingsManager.isShowLoadingHints = false;
+          settingsManager.isDisableBottomMenu = true;
           settingsManager.maxOribtsDisplayed = settingsManager.maxOrbitsDisplayedMobile;
           settingsManager.enableHoverOverlay = false;
           settingsManager.cameraMovementSpeed = 0.0025;
@@ -36,44 +35,81 @@ export class MobileManager {
           Object.keys(settingsManager.plugins).forEach((key) => {
             settingsManager.plugins[key] = false;
           });
-          settingsManager.plugins.satInfoboxCore = cachePlugins.satInfoboxCore;
-          settingsManager.plugins.topMenu = cachePlugins.topMenu;
-          settingsManager.plugins.datetime = cachePlugins.datetime;
-          settingsManager.plugins.soundManager = cachePlugins.soundManager;
+          settingsManager.plugins.SatInfoBox = cachePlugins.SatInfoBox;
+          settingsManager.plugins.TopMenu = cachePlugins.TopMenu;
+          settingsManager.plugins.DateTimeManager = cachePlugins.DateTimeManager;
+          settingsManager.plugins.SoundManager = cachePlugins.SoundManager;
           settingsManager.defaultColorScheme = 'CelestrakColorScheme';
 
-          settingsManager.isDisableGodrays = true;
-          settingsManager.isDisableSkybox = true;
-          settingsManager.isDisableMoon = true;
-          settingsManager.isDisableSearchBox = true;
-          settingsManager.isDrawCovarianceEllipsoid = false;
+          // Get the size of keeptrack-root
+          const keeptrackRoot = getEl('keeptrack-root');
 
-          settingsManager.isDisableAsyncReadPixels = true;
+          if (keeptrackRoot?.clientWidth ?? 601 < 600) {
+            settingsManager.isShowPrimaryLogo = false;
+            settingsManager.isShowSecondaryLogo = false;
+          } else if (!settingsManager.isMobileModeEnabled) {
+            keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
+              ToastMsgType.normal);
+          }
 
-          settingsManager.satShader.minSize = 8;
-          settingsManager.satShader.maxAllowedSize = 45;
-          settingsManager.pickingDotSize = '32.0';
-          settingsManager.satShader.maxSize = 70;
-
-          settingsManager.isDisableStars = true;
-          settingsManager.isDisableLaunchSites = true;
-          settingsManager.isDisableControlSites = true;
-
-          keepTrackApi.register({
-            event: KeepTrackApiEvents.selectSatData,
-            cbName: 'MobileManager.selectSatData',
-            cb: () => {
-              keepTrackApi.getUiManager().searchManager.closeSearch();
-            },
+          Object.assign(settingsManager, {
+            isEnableJscCatalog: true,
+            noMeshManager: false,
+            isShowSplashScreen: false,
+            // isDisableSelectSat: true,
+            isDisableKeyboard: true,
+            isAllowRightClick: false,
+            isShowLoadingHints: false,
+            isBlockPersistence: true,
+            isDisableBottomMenu: true,
+            isDrawSun: false,
+            isDrawMilkyWay: false,
+            isDisableGodrays: true,
+            godraysSamples: -1,
+            isDisableMoon: true,
+            earthDayTextureQuality: '1K',
+            earthNightTextureQuality: '1K',
+            isDrawNightAsDay: true,
+            // earthSpecTextureQuality: '1K',
+            isDrawSpecMap: false,
+            // earthBumpTextureQuality: '1K',
+            isDrawBumpMap: false,
+            // earthCloudTextureQuality: '1K',
+            isDrawCloudsMap: false,
+            // earthPoliticalTextureQuality: '1K',
+            isDrawPoliticalMap: false,
+            earthTextureStyle: EarthTextureStyle.BLUE_MARBLE,
+            isDisableSkybox: true,
+            isDisableSearchBox: true,
+            isDrawCovarianceEllipsoid: false,
+            isDisableAsyncReadPixels: true,
+            pickingDotSize: '32.0',
+            isDisableStars: true,
+            isDisableControlSites: true,
+            isDisableSensors: true,
+            isDisableLaunchSites: true,
           });
 
-          keepTrackApi.register({
-            event: KeepTrackApiEvents.uiManagerFinal,
-            cbName: 'MobileManager.uiManagerFinal',
-            cb: () => {
+          Object.assign(settingsManager.satShader, {
+            minSize: 8,
+            maxAllowedSize: 45,
+            maxSize: 70,
+          });
+
+          keepTrackApi.on(
+            KeepTrackApiEvents.selectSatData,
+            () => {
+              keepTrackApi.getUiManager().searchManager.closeSearch();
+              hideEl('actions-section');
+            },
+          );
+
+          keepTrackApi.on(
+            KeepTrackApiEvents.uiManagerFinal,
+            () => {
               hideEl('tutorial-btn');
             },
-          });
+          );
 
           settingsManager.maxAnalystSats = 1;
           settingsManager.maxFieldOfViewMarkers = 1;
@@ -108,13 +144,8 @@ export class MobileManager {
     }
   }
 
-  public static checkIfMobileDevice() {
+  static checkIfMobileDevice() {
     return (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/iu).test(navigator.userAgent);
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  init() {
-    MobileManager.checkMobileMode();
   }
 }
 

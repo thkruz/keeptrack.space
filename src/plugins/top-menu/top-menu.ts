@@ -1,6 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl } from '@app/lib/get-el';
 import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
@@ -18,10 +18,9 @@ export class TopMenu extends KeepTrackPlugin {
 
   addHtml() {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerInit,
+      () => {
         getEl('keeptrack-header')?.insertAdjacentHTML(
           'beforeend',
           keepTrackApi.html`
@@ -70,6 +69,18 @@ export class TopMenu extends KeepTrackPlugin {
           `,
         );
 
+        // Advice only applies to things in the bottom menu
+        if (settingsManager.isDisableBottomMenu) {
+          keepTrackApi.on(
+            KeepTrackApiEvents.uiManagerFinal,
+            () => {
+              hideEl('tutorial-btn');
+            },
+          );
+
+          return;
+        }
+
         keepTrackApi.containerRoot?.insertAdjacentHTML(
           'beforeend',
           keepTrackApi.html`
@@ -88,16 +99,15 @@ export class TopMenu extends KeepTrackPlugin {
 
         adviceManagerInstance.init();
       },
-    });
+    );
   }
 
   addJs() {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
-        getEl('sound-btn').onclick = () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        getEl('sound-btn')!.onclick = () => {
           const soundIcon = <HTMLImageElement>getEl('sound-icon');
           const soundManager = keepTrackApi.getSoundManager();
 
@@ -110,25 +120,19 @@ export class TopMenu extends KeepTrackPlugin {
           if (!soundManager.isMute) {
             soundManager.isMute = true;
             soundIcon.src = soundOffPng;
-            soundIcon.parentElement.classList.remove('bmenu-item-selected');
-            soundIcon.parentElement.classList.add('bmenu-item-error');
+            soundIcon.parentElement!.classList.remove('bmenu-item-selected');
+            soundIcon.parentElement!.classList.add('bmenu-item-error');
           } else {
             soundManager.isMute = false;
             soundIcon.src = soundOnPng;
-            soundIcon.parentElement.classList.add('bmenu-item-selected');
-            soundIcon.parentElement.classList.remove('bmenu-item-error');
+            soundIcon.parentElement!.classList.add('bmenu-item-selected');
+            soundIcon.parentElement!.classList.remove('bmenu-item-error');
           }
         };
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.setSensor,
-      cbName: this.id,
-      cb: () => {
-        this.updateSensorName();
-      },
-    });
+    keepTrackApi.on(KeepTrackApiEvents.setSensor, this.updateSensorName.bind(this));
   }
 
   updateSensorName() {
@@ -139,10 +143,10 @@ export class TopMenu extends KeepTrackPlugin {
 
       // If this.sensorTitle is empty hide the div
       if (!sensorTitle || sensorTitle === '') {
-        sensorSelectedDom.style.display = 'none';
+        sensorSelectedDom.parentElement!.style.display = 'none';
       } else {
         sensorSelectedDom.innerText = sensorTitle;
-        sensorSelectedDom.style.display = 'block';
+        sensorSelectedDom.parentElement!.style.display = 'block';
       }
     }
   }

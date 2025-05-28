@@ -230,20 +230,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerInit,
-      cbName: this.id,
-      cb: () => {
-        getEl('fbl-error').addEventListener('click', () => {
-          getEl('fbl-error').style.display = 'none';
-        });
-      },
-    });
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: this.uiManagerFinal_.bind(this),
-    });
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   printLastResults() {
@@ -252,6 +239,10 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
   private uiManagerFinal_() {
     const satData = keepTrackApi.getCatalogManager().objectCache;
+
+    getEl('fbl-error')!.addEventListener('click', () => {
+      getEl('fbl-error')!.style.display = 'none';
+    });
 
     getEl('findByLooks-form').addEventListener('submit', (e: Event) => {
       e.preventDefault();

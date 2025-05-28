@@ -18,93 +18,41 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, SensorGeolocation, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, SensorGeolocation } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
-import type { KeepTrackPlugins } from '@app/plugins/plugins';
-import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
-import { EarthDayTextureQuality, EarthNightTextureQuality } from '@app/singletons/draw-manager/earth';
+import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
+import { SunTextureQuality } from '@app/singletons/draw-manager/sun';
+import { MobileManager } from '@app/singletons/mobileManager';
+import { UrlManager } from '@app/static/url-manager';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { RADIUS_OF_EARTH } from '../lib/constants';
 import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
 import { ClassificationString } from '../static/classification';
 import { isThisNode } from '../static/isThisNode';
-import { GetVariables } from './getVariables';
-import { darkClouds } from './presets/darkClouds';
+import { defaultColorSettings } from './default-color-settings';
+import { defaultPlugins } from './default-plugins';
+import { parseGetVariables } from './parse-get-variables';
 import { SettingsPresets } from './presets/presets';
-import { sateliot } from './presets/sateliot';
-import { starTalk } from './presets/startalk';
 
 export class SettingsManager {
   /**
    * A variable to hold a classification string, set to `null` when unused
    */
   classificationStr = null as ClassificationString | null;
-  menuMode: MenuMode = MenuMode.BASIC;
+  activeMenuMode: MenuMode = MenuMode.BASIC;
   // This controls which of the built-in plugins are loaded
-  plugins = <KeepTrackPlugins>{
-    debug: true,
-    satInfoboxCore: true,
-    aboutManager: false,
-    collisions: true,
-    trackingImpactPredict: true,
-    dops: true,
-    findSat: true,
-    launchCalendar: true,
-    newLaunch: true,
-    nextLaunch: true,
-    nightToggle: true,
-    photoManager: true,
-    screenRecorder: true,
-    satChanges: false,
-    stereoMap: true,
-    timeMachine: true,
-    initialOrbit: true,
-    missile: true,
-    breakup: true,
-    editSat: true,
-    constellations: true,
-    countries: true,
-    colorsMenu: true,
-    shortTermFences: true,
-    orbitReferences: true,
-    analysis: true,
-    plotAnalysis: true,
-    sensorFov: true,
-    sensorSurv: true,
-    satelliteFov: true,
-    satelliteView: true,
-    planetarium: true,
-    astronomy: true,
-    screenshot: true,
-    watchlist: true,
-    sensor: true,
-    settingsMenu: true,
-    graphicsMenu: true,
-    datetime: true,
-    social: true,
-    topMenu: true,
-    classificationBar: true,
-    soundManager: true,
-    gamepad: true,
-    debrisScreening: true,
-    videoDirector: true,
-    reports: true,
-    polarPlot: true,
-    timeline: true,
-    timelineAlt: true,
-    transponderChannelData: true,
-    calculator: true,
-    createSat: true,
-    filterMenu: true,
-    RPOCalculator: true,
-  };
+  plugins = defaultPlugins;
   changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
   changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute
-  earthDayTextureQuality = EarthDayTextureQuality.MEDIUM;
-  earthNightTextureQuality = EarthNightTextureQuality.MEDIUM;
+  earthDayTextureQuality;
+  earthNightTextureQuality;
+  earthSpecTextureQuality;
+  earthBumpTextureQuality;
+  earthCloudTextureQuality;
+  earthPoliticalTextureQuality;
   filter: FilterPluginSettings = {};
   /**
    * This enables/disable the mission data section of the sat-info-box. There is no value if your data set contains no mission data.
@@ -125,6 +73,26 @@ export class SettingsManager {
    * Flag to determine if the covariance ellipsoid should be drawn.
    */
   isDrawCovarianceEllipsoid = false;
+  isDrawPoliticalMap = true;
+  isDrawCloudsMap = true;
+  sunTextureQuality: SunTextureQuality;
+  earthTextureStyle: EarthTextureStyle;
+  isEarthGrayScale = false;
+  isEarthAmbientLighting = true;
+  isBlockPersistence = false;
+  /** Center on a satellite when it is selected. */
+  isFocusOnSatelliteWhenSelected = true;
+  isUseJdayOnTopMenu = true;
+  /** Flag to determine if loading hints are shown on splash screen*/
+  isShowLoadingHints = true;
+  /**
+   * Flag to determine if the bottom menu is disabled. Do not enable this unless you have disabled
+   * plugins that use the bottom menu.
+   */
+  isDisableBottomMenu = false;
+  /** The initial time offset */
+  staticOffset: number = 0; // in seconds
+  isDrawNightAsDay = false;
 
 
   static preserveSettings() {
@@ -158,10 +126,10 @@ export class SettingsManager {
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY, settingsManager.godraysDensity.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT, settingsManager.godraysWeight.toString());
     PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY, settingsManager.godraysIlluminationDecay.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality?.toString());
+    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality?.toString());
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.saveSettings);
+    keepTrackApi.emit(KeepTrackApiEvents.saveSettings);
   }
 
   colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
@@ -236,7 +204,7 @@ export class SettingsManager {
   isDisableAsciiCatalog = true;
   settingsManager = null;
   /**
-   * Indicates whether or not Launch Agency and Payload Owners/Manufacturers should be displayed on globe.
+   * Indicates whether or not Payload Owners/Manufacturers should be displayed on globe.
    *
    * TODO: This needs to be revamped. Most agencies are not linked to any satellites!
    */
@@ -489,10 +457,6 @@ export class SettingsManager {
    */
   autoRotateSpeed = 0.000075;
   /**
-   * Determines whether or not to use lighter blue texture for the Earth.
-   */
-  blueImages = false;
-  /**
    * The speed at which the camera decays.
    *
    * Reduce this give momentum to camera changes
@@ -663,14 +627,6 @@ export class SettingsManager {
    */
   gpsElevationMask = <Degrees>15;
   /**
-   * Determines whether to use default high resolution texture for the Earth.
-   */
-  hiresImages = false;
-  /**
-   * Determines whether to use default high resolution texture for the Earth minus clouds.
-   */
-  hiresNoCloudsImages = false;
-  /**
    * Color of the dot when hovering over an object.
    */
   hoverColor = <[number, number, number, number]>[1.0, 1.0, 0.0, 1.0]; // Yellow
@@ -724,8 +680,11 @@ export class SettingsManager {
   isDrawBumpMap = true;
   /**
    * Determines whether the atmosphere should be drawn or not.
+   * 0 = No atmosphere
+   * 1 = Thin white atmosphere
+   * 2 = Colored atmosphere
    */
-  isDrawAtmosphere = true;
+  isDrawAtmosphere: AtmosphereSettings = AtmosphereSettings.COLORFUL;
   /**
    * Determines whether or not to draw the Aurora effect.
    */
@@ -737,7 +696,7 @@ export class SettingsManager {
   /**
    * Disables the loading of control site data
    */
-  isDisableControlSites = false;
+  isDisableControlSites = true;
   /**
    * Disables the loading of launch site data
    */
@@ -818,10 +777,6 @@ export class SettingsManager {
   lkVerify = 0;
   lowPerf = false;
   /**
-   * Determines whether to use default low resolution texture for the Earth.
-   */
-  lowresImages = false;
-  /**
    * Preallocate the maximum number of analyst satellites that can be manipulated
    *
    * NOTE: This mainly applies to breakup scenarios
@@ -901,10 +856,6 @@ export class SettingsManager {
    */
   nameOfSpecialSats = 'Special Sats';
   /**
-   * Determines whether or not to use NASA Blue Marble texture for the Earth.
-   */
-  nasaImages = false;
-  /**
    * The number of passes to consider when determining lookangles.
    */
   nextNPassesCount = 5;
@@ -955,10 +906,6 @@ export class SettingsManager {
    * Color of secondary object orbit.
    */
   orbitSelectColor2 = <[number, number, number, number]>[0.0, 0.4, 1.0, 0.9];
-  /**
-   * Determines whether or not to use political map texture for the Earth.
-   */
-  politicalImages = false;
   pTime = [];
   /**
    * Global flag for determining if a screenshot is queued
@@ -1065,7 +1012,6 @@ export class SettingsManager {
    * Automatically display all of the orbits
    */
   startWithOrbitsDisplayed = false;
-  brownEarthImages = false;
   /**
    * How many draw calls to wait before updating orbit overlay if last draw time was greater than 50ms
    */
@@ -1074,10 +1020,6 @@ export class SettingsManager {
    * How many draw calls to wait before updating orbit overlay if last draw time was greater than 20ms
    */
   updateHoverDelayLimitSmall = 3;
-  /**
-   * Determines whether to use vector map texture for the Earth.
-   */
-  vectorImages = false;
   /**
    * Size of the dot vertex shader
    */
@@ -1155,7 +1097,7 @@ export class SettingsManager {
   /**
    * Size of the dot for picking purposes
    */
-  pickingDotSize: string = '16.0';
+  pickingDotSize: string = '18.0';
 
   /**
    * Disable drawing godrays (huge performance hit on mobile)
@@ -1202,7 +1144,7 @@ export class SettingsManager {
     this.isDrawSun = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_SUN, this.isDrawSun) as boolean;
     this.isDrawCovarianceEllipsoid = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, this.isDrawCovarianceEllipsoid) as boolean;
     this.isBlackEarth = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_BLACK_EARTH, this.isBlackEarth) as boolean;
-    this.isDrawAtmosphere = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ATMOSPHERE, this.isDrawAtmosphere) as boolean;
+    this.isDrawAtmosphere = parseInt(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE) ?? '0') as AtmosphereSettings;
     this.isDrawAurora = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_AURORA, this.isDrawAurora) as boolean;
     this.isDrawMilkyWay = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_MILKY_WAY, this.isDrawMilkyWay) as boolean;
     this.isGraySkybox = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_GRAY_SKYBOX, this.isGraySkybox) as boolean;
@@ -1237,26 +1179,43 @@ export class SettingsManager {
   }
 
   init(settingsOverride?: SettingsManagerOverride) {
+    /*
+     * Export settingsManager to everyone else
+     * window.settingsManager = this;
+     * Expose these to node if running in node
+     */
+    if (global) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (<any>global).settingsManager = this;
+    }
+
     this.pTime = [];
 
     this.checkIfIframe_();
     this.setInstallDirectory_();
-    this.setMobileSettings_();
+    MobileManager.checkMobileMode();
     this.setEmbedOverrides_();
     this.setColorSettings_();
-    /**
-     * Load Order:
-     * URL Params > Local Storage > Default
-     */
-    this.loadPersistedSettings();
+
+    const params = this.loadOverridesFromUrl_();
 
     if (settingsOverride) {
       this.loadOverrides_(settingsOverride);
     }
 
-    const params = this.loadOverridesFromUrl_();
+    if (!this.disableUI) {
+      parseGetVariables(params, this);
+    }
+    settingsManager.isBlockPersistence = UrlManager.parseGetVariables(this) || settingsManager.isBlockPersistence;
 
-    this.initParseFromGETVariables_(params);
+    if (!settingsManager.isBlockPersistence) {
+      /**
+       * Load Order:
+       * URL Params > Local Storage > Default
+       */
+      this.loadPersistedSettings();
+
+    }
 
     // If No UI Reduce Overhead
     if (this.disableUI) {
@@ -1268,23 +1227,19 @@ export class SettingsManager {
 
     // Disable resource intense plugins if lowPerf is enabled
     if (this.lowPerf) {
-      this.plugins.sensorFov = false;
-      this.plugins.sensorSurv = false;
-      this.plugins.satelliteFov = false;
+      if (this.plugins.SensorFov) {
+        this.plugins.SensorFov.enabled = false;
+      }
+      if (this.plugins.SensorSurvFence) {
+        this.plugins.SensorSurvFence.enabled = false;
+      }
+      if (this.plugins.SatelliteFov) {
+        this.plugins.SatelliteFov.enabled = false;
+      }
       this.maxFieldOfViewMarkers = 1;
     }
 
     this.loadLastMapTexture_();
-
-    /*
-     * Export settingsManager to everyone else
-     * window.settingsManager = this;
-     * Expose these to node if running in node
-     */
-    if (global) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (<any>global).settingsManager = this;
-    }
   }
 
   private checkIfIframe_() {
@@ -1314,94 +1269,8 @@ export class SettingsManager {
       // eslint-disable-next-line no-console
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.5') {
-      this.colors = {
-        version: '1.4.5',
-        length: 0,
-        facility: [0.64, 0.0, 0.64, 1.0],
-        sunlight100: [1.0, 1.0, 1.0, 0.7],
-        sunlight80: [1.0, 1.0, 1.0, 0.4],
-        sunlight60: [1.0, 1.0, 1.0, 0.1],
-        starHi: [1.0, 1.0, 1.0, 1.0],
-        starMed: [1.0, 1.0, 1.0, 0.85],
-        starLow: [1.0, 1.0, 1.0, 0.65],
-        sensor: [1.0, 0.0, 0.0, 1.0],
-        sensorAlt: [0.0, 0.0, 1.0, 1.0],
-        marker: [
-          [0.2, 1.0, 1.0, 1.0],
-          [1.0, 0.2, 1.0, 1.0],
-          [1.0, 1.0, 0.2, 1.0],
-          [0.2, 0.2, 1.0, 1.0],
-          [0.2, 1.0, 0.2, 1.0],
-          [1.0, 0.2, 0.2, 1.0],
-          [0.5, 0.6, 1.0, 1.0],
-          [0.6, 0.5, 1.0, 1.0],
-          [1.0, 0.6, 0.5, 1.0],
-          [1.0, 1.0, 1.0, 1.0],
-          [0.2, 1.0, 1.0, 1.0],
-          [1.0, 0.2, 1.0, 1.0],
-          [1.0, 1.0, 0.2, 1.0],
-          [0.2, 0.2, 1.0, 1.0],
-          [0.2, 1.0, 0.2, 1.0],
-          [1.0, 0.2, 0.2, 1.0],
-          [0.5, 0.6, 1.0, 1.0],
-          [0.6, 0.5, 1.0, 1.0],
-        ],
-        deselected: [1.0, 1.0, 1.0, 0],
-        inFOV: [0.85, 0.5, 0.0, 1.0],
-        inFOVAlt: [0.2, 0.4, 1.0, 1],
-        payload: [0.2, 1.0, 0.0, 0.5],
-        rocketBody: [0.2, 0.4, 1.0, 1],
-        debris: [0.5, 0.5, 0.5, 1],
-        unknown: [0.5, 0.5, 0.5, 0.85],
-        pink: [1.0, 0.0, 0.6, 1.0],
-        analyst: [1.0, 1.0, 1.0, 0.8],
-        missile: [1.0, 1.0, 0.0, 1.0],
-        missileInview: [1.0, 0.0, 0.0, 1.0],
-        transparent: [1.0, 1.0, 1.0, 0.1],
-        satHi: [1.0, 1.0, 1.0, 1.0],
-        satMed: [1.0, 1.0, 1.0, 0.8],
-        satLow: [1.0, 1.0, 1.0, 0.6],
-        sunlightInview: [0.85, 0.5, 0.0, 1.0],
-        penumbral: [1.0, 1.0, 1.0, 0.3],
-        umbral: [1.0, 1.0, 1.0, 0.1],
-        /*
-         * DEBUG Colors
-         * sunlight = [0.2, 0.4, 1.0, 1]
-         * penumbral = [0.5, 0.5, 0.5, 0.85]
-         * umbral = [0.2, 1.0, 0.0, 0.5]
-         */
-        gradientAmt: 0,
-        /*
-         * Gradients Must be Edited in color-scheme.js
-         * apogeeGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
-         * velGradient = [1.0 - this.colors.gradientAmt, this.colors.gradientAmt, 0.0, 1.0]
-         */
-        satSmall: [0.2, 1.0, 0.0, 0.65],
-        confidenceHi: [0.0, 1.0, 0.0, 0.65],
-        confidenceMed: [1.0, 0.4, 0.0, 0.65],
-        confidenceLow: [1.0, 0.0, 0.0, 0.65],
-        rcsXXSmall: [1.0, 0, 0, 0.6],
-        rcsXSmall: [1.0, 0.2, 0, 0.6],
-        rcsSmall: [1.0, 0.4, 0, 0.6],
-        rcsMed: [0.2, 0.4, 1.0, 1],
-        rcsLarge: [0, 1.0, 0, 0.6],
-        rcsUnknown: [1.0, 1.0, 0, 0.6],
-        lostobjects: [1, 0, 0, 0.8],
-        inGroup: [1.0, 0.0, 0.0, 1.0],
-        countryPRC: [1.0, 0, 0, 0.6],
-        countryUS: [0.2, 0.4, 1.0, 1],
-        countryCIS: [1.0, 1.0, 1.0, 1.0],
-        countryOther: [0, 1.0, 0, 0.6],
-        densityPayload: [0.15, 0.7, 0.8, 1.0],
-        spatialDensityHi: [1, 0, 0, 1],
-        spatialDensityMed: [1, 0.4, 0, 1],
-        spatialDensityLow: [1, 1, 0, 0.9],
-        spatialDensityOther: [0.8, 0.8, 0.8, 0.3],
-        notional: [1, 0, 0, 0.8],
-        starlink: [0.0, 0.8, 0.0, 0.8],
-        starlinkNot: [0.8, 0.0, 0.0, 0.8],
-      };
+    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.6') {
+      this.colors = defaultColorSettings;
 
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));
     }
@@ -1412,21 +1281,7 @@ export class SettingsManager {
    * @returns An array of query string parameters.
    */
   private loadOverridesFromUrl_() {
-    const queryStr = window.location.search.substring(1);
-
-    // URI Encode all %22 to ensure url is not broken
-    const params = queryStr
-      .split('%22')
-      .map((item, index) => {
-        if (index % 2 === 0) {
-          return item;
-        }
-
-        return encodeURIComponent(item);
-
-      })
-      .join('')
-      .split('&');
+    const params = UrlManager.getParams();
 
     const plugins = this.plugins;
 
@@ -1458,211 +1313,6 @@ export class SettingsManager {
   }
 
   /**
-   * This is an initial parse of the GET variables to determine
-   * critical settings. Other variables are checked later during catalogManagerInstance.init
-   */
-  // eslint-disable-next-line complexity
-  private initParseFromGETVariables_(params: string[]) {
-    if (!this.disableUI) {
-      for (const param of params) {
-        const key = param.split('=')[0];
-        const val = param.split('=')[1];
-
-        switch (key) {
-          case 'preset':
-            switch (val) {
-              case 'ops-center':
-                SettingsPresets.loadPresetOpsCenter(this);
-                break;
-              case 'education':
-                SettingsPresets.loadPresetEducation(this);
-                break;
-              case 'outreach':
-                SettingsPresets.loadPresetOutreach(this);
-                break;
-              case 'debris':
-                SettingsPresets.loadPresetDebris(this);
-                break;
-              case 'dark-clouds':
-                darkClouds(settingsManager);
-                break;
-              case 'startalk':
-                starTalk(settingsManager);
-                break;
-              case 'sateliot':
-                sateliot(settingsManager);
-                break;
-              case 'million-year':
-                SettingsPresets.loadPresetMillionYear(this);
-                break;
-              case 'million-year2':
-                SettingsPresets.loadPresetMillionYear2(this);
-                break;
-              case 'facsat2':
-                SettingsPresets.loadPresetFacSat2(this);
-                break;
-              case 'altitudes':
-                SettingsPresets.loadPresetAltitudes_(this);
-                break;
-              case 'starlink':
-                SettingsPresets.loadPresetStarlink(this);
-                break;
-              default:
-                break;
-            }
-            break;
-          case 'external-only':
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'gp':
-            this.dataSources.tle = decodeURIComponent(val);
-            break;
-          case 'tle':
-            // Decode from UTF-8
-            this.dataSources.externalTLEs = decodeURIComponent(val);
-            break;
-          case 'jsc':
-            this.isEnableJscCatalog = val === 'true';
-            break;
-          case 'sat':
-            keepTrackApi.register({
-              event: KeepTrackApiEvents.onCruncherReady,
-              cbName: 'satFromSettings',
-              cb: () => {
-                setTimeout(() => {
-                  if (typeof val === 'string') {
-                    const sccNum = parseInt(val);
-
-                    if (sccNum >= 0) {
-                      const id = keepTrackApi.getCatalogManager().sccNum2Id(sccNum.toString().padStart(5, '0'));
-
-                      if (id && id >= 0) {
-                        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
-                      } else {
-                        keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
-                      }
-                    } else {
-                      keepTrackApi.getUiManager().toast(`Invalid Satellite: ${val}`, ToastMsgType.error);
-                    }
-                  }
-                }, 2000);
-              },
-            });
-            break;
-          case 'debug':
-            this.plugins.debug = true;
-            break;
-          case 'nomarkers':
-            this.maxFieldOfViewMarkers = 1;
-            break;
-          case 'noorbits':
-            this.isDrawOrbits = false;
-            break;
-          case 'searchLimit':
-            if (parseInt(val) > 0) {
-              this.searchLimit = parseInt(val);
-            } else {
-              keepTrackApi.getUiManager().toast(`Invalid search limit: ${val}`, ToastMsgType.error);
-            }
-            break;
-          case 'console':
-            this.isEnableConsole = true;
-            break;
-          case 'godrays':
-            this.godraysSamples = GetVariables.godrays(val);
-            break;
-          case 'smallImages':
-            this.smallImages = true;
-            break;
-          case 'lowperf':
-            this.isShowSplashScreen = false;
-            this.isDrawMilkyWay = false;
-            this.isDrawLess = true;
-            this.zFar = 250000.0;
-            this.noMeshManager = true;
-            this.maxFieldOfViewMarkers = 1;
-            this.smallImages = true;
-            break;
-          case 'hires':
-            this.earthNumLatSegs = 128;
-            this.earthNumLonSegs = 128;
-            break;
-          case 'nostars':
-            this.isDisableStars = true;
-            this.isDrawMilkyWay = false;
-            break;
-          case 'draw-less':
-            this.isDrawMilkyWay = false;
-            this.isDrawLess = true;
-            this.zFar = 250000.0;
-            this.noMeshManager = true;
-            break;
-          case 'draw-more':
-            this.isDrawLess = false;
-            this.noMeshManager = false;
-            this.smallImages = false;
-            this.isDrawMilkyWay = true;
-            break;
-          case 'hires-milky-way':
-            this.hiresMilkWay = true;
-            break;
-          case 'vec':
-            this.vectorImages = true;
-            break;
-          case 'political':
-            this.politicalImages = true;
-            break;
-          case 'offline':
-            this.offline = true;
-            this.dataSources.tle = '/tle/tle.json';
-            this.dataSources.vimpel = '/tle/vimpel.json';
-            break;
-          case 'notmtoast':
-            this.isDisableTimeMachineToasts = true;
-            break;
-          case 'cpo':
-            this.copyrightOveride = true;
-            break;
-          case 'logo':
-            this.isShowPrimaryLogo = true;
-            break;
-          case 'noPropRate':
-            this.isAlwaysHidePropRate = true;
-            break;
-          case 'supplement-data':
-            this.dataSources.isSupplementExternal = true;
-            break;
-          case 'latest-sats':
-            this.dataSources.tle = `https://api.keeptrack.space/v3/sats/latest/${val}`;
-            this.isEnableJscCatalog = false;
-            break;
-          case 'CATNR':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?CATNR=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'NAME':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?NAME=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'INTDES':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?INTDES=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'GROUP':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?GROUP=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          case 'SPECIAL':
-            this.dataSources.externalTLEs = `https://celestrak.org/NORAD/elements/gp.php?SPECIAL=${val}&FORMAT=3LE`;
-            this.dataSources.externalTLEsOnly = true;
-            break;
-          default:
-        }
-      }
-    }
-  }
-
-  /**
    * Load the previously saved map texture.
    */
   private loadLastMapTexture_() {
@@ -1673,51 +1323,9 @@ export class SettingsManager {
     if (this.isLoadLastMap && !this.isDrawLess) {
       const lastMap = PersistenceManager.getInstance().getItem(StorageKey.LAST_MAP);
 
-      switch (lastMap) {
-        case 'blue':
-          this.blueImages = true;
-          break;
-        case 'nasa':
-          this.nasaImages = true;
-          break;
-        case 'low':
-          this.lowresImages = true;
-          break;
-        case 'brown':
-          this.brownEarthImages = true;
-          break;
-        case 'high':
-          this.hiresImages = true;
-          break;
-        case 'high-nc':
-          this.hiresNoCloudsImages = true;
-          break;
-        case 'vec':
-          this.vectorImages = true;
-          break;
-        case 'political':
-          this.politicalImages = true;
-          break;
-        // file deepcode ignore DuplicateCaseBody: The default image could change in the future
-        default:
-          this.lowresImages = true;
-          break;
+      if (lastMap) {
+        settingsManager.earthTextureStyle = lastMap as EarthTextureStyle;
       }
-    }
-
-    // Make sure there is some map loaded!
-    if (
-      !this.blueImages &&
-      !this.nasaImages &&
-      !this.lowresImages &&
-      !this.brownEarthImages &&
-      !this.hiresImages &&
-      !this.hiresNoCloudsImages &&
-      !this.vectorImages &&
-      !this.politicalImages &&
-      !this.smallImages
-    ) {
-      this.lowresImages = true;
     }
   }
 
@@ -1740,25 +1348,8 @@ export class SettingsManager {
       this.enableHoverOrbits = true;
       this.isDrawLess = true;
       this.smallImages = true;
-      this.hiresNoCloudsImages = false;
       this.updateHoverDelayLimitSmall = 25;
       this.updateHoverDelayLimitBig = 45;
-    }
-  }
-
-  /**
-   * Sets the mobile settings based on the current window width.
-   * If the window width is less than or equal to the desktop minimum width,
-   * mobile mode is enabled and certain settings are adjusted accordingly.
-   */
-  private setMobileSettings_() {
-    if (window.innerWidth <= this.desktopMinimumWidth) {
-      this.disableWindowTouchMove = false;
-      /*
-       * this.maxFieldOfViewMarkers = 20000;
-       * this.isDrawLess = true;
-       * this.noMeshManager = true;
-       */
     }
   }
 
@@ -1786,13 +1377,10 @@ export class SettingsManager {
     // override values in this with overrides
 
     for (const key of Object.keys(overrides)) {
-      if (key in this) {
-        if (key === 'colors' || key === 'plugins') {
-          // Merge the colors object
-          this[key] = { ...this[key], ...overrides[key] };
-        } else {
-          this[key] = overrides[key];
-        }
+      if (typeof overrides[key] === 'object' && overrides[key] !== null) {
+        this[key] = { ...this[key], ...overrides[key] };
+      } else {
+        this[key] = overrides[key];
       }
     }
   }

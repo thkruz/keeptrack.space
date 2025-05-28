@@ -160,10 +160,9 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);
         getEl('video-director-form')!.addEventListener('submit', VideoDirectorPlugin.onSubmit);
         getEl('video-director-rotate')!.addEventListener('click', () => {
@@ -171,7 +170,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
           keepTrackApi.getMainCamera().autoRotate(true);
         });
       },
-    });
+    );
   }
 
   private static onFormChange(e: Event) {

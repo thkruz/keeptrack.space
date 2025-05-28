@@ -25,11 +25,11 @@
 
 /* eslint-disable no-unreachable */
 
-import logoPrimaryPng from '@public/img/logo-primary.png';
-import logoSecondaryPng from '@public/img/logo-secondary.png';
+import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
 import earthJpg from '@public/img/wallpaper/Earth.jpg';
 import issJpg from '@public/img/wallpaper/iss.jpg';
+import moonJpg from '@public/img/wallpaper/moon.jpg';
 import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
 import rocketJpg from '@public/img/wallpaper/rocket.jpg';
 import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
@@ -63,7 +63,6 @@ import { ErrorManager, errorManagerInstance } from './singletons/errorManager';
 import { GroupsManager } from './singletons/groups-manager';
 import { HoverManager } from './singletons/hover-manager';
 import { InputManager } from './singletons/input-manager';
-import { mobileManager } from './singletons/mobileManager';
 import { OrbitManager } from './singletons/orbitManager';
 import { Scene } from './singletons/scene';
 import { TimeManager } from './singletons/time-manager';
@@ -78,9 +77,8 @@ import { SplashScreen } from './static/splash-screen';
 export class KeepTrack {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
   private static readonly splashScreenImgList_ =
-    [observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
+    [blueMarbleJpg, moonJpg, observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
 
-  private readonly isShowFPS = false;
   isReady = false;
   private isUpdateTimeThrottle_: boolean;
   private lastGameLoopTimestamp_ = <Milliseconds>0;
@@ -124,12 +122,6 @@ export class KeepTrack {
       import(/* webpackMode: "eager" */ '@css/loading-screen.css');
       KeepTrack.getDefaultBodyHtml();
       BottomMenu.init();
-
-      keepTrackApi.register({
-        event: KeepTrackApiEvents.uiManagerFinal,
-        cbName: 'addBottomMenuFilterButtons',
-        cb: () => BottomMenu.addBottomMenuFilterButtons(),
-      });
 
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
         KeepTrack.loadSplashScreen_();
@@ -237,19 +229,19 @@ export class KeepTrack {
     keepTrackApi.containerRoot.id = 'keeptrack-root';
     keepTrackApi.containerRoot.innerHTML += keepTrackApi.html`
       <header>
-        <div id="keeptrack-header"></div>
+        <div id="keeptrack-header" class="start-hidden"></div>
       </header>
       <main>
         <div id="rmb-wrapper"></div>
         <div id="canvas-holder">
         <div id="logo-primary" class="start-hidden">
             <a href="https://keeptrack.space" target="_blank">
-              <img src="${logoPrimaryPng}" alt="KeepTrack">
+              <img src="${settingsManager.installDirectory}img/logo-primary.png" alt="KeepTrack">
             </a>
           </div>
           <div id="logo-secondary" class="start-hidden">
             <a href="https://celestrak.org" target="_blank">
-              <img src="${logoSecondaryPng}" alt="Celestrak">
+              <img src="${settingsManager.installDirectory}img/logo-secondary.png" alt="Celestrak">
             </a>
           </div>
           <canvas id="keeptrack-canvas"></canvas>
@@ -463,7 +455,7 @@ theodore.kruczek at gmail dot com.
       this.demoManager.update();
     }
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.endOfDraw, dt);
+    keepTrackApi.emit(KeepTrackApiEvents.endOfDraw, dt);
   }
 
   async run(): Promise<void> {
@@ -476,6 +468,7 @@ theodore.kruczek at gmail dot com.
       const dotsManagerInstance = keepTrackApi.getDotsManager();
       const uiManagerInstance = keepTrackApi.getUiManager();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+      const inputManagerInstance = keepTrackApi.getInputManager();
 
       // Upodate the version number and date
       settingsManager.versionNumber = VERSION;
@@ -494,7 +487,6 @@ theodore.kruczek at gmail dot com.
       keepTrackApi.getMainCamera().init(settingsManager);
 
       SplashScreen.loadStr(SplashScreen.msg.science);
-      mobileManager.init();
 
       // Load all the plugins now that we have the API initialized
       await import('./plugins/plugins')
@@ -535,7 +527,7 @@ theodore.kruczek at gmail dot com.
 
       dotsManagerInstance.initBuffers(colorSchemeManagerInstance.colorBuffer!);
 
-      this.inputManager.init();
+      inputManagerInstance.init();
 
       await renderer.init(settingsManager);
       renderer.meshManager.init(renderer.gl);
@@ -559,7 +551,7 @@ theodore.kruczek at gmail dot com.
        * Create Container Div
        * NOTE: This needs to be done before uiManagerFinal
        */
-      if (settingsManager.plugins.debug) {
+      if (settingsManager.plugins.DebugMenuPlugin) {
         const uiWrapperDom = getEl('ui-wrapper');
 
         if (uiWrapperDom) {
@@ -568,9 +560,9 @@ theodore.kruczek at gmail dot com.
       }
 
       // Update any CSS now that we know what is loaded
-      keepTrackApi.runEvent(KeepTrackApiEvents.uiManagerFinal);
+      keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
 
-      if (settingsManager.plugins.debug) {
+      if (settingsManager.plugins.DebugMenuPlugin) {
         const erudaDom = getEl('eruda');
 
         if (erudaDom) {
@@ -607,12 +599,12 @@ theodore.kruczek at gmail dot com.
       }
 
       window.addEventListener('resize', () => {
-        keepTrackApi.runEvent(KeepTrackApiEvents.resize);
+        keepTrackApi.emit(KeepTrackApiEvents.resize);
       });
-      keepTrackApi.runEvent(KeepTrackApiEvents.resize);
+      keepTrackApi.emit(KeepTrackApiEvents.resize);
 
       keepTrackApi.isInitialized = true;
-      keepTrackApi.runEvent(KeepTrackApiEvents.onKeepTrackReady);
+      keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
       if (settingsManager.onLoadCb) {
         settingsManager.onLoadCb();
       }
@@ -631,11 +623,9 @@ theodore.kruczek at gmail dot com.
     renderer.dt = dt;
     renderer.dtAdjusted = <Milliseconds>(Math.min(renderer.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
 
-    // Display it if that settings is enabled
-    if (this.isShowFPS) {
-      // eslint-disable-next-line no-console
-      console.log(KeepTrack.getFps_(renderer.dt));
-    }
+    this.timeManager.update();
+
+    keepTrackApi.emit(KeepTrackApiEvents.update, dt);
 
     // Update official time for everyone else
     timeManagerInstance.setNow(<Milliseconds>Date.now());

@@ -1,10 +1,10 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { getDayOfYear, Milliseconds } from 'ootk';
-import { keepTrackApi } from '../keepTrackApi';
+import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
+import { InputEventType, keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { DateTimeManager } from '../plugins/date-time-manager/date-time-manager';
-import { UrlManager } from '../static/url-manager';
 import { errorManagerInstance } from './errorManager';
 
 export class TimeManager {
@@ -41,7 +41,7 @@ export class TimeManager {
   /**
    * The time offset ignoring propRate (ex. New Launch)
    */
-  staticOffset = 0;
+  staticOffset = settingsManager.staticOffset ?? 0;
   private simulationTimeSerialized_ = <string>null;
   timeTextStr = <string>null;
   /**
@@ -56,6 +56,8 @@ export class TimeManager {
    */
   private dynamicOffset_: number;
   isCreateClockDOMOnce_ = false;
+  gmst: GreenwichMeanSiderealTime = 0 as GreenwichMeanSiderealTime;
+  j: number;
 
   static currentEpoch(currentDate: Date): [string, string] {
     const currentDateObj = new Date(currentDate);
@@ -147,7 +149,7 @@ export class TimeManager {
       }
     }
 
-    UrlManager.updateURL();
+    keepTrackApi.emit(KeepTrackApiEvents.propRateChanged, this.propRate);
   }
 
   static isLeapYear(dateIn: Date) {
@@ -165,7 +167,7 @@ export class TimeManager {
     this.staticOffset = staticOffset;
     this.calculateSimulationTime();
     this.synchronize();
-    keepTrackApi.runEvent(KeepTrackApiEvents.staticOffsetChange, this.staticOffset);
+    keepTrackApi.emit(KeepTrackApiEvents.staticOffsetChange, this.staticOffset);
   }
 
   getOffsetTimeObj(offset: number) {
@@ -204,20 +206,23 @@ export class TimeManager {
     this.initializeKeyboardBindings_();
   }
 
-  private initializeKeyboardBindings_() {
-    const keyboardManager = keepTrackApi.getInputManager().keyboard;
+  update() {
+    const { gmst, j } = SatMath.calculateTimeVariables(this.simulationTimeObj);
 
-    keyboardManager.registerKeyEvent({
-      key: 't',
-      callback: () => {
+    this.gmst = gmst;
+    this.j = j;
+  }
+
+  private initializeKeyboardBindings_() {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 't' && !isRepeat) {
         keepTrackApi.getUiManager().toast('Time Set to Real Time', ToastMsgType.normal);
         this.changeStaticOffset(0); // Reset to Current Time
-      },
+      }
     });
 
-    keyboardManager.registerKeyDownEvent({
-      key: ',',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === ',' && !isRepeat) {
         this.calculateSimulationTime();
         let newPropRate = this.propRate;
 
@@ -242,12 +247,11 @@ export class TimeManager {
         } else {
           this.changePropRate(newPropRate);
         }
-      },
+      }
     });
 
-    keyboardManager.registerKeyDownEvent({
-      key: '.',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === '.' && !isRepeat) {
         this.calculateSimulationTime();
         let newPropRate = this.propRate;
 
@@ -272,30 +276,25 @@ export class TimeManager {
         } else {
           this.changePropRate(newPropRate);
         }
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: '<',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === '<' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountBig);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: '>',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === '>' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountBig);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: '/',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === '/' && !isRepeat) {
         let newPropRate: number;
 
         if (this.propRate === 1) {
@@ -312,25 +311,21 @@ export class TimeManager {
           this.changePropRate(newPropRate);
         }
         this.calculateSimulationTime();
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: 'Equal',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
+      if (code === 'Equal' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset + settingsManager.changeTimeWithKeyboardAmountSmall);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
+      }
     });
 
-    keyboardManager.registerKeyEvent({
-      key: 'Minus',
-      callback: () => {
+    keepTrackApi.on(InputEventType.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
+      if (code === 'Minus' && !isRepeat) {
         this.calculateSimulationTime();
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall);
-        keepTrackApi.runEvent(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
-      },
+      }
     });
   }
 
@@ -371,7 +366,7 @@ export class TimeManager {
     this.selectedDate = selectedDate;
 
     // This function only applies when datetime plugin is enabled
-    if (settingsManager.plugins.datetime) {
+    if (settingsManager.plugins.DateTimeManager) {
       if (this.lastTime - this.simulationTimeObj.getTime() < <Milliseconds>300) {
         this.simulationTimeSerialized_ = this.simulationTimeObj.toJSON();
         this.timeTextStr = this.timeTextStrEmpty_;
@@ -399,11 +394,6 @@ export class TimeManager {
 
       // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
       this.dateDOM.textContent = this.timeTextStr;
-
-      // Load the current JDAY
-      const jday = getDayOfYear(this.simulationTimeObj);
-
-      getEl('jday').innerHTML = jday.toString();
     }
 
     // Passing datetimeInput eliminates needing jQuery in main module
@@ -411,7 +401,7 @@ export class TimeManager {
       this.lastTime - this.simulationTimeObj.getTime() < 300 &&
       ((keepTrackApi.getPlugin(DateTimeManager))?.isEditTimeOpen || !settingsManager.cruncherReady || !keepTrackApi.getPlugin(DateTimeManager))
     ) {
-      if (settingsManager.plugins.datetime) {
+      if (settingsManager.plugins.DateTimeManager) {
         if (!this.datetimeInputDOM) {
           this.datetimeInputDOM = <HTMLInputElement>getEl('datetime-input-tb', true);
         }
@@ -425,6 +415,8 @@ export class TimeManager {
   synchronize() {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
+
+    keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
 
     const message = {
       typ: CruncerMessageTypes.OFFSET,
@@ -442,5 +434,49 @@ export class TimeManager {
     if (orbitManagerInstance.orbitWorker) {
       orbitManagerInstance.orbitWorker.postMessage(message);
     }
+  }
+
+  private isLeapYear(date: Date): boolean {
+    const year = date.getUTCFullYear();
+
+    if ((year & 3) !== 0) {
+      return false;
+    }
+
+    return year % 100 !== 0 || year % 400 === 0;
+  }
+
+  getUTCDayOfYear(doy: Date) {
+    const mn = doy.getUTCMonth();
+    const dn = doy.getUTCDate();
+    const dayCount = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    let dayInYear = 365;
+    let dayOfYear = dayCount[mn] + dn;
+
+    if (mn > 1 && this.isLeapYear(doy)) {
+      dayOfYear++;
+      dayInYear++;
+    }
+
+    return dayOfYear % dayInYear;
+  }
+
+  getUTCDateFromDayOfYear(year: number, dayOfYear: number): Date {
+    const isLeapYear = this.isLeapYear(this.createUTCDate(year, 0, 1));
+    const daysInMonth = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    let month = 0;
+
+    while (dayOfYear > daysInMonth[month]) {
+      dayOfYear -= daysInMonth[month];
+      month++;
+    }
+
+    return this.createUTCDate(year, month, dayOfYear);
+  }
+
+  private createUTCDate(year: number, month?: number, day?: number, hours?: number, minutes?: number, seconds?: number): Date {
+    const date = new Date(Date.UTC(year, month ?? 0, day ?? 1, hours ?? 0, minutes ?? 0, seconds ?? 0));
+
+    return date;
   }
 }

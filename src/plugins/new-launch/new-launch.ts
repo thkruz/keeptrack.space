@@ -49,96 +49,91 @@ export class NewLaunch extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4).padStart(8, '0');
   };
 
-  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = rocketLaunchPng;
   isRequireSatelliteSelected = true;
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   sideMenuElementName: string = 'newLaunch-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
-  <div id="newLaunch-menu" class="side-menu-parent start-hidden text-select">
-    <div id="newLaunch-content" class="side-menu">
-      <div class="row">
-        <h5 class="center-align">New Launch</h5>
-        <form id="${this.sideMenuElementName}-form" class="col s12">
-          <div class="input-field col s12">
-            <input disabled value="00005" id="nl-scc" type="text">
-            <label for="disabled" class="active">Satellite SCC#</label>
+  sideMenuElementHtml: string = (() => {
+    // Group launchSites by country
+    const grouped: { [country: string]: { key: string; name: string, site: string }[] } = {};
+
+    for (const [key, site] of Object.entries(launchSites)) {
+      const country = site.country || 'Other';
+
+      if (!grouped[country]) {
+        grouped[country] = [];
+      }
+      grouped[country].push({ key, name: site.name, site: site.site ?? 'Unknown Site' });
+    }
+
+    // Sort countries alphabetically, and sites by name
+    const countryKeys = Object.keys(grouped).sort();
+
+    for (const country of countryKeys) {
+      grouped[country].sort((a, b) => {
+        const siteCompare = a.site.localeCompare(b.site);
+
+        if (siteCompare !== 0) {
+          return siteCompare;
+        }
+
+        return a.name.localeCompare(b.name);
+      });
+    }
+
+    // Build the select options HTML
+    const optionsHtml = countryKeys.map((country) =>
+      `<optgroup label="${country}"> ${grouped[country]
+        .map((site) => `<option value="${site.key}">${site.name}<br/> - ${site.site}</option>`).join('\n')}
+      </optgroup>`,
+    ).join('\n');
+
+    return keepTrackApi.html`
+      <div id="newLaunch-menu" class="side-menu-parent start-hidden text-select">
+        <div id="newLaunch-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">New Launch</h5>
+            <form id="${this.sideMenuElementName}-form" class="col s12">
+              <div class="input-field col s12">
+                <input disabled value="00005" id="nl-scc" type="text">
+                <label for="disabled" class="active">Satellite SCC#</label>
+              </div>
+              <div class="input-field col s12">
+                <input disabled value="50.00" id="nl-inc" type="text">
+                <label for="disabled" class="active">Inclination</label>
+              </div>
+              <div class="input-field col s12">
+                <select value="50.00" id="nl-updown" type="text">
+                  <option value="N">North</option>
+                  <option value="S">South</option>
+                </select>
+                <label for="disabled">Launching North or South</label>
+              </div>
+              <div class="input-field col s12" id="nl-launch-menu">
+                <select id="nl-facility">
+                  ${optionsHtml}
+                </select>
+                <label>Launch Facility</label>
+              </div>
+              <div class="center-align">
+                <button
+                  id="${this.sideMenuElementName}-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Launch
+                  Nominal &#9658;
+                </button>
+              </div>
+            </form>
           </div>
-          <div class="input-field col s12">
-            <input disabled value="50.00" id="nl-inc" type="text">
-            <label for="disabled" class="active">Inclination</label>
-          </div>
-          <div class="input-field col s12">
-            <select value="50.00" id="nl-updown" type="text">
-              <option value="N">North</option>
-              <option value="S">South</option>
-            </select>
-            <label for="disabled">Launching North or South</label>
-          </div>
-          <div class="input-field col s12" id="nl-launch-menu">
-            <select id="nl-facility">
-              <optgroup label="United States">
-                <option value="CAS">Canary Island Air Space (Pegasus)</option>
-                <option value="AFETR">Cape Canaveral AFS | Kennedy Space Center</option>
-                <option value="ERAS">Eastern Range Air Space (Pegasus)</option>
-                <option value="KODAK">Kodiak Launch Complex</option>
-                <option value="KWAJ">Reagan Test Site</option>
-                <option value="AFWTR">Vandenberg AFB</option>
-                <option value="WLPIS">Wallops Flight Facility</option>
-                <option value="WRAS">Western Range Air Space (Pegasus)</option>
-              </optgroup>
-              <optgroup label="Russia">
-                <option value="KYMTR">Kasputin Yar MSC</option>
-                <option value="PKMTR">Plesetsk MSC</option>
-                <option value="SEAL">Sea Launch Platform</option>
-                <option value="SADOL">Submarine Launch, Barents Sea</option>
-                <option value="TTMTR">Tyuratam MSC | Baikonur Cosmodrome</option>
-                <option value="VOSTO">Vostochny Cosmodrome</option>
-                <option value="OREN">Yasny (Dombarovskiy) Cosmodrome</option>
-              </optgroup>
-              <optgroup label="China">
-                <option value="JSC">Jiuquan SLC</option>
-                <option value="TSC">Taiyuan SLC</option>
-                <option value="WSC">Wenchang SLC</option>
-                <option value="XSC">Xichang SLC</option>
-              </optgroup>
-              <optgroup label="Japan">
-                <option value="TNSTA">Tanegashima Space Center</option>
-                <option value="KSCUT">Uchinoura Space Center</option>
-              </optgroup>
-              <optgroup label="North Korea">
-                <option value="YUN">Sohae Satellite Launch Station</option>
-                <option value="TNGH">Tonghae Satellite Launching Ground</option>
-              </optgroup>
-              <optgroup label="Other">
-                <option value="FRGUI">Guiana Space Centre (Kourou FG)</option>
-                <option value="HGSTR">Hammaguira Space Track Range</option>
-                <option value="NSC">Naro Space Center</option>
-                <option value="YAVNE">Palmachim Air Force Base</option>
-                <option value="RLLC">Rocket Labs Launch Complex</option>
-                <option value="SNMLP">San Marco Launch Platform</option>
-                <option value="SRI">Satish Dhawan Space Centre (Sriharikota IN)</option>
-                <option value="SEM">Semnan Spaceport</option>
-                <option value="WOMRA">Woomera Test Range</option>
-              </optgroup>
-            </select>
-            <label>Launch Facility</label>
-          </div>
-          <div class="center-align">
-            <button
-            id="${this.sideMenuElementName}-submit" class="btn btn-ui waves-effect waves-light" type="submit" name="action">Create Launch
-              Nominal &#9658;
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
-    </div>
-  </div>
-  `;
+    `;
+  })();
 
   dragOptions: ClickDragOptions = {
+    minWidth: 400,
+    maxWidth: 600,
     isDraggable: true,
   };
 
@@ -193,16 +188,10 @@ export class NewLaunch extends KeepTrackPlugin {
     let launchLat: Degrees | null = null;
     let launchLon: Degrees | null = null;
 
-    if (catalogManagerInstance.isLaunchSiteManagerLoaded) {
-      for (const launchSite in catalogManagerInstance.launchSites) {
-        if (catalogManagerInstance.launchSites[launchSite].name === launchFac) {
-          launchLat = catalogManagerInstance.launchSites[launchSite].lat;
-          launchLon = catalogManagerInstance.launchSites[launchSite].lon;
-        }
-      }
-    } else {
-      throw new Error('Launch Site Manager not loaded!');
-    }
+    const launchSite = catalogManagerInstance.launchSites[launchFac];
+
+    launchLat = launchSite.lat;
+    launchLon = launchSite.lon;
 
     if (launchLat === null || launchLon === null) {
       uiManagerInstance.toast(`Launch Site ${launchFac} not found!`, ToastMsgType.critical);
@@ -260,9 +249,6 @@ export class NewLaunch extends KeepTrackPlugin {
       return;
     }
 
-    uiManagerInstance.toast('Time is now relative to launch time.', ToastMsgType.standby);
-    keepTrackApi.getSoundManager()?.play(SoundNames.LIFT_OFF);
-
     // Prevent caching of old TLEs
     sat.satrec = null as unknown as SatelliteRecord;
 
@@ -305,6 +291,9 @@ export class NewLaunch extends KeepTrackPlugin {
 
         uiManagerInstance.toast('Launch Nominal Created!', ToastMsgType.standby);
         uiManagerInstance.searchManager.doSearch(sat.sccNum);
+
+        uiManagerInstance.toast('Time is now relative to launch time.', ToastMsgType.standby);
+        keepTrackApi.getSoundManager()?.play(SoundNames.LIFT_OFF);
       },
       validationFunc: (data: PositionCruncherOutgoingMsg) => typeof data.satPos !== 'undefined',
       error: () => {
@@ -317,17 +306,16 @@ export class NewLaunch extends KeepTrackPlugin {
         hideLoading();
         uiManagerInstance.toast('Cruncher failed to meet requirement after multiple tries! Is this launch even possible?', ToastMsgType.critical);
       },
-      isSkipFirst: true,
+      skipNumber: 2,
       maxRetries: 50,
     });
   };
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.uiManagerFinal,
-      cbName: this.id,
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
         getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', () => {
           const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
@@ -337,12 +325,11 @@ export class NewLaunch extends KeepTrackPlugin {
           this.preValidate_(sat);
         });
       },
-    });
+    );
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.selectSatData,
-      cbName: this.id,
-      cb: (obj: BaseObject) => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.selectSatData,
+      (obj: BaseObject) => {
         if (obj?.isSatellite()) {
           const sat = obj as DetailedSatellite;
 
@@ -353,7 +340,7 @@ export class NewLaunch extends KeepTrackPlugin {
           this.setBottomIconToDisabled();
         }
       },
-    });
+    );
   }
 
   private preValidate_(sat: DetailedSatellite): void {

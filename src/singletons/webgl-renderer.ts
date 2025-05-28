@@ -8,7 +8,6 @@ import { GetSatType } from '../interfaces';
 import { getEl } from '../lib/get-el';
 import { SettingsManager } from '../settings/settings';
 import { isThisNode } from '../static/isThisNode';
-import { SatMath } from '../static/sat-math';
 import { Camera, CameraType } from './camera';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { MeshManager } from './draw-manager/mesh-manager';
@@ -27,7 +26,7 @@ export class WebGLRenderer {
   private satLabelModeLastTime_ = 0;
   private satMiniBox_: HTMLDivElement;
   private settings_: SettingsManager;
-  private isContextLost_ = false;
+  isContextLost = false;
 
   /** A canvas where the renderer draws its output. */
   domElement: HTMLCanvasElement;
@@ -47,7 +46,6 @@ export class WebGLRenderer {
    * Main source of glContext for rest of the application
    */
   gl: WebGL2RenderingContext;
-  gmst: GreenwichMeanSiderealTime;
   isDrawOrbitsAbove: boolean;
   isPostProcessingResizeNeeded: boolean;
   isShowDistance = false;
@@ -90,7 +88,7 @@ export class WebGLRenderer {
   private isAltCanvasSize_ = false;
 
   render(scene: Scene, camera: Camera): void {
-    if (this.isContextLost_) {
+    if (this.isContextLost) {
       return;
     }
 
@@ -121,13 +119,13 @@ export class WebGLRenderer {
   private onContextLost_(e: WebGLContextEvent) {
     e.preventDefault(); // allows the context to be restored
     errorManagerInstance.info('WebGL Context Lost');
-    this.isContextLost_ = true;
+    this.isContextLost = true;
   }
 
   private onContextRestore_() {
     errorManagerInstance.info('WebGL Context Restored');
     this.resetGLState_();
-    this.isContextLost_ = false;
+    this.isContextLost = false;
   }
 
   // eslint-disable-next-line require-await
@@ -139,10 +137,9 @@ export class WebGLRenderer {
       throw new Error('The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.');
     }
 
-    keepTrackApi.register({
-      event: KeepTrackApiEvents.resize,
-      cbName: 'webgl-Renderer',
-      cb: () => {
+    keepTrackApi.on(
+      KeepTrackApiEvents.resize,
+      () => {
         // Clear any existing resize timer
         clearTimeout(this.lastResizeTime);
 
@@ -155,7 +152,7 @@ export class WebGLRenderer {
           this.resizeCanvas();
         }, 100);
       },
-    });
+    );
 
     // Try to prevent crashes
     if (this.domElement?.addEventListener) {
@@ -200,7 +197,7 @@ export class WebGLRenderer {
     this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
 
     this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
-    keepTrackApi.getHoverManager().init();
+    keepTrackApi.getHoverManager()?.init();
     this.startWithOrbits();
 
     // Reinitialize the canvas on mobile rotation
@@ -208,7 +205,7 @@ export class WebGLRenderer {
       this.isRotationEvent_ = true;
     });
 
-    keepTrackApi.getScene().earth.reloadEarthHiResTextures();
+    keepTrackApi.getScene().earth.init();
   }
 
   /**
@@ -650,11 +647,7 @@ export class WebGLRenderer {
     this.updateSecondarySatellite_();
     keepTrackApi.getMainCamera().update(this.dt);
 
-    const { gmst, j } = SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj);
-
-    this.gmst = gmst;
-
-    keepTrackApi.getScene().update(timeManagerInstance.simulationTimeObj, gmst, j);
+    keepTrackApi.getScene().update(timeManagerInstance.simulationTimeObj);
 
     this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
 
@@ -666,7 +659,7 @@ export class WebGLRenderer {
      * ]);
      */
 
-    keepTrackApi.runEvent(KeepTrackApiEvents.updateLoop);
+    keepTrackApi.emit(KeepTrackApiEvents.updateLoop);
   }
 
   getCurrentViewport(target?: vec4): vec4 {
@@ -685,7 +678,6 @@ export class WebGLRenderer {
     return target;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   getPixelRatio(): number {
     return window.devicePixelRatio;
   }

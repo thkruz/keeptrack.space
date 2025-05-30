@@ -117,6 +117,7 @@ export class ConfigManager {
     this.config.loadingScreenCssPath = process.env.LOADING_SCREEN_CSS_PATH ?? envVars.LOADING_SCREEN_CSS_PATH ?? this.config.loadingScreenCssPath;
     this.config.primaryLogoPath = process.env.PRIMARY_LOGO_PATH ?? envVars.PRIMARY_LOGO_PATH ?? this.config.primaryLogoPath;
     this.config.secondaryLogoPath = process.env.SECONDARY_LOGO_PATH ?? envVars.SECONDARY_LOGO_PATH ?? this.config.secondaryLogoPath;
+    this.config.mode = (process.env.MODE ?? envVars.MODE ?? this.config.mode ?? 'development') as 'development' | 'production' | 'none';
 
     // Parse isPro as boolean
     const isPro = process.env.IS_PRO ?? envVars.IS_PRO;

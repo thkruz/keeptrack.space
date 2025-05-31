@@ -182,38 +182,37 @@ export class Godrays {
 
       // the texCoords passed in from the vertex shader.
       in vec2 v_texCoord;
-
       out vec4 fragColor;
 
-      // Gaussian blur function
-      vec4 blur(sampler2D tex, vec2 uv, vec2 resolution) {
+      // Gaussian blur function (5x5 kernel) with variable blur amount
+      vec4 blur(sampler2D tex, vec2 uv, vec2 resolution, float blurScale) {
         // Account for aspect ratio to prevent stretching
         float aspectRatio = resolution.x / resolution.y;
-        vec2 blurSize = vec2(1.15 / resolution.x, 1.15 / resolution.y);
+        // Scale the blur size by blurScale
+        vec2 blurSize = vec2(1.5 / resolution.x, 1.5 / resolution.y) * blurScale;
         vec4 sum = vec4(0.0);
         float totalWeight = 0.0;
 
-        // 9x9 kernel for strong blur
-        for (int x = -4; x <= 4; x++) {
-            for (int y = -4; y <= 4; y++) {
+        // 5x5 kernel for Gaussian blur
+        for (int x = -2; x <= 2; x++) {
+          for (int y = -2; y <= 2; y++) {
                 vec2 offset = vec2(float(x) * blurSize.x, float(y) * blurSize.y);
                 vec2 sampleCoord = clamp(uv + offset, 0.0, 1.0);
-                // Gaussian weight
                 float weight = exp(-dot(offset * vec2(1.0, aspectRatio), offset * vec2(1.0, aspectRatio)) * 0.5);
                 sum += texture(tex, sampleCoord) * weight;
                 totalWeight += weight;
             }
         }
 
-        return sum / totalWeight; // Normalize by actual total weight
+        return sum / totalWeight;
       }
 
       void main() {
         // Use uniforms if provided, otherwise use defaults
-        float decay = 0.983;          // Slightly less decay for more persistent rays
-        float exposure = 0.5;         // Increased exposure for brighter rays
-        float density = 1.8;         // Reduced density for smoother sampling
-        float weight = 0.085;         // Increased base weight
+        float decay = 0.983;
+        float exposure = 0.5;
+        float density = 1.8;
+        float weight = 0.085;
         float illuminationDecay = 2.7;
 
         // Override with uniforms if set
@@ -223,41 +222,59 @@ export class Godrays {
         if (u_weight > 0.0) weight = u_weight;
         if (u_illuminationDecay > 0.0) illuminationDecay = u_illuminationDecay;
 
-        vec2 lightPositionOnScreen = vec2(u_sunPosition.x,1.0 - u_sunPosition.y);
+        vec2 lightPositionOnScreen = vec2(u_sunPosition.x, 1.0 - u_sunPosition.y);
         vec2 texCoord = v_texCoord;
 
         // Calculate vector from pixel to light source
         vec2 deltaTexCoord = (texCoord - lightPositionOnScreen.xy);
 
-        // Distance from current pixel to light source
+        // Distance from current pixel to light source (0 to sqrt(2))
         float dist = length(deltaTexCoord);
 
-        // Apply tapering based on distance
-        // Hardcoding 1.0 / float(u_samples) * density where density is 1.05 and samples are 128
+        // Early out: if the sun is offscreen or too far, skip effect
+        if (lightPositionOnScreen.x < 0.0 || lightPositionOnScreen.x > 1.0 ||
+            lightPositionOnScreen.y < 0.0 || lightPositionOnScreen.y > 1.0 ||
+            dist > 1.5) {
+          fragColor = texture(u_sampler, v_texCoord);
+          return;
+        }
+
+        // Blur increases with distance, min 1.0, max 3.0 (tweak as needed)
+        float blurScale = mix(1.0, 3.0, clamp(dist / 1.4142, 0.0, 1.0));
+
         deltaTexCoord *= 1.0 / float(u_samples) * density;
 
-        // Apply initial blur to reduce pixelation
-        vec4 color = blur(u_sampler, texCoord.xy, u_resolution);
+        // Initial blur
+        vec4 color = blur(u_sampler, texCoord.xy, u_resolution, blurScale);
 
-        for(int i= 0; i <= u_samples ; i++)
-        {
-          // Calculate the current sampling coord
+        // Early out: if initial blur is almost black, skip further computation
+        if (color.a < 0.01 && color.r < 0.01 && color.g < 0.01 && color.b < 0.01) {
+          fragColor = color;
+          return;
+        }
+
+        for(int i = 0; i <= u_samples; i++) {
           texCoord -= deltaTexCoord;
 
-          // Break loop if off-screen
+          // Early out: if texCoord is out of bounds, break the loop
           if (texCoord.x < 0.0 || texCoord.x > 1.0 || texCoord.y < 0.0 || texCoord.y > 1.0) {
             break;
           }
 
-          // Sample the color with blur from the texture at this texCoord
-          vec4 sampleColor = blur(u_sampler, texCoord, u_resolution);
+          // Increase blur as we move away from the sun
+          float sampleDist = length(texCoord - lightPositionOnScreen.xy);
+          float sampleBlurScale = mix(1.0, 3.0, clamp(sampleDist / 1.4142, 0.0, 1.0));
 
-          // Apply the illumination decay factor
+          vec4 sampleColor = blur(u_sampler, texCoord, u_resolution, sampleBlurScale);
+
+          // Early out: if sampleColor is almost black, skip further computation
+          if (sampleColor.a < 0.01 && sampleColor.r < 0.01 && sampleColor.g < 0.01 && sampleColor.b < 0.01) {
+            break;
+          }
+
           sampleColor *= illuminationDecay * weight;
-
           // Accumulate the color
           color += sampleColor;
-
           // Update the illumination decay factor
           illuminationDecay *= decay;
         }

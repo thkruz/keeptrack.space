@@ -14,18 +14,47 @@ export class KeyboardInput {
     if (!settingsManager.disableUI) {
       // Listen for keyboard events on the parent window if in embed mode and inside an iframe
       if (window !== window.parent && settingsManager.isEmbedMode) {
-        window.parent.addEventListener('keydown', (e: Event) => {
+        // Listen for keyboard events sent from the parent via postMessage
+        window.addEventListener('message', (event: MessageEvent) => {
+          // Optionally, check event.origin here for security
+          if (!event.data || typeof event.data !== 'object') {
+            return;
+          }
           if (keepTrackApi.getUiManager().isCurrentlyTyping) {
             return;
           }
-          this.keyDownHandler_(<KeyboardEvent>e);
-        });
-        window.parent.addEventListener('keyup', (e: Event) => {
-          if (keepTrackApi.getUiManager().isCurrentlyTyping) {
-            return;
+
+          if (event.data.type === 'keydown') {
+            this.keyDownHandler_(event.data.event as KeyboardEvent);
+          } else if (event.data.type === 'keyup') {
+            this.keyUpHandler_(event.data.event as KeyboardEvent);
           }
-          this.keyUpHandler_(<KeyboardEvent>e);
         });
+        /**
+         * Example code for the parent window to post keyboard events to the iframe.
+         * This should be placed in the parent window's code, not here.
+         *
+         * window.addEventListener('keydown', (e) => {
+         *   iframe.contentWindow.postMessage({ type: 'keydown', event: {
+         *     key: e.key,
+         *     code: e.code,
+         *     shiftKey: e.shiftKey,
+         *     ctrlKey: e.ctrlKey,
+         *     altKey: e.altKey,
+         *     metaKey: e.metaKey
+         *   } }, '*');
+         * });
+         * window.addEventListener('keyup', (e) => {
+         *   iframe.contentWindow.postMessage({ type: 'keyup', event: {
+         *     key: e.key,
+         *     code: e.code,
+         *     shiftKey: e.shiftKey,
+         *     ctrlKey: e.ctrlKey,
+         *     altKey: e.altKey,
+         *     metaKey: e.metaKey
+         *   } }, '*');
+         * });
+         */
       }
 
       // Listen for keyboard events on the current window

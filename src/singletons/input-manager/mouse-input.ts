@@ -181,7 +181,6 @@ export class MouseInput {
   mouseMoveTimeout = -1;
   mouseSat = -1;
   touchSat: number;
-  private hideTimeout_: NodeJS.Timeout;
 
   constructor(keyboard: KeyboardInput) {
     this.keyboard_ = keyboard;
@@ -314,17 +313,13 @@ export class MouseInput {
       evt.preventDefault();
     }
 
-    // Use Fullscreen API to check if the container is in fullscreen mode (works in iframe)
-    const isInIframe = window.parent?.innerHeight !== window.innerHeight || window.parent?.innerWidth !== window.innerWidth;
-    const isCtrlPressed = keepTrackApi.getInputManager().keyboard.getKey('Control');
+    // Safer way to check if running inside an iframe
+    const isInIframe = window.self !== window.top;
 
-    if (isInIframe && !isCtrlPressed) {
+    if (isInIframe) {
       if (settingsManager.isEmbedMode) {
-        this.showZoomNotification_();
         evt.preventDefault();
       }
-
-      return;
     }
 
     let delta = evt.deltaY;
@@ -334,39 +329,6 @@ export class MouseInput {
     }
 
     keepTrackApi.getMainCamera().zoomWheel(delta);
-  }
-
-  private showZoomNotification_() {
-    let overlay = document.getElementById('zoom-overlay') as HTMLDivElement | null;
-
-    if (!overlay) {
-      overlay = document.createElement('div');
-      overlay.id = 'zoom-overlay';
-      overlay.innerText = 'Press Ctrl + Scroll to zoom';
-      Object.assign(overlay.style, {
-        position: 'absolute',
-        width: '50%',
-        top: '40%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        backgroundColor: 'rgba(60, 60, 60, 0.9)',
-        color: 'white',
-        padding: '8px 16px',
-        borderRadius: '4px',
-        fontSize: '2rem',
-        zIndex: '1000',
-        display: 'none',
-        pointerEvents: 'none',
-      });
-      keepTrackApi.containerRoot.appendChild(overlay);
-    }
-
-    overlay.style.display = 'block';
-
-    clearTimeout(this.hideTimeout_);
-    this.hideTimeout_ = setTimeout(() => {
-      overlay!.style.display = 'none';
-    }, 2000);
   }
 
   private rmbMenuActions_(e: MouseEvent) {

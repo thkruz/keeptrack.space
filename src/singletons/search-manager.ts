@@ -652,8 +652,10 @@ export class SearchManager {
       SatInfoBox.resetMenuLocation(satInfoboxDom, false);
     }
 
-    slideInDown(getEl('search-results')!, 1000);
-    this.isResultsOpen = true;
+    if (!settingsManager.isEmbedMode) {
+      slideInDown(getEl('search-results')!, 1000);
+      this.isResultsOpen = true;
+    }
 
     colorSchemeManagerInstance.isUseGroupColorScheme = true;
     colorSchemeManagerInstance.calculateColorBuffers(true);

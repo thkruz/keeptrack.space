@@ -294,7 +294,7 @@ export class MouseInput {
         }
       }
     }
-    // Force the serach bar to get repainted because it gets overwrote a lot
+    // Force the search bar to get repainted because it gets overwritten a lot
     this.dragHasMoved = false;
     keepTrackApi.getMainCamera().isDragging = false;
 

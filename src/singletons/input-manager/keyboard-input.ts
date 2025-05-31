@@ -6,14 +6,58 @@ export class KeyboardInput {
   keyUpEvents = <KeyEvent[]>[];
 
   init() {
-    if (settingsManager.isDisableKeyboard) {
-      return;
+    if (!settingsManager.isEmbedMode) {
+      window.addEventListener('blur', this.keyStates.clear.bind(this.keyStates));
+      window.addEventListener('focus', this.keyStates.clear.bind(this.keyStates));
     }
 
-    window.addEventListener('blur', this.keyStates.clear.bind(this.keyStates));
-    window.addEventListener('focus', this.keyStates.clear.bind(this.keyStates));
-
     if (!settingsManager.disableUI) {
+      // Listen for keyboard events on the parent window if in embed mode and inside an iframe
+      if (window !== window.parent && settingsManager.isEmbedMode) {
+        // Listen for keyboard events sent from the parent via postMessage
+        window.addEventListener('message', (event: MessageEvent) => {
+          // Optionally, check event.origin here for security
+          if (!event.data || typeof event.data !== 'object') {
+            return;
+          }
+          if (keepTrackApi.getUiManager().isCurrentlyTyping) {
+            return;
+          }
+
+          if (event.data.type === 'keydown') {
+            this.keyDownHandler_(event.data.event as KeyboardEvent);
+          } else if (event.data.type === 'keyup') {
+            this.keyUpHandler_(event.data.event as KeyboardEvent);
+          }
+        });
+        /**
+         * Example code for the parent window to post keyboard events to the iframe.
+         * This should be placed in the parent window's code, not here.
+         *
+         * window.addEventListener('keydown', (e) => {
+         *   iframe.contentWindow.postMessage({ type: 'keydown', event: {
+         *     key: e.key,
+         *     code: e.code,
+         *     shiftKey: e.shiftKey,
+         *     ctrlKey: e.ctrlKey,
+         *     altKey: e.altKey,
+         *     metaKey: e.metaKey
+         *   } }, '*');
+         * });
+         * window.addEventListener('keyup', (e) => {
+         *   iframe.contentWindow.postMessage({ type: 'keyup', event: {
+         *     key: e.key,
+         *     code: e.code,
+         *     shiftKey: e.shiftKey,
+         *     ctrlKey: e.ctrlKey,
+         *     altKey: e.altKey,
+         *     metaKey: e.metaKey
+         *   } }, '*');
+         * });
+         */
+      }
+
+      // Listen for keyboard events on the current window
       window.addEventListener('keydown', (e: Event) => {
         if (keepTrackApi.getUiManager().isCurrentlyTyping) {
           return;
@@ -44,6 +88,10 @@ export class KeyboardInput {
     const isCtrlPressed = this.keyStates.get('Control') ?? false;
 
     this.keyStates.set(key, false);
+
+    if (settingsManager.isDisableKeyboard) {
+      return;
+    }
 
     /*
      * Prevent default browser behavior for handled keys
@@ -80,6 +128,10 @@ export class KeyboardInput {
     const isCtrlPressed = this.keyStates.get('Control') ?? false;
 
     this.keyStates.set(key, true);
+
+    if (settingsManager.isDisableKeyboard) {
+      return;
+    }
 
     /*
      * Prevent default browser behavior for handled keys

@@ -1,5 +1,3 @@
-/* eslint-disable no-unreachable */
-// eslint-disable-next-line max-classes-per-file
 import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -10,6 +8,7 @@ import { Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
 import { lineManagerInstance } from '../draw-manager/line-manager';
+import { errorManagerInstance } from '../errorManager';
 import { InputManager, LatLon } from '../input-manager';
 import { KeyboardInput } from './keyboard-input';
 
@@ -18,171 +17,8 @@ export class MouseInput {
   private readonly keyboard_: KeyboardInput;
   private mouseTimeout = -1;
 
-  public canvasClick = null;
-  clickedSat = 0;
-  public dragPosition = [<Kilometers>0, <Kilometers>0, <Kilometers>0];
-  public isMouseMoving = false;
-  public isStartedOnCanvas = false;
-  public latLon: LatLon;
-  public mouseMoveTimeout = -1;
-  public mouseSat = -1;
-  touchSat: number;
-
-  constructor(keyboard: KeyboardInput) {
-    this.keyboard_ = keyboard;
-  }
-
-  public canvasMouseDown(evt: MouseEvent) {
-    if (settingsManager.disableNormalEvents) {
-      evt.preventDefault();
-    }
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-
-    this.isStartedOnCanvas = true;
-
-    if (evt.button === 2) {
-      this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-
-      const gmst = keepTrackApi.getTimeManager().gmst;
-
-      this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
-    }
-
-    if (evt.button === 0) {
-      if (settingsManager.isFreezePropRateOnDrag) {
-        timeManagerInstance.calculateSimulationTime();
-        timeManagerInstance.lastPropRate = timeManagerInstance.propRate * 1;
-        timeManagerInstance.changePropRate(0);
-      }
-    }
-
-    keepTrackApi.getInputManager().hidePopUps();
-
-    keepTrackApi.emit(KeepTrackApiEvents.canvasMouseDown, evt);
-  }
-
-  public static earthClicked({ clickedSatId }: { clickedSatId: number }) {
-    keepTrackApi.rmbMenuItems
-      .filter((item) => item.isRmbOnEarth || (item.isRmbOnSat && clickedSatId !== -1))
-      .sort((a, b) => a.order - b.order)
-      .forEach((item) => {
-        const dom = getEl(item.elementIdL1);
-
-        if (dom) {
-          dom.style.display = 'block';
-        }
-      });
-  }
-
-  public canvasMouseMove(evt: MouseEvent, mainCameraInstance: Camera): void {
-    if (this.mouseMoveTimeout === -1) {
-      this.mouseMoveTimeout = window.setTimeout(() => {
-        this.canvasMouseMoveFire(mainCameraInstance, evt);
-      }, 16);
-    }
-  }
-
-  public canvasMouseMoveFire(mainCameraInstance: Camera, evt: MouseEvent) {
-    mainCameraInstance.mouseX = evt.clientX - (keepTrackApi.containerRoot.scrollLeft - window.scrollX) - keepTrackApi.containerRoot.offsetLeft;
-    mainCameraInstance.mouseY = evt.clientY - (keepTrackApi.containerRoot.scrollTop - window.scrollY) - keepTrackApi.containerRoot.offsetTop;
-    if (
-      mainCameraInstance.isDragging &&
-      mainCameraInstance.screenDragPoint[0] !== mainCameraInstance.mouseX &&
-      mainCameraInstance.screenDragPoint[1] !== mainCameraInstance.mouseY
-    ) {
-      this.dragHasMoved = true;
-      mainCameraInstance.camAngleSnappedOnSat = false;
-    }
-    this.isMouseMoving = true;
-
-    // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
-    clearTimeout(this.mouseTimeout);
-    this.mouseTimeout = window.setTimeout(() => {
-      this.isMouseMoving = false;
-    }, 150);
-
-    // This is to prevent mousemove being called between drawframes (who cares if it has moved at that point)
-    window.clearTimeout(this.mouseMoveTimeout);
-    this.mouseMoveTimeout = -1;
-  }
-
-  public canvasMouseUp(evt: MouseEvent) {
-    if (settingsManager.disableNormalEvents) {
-      evt.preventDefault();
-    }
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-
-    if (!this.isStartedOnCanvas) {
-      return;
-    }
-    this.isStartedOnCanvas = false;
-
-    if (!this.dragHasMoved) {
-      /*
-       * if (settingsManager.isMobileModeEnabled) {
-       *   keepTrackApi.getMainCamera().mouseX = isNaN(keepTrackApi.getMainCamera().mouseX) ? 0 : keepTrackApi.getMainCamera().mouseX;
-       *   keepTrackApi.getMainCamera().mouseY = isNaN(keepTrackApi.getMainCamera().mouseY) ? 0 : keepTrackApi.getMainCamera().mouseY;
-       *   this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-       * }
-       */
-      this.clickedSat = this.mouseSat;
-      if (evt.button === 0) {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-        // Left Mouse Button Clicked
-        if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
-          if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY).isStatic()) {
-            keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
-          }
-        } else {
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
-        }
-      }
-      if (evt.button === 2) {
-        // Right Mouse Button Clicked
-        if (!this.keyboard_.getKey('Ctrl') && !this.keyboard_.getKey('Shift')) {
-          keepTrackApi.getInputManager().openRmbMenu(this.clickedSat);
-        }
-      }
-    }
-    // Force the serach bar to get repainted because it gets overwrote a lot
-    this.dragHasMoved = false;
-    keepTrackApi.getMainCamera().isDragging = false;
-
-    if (settingsManager.isFreezePropRateOnDrag) {
-      timeManagerInstance.calculateSimulationTime();
-      timeManagerInstance.changePropRate(timeManagerInstance.lastPropRate);
-    }
-
-    if (!settingsManager.disableUI) {
-      keepTrackApi.getMainCamera().autoRotate(false);
-    }
-  }
-
-  public static canvasWheel(evt: WheelEvent): void {
-    if (!settingsManager.disableUI && settingsManager.disableNormalEvents) {
-      evt.preventDefault();
-    }
-
-    const isFullScreen = keepTrackApi.containerRoot.clientWidth === window.innerWidth && keepTrackApi.containerRoot.clientHeight === window.innerHeight;
-    const isCtrlPressed = keepTrackApi.getInputManager().keyboard.getKey('Ctrl');
-    const isShiftPressed = keepTrackApi.getInputManager().keyboard.getKey('Shift');
-
-    if (!isFullScreen && !isCtrlPressed && !isShiftPressed) {
-      return;
-    }
-
-    let delta = evt.deltaY;
-
-    if (evt.deltaMode === 1) {
-      delta *= 33.3333333;
-    }
-
-    keepTrackApi.getMainCamera().zoomWheel(delta);
-  }
-
   init(canvasDOM: HTMLCanvasElement) {
-    const rightBtnMenuDOM = getEl('right-btn-menu');
+    const rightBtnMenuDOM = getEl('right-btn-menu')!;
     const satHoverBoxDOM = getEl('sat-hoverbox');
     const resetCameraDOM = getEl('reset-camera-rmb');
     const clearScreenDOM = getEl('clear-screen-rmb');
@@ -191,7 +27,7 @@ export class MouseInput {
 
     if (settingsManager.disableZoomControls || settingsManager.disableNormalEvents) {
       const stopWheelZoom = (event: Event) => {
-        if (this.keyboard_.getKey('Ctrl')) {
+        if (this.keyboard_.getKey('Control')) {
           event.preventDefault();
         }
       };
@@ -215,33 +51,25 @@ export class MouseInput {
 
     this.mouseMoveTimeout = -1;
     canvasDOM.addEventListener('mousemove', (e) => {
-      this.canvasMouseMove(e, keepTrackApi.getMainCamera());
+      this.canvasMouseMove_(e, keepTrackApi.getMainCamera());
       settingsManager.lastInteractionTime = Date.now();
     });
 
     if (!settingsManager.disableUI) {
       canvasDOM.addEventListener('wheel', (evt: WheelEvent) => {
-        MouseInput.canvasWheel(evt);
+        this.canvasWheel_(evt);
         settingsManager.lastInteractionTime = Date.now();
       });
 
-      this.canvasClick = (evt: MouseEvent) => {
-        if (settingsManager.disableNormalEvents) {
-          evt.preventDefault();
-        }
-        keepTrackApi.getInputManager().hidePopUps();
-        closeColorbox();
-      };
-
       if (!settingsManager.isMobileModeEnabled) {
         canvasDOM.addEventListener('click', (e: MouseEvent) => {
-          this.canvasClick(e);
+          this.canvasClick_(e);
         });
         canvasDOM.addEventListener('mousedown', (e: MouseEvent) => {
-          this.canvasMouseDown(e);
+          this.canvasMouseDown_(e);
         });
         canvasDOM.addEventListener('mouseup', (e: MouseEvent) => {
-          this.canvasMouseUp(e);
+          this.canvasMouseUp_(e);
         });
       }
 
@@ -255,13 +83,19 @@ export class MouseInput {
             if (el.style.display === 'none') {
               return;
             }
-            this.rmbMenuActions(e);
+            this.rmbMenuActions_(e);
           });
         });
 
       keepTrackApi.rmbMenuItems.forEach(({ elementIdL1, elementIdL2 }) => {
         const el1 = getEl(elementIdL1);
         const el2 = getEl(elementIdL2);
+
+        if (!el1 || !el2) {
+          errorManagerInstance.warn(`Missing elements for RMB menu: ${elementIdL1}, ${elementIdL2}`);
+
+          return;
+        }
 
         el1?.addEventListener('mouseenter', () => {
           InputManager.clearRMBSubMenu();
@@ -293,7 +127,7 @@ export class MouseInput {
         }
 
         // Right Mouse Button RMB
-        if (evt.button === 2 && (this.keyboard_.getKey('Shift') || this.keyboard_.getKey('Ctrl'))) {
+        if (evt.button === 2 && (this.keyboard_.getKey('Shift') || this.keyboard_.getKey('Control'))) {
           keepTrackApi.getMainCamera().panStartPosition = keepTrackApi.getMainCamera().panCurrent;
           if (this.keyboard_.getKey('Shift')) {
             keepTrackApi.getMainCamera().isScreenPan = false;
@@ -322,7 +156,9 @@ export class MouseInput {
 
     if (settingsManager.disableUI) {
       canvasDOM.addEventListener('wheel', () => {
-        satHoverBoxDOM.style.display = 'none';
+        if (satHoverBoxDOM) {
+          satHoverBoxDOM.style.display = 'none';
+        }
       });
     }
 
@@ -337,7 +173,165 @@ export class MouseInput {
     });
   }
 
-  public rmbMenuActions(e: MouseEvent) {
+  clickedSat = 0;
+  dragPosition = [<Kilometers>0, <Kilometers>0, <Kilometers>0];
+  isMouseMoving = false;
+  isStartedOnCanvas = false;
+  latLon: LatLon;
+  mouseMoveTimeout = -1;
+  mouseSat = -1;
+  touchSat: number;
+
+  constructor(keyboard: KeyboardInput) {
+    this.keyboard_ = keyboard;
+  }
+
+  private canvasMouseMove_(evt: MouseEvent, mainCameraInstance: Camera): void {
+    if (this.mouseMoveTimeout === -1) {
+      this.mouseMoveTimeout = window.setTimeout(() => {
+        this.canvasMouseMoveFire_(mainCameraInstance, evt);
+      }, 16);
+    }
+  }
+
+  private canvasMouseMoveFire_(mainCameraInstance: Camera, evt: MouseEvent) {
+    mainCameraInstance.mouseX = evt.clientX - (keepTrackApi.containerRoot.scrollLeft - window.scrollX) - keepTrackApi.containerRoot.offsetLeft;
+    mainCameraInstance.mouseY = evt.clientY - (keepTrackApi.containerRoot.scrollTop - window.scrollY) - keepTrackApi.containerRoot.offsetTop;
+    if (
+      mainCameraInstance.isDragging &&
+      mainCameraInstance.screenDragPoint[0] !== mainCameraInstance.mouseX &&
+      mainCameraInstance.screenDragPoint[1] !== mainCameraInstance.mouseY
+    ) {
+      this.dragHasMoved = true;
+      mainCameraInstance.camAngleSnappedOnSat = false;
+    }
+    this.isMouseMoving = true;
+
+    // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
+    clearTimeout(this.mouseTimeout);
+    this.mouseTimeout = window.setTimeout(() => {
+      this.isMouseMoving = false;
+    }, 150);
+
+    // This is to prevent mousemove being called between drawframes (who cares if it has moved at that point)
+    window.clearTimeout(this.mouseMoveTimeout);
+    this.mouseMoveTimeout = -1;
+  }
+
+  private canvasClick_(evt: MouseEvent) {
+    if (settingsManager.disableNormalEvents) {
+      evt.preventDefault();
+    }
+    keepTrackApi.getInputManager().hidePopUps();
+    closeColorbox();
+  }
+
+  private canvasMouseDown_(evt: MouseEvent) {
+    if (settingsManager.disableNormalEvents) {
+      evt.preventDefault();
+    }
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+
+    this.isStartedOnCanvas = true;
+
+    if (evt.button === 2) {
+      this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+
+      const gmst = keepTrackApi.getTimeManager().gmst;
+
+      this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
+    }
+
+    if (evt.button === 0) {
+      if (settingsManager.isFreezePropRateOnDrag) {
+        timeManagerInstance.calculateSimulationTime();
+        timeManagerInstance.lastPropRate = timeManagerInstance.propRate * 1;
+        timeManagerInstance.changePropRate(0);
+      }
+    }
+
+    keepTrackApi.getInputManager().hidePopUps();
+
+    keepTrackApi.emit(KeepTrackApiEvents.canvasMouseDown, evt);
+  }
+
+  private canvasMouseUp_(evt: MouseEvent) {
+    if (settingsManager.disableNormalEvents) {
+      evt.preventDefault();
+    }
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+
+    if (!this.isStartedOnCanvas) {
+      return;
+    }
+    this.isStartedOnCanvas = false;
+
+    if (!this.dragHasMoved) {
+      /*
+       * if (settingsManager.isMobileModeEnabled) {
+       *   keepTrackApi.getMainCamera().mouseX = isNaN(keepTrackApi.getMainCamera().mouseX) ? 0 : keepTrackApi.getMainCamera().mouseX;
+       *   keepTrackApi.getMainCamera().mouseY = isNaN(keepTrackApi.getMainCamera().mouseY) ? 0 : keepTrackApi.getMainCamera().mouseY;
+       *   this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+       * }
+       */
+      this.clickedSat = this.mouseSat;
+      if (evt.button === 0) {
+        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
+        // Left Mouse Button Clicked
+        if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
+          if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY)?.isStatic()) {
+            keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
+          }
+        } else {
+          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
+        }
+      }
+      if (evt.button === 2) {
+        // Right Mouse Button Clicked
+        if (!this.keyboard_.getKey('Control') && !this.keyboard_.getKey('Shift')) {
+          keepTrackApi.getInputManager().openRmbMenu(this.clickedSat);
+        }
+      }
+    }
+    // Force the search bar to get repainted because it gets overwritten a lot
+    this.dragHasMoved = false;
+    keepTrackApi.getMainCamera().isDragging = false;
+
+    if (settingsManager.isFreezePropRateOnDrag) {
+      timeManagerInstance.calculateSimulationTime();
+      timeManagerInstance.changePropRate(timeManagerInstance.lastPropRate);
+    }
+
+    if (!settingsManager.disableUI) {
+      keepTrackApi.getMainCamera().autoRotate(false);
+    }
+  }
+
+  private canvasWheel_(evt: WheelEvent): void {
+    if (!settingsManager.disableUI && settingsManager.disableNormalEvents) {
+      evt.preventDefault();
+    }
+
+    // Safer way to check if running inside an iframe
+    const isInIframe = window.self !== window.top;
+
+    if (isInIframe) {
+      if (settingsManager.isEmbedMode) {
+        evt.preventDefault();
+      }
+    }
+
+    let delta = evt.deltaY;
+
+    if (evt.deltaMode === 1) {
+      delta *= 33.3333333;
+    }
+
+    keepTrackApi.getMainCamera().zoomWheel(delta);
+  }
+
+  private rmbMenuActions_(e: MouseEvent) {
     // No Right Click Without UI
     if (settingsManager.disableUI) {
       return;
@@ -375,7 +369,7 @@ export class MouseInput {
         break;
       case 'clear-screen-rmb':
         if (keepTrackApi.getPlugin(TimeMachine)) {
-          keepTrackApi.getPlugin(TimeMachine).isTimeMachineRunning = false;
+          keepTrackApi.getPlugin(TimeMachine)!.isTimeMachineRunning = false;
         }
         uiManagerInstance.doSearch('');
         uiManagerInstance.searchManager.closeSearch();
@@ -392,7 +386,11 @@ export class MouseInput {
     }
     keepTrackApi.getSoundManager().play(SoundNames.CLICK);
 
-    getEl('right-btn-menu').style.display = 'none';
+    const rightButtonMenuElement = getEl('right-btn-menu');
+
+    if (rightButtonMenuElement) {
+      rightButtonMenuElement.style.display = 'none';
+    }
     InputManager.clearRMBSubMenu();
   }
 }

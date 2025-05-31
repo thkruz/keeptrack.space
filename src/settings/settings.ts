@@ -93,6 +93,7 @@ export class SettingsManager {
   /** The initial time offset */
   staticOffset: number = 0; // in seconds
   isDrawNightAsDay = false;
+  isEmbedMode = false;
 
 
   static preserveSettings() {

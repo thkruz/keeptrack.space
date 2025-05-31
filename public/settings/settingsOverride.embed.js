@@ -20,9 +20,7 @@
 // Settings Manager Overrides
 const settingsOverride = {
   /*
-   * This is an example of available settings that can be overridden.
-   * Uncomment any options you wish to change.
-   *
+   * These are the overrides for the embedded version.
    */
   plugins: {
     DebugMenuPlugin: {

@@ -329,6 +329,7 @@ const settingsOverride = {
   // earthPoliticalTextureQuality: '1k',
   isDrawPoliticalMap: false,
   earthTextureStyle: 'earthmap', // 'earthmap' or 'flat'
+  isEmbedMode: true,
 };
 
 // Expose these to the console

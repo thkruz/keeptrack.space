@@ -6,14 +6,29 @@ export class KeyboardInput {
   keyUpEvents = <KeyEvent[]>[];
 
   init() {
-    if (settingsManager.isDisableKeyboard) {
-      return;
+    if (!settingsManager.isEmbedMode) {
+      window.addEventListener('blur', this.keyStates.clear.bind(this.keyStates));
+      window.addEventListener('focus', this.keyStates.clear.bind(this.keyStates));
     }
 
-    window.addEventListener('blur', this.keyStates.clear.bind(this.keyStates));
-    window.addEventListener('focus', this.keyStates.clear.bind(this.keyStates));
-
     if (!settingsManager.disableUI) {
+      // Listen for keyboard events on the parent window if in embed mode and inside an iframe
+      if (window !== window.parent && settingsManager.isEmbedMode) {
+        window.parent.addEventListener('keydown', (e: Event) => {
+          if (keepTrackApi.getUiManager().isCurrentlyTyping) {
+            return;
+          }
+          this.keyDownHandler_(<KeyboardEvent>e);
+        });
+        window.parent.addEventListener('keyup', (e: Event) => {
+          if (keepTrackApi.getUiManager().isCurrentlyTyping) {
+            return;
+          }
+          this.keyUpHandler_(<KeyboardEvent>e);
+        });
+      }
+
+      // Listen for keyboard events on the current window
       window.addEventListener('keydown', (e: Event) => {
         if (keepTrackApi.getUiManager().isCurrentlyTyping) {
           return;
@@ -44,6 +59,10 @@ export class KeyboardInput {
     const isCtrlPressed = this.keyStates.get('Control') ?? false;
 
     this.keyStates.set(key, false);
+
+    if (settingsManager.isDisableKeyboard) {
+      return;
+    }
 
     /*
      * Prevent default browser behavior for handled keys
@@ -80,6 +99,10 @@ export class KeyboardInput {
     const isCtrlPressed = this.keyStates.get('Control') ?? false;
 
     this.keyStates.set(key, true);
+
+    if (settingsManager.isDisableKeyboard) {
+      return;
+    }
 
     /*
      * Prevent default browser behavior for handled keys

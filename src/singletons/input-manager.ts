@@ -357,7 +357,7 @@ export class InputManager {
     } else {
       // This is the Earth
       isEarth = true;
-      MouseInput.earthClicked({
+      InputManager.earthClicked({
         clickedSatId,
       });
     }
@@ -391,6 +391,19 @@ export class InputManager {
     rightBtnMenuDOM!.style.position = 'absolute';
     rightBtnMenuDOM!.style.left = `${mainCameraInstance.mouseX + offsetX}px`;
     rightBtnMenuDOM!.style.top = `${mainCameraInstance.mouseY + offsetY}px`;
+  }
+
+  static earthClicked({ clickedSatId }: { clickedSatId: number }) {
+    keepTrackApi.rmbMenuItems
+      .filter((item) => item.isRmbOnEarth || (item.isRmbOnSat && clickedSatId !== -1))
+      .sort((a, b) => a.order - b.order)
+      .forEach((item) => {
+        const dom = getEl(item.elementIdL1);
+
+        if (dom) {
+          dom.style.display = 'block';
+        }
+      });
   }
 
   /* istanbul ignore next */

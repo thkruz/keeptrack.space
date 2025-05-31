@@ -1,4 +1,4 @@
-![Latest Version](https://img.shields.io/badge/version-10.6.0-darkgreen?style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square) <img src="./public/img/textLogoLg.png" width='100%' alt="KeepTrack.Space" align="center">
+![Latest Version](https://img.shields.io/badge/version-10.6.0-darkgreen?style=flat-square) ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/thkruz/keeptrack.space?style=flat-square) ![language](https://img.shields.io/github/languages/top/thkruz/keeptrack.space?style=flat-square) ![Languages](https://img.shields.io/github/languages/count/thkruz/keeptrack.space?style=flat-square) ![GitHub issues](https://img.shields.io/github/issues/thkruz/keeptrack.space?style=flat-square) ![License](https://img.shields.io/github/license/thkruz/keeptrack.space?style=flat-square) <img src="./public/img/logo.png" width='100%' alt="KeepTrack.Space" align="center">
 
 # Table of Contents
 
@@ -76,7 +76,7 @@ The feature set rivals those of expensive toolkits, such as AGI's STK, and inclu
 
 # Installation
 
-KeepTrack is automatically deployed with the most-current version of the main branch to https://keeptrack.space via Cloudflare.
+KeepTrack is automatically deployed with the most-current version of the main branch to <https://keeptrack.space> via Cloudflare.
 
 ## Prerequisites
 
@@ -102,7 +102,7 @@ The main draw loop (drawManager.ts) has been optimized to reduce memory leaks an
 
 Any modifications to a satellite require that information to be passed to the positionCruncher webworker to ensure the UI calculations match the dot on the screen. Most calculations utilize a brute-force method of guess and check (lookangle times, missile trajectories, etc). Optimizing the loop for those calculations is critcal to keeping the project responsive. One trick to improve performance is that satSet creates a dictionary of index -> Norad ID number and index -> COSPAR number to allow rapid lookup of satellite data.
 
-There are Typescript files for generating TLE.json that are not included, but https://api.keeptrack.space/v2/sats can be referenced for an up-to-date catalog.
+There are Typescript files for generating TLE.json that are not included, but <https://api.keeptrack.space/v2/sats> can be referenced for an up-to-date catalog.
 
 # Release Notes
 

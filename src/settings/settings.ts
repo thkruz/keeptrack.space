@@ -94,6 +94,7 @@ export class SettingsManager {
   staticOffset: number = 0; // in seconds
   isDrawNightAsDay = false;
   isEmbedMode = false;
+  splashScreenList: string[] | null = null;
 
 
   static preserveSettings() {

@@ -25,21 +25,6 @@
 
 /* eslint-disable no-unreachable */
 
-import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
-import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
-import earthJpg from '@public/img/wallpaper/Earth.jpg';
-import issJpg from '@public/img/wallpaper/iss.jpg';
-import moonJpg from '@public/img/wallpaper/moon.jpg';
-import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
-import rocketJpg from '@public/img/wallpaper/rocket.jpg';
-import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
-import rocket3Jpg from '@public/img/wallpaper/rocket3.jpg';
-import rocket4Jpg from '@public/img/wallpaper/rocket4.jpg';
-import satJpg from '@public/img/wallpaper/sat.jpg';
-import sat2Jpg from '@public/img/wallpaper/sat2.jpg';
-import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
-import thuleJpg from '@public/img/wallpaper/thule.jpg';
-
 import 'material-icons/iconfont/material-icons.css';
 
 import eruda, { ErudaConsole } from 'eruda';
@@ -75,10 +60,6 @@ import { SensorMath } from './static/sensor-math';
 import { SplashScreen } from './static/splash-screen';
 
 export class KeepTrack {
-  /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
-  private static readonly splashScreenImgList_ =
-    [blueMarbleJpg, moonJpg, observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg];
-
   isReady = false;
   private isUpdateTimeThrottle_: boolean;
   private lastGameLoopTimestamp_ = <Milliseconds>0;
@@ -124,7 +105,7 @@ export class KeepTrack {
       BottomMenu.init();
 
       if (!isThisNode() && settingsManager.isShowSplashScreen) {
-        KeepTrack.loadSplashScreen_();
+        SplashScreen.loadImages();
       }
     }
 
@@ -363,31 +344,6 @@ export class KeepTrack {
     } catch (e) {
       // intentionally left blank
     }
-  }
-
-  /* istanbul ignore next */
-  private static loadSplashScreen_(): void {
-    // Randomly load a splash screen - not a vulnerability
-    const image = KeepTrack.splashScreenImgList_[Math.floor(Math.random() * KeepTrack.splashScreenImgList_.length)];
-    const loadingDom = getEl('loading-screen');
-
-    if (loadingDom) {
-      loadingDom.style.backgroundImage = `url(${image})`;
-      loadingDom.style.backgroundSize = 'cover';
-      loadingDom.style.backgroundPosition = 'center';
-      loadingDom.style.backgroundRepeat = 'no-repeat';
-    } else {
-      errorManagerInstance.debug('Failed to load splash screen');
-    }
-
-    // Preload the rest of the images after 30 seconds
-    setTimeout(() => {
-      KeepTrack.splashScreenImgList_.forEach((img) => {
-        const preloadImg = new Image();
-
-        preloadImg.src = img;
-      });
-    }, 30000);
   }
 
   private static printLogoToConsole_() {

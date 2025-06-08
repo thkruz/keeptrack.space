@@ -35,6 +35,7 @@ import { isThisNode } from '../static/isThisNode';
 import { defaultColorSettings } from './default-color-settings';
 import { defaultPlugins } from './default-plugins';
 import { parseGetVariables } from './parse-get-variables';
+import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 
 export class SettingsManager {
@@ -95,6 +96,7 @@ export class SettingsManager {
   isDrawNightAsDay = false;
   isEmbedMode = false;
   splashScreenList: string[] | null = null;
+  preset: string | null = null; // Used to force a preset to be loaded without GET variable
 
 
   static preserveSettings() {
@@ -1201,7 +1203,15 @@ export class SettingsManager {
       this.loadOverrides_(settingsOverride);
     }
 
-    if (!this.disableUI) {
+    if (settingsManager.preset) {
+      switch (settingsManager.preset) { // NOSONAR
+        case 'dark-clouds':
+          darkClouds(settingsManager);
+          break;
+        default:
+          break;
+      }
+    } else if (!this.disableUI) {
       parseGetVariables(params, this);
     }
     settingsManager.isBlockPersistence = UrlManager.parseGetVariables(this) || settingsManager.isBlockPersistence;

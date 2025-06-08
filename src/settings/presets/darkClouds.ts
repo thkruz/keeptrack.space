@@ -1,4 +1,7 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import i18next from 'i18next';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
@@ -12,13 +15,35 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   const DELAY_BEFORE_ROTATING = 1000; // ms - NOTE: Number should be at least 1000 or it will fail to fire the event
   const RESTART_ROTATE_TIME = 10; // Restart auto rotate after this many seconds
 
+  settingsManager.isBlockPersistence = true;
+
   settingsManager.disableAllPlugins();
   settingsManager.plugins.TimeMachine = { enabled: true };
   settingsManager.plugins.TopMenu = { enabled: false };
 
-  settingsManager.isDisableAsciiCatalog = true;
+  settingsManager.staticOffset = 1743509069000 - Date.now(); // Set to April 1, 2025
 
+  settingsManager.isEnableJscCatalog = false;
+
+  settingsManager.earthDayTextureQuality = '16k';
+  settingsManager.earthNightTextureQuality = '16k';
+  settingsManager.earthSpecTextureQuality = '8k';
+  settingsManager.earthBumpTextureQuality = '8k';
+  settingsManager.earthPoliticalTextureQuality = 'off';
+  settingsManager.earthCloudTextureQuality = '8k';
+
+  settingsManager.isEPFL = true; // Enable EPFL
+  settingsManager.isShowLoadingHints = false; // Disable Loading Hints
+
+  settingsManager.splashScreenList = ['epfl1', 'epfl2']; // Set Splash Screens to EPFL
+
+  keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+    hideEl('logo-primary');
+  });
+  settingsManager.isDisableAsciiCatalog = true;
+  settingsManager.defaultColorScheme = 'ObjectTypeColorScheme';
   settingsManager.isDisableStars = true;
+  settingsManager.isOrbitCruncherInEcf = false;
   settingsManager.maxAnalystSats = 1;
   settingsManager.maxMissiles = 1;
   settingsManager.maxFieldOfViewMarkers = 1;
@@ -73,18 +98,20 @@ export const darkClouds = (settingsManager: SettingsManager) => {
    */
   settingsManager.timeMachineString = (yearStr) => {
     keepTrackApi.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
+    const satellitesSpan = `<span style="color: rgb(35, 255, 35);">${t7e('darkClouds.satellites')}</span>`;
+    const debrisSpan = `<span style="color: rgb(255, 255, 35);">${t7e('darkClouds.debris')}</span>`;
     const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
-    const english = `In ${yearPrefix}${yearStr}`;
-    /*
-     * const french = `En ${yearPrefix}${yearStr}`;
-     * const german = `Im ${yearPrefix}${yearStr}`;
-     */
-    const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
-    const debrisSpan = '<span style="color: rgb(255, 255, 35);">Debris </span>';
+    let inYearString = `${t7e('darkClouds.in')} ${yearPrefix}${yearStr}`;
 
-    getEl('textOverlay')!.innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+    if (i18next.language === 'zh') {
+      // Chinese language uses a different format
+      inYearString = `${yearPrefix}${yearStr}${t7e('darkClouds.in')}`;
+      getEl('textOverlay')!.innerHTML = `${inYearString}${satellitesSpan}${t7e('darkClouds.and')}${debrisSpan}`;
+    } else {
+      getEl('textOverlay')!.innerHTML = `${satellitesSpan} ${t7e('darkClouds.and')} ${debrisSpan} ${inYearString}`;
+    }
 
-    return `${english}`;
+    return `${inYearString}`;
   };
 
   settingsManager.onLoadCb = () => {
@@ -151,7 +178,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
     settingsManager.lastInteractionTime = Date.now() - RESTART_ROTATE_TIME * 1000 + 1000;
     const allSatsGroup = keepTrackApi.getGroupsManager().createGroup(0, null); // All Satellites
 
-    setInnerHtml('textOverlay', 'Building Buffers');
+    setInnerHtml('textOverlay', t7e('darkClouds.buildingBuffers'));
 
     // Show All Orbits first to build buffers
     keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
@@ -189,7 +216,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
            * satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
            */
           setTimeout(() => {
-            setInnerHtml('textOverlay', 'Present Day');
+            setInnerHtml('textOverlay', t7e('darkClouds.presentDay'));
           }, 0);
         }
       }, 1000);

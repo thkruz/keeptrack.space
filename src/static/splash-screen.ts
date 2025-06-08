@@ -63,28 +63,9 @@ export abstract class SplashScreen {
         <div id="loading-hint">Hint: ${this.showHint()}</div>
         <div id="version-text">v10.5.2</div>
         <div id="copyright-notice">
-          ${settingsManager.isMobileModeEnabled ? t7e('loadingScreenMsgs.copyrightNoticeMobile') : t7e('loadingScreenMsgs.copyrightNotice')}
+          ${settingsManager.isMobileModeEnabled ? t7e('copyright.noticeMobile') : t7e('copyright.notice')}
         </div>
       </div>`;
-
-    // If this is the official website, update the copyright notice
-    const trustedDomains = ['keeptrack.space', 'www.keeptrack.space', 'app.keeptrack.space', 'embed.keeptrack.space'];
-
-    if (trustedDomains.includes(window.location.hostname)) {
-      const copyrightNotice = getEl('copyright-notice');
-
-      // TODO: Handle this better, elsewhere, and with other languages
-      if (copyrightNotice) {
-        copyrightNotice.innerHTML = copyrightNotice.innerHTML.replace(
-          ' No commercial license has been granted. No compensation has been provided to the rights holder.',
-          '',
-        );
-        copyrightNotice.innerHTML = copyrightNotice.innerHTML.replace(
-          '<br>No commercial license has been granted, and no compensation has been provided to the rights holder.',
-          '',
-        );
-      }
-    }
 
     if (!settingsManager.isShowLoadingHints) {
       hideEl('loading-hint');

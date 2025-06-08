@@ -77,6 +77,11 @@ class BuildManager {
         fileManager.copyFile(config.settingsPath, './dist/settings/settingsOverride.js', { force: true });
       }
 
+      if (config.isPro) {
+        // Merge locales files
+        fileManager.mergeLocales('src/locales', 'src/plugins-pro/locales');
+      }
+
       // Configure plugins
       pluginManager.configurePlugins(config.isPro);
 

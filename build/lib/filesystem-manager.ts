@@ -222,4 +222,68 @@ export class FileSystemManager {
 
     return resolve(this.rootDir, path);
   }
+
+  /**
+   * Merges locale files from the source and plugin directories into the destination directory.
+   * @param srcDir The source directory containing locale files.
+   * @param pluginDir The plugin directory containing additional locale files.
+   */
+  mergeLocales(srcDir: string, pluginDir: string) {
+    // Read locale files from the source directory
+    const srcLocales = readdirSync(this.resolvePath(srcDir), { withFileTypes: true })
+      .filter((file) => file.isFile() && file.name.endsWith('.src.json'))
+      .map((file) => file.name.replace(/\.src\.json$/u, '.json'));
+
+    // Read locale files from the plugin directory
+    const pluginLocales = readdirSync(this.resolvePath(pluginDir), { withFileTypes: true })
+      .filter((file) => file.isFile() && file.name.endsWith('.json'))
+      .map((file) => file.name);
+
+    // If a srcLocale file and pluginLocale file have the same name, merge them
+    srcLocales.forEach((locale) => {
+      if (pluginLocales.includes(locale)) {
+        const srcPath = this.resolvePath(`${srcDir}/${locale}`);
+        const pluginPath = this.resolvePath(`${pluginDir}/${locale}`);
+
+        // Merge the locale files
+        const mergedContent = this.mergeLocaleFiles(srcPath, pluginPath);
+
+        this.writeFile(srcPath, mergedContent);
+
+        console.log(`Merged and wrote locale file: ${locale} to ${srcPath}`);
+      } else {
+        console.log(`No matching plugin locale file for: ${locale}`);
+        // Just write the source locale file to the destination
+        const srcPath = this.resolvePath(`${srcDir}/${locale}`);
+        // Read the source file as .src.json even if srcPath is .json
+        const srcPathSrcJson = srcPath.replace(/\.json$/u, '.src.json');
+        const content = this.readFile(srcPathSrcJson);
+
+        this.writeFile(srcPath, content);
+        console.log(`Wrote source locale file: ${locale} to ${srcPath}`);
+      }
+    });
+  }
+
+  /**
+   * Merges two locale files into one.
+   * @param srcPath The path to the source locale file.
+   * @param pluginPath The path to the plugin locale file.
+   * @returns The merged content as a string.
+   */
+  mergeLocaleFiles(srcPath: string, pluginPath: string): string {
+    // Read the source file as .src.json even if srcPath is .json
+    const srcPathSrcJson = srcPath.replace(/\.json$/u, '.src.json');
+    const srcContent = this.readFile(srcPathSrcJson);
+    const pluginContent = this.readFile(pluginPath);
+
+    const srcJson = JSON.parse(srcContent);
+    const pluginJson = JSON.parse(pluginContent);
+
+    const mergedJson = { ...srcJson, ...pluginJson };
+
+    console.log(`Merged locale files: ${srcPath} + ${pluginPath}`);
+
+    return JSON.stringify(mergedJson, null, 2);
+  }
 }

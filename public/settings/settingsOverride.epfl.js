@@ -20,6 +20,10 @@
 // Settings Manager Overrides
 const settingsOverride = {
   preset: 'dark-clouds',
+  isDisableExtraCatalog: true,
+  dataSources: {
+    tle: '/tle/tle.json',
+  },
 };
 
 // Expose these to the console

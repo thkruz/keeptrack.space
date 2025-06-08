@@ -1,17 +1,17 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
+import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import i18next from 'i18next';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
-import { lat2pitch, lon2yaw } from '../../lib/transforms';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
 
 export const darkClouds = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>0; // NOTE: 0 will make the geosynchronous satellites more apparent
-  const DEFAULT_LONGITUDE = <Degrees>20;
+  const DEFAULT_LONGITUDE = <Degrees>121;
   const DELAY_BEFORE_ROTATING = 1000; // ms - NOTE: Number should be at least 1000 or it will fail to fire the event
   const RESTART_ROTATE_TIME = 10; // Restart auto rotate after this many seconds
 
@@ -21,7 +21,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   settingsManager.plugins.TimeMachine = { enabled: true };
   settingsManager.plugins.TopMenu = { enabled: false };
 
-  settingsManager.staticOffset = 1743509069000 - Date.now(); // Set to April 1, 2025
+  settingsManager.staticOffset = 1743483637000 - Date.now(); // Set to April 1, 2025
 
   settingsManager.isEnableJscCatalog = false;
 
@@ -31,6 +31,8 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   settingsManager.earthBumpTextureQuality = '8k';
   settingsManager.earthPoliticalTextureQuality = 'off';
   settingsManager.earthCloudTextureQuality = '8k';
+
+  settingsManager.disableCameraControls = true;
 
   settingsManager.isEPFL = true; // Enable EPFL
   settingsManager.isShowLoadingHints = false; // Disable Loading Hints
@@ -163,10 +165,12 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
     const startTimeMachine = () => {
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
+      keepTrackApi.getMainCamera().camPitch = lat2pitch(DEFAULT_LATITUDE);
+      keepTrackApi.getMainCamera().camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
+      keepTrackApi.getMainCamera().zoomLevel_ = 0.8;
+      keepTrackApi.getMainCamera().zoomTarget = 0.8;
       setTimeout(() => {
         (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
-        keepTrackApi.getMainCamera().zoomTarget = 0.8; // Reset Zoom to Default
-        keepTrackApi.getMainCamera().camSnap(lat2pitch(DEFAULT_LATITUDE), lon2yaw(DEFAULT_LONGITUDE, new Date())); // Reset Camera to Default
       }, 100);
       setTimeout(() => {
         keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false; // Disable Camera Snap Mode

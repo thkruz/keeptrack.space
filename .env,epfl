@@ -1,0 +1,6 @@
+# .env file for epfl dark clouds exhibit
+
+# Path to the settings TypeScript file
+SETTINGS_PATH=public/settings/settingsOverride.epfl.js
+MODE=development
+IS_PRO=true

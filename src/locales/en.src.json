@@ -100,9 +100,11 @@
     "coloring": "Coloring Inside the Lines..",
     "elsets": "Locating GPs...",
     "models": "Building 3D Models...",
-    "cunningPlan": "Crafting a Cunning Plan...",
-    "copyrightNotice": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible.<br>No commercial license has been granted, and no compensation has been provided to the rights holder.<br>Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.",
-    "copyrightNoticeMobile": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible. No commercial license has been granted. No compensation has been provided to the rights holder. Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms."
+    "cunningPlan": "Crafting a Cunning Plan..."
+  },
+  "copyright": {
+    "notice": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible.<br>No commercial license has been granted, and no compensation has been provided to the rights holder.<br>Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.",
+    "noticeMobile": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible. No commercial license has been granted. No compensation has been provided to the rights holder. Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms."
   },
   "splashScreens": {
     "1": "Satellite models appear bigger than they really are. Everything else is to scale.",

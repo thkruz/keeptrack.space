@@ -188,6 +188,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 400,
   },
+  ManeuverPlugin: {
+    enabled: true,
+    order: 409,
+  },
   InitialOrbitDeterminationPlugin: {
     enabled: false,
     order: 410,

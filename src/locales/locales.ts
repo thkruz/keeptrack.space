@@ -327,6 +327,11 @@ export const loadLocalization = () => ({
       title: t7e('plugins.GraphicsMenuPlugin.title'),
       helpBody: t7e('plugins.GraphicsMenuPlugin.helpBody'),
     },
+    ManeuverPlugin: {
+      bottomIconLabel: t7e('plugins.ManeuverPlugin.bottomIconLabel'),
+      title: t7e('plugins.ManeuverPlugin.title'),
+      helpBody: t7e('plugins.ManeuverPlugin.helpBody'),
+    },
   },
 });
 

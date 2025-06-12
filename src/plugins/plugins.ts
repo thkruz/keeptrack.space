@@ -150,6 +150,13 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new AnalysisMenu().init(), config: plugins.AnalysisMenu },
       {
         init: () => (async () => {
+          const proPlugin = await import('../plugins-pro/maneuver/maneuver');
+
+          new proPlugin.ManeuverPlugin().init();
+        })(), config: plugins.ManeuverPlugin,
+      },
+      {
+        init: () => (async () => {
           const proPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
 
           new proPlugin.InitialOrbitDeterminationPlugin().init();

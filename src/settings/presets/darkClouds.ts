@@ -3,7 +3,7 @@ import { lat2pitch, lon2yaw } from '@app/lib/transforms';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import i18next from 'i18next';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import { Degrees, Kilometers, Milliseconds, Radians } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
@@ -140,15 +140,15 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
     getEl('textOverlay')!.style.cssText = `
                     border-radius: 2px;
-                    bottom: 125px;
-                    right: 150px;
+                    bottom: 25px;
+                    right: 30px;
                     width: auto;
                     position: absolute;
-                    min-height: 48px;
-                    line-height: 2.5em !important;
+                    min-height: 36px;
+                    line-height: 2em !important;
                     background-color: rgb(0, 0, 0) !important;
-                    padding: 10px 55px !important;
-                    font-size: 3.6rem !important;
+                    padding: 7px 40px !important;
+                    font-size: 2.5rem !important;
                     font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
                     font-weight: 300;
                     color: white;
@@ -165,16 +165,23 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
     const startTimeMachine = () => {
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
-      keepTrackApi.getMainCamera().camPitch = lat2pitch(DEFAULT_LATITUDE);
-      keepTrackApi.getMainCamera().camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
-      keepTrackApi.getMainCamera().zoomLevel_ = 0.8;
-      keepTrackApi.getMainCamera().zoomTarget = 0.8;
+      const mainCameraInstance = keepTrackApi.getMainCamera();
+
+      mainCameraInstance.camPitch = lat2pitch(DEFAULT_LATITUDE);
+      mainCameraInstance.camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
+      mainCameraInstance.dragStartPitch = 0.06321641675916885 as Radians;
+      mainCameraInstance.dragStartYaw = 2.244571612554059 as Radians;
+      mainCameraInstance.zoomLevel_ = 0.8;
+      mainCameraInstance.zoomTarget = 0.8;
+
+      mainCameraInstance.screenDragPoint = [mainCameraInstance.mouseX, mainCameraInstance.mouseY];
+
       setTimeout(() => {
         (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
       }, 100);
       setTimeout(() => {
-        keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
-        keepTrackApi.getMainCamera().autoRotate(true); // Start Rotating Camera
+        mainCameraInstance.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
+        mainCameraInstance.autoRotate(true); // Start Rotating Camera
       }, DELAY_BEFORE_ROTATING);
     };
 

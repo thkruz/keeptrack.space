@@ -15,6 +15,14 @@ export const launchSites = {
     wikiUrl: 'https://en.wikipedia.org/wiki/Dombarovsky_(air_base)',
     // NOTES: Dnepr launch site. Unused since 2015. Multiple silos and launch pads.
   },
+  'ALEUT-SPIN': {
+    name: 'SpinLaunch Launch Site (Planned)',
+    lat: 51.78,
+    lon: -176.64,
+    site: 'Adak Island',
+    country: 'United States',
+    wikiUrl: 'https://www.akbizmag.com/industry/alaska-native/aleut-partners-with-spinlaunch-to-build-space-catapult-on-adak-island/',
+  },
   'FRGUI-ELV': {
     name: 'Vega Launch Complex',
     lat: 5.236,

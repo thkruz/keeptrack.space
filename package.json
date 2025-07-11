@@ -97,7 +97,7 @@
     "@types/file-saver": "^2.0.7",
     "@types/jest": "^29.5.5",
     "@types/materialize-css": "^1.0.11",
-    "@types/node": "^20.7.0",
+    "@types/node": "^24.0.13",
     "@types/numeric": "^1.2.2",
     "@types/papaparse": "^5.3.14",
     "@types/webgl2": "^0.0.11",

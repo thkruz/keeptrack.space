@@ -240,6 +240,11 @@
       "title": "Collisions Menu",
       "helpBody": "The Collisions Menu shows satellites with a high probability of collision. <br><br> Clicking on a row will select the two satellites involved in the collision and change the time to the time of the collision."
     },
+    "ManeuverDetection": {
+      "bottomIconLabel": "Maneuver Detection",
+      "title": "Maneuver Detection Menu",
+      "helpBody": "The Maneuver Detection menu displays the latest maneuver detection messages for satellites."
+    },
     "TrackingImpactPredict": {
       "bottomIconLabel": "Reentry Prediction",
       "title": "Tracking and Impact Prediction Menu",

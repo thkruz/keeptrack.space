@@ -97,9 +97,13 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 90,
   },
-  TrackingImpactPredict: {
+  ManeuverDetection: {
     enabled: true,
     order: 91,
+  },
+  TrackingImpactPredict: {
+    enabled: true,
+    order: 92,
   },
   StereoMap: {
     enabled: true,

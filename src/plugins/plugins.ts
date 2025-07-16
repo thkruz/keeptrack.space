@@ -30,6 +30,7 @@ import { GamepadPlugin } from './gamepad/gamepad';
 import { KeepTrackPluginsConfiguration } from './keeptrack-plugins-configuration';
 import { KeepTrackPlugin } from './KeepTrackPlugin';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
+import { ManeuverDetection } from './maneuver-detection/maneuver-detection';
 import { MissilePlugin } from './missile/missile-plugin';
 import { NewLaunch } from './new-launch/new-launch';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
@@ -113,6 +114,7 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new OrbitReferences().init(), config: plugins.OrbitReferences },
       { init: () => new Collisions().init(), config: plugins.Collisions },
       { init: () => new TrackingImpactPredict().init(), config: plugins.TrackingImpactPredict },
+      { init: () => new ManeuverDetection().init(), config: plugins.ManeuverDetection },
       { init: () => new Breakup().init(), config: plugins.Breakup },
       { init: () => new DebrisScreening().init(), config: plugins.DebrisScreening },
       { init: () => new TransponderChannelData().init(), config: plugins.transponderChannelData },

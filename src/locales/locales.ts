@@ -167,6 +167,11 @@ export const loadLocalization = () => ({
       title: t7e('plugins.TrackingImpactPredict.title'),
       helpBody: t7e('plugins.TrackingImpactPredict.helpBody'),
     },
+    ManeuverDetection: {
+      bottomIconLabel: t7e('plugins.ManeuverDetection.bottomIconLabel'),
+      title: t7e('plugins.ManeuverDetection.title'),
+      helpBody: t7e('plugins.ManeuverDetection.helpBody'),
+    },
     Breakup: {
       bottomIconLabel: t7e('plugins.Breakup.bottomIconLabel'),
       title: t7e('plugins.Breakup.title'),

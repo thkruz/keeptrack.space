@@ -35,6 +35,10 @@ export class WebGlProgramHelper {
     this.vertexShaderCode = vertexShaderCode;
     this.fragmentShaderCode = fragmentShaderCode;
 
+    if (this.gl_.isContextLost()) {
+      throw new Error('WebGL context is lost. Cannot create program.');
+    }
+
     this.vertexShader = WebGlProgramHelper.createVertexShader_(gl, vertexShaderCode);
     this.fragmentShader = WebGlProgramHelper.createFragmentShader_(gl, fragmentShaderCode);
 

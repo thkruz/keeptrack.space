@@ -43,7 +43,7 @@ export enum EarthDayTextureQuality {
 
 export enum EarthNightTextureQuality {
   POTATO = '512',
-  LOW = '1K',
+  LOW = '1k',
   MEDIUM = '2k',
   HIGH = '4k',
   ULTRA = '16k',
@@ -52,7 +52,7 @@ export enum EarthNightTextureQuality {
 export enum EarthSpecTextureQuality {
   OFF = 'off',
   POTATO = '512',
-  LOW = '1K',
+  LOW = '1k',
   MEDIUM = '2k',
   HIGH = '4k',
   ULTRA = '16k',
@@ -68,7 +68,7 @@ export enum EarthBumpTextureQuality {
 export enum EarthCloudTextureQuality {
   OFF = 'off',
   POTATO = '512',
-  LOW = '1K',
+  LOW = '1k',
   MEDIUM = '2k',
   HIGH = '4k',
   ULTRA = '8k',
@@ -76,7 +76,7 @@ export enum EarthCloudTextureQuality {
 
 export enum EarthPoliticalTextureQuality {
   OFF = 'off',
-  POTATO = '1K',
+  POTATO = '1k',
   LOW = '2K',
   MEDIUM = '4k',
   HIGH = '8k',
@@ -294,12 +294,12 @@ export class Earth {
     this.cloudPosition_ = this.cloudPosition_ > 8192 ? 0 : this.cloudPosition_; // Reset the cloud position when it reaches 8192 - the width of the texture
   }
 
-  private getSrc_(base: string, resolution: string, extension = 'jpg'): string {
+  private getSrc_(base: string, resolution: string | undefined, extension = 'jpg'): string {
     if (!settingsManager.installDirectory) {
       throw new Error('settingsManager.installDirectory is undefined');
     }
 
-    let src = `${settingsManager.installDirectory}textures/${base}${resolution}.${extension}`;
+    let src = `${settingsManager.installDirectory}textures/${base}${resolution ?? '1k'}.${extension}`;
 
     if (settingsManager.smallImages || settingsManager.isMobileModeEnabled) {
       src = `${settingsManager.installDirectory}textures/${base}512.${extension}`;

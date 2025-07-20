@@ -210,6 +210,10 @@ const settingsOverride = {
       enabled: false,
       order: 400,
     },
+    ManeuverPlugin: {
+      enabled: false,
+      order: 409,
+    },
     InitialOrbitDeterminationPlugin: {
       enabled: false,
       order: 410,
@@ -328,6 +332,7 @@ const settingsOverride = {
   isDrawPoliticalMap: false,
   earthTextureStyle: 'earthmap', // 'earthmap' or 'flat'
   isEmbedMode: true,
+  isDisableToasts: true,
 };
 
 // Expose these to the console

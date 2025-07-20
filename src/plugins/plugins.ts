@@ -75,7 +75,7 @@ import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 
 // Register all core modules
-export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPluginsConfiguration): void => {
+export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrackPluginsConfiguration): Promise<void> => {
   plugins ??= <KeepTrackPluginsConfiguration>{};
   try {
     const pluginList: { init: () => void | Promise<void>, config?: { enabled: boolean } }[] = [
@@ -196,7 +196,8 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
     for (const { init, config } of pluginList) {
       if (config?.enabled) {
         try {
-          init();
+          // eslint-disable-next-line no-await-in-loop
+          await init();
         } catch (e) {
           errorManagerInstance.warn(`Error loading plugin:${e.message}`);
         }

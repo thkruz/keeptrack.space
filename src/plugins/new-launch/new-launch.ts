@@ -10,6 +10,7 @@ import { SatMath } from '@app/static/sat-math';
 import { launchSites } from '@app/catalogs/launch-sites';
 import { t7e } from '@app/locales/keys';
 import { CatalogManager } from '@app/singletons/catalog-manager';
+import { LaunchSite } from '@app/singletons/catalog-manager/LaunchFacility';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
@@ -338,6 +339,35 @@ export class NewLaunch extends KeepTrackPlugin {
         }
       },
     );
+  }
+
+  selectLaunchSite(launchSite: LaunchSite): void {
+    // Find the key for the launch site in launchSites by matching the name
+    const launchSiteKey = Object.keys(launchSites).find((key) => {
+      const site = launchSites[key];
+
+
+      return site.name === launchSite.name && site.site === launchSite.site;
+    });
+
+    if (launchSiteKey) {
+      const launchSiteSelect = <HTMLSelectElement>getEl('nl-facility');
+
+      // Set the value of the launch site select element
+      launchSiteSelect.value = launchSiteKey;
+      // Trigger change event to update the UI
+      launchSiteSelect.dispatchEvent(new Event('change'));
+
+      if (launchSites[launchSiteKey].defaultDir) {
+        const launchSiteDropdown = <HTMLSelectElement>getEl('nl-updown');
+
+        launchSiteDropdown.value = launchSites[launchSiteKey].defaultDir;
+        launchSiteDropdown.name = launchSites[launchSiteKey].defaultDir === 'N' ? 'North' : 'South';
+        launchSiteDropdown.dispatchEvent(new Event('change'));
+      }
+    } else {
+      console.warn(`Launch site ${launchSite.name} not found in launchSites catalog.`);
+    }
   }
 
   private preValidate_(sat: DetailedSatellite): void {

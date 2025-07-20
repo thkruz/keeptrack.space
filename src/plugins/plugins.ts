@@ -78,15 +78,15 @@ import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPluginsConfiguration): void => {
   plugins ??= <KeepTrackPluginsConfiguration>{};
   try {
-    const pluginList: { init: () => void, config?: { enabled: boolean } }[] = [
+    const pluginList: { init: () => void | Promise<void>, config?: { enabled: boolean } }[] = [
       { init: () => new SelectSatManager().init(), config: { enabled: true } },
       { init: () => new TopMenu().init(), config: plugins.TopMenu },
       {
-        init: () => (async () => {
+        init: async () => {
           const proPlugin = await import('../plugins-pro/debug/debug');
 
           new proPlugin.DebugMenuPlugin().init();
-        })(), config: plugins.DebugMenuPlugin,
+        }, config: plugins.DebugMenuPlugin,
       },
       { init: () => new SatInfoBox().init(), config: plugins.SatInfoBox },
       { init: () => new DateTimeManager().init(), config: plugins.DateTimeManager },
@@ -124,18 +124,18 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new SatelliteFov().init(), config: plugins.SatelliteFov },
       { init: () => new StereoMap().init(), config: plugins.StereoMap },
       {
-        init: () => (async () => {
+        init: async () => {
           const proPlugin = await import('../plugins-pro/planetarium/planetarium');
 
           new proPlugin.Planetarium().init();
-        })(), config: plugins.Planetarium,
+        }, config: plugins.Planetarium,
       },
       {
-        init: () => (async () => {
+        init: async () => {
           const proPlugin = await import('../plugins-pro/astronomy/astronomy');
 
           new proPlugin.Astronomy().init();
-        })(), config: plugins.Astronomy,
+        }, config: plugins.Astronomy,
       },
       { init: () => new NightToggle().init(), config: plugins.NightToggle },
       { init: () => new DopsPlugin().init(), config: plugins.DopsPlugin },
@@ -149,18 +149,18 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new ScreenRecorder().init(), config: plugins.ScreenRecorder },
       { init: () => new AnalysisMenu().init(), config: plugins.AnalysisMenu },
       {
-        init: () => (async () => {
+        init: async () => {
           const proPlugin = await import('../plugins-pro/maneuver/maneuver');
 
           new proPlugin.ManeuverPlugin().init();
-        })(), config: plugins.ManeuverPlugin,
+        }, config: plugins.ManeuverPlugin,
       },
       {
-        init: () => (async () => {
+        init: async () => {
           const proPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
 
           new proPlugin.InitialOrbitDeterminationPlugin().init();
-        })(), config: plugins.InitialOrbitDeterminationPlugin,
+        }, config: plugins.InitialOrbitDeterminationPlugin,
       },
       { init: () => new Calculator().init(), config: plugins.Calculator },
       { init: () => new EciPlot().init(), config: plugins.EciPlot },
@@ -173,20 +173,20 @@ export const loadPlugins = (keepTrackApi: KeepTrackApi, plugins: KeepTrackPlugin
       { init: () => new FilterMenuPlugin().init(), config: plugins.FilterMenuPlugin },
       { init: () => new SettingsMenuPlugin().init(), config: plugins.SettingsMenuPlugin },
       {
-        init: () => (async () => {
+        init: async () => {
           const proPlugin = await import('../plugins-pro/graphics-menu/graphics-menu');
 
           new proPlugin.GraphicsMenuPlugin().init();
-        })(), config: plugins.GraphicsMenuPlugin,
+        }, config: plugins.GraphicsMenuPlugin,
       },
       { init: () => new GamepadPlugin().init(), config: plugins.GamepadPlugin },
       { init: () => new VideoDirectorPlugin().init(), config: plugins.VideoDirectorPlugin },
       {
-        init: () => (async () => {
+        init: async () => {
           const proPlugin = await import('../plugins-pro/about-menu/about-menu');
 
           new proPlugin.AboutMenuPlugin().init();
-        })(), config: plugins.AboutMenuPlugin,
+        }, config: plugins.AboutMenuPlugin,
       },
       { init: () => new EarthPresetsPlugin().init(), config: plugins.EarthPresetsPlugin },
       { init: () => new DrawLinesPlugin().init(), config: plugins.DrawLinesPlugin },

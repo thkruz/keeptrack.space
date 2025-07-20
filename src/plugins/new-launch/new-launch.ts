@@ -15,7 +15,7 @@ import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -252,17 +252,14 @@ export class NewLaunch extends KeepTrackPlugin {
     // Prevent caching of old TLEs
     sat.satrec = null as unknown as SatelliteRecord;
 
-    let satrec: SatelliteRecord;
-
     try {
-      satrec = Sgp4.createSatrec(tle1, tle2);
-      sat.satrec = satrec;
+      sat.editTle(tle1, tle2 as TleLine2);
     } catch (e) {
       errorManagerInstance.error(e, 'new-launch.ts', 'Error creating satellite record!');
 
       return;
     }
-    if (SatMath.altitudeCheck(satrec, simulationTimeObj) > 1) {
+    if (SatMath.altitudeCheck(sat.satrec, simulationTimeObj) > 1) {
       catalogManagerInstance.satCruncher.postMessage({
         typ: CruncerMessageTypes.SAT_EDIT,
         id,

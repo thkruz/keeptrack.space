@@ -41,6 +41,7 @@ global.mocks.glMock = {
   getProgramParameter: jest.fn(() => true),
   getShaderParameter: jest.fn(() => true),
   getUniformLocation: jest.fn(() => true),
+  isContextLost: jest.fn(() => false),
   linkProgram: jest.fn(),
   readPixels: jest.fn(),
   renderbufferStorage: jest.fn(),

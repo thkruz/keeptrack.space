@@ -346,7 +346,6 @@ export class NewLaunch extends KeepTrackPlugin {
     const launchSiteKey = Object.keys(launchSites).find((key) => {
       const site = launchSites[key];
 
-
       return site.name === launchSite.name && site.site === launchSite.site;
     });
 

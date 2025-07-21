@@ -123,7 +123,3 @@ stats.json
 
 # Local env files
 .env
-
-# Generate Locales files
-src/locales/*.json
-!src/locales/*.src.json

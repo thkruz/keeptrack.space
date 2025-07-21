@@ -1,0 +1,693 @@
+{
+  "time": {
+    "days": {
+      "0": "Domingo",
+      "1": "Lunes",
+      "2": "Martes",
+      "3": "Miércoles",
+      "4": "Jueves",
+      "5": "Viernes",
+      "6": "Sábado"
+    },
+    "days-short": {
+      "0": "Dom",
+      "1": "Lun",
+      "2": "Mar",
+      "3": "Mié",
+      "4": "Jue",
+      "5": "Vie",
+      "6": "Sáb"
+    },
+    "months": {
+      "1": "Enero",
+      "2": "Febrero",
+      "3": "Marzo",
+      "4": "Abril",
+      "5": "Mayo",
+      "6": "Junio",
+      "7": "Julio",
+      "8": "Agosto",
+      "9": "Septiembre",
+      "10": "Octubre",
+      "11": "Noviembre",
+      "12": "Diciembre"
+    },
+    "calendar": {
+      "time": "Hora",
+      "hour": "Hora",
+      "minute": "Minuto",
+      "second": "Segundo",
+      "now": "Ahora",
+      "done": "Hecho",
+      "pause": "Pausa",
+      "propagation": "Propagación"
+    }
+  },
+  "errorMsgs": {
+    "catalogNotFullyInitialized": "El catálogo no se ha inicializado completamente todavía. Por favor, espere unos segundos e intente de nuevo.",
+    "sensorGroupsApiEmpty": "No se encontraron grupos de sensores en la API, volviendo a la base de datos de grupos de sensores incluida.",
+    "SelectSensorFirst": "¡Seleccione un sensor primero!",
+    "SelectSatelliteFirst": "¡Seleccione un satélite primero!",
+    "SelectSecondarySatellite": "¡Seleccione un satélite secundario!",
+    "SatelliteNotDetailedSatellite": "¡El satélite no es un DetailedSatellite!",
+    "SensorNotFound": "¡Sensor no encontrado!",
+    "Scene": {
+      "disablingGodrays": "¡Tu computadora está teniendo problemas! Desactivando los rayos de luz.",
+      "disablingAurora": "¡Tu computadora está teniendo problemas! Desactivando la aurora.",
+      "disablingAtmosphere": "¡Tu computadora está teniendo problemas! Desactivando la atmósfera.",
+      "disablingMoon": "¡Tu computadora está teniendo problemas! Desactivando la luna.",
+      "disablingMilkyWay": "¡Tu computadora está teniendo problemas! Desactivando la Vía Láctea.",
+      "disablingSun": "¡Tu computadora está teniendo problemas! Desactivando el sol."
+    },
+    "Breakup": {
+      "CannotCreateBreakupForNonCircularOrbits": "No se puede crear una ruptura para órbitas no circulares. Estamos trabajando en una solución.",
+      "CannotCalcDirectionOfSatellite": "No se puede calcular la dirección del satélite. Intente de nuevo más tarde.",
+      "ErrorCreatingBreakup": "¡Error al crear la ruptura!",
+      "InvalidStartNum": "¡Número de inicio de satélite inválido! ¡Restableciendo a 90000!",
+      "BreakupGeneratorFailed": "¡El generador de ruptura falló!",
+      "SatelliteNotFound": "¡Satélite no encontrado!"
+    },
+    "Collisions": {
+      "noCollisionsData": "¡No se encontraron datos de colisión!",
+      "errorProcessingCollisions": "¡Error al procesar los datos de SOCRATES!"
+    },
+    "EditSat": {
+      "errorReadingFile": "¡Error al leer el archivo!",
+      "satelliteNotFound": "¡Satélite no encontrado!"
+    },
+    "CreateSat": {
+      "errorCreatingSat": "¡Error al crear el satélite!"
+    },
+    "Reports": {
+      "popupBlocker": "Por favor, permita las ventanas emergentes en este sitio para ver los informes."
+    },
+    "SensorManager": {
+      "errorUpdatingUi": "Error al actualizar el estilo de la interfaz de usuario del sensor."
+    }
+  },
+  "hoverManager": {
+    "launched": "Lanzado",
+    "launchedPlanned": "Lanzado: Planeado",
+    "launchedUnknown": "Lanzado: Desconocido"
+  },
+  "loadingScreenMsgs": {
+    "math": "Intentando hacer matemáticas...",
+    "science": "Localizando ciencia...",
+    "science2": "Ciencia encontrada...",
+    "dots": "Dibujando puntos en el espacio...",
+    "satIntel": "Integrando inteligencia satelital...",
+    "painting": "Pintando la Tierra...",
+    "coloring": "Coloreando dentro de las líneas...",
+    "elsets": "Localizando GPs...",
+    "models": "Construyendo modelos 3D...",
+    "cunningPlan": "Desarrollando un plan astuto...",
+    "copyrightNotice": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles.<br>No se ha concedido una licencia comercial, y no se ha proporcionado compensación al titular de los derechos.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para los términos completos.",
+    "copyrightNoticeMobile": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles. No se ha concedido una licencia comercial. No se ha proporcionado compensación al titular de los derechos. El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para los términos completos."
+  },
+  "splashScreens": {
+    "1": "Los modelos de satélites aparecen más grandes de lo que son en realidad. Todo lo demás está a escala.",
+    "2": "Presiona la tecla 'L' para activar/desactivar las órbitas de los satélites.",
+    "3": "Presiona la tecla 'P' para abrir un gráfico polar del satélite actual (¡Primero debes seleccionar un sensor!).",
+    "4": "Reinicia el tiempo de simulación presionando la tecla 'T'.",
+    "5": "Acelera la simulación presionando la tecla '>'.",
+    "6": "Ralentiza la simulación presionando la tecla '<'.",
+    "7": "Presionar la tecla '/' alternará la velocidad de simulación entre 1x y 0x.",
+    "8": "Presiona la tecla 'V' para cambiar el modo de vista.",
+    "9": "Presiona Shift+F1 para abrir el menú de ayuda en cualquier momento.",
+    "10": "Presiona la tecla 'R' para activar la rotación automática.",
+    "11": "Presionar Shift + C cuando un satélite está seleccionado activará/desactivará su cono de visibilidad.",
+    "12": "La tecla 'Inicio' rotará la cámara hacia el sensor actual.",
+    "13": "La tecla '`' (tilde) reiniciará la cámara a la vista predeterminada.",
+    "14": "La tecla 'M' mostrará la vista del mapa 2D del satélite actual.",
+    "15": "El menú de configuración ubicado en la barra de herramientas inferior contiene muchas opciones para personalizar tu experiencia.",
+    "16": "Muchos de los menús tienen configuraciones adicionales a las que se puede acceder haciendo clic en el icono de engranaje.",
+    "17": "Agrega satélites a la lista de seguimiento para recibir notificaciones cuando estén sobre el sensor actual.",
+    "18": "Haz clic derecho en el globo para abrir el menú contextual con más opciones.",
+    "19": "Presiona las teclas '+' o '-' para acercar y alejar.",
+    "20": "Presiona 'F11' para activar/desactivar el modo de pantalla completa.",
+    "21": "Puedes buscar satélites por nombre o ID de NORAD en la barra de búsqueda en la parte superior derecha.",
+    "22": "Se puede crear un lanzamiento nominal nuevo seleccionando un satélite y haciendo clic en el botón 'Nuevo Lanzamiento' en el menú inferior.",
+    "23": "Presiona la tecla 'N' para activar/desactivar el modo nocturno.",
+    "24": "Presiona la tecla 'I' para ocultar/mostrar información contextual sobre un satélite.",
+    "25": "Presiona la tecla 'B' para ocultar/mostrar el menú.",
+    "26": "Acelera la simulación presionando la tecla Shift + ';'.",
+    "27": "Ralentiza la simulación presionando la tecla ','.",
+    "28": "Establece un objeto como Secundario para ver su distancia relativa con el objeto primario.",
+    "29": "Cambia un objeto entre Primario/Secundario con la tecla '['."
+  },
+  "darkClouds": {
+    "in": "En",
+    "satellites": "Satélites",
+    "and": "y",
+    "debris": "Escombros",
+    "buildingBuffers": "Construyendo búferes...",
+    "presentDay": "Día Actual"
+  },
+  "plugins": {
+    "SensorListPlugin": {
+      "bottomIconLabel": "Sensores",
+      "title": "Menú de Lista de Sensores",
+      "helpBody": "El menú de Sensores te permite seleccionar un sensor para usar en cálculos y funciones de otros menús. Los sensores están agrupados según las redes que principalmente respaldan. En el lado izquierdo del menú está el nombre del sensor y en el lado derecho está el país/organización que lo posee. <br><br> Seleccionar una opción \"Todos...Sensores\" seleccionará todos los sensores en ese grupo. Esto es útil para visualizar la cobertura de las redes, pero actualmente no funciona para todos los cálculos. Si estás tratando de calcular ángulos de visión para una red, es mejor usar la herramienta de ángulos de visión multi-sitio o usar ángulos de visión para cada uno de los sensores individuales en la red. <br><br> Los sensores en esta lista incluyen Radares Mecánicos y de Array en Fase, además de sensores Ópticos: <ul style=\"margin-left: 40px;\"> <li> Los Radares de Array en Fase típicamente están limitados a la Órbita Terrestre Baja (LEO). </li> <li> Los Radares Mecánicos pueden usarse tanto para LEO como para la Órbita Geoestacionaria (GEO). </li> <li> Los sensores Ópticos se usan típicamente para GEO, pero también pueden usarse para LEO. </li> <li> Los sensores Ópticos están limitados a observaciones nocturnas en cielos despejados, mientras que los radares pueden usarse tanto de día como de noche. </li> </ul> <br> La información del sensor se basa en datos públicamente disponibles y puede verificarse en el menú de Información del Sensor. Si tienes datos públicos sobre sensores adicionales o correcciones a la información de sensores existentes, por favor contáctame en <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>."
+    },
+    "SensorInfoPlugin": {
+      "bottomIconLabel": "Info del Sensor",
+      "title": "Menú de Información del Sensor",
+      "helpBody": "La Información del Sensor proporciona detalles sobre el sensor actualmente seleccionado. La información se basa en datos públicamente disponibles y puede no ser 100% precisa siempre. Si tienes datos públicos sobre sensores adicionales o correcciones a la información de sensores existentes, por favor contáctame en <a href=\"mailto:admin@keeptrack.space\">admin@keeptrack.space</a>. <br><br> La información proporcionada incluye: <ul style=\"margin-left: 40px;\"> <li> Nombre del Sensor </li> <li> Propietario del Sensor </li> <li> Tipo de Sensor </li> <li> Campo de Visión del Sensor </li> </ul> <br> Además, se pueden crear rápidamente líneas desde el sensor al sol o la luna desde este menú."
+    },
+    "CustomSensorPlugin": {
+      "bottomIconLabel": "Sensor Personalizado",
+      "title": "Menú de Sensor Personalizado",
+      "helpBody": "Esto te permite crear un sensor personalizado para usar en cálculos y funciones de otros menús. Puede ser un sensor completamente original o una modificación de uno existente. <br><br> Después de establecer la latitud, longitud y altitud del sensor, puedes configurar su campo de visión. Seleccionar telescopio creará un campo de visión de 360 grados con una máscara de elevación de 10 grados y rango ilimitado. Deseleccionar la opción de telescopio te permitirá configurar el campo de visión manualmente. <br><br> Si estás tratando de editar un sensor existente, puedes seleccionarlo primero de la lista de sensores y el sensor personalizado se actualizará con la información del sensor seleccionado."
+    },
+    "LookAnglesPlugin": {
+      "bottomIconLabel": "Ángulos de Visión",
+      "title": "Menú de Ángulos de Visión",
+      "helpBody": "El menú de Ángulos de Visión te permite calcular el rango, azimut y ángulos de elevación entre un sensor y un satélite. Un satélite y un sensor deben ser seleccionados primero antes de que el menú pueda ser usado. <br><br> La opción de alternar solo tiempos de ascenso y puesta calculará solo los tiempos de ascenso y puesta del satélite. Esto es útil para determinar rápidamente cuándo un satélite será visible para un sensor. <br><br> El rango de búsqueda puede ser modificado cambiando las opciones de longitud e intervalo."
+    },
+    "MultiSiteLookAnglesPlugin": {
+      "bottomIconLabel": "Vistas Multi-Sitio",
+      "title": "Menú de Ángulos de Visión Multi-Sitio",
+      "helpBody": "El menú de Ángulos de Visión Multi-Sitio te permite calcular el rango, azimut y ángulos de elevación entre un satélite y múltiples sensores. Un satélite debe ser seleccionado primero antes de que el menú pueda ser usado. <br><br> Por defecto, el menú calculará los ángulos de visión para todos los sensores en la Red de Vigilancia Espacial. Si deseas calcular los ángulos de visión para sensores adicionales, puedes exportar un archivo csv en la parte inferior del menú. El archivo csv contendrá ángulos de visión para todos los sensores. <br><br> Hacer clic en una fila de la tabla seleccionará el sensor y cambiará el tiempo de simulación al tiempo del ángulo de visión."
+    },
+    "SensorTimeline": {
+      "bottomIconLabel": "Línea de Tiempo del Sensor",
+      "title": "Menú de Línea de Tiempo del Sensor",
+      "helpBody": "El menú de Línea de Tiempo del Sensor muestra cuándo una lista de sensores tiene visibilidad de un satélite. La línea de tiempo está codificada por colores para mostrar la calidad del pase. Rojo es un mal pase, amarillo es un pase promedio y verde es un buen pase. Haz clic en un pase para cambiar el sensor y el tiempo a ese pase. <br><br> La línea de tiempo puede ser modificada cambiando el tiempo de inicio y fin de la simulación. Además, la línea de tiempo puede ser modificada cambiando las opciones de longitud e intervalo."
+    },
+    "ProximityOps": {
+      "bottomIconLabel": "Rendezvous y Operaciones de Proximidad",
+      "title": "Rendezvous y Operaciones de Proximidad (RPO)",
+      "titleSecondary": "Lista de Rendezvous y Operaciones de Proximidad",
+      "helpBody": "Encuentra acercamientos próximos entre satélites",
+      "noradId": "ID NORAD",
+      "maxDistThreshold": "Distancia Máxima de Umbral (km)",
+      "maxRelativeVelocity": "Velocidad Relativa Máxima (km/s)",
+      "searchDuration": "Duración de Búsqueda (horas)",
+      "geoText": "Geoestacionario",
+      "leoText": "Órbita Terrestre Baja",
+      "orbitType": "Tipo de Órbita",
+      "geoAllVsAll": "Geoestacionario Todos vs Todos",
+      "geoAllVsAllTooltip": "Buscar RPOs entre todos los satélites geoestacionarios",
+      "comparePayloadsOnly": "Comparar Solo Cargas Útiles",
+      "comparePayloadsOnlyTooltip": "Buscar solo RPOs entre cargas útiles",
+      "ignoreVimpelRso": "Ignorar Vimpel RSO",
+      "ignoreVimpelRsoTooltip": "Ignorar RSOs provenientes del Catálogo Vimpel"
+    },
+    "SatelliteTimeline": {
+      "bottomIconLabel": "Línea de Tiempo del Satélite",
+      "title": "Menú de Línea de Tiempo del Satélite",
+      "helpBody": "El menú de Línea de Tiempo del Satélite muestra cuándo un solo sensor tiene visibilidad de una lista de satélites. La línea de tiempo está codificada por colores para mostrar la calidad del pase. Rojo es un mal pase, amarillo es un pase promedio y verde es un buen pase. Haz clic en un pase para cambiar el satélite y el tiempo a ese pase. <br><br> La línea de tiempo puede ser modificada cambiando el tiempo de inicio y fin de la simulación. Además, la línea de tiempo puede ser modificada cambiando las opciones de longitud e intervalo."
+    },
+    "WatchlistPlugin": {
+      "bottomIconLabel": "Lista de Seguimiento",
+      "title": "Menú de Lista de Seguimiento",
+      "helpBody": "El menú de Lista de Seguimiento te permite crear una lista de satélites prioritarios para rastrear. Esto te permite recuperar rápidamente los satélites que más te interesan. La lista se guarda en el almacenamiento local de tu navegador y estará disponible la próxima vez que visites el sitio. <br><br> Cuando los satélites en la lista de seguimiento entran en el campo de visión del sensor seleccionado, se mostrará una notificación, se dibujará una línea desde el sensor al satélite y el número del satélite se mostrará en el globo. <br><br> La función de superposición depende de que la lista de seguimiento esté poblada."
+    },
+    "WatchlistOverlay": {
+      "bottomIconLabel": "Superposición",
+      "title": "Menú de Superposición",
+      "helpBody": "<p> La Superposición de la Lista de Seguimiento muestra el próximo tiempo de pase para cada satélite en tu lista de seguimiento. La superposición se actualiza cada 10 segundos. </p> <p> La superposición está codificada por colores para mostrar el tiempo hasta el próximo pase. Los colores son los siguientes: </p> <ul> <li>Amarillo - En Vista</li> <li>Azul - El tiempo hasta el próximo pase es de hasta 30 minutos después del tiempo actual o 10 minutos antes del tiempo actual</li> <li>Blanco - Cualquier pase futuro que no cumpla con los requisitos anteriores</li> </ul> <p> Hacer clic en un satélite en la superposición centrará el mapa en ese satélite. </p>"
+    },
+    "ReportsPlugin": {
+      "bottomIconLabel": "Informes",
+      "title": "Menú de Informes",
+      "helpBody": "El Menú de Informes es una colección de herramientas para ayudarte a analizar y entender los datos que estás viendo."
+    },
+    "PolarPlotPlugin": {
+      "bottomIconLabel": "Gráfico Polar",
+      "title": "Menú de Gráfico Polar",
+      "helpBody": "El Menú de Gráfico Polar se usa para generar un gráfico polar 2D del azimut y elevación del satélite a lo largo del tiempo."
+    },
+    "NextLaunchesPlugin": {
+      "bottomIconLabel": "Próximos Lanzamientos",
+      "title": "Menú de Próximos Lanzamientos",
+      "helpBody": "El Menú de Próximos Lanzamientos obtiene datos de <a href=\"https://thespacedevs.com/\" target=\"_blank\">The Space Devs</a> para mostrar los próximos lanzamientos."
+    },
+    "FindSatPlugin": {
+      "bottomIconLabel": "Buscar Satélite",
+      "title": "Menú de Búsqueda de Satélite",
+      "helpBody": "El Menú de Búsqueda de Satélite se usa para encontrar satélites por parámetros orbitales o características del satélite. <br><br> Para la mayoría de los parámetros, escribes el valor objetivo en la izquierda y luego un margen de error en la derecha. Por ejemplo, si quisieras encontrar todos los satélites en una inclinación de 51-52 grados, puedes escribir 51.5 en la caja izquierda y 0.5 en la caja derecha. La búsqueda entonces encontrará todos los satélites dentro de esas inclinaciones y los mostrará en la barra de búsqueda."
+    },
+    "ShortTermFences": {
+      "bottomIconLabel": "Cerca a Corto Plazo",
+      "title": "Menú de Cercas a Corto Plazo (STF)",
+      "helpBody": "El Menú de Cercas a Corto Plazo (STF) se usa para visualizar cajas de búsqueda de sensores. <br><br> Es poco probable que esto sea muy útil a menos que poseas/operes un sensor con funcionalidad de caja de búsqueda."
+    },
+    "Collisions": {
+      "bottomIconLabel": "Colisiones",
+      "title": "Menú de Colisiones",
+      "helpBody": "El Menú de Colisiones muestra satélites con alta probabilidad de colisión. <br><br> Hacer clic en una fila seleccionará los dos satélites involucrados en la colisión y cambiará el tiempo al momento de la colisión."
+    },
+    "TrackingImpactPredict": {
+      "bottomIconLabel": "Predicción de Reentrada",
+      "title": "Menú de Seguimiento y Predicción de Impacto",
+      "helpBody": "El menú de Seguimiento y Predicción de Impacto (TIP) muestra los últimos mensajes de seguimiento y predicción de impacto para satélites. La tabla muestra las siguientes columnas:<br><br> <b>NORAD</b>: El ID de catálogo NORAD del satélite.<br><br> <b>Fecha de Decaimiento</b>: La fecha de la predicción de decaimiento del satélite.<br><br> <b>Latitud</b>: La latitud del satélite en el momento del decaimiento.<br><br> <b>Longitud</b>: La longitud del satélite en el momento del decaimiento.<br><br> <b>Ventana (min)</b>: La ventana de tiempo en minutos para la predicción.<br><br> <b>Próximo Informe (hrs)</b>: El tiempo en horas hasta el próximo informe.<br><br> <b>Ángulo de Reentrada (deg)</b>: El ángulo de reentrada del satélite en grados.<br><br> <b>RCS (m²)</b>: La sección transversal de radar del satélite en metros cuadrados.<br><br> <b>Edad del GP (hrs)</b>: La edad del último conjunto de elementos en horas.<br><br> <b>Masa en Seco (kg)</b>: La masa en seco del satélite en kilogramos.<br><br> <b>Volumen (m³)</b>: El volumen estimado del satélite en metros cúbicos.<br><br>"
+    },
+    "Breakup": {
+      "bottomIconLabel": "Crear Desintegración",
+      "title": "Menú de Desintegración",
+      "helpBody": "El Menú de Desintegración es una herramienta para simular la desintegración de un satélite. <br><br> Al modificar, duplicar y modificar la órbita de un satélite, podemos modelar la desintegración de un satélite. Después de seleccionar un satélite y abrir el menú, el usuario puede seleccionar: <ul style=\"margin-left: 40px;\"> <li>Variación de Inclinación</li> <li>Variación de RAAN</li> <li>Variación de Período</li> <li>Número de Piezas de Desintegración</li> </ul> Cuanto mayor sea la variación, mayor será la dispersión en la desintegración simulada. Las variaciones predeterminadas son suficientes para simular una desintegración con una dispersión razonable."
+    },
+    "DebrisScreening": {
+      "bottomIconLabel": "Detección de Escombros",
+      "title": "Menú de Detección de Escombros",
+      "helpBody": "El menú de Detección de Escombros se usa para generar una lista de objetos de escombros que potencialmente podrían ser vistos por un satélite. La lista se genera calculando los parámetros orbitales de los objetos de escombros y comparándolos con los parámetros orbitales del satélite. El usuario puede elegir generar la lista usando el propagador TLE o SGP4. El usuario también puede elegir filtrar la lista por el tamaño del objeto de escombros y la magnitud del objeto de escombros. El usuario también puede elegir filtrar la lista por el tamaño del objeto de escombros y la magnitud del objeto de escombros. El usuario también puede elegir generar la lista usando el propagador TLE o SGP4. El usuario también puede elegir filtrar la lista por el tamaño del objeto de escombros y la magnitud del objeto de escombros."
+    },
+    "TransponderChannelData": {
+      "bottomIconLabel": "Información de Transpondedor y Canal",
+      "title": "Información de Transpondedor y Canal de Satélite",
+      "helpBody": "<p>Esta tabla contiene detalles técnicos de canales satelitales, incluyendo servicios de TV, radio y otras comunicaciones:</p><ul><li><strong>satélite:</strong> Nombre del satélite que transmite el canal</li><li><strong>tvcanal:</strong> Nombre del canal de TV/radio o servicio de comunicación</li><li><strong>haz:</strong> Dirección del haz del satélite (ej., Hemi oeste)</li><li><strong>freq:</strong> Frecuencia y polaridad del transpondedor (ej., 3840 V)</li><li><strong>sistema:</strong> Sistema de transmisión (ej., DVB-S2 8PSK)</li><li><strong>SRFEC:</strong> Tasa de símbolo y relación FEC (ej., 30000 3/4)</li><li><strong>video:</strong> Formato de compresión de video/datos (ej., MPEG-4/HD)</li><li><strong>idioma:</strong> Idiomas de audio/comunicación disponibles (ej., Ing, Chi)</li><li><strong>encriptación:</strong> Sistema de encriptación utilizado (ej., PowerVu)</li></ul><p>Esta información es útil para profesionales de comunicación satelital, técnicos, entusiastas y cualquier persona que configure o solucione problemas de equipos de recepción satelital.</p>"
+    },
+    "EditSat": {
+      "bottomIconLabel": "Editar Satélite",
+      "title": "Menú de Edición de Satélite",
+      "helpBody": "El Menú de Edición de Satélite se usa para editar los datos del satélite. <br><br> <ul> <li> Número SCC del Satélite - Un número único asignado a cada satélite por la Fuerza Espacial de EE. UU. </li> <li> Año de Época - El año de la última actualización orbital del satélite. </li> <li> Día de Época - El día del año de la última actualización orbital del satélite. </li> <li> Inclinación - El ángulo entre el plano orbital del satélite y el plano ecuatorial. </li> <li> Ascensión Recta - El ángulo entre el nodo ascendente y la posición del satélite en el momento de la última actualización orbital. </li> <li> Excentricidad - La cantidad en que la órbita del satélite se desvía de un círculo perfecto. </li> <li> Argumento del Perigeo - El ángulo entre el nodo ascendente y el punto más cercano del satélite a la tierra. </li> <li> Anomalía Media - El ángulo entre la posición del satélite en el momento de la última actualización orbital y el punto más cercano del satélite a la tierra. </li> <li> Movimiento Medio - La tasa a la que cambia la anomalía media del satélite. </li> </ul>"
+    },
+    "NewLaunch": {
+      "bottomIconLabel": "Nuevo Lanzamiento",
+      "title": "Menú de Nuevo Lanzamiento",
+      "helpBody": "El Menú de Nuevo Lanzamiento se usa para generar lanzamientos orbitales nocionales modificando satélites existentes con parámetros similares. <br><br> Después de seleccionar un satélite, puedes seleccionar una ubicación de lanzamiento y un azimut norte/sur. El satélite seleccionado será modificado para alinearlo con el sitio de lanzamiento. El reloj se cambia entonces a 00:00:00 para representar el tiempo relativo después del lanzamiento. Esto puede ser útil para calcular la cobertura del sensor relativa al tiempo de lanzamiento. La relación del objeto con otros objetos orbitales será incorrecta."
+    },
+    "MissilePlugin": {
+      "bottomIconLabel": "Misil",
+      "title": "Menú de Misiles",
+      "helpBody": "El Menú de Misiles se usa para generar lanzamientos nocionales de misiles entre países. <br><br> Cuando usas misiles lanzados desde submarinos, el punto de lanzamiento es una latitud y longitud personalizadas. Cuando usas misiles basados en tierra, el punto de lanzamiento es una latitud y longitud fijas basadas en informes de fuentes abiertas. <br><br> Además de misiles personalizados, están disponibles algunos escenarios predefinidos que involucran cientos de misiles. <br><br> Todos los lanzamientos de misiles son nocionales y no pretenden representar eventos del mundo real. Las trayectorias de lanzamiento se basan todas en el mismo modelo balístico, pero usan diferentes rangos mínimos y máximos."
+    },
+    "StereoMap": {
+      "bottomIconLabel": "Mapa Estéreo",
+      "title": "Menú de Mapa Estereográfico",
+      "helpBody": "El Menú de Mapa Estereográfico se usa para visualizar trazas terrestres de satélites en una proyección estereográfica. <br/><br/> Puedes hacer clic en un punto a lo largo de la traza terrestre para cambiar el tiempo de la simulación a cuando el satélite alcanza ese punto. <br/><br/> Los puntos amarillos indican cuándo el satélite está a la vista del sensor. Los puntos rojos indican cuándo el satélite no está a la vista del sensor. El punto más cercano al satélite es el tiempo actual."
+    },
+    "SensorFov": {
+      "bottomIconLabel": "Campo de Visión del Sensor"
+    },
+    "SensorSurvFence": {
+      "bottomIconLabel": "Cerca del Sensor"
+    },
+    "SatelliteViewPlugin": {
+      "bottomIconLabel": "Vista de Satélite"
+    },
+    "SatelliteFov": {
+      "bottomIconLabel": "Campo de Visión del Satélite",
+      "title": "Menú de Campo de Visión del Satélite",
+      "helpBody": "El plugin de Campo de Visión del Satélite te permite controlar el campo de visión de un satélite."
+    },
+    "Planetarium": {
+      "bottomIconLabel": "Vista de Planetario"
+    },
+    "NightToggle": {
+      "bottomIconLabel": "Alternar Noche"
+    },
+    "SatConstellations": {
+      "bottomIconLabel": "Constelaciones",
+      "title": "Menú de Constelaciones",
+      "helpBody": "El menú de Constelaciones te permite ver grupos de satélites. <br><br> Para algunas constelaciones, se dibujarán enlaces ascendentes/descendentes y/o enlaces cruzados nocionales entre los satélites de la constelación."
+    },
+    "CountriesMenu": {
+      "bottomIconLabel": "Países",
+      "title": "Menú de Países",
+      "helpBody": "El Menú de Países te permite filtrar los satélites por país de origen."
+    },
+    "ColorMenu": {
+      "bottomIconLabel": "Esquemas de Color",
+      "title": "Menú de Esquema de Color",
+      "helpBody": "El Menú de Colores es un lugar para cambiar el tema de color usado para renderizar los objetos. <br><br> Los varios temas pueden cambiar los colores basándose en las órbitas de los objetos, las características de los objetos, o la relación de los objetos con el sol y/o la tierra."
+    },
+    "Screenshot": {
+      "bottomIconLabel": "Tomar Foto"
+    },
+    "LaunchCalendar": {
+      "bottomIconLabel": "Calendario de Lanzamientos"
+    },
+    "TimeMachine": {
+      "bottomIconLabel": "Máquina del Tiempo"
+    },
+    "SatellitePhotos": {
+      "bottomIconLabel": "Fotos de Satélites",
+      "title": "Menú de Fotos de Satélites",
+      "helpBody": "El Menú de Fotos de Satélites se usa para mostrar fotos en vivo de satélites seleccionados. <br><br> Nota - los cambios en la API de imágenes pueden causar que se seleccione el satélite incorrecto en KeepTrack."
+    },
+    "ScreenRecorder": {
+      "bottomIconLabel": "Grabar Video"
+    },
+    "Astronomy": {
+      "bottomIconLabel": "Astronomía"
+    },
+    "AnalysisMenu": {
+      "bottomIconLabel": "Análisis",
+      "title": "Menú de Análisis",
+      "helpBody": "El Menú de Análisis proporciona una serie de herramientas para ayudarte a analizar los datos en la vista actual. Las herramientas son: <ul style=\"margin-left: 40px;\"> <li>Exportar TLEs Oficiales - Exportar conjuntos de elementos de dos líneas reales.</li> <li>Exportar 3LES - Exportar conjuntos de elementos de tres líneas.</li> <li>Exportar TLEs de KeepTrack - Exportar todos los conjuntos de elementos de dos líneas de KeepTrack, incluyendo analistas.</li> <li>Exportar 3LES de KeepTrack - Exportar todos los conjuntos de elementos de tres líneas de KeepTrack, incluyendo analistas.</li> <li>Encontrar Objetos Cercanos - Encontrar objetos que están cerca unos de otros.</li> <li>Encontrar Reentradas - Encontrar objetos que probablemente reentren en la atmósfera.</li> <li>Mejores Pases - Encontrar los mejores pases para un satélite basado en el sensor actualmente seleccionado.</li> </ul>"
+    },
+    "Calculator": {
+      "bottomIconLabel": "Transformaciones de Marco de Referencia",
+      "title": "Menú de Transformaciones de Marco de Referencia",
+      "helpBody": "El Menú de Transformaciones de Marco de Referencia se usa para convertir entre diferentes marcos de referencia. <br><br> El menú te permite convertir entre los siguientes marcos de referencia: <ul style=\"margin-left: 40px;\"> <li> ECI - Inercial Centrado en la Tierra </li> <li> ECEF - Fijo a la Tierra Centrado en la Tierra </li> <li> Geodésico </li> <li> Topocéntrico </li> </ul>"
+    },
+    "ManeuverPlugin": {
+      "bottomIconLabel": "Maniobra",
+      "title": "Menú de Maniobras",
+      "helpBody": "El Menú de Maniobras se utiliza para crear una maniobra para un satélite.<br><br>El menú te permite seleccionar el tipo de maniobra, el momento de la maniobra y la magnitud de la maniobra. La maniobra puede aplicarse a un satélite seleccionándolo de la lista de satélites."
+    },
+    "SettingsMenuPlugin": {
+      "bottomIconLabel": "Configuración",
+      "title": "Menú de Configuración",
+      "helpBody": "El menú de Configuración te permite configurar la aplicación."
+    },
+    "VideoDirectorPlugin": {
+      "bottomIconLabel": "Director de Video",
+      "title": "Menú de Director de Video",
+      "helpBody": "El Menú de Director de Video se usa para manipular la cámara y los objetos en la escena para crear un video."
+    },
+    "CreateSat": {
+      "bottomIconLabel": "Crear Satélite",
+      "title": "Crear Satélite",
+      "helpBody": "El menú de Crear Satélite se utiliza para crear un satélite a partir de sus elementos keplerianos"
+    },
+    "DopsPlugin": {
+      "bottomIconLabel": "Ver DOPs",
+      "title": "Menú de Dilución de Precisión",
+      "helpBody": "El menú de Dilución de Precisión (DOP) se utiliza para calcular los valores DOP para un satélite y sensor. <br><br> Los valores DOP son: <ul style=\"margin-left: 40px;\"> <li> GDOP - Dilución de Precisión Geométrica </li> <li> PDOP - Dilución de Precisión de Posición </li> <li> HDOP - Dilución de Precisión Horizontal </li> <li> VDOP - Dilución de Precisión Vertical </li> <li> TDOP - Dilución de Precisión de Tiempo </li> <li> NDOP - Dilución de Precisión del Número de Satélites </li> </ul>"
+    },
+    "EciPlot": {
+      "bottomIconLabel": "Gráfico ECI",
+      "title": "Menú de Gráfico ECI",
+      "helpBody": "El Menú de Gráfico ECI se utiliza para graficar la posición del satélite en el marco de referencia Inercial Centrado en la Tierra (ECI)."
+    },
+    "EcfPlot": {
+      "bottomIconLabel": "Gráfico ECF",
+      "title": "Menú de Gráfico ECF",
+      "helpBody": "El Menú de Gráfico ECF se utiliza para graficar la posición del satélite en el marco de referencia Fijo a la Tierra Centrado en la Tierra (ECF)."
+    },
+    "RicPlot": {
+      "bottomIconLabel": "Gráfico RIC",
+      "title": "Menú de Gráfico RIC",
+      "helpBody": "El Menú de Gráfico RIC se utiliza para graficar la posición del satélite en el marco de referencia Radial, En-Pista y Transversal (RIC)."
+    },
+    "Time2LonPlots": {
+      "bottomIconLabel": "Gráfico de Cascada",
+      "title": "Menú de Cascada",
+      "helpBody": "El Menú de Gráfico de Tiempo a Longitud (Cascada) se utiliza para graficar la longitud del satélite a lo largo del tiempo."
+    },
+    "Lat2LonPlots": {
+      "bottomIconLabel": "Gráfico Lat vs Lon",
+      "title": "Menú de Gráfico de Latitud a Longitud",
+      "helpBody": "El Menú de Gráfico de Latitud vs Longitud se utiliza para graficar la latitud versus la longitud en el cinturón GEO."
+    },
+    "Inc2AltPlots": {
+      "bottomIconLabel": "Gráfico Inc vs Alt",
+      "title": "Menú de Gráfico de Inclinación a Altitud",
+      "helpBody": "El Menú de Gráfico de Inclinación a Altitud se utiliza para graficar la inclinación del satélite contra su altitud."
+    },
+    "Inc2LonPlots": {
+      "bottomIconLabel": "Gráfico Inc vs Lon",
+      "title": "Menú de Gráfico de Inclinación a Longitud",
+      "helpBody": "El Menú de Gráfico de Inc vs Lon se utiliza para graficar la inclinación versus la longitud en el cinturón GEO."
+    },
+    "GraphicsMenuPlugin": {
+      "bottomIconLabel": "Menú de Gráficos",
+      "title": "Menú de Gráficos",
+      "helpBody": "El Menú de Gráficos se utiliza para cambiar la configuración gráfica de la aplicación."
+    }
+  },
+  "countries": {
+    "AAT": "AAT",
+    "ADG": "Adiguesia",
+    "AF": "Afganistán",
+    "AG": "Antigua",
+    "AGUK": "Antigua",
+    "AM": "Armenia",
+    "ANTN": "Antillas Neerlandesas",
+    "AO": "Angola",
+    "AQ": "Antártida",
+    "AR": "Argentina",
+    "ARV": "Antártida Argentina",
+    "AT": "Austria",
+    "AU": "Australia",
+    "AZ": "Azerbaiyán",
+    "B": "Bélgica",
+    "BASH": "Baskortostán",
+    "BAT": "BAT",
+    "BB": "Barbados",
+    "BBUK": "Barbados",
+    "BD": "Bangladés",
+    "BG": "Bulgaria",
+    "BGN": "R.P. Bulgaria",
+    "BM": "Bermudas",
+    "BO": "Bolivia",
+    "BR": "Brasil",
+    "BS": "Bahamas",
+    "BT": "Bután",
+    "BY": "Bielorrusia",
+    "CA": "Canadá",
+    "CD": "R.D. del Congo",
+    "CH": "Suiza",
+    "CI": "Costa de Marfil",
+    "CK": "Islas Cook",
+    "CL": "Chile",
+    "CM": "Camerún",
+    "CN": "China",
+    "CO": "Colombia",
+    "COLP": "Congo",
+    "CR": "Costa Rica",
+    "CSFR": "Checoslovaquia",
+    "CSSR": "Checoslovaquia",
+    "CU": "Cuba",
+    "CYM": "Islas Caimán",
+    "CYMRU": "Gales",
+    "CZ": "República Checa",
+    "D": "Alemania",
+    "DAG": "Daguestán",
+    "DD": "Alemania Oriental",
+    "DJ": "Yibuti",
+    "DK": "Dinamarca",
+    "DML": "Tierra de la Reina Maud",
+    "DR": "Alemania (Reich)",
+    "DX": "Alemania (ocup.)",
+    "DZ": "Argelia",
+    "E": "España",
+    "EC": "Ecuador",
+    "EE": "Estonia",
+    "EG": "Egipto",
+    "ENG": "Inglaterra",
+    "ESCN": "Islas Canarias",
+    "ET": "Etiopía",
+    "F": "Francia",
+    "FI": "Finlandia",
+    "GE": "Georgia",
+    "GH": "Ghana",
+    "GI": "Gibraltar",
+    "GL": "Groenlandia",
+    "GR": "Grecia",
+    "GRD": "Granada",
+    "GT": "Guatemala",
+    "GU": "Guam",
+    "GUF": "Guayana Francesa",
+    "HK": "China (Hong Kong)",
+    "HKUK": "Hong Kong",
+    "HR": "Croacia",
+    "HU": "Hungría",
+    "I": "Italia",
+    "I-ARAB": "Arabsat",
+    "I-CSC1": "COSPAS-SARSAT",
+    "I-ELDO": "Organización Europea de Desarrollo de Lanzadores",
+    "I-ESRO": "Organización Europea de Investigación Espacial",
+    "I-EUM": "EUMETSAT",
+    "I-EU": "UE",
+    "I-EUT": "EUTELSAT",
+    "I-INM": "INMARSAT",
+    "I-INT": "INTELSAT",
+    "I-ISS": "ISS",
+    "I-NATO": "Organización del Tratado del Atlántico Norte",
+    "I-RASC": "RASCOM",
+    "ID": "Indonesia",
+    "IE": "Irlanda",
+    "IL": "Israel",
+    "IN": "India",
+    "IQ": "Irak",
+    "IR": "Irán",
+    "IS": "Islandia",
+    "J": "Japón",
+    "JO": "Jordania",
+    "KE": "Kenia",
+    "KI": "Kiribati",
+    "KG": "Kirguistán",
+    "KGSR": "RSS Kirguisa",
+    "KH": "Camboya",
+    "KORS": "Antillas Neerlandesas",
+    "KORSA": "Antillas Neerlandesas",
+    "KP": "Corea del Norte",
+    "KR": "Corea del Sur",
+    "KW": "Kuwait",
+    "KZ": "Kazajistán",
+    "L": "Luxemburgo",
+    "LA": "Laos",
+    "LB": "Líbano",
+    "LK": "Sri Lanka",
+    "LT": "Lituania",
+    "LV": "Letonia",
+    "LY": "Libia",
+    "MA": "Marruecos",
+    "MC": "Mónaco",
+    "MD": "Moldavia",
+    "MH": "Islas Marshall",
+    "MN": "Mongolia",
+    "MR": "Mauritania",
+    "MU": "Mauricio",
+    "MV": "Maldivas",
+    "MX": "México",
+    "MY": "Malasia",
+    "MYM": "Myanmar",
+    "N": "Noruega",
+    "NG": "Nigeria",
+    "NL": "Países Bajos",
+    "NP": "Nepal",
+    "NZ": "Nueva Zelanda",
+    "NZRD": "Dependencia de Ross",
+    "OM": "Omán",
+    "P": "Portugal",
+    "PAR": "Panamá",
+    "PCZ": "Zona del Canal",
+    "PE": "Perú",
+    "PG": "Papúa Nueva Guinea",
+    "PK": "Pakistán",
+    "PH": "Filipinas",
+    "PL": "Polonia",
+    "PLRL": "Polonia",
+    "PR": "Puerto Rico",
+    "PT": "Portugal",
+    "PY": "Paraguay",
+    "QA": "Catar",
+    "RO": "Rumanía",
+    "RU": "Rusia",
+    "RW": "Ruanda",
+    "S": "Suecia",
+    "SA": "Arabia Saudita",
+    "SCOT": "Escocia",
+    "SD": "Sudán",
+    "SG": "Singapur",
+    "SH": "Santa Elena",
+    "SI": "Eslovenia",
+    "SK": "Eslovaquia",
+    "SR": "Surinam",
+    "SU": "URSS",
+    "SY": "Siria",
+    "T": "Tailandia",
+    "TC": "Islas Turcas y Caicos",
+    "TF": "Territorios Australes Franceses",
+    "TJ": "Tayikistán",
+    "TM": "Turkmenistán",
+    "TN": "Túnez",
+    "TO": "Tonga",
+    "TR": "Turquía",
+    "TTPI": "TTPI",
+    "TUVA": "Tuvá",
+    "TW": "Taiwán",
+    "UA": "Ucrania",
+    "UAE": "Emiratos Árabes Unidos",
+    "UK": "Reino Unido",
+    "UM": "Isla Wake",
+    "US": "Estados Unidos",
+    "UY": "Uruguay",
+    "UZ": "Uzbekistán",
+    "VE": "Venezuela",
+    "VN": "Vietnam",
+    "YE": "Yemen",
+    "ZA": "Sudáfrica",
+    "ZR": "Zaire",
+    "ZW": "Zimbabue",
+    "ANALSAT": "Satélite Analista",
+    "SAUD": "Arabia Saudita",
+    "AB": "Arabia Saudita",
+    "AC": "AsiaSat Corp",
+    "ALG": "Argelia",
+    "ALL": "Todos",
+    "ARGN": "Argentina",
+    "ASRA": "Austria",
+    "AUS": "Australia",
+    "AZER": "Azerbaiyán",
+    "BEL": "Bélgica",
+    "BELA": "Bielorrusia",
+    "BERM": "Bermudas",
+    "BOL": "Bolivia",
+    "BRAZ": "Brasil",
+    "CHBZ": "China/Brasil",
+    "CHLE": "Chile",
+    "CIS": "URSS/Rusia",
+    "COL": "Colombia",
+    "CZCH": "Checoslovaquia",
+    "DEN": "Dinamarca",
+    "ECU": "Ecuador",
+    "EGYP": "Egipto",
+    "ESA": "Agencia Espacial Europea",
+    "I-ESA": "Agencia Espacial Europea",
+    "EST": "Estonia",
+    "EUME": "EUMETSAT",
+    "EUTE": "EUTELSAT",
+    "FIN": "Finlandia",
+    "FGER": "Francia/Alemania",
+    "FR": "Francia",
+    "FRIT": "Francia/Italia",
+    "GER": "Alemania",
+    "GLOB": "Estados Unidos",
+    "GREC": "Grecia",
+    "HUN": "Hungría",
+    "IM": "Reino Unido",
+    "IND": "India",
+    "INDO": "Indonesia",
+    "IRAN": "Irán",
+    "IRAQ": "Irak",
+    "ISRA": "Israel",
+    "ISS": "Internacional",
+    "IT": "Italia",
+    "ITSO": "Luxemburgo",
+    "JPN": "Japón",
+    "KAZ": "Kazajistán",
+    "LAOS": "Laos",
+    "LTU": "Lituania",
+    "LUXE": "Luxemburgo",
+    "MALA": "Malasia",
+    "MEX": "México",
+    "NATO": "Organización del Tratado del Atlántico Norte",
+    "NETH": "Países Bajos",
+    "NICO": "Estados Unidos",
+    "NIG": "Nigeria",
+    "NKOR": "Corea del Norte",
+    "NOR": "Noruega",
+    "O3B": "Luxemburgo",
+    "ORB": "Estados Unidos",
+    "PAKI": "Pakistán",
+    "PERU": "Perú",
+    "POL": "Polonia",
+    "POR": "Portugal",
+    "PRC": "China",
+    "RASC": "Mauricio",
+    "ROC": "Taiwán",
+    "Taiwan": "Taiwán",
+    "ROM": "Rumanía",
+    "SAFR": "Sudáfrica",
+    "SEAL": "Rusia",
+    "RP": "Filipinas",
+    "SES": "Luxemburgo",
+    "SING": "Singapur",
+    "SKOR": "Corea del Sur",
+    "SN": "Senegal",
+    "SPN": "España",
+    "STCT": "Singapur/Taiwán",
+    "SWED": "Suecia",
+    "SWTZ": "Suiza",
+    "THAI": "Tailandia",
+    "TMMC": "Turkmenistán/Mónaco",
+    "TURK": "Turquía",
+    "UKR": "Ucrania",
+    "URY": "Uruguay",
+    "USA": "Estados Unidos",
+    "USBZ": "Estados Unidos/Brasil",
+    "VENZ": "Venezuela",
+    "VTNM": "Vietnam",
+    "TBD": "Desconocido"
+  },
+  "copyright": {
+    "notice": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para ver los términos completos.",
+    "noticeMobile": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para ver los términos completos."
+  }
+}

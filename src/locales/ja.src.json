@@ -135,6 +135,14 @@
     "28": "オブジェクトをセカンダリに設定すると、プライマリオブジェクトとの相対距離を確認できます。",
     "29": "'['キーでオブジェクトをプライマリ/セカンダリ間で切り替えます。"
   },
+  "darkClouds": {
+    "in": "内",
+    "satellites": "衛星",
+    "and": "および",
+    "debris": "デブリ",
+    "buildingBuffers": "バッファを構築中...",
+    "presentDay": "現在"
+  },
   "plugins": {
     "SensorListPlugin": {
       "bottomIconLabel": "センサー",
@@ -329,6 +337,11 @@
       "bottomIconLabel": "座標系変換",
       "title": "座標系変換メニュー",
       "helpBody": "座標系変換メニューは、異なる座標系間で変換するために使用されます。<br><br>このメニューでは、以下の座標系間で変換できます：<ul style=\"margin-left: 40px;\"><li>ECI - 地球中心慣性座標系</li><li>ECEF - 地球中心地球固定座標系</li><li>測地座標系</li><li>観測点中心座標系</li></ul>"
+    },
+    "ManeuverPlugin": {
+      "bottomIconLabel": "マヌーバ",
+      "title": "マヌーバメニュー",
+      "helpBody": "マヌーバメニューは、衛星のマヌーバ（軌道変更）を作成するために使用されます。<br><br>このメニューでは、マヌーバの種類、実施時刻、マヌーバの大きさを選択できます。衛星リストから衛星を選択してマヌーバを適用できます。"
     },
     "AnalysisMenu": {
       "bottomIconLabel": "分析",

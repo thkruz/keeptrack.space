@@ -338,6 +338,11 @@
       "title": "参考系转换菜单",
       "helpBody": "参考系转换菜单用于在不同参考系之间转换。<br><br>菜单允许您在以下参考系之间转换：<ul style=\"margin-left: 40px;\"><li>ECI - 地心惯性系</li><li>ECEF - 地心地固系</li><li>大地坐标系</li><li>地方坐标系</li></ul>"
     },
+    "ManeuverPlugin": {
+      "bottomIconLabel": "机动",
+      "title": "机动菜单",
+      "helpBody": "机动菜单用于为卫星创建机动。<br><br>菜单允许您选择机动类型、机动时间和机动幅度。可通过从卫星列表中选择卫星来应用机动。"
+    },
     "AnalysisMenu": {
       "bottomIconLabel": "分析",
       "title": "分析菜单",

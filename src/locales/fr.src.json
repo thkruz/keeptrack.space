@@ -135,6 +135,14 @@
     "28": "Définissez un objet comme Secondaire pour voir sa distance relative avec l'objet principal.",
     "29": "Basculez un objet entre Principal/Secondaire avec la touche '['."
   },
+  "darkClouds": {
+    "in": "Dans",
+    "satellites": "Satellites",
+    "and": "et",
+    "debris": "Débris",
+    "buildingBuffers": "Construction des tampons...",
+    "presentDay": "De nos jours"
+  },
   "plugins": {
     "SensorListPlugin": {
       "bottomIconLabel": "Capteurs",
@@ -329,6 +337,11 @@
       "bottomIconLabel": "Transformations de repère",
       "title": "Menu Transformations de repère",
       "helpBody": "Le menu Transformations de repère permet de convertir entre différents repères de référence. <br><br> Le menu permet de convertir entre les repères suivants : <ul style=\"margin-left: 40px;\"> <li> ECI - Terre centrée inertielle </li> <li> ECEF - Terre centrée fixe </li> <li> Géodésique </li> <li> Topocentrique </li> </ul>"
+    },
+    "ManeuverPlugin": {
+      "bottomIconLabel": "Manœuvre",
+      "title": "Menu Manœuvre",
+      "helpBody": "Le menu Manœuvre permet de créer une manœuvre pour un satellite.<br><br>Le menu vous permet de sélectionner le type de manœuvre, l'heure de la manœuvre et l'amplitude de la manœuvre. La manœuvre peut être appliquée à un satellite en le sélectionnant dans la liste des satellites."
     },
     "AnalysisMenu": {
       "bottomIconLabel": "Analyse",

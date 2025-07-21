@@ -135,6 +135,14 @@
     "28": "객체를 보조로 설정하여 주 객체와의 상대적 거리를 확인합니다.",
     "29": "'[' 키로 객체를 주/보조 사이에서 전환합니다."
   },
+  "darkClouds": {
+    "in": "내",
+    "satellites": "위성",
+    "and": "및",
+    "debris": "파편",
+    "buildingBuffers": "버퍼 생성 중...",
+    "presentDay": "현재"
+  },
   "plugins": {
     "SensorListPlugin": {
       "bottomIconLabel": "센서",
@@ -329,6 +337,11 @@
       "bottomIconLabel": "기준계 변환",
       "title": "기준계 변환 메뉴",
       "helpBody": "기준계 변환 메뉴는 서로 다른 기준계 간에 변환하는 데 사용됩니다. <br><br> 이 메뉴를 사용하면 다음 기준계 간에 변환할 수 있습니다: <ul style='margin-left: 40px;'> <li> ECI - 지구 중심 관성 </li> <li> ECEF - 지구 중심 지구 고정 </li> <li> 측지학적 </li> <li> 지역 중심 </li> </ul>"
+    },
+    "ManeuverPlugin": {
+      "bottomIconLabel": "기동",
+      "title": "기동 메뉴",
+      "helpBody": "기동 메뉴는 위성에 기동을 생성하는 데 사용됩니다. <br><br> 이 메뉴에서는 기동 유형, 기동 시간, 기동 크기를 선택할 수 있습니다. 위성 목록에서 위성을 선택하여 기동을 적용할 수 있습니다."
     },
     "AnalysisMenu": {
       "bottomIconLabel": "분석",

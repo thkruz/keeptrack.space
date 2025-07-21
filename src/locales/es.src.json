@@ -135,6 +135,14 @@
     "28": "Establece un objeto como Secundario para ver su distancia relativa con el objeto primario.",
     "29": "Cambia un objeto entre Primario/Secundario con la tecla '['."
   },
+  "darkClouds": {
+    "in": "En",
+    "satellites": "Satélites",
+    "and": "y",
+    "debris": "Escombros",
+    "buildingBuffers": "Construyendo búferes...",
+    "presentDay": "Día Actual"
+  },
   "plugins": {
     "SensorListPlugin": {
       "bottomIconLabel": "Sensores",
@@ -334,6 +342,11 @@
       "bottomIconLabel": "Transformaciones de Marco de Referencia",
       "title": "Menú de Transformaciones de Marco de Referencia",
       "helpBody": "El Menú de Transformaciones de Marco de Referencia se usa para convertir entre diferentes marcos de referencia. <br><br> El menú te permite convertir entre los siguientes marcos de referencia: <ul style=\"margin-left: 40px;\"> <li> ECI - Inercial Centrado en la Tierra </li> <li> ECEF - Fijo a la Tierra Centrado en la Tierra </li> <li> Geodésico </li> <li> Topocéntrico </li> </ul>"
+    },
+    "ManeuverPlugin": {
+      "bottomIconLabel": "Maniobra",
+      "title": "Menú de Maniobras",
+      "helpBody": "El Menú de Maniobras se utiliza para crear una maniobra para un satélite.<br><br>El menú te permite seleccionar el tipo de maniobra, el momento de la maniobra y la magnitud de la maniobra. La maniobra puede aplicarse a un satélite seleccionándolo de la lista de satélites."
     },
     "SettingsMenuPlugin": {
       "bottomIconLabel": "Configuración",

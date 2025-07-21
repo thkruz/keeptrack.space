@@ -90,7 +90,7 @@ export class ProximityOps extends KeepTrackPlugin {
     </div>
 
     <div class="input-field col s12">
-        <select id="proximity-ops-type" type="text" ${(<HTMLInputElement>getEl('proximity-ops-ava'))?.checked ? 'disabled' : ''}>
+        <select id="proximity-ops-type" type="text" ${(<HTMLInputElement>getEl('proximity-ops-ava', true))?.checked ? 'disabled' : ''}>
             <option value="GEO" selected>${t7e('plugins.ProximityOps.geoText')}</option>
             <option value="LEO">${t7e('plugins.ProximityOps.leoText')}</option>
         </select>

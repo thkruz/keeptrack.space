@@ -1,24 +1,51 @@
+import { KeepTrackApiEvents } from '@app/interfaces';
+import { lat2pitch, lon2yaw } from '@app/lib/transforms';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import i18next from 'i18next';
+import { Degrees, Kilometers, Milliseconds, Radians } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
-import { lat2pitch, lon2yaw } from '../../lib/transforms';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
 
 export const darkClouds = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>0; // NOTE: 0 will make the geosynchronous satellites more apparent
-  const DEFAULT_LONGITUDE = <Degrees>20;
+  const DEFAULT_LONGITUDE = <Degrees>121;
   const DELAY_BEFORE_ROTATING = 1000; // ms - NOTE: Number should be at least 1000 or it will fail to fire the event
   const RESTART_ROTATE_TIME = 10; // Restart auto rotate after this many seconds
+
+  settingsManager.isBlockPersistence = true;
 
   settingsManager.disableAllPlugins();
   settingsManager.plugins.TimeMachine = { enabled: true };
   settingsManager.plugins.TopMenu = { enabled: false };
 
-  settingsManager.isDisableAsciiCatalog = true;
+  settingsManager.staticOffset = 1743483637000 - Date.now(); // Set to April 1, 2025
 
+  settingsManager.isEnableJscCatalog = false;
+
+  settingsManager.earthDayTextureQuality = '16k';
+  settingsManager.earthNightTextureQuality = '16k';
+  settingsManager.earthSpecTextureQuality = '8k';
+  settingsManager.earthBumpTextureQuality = '8k';
+  settingsManager.earthPoliticalTextureQuality = 'off';
+  settingsManager.earthCloudTextureQuality = '8k';
+
+  settingsManager.disableCameraControls = true;
+
+  settingsManager.isEPFL = true; // Enable EPFL
+  settingsManager.isShowLoadingHints = false; // Disable Loading Hints
+
+  settingsManager.splashScreenList = ['epfl1', 'epfl2']; // Set Splash Screens to EPFL
+
+  keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+    hideEl('logo-primary');
+  });
+  settingsManager.isDisableAsciiCatalog = true;
+  settingsManager.defaultColorScheme = 'ObjectTypeColorScheme';
   settingsManager.isDisableStars = true;
+  settingsManager.isOrbitCruncherInEcf = false;
   settingsManager.maxAnalystSats = 1;
   settingsManager.maxMissiles = 1;
   settingsManager.maxFieldOfViewMarkers = 1;
@@ -73,18 +100,20 @@ export const darkClouds = (settingsManager: SettingsManager) => {
    */
   settingsManager.timeMachineString = (yearStr) => {
     keepTrackApi.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
+    const satellitesSpan = `<span style="color: rgb(35, 255, 35);">${t7e('darkClouds.satellites')}</span>`;
+    const debrisSpan = `<span style="color: rgb(255, 255, 35);">${t7e('darkClouds.debris')}</span>`;
     const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
-    const english = `In ${yearPrefix}${yearStr}`;
-    /*
-     * const french = `En ${yearPrefix}${yearStr}`;
-     * const german = `Im ${yearPrefix}${yearStr}`;
-     */
-    const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
-    const debrisSpan = '<span style="color: rgb(255, 255, 35);">Debris </span>';
+    let inYearString = `${t7e('darkClouds.in')} ${yearPrefix}${yearStr}`;
 
-    getEl('textOverlay')!.innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+    if (i18next.language === 'zh') {
+      // Chinese language uses a different format
+      inYearString = `${yearPrefix}${yearStr}${t7e('darkClouds.in')}`;
+      getEl('textOverlay')!.innerHTML = `${inYearString}${satellitesSpan}${t7e('darkClouds.and')}${debrisSpan}`;
+    } else {
+      getEl('textOverlay')!.innerHTML = `${satellitesSpan} ${t7e('darkClouds.and')} ${debrisSpan} ${inYearString}`;
+    }
 
-    return `${english}`;
+    return `${inYearString}`;
   };
 
   settingsManager.onLoadCb = () => {
@@ -111,15 +140,15 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
     getEl('textOverlay')!.style.cssText = `
                     border-radius: 2px;
-                    bottom: 125px;
-                    right: 150px;
+                    bottom: 25px;
+                    right: 30px;
                     width: auto;
                     position: absolute;
-                    min-height: 48px;
-                    line-height: 2.5em !important;
+                    min-height: 36px;
+                    line-height: 2em !important;
                     background-color: rgb(0, 0, 0) !important;
-                    padding: 10px 55px !important;
-                    font-size: 3.6rem !important;
+                    padding: 7px 40px !important;
+                    font-size: 2.5rem !important;
                     font-family: -apple-system, BlinkMacSystemFont, 'Open Sans', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
                     font-weight: 300;
                     color: white;
@@ -136,14 +165,23 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
     const startTimeMachine = () => {
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
+      const mainCameraInstance = keepTrackApi.getMainCamera();
+
+      mainCameraInstance.camPitch = lat2pitch(DEFAULT_LATITUDE);
+      mainCameraInstance.camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
+      mainCameraInstance.dragStartPitch = 0.06321641675916885 as Radians;
+      mainCameraInstance.dragStartYaw = 2.244571612554059 as Radians;
+      mainCameraInstance.zoomLevel_ = 0.8;
+      mainCameraInstance.zoomTarget = 0.8;
+
+      mainCameraInstance.screenDragPoint = [mainCameraInstance.mouseX, mainCameraInstance.mouseY];
+
       setTimeout(() => {
         (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
-        keepTrackApi.getMainCamera().zoomTarget = 0.8; // Reset Zoom to Default
-        keepTrackApi.getMainCamera().camSnap(lat2pitch(DEFAULT_LATITUDE), lon2yaw(DEFAULT_LONGITUDE, new Date())); // Reset Camera to Default
       }, 100);
       setTimeout(() => {
-        keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
-        keepTrackApi.getMainCamera().autoRotate(true); // Start Rotating Camera
+        mainCameraInstance.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
+        mainCameraInstance.autoRotate(true); // Start Rotating Camera
       }, DELAY_BEFORE_ROTATING);
     };
 
@@ -151,7 +189,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
     settingsManager.lastInteractionTime = Date.now() - RESTART_ROTATE_TIME * 1000 + 1000;
     const allSatsGroup = keepTrackApi.getGroupsManager().createGroup(0, null); // All Satellites
 
-    setInnerHtml('textOverlay', 'Building Buffers');
+    setInnerHtml('textOverlay', t7e('darkClouds.buildingBuffers'));
 
     // Show All Orbits first to build buffers
     keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
@@ -189,7 +227,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
            * satSet.setColorScheme(colorSchemeManager.group, true); // force color recalc
            */
           setTimeout(() => {
-            setInnerHtml('textOverlay', 'Present Day');
+            setInnerHtml('textOverlay', t7e('darkClouds.presentDay'));
           }, 0);
         }
       }, 1000);

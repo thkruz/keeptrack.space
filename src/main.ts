@@ -22,33 +22,6 @@
 
 import { KeepTrack } from './keeptrack';
 
-const isSafari = (): boolean => {
-  const ua = navigator.userAgent;
-
-  // Immediately reject if any third-party browser identifier is found
-  if ((/(?:CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo|Brave|Focus|Chrome|Firefox|Edge|Opera)/iu).test(ua)) {
-    return false;
-  }
-
-  /*
-   * Check for Safari-specific pattern
-   * Safari has "Version/X.X" followed by "Safari/XXX.X.X" at the end
-   */
-  const safariPattern = /Version\/[\d.]+ .*Safari\/[\d.]+$/u;
-
-  return safariPattern.test(ua);
-};
-
-if (isSafari()) {
-  // Safari is not supported
-  // eslint-disable-next-line no-alert
-  alert(
-    'KeepTrack\'s 3D Application is not supported on Safari.\n\n' +
-    'Please use a different browser. You will be redirected to the homepage.',
-  );
-  // Redirect to the homepage
-  window.location.href = 'https://keeptrack.space';
-}
 
 // Load the main website class
 const keepTrack = new KeepTrack(window.settingsOverride);

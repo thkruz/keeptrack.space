@@ -43,7 +43,7 @@ export enum EarthDayTextureQuality {
 
 export enum EarthNightTextureQuality {
   POTATO = '512',
-  LOW = '1K',
+  LOW = '1k',
   MEDIUM = '2k',
   HIGH = '4k',
   ULTRA = '16k',
@@ -52,7 +52,7 @@ export enum EarthNightTextureQuality {
 export enum EarthSpecTextureQuality {
   OFF = 'off',
   POTATO = '512',
-  LOW = '1K',
+  LOW = '1k',
   MEDIUM = '2k',
   HIGH = '4k',
   ULTRA = '16k',
@@ -68,7 +68,7 @@ export enum EarthBumpTextureQuality {
 export enum EarthCloudTextureQuality {
   OFF = 'off',
   POTATO = '512',
-  LOW = '1K',
+  LOW = '1k',
   MEDIUM = '2k',
   HIGH = '4k',
   ULTRA = '8k',
@@ -76,7 +76,7 @@ export enum EarthCloudTextureQuality {
 
 export enum EarthPoliticalTextureQuality {
   OFF = 'off',
-  POTATO = '1K',
+  POTATO = '1k',
   LOW = '2K',
   MEDIUM = '4k',
   HIGH = '8k',
@@ -157,6 +157,7 @@ export class Earth {
   private readonly SPEC_SRC_BASE = 'earthspec';
   private readonly POLITICAL_SRC_BASE = 'boundaries';
   private readonly CLOUDS_SRC_BASE = 'clouds';
+  private readonly DEFAULT_RESOLUTION = '1k';
 
   /**
    * This is run once per frame to render the earth.
@@ -294,12 +295,12 @@ export class Earth {
     this.cloudPosition_ = this.cloudPosition_ > 8192 ? 0 : this.cloudPosition_; // Reset the cloud position when it reaches 8192 - the width of the texture
   }
 
-  private getSrc_(base: string, resolution: string, extension = 'jpg'): string {
+  private getSrc_(base: string, resolution: string | undefined, extension = 'jpg'): string {
     if (!settingsManager.installDirectory) {
       throw new Error('settingsManager.installDirectory is undefined');
     }
 
-    let src = `${settingsManager.installDirectory}textures/${base}${resolution}.${extension}`;
+    let src = `${settingsManager.installDirectory}textures/${base}${resolution ?? this.DEFAULT_RESOLUTION}.${extension}`;
 
     if (settingsManager.smallImages || settingsManager.isMobileModeEnabled) {
       src = `${settingsManager.installDirectory}textures/${base}512.${extension}`;
@@ -627,12 +628,12 @@ export class Earth {
       // Final color
       vec3 dayColor = (ambientLightColor + directionalLightColor) * diffuse;
       vec3 dayTexColor = textureLod(uDayMap, vUv, -1.0).rgb * dayColor;
-      vec3 nightColor = 0.5 * textureLod(uNightMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);
+      vec3 nightColor = 0.3 * textureLod(uNightMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);
 
       fragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
 
       // Political map (Draw before clouds and atmosphere)
-      fragColor += textureLod(uPoliticalMap, vUv, 1.0);
+      fragColor += textureLod(uPoliticalMap, vUv, 1.0) * diffuse;
 
       // ................................................
       // Clouds
@@ -641,7 +642,7 @@ export class Earth {
         vec2 uv = vUv;
         uv.x -= uCloudPosition;
 
-        vec3 cloudsColor = textureLod(uCloudsMap, uv, -1.0).rgb;
+        vec3 cloudsColor = textureLod(uCloudsMap, uv, -1.0).rgb * diffuse;
         fragColor.rgb += cloudsColor * 0.8 * pow(uZoomLevel, 2.5);
 
       // ...............................................
@@ -659,7 +660,7 @@ export class Earth {
         float fragToCameraAngle = (1.0 - dot(fragToCamera, vNormal));
         fragToCameraAngle = pow(fragToCameraAngle, 3.8); //Curve the change, Make the fresnel thinner
 
-        fragColor.rgb += (atmosphereColor * fragToCameraAngle * smoothstep(0.25, 0.5, fragToLightAngle));
+        fragColor.rgb += (atmosphereColor * 2.0 * fragToCameraAngle * smoothstep(0.25, 0.5, fragToLightAngle));
       } else if (uAtmosphereType > 0.5 && uAtmosphereType < 1.5) {
         // If 1 then draw the white atmosphere
         // Draw thin white line around the Earth no matter what fragToLightAngle is

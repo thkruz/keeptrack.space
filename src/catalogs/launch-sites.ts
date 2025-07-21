@@ -15,6 +15,14 @@ export const launchSites = {
     wikiUrl: 'https://en.wikipedia.org/wiki/Dombarovsky_(air_base)',
     // NOTES: Dnepr launch site. Unused since 2015. Multiple silos and launch pads.
   },
+  'ALEUT-SPIN': {
+    name: 'SpinLaunch Launch Site (Planned)',
+    lat: 51.78,
+    lon: -176.64,
+    site: 'Adak Island',
+    country: 'United States',
+    wikiUrl: 'https://www.akbizmag.com/industry/alaska-native/aleut-partners-with-spinlaunch-to-build-space-catapult-on-adak-island/',
+  },
   'FRGUI-ELV': {
     name: 'Vega Launch Complex',
     lat: 5.236,
@@ -22,6 +30,7 @@ export const launchSites = {
     site: 'Guiana Space Centre',
     country: 'French Guiana',
     wikiUrl: 'https://en.wikipedia.org/wiki/ELA-1',
+    defaultDir: 'N',
   },
   'FRGUI-ELA4': {
     name: 'Ariane Launch Complex 4',
@@ -30,6 +39,7 @@ export const launchSites = {
     site: 'Guiana Space Centre',
     country: 'French Guiana',
     wikiUrl: 'https://en.wikipedia.org/wiki/ELA-4',
+    defaultDir: 'N',
   },
   HGSTR: {
     name: 'Hammaguira Space Track Range',
@@ -46,6 +56,7 @@ export const launchSites = {
     site: 'Jeju Island',
     country: 'South Korea',
     wikiUrl: 'https://en.wikipedia.org/wiki/Jeju_Island',
+    defaultDir: 'S',
   },
   'JSC-LA4': {
     name: 'Launch Area 4 (South Launch Site)',
@@ -54,6 +65,7 @@ export const launchSites = {
     site: 'Jiuquan Satellite Launch Center',
     country: 'China',
     wikiUrl: 'https://en.wikipedia.org/wiki/Jiuquan_Launch_Area_4',
+    defaultDir: 'S',
   },
   'JSC-LS-95': {
     name: 'Launch Site 95',
@@ -62,6 +74,7 @@ export const launchSites = {
     site: 'Jiuquan Satellite Launch Center',
     country: 'China',
     wikiUrl: 'https://en.wikipedia.org/wiki/Jiuquan_Satellite_Launch_Center',
+    defaultDir: 'S',
   },
   PSCA: { // KODAK
     name: 'Launch Pad 3C',
@@ -70,6 +83,7 @@ export const launchSites = {
     site: 'Pacific Spaceport Complex - Alaska', // Formerally Kodiak Launch Complex
     country: 'United States',
     wikiUrl: 'https://en.wikipedia.org/wiki/Pacific_Spaceport_Complex_%E2%80%93_Alaska',
+    defaultDir: 'S',
   },
   KSCUT: {
     name: 'Epsilon Rocket Launch Site', // Mu Pad
@@ -102,6 +116,7 @@ export const launchSites = {
     site: 'Naro Space Center',
     country: 'South Korea',
     wikiUrl: 'https://en.wikipedia.org/wiki/Naro_Space_Center',
+    defaultDir: 'S',
   },
   'PKMTR-S35': { // PLMSC
     name: 'Site 35', // Angara
@@ -110,6 +125,7 @@ export const launchSites = {
     site: 'Plesetsk Cosmodrome',
     country: 'Russia',
     wikiUrl: 'https://en.wikipedia.org/wiki/Plesetsk_Cosmodrome_Site_35',
+    defaultDir: 'N',
   },
   'PKMTR-S43': { // PLMSC
     name: 'Site 43', // Soyuz
@@ -118,6 +134,7 @@ export const launchSites = {
     site: 'Plesetsk Cosmodrome',
     country: 'Russia',
     wikiUrl: 'https://en.wikipedia.org/wiki/Plesetsk_Cosmodrome_Site_43',
+    defaultDir: 'N',
   },
   PMRF: {
     name: 'Barking Sands',
@@ -134,6 +151,7 @@ export const launchSites = {
     site: 'Rocket Lab Launch Complex 1',
     country: 'New Zealand',
     wikiUrl: 'https://en.wikipedia.org/wiki/Rocket_Lab_Launch_Complex_1',
+    defaultDir: 'S',
   },
   SCSLA: {
     name: 'Sea Launch Area',
@@ -150,6 +168,7 @@ export const launchSites = {
     site: 'Semnan Space Center',
     country: 'Iran',
     wikiUrl: 'https://en.wikipedia.org/wiki/Semnan_Space_Center',
+    defaultDir: 'S',
   },
   SHASC: {
     name: 'Shahroud Launch Pad',
@@ -158,6 +177,7 @@ export const launchSites = {
     site: 'Shahroud Space Center',
     country: 'Iran',
     wikiUrl: 'https://en.wikipedia.org/wiki/Shahroud_Space_Center',
+    defaultDir: 'S',
   },
   SNMLP: { // San Marco - this is no longer used
     name: 'San Marco Launch Platform',
@@ -182,6 +202,7 @@ export const launchSites = {
     site: 'Satish Dhawan Space Centre',
     country: 'India',
     wikiUrl: 'https://en.wikipedia.org/wiki/Satish_Dhawan_Space_Centre',
+    defaultDir: 'S',
   },
   // SVOBO closed in 2007
   TANSC: {
@@ -199,6 +220,7 @@ export const launchSites = {
     site: 'Taiyuan Satellite Launch Center',
     country: 'China',
     wikiUrl: 'https://en.wikipedia.org/wiki/Taiyuan_Satellite_Launch_Center',
+    defaultDir: 'S',
   },
   'TTMTR-1': { // TYMSC or Baikonur
     name: 'Gagarin\'s Start',
@@ -256,6 +278,7 @@ export const launchSites = {
     site: 'Vostochny Cosmodrome',
     country: 'Russia',
     wikiUrl: 'https://en.wikipedia.org/wiki/Vostochny_Cosmodrome',
+    defaultDir: 'S',
   },
   MARS: { // Wallops Flight Facility | WLPIS
     name: 'Pad 0B/0C', // Minotaur and Electron
@@ -264,6 +287,7 @@ export const launchSites = {
     site: 'Mid-Atlantic Regional Spaceport',
     country: 'United States',
     wikiUrl: 'https://en.wikipedia.org/wiki/Mid-Atlantic_Regional_Spaceport_Launch_Pad_0#Launch_Complex-2_(Pad_0C)',
+    defaultDir: 'S',
   },
   WOMRA: {
     name: 'HAD Launch Complex',
@@ -280,6 +304,7 @@ export const launchSites = {
     site: 'Wenchang Space Launch Site',
     country: 'China',
     wikiUrl: 'https://en.wikipedia.org/wiki/Wenchang_Space_Launch_Site',
+    defaultDir: 'S',
   },
   XSC: {
     name: 'Launch Complex 2/3',
@@ -288,6 +313,7 @@ export const launchSites = {
     site: 'Xichang Satellite Launch Center',
     country: 'China',
     wikiUrl: 'https://en.wikipedia.org/wiki/Palmachim_Airbase',
+    defaultDir: 'S',
   },
   YAVNE: {
     name: 'Launch Pad',
@@ -313,6 +339,7 @@ export const launchSites = {
     site: 'SpaceX Starbase',
     country: 'United States',
     wikiUrl: 'https://en.wikipedia.org/wiki/SpaceX_Starbase',
+    defaultDir: 'S',
   },
   VIKRAM: {
     name: 'Thumba Equatorial Rocket Launching Station',
@@ -321,6 +348,7 @@ export const launchSites = {
     site: 'Vikram Sarabhai Space Centre',
     country: 'India',
     wikiUrl: 'https://en.wikipedia.org/wiki/Thumba_Equatorial_Rocket_Launching_Station',
+    defaultDir: 'S',
   },
   ELAREN: {
     name: 'Médano del Loro',
@@ -329,6 +357,7 @@ export const launchSites = {
     site: 'El Arenosillo Test Centre',
     country: 'Spain',
     wikiUrl: 'https://en.wikipedia.org/wiki/El_Arenosillo',
+    defaultDir: 'S',
   },
   // Planned or Inactive
   OSATC: {
@@ -338,6 +367,7 @@ export const launchSites = {
     site: 'Denel Overberg Test Range',
     country: 'South Africa',
     wikiUrl: 'https://en.wikipedia.org/wiki/Denel_Overberg_Test_Range',
+    defaultDir: 'S',
   },
   SPSWE: {
     name: 'Planned Launch Site',
@@ -346,6 +376,7 @@ export const launchSites = {
     site: 'Spaceport Sweden',
     country: 'Sweden',
     wikiUrl: 'https://en.wikipedia.org/wiki/Spaceport_Sweden',
+    defaultDir: 'N',
   },
   MARLS: {
     name: 'Planned Launch Site',
@@ -354,6 +385,7 @@ export const launchSites = {
     site: 'Maritime Spaceport',
     country: 'Canada',
     wikiUrl: 'https://en.wikipedia.org/wiki/Maritime_Launch_Services',
+    defaultDir: 'S',
   },
   MASC: {
     name: 'Planned Launch Site',
@@ -362,6 +394,7 @@ export const launchSites = {
     site: 'Maine Spaceport Complex',
     country: 'United States',
     wikiUrl: 'https://en.wikipedia.org/wiki/Maine_Spaceport_Complex',
+    defaultDir: 'S',
   },
   ANDSP: {
     name: 'Planned Launch Site',
@@ -370,6 +403,7 @@ export const launchSites = {
     site: 'Andøya Spaceport',
     country: 'Norway',
     wikiUrl: 'https://en.wikipedia.org/wiki/And%C3%B8ya_Space',
+    defaultDir: 'N',
   },
   BOS: {
     name: 'Planned Launch Site',
@@ -378,6 +412,7 @@ export const launchSites = {
     site: 'Bowen Orbital Spaceport',
     country: 'Australia',
     wikiUrl: 'https://en.wikipedia.org/wiki/Gilmour_Space_Technologies',
+    defaultDir: 'N',
   },
   EHLC: {
     name: 'Planned Launch Site',
@@ -386,6 +421,7 @@ export const launchSites = {
     site: 'El Hierro Launch Centre',
     country: 'Spain',
     wikiUrl: 'https://en.wikipedia.org/wiki/El_Hierro_Launch_Centre',
+    defaultDir: 'S',
   },
   ALCSC: {
     name: 'Space Launch Vehicle Pad',
@@ -394,6 +430,7 @@ export const launchSites = {
     site: 'Alcântara Space Center',
     country: 'Brazil',
     wikiUrl: 'https://en.wikipedia.org/wiki/Alc%C3%A2ntara_Space_Center',
+    defaultDir: 'N',
   },
   PBNB: {
     name: 'Centro Espacial Manuel Belgrano (Planned)',
@@ -402,6 +439,7 @@ export const launchSites = {
     site: 'Port Belgrano Naval Base',
     country: 'Argentina',
     wikiUrl: 'https://en.wikipedia.org/wiki/Port_Belgrano_Naval_Base',
+    defaultDir: 'S',
   },
 } as unknown as {
   [key: string]: {
@@ -411,6 +449,7 @@ export const launchSites = {
     site: string;
     country: string;
     wikiUrl: null;
+    defaultDir?: string; // Optional default direction
   }
 };
 

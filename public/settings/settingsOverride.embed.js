@@ -210,6 +210,10 @@ const settingsOverride = {
       enabled: false,
       order: 400,
     },
+    ManeuverPlugin: {
+      enabled: false,
+      order: 409,
+    },
     InitialOrbitDeterminationPlugin: {
       enabled: false,
       order: 410,
@@ -315,9 +319,9 @@ const settingsOverride = {
   isDisableGodrays: true,
   godraysSamples: -1,
   isDisableMoon: true,
-  earthDayTextureQuality: '1k',
-  earthNightTextureQuality: '1k',
-  isDrawNightAsDay: true,
+  earthDayTextureQuality: '2k',
+  earthNightTextureQuality: '2k',
+  isDrawNightAsDay: false,
   earthSpecTextureQuality: 'off',
   isDrawSpecMap: false,
   earthBumpTextureQuality: 'off',
@@ -328,6 +332,7 @@ const settingsOverride = {
   isDrawPoliticalMap: false,
   earthTextureStyle: 'earthmap', // 'earthmap' or 'flat'
   isEmbedMode: true,
+  isDisableToasts: true,
 };
 
 // Expose these to the console

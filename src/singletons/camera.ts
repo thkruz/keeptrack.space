@@ -90,7 +90,7 @@ export class Camera {
   /**
    * Percentage of the distance to maxZoomDistance from the minZoomDistance
    */
-  private zoomLevel_ = settingsManager.initZoomLevel ?? 0.6925;
+  zoomLevel_ = settingsManager.initZoomLevel ?? 0.6925;
   private zoomTarget_ = settingsManager.initZoomLevel ?? 0.6925;
 
   camAngleSnappedOnSat = false;

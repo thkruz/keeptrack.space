@@ -1,4 +1,4 @@
-import { Configuration, CopyRspackPlugin, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
+import { Configuration, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -194,9 +194,11 @@ export class WebpackManager {
       new CleanTerminalPlugin({
         beforeCompile: true,
       }),
-      new CopyRspackPlugin({
-        patterns: [{ from: 'public', to: 'dist' }],
-      }),
+      /*
+       * new CopyRspackPlugin({
+       *   patterns: [{ from: 'public', to: '..' }],
+       * }),
+       */
       new HtmlRspackPlugin({
         filename: '../index.html',
         template: './public/index.html',

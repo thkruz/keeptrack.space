@@ -19,6 +19,11 @@
   height: 12px;
 }
 
+body {
+  /* Prevents Safari from bouncing */
+  overflow: hidden;
+}
+
 ::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
 }

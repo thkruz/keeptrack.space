@@ -9,6 +9,7 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { NewLaunch } from '../new-launch/new-launch';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
 import { SatInfoBox } from './sat-info-box';
@@ -134,6 +135,10 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.METEOROLOGICAL_ROCKET_LAUNCH_AGENCY_OR_MANUFACTURER:
         case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
           SelectSatManager.selectOwnerManufacturer_(obj as LandObject);
+
+          return;
+        case SpaceObjectType.LAUNCH_SITE:
+          keepTrackApi.getPlugin(NewLaunch)?.selectLaunchSite(obj as LandObject);
 
           return;
         case SpaceObjectType.STAR:

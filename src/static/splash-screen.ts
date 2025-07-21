@@ -3,7 +3,32 @@ import { keepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { MobileManager } from '../singletons/mobileManager';
 
+import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
+import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
+import earthJpg from '@public/img/wallpaper/Earth.jpg';
+import epfl1Jpg from '@public/img/wallpaper/epfl-1.jpg';
+import epfl2Jpg from '@public/img/wallpaper/epfl-2.jpg';
+import issJpg from '@public/img/wallpaper/iss.jpg';
+import moonJpg from '@public/img/wallpaper/moon.jpg';
+import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
+import opsJpg from '@public/img/wallpaper/ops.jpg';
+import rocketJpg from '@public/img/wallpaper/rocket.jpg';
+import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
+import rocket3Jpg from '@public/img/wallpaper/rocket3.jpg';
+import rocket4Jpg from '@public/img/wallpaper/rocket4.jpg';
+import satJpg from '@public/img/wallpaper/sat.jpg';
+import sat2Jpg from '@public/img/wallpaper/sat2.jpg';
+import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
+import thuleJpg from '@public/img/wallpaper/thule.jpg';
+
 export abstract class SplashScreen {
+  /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
+  private static splashScreenImgList_ =
+    [
+      blueMarbleJpg, moonJpg, observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg,
+      epfl1Jpg, epfl2Jpg, opsJpg,
+    ];
+
   static readonly msg = {
     math: t7e('loadingScreenMsgs.math'),
     science: t7e('loadingScreenMsgs.science'),
@@ -38,28 +63,9 @@ export abstract class SplashScreen {
         <div id="loading-hint">Hint: ${this.showHint()}</div>
         <div id="version-text">v10.5.2</div>
         <div id="copyright-notice">
-          ${settingsManager.isMobileModeEnabled ? t7e('loadingScreenMsgs.copyrightNoticeMobile') : t7e('loadingScreenMsgs.copyrightNotice')}
+          ${settingsManager.isMobileModeEnabled ? t7e('copyright.noticeMobile') : t7e('copyright.notice')}
         </div>
       </div>`;
-
-    // If this is the official website, update the copyright notice
-    const trustedDomains = ['keeptrack.space', 'www.keeptrack.space', 'app.keeptrack.space', 'embed.keeptrack.space'];
-
-    if (trustedDomains.includes(window.location.hostname)) {
-      const copyrightNotice = getEl('copyright-notice');
-
-      // TODO: Handle this better, elsewhere, and with other languages
-      if (copyrightNotice) {
-        copyrightNotice.innerHTML = copyrightNotice.innerHTML.replace(
-          ' No commercial license has been granted. No compensation has been provided to the rights holder.',
-          '',
-        );
-        copyrightNotice.innerHTML = copyrightNotice.innerHTML.replace(
-          '<br>No commercial license has been granted, and no compensation has been provided to the rights holder.',
-          '',
-        );
-      }
-    }
 
     if (!settingsManager.isShowLoadingHints) {
       hideEl('loading-hint');
@@ -119,5 +125,39 @@ export abstract class SplashScreen {
       return;
     } // If the element is not found, do nothing
     LoaderText.textContent = str;
+  }
+
+  static loadImages() {
+    if (settingsManager.splashScreenList) {
+      const allowedNames = new Set(settingsManager.splashScreenList);
+
+      // Filter images whose file name (without extension) matches an entry in splashScreenList
+      this.splashScreenImgList_ = this.splashScreenImgList_.filter((imgPath) => {
+        const fileName = imgPath.split('/').pop()?.split('.')[0]?.toLowerCase();
+
+
+        return fileName && allowedNames.has(fileName);
+      });
+    }
+
+    // Randomly load a splash screen - not a vulnerability
+    const image = this.splashScreenImgList_[Math.floor(Math.random() * this.splashScreenImgList_.length)];
+    const loadingDom = getEl('loading-screen');
+
+    if (loadingDom) {
+      loadingDom.style.backgroundImage = `url(${image})`;
+      loadingDom.style.backgroundSize = 'cover';
+      loadingDom.style.backgroundPosition = 'center';
+      loadingDom.style.backgroundRepeat = 'no-repeat';
+    }
+
+    // Preload the rest of the images after 30 seconds
+    setTimeout(() => {
+      this.splashScreenImgList_.forEach((img) => {
+        const preloadImg = new Image();
+
+        preloadImg.src = img;
+      });
+    }, 30000);
   }
 }

@@ -3,6 +3,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '@app/singletons/camera';
+import i18next from 'i18next';
 import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { getEl } from '../lib/get-el';
 import { SensorMath } from '../static/sensor-math';
@@ -196,6 +197,13 @@ export class HoverManager {
 
       country = country.length > 0 ? country : 'Unknown';
       this.satHoverBoxNode3.textContent = country;
+
+      this.satHoverBoxNode3.innerHTML = keepTrackApi.html`
+        <span id="hoverbox-fi"></span>
+        <span>${country}</span>
+      `;
+
+      getEl('hoverbox-fi')!.classList.value = `fi ${country2flagIcon(sat.country)}`;
     } else {
       let confidenceScoreString = '';
       let color: string = 'black';
@@ -266,9 +274,19 @@ export class HoverManager {
     const launchYear = parseInt(sat.intlDes.slice(2, 4));
 
     if (launchYear < 57) {
+      if (i18next.language === 'zh') {
+        return `${t7e('hoverManager.launched')}20${launchYear.toString().padStart(2, '0')}`;
+      }
+
       return `${t7e('hoverManager.launched')}: 20${launchYear.toString().padStart(2, '0')}`;
+
     } else if (launchYear >= 57 && launchYear < 100) {
+      if (i18next.language === 'zh') {
+        return `${t7e('hoverManager.launched')}19${launchYear.toString().padStart(2, '0')}`;
+      }
+
       return `${t7e('hoverManager.launched')}: 19${launchYear.toString().padStart(2, '0')}`;
+
     }
 
     return t7e('hoverManager.launchedUnknown');

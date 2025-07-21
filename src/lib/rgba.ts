@@ -35,7 +35,12 @@ export const hex2rgba = (hex: string): rgbaType => {
  * @throws An error if the input is not a valid RGBA color code.
  */
 export const parseRgba = (str: string): [number, number, number, number] => {
-  let [r, g, b, a]: rgbaType = <rgbaType>str.match(/(?<!\w)-?[\d.]+/gu);
+  const matches = str.match(/-?[\d.]+/gu);
+
+  if (!matches || matches.length < 4) {
+    throw new Error('Invalid rgba input');
+  }
+  let [r, g, b, a]: rgbaType = matches as rgbaType;
 
   r = parseFloat(<string>r) / 255;
   g = parseFloat(<string>g) / 255;

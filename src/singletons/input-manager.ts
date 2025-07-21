@@ -33,6 +33,7 @@ export class InputManager {
   public mouse: MouseInput;
   public touch: TouchInput;
   public isAsyncWorking = true;
+  lastUpdateTime: number = 0;
 
   constructor() {
     this.keyboard = new KeyboardInput();
@@ -466,7 +467,10 @@ export class InputManager {
       if (uiManagerInstance.searchHoverSatId >= 0) {
         this.mouse.mouseSat = uiManagerInstance.searchHoverSatId;
       } else if (!settingsManager.isMobileModeEnabled) {
-        this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+        if (Date.now() - this.lastUpdateTime > 100) {
+          this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+          this.lastUpdateTime = Date.now();
+        }
       }
     }
   }

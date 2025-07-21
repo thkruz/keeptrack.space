@@ -1,0 +1,4 @@
+# Locales JSON Files
+
+The build process will automatically generate proper json files. Edit the
+.src.json and do not manually create the .json files.

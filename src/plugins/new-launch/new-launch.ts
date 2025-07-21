@@ -10,12 +10,13 @@ import { SatMath } from '@app/static/sat-math';
 import { launchSites } from '@app/catalogs/launch-sites';
 import { t7e } from '@app/locales/keys';
 import { CatalogManager } from '@app/singletons/catalog-manager';
+import { LaunchSite } from '@app/singletons/catalog-manager/LaunchFacility';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { OrbitFinder } from '@app/singletons/orbit-finder';
 import { TimeManager } from '@app/singletons/time-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond, SatelliteRecord, Sgp4, TleLine1 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
@@ -252,17 +253,14 @@ export class NewLaunch extends KeepTrackPlugin {
     // Prevent caching of old TLEs
     sat.satrec = null as unknown as SatelliteRecord;
 
-    let satrec: SatelliteRecord;
-
     try {
-      satrec = Sgp4.createSatrec(tle1, tle2);
-      sat.satrec = satrec;
+      sat.editTle(tle1, tle2 as TleLine2);
     } catch (e) {
       errorManagerInstance.error(e, 'new-launch.ts', 'Error creating satellite record!');
 
       return;
     }
-    if (SatMath.altitudeCheck(satrec, simulationTimeObj) > 1) {
+    if (SatMath.altitudeCheck(sat.satrec, simulationTimeObj) > 1) {
       catalogManagerInstance.satCruncher.postMessage({
         typ: CruncerMessageTypes.SAT_EDIT,
         id,
@@ -341,6 +339,34 @@ export class NewLaunch extends KeepTrackPlugin {
         }
       },
     );
+  }
+
+  selectLaunchSite(launchSite: LaunchSite): void {
+    // Find the key for the launch site in launchSites by matching the name
+    const launchSiteKey = Object.keys(launchSites).find((key) => {
+      const site = launchSites[key];
+
+      return site.name === launchSite.name && site.site === launchSite.site;
+    });
+
+    if (launchSiteKey) {
+      const launchSiteSelect = <HTMLSelectElement>getEl('nl-facility');
+
+      // Set the value of the launch site select element
+      launchSiteSelect.value = launchSiteKey;
+      // Trigger change event to update the UI
+      launchSiteSelect.dispatchEvent(new Event('change'));
+
+      if (launchSites[launchSiteKey].defaultDir) {
+        const launchSiteDropdown = <HTMLSelectElement>getEl('nl-updown');
+
+        launchSiteDropdown.value = launchSites[launchSiteKey].defaultDir;
+        launchSiteDropdown.name = launchSites[launchSiteKey].defaultDir === 'N' ? 'North' : 'South';
+        launchSiteDropdown.dispatchEvent(new Event('change'));
+      }
+    } else {
+      console.warn(`Launch site ${launchSite.name} not found in launchSites catalog.`);
+    }
   }
 
   private preValidate_(sat: DetailedSatellite): void {

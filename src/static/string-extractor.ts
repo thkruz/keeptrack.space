@@ -1,3 +1,4 @@
+import { t7e } from '@app/locales/keys';
 import { BaseObject, SpaceObjectType } from 'ootk';
 import { countryCodeList, countryMapList, launchSiteMap } from '../catalogs/countries';
 import { rocketUrls } from '../catalogs/rocket-urls';
@@ -37,7 +38,7 @@ export abstract class StringExtractor {
   }
 
   public static extractCountry(countryCode: string): string {
-    return countryMapList[countryCode] ?? 'Unknown';
+    return countryMapList[countryCode] ?? t7e('countries.TBD');
   }
 
   public static extractLaunchSite(LS: string): { site: string; country: string, wikiUrl: string | null } {

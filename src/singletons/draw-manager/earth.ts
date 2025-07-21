@@ -157,6 +157,7 @@ export class Earth {
   private readonly SPEC_SRC_BASE = 'earthspec';
   private readonly POLITICAL_SRC_BASE = 'boundaries';
   private readonly CLOUDS_SRC_BASE = 'clouds';
+  private readonly DEFAULT_RESOLUTION = '1k';
 
   /**
    * This is run once per frame to render the earth.
@@ -299,7 +300,7 @@ export class Earth {
       throw new Error('settingsManager.installDirectory is undefined');
     }
 
-    let src = `${settingsManager.installDirectory}textures/${base}${resolution ?? '1k'}.${extension}`;
+    let src = `${settingsManager.installDirectory}textures/${base}${resolution ?? this.DEFAULT_RESOLUTION}.${extension}`;
 
     if (settingsManager.smallImages || settingsManager.isMobileModeEnabled) {
       src = `${settingsManager.installDirectory}textures/${base}512.${extension}`;

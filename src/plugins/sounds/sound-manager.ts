@@ -88,64 +88,64 @@ export class SoundManager extends KeepTrackPlugin {
   }
 
   sounds = {
-    standby: new Audio(popMp3),
-    error1: new Audio(error1Mp3),
-    error2: new Audio(error2Mp3),
-    export: new Audio(exportMp3),
-    click: new Audio(switchMp3),
-    beep1: new Audio(beep1Mp3),
-    genericBeep1: new Audio(genericBeep1Mp3),
-    genericBeep2: new Audio(genericBeep2Mp3),
-    genericBeep3: new Audio(genericBeep3Mp3),
-    whoosh1: new Audio(whoosh1Mp3),
-    whoosh2: new Audio(whoosh2Mp3),
-    whoosh3: new Audio(whoosh3Mp3),
-    whoosh4: new Audio(whoosh4Mp3),
-    whoosh5: new Audio(whoosh5Mp3),
-    whoosh6: new Audio(whoosh6Mp3),
-    whoosh7: new Audio(whoosh7Mp3),
-    whoosh8: new Audio(whoosh8Mp3),
-    click1: new Audio(click30Mp3),
-    click2: new Audio(click2Mp3),
-    click3: new Audio(click3Mp3),
-    click4: new Audio(click4Mp3),
-    click5: new Audio(click29Mp3),
-    click6: new Audio(click27Mp3),
-    click7: new Audio(click7Mp3),
-    click8: new Audio(click8Mp3),
-    click9: new Audio(click28Mp3),
-    click10: new Audio(click10Mp3),
-    click11: new Audio(click11Mp3),
-    click12: new Audio(click12Mp3),
-    click13: new Audio(click13Mp3),
-    click14: new Audio(click14Mp3),
-    click15: new Audio(click15Mp3),
-    click16: new Audio(click16Mp3),
-    click17: new Audio(click17Mp3),
-    click18: new Audio(click18Mp3),
-    click19: new Audio(click19Mp3),
-    click20: new Audio(click20Mp3),
-    click21: new Audio(click21Mp3),
-    click22: new Audio(click22Mp3),
-    click23: new Audio(click23Mp3),
-    click24: new Audio(click24Mp3),
-    click25: new Audio(click25Mp3),
-    click26: new Audio(click26Mp3),
-    chatter1: new Audio(chatter1Mp3),
-    chatter2: new Audio(chatter2Mp3),
-    chatter3: new Audio(chatter3Mp3),
-    chatter4: new Audio(chatter4Mp3),
-    chatter5: new Audio(chatter5Mp3),
-    chatter6: new Audio(chatter6Mp3),
-    chatter7: new Audio(chatter7Mp3),
-    chatter8: new Audio(chatter8Mp3),
-    loading: new Audio(loadingMp3),
-    button: new Audio(buttonMp3),
-    menuButton: new Audio(button2Mp3),
-    toggleOn: new Audio(toggleOnMp3),
-    toggleOff: new Audio(toggleOffMp3),
-    liftoff: new Audio(liftoffMp3),
-  } as Record<string, HTMLAudioElement>;
+    standby: popMp3,
+    error1: error1Mp3,
+    error2: error2Mp3,
+    export: exportMp3,
+    click: switchMp3,
+    beep1: beep1Mp3,
+    genericBeep1: genericBeep1Mp3,
+    genericBeep2: genericBeep2Mp3,
+    genericBeep3: genericBeep3Mp3,
+    whoosh1: whoosh1Mp3,
+    whoosh2: whoosh2Mp3,
+    whoosh3: whoosh3Mp3,
+    whoosh4: whoosh4Mp3,
+    whoosh5: whoosh5Mp3,
+    whoosh6: whoosh6Mp3,
+    whoosh7: whoosh7Mp3,
+    whoosh8: whoosh8Mp3,
+    click1: click30Mp3,
+    click2: click2Mp3,
+    click3: click3Mp3,
+    click4: click4Mp3,
+    click5: click29Mp3,
+    click6: click27Mp3,
+    click7: click7Mp3,
+    click8: click8Mp3,
+    click9: click28Mp3,
+    click10: click10Mp3,
+    click11: click11Mp3,
+    click12: click12Mp3,
+    click13: click13Mp3,
+    click14: click14Mp3,
+    click15: click15Mp3,
+    click16: click16Mp3,
+    click17: click17Mp3,
+    click18: click18Mp3,
+    click19: click19Mp3,
+    click20: click20Mp3,
+    click21: click21Mp3,
+    click22: click22Mp3,
+    click23: click23Mp3,
+    click24: click24Mp3,
+    click25: click25Mp3,
+    click26: click26Mp3,
+    chatter1: chatter1Mp3,
+    chatter2: chatter2Mp3,
+    chatter3: chatter3Mp3,
+    chatter4: chatter4Mp3,
+    chatter5: chatter5Mp3,
+    chatter6: chatter6Mp3,
+    chatter7: chatter7Mp3,
+    chatter8: chatter8Mp3,
+    loading: loadingMp3,
+    button: buttonMp3,
+    menuButton: button2Mp3,
+    toggleOn: toggleOnMp3,
+    toggleOff: toggleOffMp3,
+    liftoff: liftoffMp3,
+  } as Record<string, string | HTMLAudioElement>;
 
   addJs = (): void => {
     super.addJs();
@@ -155,10 +155,6 @@ export class SoundManager extends KeepTrackPlugin {
     keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, () => {
       this.voices = speechSynthesis.getVoices();
     });
-
-    this.sounds.loading.volume = 0.25;
-    this.sounds.export.volume = 0.3;
-    this.sounds.error2.volume = 0.5;
   };
 
   /**
@@ -202,7 +198,7 @@ export class SoundManager extends KeepTrackPlugin {
 
     const sound = this.sounds[soundName];
 
-    if (isFadeout) {
+    if (isFadeout && sound instanceof HTMLAudioElement) {
       SoundManager.fadeOut_(sound);
     }
   }
@@ -244,18 +240,26 @@ export class SoundManager extends KeepTrackPlugin {
     } // Not Ready Yet
 
     let random = 1;
-    let sound: HTMLAudioElement;
+    let sound: HTMLAudioElement | string;
 
     switch (soundName) {
       case SoundNames.BEEP:
         random = Math.floor(Math.random() * 3) + 1;
         sound = this.sounds[`genericBeep${random}`];
+        if (sound instanceof HTMLAudioElement === false) {
+          sound = new Audio(sound);
+          this.sounds[`genericBeep${random}`] = sound; // Cache the audio element
+        }
         sound.play();
 
         return;
       case SoundNames.WHOOSH:
         random = Math.floor(Math.random() * 8) + 1;
         sound = this.sounds[`whoosh${random}`];
+        if (sound instanceof HTMLAudioElement === false) {
+          sound = new Audio(sound);
+          this.sounds[`whoosh${random}`] = sound; // Cache the audio element
+        }
         sound.play();
 
         return;
@@ -267,13 +271,25 @@ export class SoundManager extends KeepTrackPlugin {
         // Random error or error2
         random = Math.floor(Math.random() * 2) + 1;
         sound = this.sounds[`error${random}`];
+        if (sound instanceof HTMLAudioElement === false) {
+          sound = new Audio(sound);
+          // Error2 is too loud, so we reduce its volume
+          if (random === 2) {
+            sound.volume = 0.5;
+          }
+          this.sounds[`error${random}`] = sound; // Cache the audio element
+        }
         sound.play();
 
         return;
       case SoundNames.CLICK:
         random = Math.floor(Math.random() * this.maxClickClip_) + 1;
         sound = this.sounds[`click${random}`];
-        sound.volume = 0.25;
+        if (sound instanceof HTMLAudioElement === false) {
+          sound = new Audio(sound);
+          sound.volume = 0.25;
+          this.sounds[`click${random}`] = sound; // Cache the audio element
+        }
         sound.play();
 
         return;
@@ -286,23 +302,35 @@ export class SoundManager extends KeepTrackPlugin {
           }
         }
         sound = this.sounds[`chatter${random}`];
-        sound.volume = 0.15;
+        if (sound instanceof HTMLAudioElement === false) {
+          sound = new Audio(sound);
+          sound.volume = 0.15;
+          this.sounds[`chatter${random}`] = sound; // Cache the audio element
+        }
         this.stop(SoundNames.CHATTER, false); // Stop all other chatter clips
         sound.play();
 
-        // Play another chatter clip after this one
-        this.nextChatter = setTimeout(
-          () => {
+        // Play another chatter clip after this one finishes playing
+        sound.addEventListener('ended', () => {
+          this.nextChatter = setTimeout(() => {
             this.play(SoundNames.CHATTER);
-          },
-          sound.duration * 1000 + 10000,
-        );
+          }, 10000); // 10 seconds after the clip ends
+        }, { once: true });
 
         return;
       default:
         sound = this.sounds[soundName];
+        if (sound instanceof HTMLAudioElement === false) {
+          sound = new Audio(sound);
+          if (soundName === SoundNames.LOADING) {
+            sound.volume = 0.25;
+          }
+          if (soundName === SoundNames.EXPORT) {
+            sound.volume = 0.3;
+          }
+          this.sounds[soundName] = sound; // Cache the audio element
+        }
         sound.play();
-
     }
   }
 }

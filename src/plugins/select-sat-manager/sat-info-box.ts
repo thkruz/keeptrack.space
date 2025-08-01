@@ -76,6 +76,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     super.addHtml();
 
     // NOTE: This has to go first.
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.orbitalData.bind(this));
     // -------------------------------------------------
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSensorInfo_.bind(this));
@@ -83,7 +84,6 @@ export class SatInfoBox extends KeepTrackPlugin {
     keepTrackApi.on(InputEventType.KeyDown, this.onKeyDownLowerI_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSatMissionData_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateObjectData_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   private onKeyDownLowerI_(key: string): void {

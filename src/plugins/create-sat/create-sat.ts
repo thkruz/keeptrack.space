@@ -7,6 +7,7 @@ import {
   KilometersPerSecond,
   SatelliteRecord,
   Sgp4,
+  Tle,
 } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
@@ -38,6 +39,7 @@ interface TleInputParams {
   epochday: string;
   source: string;
   name: string;
+  period: string;
 }
 
 /**
@@ -72,7 +74,7 @@ export class CreateSat extends KeepTrackPlugin {
           <form id="createSat">
             <div class="input-field col s12">
               <input value="90000" id="${CreateSat.elementPrefix}-scc" type="text" maxlength="5" />
-              <label for="${CreateSat.elementPrefix}-scc" class="active">Satellite SCC#</label>
+              <label for="${CreateSat.elementPrefix}-scc" class="active">Satellite NORAD ID (90000-99999)</label>
             </div>
             <div class="input-field col s12">
               <select value=1 id="${CreateSat.elementPrefix}-type" type="text">
@@ -141,9 +143,6 @@ export class CreateSat extends KeepTrackPlugin {
             </div>
           </form>
         </div>
-        <div id="${CreateSat.elementPrefix}-error" class="center-align menu-selectable start-hidden">
-          <h6 class="center-align">Error</h6>
-        </div>
       </div>
     </div>
   `;
@@ -197,7 +196,12 @@ export class CreateSat extends KeepTrackPlugin {
       try {
         const meanmo = 1440 / parseFloat(per);
 
-        (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value = meanmo.toFixed(4);
+        (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value = meanmo.toFixed(5).padStart(8, '0');
+        /*
+         * Also reformat the input just in case the user entered a value with
+         * more than 5 decimal places
+         */
+        perInput.value = parseFloat(per).toFixed(4).padStart(8, '0');
       } catch (error) {
         errorManagerInstance.error(error as Error, 'create-sat.ts', 'Error converting period to mean motion');
       }
@@ -215,9 +219,15 @@ export class CreateSat extends KeepTrackPlugin {
       try {
         const per = (1440 / parseFloat(meanmo)).toFixed(4);
 
-        (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = per;
+        (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = per.padStart(8, '0');
+
+        /*
+         * Also reformat the input just in case the user entered a value with
+         * more than 4 decimal places
+         */
+        meanmoInput.value = parseFloat(meanmo).toFixed(5).padStart(8, '0');
       } catch (error) {
-        errorManagerInstance.error(error as Error, 'create-sat.ts', 'Error converting mean motion to period');
+        errorManagerInstance.warn(`Error converting mean motion to period: ${error}`);
       }
     });
   }
@@ -240,6 +250,7 @@ export class CreateSat extends KeepTrackPlugin {
       epochday: (getEl(`${CreateSat.elementPrefix}-day`) as HTMLInputElement).value,
       source: (getEl(`${CreateSat.elementPrefix}-src`) as HTMLInputElement).value,
       name: (getEl(`${CreateSat.elementPrefix}-name`) as HTMLInputElement).value,
+      period: (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value,
     };
   }
 
@@ -277,19 +288,236 @@ export class CreateSat extends KeepTrackPlugin {
     (getEl(`${CreateSat.elementPrefix}-name`) as HTMLInputElement).value = 'New Satellite';
   }
 
+  private static validateInputs_(inputParams: TleInputParams): string | null {
+    // Validate NORAD ID
+    if (!(/^\d{5}$/u).test(inputParams.scc) || parseInt(inputParams.scc, 10) < 90000 || parseInt(inputParams.scc, 10) > 99999) {
+      return 'Invalid NORAD ID. Must be a 5-digit number between 90000 and 99999.';
+    }
+    // Validate type
+    if (!['1', '2', '3', '4'].includes(inputParams.type)) {
+      return 'Invalid type. Must be 1 (Payload), 2 (Rocket Body), 3 (Debris), or 4 (Special).';
+    }
+    // Validate country
+    if (!inputParams.country) {
+      return 'Invalid country. Must be selected from the list.';
+    }
+    // Validate epoch year
+    if (!(/^\d{2}$/u).test(inputParams.epochyr)) {
+      return 'Invalid epoch year. Must be a 2-digit number.';
+    }
+    // Validate epoch day
+    if (!(/^\d{3}\.\d{8}$/u).test(inputParams.epochday)) {
+      return 'Invalid epoch day. Must be in the format NNN.NNNNNNNN (e.g., 001.00000000).';
+    }
+    // Validate inclination
+    if (!(/^\d{3}\.\d{4}$/u).test(inputParams.inc)) {
+      return 'Invalid inclination. Must be in the format NNN.NNNN (e.g., 000.0000).';
+    }
+    // Validate right ascension
+    if (!(/^\d{3}\.\d{4}$/u).test(inputParams.rasc)) {
+      return 'Invalid right ascension. Must be in the format NNN.NNNN (e.g., 000.0000).';
+    }
+    // Validate eccentricity
+    if (!(/^\d{7}$/u).test(inputParams.ecen)) {
+      return 'Invalid eccentricity. Must be a 7-digit number (e.g., 0000000).';
+    }
+    // Validate argument of perigee
+    if (!(/^\d{3}\.\d{4}$/u).test(inputParams.argPe)) {
+      return 'Invalid argument of perigee. Must be in the format NNN.NNNN (e.g., 000.0000).';
+    }
+    // Validate mean anomaly
+    if (!(/^\d{3}\.\d{4}$/u).test(inputParams.meana)) {
+      return 'Invalid mean anomaly. Must be in the format NNN.NNNN (e.g., 000.0000).';
+    }
+    // Validate mean motion
+    if (!(/^\d{2}\.\d{5}$/u).test(inputParams.meanmo)) {
+      return 'Invalid mean motion. Must be in the format NN.NNNNN (e.g., 16.00000).';
+    }
+    // Validate period
+    if (!(/^\d{2,4}\.\d{4}$/u).test(inputParams.period)) {
+      return 'Invalid period. Must be in the format NN.NNNN to NNNN.NNNN (e.g., 90.0000, 9999.9999) with 8 digits total.';
+    }
+    // Validate source
+    if (!inputParams.source || inputParams.source.trim() === '') {
+      return 'Invalid source. Must not be empty.';
+    }
+    // Validate name
+    if (!inputParams.name || inputParams.name.trim() === '') {
+      return 'Invalid name. Must not be empty.';
+    }
+
+    // All validations passed
+    return null;
+  }
+
+  /**
+   * Ensure input formatting is correct to pass validation
+   */
+  private static fixInputFormatting_(): void {
+    const sccInput = getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement;
+    const scc = sccInput.value.trim().padStart(5, '0');
+
+    sccInput.value = scc;
+
+    const yearInput = getEl(`${CreateSat.elementPrefix}-year`) as HTMLInputElement;
+    let year = yearInput.value.trim().replace(/\D/gu, '').slice(-2); // Only digits, last 2
+
+    year = year.padStart(2, '0'); // Must be 2 digits
+
+    yearInput.value = year;
+
+    const dayInput = getEl(`${CreateSat.elementPrefix}-day`) as HTMLInputElement;
+    let day = dayInput.value.trim();
+
+    // Ensure day is in the format NNN.NNNNNNNN (e.g., 001.00000000)
+    const dayNum = parseFloat(day);
+
+    if (!isNaN(dayNum)) {
+      // Always 3 integer digits, 8 decimals
+      day = dayNum.toFixed(8).padStart(12, '0');
+    } else {
+      // fallback: pad left to 12 chars
+      day = day.padStart(12, '0');
+    }
+
+    dayInput.value = day;
+
+    const incInput = getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement;
+    let inc = incInput.value.trim();
+    const incNum = parseFloat(inc);
+
+    // Ensure inclination is in the format NNN.NNNN (e.g., 000.0000)
+    if (!isNaN(incNum)) {
+      inc = incNum.toFixed(4).padStart(8, '0');
+    } else {
+      inc = inc.padStart(8, '0');
+    }
+
+    incInput.value = inc;
+
+    const rascInput = getEl(`${CreateSat.elementPrefix}-rasc`) as HTMLInputElement;
+    let rasc = rascInput.value.trim();
+    const rascNum = parseFloat(rasc);
+
+    // Ensure right ascension is in the format NNN.NNNN (e.g., 000.0000)
+    if (!isNaN(rascNum)) {
+      rasc = rascNum.toFixed(4).padStart(8, '0');
+    } else {
+      rasc = rasc.padStart(8, '0');
+    }
+
+    rascInput.value = rasc;
+
+    const ecenInput = getEl(`${CreateSat.elementPrefix}-ecen`) as HTMLInputElement;
+    let ecen = ecenInput.value.trim();
+
+    /*
+     * Ensure eccentricity is a 7-digit number (e.g., 0000000)
+     * Remove any decimal point and pad with zeros
+     */
+    ecen = ecen.replace('.', '').replace(/\D/gu, '').padStart(7, '0').slice(0, 7);
+
+    ecenInput.value = ecen;
+
+    const argPeInput = getEl(`${CreateSat.elementPrefix}-argPe`) as HTMLInputElement;
+    let argPe = argPeInput.value.trim();
+    const argPeNum = parseFloat(argPe);
+
+    // Ensure argument of perigee is in the format NNN.NNNN (e.g., 000.0000)
+    if (!isNaN(argPeNum)) {
+      argPe = argPeNum.toFixed(4).padStart(8, '0');
+    } else {
+      argPe = argPe.padStart(8, '0');
+    }
+
+    argPeInput.value = argPe;
+
+    const meanaInput = getEl(`${CreateSat.elementPrefix}-meana`) as HTMLInputElement;
+    let meana = meanaInput.value.trim();
+    const meanaNum = parseFloat(meana);
+
+    // Ensure mean anomaly is in the format NNN.NNNN (e.g., 000.0000)
+    if (!isNaN(meanaNum)) {
+      meana = meanaNum.toFixed(4).padStart(8, '0');
+    } else {
+      meana = meana.padStart(8, '0');
+    }
+
+    meanaInput.value = meana;
+
+    const meanmoInput = getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement;
+    // Ensure mean motion is in the format NN.NNNNN (e.g., 16.00000)
+    let meanmo = meanmoInput.value.trim();
+    const meanmoNum = parseFloat(meanmo);
+
+    if (!isNaN(meanmoNum)) {
+      meanmo = meanmoNum.toFixed(5).padStart(8, '0');
+    } else {
+      meanmo = meanmo.padStart(8, '0');
+    }
+    meanmoInput.value = meanmo;
+
+    const periodInput = getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement;
+    let period = periodInput.value.trim();
+
+    // Ensure period is a valid number and format as NNNN.NNNN (8 digits total, pad left if needed)
+    const periodNum = parseFloat(period);
+
+    if (!isNaN(periodNum)) {
+      // Always 4 decimals, pad integer part to at least 2 digits (e.g., 90.0000, 9999.9999)
+      period = periodNum.toFixed(4);
+      // Pad left so total length is 8 (for 2 int digits) or 9 (for 3+ int digits)
+      if (period.length < 8) {
+        period = period.padStart(8, '0');
+      }
+    } else {
+      period = period.padStart(8, '0');
+    }
+
+    periodInput.value = period;
+
+    const sourceInput = getEl(`${CreateSat.elementPrefix}-src`) as HTMLInputElement;
+    const source = sourceInput.value.trim();
+
+    sourceInput.value = source;
+
+    const nameInput = getEl(`${CreateSat.elementPrefix}-name`) as HTMLInputElement;
+    const name = nameInput.value.trim();
+
+    nameInput.value = name;
+
+    // Ensure type is a valid number
+    const typeInput = getEl(`${CreateSat.elementPrefix}-type`) as HTMLInputElement;
+    const type = parseInt(typeInput.value, 10);
+
+    if (isNaN(type) || type < 1 || type > 4) {
+      typeInput.value = '1'; // Default to Payload if invalid
+    } else {
+      typeInput.value = type.toString();
+    }
+  }
+
   /**
    * Create and submit a new satellite
    */
   private static createSatSubmit_(): void {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const errorElement = getEl(`${CreateSat.elementPrefix}-error`)!;
 
-    // Hide any previous error
-    errorElement.style.display = 'none';
+    // Attempt to fix formatting issues
+    CreateSat.fixInputFormatting_();
 
     // Get all input values
     const inputParams = CreateSat.getTleInputs_();
+
+    // Validate inputs
+    const invalidMsg = CreateSat.validateInputs_(inputParams);
+
+    if (invalidMsg) {
+      keepTrackApi.getUiManager().toast(`Invalid input parameters: ${invalidMsg}`, ToastMsgType.error, true);
+
+      return;
+    }
 
     try {
       // Convert SCC to internal ID
@@ -310,6 +538,8 @@ export class CreateSat extends KeepTrackPlugin {
       const country = inputParams.country;
       const type = parseInt(inputParams.type);
       const intl = `${inputParams.epochyr}69B`; // International designator
+      const scc = inputParams.scc.replace(/^0+/u, '');
+      const convertedScc = Tle.convert6DigitToA5(scc); // Convert SCC to A5 format
 
       // Create TLE from parameters
       const { tle1, tle2 } = FormatTle.createTle({
@@ -323,16 +553,12 @@ export class CreateSat extends KeepTrackPlugin {
         epochyr: inputParams.epochyr,
         epochday: inputParams.epochday,
         intl,
-        scc: inputParams.scc,
+        scc: convertedScc,
       });
 
       // Check if TLE generation failed
       if (tle1 === 'Error') {
-        errorManagerInstance.error(
-          new Error(tle2),
-          'create-sat.ts',
-          t7e('errorMsgs.CreateSat.errorCreatingSat'),
-        );
+        errorManagerInstance.warn(t7e('errorMsgs.CreateSat.errorCreatingSat'));
 
         return;
       }
@@ -417,8 +643,7 @@ export class CreateSat extends KeepTrackPlugin {
       );
 
     } catch (error) {
-      errorManagerInstance.error(error as Error, 'create-sat.ts', 'Failed to create satellite');
-      keepTrackApi.getUiManager().toast('Failed to create satellite', ToastMsgType.error, true);
+      errorManagerInstance.warn(`Failed to create satellite: ${error}`);
     }
   }
 

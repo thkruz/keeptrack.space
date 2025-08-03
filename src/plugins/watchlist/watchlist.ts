@@ -122,38 +122,45 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         watchlistString = null;
       }
     }
+
     if (watchlistString !== null && watchlistString !== '[]' && watchlistString.length > 0) {
-      let newWatchlist: { id: number, inView: boolean }[];
-      // We save it as an array of sccNums
-      const savedSatList: string[] = JSON.parse(watchlistString);
-
-      if (savedSatList.length > 0) {
-        // We need to convert it to an array of objects
-        newWatchlist = savedSatList.map((sccNum: string) => ({ id: parseInt(sccNum), inView: false }));
-      } else {
-        newWatchlist = [];
-      }
-
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-
-      for (const obj of newWatchlist) {
-        const sat = catalogManagerInstance.getObject(catalogManagerInstance.sccNum2Id(obj.id), GetSatType.EXTRA_ONLY);
-
-        if (sat !== null) {
-          obj.id = sat.id;
-          obj.inView = false;
-        } else {
-          errorManagerInstance.warn('Watchlist File Format Incorret');
-
-          return;
-        }
-      }
-      if (newWatchlist.length > 0) {
-        keepTrackApi.getUiManager().toast(`Watchlist Loaded with ${newWatchlist.length} Satellites`, ToastMsgType.normal);
-      }
+      const newWatchlist = this.createNewWatchlist(watchlistString);
 
       this.updateWatchlist({ updateWatchlistList: newWatchlist, isSkipSearch: true });
     }
+  }
+
+  createNewWatchlist(watchlistString: string): { id: number, inView: boolean }[] {
+    let newWatchlist: { id: number, inView: boolean }[];
+    // We save it as an array of sccNums
+    const savedSatList: string[] = JSON.parse(watchlistString);
+
+    if (savedSatList.length > 0) {
+      // We need to convert it to an array of objects
+      newWatchlist = savedSatList.map((sccNum: string) => ({ id: parseInt(sccNum), inView: false }));
+    } else {
+      newWatchlist = [];
+    }
+
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
+    for (const obj of newWatchlist) {
+      const sat = catalogManagerInstance.getObject(catalogManagerInstance.sccNum2Id(obj.id), GetSatType.EXTRA_ONLY);
+
+      if (sat !== null) {
+        obj.id = sat.id;
+        obj.inView = false;
+      } else {
+        errorManagerInstance.warn('Watchlist File Format Incorret');
+
+        return [];
+      }
+    }
+    if (newWatchlist.length > 0) {
+      keepTrackApi.getUiManager().toast(`Watchlist Loaded with ${newWatchlist.length} Satellites`, ToastMsgType.normal);
+    }
+
+    return newWatchlist;
   }
 
   /**
@@ -440,12 +447,22 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    */
   private onClearClicked_() {
     keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+    this.clear();
+  }
+
+  clear() {
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
     for (const obj of this.watchlistList) {
       orbitManagerInstance.removeInViewOrbit(obj.id);
     }
-    // TODO: Clear lines from sensors to satellites
+
+    keepTrackApi.getLineManager().lines.forEach((line) => {
+      if (line instanceof SensorToSatLine) {
+        line.isGarbage = true;
+      }
+    });
+
     this.updateWatchlist({ updateWatchlistList: [], isSkipSearch: true });
   }
 

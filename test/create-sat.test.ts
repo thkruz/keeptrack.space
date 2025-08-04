@@ -68,6 +68,10 @@ describe('CreateSat', () => {
     keepTrackApi.getUiManager = jest.fn().mockReturnValue(mockUiManager);
     keepTrackApi.getTimeManager = jest.fn().mockReturnValue(mockTimeManager);
 
+    // Mock the validation CreateSat[validateInputs_] method to always return false
+    // eslint-disable-next-line dot-notation
+    CreateSat['validateInputs_'] = jest.fn().mockReturnValue(false);
+
     // Call the method under test
     // eslint-disable-next-line dot-notation
     CreateSat['createSatSubmit_']();

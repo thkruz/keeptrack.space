@@ -21,7 +21,7 @@ type KeepTrackMesh = Mesh & {
 type MeshModel = {
   id: number;
   name: string;
-  mesh: KeepTrackMesh
+  mesh: KeepTrackMesh | null;
 };
 
 export interface MeshObject {
@@ -255,7 +255,7 @@ export class MeshManager {
       return;
     }
 
-    if (!this.currentMeshObject) {
+    if (!this.currentMeshObject || !this.currentMeshObject.model.mesh) {
       return;
     }
     if (typeof this.currentMeshObject?.id === 'undefined' || this.currentMeshObject?.id === -1) {
@@ -652,6 +652,12 @@ export class MeshManager {
   }
 
   private applyAttributePointers_(model: MeshModel) {
+    if (!model.mesh) {
+      errorManagerInstance.warn('Mesh model is not defined. Cannot apply attribute pointers.');
+
+      return;
+    }
+
     const gl = this.gl_;
     const layout = model.mesh.vertexBuffer.layout;
 
@@ -793,7 +799,7 @@ export class MeshManager {
       this.models[mesh] = {
         id: -1,
         name: mesh,
-        mesh: null as unknown as KeepTrackMesh,
+        mesh: null as KeepTrackMesh | null,
       };
     }
   }

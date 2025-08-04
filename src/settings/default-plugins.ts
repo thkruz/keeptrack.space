@@ -5,6 +5,14 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 0,
   },
+  TooltipsPlugin: {
+    enabled: false,
+    order: 1,
+  },
+  UserAccountPlugin: {
+    enabled: false,
+    order: 2,
+  },
   SensorListPlugin: {
     enabled: true,
     order: 10,

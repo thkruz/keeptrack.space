@@ -6,6 +6,8 @@ export type PluginConfiguration = {
 };
 
 export type KeepTrackPluginsConfiguration = {
+  TooltipsPlugin?: PluginConfiguration
+  UserAccountPlugin?: PluginConfiguration
   ManeuverPlugin?: PluginConfiguration;
   DebugMenuPlugin?: PluginConfiguration;
   SensorListPlugin?: PluginConfiguration;

@@ -62,6 +62,8 @@ export enum StorageKey {
   FILTER_SETTINGS_OTHER_COUNTRIES = 'v2-filter-settings-other-countries',
   FILTER_SETTINGS_STARLINK = 'v2-filter-settings-starlink',
   SENSOR_TIMELINE_ENABLED_SENSORS = 'v2-sensor-timeline-enabled-sensors',
+
+  USER_ACCOUNT = 'v2-user-account',
 }
 export class PersistenceManager {
   private readonly storage_: Storage;

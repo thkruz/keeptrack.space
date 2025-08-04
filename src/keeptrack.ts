@@ -515,6 +515,14 @@ theodore.kruczek at gmail dot com.
         }
       }
 
+      if (settingsManager.isDisableCanvas) {
+        const canvasHolderDom = getEl('keeptrack-canvas');
+
+        if (canvasHolderDom) {
+          canvasHolderDom.style.display = 'none';
+        }
+      }
+
       // Update any CSS now that we know what is loaded
       keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
 

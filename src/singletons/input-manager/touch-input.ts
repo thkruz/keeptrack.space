@@ -87,7 +87,7 @@ export class TouchInput {
     }
 
     // Reset if last finger
-    if (evt.touches.length === 0) {
+    if (evt.touches?.length === 0) {
       this.isPinching = false;
       this.isPanning = false;
       mainCameraInstance.mouseX = 0;

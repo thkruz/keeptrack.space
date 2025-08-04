@@ -123,3 +123,7 @@ stats.json
 
 # Local env files
 .env
+
+# Cypress Testing Files
+cypress
+cypress.config.ts

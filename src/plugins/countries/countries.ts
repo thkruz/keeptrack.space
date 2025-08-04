@@ -31,23 +31,14 @@ export class CountriesMenu extends KeepTrackPlugin {
 
   sideMenuElementName = 'countries-menu';
 
-  addHtml(): void {
+  addHtml() {
     super.addHtml();
-
-    keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherReady,
-      () => {
-        getEl('country-list')!.innerHTML = CountriesMenu.generateCountryList_();
-      },
-    );
-  }
-
-  addJs() {
-    super.addJs();
 
     keepTrackApi.on(
       KeepTrackApiEvents.uiManagerFinal,
       () => {
+        getEl('country-list')!.innerHTML = CountriesMenu.generateCountryList_();
+
         getEl('country-menu')!
           .querySelectorAll('li')
           .forEach((element) => {

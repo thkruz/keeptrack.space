@@ -55,7 +55,7 @@ export const sensorGroups: SensorGroup[] = [
       name: 'All Missile Defense Sensors',
       badge: 'MDA',
     },
-    list: ['COBRADANE', 'HARTPY', 'QTRTPY', 'KURTPY', 'SHATPY', 'KCSTPY', 'SBXRDR'],
+    list: ['LRDR', 'COBRADANE', 'HARTPY', 'QTRTPY', 'KURTPY', 'SHATPY', 'KCSTPY', 'SBXRDR'],
   },
   {
     name: 'OWL-Net',

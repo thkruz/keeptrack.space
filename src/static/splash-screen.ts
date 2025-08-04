@@ -12,6 +12,7 @@ import issJpg from '@public/img/wallpaper/iss.jpg';
 import moonJpg from '@public/img/wallpaper/moon.jpg';
 import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
 import opsJpg from '@public/img/wallpaper/ops.jpg';
+import ops2Jpg from '@public/img/wallpaper/ops2.jpg';
 import rocketJpg from '@public/img/wallpaper/rocket.jpg';
 import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
 import rocket3Jpg from '@public/img/wallpaper/rocket3.jpg';
@@ -26,7 +27,7 @@ export abstract class SplashScreen {
   private static splashScreenImgList_ =
     [
       blueMarbleJpg, moonJpg, observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg,
-      epfl1Jpg, epfl2Jpg, opsJpg,
+      epfl1Jpg, epfl2Jpg, opsJpg, ops2Jpg,
     ];
 
   static readonly msg = {
@@ -61,7 +62,7 @@ export abstract class SplashScreen {
           <span id="loader-text">Downloading Science...</span>
         </div>
         <div id="loading-hint">Hint: ${this.showHint()}</div>
-        <div id="version-text">v10.5.2</div>
+        <div id="version-text">v10.6.1</div>
         <div id="copyright-notice">
           ${settingsManager.isMobileModeEnabled ? t7e('copyright.noticeMobile') : t7e('copyright.notice')}
         </div>

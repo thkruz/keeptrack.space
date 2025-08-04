@@ -2,7 +2,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 
 import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { openColorbox } from '@app/lib/colorbox';
-import { hideEl } from '@app/lib/get-el';
+import { hideEl, showEl } from '@app/lib/get-el';
 import { LaunchSite } from '@app/singletons/catalog-manager/LaunchFacility';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { DetailedSatellite, DetailedSensor, eci2lla } from 'ootk';
@@ -101,14 +101,21 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
       if (sat instanceof DetailedSatellite === false) {
         hideEl('view-sat-info-rmb');
         hideEl('view-related-sats-rmb');
+      } else {
+        showEl('view-sat-info-rmb');
+        showEl('view-related-sats-rmb');
       }
 
       if (sat instanceof DetailedSensor === false) {
         hideEl('view-sensor-info-rmb');
+      } else {
+        showEl('view-sensor-info-rmb');
       }
 
       if (sat instanceof LaunchSite === false) {
         hideEl('view-launchsite-info-rmb');
+      } else {
+        showEl('view-launchsite-info-rmb');
       }
     });
   }
@@ -121,10 +128,12 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
     if (!sensorInfoPluginInstance) {
       return;
     }
-    sensorInfoPluginInstance.setBottomIconToSelected();
+
     if (!sensorInfoPluginInstance.isMenuButtonActive) {
+      sensorInfoPluginInstance.setBottomIconToSelected();
       sensorInfoPluginInstance.openSideMenu();
     }
+
     sensorInfoPluginInstance.getSensorInfo();
   }
 }

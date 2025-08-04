@@ -20,7 +20,8 @@ type KeepTrackMesh = Mesh & {
 
 type MeshModel = {
   id: number;
-  mesh: KeepTrackMesh
+  name: string;
+  mesh: KeepTrackMesh | null;
 };
 
 export interface MeshObject {
@@ -49,7 +50,7 @@ export class MeshManager {
   private gl_: WebGL2RenderingContext;
   isReady = false;
   private meshList_: string[] = [];
-  private meshes_: KeepTrackMesh;
+  private meshes_: KeepTrackMesh = {} as KeepTrackMesh;
   private numOfWarnings_: number;
   private program_: WebGLProgram;
   private sccNumAehf_ = ['36868', '38254', '39256', '43651', '44481', '45465'];
@@ -143,6 +144,7 @@ export class MeshManager {
 
   private mvMatrix_: mat4;
   private nMatrix_: mat3;
+  private downloadedMeshes_: string[] = [];
 
   checkIfNameKnown(name: string): boolean {
     // TODO: Currently all named models aim at nadir - that isn't always true
@@ -203,6 +205,13 @@ export class MeshManager {
     if (!this.isReady) {
       return;
     }
+
+    // Check for this.currentMeshObject.model.mesh.vertexBuffer
+    if (!this.currentMeshObject.model.mesh?.vertexBuffer) {
+      // Our mesh is probably still downloading. Skip drawing
+      return;
+    }
+
     // Don't draw meshes if the camera is too far away
     if (keepTrackApi.getMainCamera().camDistBuffer >= settingsManager.nearZoomLevel) {
       return;
@@ -246,7 +255,7 @@ export class MeshManager {
       return;
     }
 
-    if (!this.currentMeshObject) {
+    if (!this.currentMeshObject || !this.currentMeshObject.model.mesh) {
       return;
     }
     if (typeof this.currentMeshObject?.id === 'undefined' || this.currentMeshObject?.id === -1) {
@@ -451,19 +460,10 @@ export class MeshManager {
       // Changes Loading Screen Text
       SplashScreen.loadStr(SplashScreen.msg.models);
 
-      OBJ.downloadModels(this.fileList_).then((models: MeshMap) => {
-        /*
-         * DEBUG:
-         * for (var [name, mesh] of Object.entries(models)) {
-         *   console.debug('Name:', name);
-         *   console.debug('Mesh:', mesh);
-         * }
-         */
-        this.meshes_ = models as unknown as KeepTrackMesh;
-        this.initShaders();
-        this.initBuffers();
-        this.isReady = true;
-      });
+      this.initShaders();
+      this.initAllBuffers();
+      this.isReady = true;
+
     } catch {
       errorManagerInstance.warn('Meshes failed to load!');
     }
@@ -480,6 +480,11 @@ export class MeshManager {
     }
 
     this.updateModel_(selectedDate, sat);
+
+    if (this.currentMeshObject.model.mesh === null) {
+      this.initBuffers(this.currentMeshObject.model.name);
+      this.updateModel_(selectedDate, sat);
+    }
 
     const posData = keepTrackApi.getDotsManager().positionData;
     const position = {
@@ -647,6 +652,12 @@ export class MeshManager {
   }
 
   private applyAttributePointers_(model: MeshModel) {
+    if (!model.mesh) {
+      errorManagerInstance.warn('Mesh model is not defined. Cannot apply attribute pointers.');
+
+      return;
+    }
+
     const gl = this.gl_;
     const layout = model.mesh.vertexBuffer.layout;
 
@@ -685,15 +696,26 @@ export class MeshManager {
     }
   }
 
-  private initBuffers() {
+  private initBuffers(mesh: string) {
     const gl = this.gl_;
     const layout = new OBJ.Layout(OBJ.Layout.POSITION, OBJ.Layout.NORMAL, OBJ.Layout.AMBIENT, OBJ.Layout.DIFFUSE, OBJ.Layout.UV, OBJ.Layout.SPECULAR, OBJ.Layout.SPECULAR_EXPONENT);
 
-    // initialize the mesh's buffers
-    for (const mesh in this.meshes_) {
-      if (!Object.prototype.hasOwnProperty.call(this.meshes_, mesh)) {
-        continue;
-      }
+    // Find the mesh in fileList_ and then download just that mesh
+    const meshFile = this.fileList_.find((file) => file.obj.includes(mesh));
+
+    if (!meshFile) {
+      console.warn(`Mesh file not found for mesh: ${mesh}`);
+
+      return;
+    }
+
+    if (this.downloadedMeshes_.includes(mesh)) {
+      // Already downloaded this mesh, skip
+      return;
+    }
+
+    OBJ.downloadModels([meshFile]).then((models: MeshMap) => {
+      this.meshes_[mesh] = models[mesh];
       try {
         // Create the vertex buffer for this mesh
         const vertexBuffer = gl.createBuffer() as WebGLBuffer & {
@@ -752,6 +774,7 @@ export class MeshManager {
          */
         this.models[mesh] = {
           id: -1,
+          name: mesh,
           mesh: this.meshes_[mesh],
         };
         /*
@@ -764,6 +787,20 @@ export class MeshManager {
          * console.warn(error);
          */
       }
+    });
+
+    this.downloadedMeshes_.push(mesh);
+  }
+
+  private initAllBuffers() {
+    // initialize the mesh's buffers
+    for (const mesh of this.meshList_) {
+      // this.initBuffers(mesh);
+      this.models[mesh] = {
+        id: -1,
+        name: mesh,
+        mesh: null as KeepTrackMesh | null,
+      };
     }
   }
 

@@ -21,7 +21,7 @@ export enum Operators {
   NOR = 'NOR',
   PLA = 'PLA',
   CAS = 'CAS',
-  LEOLABS = 'LEO LABS',
+  LEOLABS = 'LEOLABS',
   CALTECH = 'CALTECH',
   COMMERCIAL = 'COMMERCIAL',
   ITAF = 'ITAF', // Italian Air Force
@@ -90,7 +90,7 @@ export const sensors = <SensorList>{
     shortName: 'CLR',
     id: 0,
     name: 'Clear SFS, Alaska',
-    uiName: 'Clear SFS',
+    uiName: 'Clear SFS (UEWR)',
     system: 'PAVE PAWS UEWR',
     freqBand: 'UHF',
     type: SpaceObjectType.PHASED_ARRAY_RADAR,
@@ -586,6 +586,33 @@ export const sensors = <SensorList>{
     url: '',
     country: 'Australia',
     operator: Operators.RAAF,
+  }),
+  // LRDR
+  LRDR: new RfSensor({
+    objName: 'LRDR',
+    id: 0,
+    name: 'Long Range Discrimination Radar, Alaska',
+    uiName: 'Clear AFS (LRDR)',
+    system: 'LRDR',
+    freqBand: 'S-Band',
+    type: SpaceObjectType.PHASED_ARRAY_RADAR,
+    lat: <Degrees>64.290556,
+    lon: <Degrees>-149.186945,
+    alt: <Kilometers>0.175, // Open Street Maps
+    minAz: <Degrees>184,
+    maxAz: <Degrees>64,
+    boresightAz: [244 as Degrees, 4 as Degrees],
+    minEl: <Degrees>3,
+    maxEl: <Degrees>85,
+    boresightEl: [20 as Degrees, 20 as Degrees],
+    minRng: <Kilometers>200,
+    maxRng: <Kilometers>12500, // https://www.janes.com/osint-insights/defence-news/c4isr/lockheed-martin-delivers-spy-7-radar-to-japan
+    beamwidth: <Degrees>0.3, // Roough estimate - need a source
+    zoom: ZoomValue.GEO,
+    changeObjectInterval: <Milliseconds>1000,
+    url: '',
+    country: 'United States',
+    operator: Operators.USSF,
   }),
   // TPY-2 RADARS
   HARTPY: new DetailedSensor({

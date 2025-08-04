@@ -67,6 +67,7 @@ import { StereoMap } from './stereo-map/stereo-map';
 import { TimeMachine } from './time-machine/time-machine';
 import { SatelliteTimeline } from './timeline-satellite/satellite-timeline';
 import { SensorTimeline } from './timeline-sensor/sensor-timeline';
+import { TooltipsPlugin } from './tooltips/tooltips';
 import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact-predict';
 import { TransponderChannelData } from './transponder-channel-data/transponder-channel-data';
 import { VideoDirectorPlugin } from './video-director/video-director';
@@ -81,6 +82,14 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
     const pluginList: { init: () => void | Promise<void>, config?: { enabled: boolean } }[] = [
       { init: () => new SelectSatManager().init(), config: { enabled: true } },
       { init: () => new TopMenu().init(), config: plugins.TopMenu },
+      { init: () => new TooltipsPlugin().init(), config: plugins.TooltipsPlugin },
+      {
+        init: async () => {
+          const proPlugin = await import('../plugins-pro/user-account/user-account');
+
+          new proPlugin.UserAccountPlugin().init();
+        }, config: plugins.UserAccountPlugin,
+      },
       {
         init: async () => {
           const proPlugin = await import('../plugins-pro/debug/debug');

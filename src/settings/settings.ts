@@ -97,6 +97,7 @@ export class SettingsManager {
   isEmbedMode = false;
   splashScreenList: string[] | null = null;
   preset: string | null = null; // Used to force a preset to be loaded without GET variable
+  isDisableCanvas = false; // Used to disable the canvas for debugging purposes
 
 
   static preserveSettings() {

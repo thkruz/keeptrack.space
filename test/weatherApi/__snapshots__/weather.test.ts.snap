@@ -237,7 +237,7 @@ exports[`SensorTimeline Weather Integration should correctly calculate passes an
         "system": "PAVE PAWS UEWR",
         "totalVelocity": 0,
         "type": 23,
-        "uiName": "Clear SFS",
+        "uiName": "Clear SFS (UEWR)",
         "url": undefined,
         "velocity": {
           "x": 0,

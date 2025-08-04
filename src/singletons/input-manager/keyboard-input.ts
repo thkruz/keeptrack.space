@@ -16,6 +16,11 @@ export class KeyboardInput {
       if (window !== window.parent && settingsManager.isEmbedMode) {
         // Listen for keyboard events sent from the parent via postMessage
         window.addEventListener('message', (event: MessageEvent) => {
+          // If event.target's class contains "keyboard-priority", ignore it
+          if (event.target instanceof Element && event.target.classList.contains('keyboard-priority')) {
+            return;
+          }
+
           // Optionally, check event.origin here for security
           if (!event.data || typeof event.data !== 'object') {
             return;
@@ -59,12 +64,20 @@ export class KeyboardInput {
 
       // Listen for keyboard events on the current window
       window.addEventListener('keydown', (e: Event) => {
+        // If event.target's class contains "keyboard-priority", ignore it
+        if (e.target instanceof Element && e.target.classList.contains('keyboard-priority')) {
+          return;
+        }
         if (keepTrackApi.getUiManager().isCurrentlyTyping) {
           return;
         }
         this.keyDownHandler_(<KeyboardEvent>e);
       });
       window.addEventListener('keyup', (e: Event) => {
+        // If event.target's class contains "keyboard-priority", ignore it
+        if (e.target instanceof Element && e.target.classList.contains('keyboard-priority')) {
+          return;
+        }
         if (keepTrackApi.getUiManager().isCurrentlyTyping) {
           return;
         }

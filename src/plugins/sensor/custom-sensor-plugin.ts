@@ -300,6 +300,59 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     const minrange = (<HTMLInputElement>getEl('cs-minrange')).value;
     const maxrange = (<HTMLInputElement>getEl('cs-maxrange')).value;
 
+    if (lat > 90 || lat < -90) {
+      errorManagerInstance.warn('Custom Sensor Latitude must be between -90 and 90 degrees.');
+
+      return;
+    }
+
+    if (lon > 180 || lon < -180) {
+      errorManagerInstance.warn('Custom Sensor Longitude must be between -180 and 180 degrees.');
+
+      return;
+    }
+
+    if (parseFloat(alt) < 0) {
+      errorManagerInstance.warn('Custom Sensor Altitude must be greater than or equal to 0 km.');
+
+      return;
+    }
+
+    if (parseFloat(minaz) < -360 || parseFloat(minaz) > 360) {
+      errorManagerInstance.warn('Custom Sensor Minimum Azimuth must be between -360 and 360 degrees.');
+
+      return;
+    }
+
+    if (parseFloat(maxaz) < -360 || parseFloat(maxaz) > 360) {
+      errorManagerInstance.warn('Custom Sensor Maximum Azimuth must be between -360 and 360 degrees.');
+
+      return;
+    }
+
+    if (parseFloat(minel) < -90 || parseFloat(minel) > 90) {
+      errorManagerInstance.warn('Custom Sensor Minimum Elevation must be between -90 and 90 degrees.');
+
+      return;
+    }
+
+    if (parseFloat(maxel) < -90 || parseFloat(maxel) > 90) {
+      errorManagerInstance.warn('Custom Sensor Maximum Elevation must be between -90 and 90 degrees.');
+
+      return;
+    }
+
+    if (parseFloat(minrange) < 0) {
+      errorManagerInstance.warn('Custom Sensor Minimum Range must be greater than or equal to 0 km.');
+
+      return;
+    }
+    if (parseFloat(maxrange) < 0) {
+      errorManagerInstance.warn('Custom Sensor Maximum Range must be greater than or equal to 0 km.');
+
+      return;
+    }
+
     let type = SpaceObjectType.OBSERVER;
 
     switch (sensorType) {

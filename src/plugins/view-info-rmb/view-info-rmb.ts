@@ -94,10 +94,6 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
       }
       const sat = keepTrackApi.getCatalogManager().getObject(clickedSatId);
 
-      if (typeof sat === 'undefined' || sat === null) {
-        return;
-      }
-
       if (sat instanceof DetailedSatellite === false) {
         hideEl('view-sat-info-rmb');
         hideEl('view-related-sats-rmb');
@@ -120,12 +116,12 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
     });
   }
 
-  viewSensorInfoRmb(clickedSat?: number): void {
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(clickedSat ?? -1);
+  viewSensorInfoRmb(clickedSat = -1): void {
+    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(clickedSat);
 
     const sensorInfoPluginInstance = keepTrackApi.getPlugin(SensorInfoPlugin);
 
-    if (!sensorInfoPluginInstance) {
+    if (!sensorInfoPluginInstance || clickedSat < 0) {
       return;
     }
 

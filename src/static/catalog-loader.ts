@@ -850,16 +850,20 @@ export class CatalogLoader {
     catalogManagerInstance.sccIndex[`${sccNum.toString()}`] = tempSatData.length;
     catalogManagerInstance.cosparIndex[`${intlDes}`] = tempSatData.length;
 
-    const satellite = new DetailedSatellite({
-      ...asciiSatInfo,
-      tle1: asciiSatInfo.tle1,
-      tle2: asciiSatInfo.tle2,
-    });
+    try {
+      const satellite = new DetailedSatellite({
+        ...asciiSatInfo,
+        tle1: asciiSatInfo.tle1,
+        tle2: asciiSatInfo.tle2,
+      });
 
-    satellite.id = tempSatData.length;
-    satellite.altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
+      satellite.id = tempSatData.length;
+      satellite.altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
 
-    tempSatData.push(satellite);
+      tempSatData.push(satellite);
+    } catch (e) {
+      errorManagerInstance.warn(`Failed to process satellite: ${element.ON} (${element.SCC})`);
+    }
   }
 
   private static processAsciiCatalog_(asciiCatalog: AsciiTleSat[], catalogManagerInstance: CatalogManager, tempSatData: DetailedSatellite[]) {

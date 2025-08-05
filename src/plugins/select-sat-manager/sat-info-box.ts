@@ -50,6 +50,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   private issensorInfoLoaded_ = false;
   private islaunchDataLoaded_ = false;
   private issatMissionDataLoaded_ = false;
+  private isManeuverDataLoaded_ = false;
   private isTopLinkEventListenersAdded_ = false;
 
   // Starting values of the collapsable sections
@@ -82,6 +83,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateLaunchData_.bind(this));
     keepTrackApi.on(InputEventType.KeyDown, this.onKeyDownLowerI_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSatMissionData_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateManeuverData_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateObjectData_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
@@ -462,6 +464,11 @@ export class SatInfoBox extends KeepTrackPlugin {
     if (!this.issatMissionDataLoaded_) {
       SatInfoBox.createSatMissionData();
       this.issatMissionDataLoaded_ = true;
+    }
+
+    if (!this.isManeuverDataLoaded_) {
+      SatInfoBox.createManeuverData_();
+      this.isManeuverDataLoaded_ = true;
     }
 
     // Now that is is loaded, reset the sizing and location
@@ -1051,6 +1058,23 @@ export class SatInfoBox extends KeepTrackPlugin {
     );
   }
 
+  private static createManeuverData_() {
+    getEl(SatInfoBox.containerId_)?.insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
+          <div id="maneuver-sat-info">
+            <div class="sat-info-section-header">
+              Maneuver Data
+              <span id="maneuver-sat-info-collapse" class="section-collapse material-icons" style="position: absolute; right: 0;">expand_less</span>
+            </div>
+            <div id="sat-info-maneuver-data">
+              <span>This is where your canvas would go for the 3D plot.</span>
+            </div>
+          </div>
+          `,
+    );
+  }
+
   private static createOrbitalData_() {
     getEl('ui-wrapper')?.insertAdjacentHTML(
       'beforeend',
@@ -1498,6 +1522,25 @@ export class SatInfoBox extends KeepTrackPlugin {
       } else {
         errorManagerInstance.debug('sat-only-info element not found');
       }
+    }
+  }
+
+  private static updateManeuverData_(obj?: BaseObject) {
+    /*
+     * This will run once when a satellite is selected
+     * obj will be the satellite object
+     */
+
+    if (obj instanceof DetailedSatellite) {
+      showEl('sat-info-maneuver-data');
+      console.log(`Satellite ${obj.sccNum6} selected...`);
+      /*
+       * This is where you should do the fetch for the maneuver data from your
+       * API and update the canvas.
+       */
+    } else {
+      // Ignore missiles and other objects
+      hideEl('sat-info-maneuver-data');
     }
   }
 

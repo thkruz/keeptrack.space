@@ -224,6 +224,32 @@ export class FileSystemManager {
   }
 
   /**
+   * Copies all locale files ending with `.src.json` from the specified source directory,
+   * renaming them to `.json` and saving them in the same directory.
+   *
+   * @param srcDir - The source directory containing `.src.json` locale files.
+   */
+  compileLocales(srcDir: string) {
+    const fullSrcDir = this.resolvePath(srcDir);
+    const files = readdirSync(fullSrcDir, { withFileTypes: true });
+
+    files.forEach((file) => {
+      if (file.isFile() && file.name.endsWith('.src.json')) {
+        const srcFilePath = join(fullSrcDir, file.name);
+        const destFileName = file.name.replace(/\.src\.json$/u, '.json');
+        const destFilePath = join(fullSrcDir, destFileName);
+
+        const content = this.readFile(srcFilePath);
+
+        this.writeFile(destFilePath, content);
+
+        logWithStyle(`Copied locale: ${srcFilePath} -> ${destFilePath}`, ConsoleStyles.DEBUG);
+      }
+    });
+  }
+
+
+  /**
    * Merges locale files from the source and plugin directories into the destination directory.
    * @param srcDir The source directory containing locale files.
    * @param pluginDir The plugin directory containing additional locale files.
@@ -235,9 +261,15 @@ export class FileSystemManager {
       .map((file) => file.name.replace(/\.src\.json$/u, '.json'));
 
     // Read locale files from the plugin directory
-    const pluginLocales = readdirSync(this.resolvePath(pluginDir), { withFileTypes: true })
-      .filter((file) => file.isFile() && file.name.endsWith('.json'))
-      .map((file) => file.name);
+    let pluginLocales: string[] = [];
+
+    try {
+      pluginLocales = readdirSync(this.resolvePath(pluginDir), { withFileTypes: true })
+        .filter((file) => file.isFile() && file.name.endsWith('.json'))
+        .map((file) => file.name);
+    } catch {
+      pluginLocales = [];
+    }
 
     // If a srcLocale file and pluginLocale file have the same name, merge them
     srcLocales.forEach((locale) => {

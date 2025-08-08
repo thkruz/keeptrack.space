@@ -14,8 +14,6 @@ export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
 }
 
 export class SpatialDensityColorScheme extends ColorScheme {
-  colorTheme: Record<string, rgbaArray>;
-  objectTypeFlags: Record<string, boolean>;
   readonly label = 'Spatial Density';
   readonly id = 'SpatialDensityColorScheme';
   static readonly id = 'SpatialDensityColorScheme';

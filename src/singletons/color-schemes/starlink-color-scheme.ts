@@ -7,8 +7,6 @@ import { MissileObject } from '../catalog-manager/MissileObject';
 import { ColorScheme } from './color-scheme';
 
 export class StarlinkColorScheme extends ColorScheme {
-  colorTheme: Record<string, rgbaArray>;
-  objectTypeFlags: Record<string, boolean>;
   readonly label = 'Starlink';
   readonly id = 'StarlinkColorScheme';
   static readonly id = 'StarlinkColorScheme';

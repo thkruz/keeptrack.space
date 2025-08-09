@@ -3682,6 +3682,14 @@ a.ui-button:active,
   padding: 5%;
 }
 
+#colorbox-title {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: x-large;
+}
+
 #colorbox-container {
   background-color: 'white';
   transform: translateX(-200%);
@@ -3690,7 +3698,7 @@ a.ui-button:active,
   z-index: 100;
   width: 95%;
   height: 95%;
-  margin: auto;
+  margin: 0px;
   border-color: var(--color-dark-border);
   border-width: 10px;
   border-style: solid;

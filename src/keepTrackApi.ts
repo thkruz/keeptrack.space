@@ -116,6 +116,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.parseGetVariables]: [string[]]; // params
   [KeepTrackApiEvents.searchUpdated]: [string]; // search term
   [KeepTrackApiEvents.legendUpdated]: [string]; // legend name
+  [KeepTrackApiEvents.satInfoBoxAddListeners]: [];
 };
 
 interface KeepTrackApiRegisterParams<T extends EventBusEvent> {

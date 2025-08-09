@@ -83,6 +83,8 @@
 }
 
 .section-collapse {
+  position: absolute;
+  right: 0px;
   cursor: pointer;
   color: var(--color-dark-text-accent);
   width: 25px;
@@ -106,6 +108,7 @@
 }
 
 #actions-section,
+#links-section,
 #launch-section,
 #sat-identifier-data,
 #orbital-section,
@@ -120,6 +123,7 @@
 }
 
 #actions-section.collapsed,
+#links-section.collapsed,
 #launch-section.collapsed,
 #sat-identifier-data.collapsed,
 #orbital-section.collapsed,

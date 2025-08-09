@@ -5,6 +5,7 @@ import { hideLoading, showLoading } from './showLoading';
 import { slideInRight, slideOutLeft } from './slide';
 
 interface ColorboxOptions {
+  title?: string;
   image?: boolean;
   callback?: () => void;
 }
@@ -51,6 +52,10 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
       });
     }
   }, -1);
+
+  if (options.title) {
+    setColorboxTitle(options.title);
+  }
 };
 
 export const closeColorbox = (): void => {
@@ -71,6 +76,24 @@ export const closeColorbox = (): void => {
     },
     -200,
   );
+
+  clearColorboxTitle();
+};
+
+const setColorboxTitle = (title: string): void => {
+  const titleSpan = getEl('colorbox-title');
+
+  if (titleSpan) {
+    titleSpan.textContent = title;
+  }
+};
+
+const clearColorboxTitle = (): void => {
+  const titleSpan = getEl('colorbox-title');
+
+  if (titleSpan) {
+    titleSpan.textContent = '';
+  }
 };
 
 /**
@@ -96,6 +119,14 @@ export const createColorbox = () => {
   const headerDiv = document.createElement('div');
 
   headerDiv.id = 'colorbox-header';
+
+  // Add title element
+  const titleSpan = document.createElement('span');
+
+  titleSpan.id = 'colorbox-title';
+  titleSpan.textContent = '';
+  headerDiv.appendChild(titleSpan);
+
   const openButton = document.createElement('button');
 
   openButton.id = 'colorbox-open-button';

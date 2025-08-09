@@ -649,7 +649,7 @@ export class SearchManager {
     const satInfoboxDom = getEl('sat-infobox', true);
 
     if (satInfoboxDom) {
-      SatInfoBox.resetMenuLocation(satInfoboxDom, false);
+      SatInfoBox.initPosition(satInfoboxDom, false);
     }
 
     if (!settingsManager.isEmbedMode) {

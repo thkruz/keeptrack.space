@@ -4,6 +4,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SoundNames } from '@app/plugins/sounds/SoundNames';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
+import { UrlManager } from '@app/static/url-manager';
 import { Kilometers, eci2lla } from 'ootk';
 import { closeColorbox } from '../../lib/colorbox';
 import { getEl } from '../../lib/get-el';
@@ -286,6 +287,7 @@ export class MouseInput {
         } else {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
         }
+
       }
       if (evt.button === 2) {
         // Right Mouse Button Clicked
@@ -294,6 +296,9 @@ export class MouseInput {
         }
       }
     }
+
+    UrlManager.updateURL(true);
+
     // Force the search bar to get repainted because it gets overwritten a lot
     this.dragHasMoved = false;
     keepTrackApi.getMainCamera().isDragging = false;

@@ -46,7 +46,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.WHITE;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+        keepTrackApi.getPlugin(NightToggle)?.toggleNightMode();
         break;
       case 'earth-opscenter-rmb':
         keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);

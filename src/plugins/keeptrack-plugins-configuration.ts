@@ -6,8 +6,8 @@ export type PluginConfiguration = {
 };
 
 export type KeepTrackPluginsConfiguration = {
-  TooltipsPlugin?: PluginConfiguration
-  UserAccountPlugin?: PluginConfiguration
+  TooltipsPlugin?: PluginConfiguration;
+  UserAccountPlugin?: PluginConfiguration;
   ManeuverPlugin?: PluginConfiguration;
   DebugMenuPlugin?: PluginConfiguration;
   SensorListPlugin?: PluginConfiguration;
@@ -19,7 +19,13 @@ export type KeepTrackPluginsConfiguration = {
   transponderChannelData?: PluginConfiguration;
   VideoDirectorPlugin?: PluginConfiguration;
   DebrisScreening?: PluginConfiguration;
-  SatInfoBox?: PluginConfiguration;
+  SatInfoBoxCore?: PluginConfiguration;
+  SatInfoBoxActions?: PluginConfiguration;
+  SatInfoBoxLinks?: PluginConfiguration;
+  SatInfoBoxOrbital?: PluginConfiguration;
+  SatInfoBoxObject?: PluginConfiguration;
+  SatInfoBoxMission?: PluginConfiguration;
+  SatInfoBoxSensor?: PluginConfiguration;
   FindSatPlugin?: PluginConfiguration;
   SatelliteFov?: PluginConfiguration;
   NightToggle?: PluginConfiguration;

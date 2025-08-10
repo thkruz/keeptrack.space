@@ -35,7 +35,7 @@ import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { SatMath, SunStatus } from '@app/static/sat-math';
-import { TearrData } from '@app/static/sensor-math';
+import type { TearrData } from '@app/static/sensor-math';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from 'ootk';
@@ -48,6 +48,18 @@ import { SensorInfoPlugin } from './sensor-info-plugin';
 
 export class SensorManager {
   lastMultiSiteArray: TearrData[];
+
+  // TODO: There is a better way to handle this.
+  currentTEARR = <TearrData>{
+    az: 0,
+    el: 0,
+    rng: 0,
+    objName: '',
+    lat: 0,
+    lon: 0,
+    alt: 0,
+    inView: false,
+  };
 
   getSensor(): DetailedSensor | null {
     return this.currentSensors[0] ?? null;

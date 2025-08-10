@@ -6,7 +6,7 @@ import { CatalogManager } from '@app/singletons/catalog-manager';
 import { StringifiedNumber } from '@app/static/sat-math';
 import { BaseObject, FormatTle, Tle } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SatInfoBox } from '../select-sat-manager/sat-info-box';
+import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class OrbitReferences extends KeepTrackPlugin {

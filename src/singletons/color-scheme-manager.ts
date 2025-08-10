@@ -55,22 +55,6 @@ import { PersistenceManager, StorageKey } from './persistence-manager';
 
 export class ColorSchemeManager {
   // This is where you confiure addon color schemes
-  static readonly addonColorSchemes = [
-    ObjectTypeColorScheme,
-    CelestrakColorScheme,
-    CountryColorScheme,
-    RcsColorScheme,
-    MissionColorScheme,
-    ConfidenceColorScheme,
-    OrbitalPlaneDensityColorScheme,
-    SpatialDensityColorScheme,
-    SunlightColorScheme,
-    GpAgeColorScheme,
-    SourceColorScheme,
-    VelocityColorScheme,
-    StarlinkColorScheme,
-    SmallSatColorScheme,
-  ];
   readonly colorSchemeInstances = {
     CelestrakColorScheme: new CelestrakColorScheme(),
     ObjectTypeColorScheme: new ObjectTypeColorScheme(),

@@ -144,6 +144,7 @@
     "presentDay": "现在"
   },
   "plugins": {
+    "proOnlyMsg": "此插件为专业版插件。您的 .env 文件配置不正确或缺少相关文件！详情请访问 https://keeptrack.space/pro。",
     "SensorListPlugin": {
       "bottomIconLabel": "传感器",
       "title": "传感器列表菜单",

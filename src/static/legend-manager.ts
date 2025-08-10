@@ -1,5 +1,6 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
-import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
+import { addonColorSchemes } from '@app/singletons/color-scheme-addons';
+import type { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { ObjectTypeColorScheme } from '@app/singletons/color-schemes/object-type-color-scheme';
 import { keepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
@@ -35,7 +36,7 @@ export abstract class LegendManager {
     const addonLegends = {};
     const addonlegendClassList = [] as string[];
 
-    for (const ColorSchemeClass of ColorSchemeManager.addonColorSchemes) {
+    for (const ColorSchemeClass of addonColorSchemes) {
       addonLegends[ColorSchemeClass.id] = ColorSchemeClass.legendHtml;
 
       for (const flag in ColorSchemeClass.uniqueObjectTypeFlags) {

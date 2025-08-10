@@ -8,6 +8,10 @@
   justify-content: space-around;
   align-items: center;
   padding-bottom: 5px;
+  text-align: center;
+  background: var(--color-dark-border);
+  color: var(--colorWhite);
+  margin-bottom: 5px;
 }
 
 #sat-add-watchlist,
@@ -37,6 +41,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   margin-bottom: 5px;
+  cursor: pointer;
 }
 
 #sat-infobox a {
@@ -107,9 +112,7 @@
   margin-top: 5px;
 }
 
-#actions-section,
-#links-section,
-#launch-section,
+.sat-info-section,
 #sat-identifier-data,
 #orbital-section,
 #secondary-sat-info,
@@ -122,16 +125,14 @@
   margin: 5px 0px;
 }
 
-#actions-section.collapsed,
-#links-section.collapsed,
-#launch-section.collapsed,
+.sat-info-section.collapsed,
 #sat-identifier-data.collapsed,
 #orbital-section.collapsed,
 #secondary-sat-info.collapsed,
 #sensor-sat-info.collapsed,
 #sat-mission-data.collapsed {
   max-height: 25px;
-  transition: max-height 0.25s ease-in-out;
+  transition: max-height 0.2s ease-in-out;
   margin: 5px 0px;
 }
 

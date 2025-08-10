@@ -14,7 +14,6 @@ import { jday } from '@app/lib/transforms';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, Degrees, EciVec3, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from 'ootk';
-import { SatInfoBox } from '../select-sat-manager/sat-info-box';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 
 let BurnRate: number, EarthMass: number, EarthRadius: number, FuelDensity: number, G: number, R: number, WarheadMass: number, h: number;
@@ -740,10 +739,10 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
     currentTEARR.inView = false;
   }
 
-  const satInfoBoxCorePlugin = keepTrackApi.getPlugin(SatInfoBox);
+  const sensorManagerInstance = keepTrackApi.getSensorManager();
 
-  if (satInfoBoxCorePlugin) {
-    satInfoBoxCorePlugin.currentTEARR = currentTEARR;
+  if (sensorManagerInstance) {
+    sensorManagerInstance.currentTEARR = currentTEARR;
   }
 
   return currentTEARR;

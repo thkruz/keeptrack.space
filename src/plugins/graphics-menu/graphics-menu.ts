@@ -1,10 +1,8 @@
-export class GraphicsMenuPlugin {
+import { t7e } from '@app/locales/keys';
+import { KeepTrackPlugin } from '../KeepTrackPlugin';
+
+export class GraphicsMenuPlugin extends KeepTrackPlugin {
   init() {
-    settingsManager.plugins.GraphicsMenuPlugin = {
-      enabled: false,
-    };
-    console.error(
-      'Graphics menu plugin is a pro plugin. Your .env file is improperly configured or you do not have the pro files!',
-    );
+    console.error(t7e('plugins.proOnlyMsg'));
   }
 }

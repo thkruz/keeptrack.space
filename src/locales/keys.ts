@@ -548,6 +548,7 @@ export const Keys = [
   'countries.VENZ',
   'countries.VTNM',
   'countries.TBD',
+  'plugins.proOnlyMsg',
 ] as const;
 
 // Type for all valid translation keys

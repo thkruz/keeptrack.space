@@ -23,6 +23,12 @@ class BuildManager {
       const pluginManager = new PluginManager(fileManager);
       const versionManager = new VersionManager(fileManager);
 
+      // Check for .env file - if it is missing copy from .env.example
+      if (!fileManager.fileExists('./.env')) {
+        fileManager.copyFile('./.env.example', './.env', { force: false });
+        logWithStyle('.env file not found, copied from .env.example', ConsoleStyles.WARNING);
+      }
+
       // Load configuration
       const config = configManager.loadConfig(process.argv.slice(2));
 

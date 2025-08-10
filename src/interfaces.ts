@@ -344,4 +344,6 @@ export enum KeepTrackApiEvents {
   searchUpdated = 'searchUpdated',
   legendUpdated = 'legendUpdated',
   satInfoBoxAddListeners = 'satInfoBoxAddListeners',
+  satInfoBoxInit = 'satInfoBoxInit',
+  satInfoBoxFinal = 'satInfoBoxFinal',
 }

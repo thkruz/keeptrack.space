@@ -7,7 +7,7 @@ import wifiFindPng from '@public/img/icons/wifi-find.png';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SatInfoBox } from '../select-sat-manager/sat-info-box';
+import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 

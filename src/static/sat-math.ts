@@ -55,7 +55,7 @@ import {
 import { EciArr3 } from '../interfaces';
 import { DISTANCE_TO_SUN, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '../lib/constants';
 import { jday, lon2yaw } from '../lib/transforms';
-import { Sun } from '../singletons/draw-manager/sun';
+import type { Sun } from '../singletons/draw-manager/sun';
 import { errorManagerInstance } from '../singletons/errorManager';
 import { CoordinateTransforms } from './coordinate-transforms';
 
@@ -347,8 +347,12 @@ export abstract class SatMath {
    * @param rae An object containing the range, azimuth, and elevation of the satellite in RAE coordinates.
    * @returns A boolean indicating whether the satellite is within the field of view of the sensor.
    */
-  static checkIsInView(sensor: Sensor, rae: { rng: Kilometers; az: Degrees; el: Degrees }): boolean {
+  static checkIsInView(sensor: Sensor, rae: { rng: Kilometers | null; az: Degrees | null; el: Degrees | null }): boolean {
     const { az, el, rng } = rae;
+
+    if (az === null || el === null || rng === null) {
+      return false;
+    }
 
     if (sensor.minAz > sensor.maxAz) {
       if (

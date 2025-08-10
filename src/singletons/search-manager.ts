@@ -1,5 +1,5 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
+import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import type { CatalogManager } from '@app/singletons/catalog-manager';
 import { GroupType, ObjectGroup } from '@app/singletons/object-group';
@@ -647,9 +647,10 @@ export class SearchManager {
     }, '');
 
     const satInfoboxDom = getEl('sat-infobox', true);
+    const satInfoBoxPlugin = keepTrackApi.getPlugin(SatInfoBox);
 
-    if (satInfoboxDom) {
-      SatInfoBox.initPosition(satInfoboxDom, false);
+    if (satInfoBoxPlugin && satInfoboxDom) {
+      satInfoBoxPlugin.initPosition(satInfoboxDom, false);
     }
 
     if (!settingsManager.isEmbedMode) {

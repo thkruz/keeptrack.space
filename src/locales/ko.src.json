@@ -144,6 +144,7 @@
     "presentDay": "현재"
   },
   "plugins": {
+    "proOnlyMsg": "이 플러그인은 프로 플러그인입니다. .env 파일이 잘못 구성되었거나 파일이 누락되었습니다! 자세한 내용은 https://keeptrack.space/pro를 참조하세요.",
     "SensorListPlugin": {
       "bottomIconLabel": "센서",
       "title": "센서 목록 메뉴",

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from '@app/plugins/sensor/sensorManager';

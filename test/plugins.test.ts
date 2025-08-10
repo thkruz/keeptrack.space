@@ -5,7 +5,7 @@ describe('plugins', () => {
   it('should be able to initialize all plugins', () => {
     loadPlugins(keepTrackApi, {
       debug: false,
-      SatInfoBox: true,
+      SatInfoBoxCore: true,
       AboutMenuPlugin: true,
       Collisions: true,
       DopsPlugin: true,

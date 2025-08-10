@@ -9,9 +9,9 @@ import type { SensorManager } from './plugins/sensor/sensorManager';
 import { SoundManager } from './plugins/sounds/sound-manager';
 import { SoundNames } from './plugins/sounds/SoundNames';
 import { SettingsManager } from './settings/settings';
-import { Camera } from './singletons/camera';
+import type { Camera } from './singletons/camera';
 import type { CatalogManager } from './singletons/catalog-manager';
-import { MissileObject } from './singletons/catalog-manager/MissileObject';
+import type { MissileObject } from './singletons/catalog-manager/MissileObject';
 import type { ColorSchemeManager } from './singletons/color-scheme-manager';
 import type { DotsManager } from './singletons/dots-manager';
 import type { LineManager } from './singletons/draw-manager/line-manager';
@@ -26,8 +26,8 @@ import { Scene } from './singletons/scene';
 import type { TimeManager } from './singletons/time-manager';
 import type { UiManager } from './singletons/uiManager';
 import { WebGLRenderer } from './singletons/webgl-renderer';
-import { SatMath } from './static/sat-math';
-import { SensorMath } from './static/sensor-math';
+import type { SatMath } from './static/sat-math';
+import type { SensorMath } from './static/sensor-math';
 
 declare global {
   interface Window {
@@ -117,6 +117,8 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.searchUpdated]: [string]; // search term
   [KeepTrackApiEvents.legendUpdated]: [string]; // legend name
   [KeepTrackApiEvents.satInfoBoxAddListeners]: [];
+  [KeepTrackApiEvents.satInfoBoxInit]: [];
+  [KeepTrackApiEvents.satInfoBoxFinal]: [];
 };
 
 interface KeepTrackApiRegisterParams<T extends EventBusEvent> {

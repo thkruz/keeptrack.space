@@ -340,7 +340,7 @@ export class SettingsManager {
    * Higher values make godrays more pronounced.
    * @default 0.75.
    */
-  godraysExposure = 0.75;
+  godraysExposure = 0.4;
   /**
    * The density of godrays effect.
    * Controls the intensity and thickness of the light scattering effect.

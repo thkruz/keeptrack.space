@@ -195,7 +195,6 @@ export abstract class UrlManager {
           break;
         case 'color':
           UrlManager.assignColorScheme_(kv, settingsManager);
-          isUsingParsedVariables = true;
           break;
         default:
           // Do nothing for other keys, they will be handled in the keepTrackApi.onKeepTrackReady event

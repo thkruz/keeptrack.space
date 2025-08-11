@@ -48,6 +48,10 @@ export class PluginManager {
       openSourcePath: '../plugins/initial-orbit/initial-orbit',
       proPath: '../plugins-pro/initial-orbit/initial-orbit',
     },
+    'earth-atmosphere': {
+      openSourcePath: '../plugins/earth-atmosphere/earth-atmosphere',
+      proPath: '../plugins-pro/earth-atmosphere/earth-atmosphere',
+    },
     debug: {
       openSourcePath: '../plugins/debug/debug',
       proPath: '../plugins-pro/debug/debug',

@@ -129,6 +129,16 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
       { init: () => new SocialMedia().init(), config: plugins.SocialMedia },
       { init: () => new ClassificationBar().init(), config: plugins.ClassificationBar },
       { init: () => new SoundManager().init(), config: plugins.SoundManager },
+
+      {
+        init: async () => {
+          const proPlugin = await import('../plugins-pro/earth-atmosphere/earth-atmosphere');
+
+          new proPlugin.EarthAtmosphere().init();
+        }, config: plugins.EarthAtmosphere,
+      },
+
+      // Bottom Menu Plugins
       { init: () => new SensorListPlugin().init(), config: plugins.SensorListPlugin },
       { init: () => new SensorInfoPlugin().init(), config: plugins.SensorInfoPlugin },
       { init: () => new CustomSensorPlugin().init(), config: plugins.CustomSensorPlugin },

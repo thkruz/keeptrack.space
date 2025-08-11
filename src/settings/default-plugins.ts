@@ -287,6 +287,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   GamepadPlugin: {
     enabled: true,
   },
+  // Scene plugins
+  EarthAtmosphere: {
+    enabled: true,
+  },
   // RMB plugins
   EarthPresetsPlugin: {
     enabled: true,

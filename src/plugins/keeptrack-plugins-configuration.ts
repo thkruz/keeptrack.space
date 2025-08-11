@@ -6,6 +6,7 @@ export type PluginConfiguration = {
 };
 
 export type KeepTrackPluginsConfiguration = {
+  EarthAtmosphere?: PluginConfiguration;
   TooltipsPlugin?: PluginConfiguration;
   UserAccountPlugin?: PluginConfiguration;
   ManeuverPlugin?: PluginConfiguration;

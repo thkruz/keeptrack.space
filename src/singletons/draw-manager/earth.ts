@@ -149,7 +149,8 @@ export class Earth {
   isUseHiRes: boolean;
   /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
-  mesh: Mesh;
+  surfaceMesh: Mesh;
+  atmosphereMesh: Mesh | null = null;
   imageCache: Record<string, HTMLImageElement> = {};
   cloudPosition_: number = Math.random() * 8192; // Randomize the cloud position
 
@@ -163,7 +164,10 @@ export class Earth {
    * This is run once per frame to render the earth.
    */
   draw(tgtBuffer: WebGLFramebuffer | null) {
-    this.drawColoredEarth_(tgtBuffer);
+    this.drawEarthSurface_(tgtBuffer);
+    if (settingsManager.isDrawAtmosphere) {
+      this.drawEarthAtmosphere_(tgtBuffer);
+    }
     this.drawBlackGpuPickingEarth_();
   }
 
@@ -190,13 +194,13 @@ export class Earth {
     // Change to the main drawing buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    occlusionPrgm.attrSetup(this.mesh.geometry.getCombinedBuffer());
+    occlusionPrgm.attrSetup(this.surfaceMesh.geometry.getCombinedBuffer());
 
     // Set the uniforms
     occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, camMatrix);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
-    gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.surfaceMesh.geometry.getIndex());
+    gl.drawElements(gl.TRIANGLES, this.surfaceMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
 
     /*
      * DEBUG:
@@ -226,20 +230,19 @@ export class Earth {
       this.initTextures_();
 
       // We only need to make the mesh once
-      if (!this.mesh) {
-        const geometry = new SphereGeometry(this.gl_, {
+      if (!this.surfaceMesh) {
+        const earthSurfaceGeometry = new SphereGeometry(this.gl_, {
           radius: RADIUS_OF_EARTH,
           widthSegments: settingsManager.earthNumLatSegs,
           heightSegments: settingsManager.earthNumLonSegs,
         });
-        const material = new ShaderMaterial(this.gl_, {
+        const earthSurfaceMaterial = new ShaderMaterial(this.gl_, {
           uniforms: {
             uIsAmbientLighting: <WebGLUniformLocation><unknown>null,
             uGlow: <WebGLUniformLocation><unknown>null,
             uZoomLevel: <WebGLUniformLocation><unknown>null,
             uisGrayScale: <WebGLUniformLocation><unknown>null,
             uCloudPosition: <WebGLUniformLocation><unknown>null,
-            uAtmosphereType: <WebGLUniformLocation><unknown>null,
             uIsDrawAurora: <WebGLUniformLocation><unknown>null,
             uLightDirection: <WebGLUniformLocation><unknown>null,
             uDayMap: <WebGLUniformLocation><unknown>null,
@@ -249,12 +252,12 @@ export class Earth {
             uPoliticalMap: <WebGLUniformLocation><unknown>null,
             uCloudsMap: <WebGLUniformLocation><unknown>null,
           },
-          vertexShader: this.shaders_.vert,
-          fragmentShader: this.shaders_.frag,
+          vertexShader: this.shaders.surfaceVert,
+          fragmentShader: this.shaders.surfaceFrag,
           glslVersion: GLSL3,
         });
 
-        this.mesh = new Mesh(this.gl_, geometry, material, {
+        this.surfaceMesh = new Mesh(this.gl_, earthSurfaceGeometry, earthSurfaceMaterial, {
           name: 'earth',
           precision: 'highp',
           disabledUniforms: {
@@ -263,8 +266,36 @@ export class Earth {
           },
         });
 
-        this.initVaoVisible_();
+        this.initVaoSurface_();
         this.initVaoOcclusion_();
+
+        if (this.shaders.atmosphereFrag !== '' && this.shaders.atmosphereVert !== '') {
+          const earthAtmosphereGeometry = new SphereGeometry(this.gl_, {
+            radius: RADIUS_OF_EARTH * 1.025, // Slightly larger than the earth
+            widthSegments: settingsManager.earthNumLatSegs,
+            heightSegments: settingsManager.earthNumLonSegs,
+          });
+          const earthAtmosphereMaterial = new ShaderMaterial(this.gl_, {
+            uniforms: {
+              uLightDirection: <WebGLUniformLocation><unknown>null,
+            },
+            vertexShader: this.shaders.atmosphereVert,
+            fragmentShader: this.shaders.atmosphereFrag,
+            glslVersion: GLSL3,
+          });
+
+          this.atmosphereMesh = new Mesh(this.gl_, earthAtmosphereGeometry, earthAtmosphereMaterial, {
+            name: 'earth-atmosphere',
+            precision: 'highp',
+            disabledUniforms: {
+              modelMatrix: true,
+              viewMatrix: true,
+            },
+          });
+
+          this.initVaoAtmosphere_();
+        }
+
       }
     } catch (error) {
       errorManagerInstance.debug(error);
@@ -281,7 +312,7 @@ export class Earth {
     this.lightDirection = [pos.x, pos.y, pos.z];
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
-    this.modelViewMatrix_ = mat4.copy(mat4.create(), this.mesh.geometry.localMvMatrix);
+    this.modelViewMatrix_ = mat4.copy(mat4.create(), this.surfaceMesh.geometry.localMvMatrix);
     mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, gmst);
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
 
@@ -339,7 +370,7 @@ export class Earth {
       );
     }
 
-    gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
+    gl.drawElements(gl.TRIANGLES, this.surfaceMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
 
     if (!settingsManager.isMobileModeEnabled) {
       gl.disable(gl.SCISSOR_TEST);
@@ -356,41 +387,85 @@ export class Earth {
   /**
    * This is run once per frame to render the earth.
    */
-  private drawColoredEarth_(tgtBuffer: WebGLFramebuffer | null) {
+  private drawEarthSurface_(tgtBuffer: WebGLFramebuffer | null) {
     const gl = this.gl_;
 
-    this.mesh.program.use();
+    this.surfaceMesh.program.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    this.setUniforms_(gl);
+    this.setSurfaceUniforms_(gl);
     this.setTextures_(gl);
 
     gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    gl.bindVertexArray(this.mesh.geometry.vao);
-    gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
+    gl.bindVertexArray(this.surfaceMesh.geometry.vao);
+    gl.drawElements(gl.TRIANGLES, this.surfaceMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
+  }
+
+  private drawEarthAtmosphere_(tgtBuffer: WebGLFramebuffer | null) {
+    if (!this.atmosphereMesh) {
+      return;
+    }
+
+    const gl = this.gl_;
+
+    this.atmosphereMesh.program.use();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+
+    // Set only uniform
+    this.setAtmosphereUniforms_(gl);
+
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthMask(false); // Disable depth writing
+
+    gl.enable(gl.POLYGON_OFFSET_FILL);
+    gl.polygonOffset(0.0, -RADIUS_OF_EARTH);
+
+    (this.atmosphereMesh.geometry as SphereGeometry).sortFacesByDistance(keepTrackApi.getMainCamera().getCamPos());
+
+    gl.bindVertexArray(this.atmosphereMesh.geometry.vao);
+    gl.drawElements(gl.TRIANGLES, this.atmosphereMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
+    gl.bindVertexArray(null);
+
+    gl.depthMask(true); // Re-enable depth writing
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.disable(gl.POLYGON_OFFSET_FILL);
   }
 
   /**
    * This is run once per frame to set the uniforms for the earth.
    */
-  private setUniforms_(gl: WebGL2RenderingContext) {
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
-    gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
-    gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+  private setSurfaceUniforms_(gl: WebGL2RenderingContext) {
+    gl.uniformMatrix4fv(this.surfaceMesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.surfaceMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
+    gl.uniformMatrix3fv(this.surfaceMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
+    gl.uniform3fv(this.surfaceMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
 
-    gl.uniform1f(this.mesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
-    gl.uniform1f(this.mesh.material.uniforms.uGlow, this.glowNumber_);
-    gl.uniform1f(this.mesh.material.uniforms.uZoomLevel, keepTrackApi.getMainCamera().zoomLevel() ?? 1);
-    gl.uniform1f(this.mesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
-    gl.uniform1f(this.mesh.material.uniforms.uCloudPosition, this.cloudPosition_);
-    gl.uniform3fv(this.mesh.material.uniforms.uLightDirection, this.lightDirection);
-    gl.uniform1f(this.mesh.material.uniforms.uAtmosphereType, settingsManager.isDrawAtmosphere);
-    gl.uniform1f(this.mesh.material.uniforms.uIsDrawAurora, settingsManager.isDrawAurora ? 1.0 : 0.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uGlow, this.glowNumber_);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, keepTrackApi.getMainCamera().zoomLevel() ?? 1);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
+    gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uIsDrawAurora, settingsManager.isDrawAurora ? 1.0 : 0.0);
+  }
+
+  private setAtmosphereUniforms_(gl: WebGL2RenderingContext) {
+    if (!this.atmosphereMesh) {
+      return;
+    }
+
+    gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
+    gl.uniformMatrix3fv(this.atmosphereMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
+    gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+
+    gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
   }
 
   private initTextures_(): void {
@@ -451,7 +526,7 @@ export class Earth {
     this.vaoOcclusion_ = gl.createVertexArray();
     gl.bindVertexArray(this.vaoOcclusion_);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.surfaceMesh.geometry.getCombinedBuffer());
 
     /*
      * gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.pickingBuffers.color);
@@ -462,11 +537,11 @@ export class Earth {
 
     // Only Enable Position Attribute
     gl.enableVertexAttribArray(dotsManagerInstance.programs.picking.attribs.a_position.location);
-    this.mesh.geometry.attributes.position.bindToArrayBuffer(gl);
+    this.surfaceMesh.geometry.attributes.position.bindToArrayBuffer(gl);
     gl.vertexAttribPointer(dotsManagerInstance.programs.picking.attribs.a_position.location, 3, gl.FLOAT, false, Float32Array.BYTES_PER_ELEMENT * 8, 0);
 
     // Select the vertex indicies buffer
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.surfaceMesh.geometry.getIndex());
 
     gl.bindVertexArray(null);
   }
@@ -474,24 +549,49 @@ export class Earth {
   /**
    * This is run once per session to initialize the earth vao.
    */
-  private initVaoVisible_() {
+  private initVaoSurface_() {
     const gl = this.gl_;
 
-    this.mesh.geometry.vao = gl.createVertexArray();
-    gl.bindVertexArray(this.mesh.geometry.vao);
+    this.surfaceMesh.geometry.vao = gl.createVertexArray();
+    gl.bindVertexArray(this.surfaceMesh.geometry.vao);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.mesh.geometry.getCombinedBuffer());
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.position.location);
-    this.mesh.geometry.attributes.position.bindToArrayBuffer(gl);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.surfaceMesh.geometry.getCombinedBuffer());
+    gl.enableVertexAttribArray(this.surfaceMesh.geometry.attributes.position.location);
+    this.surfaceMesh.geometry.attributes.position.bindToArrayBuffer(gl);
 
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.normal.location);
-    this.mesh.geometry.attributes.normal.bindToArrayBuffer(gl);
+    gl.enableVertexAttribArray(this.surfaceMesh.geometry.attributes.normal.location);
+    this.surfaceMesh.geometry.attributes.normal.bindToArrayBuffer(gl);
 
-    gl.enableVertexAttribArray(this.mesh.geometry.attributes.uv.location);
-    this.mesh.geometry.attributes.uv.bindToArrayBuffer(gl);
+    gl.enableVertexAttribArray(this.surfaceMesh.geometry.attributes.uv.location);
+    this.surfaceMesh.geometry.attributes.uv.bindToArrayBuffer(gl);
 
     // Select the vertex indicies buffer
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.surfaceMesh.geometry.getIndex());
+
+    gl.bindVertexArray(null);
+  }
+
+  /**
+   * Do not run this unless atmosphereMesh is defined
+   */
+  private initVaoAtmosphere_() {
+    const gl = this.gl_;
+
+    this.atmosphereMesh!.geometry.vao = gl.createVertexArray();
+    gl.bindVertexArray(this.atmosphereMesh!.geometry.vao);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.atmosphereMesh!.geometry.getCombinedBuffer());
+    gl.enableVertexAttribArray(this.atmosphereMesh!.geometry.attributes.position.location);
+    this.atmosphereMesh!.geometry.attributes.position.bindToArrayBuffer(gl);
+
+    gl.enableVertexAttribArray(this.atmosphereMesh!.geometry.attributes.normal.location);
+    this.atmosphereMesh!.geometry.attributes.normal.bindToArrayBuffer(gl);
+
+    gl.enableVertexAttribArray(this.atmosphereMesh!.geometry.attributes.uv.location);
+    this.atmosphereMesh!.geometry.attributes.uv.bindToArrayBuffer(gl);
+
+    // Select the vertex indicies buffer
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.atmosphereMesh!.geometry.getIndex());
 
     gl.bindVertexArray(null);
   }
@@ -501,7 +601,7 @@ export class Earth {
    */
   private setTextures_(gl: WebGL2RenderingContext) {
     // Day Map
-    gl.uniform1i(this.mesh.material.uniforms.uDayMap, 0);
+    gl.uniform1i(this.surfaceMesh.material.uniforms.uDayMap, 0);
     gl.activeTexture(gl.TEXTURE0);
     if (this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthDayTextureQuality] && !settingsManager.isBlackEarth) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthDayTextureQuality]);
@@ -510,7 +610,7 @@ export class Earth {
     }
 
     // Night Map
-    gl.uniform1i(this.mesh.material.uniforms.uNightMap, 1);
+    gl.uniform1i(this.surfaceMesh.material.uniforms.uNightMap, 1);
     gl.activeTexture(gl.TEXTURE1);
 
     if ((!this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality] &&
@@ -523,7 +623,7 @@ export class Earth {
     }
 
     // Bump Map
-    gl.uniform1i(this.mesh.material.uniforms.uBumpMap, 2);
+    gl.uniform1i(this.surfaceMesh.material.uniforms.uBumpMap, 2);
     gl.activeTexture(gl.TEXTURE2);
     if (settingsManager.isDrawBumpMap && this.textureBump[settingsManager.earthBumpTextureQuality]) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureBump[settingsManager.earthBumpTextureQuality]);
@@ -532,7 +632,7 @@ export class Earth {
     }
 
     // Specular Map
-    gl.uniform1i(this.mesh.material.uniforms.uSpecMap, 3);
+    gl.uniform1i(this.surfaceMesh.material.uniforms.uSpecMap, 3);
     gl.activeTexture(gl.TEXTURE3);
     if (settingsManager.isDrawSpecMap && this.textureSpec[settingsManager.earthSpecTextureQuality]) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureSpec[settingsManager.earthSpecTextureQuality]);
@@ -541,7 +641,7 @@ export class Earth {
     }
 
     // Political Map
-    gl.uniform1i(this.mesh.material.uniforms.uPoliticalMap, 4);
+    gl.uniform1i(this.surfaceMesh.material.uniforms.uPoliticalMap, 4);
     gl.activeTexture(gl.TEXTURE4);
     if (settingsManager.isDrawPoliticalMap && this.texturePolitical[settingsManager.earthPoliticalTextureQuality]) {
       gl.bindTexture(gl.TEXTURE_2D, this.texturePolitical[settingsManager.earthPoliticalTextureQuality]);
@@ -550,7 +650,7 @@ export class Earth {
     }
 
     // Clouds Map
-    gl.uniform1i(this.mesh.material.uniforms.uCloudsMap, 5);
+    gl.uniform1i(this.surfaceMesh.material.uniforms.uCloudsMap, 5);
     gl.activeTexture(gl.TEXTURE5);
     if (settingsManager.isDrawCloudsMap && this.textureClouds[settingsManager.earthCloudTextureQuality]) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureClouds[settingsManager.earthCloudTextureQuality]);
@@ -564,15 +664,14 @@ export class Earth {
    *
    * NOTE: Keep these at the bottom of the file to ensure proper syntax highlighting.
    */
-  private readonly shaders_ = {
-    frag: keepTrackApi.glsl`
+  shaders = {
+    surfaceFrag: keepTrackApi.glsl`
     precision highp float;
 
     uniform float uIsAmbientLighting;
     uniform float uGlow;
     uniform float uCloudPosition;
     uniform vec3 uLightDirection;
-    uniform float uAtmosphereType;
     uniform float uIsDrawAurora;
     uniform float uZoomLevel;
     uniform float uisGrayScale;
@@ -622,13 +721,13 @@ export class Earth {
 
       //................................................
       // Specular lighting
-      vec3 specLightColor = textureLod(uSpecMap, vUv, -1.0).rgb * diffuse * 0.1;
+      vec3 specLightColor = textureLod(uSpecMap, vUv, -1.0).rgb * diffuse * 0.05;
 
       //................................................
       // Final color
       vec3 dayColor = (ambientLightColor + directionalLightColor) * diffuse;
       vec3 dayTexColor = textureLod(uDayMap, vUv, -1.0).rgb * dayColor;
-      vec3 nightColor = 0.3 * textureLod(uNightMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);
+      vec3 nightColor = smoothstep(0.0, 2.0, (1.0 - uZoomLevel)) * textureLod(uNightMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);
 
       fragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
 
@@ -646,28 +745,6 @@ export class Earth {
         fragColor.rgb += cloudsColor * 0.8 * pow(uZoomLevel, 2.5);
 
       // ...............................................
-      // Atmosphere
-
-      // If 2 then draw the colorful atmosphere
-      if (uAtmosphereType > 1.5 && uAtmosphereType < 2.5) {
-        float sunAmount = max(dot(vNormal, uLightDirection), 0.1);
-        float darkAmount = max(dot(vNormal, -uLightDirection), 0.0);
-        float r = 1.0 - sunAmount;
-        float g = max(1.0 - sunAmount, 0.85) - darkAmount;
-        float b = max(sunAmount, 0.9) - darkAmount;
-        vec3 atmosphereColor = vec3(r,g,b);
-
-        float fragToCameraAngle = (1.0 - dot(fragToCamera, vNormal));
-        fragToCameraAngle = pow(fragToCameraAngle, 3.8); //Curve the change, Make the fresnel thinner
-
-        fragColor.rgb += (atmosphereColor * 2.0 * fragToCameraAngle * smoothstep(0.25, 0.5, fragToLightAngle));
-      } else if (uAtmosphereType > 0.5 && uAtmosphereType < 1.5) {
-        // If 1 then draw the white atmosphere
-        // Draw thin white line around the Earth no matter what fragToLightAngle is
-        float fragToCameraAngle = (1.0 - dot(fragToCamera, vNormal));
-        fragToCameraAngle = pow(fragToCameraAngle, 7.0); //Curve the change, Make the fresnel thinner
-        fragColor.rgb += vec3(1.0, 1.0, 1.0) * fragToCameraAngle;
-      } // If 0 then no atmosphere
 
       // Gray scale the color
       if (uisGrayScale > 0.5) {
@@ -695,7 +772,7 @@ export class Earth {
 
     }
     `,
-    vert: keepTrackApi.glsl`
+    surfaceVert: keepTrackApi.glsl`
     out vec2 vUv;
     out vec3 vNormal;
     out vec3 vWorldPos;
@@ -711,5 +788,7 @@ export class Earth {
         gl_Position = projectionMatrix * worldPosition;
     }
     `,
+    atmosphereVert: '', // Placeholder Only
+    atmosphereFrag: '', // Placeholder Only
   };
 }

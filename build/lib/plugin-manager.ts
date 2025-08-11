@@ -32,9 +32,25 @@ export class PluginManager {
       openSourcePath: '../plugins/about-menu/about-menu',
       proPath: '../plugins-pro/about-menu/about-menu',
     },
+    'sat-info-box-actions': {
+      openSourcePath: '../plugins/sat-info-box-actions/sat-info-box-actions',
+      proPath: '../plugins-pro/sat-info-box-actions/sat-info-box-actions',
+    },
+    'sat-inno-box-links': {
+      openSourcePath: '../plugins/sat-info-box-links/sat-info-box-links',
+      proPath: '../plugins-pro/sat-info-box-links/sat-info-box-links',
+    },
+    'sat-info-box-mission': {
+      openSourcePath: '../plugins/sat-info-box-mission/sat-info-box-mission',
+      proPath: '../plugins-pro/sat-info-box-mission/sat-info-box-mission',
+    },
     'initial-orbit': {
       openSourcePath: '../plugins/initial-orbit/initial-orbit',
       proPath: '../plugins-pro/initial-orbit/initial-orbit',
+    },
+    'earth-atmosphere': {
+      openSourcePath: '../plugins/earth-atmosphere/earth-atmosphere',
+      proPath: '../plugins-pro/earth-atmosphere/earth-atmosphere',
     },
     debug: {
       openSourcePath: '../plugins/debug/debug',

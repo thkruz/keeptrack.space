@@ -13,16 +13,12 @@ export interface LaunchSiteParams {
 }
 
 export class LaunchSite extends BaseObject {
-  name: string;
   lat: number;
   lon: number;
   alt: number;
   site?: string; // Optional site name
   country?: string; // Optional country name
   wikiUrl?: string | null; // Optional Wikipedia URL
-  id: number; // Optional ID for the launch site
-  type: SpaceObjectType;
-
 
   constructor(info: LaunchSiteParams) {
     super(info);

@@ -14,8 +14,6 @@ export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
 }
 
 export class CountryColorScheme extends ColorScheme {
-  colorTheme: Record<string, rgbaArray>;
-  objectTypeFlags: Record<string, boolean>;
   readonly label = 'Country';
   readonly id = 'CountryColorScheme';
   static readonly id = 'CountryColorScheme';
@@ -89,7 +87,7 @@ export class CountryColorScheme extends ColorScheme {
       };
     }
 
-    if (keepTrackApi.getGroupsManager().selectedGroup.hasObject(obj.id)) {
+    if (keepTrackApi.getGroupsManager().selectedGroup?.hasObject(obj.id)) {
       return this.checkCountry_(obj);
     }
 

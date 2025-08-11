@@ -5,8 +5,6 @@ import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { ColorScheme } from './color-scheme';
 
 export class SmallSatColorScheme extends ColorScheme {
-  colorTheme: Record<string, rgbaArray>;
-  objectTypeFlags: Record<string, boolean>;
   readonly label = 'Small Satellites';
   readonly id = 'SmallSatColorScheme';
   static readonly id = 'SmallSatColorScheme';

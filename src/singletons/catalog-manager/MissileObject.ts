@@ -4,8 +4,6 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, BaseObjectParams, DEG2RAD, Degrees, Kilometers, Radians, SpaceObjectType, Vector3D, calcGmst, eci2lla, lla2eci } from 'ootk';
 
 export class MissileObject extends BaseObject {
-  id: number;
-  active: boolean;
   type = SpaceObjectType.BALLISTIC_MISSILE;
   desc: string;
   latList: Degrees[];
@@ -20,7 +18,7 @@ export class MissileObject extends BaseObject {
 
   constructor(info: MissileParams & BaseObjectParams) {
     super(info);
-    this.id = info.id;
+    this.id = info.id ?? 0;
     this.active = info.active;
     this.desc = info.desc;
     this.latList = info.latList;

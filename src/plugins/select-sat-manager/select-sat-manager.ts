@@ -10,9 +10,9 @@ import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { NewLaunch } from '../new-launch/new-launch';
+import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SoundNames } from '../sounds/SoundNames';
 import { TopMenu } from '../top-menu/top-menu';
-import { SatInfoBox } from './sat-info-box';
 
 /**
  * This is the class that manages the selection of objects.

@@ -34,8 +34,9 @@ import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
 import saveAs from 'file-saver';
-import { CatalogSource, DetailedSatellite } from 'ootk';
+import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { EL as SAT_INFO_EL, SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 
@@ -54,6 +55,11 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     }
 
     this.updateWatchlist();
+  };
+
+  EL = {
+    ADD_WATCHLIST: 'sat-add-watchlist',
+    REMOVE_WATCHLIST: 'sat-remove-watchlist',
   };
 
   bottomIconElementName: string = 'menu-watchlist';
@@ -106,6 +112,53 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.onCruncherReady, this.onCruncherReady_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
+  }
+
+  addJs(): void {
+    super.addJs();
+
+    const satInfoBoxPlugin = keepTrackApi.getPlugin(SatInfoBox)!;
+
+    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxAddListeners, () => {
+      getEl(this.EL.ADD_WATCHLIST)?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
+      getEl(this.EL.REMOVE_WATCHLIST)?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
+    });
+
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.selectSatData_.bind(this));
+  }
+
+  private satInfoBoxFinal_() {
+    // Add html to EL.TITLE
+    getEl(SAT_INFO_EL.NAME)?.insertAdjacentHTML('beforebegin', keepTrackApi.html`
+      <img id="${this.EL.ADD_WATCHLIST}" src="${bookmarkAddPng}"/>
+      <img id="${this.EL.REMOVE_WATCHLIST}" src="${bookmarkRemovePng}"/>
+    `);
+  }
+
+  private selectSatData_(obj?: BaseObject) {
+    if (!obj) {
+      return;
+    }
+
+    if (this.isOnWatchlist(obj.id)) {
+      getEl(this.EL.REMOVE_WATCHLIST)!.style.display = 'block';
+      getEl(this.EL.ADD_WATCHLIST)!.style.display = 'none';
+    } else {
+      getEl(this.EL.ADD_WATCHLIST)!.style.display = 'block';
+      getEl(this.EL.REMOVE_WATCHLIST)!.style.display = 'none';
+    }
+  }
+
+  private addRemoveWatchlist_() {
+    const id = keepTrackApi.getPlugin(SelectSatManager)!.selectedSat;
+
+    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+    if (this.isOnWatchlist(id)) {
+      this.removeSat(id);
+    } else {
+      this.addSat(id);
+    }
   }
 
   /**

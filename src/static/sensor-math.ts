@@ -1,5 +1,4 @@
 import { SatPassTimes } from '@app/interfaces';
-import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import {
   BaseObject,
@@ -36,10 +35,10 @@ export enum TearrType {
 }
 
 export type TearrData = {
-  objName: string;
-  rng: Kilometers;
-  az: Degrees;
-  el: Degrees;
+  objName?: string;
+  rng: Kilometers | null;
+  az: Degrees | null;
+  el: Degrees | null;
   time: string;
   type?: TearrType;
   inView?: boolean;
@@ -60,7 +59,7 @@ export class SensorMath {
     const aer = SatMath.getRae(now, satrec, sensor);
     const isInFOV = SatMath.checkIsInView(sensor, aer);
 
-    if (isInFOV) {
+    if (aer.az && aer.el && aer.rng && isInFOV) {
       if (isRiseSetLookangles) {
         // Previous Pass to Calculate first line of coverage
         const now1 = new Date();
@@ -80,7 +79,7 @@ export class SensorMath {
         const isInFOVNext = SatMath.checkIsInView(sensor, aerNext);
 
         // if elevation is going down then it is a peak
-        if (!isMaxElFound && aerNext.el < aer.el) {
+        if (!isMaxElFound && aerNext.el && aerNext.el < aer.el) {
           return {
             time: dateFormat(now, 'isoDateTime', true),
             rng: aer.rng,
@@ -118,9 +117,9 @@ export class SensorMath {
 
         return {
           time: '',
-          rng: <Kilometers>null,
-          az: <Degrees>null,
-          el: <Degrees>null,
+          rng: null,
+          az: null,
+          el: null,
           inView: isInFOV,
           objName: sensor.objName,
         };
@@ -165,7 +164,7 @@ export class SensorMath {
     // Set default timing settings. These will be changed to find look angles at different times in future.
     const now = typeof propTime !== 'undefined' ? propTime : timeManagerInstance.simulationTimeObj;
     const { m, gmst } = SatMath.calculateTimeVariables(now, sat.satrec);
-    const positionEci = <EciVec3>Sgp4.propagate(sat.satrec, m).position;
+    const positionEci = <EciVec3>Sgp4.propagate(sat.satrec, m!).position;
 
     if (!positionEci) {
       errorManagerInstance.debug(`No ECI position for ${sat.satrec.satnum} at ${now}`);
@@ -235,15 +234,15 @@ export class SensorMath {
     let sameBeamStr = '';
 
     try {
-      const satInfoBoxCorePlugin = keepTrackApi.getPlugin(SatInfoBox);
+      const sensorManagerInstance = keepTrackApi.getSensorManager();
 
-      if (satInfoBoxCorePlugin.currentTEARR?.inView) {
+      if (sensorManagerInstance.currentTEARR?.inView) {
         const sensorManagerInstance = keepTrackApi.getSensorManager();
 
         const firstSensor = sensorManagerInstance.currentSensors[0];
 
-        if (firstSensor instanceof RfSensor && parseFloat(distanceApart) < satInfoBoxCorePlugin.currentTEARR?.rng * Math.sin(DEG2RAD * firstSensor.beamwidth)) {
-          if (satInfoBoxCorePlugin.currentTEARR?.rng < sensorManagerInstance.currentSensors[0].maxRng && satInfoBoxCorePlugin.currentTEARR?.rng > 0) {
+        if (firstSensor instanceof RfSensor && parseFloat(distanceApart) < sensorManagerInstance.currentTEARR.rng! * Math.sin(DEG2RAD * firstSensor.beamwidth)) {
+          if (sensorManagerInstance.currentTEARR.rng! < sensorManagerInstance.currentSensors[0].maxRng && sensorManagerInstance.currentTEARR.rng! > 0) {
             sameBeamStr = ' (Within One Beam)';
           }
         }
@@ -319,7 +318,7 @@ export class SensorMath {
       if (sensor.minAz > sensor.maxAz) {
         if (
           ((az >= sensor.minAz || az <= sensor.maxAz) && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
-          ((az >= sensor.minAz2 || az <= sensor.maxAz2) && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
+          ((az >= sensor.minAz2! || az <= sensor.maxAz2!) && el >= sensor.minEl2! && el <= sensor.maxEl2! && rng <= sensor.maxRng2! && rng >= sensor.minRng2!)
         ) {
           if (dist < minDistanceApart) {
             minDistanceApart = dist;
@@ -327,7 +326,7 @@ export class SensorMath {
         }
       } else if (
         (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
-        (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
+        (az >= sensor.minAz2! && az <= sensor.maxAz2! && el >= sensor.minEl2! && el <= sensor.maxEl2! && rng <= sensor.maxRng2! && rng >= sensor.minRng2!)
       ) {
         if (dist < minDistanceApart) {
           minDistanceApart = dist;
@@ -349,7 +348,7 @@ export class SensorMath {
     interval = interval || 30;
     numPasses = numPasses || 1;
 
-    const passTimesArray = [];
+    const passTimesArray = [] as Date[]; // Array of pass times in UTC
     let offset = 0;
 
     const orbitalPeriod = MINUTES_PER_DAY / ((sat.satrec.no * MINUTES_PER_DAY) / TAU); // Seconds in a day divided by mean motion
@@ -385,7 +384,7 @@ export class SensorMath {
 
     sensors = sensorManagerInstance.verifySensors(sensors);
     // Loop through sensors looking for in view times
-    const inViewTime = [];
+    const inViewTime = [] as Date[];
     // If length and interval not set try to use defaults
 
     searchLength ??= 2;

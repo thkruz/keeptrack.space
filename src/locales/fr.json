@@ -144,6 +144,7 @@
     "presentDay": "De nos jours"
   },
   "plugins": {
+    "proOnlyMsg": "Ce plugin est réservé aux utilisateurs pro. Votre fichier .env est mal configuré ou il vous manque des fichiers ! Vous pouvez en savoir plus sur https://keeptrack.space/pro.",
     "SensorListPlugin": {
       "bottomIconLabel": "Capteurs",
       "title": "Menu Liste des Capteurs",

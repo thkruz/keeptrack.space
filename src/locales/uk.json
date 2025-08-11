@@ -144,6 +144,7 @@
     "presentDay": "Сьогодні"
   },
   "plugins": {
+    "proOnlyMsg": "Цей плагін доступний лише у Pro-версії. Ваш файл .env налаштовано неправильно або бракує файлів! Дізнайтеся більше на https://keeptrack.space/pro.",
     "SensorListPlugin": {
       "bottomIconLabel": "Сенсори",
       "title": "Меню списку сенсорів",

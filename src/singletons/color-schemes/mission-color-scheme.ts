@@ -16,8 +16,6 @@ export interface MissionColorSchemeColorMap extends ColorSchemeColorMap {
 }
 
 export class MissionColorScheme extends ColorScheme {
-  colorTheme: Record<string, rgbaArray>;
-  objectTypeFlags: Record<string, boolean>;
   readonly label = 'Mission';
   readonly id = 'MissionColorScheme';
   static readonly id = 'MissionColorScheme';

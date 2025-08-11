@@ -4,10 +4,10 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorMath } from '@app/static/sensor-math';
 import numeric from 'numeric';
 import { DetailedSatellite, DetailedSensor, RAD2DEG } from 'ootk';
-import { LineManager } from '../draw-manager/line-manager';
+import type { LineManager } from '../draw-manager/line-manager';
 import { errorManagerInstance } from '../errorManager';
-import { TimeManager } from '../time-manager';
-import { ControlSite } from './ControlSite';
+import type { TimeManager } from '../time-manager';
+import type { ControlSite } from './ControlSite';
 
 export enum SatConstellationString {
   Aehf = 'aehf',

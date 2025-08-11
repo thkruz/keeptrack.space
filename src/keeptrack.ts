@@ -91,6 +91,8 @@ export class KeepTrack {
       throw new Error('KeepTrack is already started');
     }
 
+    // Update the version number
+    settingsManager.versionNumber = VERSION;
     this.settingsOverride_ = settingsOverride;
   }
 
@@ -425,9 +427,6 @@ theodore.kruczek at gmail dot com.
       const uiManagerInstance = keepTrackApi.getUiManager();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
       const inputManagerInstance = keepTrackApi.getInputManager();
-
-      // Upodate the version number and date
-      settingsManager.versionNumber = VERSION;
 
       // Error Trapping
       window.addEventListener('error', (e: ErrorEvent) => {

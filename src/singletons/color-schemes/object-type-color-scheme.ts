@@ -22,8 +22,6 @@ export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
 }
 
 export class ObjectTypeColorScheme extends ColorScheme {
-  colorTheme: Record<string, rgbaArray>;
-  objectTypeFlags: Record<string, boolean>;
   readonly label = 'Object Type';
   readonly id = 'ObjectTypeColorScheme';
   static readonly id = 'ObjectTypeColorScheme';
@@ -303,7 +301,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
 
   updateGroup(obj: BaseObject): ColorInformation {
     // Show Things in the Group
-    if (keepTrackApi.getGroupsManager().selectedGroup.hasObject(obj.id)) {
+    if (keepTrackApi.getGroupsManager().selectedGroup?.hasObject(obj.id)) {
       if (obj.isMissile()) {
         return this.missileColor_(obj as MissileObject);
       }

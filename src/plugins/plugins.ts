@@ -46,12 +46,15 @@ import { PolarPlotPlugin } from './polar-plot/polar-plot';
 import { ProximityOps } from './proximity-ops/proximity-ops';
 import { ReportsPlugin } from './reports/reports';
 import { SatConstellations } from './sat-constellations/sat-constellations';
+import { SatInfoBoxObject } from './sat-info-box-object/sat-info-box-object';
+import { SatInfoBoxOrbital } from './sat-info-box-orbital/sat-info-box-orbital';
+import { SatInfoBoxSensor } from './sat-info-box-sensor/sat-info-box-sensor';
+import { SatInfoBox } from './sat-info-box/sat-info-box';
 import { SatelliteFov } from './satellite-fov/satellite-fov';
 import { SatellitePhotos } from './satellite-photos/satellite-photos';
 import { ScreenRecorder } from './screen-recorder/screen-recorder';
 import { StreamManager } from './screen-recorder/stream-manager';
 import { Screenshot } from './screenshot/screenshot';
-import { SatInfoBox } from './select-sat-manager/sat-info-box';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
 import { SensorFov } from './sensor-fov/sensor-fov';
 import { SensorListPlugin } from './sensor-list/sensor-list';
@@ -97,11 +100,45 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
           new proPlugin.DebugMenuPlugin().init();
         }, config: plugins.DebugMenuPlugin,
       },
-      { init: () => new SatInfoBox().init(), config: plugins.SatInfoBox },
+      { init: () => new SatInfoBox().init(), config: plugins.SatInfoBoxCore },
+      {
+        init: async () => {
+          const proPlugin = await import('../plugins-pro/sat-info-box-actions/sat-info-box-actions');
+
+          new proPlugin.SatInfoBoxActions().init();
+        }, config: plugins.SatInfoBoxActions,
+      },
+      {
+        init: async () => {
+          const proPlugin = await import('../plugins-pro/sat-info-box-links/sat-info-box-links');
+
+          new proPlugin.SatInfoBoxLinks().init();
+        }, config: plugins.SatInfoBoxLinks,
+      },
+      { init: () => new SatInfoBoxOrbital().init(), config: plugins.SatInfoBoxOrbital },
+      { init: () => new SatInfoBoxObject().init(), config: plugins.SatInfoBoxObject },
+      {
+        init: async () => {
+          const proPlugin = await import('../plugins-pro/sat-info-box-mission/sat-info-box-mission');
+
+          new proPlugin.SatInfoBoxMission().init();
+        }, config: plugins.SatInfoBoxMission,
+      },
+      { init: () => new SatInfoBoxSensor().init(), config: plugins.SatInfoBoxSensor },
       { init: () => new DateTimeManager().init(), config: plugins.DateTimeManager },
       { init: () => new SocialMedia().init(), config: plugins.SocialMedia },
       { init: () => new ClassificationBar().init(), config: plugins.ClassificationBar },
       { init: () => new SoundManager().init(), config: plugins.SoundManager },
+
+      {
+        init: async () => {
+          const proPlugin = await import('../plugins-pro/earth-atmosphere/earth-atmosphere');
+
+          new proPlugin.EarthAtmosphere().init();
+        }, config: plugins.EarthAtmosphere,
+      },
+
+      // Bottom Menu Plugins
       { init: () => new SensorListPlugin().init(), config: plugins.SensorListPlugin },
       { init: () => new SensorInfoPlugin().init(), config: plugins.SensorInfoPlugin },
       { init: () => new CustomSensorPlugin().init(), config: plugins.CustomSensorPlugin },

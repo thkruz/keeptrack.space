@@ -64,7 +64,7 @@ export class Godrays {
 
     gl.uniform1i(this.mesh.material.uniforms.u_samples, settingsManager.godraysSamples ?? 32);
     gl.uniform1f(this.mesh.material.uniforms.u_decay, settingsManager.godraysDecay ?? 0.985);
-    gl.uniform1f(this.mesh.material.uniforms.u_exposure, settingsManager.godraysExposure ?? 1.2);
+    gl.uniform1f(this.mesh.material.uniforms.u_exposure, settingsManager.godraysExposure ?? 0.4);
     gl.uniform1f(this.mesh.material.uniforms.u_density, settingsManager.godraysDensity ?? 1.05);
     gl.uniform1f(this.mesh.material.uniforms.u_weight, settingsManager.godraysWeight ?? 0.075);
     gl.uniform1f(this.mesh.material.uniforms.u_illuminationDecay, settingsManager.godraysIlluminationDecay ?? 1.0);
@@ -184,7 +184,7 @@ export class Godrays {
       in vec2 v_texCoord;
       out vec4 fragColor;
 
-      // Gaussian blur function (5x5 kernel) with variable blur amount
+      // Gaussian blur function (3x3 kernel) with variable blur amount
       vec4 blur(sampler2D tex, vec2 uv, vec2 resolution, float blurScale) {
         // Account for aspect ratio to prevent stretching
         float aspectRatio = resolution.x / resolution.y;
@@ -194,8 +194,8 @@ export class Godrays {
         float totalWeight = 0.0;
 
         // 5x5 kernel for Gaussian blur
-        for (int x = -2; x <= 2; x++) {
-          for (int y = -2; y <= 2; y++) {
+        for (int x = -1; x <= 1; x++) {
+          for (int y = -1; y <= 1; y++) {
                 vec2 offset = vec2(float(x) * blurSize.x, float(y) * blurSize.y);
                 vec2 sampleCoord = clamp(uv + offset, 0.0, 1.0);
                 float weight = exp(-dot(offset * vec2(1.0, aspectRatio), offset * vec2(1.0, aspectRatio)) * 0.5);
@@ -210,7 +210,7 @@ export class Godrays {
       void main() {
         // Use uniforms if provided, otherwise use defaults
         float decay = 0.983;
-        float exposure = 0.5;
+        float exposure = 0.4;
         float density = 1.8;
         float weight = 0.085;
         float illuminationDecay = 2.7;
@@ -278,10 +278,17 @@ export class Godrays {
           // Update the illumination decay factor
           illuminationDecay *= decay;
         }
-        color = color * exposure;
+        vec4 scene = texture(u_sampler, v_texCoord);
 
-        // Mix the color with the original texture
-        fragColor = mix(color, vec4(0.0,0.0,0.0,1.0), 0.5);
+        // Optional simple tone map for stability (prevents blowout):
+        vec3 rays = 1.0 - exp(-color.rgb * exposure);
+
+        // Additive compose the shafts over the scene
+        fragColor = vec4(scene.rgb + rays, 1.0);
+
+        // If you don’t want tone mapping yet, use this instead:
+        // vec3 rays = color.rgb * exposure;
+        // fragColor = vec4(min(scene.rgb + rays, 1.0), 1.0);
       }
     `,
     vert: keepTrackApi.glsl`

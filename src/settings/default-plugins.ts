@@ -245,7 +245,25 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     order: 601,
   },
   // Non-Menu plugins
-  SatInfoBox: {
+  SatInfoBoxCore: {
+    enabled: true,
+  },
+  SatInfoBoxActions: {
+    enabled: true,
+  },
+  SatInfoBoxLinks: {
+    enabled: true,
+  },
+  SatInfoBoxObject: {
+    enabled: true,
+  },
+  SatInfoBoxMission: {
+    enabled: true,
+  },
+  SatInfoBoxOrbital: {
+    enabled: true,
+  },
+  SatInfoBoxSensor: {
     enabled: true,
   },
   TopMenu: {
@@ -267,6 +285,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
   },
   GamepadPlugin: {
+    enabled: true,
+  },
+  // Scene plugins
+  EarthAtmosphere: {
     enabled: true,
   },
   // RMB plugins

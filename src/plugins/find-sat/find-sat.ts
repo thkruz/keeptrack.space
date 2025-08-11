@@ -42,7 +42,6 @@ export interface SearchSatParams {
 
 export class FindSatPlugin extends KeepTrackPlugin {
   readonly id = 'FindSatPlugin';
-  dependencies_: string[];
   private lastResults_ = <DetailedSatellite[]>[];
 
   dragOptions: ClickDragOptions = {
@@ -244,7 +243,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       getEl('fbl-error')!.style.display = 'none';
     });
 
-    getEl('findByLooks-form').addEventListener('submit', (e: Event) => {
+    getEl('findByLooks-form')!.addEventListener('submit', (e: Event) => {
       e.preventDefault();
       showLoading(() => {
         this.findByLooksSubmit_().then(() => {
@@ -255,27 +254,27 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     getUnique(satData.filter((obj: BaseObject) => (obj as DetailedSatellite)?.bus).map((obj) => (obj as DetailedSatellite).bus))
       // Sort using lower case
-      .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
+      .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
       .forEach((bus) => {
-        getEl('fbl-bus').insertAdjacentHTML('beforeend', `<option value="${bus}">${bus}</option>`);
+        getEl('fbl-bus')!.insertAdjacentHTML('beforeend', `<option value="${bus}">${bus}</option>`);
       });
 
     countryNameList.forEach((countryName: string) => {
-      getEl('fbl-country').insertAdjacentHTML('beforeend', `<option value="${countryCodeList[countryName]}">${countryName}</option>`);
+      getEl('fbl-country')!.insertAdjacentHTML('beforeend', `<option value="${countryCodeList[countryName]}">${countryName}</option>`);
     });
 
     getUnique(satData.filter((obj: BaseObject) => (obj as DetailedSatellite)?.shape).map((obj) => (obj as DetailedSatellite).shape))
       // Sort using lower case
-      .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
+      .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
       .forEach((shape) => {
-        getEl('fbl-shape').insertAdjacentHTML('beforeend', `<option value="${shape}">${shape}</option>`);
+        getEl('fbl-shape')!.insertAdjacentHTML('beforeend', `<option value="${shape}">${shape}</option>`);
       });
 
     getUnique(satData.filter((obj: BaseObject) => (obj as DetailedSatellite)?.source).map((obj) => (obj as DetailedSatellite).source))
       // Sort using lower case
-      .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
+      .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
       .forEach((source) => {
-        getEl('fbl-source').insertAdjacentHTML('beforeend', `<option value="${source}">${source}</option>`);
+        getEl('fbl-source')!.insertAdjacentHTML('beforeend', `<option value="${source}">${source}</option>`);
       });
     const payloadPartials = satData
       .filter((obj: BaseObject) => (obj as DetailedSatellite)?.payload)
@@ -288,13 +287,13 @@ export class FindSatPlugin extends KeepTrackPlugin {
       .filter((obj) => obj.length >= 3);
 
     getUnique(payloadPartials)
-      .sort((a, b) => (<string>a).toLowerCase().localeCompare((<string>b).toLowerCase()))
+      .sort((a, b) => (a).toLowerCase().localeCompare((b).toLowerCase()))
       .forEach((payload) => {
         if (payload === '') {
           return;
         }
         if (payload.length > 3) {
-          getEl('fbl-payload').insertAdjacentHTML('beforeend', `<option value="${payload}">${payload}</option>`);
+          getEl('fbl-payload')!.insertAdjacentHTML('beforeend', `<option value="${payload}">${payload}</option>`);
         }
       });
 
@@ -387,9 +386,15 @@ export class FindSatPlugin extends KeepTrackPlugin {
         return false;
       }
 
+      const currentSatellite = keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
+
+      if (!currentSatellite) {
+        return false;
+      }
+
       const rae = eci2rae(
         keepTrackApi.getTimeManager().simulationTimeObj,
-        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
+        currentSatellite.position,
         keepTrackApi.getSensorManager().currentSensors[0],
       );
 
@@ -404,9 +409,15 @@ export class FindSatPlugin extends KeepTrackPlugin {
         return false;
       }
 
+      const currentSatellite = keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
+
+      if (!currentSatellite) {
+        return false;
+      }
+
       const rae = eci2rae(
         keepTrackApi.getTimeManager().simulationTimeObj,
-        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
+        currentSatellite.position,
         keepTrackApi.getSensorManager().currentSensors[0],
       );
 
@@ -432,9 +443,15 @@ export class FindSatPlugin extends KeepTrackPlugin {
         return false;
       }
 
+      const currentSatellite = keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
+
+      if (!currentSatellite) {
+        return false;
+      }
+
       const rae = eci2rae(
         keepTrackApi.getTimeManager().simulationTimeObj,
-        keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY).position,
+        currentSatellite.position,
         keepTrackApi.getSensorManager().currentSensors[0],
       );
 
@@ -631,6 +648,6 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   private static checkRcs_(possibles: DetailedSatellite[], minRcs: number, maxRcs: number) {
-    return possibles.filter((possible) => possible.rcs > minRcs && possible.rcs < maxRcs);
+    return possibles.filter((possible) => (possible?.rcs ?? -Infinity) > minRcs && (possible?.rcs ?? Infinity) < maxRcs);
   }
 }

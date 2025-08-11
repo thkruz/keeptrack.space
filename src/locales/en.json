@@ -146,6 +146,7 @@
     "presentDay": "Present Day"
   },
   "plugins": {
+    "proOnlyMsg": "This plugin is a pro plugin. Your .env file is improperly configured or you are missing files! You can learn more at https://keeptrack.space/pro.",
     "SensorListPlugin": {
       "bottomIconLabel": "Sensors",
       "title": "Sensor List Menu",

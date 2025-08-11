@@ -2,6 +2,652 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.7.0
+
+>  
+
+- fix: :bug: update hostname check for copyright notice in splash screen
+- Hotfixes
+- fix: :ambulance: fix outreach not loading due to new API schema
+- Hotfixes
+- fix: :ambulance: fix vimpel issues with R2 CORS
+- Bug Fixes. Bump to 10.5.1
+- fix: :ambulance: fix covariance ellipsoids breaking mobile
+- fix: :bug: fix lack of variety in loading screens
+- build(deps): bump uuid from 9.0.1 to 11.1.0
+- build(deps): bump flag-icons from 7.2.3 to 7.3.2
+- New Color Schemes and Filter Menu
+- fix: :bug: fix offline mode
+- Develop
+- build(deps-dev): bump @types/webgl2 from 0.0.10 to 0.0.11
+- Develop
+- Develop
+- fix: :bug: add fixes for bad colorscheme values and velocity scheme
+- Develop
+- fix: :ambulance: fix color schemes relying on class name that change …
+- fix: :ambulance: fix color schemes relying on class name that change …
+- Develop
+- fix: :beers: fix k vs K
+- Develop
+- fix: :bug: stop using LFS for cloudflare compatibility
+- fix: :ambulance: fix color scheme not loading
+- fix: :ambulance: fix issue with color scheme freezing
+- Develop
+- Develop
+- fix: :ambulance: fix missing parentheses
+- Develop
+- Develop
+- Aldoria Additions and Other Updates
+- Develop
+- Develop
+- Develop
+- Develop
+- refactor: :recycle: update tle path to use v2 of API
+- Develop
+- Develop
+- fix: :arrow_up: bump ootk
+- Develop
+- Develop
+- Develop
+- Develop
+- Develop
+- fix: :zap: improve orbit finder algorithm for breakups
+- Develop
+- Address Issues Found on Hacker News
+- Develop
+- Develop
+- Develop
+- Develop
+- Develop
+- fix: :ambulance: fix error when no satellite selected
+- fix: :bug: fix transponder menu being enabled incorrectly
+- feat: :sparkles: add geo satellite transponder info
+- Develop
+- Updates to TIP Plugin
+- fix: :bug: fix flickering on mobile
+- Develop
+- Develop
+- Develop
+- Develop
+- fix: :ambulance: emergency fix
+- fix: fix analytics on localhost
+- Develop
+- Develop
+- Develop
+- docs: :memo: fix readme links
+- ci: :construction_worker: allow npm audit to fail but open an issue
+- Develop
+- Develop
+- Develop
+- Develop
+- fix: :ambulance: fix one bad satellite breaking website
+- Develop
+- fix: :ambulance: fix new launch plugin
+- fix: :bug: multiple bug fixes related to color buffer updates
+- fix: :zap: fix performance bug and css issues
+- test: :white_check_mark: fix broken tests
+- Develop
+- Develop
+- Develop
+- Hotfix to deprecated plot plugins impacting app even when disabled.
+- KeepTrack v9.0.0
+- fix: :bug: prevent triggering an error when typing in invalid custom sensor values
+- fix: :bug: handle errors when processing known satellites in ASCII file
+- fix: :bug: handle undefined satellite object in right button menu
+- fix: :bug: handle errors when processing satellites in CatalogLoader
+- fix: :bug: prevent update execution if sun model is not loaded
+- refactor: :recycle: update event handling in CountriesMenu to use uiManagerFinal
+- feat: :children_crossing: enhance satellite creation with input validation and formatting improvements
+- fix: :bug: fix requestFullscreen failing on some browsers
+- fix: :bug: fix breakup throwing uncaught error
+- fix: :bug: Better handling of errors in obj-to-obj-line.ts
+- fix: :bug: add validation to avoid race conditions
+- fix: :bug: add validation to analytics tool before using
+- fix: :bug: validate datetimeTextElement before setting date/time
+- fix: :bug: add trap for race condition
+- feat: :technologist: new build system
+- test: :white_check_mark: add locales json build output for unit testing in github runner
+- test: :white_check_mark: add jest tests to ensure this continues working as intended
+- test: :white_check_mark: fix outdated snapshots
+- fix: :bug: fix all open issues with rpo-calculator (now proximity-ops)
+- feat: :sparkles: add additonal features to Remote Proximity Operations plugin
+- feat: :technologist: add strict i18n key validation and korean support
+- feat: :technologist: add strict i18n key validation and korean support
+- feat: 🔥 Plotting changes to make it cleaner and refactor code to make it more readable
+- feat: 🔥 Inital commit for find RPO plugin
+- feat: :sparkles: implement covariance ellipsoids
+- feat: 🔥Added option to take into account the weather forecast when finding observable transits for optical sensors
+- refactor: :recycle: reduce unnecessary API calls, utilize enums, fix linter errors, add optimizations
+- docs: :page_facing_up: transfer copyright to Kruczek Labs LLC
+- feat: :children_crossing: improve layout of sensor timeline
+- feat: :sparkles: new launches now use nominal satellites
+- feat: :speech_balloon: add translation support for proximity ops
+- build: :arrow_up: add compatibility with ootk 5
+- feat: :sparkles: add OWL-Net sensors
+- build: :construction_worker: remove auto version date due to merge conflicts and add version to readme
+- feat: 🔥 Add changes to enable RPO plugin & add temporary icon
+- fix: :pencil2: fix Collisions spelling
+- fix: :pencil2: fix Collisions spelling
+- perf: :stethoscope: add throttle for telemetry reporting
+- fix: :art: update logo and add version/copyright information to splash screen
+- fix: :ambulance: fix sensor name not resetting in top menu
+- feat: :sparkles: add ability to increase number of ECF orbits drawn
+- feat: :sparkles: add ability to reload last selected sensors
+- fix: :children_crossing: make it clear ECF orbits only work on GEO satellites
+- fix: :bug: fix satellite view not being enabled
+- fix: :bug: add error catching when drawing map and context lost to canvs
+- fix: :children_crossing: provide feedback when fov bubble enabled but not valid
+- refactor: :children_crossing: set godrays to off by default due to reports of performance issues
+- fix: :goal_net: add Safari browser support warning and redirect
+- fix: :bug: fix bug where alt is null in inc2alt plots
+- fix: :bug: avoid crashing production server even when there is a uniform issue in WebGl
+- refactor: :recycle: change bottom menu categories
+- test: :technologist: fix issue with vscode debug not working with jest
+- Update src/static/gl-utils.ts
+- docs: :bookmark: bump version
+- test: :white_check_mark: fix broken test
+- fix: :beers: used the wrong word for RPO
+- build: :arrow_up: bump ootk to v5
+- chore: :bookmark: bump patch version
+- fix: :bug: fix race condition with soundManager loading after being called
+- fix: :bug: fix issue with sound firing before initialization
+- build: :arrow_up: bump ootk
+- ci: :bug: fix lint-yml checking other files
+- fix: :label: fix incorrect type
+- fix: :bug: prevent errors when plugins are disabled
+- build: :bug: add missing .gitmodules file
+- fix: :ambulance: calendar incorrectly adding 1 to jday
+- fix: :twisted_rightwards_arrows: fix merge issue
+- fix: :twisted_rightwards_arrows: fix merge issue
+- fix: :poop: remove console.log
+- feat: 🔥Add openmeteo dependecy to package.json
+- fix: :bug: fix broken ui icons
+- Resloved conflicts between fixes and new feature branch
+- feat: :sparkles: add telemetry server integration for error troubleshooting
+- feat: :sparkles: add telemetry server integration for error troubleshooting
+- feat: :sparkles: add OWL-Net sensors
+- fix: resolve leftover conflict markers in version files
+- feat: 🔥 Add changes to enable RPO plugin & add temporary icon
+- refactor: :recycle: refactor to merge with celestrak changes
+- fix: :bug: remove unused normalMatrix that was causing errors on init
+- fix: :bug: remove unused normalMatrix that was causing errors on init
+- fix: :bug: fix linter errors with telemetry
+- fix: :bug: fix linter errors with telemetry
+- fix: :bug: fix filters being improperly applied on mobile
+- fix: :bug: fix filters being improperly applied on mobile
+- feat: :sparkles: add newtab utility for future work exporting information to a new tab
+- feat: :sparkles: add newtab utility for future work exporting information to a new tab
+- refactor: :recycle: rename defaultColorScheme and set Celestrak to default
+- refactor: :recycle: rename defaultColorScheme and set Celestrak to default
+- feat: :sparkles: disable unused filters in bottom menu
+- Bug: 🐛Fixed issue with plotted pass not corresponding to displayed time if the calculations were not done starting at a full hour
+- refactor: :recycle: use first color scheme instead of "default" color scheme
+- fix: :bug: ensure confidence levels are completely hidden if disabled
+- fix: :bug: ensure confidence levels are completely hidden if disabled
+- fix: :children_crossing: provide feedback when fov bubble enabled but not valid
+- fix: :bug: show help button disabled until side menu is open
+- fix: :bug: show help button disabled until side menu is open
+- refactor: :recycle: hide altName and altId independently
+- refactor: :recycle: hide altName and altId independently
+- fix: :bug: force set legend menu at init
+- fix: :bug: force set legend menu at init
+- fix: :bug: prevent errors when plugins are disabled
+- fix: :bug: ensure dots are updated on mobile
+- fix: :bug: ensure dots are updated on mobile
+- fix: :bug: explicitly allow tutorial button to be missing during testing
+- fix: :bug: explicitly allow tutorial button to be missing during testing
+- fix: :label: fix typo in filter
+- test: :white_check_mark: fix test to match new logic
+- fix: :label: fix typo in filter
+- test: :white_check_mark: fix test to match new logic
+- fix: :lipstick: fix mismatch in styling for full screen icon
+- fix: :lipstick: fix mismatch in styling for full screen icon
+- refactor: :recycle: hide altName and altId independently
+- refactor: :recycle: rename defaultColorScheme and set Celestrak to default
+- fix: :bug: default help button to disabled
+- fix: :bug: ensure confidence levels are completely hidden if disabled
+- fix: :bug: show help button disabled until side menu is open
+- refactor: :recycle: use first color scheme instead of "default" color scheme
+- fix: :bug: fix bug when surviellance plugin is disabled
+- fix: :iphone: fix size of sat-info-box title
+- feat: :sparkles: disable unused filters in bottom menu
+- refactor: :recycle: refactor to merge with celestrak changes
+- fix: :label: fix type
+- test: :white_check_mark: increase test coverage
+- refactor: :recycle: make colorschemes modular
+- feat: :sparkles: update environment configuration files to add embed settings
+- refactor: :recycle: refactor sat-info-box to be more modular and dynamic
+- refactor: :recycle: rewrite sat-info-box to be more modular
+- refactor: :recycle: improve typing and fix eslint errors/warnings
+- refactor: :recycle: improve typing and fix eslint errors/warnings
+- feat: :sparkles: update earth and sun rendering
+- refactor: :recycle: convert register and runEvent to on and emit syntax
+- feat: :sparkles: add new bottom menu categories
+- feat: :sparkles: add new languages to localization
+- chore: :sparkles: Add country translations to localization files for Korean, Russian, and Ukrainian
+- refactor: :recycle: move countries to locales json files
+- feat: :sparkles: add new filter menu
+- feat: :closed_lock_with_key: move non-agpl code out of public repo
+- refactor: :speech_balloon: Translate UI elements and help texts to other languages, add copyright notices, and update sensor-related plugin descriptions for improved clarity and localization.
+- feat: Enhance keyboard input handling and add debug keyboard overlay
+- feat: :sparkles: add new color schemes for orbital density
+- feat: 🔥 Inital commit for find RPO plugin
+- feat: :sparkles: add more translations
+- feat: :sparkles: add EarthPresetsPlugin, DrawLinesPlugin, and ViewInfoRmbPlugin with context menu integration
+- test: :white_check_mark: add more testing of color-scheme-manager
+- feat: :sparkles: step 1 of merging celestrak version with main version
+- refactor: :recycle: replace inline plugin configuration with defaultPlugins import for cleaner settings management
+- feat: :sparkles: add multiple launch sites with detailed information including coordinates and country
+- refactor: :goal_net: add better handling for null events
+- test: :white_check_mark: increase test coverage
+- test: :white_check_mark: increase test coverage
+- feat: :sparkles: add embed mode support and enhance input handling for keyboard and mouse interactions
+- refactor: :recycle: refactor sat-info-box to account for null better
+- feat: :sparkles: add launch site management with detailed site information and update UI for launch facility selection
+- refactor: :recycle: enhance settings persistence management and streamline URL parameter handling
+- refactor: :recycle: implement parseGetVariables function for enhanced settings management from URL parameters
+- feat: Refactor keyboard input handling to use unified event system and add new key bindings
+- refactor: :recycle: cleanup create-sat code for production
+- refactor: :recycle: fix linter errors
+- test: :rotating_light: fix linter errors in Jest test
+- feat: :sparkles: Add dark clouds and maneuver plugin translations for multiple languages
+- refactor: :recycle: move keyboard events to their class instead of keyboard manager
+- fix: :recycle: make color scheme changes more consistent
+- feat: :sparkles: update plugin menu modes and add block persistence setting
+- feat: :sparkles: add new mission color scheme
+- feat: :sparkles: add earth texture quality options to graphics menu
+- feat: :sparkles: add wikipedia urls to launch sites
+- test: :white_check_mark: fix all tests
+- feat: :sparkles: add EarthAtmosphere plugin and integrate into plugin manager
+- feat: :sparkles: add color scheme for data source
+- fix: :bug: remove more images from lfs
+- refactor: :recycle: streamline URL parameter handling and remove unused satellite selection logic
+- feat: :sparkles: reupload images
+- refactor: :technologist: standardize plugin naming to PascalCase and update related configurations for consistency
+- feat: :sparkles: enhance bottom menu functionality and settings management
+- fix: :bug: refactor build pipeline and add Node.js setup action for improved dependency management
+- feat: :sparkles: implement TooltipsPlugin with tooltip creation and positioning logic
+- refactor: :recycle: move common math functions to ootk
+- test: :white_check_mark: add testing foro create-sat.ts
+- refactor: :recycle: split default color settings for improved visual customization
+- feat: :sparkles: update bottom menu icons
+- feat: :zap: optimize sound management by loading on demand
+- fix: 🐛 Fixed bugs with input values and plot
+- refactor: :recycle: replace custom day of year calculations with TimeManager methods and streamline related logic
+- refactor: :recycle: standardize plugin naming conventions across the codebase
+- ci: :construction_worker: update issue templates for better clarity and usability
+- refactor: :technologist: standardize plugin names to PascalCase and update related configurations for consistency
+- refactor: :recycle: update event names and streamline URL management across components
+- fix: :bug: fix filtering in planetarium view
+- feat: :sparkles: implement sorting of sphere geometry faces for transparency rendering
+- refactor: :recycle: standardize plugin naming conventions and menu modes across multiple plugins
+- fix: :bug: update styles for ui-datepicker and copyright notice, adjust mobile settings handling in SplashScreen and SettingsManager
+- fix: :bug: update settings to enable JSC catalog, manage night mode display, and handle dots parameter in UrlManager
+- fix: :rotating_light: fix linter error on comment style
+- refactor: :rotating_light: remove linter errors
+- feat: :sparkles: add legendUpdated event and update legend handling in color schemes
+- fix: :bug: update build pipeline for improved YAML linting, NPM audit, and Node.js setup
+- refactor: :recycle: move splash screen images to SplashScreen class
+- feat: :sparkles: enable custom language files for pro users
+- ci: :fire: remove old ci/cd actions
+- refactor: :recycle: remove unused properties from various color scheme classes
+- refactor: :recycle: refactor to merge with celestrak changes
+- feat: :sparkles: add primary and secondary logo paths to configuration and update build process to handle new logos
+- feat: :sparkles: update icons and improve create satellite plugin
+- chore: :fire: remove Cypress configuration and test files
+- fix: :bug: force new persistence cache
+- refactor: :goal_net: add more defensive code to watchlist.ts
+- refactor: :recycle: standardize plugin naming conventions for consistency across configuration and initialization
+- refactor: :goal_net: add more defensive code to KeepTrackPlugin.ts
+- refactor: :recycle: replace SatMath calculations with keepTrackApi time manager for consistency across plugins
+- feat: :sparkles: enhance keyboard input handling for iframe communication and improve mouse input iframe detection
+- feat: :sparkles: enhance build process with optional directory copying and remove deprecated example HTML files
+- refactor: :recycle: sync dark-clouds preset with original version
+- fix: :bug: fix math for age of elset calculations
+- fix: :bug: cap covariance radii to prevent excessive bubble sizes, enable Jday usage in settings, and update bottom menu visibility handling
+- fix: :bug: sync keyboard commands with calendar plugin
+- feat: :sparkles: enhance Gaussian blur function with variable blur amount and optimize performance by early exits
+- refactor: :recycle: extract is visible to sensor logic
+- feat: :zap: optimize mesh management by loading on demand
+- fix: :bug: update build-manager to copy examples directory and adjust settings manager for static offset handling
+- refactor: :recycle: streamline watchlist creation and clear functionality in WatchlistPlugin
+- feat: :sparkles: Add launch site selection functionality to NewLaunch plugin
+- fix: :bug: fix time management with delayed enabling of time changes
+- refactor: :recycle: typecast SelectSatManager since KeepTrackPlugin constructor validates dependencies
+- feat: :sparkles: add SETTINGS mode to MenuMode enum and update related plugins for enhanced menu functionality
+- fix: :bug: correct night mode toggle logic in NightToggle plugin
+- fix: :bug: update cache action version and streamline SSH setup in build pipeline
+- fix: :bug: add !important to nav-bar-height and refactor settings override loading in SettingsManager
+- feat: :sparkles: streamline satellite selection handling and enhance settings for hover overlay and focus on satellite
+- test: :white_check_mark: fix all broken tests
+- refactor: :recycle: update WebpackManager to use BuildConfig and remove deprecated dotenv usage; clean up CSS filters
+- feat: :sparkles: add visible field to lookangles plugin
+- fix: :bug: fix issues with new color scheme system
+- fix: :bug: update class method references to use optional chaining for safer DOM manipulation
+- feat: :sparkles: disable unused filters in bottom menu
+- feat: :sparkles: Add locale file compilation method to FileSystemManager
+- fix: :bug: move SSH setup for deploy key to appropriate steps and ensure submodules are updated
+- refactor: :technologist: update to use DebugMenuPlugin and SensorListPlugin for sorting
+- fix: :bug: fix age of elset calculation
+- feat: :sparkles: add Long Range Discrimination Radar (LRDR) sensor and fix LEOLABS enum value
+- feat: :sparkles: Enhance darkClouds preset with improved camera settings and UI adjustments
+- feat: :sparkles: add epfl env
+- refactor: :technologist: add better control over sensor plugins
+- refactor: :recycle: use first color scheme instead of "default" color scheme
+- feat: :sparkles: Add ManeuverPlugin with configuration and localization support
+- refactor: :rotating_light: fix sonarqube findings
+- fix: :bug: remove IIFE for Safari support
+- refactor: :technologist: rename watchlist to WatchlistPlugin and update related configurations for consistency
+- fix: :ambulance: fix color schemes relying on class name that change during production build
+- refactor: :goal_net: add more defensive code to new-launbch.ts
+- refactor: :technologist: standardize plugin naming to PascalCase for consistency
+- fix: :bug: night mode toggle logic in NightToggle plugin
+- fix: :bug: update keyboard_ property to readonly and remove unused right-click menu elements
+- fix: :bug: adjust godrays exposure value and blur kernel size for improved rendering
+- fix: :bug: Remove Safari support check and redirect logic from main initialization
+- refactor: :rotating_light: remove linter errors
+- feat: :sparkles: add settings to enable/disable launch sites and sensors via URL parameters
+- feat: :sparkles: add jsc vimpel filter
+- refactor: :recycle: replace direct plugin imports with getPluginByName calls in SensorListPlugin, CustomSensorPlugin, and SensorManager
+- feat: :sparkles: update satellite record handling in orbit cruncher for better ecf handling
+- chore: :memo: update package number
+- refactor: :rotating_light: fix linter errors in get-el.ts
+- refactor: :recycle: change polar plot design
+- refactor: :rotating_light: fix sonarqube findings in sun.ts
+- fix: :bug: replace SSH setup script with webfactory/ssh-agent action for deploy key
+- fix: :bug: update waitForCruncher parameters to skip messages and count passes for improved synchronization
+- fix: :bug: fix resizing needed after start but before loading is finished
+- feat: :sparkles: add TooltipsPlugin and UserAccountPlugin configurations to KeepTrackPluginsConfiguration
+- refactor: :recycle: remove obsolete test files for Astronomy and Planetarium plugins
+- feat: :sparkles: add sorting functionality for bottom icons in UiManager
+- refactor: :recycle: refactor eruda toggle to standalone method
+- refactor: :recycle: standardize error handling in slide.ts
+- feat: :sparkles: add MAX_BOTTOM_ICON_ORDER constant for consistent bottom icon sorting
+- fix: :bug: Improve Safari detection logic for better browser compatibility
+- refactor: :rotating_light: fix sonarqube findings
+- fix: :bug: remove unnecessary resizeCanvas method
+- refactor: :recycle: enhance ECF settings handling and update URL parameter management
+- fix: :bug: adjust dropdown content max-height and style scrollbar for better usability
+- feat: :sparkles: update darkClouds preset with new longitude and settingsOverride structure
+- fix: :bug: update SelectSatManager import type and adjust parseGetVariables calls in tests to include settingsManager
+- fix: :bug: update sensor-selected-container display logic and reset sensor button state
+- fix: :bug: fix image loading in colorbox with callback for better display control
+- build: :construction_worker: Add setenv script to configure environment variables
+- fix: :bug: update copyright notice handling for official website
+- feat: :sparkles: add slow shrink/grow to sun geometry
+- refactor: :recycle: improve audio element validation in SoundManager
+- refactor: :recycle: remove unused .lftp_ignore file
+- refactor: :technologist: rename aboutManager to AboutMenuPlugin for consistency across plugins
+- refactor: :recycle: use getDayOfYear in ootk
+- refactor: :rotating_light: fix linter errors
+- refactor: :recycle: add typing and remove unnecessary checks in sunAngle
+- refactor: :recycle: chane isAudioElement to private since it's only used internally within SoundManager
+- feat: :art: Update texture quality settings and disable night mode in mobile manager
+- fix: :lipstick: add absolute positioning to nav for improved layout
+- fix: :bug: update context loss handling in WebGLRenderer and SelectSatManager for improved stability
+- refactor: :recycle: improve type handling and null checks in select-sat-manager
+- refactor: :recycle: improve type handling and null checks in select-sat-manager
+- fix: :ambulance: fix color schemes relying on class name that change during production build
+- feat: :sparkles: add keyboard event handling for elements with 'keyboard-priority' class
+- fix: :bug: enhance visibility of menu items based on satellite type in ViewInfoRmbPlugin
+- fix: :bug: handle null mesh cases in MeshModel and applyAttributePointers_
+- feat: :sparkles: add canvas visibility toggle in settings manager
+- fix: :bug: Correct texture quality string casing and standardize resolution handling
+- fix: :bug: standardize earth texture quality values to lowercase
+- fix: :bug: standardize texture quality values to lowercase in MobileManager
+- fix: :bug: update build pipeline to set up SSH for deploy key using webfactory/ssh-agent action
+- feat: :sparkles: refactor Astronomy and Planetarium plugins to extend KeepTrackPlugin and initialize dependencies
+- fix: :bug: update legend HTML to correct source order and display for data sources
+- fix: :bug: update event listener bindings in BottomMenu to use class method references
+- fix: :bug: reorder experimental menu item to maintain consistent menu structure
+- fix: :bug: remove git lfs
+- fix: :bug: remove git lfs
+- fix: :bug: update build pipeline to set up SSH for deploy key and remove submodule checkout
+- fix: :bug: update godraysSamples values to use numeric constants instead of GodraySamples enum
+- fix: :zap: prevent multiple resize events firing back to back
+- fix: :bug: fix proprate label not updating when slider moved
+- fix: :bug: disable eruda popping up on global error
+- chore: :bookmark: update version number to 10.6.2 in package.json
+- fix: :bug: Prevent Safari from bouncing by setting body overflow to hidden
+- refactor: :recycle: remove unused CopyRspackPlugin from webpack configuration
+- fix: :bug: add SSH setup for deploy key in build pipeline steps
+- fix: :bug: update build pipeline to initialize git submodules during checkout
+- fix: :bug: update loadOverridesFromUrl_ to handle query strings correctly when a hash is present
+- docs: :wastebasket: remove deprecated references to github page
+- fix: :white_check_mark: fix tests
+- refactor: :rewind: remove Aldoria specific code from main repo
+- fix: :zap: update TypeScript target version to ES2023 in tsconfig
+- feat: :sparkles: add UserAccountPlugin with initialization error handling
+- fix: :bug: update satellite record creation to prevent caching of old TLEs
+- fix: :bug: update picking dot size and adjust draw size calculations to reduce flickering
+- chore: :arrow_up: update version to 10.6.1 in package.json and splash-screen
+- feat: :art: adjust night color intensity and apply diffuse factor to political and clouds textures
+- feat: :sparkles: Add SpinLaunch launch site details to launchSites catalog
+- refactor: :truck: rename all locale files
+- fix: :bug: update texture quality settings to 'off' for better performance in embed mode
+- fix: :bug: correct typo in comment and prevent search results animation in embed mode
+- refactor: :recycle: remove unnecessary eslint-disable comments for class methods across multiple files
+- fix: :bug: Replace throw error with console.error in pro plugin initialization methods
+- fix: :bug: fix resizing not firing correctly
+- build: :truck: change default port to 5544 to match CORS exception
+- fix: :bug: prevent attempting to export a find result before running a find
+- fix: :bug: fix Safari only error related to rgba parsing
+- fix: :bug: add SSH setup and submodule update steps before installing dependencies in build pipeline
+- build: :lock: fix all open npm audit findings
+- feat: :sparkles: Optimize mouse satellite ID retrieval with update time check
+- fix: :bug: update logo image path and format URLs in installation instructions for consistency
+- fix: :bug: remove Vimpel satellites setting and replace with JSC catalog enable flag
+- fix: :bug: correct YAML lint file path and enhance build summary message
+- feat: :sparkles: add loading hints toggle to settings and update splash screen behavior
+- fix: :bug: adjust political map rendering order to ensure correct layering with clouds and atmosphere
+- fix: :bug: remove unused hideEl calls for earth-related context menus
+- feat: :sparkles: add toast method to KeepTrackApi for displaying notifications
+- refactor: :art: update color settings version and adjust facility color values
+- feat: :sparkles: add clear method to PersistenceManager for removing all stored items
+- refactor: :wastebasket: remove sensor plugin and replace with setting
+- refactor: :technologist: replace height with max-height for input focus to improve layout consistency
+- fix: :bug: Handle null or undefined values in saveItem method by removing the item
+- fix: :rotating_light: fix linter error
+- fix: :rotating_light: fix linter error
+- fix: :bug: update camera position any time mouse button released
+- fix: :bug: fix no sound playing on Safari
+- feat: :sparkles: Update loadPlugins to support asynchronous plugin initialization
+- feat: :sparkles: Add ManeuverPlugin menu and help text for satellite maneuvers
+- feat: :sparkles: Add ManeuverPlugin settings and disable toast notifications
+- build: :bug: update submodule configuration for src/plugins-pro
+- build: :bug: remove submodule from .gitignore
+- test: :white_check_mark: mock validation method to always return false in CreateSat tests
+- fix: :bug: update background and theme colors in manifest.webmanifest
+- chore: :arrow_up: update cypress dependency to version 13.17.0
+- chore: :sparkles: add Cypress testing files to .gitignore
+- fix: :truck: rename epfl wallpaper due to case-sensitive issue
+- fix: :bug: Add explicit error when WebGL context lost during program creation
+- docs: :memo: add README for locales JSON files
+- docs: :memo: update comment to clarify settings overrides for embedded version
+- fix: :bug: improve copyright notice handling for official website by using a trusted domains list
+- fix: :bug: update test and build steps to initialize git submodules before execution
+- fix: :bug: update UrlManager to set isSupplementExternal and disable isMissionDataEnabled for external TLEs
+- chore: :arrow_up: update version to 10.6.0 in README.md and version.js
+- fix: :bug: add 'start-hidden' class to keeptrack header and show it on loading screen
+- refactor: :recycle: Specify array types for combinedArray and index in SphereGeometry
+- fix: :bug: fix bug when surviellance plugin is disabled
+- fix: :bug: fix bug when surviellance plugin is disabled
+- feat: :sparkles: add ussr flag
+- refactor: :recycle: update color settings version number
+- fix: :bug: fix invalid locale string
+- fix: :bug: hide default eruda btn
+- fix: :bug: fix plugin settings menu not loading
+- fix: :arrow_up: adjust isimp to work with new ootk version
+- build: :arrow_up: bump ootk
+- fix: :bug: fix auto rotation up/down being backwards
+- fix: :bug: fix mismatch between D1 database and app
+- fix: :bug: fix bug when pitch and yaw is exactly 0
+- feat: :sparkles: add ops2 wallpaper to splash screen image list
+- refactor: :recycle: Use DEFAULT_RESOLUTION for texture source resolution fallback
+- refactor: :recycle: integrate localization for country extraction fallback
+- fix: :bug: add support for Vimpel satellites in settings manager
+- fix: :bug: add npm ci step for installing dependencies in build pipeline
+- feat: :sparkles: add settings preservation on orbit line and ECI/ECF toggles
+- fix: :ambulance: fix typo in typing breaking build
+- refactor: :recycle: remove extra line
+- fix: :bug: remove unnecessary sorting of atmosphere mesh faces to optimize rendering
+- fix: :bug: ensure GraphicsMenuPlugin is enabled before setting texture quality defaults
+- test: :white_check_mark: update snapshot to reflect changes in weather API test
+- feat: :sparkles: update eruda dependency from 2.5.0 to 3.4.3
+- feat: :sparkles: add USER_ACCOUNT key to StorageKey enum in PersistenceManager
+- chore: :arrow_up: update version to 10.6.1 in README.md
+- fix: :bug: add optional chaining to prevent errors when accessing touches length
+- fix: :recycle: move register uiManagerFinal event listener in SatInfoBox constructor
+- test: :white_check_mark: Skip error messages display test on loading screen
+- fix: :bug: Correctly reference the second parameter in getEl function for proximity ops type select
+- chore: :package: Update subproject commit reference in plugins-pro
+- chore: :package: Update subproject commit reference in plugins-pro
+- chore: :package: Mark subproject as dirty in plugins-pro
+- chore: :package: update subproject commit reference in plugins-pro
+- chore: :package: update subproject commit reference in plugins-pro
+- refactor: :recycle: change zoomLevel_ to public in Camera class
+- chore: :package: update subproject commit reference in plugins-pro
+- chore: :package: update subproject commit reference in plugins-pro
+- fix: :bug: fix broken og image
+- fix: :bug: add MODE environment variable for development mode
+- fix: :bug: ensure MODE is loaded from environment variables in config manager
+- fix: :bug: update WebpackManager configuration to use the full config object instead of mode
+- fix: :bug: update .env file header to reflect correct environment for embed.keeptrack.space
+- fix: :bug: update submodule URL to use SSH instead of HTTPS
+- chore: :arrow_up: bump version to 10.6.0 in package.json
+- fix: :bug: update regex for TLE data source to include optional Celestrak path
+- chore: :arrow_up: update subproject commit reference in plugins-pro
+- chore: :package: update subproject commit reference in plugins-pro
+- fix: :bug: correct textureLod parameter for political map rendering
+- chore: :technologist: update subproject commit reference in plugins-pro
+- fix: :bug: fix line addition logic in createRef2Ref method
+- chore: :package: update subproject commit reference in plugins-pro
+- fix: :bug: Hide copyright notice and version text on splash screen
+- build: :bug: update subproject commit for src/plugins-pro
+- fix: :bug: default help button to disabled
+- fix: :bug: update earth texture dropdown after hitting reset
+- fix: :bug: default help button to disabled
+- fix: :bug: update earth texture dropdown after hitting reset
+- fix: :label: fix type
+- fix: :label: fix type
+- test: :white_check_mark: update test to match new code
+- docs: :memo: update readme with build tutorial
+- chore: :memo: add note about issue #1018
+- refactor: :recycle: link to live api server
+- test: :white_check_mark: explicitly allow missing element
+- build: :arrow_up: bump ootk
+- build: :rotating_light: disable callback-return rule in eslint
+- fix: :bug: remove unnecessary flag setting for parsed variables in UrlManager
+- feat: :sparkles: add user account button image to top menu
+- fix: :bug: Ensure isContextLost method returns false in glMock for accurate context state
+- refactor: :art: remove empty line before the return statement for better code consistency
+- fix: :bug: ensure YAML lint step continues on error for better pipeline resilience
+- fix: :bug: add isUseJdayOnTopMenu setting to control Jday display in top menu
+- feat: :sparkles: add attribution for collision data source in the UI
+- fix: :bug: set max-width for input focus to ensure proper layout of bottom icons
+- fix: :iphone: fix size of sat-info-box title
+- fix: :iphone: fix size of sat-info-box title
+- fix: :bug: add missing import
+- fix: :bug: fix missing form element from change listener
+- refactor: :recycle: remove extra empty line
+- feat: :sparkles: update night and day Earth map textures for improved visuals
+- feat: :sparkles: add new icon images for globe, orbit, etc
+- fix: :zap: compress moonmap textures for improved performance
+- feat: :sparkles: add lock and login icons to the public image assets
+- feat: :sparkles: Add earthspec2k texture for enhanced visual fidelity
+- refactor: :truck: fix typo
+- fix: :bug: fix broken flag images
+- feat: :art: reupload images
+- build: :lock: fix npm security issues
+
+#### v10.3.0
+
+>  
+
+- fix: :bug: fix failure when no internet connection
+- ✨ updating sensor-timeline to show visibility from optical sensors
+- 📈 Updated plot-analysis plugin. Added a lat2lon plot, and updated hover data
+- feat: :sparkles: add graphics menu and update shaders
+- feat: :sparkles: add caclulator plugin
+- refactor: :rotating_light: fix linting errors
+- 🛰️  New plugin to create a sat from its keplerian elements
+- refactor: :recycle: move graphics settings into graphics menu
+- fix: :bug: fixes to orbit-finder
+- feat: :sparkles: add startalk preset
+- 🏗️  Updating settings, interfaces, packages for code building
+- refactor: :recycle: refactor catalog-search to move new functions to satMath class
+- chore: :memo: update copyright dates
+- refactor: :recycle: change Old GP colorscheme
+- 🎯 Polar plot minor update
+- refactor: :truck: rename clickDragOptions
+- build: :building_construction: disable settings in settingsOverride by default
+- feat: :sparkles: add satellite overflight feature to analysis
+- refactor: :zap: eliminate loading extra satellites when using limitSat
+- feat: :sparkles: add satellite status
+- 🎚️  Propagation slider added to the calendar plugin
+- refactor: :alien: update collisions plugin to use new KeepTrack API V2
+- refactor: :recycle: move sync settings to settingsManager
+- refactor: :recycle: update launch site mapping
+- fix: :rotating_light: fix typescript errors
+- 👀 find-sat plugin updated to add more options: search by data source, or by TLE age
+- 🗺️  updating stereo-map to shwo all selected sensors
+- fix: :bug: fix typescript syntax errors
+- fix: :bug: fix countries menu for new cloudflare backend
+- refactor: :rotating_light: fix typescript lint errors
+- fix: :bug: fix issue with classification colors
+- fix: :bug: fix issues with nodal precession
+- fix: :bug: fix known satellites failing with ascii catalog
+- 🖼️  Aldoria version first commit. Updated public/ data and folder
+- fix: :bug: fix missing decimal place
+- 🚀 minor updates to watchlist plugin, and classification bar
+- refactor: :rotating_light: fix linting errors in moon.ts
+- refactor: :recycle: refactor findObjsByOrbit
+- fix: :bug: fix colors
+- ⌨️  New shortcut to switch from ECI to ECF: 'E'
+- fix: :pencil2: fix typo in import
+- refactor: :recycle: rename ELSET to GP
+- fix: :bug: add missing launch sites
+- fix: :bug: update routes
+- feat: :sparkles: add callback option to clickAndDragWidth
+- ci: :construction_worker: update sonar-project settings
+- fix: :bug: fix scrolling gamepad errors
+- build: :building_construction: update husky
+- refactor: :recycle: update tle path to use v2 of API
+- fix: :ambulance: fix single bad TLE breaking sccIndex and cosparIndex
+- fix: :poop: move mock date to test not live code
+- feat: :sparkles: add gp url param option
+- fix: :bug: add iss flag
+- build: :building_construction: update .gitattributes to stop uploading binaries
+- fix: :bug: fix bug where logo wasn't hidden with settingsManager
+- docs: :memo: update changelog
+- fix: :rotating_light: fix typescript linter errors
+- feat: :sparkles: add compatibility with ALDORIA CONFIDENTIAL setting
+- fix: :bug: use launch year data if available
+- fix: :bug: ignore flag for object with no country
+- ci: :construction_worker: update sonar connected-mode settings
+- fix: :bug: make debug toasts standby color
+- fix: :bug: fix missing cis flag
+- fix: :arrow_up: bump ootk
+- fix: :bug: fix bug where launch year missing 0
+- fix: :zap: disable the camera widget by default since it is for a small number of users
+- build: :see_no_evil: update gitignore
+- fix: :bug: fix camera widget ignoring settings
+- feat: :sparkles: add payload status
+- feat: :sparkles: add compatibility with ALDORIA CONFIDENTIAL setting
+- fix: :bug: filter out 270000 analyst satellites
+- fix: :zap: smooth loading of colors during later years of time machine
+- fix: :bug: fix incorrect date calculation in ootk-core dependency
+- refactor: :zap: eliminate loading extra satellites when using limitSats
+- test: :white_check_mark: fix test
+- fix: :bug: fix bug where CIS flag shown instead of RU
+- fix: :bug: fix confidence logic
+- chore: :memo: update version date
+- fix: :arrow_up: bump ootk to fix leap year errors
+- feat: :sparkles: allow spaces in watchlist entry
+- chore: :memo: add todo for creating a new setting
+- refactor: :memo: update comment for bottomIconElementName
+- fix: :lock: fix security issues in dependencies
+
 #### v10.2.2
 
 >  

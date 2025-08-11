@@ -246,7 +246,7 @@ export class SoundManager extends KeepTrackPlugin {
       case SoundNames.BEEP:
         random = Math.floor(Math.random() * 3) + 1;
         sound = this.sounds[`genericBeep${random}`];
-        if (sound instanceof HTMLAudioElement === false) {
+        if (!SoundManager.isAudioElement_(sound)) {
           sound = new Audio(sound);
           this.sounds[`genericBeep${random}`] = sound; // Cache the audio element
         }
@@ -256,7 +256,7 @@ export class SoundManager extends KeepTrackPlugin {
       case SoundNames.WHOOSH:
         random = Math.floor(Math.random() * 8) + 1;
         sound = this.sounds[`whoosh${random}`];
-        if (sound instanceof HTMLAudioElement === false) {
+        if (!SoundManager.isAudioElement_(sound)) {
           sound = new Audio(sound);
           this.sounds[`whoosh${random}`] = sound; // Cache the audio element
         }
@@ -271,7 +271,7 @@ export class SoundManager extends KeepTrackPlugin {
         // Random error or error2
         random = Math.floor(Math.random() * 2) + 1;
         sound = this.sounds[`error${random}`];
-        if (sound instanceof HTMLAudioElement === false) {
+        if (!SoundManager.isAudioElement_(sound)) {
           sound = new Audio(sound);
           // Error2 is too loud, so we reduce its volume
           if (random === 2) {
@@ -285,7 +285,7 @@ export class SoundManager extends KeepTrackPlugin {
       case SoundNames.CLICK:
         random = Math.floor(Math.random() * this.maxClickClip_) + 1;
         sound = this.sounds[`click${random}`];
-        if (sound instanceof HTMLAudioElement === false) {
+        if (!SoundManager.isAudioElement_(sound)) {
           sound = new Audio(sound);
           sound.volume = 0.25;
           this.sounds[`click${random}`] = sound; // Cache the audio element
@@ -302,7 +302,7 @@ export class SoundManager extends KeepTrackPlugin {
           }
         }
         sound = this.sounds[`chatter${random}`];
-        if (sound instanceof HTMLAudioElement === false) {
+        if (!SoundManager.isAudioElement_(sound)) {
           sound = new Audio(sound);
           sound.volume = 0.15;
           this.sounds[`chatter${random}`] = sound; // Cache the audio element
@@ -320,7 +320,7 @@ export class SoundManager extends KeepTrackPlugin {
         return;
       default:
         sound = this.sounds[soundName];
-        if (sound instanceof HTMLAudioElement === false) {
+        if (!SoundManager.isAudioElement_(sound)) {
           sound = new Audio(sound);
           if (soundName === SoundNames.LOADING) {
             sound.volume = 0.25;
@@ -332,6 +332,10 @@ export class SoundManager extends KeepTrackPlugin {
         }
         sound.play();
     }
+  }
+
+  private static isAudioElement_(sound: string | HTMLAudioElement): sound is HTMLAudioElement {
+    return sound instanceof HTMLAudioElement;
   }
 }
 

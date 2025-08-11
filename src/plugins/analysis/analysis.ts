@@ -42,7 +42,6 @@ import { WatchlistPlugin } from '../watchlist/watchlist';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
-  protected dependencies_: [];
   closeObjectSearchStrCache_: string | null = null;
   menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
   bottomIconImg = folderCodePng;
@@ -742,7 +741,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
         time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
         const lla = sat.lla(time);
 
-        if (lla.lat > lat - latMargin && lla.lat < lat + latMargin && lla.lon > lon - lonMargin && lla.lon < lon + lonMargin) {
+        if (lla && lla.lat > lat - latMargin && lla.lat < lat + latMargin && lla.lon > lon - lonMargin && lla.lon < lon + lonMargin) {
           overflights.push({
             START_DTG: time.toISOString(),
             SATELLITE_ID: sat.sccNum,

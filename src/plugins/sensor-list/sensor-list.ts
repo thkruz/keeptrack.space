@@ -10,7 +10,7 @@ import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
-import { SatInfoBox } from '../select-sat-manager/sat-info-box';
+import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
 import { InputEventType, keepTrackApi } from './../../keepTrackApi';

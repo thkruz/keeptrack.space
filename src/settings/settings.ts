@@ -340,7 +340,7 @@ export class SettingsManager {
    * Higher values make godrays more pronounced.
    * @default 0.75.
    */
-  godraysExposure = 0.75;
+  godraysExposure = 0.4;
   /**
    * The density of godrays effect.
    * Controls the intensity and thickness of the light scattering effect.
@@ -416,7 +416,6 @@ export class SettingsManager {
    */
   nearZoomLevel = 25 as Kilometers;
   isPreventColorboxClose = false;
-  isDayNightToggle = false;
   isUseHigherFOVonMobile = null;
   lostSatStr = '';
   maxOribtsDisplayed = 100000;
@@ -685,7 +684,7 @@ export class SettingsManager {
    * 1 = Thin white atmosphere
    * 2 = Colored atmosphere
    */
-  isDrawAtmosphere: AtmosphereSettings = AtmosphereSettings.COLORFUL;
+  isDrawAtmosphere: AtmosphereSettings = AtmosphereSettings.ON;
   /**
    * Determines whether or not to draw the Aurora effect.
    */

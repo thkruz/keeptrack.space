@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
-import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SensorManager } from '@app/plugins/sensor/sensorManager';
@@ -161,9 +161,9 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
   keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerInstance);
 
-  keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
-  keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
-  keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
+  keepTrackApi.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));
+  keepTrackApi.getDotsManager().sizeData = new Int8Array(Array(100).fill(0));
+  keepTrackApi.getDotsManager().positionData = new Float32Array(Array(100).fill(0));
   // Setup a mock catalog
   const sat2 = defaultSat.clone();
 

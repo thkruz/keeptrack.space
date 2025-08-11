@@ -10,8 +10,6 @@ export class Calendar {
   private simulationDate: Date;
   private propagationRate: number = 1;
   private isVisible: boolean = false;
-  private readonly timerUntilEnabled: number = 10000;
-  private isCalendarEnabled: boolean = false;
 
   // PropRate Slider limits
   private readonly propRateLimitMin = -20;
@@ -21,10 +19,6 @@ export class Calendar {
     this.containerId = containerId;
     this.calendarDate = new Date();
     this.simulationDate = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
-
-    setTimeout(() => {
-      this.isCalendarEnabled = true;
-    }, this.timerUntilEnabled);
   }
 
   private render(date?: Date): void {
@@ -500,7 +494,7 @@ export class Calendar {
   }
 
   toggleDatePicker(): void {
-    if (!this.isCalendarEnabled) {
+    if (!keepTrackApi.getTimeManager().isTimeChangingEnabled) {
       keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
       return;
@@ -515,7 +509,7 @@ export class Calendar {
   }
 
   showDatePicker(): void {
-    if (!this.isCalendarEnabled) {
+    if (!keepTrackApi.getTimeManager().isTimeChangingEnabled) {
       keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
       return;

@@ -13,8 +13,6 @@ export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
 }
 
 export class OrbitalPlaneDensityColorScheme extends ColorScheme {
-  colorTheme: Record<string, rgbaArray>;
-  objectTypeFlags: Record<string, boolean>;
   readonly label = 'Orbital Plane Density';
   readonly id = 'OrbitalPlaneDensityColorScheme';
   static readonly id = 'OrbitalPlaneDensityColorScheme';

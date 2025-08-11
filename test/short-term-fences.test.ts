@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SatInfoBox } from '@app/plugins/select-sat-manager/sat-info-box';
+import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ShortTermFences } from '@app/plugins/short-term-fences/short-term-fences';
 import { defaultSat, defaultSensor } from './environment/apiMocks';

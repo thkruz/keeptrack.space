@@ -33,6 +33,8 @@ export class EditSat extends KeepTrackPlugin {
   isIconDisabled = true;
   isIconDisabledOnLoad = true;
 
+  static readonly elementPrefix = 'es';
+
   sideMenuElementName = 'editSat-menu';
   sideMenuElementHtml = keepTrackApi.html`
     <div id="editSat-menu" class="side-menu-parent start-hidden text-select">
@@ -192,8 +194,6 @@ export class EditSat extends KeepTrackPlugin {
       },
     );
   }
-
-  static readonly elementPrefix = 'es';
 
   isRmbOnSat = true;
   rmbMenuOrder = 2;

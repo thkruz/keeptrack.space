@@ -71,8 +71,8 @@ export interface ColorSchemeParams {
 
 export abstract class ColorScheme {
   colorTheme: Record<string, rgbaArray> = {};
-  static readonly uniqueColorTheme: Record<string, rgbaArray>;
   objectTypeFlags: Record<string, boolean>;
+  static readonly uniqueColorTheme: Record<string, rgbaArray>;
   static readonly uniqueObjectTypeFlags: Record<string, boolean>;
   legendHtml: string = '';
   /** This is used in the UI */

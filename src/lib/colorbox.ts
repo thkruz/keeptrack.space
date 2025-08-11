@@ -89,7 +89,7 @@ const setColorboxTitle = (title: string): void => {
 };
 
 const clearColorboxTitle = (): void => {
-  const titleSpan = getEl('colorbox-title');
+  const titleSpan = getEl('colorbox-title', true);
 
   if (titleSpan) {
     titleSpan.textContent = '';

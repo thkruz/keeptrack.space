@@ -426,8 +426,6 @@ export class Earth {
     gl.enable(gl.POLYGON_OFFSET_FILL);
     gl.polygonOffset(0.0, -RADIUS_OF_EARTH);
 
-    (this.atmosphereMesh.geometry as SphereGeometry).sortFacesByDistance(keepTrackApi.getMainCamera().getCamPos());
-
     gl.bindVertexArray(this.atmosphereMesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.atmosphereMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);

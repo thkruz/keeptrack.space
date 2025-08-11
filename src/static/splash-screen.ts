@@ -62,7 +62,7 @@ export abstract class SplashScreen {
           <span id="loader-text">Downloading Science...</span>
         </div>
         <div id="loading-hint">Hint: ${this.showHint()}</div>
-        <div id="version-text">v10.6.2</div>
+        <div id="version-text">v${settingsManager.versionNumber}</div>
         <div id="copyright-notice">
           ${settingsManager.isMobileModeEnabled ? t7e('copyright.noticeMobile') : t7e('copyright.notice')}
         </div>

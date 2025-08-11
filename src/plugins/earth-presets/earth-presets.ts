@@ -33,9 +33,10 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawSpecMap = true;
         settingsManager.isEarthGrayScale = false;
         settingsManager.isDrawPoliticalMap = true;
-        settingsManager.isDrawAtmosphere = AtmosphereSettings.COLORFUL;
+        settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = true;
         keepTrackApi.getPlugin(NightToggle)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(NightToggle)?.off();
         break;
       case 'earth-engineer-rmb':
         keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.BLUE_MARBLE);
@@ -44,9 +45,9 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawSpecMap = false;
         settingsManager.isEarthGrayScale = false;
         settingsManager.isDrawPoliticalMap = false;
-        settingsManager.isDrawAtmosphere = AtmosphereSettings.WHITE;
+        settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.getPlugin(NightToggle)?.toggleNightMode();
+        keepTrackApi.getPlugin(NightToggle)?.on();
         break;
       case 'earth-opscenter-rmb':
         keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
@@ -57,6 +58,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = true;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
+        keepTrackApi.getPlugin(NightToggle)?.on();
         break;
       case 'earth-90sGraphics-rmb':
         keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
@@ -67,6 +69,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
+        keepTrackApi.getPlugin(NightToggle)?.on();
         break;
       default:
         break;

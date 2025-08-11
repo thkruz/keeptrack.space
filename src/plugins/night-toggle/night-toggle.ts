@@ -27,14 +27,22 @@ export class NightToggle extends KeepTrackPlugin {
   };
 
   toggleNightMode() {
-    if (!this.isMenuButtonActive) {
-      keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
-      settingsManager.isDrawNightAsDay = true;
-      this.setBottomIconToSelected();
+    if (this.isMenuButtonActive) {
+      this.on();
     } else {
-      keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
-      settingsManager.isDrawNightAsDay = false;
-      this.setBottomIconToUnselected();
+      this.off();
     }
+  }
+
+  on() {
+    keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+    settingsManager.isDrawNightAsDay = true;
+    this.setBottomIconToSelected();
+  }
+
+  off() {
+    keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+    settingsManager.isDrawNightAsDay = false;
+    this.setBottomIconToUnselected();
   }
 }

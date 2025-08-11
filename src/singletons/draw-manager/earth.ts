@@ -90,8 +90,7 @@ export enum EarthTextureStyle {
 
 export enum AtmosphereSettings {
   OFF = 0,
-  WHITE = 1,
-  COLORFUL = 2,
+  ON = 1,
 }
 
 export class Earth {
@@ -165,7 +164,7 @@ export class Earth {
    */
   draw(tgtBuffer: WebGLFramebuffer | null) {
     this.drawEarthSurface_(tgtBuffer);
-    if (settingsManager.isDrawAtmosphere) {
+    if (settingsManager.isDrawAtmosphere === AtmosphereSettings.ON) {
       this.drawEarthAtmosphere_(tgtBuffer);
     }
     this.drawBlackGpuPickingEarth_();
@@ -251,6 +250,7 @@ export class Earth {
             uSpecMap: <WebGLUniformLocation><unknown>null,
             uPoliticalMap: <WebGLUniformLocation><unknown>null,
             uCloudsMap: <WebGLUniformLocation><unknown>null,
+            uisDrawNightAsDay: <WebGLUniformLocation><unknown>null,
           },
           vertexShader: this.shaders.surfaceVert,
           fragmentShader: this.shaders.surfaceFrag,
@@ -452,6 +452,7 @@ export class Earth {
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uisDrawNightAsDay, settingsManager.isDrawNightAsDay ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsDrawAurora, settingsManager.isDrawAurora ? 1.0 : 0.0);
   }
 
@@ -675,6 +676,7 @@ export class Earth {
     uniform float uIsDrawAurora;
     uniform float uZoomLevel;
     uniform float uisGrayScale;
+    uniform float uisDrawNightAsDay;
 
     in vec2 vUv;
     in vec3 vNormal;
@@ -727,7 +729,14 @@ export class Earth {
       // Final color
       vec3 dayColor = (ambientLightColor + directionalLightColor) * diffuse;
       vec3 dayTexColor = textureLod(uDayMap, vUv, -1.0).rgb * dayColor;
-      vec3 nightColor = smoothstep(0.0, 2.0, (1.0 - uZoomLevel)) * textureLod(uNightMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);
+      vec3 nightColor = vec3(0.0);
+
+      if (uisDrawNightAsDay < 0.5) {
+        nightColor = smoothstep(0.0, 2.0, (1.0 - uZoomLevel)) * textureLod(uNightMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);
+      } else {
+        // If day night toggle is on, the nightColor should be bright like the day texture
+        nightColor = textureLod(uDayMap, vUv, -1.0).rgb * pow(1.0 - diffuse, 2.0);
+      }
 
       fragColor = vec4(dayTexColor + nightColor + bumpTexColor + specLightColor, 1.0);
 

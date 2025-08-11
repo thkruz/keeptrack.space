@@ -517,7 +517,7 @@ export abstract class UrlManager {
         settingsManager.isEarthGrayScale = false;
         settingsManager.isDrawPoliticalMap = true;
         settingsManager.isDrawAurora = true;
-        settingsManager.isDrawAtmosphere = AtmosphereSettings.COLORFUL;
+        settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = true;
         break;
       case 'engineer':
@@ -528,7 +528,7 @@ export abstract class UrlManager {
         settingsManager.isEarthGrayScale = false;
         settingsManager.isDrawPoliticalMap = false;
         settingsManager.isDrawAurora = false;
-        settingsManager.isDrawAtmosphere = AtmosphereSettings.WHITE;
+        settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = false;
         keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
           keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();

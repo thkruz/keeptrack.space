@@ -434,7 +434,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   }
 
   resetToDefaults() {
-    keepTrackApi.getSoundManager().play(SoundNames.BUTTON_CLICK);
+    keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
     const filterForm = <HTMLFormElement>getEl('filter-form');
 
     const checkboxes = filterForm.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;

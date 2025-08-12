@@ -164,11 +164,11 @@ export class StereoMap extends KeepTrackPlugin {
           this.openSideMenu();
           this.setBottomIconToSelected();
           this.updateMap();
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           this.closeSideMenu();
           this.setBottomIconToUnselected();
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
       }
     });

@@ -127,15 +127,15 @@ export class ShortTermFences extends KeepTrackPlugin {
       () => {
         getEl('stfForm')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
-          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+          keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
           this.onSubmit_.bind(this)();
         });
         getEl('stf-remove-last')?.addEventListener('click', () => {
-          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+          keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
           keepTrackApi.getSensorManager().removeStf();
         });
         getEl('stf-clear-all')?.addEventListener('click', () => {
-          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+          keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
           keepTrackApi.getSensorManager().clearStf();
         });
 

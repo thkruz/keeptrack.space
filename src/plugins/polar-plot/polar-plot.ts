@@ -123,11 +123,11 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
           this.openSideMenu();
           this.setBottomIconToSelected();
           this.updatePlot_();
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           this.closeSideMenu();
           this.setBottomIconToUnselected();
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
       }
     });

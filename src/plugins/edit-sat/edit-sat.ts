@@ -158,7 +158,7 @@ export class EditSat extends KeepTrackPlugin {
         getEl('editSat-save')!.addEventListener('click', EditSat.editSatSaveClick);
 
         getEl('editSat-open')!.addEventListener('click', () => {
-          keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+          keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
           getEl('editSat-file')!.click();
         });
 
@@ -431,7 +431,7 @@ export class EditSat extends KeepTrackPlugin {
   }
 
   private static editSatSubmit() {
-    keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+    keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
 
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
@@ -498,7 +498,7 @@ export class EditSat extends KeepTrackPlugin {
   private static editSatSaveClick(e: Event) {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
 
-    keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
+    keepTrackApi.getSoundManager()?.play(SoundNames.EXPORT);
 
     try {
       const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;

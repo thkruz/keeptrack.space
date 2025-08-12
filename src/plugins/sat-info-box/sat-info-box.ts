@@ -100,7 +100,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   withClickSound<T extends unknown[]>(handler: (...args: T) => unknown): (...args: T) => unknown {
     return (...args: T) => {
       // This code will run before the handler
-      keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
 
       return handler.apply(this, args);
     };

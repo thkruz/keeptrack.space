@@ -509,7 +509,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 
   static resetToDefaults() {
-    keepTrackApi.getSoundManager().play(SoundNames.BUTTON_CLICK);
+    keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
     settingsManager.isDrawOrbits = true;
     settingsManager.drawCameraWidget = false;
     settingsManager.isDrawTrailingOrbits = false;

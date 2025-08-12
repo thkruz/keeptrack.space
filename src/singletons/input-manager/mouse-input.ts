@@ -389,7 +389,7 @@ export class MouseInput {
         keepTrackApi.emit(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
         break;
     }
-    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+    keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
 
     const rightButtonMenuElement = getEl('right-btn-menu');
 

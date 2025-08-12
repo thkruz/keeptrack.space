@@ -685,7 +685,10 @@
     "USBZ": "アメリカ合衆国/ブラジル",
     "VENZ": "ベネズエラ",
     "VTNM": "ベトナム",
-    "TBD": "不明"
+    "TBD": "不明",
+    "BH": "バーレーン",
+    "BW": "ボツワナ",
+    "ESA/JAXA": "ESA/JAXA"
   },
   "copyright": {
     "notice": "KeepTrack™およびKeepTrack.Space™はKruczek Labs LLCの商標です。<br>無断使用、リブランディング、または帰属の削除は、商標およびオープンソースライセンスの条件に違反する可能性があります。<br>© 2025 Kruczek Labs LLC. 無断転載を禁じます。詳細はLICENSEをご覧ください。",

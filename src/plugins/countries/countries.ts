@@ -73,13 +73,28 @@ export class CountriesMenu extends KeepTrackPlugin {
       return { country, countryCode };
     }).sort((a, b) => a.country.localeCompare(b.country));
 
-    return `${countries.reduce((acc, countryArr) => {
-      if (countryArr.countryCode === '') {
-        return acc;
-      }
+    // Group countries by their display name
+    const countryGroups: Record<string, string[]> = {};
 
-      return `${acc}<li class="menu-selectable country-option" data-group="${countryArr.countryCode}">${countryArr.country}</li>`;
-    }, header)}<br/>`;
+    countries.forEach(({ country, countryCode }) => {
+      if (countryCode === '') {
+        return;
+      }
+      if (!countryGroups[country]) {
+        countryGroups[country] = [];
+      }
+      countryGroups[country].push(countryCode);
+    });
+
+    // Create a single <li> per country, with all codes merged by '|'
+    const mergedList = Object.entries(countryGroups).reduce((acc, [country, codes]) => {
+      const dataGroup = codes.join('|');
+
+
+      return `${acc}<li class="menu-selectable country-option" data-group="${dataGroup}">${country}</li>`;
+    }, header);
+
+    return `${mergedList}<br/>`;
   }
 
   private static countryMenuClick_(countryCode: string): void {

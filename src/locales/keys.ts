@@ -548,6 +548,9 @@ export const Keys = [
   'countries.VENZ',
   'countries.VTNM',
   'countries.TBD',
+  'countries.BH',
+  'countries.BW',
+  'countries.ESA/JAXA',
   'plugins.proOnlyMsg',
 ] as const;
 

@@ -75,15 +75,10 @@ export abstract class StringExtractor {
       return 'Unknown';
     }
 
-    // TODO: Move this to the backend
-    if (user === 'STIOT') {
-      user = 'Sateliot';
-    }
-
     const userUrl = userUrls.filter((url) => url.user === user);
 
-    if (userUrl.length > 0) {
-      return `<a class="iframe" href="${userUrl[0].url}">${user}</a>`;
+    if (userUrl?.[0]?.url) {
+      return `<a href="${userUrl[0].url}" target="_blank">${user}</a>`;
     }
 
     return user;

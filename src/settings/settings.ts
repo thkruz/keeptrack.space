@@ -320,10 +320,10 @@ export class SettingsManager {
   isDrawSun = true;
   /**
    * Determines how many draw commands are used for sun illumination
-   * This should be a GodraySamples value (16, 32, 64, 128)
-   * @default 16
+   * This should be a GodraySamples value (24, 36, 52, 80)
+   * @default 24
    */
-  godraysSamples = 16;
+  godraysSamples = 24;
   /**
    * The decay factor for the godray effect.
    *
@@ -680,9 +680,8 @@ export class SettingsManager {
   isDrawBumpMap = true;
   /**
    * Determines whether the atmosphere should be drawn or not.
-   * 0 = No atmosphere
-   * 1 = Thin white atmosphere
-   * 2 = Colored atmosphere
+   * 0 = Off
+   * 1 = On
    */
   isDrawAtmosphere: AtmosphereSettings = AtmosphereSettings.ON;
   /**
@@ -1144,7 +1143,7 @@ export class SettingsManager {
     this.isDrawSun = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_SUN, this.isDrawSun) as boolean;
     this.isDrawCovarianceEllipsoid = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, this.isDrawCovarianceEllipsoid) as boolean;
     this.isBlackEarth = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_BLACK_EARTH, this.isBlackEarth) as boolean;
-    this.isDrawAtmosphere = parseInt(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE) ?? '0') as AtmosphereSettings;
+    this.isDrawAtmosphere = parseInt(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE) ?? '1') as AtmosphereSettings;
     this.isDrawAurora = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_AURORA, this.isDrawAurora) as boolean;
     this.isDrawMilkyWay = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_MILKY_WAY, this.isDrawMilkyWay) as boolean;
     this.isGraySkybox = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_GRAY_SKYBOX, this.isGraySkybox) as boolean;

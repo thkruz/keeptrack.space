@@ -207,7 +207,7 @@ export class MeshManager {
     }
 
     // Check for this.currentMeshObject.model.mesh.vertexBuffer
-    if (!this.currentMeshObject.model.mesh?.vertexBuffer) {
+    if (!this.currentMeshObject.model?.mesh?.vertexBuffer) {
       // Our mesh is probably still downloading. Skip drawing
       return;
     }
@@ -476,6 +476,13 @@ export class MeshManager {
 
   update(selectedDate: Date, sat: DetailedSatellite | MissileObject) {
     if (!sat.isSatellite() && !sat.isMissile()) {
+      return;
+    }
+
+    // Mesh isn't set for some reason. Our mesh is probably still downloading.
+    if (!this.currentMeshObject.model) {
+
+      // Avoid throwing an error
       return;
     }
 

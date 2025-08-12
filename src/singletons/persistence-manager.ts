@@ -64,6 +64,7 @@ export enum StorageKey {
   SENSOR_TIMELINE_ENABLED_SENSORS = 'v2-sensor-timeline-enabled-sensors',
 
   USER_ACCOUNT = 'v2-user-account',
+  VERSION = 'v2-version',
 }
 export class PersistenceManager {
   private readonly storage_: Storage;
@@ -72,6 +73,7 @@ export class PersistenceManager {
 
   private constructor() {
     this.storage_ = localStorage;
+    this.validateStorage();
     this.verifyStorage();
   }
 
@@ -85,6 +87,56 @@ export class PersistenceManager {
     }
 
     return PersistenceManager.instance_;
+  }
+
+  validateStorage(): void {
+    const currentVersion = this.storage_.getItem(StorageKey.VERSION);
+
+    if (
+      typeof currentVersion === 'string' &&
+      typeof settingsManager.versionNumber === 'string' &&
+      this.compareSemver_(currentVersion, settingsManager.versionNumber) < 0
+    ) {
+      // Handle version mismatch
+      console.warn(`Version mismatch: ${currentVersion} < ${settingsManager.versionNumber}`);
+      console.warn('Clearing local storage...');
+      // Perform any necessary migration or cleanup
+      this.storage_.clear();
+    }
+
+    // Save the current version to storage
+    this.storage_.setItem(StorageKey.VERSION, settingsManager.versionNumber);
+  }
+
+  /**
+   * Compares two semantic version strings.
+   *
+   * Splits each version string by '.' and compares each numeric part sequentially.
+   * Returns -1 if `a` is less than `b`, 1 if `a` is greater than `b`, and 0 if they are equal.
+   * Handles versions of different lengths by treating missing parts as 0.
+   *
+   * @param a - The first semantic version string (e.g., "1.2.3").
+   * @param b - The second semantic version string (e.g., "1.2.4").
+   * @returns A number indicating the comparison result:
+   *          -1 if `a` < `b`, 1 if `a` > `b`, 0 if equal.
+   */
+  private compareSemver_(a: string, b: string): number {
+    const pa = a.split('.').map(Number);
+    const pb = b.split('.').map(Number);
+
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const na = pa[i] || 0;
+      const nb = pb[i] || 0;
+
+      if (na < nb) {
+        return -1;
+      }
+      if (na > nb) {
+        return 1;
+      }
+    }
+
+    return 0;
   }
 
   verifyStorage(): void {

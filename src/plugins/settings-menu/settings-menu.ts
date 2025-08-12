@@ -95,7 +95,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
             <div class="switch row">
               <label data-position="top" data-delay="50" data-tooltip="Orbits will be drawn using ECF vs ECI (Mainly for GEO Orbits)">
-                <input id="settings-drawEcf" type="checkbox" />
+                <input id="settings-drawEcf" type="checkbox" checked/>
                 <span class="lever"></span>
                 Draw Orbits in ECF
               </label>
@@ -509,11 +509,11 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 
   static resetToDefaults() {
-    keepTrackApi.getSoundManager().play(SoundNames.BUTTON_CLICK);
+    keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
     settingsManager.isDrawOrbits = true;
     settingsManager.drawCameraWidget = false;
     settingsManager.isDrawTrailingOrbits = false;
-    settingsManager.isOrbitCruncherInEcf = false;
+    settingsManager.isOrbitCruncherInEcf = true;
     settingsManager.isDrawInCoverageLines = true;
     settingsManager.enableHoverOverlay = true;
     settingsManager.isFocusOnSatelliteWhenSelected = true;

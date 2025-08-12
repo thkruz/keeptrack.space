@@ -108,7 +108,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
       KeepTrackApiEvents.uiManagerFinal,
       () => {
         getEl('export-launch-info')!.addEventListener('click', () => {
-          keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
+          keepTrackApi.getSoundManager()?.play(SoundNames.EXPORT);
           saveCsv(this.launchList as unknown as Array<Record<string, unknown>>, 'launchList');
         });
       },

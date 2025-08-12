@@ -1,10 +1,16 @@
 /* eslint-disable max-lines */
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { DetailedSatellite, MINUTES_PER_DAY } from 'ootk';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
+import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
+import { errorManagerInstance } from '@app/singletons/errorManager';
+import { CoordinateTransforms } from '@app/static/coordinate-transforms';
+import { SatMath } from '@app/static/sat-math';
+import { SensorMath } from '@app/static/sensor-math';
+import { BaseObject, DetailedSatellite, eci2lla, MINUTES_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 const SECTIONS = {
   ORBITAL: 'orbital-section',
@@ -98,28 +104,28 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       `).join('');
   }
 
-  private updateOrbitData_(sat: DetailedSatellite): void {
-    if (sat === null || typeof sat === 'undefined') {
+  private updateOrbitData_(obj: BaseObject): void {
+    if (obj === null || typeof obj === 'undefined') {
       return;
     }
 
-    if (sat.isSatellite()) {
-      getEl(EL.APOGEE)!.innerHTML = `${sat.apogee.toFixed(0)} km`;
-      getEl(EL.PERIGEE)!.innerHTML = `${sat.perigee.toFixed(0)} km`;
-      getEl(EL.INCLINATION)!.innerHTML = `${sat.inclination.toFixed(2)}°`;
-      getEl(EL.ECCENTRICITY)!.innerHTML = sat.eccentricity.toFixed(3);
-      getEl(EL.RAAN)!.innerHTML = `${sat.rightAscension.toFixed(2)}°`;
-      getEl(EL.ARG_PE)!.innerHTML = `${sat.argOfPerigee.toFixed(2)}°`;
+    if (obj instanceof DetailedSatellite) {
+      getEl(EL.APOGEE)!.innerHTML = `${obj.apogee.toFixed(0)} km`;
+      getEl(EL.PERIGEE)!.innerHTML = `${obj.perigee.toFixed(0)} km`;
+      getEl(EL.INCLINATION)!.innerHTML = `${obj.inclination.toFixed(2)}°`;
+      getEl(EL.ECCENTRICITY)!.innerHTML = obj.eccentricity.toFixed(3);
+      getEl(EL.RAAN)!.innerHTML = `${obj.rightAscension.toFixed(2)}°`;
+      getEl(EL.ARG_PE)!.innerHTML = `${obj.argOfPerigee.toFixed(2)}°`;
 
       const periodDom = getEl(EL.PERIOD)!;
 
-      periodDom.innerHTML = `${sat.period.toFixed(2)} min`;
+      periodDom.innerHTML = `${obj.period.toFixed(2)} min`;
       periodDom.dataset.position = 'top';
       periodDom.dataset.delay = '50';
-      periodDom.dataset.tooltip = `Mean Motion: ${(MINUTES_PER_DAY / sat.period).toFixed(2)}`;
+      periodDom.dataset.tooltip = `Mean Motion: ${(MINUTES_PER_DAY / obj.period).toFixed(2)}`;
 
       const now: Date | number | string = new Date();
-      const daysold = sat.ageOfElset(now);
+      const daysold = obj.ageOfElset(now);
       const age = daysold >= 1 ? daysold : daysold * 24;
       const units = daysold >= 1 ? 'Days' : 'Hours';
       const elsetAgeDom = getEl(EL.ELSET_AGE)!;
@@ -128,7 +134,101 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
       elsetAgeDom.dataset.position = 'top';
       elsetAgeDom.dataset.delay = '50';
-      elsetAgeDom.dataset.tooltip = `Epoch Year: ${sat.tle1.substr(18, 2).toString()} Day: ${sat.tle1.substr(20, 8).toString()}`;
+      elsetAgeDom.dataset.tooltip = `Epoch Year: ${obj.tle1.substr(18, 2).toString()} Day: ${obj.tle1.substr(20, 8).toString()}`;
+
+      const gmst = keepTrackApi.getTimeManager().gmst;
+      const lla = eci2lla(obj.position, gmst);
+
+      const satLonElement = getEl('sat-longitude');
+      const satLatElement = getEl('sat-latitude');
+
+      if (satLonElement && satLatElement) {
+        if (lla.lon >= 0) {
+          satLonElement.innerHTML = `${lla.lon.toFixed(3)}°E`;
+        } else {
+          satLonElement.innerHTML = `${(lla.lon * -1).toFixed(3)}°W`;
+        }
+        if (lla.lat >= 0) {
+          satLatElement.innerHTML = `${lla.lat.toFixed(3)}°N`;
+        } else {
+          satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°S`;
+        }
+      }
+
+    }
+    const satAltitudeElement = getEl('sat-altitude');
+    const satVelocityElement = getEl('sat-velocity');
+
+    if (satAltitudeElement && satVelocityElement) {
+
+      if (obj instanceof DetailedSatellite) {
+        const gmst = keepTrackApi.getTimeManager().gmst;
+
+        satAltitudeElement.innerHTML = `${SatMath.getAlt(obj.position, gmst).toFixed(2)} km`;
+        satVelocityElement.innerHTML = `${obj.totalVelocity.toFixed(2)} km/s`;
+      } else {
+        const misl = obj as MissileObject;
+
+        satAltitudeElement.innerHTML = `${(keepTrackApi.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} km`;
+        if (misl.totalVelocity) {
+          satVelocityElement.innerHTML = `${misl.totalVelocity.toFixed(2)} km/s`;
+        } else {
+          satVelocityElement.innerHTML = 'Unknown';
+        }
+      }
+    }
+
+    if (keepTrackApi.getPlugin(SelectSatManager)!.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
+      showEl('secondary-sat-info');
+      showEl('sec-angle-link');
+    } else if (keepTrackApi.getPlugin(SelectSatManager)!.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
+      hideEl('secondary-sat-info');
+      hideEl('sec-angle-link');
+    }
+
+    const covMatrix = keepTrackApi.getPlugin(SelectSatManager)!.primarySatCovMatrix;
+    let covRadial = covMatrix[0];
+    let covCrossTrack = covMatrix[1];
+    let covInTrack = covMatrix[2];
+
+    const useKm =
+      covRadial > 0.5 &&
+      covCrossTrack > 0.5 &&
+      covInTrack > 0.5;
+
+    if (useKm) {
+      getEl('sat-uncertainty-radial')!.innerHTML = `${(covMatrix[0]).toFixed(2)} km`;
+      getEl('sat-uncertainty-crosstrack')!.innerHTML = `${(covMatrix[1]).toFixed(2)} km`;
+      getEl('sat-uncertainty-intrack')!.innerHTML = `${(covMatrix[2]).toFixed(2)} km`;
+    } else {
+      covRadial *= 1000;
+      covCrossTrack *= 1000;
+      covInTrack *= 1000;
+      getEl('sat-uncertainty-radial')!.innerHTML = `${covRadial.toFixed(2)} m`;
+      getEl('sat-uncertainty-crosstrack')!.innerHTML = `${covCrossTrack.toFixed(2)} m`;
+      getEl('sat-uncertainty-intrack')!.innerHTML = `${covInTrack.toFixed(2)} m`;
+    }
+
+    const secondarySatObj = keepTrackApi.getPlugin(SelectSatManager)!.secondarySatObj;
+
+    if (secondarySatObj && obj.isSatellite()) {
+      const sat = obj as DetailedSatellite;
+      const ric = CoordinateTransforms.sat2ric(secondarySatObj, sat);
+      const dist = SensorMath.distanceString(sat, secondarySatObj).split(' ')[2];
+
+      const satDistanceElement = getEl('sat-sec-dist');
+      const satRadiusElement = getEl('sat-sec-rad');
+      const satInTrackElement = getEl('sat-sec-intrack');
+      const satCrossTrackElement = getEl('sat-sec-crosstrack');
+
+      if (satDistanceElement && satRadiusElement && satInTrackElement && satCrossTrackElement) {
+        satDistanceElement.innerHTML = `${dist} km`;
+        satRadiusElement.innerHTML = `${ric.position[0].toFixed(2)}km`;
+        satInTrackElement.innerHTML = `${ric.position[1].toFixed(2)}km`;
+        satCrossTrackElement.innerHTML = `${ric.position[2].toFixed(2)}km`;
+      } else {
+        errorManagerInstance.debug('Error updating secondary satellite info!');
+      }
     }
   }
 }

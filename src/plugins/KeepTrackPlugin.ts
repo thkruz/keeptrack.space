@@ -351,7 +351,7 @@ export abstract class KeepTrackPlugin {
               return;
             }
 
-            keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+            keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
             if (this.isSideMenuSettingsOpen) {
               this.closeSecondaryMenu();
 
@@ -372,7 +372,7 @@ export abstract class KeepTrackPlugin {
 
           if (this.downloadIconCb) {
             getEl(`${this.sideMenuElementName}-download-btn`)?.addEventListener('click', () => {
-              keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
+              keepTrackApi.getSoundManager()?.play(SoundNames.EXPORT);
 
               if (this.downloadIconCb) {
                 this.downloadIconCb();

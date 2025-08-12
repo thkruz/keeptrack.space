@@ -173,7 +173,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
             sensorMoonBtnElement.textContent = 'Add Line to Moon  \u25B6';
             this.isMonnLineVisible_ = false;
-            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+            keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
 
 
             return;
@@ -194,7 +194,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         // Change Button Text
         sensorMoonBtnElement.textContent = 'Remove Line to Moon  \u25B6';
         this.isMonnLineVisible_ = true;
-        keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+        keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       }
     });
   }
@@ -215,7 +215,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
             line.isGarbage = true;
             sensorSunBtnElement.textContent = 'Add Line to Sun  \u25B6';
             this.isSunLineVisible_ = false;
-            keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+            keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
 
             return;
           }
@@ -235,7 +235,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         // Change Button Text
         sensorSunBtnElement.textContent = 'Remove Line to Sun  \u25B6';
         this.isSunLineVisible_ = true;
-        keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+        keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       }
     });
   }

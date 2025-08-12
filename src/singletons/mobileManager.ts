@@ -39,6 +39,9 @@ export class MobileManager {
           settingsManager.plugins.TopMenu = cachePlugins.TopMenu;
           settingsManager.plugins.DateTimeManager = cachePlugins.DateTimeManager;
           settingsManager.plugins.SoundManager = cachePlugins.SoundManager;
+          settingsManager.plugins.SatInfoBoxOrbital = cachePlugins.SatInfoBoxOrbital;
+          settingsManager.plugins.SatInfoBoxObject = cachePlugins.SatInfoBoxObject;
+          settingsManager.plugins.SatInfoBoxMission = cachePlugins.SatInfoBoxMission;
           settingsManager.defaultColorScheme = 'CelestrakColorScheme';
 
           // Get the size of keeptrack-root

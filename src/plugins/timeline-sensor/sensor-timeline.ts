@@ -387,11 +387,11 @@ export class SensorTimeline extends KeepTrackPlugin {
         if (sensorButton.classList.contains('btn-red')) {
           sensorButton.classList.remove('btn-red');
           this.enabledSensors_.push(sensor);
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           sensorButton.classList.add('btn-red');
           this.enabledSensors_.splice(this.enabledSensors_.indexOf(sensor), 1);
-          keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
 
         this.ctxStatic_.reset();

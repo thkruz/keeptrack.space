@@ -13,6 +13,7 @@ import moonJpg from '@public/img/wallpaper/moon.jpg';
 import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
 import opsJpg from '@public/img/wallpaper/ops.jpg';
 import ops2Jpg from '@public/img/wallpaper/ops2.jpg';
+import ops3Jpg from '@public/img/wallpaper/ops3.jpg';
 import rocketJpg from '@public/img/wallpaper/rocket.jpg';
 import rocket2Jpg from '@public/img/wallpaper/rocket2.jpg';
 import rocket3Jpg from '@public/img/wallpaper/rocket3.jpg';
@@ -27,7 +28,7 @@ export abstract class SplashScreen {
   private static splashScreenImgList_ =
     [
       blueMarbleJpg, moonJpg, observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg,
-      epfl1Jpg, epfl2Jpg, opsJpg, ops2Jpg,
+      epfl1Jpg, epfl2Jpg, opsJpg, ops2Jpg, ops3Jpg,
     ];
 
   static readonly msg = {

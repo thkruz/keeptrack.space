@@ -685,6 +685,9 @@
     "USBZ": "Estados Unidos/Brasil",
     "VENZ": "Venezuela",
     "VTNM": "Vietnam",
-    "TBD": "Desconocido"
+    "TBD": "Desconocido",
+    "BH": "Baréin",
+    "BW": "Botswana",
+    "ESA/JAXA": "ESA/JAXA"
   }
 }

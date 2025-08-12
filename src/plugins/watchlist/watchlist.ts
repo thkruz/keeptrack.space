@@ -153,7 +153,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   private addRemoveWatchlist_() {
     const id = keepTrackApi.getPlugin(SelectSatManager)!.selectedSat;
 
-    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+    keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
     if (this.isOnWatchlist(id)) {
       this.removeSat(id);
     } else {
@@ -262,7 +262,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     // Remove button selected on watchlist menu
     getEl('watchlist-list')?.addEventListener('click', (evt: Event) => {
-      keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
       if ((<HTMLElement>evt.target).classList.contains('sat-name')) {
         const satName = (<HTMLElement>evt.target).dataset.satName;
 
@@ -291,7 +291,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     });
 
     getEl('watchlist-open')?.addEventListener('click', () => {
-      keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+      keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
       getEl('watchlist-file')?.click();
     });
 
@@ -466,7 +466,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * Handles the event when a new satellite is added to the watchlist.
    */
   private onAddEvent_() {
-    keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+    keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
     const sats = (<HTMLInputElement>getEl('watchlist-new')).value.split(/[\s,]+/u);
 
     sats.forEach((satNum: string) => {
@@ -499,7 +499,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * Removes the satellites from the watchlist and clears the lines from sensors to satellites.
    */
   private onClearClicked_() {
-    keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+    keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
     this.clear();
   }
 
@@ -587,7 +587,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @param evt - The click event object.
    */
   private onSaveClicked_(evt: Event) {
-    keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+    keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
     const satIds: string[] = [];
 
     for (let i = 0; i < this.watchlistList.length; i++) {

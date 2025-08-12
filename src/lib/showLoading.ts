@@ -31,7 +31,7 @@ export const showLoading = (callback?: () => void, delay?: number): void => {
   }
   SplashScreen.loadStr(getRandomMessage());
 
-  keepTrackApi.getSoundManager().play(SoundNames.LOADING);
+  keepTrackApi.getSoundManager()?.play(SoundNames.LOADING);
 
   fadeIn(loading, 'flex', 500);
 
@@ -66,5 +66,5 @@ export const hideLoading = () => {
   }
 
   fadeOut(loading, 1000);
-  keepTrackApi.getSoundManager().stop(SoundNames.LOADING);
+  keepTrackApi.getSoundManager()?.stop(SoundNames.LOADING);
 };

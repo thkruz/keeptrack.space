@@ -309,7 +309,6 @@ export class KeepTrackApi {
    * @param {KeepTrackApiEvents} params.event - The name of the event to register the callback for.
    * @param {string} params.cbName - The name of the callback function.
    * @param params.cb - The callback function to register.
-   * @throws An error if the event is invalid.
    */
   once<T extends KeepTrackApiEvents>(event: T, cb: (...args: KeepTrackApiEventArguments[T]) => void) {
     this.verifyEvent_(event);
@@ -317,7 +316,13 @@ export class KeepTrackApi {
     this.events[event].push({
       cb: (...args: KeepTrackApiEventArguments[T]) => {
         cb(...args);
-        this.unregister(event, cb);
+        // if this.unregister is not null
+        if (this.events[event]) {
+          // Remove the callback after it has been called once
+          this.unregister(event, cb);
+        } else {
+          console.warn(`Callback for event ${event} was not found in unregister.`);
+        }
       },
       event: <T><unknown>null,
     });

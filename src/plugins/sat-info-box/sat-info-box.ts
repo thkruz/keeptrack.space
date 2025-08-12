@@ -100,7 +100,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   withClickSound<T extends unknown[]>(handler: (...args: T) => unknown): (...args: T) => unknown {
     return (...args: T) => {
       // This code will run before the handler
-      keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
 
       return handler.apply(this, args);
     };
@@ -200,7 +200,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       keepTrackApi.html`
         <div id="${CONTAINER_ID}" class="text-select satinfo-fixed start-hidden">
           ${elements
-          .toSorted((a, b) => (a.order ?? 0) - (b.order ?? 0))
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
           .map((el) => el.html ?? '')
           .join('')}
         </div>

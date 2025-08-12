@@ -96,7 +96,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     </div>`;
   sideMenuSettingsWidth: number = 350;
   downloadIconCb = () => {
-    keepTrackApi.getSoundManager().play(SoundNames.EXPORT);
+    keepTrackApi.getSoundManager()?.play(SoundNames.EXPORT);
     const exportData = keepTrackApi.getSensorManager().lastMultiSiteArray.map((look) => ({
       time: look.time,
       sensor: look.objName,
@@ -193,12 +193,12 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
                 sensorButton.classList.remove('red');
                 sensorButton.classList.add('green');
                 this.disabledSensors_.splice(this.disabledSensors_.indexOf(sensor), 1);
-                keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_ON);
+                keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
               } else {
                 sensorButton.classList.add('red');
                 sensorButton.classList.remove('green');
                 this.disabledSensors_.push(sensor);
-                keepTrackApi.getSoundManager().play(SoundNames.TOGGLE_OFF);
+                keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
               }
 
               this.getlookanglesMultiSite_(

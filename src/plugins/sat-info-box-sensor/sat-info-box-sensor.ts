@@ -5,7 +5,6 @@ import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import type { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import type { TimeManager } from '@app/singletons/time-manager';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
 import { SatMath, SunStatus } from '@app/static/sat-math';
 import { SensorMath, TearrData } from '@app/static/sensor-math';
 import { BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, RfSensor, SpaceObjectType, Sun, SunTime } from 'ootk';
@@ -266,48 +265,6 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         keepTrackApi.getSensorManager().currentTEARR = missileManager.getMissileTEARR(obj as MissileObject);
       }
 
-      const gmst = keepTrackApi.getTimeManager().gmst;
-      const lla = eci2lla(obj.position, gmst);
-
-      const satLonElement = getEl('sat-longitude');
-      const satLatElement = getEl('sat-latitude');
-
-      if (satLonElement && satLatElement) {
-        if (lla.lon >= 0) {
-          satLonElement.innerHTML = `${lla.lon.toFixed(3)}°E`;
-        } else {
-          satLonElement.innerHTML = `${(lla.lon * -1).toFixed(3)}°W`;
-        }
-        if (lla.lat >= 0) {
-          satLatElement.innerHTML = `${lla.lat.toFixed(3)}°N`;
-        } else {
-          satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°S`;
-        }
-      }
-
-      const covMatrix = keepTrackApi.getPlugin(SelectSatManager)!.primarySatCovMatrix;
-      let covRadial = covMatrix[0];
-      let covCrossTrack = covMatrix[1];
-      let covInTrack = covMatrix[2];
-
-      const useKm =
-        covRadial > 0.5 &&
-        covCrossTrack > 0.5 &&
-        covInTrack > 0.5;
-
-      if (useKm) {
-        getEl('sat-uncertainty-radial')!.innerHTML = `${(covMatrix[0]).toFixed(2)} km`;
-        getEl('sat-uncertainty-crosstrack')!.innerHTML = `${(covMatrix[1]).toFixed(2)} km`;
-        getEl('sat-uncertainty-intrack')!.innerHTML = `${(covMatrix[2]).toFixed(2)} km`;
-      } else {
-        covRadial *= 1000;
-        covCrossTrack *= 1000;
-        covInTrack *= 1000;
-        getEl('sat-uncertainty-radial')!.innerHTML = `${covRadial.toFixed(2)} m`;
-        getEl('sat-uncertainty-crosstrack')!.innerHTML = `${covCrossTrack.toFixed(2)} m`;
-        getEl('sat-uncertainty-intrack')!.innerHTML = `${covInTrack.toFixed(2)} m`;
-      }
-
       if (
         settingsManager.plugins?.StereoMap &&
         keepTrackApi.getPlugin(StereoMap)?.isMenuButtonActive &&
@@ -317,60 +274,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         settingsManager.lastMapUpdateTime = timeManagerInstance.realTime;
       }
 
-      const satAltitudeElement = getEl('sat-altitude');
-      const satVelocityElement = getEl('sat-velocity');
-
-      if (satAltitudeElement && satVelocityElement) {
-
-        if (obj.isSatellite()) {
-          const sat = obj as DetailedSatellite;
-          const gmst = keepTrackApi.getTimeManager().gmst;
-
-          satAltitudeElement.innerHTML = `${SatMath.getAlt(sat.position, gmst).toFixed(2)} km`;
-          satVelocityElement.innerHTML = `${sat.totalVelocity.toFixed(2)} km/s`;
-        } else {
-          const misl = obj as MissileObject;
-
-          satAltitudeElement.innerHTML = `${(keepTrackApi.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} km`;
-          if (misl.totalVelocity) {
-            satVelocityElement.innerHTML = `${misl.totalVelocity.toFixed(2)} km/s`;
-          } else {
-            satVelocityElement.innerHTML = 'Unknown';
-          }
-        }
-      }
-
       this.updateSatelliteTearrData_(obj, sensorManagerInstance, timeManagerInstance);
-
-      if (keepTrackApi.getPlugin(SelectSatManager)!.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
-        showEl('secondary-sat-info');
-        showEl('sec-angle-link');
-      } else if (keepTrackApi.getPlugin(SelectSatManager)!.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
-        hideEl('secondary-sat-info');
-        hideEl('sec-angle-link');
-      }
-
-      const secondarySatObj = keepTrackApi.getPlugin(SelectSatManager)!.secondarySatObj;
-
-      if (secondarySatObj && obj.isSatellite()) {
-        const sat = obj as DetailedSatellite;
-        const ric = CoordinateTransforms.sat2ric(secondarySatObj, sat);
-        const dist = SensorMath.distanceString(sat, secondarySatObj).split(' ')[2];
-
-        const satDistanceElement = getEl('sat-sec-dist');
-        const satRadiusElement = getEl('sat-sec-rad');
-        const satInTrackElement = getEl('sat-sec-intrack');
-        const satCrossTrackElement = getEl('sat-sec-crosstrack');
-
-        if (satDistanceElement && satRadiusElement && satInTrackElement && satCrossTrackElement) {
-          satDistanceElement.innerHTML = `${dist} km`;
-          satRadiusElement.innerHTML = `${ric.position[0].toFixed(2)}km`;
-          satInTrackElement.innerHTML = `${ric.position[1].toFixed(2)}km`;
-          satCrossTrackElement.innerHTML = `${ric.position[2].toFixed(2)}km`;
-        } else {
-          errorManagerInstance.debug('Error updating secondary satellite info!');
-        }
-      }
 
       const nextPassElement = getEl('sat-nextpass');
 

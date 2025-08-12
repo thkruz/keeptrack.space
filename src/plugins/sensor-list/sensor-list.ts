@@ -105,7 +105,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
           if (realTarget.id === 'reset-sensor-button') {
             keepTrackApi.getSensorManager().resetSensorSelected();
-            keepTrackApi.getSoundManager().play(SoundNames.MENU_BUTTON);
+            keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
 
             return;
           }
@@ -139,7 +139,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
                 `,
           );
           getEl('sensors-in-fov-link')?.addEventListener('click', () => {
-            keepTrackApi.getSoundManager().play(SoundNames.CLICK);
+            keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
 
             const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
 
@@ -213,7 +213,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
           const sensor = keepTrackApi.getSensorManager().currentSensors[0];
 
           keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, keepTrackApi.getTimeManager().selectedDate);
-          keepTrackApi.getSoundManager().play(SoundNames.WHOOSH);
+          keepTrackApi.getSoundManager()?.play(SoundNames.WHOOSH);
         }
       }
     });

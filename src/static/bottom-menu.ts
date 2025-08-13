@@ -115,6 +115,11 @@ export class BottomMenu {
     keepTrackApi.emit(KeepTrackApiEvents.bottomMenuModeChange);
   }
 
+  static changeMenuMode(menuMode: MenuMode) {
+    settingsManager.activeMenuMode = menuMode;
+    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuModeChange);
+  }
+
   static addBottomMenuFilterButtons() {
     const menuBasicDom = getEl(BottomMenu.basicMenuId);
     const menuAdvancedDom = getEl(BottomMenu.advancedMenuId);

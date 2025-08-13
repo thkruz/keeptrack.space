@@ -1,3 +1,7 @@
+import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { getEl } from '@app/lib/get-el';
+import { BottomMenu } from '@app/static/bottom-menu';
 import { SettingsManager } from '../settings';
 
 export const stemEnvironment = (settingsManager: SettingsManager) => {
@@ -15,6 +19,10 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.plugins.ColorMenu = { enabled: true };
   settingsManager.plugins.Collisions = { enabled: true };
   settingsManager.plugins.SatellitePhotos = { enabled: true };
+  settingsManager.plugins.FilterMenuPlugin = { enabled: true };
+  settingsManager.plugins.NextLaunchesPlugin = { enabled: true };
+  settingsManager.plugins.TimeMachine = { enabled: true };
+  settingsManager.plugins.StereoMap = { enabled: true };
   settingsManager.isShowSplashScreen = true;
 
 
@@ -49,4 +57,11 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.isLoadLastSensor = false;
 
   settingsManager.isDisableExtraCatalog = false;
+
+  keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, () => {
+    BottomMenu.changeMenuMode(MenuMode.ALL);
+
+    getEl('bottom-icons-filter')!.style.display = 'none';
+    document.documentElement.style.setProperty('--bottom-filter-width', '0px');
+  });
 };

@@ -299,7 +299,7 @@ export class CelestrakColorScheme extends ColorScheme {
       errorManagerInstance.debug(`${sat.id.toString()} has no color!`);
 
       return {
-        color: this.colorTheme.transparent,
+        color: settingsManager.colors.transparent ?? this.colorTheme.transparent,
         pickable: Pickable.No,
       };
     }

@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
+import { getEl } from '@app/lib/get-el';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { CoordinateTransforms } from '@app/static/coordinate-transforms';
@@ -176,14 +176,6 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
           satVelocityElement.innerHTML = 'Unknown';
         }
       }
-    }
-
-    if (keepTrackApi.getPlugin(SelectSatManager)!.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
-      showEl('secondary-sat-info');
-      showEl('sec-angle-link');
-    } else if (keepTrackApi.getPlugin(SelectSatManager)!.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
-      hideEl('secondary-sat-info');
-      hideEl('sec-angle-link');
     }
 
     const covMatrix = keepTrackApi.getPlugin(SelectSatManager)!.primarySatCovMatrix;

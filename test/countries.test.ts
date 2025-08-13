@@ -1,6 +1,7 @@
 /* eslint-disable dot-notation */
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { GroupsManager } from '@app/singletons/groups-manager';
 import { ObjectGroup } from '@app/singletons/object-group';
 import { keepTrackContainer } from '../src/container';
@@ -14,6 +15,9 @@ describe('CountriesMenu_class', () => {
   beforeEach(() => {
     setupDefaultHtml();
     const mockGroupsManager = new GroupsManager();
+    const topMenu = new TopMenu();
+
+    topMenu.init();
 
     mockGroupsManager.groupList.F = {
       groupName: 'F',

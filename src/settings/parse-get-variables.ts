@@ -5,6 +5,7 @@ import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 import { starTalk } from './presets/startalk';
+import { stemEnvironment } from './presets/stem';
 import type { SettingsManager } from './settings';
 
 // eslint-disable-next-line complexity
@@ -33,6 +34,9 @@ export const parseGetVariables = (params: string[], settingsManager: SettingsMan
             break;
           case 'startalk':
             starTalk(settingsManager);
+            break;
+          case 'stem':
+            stemEnvironment(settingsManager);
             break;
           case 'million-year':
             SettingsPresets.loadPresetMillionYear(settingsManager);

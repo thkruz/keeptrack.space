@@ -12,10 +12,11 @@ import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/SoundNames';
+import { TopMenu } from '../top-menu/top-menu';
 
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
-  dependencies_ = [];
+  dependencies_ = [TopMenu.name];
 
   menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 

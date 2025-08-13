@@ -255,7 +255,7 @@ export class MeshManager {
       return;
     }
 
-    if (!this.currentMeshObject || !this.currentMeshObject.model.mesh) {
+    if (!this.currentMeshObject || !this.currentMeshObject.model?.mesh) {
       return;
     }
     if (typeof this.currentMeshObject?.id === 'undefined' || this.currentMeshObject?.id === -1) {
@@ -479,18 +479,11 @@ export class MeshManager {
       return;
     }
 
-    // Mesh isn't set for some reason. Our mesh is probably still downloading.
-    if (!this.currentMeshObject.model) {
-
-      // Avoid throwing an error
-      return;
-    }
-
     this.updateModel_(selectedDate, sat);
 
-    if (!this.currentMeshObject.model.mesh) {
-      this.initBuffers(this.currentMeshObject.model.name);
+    if (!this.currentMeshObject.model?.mesh) {
       this.updateModel_(selectedDate, sat);
+      this.initBuffers(this.currentMeshObject.model.name);
     }
 
     const posData = keepTrackApi.getDotsManager().positionData;

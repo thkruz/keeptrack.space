@@ -35,12 +35,12 @@ export class MobileManager {
           Object.keys(settingsManager.plugins).forEach((key) => {
             settingsManager.plugins[key] = false;
           });
+          settingsManager.plugins.SoundManager = cachePlugins.SoundManager;
           settingsManager.plugins.SatInfoBoxCore = cachePlugins.SatInfoBoxCore;
+          settingsManager.plugins.SatInfoBoxObject = cachePlugins.SatInfoBoxObject;
           settingsManager.plugins.TopMenu = cachePlugins.TopMenu;
           settingsManager.plugins.DateTimeManager = cachePlugins.DateTimeManager;
-          settingsManager.plugins.SoundManager = cachePlugins.SoundManager;
           settingsManager.plugins.SatInfoBoxOrbital = cachePlugins.SatInfoBoxOrbital;
-          settingsManager.plugins.SatInfoBoxObject = cachePlugins.SatInfoBoxObject;
           settingsManager.plugins.SatInfoBoxMission = cachePlugins.SatInfoBoxMission;
           settingsManager.defaultColorScheme = 'CelestrakColorScheme';
 
@@ -58,7 +58,7 @@ export class MobileManager {
           Object.assign(settingsManager, {
             isEnableJscCatalog: true,
             noMeshManager: false,
-            isShowSplashScreen: false,
+            isShowSplashScreen: true,
             // isDisableSelectSat: true,
             isDisableKeyboard: true,
             isAllowRightClick: false,

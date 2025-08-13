@@ -345,7 +345,6 @@ export class SettingsPresets {
     settings.maxAnalystSats = 1;
     settings.maxMissiles = 1;
     settings.maxFieldOfViewMarkers = 1;
-    settings.isShowSplashScreen = true;
     settings.isEPFL = true;
     settings.disableAllPlugins();
     settings.isDrawCovarianceEllipsoid = false;

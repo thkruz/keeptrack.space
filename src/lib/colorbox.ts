@@ -209,4 +209,12 @@ const setupImageColorbox_ = (url: string, onLoadCb: () => void) => {
     hideLoading();
   };
   colorboxImage.src = url;
+
+  const openButton = getEl('colorbox-open-button') as HTMLButtonElement;
+
+  openButton.onclick = () => {
+    if (colorboxImage?.src) {
+      window.open(colorboxImage.src, '_blank');
+    }
+  };
 };

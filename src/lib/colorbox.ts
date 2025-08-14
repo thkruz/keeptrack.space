@@ -172,6 +172,7 @@ const setupIframeColorbox_ = (url: string, onLoadCb: () => void) => {
   (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {
     errorManagerInstance.warn(`Failed to load: ${url}`);
     closeColorbox();
+    hideLoading();
   };
   colorboxIframe.src = url;
   colorboxIframe.onload = () => {
@@ -205,6 +206,17 @@ const setupImageColorbox_ = (url: string, onLoadCb: () => void) => {
   colorboxImage.onerror = () => {
     errorManagerInstance.warn(`Failed to load image: ${url}`);
     closeColorbox();
+    hideLoading();
   };
   colorboxImage.src = url;
+
+  const openButton = getEl('colorbox-open-button', true) as HTMLButtonElement;
+
+  if (openButton) {
+    openButton.onclick = () => {
+      if (colorboxImage?.src) {
+        window.open(colorboxImage.src, '_blank');
+      }
+    };
+  }
 };

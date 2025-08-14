@@ -92,6 +92,13 @@ export class DateTimeManager extends KeepTrackPlugin {
       return;
     }
 
+    const NavWrapper = getEl('nav-wrapper');
+    // Remove the styling from nav-wrapper
+
+    if (NavWrapper) {
+      NavWrapper.style = '';
+    }
+
     this.calendar = new Calendar('datetime-input-form');
 
     document.getElementById('datetime-text')?.addEventListener('click', this.datetimeTextClick.bind(this));

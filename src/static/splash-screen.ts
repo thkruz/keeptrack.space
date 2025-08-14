@@ -130,9 +130,9 @@ export abstract class SplashScreen {
   }
 
   static loadImages() {
-    if (settingsManager.splashScreenList) {
-      const allowedNames = new Set(settingsManager.splashScreenList);
+    const allowedNames = new Set(settingsManager.splashScreenList);
 
+    if (this.splashScreenImgList_ !== null && allowedNames.size > 0) {
       // Filter images whose file name (without extension) matches an entry in splashScreenList
       this.splashScreenImgList_ = this.splashScreenImgList_.filter((imgPath) => {
         const fileName = imgPath.split('/').pop()?.split('.')[0]?.toLowerCase();

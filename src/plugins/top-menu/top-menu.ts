@@ -25,7 +25,7 @@ export class TopMenu extends KeepTrackPlugin {
           'beforeend',
           keepTrackApi.html`
             <nav>
-              <div id="nav-wrapper" class="nav-wrapper">
+              <div id="nav-wrapper" class="nav-wrapper" style="display: flex; justify-content: flex-end;">
                 <ul id="nav-mobile2" class="right">
                   <li>
                     <a id="sound-btn" class="top-menu-icons">

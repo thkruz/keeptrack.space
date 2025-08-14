@@ -120,7 +120,7 @@ export abstract class ColorScheme {
     if (!keepTrackApi.getGroupsManager().selectedGroup.hasObject(obj.id)) {
       // Hide Everything Else
       return {
-        color: this.colorTheme.transparent,
+        color: settingsManager.colors.transparent ?? this.colorTheme.transparent,
         pickable: Pickable.No,
       };
     }

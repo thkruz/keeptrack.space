@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.7.2
+
+>  
+
+- feat: :children_crossing: Add new country codes and update localization files
+- chore: :bookmark: update version to 10.7.0 in README and version.js
+- feat: :sparkles: add satellite info boxes to mobile settings manager
+- fix: :bug: use optional chaining for sound manager calls to prevent errors
+- feat: :sparkles: add version management to PersistenceManager with validation and storage
+- fix: :bug: update getEl calls to include the 'true' parameter for titleSpan and optimize array initialization in tests
+- fix: :bug: update default values for godraysSamples and isDrawAtmosphere settings
+- fix: :bug: improve null checks for current mesh object to prevent errors during rendering
+- fix: :bug: add null check for unregistering callbacks in KeepTrackApi
+- chore: :bookmark: update version to 10.7.1 in README, package.json, and version.js
+- fix: :bug: update version display in splash screen to reflect current version number
+- fix: :bug: update settings to correctly show ECF drawing enabled by default
+- fix: :bug: replace toSorted with sort for consistent array ordering in SatInfoBox
+- feat: :sparkles: add new wallpaper
+- test: :white_check_mark: update expected output for valid country name test to include full name
+- fix: :bug: simplify null check for current mesh object in MeshManager
+
 #### v10.7.0
 
 >  

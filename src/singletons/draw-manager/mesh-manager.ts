@@ -207,7 +207,7 @@ export class MeshManager {
     }
 
     // Check for this.currentMeshObject.model.mesh.vertexBuffer
-    if (!this.currentMeshObject.model.mesh?.vertexBuffer) {
+    if (!this.currentMeshObject.model?.mesh?.vertexBuffer) {
       // Our mesh is probably still downloading. Skip drawing
       return;
     }
@@ -255,7 +255,7 @@ export class MeshManager {
       return;
     }
 
-    if (!this.currentMeshObject || !this.currentMeshObject.model.mesh) {
+    if (!this.currentMeshObject || !this.currentMeshObject.model?.mesh) {
       return;
     }
     if (typeof this.currentMeshObject?.id === 'undefined' || this.currentMeshObject?.id === -1) {
@@ -481,9 +481,8 @@ export class MeshManager {
 
     this.updateModel_(selectedDate, sat);
 
-    if (!this.currentMeshObject.model.mesh) {
+    if (!this.currentMeshObject.model?.mesh) {
       this.initBuffers(this.currentMeshObject.model.name);
-      this.updateModel_(selectedDate, sat);
     }
 
     const posData = keepTrackApi.getDotsManager().positionData;

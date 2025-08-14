@@ -2,7 +2,7 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { SatMath } from '@app/static/sat-math';
@@ -10,6 +10,7 @@ import { StringExtractor } from '@app/static/string-extractor';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 const SECTIONS = {
   OBJECT: 'object-section',
@@ -174,6 +175,15 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
     if (!obj || (!obj.isSatellite() && !obj.isMissile())) {
       return;
     }
+
+    if (keepTrackApi.getPlugin(SelectSatManager)!.secondarySat !== -1 && getEl('secondary-sat-info')?.style?.display === 'none') {
+      showEl('secondary-sat-info');
+      showEl('sec-angle-link');
+    } else if (keepTrackApi.getPlugin(SelectSatManager)!.secondarySat === -1 && getEl('secondary-sat-info')?.style?.display !== 'none') {
+      hideEl('secondary-sat-info');
+      hideEl('sec-angle-link');
+    }
+
     const satMisl = obj as DetailedSatellite | MissileObject;
 
     this.updateCountryCorrelationTable_(satMisl);

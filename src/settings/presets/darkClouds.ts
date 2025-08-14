@@ -37,7 +37,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   settingsManager.isEPFL = true; // Enable EPFL
   settingsManager.isShowLoadingHints = false; // Disable Loading Hints
 
-  settingsManager.splashScreenList = ['epfl1', 'epfl2']; // Set Splash Screens to EPFL
+  settingsManager.splashScreenList = ['epfl-1', 'epfl-2']; // Set Splash Screens to EPFL
 
   keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
     hideEl('logo-primary');

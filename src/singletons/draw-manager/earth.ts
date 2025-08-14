@@ -424,7 +424,7 @@ export class Earth {
     gl.depthMask(false); // Disable depth writing
 
     gl.enable(gl.POLYGON_OFFSET_FILL);
-    gl.polygonOffset(0.0, -RADIUS_OF_EARTH);
+    gl.polygonOffset(0.0, -RADIUS_OF_EARTH * 50 * (1 - keepTrackApi.getMainCamera().zoomLevel()));
 
     gl.bindVertexArray(this.atmosphereMesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.atmosphereMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);

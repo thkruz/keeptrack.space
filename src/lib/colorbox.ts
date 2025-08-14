@@ -172,6 +172,7 @@ const setupIframeColorbox_ = (url: string, onLoadCb: () => void) => {
   (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {
     errorManagerInstance.warn(`Failed to load: ${url}`);
     closeColorbox();
+    hideLoading();
   };
   colorboxIframe.src = url;
   colorboxIframe.onload = () => {
@@ -205,6 +206,7 @@ const setupImageColorbox_ = (url: string, onLoadCb: () => void) => {
   colorboxImage.onerror = () => {
     errorManagerInstance.warn(`Failed to load image: ${url}`);
     closeColorbox();
+    hideLoading();
   };
   colorboxImage.src = url;
 };

@@ -210,11 +210,13 @@ const setupImageColorbox_ = (url: string, onLoadCb: () => void) => {
   };
   colorboxImage.src = url;
 
-  const openButton = getEl('colorbox-open-button') as HTMLButtonElement;
+  const openButton = getEl('colorbox-open-button', true) as HTMLButtonElement;
 
-  openButton.onclick = () => {
-    if (colorboxImage?.src) {
-      window.open(colorboxImage.src, '_blank');
-    }
-  };
+  if (openButton) {
+    openButton.onclick = () => {
+      if (colorboxImage?.src) {
+        window.open(colorboxImage.src, '_blank');
+      }
+    };
+  }
 };

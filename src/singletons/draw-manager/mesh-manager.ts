@@ -482,7 +482,6 @@ export class MeshManager {
     this.updateModel_(selectedDate, sat);
 
     if (!this.currentMeshObject.model?.mesh) {
-      this.updateModel_(selectedDate, sat);
       this.initBuffers(this.currentMeshObject.model.name);
     }
 

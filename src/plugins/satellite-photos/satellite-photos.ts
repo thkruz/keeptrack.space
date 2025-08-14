@@ -39,6 +39,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
         <li id="himawari8-link" class="link satPhotoRow">Himawari 8</li>
         <li id="goes16-link" class="link satPhotoRow">GOES 16</li>
         <li id="goes18-link" class="link satPhotoRow">GOES 18</li>
+        <li id="elektro3-link" class="link satPhotoRow">Elektro-L 2</li>
       </ul>
     </div>
   </div>`;
@@ -64,6 +65,98 @@ export class SatellitePhotos extends KeepTrackPlugin {
         });
         getEl('goes18-link')!.addEventListener('click', () => {
           SatellitePhotos.loadPic_(51850, 'https://cdn.star.nesdis.noaa.gov/GOES18/ABI/FD/GEOCOLOR/latest.jpg');
+        });
+        getEl('elektro3-link')!.addEventListener('click', () => {
+          /*
+           * We can only access the latest 24 hours of images based on REAL time
+           * not simulation time. If beyond the last 24 hours or in the future,
+           * change to the closest available image.
+           *
+           * Images are uploaded in 30 minute intervals in this format https://electro.ntsomz.ru/i/splash/20250813-1400.jpg
+           *
+           * The time is in UTC+3, so we need to convert the simulation time to UTC+3
+           */
+
+          const simulationTime = keepTrackApi.getTimeManager().simulationTimeObj;
+          const realTime = new Date().getTime();
+
+          if (realTime - simulationTime.getTime() < 0) {
+            // Change to the closest available image.
+            const closestTime = new Date(simulationTime);
+
+            closestTime.setHours(closestTime.getHours() + 24);
+            closestTime.setMinutes(closestTime.getMinutes() - 30);
+            closestTime.setSeconds(0);
+            const formattedDate = closestTime.toISOString().slice(0, 10).replace(/-/gu, '');
+
+            /*
+             * Verify closest time is not in the future (add a 30 minute buffer
+             * for upload/update times)
+             */
+            if ((closestTime.getTime() + 30 * 60 * 1000) - realTime > 0) {
+              // Subtract 30 minutes
+              closestTime.setMinutes(closestTime.getMinutes() - 30);
+            }
+            const closestTimeUTCString = closestTime.toLocaleString('en-UK', {
+              year: 'numeric',
+              month: 'short',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+              timeZone: 'UTC',
+            });
+
+            SatellitePhotos.loadPic_(41105,
+              `https://electro.ntsomz.ru/i/splash/${formattedDate}-${(closestTime.getUTCHours() + 3).toString().padStart(2, '0')}00.jpg`,
+              `Electro-L 2 at ${closestTimeUTCString}`,
+            );
+
+            return;
+          }
+
+          // Find the closest 30 minute interval
+          let closestTime: Date;
+
+          if (realTime - simulationTime.getTime() > 24 * 60 * 60 * 1000) {
+            closestTime = new Date(realTime);
+          } else {
+            closestTime = new Date(simulationTime);
+          }
+
+          closestTime.setMinutes(Math.floor(closestTime.getMinutes() / 30) * 30);
+          closestTime.setSeconds(0);
+          const formattedDate = closestTime.toISOString().slice(0, 10).replace(/-/gu, '');
+
+          // Verify closest time is within the last 24 hours
+          if (realTime - closestTime.getTime() > 24 * 60 * 60 * 1000) {
+            // Add 30 minutes
+            closestTime.setMinutes(closestTime.getMinutes() + 30);
+          }
+
+          /*
+           * Verify closest time is not in the future (add a 30 minute buffer
+           * for upload/update times)
+           */
+          if ((closestTime.getTime() + 30 * 60 * 1000) - realTime > 0) {
+            // Subtract 30 minutes
+            closestTime.setMinutes(closestTime.getMinutes() - 30);
+          }
+          // Format the closest time for display in a more user-friendly way
+          const closestTimeUTCString = closestTime.toLocaleString('en-UK', {
+            year: 'numeric',
+            month: 'short',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZone: 'UTC',
+          });
+
+          SatellitePhotos.loadPic_(41105,
+            `https://electro.ntsomz.ru/i/splash/${formattedDate}-${(closestTime.getUTCHours() + 3).toString().padStart(2, '0')}00.jpg`,
+            `Electro-L 2 at ${closestTimeUTCString}`,
+          );
         });
       },
     );
@@ -132,20 +225,23 @@ export class SatellitePhotos extends KeepTrackPlugin {
     req.send();
   }
 
-  private static colorbox_(url: string): void {
+  private static colorbox_(url: string, title?: string): void {
     settingsManager.isPreventColorboxClose = true;
     setTimeout(() => {
       settingsManager.isPreventColorboxClose = false;
     }, 2000);
 
-    openColorbox(url, { image: true });
+    openColorbox(url, {
+      title: title || 'Latest Satellite Photo',
+      image: true,
+    });
   }
 
-  private static loadPic_(satId: number, url: string): void {
+  private static loadPic_(satId: number, url: string, title?: string): void {
     keepTrackApi.getUiManager().searchManager.hideResults();
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(satId) ?? -1);
     keepTrackApi.getMainCamera().changeZoom(0.7);
-    SatellitePhotos.colorbox_(url);
+    SatellitePhotos.colorbox_(url, title);
   }
 
   private static himawari8_(): void {

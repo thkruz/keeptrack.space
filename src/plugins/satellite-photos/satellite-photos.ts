@@ -109,7 +109,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
             SatellitePhotos.loadPic_(41105,
               `https://electro.ntsomz.ru/i/splash/${formattedDate}-${(closestTime.getUTCHours() + 3).toString().padStart(2, '0')}00.jpg`,
-              `Electro-L 2 at ${closestTimeUTCString}`,
+              `Electro-L 2 at ${closestTimeUTCString} UTC`,
             );
 
             return;
@@ -138,9 +138,9 @@ export class SatellitePhotos extends KeepTrackPlugin {
            * Verify closest time is not in the future (add a 30 minute buffer
            * for upload/update times)
            */
-          if ((closestTime.getTime() + 30 * 60 * 1000) - realTime > 0) {
-            // Subtract 30 minutes
-            closestTime.setMinutes(closestTime.getMinutes() - 30);
+          if ((closestTime.getTime() + 60 * 60 * 1000) - realTime > 0) {
+            // Subtract 60 minutes
+            closestTime.setMinutes(closestTime.getMinutes() - 60);
           }
           // Format the closest time for display in a more user-friendly way
           const closestTimeUTCString = closestTime.toLocaleString('en-UK', {
@@ -155,7 +155,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
           SatellitePhotos.loadPic_(41105,
             `https://electro.ntsomz.ru/i/splash/${formattedDate}-${(closestTime.getUTCHours() + 3).toString().padStart(2, '0')}00.jpg`,
-            `Electro-L 2 at ${closestTimeUTCString}`,
+            `Electro-L 2 at ${closestTimeUTCString} UTC`,
           );
         });
       },

@@ -36,7 +36,7 @@ export const sensorGroups: SensorGroup[] = [
     list: [
       'EGLAFB', 'KWAJSPF', 'GEODDSDGC', 'GEODDSMAU', 'GEODDSSOC',
       'KWAJALT', 'KWAJMMW', 'KWAJALC', 'KWAJTDX', 'MITMIL', 'RAFASC',
-      'GLBII', 'HOLCBAND', 'HOLSST',
+      'GLBII', 'HOLCBAND', 'HOLSST', 'HOLDARC',
     ],
   },
   {

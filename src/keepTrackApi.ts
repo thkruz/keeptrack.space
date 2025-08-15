@@ -321,7 +321,7 @@ export class KeepTrackApi {
           // Remove the callback after it has been called once
           this.unregister(event, cb);
         } else {
-          console.warn(`Callback for event ${event} was not found in unregister.`);
+          errorManagerInstance.log(`Callback for event ${event} was not found in unregister.`);
         }
       },
       event: <T><unknown>null,
@@ -337,7 +337,7 @@ export class KeepTrackApi {
       }
     }
     // If we got this far, it means we couldn't find the callback
-    errorManagerInstance.error(new Error('Callback not found!'), 'keepTrackApi.unregister');
+    errorManagerInstance.log(`Callback for event ${event} was not found in unregister.`);
   }
 
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);

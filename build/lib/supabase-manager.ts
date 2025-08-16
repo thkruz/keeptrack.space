@@ -3,13 +3,6 @@ import { BuildConfig } from './config-manager';
 
 export class SupaBaseManager {
   compileEnvVariables(config: BuildConfig) {
-    // Write html to src/plugins-pro/user-account/auth-config.js
-    writeFileSync(
-      './src/plugins-pro/user-account/auth-config.js',
-      `export const supabaseUrl = '${config.PUBLIC_SUPABASE_URL}';\n` +
-      `export const supabaseKey = '${config.PUBLIC_SUPABASE_ANON_KEY}';\n`,
-    );
-
     mkdir('./dist/auth', { recursive: true }, (err) => {
       if (err) {
         console.error('Error creating directory:', err);
@@ -25,9 +18,11 @@ export class SupaBaseManager {
         './src/plugins-pro/user-account/popup-callback.js',
         './dist/auth/popup-callback.js',
       );
-      copyFileSync(
-        './src/plugins-pro/user-account/auth-config.js',
+      // Write html to src/plugins-pro/user-account/auth-config.js
+      writeFileSync(
         './dist/auth/auth-config.js',
+        `export const supabaseUrl = '${config.PUBLIC_SUPABASE_URL}';\n` +
+        `export const supabaseKey = '${config.PUBLIC_SUPABASE_ANON_KEY}';\n`,
       );
     } catch (error) {
       console.warn('Error copying files:', error);

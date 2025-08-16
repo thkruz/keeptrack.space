@@ -15,6 +15,9 @@ export interface BuildConfig {
   styleCssPath: string;
   loadingScreenCssPath: string;
   isPro: boolean;
+
+  PUBLIC_SUPABASE_URL?: string;
+  PUBLIC_SUPABASE_ANON_KEY?: string;
 }
 
 /**
@@ -121,6 +124,9 @@ export class ConfigManager {
 
     // Parse isPro as boolean
     const isPro = process.env.IS_PRO ?? envVars.IS_PRO;
+
+    this.config.PUBLIC_SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? envVars.NEXT_PUBLIC_SUPABASE_URL;
+    this.config.PUBLIC_SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     this.config.isPro = isPro === 'true';
   }

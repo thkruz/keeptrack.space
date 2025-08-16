@@ -5,6 +5,7 @@ import { BuildError, ConsoleStyles, ErrorCodes, handleBuildError, logWithStyle }
 import { ConfigManager } from './lib/config-manager';
 import { FileSystemManager } from './lib/filesystem-manager';
 import { PluginManager } from './lib/plugin-manager';
+import { SupaBaseManager } from './lib/supabase-manager';
 import { VersionManager } from './lib/version-manager';
 import { WebpackManager } from './webpack-manager';
 
@@ -22,6 +23,7 @@ class BuildManager {
       const configManager = new ConfigManager();
       const pluginManager = new PluginManager(fileManager);
       const versionManager = new VersionManager(fileManager);
+      const supabaseManager = new SupaBaseManager();
 
       // Check for .env file - if it is missing copy from .env.example
       if (!fileManager.fileExists('./.env')) {
@@ -89,6 +91,9 @@ class BuildManager {
       } else {
         fileManager.compileLocales('src/locales');
       }
+
+      // Configure Supabase
+      supabaseManager.compileEnvVariables(config);
 
       // Configure plugins
       pluginManager.configurePlugins(config.isPro);

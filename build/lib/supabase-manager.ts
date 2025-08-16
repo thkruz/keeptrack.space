@@ -16,17 +16,21 @@ export class SupaBaseManager {
       }
     });
 
-    copyFileSync(
-      './src/plugins-pro/user-account/callback.html',
-      './dist/auth/callback.html',
-    );
-    copyFileSync(
-      './src/plugins-pro/user-account/popup-callback.js',
-      './dist/auth/popup-callback.js',
-    );
-    copyFileSync(
-      './src/plugins-pro/user-account/auth-config.js',
-      './dist/auth/auth-config.js',
-    );
+    try {
+      copyFileSync(
+        './src/plugins-pro/user-account/callback.html',
+        './dist/auth/callback.html',
+      );
+      copyFileSync(
+        './src/plugins-pro/user-account/popup-callback.js',
+        './dist/auth/popup-callback.js',
+      );
+      copyFileSync(
+        './src/plugins-pro/user-account/auth-config.js',
+        './dist/auth/auth-config.js',
+      );
+    } catch (error) {
+      console.warn('Error copying files:', error);
+    }
   }
 }

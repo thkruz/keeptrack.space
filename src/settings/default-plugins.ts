@@ -10,7 +10,7 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     order: 1,
   },
   UserAccountPlugin: {
-    enabled: false,
+    enabled: true,
     order: 2,
   },
   SensorListPlugin: {

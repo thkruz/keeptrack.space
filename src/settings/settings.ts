@@ -1276,7 +1276,7 @@ export class SettingsManager {
       // eslint-disable-next-line no-console
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
-    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== '1.4.6') {
+    if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== defaultColorSettings.version) {
       this.colors = defaultColorSettings;
 
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));

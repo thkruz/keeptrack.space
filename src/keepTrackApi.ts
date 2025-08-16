@@ -119,6 +119,7 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.satInfoBoxAddListeners]: [];
   [KeepTrackApiEvents.satInfoBoxInit]: [];
   [KeepTrackApiEvents.satInfoBoxFinal]: [];
+  [KeepTrackApiEvents.error]: [Error, string]; // error, function name
 };
 
 interface KeepTrackApiRegisterParams<T extends EventBusEvent> {

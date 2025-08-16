@@ -346,4 +346,5 @@ export enum KeepTrackApiEvents {
   satInfoBoxAddListeners = 'satInfoBoxAddListeners',
   satInfoBoxInit = 'satInfoBoxInit',
   satInfoBoxFinal = 'satInfoBoxFinal',
+  error = 'error',
 }

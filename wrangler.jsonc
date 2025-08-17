@@ -1,0 +1,8 @@
+{
+  "name": "keeptrack-space",
+  "compatibility_date": "2025-08-17",
+  "assets": {
+    "directory": "./dist/",
+    "not_found_handling": "single-page-application"
+  }
+}

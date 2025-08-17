@@ -166,6 +166,10 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @returns A promise that resolves to void.
    */
   private async onCruncherReady_(): Promise<void> {
+    if (!settingsManager.offlineMode) {
+      return;
+    }
+
     let watchlistString = PersistenceManager.getInstance().getItem(StorageKey.WATCHLIST_LIST);
 
     if (!watchlistString || watchlistString === '[]') {

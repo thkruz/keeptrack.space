@@ -155,7 +155,7 @@ export class SettingsPresets {
     settings.searchLimit = 100000;
     settings.isEPFL = true;
     settings.isDisableExtraCatalog = false;
-    settings.offline = true;
+    settings.offlineMode = true;
     settings.timeMachineDelay = <Milliseconds>1325;
     settings.maxZoomDistance = <Kilometers>2000000;
     settings.satShader.minSize = 8.0;

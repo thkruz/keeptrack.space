@@ -864,7 +864,7 @@ export class SettingsManager {
    */
   isDisableStars = true;
   /** Flag to determine if external data is available */
-  offline = false;
+  offlineMode = false;
   /**
    * The offset in the x direction for the offset camera mode.
    */
@@ -1414,15 +1414,8 @@ export class SettingsManager {
           // this.offline = true;
         }
         break;
-      case 'darts.staging.dso.mil':
-        this.installDirectory = '/keeptrack/';
-        break;
-      case 'thkruz.github.io':
-      case 'www.thkruz.github.io':
-        this.installDirectory = '/keeptrack.space/';
-        break;
       case '':
-        this.offline = true;
+        this.offlineMode = true;
         this.isDisableAsciiCatalog = false;
         this.installDirectory = './';
         break;

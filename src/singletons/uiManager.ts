@@ -422,7 +422,7 @@ export class UiManager {
 
   onReady() {
     // Code Once index.htm is loaded
-    if (settingsManager.offline) {
+    if (settingsManager.offlineMode) {
       this.updateInterval = 250;
     }
 

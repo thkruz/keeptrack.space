@@ -240,7 +240,7 @@ export class CatalogLoader {
           .catch((error) => {
             errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
           });
-      } else if (settingsManager.offline) {
+      } else if (settingsManager.offlineMode) {
         await fetch(`${settingsManager.installDirectory}tle/tle.json`)
           .then((response) => response.json())
           .then((data) => CatalogLoader.parse({
@@ -431,7 +431,7 @@ export class CatalogLoader {
     let asciiCatalog: Promise<AsciiTleSat[]> | null = null;
     let jsCatalog: Promise<JsSat[]> | null = null;
 
-    if (settingsManager.offline && !settingsManager.isDisableExtraCatalog) {
+    if (settingsManager.offlineMode && !settingsManager.isDisableExtraCatalog) {
       extraSats = CatalogLoader.getExtraCatalog_(settingsManager);
     }
     if (!settingsManager.dataSources.externalTLEs && !settingsManager.isDisableAsciiCatalog) {

@@ -190,7 +190,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   createNewWatchlist(watchlistString: string): { id: number, inView: boolean }[] {
     let newWatchlist: { id: number, inView: boolean }[];
     // We save it as an array of sccNums
-    const savedSatList: string[] = JSON.parse(watchlistString);
+    const savedSatList: string[] = this.unserialize(watchlistString);
 
     if (savedSatList.length > 0) {
       // We need to convert it to an array of objects
@@ -370,14 +370,9 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     colorSchemeManager.calculateColorBuffers(true); // force color recalc
 
-    const saveWatchlist: string[] = [];
-
-    for (let i = 0; i < this.watchlistList.length; i++) {
-      sat = catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);
-      saveWatchlist[i] = sat?.sccNum ?? '';
+    if (settingsManager.offlineMode) {
+      PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, this.serialize());
     }
-
-    PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, JSON.stringify(saveWatchlist));
   }
 
   selectSat(id: number) {
@@ -550,7 +545,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     try {
       // We save it as an array of sccNums
-      const savedSatList: string[] = JSON.parse(<string>evt.target.result);
+      const savedSatList: string[] = this.unserialize(<string>evt.target.result);
 
       if (savedSatList.length > 0) {
         // We need to convert it to an array of objects
@@ -592,6 +587,22 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    */
   private onSaveClicked_(evt: Event) {
     keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+    const watchlistString = this.serialize();
+    const blob = new Blob([watchlistString], {
+      type: 'text/plain;charset=utf-8',
+    });
+
+    try {
+      saveAs(blob, 'watchlist.json');
+    } catch (e) {
+      if (!isThisNode()) {
+        errorManagerInstance.error(e, 'watchlist.ts', 'Error saving watchlist!');
+      }
+    }
+    evt.preventDefault();
+  }
+
+  serialize() {
     const satIds: string[] = [];
 
     for (let i = 0; i < this.watchlistList.length; i++) {
@@ -605,17 +616,21 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       satIds[i] = sat.sccNum;
     }
     const watchlistString = JSON.stringify(satIds);
-    const blob = new Blob([watchlistString], {
-      type: 'text/plain;charset=utf-8',
-    });
 
+
+    return watchlistString;
+  }
+
+  unserialize(watchlistString: string): string[] {
     try {
-      saveAs(blob, 'watchlist.json');
-    } catch (e) {
-      if (!isThisNode()) {
-        errorManagerInstance.error(e, 'watchlist.ts', 'Error saving watchlist!');
-      }
+      const savedSatList: string[] = JSON.parse(watchlistString);
+
+
+      return savedSatList;
+    } catch {
+      errorManagerInstance.warn('Watchlist File Format Incorrect');
+
+      return [];
     }
-    evt.preventDefault();
   }
 }

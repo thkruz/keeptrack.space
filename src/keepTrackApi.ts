@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import { User } from '@supabase/supabase-js';
 import { AnalyticsInstance } from 'analytics';
 import { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
@@ -28,7 +29,6 @@ import type { UiManager } from './singletons/uiManager';
 import { WebGLRenderer } from './singletons/webgl-renderer';
 import type { SatMath } from './static/sat-math';
 import type { SensorMath } from './static/sensor-math';
-import { User } from '@supabase/supabase-js';
 
 declare global {
   interface Window {
@@ -122,6 +122,8 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.satInfoBoxFinal]: [];
   [KeepTrackApiEvents.error]: [Error, string]; // error, function name
   [KeepTrackApiEvents.userAccountChange]: [User | null]; // user
+  [KeepTrackApiEvents.userLogin]: [User | null]; // user
+  [KeepTrackApiEvents.userLogout]: []; // no arguments
 };
 
 interface KeepTrackApiRegisterParams<T extends EventBusEvent> {

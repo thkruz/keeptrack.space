@@ -348,4 +348,6 @@ export enum KeepTrackApiEvents {
   satInfoBoxFinal = 'satInfoBoxFinal',
   error = 'error',
   userAccountChange = 'userAccountChange',
+  userLogin = 'userSignedIn',
+  userLogout = 'userLogout',
 }

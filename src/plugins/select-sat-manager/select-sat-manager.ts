@@ -270,15 +270,6 @@ export class SelectSatManager extends KeepTrackPlugin {
     };
 
     this.switchToSatCenteredCamera_();
-
-    if (sat instanceof DetailedSatellite) {
-      keepTrackApi.analytics.track('select_satellite', {
-        id: sat.id,
-        name: sat.name,
-        sccNum: sat.sccNum,
-      });
-    }
-
     this.setSelectedSat_(sat.id);
   }
 
@@ -399,6 +390,14 @@ export class SelectSatManager extends KeepTrackPlugin {
 
       if (!this.secondarySatObj) {
         this.secondarySatObj = null;
+      }
+
+      if (this.secondarySatObj instanceof MissileObject) {
+        this.secondarySatObj = null;
+
+        errorManagerInstance.warn('Selecting a missile as the secondary object is not supported!');
+
+        return;
       }
 
       if ((this.secondarySatObj?.id ?? -1) >= 0 && this.secondarySatObj instanceof DetailedSatellite) {

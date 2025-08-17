@@ -28,6 +28,7 @@ import type { UiManager } from './singletons/uiManager';
 import { WebGLRenderer } from './singletons/webgl-renderer';
 import type { SatMath } from './static/sat-math';
 import type { SensorMath } from './static/sensor-math';
+import { User } from '@supabase/supabase-js';
 
 declare global {
   interface Window {
@@ -114,12 +115,13 @@ type KeepTrackApiEventArguments = {
   [InputEventType.KeyUp]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [InputEventType.KeyPress]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [KeepTrackApiEvents.parseGetVariables]: [string[]]; // params
-  [KeepTrackApiEvents.searchUpdated]: [string]; // search term
+  [KeepTrackApiEvents.searchUpdated]: [string, number, number]; // search term, result count, search limit
   [KeepTrackApiEvents.legendUpdated]: [string]; // legend name
   [KeepTrackApiEvents.satInfoBoxAddListeners]: [];
   [KeepTrackApiEvents.satInfoBoxInit]: [];
   [KeepTrackApiEvents.satInfoBoxFinal]: [];
   [KeepTrackApiEvents.error]: [Error, string]; // error, function name
+  [KeepTrackApiEvents.userAccountChange]: [User | null]; // user
 };
 
 interface KeepTrackApiRegisterParams<T extends EventBusEvent> {

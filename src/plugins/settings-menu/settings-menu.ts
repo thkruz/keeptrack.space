@@ -7,7 +7,7 @@ import { rgbCss } from '@app/lib/rgbCss';
 import { SettingsManager } from '@app/settings/settings';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { LegendManager } from '@app/static/legend-manager';
-import { OrbitCruncherType, OrbitDrawTypes } from '@app/webworker/orbitCruncher';
+import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SoundNames } from '../sounds/SoundNames';
@@ -572,19 +572,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
     settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;
 
-    if (keepTrackApi.getOrbitManager().orbitWorker) {
-      if (settingsManager.isDrawTrailingOrbits) {
-        keepTrackApi.getOrbitManager().orbitWorker.postMessage({
-          typ: OrbitCruncherType.CHANGE_ORBIT_TYPE,
-          orbitType: OrbitDrawTypes.TRAIL,
-        });
-      } else {
-        keepTrackApi.getOrbitManager().orbitWorker.postMessage({
-          typ: OrbitCruncherType.CHANGE_ORBIT_TYPE,
-          orbitType: OrbitDrawTypes.ORBIT,
-        });
-      }
-    }
+    keepTrackApi.getOrbitManager().updateOrbitType();
+
     // Must come after the above checks
     settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
     const isHOSChecked = (<HTMLInputElement>getEl('settings-hos')).checked;

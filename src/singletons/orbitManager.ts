@@ -5,7 +5,7 @@ import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';
-import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
+import { OrbitCruncherType, OrbitDrawTypes } from '@app/webworker/orbitCruncher';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
 import { GetSatType } from '../interfaces';
@@ -568,5 +568,23 @@ export class OrbitManager {
       throw new Error(`orbit buffer ${id} not allocated`);
     }
     this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], settingsManager.orbitSegments + 1);
+  }
+
+  updateOrbitType() {
+    if (!this.orbitWorker) {
+      return;
+    }
+
+    if (settingsManager.isDrawTrailingOrbits) {
+      keepTrackApi.getOrbitManager().orbitWorker.postMessage({
+        typ: OrbitCruncherType.CHANGE_ORBIT_TYPE,
+        orbitType: OrbitDrawTypes.TRAIL,
+      });
+    } else {
+      keepTrackApi.getOrbitManager().orbitWorker.postMessage({
+        typ: OrbitCruncherType.CHANGE_ORBIT_TYPE,
+        orbitType: OrbitDrawTypes.ORBIT,
+      });
+    }
   }
 }

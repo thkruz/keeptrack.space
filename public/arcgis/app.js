@@ -99,6 +99,7 @@
 
       const graphics = [];
       const satData = [];
+      let worker = null;
 
       function addSatGraphic(sat) {
         const now = new Date();
@@ -114,6 +115,7 @@
           },
           attributes: {
             name: sat.name || 'SAT',
+            id: graphics.length,
             tle1: sat.tle1,
             tle2: sat.tle2,
             t0: Date.now()
@@ -128,7 +130,7 @@
         graphics.push(g);
       }
 
-      function updatePositions() {
+      function updatePositionsCpu() {
         const now = new Date();
         for (let i = 0; i < graphics.length; i++) {
           const g = graphics[i];
@@ -138,25 +140,29 @@
       }
 
       function drawTrackForGraphic(graphic) {
+        if (!worker) {
+          // Fallback to CPU if worker not available
+          tracksLayer.removeAll();
+          const positions = [];
+          const minutes = 60 * 24;
+          const startTime = new Date();
+          for (let i = 0; i < minutes; i++) {
+            const t = new Date(startTime.getTime() + i * 60 * 1000);
+            const pt = getSatPointFromTle(t, graphic.attributes.tle1, graphic.attributes.tle2);
+            if (pt) positions.push([pt.x, pt.y, pt.z]);
+          }
+          if (positions.length > 1) {
+            const line = new Graphic({
+              geometry: createTrackPolyline(positions),
+              symbol: { type: 'line-3d', symbolLayers: [{ type: 'line', size: 2, material: { color: [192, 192, 192, 0.6] } }] }
+            });
+            tracksLayer.add(line);
+          }
+          return;
+        }
+
         tracksLayer.removeAll();
-        const positions = [];
-        const minutes = 60 * 24;
-        const startTime = new Date();
-        for (let i = 0; i < minutes; i++) {
-          const t = new Date(startTime.getTime() + i * 60 * 1000);
-          const pt = getSatPointFromTle(t, graphic.attributes.tle1, graphic.attributes.tle2);
-          if (pt) positions.push([pt.x, pt.y, pt.z]);
-        }
-        if (positions.length > 1) {
-          const line = new Graphic({
-            geometry: createTrackPolyline(positions),
-            symbol: {
-              type: 'line-3d',
-              symbolLayers: [{ type: 'line', size: 2, material: { color: [192, 192, 192, 0.6] } }]
-            }
-          });
-          tracksLayer.add(line);
-        }
+        worker.postMessage({ type: 'track', id: graphic.attributes.id });
       }
 
       view.popup.watch('selectedFeature', function () { tracksLayer.removeAll(); });
@@ -174,8 +180,51 @@
           const MAX_SATS = 1000; // adjust as needed
           const subset = sats.slice(0, MAX_SATS);
           subset.forEach(addSatGraphic);
-          // Smooth animation loop
-          setInterval(updatePositions, 1000);
+
+          // Initialize worker
+          try {
+            worker = new Worker('./worker.js');
+            // Seed worker with TLEs
+            const payload = subset.map((s, idx) => ({ id: idx, name: s.name || 'SAT', tle1: s.tle1, tle2: s.tle2 }));
+            worker.postMessage({ type: 'init', payload });
+
+            worker.onmessage = function(ev) {
+              const data = ev.data || {};
+              if (data.type === 'positions' && data.positions && data.positions.buffer) {
+                const arr = new Float32Array(data.positions);
+                for (let i = 0; i < graphics.length; i++) {
+                  const j = i * 3;
+                  const x = arr[j];
+                  const y = arr[j + 1];
+                  const z = arr[j + 2];
+                  if (!Number.isNaN(x) && !Number.isNaN(y) && !Number.isNaN(z)) {
+                    graphics[i].geometry = { type: 'point', x, y, z, spatialReference: { wkid: 4326 } };
+                  }
+                }
+              } else if (data.type === 'track' && data.positions) {
+                const arr = new Float32Array(data.positions);
+                const path = [];
+                for (let k = 0; k < arr.length; k += 3) {
+                  const x = arr[k];
+                  const y = arr[k + 1];
+                  const z = arr[k + 2];
+                  if (!Number.isNaN(x) && !Number.isNaN(y) && !Number.isNaN(z)) path.push([x, y, z]);
+                }
+                if (path.length > 1) {
+                  const line = new Graphic({ geometry: createTrackPolyline(path), symbol: { type: 'line-3d', symbolLayers: [{ type: 'line', size: 2, material: { color: [192,192,192,0.6] } }] } });
+                  tracksLayer.add(line);
+                }
+              }
+            };
+
+            // Drive updates via worker
+            setInterval(function() {
+              if (worker) worker.postMessage({ type: 'tick', time: Date.now() });
+            }, 1000);
+          } catch (e) {
+            // Fallback to CPU updates if worker creation fails
+            setInterval(updatePositionsCpu, 1000);
+          }
         })
         .catch((e) => console.error(e));
     });

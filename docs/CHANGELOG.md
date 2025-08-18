@@ -2,6 +2,64 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.8.0
+
+>  
+
+- feat: :sparkles: enhance error handling by adding error event to KeepTrackApi and removing telemetry implementation
+- test: :white_check_mark: add unit tests for GetVariables and parseGetVariables functions
+- feat: :sparkles: update environment configuration and remove SupabaseManager; adjust plugin settings for better control
+- feat: :sparkles: add Elektro-L 2 satellite image retrieval and display functionality
+- feat: :sparkles: update ESLint configuration to allow process.env usage and integrate dotenv-webpack for environment variable management
+- feat: :sparkles: add isWatchlistTopMenuNotification flag and update settings persistence for offline mode
+- feat: :sparkles: enhance SensorManager to support offline mode and load sensor JSON
+- feat: :sparkles: enhance WatchlistPlugin with top menu notifications and update StorageKey enum for better organization
+- feat: :sparkles: add stem environment preset and integrate into parseGetVariables
+- feat: :sparkles: add userAccountChange event and update searchUpdated event parameters
+- refactor: :recycle: refactor watchlist serialization and deserialization methods for improved clarity and error handling
+- feat: :sparkles: integrate SupabaseManager for environment variable handling and add Supabase dependencies
+- feat: :sparkles: refactor orbit type handling to use updateOrbitType method in OrbitManager
+- test: :white_check_mark: update WatchlistPlugin to conditionally enable top-menu elements
+- feat: :sparkles: add HOLDARC sensor details and update coordinates for existing sensors
+- refactor: :recycle: rename offline property to offlineMode
+- fix: :bug: wrap file copy operations in try-catch to handle errors gracefully
+- chore: :bookmark: update subproject commit reference in plugins-pro
+- fix: :bug: refactor visibility logic for secondary satellite info in SatInfoBoxObject
+- feat: :sparkles: enhance stem environment with BottomMenu integration and event handling
+- fix: :bug: ensure open button is defined before setting onclick handler in colorbox
+- fix: :bug: move auth-config.js writing logic to ensure proper file handling after directory creation
+- fix: :bug: handle invalid covariance matrix in selectSatObject_ method and set default radii
+- fix: :bug: use optional chaining for model mesh access to prevent runtime errors
+- fix: :bug: update Electro-L 2 timestamp format and adjust time buffer for closest satellite image retrieval
+- feat: :sparkles: add userLogin and userLogout events to KeepTrackApiEvents
+- chore: :fire: remove wrangler configuration file as part of cleanup
+- feat: :sparkles: add initial wrangler configuration for deployment setup
+- feat: :sparkles: add functionality to open image in new tab from colorbox
+- fix: :bug: clear styling from nav-wrapper in DateTimeManager initialization
+- fix: :bug: correct plugin assignment order and enable splash screen visibility
+- feat: :sparkles: add onWatchlistAdd and onWatchlistRemove events to KeepTrackApiEvents
+- fix: :bug: update environment variable keys for Supabase configuration to match naming conventions
+- fix: :bug: replace console warning with error logging for unregister callback not found
+- test: :white_check_mark: add TopMenu import and initialization in CountriesMenu tests
+- fix: :bug: use optional chaining for transparent color fallback in color schemes
+- fix: :bug: update version badge to 10.7.2 and update subproject commit reference
+- fix: :bug: ensure splash screen images are filtered only when splashScreenList is defined
+- fix: :bug: add TopMenu as a dependency for CountriesMenu plugin
+- feat: :sparkles: enhance helpBody description for Create Satellite menu with detailed usage instructions
+- feat: :sparkles: add account-circle icon to public assets
+- Update src/plugins/select-sat-manager/select-sat-manager.ts
+- chore: :heavy_plus_sign: update subproject commit reference in plugins-pro
+- fix: :bug: ensure mesh initialization only occurs if model name is defined
+- fix: :bug: update color settings version check to use defaultColorSettings.version
+- fix: :bug: ensure loading indicator is hidden on image and iframe load errors
+- Update src/static/splash-screen.ts
+- fix: :bug: update nav-wrapper style to use flexbox for better alignment
+- fix: :bug: correct splash screen identifiers to use hyphens for consistency
+- fix: :bug: adjust polygon offset calculation for atmosphere rendering based on camera zoom level
+- fix: :bug: remove redundant updateModel call in MeshManager
+- fix: :bug: remove splash screen visibility setting from loadPresetFacSat2
+- feat: :sparkles: add facebook-white icon to the public image assets
+
 #### v10.7.2
 
 >  

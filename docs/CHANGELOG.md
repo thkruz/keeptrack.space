@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.8.1
+
+>  
+
+- docs: :loud_sound: update CHANGELOG with new features, fixes, and enhancements for v10.8.0
+- chore: :bookmark: update version to 10.8.0 and refine Create Satellite help description
+- chore: :bookmark: update subproject commit reference in plugins-pro
+
 #### v10.8.0
 
 >  

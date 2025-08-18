@@ -1,9 +1,12 @@
 import { errorManagerInstance } from './errorManager';
 
 export enum StorageKey {
+  // OfflineMode Only
   CURRENT_SENSOR = 'v2-keepTrack-currentSensor',
-  SETTINGS_MANAGER_COLORS = 'v2-settingsManager-colors',
   WATCHLIST_LIST = 'v2-keepTrack-watchlistList',
+
+  // Others
+  SETTINGS_MANAGER_COLORS = 'v2-settingsManager-colors',
   SETTINGS_DOT_COLORS = 'v2-keepTrack-settings-dotColors',
   IS_ADVICE_ENABLED = 'v2-isAdviceEnabled',
   LAST_MAP = 'v2-keepTrack-earthTexture',
@@ -63,7 +66,6 @@ export enum StorageKey {
   FILTER_SETTINGS_STARLINK = 'v2-filter-settings-starlink',
   SENSOR_TIMELINE_ENABLED_SENSORS = 'v2-sensor-timeline-enabled-sensors',
 
-  USER_ACCOUNT = 'v2-user-account',
   VERSION = 'v2-version',
 }
 export class PersistenceManager {

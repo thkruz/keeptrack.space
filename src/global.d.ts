@@ -6,6 +6,7 @@ declare global {
     zaraz?: {
       consent?: {
         get: (key: string) => boolean;
+        modal: boolean;
       };
     };
   }

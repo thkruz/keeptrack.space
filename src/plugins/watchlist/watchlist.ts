@@ -25,7 +25,7 @@
 import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sat-line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
@@ -113,6 +113,42 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.onCruncherReady, this.onCruncherReady_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
+
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerInit,
+      () => {
+        if (!settingsManager.isWatchlistTopMenuNotification) {
+          return;
+        }
+
+        getEl('nav-mobile2')?.insertAdjacentHTML(
+          'afterbegin',
+          keepTrackApi.html`
+                <li id="top-menu-watchlist-li" class="hidden">
+                  <a id="top-menu-watchlist-btn" class="top-menu-icons">
+                    <div class="top-menu-icons bmenu-item-selected">
+                      <img id="top-menu-watchlist-btn-icon"
+                      src="" delayedsrc="${bookmarksPng}" alt="" />
+                    </div>
+                  </a>
+                </li>
+              `,
+        );
+      },
+    );
+
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        if (!settingsManager.isWatchlistTopMenuNotification) {
+          return;
+        }
+
+        getEl('top-menu-watchlist-btn')?.addEventListener('click', () => {
+          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+        });
+      },
+    );
   }
 
   addJs(): void {
@@ -286,6 +322,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       }
     });
 
+    if (this.watchlistList.length > 0) {
+      showEl('top-menu-watchlist-li');
+    } else {
+      hideEl('top-menu-watchlist-li');
+    }
+
     getEl('watchlist-save')?.addEventListener('click', (evt: Event) => {
       this.onSaveClicked_(evt);
     });
@@ -363,6 +405,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       }
     }
 
+    if (this.watchlistList.length > 0) {
+      showEl('top-menu-watchlist-li');
+    } else {
+      hideEl('top-menu-watchlist-li');
+    }
+
     if (!isSkipSearch) {
       keepTrackApi.getUiManager().doSearch(watchlistString, true);
     }
@@ -401,6 +449,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     });
 
     this.updateWatchlist();
+    keepTrackApi.emit(KeepTrackApiEvents.onWatchlistRemove, this.watchlistList);
 
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -440,6 +489,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         return parseInt(satA.sccNum) - parseInt(satB.sccNum);
       });
       this.updateWatchlist();
+      keepTrackApi.emit(KeepTrackApiEvents.onWatchlistAdd, this.watchlistList);
     }
   }
 

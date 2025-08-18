@@ -93,6 +93,8 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.altCanvasResize]: [];
   [KeepTrackApiEvents.endOfDraw]: [Milliseconds];
   [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
+  [KeepTrackApiEvents.onWatchlistAdd]: [{ id: number, inView: boolean }[]];
+  [KeepTrackApiEvents.onWatchlistRemove]: [{ id: number, inView: boolean }[]];
   [KeepTrackApiEvents.staticOffsetChange]: [number];
   [KeepTrackApiEvents.onLineAdded]: [LineManager];
   [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];

@@ -343,8 +343,6 @@ export class SensorManager {
   setSensor(selectedSensor: DetailedSensor | string | null, sensorId: number | null = null): void {
     selectedSensor ??= SensorManager.getSensorFromsensorId(sensorId);
 
-    PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
-
     if (selectedSensor === null && sensorId === null) {
       // No sensor selected
       this.sensorTitle = '';
@@ -439,6 +437,9 @@ export class SensorManager {
     }
 
     // Run any callbacks
+    if (settingsManager.offlineMode) {
+      PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
+    }
     keepTrackApi.emit(KeepTrackApiEvents.setSensor, selectedSensor, sensorId ?? null);
 
     for (const sensor of this.currentSensors) {
@@ -511,6 +512,39 @@ export class SensorManager {
 
   getAllSensors(): DetailedSensor[] {
     return Object.values(sensors);
+  }
+
+  /**
+   * Load JSON either by input or through PersistenceManager - Offline Mode only
+   */
+  loadSensorJson(json?: string | null): void {
+    if (!settingsManager.offlineMode) {
+      return;
+    }
+
+    json ??= PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR);
+
+    if (!json) {
+      return;
+    }
+    const currentSensor = JSON.parse(json);
+
+    if (currentSensor !== null) {
+      try {
+        // If there is a sensorId set use that
+        if (typeof currentSensor[0] === 'undefined' || currentSensor[0] === null) {
+          this.setSensor(null, currentSensor[1]);
+          // If the sensor is a string, load that collection of sensors
+        } else if (typeof currentSensor[0].objName === 'undefined') {
+          this.setSensor(currentSensor[0], currentSensor[1]);
+        } else {
+          // Seems to be a single sensor without a sensorId, load that
+          this.setSensor(sensors[currentSensor[0].objName], currentSensor[1]);
+        }
+      } catch {
+        PersistenceManager.getInstance().removeItem(StorageKey.CURRENT_SENSOR);
+      }
+    }
   }
 
   private sensorSunStatus_(now: Date, sensor?: DetailedSensor): { sunStatus: SunStatus } {

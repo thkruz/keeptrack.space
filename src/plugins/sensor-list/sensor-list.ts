@@ -4,7 +4,6 @@ import { getClass } from '@app/lib/get-class';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { CameraType } from '@app/singletons/camera';
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import sensorPng from '@public/img/icons/sensor.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
@@ -199,8 +198,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
     keepTrackApi.on(
       KeepTrackApiEvents.onCruncherReady,
       () => {
-        if (!settingsManager.disableUI && settingsManager.isLoadLastSensor) {
-          SensorListPlugin.reloadLastSensor_();
+        if (!settingsManager.disableUI && settingsManager.isLoadLastSensor && settingsManager.offlineMode) {
+          keepTrackApi.getSensorManager().loadSensorJson();
         }
       },
     );
@@ -331,35 +330,6 @@ export class SensorListPlugin extends KeepTrackPlugin {
       errorManagerInstance.warn('Error generating HTML:', error);
 
       return '';
-    }
-  }
-
-  private static reloadLastSensor_() {
-    const json = PersistenceManager.getInstance().getItem(StorageKey.CURRENT_SENSOR);
-
-    if (!json) {
-      return;
-    }
-    const currentSensor = JSON.parse(json);
-    // istanbul ignore next
-
-    if (currentSensor !== null) {
-      try {
-        const sensorManagerInstance = keepTrackApi.getSensorManager();
-
-        // If there is a sensorId set use that
-        if (typeof currentSensor[0] === 'undefined' || currentSensor[0] === null) {
-          sensorManagerInstance.setSensor(null, currentSensor[1]);
-          // If the sensor is a string, load that collection of sensors
-        } else if (typeof currentSensor[0].objName === 'undefined') {
-          sensorManagerInstance.setSensor(currentSensor[0], currentSensor[1]);
-        } else {
-          // Seems to be a single sensor without a sensorId, load that
-          sensorManagerInstance.setSensor(sensors[currentSensor[0].objName], currentSensor[1]);
-        }
-      } catch {
-        PersistenceManager.getInstance().removeItem(StorageKey.CURRENT_SENSOR);
-      }
     }
   }
 }

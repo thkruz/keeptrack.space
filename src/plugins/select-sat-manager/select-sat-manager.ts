@@ -411,7 +411,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         ] as vec3;
 
         if (!radii[0] || !radii[1] || !radii[2]) {
-          errorManagerInstance.log('SelectSatManager.selectSatObject_: Invalid covariance matrix');
+          errorManagerInstance.log('SelectSatManager.setSecondarySat: Invalid covariance matrix');
           radii = [1200, 1000, 5000];
         }
 

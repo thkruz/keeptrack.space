@@ -50,7 +50,7 @@ export class StreamManager {
       audio: false,
     };
 
-    if (window.location.protocol === 'https:' || settingsManager.offline) {
+    if (window.location.protocol === 'https:' || settingsManager.offlineMode) {
       const enhancedNavigator = navigator as Navigator &
       { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream>; } &
       { mediaDevices: { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream>; }; };

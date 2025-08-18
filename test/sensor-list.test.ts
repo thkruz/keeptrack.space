@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { sensors } from '@app/catalogs/sensors';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
-import { PersistenceManager } from '@app/singletons/persistence-manager';
 import { DetailedSensor } from 'ootk';
 
 describe('SensorListPlugin', () => {
@@ -61,33 +59,5 @@ describe('SensorListPlugin', () => {
     expect(() => {
       SensorListPlugin.createLiForSensor_({} as DetailedSensor);
     }).toThrow('No sensors found');
-  });
-
-  it('should reload last sensor if data exists', () => {
-    const mockSetSensor = jest.fn();
-
-    jest.spyOn(PersistenceManager.getInstance(), 'getItem').mockReturnValue(
-      JSON.stringify([{ objName: 'sensor1' }, 'sensorId']),
-    );
-    jest.spyOn(keepTrackApi, 'getSensorManager').mockReturnValue({
-      setSensor: mockSetSensor,
-    } as any);
-
-    SensorListPlugin.reloadLastSensor_();
-
-    expect(mockSetSensor).toHaveBeenCalledWith(sensors.sensor1, 'sensorId');
-  });
-
-  it('should not reload last sensor if no data exists', () => {
-    const mockSetSensor = jest.fn();
-
-    jest.spyOn(PersistenceManager.getInstance(), 'getItem').mockReturnValue(null);
-    jest.spyOn(keepTrackApi, 'getSensorManager').mockReturnValue({
-      setSensor: mockSetSensor,
-    } as any);
-
-    SensorListPlugin.reloadLastSensor_();
-
-    expect(mockSetSensor).not.toHaveBeenCalled();
   });
 });

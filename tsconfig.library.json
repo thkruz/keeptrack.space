@@ -34,7 +34,6 @@
     "tsconfig.json",
     "src/tools/**/*",
     "test/**/*",
-    "src/plugins/startAnalytics.js"
   ],
   "filesGlob": [
     "src/**/*.ts",

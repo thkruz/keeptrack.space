@@ -60,7 +60,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   settingsManager.isLoadLastSensor = false;
 
   settingsManager.isDisableExtraCatalog = false;
-  settingsManager.offline = true;
+  settingsManager.offlineMode = true;
 
   settingsManager.startWithOrbitsDisplayed = true;
 

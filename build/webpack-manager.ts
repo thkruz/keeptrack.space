@@ -1,10 +1,10 @@
 import { Configuration, HtmlRspackPlugin, LightningCssMinimizerRspackPlugin, SwcJsMinimizerRspackPlugin } from '@rspack/core';
 import CleanTerminalPlugin from 'clean-terminal-webpack-plugin';
+import DotEnv from 'dotenv-webpack';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import WebpackBar from 'webpackbar/rspack';
 import { BuildConfig } from './lib/config-manager';
-
 export class WebpackManager {
   static readonly DEFAULT_MODE = 'development';
   static readonly DEFAULT_WATCH = false;
@@ -70,9 +70,11 @@ export class WebpackManager {
 
     // split entry points of main and webworkers
     const mainConfig = this.createMainConfig_(baseConfig, dirName, 'dist');
+    const authConfig = this.createAuthConfig_(baseConfig, dirName, 'dist', 'auth/');
     const webWorkerConfig = this.createWorkerConfig_(baseConfig, dirName, 'dist', '');
 
     webpackConfig.push(mainConfig);
+    webpackConfig.push(authConfig);
     webpackConfig.push(webWorkerConfig);
 
     // Modify the resolve configuration to handle web worker imports
@@ -170,15 +172,7 @@ export class WebpackManager {
       },
       ignoreWarnings: [/asset size limit/u, /combined asset size exceeds the recommended limit/u],
       stats: 'errors-warnings',
-      plugins: [
-        new WebpackBar({
-          name: 'KeepTrack Main Code',
-          color: '#66b242',
-          basic: false,
-          fancy: true,
-          profile: false,
-        }),
-      ],
+      plugins: [],
     };
   }
 
@@ -199,10 +193,6 @@ export class WebpackManager {
        *   patterns: [{ from: 'public', to: '..' }],
        * }),
        */
-      new HtmlRspackPlugin({
-        filename: '../index.html',
-        template: './public/index.html',
-      }),
     );
     baseConfig.module!.rules!.push({
       test: /\.(?:woff|woff2|eot|ttf|otf)$/iu,
@@ -230,6 +220,66 @@ export class WebpackManager {
           path: `${dirName}/../${subFolder}/js`,
           publicPath: `./${pubPath}js/`,
         },
+        plugins: [
+          new CleanTerminalPlugin({
+            beforeCompile: true,
+          }),
+          new HtmlRspackPlugin({
+            filename: '../index.html',
+            template: './public/index.html',
+          }),
+          new DotEnv({
+            systemvars: true,
+            path: '../.env',
+            allowEmptyValues: true,
+          }),
+          new WebpackBar({
+            name: 'KeepTrack Main Code',
+            color: '#66b242',
+            basic: false,
+            fancy: true,
+            profile: false,
+          }),
+        ],
+      },
+    });
+  }
+
+  /**
+   * Returns the auth configuration object for webpack.
+   */
+  private static createAuthConfig_(baseConfig: Configuration, dirName: string, subFolder: string, pubPath = '') {
+    return <Configuration>({
+      ...baseConfig,
+      ...{
+        name: 'AuthFiles',
+        entry: {
+          'popup-callback': ['./src/plugins-pro/user-account/popup-callback.ts'],
+        },
+        output: {
+          // Add hash to the end of the file name if not embeded
+          filename: `[name]${subFolder === 'dist' ? '.[contenthash]' : ''}.js`,
+          path: `${dirName}/../${subFolder}/auth`,
+          publicPath: `../${pubPath}`,
+        },
+        plugins: [
+          new HtmlRspackPlugin({
+            filename: '../auth/callback.html',
+            template: './src/plugins-pro/user-account/callback.html',
+          }),
+          new DotEnv({
+            systemvars: true,
+            path: '../.env',
+            allowEmptyValues: true,
+          }),
+          new WebpackBar({
+            name: 'KeepTrack Auth',
+            color: '#66b242',
+            basic: false,
+            fancy: true,
+            profile: false,
+          }),
+        ],
       },
     });
   }

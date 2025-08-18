@@ -191,7 +191,7 @@ export class SearchManager {
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     if (searchString === '') {
       this.hideResults();
-      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString);
+      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
       return;
     }
@@ -209,7 +209,7 @@ export class SearchManager {
       dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
       (<HTMLInputElement>getEl('search')).value = '';
       this.hideResults();
-      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString);
+      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
       return;
     }
@@ -228,8 +228,8 @@ export class SearchManager {
       return;
     }
 
-    // Emit the search before it is modified
-    keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString);
+    // Cache the search before it is modified
+    const searchString_ = searchString;
 
     // Uppercase to make this search not case sensitive
     searchString = searchString.toUpperCase();
@@ -253,6 +253,8 @@ export class SearchManager {
       // If not, then do a regular search
       results = SearchManager.doRegularSearch_(searchString);
     }
+
+    keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString_, results.length, settingsManager.searchLimit);
 
     // Remove any results greater than the maximum allowed
     results = results.splice(0, settingsManager.searchLimit);
@@ -297,10 +299,6 @@ export class SearchManager {
     const satData = SearchManager.getSearchableObjects_(true) as (DetailedSatellite & MissileObject)[];
 
     searchList.forEach((searchStringIn) => {
-      keepTrackApi.analytics.track('search', {
-        search: searchStringIn,
-      });
-
       satData.every((sat) => {
         if (results.length >= settingsManager.searchLimit) {
           return false;
@@ -441,10 +439,6 @@ export class SearchManager {
       if (i >= satData.length) {
         i = lastFoundI;
       }
-
-      keepTrackApi.analytics.track('search', {
-        search: searchStringIn,
-      });
 
       for (; i < satData.length; i++) {
         if (results.length >= settingsManager.searchLimit) {

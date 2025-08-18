@@ -1,4 +1,5 @@
 /* eslint-disable class-methods-use-this */
+import { User } from '@supabase/supabase-js';
 import { AnalyticsInstance } from 'analytics';
 import { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
 import { keepTrackContainer } from './container';
@@ -92,6 +93,8 @@ type KeepTrackApiEventArguments = {
   [KeepTrackApiEvents.altCanvasResize]: [];
   [KeepTrackApiEvents.endOfDraw]: [Milliseconds];
   [KeepTrackApiEvents.onWatchlistUpdated]: [{ id: number, inView: boolean }[]];
+  [KeepTrackApiEvents.onWatchlistAdd]: [{ id: number, inView: boolean }[]];
+  [KeepTrackApiEvents.onWatchlistRemove]: [{ id: number, inView: boolean }[]];
   [KeepTrackApiEvents.staticOffsetChange]: [number];
   [KeepTrackApiEvents.onLineAdded]: [LineManager];
   [KeepTrackApiEvents.sensorDotSelected]: [DetailedSensor];
@@ -114,11 +117,15 @@ type KeepTrackApiEventArguments = {
   [InputEventType.KeyUp]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [InputEventType.KeyPress]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [KeepTrackApiEvents.parseGetVariables]: [string[]]; // params
-  [KeepTrackApiEvents.searchUpdated]: [string]; // search term
+  [KeepTrackApiEvents.searchUpdated]: [string, number, number]; // search term, result count, search limit
   [KeepTrackApiEvents.legendUpdated]: [string]; // legend name
   [KeepTrackApiEvents.satInfoBoxAddListeners]: [];
   [KeepTrackApiEvents.satInfoBoxInit]: [];
   [KeepTrackApiEvents.satInfoBoxFinal]: [];
+  [KeepTrackApiEvents.error]: [Error, string]; // error, function name
+  [KeepTrackApiEvents.userAccountChange]: [User | null]; // user
+  [KeepTrackApiEvents.userLogin]: [User | null]; // user
+  [KeepTrackApiEvents.userLogout]: []; // no arguments
 };
 
 interface KeepTrackApiRegisterParams<T extends EventBusEvent> {
@@ -321,7 +328,7 @@ export class KeepTrackApi {
           // Remove the callback after it has been called once
           this.unregister(event, cb);
         } else {
-          console.warn(`Callback for event ${event} was not found in unregister.`);
+          errorManagerInstance.log(`Callback for event ${event} was not found in unregister.`);
         }
       },
       event: <T><unknown>null,
@@ -337,7 +344,7 @@ export class KeepTrackApi {
       }
     }
     // If we got this far, it means we couldn't find the callback
-    errorManagerInstance.error(new Error('Callback not found!'), 'keepTrackApi.unregister');
+    errorManagerInstance.log(`Callback for event ${event} was not found in unregister.`);
   }
 
   getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);

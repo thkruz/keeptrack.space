@@ -240,11 +240,16 @@ export class SelectSatManager extends KeepTrackPlugin {
         const covMatrix = createSampleCovarianceFromTle(sat.tle1, sat.tle2).matrix.elements;
 
         // Cap radii at 1200 km (radial), 1000 km (cross-track), and 5000 km (in-track) to avoid huge bubbles
-        const radii = [
+        let radii = [
           Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
           Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
           Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
         ] as vec3;
+
+        if (!radii[0] || !radii[1] || !radii[2]) {
+          errorManagerInstance.log('SelectSatManager.selectSatObject_: Invalid covariance matrix');
+          radii = [1200, 1000, 5000];
+        }
 
         this.primarySatCovMatrix = radii;
 
@@ -265,15 +270,6 @@ export class SelectSatManager extends KeepTrackPlugin {
     };
 
     this.switchToSatCenteredCamera_();
-
-    if (sat instanceof DetailedSatellite) {
-      keepTrackApi.analytics.track('select_satellite', {
-        id: sat.id,
-        name: sat.name,
-        sccNum: sat.sccNum,
-      });
-    }
-
     this.setSelectedSat_(sat.id);
   }
 
@@ -396,15 +392,28 @@ export class SelectSatManager extends KeepTrackPlugin {
         this.secondarySatObj = null;
       }
 
+      if (this.secondarySatObj instanceof MissileObject) {
+        this.secondarySatObj = null;
+
+        errorManagerInstance.warn('Selecting a missile as the secondary object is not supported!');
+
+        return;
+      }
+
       if ((this.secondarySatObj?.id ?? -1) >= 0 && this.secondarySatObj instanceof DetailedSatellite) {
         const covMatrix = createSampleCovarianceFromTle(this.secondarySatObj.tle1, this.secondarySatObj.tle2).matrix.elements;
 
         // Cap radii at 1200 km (radial), 1000 km (cross-track), and 5000 km (in-track) to avoid huge bubbles
-        const radii = [
+        let radii = [
           Math.min(Math.sqrt(covMatrix[0][0]) * settingsManager.covarianceConfidenceLevel, 1200), // Radial
           Math.min(Math.sqrt(covMatrix[2][2]) * settingsManager.covarianceConfidenceLevel, 1000), // Cross-track
           Math.min(Math.sqrt(covMatrix[1][1]) * settingsManager.covarianceConfidenceLevel, 5000), // In-track
         ] as vec3;
+
+        if (!radii[0] || !radii[1] || !radii[2]) {
+          errorManagerInstance.log('SelectSatManager.setSecondarySat: Invalid covariance matrix');
+          radii = [1200, 1000, 5000];
+        }
 
         this.secondarySatCovMatrix = radii;
 

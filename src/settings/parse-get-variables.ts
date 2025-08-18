@@ -121,7 +121,7 @@ export const parseGetVariables = (params: string[], settingsManager: SettingsMan
         settingsManager.earthTextureStyle = EarthTextureStyle.FLAT;
         break;
       case 'offline':
-        settingsManager.offline = true;
+        settingsManager.offlineMode = true;
         settingsManager.dataSources.tle = '/tle/tle.json';
         settingsManager.dataSources.vimpel = '/tle/vimpel.json';
         break;

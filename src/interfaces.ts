@@ -320,6 +320,8 @@ export enum KeepTrackApiEvents {
    * Run in the updateWatchlist method of CatalogManager instance with parameters (watchlist: number[])
    */
   onWatchlistUpdated = 'onWatchlistUpdated',
+  onWatchlistAdd = 'onWatchlistAdd',
+  onWatchlistRemove = 'onWatchlistRemove',
   /**
    * Run in the staticOffset setter of TimeManager instance with parameters (staticOffset: number)
    */
@@ -346,4 +348,8 @@ export enum KeepTrackApiEvents {
   satInfoBoxAddListeners = 'satInfoBoxAddListeners',
   satInfoBoxInit = 'satInfoBoxInit',
   satInfoBoxFinal = 'satInfoBoxFinal',
+  error = 'error',
+  userAccountChange = 'userAccountChange',
+  userLogin = 'userSignedIn',
+  userLogout = 'userLogout',
 }

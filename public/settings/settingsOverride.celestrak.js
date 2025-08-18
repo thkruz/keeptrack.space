@@ -26,8 +26,16 @@ const settingsOverride = {
    */
   plugins: {
     DebugMenuPlugin: {
-      enabled: true,
+      enabled: false,
       order: 0,
+    },
+    TooltipsPlugin: {
+      enabled: false,
+      order: 1,
+    },
+    UserAccountPlugin: {
+      enabled: true,
+      order: 2,
     },
     SensorListPlugin: {
       enabled: true,
@@ -38,7 +46,7 @@ const settingsOverride = {
       order: 11,
     },
     CustomSensorPlugin: {
-      enabled: true,
+      enabled: false,
       order: 12,
     },
     SensorFov: {
@@ -46,11 +54,11 @@ const settingsOverride = {
       order: 13,
     },
     SensorSurvFence: {
-      enabled: true,
+      enabled: false,
       order: 14,
     },
     ShortTermFences: {
-      enabled: true,
+      enabled: false,
       order: 15,
     },
     LookAnglesPlugin: {
@@ -58,15 +66,15 @@ const settingsOverride = {
       order: 20,
     },
     MultiSiteLookAnglesPlugin: {
-      enabled: true,
+      enabled: false,
       order: 21,
     },
     SensorTimeline: {
-      enabled: true,
+      enabled: false,
       order: 30,
     },
     SatelliteTimeline: {
-      enabled: true,
+      enabled: false,
       order: 31,
     },
     WatchlistPlugin: {
@@ -79,6 +87,7 @@ const settingsOverride = {
     },
     ReportsPlugin: {
       enabled: true,
+      menuMode: [1],
       order: 50,
     },
     PolarPlotPlugin: {
@@ -86,27 +95,27 @@ const settingsOverride = {
       order: 60,
     },
     CreateSat: {
-      enabled: true,
+      enabled: false,
       order: 70,
     },
     EditSat: {
-      enabled: true,
+      enabled: false,
       order: 71,
     },
     NewLaunch: {
-      enabled: true,
+      enabled: false,
       order: 72,
     },
     Breakup: {
-      enabled: true,
+      enabled: false,
       order: 73,
     },
     MissilePlugin: {
-      enabled: true,
+      enabled: false,
       order: 74,
     },
     SatelliteFov: {
-      enabled: true,
+      enabled: false,
       order: 75,
     },
     FindSatPlugin: {
@@ -114,7 +123,7 @@ const settingsOverride = {
       order: 80,
     },
     ProximityOps: {
-      enabled: true,
+      enabled: false,
       order: 81,
     },
     Collisions: {
@@ -130,7 +139,7 @@ const settingsOverride = {
       order: 150,
     },
     SatelliteViewPlugin: {
-      enabled: true,
+      enabled: false,
       order: 151,
     },
     Planetarium: {
@@ -138,7 +147,7 @@ const settingsOverride = {
       order: 155,
     },
     Astronomy: {
-      enabled: true,
+      enabled: false,
       order: 156,
     },
     SatConstellations: {
@@ -158,35 +167,35 @@ const settingsOverride = {
       order: 240,
     },
     TimeMachine: {
-      enabled: true,
+      enabled: false,
       order: 250,
     },
     EciPlot: {
-      enabled: true,
+      enabled: false,
       order: 260,
     },
     EcfPlot: {
-      enabled: true,
+      enabled: false,
       order: 261,
     },
     RicPlot: {
-      enabled: true,
+      enabled: false,
       order: 262,
     },
     Time2LonPlots: {
-      enabled: true,
+      enabled: false,
       order: 263,
     },
     Lat2LonPlots: {
-      enabled: true,
+      enabled: false,
       order: 264,
     },
     Inc2AltPlots: {
-      enabled: true,
+      enabled: false,
       order: 265,
     },
     Inc2LonPlots: {
-      enabled: true,
+      enabled: false,
       order: 266,
     },
     NightToggle: {
@@ -194,22 +203,22 @@ const settingsOverride = {
       order: 310,
     },
     DebrisScreening: {
-      enabled: true,
+      enabled: false,
       order: 280,
     },
     transponderChannelData: {
-      enabled: true,
+      enabled: false,
     },
     NextLaunchesPlugin: {
-      enabled: true,
+      enabled: false,
       order: 350,
     },
     LaunchCalendar: {
-      enabled: true,
+      enabled: false,
       order: 351,
     },
     Calculator: {
-      enabled: true,
+      enabled: false,
       order: 400,
     },
     InitialOrbitDeterminationPlugin: {
@@ -217,7 +226,7 @@ const settingsOverride = {
       order: 410,
     },
     AnalysisMenu: {
-      enabled: true,
+      enabled: false,
       order: 420,
     },
     Screenshot: {
@@ -225,11 +234,11 @@ const settingsOverride = {
       order: 450,
     },
     ScreenRecorder: {
-      enabled: true,
+      enabled: false,
       order: 451,
     },
     DopsPlugin: {
-      enabled: true,
+      enabled: false,
       order: 500,
     },
     SatChangesPlugin: {
@@ -237,7 +246,7 @@ const settingsOverride = {
       order: 501, // TODO: Update when backend is ready
     },
     VideoDirectorPlugin: {
-      enabled: true,
+      enabled: false,
       order: 510,
     },
     SettingsMenuPlugin: {
@@ -273,20 +282,20 @@ const settingsOverride = {
       enabled: true,
     },
     OrbitReferences: {
-      enabled: true,
+      enabled: false,
     },
     SoundManager: {
       enabled: true,
     },
     GamepadPlugin: {
-      enabled: true,
+      enabled: false,
     },
     // RMB plugins
     EarthPresetsPlugin: {
       enabled: true,
     },
     DrawLinesPlugin: {
-      enabled: true,
+      enabled: false,
     },
     ViewInfoRmbPlugin: {
       enabled: true,

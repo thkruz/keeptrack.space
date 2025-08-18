@@ -1,4 +1,3 @@
-import { keepTrackApi } from '@app/keepTrackApi';
 import { CountriesMenu } from '@app/plugins/countries/countries';
 import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
@@ -6,9 +5,7 @@ import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import * as catalogLoader from '@app/static/catalog-loader';
 
-import googleAnalytics from '@analytics/google-analytics';
 import { KeepTrackApiEvents } from '@app/interfaces';
-import createAnalytics from 'analytics';
 import { KeepTrackApi } from '../keepTrackApi';
 import { getEl } from '../lib/get-el';
 import { errorManagerInstance } from '../singletons/errorManager';
@@ -83,6 +80,15 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
   plugins ??= <KeepTrackPluginsConfiguration>{};
   try {
     const pluginList: { init: () => void | Promise<void>, config?: { enabled: boolean } }[] = [
+      {
+        init: async () => {
+          const proPlugin = await import('../plugins-pro/telemetry/telemetry');
+
+          keepTrackApi.loadedPlugins.push(new proPlugin.Telemetry() as unknown as KeepTrackPlugin);
+        }, config: {
+          enabled: true,
+        },
+      },
       { init: () => new SelectSatManager().init(), config: { enabled: true } },
       { init: () => new TopMenu().init(), config: plugins.TopMenu },
       { init: () => new TooltipsPlugin().init(), config: plugins.TooltipsPlugin },
@@ -293,24 +299,6 @@ export const uiManagerFinal = (): void => {
    *   document.documentElement.style.setProperty('--nav-bar-height', `${topMenuHeight + 50}px`);
    * }
    */
-
-  // Only turn on analytics if on keeptrack.space ()
-  if (window.location.hostname === 'keeptrack.space' || window.location.hostname === 'www.keeptrack.space') {
-    const analytics = createAnalytics({
-      app: 'KeepTrack',
-      version: 100,
-      plugins: [
-        googleAnalytics({
-          measurementIds: 'G-ENHWK6L0X7',
-        }),
-      ],
-    });
-
-    if (analytics) {
-      keepTrackApi.analytics = analytics;
-      keepTrackApi.analytics.page();
-    }
-  }
 };
 
 

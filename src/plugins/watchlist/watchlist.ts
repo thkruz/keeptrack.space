@@ -25,7 +25,7 @@
 import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl } from '@app/lib/get-el';
+import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sat-line';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
@@ -113,6 +113,44 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.onCruncherReady, this.onCruncherReady_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
+
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerInit,
+      () => {
+        if (!settingsManager.isWatchlistTopMenuNotification) {
+          return;
+        }
+
+        // Optional if top-menu is enabled
+        getEl('nav-mobile2', true)?.insertAdjacentHTML(
+          'afterbegin',
+          keepTrackApi.html`
+                <li id="top-menu-watchlist-li" class="hidden">
+                  <a id="top-menu-watchlist-btn" class="top-menu-icons">
+                    <div class="top-menu-icons bmenu-item-selected">
+                      <img id="top-menu-watchlist-btn-icon"
+                      src="" delayedsrc="${bookmarksPng}" alt="" />
+                    </div>
+                  </a>
+                </li>
+              `,
+        );
+      },
+    );
+
+    keepTrackApi.on(
+      KeepTrackApiEvents.uiManagerFinal,
+      () => {
+        if (!settingsManager.isWatchlistTopMenuNotification) {
+          return;
+        }
+
+        // Optional if top-menu is enabled
+        getEl('top-menu-watchlist-btn', true)?.addEventListener('click', () => {
+          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+        });
+      },
+    );
   }
 
   addJs(): void {
@@ -166,6 +204,10 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    * @returns A promise that resolves to void.
    */
   private async onCruncherReady_(): Promise<void> {
+    if (!settingsManager.offlineMode) {
+      return;
+    }
+
     let watchlistString = PersistenceManager.getInstance().getItem(StorageKey.WATCHLIST_LIST);
 
     if (!watchlistString || watchlistString === '[]') {
@@ -186,7 +228,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   createNewWatchlist(watchlistString: string): { id: number, inView: boolean }[] {
     let newWatchlist: { id: number, inView: boolean }[];
     // We save it as an array of sccNums
-    const savedSatList: string[] = JSON.parse(watchlistString);
+    const savedSatList: string[] = this.unserialize(watchlistString);
 
     if (savedSatList.length > 0) {
       // We need to convert it to an array of objects
@@ -282,6 +324,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       }
     });
 
+    if (this.watchlistList.length > 0) {
+      showEl('top-menu-watchlist-li');
+    } else {
+      hideEl('top-menu-watchlist-li');
+    }
+
     getEl('watchlist-save')?.addEventListener('click', (evt: Event) => {
       this.onSaveClicked_(evt);
     });
@@ -359,6 +407,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       }
     }
 
+    if (this.watchlistList.length > 0) {
+      showEl('top-menu-watchlist-li');
+    } else {
+      hideEl('top-menu-watchlist-li');
+    }
+
     if (!isSkipSearch) {
       keepTrackApi.getUiManager().doSearch(watchlistString, true);
     }
@@ -366,14 +420,9 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     colorSchemeManager.calculateColorBuffers(true); // force color recalc
 
-    const saveWatchlist: string[] = [];
-
-    for (let i = 0; i < this.watchlistList.length; i++) {
-      sat = catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);
-      saveWatchlist[i] = sat?.sccNum ?? '';
+    if (settingsManager.offlineMode) {
+      PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, this.serialize());
     }
-
-    PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, JSON.stringify(saveWatchlist));
   }
 
   selectSat(id: number) {
@@ -402,6 +451,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     });
 
     this.updateWatchlist();
+    keepTrackApi.emit(KeepTrackApiEvents.onWatchlistRemove, this.watchlistList);
 
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -441,6 +491,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         return parseInt(satA.sccNum) - parseInt(satB.sccNum);
       });
       this.updateWatchlist();
+      keepTrackApi.emit(KeepTrackApiEvents.onWatchlistAdd, this.watchlistList);
     }
   }
 
@@ -546,7 +597,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     try {
       // We save it as an array of sccNums
-      const savedSatList: string[] = JSON.parse(<string>evt.target.result);
+      const savedSatList: string[] = this.unserialize(<string>evt.target.result);
 
       if (savedSatList.length > 0) {
         // We need to convert it to an array of objects
@@ -588,6 +639,22 @@ export class WatchlistPlugin extends KeepTrackPlugin {
    */
   private onSaveClicked_(evt: Event) {
     keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+    const watchlistString = this.serialize();
+    const blob = new Blob([watchlistString], {
+      type: 'text/plain;charset=utf-8',
+    });
+
+    try {
+      saveAs(blob, 'watchlist.json');
+    } catch (e) {
+      if (!isThisNode()) {
+        errorManagerInstance.error(e, 'watchlist.ts', 'Error saving watchlist!');
+      }
+    }
+    evt.preventDefault();
+  }
+
+  serialize() {
     const satIds: string[] = [];
 
     for (let i = 0; i < this.watchlistList.length; i++) {
@@ -601,17 +668,21 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       satIds[i] = sat.sccNum;
     }
     const watchlistString = JSON.stringify(satIds);
-    const blob = new Blob([watchlistString], {
-      type: 'text/plain;charset=utf-8',
-    });
 
+
+    return watchlistString;
+  }
+
+  unserialize(watchlistString: string): string[] {
     try {
-      saveAs(blob, 'watchlist.json');
-    } catch (e) {
-      if (!isThisNode()) {
-        errorManagerInstance.error(e, 'watchlist.ts', 'Error saving watchlist!');
-      }
+      const savedSatList: string[] = JSON.parse(watchlistString);
+
+
+      return savedSatList;
+    } catch {
+      errorManagerInstance.warn('Watchlist File Format Incorrect');
+
+      return [];
     }
-    evt.preventDefault();
   }
 }

@@ -83,6 +83,8 @@ export class SettingsManager {
   isBlockPersistence = false;
   /** Center on a satellite when it is selected. */
   isFocusOnSatelliteWhenSelected = true;
+  /** Flag to determine if the watchlist is shown in the top menu */
+  isWatchlistTopMenuNotification = true;
   isUseJdayOnTopMenu = true;
   /** Flag to determine if loading hints are shown on splash screen*/
   isShowLoadingHints = true;
@@ -101,38 +103,40 @@ export class SettingsManager {
 
 
   static preserveSettings() {
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, settingsManager.isDrawOrbits.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, settingsManager.isDrawTrailingOrbits.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ECF, settingsManager.isOrbitCruncherInEcf.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, settingsManager.isDrawInCoverageLines.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_SUN, settingsManager.isDrawSun.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, settingsManager.isDrawCovarianceEllipsoid.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH, settingsManager.isBlackEarth.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE, settingsManager.isDrawAtmosphere.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_AURORA, settingsManager.isDrawAurora.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_MILKY_WAY, settingsManager.isDrawMilkyWay.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HOS, settingsManager.colors.transparent[3] === 0 ? 'true' : 'false');
-    if (settingsManager.isShowConfidenceLevels) {
-      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
-    } else {
-      PersistenceManager.getInstance().removeItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS);
+    if (settingsManager.offlineMode) {
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ORBITS, settingsManager.isDrawOrbits.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, settingsManager.isDrawTrailingOrbits.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ECF, settingsManager.isOrbitCruncherInEcf.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_IN_COVERAGE_LINES, settingsManager.isDrawInCoverageLines.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_SUN, settingsManager.isDrawSun.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_COVARIANCE_ELLIPSOID, settingsManager.isDrawCovarianceEllipsoid.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_BLACK_EARTH, settingsManager.isBlackEarth.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_ATMOSPHERE, settingsManager.isDrawAtmosphere.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_AURORA, settingsManager.isDrawAurora.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_MILKY_WAY, settingsManager.isDrawMilkyWay.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_GRAY_SKYBOX, settingsManager.isGraySkybox.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_ECI_ON_HOVER, settingsManager.isEciOnHover.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_HOS, settingsManager.colors.transparent[3] === 0 ? 'true' : 'false');
+      if (settingsManager.isShowConfidenceLevels) {
+        PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS, settingsManager.isShowConfidenceLevels.toString());
+      } else {
+        PersistenceManager.getInstance().removeItem(StorageKey.SETTINGS_CONFIDENCE_LEVELS);
+      }
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEMO_MODE, settingsManager.isDemoModeOn.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE, settingsManager.isSatLabelModeOn.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, settingsManager.isDisableTimeMachineToasts.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES, settingsManager.godraysSamples.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY, settingsManager.godraysDecay.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE, settingsManager.godraysExposure.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY, settingsManager.godraysDensity.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT, settingsManager.godraysWeight.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY, settingsManager.godraysIlluminationDecay.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality?.toString());
+      PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality?.toString());
     }
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DEMO_MODE, settingsManager.isDemoModeOn.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE, settingsManager.isSatLabelModeOn.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG, settingsManager.isFreezePropRateOnDrag.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DISABLE_TIME_MACHINE_TOASTS, settingsManager.isDisableTimeMachineToasts.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SEARCH_LIMIT, settingsManager.searchLimit.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES, settingsManager.godraysSamples.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY, settingsManager.godraysDecay.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_EXPOSURE, settingsManager.godraysExposure.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_DENSITY, settingsManager.godraysDensity.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_WEIGHT, settingsManager.godraysWeight.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY, settingsManager.godraysIlluminationDecay.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION, settingsManager.earthDayTextureQuality?.toString());
-    PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality?.toString());
 
     keepTrackApi.emit(KeepTrackApiEvents.saveSettings);
   }
@@ -657,7 +661,8 @@ export class SettingsManager {
     /** This determines if tle source is loaded to supplement externalTLEs  */
     isSupplementExternal: false,
   };
-  telemetryServer = 'http://127.0.0.1:8787';
+  telemetryServer = 'https://telemetry.keeptrack.space';
+  userServer = 'https://user.keeptrack.space';
   /**
    * Determines whether or not to hide the propogation rate text on the GUI.
    */
@@ -1135,6 +1140,11 @@ export class SettingsManager {
   drawCameraWidget = false;
 
   loadPersistedSettings() {
+    // Offline Mode only
+    if (!this.offlineMode) {
+      return;
+    }
+
     this.isDrawOrbits = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_ORBITS, this.isDrawOrbits) as boolean;
     this.drawCameraWidget = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, this.drawCameraWidget) as boolean;
     this.isDrawTrailingOrbits = PersistenceManager.getInstance().checkIfEnabled(StorageKey.SETTINGS_DRAW_TRAILING_ORBITS, this.isDrawTrailingOrbits) as boolean;

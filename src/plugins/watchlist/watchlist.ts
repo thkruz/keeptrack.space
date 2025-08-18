@@ -121,7 +121,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
           return;
         }
 
-        getEl('nav-mobile2')?.insertAdjacentHTML(
+        // Optional if top-menu is enabled
+        getEl('nav-mobile2', true)?.insertAdjacentHTML(
           'afterbegin',
           keepTrackApi.html`
                 <li id="top-menu-watchlist-li" class="hidden">
@@ -144,7 +145,8 @@ export class WatchlistPlugin extends KeepTrackPlugin {
           return;
         }
 
-        getEl('top-menu-watchlist-btn')?.addEventListener('click', () => {
+        // Optional if top-menu is enabled
+        getEl('top-menu-watchlist-btn', true)?.addEventListener('click', () => {
           keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
         });
       },

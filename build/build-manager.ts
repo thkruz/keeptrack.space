@@ -90,8 +90,6 @@ class BuildManager {
         fileManager.compileLocales('src/locales');
       }
 
-      // Configure Supabase
-
       // Configure plugins
       pluginManager.configurePlugins(config.isPro);
 

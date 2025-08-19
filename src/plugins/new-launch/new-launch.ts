@@ -46,6 +46,11 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
+    // Validate satellite before changing DOM
+    if (!(sat instanceof DetailedSatellite) || !sat.sccNum || !sat.inclination || isNaN(sat.inclination)) {
+      return;
+    }
+
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
     (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4).padStart(8, '0');
   };

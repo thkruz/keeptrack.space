@@ -8,7 +8,7 @@ import { saveCsv, saveVariable } from './lib/saveVariable';
 import { KeepTrackPlugin } from './plugins/KeepTrackPlugin';
 import type { SensorManager } from './plugins/sensor/sensorManager';
 import { SoundManager } from './plugins/sounds/sound-manager';
-import { SoundNames } from './plugins/sounds/SoundNames';
+import { SoundNames } from './plugins/sounds/sounds';
 import { SettingsManager } from './settings/settings';
 import type { Camera } from './singletons/camera';
 import type { CatalogManager } from './singletons/catalog-manager';

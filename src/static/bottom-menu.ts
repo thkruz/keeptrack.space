@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { SoundNames } from '@app/plugins/sounds/SoundNames';
+import { SoundNames } from '@app/plugins/sounds/sounds';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
 import developerModePng from '@public/img/icons/developer-mode.png';

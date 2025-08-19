@@ -4,7 +4,7 @@ import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
 
 /**

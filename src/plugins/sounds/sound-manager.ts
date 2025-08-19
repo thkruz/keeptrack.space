@@ -2,65 +2,15 @@ import { keepTrackContainer } from '@app/container';
 import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/lib/get-el';
-import beep1Mp3 from '@public/audio/beep1.mp3';
-import buttonMp3 from '@public/audio/button.mp3';
-import button2Mp3 from '@public/audio/button2.mp3';
-import chatter1Mp3 from '@public/audio/chatter1.mp3';
-import chatter2Mp3 from '@public/audio/chatter2.mp3';
-import chatter3Mp3 from '@public/audio/chatter3.mp3';
-import chatter4Mp3 from '@public/audio/chatter4.mp3';
-import chatter5Mp3 from '@public/audio/chatter5.mp3';
-import chatter6Mp3 from '@public/audio/chatter6.mp3';
-import chatter7Mp3 from '@public/audio/chatter7.mp3';
-import chatter8Mp3 from '@public/audio/chatter8.mp3';
-import click10Mp3 from '@public/audio/click10.mp3';
-import click11Mp3 from '@public/audio/click11.mp3';
-import click12Mp3 from '@public/audio/click12.mp3';
-import click13Mp3 from '@public/audio/click13.mp3';
-import click14Mp3 from '@public/audio/click14.mp3';
-import click15Mp3 from '@public/audio/click15.mp3';
-import click16Mp3 from '@public/audio/click16.mp3';
-import click17Mp3 from '@public/audio/click17.mp3';
-import click18Mp3 from '@public/audio/click18.mp3';
-import click19Mp3 from '@public/audio/click19.mp3';
-import click2Mp3 from '@public/audio/click2.mp3';
-import click20Mp3 from '@public/audio/click20.mp3';
-import click21Mp3 from '@public/audio/click21.mp3';
-import click22Mp3 from '@public/audio/click22.mp3';
-import click23Mp3 from '@public/audio/click23.mp3';
-import click24Mp3 from '@public/audio/click24.mp3';
-import click25Mp3 from '@public/audio/click25.mp3';
-import click26Mp3 from '@public/audio/click26.mp3';
-import click27Mp3 from '@public/audio/click27.mp3';
-import click28Mp3 from '@public/audio/click28.mp3';
-import click29Mp3 from '@public/audio/click29.mp3';
-import click3Mp3 from '@public/audio/click3.mp3';
-import click30Mp3 from '@public/audio/click30.mp3';
-import click4Mp3 from '@public/audio/click4.mp3';
-import click7Mp3 from '@public/audio/click7.mp3';
-import click8Mp3 from '@public/audio/click8.mp3';
-import error1Mp3 from '@public/audio/error.mp3';
-import error2Mp3 from '@public/audio/error2.mp3';
-import exportMp3 from '@public/audio/export.wav';
-import genericBeep1Mp3 from '@public/audio/genericBeep1.mp3';
-import genericBeep2Mp3 from '@public/audio/genericBeep2.mp3';
-import genericBeep3Mp3 from '@public/audio/genericBeep3.mp3';
-import liftoffMp3 from '@public/audio/liftoff.mp3';
-import loadingMp3 from '@public/audio/loading.wav';
-import popMp3 from '@public/audio/pop.mp3';
-import switchMp3 from '@public/audio/switch.mp3';
-import toggleOffMp3 from '@public/audio/toggle-off.mp3';
-import toggleOnMp3 from '@public/audio/toggle-on.mp3';
-import whoosh1Mp3 from '@public/audio/whoosh1.mp3';
-import whoosh2Mp3 from '@public/audio/whoosh2.mp3';
-import whoosh3Mp3 from '@public/audio/whoosh3.mp3';
-import whoosh4Mp3 from '@public/audio/whoosh4.mp3';
-import whoosh5Mp3 from '@public/audio/whoosh5.mp3';
-import whoosh6Mp3 from '@public/audio/whoosh6.mp3';
-import whoosh7Mp3 from '@public/audio/whoosh7.mp3';
-import whoosh8Mp3 from '@public/audio/whoosh8.mp3';
+import { errorManagerInstance } from '@app/singletons/errorManager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SoundNames } from './SoundNames';
+import { SoundNames, sounds } from './sounds';
+
+interface PlayingSound {
+  source: AudioBufferSourceNode;
+  gainNode: GainNode;
+  startTime: number;
+}
 
 export class SoundManager extends KeepTrackPlugin {
   readonly id = 'SoundManager';
@@ -72,11 +22,26 @@ export class SoundManager extends KeepTrackPlugin {
   nextChatter: ReturnType<typeof setTimeout>;
   private maxClickClip_ = 0;
 
+  // Web Audio API properties
+  private audioContext: AudioContext | null = null;
+  private readonly audioBuffers: Map<string, AudioBuffer> = new Map();
+  private readonly playingSounds: Map<string, PlayingSound[]> = new Map();
+  private isAudioReady = false;
+  private audioLoadingPromise: Promise<void> | null = null;
+
+  // Fallback to HTML5 Audio for speech and complex sounds
+  private readonly htmlAudioElements: Map<string, HTMLAudioElement> = new Map();
+  // Sounds that should always use HTML5 Audio due to length
+  private readonly useHtmlAudioFor = new Set(['chatter1', 'chatter2', 'chatter3', 'chatter4', 'chatter5', 'chatter6', 'chatter7', 'chatter8']);
+
   constructor() {
     super();
 
+    // Initialize audio context and preload
+    this.initializeAudio();
+
     // Find the maxClickClip_
-    Object.keys(this.sounds).forEach((key) => {
+    Object.keys(sounds).forEach((key) => {
       if (key.startsWith('click')) {
         const clipNumber = parseInt(key.replace('click', ''));
 
@@ -87,65 +52,146 @@ export class SoundManager extends KeepTrackPlugin {
     });
   }
 
-  sounds = {
-    standby: popMp3,
-    error1: error1Mp3,
-    error2: error2Mp3,
-    export: exportMp3,
-    click: switchMp3,
-    beep1: beep1Mp3,
-    genericBeep1: genericBeep1Mp3,
-    genericBeep2: genericBeep2Mp3,
-    genericBeep3: genericBeep3Mp3,
-    whoosh1: whoosh1Mp3,
-    whoosh2: whoosh2Mp3,
-    whoosh3: whoosh3Mp3,
-    whoosh4: whoosh4Mp3,
-    whoosh5: whoosh5Mp3,
-    whoosh6: whoosh6Mp3,
-    whoosh7: whoosh7Mp3,
-    whoosh8: whoosh8Mp3,
-    click1: click30Mp3,
-    click2: click2Mp3,
-    click3: click3Mp3,
-    click4: click4Mp3,
-    click5: click29Mp3,
-    click6: click27Mp3,
-    click7: click7Mp3,
-    click8: click8Mp3,
-    click9: click28Mp3,
-    click10: click10Mp3,
-    click11: click11Mp3,
-    click12: click12Mp3,
-    click13: click13Mp3,
-    click14: click14Mp3,
-    click15: click15Mp3,
-    click16: click16Mp3,
-    click17: click17Mp3,
-    click18: click18Mp3,
-    click19: click19Mp3,
-    click20: click20Mp3,
-    click21: click21Mp3,
-    click22: click22Mp3,
-    click23: click23Mp3,
-    click24: click24Mp3,
-    click25: click25Mp3,
-    click26: click26Mp3,
-    chatter1: chatter1Mp3,
-    chatter2: chatter2Mp3,
-    chatter3: chatter3Mp3,
-    chatter4: chatter4Mp3,
-    chatter5: chatter5Mp3,
-    chatter6: chatter6Mp3,
-    chatter7: chatter7Mp3,
-    chatter8: chatter8Mp3,
-    loading: loadingMp3,
-    button: buttonMp3,
-    menuButton: button2Mp3,
-    toggleOn: toggleOnMp3,
-    toggleOff: toggleOffMp3,
-    liftoff: liftoffMp3,
-  } as Record<string, string | HTMLAudioElement>;
+  private async initializeAudio() {
+    try {
+      // Initialize Web Audio Context
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      // Preload all audio
+      this.audioLoadingPromise = this.preloadAllAudio();
+      await this.audioLoadingPromise;
+
+      this.isAudioReady = true;
+    } catch (error) {
+      errorManagerInstance.log(`Web Audio API initialization failed, using HTML5 Audio fallback: ${error}`);
+      this.audioContext = null;
+      this.preloadHtmlAudio();
+      this.isAudioReady = true;
+    }
+  }
+
+  private async preloadAllAudio(): Promise<void> {
+    if (!this.audioContext) {
+      return;
+    }
+
+    const loadPromises = Object.entries(sounds).map(async ([key, path]) => {
+      try {
+        if (this.useHtmlAudioFor.has(key)) {
+          // Use HTML5 Audio for complex sounds like chatter
+          const audio = new Audio(path);
+
+          audio.preload = 'auto';
+          audio.volume = this.getVolumeForSound(key);
+          audio.load();
+          this.htmlAudioElements.set(key, audio);
+        } else {
+          // Use Web Audio API for simple sounds
+          const response = await fetch(path);
+          const arrayBuffer = await response.arrayBuffer();
+          const audioBuffer = await this.audioContext?.decodeAudioData(arrayBuffer);
+
+          if (!audioBuffer) {
+            throw new Error(`Failed to decode audio data: ${key}`);
+          }
+
+          this.audioBuffers.set(key, audioBuffer);
+        }
+      } catch (error) {
+        errorManagerInstance.warn(`Failed to load audio: ${key}`, error);
+      }
+    });
+
+    await Promise.all(loadPromises);
+  }
+
+  private preloadHtmlAudio() {
+    // Fallback to HTML5 Audio for all sounds
+    Object.entries(sounds).forEach(([key, path]) => {
+      const audio = new Audio(path);
+
+      audio.preload = 'auto';
+      audio.volume = this.getVolumeForSound(key);
+      audio.load();
+      this.htmlAudioElements.set(key, audio);
+    });
+  }
+
+  private getVolumeForSound(soundKey: string): number {
+    if (soundKey.startsWith('click')) {
+      return 0.25;
+    } else if (soundKey.startsWith('chatter')) {
+      return 0.15;
+    } else if (soundKey === 'loading') {
+      return 0.25;
+    } else if (soundKey === 'export') {
+      return 0.3;
+    } else if (soundKey === 'error2') {
+      return 0.5;
+    }
+
+    return 1.0;
+  }
+
+  private playWithWebAudio(soundKey: string, volume = 1.0): AudioBufferSourceNode | null {
+    if (!this.audioContext || !this.audioBuffers.has(soundKey)) {
+      return null;
+    }
+
+    const buffer = this.audioBuffers.get(soundKey)!;
+    const source = this.audioContext.createBufferSource();
+    const gainNode = this.audioContext.createGain();
+
+    source.buffer = buffer;
+    gainNode.gain.value = volume;
+
+    source.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+
+    // Track playing sound for potential stopping
+    const playingSound: PlayingSound = {
+      source,
+      gainNode,
+      startTime: this.audioContext.currentTime,
+    };
+
+    if (!this.playingSounds.has(soundKey)) {
+      this.playingSounds.set(soundKey, []);
+    }
+    this.playingSounds.get(soundKey)!.push(playingSound);
+
+    // Clean up when finished
+    source.onended = () => {
+      const sounds = this.playingSounds.get(soundKey);
+
+      if (sounds) {
+        const index = sounds.indexOf(playingSound);
+
+        if (index > -1) {
+          sounds.splice(index, 1);
+        }
+      }
+    };
+
+    source.start();
+
+    return source;
+  }
+
+  private playWithHtmlAudio(soundKey: string): boolean {
+    const audio = this.htmlAudioElements.get(soundKey);
+
+    if (!audio) {
+      return false;
+    }
+
+    audio.currentTime = 0;
+    audio.play().catch((error) => {
+      errorManagerInstance.log(`Failed to play HTML audio: ${soundKey} ${error}`);
+    });
+
+    return true;
+  }
 
   addJs = (): void => {
     super.addJs();
@@ -154,8 +200,29 @@ export class SoundManager extends KeepTrackPlugin {
 
     keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, () => {
       this.voices = speechSynthesis.getVoices();
+
+      // Resume audio context if suspended (required by browser autoplay policies)
+      if (this.audioContext?.state === 'suspended') {
+        this.audioContext.resume();
+      }
     });
   };
+
+  /**
+   * Wait for all audio to be ready for playback
+   */
+  async waitForAudioReady(): Promise<void> {
+    if (this.audioLoadingPromise) {
+      await this.audioLoadingPromise;
+    }
+  }
+
+  /**
+   * Check if audio is ready for playback
+   */
+  get audioReady(): boolean {
+    return this.isAudioReady;
+  }
 
   /**
    * Create a new utterance for the specified text and add it to the queue.
@@ -163,26 +230,16 @@ export class SoundManager extends KeepTrackPlugin {
   speak(text: string) {
     if (this.isMute) {
       return;
-    } // Muted
+    }
 
-    // Create a new instance of SpeechSynthesisUtterance.
     const msg = new SpeechSynthesisUtterance();
 
-    // Set the text.
     msg.text = text;
-
-    // Set the attributes.
     msg.volume = 0.5;
     msg.rate = 1;
     msg.pitch = 1;
-
-    /*
-     * If a voice has been selected, find the voice and set the
-     * utterance instance's voice attribute.
-     */
     msg.voice = this.voices.filter((voice) => voice.name === 'Google UK English Female')[0];
 
-    // Queue this utterance.
     window.speechSynthesis.speak(msg);
   }
 
@@ -196,16 +253,47 @@ export class SoundManager extends KeepTrackPlugin {
       return;
     }
 
-    const sound = this.sounds[soundName];
+    // Stop Web Audio API sounds
+    const playingSounds = this.playingSounds.get(soundName);
 
-    if (isFadeout && sound instanceof HTMLAudioElement) {
-      SoundManager.fadeOut_(sound);
+    if (playingSounds) {
+      playingSounds.forEach(({ source, gainNode }) => {
+        if (isFadeout && this.audioContext) {
+          // Fade out over 1 second
+          gainNode.gain.setTargetAtTime(0, this.audioContext.currentTime, 0.3);
+          setTimeout(() => {
+            try {
+              source.stop();
+            } catch {
+              // Source may have already stopped
+            }
+          }, 1000);
+        } else {
+          try {
+            source.stop();
+          } catch {
+            // Source may have already stopped
+          }
+        }
+      });
+      this.playingSounds.set(soundName, []);
+    }
+
+    // Stop HTML5 Audio sounds
+    const htmlAudio = this.htmlAudioElements.get(soundName);
+
+    if (htmlAudio) {
+      if (isFadeout) {
+        SoundManager.fadeOut_(htmlAudio);
+      } else {
+        htmlAudio.pause();
+        htmlAudio.currentTime = 0;
+      }
     }
   }
 
   private static fadeOut_(sound: HTMLAudioElement, duration = 1000) {
     const volumeCached = sound.volume;
-
     const interval = 10;
     const steps = duration / interval;
     const decrement = sound.volume / steps;
@@ -228,71 +316,55 @@ export class SoundManager extends KeepTrackPlugin {
 
   play(soundName: SoundNames) {
     if (navigator.userActivation?.hasBeenActive === false) {
-      // Not active yet
       return;
     }
 
     if (this.isMute) {
       return;
-    } // Muted
+    }
+
     if (getEl('loading-screen')?.classList.contains('fullscreen')) {
       return;
-    } // Not Ready Yet
+    }
+
+    // Resume audio context if needed
+    if (this.audioContext?.state === 'suspended') {
+      this.audioContext.resume();
+    }
 
     let random = 1;
-    let sound: HTMLAudioElement | string;
+    let soundKey: string;
+    let volume: number;
 
     switch (soundName) {
       case SoundNames.BEEP:
         random = Math.floor(Math.random() * 3) + 1;
-        sound = this.sounds[`genericBeep${random}`];
-        if (!SoundManager.isAudioElement_(sound)) {
-          sound = new Audio(sound);
-          this.sounds[`genericBeep${random}`] = sound; // Cache the audio element
-        }
-        sound.play();
+        soundKey = `genericBeep${random}`;
+        volume = this.getVolumeForSound(soundKey);
+        break;
 
-        return;
       case SoundNames.WHOOSH:
         random = Math.floor(Math.random() * 8) + 1;
-        sound = this.sounds[`whoosh${random}`];
-        if (!SoundManager.isAudioElement_(sound)) {
-          sound = new Audio(sound);
-          this.sounds[`whoosh${random}`] = sound; // Cache the audio element
-        }
-        sound.play();
+        soundKey = `whoosh${random}`;
+        volume = this.getVolumeForSound(soundKey);
+        break;
 
-        return;
       case SoundNames.ERROR:
-        if (this.lastLongAudioTime + 1200000 > Date.now()) {
+        if (this.lastLongAudioTime + 30000 > Date.now()) {
           return;
-        } // Don't play if played in last 30 second
-        this.lastLongAudioTime = Date.now();
-        // Random error or error2
-        random = Math.floor(Math.random() * 2) + 1;
-        sound = this.sounds[`error${random}`];
-        if (!SoundManager.isAudioElement_(sound)) {
-          sound = new Audio(sound);
-          // Error2 is too loud, so we reduce its volume
-          if (random === 2) {
-            sound.volume = 0.5;
-          }
-          this.sounds[`error${random}`] = sound; // Cache the audio element
         }
-        sound.play();
+        this.lastLongAudioTime = Date.now();
+        random = Math.floor(Math.random() * 2) + 1;
+        soundKey = `error${random}`;
+        volume = this.getVolumeForSound(soundKey);
+        break;
 
-        return;
       case SoundNames.CLICK:
         random = Math.floor(Math.random() * this.maxClickClip_) + 1;
-        sound = this.sounds[`click${random}`];
-        if (!SoundManager.isAudioElement_(sound)) {
-          sound = new Audio(sound);
-          sound.volume = 0.25;
-          this.sounds[`click${random}`] = sound; // Cache the audio element
-        }
-        sound.play();
+        soundKey = `click${random}`;
+        volume = this.getVolumeForSound(soundKey);
+        break;
 
-        return;
       case SoundNames.CHATTER:
         random = Math.floor(Math.random() * 8) + 1;
         if (random === this.currentChatterClip_) {
@@ -301,41 +373,31 @@ export class SoundManager extends KeepTrackPlugin {
             random = 1;
           }
         }
-        sound = this.sounds[`chatter${random}`];
-        if (!SoundManager.isAudioElement_(sound)) {
-          sound = new Audio(sound);
-          sound.volume = 0.15;
-          this.sounds[`chatter${random}`] = sound; // Cache the audio element
-        }
-        this.stop(SoundNames.CHATTER, false); // Stop all other chatter clips
-        sound.play();
+        soundKey = `chatter${random}`;
 
-        // Play another chatter clip after this one finishes playing
-        sound.addEventListener('ended', () => {
-          this.nextChatter = setTimeout(() => {
-            this.play(SoundNames.CHATTER);
-          }, 10000); // 10 seconds after the clip ends
-        }, { once: true });
+        this.stop(SoundNames.CHATTER, false);
+
+        // Use HTML5 Audio for chatter (better for longer sounds)
+        if (this.playWithHtmlAudio(soundKey)) {
+          const audio = this.htmlAudioElements.get(soundKey)!;
+
+          audio.addEventListener('ended', () => {
+            this.nextChatter = setTimeout(() => {
+              this.play(SoundNames.CHATTER);
+            }, 10000);
+          }, { once: true });
+        }
 
         return;
+
       default:
-        sound = this.sounds[soundName];
-        if (!SoundManager.isAudioElement_(sound)) {
-          sound = new Audio(sound);
-          if (soundName === SoundNames.LOADING) {
-            sound.volume = 0.25;
-          }
-          if (soundName === SoundNames.EXPORT) {
-            sound.volume = 0.3;
-          }
-          this.sounds[soundName] = sound; // Cache the audio element
-        }
-        sound.play();
+        soundKey = soundName;
+        volume = this.getVolumeForSound(soundKey);
+    }
+
+    // Try Web Audio API first, fallback to HTML5 Audio
+    if (!this.playWithWebAudio(soundKey, volume)) {
+      this.playWithHtmlAudio(soundKey);
     }
   }
-
-  private static isAudioElement_(sound: string | HTMLAudioElement): sound is HTMLAudioElement {
-    return sound instanceof HTMLAudioElement;
-  }
 }
-

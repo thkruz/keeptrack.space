@@ -11,7 +11,7 @@ import { Localization } from '@app/locales/locales';
 import { SearchResult } from '@app/singletons/search-manager';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
 
 export class CountriesMenu extends KeepTrackPlugin {

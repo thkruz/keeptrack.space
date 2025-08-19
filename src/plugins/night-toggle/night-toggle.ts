@@ -3,7 +3,7 @@ import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { MenuMode } from '@app/interfaces';
 import dayNightPng from '@public/img/icons/day-night.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 
 export class NightToggle extends KeepTrackPlugin {
   readonly id = 'NightToggle';

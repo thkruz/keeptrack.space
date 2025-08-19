@@ -10,7 +10,7 @@ import { LegendManager } from '@app/static/legend-manager';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
 
 /**

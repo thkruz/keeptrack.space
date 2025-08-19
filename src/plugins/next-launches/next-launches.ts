@@ -8,7 +8,7 @@ import { truncateString } from '@app/lib/truncate-string';
 import { errorManagerInstance } from '@app/singletons/errorManager';
 import calendar2Png from '@public/img/icons/calendar2.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 
 interface LaunchInfoData {
   window_start: string | number | Date;

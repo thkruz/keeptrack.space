@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e, TranslationKey } from '@app/locales/keys';
-import { SoundNames } from '@app/plugins/sounds/SoundNames';
+import { SoundNames } from '@app/plugins/sounds/sounds';
 import { SplashScreen } from '@app/static/splash-screen';
 import { fadeIn, fadeOut } from './fade';
 import { getEl } from './get-el';

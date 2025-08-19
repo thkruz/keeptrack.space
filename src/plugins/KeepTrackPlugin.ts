@@ -12,7 +12,7 @@ import { shake } from '../lib/shake';
 import { slideInRight, slideOutLeft } from '../lib/slide';
 import { errorManagerInstance } from '../singletons/errorManager';
 import type { SelectSatManager } from './select-sat-manager/select-sat-manager';
-import { SoundNames } from './sounds/SoundNames';
+import { SoundNames } from './sounds/sounds';
 
 export interface ClickDragOptions {
   leftOffset?: number;

@@ -11,7 +11,7 @@ import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandO
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { NewLaunch } from '../new-launch/new-launch';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
 
 /**

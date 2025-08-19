@@ -95,17 +95,39 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   downloadIconCb = () => {
     const sensor = keepTrackApi.getSensorManager().getSensor();
 
+    if (!this.lastlooksArray_) {
+      this.refreshSideMenuData_();
+    }
+
+    if (!this.lastlooksArray_) {
+      errorManagerInstance.warn('No look angles available for download!');
+
+      return;
+    }
+
     // Prepare lastlooksArray_ for CSV
+    let sensorDisplayName: string;
+
+    if (sensor) {
+      if (sensor.system) {
+        sensorDisplayName = `${sensor.system} (${sensor.name})`;
+      } else {
+        sensorDisplayName = sensor.name;
+      }
+    } else {
+      sensorDisplayName = 'Unknown Sensor';
+    }
+
     const csvData = this.lastlooksArray_.map((look) => ({
       Time: dateFormat(look.time, 'isoDateTime', false),
-      Type: LookAnglesPlugin.tearrTypeToString_(look.type),
-      Azimuth: look.az.toFixed(1),
-      Elevation: look.el.toFixed(1),
-      Range: look.rng.toFixed(0),
-      Sensor: sensor.system ? `${sensor.system} (${sensor.name})` : sensor.name,
+      Type: LookAnglesPlugin.tearrTypeToString_(look.type as TearrType),
+      Azimuth: look.az?.toFixed(1) ?? 'Unknown',
+      Elevation: look.el?.toFixed(1) ?? 'Unknown',
+      Range: look.rng?.toFixed(0) ?? 'Unknown',
+      Sensor: sensorDisplayName,
     }));
 
-    saveCsv(csvData, `${sensor.shortName ?? sensor.objName ?? 'unk'}-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
+    saveCsv(csvData, `${sensorDisplayName ?? 'unk'}-${(this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum6}-look-angles`);
   };
   sideMenuSecondaryOptions = {
     width: 300,
@@ -117,17 +139,17 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     keepTrackApi.on(
       KeepTrackApiEvents.uiManagerFinal,
       () => {
-        getEl('look-angles-length').addEventListener('change', () => {
+        getEl('look-angles-length')!.addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
           this.refreshSideMenuData_();
         });
 
-        getEl('look-angles-interval').addEventListener('change', () => {
+        getEl('look-angles-interval')!.addEventListener('change', () => {
           this.angleCalculationInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
           this.refreshSideMenuData_();
         });
 
-        getEl('settings-riseset').addEventListener('change', this.settingsRisesetChange_.bind(this));
+        getEl('settings-riseset')!.addEventListener('change', this.settingsRisesetChange_.bind(this));
 
         const sat = this.selectSatManager_.getSelectedSat();
 
@@ -151,7 +173,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     });
   }
 
-  private checkIfCanBeEnabled_(obj: BaseObject) {
+  private checkIfCanBeEnabled_(obj: BaseObject | null) {
     if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
       this.setBottomIconToEnabled();
       if (this.isMenuButtonActive && obj) {
@@ -265,10 +287,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tdT.setAttribute('style', 'text-decoration: underline');
 
     // If isRiseSetOnly is true, add a column for type
-    let tdType = null;
+    const tdType: HTMLTableCellElement = tr.insertCell();
 
     if (lookAngleData.length > 0 && typeof lookAngleData[0].type !== 'undefined') {
-      tdType = tr.insertCell();
 
       tdType.appendChild(document.createTextNode('Type'));
       tdType.setAttribute('style', 'text-decoration: underline');
@@ -334,15 +355,15 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
       if (tdType) {
         tdType = tr.insertCell();
-        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type)));
+        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type ?? TearrType.UNKNOWN)));
       }
 
       tdE = tr.insertCell();
-      tdE.appendChild(document.createTextNode(entry.el.toFixed(1)));
+      tdE.appendChild(document.createTextNode(entry.el?.toFixed(1) ?? 'Unknown'));
       tdA = tr.insertCell();
-      tdA.appendChild(document.createTextNode(entry.az.toFixed(0)));
+      tdA.appendChild(document.createTextNode(entry.az?.toFixed(0) ?? 'Unknown'));
       tdR = tr.insertCell();
-      tdR.appendChild(document.createTextNode(entry.rng.toFixed(0)));
+      tdR.appendChild(document.createTextNode(entry.rng?.toFixed(0) ?? 'Unknown'));
       tdV = tr.insertCell();
       tdV.appendChild(document.createTextNode(entry.canStationObserve ? 'Yes' : 'No'));
       if (entry.canStationObserve) {
@@ -361,6 +382,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         return 'Set';
       case TearrType.MAX_EL:
         return 'Max El';
+      case TearrType.UNKNOWN:
       default:
         return 'Unknown';
     }

@@ -34,6 +34,9 @@ export class SoundManager extends KeepTrackPlugin {
   // Sounds that should always use HTML5 Audio due to length
   private readonly useHtmlAudioFor = new Set(['chatter1', 'chatter2', 'chatter3', 'chatter4', 'chatter5', 'chatter6', 'chatter7', 'chatter8']);
 
+  private readonly LONG_AUDIO_COOLDOWN_MS = 30000;
+  private readonly CHATTER_REPEAT_DELAY_MS = 10000;
+
   constructor() {
     super();
 
@@ -350,7 +353,7 @@ export class SoundManager extends KeepTrackPlugin {
         break;
 
       case SoundNames.ERROR:
-        if (this.lastLongAudioTime + 30000 > Date.now()) {
+        if (this.lastLongAudioTime + this.LONG_AUDIO_COOLDOWN_MS > Date.now()) {
           return;
         }
         this.lastLongAudioTime = Date.now();
@@ -384,7 +387,7 @@ export class SoundManager extends KeepTrackPlugin {
           audio.addEventListener('ended', () => {
             this.nextChatter = setTimeout(() => {
               this.play(SoundNames.CHATTER);
-            }, 10000);
+            }, this.CHATTER_REPEAT_DELAY_MS);
           }, { once: true });
         }
 

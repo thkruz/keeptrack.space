@@ -14,7 +14,7 @@ import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 import { SensorInfoPlugin } from './sensor-info-plugin';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {

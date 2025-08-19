@@ -27,6 +27,7 @@ declare global {
   interface Window {
     settingsManager: SettingsManager;
     settingsOverride: any;
+    webkitAudioContext: any;
   }
   interface Global {
     settingsManager: SettingsManager;

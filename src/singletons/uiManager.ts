@@ -27,7 +27,7 @@
 import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
-import { SoundNames } from '@app/plugins/sounds/SoundNames';
+import { SoundNames } from '@app/plugins/sounds/sounds';
 import { isThisNode } from '@app/static/isThisNode';
 import '@materializecss/materialize';
 import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from 'ootk';

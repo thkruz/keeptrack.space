@@ -9,7 +9,7 @@ import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 
 export class ShortTermFences extends KeepTrackPlugin {
   readonly id = 'ShortTermFences';

@@ -4,7 +4,7 @@ import { getEl } from '@app/lib/get-el';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
 
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////

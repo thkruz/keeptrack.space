@@ -7,7 +7,7 @@ import polarPlotPng from '@public/img/icons/polar-plot.png';
 import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 

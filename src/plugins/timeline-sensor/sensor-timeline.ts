@@ -17,7 +17,7 @@ import {
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorManager } from '../sensor/sensorManager';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 
 import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import { fetchWeatherApi } from 'openmeteo';

@@ -21,7 +21,7 @@ import {
 import { sensorGroups } from '../../catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 import { SensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';

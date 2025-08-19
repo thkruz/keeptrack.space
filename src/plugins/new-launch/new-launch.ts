@@ -19,7 +19,7 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 
 export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';
@@ -45,6 +45,11 @@ export class NewLaunch extends KeepTrackPlugin {
     }
 
     const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
+
+    // Validate satellite before changing DOM
+    if (!(sat instanceof DetailedSatellite) || !sat.sccNum || !sat.inclination || isNaN(sat.inclination)) {
+      return;
+    }
 
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
     (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4).padStart(8, '0');

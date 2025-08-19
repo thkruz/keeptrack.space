@@ -38,7 +38,7 @@ import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { EL as SAT_INFO_EL, SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];

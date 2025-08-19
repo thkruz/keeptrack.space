@@ -56,7 +56,7 @@ import { dateFormat } from '@app/lib/dateFormat';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LlaVec3, calcGmst, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 
 interface GroundTracePoint {
   x: number;

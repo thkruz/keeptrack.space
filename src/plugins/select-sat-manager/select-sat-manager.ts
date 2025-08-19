@@ -11,7 +11,7 @@ import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandO
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { NewLaunch } from '../new-launch/new-launch';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
 
 /**
@@ -31,7 +31,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   primarySatObj: DetailedSatellite | MissileObject = this.noSatObj_;
   /** Ellipsoid radii for the primary satellite in RCI coordinates */
-  primarySatCovMatrix: vec3;
+  primarySatCovMatrix: vec3 | null = null;
   secondarySat = -1;
   secondarySatObj: DetailedSatellite | null = null;
   /** Ellipsoid radii for the secondary satellite in RCI coordinates */

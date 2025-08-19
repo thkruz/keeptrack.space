@@ -32,6 +32,7 @@ export enum TearrType {
   MAX_EL,
   RISE_AND_MAX_EL,
   MAX_EL_AND_SET,
+  UNKNOWN,
 }
 
 export type TearrData = {

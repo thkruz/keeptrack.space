@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.8.2
+
+>  
+
+- feat: :zap: enhance audio playback using Web Audio API
+- fix: :bug: handle potential null values in look angles download and improve data display
+- fix: :bug: handle potential null values in filter settings saving to ensure defaults are applied
+- fix: :bug: handle potential null values for primary satellite covariance matrix in SelectSatManager
+- fix: :bug: handle potential null values in audio playback and error logging
+- fix: :bug: improve error handling in ScreenRecorder and StreamManager to prevent crashes when media recorder is not initialized
+- docs: :loud_sound: add v10.8.1 section to CHANGELOG with updates for new features and fixes
+- fix: :bug: add validation for satellite data before updating DOM elements
+- chore: :bookmark: update subproject commit reference in plugins-pro
+- chore: :bookmark: update subproject commit reference in plugins-pro
+
 #### v10.8.1
 
 >  

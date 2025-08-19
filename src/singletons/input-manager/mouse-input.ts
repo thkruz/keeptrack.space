@@ -1,7 +1,7 @@
 import { GetSatType, KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SoundNames } from '@app/plugins/sounds/SoundNames';
+import { SoundNames } from '@app/plugins/sounds/sounds';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Camera, CameraType } from '@app/singletons/camera';
 import { UrlManager } from '@app/static/url-manager';

@@ -7,7 +7,7 @@ import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SoundNames } from '../sounds/SoundNames';
+import { SoundNames } from '../sounds/sounds';
 import './sat-info-box.css';
 
 const CONTAINER_ID = 'sat-infobox';

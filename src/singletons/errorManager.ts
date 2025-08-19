@@ -42,7 +42,7 @@ export class ErrorManager {
 
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    uiManagerInstance.toast(toastMsg, ToastMsgType.error, true);
+    uiManagerInstance?.toast(toastMsg, ToastMsgType.error, true);
 
     if (isThisNode()) {
       throw e;
@@ -72,7 +72,7 @@ ${e.stack}`,
     if (this.ALLOW_WARN) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(msg, ToastMsgType.serious, true);
+      uiManagerInstance?.toast(msg, ToastMsgType.serious, true);
     }
 
     if (!isHideFromConsole) {
@@ -89,7 +89,7 @@ ${e.stack}`,
     if (this.ALLOW_INFO) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(msg, ToastMsgType.normal, true);
+      uiManagerInstance?.toast(msg, ToastMsgType.normal, true);
     }
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
@@ -105,7 +105,7 @@ ${e.stack}`,
     if (this.ALLOW_LOG) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(msg, ToastMsgType.standby, true);
+      uiManagerInstance?.toast(msg, ToastMsgType.standby, true);
     }
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
@@ -121,7 +121,7 @@ ${e.stack}`,
     if (this.ALLOW_DEBUG) {
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      uiManagerInstance.toast(msg, ToastMsgType.standby, true);
+      uiManagerInstance?.toast(msg, ToastMsgType.standby, true);
       // eslint-disable-next-line no-debugger
       debugger;
     }

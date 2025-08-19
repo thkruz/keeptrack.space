@@ -312,31 +312,31 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   private saveSettings_() {
     const persistenceManagerInstance = PersistenceManager.getInstance();
 
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_PAYLOADS, (settingsManager.filter.payloads as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_ROCKET_BODIES, (settingsManager.filter.rocketBodies as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_DEBRIS, (settingsManager.filter.debris as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_UNKNOWN_TYPE, (settingsManager.filter.unknownType as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_AGENCIES, (settingsManager.filter.agencies as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_LEO, (settingsManager.filter.lEOSatellites as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_HEO, (settingsManager.filter.hEOSatellites as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_MEO, (settingsManager.filter.mEOSatellites as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_GEO, (settingsManager.filter.gEOSatellites as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_VIMPEL, (settingsManager.filter.vimpelSatellites as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_CELESTRAK, (settingsManager.filter.celestrakSatellites as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_NOTIONAL, (settingsManager.filter.notionalSatellites as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_UNITED_STATES, (settingsManager.filter.unitedStates as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_UNITED_KINGDOM, (settingsManager.filter.unitedKingdom as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_FRANCE, (settingsManager.filter.france as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_GERMANY, (settingsManager.filter.germany as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_JAPAN, (settingsManager.filter.japan as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_CHINA, (settingsManager.filter.china as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_INDIA, (settingsManager.filter.india as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_RUSSIA, (settingsManager.filter.russia as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_USSR, (settingsManager.filter.uSSR as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_SOUTH_KOREA, (settingsManager.filter.southKorea as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_AUSTRALIA, (settingsManager.filter.australia as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_OTHER_COUNTRIES, (settingsManager.filter.otherCountries as boolean).toString());
-    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_STARLINK, (settingsManager.filter.starlinkSatellites as boolean).toString());
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_PAYLOADS, (settingsManager.filter.payloads as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_ROCKET_BODIES, (settingsManager.filter.rocketBodies as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_DEBRIS, (settingsManager.filter.debris as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_UNKNOWN_TYPE, (settingsManager.filter.unknownType as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_AGENCIES, (settingsManager.filter.agencies as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_LEO, (settingsManager.filter.lEOSatellites as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_HEO, (settingsManager.filter.hEOSatellites as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_MEO, (settingsManager.filter.mEOSatellites as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_GEO, (settingsManager.filter.gEOSatellites as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_VIMPEL, (settingsManager.filter.vimpelSatellites as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_CELESTRAK, (settingsManager.filter.celestrakSatellites as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_NOTIONAL, (settingsManager.filter.notionalSatellites as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_UNITED_STATES, (settingsManager.filter.unitedStates as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_UNITED_KINGDOM, (settingsManager.filter.unitedKingdom as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_FRANCE, (settingsManager.filter.france as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_GERMANY, (settingsManager.filter.germany as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_JAPAN, (settingsManager.filter.japan as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_CHINA, (settingsManager.filter.china as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_INDIA, (settingsManager.filter.india as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_RUSSIA, (settingsManager.filter.russia as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_USSR, (settingsManager.filter.uSSR as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_SOUTH_KOREA, (settingsManager.filter.southKorea as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_AUSTRALIA, (settingsManager.filter.australia as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_OTHER_COUNTRIES, (settingsManager.filter.otherCountries as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_STARLINK, (settingsManager.filter.starlinkSatellites as boolean)?.toString() ?? 'true');
   }
 
   private loadSettings_() {

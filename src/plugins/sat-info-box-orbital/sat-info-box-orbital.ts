@@ -179,26 +179,33 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     }
 
     const covMatrix = keepTrackApi.getPlugin(SelectSatManager)!.primarySatCovMatrix;
-    let covRadial = covMatrix[0];
-    let covCrossTrack = covMatrix[1];
-    let covInTrack = covMatrix[2];
 
-    const useKm =
-      covRadial > 0.5 &&
-      covCrossTrack > 0.5 &&
-      covInTrack > 0.5;
+    if (covMatrix) {
+      let covRadial = covMatrix[0];
+      let covCrossTrack = covMatrix[1];
+      let covInTrack = covMatrix[2];
 
-    if (useKm) {
-      getEl('sat-uncertainty-radial')!.innerHTML = `${(covMatrix[0]).toFixed(2)} km`;
-      getEl('sat-uncertainty-crosstrack')!.innerHTML = `${(covMatrix[1]).toFixed(2)} km`;
-      getEl('sat-uncertainty-intrack')!.innerHTML = `${(covMatrix[2]).toFixed(2)} km`;
+      const useKm =
+        covRadial > 0.5 &&
+        covCrossTrack > 0.5 &&
+        covInTrack > 0.5;
+
+      if (useKm) {
+        getEl('sat-uncertainty-radial')!.innerHTML = `${(covMatrix[0]).toFixed(2)} km`;
+        getEl('sat-uncertainty-crosstrack')!.innerHTML = `${(covMatrix[1]).toFixed(2)} km`;
+        getEl('sat-uncertainty-intrack')!.innerHTML = `${(covMatrix[2]).toFixed(2)} km`;
+      } else {
+        covRadial *= 1000;
+        covCrossTrack *= 1000;
+        covInTrack *= 1000;
+        getEl('sat-uncertainty-radial')!.innerHTML = `${covRadial.toFixed(2)} m`;
+        getEl('sat-uncertainty-crosstrack')!.innerHTML = `${covCrossTrack.toFixed(2)} m`;
+        getEl('sat-uncertainty-intrack')!.innerHTML = `${covInTrack.toFixed(2)} m`;
+      }
     } else {
-      covRadial *= 1000;
-      covCrossTrack *= 1000;
-      covInTrack *= 1000;
-      getEl('sat-uncertainty-radial')!.innerHTML = `${covRadial.toFixed(2)} m`;
-      getEl('sat-uncertainty-crosstrack')!.innerHTML = `${covCrossTrack.toFixed(2)} m`;
-      getEl('sat-uncertainty-intrack')!.innerHTML = `${covInTrack.toFixed(2)} m`;
+      getEl('sat-uncertainty-radial')!.innerHTML = 'Unknown';
+      getEl('sat-uncertainty-crosstrack')!.innerHTML = 'Unknown';
+      getEl('sat-uncertainty-intrack')!.innerHTML = 'Unknown';
     }
 
     const secondarySatObj = keepTrackApi.getPlugin(SelectSatManager)!.secondarySatObj;

@@ -31,7 +31,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   primarySatObj: DetailedSatellite | MissileObject = this.noSatObj_;
   /** Ellipsoid radii for the primary satellite in RCI coordinates */
-  primarySatCovMatrix: vec3;
+  primarySatCovMatrix: vec3 | null = null;
   secondarySat = -1;
   secondarySatObj: DetailedSatellite | null = null;
   /** Ellipsoid radii for the secondary satellite in RCI coordinates */

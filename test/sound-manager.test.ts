@@ -1,7 +1,7 @@
 import { KeepTrackApiEvents } from '@app/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
-import { SoundNames } from '@app/plugins/sounds/sounds';
+import { SoundNames, sounds } from '@app/plugins/sounds/sounds';
 import { standardPluginSuite } from './generic-tests';
 
 describe('Sound Manager', () => {
@@ -14,8 +14,6 @@ describe('Sound Manager', () => {
   standardPluginSuite(SoundManager, 'SoundManager');
 
   it('should_play_sound', () => {
-    const sounds = soundManagerPlugin.sounds;
-
     expect(sounds).toBeDefined();
     expect(sounds.click).toBeDefined();
 

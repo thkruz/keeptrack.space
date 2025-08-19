@@ -186,7 +186,7 @@ export class SoundManager extends KeepTrackPlugin {
     }
 
     audio.currentTime = 0;
-    audio.play().catch((error) => {
+    audio.play()?.catch((error) => {
       errorManagerInstance.log(`Failed to play HTML audio: ${soundKey} ${error}`);
     });
 

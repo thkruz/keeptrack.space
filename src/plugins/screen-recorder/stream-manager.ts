@@ -89,7 +89,10 @@ export class StreamManager {
 
   stop(): void {
     if (!this.mediaRecorder_) {
-      throw new Error('MediaRecorder is not initialized');
+      this.isVideoRecording = false;
+      this.onStop_();
+
+      return; // No recorder to stop
     }
     if (this.isVideoRecording === false) {
       return;
@@ -107,6 +110,10 @@ export class StreamManager {
   }
 
   save(fileName: string): void {
+    if (!this.mediaRecorder_) {
+      return; // No recorder to save
+    }
+
     const name = fileName;
     const blob = new Blob(this.recordedBlobs, { type: this.supportedType });
     const url = window.URL.createObjectURL(blob);

@@ -25,7 +25,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
         this.setBottomIconToSelected();
         this.streamManagerInstance_.start();
         this.streamManagerInstance_.isVideoRecording = true;
-      } catch (e) {
+      } catch {
         errorManagerInstance.warn('Compatibility Error with Recording!');
         this.streamManagerInstance_.isVideoRecording = false;
         this.setBottomIconToDisabled();

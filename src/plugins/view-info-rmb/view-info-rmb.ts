@@ -125,6 +125,14 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
       return;
     }
 
+    const firstSensor = keepTrackApi.getSensorManager().currentSensors[0];
+
+    if (!firstSensor) {
+      errorManagerInstance.warn('Sensor not found! Select a sensor first.');
+
+      return;
+    }
+
     if (!sensorInfoPluginInstance.isMenuButtonActive) {
       sensorInfoPluginInstance.setBottomIconToSelected();
       sensorInfoPluginInstance.openSideMenu();

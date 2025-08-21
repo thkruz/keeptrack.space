@@ -49,6 +49,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     order: number;
   }[] = [];
   private isVisible_ = false;
+  private isHtmlReady_ = false;
 
   addHtml(): void {
     super.addHtml();
@@ -211,6 +212,8 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     // Create a Sat Info Box Initializing Script
     this.initDraggabilly();
+
+    this.isHtmlReady_ = true;
   }
 
   private createHeader(): string {
@@ -261,6 +264,12 @@ export class SatInfoBox extends KeepTrackPlugin {
 
   private updateHeaderData_(obj: BaseObject): void {
     if (!obj || obj.isStatic() || obj.isSensor()) {
+      return;
+    }
+
+    if (!this.isHtmlReady_) {
+      setTimeout(() => this.updateHeaderData_(obj), 500);
+
       return;
     }
 

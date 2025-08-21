@@ -398,6 +398,22 @@ export class NewLaunch extends KeepTrackPlugin {
     const type = inputParams.type;
     const intl = `${inputParams.epochYear}69B`; // International designator
 
+    // Verify ecen, epochyr, epochday formats
+    if (!(/^\d{7}$/u).test(inputParams.eccentricity.toString()?.split('.')[1]?.padStart(7, '0'))) {
+      keepTrackApi.getUiManager().toast('Invalid eccentricity format!', ToastMsgType.critical, true);
+      throw new Error('Invalid eccentricity format');
+    }
+
+    if (!(/^\d{2}$/u).test(inputParams.epochYear.toString()?.padStart(2, '0'))) {
+      keepTrackApi.getUiManager().toast('Invalid epoch year format!', ToastMsgType.critical, true);
+      throw new Error('Invalid epoch year format');
+    }
+
+    if (!(/^\d{3}$/u).test(inputParams.epochDay.toString()?.padStart(3, '0'))) {
+      keepTrackApi.getUiManager().toast('Invalid epoch day format!', ToastMsgType.critical, true);
+      throw new Error('Invalid epoch day format');
+    }
+
     // Create TLE from parameters
     const { tle1: tle1_, tle2 } = FormatTle.createTle({
       sat: inputParams,

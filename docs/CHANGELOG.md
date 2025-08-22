@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.8.3
+
+>  
+
+- fix: :bug: add validation for eccentricity, epoch year, and epoch day formats in createNominalSat_
+- docs: :loud_sound: update CHANGELOG for v10.8.2 with new features and bug fixes
+- fix: :bug: ensure HTML is ready before updating header data in SatInfoBox
+- fix: :bug: add sensor existence check before accessing sensor info in viewSensorInfoRmb
+- refactor: :recycle: replace magic numbers with constants for long audio cooldown and chatter repeat delay
+- feat: :sparkles: add new achievement images for ISS and Vanguard
+- chore: :bookmark: update version to 10.8.2 in README and version.js
+- fix: :bug: add color scheme validation before updating last satellite color
+- chore: :bookmark: update subproject commit reference in plugins-pro
+- fix: :bug: adjust cloud color intensity calculation for improved visual quality
+
 #### v10.8.2
 
 >  

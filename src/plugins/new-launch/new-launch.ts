@@ -399,7 +399,8 @@ export class NewLaunch extends KeepTrackPlugin {
     const intl = `${inputParams.epochYear}69B`; // International designator
 
     // Verify ecen, epochyr, epochday formats
-    if (!(/^\d{7}$/u).test(inputParams.eccentricity.toString()?.split('.')[1]?.padStart(7, '0'))) {
+    const eccFrac = inputParams.eccentricity.toString().split('.')[1] ?? '0';
+    if (!(/^\d{7}$/u).test(eccFrac.padStart(7, '0'))) {
       keepTrackApi.getUiManager().toast('Invalid eccentricity format!', ToastMsgType.critical, true);
       throw new Error('Invalid eccentricity format');
     }

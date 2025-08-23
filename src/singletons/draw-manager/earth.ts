@@ -749,7 +749,7 @@ export class Earth {
         uv.x -= uCloudPosition;
 
         vec3 cloudsColor = textureLod(uCloudsMap, uv, -1.0).rgb * diffuse;
-        fragColor.rgb += cloudsColor * 0.8 * pow(uZoomLevel, 2.5);
+        fragColor.rgb += cloudsColor * 1.0 * pow(uZoomLevel, 2.0);
 
       // ...............................................
 

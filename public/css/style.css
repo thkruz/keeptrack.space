@@ -1000,7 +1000,7 @@ input:focus {
 }
 
 #nav-mobile2 a:hover {
-  filter: brightness(3);
+  filter: brightness(2);
 }
 
 #sensor-selected-container:hover,
@@ -1171,7 +1171,6 @@ input:focus {
 }
 
 #github-share1 img,
-#top-menu-user-account-btn img,
 #legend-icon img,
 #tutorial-icon img,
 #fullscreen-icon img,

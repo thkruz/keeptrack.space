@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v10.8.4
+
+>  
+
+- chore: :bookmark: update version to 10.8.3 in README, CHANGELOG, and version.js
+- feat: add new achievement and icon images; update subproject reference
+- Update src/plugins/new-launch/new-launch.ts
+- chore: :bookmark: update subproject commit reference in src/plugins-pro
+- fix: :rotating_light: fix linter error
+
 #### v10.8.3
 
 >  

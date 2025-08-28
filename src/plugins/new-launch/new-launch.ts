@@ -102,6 +102,9 @@ export class NewLaunch extends KeepTrackPlugin {
         <div id="newLaunch-content" class="side-menu">
           <div class="row">
             <h5 class="center-align">New Launch</h5>
+            <div class="center-align" style="margin: 0em 0.75em 1.5em 0.75em; color: #888; font-size: 0.95em;">
+              Note: This tool is optimized for LEO satellites and may not work correctly for HEO or GEO orbits.
+            </div>
             <form id="${this.sideMenuElementName}-form" class="col s12">
               <div class="input-field col s12">
                 <input disabled value="00005" id="nl-scc" type="text">
@@ -403,17 +406,17 @@ export class NewLaunch extends KeepTrackPlugin {
 
     if (!(/^\d{7}$/u).test(eccFrac.padStart(7, '0'))) {
       keepTrackApi.getUiManager().toast('Invalid eccentricity format!', ToastMsgType.critical, true);
-      throw new Error('Invalid eccentricity format');
+      errorManagerInstance.warn('There was an issue with this satellite\'s eccentricity format. Try a different satellite.');
     }
 
     if (!(/^\d{2}$/u).test(inputParams.epochYear.toString()?.padStart(2, '0'))) {
       keepTrackApi.getUiManager().toast('Invalid epoch year format!', ToastMsgType.critical, true);
-      throw new Error('Invalid epoch year format');
+      errorManagerInstance.warn('There was an issue with this satellite\'s epoch year format. Try a different satellite.');
     }
 
-    if (!(/^\d{3}$/u).test(inputParams.epochDay.toString()?.padStart(3, '0'))) {
-      keepTrackApi.getUiManager().toast('Invalid epoch day format!', ToastMsgType.critical, true);
-      throw new Error('Invalid epoch day format');
+    if (!(/^(?:\d{3}\.\d{8})$/u).test(inputParams.epochDay.toFixed(8).padStart(12, '0'))) {
+      keepTrackApi.getUiManager().toast('Invalid epoch day format! Must be 3 digits, a decimal, and 8 digits after the decimal.', ToastMsgType.critical, true);
+      errorManagerInstance.warn('There was an issue with this satellite\'s epoch day format. Try a different satellite.');
     }
 
     // Create TLE from parameters

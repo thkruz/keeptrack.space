@@ -1,9 +1,9 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { Classification, ClassificationString } from '@app/app/ui/classification';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { Classification, ClassificationString } from '@app/static/classification';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 export class ClassificationBar extends KeepTrackPlugin {
   readonly id = 'ClassificationBar';

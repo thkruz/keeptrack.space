@@ -1,13 +1,13 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { LineManager } from '@app/singletons/draw-manager/line-manager';
-import { SensorToMoonLine } from '@app/singletons/draw-manager/line-manager/sensor-to-moon-line';
-import { SensorToSunLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sun-line';
 import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { RfSensor, SpaceObjectType } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
+import { LineManager } from '@app/engine/rendering/line-manager';
+import { SensorToMoonLine } from '@app/engine/rendering/line-manager/sensor-to-moon-line';
+import { SensorToSunLine } from '@app/engine/rendering/line-manager/sensor-to-sun-line';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   readonly id = 'SensorInfoPlugin';

@@ -1,6 +1,6 @@
-import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/lib/constants';
-import { Camera, CameraType } from '@app/singletons/camera';
-import { SatMath } from '@app/static/sat-math';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { Camera, CameraType } from '@app/engine/input/camera';
+import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { DEG2RAD, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 

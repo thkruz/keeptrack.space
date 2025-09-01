@@ -1,13 +1,13 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManagerOverride } from '@app/settings/settings';
 import { DetailedSatellite, Milliseconds, Satellite } from 'ootk';
+import { CatalogLoader } from '../src/app/data/catalog-loader';
+import { UiManager } from '../src/app/ui/uiManager';
 import { keepTrackContainer } from '../src/container';
-import { SatCruncherMessageData, Singletons } from '../src/interfaces';
+import { SatCruncherMessageData, Singletons } from '../src/engine/core/interfaces';
+import { OrbitManager } from '../src/engine/rendering/orbitManager';
+import { WebGLRenderer } from '../src/engine/rendering/webgl-renderer';
 import { CatalogManager } from '../src/singletons/catalog-manager';
-import { OrbitManager } from '../src/singletons/orbitManager';
-import { UiManager } from '../src/singletons/uiManager';
-import { WebGLRenderer } from '../src/singletons/webgl-renderer';
-import { CatalogLoader } from '../src/static/catalog-loader';
 import { KeepTrack } from './../src/keeptrack';
 import { defaultSat } from './environment/apiMocks';
 import { mockCameraManager, setupDefaultHtml } from './environment/standard-env';

@@ -5,16 +5,15 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-params */
 /* eslint-disable max-lines */
-import { MissileParams, ToastMsgType } from '@app/interfaces';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { MissileParams, ToastMsgType } from '@app/engine/core/interfaces';
+import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
+import { jday } from '@app/engine/utils/transforms';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { RADIUS_OF_EARTH } from '@app/lib/constants';
-import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
-
-import { jday } from '@app/lib/transforms';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, Degrees, EciVec3, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from 'ootk';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
+import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
 
 let BurnRate: number, EarthMass: number, EarthRadius: number, FuelDensity: number, G: number, R: number, WarheadMass: number, h: number;
 const missileArray: MissileObject[] = [];

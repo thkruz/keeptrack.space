@@ -23,16 +23,16 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import analysisPng from '@public/img/icons/reports.png';
 
 
 import { t7e } from '@app/locales/keys';
 import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 interface ReportData {

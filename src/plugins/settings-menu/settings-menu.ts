@@ -1,15 +1,15 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { LegendManager } from '@app/app/ui/legend-manager';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { ColorPick } from '@app/engine/utils/color-pick';
+import { getEl, hideEl } from '@app/engine/utils/get-el';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { parseRgba } from '@app/engine/utils/rgba';
+import { rgbCss } from '@app/engine/utils/rgbCss';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { ColorPick } from '@app/lib/color-pick';
-import { getEl, hideEl } from '@app/lib/get-el';
-import { parseRgba } from '@app/lib/rgba';
-import { rgbCss } from '@app/lib/rgbCss';
 import { SettingsManager } from '@app/settings/settings';
-import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { LegendManager } from '@app/static/legend-manager';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import settingsPng from '@public/img/icons/settings.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
 
@@ -34,7 +34,7 @@ import { TimeMachine } from '../time-machine/time-machine';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-declare module '@app/interfaces' {
+declare module '@app/engine/core/interfaces' {
   interface UserSettings {
     isBlackEarth: boolean;
     isDrawMilkyWay: boolean;

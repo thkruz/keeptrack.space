@@ -19,11 +19,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fencePng from '@public/img/icons/fence.png';
 import { DetailedSensor } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
 

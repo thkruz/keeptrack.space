@@ -1,13 +1,13 @@
-import { sensors } from '@app/catalogs/sensors';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
+import { sensors } from '@app/app/data/catalogs/sensors';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { dateFormat } from '@app/engine/utils/dateFormat';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { saveCsv } from '@app/engine/utils/saveVariable';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { dateFormat } from '@app/lib/dateFormat';
-import { getEl } from '@app/lib/get-el';
-import { saveCsv } from '@app/lib/saveVariable';
-import { showLoading } from '@app/lib/showLoading';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
-import { SensorMath, TearrData } from '@app/static/sensor-math';
 import tableRowsPng from '@public/img/icons/table-rows.png';
 import {
   BaseObject,
@@ -18,11 +18,11 @@ import {
   SpaceObjectType,
   TAU,
 } from 'ootk';
-import { sensorGroups } from '../../catalogs/sensor-groups';
-import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
+import { SensorManager } from '../../app/sensors/sensorManager';
+import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
+import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { SensorManager } from './sensorManager';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];

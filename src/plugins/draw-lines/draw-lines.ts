@@ -1,14 +1,14 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
-import { hideEl } from '@app/lib/get-el';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
-import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { hideEl } from '@app/engine/utils/get-el';
 import { DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { lineManagerInstance } from '@app/engine/rendering/line-manager';
+import { LineColors } from '@app/engine/rendering/line-manager/line';
 
 export class DrawLinesPlugin extends KeepTrackPlugin {
   readonly id = 'DrawLinesPlugin';

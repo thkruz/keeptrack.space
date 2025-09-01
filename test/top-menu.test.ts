@@ -1,10 +1,10 @@
 import { keepTrackContainer } from '@app/container';
-import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, Singletons } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import { setupMinimumHtml } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
 

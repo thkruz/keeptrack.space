@@ -9,16 +9,16 @@ import {
   Sgp4,
   Tle,
 } from 'ootk';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
-import { countryCodeList, countryNameList } from '@app/catalogs/countries';
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { getEl } from '@app/lib/get-el';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
 

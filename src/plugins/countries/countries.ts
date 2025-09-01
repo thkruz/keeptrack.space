@@ -1,15 +1,15 @@
-import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl } from '@app/lib/get-el';
+import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { getEl } from '@app/engine/utils/get-el';
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { GroupType } from '@app/app/data/object-group';
+import { StringExtractor } from '@app/app/ui/string-extractor';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { GroupType } from '@app/singletons/object-group';
-import { StringExtractor } from '@app/static/string-extractor';
 import flagPng from '@public/img/icons/flag.png';
 
+import { SearchResult } from '@app/app/ui/search-manager';
 import { Localization } from '@app/locales/locales';
-import { SearchResult } from '@app/singletons/search-manager';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';

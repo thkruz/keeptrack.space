@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';

@@ -19,13 +19,13 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { getEl } from '@app/engine/utils/get-el';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
 import { BaseObject, Degrees } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 

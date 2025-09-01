@@ -1,9 +1,9 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
 
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 
 /**
@@ -27,7 +27,7 @@ import { SoundNames } from '../sounds/sounds';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-declare module '@app/interfaces' {
+declare module '@app/engine/core/interfaces' {
   interface UserSettings {
     isBlackEarth: boolean;
     isDrawMilkyWay: boolean;

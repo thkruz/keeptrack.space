@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { CameraType } from '@app/engine/input/camera';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CameraType } from '@app/singletons/camera';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 

@@ -1,4 +1,4 @@
-import { getEl } from '@app/lib/get-el';
+import { getEl } from '@app/engine/utils/get-el';
 import { DebrisScreening } from '@app/plugins/debris-screening/debris-screening';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';

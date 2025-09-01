@@ -1,9 +1,9 @@
 import { keepTrackContainer } from '@app/container';
-import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, Singletons } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames, sounds } from './sounds';
 
 interface PlayingSound {

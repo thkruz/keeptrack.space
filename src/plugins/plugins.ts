@@ -1,14 +1,15 @@
+import * as catalogLoader from '@app/app/data/catalog-loader';
 import { CountriesMenu } from '@app/plugins/countries/countries';
 import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import * as catalogLoader from '@app/static/catalog-loader';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { KeepTrackPlugin } from '../engine/plugins/base-plugin';
+import { errorManagerInstance } from '../engine/utils/errorManager';
+import { getEl } from '../engine/utils/get-el';
 import { KeepTrackApi } from '../keepTrackApi';
-import { getEl } from '../lib/get-el';
-import { errorManagerInstance } from '../singletons/errorManager';
 import { AnalysisMenu } from './analysis/analysis';
 import { Breakup } from './breakup/breakup';
 import { Calculator } from './calculator/calculator';
@@ -25,7 +26,6 @@ import { EditSat } from './edit-sat/edit-sat';
 import { FilterMenuPlugin } from './filter-menu/filter-menu';
 import { GamepadPlugin } from './gamepad/gamepad';
 import { KeepTrackPluginsConfiguration } from './keeptrack-plugins-configuration';
-import { KeepTrackPlugin } from './KeepTrackPlugin';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
 import { MissilePlugin } from './missile/missile-plugin';
 import { NewLaunch } from './new-launch/new-launch';

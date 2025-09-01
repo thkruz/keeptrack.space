@@ -1,12 +1,12 @@
-import { EChartsData, MenuMode } from '@app/interfaces';
+import { EChartsData, MenuMode } from '@app/engine/core/interfaces';
+import { SatMathApi } from '@app/engine/math/sat-math-api';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { SatMathApi } from '@app/singletons/sat-math-api';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { DetailedSatellite } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 type EChartsOption = echarts.EChartsOption;

@@ -1,16 +1,16 @@
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
 import gpsPng from '@public/img/icons/gps.png';
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import type { CatalogManager } from '@app/singletons/catalog-manager';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import type { GroupsManager } from '@app/singletons/groups-manager';
-import { GroupType } from '@app/singletons/object-group';
-import { DopMath } from '@app/static/dop-math';
+import type { GroupsManager } from '@app/app/data/groups-manager';
+import { GroupType } from '@app/app/data/object-group';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { DopMath } from '@app/engine/math/dop-math';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { CatalogManager } from '@app/app/data/catalog-manager';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';

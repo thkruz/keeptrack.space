@@ -1,12 +1,12 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
-import { SatMath } from '@app/static/sat-math';
 import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import { DetailedSatellite, Hours, Kilometers, Milliseconds, Minutes, PosVel, Seconds, Sgp4 } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class DebrisScreening extends KeepTrackPlugin {

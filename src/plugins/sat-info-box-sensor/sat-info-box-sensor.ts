@@ -1,18 +1,18 @@
 /* eslint-disable max-lines */
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
+import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import type { TimeManager } from '@app/engine/core/time-manager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import type { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import type { TimeManager } from '@app/singletons/time-manager';
-import { SatMath, SunStatus } from '@app/static/sat-math';
-import { SensorMath, TearrData } from '@app/static/sensor-math';
 import { BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, RfSensor, SpaceObjectType, Sun, SunTime } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import type { SensorManager } from '../../app/sensors/sensorManager';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import type { SensorManager } from '../sensor/sensorManager';
 import { StereoMap } from '../stereo-map/stereo-map';
 
 const SECTIONS = {

@@ -18,20 +18,20 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, SensorGeolocation } from '@app/interfaces';
+import { MobileManager } from '@app/app/ui/mobileManager';
+import { KeepTrackApiEvents, MenuMode, SensorGeolocation } from '@app/engine/core/interfaces';
+import { UrlManager } from '@app/engine/input/url-manager';
+import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
+import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
+import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
+import { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
-import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
-import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
-import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
-import { SunTextureQuality } from '@app/singletons/draw-manager/sun';
-import { MobileManager } from '@app/singletons/mobileManager';
-import { UrlManager } from '@app/static/url-manager';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
-import { RADIUS_OF_EARTH } from '../lib/constants';
-import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
-import { ClassificationString } from '../static/classification';
-import { isThisNode } from '../static/isThisNode';
+import { ClassificationString } from '../app/ui/classification';
+import { RADIUS_OF_EARTH } from '../engine/utils/constants';
+import { isThisNode } from '../engine/utils/isThisNode';
+import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import { defaultColorSettings } from './default-color-settings';
 import { defaultPlugins } from './default-plugins';
 import { parseGetVariables } from './parse-get-variables';

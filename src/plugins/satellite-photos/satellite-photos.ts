@@ -1,13 +1,13 @@
-import { openColorbox } from '@app/lib/colorbox';
-import { getEl } from '@app/lib/get-el';
-import { lat2pitch, lon2yaw } from '@app/lib/transforms';
+import { openColorbox } from '@app/engine/utils/colorbox';
+import { getEl } from '@app/engine/utils/get-el';
+import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import photoManagerPng from '@public/img/icons/photoManager.png';
 import { Degrees } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 interface DiscvrResponse {

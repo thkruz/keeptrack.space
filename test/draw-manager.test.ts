@@ -1,8 +1,8 @@
 /* eslint-disable dot-notation */
+import { CameraType } from '@app/engine/input/camera';
+import { Moon } from '@app/engine/rendering/draw-manager/moon';
+import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CameraType } from '@app/singletons/camera';
-import { Moon } from '@app/singletons/draw-manager/moon';
-import { WebGLRenderer } from '@app/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 

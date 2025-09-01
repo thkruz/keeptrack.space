@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable global-require */
 
-import { ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
+import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
 import { GetVariables } from '@app/settings/getVariables';
 import { parseGetVariables } from '@app/settings/parse-get-variables';
 import { SettingsManager } from '@app/settings/settings';
-import { EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 
 describe('parseGetVariables', () => {
   let settingsManager: SettingsManager;

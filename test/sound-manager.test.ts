@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SoundNames, sounds } from '@app/plugins/sounds/sounds';

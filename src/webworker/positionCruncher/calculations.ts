@@ -1,7 +1,7 @@
 import { Degrees, GreenwichMeanSiderealTime, Kilometers, LlaVec3, MILLISECONDS_TO_DAYS, PI, RAD2DEG, Radians, RaeVec3, Sensor, Sgp4, SpaceObjectType, rae2eci } from 'ootk';
-import { SensorObjectCruncher } from '../../interfaces';
-import { A } from '../../lib/external/meuusjs';
-import { jday } from '../../lib/transforms';
+import { SensorObjectCruncher } from '../../engine/core/interfaces';
+import { A } from '../../engine/utils/external/meuusjs';
+import { jday } from '../../engine/utils/transforms';
 import { oneOrZero } from '../constants';
 
 /* Returns Current Propagation Time */
@@ -64,7 +64,7 @@ export const isInFov = (sensor: SensorObjectCruncher, lookangles?: RaeVec3): one
     }
   } else if (
     (az >= sensor.minAz && az <= sensor.maxAz && el >= sensor.minEl && el <= sensor.maxEl && rng <= sensor.maxRng && rng >= sensor.minRng) ||
-      (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
+    (az >= sensor.minAz2 && az <= sensor.maxAz2 && el >= sensor.minEl2 && el <= sensor.maxEl2 && rng <= sensor.maxRng2 && rng >= sensor.minRng2)
   ) {
     return 1;
   }

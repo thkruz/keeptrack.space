@@ -1,12 +1,12 @@
-import { EChartsData, GetSatType } from '@app/interfaces';
+import { EChartsData, GetSatType } from '@app/engine/core/interfaces';
+import { SatMathApi } from '@app/engine/math/sat-math-api';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { SatMathApi } from '@app/singletons/sat-math-api';
 import waterfallPng from '@public/img/icons/waterfall.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { Degrees, DetailedSatellite, SpaceObjectType } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Time2LonPlots extends KeepTrackPlugin {

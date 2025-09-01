@@ -1,8 +1,8 @@
-import { GetSatType } from '@app/interfaces';
+import { CatalogExporter } from '@app/app/data/catalog-exporter';
+import { CatalogSearch } from '@app/app/data/catalog-search';
+import { GetSatType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { CatalogExporter } from '@app/static/catalog-exporter';
-import { CatalogSearch } from '@app/static/catalog-search';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, SpaceObjectType } from 'ootk';
 import { CatalogManager } from './../src/singletons/catalog-manager';
 import { defaultSat } from './environment/apiMocks';

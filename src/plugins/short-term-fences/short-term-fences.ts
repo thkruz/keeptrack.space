@@ -1,12 +1,12 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import wifiFindPng from '@public/img/icons/wifi-find.png';
 
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';

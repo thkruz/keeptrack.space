@@ -1,10 +1,10 @@
+import { SensorManager } from '@app/app/sensors/sensorManager';
 import { keepTrackContainer } from '@app/container';
-import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { KeepTrackApiEvents, Singletons } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
-import { SensorManager } from '@app/plugins/sensor/sensorManager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';

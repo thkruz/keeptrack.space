@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Milliseconds } from 'ootk';

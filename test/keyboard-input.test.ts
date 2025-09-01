@@ -1,7 +1,7 @@
+import { KeyboardInput } from '@app/engine/input/input-manager/keyboard-input';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
-import { KeyboardInput } from '@app/singletons/input-manager/keyboard-input';
 import { keepTrackContainer } from '../src/container';
-import { Singletons } from '../src/interfaces';
+import { Singletons } from '../src/engine/core/interfaces';
 
 describe('KeyboardInput_class', () => {
   // Tests that keyHandler does not execute if uiManagerInstance.isCurrentlyTyping is true

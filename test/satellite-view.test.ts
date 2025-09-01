@@ -1,12 +1,12 @@
+import { UiManager } from '@app/app/ui/uiManager';
 import { keepTrackContainer } from '@app/container';
-import { KeepTrackApiEvents, Singletons, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, Singletons, ToastMsgType } from '@app/engine/core/interfaces';
+import { Camera, CameraType } from '@app/engine/input/camera';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { t7e } from '@app/locales/keys';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Camera, CameraType } from '@app/singletons/camera';
-import { UiManager } from '@app/singletons/uiManager';
 import { mockCameraManager, mockUiManager } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
 

@@ -1,7 +1,7 @@
+import { ClassificationString } from '@app/app/ui/classification';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { ClassificationBar } from '@app/plugins/classification-bar/classification-bar';
-import { ClassificationString } from '@app/static/classification';
 import { setupMinimumHtml } from './environment/standard-env';
 import { standardPluginInit, standardPluginSuite } from './generic-tests';
 

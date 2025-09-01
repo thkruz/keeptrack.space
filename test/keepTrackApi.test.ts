@@ -1,5 +1,5 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
-import { isThisNode } from '@app/static/isThisNode';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { isThisNode } from '@app/engine/utils/isThisNode';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from 'ootk';
 import { keepTrackApi } from '../src/keepTrackApi';

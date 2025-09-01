@@ -1,12 +1,12 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { GroupType } from '@app/app/data/object-group';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { saveCsv } from '@app/engine/utils/saveVariable';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { saveCsv } from '@app/lib/saveVariable';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { GroupType } from '@app/singletons/object-group';
 import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
 import { BaseObject, DetailedSatellite } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 

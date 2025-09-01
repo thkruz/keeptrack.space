@@ -1,9 +1,9 @@
+import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
+import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
 import { keepTrackApi } from '../../keepTrackApi';
-import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
-import { lat2pitch, lon2yaw } from '../../lib/transforms';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
 

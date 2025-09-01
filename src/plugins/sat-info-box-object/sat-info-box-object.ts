@@ -1,16 +1,16 @@
 /* eslint-disable max-lines */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { StringExtractor } from '@app/app/ui/string-extractor';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { openColorbox } from '@app/engine/utils/colorbox';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { openColorbox } from '@app/lib/colorbox';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
-import { StringExtractor } from '@app/static/string-extractor';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 
 const SECTIONS = {
   OBJECT: 'object-section',

@@ -1,10 +1,10 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { getEl } from '@app/engine/utils/get-el';
+import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl } from '@app/lib/get-el';
-import { hideLoading, showLoading } from '@app/lib/showLoading';
 import rocketPng from '@public/img/icons/rocket.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from './missile-manager';
 
 export class MissilePlugin extends KeepTrackPlugin {

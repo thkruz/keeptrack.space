@@ -4,10 +4,10 @@
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
 /* eslint-disable max-lines-per-function */
-import { ToastMsgType } from '@app/interfaces';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { ToastMsgType } from '@app/engine/core/interfaces';
+import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { RADIUS_OF_EARTH } from '@app/lib/constants';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
 import { Kilometers, Meters, SpaceObjectType } from 'ootk';
 import { missileManager } from './missile-manager';
 

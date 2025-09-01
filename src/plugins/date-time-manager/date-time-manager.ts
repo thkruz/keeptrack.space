@@ -1,8 +1,8 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { isThisNode } from '@app/static/isThisNode';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
 

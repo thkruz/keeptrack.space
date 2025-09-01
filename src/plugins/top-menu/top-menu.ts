@@ -1,15 +1,15 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
+import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl } from '@app/lib/get-el';
-import { adviceManagerInstance } from '@app/singletons/adviceManager';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
 import layersPng from '@public/img/icons/layers.png';
 import searchPng from '@public/img/icons/search.png';
 import soundOffPng from '@public/img/icons/sound-off.png';
 import soundOnPng from '@public/img/icons/sound-on.png';
-import { errorManagerInstance } from '../../singletons/errorManager';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { errorManagerInstance } from '../../engine/utils/errorManager';
 
 export class TopMenu extends KeepTrackPlugin {
   readonly id = 'TopMenu';

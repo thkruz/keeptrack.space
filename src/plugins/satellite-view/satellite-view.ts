@@ -19,15 +19,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { CameraType } from '@app/engine/input/camera';
+import { getEl } from '@app/engine/utils/get-el';
+import { shake } from '@app/engine/utils/shake';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { shake } from '@app/lib/shake';
 import { t7e } from '@app/locales/keys';
-import { CameraType } from '@app/singletons/camera';
 import viewInAirPng from '@public/img/icons/view-in-air.png';
 import { DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {

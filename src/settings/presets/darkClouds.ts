@@ -1,11 +1,11 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
-import { lat2pitch, lon2yaw } from '@app/lib/transforms';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import i18next from 'i18next';
 import { Degrees, Kilometers, Milliseconds, Radians } from 'ootk';
+import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
 import { keepTrackApi } from '../../keepTrackApi';
-import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
 

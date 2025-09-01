@@ -22,23 +22,23 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { isThisNode } from '@app/engine/utils/isThisNode';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sat-line';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { isThisNode } from '@app/static/isThisNode';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
 import saveAs from 'file-saver';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { EL as SAT_INFO_EL, SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { SensorToSatLine } from '@app/engine/rendering/line-manager/sensor-to-sat-line';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];

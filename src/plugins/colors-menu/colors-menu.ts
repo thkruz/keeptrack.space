@@ -1,10 +1,10 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { ColorScheme } from '@app/singletons/color-schemes/color-scheme';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import palettePng from '@public/img/icons/palette.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class ColorMenu extends KeepTrackPlugin {

@@ -22,12 +22,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Classification } from '@app/app/ui/classification';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 export class Screenshot extends KeepTrackPlugin {
   readonly id = 'Screenshot';

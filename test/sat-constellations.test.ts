@@ -1,8 +1,8 @@
+import { GroupsManager } from '@app/app/data/groups-manager';
+import { GroupType } from '@app/app/data/object-group';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { SatConstellations } from '@app/plugins/sat-constellations/sat-constellations';
-import { GroupsManager } from '@app/singletons/groups-manager';
-import { GroupType } from '@app/singletons/object-group';
 import { setupDefaultHtml, setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 

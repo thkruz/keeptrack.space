@@ -1,9 +1,9 @@
-import { GeolocationPosition } from '@app/interfaces';
+import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
+import { UiManager } from '@app/app/ui/uiManager';
+import { GeolocationPosition } from '@app/engine/core/interfaces';
+import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
-import { UiManager } from '@app/singletons/uiManager';
-import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { defaultSensor } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors, setupMinimumHtml, setupStandardEnvironment } from './environment/standard-env';
 

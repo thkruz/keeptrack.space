@@ -1,8 +1,8 @@
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 
-import { MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import dayNightPng from '@public/img/icons/day-night.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 
 export class NightToggle extends KeepTrackPlugin {

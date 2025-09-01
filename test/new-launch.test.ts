@@ -1,6 +1,6 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { NewLaunch } from '@app/plugins/new-launch/new-launch';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees } from 'ootk';

@@ -1,14 +1,14 @@
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import sputnickPng from '@public/img/icons/sputnick.png';
 import './tracking-impact-predict.css';
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
-import { SatMath } from '@app/static/sat-math';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { RAD2DEG } from 'ootk';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export interface TipMsg {

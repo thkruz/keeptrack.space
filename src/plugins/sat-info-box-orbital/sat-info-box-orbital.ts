@@ -1,14 +1,14 @@
 /* eslint-disable max-lines */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { SensorMath } from '@app/app/sensors/sensor-math';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
-import { SatMath } from '@app/static/sat-math';
-import { SensorMath } from '@app/static/sensor-math';
 import { BaseObject, DetailedSatellite, eci2lla, MINUTES_PER_DAY } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 

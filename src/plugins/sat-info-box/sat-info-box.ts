@@ -1,11 +1,11 @@
 import Draggabilly from 'draggabilly';
 /* eslint-disable max-lines */
-import { country2flagIcon } from '@app/catalogs/countries';
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { country2flagIcon } from '@app/app/data/catalogs/countries';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import './sat-info-box.css';

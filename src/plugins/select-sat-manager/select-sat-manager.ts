@@ -1,14 +1,14 @@
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { CameraType } from '@app/engine/input/camera';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { CameraType } from '@app/singletons/camera';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { NewLaunch } from '../new-launch/new-launch';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SoundNames } from '../sounds/sounds';

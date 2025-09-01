@@ -1,11 +1,11 @@
-import { EChartsData, GetSatType, MenuMode } from '@app/interfaces';
+import { EChartsData, GetSatType, MenuMode } from '@app/engine/core/interfaces';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import waterfall2Png from '@public/img/icons/waterfall2.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { DetailedSatellite, SpaceObjectType } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Inc2AltPlots extends KeepTrackPlugin {

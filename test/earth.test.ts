@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-import { Earth } from '@app/singletons/draw-manager/earth';
+import { Earth } from '@app/engine/rendering/draw-manager/earth';
 import { mat4 } from 'gl-matrix';
 import { GreenwichMeanSiderealTime } from 'ootk';
 

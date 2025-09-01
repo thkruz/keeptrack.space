@@ -1,10 +1,10 @@
-import { Constructor, KeepTrackApiEvents } from '@app/interfaces';
+import { BottomMenu } from '@app/app/ui/bottom-menu';
+import { Constructor, KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { KeepTrackPlugin } from '@app/plugins/KeepTrackPlugin';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from '@app/settings/settings';
-import { BottomMenu } from '@app/static/bottom-menu';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 export const standardPluginSuite = (Plugin: Constructor<KeepTrackPlugin>, pluginName?: string) => {

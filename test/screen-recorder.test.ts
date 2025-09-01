@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ScreenRecorder } from '@app/plugins/screen-recorder/screen-recorder';
 import { setupDefaultHtml } from './environment/standard-env';

@@ -1,10 +1,10 @@
+import { GroupsManager } from '@app/app/data/groups-manager';
+import { SearchManager } from '@app/app/ui/search-manager';
+import { UiManager } from '@app/app/ui/uiManager';
+import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
+import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CatalogManager } from '@app/singletons/catalog-manager';
-import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
-import { DotsManager } from '@app/singletons/dots-manager';
-import { GroupsManager } from '@app/singletons/groups-manager';
-import { SearchManager } from '@app/singletons/search-manager';
-import { UiManager } from '@app/singletons/uiManager';
 import { DetailedSatellite } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 

@@ -1,8 +1,8 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import videocamPng from '@public/img/icons/videocam.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { StreamManager } from './stream-manager';
 
 export class ScreenRecorder extends KeepTrackPlugin {

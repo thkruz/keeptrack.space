@@ -2,24 +2,24 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-lines */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
-import { SatMath, SunStatus } from '@app/static/sat-math';
+import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import {
   BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Hours, Kilometers, lla2eci, Milliseconds, MILLISECONDS_PER_SECOND, Radians,
   SatelliteRecord,
   Seconds, SpaceObjectType, Sun,
 } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SensorManager } from '../../app/sensors/sensorManager';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SensorManager } from '../sensor/sensorManager';
 import { SoundNames } from '../sounds/sounds';
 
-import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { fetchWeatherApi } from 'openmeteo';
 
 interface Pass {

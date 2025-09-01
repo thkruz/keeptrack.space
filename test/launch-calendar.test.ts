@@ -1,6 +1,6 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { createColorbox } from '@app/engine/utils/colorbox';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { createColorbox } from '@app/lib/colorbox';
 import { LaunchCalendar } from '@app/plugins/launch-calendar/launch-calendar';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from './environment/standard-env';

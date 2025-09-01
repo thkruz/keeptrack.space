@@ -1,19 +1,19 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
+import { StringPad } from '@app/engine/utils/stringPad';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
-import { StringPad } from '@app/lib/stringPad';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 
+import { OrbitFinder } from '@app/app/analysis/orbit-finder';
+import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
+import { TimeManager } from '@app/engine/core/time-manager';
 import { t7e } from '@app/locales/keys';
-import { OrbitFinder } from '@app/singletons/orbit-finder';
-import { TimeManager } from '@app/singletons/time-manager';
-import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 

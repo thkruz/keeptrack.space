@@ -1,5 +1,5 @@
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { SatellitePhotos } from '@app/plugins/satellite-photos/satellite-photos';
 import { setupDefaultHtml, setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';

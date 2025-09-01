@@ -1,18 +1,17 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { OrbitFinder } from '@app/app/analysis/orbit-finder';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { CatalogManager } from '@app/app/data/catalog-manager';
+import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { TimeManager } from '@app/engine/core/time-manager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
-import { CatalogManager } from '@app/singletons/catalog-manager';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import streamPng from '@public/img/icons/stream.png';
-
 import { t7e } from '@app/locales/keys';
-import { OrbitFinder } from '@app/singletons/orbit-finder';
-import { TimeManager } from '@app/singletons/time-manager';
-import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import streamPng from '@public/img/icons/stream.png';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Breakup extends KeepTrackPlugin {

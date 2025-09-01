@@ -1,10 +1,10 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { GroupType } from '@app/app/data/object-group';
+import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
+import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
-import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
-import { GroupType } from '@app/singletons/object-group';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
 

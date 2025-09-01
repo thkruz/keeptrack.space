@@ -146,7 +146,7 @@ export abstract class SplashScreen {
   }
 
   static handleStartAppButton() {
-    this.hideLoadingScreenElements();
+    SplashScreen.hideLoadingScreenElements();
     hideEl('start-app-btn');
     hideEl('adsense-placeholder');
 

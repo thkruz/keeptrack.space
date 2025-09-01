@@ -1406,8 +1406,6 @@ export class SettingsManager {
 
   private setInstallDirectory_() {
     switch (window.location.host) {
-      case 'dev.keeptrack.space':
-      case 'www.dev.keeptrack.space':
       case 'keeptrack.space':
       case 'www.keeptrack.space':
         this.installDirectory = '/app/';

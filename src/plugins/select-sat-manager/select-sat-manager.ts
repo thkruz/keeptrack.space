@@ -1,7 +1,7 @@
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
 import { CameraType } from '@app/engine/input/camera';
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -43,7 +43,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     this.registerKeyboardEvents_();
 
-    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.checkIfSelectSatVisible.bind(this));
+    keepTrackApi.on(EventBusEvent.updateLoop, this.checkIfSelectSatVisible.bind(this));
   }
 
   checkIfSelectSatVisible() {
@@ -161,7 +161,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.primarySatObj = spaceObj ?? this.noSatObj_;
 
     // Run any other callbacks
-    keepTrackApi.emit(KeepTrackApiEvents.selectSatData, spaceObj, spaceObj?.id);
+    keepTrackApi.emit(EventBusEvent.selectSatData, spaceObj, spaceObj?.id);
 
     // Record the last selected sat
     this.lastSelectedSat(this.selectedSat);
@@ -185,7 +185,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
       keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.emit(KeepTrackApiEvents.sensorDotSelected, sensor);
+      keepTrackApi.emit(EventBusEvent.sensorDotSelected, sensor);
     }
 
     this.setSelectedSat_(-1);
@@ -430,7 +430,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       keepTrackApi.getOrbitManager().clearSelectOrbit(false);
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.setSecondarySat, this.secondarySatObj, id);
+    keepTrackApi.emit(EventBusEvent.setSecondarySat, this.secondarySatObj, id);
   }
 
   private setSelectedSat_(id: number): void {
@@ -461,7 +461,7 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private registerKeyboardEvents_() {
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if ((key === '[' || key === ']') && !isRepeat) {
         this.switchPrimarySecondary();
       }

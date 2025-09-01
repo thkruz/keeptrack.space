@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { createColorbox } from '@app/engine/utils/colorbox';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { LaunchCalendar } from '@app/plugins/launch-calendar/launch-calendar';
@@ -20,9 +20,9 @@ describe('launch_calendar_plugin', () => {
 
   test('close_colorbox', () => {
     launchCalendarPlugin.init();
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
-    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
+    keepTrackApi.emit(EventBusEvent.uiManagerInit);
+    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+    keepTrackApi.emit(EventBusEvent.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
     jest.advanceTimersByTime(4000);
     // eslint-disable-next-line dot-notation
     expect(() => launchCalendarPlugin['closeColorbox_']()).not.toThrow();

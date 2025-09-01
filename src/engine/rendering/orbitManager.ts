@@ -1,7 +1,7 @@
 /* */
 
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';
@@ -206,7 +206,7 @@ export class OrbitManager {
     });
     this.isInitialized_ = true;
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (!isRepeat) {
         switch (key) {
           case 'L':
@@ -225,7 +225,7 @@ export class OrbitManager {
       }
     });
 
-    keepTrackApi.emit(KeepTrackApiEvents.orbitManagerInit);
+    keepTrackApi.emit(EventBusEvent.orbitManagerInit);
   }
 
   private toggleOrbitLines_() {

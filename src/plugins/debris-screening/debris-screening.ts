@@ -1,6 +1,6 @@
 import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath } from '@app/app/analysis/sat-math';
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -124,7 +124,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl(`${this.sideMenuElementName}-form`)!.addEventListener('submit', (e: Event) => {
           e.preventDefault();

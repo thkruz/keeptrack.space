@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
 import { Kilometers } from 'ootk';
 import { EarthTextureStyle } from '../../engine/rendering/draw-manager/earth';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
@@ -100,7 +100,7 @@ export class MobileManager {
           });
 
           keepTrackApi.on(
-            KeepTrackApiEvents.selectSatData,
+            EventBusEvent.selectSatData,
             () => {
               keepTrackApi.getUiManager().searchManager.closeSearch();
               hideEl('actions-section');
@@ -108,7 +108,7 @@ export class MobileManager {
           );
 
           keepTrackApi.on(
-            KeepTrackApiEvents.uiManagerFinal,
+            EventBusEvent.uiManagerFinal,
             () => {
               hideEl('tutorial-btn');
             },

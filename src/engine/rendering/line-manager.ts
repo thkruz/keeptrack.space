@@ -2,7 +2,7 @@
 /* eslint-disable complexity */
 /* eslint-disable camelcase */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { KeepTrackApiEvents, Singletons } from '@app/engine/core/interfaces';
+import { EventBusEvent, Singletons } from '@app/engine/core/interfaces';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -42,12 +42,12 @@ export class LineManager {
 
   clear(): void {
     this.lines = [];
-    keepTrackApi.emit(KeepTrackApiEvents.onLineAdded, keepTrackApi.getLineManager());
+    keepTrackApi.emit(EventBusEvent.onLineAdded, keepTrackApi.getLineManager());
   }
 
   add(line: Line): void {
     this.lines.push(line);
-    keepTrackApi.emit(KeepTrackApiEvents.onLineAdded, this);
+    keepTrackApi.emit(EventBusEvent.onLineAdded, this);
   }
 
   createSatRicFrame(sat: DetailedSatellite | MissileObject | null): void {
@@ -250,7 +250,7 @@ export class LineManager {
     this.program = new WebGlProgramHelper(gl, this.shaders_.vert, this.shaders_.frag, this.attribs, this.uniforms_).program;
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (sat) {
           const sensor = keepTrackApi.getSensorManager().getSensor();

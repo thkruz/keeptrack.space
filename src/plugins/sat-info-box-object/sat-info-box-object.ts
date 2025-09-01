@@ -1,7 +1,8 @@
 /* eslint-disable max-lines */
 import { SatMath } from '@app/app/analysis/sat-math';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { StringExtractor } from '@app/app/ui/string-extractor';
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
@@ -10,7 +11,6 @@ import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType } from 'o
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 
 const SECTIONS = {
   OBJECT: 'object-section',
@@ -46,7 +46,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxInit, () => {
+    keepTrackApi.on(EventBusEvent.satInfoBoxInit, () => {
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createObjectSection_(), order: 6 });
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createSecondarySection(), order: 8 });
     });
@@ -55,8 +55,8 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.updateObjectData_.bind(this));
+    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
+    keepTrackApi.on(EventBusEvent.selectSatData, this.updateObjectData_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {

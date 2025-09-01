@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorRuleSet, KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { ColorRuleSet, EventBusEvent } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ColorInformation, Pickable, rgbaArray } from '../core/interfaces';
 import { errorManagerInstance } from '../utils/errorManager';
@@ -214,7 +214,7 @@ export class ColorSchemeManager {
 
     // Create the color buffers as soon as the position cruncher is ready
     keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherReady,
+      EventBusEvent.onCruncherReady,
       (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
@@ -238,7 +238,7 @@ export class ColorSchemeManager {
         this.isReady = true;
 
         // This helps keep the inview colors up to date
-        keepTrackApi.on(KeepTrackApiEvents.staticOffsetChange, () => {
+        keepTrackApi.on(EventBusEvent.staticOffsetChange, () => {
           setTimeout(() => {
             this.calcColorBufsNextCruncher();
           }, 1000);

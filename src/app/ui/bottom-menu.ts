@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -19,10 +19,10 @@ export class BottomMenu {
 
   static init() {
     if (!settingsManager.isDisableBottomMenu) {
-      keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, BottomMenu.createBottomMenu);
-      keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, BottomMenu.addBottomMenuFilterButtons);
+      keepTrackApi.on(EventBusEvent.uiManagerInit, BottomMenu.createBottomMenu);
+      keepTrackApi.on(EventBusEvent.uiManagerFinal, BottomMenu.addBottomMenuFilterButtons);
     }
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, BottomMenu.updateBottomMenuVisibility_);
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, BottomMenu.updateBottomMenuVisibility_);
 
   }
   static createBottomMenu(): void {
@@ -112,12 +112,12 @@ export class BottomMenu {
     settingsManager.activeMenuMode = menuMode;
     this.deselectAllBottomMenuFilterButtons_();
     menuButtonDom.classList.add('bmenu-item-selected');
-    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuModeChange);
+    keepTrackApi.emit(EventBusEvent.bottomMenuModeChange);
   }
 
   static changeMenuMode(menuMode: MenuMode) {
     settingsManager.activeMenuMode = menuMode;
-    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuModeChange);
+    keepTrackApi.emit(EventBusEvent.bottomMenuModeChange);
   }
 
   static addBottomMenuFilterButtons() {
@@ -136,7 +136,7 @@ export class BottomMenu {
       menuSettingsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuSettingsDom, MenuMode.SETTINGS));
       menuAllDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuAllDom, MenuMode.ALL));
 
-      keepTrackApi.emit(KeepTrackApiEvents.bottomMenuModeChange);
+      keepTrackApi.emit(EventBusEvent.bottomMenuModeChange);
     } else {
       errorManagerInstance.warn('Failed to find all bottom menu filter buttons');
     }

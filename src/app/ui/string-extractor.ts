@@ -1,16 +1,16 @@
 import { t7e } from '@app/locales/keys';
 import { BaseObject, SpaceObjectType } from 'ootk';
-import { countryCodeList, countryMapList, launchSiteMap } from '../data/catalogs/countries';
+import { errorManagerInstance } from '../../engine/utils/errorManager';
+import { countryCodeList, getCountryMapList, launchSiteMap } from '../data/catalogs/countries';
 import { rocketUrls } from '../data/catalogs/rocket-urls';
 import { userUrls } from '../data/catalogs/user-urls';
-import { errorManagerInstance } from '../../engine/utils/errorManager';
 
 export abstract class StringExtractor {
   /**
    * Use this to adjust which type of objects are loaded
    * TODO: Move this somewhere else!
    */
-  public static controlSiteTypeFilter(controlSite: BaseObject): boolean {
+  static controlSiteTypeFilter(controlSite: BaseObject): boolean {
     switch (controlSite.type) {
       case SpaceObjectType.INTERGOVERNMENTAL_ORGANIZATION:
       case SpaceObjectType.LAUNCH_AGENCY:
@@ -37,11 +37,11 @@ export abstract class StringExtractor {
     }
   }
 
-  public static extractCountry(countryCode: string): string {
-    return countryMapList[countryCode] ?? t7e('countries.TBD');
+  static extractCountry(countryCode: string): string {
+    return getCountryMapList()[countryCode] ?? t7e('countries.TBD');
   }
 
-  public static extractLaunchSite(LS: string): { site: string; country: string, wikiUrl: string | null } {
+  static extractLaunchSite(LS: string): { site: string; country: string, wikiUrl: string | null } {
     if (!LS || LS === '') {
       return { site: 'Unknown', country: 'Unknown', wikiUrl: null };
     }
@@ -57,7 +57,7 @@ export abstract class StringExtractor {
 
   }
 
-  public static extractLiftVehicle(LV?: string): string {
+  static extractLiftVehicle(LV?: string): string {
     if (!LV || LV === 'U' || LV === 'TBD' || LV === '') {
       return 'Unknown';
     }
@@ -84,7 +84,7 @@ export abstract class StringExtractor {
     return user;
   }
 
-  public static getCountryCode(country?: string) {
+  static getCountryCode(country?: string) {
     if (!country || country === '') {
       return '';
     }

@@ -1,5 +1,5 @@
 import { SensorMath, TearrData, TearrType } from '@app/app/sensors/sensor-math';
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -137,7 +137,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('look-angles-length')!.addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
@@ -157,18 +157,18 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, (obj: BaseObject) => {
+    keepTrackApi.on(EventBusEvent.selectSatData, (obj: BaseObject) => {
       this.checkIfCanBeEnabled_(obj);
     });
 
-    keepTrackApi.on(KeepTrackApiEvents.resetSensor, () => {
+    keepTrackApi.on(EventBusEvent.resetSensor, () => {
       this.checkIfCanBeEnabled_(null);
     });
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(KeepTrackApiEvents.staticOffsetChange, () => {
+    keepTrackApi.on(EventBusEvent.staticOffsetChange, () => {
       this.refreshSideMenuData_();
     });
   }

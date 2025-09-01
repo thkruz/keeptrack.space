@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
@@ -161,7 +161,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);
         getEl('video-director-form')!.addEventListener('submit', VideoDirectorPlugin.onSubmit);

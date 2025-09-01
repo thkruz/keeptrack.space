@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -261,7 +261,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('filter-form')?.addEventListener('change', this.onFormChange_.bind(this));
         getEl('filter-reset')?.addEventListener('click', this.resetToDefaults.bind(this));
@@ -269,7 +269,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+      EventBusEvent.uiManagerInit,
       () => {
         getEl('nav-mobile2')?.insertAdjacentHTML(
           'afterbegin',
@@ -288,10 +288,10 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('top-menu-filter-btn')?.addEventListener('click', () => {
-          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          this.bottomMenuClicked();
         });
       },
     );
@@ -300,14 +300,14 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         this.syncOnLoad_();
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.saveSettings, this.saveSettings_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.loadSettings, this.loadSettings_.bind(this));
+    keepTrackApi.on(EventBusEvent.saveSettings, this.saveSettings_.bind(this));
+    keepTrackApi.on(EventBusEvent.loadSettings, this.loadSettings_.bind(this));
   }
   private saveSettings_() {
     const persistenceManagerInstance = PersistenceManager.getInstance();

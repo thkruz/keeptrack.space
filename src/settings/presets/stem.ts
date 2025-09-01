@@ -1,5 +1,5 @@
 import { BottomMenu } from '@app/app/ui/bottom-menu';
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '../settings';
@@ -58,7 +58,7 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
 
   settingsManager.isDisableExtraCatalog = false;
 
-  keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, () => {
+  keepTrackApi.on(EventBusEvent.uiManagerFinal, () => {
     BottomMenu.changeMenuMode(MenuMode.ALL);
 
     getEl('bottom-icons-filter')!.style.display = 'none';

@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { addonColorSchemes } from '@app/engine/rendering/color-scheme-addons';
 import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
@@ -68,7 +68,7 @@ export abstract class LegendManager {
     // Update Legend Colors
     LegendManager.legendColorsChange();
     settingsManager.currentLegend = menu;
-    keepTrackApi.emit(KeepTrackApiEvents.legendUpdated, menu);
+    keepTrackApi.emit(EventBusEvent.legendUpdated, menu);
   }
 
   static legendColorsChange(): void {

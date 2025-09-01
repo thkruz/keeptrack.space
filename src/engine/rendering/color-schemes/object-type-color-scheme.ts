@@ -1,12 +1,12 @@
 /* eslint-disable complexity */
-import { ColorInformation, KeepTrackApiEvents, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { ColorInformation, EventBusEvent, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../../input/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 
 export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
   payload: rgbaArray;
@@ -58,7 +58,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ...this.objectTypeFlags, ...ObjectTypeColorScheme.uniqueObjectTypeFlags,
     };
 
-    keepTrackApi.on(KeepTrackApiEvents.legendUpdated, () => {
+    keepTrackApi.on(EventBusEvent.legendUpdated, () => {
       if (settingsManager.isDisableSensors) {
         this.objectTypeFlags.sensor = false;
         this.objectTypeFlags.inFOV = false;

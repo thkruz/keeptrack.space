@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec3, vec4 } from 'gl-matrix';
@@ -250,7 +250,7 @@ export class InputManager {
       `,
       );
       // Append any other menus before putting the reset/clear options
-      keepTrackApi.emit(KeepTrackApiEvents.rightBtnMenuAdd);
+      keepTrackApi.emit(EventBusEvent.rightBtnMenuAdd);
 
       // Now add the reset/clear options
       getEl('right-btn-menu-ul')!.insertAdjacentHTML(
@@ -365,7 +365,7 @@ export class InputManager {
     rightBtnMenuDOM!.style.display = 'block';
     satHoverBoxDOM!.style.display = 'none';
 
-    keepTrackApi.emit(KeepTrackApiEvents.rightBtnMenuOpen, isEarth, clickedSatId);
+    keepTrackApi.emit(EventBusEvent.rightBtnMenuOpen, isEarth, clickedSatId);
 
     // Loop through all the menu items and determine how many are visible
     let numMenuItems = 0;

@@ -1,7 +1,7 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/engine/utils/get-el';
+import { keepTrackApi } from '@app/keepTrackApi';
 import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 
 import { SatMath } from '@app/app/analysis/sat-math';
@@ -118,7 +118,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
@@ -156,7 +156,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!sat && keepTrackApi.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
           this.setBottomIconToDisabled();
@@ -173,8 +173,8 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         }
       },
     );
-    keepTrackApi.on(KeepTrackApiEvents.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.resize, this.resizeCanvas_.bind(this));
+    keepTrackApi.on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
+    keepTrackApi.on(EventBusEvent.resize, this.resizeCanvas_.bind(this));
   }
 
   private onWatchlistUpdated_(watchlistList: number[]) {

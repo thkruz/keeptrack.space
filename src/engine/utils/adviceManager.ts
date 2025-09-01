@@ -18,7 +18,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl } from './get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';
@@ -43,7 +43,7 @@ export class AdviceManager {
     this.tutIconDOM = getEl('tutorial-icon');
 
     this.tutIconDOM.addEventListener('click', () => {
-      keepTrackApi.emit(KeepTrackApiEvents.onHelpMenuClick);
+      keepTrackApi.emit(EventBusEvent.onHelpMenuClick);
     });
 
     // TODO: This should be registered with the keyboard class
@@ -54,7 +54,7 @@ export class AdviceManager {
           this.isAdviceOpen = false;
           this.helpOuterDOM.style.display = 'none';
         } else {
-          keepTrackApi.emit(KeepTrackApiEvents.onHelpMenuClick);
+          keepTrackApi.emit(EventBusEvent.onHelpMenuClick);
         }
       }
     };

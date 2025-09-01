@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
 import { CameraType } from '@app/engine/input/camera';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -21,7 +21,7 @@ export class GamepadPlugin {
       if (settingsManager.cruncherReady) {
         this.initializeGamepad(e.gamepad);
       } else {
-        keepTrackApi.once(KeepTrackApiEvents.uiManagerInit, () => this.initializeGamepad(e.gamepad));
+        keepTrackApi.once(EventBusEvent.uiManagerInit, () => this.initializeGamepad(e.gamepad));
       }
     });
     window.addEventListener('gamepaddisconnected', () => {
@@ -35,7 +35,7 @@ export class GamepadPlugin {
 
     // Only initialize once
     if (!this.currentController) {
-      keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.updateGamepad.bind(this));
+      keepTrackApi.on(EventBusEvent.updateLoop, this.updateGamepad.bind(this));
     }
 
     this.currentController = gamepad;

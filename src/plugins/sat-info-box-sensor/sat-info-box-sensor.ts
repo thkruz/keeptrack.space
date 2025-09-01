@@ -2,7 +2,7 @@
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
 import type { TimeManager } from '@app/engine/core/time-manager';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
@@ -40,7 +40,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxInit, () => {
+    keepTrackApi.on(EventBusEvent.satInfoBoxInit, () => {
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createSensorSection_(), order: 5 });
     });
   }
@@ -48,9 +48,9 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.updateSensorInfo_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.updateSelectBox, this.updateSelectBox_.bind(this));
+    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
+    keepTrackApi.on(EventBusEvent.selectSatData, this.updateSensorInfo_.bind(this));
+    keepTrackApi.on(EventBusEvent.updateSelectBox, this.updateSelectBox_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {

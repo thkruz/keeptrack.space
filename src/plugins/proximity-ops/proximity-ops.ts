@@ -1,6 +1,6 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
+import { keepTrackApi } from '@app/keepTrackApi';
 
 import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
@@ -147,7 +147,7 @@ export class ProximityOps extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
 
         getEl('submit')!.addEventListener('click', (e) => {
@@ -189,7 +189,7 @@ export class ProximityOps extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (this.isMenuButtonActive && obj?.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl('proximity-ops-norad')).value) {
           this.updateNoradId_();

@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -132,7 +132,7 @@ export class Scene {
         this.moon.draw(this.sun.position);
       }
 
-      keepTrackApi.emit(KeepTrackApiEvents.drawOptionalScenery);
+      keepTrackApi.emit(EventBusEvent.drawOptionalScenery);
     }
 
     renderer.postProcessingManager.curBuffer = null;
@@ -267,7 +267,7 @@ export class Scene {
   async loadScene(): Promise<void> {
     try {
       this.earth.init(this.gl_);
-      keepTrackApi.emit(KeepTrackApiEvents.drawManagerLoadScene);
+      keepTrackApi.emit(EventBusEvent.drawManagerLoadScene);
       await this.sun.init(this.gl_);
 
       if (!settingsManager.isDisableGodrays) {

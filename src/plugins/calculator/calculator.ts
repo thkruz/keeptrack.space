@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import calculatorPng from '@public/img/icons/calculator.png';
 
@@ -312,7 +312,7 @@ export class Calculator extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         // Nothing to do here
       },
@@ -322,7 +322,7 @@ export class Calculator extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('calculator-itrf')!.addEventListener('click', () => {
           this.changeToITRF_();

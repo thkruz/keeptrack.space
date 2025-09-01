@@ -1,6 +1,6 @@
 import { StringifiedNumber } from '@app/app/analysis/sat-math';
 import { CatalogManager } from '@app/app/data/catalog-manager';
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, FormatTle, Tle } from 'ootk';
@@ -25,7 +25,7 @@ export class OrbitReferences extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj?: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {

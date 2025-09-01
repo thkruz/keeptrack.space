@@ -3,7 +3,7 @@ import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
 import { keepTrackApi } from '../../keepTrackApi';
 import { MobileManager } from './mobileManager';
 
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
 import earthJpg from '@public/img/wallpaper/Earth.jpg';
@@ -86,7 +86,7 @@ export abstract class SplashScreen {
       hideEl('loading-hint');
     }
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, () => {
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, () => {
       getEl('start-app-btn')?.addEventListener('click', () => {
         SplashScreen.handleStartAppButton();
       });

@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { Camera } from '@app/engine/input/camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -163,7 +163,7 @@ export class TouchInput {
     // If you hit the canvas hide any popups
     keepTrackApi.getInputManager().hidePopUps();
 
-    keepTrackApi.emit(KeepTrackApiEvents.touchStart, evt);
+    keepTrackApi.emit(EventBusEvent.touchStart, evt);
   }
 
   tap(evt: TapTouchEvent) {

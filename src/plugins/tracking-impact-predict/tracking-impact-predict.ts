@@ -3,7 +3,7 @@ import sputnickPng from '@public/img/icons/sputnick.png';
 import './tracking-impact-predict.css';
 
 import { SatMath } from '@app/app/analysis/sat-math';
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { RAD2DEG } from 'ootk';
@@ -66,12 +66,12 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       this.uiManagerFinal_.bind(this),
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherMessage,
+      EventBusEvent.onCruncherMessage,
       () => {
         if (this.selectSatIdOnCruncher_ !== null) {
           // If selectedSatManager is loaded, set the selected sat to the one that was just added

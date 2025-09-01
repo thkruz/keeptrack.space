@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
@@ -180,14 +180,14 @@ export class MissilePlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {
     super.addJs();
 
     // Missile orbits have to be updated every draw or they quickly become inaccurate
-    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.updateLoop_.bind(this));
+    keepTrackApi.on(EventBusEvent.updateLoop, this.updateLoop_.bind(this));
   }
 
   private searchForRvs_() {

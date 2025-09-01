@@ -42,10 +42,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, showEl } from '@app/engine/utils/get-el';
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import mapPng from '@public/img/icons/map.png';
 import radar1 from '@public/img/radar-1.png';
 import redSquare from '@public/img/red-square.png';
@@ -109,7 +109,7 @@ export class StereoMap extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         this.canvas_ = <HTMLCanvasElement>getEl('map-2d');
 
@@ -138,12 +138,12 @@ export class StereoMap extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherMessage,
+      EventBusEvent.onCruncherMessage,
       this.onCruncherMessage_.bind(this),
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {
           return;
@@ -154,7 +154,7 @@ export class StereoMap extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'M' && !isRepeat) {
         if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
           return;

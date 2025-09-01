@@ -274,7 +274,7 @@ export enum Singletons {
  * Enum containing the registrable events used in the KeepTrack API.
  */
 
-export enum KeepTrackApiEvents {
+export enum EventBusEvent {
   onHelpMenuClick = 'onHelpMenuClick',
   /**
    * Run at the end of SelectSatManager.selectSat with parameters (sat: SatObject, satId: number)
@@ -352,4 +352,7 @@ export enum KeepTrackApiEvents {
   userAccountChange = 'userAccountChange',
   userLogin = 'userSignedIn',
   userLogout = 'userLogout',
+  KeyUp = 'inputEvent:keyup',
+  KeyDown = 'inputEvent:keydown',
+  KeyPress = 'inputEvent:keypress',
 }

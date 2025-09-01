@@ -23,7 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -93,7 +93,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('aer-report-btn')!.addEventListener('click', () => this.generateAzElRng_());
         getEl('coes-report-btn')!.addEventListener('click', () => this.generateClasicalOrbElJ2000_());
@@ -103,7 +103,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (obj?.isSatellite()) {
           getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-disabled');

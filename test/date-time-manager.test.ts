@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
@@ -14,8 +14,8 @@ describe('DateTimeManager_class', () => {
     setupStandardEnvironment([TopMenu]);
     dtm = new DateTimeManager();
     dtm.init();
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(EventBusEvent.uiManagerInit);
+    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
   });
 
   standardPluginSuite(DateTimeManager, 'DateTimeManager');

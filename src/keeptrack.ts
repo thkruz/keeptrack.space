@@ -40,7 +40,7 @@ import { HoverManager } from './app/ui/hover-manager';
 import { SplashScreen } from './app/ui/splash-screen';
 import { UiManager } from './app/ui/uiManager';
 import { keepTrackContainer } from './container';
-import { KeepTrackApiEvents, Singletons } from './engine/core/interfaces';
+import { EventBusEvent, Singletons } from './engine/core/interfaces';
 import { Scene } from './engine/core/scene';
 import { TimeManager } from './engine/core/time-manager';
 import { Camera } from './engine/input/camera';
@@ -413,7 +413,7 @@ theodore.kruczek at gmail dot com.
       this.demoManager.update();
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.endOfDraw, dt);
+    keepTrackApi.emit(EventBusEvent.endOfDraw, dt);
   }
 
   async run(): Promise<void> {
@@ -523,7 +523,7 @@ theodore.kruczek at gmail dot com.
       }
 
       // Update any CSS now that we know what is loaded
-      keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+      keepTrackApi.emit(EventBusEvent.uiManagerFinal);
 
       if (settingsManager.plugins.DebugMenuPlugin) {
         const erudaDom = getEl('eruda');
@@ -562,12 +562,12 @@ theodore.kruczek at gmail dot com.
       }
 
       window.addEventListener('resize', () => {
-        keepTrackApi.emit(KeepTrackApiEvents.resize);
+        keepTrackApi.emit(EventBusEvent.resize);
       });
-      keepTrackApi.emit(KeepTrackApiEvents.resize);
+      keepTrackApi.emit(EventBusEvent.resize);
 
       keepTrackApi.isInitialized = true;
-      keepTrackApi.emit(KeepTrackApiEvents.onKeepTrackReady);
+      keepTrackApi.emit(EventBusEvent.onKeepTrackReady);
       if (settingsManager.onLoadCb) {
         settingsManager.onLoadCb();
       }
@@ -588,7 +588,7 @@ theodore.kruczek at gmail dot com.
 
     this.timeManager.update();
 
-    keepTrackApi.emit(KeepTrackApiEvents.update, dt);
+    keepTrackApi.emit(EventBusEvent.update, dt);
 
     // Update official time for everyone else
     timeManagerInstance.setNow(<Milliseconds>Date.now());

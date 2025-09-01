@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
@@ -61,12 +61,12 @@ export const uiManagerInit = () => {
 
 export const init = (): void => {
   // Add HTML
-  keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, uiManagerInit);
-  keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, uiManagerFinal);
+  keepTrackApi.on(EventBusEvent.uiManagerInit, uiManagerInit);
+  keepTrackApi.on(EventBusEvent.uiManagerFinal, uiManagerFinal);
 
   // Add JavaScript
-  keepTrackApi.on(KeepTrackApiEvents.bottomMenuClick, bottomMenuClick);
-  keepTrackApi.on(KeepTrackApiEvents.hideSideMenus, hideSideMenus);
+  keepTrackApi.on(EventBusEvent.bottomMenuClick, bottomMenuClick);
+  keepTrackApi.on(EventBusEvent.hideSideMenus, hideSideMenus);
 };
 
 const uiManagerFinal = () => {

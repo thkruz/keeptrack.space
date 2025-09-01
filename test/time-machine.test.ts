@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Milliseconds } from 'ootk';
@@ -25,7 +25,7 @@ describe('TimeMachine_class', () => {
     keepTrackApi.containerRoot.innerHTML += '<div id="search-results"></div>';
 
     settingsManager.timeMachineDelay = <Milliseconds>0;
-    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, timeMachinePlugin.bottomIconElementName);
+    keepTrackApi.emit(EventBusEvent.bottomMenuClick, timeMachinePlugin.bottomIconElementName);
     jest.advanceTimersByTime(1000);
     expect(timeMachinePlugin.isMenuButtonActive).toBe(true);
     jest.advanceTimersByTime(10000);

@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -105,7 +105,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('export-launch-info')!.addEventListener('click', () => {
           keepTrackApi.getSoundManager()?.play(SoundNames.EXPORT);

@@ -1,7 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
-import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -18,8 +18,8 @@ import {
   SpaceObjectType,
   TAU,
 } from 'ootk';
-import { SensorManager } from '../../app/sensors/sensorManager';
 import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
+import { SensorManager } from '../../app/sensors/sensorManager';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
@@ -118,7 +118,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         this.checkIfCanBeEnabled_(obj);
       },
@@ -142,7 +142,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.staticOffsetChange,
+      EventBusEvent.staticOffsetChange,
       () => {
         const sat = this.selectSatManager_?.getSelectedSat();
 

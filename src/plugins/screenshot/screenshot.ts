@@ -23,7 +23,7 @@
  */
 
 import { Classification } from '@app/app/ui/classification';
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import cameraPng from '@public/img/icons/camera.png';
@@ -123,12 +123,12 @@ export class Screenshot extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.altCanvasResize,
+      EventBusEvent.altCanvasResize,
       () => this.queuedScreenshot_,
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.endOfDraw,
+      EventBusEvent.endOfDraw,
       () => {
         if (this.queuedScreenshot_) {
           this.takeScreenShot();

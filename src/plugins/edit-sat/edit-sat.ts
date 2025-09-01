@@ -1,4 +1,4 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
@@ -124,7 +124,7 @@ export class EditSat extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('editSat-newTLE')!.addEventListener('click', this.editSatNewTleClick_.bind(this));
 
@@ -181,7 +181,7 @@ export class EditSat extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (!obj) {
           if (this.isMenuButtonActive) {

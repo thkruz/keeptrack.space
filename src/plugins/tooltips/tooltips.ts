@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -36,7 +36,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+      EventBusEvent.uiManagerInit,
       () => {
         const tooltipDiv = document.createElement('div');
 
@@ -60,7 +60,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         this.initTooltips();
       },

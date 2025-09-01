@@ -1,5 +1,5 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
@@ -9,6 +9,7 @@ import { GroupType } from '../../app/data/object-group';
 import { SettingsManager } from '../../settings/settings';
 import { GetSatType } from '../core/interfaces';
 import { Scene } from '../core/scene';
+import { EventBus } from '../events/event-bus';
 import { Camera, CameraType } from '../input/camera';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
@@ -92,7 +93,7 @@ export class WebGLRenderer {
       return;
     }
 
-    if (keepTrackApi.methods.altCanvasResize()) {
+    if (EventBus.getInstance().methods.altCanvasResize()) {
       this.resizeCanvas(true);
       this.isAltCanvasSize_ = true;
     } else if (this.isAltCanvasSize_) {
@@ -138,7 +139,7 @@ export class WebGLRenderer {
     }
 
     keepTrackApi.on(
-      KeepTrackApiEvents.resize,
+      EventBusEvent.resize,
       () => {
         // Clear any existing resize timer
         clearTimeout(this.lastResizeTime);
@@ -659,7 +660,7 @@ export class WebGLRenderer {
      * ]);
      */
 
-    keepTrackApi.emit(KeepTrackApiEvents.updateLoop);
+    keepTrackApi.emit(EventBusEvent.updateLoop);
   }
 
   getCurrentViewport(target?: vec4): vec4 {

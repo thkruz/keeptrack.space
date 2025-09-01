@@ -1,9 +1,9 @@
 import { SatMath } from '@app/app/analysis/sat-math';
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
-import { InputEventType, keepTrackApi } from '../../keepTrackApi';
+import { keepTrackApi } from '../../keepTrackApi';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
@@ -152,7 +152,7 @@ export class TimeManager {
       }
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.propRateChanged, this.propRate);
+    keepTrackApi.emit(EventBusEvent.propRateChanged, this.propRate);
   }
 
   static isLeapYear(dateIn: Date) {
@@ -170,7 +170,7 @@ export class TimeManager {
     this.staticOffset = staticOffset;
     this.calculateSimulationTime();
     this.synchronize();
-    keepTrackApi.emit(KeepTrackApiEvents.staticOffsetChange, this.staticOffset);
+    keepTrackApi.emit(EventBusEvent.staticOffsetChange, this.staticOffset);
   }
 
   getOffsetTimeObj(offset: number) {
@@ -221,7 +221,7 @@ export class TimeManager {
   }
 
   private initializeKeyboardBindings_() {
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 't' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -233,7 +233,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === ',' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -268,7 +268,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '.' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -303,7 +303,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '<' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -316,7 +316,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '>' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -329,7 +329,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '/' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -356,7 +356,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
       if (code === 'Equal' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -369,7 +369,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
       if (code === 'Minus' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -470,7 +470,7 @@ export class TimeManager {
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
-    keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+    keepTrackApi.emit(EventBusEvent.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
 
     const message = {
       typ: CruncerMessageTypes.OFFSET,

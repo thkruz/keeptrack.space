@@ -1,14 +1,14 @@
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 
+import { SatConstellationString } from '@app/app/data/catalog-manager/satLinkManager';
 import { GroupType } from '@app/app/data/object-group';
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import categoryPng from '@public/img/icons/category.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SatConstellationString } from '@app/app/data/catalog-manager/satLinkManager';
-import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
@@ -57,7 +57,7 @@ export class SatConstellations extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         // Add additional constellations
         getEl('constellations-menu')!.querySelector('ul')!.insertAdjacentHTML(

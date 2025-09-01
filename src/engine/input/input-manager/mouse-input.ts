@@ -1,6 +1,7 @@
-import { GetSatType, KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent, GetSatType } from '@app/engine/core/interfaces';
 import { Camera, CameraType } from '@app/engine/input/camera';
 import { UrlManager } from '@app/engine/input/url-manager';
+import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/plugins/sounds/sounds';
@@ -11,7 +12,6 @@ import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
 import { InputManager, LatLon } from '../input-manager';
 import { KeyboardInput } from './keyboard-input';
-import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 
 export class MouseInput {
   private dragHasMoved = false;
@@ -253,7 +253,7 @@ export class MouseInput {
 
     keepTrackApi.getInputManager().hidePopUps();
 
-    keepTrackApi.emit(KeepTrackApiEvents.canvasMouseDown, evt);
+    keepTrackApi.emit(EventBusEvent.canvasMouseDown, evt);
   }
 
   private canvasMouseUp_(evt: MouseEvent) {
@@ -386,7 +386,7 @@ export class MouseInput {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
         break;
       default:
-        keepTrackApi.emit(KeepTrackApiEvents.rmbMenuActions, targetId, this.clickedSat);
+        keepTrackApi.emit(EventBusEvent.rmbMenuActions, targetId, this.clickedSat);
         break;
     }
     keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);

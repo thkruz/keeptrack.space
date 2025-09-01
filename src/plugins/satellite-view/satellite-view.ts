@@ -19,7 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { CameraType } from '@app/engine/input/camera';
 import { getEl } from '@app/engine/utils/get-el';
 import { shake } from '@app/engine/utils/shake';
@@ -50,7 +50,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj) => {
         if (obj instanceof DetailedSatellite) {
           this.setBottomIconToEnabled();

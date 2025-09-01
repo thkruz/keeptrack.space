@@ -19,7 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fovPng from '@public/img/icons/fov.png';
@@ -49,7 +49,7 @@ export class SensorFov extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.setSensor,
+      EventBusEvent.setSensor,
       (sensor): void => {
         if (sensor) {
           getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
@@ -64,7 +64,7 @@ export class SensorFov extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.sensorDotSelected,
+      EventBusEvent.sensorDotSelected,
       (sensor): void => {
         if (sensor) {
           getEl(this.bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconDisabledClassString);
@@ -80,7 +80,7 @@ export class SensorFov extends KeepTrackPlugin {
   }
 
   disableFovView() {
-    keepTrackApi.emit(KeepTrackApiEvents.changeSensorMarkers, this.id);
+    keepTrackApi.emit(EventBusEvent.changeSensorMarkers, this.id);
     this.setBottomIconToUnselected(false);
   }
 

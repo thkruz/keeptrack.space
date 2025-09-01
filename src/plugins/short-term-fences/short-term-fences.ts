@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -94,7 +94,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
@@ -123,7 +123,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('stfForm')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
@@ -196,10 +196,10 @@ export class ShortTermFences extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.resetSensor, this.closeAndDisable_.bind(this));
+    keepTrackApi.on(EventBusEvent.resetSensor, this.closeAndDisable_.bind(this));
 
     keepTrackApi.on(
-      KeepTrackApiEvents.setSensor,
+      EventBusEvent.setSensor,
       (sensor, id): void => {
         if (sensor === null && id === null) {
           this.closeAndDisable_();

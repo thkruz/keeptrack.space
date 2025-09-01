@@ -1,5 +1,5 @@
 import { keepTrackContainer } from '@app/container';
-import { KeepTrackApiEvents, Singletons } from '@app/engine/core/interfaces';
+import { EventBusEvent, Singletons } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -24,8 +24,8 @@ describe('TopMenu_class', () => {
     const topMenu = new TopMenu();
 
     topMenu.init();
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(EventBusEvent.uiManagerInit);
+    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
 
     errorManagerInstance.warn = jest.fn();
@@ -39,8 +39,8 @@ describe('TopMenu_class', () => {
     const topMenu = new TopMenu();
 
     topMenu.init();
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(EventBusEvent.uiManagerInit);
+    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
 
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     const soundIcon = getEl('sound-icon') as HTMLImageElement;

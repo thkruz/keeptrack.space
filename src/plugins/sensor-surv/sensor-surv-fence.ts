@@ -19,7 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fencePng from '@public/img/icons/fence.png';
 import { DetailedSensor } from 'ootk';
@@ -48,8 +48,8 @@ export class SensorSurvFence extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.setSensor, this.enableIfSensorSelected.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.sensorDotSelected, this.enableIfSensorSelected.bind(this));
+    keepTrackApi.on(EventBusEvent.setSensor, this.enableIfSensorSelected.bind(this));
+    keepTrackApi.on(EventBusEvent.sensorDotSelected, this.enableIfSensorSelected.bind(this));
   }
 
   enableIfSensorSelected(sensor?: DetailedSensor): void {

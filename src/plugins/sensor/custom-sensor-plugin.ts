@@ -1,5 +1,5 @@
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { slideInRight } from '@app/engine/utils/slide';
@@ -227,7 +227,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         CustomSensorPlugin.httpsCheck_();
         CustomSensorPlugin.addCustomSensorFormSubmitListener();

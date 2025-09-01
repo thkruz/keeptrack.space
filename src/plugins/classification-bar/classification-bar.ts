@@ -1,5 +1,5 @@
 import { Classification, ClassificationString } from '@app/app/ui/classification';
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -56,7 +56,7 @@ export class ClassificationBar extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerInit, this.uiManagerInit_.bind(this));
   }
 
   private createContainer_(): void {

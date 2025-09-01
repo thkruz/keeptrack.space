@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -39,7 +39,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
   settingsManager.splashScreenList = ['epfl-1', 'epfl-2']; // Set Splash Screens to EPFL
 
-  keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+  keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
     hideEl('logo-primary');
   });
   settingsManager.isDisableAsciiCatalog = true;

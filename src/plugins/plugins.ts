@@ -5,7 +5,7 @@ import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view'
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { KeepTrackPlugin } from '../engine/plugins/base-plugin';
 import { errorManagerInstance } from '../engine/utils/errorManager';
 import { getEl } from '../engine/utils/get-el';
@@ -262,10 +262,10 @@ export const loadPlugins = async (keepTrackApi: KeepTrackApi, plugins: KeepTrack
     }
 
     // Load any settings from local storage after all plugins are loaded
-    keepTrackApi.emit(KeepTrackApiEvents.loadSettings);
+    keepTrackApi.emit(EventBusEvent.loadSettings);
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         uiManagerFinal();
         KeepTrackPlugin.hideUnusedMenuModes();

@@ -371,7 +371,7 @@ export const country2flagIcon = (country: string): string => {
   }
 
   // Get the country code from the list
-  const countryCode = countryCodeList[country] ?? countryCodeList[countryMapList[country]] ?? country;
+  const countryCode = countryCodeList[country] ?? countryCodeList[getCountryMapList()[country]] ?? country;
 
   // Flag codes look like this: fi-us (for United States) or fi-uk (for United Kingdom)
 
@@ -392,7 +392,7 @@ export const country2flagIcon = (country: string): string => {
  */
 export const countryNameList = Object.keys(countryCodeList);
 
-export const countryMapList = {
+export const getCountryMapList = () => ({
   'AAT': t7e('countries.AAT'),
   'ADG': t7e('countries.ADG'),
   'AF': t7e('countries.AF'),
@@ -680,7 +680,7 @@ export const countryMapList = {
   'VENZ': t7e('countries.VENZ'),
   'VTNM': t7e('countries.VTNM'),
   'TBD': t7e('countries.TBD'),
-};
+});
 
 export const launchSiteMap: Record<string, {
   site: string,

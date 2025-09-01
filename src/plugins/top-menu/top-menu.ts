@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -19,7 +19,7 @@ export class TopMenu extends KeepTrackPlugin {
   addHtml() {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+      EventBusEvent.uiManagerInit,
       () => {
         getEl('keeptrack-header')?.insertAdjacentHTML(
           'beforeend',
@@ -72,7 +72,7 @@ export class TopMenu extends KeepTrackPlugin {
         // Advice only applies to things in the bottom menu
         if (settingsManager.isDisableBottomMenu) {
           keepTrackApi.on(
-            KeepTrackApiEvents.uiManagerFinal,
+            EventBusEvent.uiManagerFinal,
             () => {
               hideEl('tutorial-btn');
             },
@@ -105,7 +105,7 @@ export class TopMenu extends KeepTrackPlugin {
   addJs() {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('sound-btn')!.onclick = () => {
           const soundIcon = <HTMLImageElement>getEl('sound-icon');
@@ -132,7 +132,7 @@ export class TopMenu extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.setSensor, this.updateSensorName.bind(this));
+    keepTrackApi.on(EventBusEvent.setSensor, this.updateSensorName.bind(this));
   }
 
   updateSensorName() {

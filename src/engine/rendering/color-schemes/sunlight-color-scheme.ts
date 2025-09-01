@@ -1,12 +1,12 @@
 /* eslint-disable complexity */
 import { SunStatus } from '@app/app/analysis/sat-math';
-import { ColorInformation, KeepTrackApiEvents, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { ColorInformation, EventBusEvent, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { ColorScheme } from './color-scheme';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 
 export class SunlightColorScheme extends ColorScheme {
   readonly label = 'Sunlight Status';
@@ -36,7 +36,7 @@ export class SunlightColorScheme extends ColorScheme {
       ...this.objectTypeFlags, ...SunlightColorScheme.uniqueObjectTypeFlags,
     };
     keepTrackApi.on(
-      KeepTrackApiEvents.onKeepTrackReady,
+      EventBusEvent.onKeepTrackReady,
       (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
         const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();

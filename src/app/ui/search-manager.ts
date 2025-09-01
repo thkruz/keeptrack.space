@@ -1,12 +1,12 @@
 import { GroupType, ObjectGroup } from '@app/app/data/object-group';
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { slideInDown, slideOutUp } from '../../engine/utils/slide';
-import { InputEventType, keepTrackApi } from '../../keepTrackApi';
+import { keepTrackApi } from '../../keepTrackApi';
 import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
@@ -49,11 +49,11 @@ export class SearchManager {
     searchResults.id = TopMenu.SEARCH_RESULT_ID;
     uiWrapper!.prepend(searchResults);
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.addListeners_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.addListeners_.bind(this));
   }
 
   init() {
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'F' && !isRepeat) {
         this.toggleSearch();
         if (this.isSearchOpen) {
@@ -191,7 +191,7 @@ export class SearchManager {
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     if (searchString === '') {
       this.hideResults();
-      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString, 0, settingsManager.searchLimit);
+      keepTrackApi.emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
       return;
     }
@@ -209,7 +209,7 @@ export class SearchManager {
       dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
       (<HTMLInputElement>getEl('search')).value = '';
       this.hideResults();
-      keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString, 0, settingsManager.searchLimit);
+      keepTrackApi.emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
       return;
     }
@@ -254,7 +254,7 @@ export class SearchManager {
       results = SearchManager.doRegularSearch_(searchString);
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.searchUpdated, searchString_, results.length, settingsManager.searchLimit);
+    keepTrackApi.emit(EventBusEvent.searchUpdated, searchString_, results.length, settingsManager.searchLimit);
 
     // Remove any results greater than the maximum allowed
     results = results.splice(0, settingsManager.searchLimit);

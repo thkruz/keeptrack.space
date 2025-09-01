@@ -24,9 +24,9 @@
  */
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
-import type { TearrData } from '@app/app/sensors/sensor-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import type { TearrData } from '@app/app/sensors/sensor-math';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/engine/utils/constants';
@@ -39,12 +39,12 @@ import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from 'ootk';
-import { sensorGroups } from '../data/catalogs/sensor-groups';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SensorFov } from '../../plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../../plugins/sensor-surv/sensor-surv-fence';
 import { LookAnglesPlugin } from '../../plugins/sensor/look-angles-plugin';
 import { SensorInfoPlugin } from '../../plugins/sensor/sensor-info-plugin';
+import { sensorGroups } from '../data/catalogs/sensor-groups';
 
 export class SensorManager {
   lastMultiSiteArray: TearrData[];
@@ -311,7 +311,7 @@ export class SensorManager {
       colorSchemeManagerInstance.calculateColorBuffers(true);
     }, 2000);
 
-    keepTrackApi.emit(KeepTrackApiEvents.resetSensor);
+    keepTrackApi.emit(EventBusEvent.resetSensor);
   }
 
   setCurrentSensor(sensor: DetailedSensor[] | null): void {
@@ -440,7 +440,7 @@ export class SensorManager {
     if (settingsManager.offlineMode) {
       PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
     }
-    keepTrackApi.emit(KeepTrackApiEvents.setSensor, selectedSensor, sensorId ?? null);
+    keepTrackApi.emit(EventBusEvent.setSensor, selectedSensor, sensorId ?? null);
 
     for (const sensor of this.currentSensors) {
       keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);

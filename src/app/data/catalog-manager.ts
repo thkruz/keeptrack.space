@@ -29,7 +29,7 @@ import { controlSites } from '@app/app/data/catalogs/control-sites';
 import { launchSiteObjects, launchSites } from '@app/app/data/catalogs/launch-sites';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { stars } from '@app/app/data/catalogs/stars';
-import { GetSatType, KeepTrackApiEvents, MissileParams, SatCruncherMessageData } from '@app/engine/core/interfaces';
+import { EventBusEvent, GetSatType, MissileParams, SatCruncherMessageData } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -576,7 +576,7 @@ export class CatalogManager {
     this.updateCruncherBuffers(mData);
 
     // Run any callbacks for a normal position cruncher message
-    keepTrackApi.emit(KeepTrackApiEvents.onCruncherMessage);
+    keepTrackApi.emit(EventBusEvent.onCruncherMessage);
 
     // Only do this once after satData, positionData, and velocityData are all received/processed from the cruncher
     if (!settingsManager.cruncherReady && this.objectCache && keepTrackApi.getDotsManager().positionData && keepTrackApi.getDotsManager().velocityData) {
@@ -601,7 +601,7 @@ export class CatalogManager {
     this.buildOrbitDensityMatrix_();
 
     // Run any functions registered with the API
-    keepTrackApi.emit(KeepTrackApiEvents.onCruncherReady);
+    keepTrackApi.emit(EventBusEvent.onCruncherReady);
 
     settingsManager.cruncherReady = true;
   }

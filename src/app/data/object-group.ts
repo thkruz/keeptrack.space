@@ -1,8 +1,8 @@
 import { BaseObject, DetailedSatellite } from 'ootk';
-import { countryMapList } from './catalogs/countries';
 import { keepTrackApi } from '../../keepTrackApi';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { CatalogSearch } from './catalog-search';
+import { getCountryMapList } from './catalogs/countries';
 
 export enum GroupType {
   ALL = 0,
@@ -133,7 +133,7 @@ export class ObjectGroup<T extends GroupType> {
 
   private createGroupByCountry_(data: GroupData[GroupType.COUNTRY], satData: DetailedSatellite[]) {
     // Map country name to country code
-    const expandedData = data.split('|').map((countryName: string) => countryMapList[countryName]);
+    const expandedData = data.split('|').map((countryName: string) => getCountryMapList()[countryName]);
     // Concat data with expandedData using | as a delimiter
 
     data = `${data}|${expandedData.join('|')}`;

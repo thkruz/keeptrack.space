@@ -1,5 +1,5 @@
 import { LegendManager } from '@app/app/ui/legend-manager';
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ColorPick } from '@app/engine/utils/color-pick';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
@@ -273,7 +273,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
         getEl('settings-form')?.addEventListener('submit', SettingsMenuPlugin.onSubmit_);
@@ -380,7 +380,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, SettingsMenuPlugin.syncOnLoad);
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, SettingsMenuPlugin.syncOnLoad);
   }
 
   static syncOnLoad() {

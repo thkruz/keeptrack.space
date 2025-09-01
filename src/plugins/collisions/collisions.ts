@@ -2,7 +2,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import CollisionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
@@ -66,9 +66,9 @@ export class Collisions extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    keepTrackApi.on(KeepTrackApiEvents.onCruncherMessage, () => {
+    keepTrackApi.on(EventBusEvent.onCruncherMessage, () => {
       if (this.selectSatIdOnCruncher_ !== null) {
         // If selectedSatManager is loaded, set the selected sat to the one that was just added
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);

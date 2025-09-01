@@ -1,4 +1,5 @@
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { EventBusEvent } from '@app/engine/core/interfaces';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { KeyEvent } from '../input-manager';
 
 export class KeyboardInput {
@@ -115,7 +116,7 @@ export class KeyboardInput {
       evt.preventDefault();
     }
 
-    keepTrackApi.emit(InputEventType.KeyUp, key, code, false, isShiftPressed, isCtrlPressed);
+    keepTrackApi.emit(EventBusEvent.KeyUp, key, code, false, isShiftPressed, isCtrlPressed);
 
     if (key === 'Shift') {
       // Loop through all uppercase letters and change them to lowercase when the shift key is released
@@ -126,8 +127,8 @@ export class KeyboardInput {
         if (this.keyStates.get(upper)) {
           this.keyStates.set(upper, false);
           this.keyStates.set(lower, true);
-          keepTrackApi.emit(InputEventType.KeyUp, upper, code, false, isShiftPressed, isCtrlPressed);
-          keepTrackApi.emit(InputEventType.KeyDown, lower, code, false, isShiftPressed, isCtrlPressed);
+          keepTrackApi.emit(EventBusEvent.KeyUp, upper, code, false, isShiftPressed, isCtrlPressed);
+          keepTrackApi.emit(EventBusEvent.KeyDown, lower, code, false, isShiftPressed, isCtrlPressed);
         }
       }
     }
@@ -155,7 +156,7 @@ export class KeyboardInput {
       evt.preventDefault();
     }
 
-    keepTrackApi.emit(InputEventType.KeyDown, key, code, isRepeat, isShiftPressed, isCtrlPressed);
+    keepTrackApi.emit(EventBusEvent.KeyDown, key, code, isRepeat, isShiftPressed, isCtrlPressed);
 
     if (key === 'Shift') {
       // Loop through all uppercase letters and change them to lowercase when the shift key is released
@@ -166,8 +167,8 @@ export class KeyboardInput {
         if (this.keyStates.get(lower)) {
           this.keyStates.set(lower, false);
           this.keyStates.set(upper, true);
-          keepTrackApi.emit(InputEventType.KeyUp, lower, code, isRepeat, isShiftPressed, isCtrlPressed);
-          keepTrackApi.emit(InputEventType.KeyDown, upper, code, isRepeat, isShiftPressed, isCtrlPressed);
+          keepTrackApi.emit(EventBusEvent.KeyUp, lower, code, isRepeat, isShiftPressed, isCtrlPressed);
+          keepTrackApi.emit(EventBusEvent.KeyDown, upper, code, isRepeat, isShiftPressed, isCtrlPressed);
         }
       }
     }

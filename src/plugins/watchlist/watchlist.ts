@@ -22,7 +22,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { SensorToSatLine } from '@app/engine/rendering/line-manager/sensor-to-sat-line';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
@@ -38,7 +39,6 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { EL as SAT_INFO_EL, SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { SensorToSatLine } from '@app/engine/rendering/line-manager/sensor-to-sat-line';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];
@@ -110,12 +110,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.onCruncherReady, this.onCruncherReady_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    keepTrackApi.on(EventBusEvent.onCruncherReady, this.onCruncherReady_.bind(this));
+    keepTrackApi.on(EventBusEvent.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+      EventBusEvent.uiManagerInit,
       () => {
         if (!settingsManager.isWatchlistTopMenuNotification) {
           return;
@@ -139,7 +139,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         if (!settingsManager.isWatchlistTopMenuNotification) {
           return;
@@ -147,7 +147,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
         // Optional if top-menu is enabled
         getEl('top-menu-watchlist-btn', true)?.addEventListener('click', () => {
-          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          this.bottomIconCallback();
         });
       },
     );
@@ -158,12 +158,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     const satInfoBoxPlugin = keepTrackApi.getPlugin(SatInfoBox)!;
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxAddListeners, () => {
+    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, () => {
       getEl(this.EL.ADD_WATCHLIST)?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
       getEl(this.EL.REMOVE_WATCHLIST)?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
     });
 
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.selectSatData_.bind(this));
+    keepTrackApi.on(EventBusEvent.selectSatData, this.selectSatData_.bind(this));
   }
 
   private satInfoBoxFinal_() {
@@ -397,7 +397,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       watchlistElement.innerHTML = watchlistListHTML;
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.onWatchlistUpdated, this.watchlistList);
+    keepTrackApi.emit(EventBusEvent.onWatchlistUpdated, this.watchlistList);
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       // No duplicates
@@ -451,7 +451,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     });
 
     this.updateWatchlist();
-    keepTrackApi.emit(KeepTrackApiEvents.onWatchlistRemove, this.watchlistList);
+    keepTrackApi.emit(EventBusEvent.onWatchlistRemove, this.watchlistList);
 
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -491,7 +491,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         return parseInt(satA.sccNum) - parseInt(satB.sccNum);
       });
       this.updateWatchlist();
-      keepTrackApi.emit(KeepTrackApiEvents.onWatchlistAdd, this.watchlistList);
+      keepTrackApi.emit(EventBusEvent.onWatchlistAdd, this.watchlistList);
     }
   }
 

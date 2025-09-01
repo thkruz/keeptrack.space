@@ -19,7 +19,7 @@
  */
 
 import { MobileManager } from '@app/app/ui/mobileManager';
-import { KeepTrackApiEvents, MenuMode, SensorGeolocation } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode, SensorGeolocation } from '@app/engine/core/interfaces';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
@@ -138,7 +138,7 @@ export class SettingsManager {
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality?.toString());
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.saveSettings);
+    keepTrackApi.emit(EventBusEvent.saveSettings);
   }
 
   colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;

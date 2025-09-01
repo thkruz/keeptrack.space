@@ -1,5 +1,5 @@
 import { BottomMenu } from '@app/app/ui/bottom-menu';
-import { KeepTrackApiEvents, MenuMode, Singletons } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode, Singletons } from '@app/engine/core/interfaces';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { t7e } from '@app/locales/keys';
 import { Localization } from '@app/locales/locales';
@@ -292,10 +292,10 @@ export abstract class KeepTrackPlugin {
 
     this.sideMenuSecondaryOptions.leftOffset = typeof this.sideMenuSecondaryOptions.leftOffset === 'number' ? this.sideMenuSecondaryOptions.leftOffset : null;
 
-    this.helpTitle = Localization.plugins[this.id]?.title ?? this.helpTitle ?? this.sideMenuTitle;
-    this.helpBody = Localization.plugins[this.id]?.helpBody ?? this.helpBody;
-    this.sideMenuTitle = Localization.plugins[this.id]?.title ?? this.sideMenuTitle;
-    this.bottomIconLabel = Localization.plugins[this.id]?.bottomIconLabel ?? this.bottomIconLabel;
+    this.helpTitle = Localization.getInstance().plugins[this.id]?.title ?? this.helpTitle ?? this.sideMenuTitle;
+    this.helpBody = Localization.getInstance().plugins[this.id]?.helpBody ?? this.helpBody;
+    this.sideMenuTitle = Localization.getInstance().plugins[this.id]?.title ?? this.sideMenuTitle;
+    this.bottomIconLabel = Localization.getInstance().plugins[this.id]?.bottomIconLabel ?? this.bottomIconLabel;
 
     if (this.bottomIconLabel) {
       const bottomIconSlug = this.bottomIconLabel.toLowerCase().replace(' ', '-');
@@ -342,7 +342,7 @@ export abstract class KeepTrackPlugin {
       this.addSideMenu(sideMenuHtmlWrapped);
 
       keepTrackApi.on(
-        KeepTrackApiEvents.uiManagerFinal,
+        EventBusEvent.uiManagerFinal,
         () => {
           getEl(`${this.sideMenuElementName}-secondary-btn`)?.addEventListener('click', () => {
             if (!this.isSettingsMenuEnabled_) {
@@ -557,7 +557,7 @@ export abstract class KeepTrackPlugin {
   }
 
   registerMenuMode(): void {
-    keepTrackApi.on(KeepTrackApiEvents.bottomMenuModeChange, (): void => {
+    keepTrackApi.on(EventBusEvent.bottomMenuModeChange, (): void => {
       this.hideBottomIcon();
       if (this.menuMode.includes(settingsManager.activeMenuMode)) {
         this.showBottomIcon();
@@ -582,12 +582,12 @@ export abstract class KeepTrackPlugin {
   }
 
   registerRmbCallback(callback: (targetId: string, clickedSatId?: number) => void): void {
-    keepTrackApi.on(KeepTrackApiEvents.rmbMenuActions, callback);
+    keepTrackApi.on(EventBusEvent.rmbMenuActions, callback);
   }
 
   addContextMenuLevel1Item(html: string): void {
     keepTrackApi.on(
-      KeepTrackApiEvents.rightBtnMenuAdd,
+      EventBusEvent.rightBtnMenuAdd,
       () => {
         const item = document.createElement('div');
 
@@ -612,7 +612,7 @@ export abstract class KeepTrackPlugin {
 
   addContextMenuLevel2Item(elementId: string, html: string): void {
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+      EventBusEvent.uiManagerInit,
       () => {
         const item = document.createElement('div');
 
@@ -630,7 +630,7 @@ export abstract class KeepTrackPlugin {
    */
   addBottomIcon(icon: Module, isDisabled = false): void {
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+      EventBusEvent.uiManagerInit,
       () => {
         const button = document.createElement('div');
 
@@ -677,7 +677,7 @@ export abstract class KeepTrackPlugin {
       this.onSetBottomIconToUnselected();
     }
     if (isHideSideMenus) {
-      keepTrackApi.emit(KeepTrackApiEvents.hideSideMenus);
+      keepTrackApi.emit(EventBusEvent.hideSideMenus);
     }
     getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-selected');
   }
@@ -738,7 +738,7 @@ export abstract class KeepTrackPlugin {
   }
 
   addSideMenu(sideMenuHtml: string): void {
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, () => {
+    keepTrackApi.on(EventBusEvent.uiManagerInit, () => {
       getEl(KeepTrackPlugin.sideMenuContainerId)?.insertAdjacentHTML('beforeend', sideMenuHtml);
     });
   }
@@ -753,7 +753,7 @@ export abstract class KeepTrackPlugin {
   }) {
     if (this.isRequireSensorSelected && this.isRequireSatelliteSelected) {
       keepTrackApi.on(
-        KeepTrackApiEvents.selectSatData,
+        EventBusEvent.selectSatData,
         (obj: BaseObject): void => {
           if (!obj?.isSatellite() || !keepTrackApi.getSensorManager().isSensorSelected()) {
             this.setBottomIconToDisabled();
@@ -766,7 +766,7 @@ export abstract class KeepTrackPlugin {
     }
     if (this.isRequireSatelliteSelected && !this.isRequireSensorSelected) {
       keepTrackApi.on(
-        KeepTrackApiEvents.selectSatData,
+        EventBusEvent.selectSatData,
         (obj: BaseObject): void => {
           if (!obj) {
             this.setBottomIconToDisabled();
@@ -780,7 +780,7 @@ export abstract class KeepTrackPlugin {
 
     if (this.isRequireSensorSelected && !this.isRequireSatelliteSelected) {
       keepTrackApi.on(
-        KeepTrackApiEvents.setSensor,
+        EventBusEvent.setSensor,
         (sensor, sensorId): void => {
           if (!sensor && !sensorId) {
             this.setBottomIconToDisabled();
@@ -793,7 +793,7 @@ export abstract class KeepTrackPlugin {
     }
 
     keepTrackApi.on(
-      KeepTrackApiEvents.bottomMenuClick,
+      EventBusEvent.bottomMenuClick,
       (iconName: string): void => {
         if (iconName === this.bottomIconElementName) {
           if (this.isMenuButtonActive) {
@@ -837,6 +837,11 @@ export abstract class KeepTrackPlugin {
         }
       },
     );
+  }
+
+  bottomMenuClicked() {
+    keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+    keepTrackApi.emit(EventBusEvent.bottomMenuClick, this.bottomIconElementName);
   }
 
   protected static genH5Title_(title: string): string {
@@ -906,7 +911,7 @@ export abstract class KeepTrackPlugin {
 
   registerSubmitButtonClicked(callback: ((() => void) | null) = null) {
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         const form = getEl(`${this.sideMenuElementName}-form`);
 
@@ -927,7 +932,7 @@ export abstract class KeepTrackPlugin {
 
   registerClickAndDragOptions(opts: ClickDragOptions = {} as ClickDragOptions): void {
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         if (this.sideMenuSecondaryHtml) {
           opts.attachedElement = getEl(`${this.sideMenuElementName}-secondary`);
@@ -942,7 +947,7 @@ export abstract class KeepTrackPlugin {
 
   registerClickAndDragOptionsSecondary(opts: ClickDragOptions = {} as ClickDragOptions): void {
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         const edgeEl = clickAndDragWidth(getEl(`${this.sideMenuElementName}-secondary`), opts);
 
@@ -961,7 +966,7 @@ export abstract class KeepTrackPlugin {
    */
   registerHelp(helpTitle: string, helpText: string) {
     keepTrackApi.on(
-      KeepTrackApiEvents.onHelpMenuClick,
+      EventBusEvent.onHelpMenuClick,
       (): boolean => {
         if (this.isMenuButtonActive) {
           adviceManagerInstance.showAdvice(helpTitle, helpText);
@@ -981,7 +986,7 @@ export abstract class KeepTrackPlugin {
    */
   registerHideSideMenu(bottomIconElementName: string, slideCb: () => void): void {
     keepTrackApi.on(
-      KeepTrackApiEvents.hideSideMenus,
+      EventBusEvent.hideSideMenus,
       (): void => {
         slideCb();
         getEl(bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);

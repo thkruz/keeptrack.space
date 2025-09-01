@@ -1,6 +1,6 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
 import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager, settingsManager } from '@app/settings/settings';
@@ -30,7 +30,7 @@ export abstract class UrlManager {
   };
 
   static {
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, (sat) => {
+    keepTrackApi.on(EventBusEvent.selectSatData, (sat) => {
       if (sat instanceof DetailedSatellite) {
         this.selectedSat_ = sat;
       } else {
@@ -39,21 +39,21 @@ export abstract class UrlManager {
       this.updateURL();
     });
 
-    keepTrackApi.on(KeepTrackApiEvents.propRateChanged, (propRate) => {
+    keepTrackApi.on(EventBusEvent.propRateChanged, (propRate) => {
       this.propRate_ = propRate;
       this.updateURL();
     });
 
-    keepTrackApi.on(KeepTrackApiEvents.searchUpdated, (searchString: string) => {
+    keepTrackApi.on(EventBusEvent.searchUpdated, (searchString: string) => {
       this.searchString_ = searchString;
       this.updateURL();
     });
 
-    keepTrackApi.on(KeepTrackApiEvents.updateDateTime, () => {
+    keepTrackApi.on(EventBusEvent.updateDateTime, () => {
       this.updateURL();
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (key) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key) => {
       if (key === 'U') {
         this.updateURL(true);
       }
@@ -184,7 +184,7 @@ export abstract class UrlManager {
               settingsManager.isOrbitCruncherInEcf = !!ecfValue;
               settingsManager.numberOfEcfOrbitsToDraw = ecfValue;
 
-              keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+              keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
                 keepTrackApi.getOrbitManager().orbitWorker.postMessage({
                   typ: OrbitCruncherType.SETTINGS_UPDATE,
                   numberOfOrbitsToDraw: settingsManager.numberOfEcfOrbitsToDraw,
@@ -201,7 +201,7 @@ export abstract class UrlManager {
           break;
       }
 
-      keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+      keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
         switch (key) {
           case 'search':
             if (!settingsManager.disableUI) {
@@ -529,7 +529,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAurora = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+        keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
           keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
@@ -543,7 +543,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAurora = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+        keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
           keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
@@ -557,7 +557,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAurora = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+        keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
           keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;

@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from 'ootk';
@@ -7,11 +7,11 @@ import { defaultSat } from './environment/apiMocks';
 
 test('keepTrackApi Unit Testing', () => {
   expect(() => {
-    keepTrackApi.unregister({ event: KeepTrackApiEvents.touchStart, cbName: 'test' });
+    keepTrackApi.unregister({ event: EventBusEvent.touchStart, cbName: 'test' });
   }).toThrow(Error);
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.updateSelectBox,
+    event: EventBusEvent.updateSelectBox,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -19,7 +19,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.onCruncherReady,
+    event: EventBusEvent.onCruncherReady,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -27,7 +27,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.onCruncherMessage,
+    event: EventBusEvent.onCruncherMessage,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -35,7 +35,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.uiManagerInit,
+    event: EventBusEvent.uiManagerInit,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -43,7 +43,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.uiManagerOnReady,
+    event: EventBusEvent.uiManagerOnReady,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -51,7 +51,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.bottomMenuClick,
+    event: EventBusEvent.bottomMenuClick,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -59,7 +59,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.hideSideMenus,
+    event: EventBusEvent.hideSideMenus,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -67,7 +67,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.nightToggle,
+    event: EventBusEvent.nightToggle,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -75,7 +75,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.orbitManagerInit,
+    event: EventBusEvent.orbitManagerInit,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -83,7 +83,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.drawManagerLoadScene,
+    event: EventBusEvent.drawManagerLoadScene,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -91,7 +91,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.drawOptionalScenery,
+    event: EventBusEvent.drawOptionalScenery,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -99,7 +99,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.updateLoop,
+    event: EventBusEvent.updateLoop,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -107,7 +107,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.rmbMenuActions,
+    event: EventBusEvent.rmbMenuActions,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -115,7 +115,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.updateDateTime,
+    event: EventBusEvent.updateDateTime,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -123,7 +123,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.uiManagerFinal,
+    event: EventBusEvent.uiManagerFinal,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -131,7 +131,7 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.rightBtnMenuAdd,
+    event: EventBusEvent.rightBtnMenuAdd,
     cbName: 'test',
     cb: () => {
       // Do nothing
@@ -139,34 +139,34 @@ test('keepTrackApi Unit Testing', () => {
   });
 
   keepTrackApi.on({
-    event: KeepTrackApiEvents.selectSatData,
+    event: EventBusEvent.selectSatData,
     cbName: 'test',
     cb: () => {
       // Do nothing
     },
   });
 
-  keepTrackApi.emit(KeepTrackApiEvents.updateSelectBox, 'test' as unknown as DetailedSatellite);
-  keepTrackApi.emit(KeepTrackApiEvents.onCruncherReady);
-  keepTrackApi.emit(KeepTrackApiEvents.onCruncherMessage);
-  keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
-  keepTrackApi.emit(KeepTrackApiEvents.uiManagerOnReady);
-  keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, 'test');
-  keepTrackApi.emit(KeepTrackApiEvents.hideSideMenus);
+  keepTrackApi.emit(EventBusEvent.updateSelectBox, 'test' as unknown as DetailedSatellite);
+  keepTrackApi.emit(EventBusEvent.onCruncherReady);
+  keepTrackApi.emit(EventBusEvent.onCruncherMessage);
+  keepTrackApi.emit(EventBusEvent.uiManagerInit);
+  keepTrackApi.emit(EventBusEvent.uiManagerOnReady);
+  keepTrackApi.emit(EventBusEvent.bottomMenuClick, 'test');
+  keepTrackApi.emit(EventBusEvent.hideSideMenus);
 
   /*
    * let emptyTexture: WebGLTexture;
    * keepTrackApi.runEvent(KeepTrackApiEvents.nightToggle(keepTrackApi.programs.drawManager.gl, emptyTexture, emptyTexture));
    */
-  keepTrackApi.emit(KeepTrackApiEvents.orbitManagerInit);
-  keepTrackApi.emit(KeepTrackApiEvents.drawManagerLoadScene);
-  keepTrackApi.emit(KeepTrackApiEvents.drawOptionalScenery);
-  keepTrackApi.emit(KeepTrackApiEvents.updateLoop);
-  keepTrackApi.emit(KeepTrackApiEvents.rmbMenuActions, 'test', -1);
-  keepTrackApi.emit(KeepTrackApiEvents.updateDateTime, new Date());
-  keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
-  keepTrackApi.emit(KeepTrackApiEvents.rightBtnMenuAdd);
-  keepTrackApi.emit(KeepTrackApiEvents.selectSatData, defaultSat, 0);
+  keepTrackApi.emit(EventBusEvent.orbitManagerInit);
+  keepTrackApi.emit(EventBusEvent.drawManagerLoadScene);
+  keepTrackApi.emit(EventBusEvent.drawOptionalScenery);
+  keepTrackApi.emit(EventBusEvent.updateLoop);
+  keepTrackApi.emit(EventBusEvent.rmbMenuActions, 'test', -1);
+  keepTrackApi.emit(EventBusEvent.updateDateTime, new Date());
+  keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+  keepTrackApi.emit(EventBusEvent.rightBtnMenuAdd);
+  keepTrackApi.emit(EventBusEvent.selectSatData, defaultSat, 0);
 });
 
 describe('keepTrackApi.html', () => {

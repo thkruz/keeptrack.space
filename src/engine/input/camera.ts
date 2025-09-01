@@ -22,13 +22,13 @@
  */
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { KeepTrackApiEvents, SatShader, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, SatShader, ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla } from 'ootk';
 import { SatMath } from '../../app/analysis/sat-math';
-import { InputEventType, keepTrackApi } from '../../keepTrackApi';
+import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
 import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
@@ -734,12 +734,12 @@ export class Camera {
 
     this.registerKeyboardEvents_();
 
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, () => {
+    keepTrackApi.on(EventBusEvent.selectSatData, () => {
       this.isAutoPitchYawToTarget = false;
     });
-    keepTrackApi.on(KeepTrackApiEvents.canvasMouseDown, this.canvasMouseDown_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.touchStart, this.touchStart_.bind(this));
-    keepTrackApi.on(InputEventType.KeyUp, (key: string, _code, _isRepeat: boolean, isShift: boolean) => {
+    keepTrackApi.on(EventBusEvent.canvasMouseDown, this.canvasMouseDown_.bind(this));
+    keepTrackApi.on(EventBusEvent.touchStart, this.touchStart_.bind(this));
+    keepTrackApi.on(EventBusEvent.KeyUp, (key: string, _code, _isRepeat: boolean, isShift: boolean) => {
       if (key === 'Shift' && !isShift) {
         this.fpsRun = 1;
         settingsManager.cameraMovementSpeed = 0.003;
@@ -754,7 +754,7 @@ export class Camera {
     const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
     keysDown.forEach((keyForFunc) => {
-      keepTrackApi.on(InputEventType.KeyDown, (key: string) => {
+      keepTrackApi.on(EventBusEvent.KeyDown, (key: string) => {
         if (key === keyForFunc) {
           this[`keyDown${key}_`].bind(this)();
         } else if (['w', 'a', 's', 'd', 'q', 'e'].includes(key)) {
@@ -763,7 +763,7 @@ export class Camera {
       });
     });
     keysUp.forEach((keyForFunc) => {
-      keepTrackApi.on(InputEventType.KeyUp, (key: string) => {
+      keepTrackApi.on(EventBusEvent.KeyUp, (key: string) => {
         if (key === keyForFunc) {
           this[`keyUp${key}_`].bind(this)();
         } else if (['w', 'a', 's', 'd', 'q', 'e'].includes(key)) {
@@ -773,21 +773,21 @@ export class Camera {
     });
 
     ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6', 'NumpadAdd', 'NumpadSubtract'].forEach((codeForFunc) => {
-      keepTrackApi.on(InputEventType.KeyDown, (_key: string, code: string) => {
+      keepTrackApi.on(EventBusEvent.KeyDown, (_key: string, code: string) => {
         if (code === codeForFunc) {
           this[`keyDown${code}_`].bind(this)();
         }
       });
     });
     ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((codeForFunc) => {
-      keepTrackApi.on(InputEventType.KeyUp, (_key: string, code: string) => {
+      keepTrackApi.on(EventBusEvent.KeyUp, (_key: string, code: string) => {
         if (code === codeForFunc) {
           this[`keyUp${code}_`].bind(this)();
         }
       });
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '`' && !isRepeat) {
         this.resetRotation();
       }

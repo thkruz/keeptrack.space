@@ -1,4 +1,4 @@
-import { EChartsData, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EChartsData, EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -71,7 +71,7 @@ export class RicPlot extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.setSecondarySat,
+      EventBusEvent.setSecondarySat,
       (obj: BaseObject | null) => {
         if (!obj || this.selectSatManager_.selectedSat === -1) {
           if (this.isMenuButtonActive) {
@@ -85,7 +85,7 @@ export class RicPlot extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (!obj || this.selectSatManager_.secondarySat === -1) {
           if (this.isMenuButtonActive) {

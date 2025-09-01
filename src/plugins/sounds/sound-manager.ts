@@ -1,5 +1,5 @@
 import { keepTrackContainer } from '@app/container';
-import { KeepTrackApiEvents, Singletons } from '@app/engine/core/interfaces';
+import { EventBusEvent, Singletons } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -201,7 +201,7 @@ export class SoundManager extends KeepTrackPlugin {
 
     keepTrackContainer.registerSingleton<SoundManager>(Singletons.SoundManager, this);
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, () => {
+    keepTrackApi.on(EventBusEvent.uiManagerInit, () => {
       this.voices = speechSynthesis.getVoices();
 
       // Resume audio context if suspended (required by browser autoplay policies)

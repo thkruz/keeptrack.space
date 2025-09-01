@@ -3,7 +3,7 @@ import { getEl } from '@app/engine/utils/get-el';
 
 import { GroupType } from '@app/app/data/object-group';
 import { StringExtractor } from '@app/app/ui/string-extractor';
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import flagPng from '@public/img/icons/flag.png';
 
@@ -36,7 +36,7 @@ export class CountriesMenu extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('country-list')!.innerHTML = CountriesMenu.generateCountryList_();
 
@@ -56,7 +56,7 @@ export class CountriesMenu extends KeepTrackPlugin {
 
   private static generateCountryList_(): string {
     const header = keepTrackApi.html`
-    <h5 class="center-align">${Localization.plugins.CountriesMenu.bottomIconLabel!}</h5>
+    <h5 class="center-align">${Localization.getInstance().plugins.CountriesMenu.bottomIconLabel!}</h5>
     <li class="divider"></li>
     <br/>`;
 
@@ -67,6 +67,8 @@ export class CountriesMenu extends KeepTrackPlugin {
         countryCodeList.push(sat.country);
       }
     });
+
+    Localization.getInstance(); // Ensure localization is initialized
 
     const countries = countryCodeList.map((countryCode) => {
       const country = StringExtractor.extractCountry(countryCode);

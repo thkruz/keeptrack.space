@@ -24,10 +24,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import '@materializecss/materialize';
 import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from 'ootk';
@@ -38,10 +38,10 @@ import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getClass } from '../../engine/utils/get-class';
 import { getEl, hideEl, setInnerHtml, showEl } from '../../engine/utils/get-el';
 import { rgbCss } from '../../engine/utils/rgbCss';
+import { LegendManager } from './legend-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 import { UiValidation } from './ui-validation';
-import { LegendManager } from './legend-manager';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
@@ -257,7 +257,7 @@ export class UiManager {
       getEl('logo-secondary')?.classList.remove('start-hidden');
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
+    keepTrackApi.emit(EventBusEvent.uiManagerInit);
 
     this.sortBottomIcons();
 
@@ -266,13 +266,13 @@ export class UiManager {
     // Initialize Navigation and Select Menus
     const elems = document.querySelectorAll('.dropdown-button');
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
       if (key === 'F2' && isShift && !isRepeat) {
         this.hideUi();
       }
     });
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'B' && !isRepeat) {
         this.toggleBottomMenu();
       }
@@ -430,12 +430,15 @@ export class UiManager {
     LegendManager.legendColorsChange();
 
     // Run any plugins code
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerOnReady);
+    keepTrackApi.emit(EventBusEvent.uiManagerOnReady);
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
-        this.bottomIconPress = (el: HTMLElement) => keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, el.id);
+        this.bottomIconPress = (el: HTMLElement) => {
+          keepTrackApi.getSoundManager()?.play(SoundNames.BEEP);
+          keepTrackApi.emit(EventBusEvent.bottomMenuClick, el.id);
+        };
         const BottomIcons = getEl('bottom-icons');
 
         BottomIcons?.addEventListener('click', (evt: Event) => {
@@ -463,7 +466,7 @@ export class UiManager {
         });
         this.hideSideMenus = () => {
           closeColorbox();
-          keepTrackApi.emit(KeepTrackApiEvents.hideSideMenus);
+          keepTrackApi.emit(EventBusEvent.hideSideMenus);
         };
       },
     );
@@ -512,7 +515,7 @@ export class UiManager {
     const sat = obj as DetailedSatellite;
 
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
-      keepTrackApi.emit(KeepTrackApiEvents.updateSelectBox, sat);
+      keepTrackApi.emit(EventBusEvent.updateSelectBox, sat);
       keepTrackApi.getTimeManager().lastBoxUpdateTime = realTime;
     }
   }

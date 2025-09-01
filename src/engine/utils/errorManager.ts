@@ -1,4 +1,4 @@
-import { KeepTrackApiEvents, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
 import githubIssueUrl, { Options } from 'new-github-issue-url';
 import { keepTrackApi } from '../../keepTrackApi';
 import { isThisNode } from './isThisNode';
@@ -26,7 +26,7 @@ export class ErrorManager {
   }
 
   error(e: Error, funcName: string, toastMsg?: string) {
-    keepTrackApi.emit(KeepTrackApiEvents.error, e, funcName);
+    keepTrackApi.emit(EventBusEvent.error, e, funcName);
 
     // eslint-disable-next-line no-console
     console.error(e);

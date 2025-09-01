@@ -1,5 +1,7 @@
 import { SensorMath } from '@app/app/sensors/sensor-math';
-import { GetSatType, KeepTrackApiEvents, MenuMode, SatPassTimes, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, GetSatType, MenuMode, SatPassTimes, ToastMsgType } from '@app/engine/core/interfaces';
+import { lineManagerInstance } from '@app/engine/rendering/line-manager';
+import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { getEl } from '@app/engine/utils/get-el';
 import { shake } from '@app/engine/utils/shake';
@@ -10,8 +12,6 @@ import { DetailedSatellite, MILLISECONDS_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from './watchlist';
-import { lineManagerInstance } from '@app/engine/rendering/line-manager';
-import { LineColors } from '@app/engine/rendering/line-manager/line';
 
 export class WatchlistOverlay extends KeepTrackPlugin {
   readonly id = 'WatchlistOverlay';
@@ -86,9 +86,9 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.updateLoop.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, WatchlistOverlay.uiManagerFinal.bind(this));
+    keepTrackApi.on(EventBusEvent.updateLoop, this.updateLoop.bind(this));
+    keepTrackApi.on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, WatchlistOverlay.uiManagerFinal.bind(this));
   }
 
   updateLoop() {

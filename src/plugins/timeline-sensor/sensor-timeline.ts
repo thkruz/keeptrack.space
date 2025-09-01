@@ -2,10 +2,10 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-lines */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from '@app/engine/utils/get-el';
+import { keepTrackApi } from '@app/keepTrackApi';
 import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
@@ -238,7 +238,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
@@ -290,7 +290,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
     // We need to wait for the sensorIds to be assigned before we can use them. Once they are ready we will reload the users last selected sensors
     keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherReady,
+      EventBusEvent.onCruncherReady,
       () => {
         const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
         let enabledSensors = [] as number[];
@@ -312,7 +312,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {
           return;

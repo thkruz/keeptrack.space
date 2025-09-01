@@ -1,13 +1,13 @@
 /* eslint-disable max-depth */
 import { SensorMath } from '@app/app/sensors/sensor-math';
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
+import { TimeManager } from '@app/engine/core/time-manager';
+import { LineManager } from '@app/engine/rendering/line-manager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import numeric from 'numeric';
 import { DetailedSatellite, DetailedSensor, RAD2DEG } from 'ootk';
 import type { ControlSite } from './ControlSite';
-import { TimeManager } from '@app/engine/core/time-manager';
-import { LineManager } from '@app/engine/rendering/line-manager';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
 
 export enum SatConstellationString {
   Aehf = 'aehf',
@@ -82,7 +82,7 @@ export class SatLinkManager {
 
   init(controlSiteList: ControlSite[]) {
     keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherReady,
+      EventBusEvent.onCruncherReady,
       () => this.onCruncher_(controlSiteList),
     );
   }

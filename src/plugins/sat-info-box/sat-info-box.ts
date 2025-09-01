@@ -1,9 +1,9 @@
 import Draggabilly from 'draggabilly';
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
-import { KeepTrackApiEvents } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -54,13 +54,13 @@ export class SatInfoBox extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.onWatchlistUpdated,
+      EventBusEvent.onWatchlistUpdated,
       (watchlistList: { id: number, inView: boolean }[]) => {
         let isOnList = false;
 
@@ -84,10 +84,10 @@ export class SatInfoBox extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.updateHeaderData_.bind(this));
+    keepTrackApi.on(EventBusEvent.selectSatData, this.updateHeaderData_.bind(this));
 
-    keepTrackApi.on(InputEventType.KeyDown, this.onKeyDownLowerI_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, (obj?: BaseObject) => this.selectSat_(this, obj));
+    keepTrackApi.on(EventBusEvent.KeyDown, this.onKeyDownLowerI_.bind(this));
+    keepTrackApi.on(EventBusEvent.selectSatData, (obj?: BaseObject) => this.selectSat_(this, obj));
   }
 
   addElement(element: { html: string | null; order: number }): void {
@@ -183,7 +183,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     this.addListenerToCollapseElement(getEl(`${SECTIONS.IDENTIFIERS}`), { value: this.isIdentifiersSectionCollapsed_ });
 
-    keepTrackApi.emit(KeepTrackApiEvents.satInfoBoxAddListeners);
+    keepTrackApi.emit(EventBusEvent.satInfoBoxAddListeners);
   }
 
   private createContainer(): void {
@@ -192,7 +192,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     plugin.addElement({ html: this.createHeader(), order: 0 });
     plugin.addElement({ html: this.createIdentifiersSection(), order: 3 });
     // Make sure we have all the dynamic html elements before getting the order
-    keepTrackApi.emit(KeepTrackApiEvents.satInfoBoxInit);
+    keepTrackApi.emit(EventBusEvent.satInfoBoxInit);
 
     const elements = plugin.getElements();
 
@@ -208,7 +208,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       `,
     );
 
-    keepTrackApi.emit(KeepTrackApiEvents.satInfoBoxFinal);
+    keepTrackApi.emit(EventBusEvent.satInfoBoxFinal);
 
     // Create a Sat Info Box Initializing Script
     this.initDraggabilly();

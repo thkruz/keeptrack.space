@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, lookanglesRow, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent, lookanglesRow, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
@@ -210,7 +210,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('analysis-bpt')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
@@ -260,7 +260,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.setSensor, (sensor) => {
+    keepTrackApi.on(EventBusEvent.setSensor, (sensor) => {
       if (!sensor) {
         return;
       }

@@ -2,13 +2,14 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import CollisionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {

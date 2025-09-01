@@ -1,4 +1,4 @@
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';

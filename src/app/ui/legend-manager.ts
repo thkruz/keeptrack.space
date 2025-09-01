@@ -1,4 +1,4 @@
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { addonColorSchemes } from '@app/engine/rendering/color-scheme-addons';
 import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';

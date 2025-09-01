@@ -1,6 +1,7 @@
 import { SensorManager } from '@app/app/sensors/sensorManager';
 import { keepTrackContainer } from '@app/container';
-import { EventBusEvent, Singletons } from '@app/engine/core/interfaces';
+import { Singletons } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';

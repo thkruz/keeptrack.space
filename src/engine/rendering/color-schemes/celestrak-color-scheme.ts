@@ -1,12 +1,13 @@
 /* eslint-disable complexity */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { ColorInformation, EventBusEvent, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../../input/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export interface CelestrakColorSchemeColorMap extends ColorSchemeColorMap {
   celestrakDefaultRocketBody: rgbaArray;

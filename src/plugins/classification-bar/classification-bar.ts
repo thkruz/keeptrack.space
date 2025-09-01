@@ -1,5 +1,5 @@
 import { Classification, ClassificationString } from '@app/app/ui/classification';
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';

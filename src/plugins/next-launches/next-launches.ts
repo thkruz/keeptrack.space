@@ -1,4 +1,4 @@
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -9,6 +9,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import calendar2Png from '@public/img/icons/calendar2.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface LaunchInfoData {
   window_start: string | number | Date;

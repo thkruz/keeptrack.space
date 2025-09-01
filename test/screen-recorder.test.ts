@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ScreenRecorder } from '@app/plugins/screen-recorder/screen-recorder';
 import { setupDefaultHtml } from './environment/standard-env';

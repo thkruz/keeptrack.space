@@ -40,7 +40,7 @@ import { HoverManager } from './app/ui/hover-manager';
 import { SplashScreen } from './app/ui/splash-screen';
 import { UiManager } from './app/ui/uiManager';
 import { keepTrackContainer } from './container';
-import { EventBusEvent, Singletons } from './engine/core/interfaces';
+import { Singletons } from './engine/core/interfaces';
 import { Scene } from './engine/core/scene';
 import { TimeManager } from './engine/core/time-manager';
 import { Camera } from './engine/input/camera';
@@ -58,6 +58,7 @@ import { keepTrackApi } from './keepTrackApi';
 import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
+import { EventBusEvent } from './engine/events/event-bus-events';
 
 export class KeepTrack {
   isReady = false;

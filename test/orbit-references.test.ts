@@ -1,4 +1,4 @@
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { OrbitReferences } from '@app/plugins/orbit-references/orbit-references';

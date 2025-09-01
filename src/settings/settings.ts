@@ -19,7 +19,7 @@
  */
 
 import { MobileManager } from '@app/app/ui/mobileManager';
-import { EventBusEvent, MenuMode, SensorGeolocation } from '@app/engine/core/interfaces';
+import { MenuMode, SensorGeolocation } from '@app/engine/core/interfaces';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
@@ -37,6 +37,7 @@ import { defaultPlugins } from './default-plugins';
 import { parseGetVariables } from './parse-get-variables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class SettingsManager {
   /**

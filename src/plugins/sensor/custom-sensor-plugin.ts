@@ -1,5 +1,5 @@
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { slideInRight } from '@app/engine/utils/slide';
@@ -16,6 +16,7 @@ import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { SoundNames } from '../sounds/sounds';
 import { SensorInfoPlugin } from './sensor-info-plugin';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   readonly id = 'CustomSensorPlugin';

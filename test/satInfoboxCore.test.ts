@@ -1,4 +1,4 @@
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBoxObject } from '@app/plugins/sat-info-box-object/sat-info-box-object';

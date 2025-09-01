@@ -1,7 +1,7 @@
 import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { CatalogManager } from '@app/app/data/catalog-manager';
-import { EventBusEvent, GetSatType, MenuMode } from '@app/engine/core/interfaces';
+import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -13,6 +13,7 @@ import streamPng from '@public/img/icons/stream.png';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class Breakup extends KeepTrackPlugin {
   readonly id = 'Breakup';

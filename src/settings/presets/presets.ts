@@ -1,5 +1,5 @@
 import { GroupType } from '@app/app/data/object-group';
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';

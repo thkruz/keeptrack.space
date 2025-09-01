@@ -5,7 +5,7 @@ import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view'
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '../engine/plugins/base-plugin';
 import { errorManagerInstance } from '../engine/utils/errorManager';
 import { getEl } from '../engine/utils/get-el';

@@ -19,13 +19,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fovPng from '@public/img/icons/fov.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class SensorFov extends KeepTrackPlugin {
   readonly id = 'SensorFov';

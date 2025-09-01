@@ -1,4 +1,4 @@
-import { EventBusEvent, GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
+import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
 import { CameraType } from '@app/engine/input/camera';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -13,6 +13,7 @@ import { NewLaunch } from '../new-launch/new-launch';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 /**
  * This is the class that manages the selection of objects.

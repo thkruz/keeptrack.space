@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';

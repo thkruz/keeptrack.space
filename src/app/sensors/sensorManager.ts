@@ -26,7 +26,7 @@
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import type { TearrData } from '@app/app/sensors/sensor-math';
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/engine/utils/constants';

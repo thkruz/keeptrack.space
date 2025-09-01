@@ -1,9 +1,9 @@
-import { BufferAttribute } from '@app/static/buffer-attribute';
-import { WebGlProgramHelper } from '@app/static/webgl-program';
 import { mat3, mat4 } from 'gl-matrix';
 import * as Ootk from 'ootk';
-import { keepTrackApi } from '../../keepTrackApi';
-import { GlUtils } from '../../static/gl-utils';
+import { keepTrackApi } from '../../../keepTrackApi';
+import { BufferAttribute } from '../buffer-attribute';
+import { GlUtils } from '../gl-utils';
+import { WebGlProgramHelper } from '../webgl-program';
 
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
@@ -39,7 +39,7 @@ export class CustomMesh {
   private nMatrix_ = mat3.create();
   private program_: WebGLProgram;
   private shaders_ = {
-    frag: keepTrackApi.glsl`#version 300 es
+    frag: KeepTrackApi.glsl`#version 300 es
       #ifdef GL_FRAGMENT_PRECISION_HIGH
         precision highp float;
       #else

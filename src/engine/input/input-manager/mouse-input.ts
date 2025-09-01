@@ -1,4 +1,4 @@
-import { EventBusEvent, GetSatType } from '@app/engine/core/interfaces';
+import { GetSatType } from '@app/engine/core/interfaces';
 import { Camera, CameraType } from '@app/engine/input/camera';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
@@ -12,6 +12,7 @@ import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
 import { InputManager, LatLon } from '../input-manager';
 import { KeyboardInput } from './keyboard-input';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class MouseInput {
   private dragHasMoved = false;

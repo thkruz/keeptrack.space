@@ -1,5 +1,5 @@
 import { sensors } from '@app/app/data/catalogs/sensors';
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { CameraType } from '@app/engine/input/camera';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
@@ -14,6 +14,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 // TODO: Add a search bar and filter for sensors
 

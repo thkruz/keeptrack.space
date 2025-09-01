@@ -19,7 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
@@ -28,6 +28,7 @@ import { BaseObject, Degrees } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class SatelliteFov extends KeepTrackPlugin {
   readonly id = 'SatelliteFov';

@@ -1,4 +1,4 @@
-import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
@@ -7,6 +7,7 @@ import { SettingsManager, settingsManager } from '@app/settings/settings';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians } from 'ootk';
 import { getEl } from '../utils/get-el';
+import { EventBusEvent } from '../events/event-bus-events';
 
 export abstract class UrlManager {
   private static selectedSat_: DetailedSatellite | null = null;

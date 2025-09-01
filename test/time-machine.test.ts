@@ -1,4 +1,4 @@
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Milliseconds } from 'ootk';

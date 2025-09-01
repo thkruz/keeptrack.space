@@ -1,4 +1,4 @@
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';

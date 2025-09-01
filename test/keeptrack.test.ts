@@ -7,10 +7,10 @@ import { keepTrackContainer } from '../src/container';
 import { SatCruncherMessageData, Singletons } from '../src/engine/core/interfaces';
 import { OrbitManager } from '../src/engine/rendering/orbitManager';
 import { WebGLRenderer } from '../src/engine/rendering/webgl-renderer';
-import { CatalogManager } from '../src/singletons/catalog-manager';
 import { KeepTrack } from './../src/keeptrack';
 import { defaultSat } from './environment/apiMocks';
 import { mockCameraManager, setupDefaultHtml } from './environment/standard-env';
+import { CatalogManager } from '@app/app/data/catalog-manager';
 
 /*
  *Code Analysis

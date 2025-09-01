@@ -1,7 +1,8 @@
-import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import githubIssueUrl, { Options } from 'new-github-issue-url';
 import { keepTrackApi } from '../../keepTrackApi';
 import { isThisNode } from './isThisNode';
+import { EventBusEvent } from '../events/event-bus-events';
 
 export class ErrorManager {
   private readonly ALLOW_DEBUG = false; // window.location.hostname === 'localhost';

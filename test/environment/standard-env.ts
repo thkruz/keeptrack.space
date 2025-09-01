@@ -1,4 +1,6 @@
 /* eslint-disable no-console */
+import { CatalogManager } from '@app/app/data/catalog-manager';
+import { SatLinkManager } from '@app/app/data/catalog-manager/satLinkManager';
 import { GroupsManager } from '@app/app/data/groups-manager';
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { SensorManager } from '@app/app/sensors/sensorManager';
@@ -7,6 +9,7 @@ import { SearchManager } from '@app/app/ui/search-manager';
 import { UiManager } from '@app/app/ui/uiManager';
 import { Scene } from '@app/engine/core/scene';
 import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 import { Camera } from '@app/engine/input/camera';
 import { InputManager } from '@app/engine/input/input-manager';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
@@ -14,18 +17,17 @@ import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { ConeMeshFactory } from '@app/engine/rendering/draw-manager/cone-mesh-factory';
 import { SensorFovMeshFactory } from '@app/engine/rendering/draw-manager/sensor-fov-mesh-factory';
+import { LineManager } from '@app/engine/rendering/line-manager';
 import { KeepTrack } from '@app/keeptrack';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
-import { SatLinkManager } from '@app/singletons/catalog-manager/satLinkManager';
 import { mat4 } from 'gl-matrix';
 import { keepTrackContainer } from '../../src/container';
 import { Constructor, Singletons } from '../../src/engine/core/interfaces';
 import { OrbitManager } from '../../src/engine/rendering/orbitManager';
 import { WebGLRenderer } from '../../src/engine/rendering/webgl-renderer';
-import { CatalogManager } from '../../src/singletons/catalog-manager';
 import { defaultSat, defaultSensor } from './apiMocks';
 
 export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlugin>[]) => {
@@ -62,7 +64,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
       disable: jest.fn(),
     },
   };
-  keepTrackApi.unregisterAllEvents();
+  EventBus.getInstance().unregisterAllEvents();
   keepTrackApi.unregisterAllPlugins();
   // eslint-disable-next-line dot-notation
   KeepTrack['setContainerElement']();
@@ -109,7 +111,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     addEventListener: jest.fn(),
   } as unknown as Worker;
 
-  orbitManagerInstance.init(null, global.mocks.glMock);
+  orbitManagerInstance.init(null as unknown as LineManager, global.mocks.glMock);
   keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
 
   const colorSchemeManagerInstance = new ColorSchemeManager();
@@ -250,7 +252,7 @@ export const enableConsoleErrors = () => {
 
 export const standardSelectSat = () => {
   keepTrackApi.getCatalogManager().objectCache = [defaultSat];
-  keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
+  keepTrackApi.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));
   keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
   keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
   keepTrackApi.getCatalogManager().getObject = () => defaultSat;
@@ -399,10 +401,10 @@ export const setupDefaultHtml = () => {
 };
 
 export const clearAllCallbacks = () => {
-  for (const callback in keepTrackApi.events) {
-    if (!Object.prototype.hasOwnProperty.call(keepTrackApi.events, callback)) {
+  for (const callback in EventBus.getInstance().events) {
+    if (!Object.prototype.hasOwnProperty.call(EventBus.getInstance().events, callback)) {
       continue;
     }
-    keepTrackApi.events[callback] = [];
+    EventBus.getInstance().events[callback] = [];
   }
 };

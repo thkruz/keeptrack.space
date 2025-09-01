@@ -24,7 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -42,6 +42,7 @@ import { LegendManager } from './legend-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 import { UiValidation } from './ui-validation';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;

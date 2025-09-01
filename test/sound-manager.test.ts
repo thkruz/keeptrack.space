@@ -1,4 +1,4 @@
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SoundNames, sounds } from '@app/plugins/sounds/sounds';

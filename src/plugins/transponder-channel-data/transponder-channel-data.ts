@@ -1,5 +1,5 @@
 import { GroupType } from '@app/app/data/object-group';
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
@@ -9,6 +9,7 @@ import { BaseObject, DetailedSatellite } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface ChannelInfo {
   satellite: string;

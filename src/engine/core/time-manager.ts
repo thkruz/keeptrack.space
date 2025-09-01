@@ -1,5 +1,5 @@
 import { SatMath } from '@app/app/analysis/sat-math';
-import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
@@ -7,6 +7,7 @@ import { keepTrackApi } from '../../keepTrackApi';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
+import { EventBusEvent } from '../events/event-bus-events';
 
 export class TimeManager {
   dateDOM = null;

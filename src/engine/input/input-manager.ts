@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec3, vec4 } from 'gl-matrix';

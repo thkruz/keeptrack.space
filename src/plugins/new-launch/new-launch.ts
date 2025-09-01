@@ -1,4 +1,4 @@
-import { EventBusEvent, GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
@@ -12,6 +12,7 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { launchSites } from '@app/app/data/catalogs/launch-sites';
 import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';

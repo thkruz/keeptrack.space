@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { EventBusEvent, GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { SensorToSatLine } from '@app/engine/rendering/line-manager/sensor-to-sat-line';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -39,6 +39,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { EL as SAT_INFO_EL, SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];

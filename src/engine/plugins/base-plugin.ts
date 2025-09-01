@@ -1,5 +1,5 @@
 import { BottomMenu } from '@app/app/ui/bottom-menu';
-import { EventBusEvent, MenuMode, Singletons } from '@app/engine/core/interfaces';
+import { MenuMode, Singletons } from '@app/engine/core/interfaces';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { t7e } from '@app/locales/keys';
 import { Localization } from '@app/locales/locales';
@@ -13,6 +13,7 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl, hideEl } from '../utils/get-el';
 import { shake } from '../utils/shake';
 import { slideInRight, slideOutLeft } from '../utils/slide';
+import { EventBusEvent } from '../events/event-bus-events';
 
 export interface ClickDragOptions {
   leftOffset?: number;

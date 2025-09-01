@@ -1,12 +1,13 @@
 /* eslint-disable complexity */
 import { SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { ColorInformation, EventBusEvent, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { ColorScheme } from './color-scheme';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class SunlightColorScheme extends ColorScheme {
   readonly label = 'Sunlight Status';

@@ -1,5 +1,6 @@
 import { keepTrackContainer } from '@app/container';
-import { EventBusEvent, Singletons } from '@app/engine/core/interfaces';
+import { Singletons } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -51,9 +52,9 @@ describe('TopMenu_class', () => {
 
     soundBtn.click();
     expect(soundManager.isMute).toBe(true);
-    expect(soundIcon.parentElement.classList.contains('bmenu-item-selected')).toBe(false);
+    expect(soundIcon.parentElement!.classList.contains('bmenu-item-selected')).toBe(false);
     soundBtn.click();
     expect(soundManager.isMute).toBe(false);
-    expect(soundIcon.parentElement.classList.contains('bmenu-item-selected')).toBe(true);
+    expect(soundIcon.parentElement!.classList.contains('bmenu-item-selected')).toBe(true);
   });
 });

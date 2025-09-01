@@ -1,4 +1,4 @@
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -10,6 +10,7 @@ import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plu
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class ShortTermFences extends KeepTrackPlugin {
   readonly id = 'ShortTermFences';

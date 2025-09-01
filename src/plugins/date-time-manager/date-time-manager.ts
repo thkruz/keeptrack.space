@@ -1,4 +1,4 @@
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';

@@ -1,5 +1,5 @@
 /* eslint-disable no-use-before-define */
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';

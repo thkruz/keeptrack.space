@@ -1,4 +1,4 @@
-import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 
@@ -13,6 +13,7 @@ import { BaseObject, CatalogSource, Degrees, DetailedSatellite, EciVec3, Kilomet
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 enum RPOType {
   GEO = 'GEO',

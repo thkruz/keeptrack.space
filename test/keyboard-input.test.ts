@@ -1,5 +1,6 @@
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardInput } from '@app/engine/input/input-manager/keyboard-input';
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { keepTrackContainer } from '../src/container';
 import { Singletons } from '../src/engine/core/interfaces';
 
@@ -14,14 +15,14 @@ describe('KeyboardInput_class', () => {
 
     keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string) => {
       if (key === 'R') {
         test = true;
       }
     });
 
     // Simulate key event while typing
-    keepTrackApi.emit(InputEventType.KeyDown, 'R', 'KeyR', false, false, false);
+    keepTrackApi.emit(EventBusEvent.KeyDown, 'R', 'KeyR', false, false, false);
 
     expect(test).toBe(true);
   });
@@ -32,12 +33,12 @@ describe('KeyboardInput_class', () => {
     let test = false;
 
     keyboardInput.init();
-    keepTrackApi.on(InputEventType.KeyDown, (key: string) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string) => {
       if (key === 'R') {
         test = true;
       }
     });
-    keepTrackApi.emit(InputEventType.KeyDown, 'R', 'KeyR', false, false, false);
+    keepTrackApi.emit(EventBusEvent.KeyDown, 'R', 'KeyR', false, false, false);
 
     expect(test).toBe(true);
   });

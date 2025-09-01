@@ -124,6 +124,8 @@ export class KeepTrackApi {
   once = EventBus.getInstance().once.bind(EventBus.getInstance());
   emit = EventBus.getInstance().emit.bind(EventBus.getInstance());
   unregister = EventBus.getInstance().unregister.bind(EventBus.getInstance());
+  events = EventBus.getInstance().events;
+  methods = EventBus.getInstance().methods;
 
   containerRoot = null as unknown as HTMLDivElement;
   isInitialized = false;

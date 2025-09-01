@@ -1,4 +1,4 @@
-import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { SensorToMoonLine } from '@app/engine/rendering/line-manager/sensor-to-moon-line';
 import { SensorToSunLine } from '@app/engine/rendering/line-manager/sensor-to-sun-line';
@@ -8,6 +8,7 @@ import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { RfSensor, SpaceObjectType } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   readonly id = 'SensorInfoPlugin';

@@ -1,6 +1,6 @@
+import { SatLinkManager, SatConstellationString } from '@app/app/data/catalog-manager/satLinkManager';
 import { TimeManager } from '@app/engine/core/time-manager';
-import { SatConstellationString, SatLinkManager } from '@app/singletons/catalog-manager/satLinkManager';
-import { LineManager } from '@app/singletons/draw-manager/line-manager';
+import { LineManager } from '@app/engine/rendering/line-manager';
 
 describe('SatLinkManager', () => {
   let satLinkManager: SatLinkManager;

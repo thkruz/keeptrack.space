@@ -1,10 +1,11 @@
 import { keepTrackContainer } from '@app/container';
-import { EventBusEvent, Singletons } from '@app/engine/core/interfaces';
+import { Singletons } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames, sounds } from './sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface PlayingSound {
   source: AudioBufferSourceNode;

@@ -1,9 +1,10 @@
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import videocamPng from '@public/img/icons/videocam.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { StreamManager } from './stream-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class ScreenRecorder extends KeepTrackPlugin {
   readonly id = 'ScreenRecorder';

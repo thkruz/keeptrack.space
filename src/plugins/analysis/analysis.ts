@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { EventBusEvent, lookanglesRow, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { lookanglesRow, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
@@ -39,6 +39,7 @@ import folderCodePng from '@public/img/icons/folder-code.png';
 import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';

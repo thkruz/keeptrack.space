@@ -1,4 +1,4 @@
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
@@ -8,6 +8,7 @@ import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, second
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 

@@ -2,7 +2,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-lines */
 
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -19,6 +19,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { fetchWeatherApi } from 'openmeteo';
 

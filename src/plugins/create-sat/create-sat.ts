@@ -15,12 +15,13 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 import { SatMath } from '@app/app/analysis/sat-math';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
-import { EventBusEvent, GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 /**
  * Interface for TLE input parameters

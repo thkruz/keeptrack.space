@@ -42,7 +42,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -57,6 +57,7 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, Lla
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface GroundTracePoint {
   x: number;

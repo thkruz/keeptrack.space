@@ -1,4 +1,4 @@
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from 'ootk';

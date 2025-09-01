@@ -1,6 +1,6 @@
 import { StringifiedNumber } from '@app/app/analysis/sat-math';
 import { CatalogManager } from '@app/app/data/catalog-manager';
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, FormatTle, Tle } from 'ootk';

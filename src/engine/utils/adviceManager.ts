@@ -18,7 +18,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl } from './get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';

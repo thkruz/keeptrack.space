@@ -1,5 +1,5 @@
 import { LegendManager } from '@app/app/ui/legend-manager';
-import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ColorPick } from '@app/engine/utils/color-pick';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
@@ -12,6 +12,7 @@ import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////

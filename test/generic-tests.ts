@@ -1,5 +1,6 @@
 import { BottomMenu } from '@app/app/ui/bottom-menu';
-import { Constructor, EventBusEvent } from '@app/engine/core/interfaces';
+import { Constructor } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';

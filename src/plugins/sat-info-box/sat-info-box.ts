@@ -1,7 +1,7 @@
 import Draggabilly from 'draggabilly';
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';

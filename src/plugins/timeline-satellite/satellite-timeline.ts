@@ -1,10 +1,11 @@
-import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 
 import { SatMath } from '@app/app/analysis/sat-math';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { shake } from '@app/engine/utils/shake';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord, Seconds } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';

@@ -22,7 +22,7 @@
  */
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { EventBusEvent, SatShader, ToastMsgType } from '@app/engine/core/interfaces';
+import { SatShader, ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4, quat, vec3 } from 'gl-matrix';
@@ -33,6 +33,7 @@ import { SettingsManager } from '../../settings/settings';
 import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
+import { EventBusEvent } from '../events/event-bus-events';
 
 /**
  * Represents the different types of cameras available.

@@ -3,7 +3,7 @@ import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
 import { keepTrackApi } from '../../keepTrackApi';
 import { MobileManager } from './mobileManager';
 
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
 import earthJpg from '@public/img/wallpaper/Earth.jpg';

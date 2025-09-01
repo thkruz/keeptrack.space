@@ -2,13 +2,14 @@ import { openColorbox } from '@app/engine/utils/colorbox';
 import { getEl } from '@app/engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 
-import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import photoManagerPng from '@public/img/icons/photoManager.png';
 import { Degrees } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface DiscvrResponse {
   centroid_coordinates: {

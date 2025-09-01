@@ -1,4 +1,4 @@
-import { EventBusEvent, ToastMsgType } from '@app/engine/core/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -17,6 +17,7 @@ import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
+import { EventBusEvent } from '../events/event-bus-events';
 
 export interface SceneParams {
   gl: WebGL2RenderingContext;

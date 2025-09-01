@@ -7,9 +7,9 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as getEl from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { settingsManager } from '@app/settings/settings';
-import { LegendManager } from '@app/static/legend-manager';
 import { BaseObject, Degrees, DetailedSatellite, SpaceObjectType, TleLine1 } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
+import { LegendManager } from '@app/app/ui/legend-manager';
 
 const obj1 = defaultSat.clone();
 

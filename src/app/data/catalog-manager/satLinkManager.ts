@@ -1,7 +1,7 @@
 /* eslint-disable max-depth */
 import { SensorMath } from '@app/app/sensors/sensor-math';
-import { EventBusEvent } from '@app/engine/core/interfaces';
 import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';

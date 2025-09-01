@@ -1,5 +1,5 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { EventBusEvent } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';

@@ -1,4 +1,4 @@
-import { EventBusEvent, GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
@@ -16,6 +16,7 @@ import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLin
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class EditSat extends KeepTrackPlugin {
   readonly id = 'EditSat';

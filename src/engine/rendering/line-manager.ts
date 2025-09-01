@@ -2,7 +2,7 @@
 /* eslint-disable complexity */
 /* eslint-disable camelcase */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { EventBusEvent, Singletons } from '@app/engine/core/interfaces';
+import { Singletons } from '@app/engine/core/interfaces';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -21,6 +21,7 @@ import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
+import { EventBusEvent } from '../events/event-bus-events';
 
 export class LineManager {
   attribs = {

@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ColorRuleSet, EventBusEvent } from '@app/engine/core/interfaces';
+import { ColorRuleSet } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ColorInformation, Pickable, rgbaArray } from '../core/interfaces';
 import { errorManagerInstance } from '../utils/errorManager';
@@ -52,6 +52,7 @@ import { SpatialDensityColorScheme } from './color-schemes/spatial-density-color
 import { StarlinkColorScheme } from './color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from './color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
+import { EventBusEvent } from '../events/event-bus-events';
 
 export class ColorSchemeManager {
   // This is where you confiure addon color schemes

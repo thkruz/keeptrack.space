@@ -6,11 +6,12 @@ import gpsPng from '@public/img/icons/gps.png';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import type { GroupsManager } from '@app/app/data/groups-manager';
 import { GroupType } from '@app/app/data/object-group';
-import { EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { DopMath } from '@app/engine/math/dop-math';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';

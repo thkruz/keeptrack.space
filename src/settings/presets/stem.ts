@@ -1,8 +1,9 @@
 import { BottomMenu } from '@app/app/ui/bottom-menu';
-import { EventBusEvent, MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '../settings';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.isBlockPersistence = true;

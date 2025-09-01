@@ -1,4 +1,5 @@
-import { EChartsData, EventBusEvent, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EChartsData, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';

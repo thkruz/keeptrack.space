@@ -64,8 +64,7 @@ export abstract class SplashScreen {
           <div style="height: 50px; min-height: 50px; max-height: 50px; overflow: hidden; display: flex; align-items: center;">
             <span id="loader-text" style="width: 100%;">Downloading Science...</span>
           </div>
-          <div id="adsense-placeholder"
-          style="display:block; width:970px;height:90px; margin:16px 0; display: none;">
+          style="width:970px;height:90px; margin:16px 0; display: none;">
           </div>
           <div style="height:36px; min-height:36px; max-height:36px; position: relative;">
             <button

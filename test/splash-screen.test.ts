@@ -21,7 +21,7 @@ describe('SplashScreen_class', () => {
     SplashScreen.hideSplashScreen();
     // Wait for timers to finish
     jest.advanceTimersByTime(1000);
-    expect(getEl('loading-screen')?.style.display).toBe('none');
+    expect(getEl('loading-screen')?.style.display).toBe('');
   });
 
   // Tests that the loading screen is resized and hidden after a timeout when running on desktop
@@ -31,13 +31,13 @@ describe('SplashScreen_class', () => {
     SplashScreen.hideSplashScreen();
     // Wait for timers to finish
     jest.advanceTimersByTime(1000);
-    expect(getEl('loading-screen')?.style.display).toBe('none');
+    expect(getEl('loading-screen')?.style.display).toBe('');
   });
 
   // Tests that loadStr() does nothing when the loader text element is not found
   it('test_load_str_element_not_found', () => {
     keepTrackApi.containerRoot.innerHTML = '<div id="loader-text"></div>';
     SplashScreen.loadStr('test');
-    expect(getEl('loader-text').textContent).toBe('test');
+    expect(getEl('loader-text')?.textContent).toBe('test');
   });
 });

@@ -192,7 +192,7 @@
   padding-left: 5%;
   padding-top: 5px;
   padding-bottom: 5px;
-  bottom: 15%;
+  bottom: max(170px, 20%);
   text-shadow:
     0px 0px 8px rgb(0 0 0),
     0px 0px 8px rgb(0 0 0);
@@ -205,4 +205,31 @@
 
 .start-hidden {
   display: none;
+}
+
+#start-app-btn {
+  display: none;
+  position: relative;
+  font-size: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: pulsate 1s infinite;
+}
+
+@keyframes pulsate {
+  0% {
+    box-shadow: 0 0 0 0 rgba(186, 22, 12, 0.7);
+    transform: translateX(-50%) scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 20px 10px rgba(186, 22, 12, 0.4);
+    transform: translateX(-50%) scale(1.08);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(186, 22, 12, 0.7);
+    transform: translateX(-50%) scale(1);
+  }
 }

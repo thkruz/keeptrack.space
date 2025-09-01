@@ -28,6 +28,7 @@ declare global {
     settingsManager: SettingsManager;
     settingsOverride: any;
     webkitAudioContext: any;
+    adsbygoogle: any;
   }
   interface Global {
     settingsManager: SettingsManager;

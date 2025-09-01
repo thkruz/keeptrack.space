@@ -70,14 +70,7 @@ export abstract class SplashScreen {
           <div style="height:36px; min-height:36px; max-height:36px; position: relative;">
             <button
             id="start-app-btn"
-            class="btn btn-ui waves-effect waves-light"
-            style="
-            display: none;
-            position: relative;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            ">
+            class="btn btn-large btn-ui waves-effect waves-light">
               ${t7e('loadingScreen.startButton')}
             </button>
           </div>

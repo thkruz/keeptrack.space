@@ -1,5 +1,7 @@
 {
-  "loadingScreen.startButton": "Haga Clic para Comenzar",
+  "loadingScreen": {
+    "startButton": "Haga Clic para Comenzar"
+  },
   "time": {
     "days": {
       "0": "Domingo",

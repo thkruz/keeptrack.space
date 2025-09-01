@@ -192,7 +192,7 @@
   padding-left: 5%;
   padding-top: 5px;
   padding-bottom: 5px;
-  bottom: 15%;
+  bottom: max(170px, 20%);
   text-shadow:
     0px 0px 8px rgb(0 0 0),
     0px 0px 8px rgb(0 0 0);

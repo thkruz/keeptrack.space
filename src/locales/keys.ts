@@ -552,6 +552,7 @@ export const Keys = [
   'countries.BW',
   'countries.ESA/JAXA',
   'plugins.proOnlyMsg',
+  'loadingScreen.startButton',
 ] as const;
 
 // Type for all valid translation keys

@@ -1138,6 +1138,8 @@ export class SettingsManager {
   orbitCruncher: Worker | null = null;
   /** Enables the camera widget */
   drawCameraWidget = false;
+  isShowAds = true;
+  isAutoStart = false;
 
   loadPersistedSettings() {
     // Offline Mode only

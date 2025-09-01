@@ -1,4 +1,5 @@
 {
+  "loadingScreen.startButton": "クリックで開始",
   "time": {
     "days": {
       "0": "日曜日",

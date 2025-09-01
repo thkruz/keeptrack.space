@@ -3,6 +3,7 @@ import { keepTrackApi } from '../keepTrackApi';
 import { getEl, hideEl, showEl } from '../lib/get-el';
 import { MobileManager } from '../singletons/mobileManager';
 
+import { KeepTrackApiEvents } from '@app/interfaces';
 import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
 import earthJpg from '@public/img/wallpaper/Earth.jpg';
@@ -56,22 +57,47 @@ export abstract class SplashScreen {
       <div id="loading-screen" class="valign-wrapper full-loader">
         <div id="logo-inner-container" class="valign">
           <div style="display: flex;">
-            <!-- <span id="logo-text" class="logo-font">KEEP TRACK</span> -->
-            <img src="img/logo.png" alt="Keep Track" id="logo-text" class="logo-font">
-            <!-- <span id="logo-text-version" class="logo-font">10</span> -->
+          <!-- <span id="logo-text" class="logo-font">KEEP TRACK</span> -->
+          <img src="img/logo.png" alt="Keep Track" id="logo-text" class="logo-font">
+          <!-- <span id="logo-text-version" class="logo-font">10</span> -->
           </div>
-          <span id="loader-text">Downloading Science...</span>
+          <div style="height: 50px; min-height: 50px; max-height: 50px; overflow: hidden; display: flex; align-items: center;">
+            <span id="loader-text" style="width: 100%;">Downloading Science...</span>
+          </div>
+          <div id="adsense-placeholder"
+          style="display:block; width:970px;height:90px; margin:16px 0; display: none;">
+          </div>
+          <div style="height:36px; min-height:36px; max-height:36px; position: relative;">
+            <button
+            id="start-app-btn"
+            class="btn btn-ui waves-effect waves-light"
+            style="
+            display: none;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            ">
+              ${t7e('loadingScreen.startButton')}
+            </button>
+          </div>
         </div>
         <div id="loading-hint">Hint: ${this.showHint()}</div>
         <div id="version-text">v${settingsManager.versionNumber}</div>
         <div id="copyright-notice">
-          ${settingsManager.isMobileModeEnabled ? t7e('copyright.noticeMobile') : t7e('copyright.notice')}
+        ${settingsManager.isMobileModeEnabled ? t7e('copyright.noticeMobile') : t7e('copyright.notice')}
         </div>
       </div>`;
 
     if (!settingsManager.isShowLoadingHints) {
       hideEl('loading-hint');
     }
+
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, () => {
+      getEl('start-app-btn')?.addEventListener('click', () => {
+        SplashScreen.handleStartAppButton();
+      });
+    });
   }
 
   static showHint(): string {
@@ -91,33 +117,49 @@ export abstract class SplashScreen {
       return;
     }
 
-    // Display content when loading is complete.
-    showEl('canvas-holder');
-
     MobileManager.checkMobileMode();
 
     if (settingsManager.isMobileModeEnabled) {
       SplashScreen.loadStr(SplashScreen.msg.math);
       hideEl('loading-screen');
       showEl('keeptrack-header');
-    } else {
-      // Loading Screen Resized and Hidden
-      setTimeout(() => {
-        getEl('loading-screen')?.classList.remove('full-loader');
-        getEl('loading-screen')?.classList.add('mini-loader-container');
-        getEl('logo-inner-container')?.classList.add('mini-loader');
-        hideEl('loading-screen');
-        showEl('keeptrack-header');
-        SplashScreen.loadStr(SplashScreen.msg.math);
-      }, 100);
+      SplashScreen.hideLoadingScreenElements();
     }
 
-    // We no longer need these elements
-    hideEl('loading-hint');
+    getEl('loader-text')!.innerText = '';
+
+    if (!settingsManager.isAutoStart) {
+      showEl('start-app-btn');
+    } else {
+      SplashScreen.handleStartAppButton();
+    }
+  }
+
+  static hideLoadingScreenElements() {
+    // Display content when loading is complete.
+    showEl('canvas-holder');
+
     hideEl('logo-text');
+    hideEl('loading-hint');
     hideEl('logo-text-version');
     hideEl('copyright-notice');
     hideEl('version-text');
+  }
+
+  static handleStartAppButton() {
+    this.hideLoadingScreenElements();
+    hideEl('start-app-btn');
+    hideEl('adsense-placeholder');
+
+    // Loading Screen Resized and Hidden
+    setTimeout(() => {
+      getEl('loading-screen')?.classList.remove('full-loader');
+      getEl('loading-screen')?.classList.add('mini-loader-container');
+      getEl('logo-inner-container')?.classList.add('mini-loader');
+      hideEl('loading-screen');
+      showEl('keeptrack-header');
+      SplashScreen.loadStr(SplashScreen.msg.math);
+    }, 100);
   }
 
   static loadStr(str: string) {

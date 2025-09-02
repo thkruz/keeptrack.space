@@ -1,16 +1,14 @@
 /* eslint-disable complexity */
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { CameraType } from '../../input/camera';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
-  sourceAldoria: rgbaArray;
   sourceCelestrak: rgbaArray;
-  sourcePrismnet: rgbaArray;
   sourceVimpel: rgbaArray;
 }
 

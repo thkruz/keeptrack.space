@@ -613,6 +613,28 @@ export class DotsManager {
     }
   }
 
+  getSize(i: number): number {
+    // Check if the index is part of lastSearchResults
+    if (settingsManager.lastSearchResults.includes(i)) {
+      return 1.0; // Return size for search results
+    }
+
+    // Check if the index is the selected satellite
+    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1;
+
+    if (i === selectedSat) {
+      return 1.0; // Return size for selected satellite
+    }
+
+    // Check if the index is a star
+    if (i >= this.starIndex1 && i <= this.starIndex2) {
+      return 1.0; // Return size for stars
+    }
+
+    // Default size for other satellites
+    return 0.0;
+  }
+
   /**
    * Updates the size buffer used for rendering the dots.
    * @param bufferLen The length of the buffer.

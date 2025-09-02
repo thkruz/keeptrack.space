@@ -2,11 +2,12 @@ import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CameraType } from '@app/engine/input/camera';
+import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import i18next from 'i18next';
-import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
+import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
@@ -22,8 +23,8 @@ export class HoverManager {
   private satHoverBoxNode1: HTMLDivElement;
   private satHoverBoxNode2: HTMLDivElement;
   private satHoverBoxNode3: HTMLDivElement;
-  public hoveringSat = -1;
-  public lasthoveringSat = -1;
+  hoveringSat = -1;
+  lasthoveringSat = -1;
 
   getHoverId() {
     return this.currentHoverId;
@@ -101,6 +102,13 @@ export class HoverManager {
       const renderer = keepTrackApi.getRenderer();
 
       const obj = catalogManagerInstance.getObject(id);
+
+      if (!obj) {
+        errorManagerInstance.log('HoverManager: hoverOverSomething_ no object found');
+
+        return;
+      }
+
       const satScreenPositionArray = renderer.getScreenCoords(obj);
 
       if (
@@ -195,24 +203,11 @@ export class HoverManager {
     if (!settingsManager.enableHoverOverlay) {
       return;
     }
-    const renderer = keepTrackApi.getRenderer();
     const sensorManagerInstance = keepTrackApi.getSensorManager();
 
     // Use this as a default if no UI
     if (settingsManager.disableUI || settingsManager.isEPFL) {
-      this.satHoverBoxNode1.textContent = sat.name;
-      this.satHoverBoxNode2.textContent = settingsManager.isEPFL ? HoverManager.getLaunchYear(sat) : sat.sccNum;
-      let country = StringExtractor.extractCountry(sat.country);
-
-      country = country.length > 0 ? country : 'Unknown';
-      this.satHoverBoxNode3.textContent = country;
-
-      this.satHoverBoxNode3.innerHTML = keepTrackApi.html`
-        <span id="hoverbox-fi"></span>
-        <span>${country}</span>
-      `;
-
-      getEl('hoverbox-fi')!.classList.value = `fi ${country2flagIcon(sat.country)}`;
+      this.updateSatObjMinimal_(sat);
     } else {
       let confidenceScoreString = '';
       let color: string = 'black';
@@ -242,7 +237,7 @@ export class HoverManager {
         <span style='color:${color};'>${confidenceScoreString}</span>
       `;
 
-      getEl('hoverbox-fi').classList.value = `fi ${country2flagIcon(sat.country)}`;
+      getEl('hoverbox-fi')!.classList.value = `fi ${country2flagIcon(sat.country)}`;
 
       if (sat.sccNum) {
         this.satHoverBoxNode2.textContent = `NORAD: ${sat.sccNum}`;
@@ -261,6 +256,22 @@ export class HoverManager {
         this.satHoverBoxNode3.style.display = 'none';
       }
     }
+  }
+
+  private updateSatObjMinimal_(sat: DetailedSatellite) {
+    this.satHoverBoxNode1.textContent = sat.name;
+    this.satHoverBoxNode2.textContent = settingsManager.isEPFL ? HoverManager.getLaunchYear(sat) : sat.sccNum;
+    let country = StringExtractor.extractCountry(sat.country);
+
+    country = country.length > 0 ? country : 'Unknown';
+    this.satHoverBoxNode3.textContent = country;
+
+    this.satHoverBoxNode3.innerHTML = keepTrackApi.html`
+        <span id="hoverbox-fi"></span>
+        <span>${country}</span>
+      `;
+
+    getEl('hoverbox-fi')!.classList.value = `fi ${country2flagIcon(sat.country)}`;
   }
 
   private static getLaunchYear(sat: DetailedSatellite) {
@@ -294,13 +305,26 @@ export class HoverManager {
   }
 
   private showEciVel_(sat: DetailedSatellite) {
-    this.satHoverBoxNode3.innerHTML =
-      `X: ${sat.position.x.toFixed(2)
-      } Y: ${sat.position.y.toFixed(2)
-      } Z: ${sat.position.z.toFixed(2)
-      }X: ${sat.velocity.x.toFixed(2)
-      } Y: ${sat.velocity.y.toFixed(2)
-      } Z: ${sat.velocity.z.toFixed(2)}`;
+    this.satHoverBoxNode3.innerHTML = `
+      <div style="display: flex; gap: 32px;">
+        <div>
+          <strong>Position:</strong>
+          <ul style="margin:0; padding-left:16px;">
+          <li>X: ${sat.position.x.toFixed(2)} km</li>
+          <li>Y: ${sat.position.y.toFixed(2)} km</li>
+          <li>Z: ${sat.position.z.toFixed(2)} km</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Velocity:</strong>
+          <ul style="margin:0; padding-left:16px;">
+          <li>Ẋ: ${sat.velocity.x.toFixed(2)} km/s</li>
+          <li>Ẏ: ${sat.velocity.y.toFixed(2)} km/s</li>
+          <li>Ż: ${sat.velocity.z.toFixed(2)} km/s</li>
+          </ul>
+        </div>
+      </div>
+    `;
   }
 
   private showHoverDetails_(id: number, satX?: number, satY?: number) {
@@ -335,8 +359,8 @@ export class HoverManager {
       this.satHoverBoxNode1.textContent = sensor.name;
       const isTelescope = sensor.type === SpaceObjectType.OPTICAL;
 
-      this.satHoverBoxNode2.textContent = sensor.country;
-      this.satHoverBoxNode3.innerHTML = !isTelescope && sensor.freqBand ? `${sensor.system} (${sensor.freqBand})` : sensor.system;
+      this.satHoverBoxNode2.textContent = sensor.country ?? 'Unknown';
+      this.satHoverBoxNode3.innerHTML = (!isTelescope && sensor.freqBand) ? `${sensor.system} (${sensor.freqBand})` : sensor.system ?? 'Unknown';
     }
   }
 
@@ -357,7 +381,7 @@ export class HoverManager {
     this.setHover(id);
   }
 
-  public setHover(i: number): void {
+  setHover(i: number): void {
     if (typeof i === 'undefined' || i === null || isNaN(i)) {
       errorManagerInstance.debug('setHover called with no id');
 
@@ -379,9 +403,20 @@ export class HoverManager {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
 
     const primarySatId = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
-    // If Old Select Sat Picked Color it Correct Color
+    const isLastHoverNeedsUpdate = this.lasthoveringSat !== -1 && this.lasthoveringSat !== primarySatId;
+    const isNewHHoverNeedsUpdate = this.hoveringSat !== -1 && this.hoveringSat !== primarySatId;
 
-    if (this.lasthoveringSat !== -1 && this.lasthoveringSat !== primarySatId) {
+    this.setHoverDotColor_(gl, isLastHoverNeedsUpdate, isNewHHoverNeedsUpdate, colorSchemeManagerInstance);
+    this.setHoverDotSize_(gl, isLastHoverNeedsUpdate, isNewHHoverNeedsUpdate);
+
+    this.lasthoveringSat = this.hoveringSat;
+  }
+
+  private setHoverDotColor_(gl: WebGL2RenderingContext, isLastHoverNeedsUpdate: boolean, isNewHHoverNeedsUpdate: boolean, colorSchemeManagerInstance: ColorSchemeManager) {
+    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+
+    // If Old Select Sat Picked Color it Correct Color
+    if (isLastHoverNeedsUpdate) {
       const hoveredSatellite = catalogManagerInstance.getObject(this.lasthoveringSat);
 
       if (hoveredSatellite) {
@@ -397,10 +432,25 @@ export class HoverManager {
         gl.bufferSubData(gl.ARRAY_BUFFER, this.lasthoveringSat * 4 * 4, new Float32Array(newColor));
       }
     }
+
     // If New Hover Sat Picked Color it
-    if (this.hoveringSat !== -1 && this.hoveringSat !== primarySatId) {
+    if (isNewHHoverNeedsUpdate) {
       gl.bufferSubData(gl.ARRAY_BUFFER, this.hoveringSat * 4 * 4, new Float32Array(settingsManager.hoverColor));
     }
-    this.lasthoveringSat = this.hoveringSat;
+  }
+
+  private setHoverDotSize_(gl: WebGL2RenderingContext, isLastHoverNeedsUpdate: boolean, isNewHHoverNeedsUpdate: boolean) {
+    const dotsManagerInstance = keepTrackApi.getDotsManager();
+
+    if (isLastHoverNeedsUpdate) {
+      dotsManagerInstance.sizeData[this.lasthoveringSat] = dotsManagerInstance.getSize(this.lasthoveringSat);
+      gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
+      gl.bufferSubData(gl.ARRAY_BUFFER, this.lasthoveringSat, new Int8Array([dotsManagerInstance.sizeData[this.lasthoveringSat]]));
+    }
+
+    if (isNewHHoverNeedsUpdate) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, dotsManagerInstance.buffers.size);
+      gl.bufferSubData(gl.ARRAY_BUFFER, this.hoveringSat, new Int8Array([1.0]));
+    }
   }
 }

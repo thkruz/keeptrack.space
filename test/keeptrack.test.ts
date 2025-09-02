@@ -1,3 +1,4 @@
+import { CatalogManager } from '@app/app/data/catalog-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManagerOverride } from '@app/settings/settings';
 import { DetailedSatellite, Milliseconds, Satellite } from 'ootk';
@@ -10,7 +11,6 @@ import { WebGLRenderer } from '../src/engine/rendering/webgl-renderer';
 import { KeepTrack } from './../src/keeptrack';
 import { defaultSat } from './environment/apiMocks';
 import { mockCameraManager, setupDefaultHtml } from './environment/standard-env';
-import { CatalogManager } from '@app/app/data/catalog-manager';
 
 /*
  *Code Analysis
@@ -144,7 +144,7 @@ describe('code_snippet', () => {
       drawManagerInstance.update = jest.fn();
       keepTrackApi.getMainCamera().draw = jest.fn();
       settingsManager.cruncherReady = true;
-      keepTrack.gameLoop();
+      keepTrack.engine.run();
       // eslint-disable-next-line dot-notation
       keepTrack['update_'](1 as Milliseconds);
       // eslint-disable-next-line dot-notation

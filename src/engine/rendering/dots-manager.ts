@@ -2,16 +2,18 @@ import { SatCruncherMessageData } from '../core/interfaces';
 import { GlUtils } from './gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, SpaceObjectType } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
+import { EventBus } from '../events/event-bus';
+import { EventBusEvent } from '../events/event-bus-events';
 import { CameraType } from '../input/camera';
 import { BufferAttribute } from './buffer-attribute';
 import { WebGlProgramHelper } from './webgl-program';
 import { WebGLRenderer } from './webgl-renderer';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 
 declare module '@app/engine/core/interfaces' {
   interface SatShader {
@@ -342,6 +344,10 @@ export class DotsManager {
     this.buffers.size = renderer.gl.createBuffer();
 
     this.initProgramPicking();
+
+    EventBus.getInstance().on(EventBusEvent.update, () => {
+      this.updatePositionBuffer();
+    });
   }
 
   /**

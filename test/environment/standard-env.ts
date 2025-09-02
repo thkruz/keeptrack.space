@@ -73,9 +73,9 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   clearAllCallbacks();
 
   const renderer = new WebGLRenderer();
-  const scene = new Scene({
-    gl: global.mocks.glMock,
-  });
+  const scene = new Scene();
+
+  scene.init({ gl: global.mocks.glMock });
 
   scene.sensorFovFactory = {
     drawAll: jest.fn(),
@@ -366,7 +366,7 @@ export const mockCameraManager = <Camera>(<unknown>{
   draw: jest.fn(),
   exitFixedToSat: jest.fn(),
   getCamDist: jest.fn(),
-  getCamPos: jest.fn(),
+  getCamPos: jest.fn().mockReturnValue([0, 0, 0]),
   getDistFromEarth: jest.fn(),
   getForwardVector: jest.fn(),
   init: jest.fn(),
@@ -397,6 +397,7 @@ export const setupDefaultHtml = () => {
     <div id="tutorial-icon"></div>
     <div id="legend-icon"></div>
     <div id="sound-icon"></div>
+    <div id="colors-rmb-menu"></div>
     `;
 };
 

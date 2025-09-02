@@ -1,4 +1,6 @@
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CameraType } from '@app/engine/input/camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
@@ -7,10 +9,10 @@ import i18next from 'i18next';
 import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, RIC, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
-import { SensorMath } from '../sensors/sensor-math';
-import { StringExtractor } from './string-extractor';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { SensorMath } from '../sensors/sensor-math';
+import { StringExtractor } from './string-extractor';
 
 export class HoverManager {
   /** The id of the object currently being hovered */
@@ -36,6 +38,13 @@ export class HoverManager {
     this.satHoverBoxNode2 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox2'));
     this.satHoverBoxNode3 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox3'));
     this.satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
+
+    EventBus.getInstance().on(EventBusEvent.highPerformanceRender, () => {
+      // Only update hover if we are not on mobile
+      if (!settingsManager.isMobileModeEnabled) {
+        this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+      }
+    });
   }
 
   /**

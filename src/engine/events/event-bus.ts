@@ -60,6 +60,8 @@ export interface EngineEventMap {
   [EventBusEvent.userAccountChange]: [User | null]; // user
   [EventBusEvent.userLogin]: [User | null]; // user
   [EventBusEvent.userLogout]: []; // no arguments
+  [EventBusEvent.SceneReady]: []; // no arguments
+  [EventBusEvent.highPerformanceRender]: [Milliseconds]; // delta time
 }
 
 interface EventBusRegisterParams<T extends EventBusEvent> {
@@ -161,5 +163,9 @@ export class EventBus {
     for (const event of Object.values(EventBusEvent)) {
       this.events[event] = [];
     }
+  }
+
+  init() {
+    // Unused for now
   }
 }

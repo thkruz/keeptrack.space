@@ -1,14 +1,37 @@
 import { DetailedSatellite, Milliseconds } from 'ootk';
 
 import { keepTrackApi } from '../../keepTrackApi';
+import { EventBus } from '../events/event-bus';
+import { EventBusEvent } from '../events/event-bus-events';
 
 export class DemoManager {
+  private static instance: DemoManager;
   private readonly UPDATE_INTERVAL_ = <Milliseconds>3000;
   private readonly IS_RANDOM_ = true;
   private lastTime_ = <Milliseconds>0;
-  public satellite = 0;
+  satellite = 0;
 
-  public update(): void {
+  private constructor() {
+    // Singleton
+  }
+
+  static getInstance(): DemoManager {
+    if (!DemoManager.instance) {
+      DemoManager.instance = new DemoManager();
+    }
+
+    return DemoManager.instance;
+  }
+
+  init() {
+    EventBus.getInstance().on(EventBusEvent.endOfDraw, () => this.update());
+  }
+
+  update(): void {
+    if (!settingsManager.isDemoModeOn || !keepTrackApi.getSensorManager()?.isSensorSelected()) {
+      return;
+    }
+
     const satData = keepTrackApi.getCatalogManager().objectCache;
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 

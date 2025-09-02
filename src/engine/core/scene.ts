@@ -1,10 +1,12 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
+import { Engine } from '../engine';
+import { EventBus } from '../events/event-bus';
+import { EventBusEvent } from '../events/event-bus-events';
 import { Camera } from '../input/camera';
 import { ConeMeshFactory } from '../rendering/draw-manager/cone-mesh-factory';
 import { Box } from '../rendering/draw-manager/cube';
@@ -17,7 +19,6 @@ import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
-import { EventBusEvent } from '../events/event-bus-events';
 
 export interface SceneParams {
   gl: WebGL2RenderingContext;
@@ -26,7 +27,7 @@ export interface SceneParams {
 
 export class Scene {
   private gl_: WebGL2RenderingContext;
-  background: WebGLTexture;
+  background: WebGLTexture | null = null;
   skybox: SkyBoxSphere;
   isScene = true;
   earth: Earth;
@@ -45,9 +46,9 @@ export class Scene {
   primaryCovBubble: Ellipsoid;
   secondaryCovBubble: Ellipsoid;
 
-  constructor(params: SceneParams) {
+  init(params: SceneParams): void {
     this.gl_ = params.gl;
-    this.background = params?.background;
+    this.background = params.background ?? null;
 
     this.skybox = new SkyBoxSphere();
     this.earth = new Earth();
@@ -60,11 +61,9 @@ export class Scene {
     this.secondaryCovBubble = new Ellipsoid(([0, 0, 0]));
     this.sensorFovFactory = new SensorFovMeshFactory();
     this.coneFactory = new ConeMeshFactory();
-  }
+    this.skybox.init(settingsManager, params.gl);
 
-  init(gl: WebGL2RenderingContext): void {
-    this.gl_ = gl;
-    this.skybox.init(settingsManager, gl);
+    EventBus.getInstance().emit(EventBusEvent.SceneReady);
   }
 
   update(simulationTime: Date) {
@@ -146,7 +145,7 @@ export class Scene {
       settingsManager.isDrawAurora ||
       settingsManager.isDrawMilkyWay) &&
       Date.now() - this.updateVisualsBasedOnPerformanceTime_ > 10000 && // Only check every 10 seconds
-      !KeepTrack.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
+      !Engine.isFpsAboveLimit(this.averageDrawTime as Milliseconds, 30)) {
       let isSettingsLeftToDisable = true;
 
       while (isSettingsLeftToDisable) {

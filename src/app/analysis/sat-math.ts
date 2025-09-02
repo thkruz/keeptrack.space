@@ -839,8 +839,12 @@ export abstract class SatMath {
     if (!jd) {
       throw new Error('Julian date is required');
     }
-    if (jd === keepTrackApi.getScene().sun.sunDirectionCache.jd) {
-      return keepTrackApi.getScene().sun.sunDirectionCache.sunDirection;
+
+    // Get the sun from the scene to access the cache
+    const sun = keepTrackApi.getScene().sun;
+
+    if (jd === sun?.sunDirectionCache.jd) {
+      return sun.sunDirectionCache.sunDirection;
     }
 
     const n = jd - 2451545;
@@ -874,7 +878,9 @@ export abstract class SatMath {
     const z = DISTANCE_TO_SUN * Math.sin(ob * DEG2RAD) * Math.sin(ecLon * DEG2RAD);
 
     // Update cache
-    keepTrackApi.getScene().sun.sunDirectionCache = { jd, sunDirection: [x, y, z] };
+    if (sun) {
+      sun.sunDirectionCache = { jd, sunDirection: [x, y, z] };
+    }
 
     return [x, y, z];
   }

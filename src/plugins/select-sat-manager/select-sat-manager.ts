@@ -4,6 +4,8 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { vec3 } from 'gl-matrix';
@@ -13,7 +15,6 @@ import { NewLaunch } from '../new-launch/new-launch';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 /**
  * This is the class that manages the selection of objects.
@@ -45,6 +46,17 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.registerKeyboardEvents_();
 
     keepTrackApi.on(EventBusEvent.updateLoop, this.checkIfSelectSatVisible.bind(this));
+
+    EventBus.getInstance().on(EventBusEvent.endOfDraw, () => {
+      if ((this.selectedSat ?? -1) > -1) {
+        const timeManagerInstance = keepTrackApi.getTimeManager();
+
+        if (this.primarySatObj) {
+          keepTrackApi.getUiManager().
+            updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
+        }
+      }
+    });
   }
 
   checkIfSelectSatVisible() {

@@ -47,7 +47,7 @@ export abstract class UiValidation {
      * Note: Depending on which plugins on enabled, some or all of
      * the following event listeners may be added.
      */
-    getEl('editSat')
+    getEl('editSat', true)
       ?.querySelectorAll('input')
       .forEach((el: HTMLInputElement) => {
         if (el.id === `${EditSat.elementPrefix}-country`) {
@@ -55,15 +55,15 @@ export abstract class UiValidation {
         }
         el.addEventListener('keydown', UiValidation.validateNumOnly_);
       });
-    getEl(`${EditSat.elementPrefix}-ecen`)?.addEventListener('keydown', UiValidation.allowPeriod_);
-    getEl(`${EditSat.elementPrefix}-day`)?.addEventListener('keyup', UiValidation.esDay366_);
-    getEl(`${EditSat.elementPrefix}-inc`)?.addEventListener('keyup', UiValidation.esInc180_);
-    getEl(`${EditSat.elementPrefix}-rasc`)?.addEventListener('keyup', UiValidation.esRasc360_);
-    getEl(`${EditSat.elementPrefix}-meanmo`)?.addEventListener('keyup', UiValidation.esMeanmo18_);
-    getEl(`${EditSat.elementPrefix}-argPe`)?.addEventListener('keyup', UiValidation.esArgPe360_);
-    getEl(`${EditSat.elementPrefix}-meana`)?.addEventListener('keyup', UiValidation.esMeana360_);
-    getEl('ms-lat')?.addEventListener('keyup', UiValidation.msLat90_);
-    getEl('ms-lon')?.addEventListener('keyup', UiValidation.msLon180_);
+    getEl(`${EditSat.elementPrefix}-ecen`, true)?.addEventListener('keydown', UiValidation.allowPeriod_);
+    getEl(`${EditSat.elementPrefix}-day`, true)?.addEventListener('keyup', UiValidation.esDay366_);
+    getEl(`${EditSat.elementPrefix}-inc`, true)?.addEventListener('keyup', UiValidation.esInc180_);
+    getEl(`${EditSat.elementPrefix}-rasc`, true)?.addEventListener('keyup', UiValidation.esRasc360_);
+    getEl(`${EditSat.elementPrefix}-meanmo`, true)?.addEventListener('keyup', UiValidation.esMeanmo18_);
+    getEl(`${EditSat.elementPrefix}-argPe`, true)?.addEventListener('keyup', UiValidation.esArgPe360_);
+    getEl(`${EditSat.elementPrefix}-meana`, true)?.addEventListener('keyup', UiValidation.esMeana360_);
+    getEl('ms-lat', true)?.addEventListener('keyup', UiValidation.msLat90_);
+    getEl('ms-lon', true)?.addEventListener('keyup', UiValidation.msLon180_);
   }
 
   private static allowPeriod_(e: KeyboardEvent) {

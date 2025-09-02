@@ -36,6 +36,8 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
+import { EventBus } from '../events/event-bus';
+import { EventBusEvent } from '../events/event-bus-events';
 import { PersistenceManager, StorageKey } from '../utils/persistence-manager';
 import { CelestrakColorScheme } from './color-schemes/celestrak-color-scheme';
 import { ColorScheme, ColorSchemeColorMap, ColorSchemeParams } from './color-schemes/color-scheme';
@@ -52,7 +54,7 @@ import { SpatialDensityColorScheme } from './color-schemes/spatial-density-color
 import { StarlinkColorScheme } from './color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from './color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
-import { EventBusEvent } from '../events/event-bus-events';
+import { WebGLRenderer } from './webgl-renderer';
 
 export class ColorSchemeManager {
   // This is where you confiure addon color schemes
@@ -186,9 +188,7 @@ export class ColorSchemeManager {
     }
   }
 
-  init(): void {
-    const renderer = keepTrackApi.getRenderer();
-
+  init(renderer: WebGLRenderer): void {
     this.gl_ = renderer.gl;
     this.colorTheme = settingsManager.colors ?? <ColorSchemeColorMap & ObjectTypeColorSchemeColorMap>{
       transparent: [0, 0, 0, 0] as rgbaArray,
@@ -247,6 +247,14 @@ export class ColorSchemeManager {
 
       },
     );
+
+    EventBus.getInstance().on(EventBusEvent.update, () => {
+      /*
+       * Update Colors
+       * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
+       */
+      this.calculateColorBuffers(false); // avoid recalculating ALL colors
+    });
 
     LegendManager.change(this.currentColorScheme.id);
   }

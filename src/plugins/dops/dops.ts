@@ -7,11 +7,11 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import type { GroupsManager } from '@app/app/data/groups-manager';
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { DopMath } from '@app/engine/math/dop-math';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';
@@ -125,6 +125,12 @@ export class DopsPlugin extends KeepTrackPlugin {
       }
       case 'dops-24dops-rmb': {
         const latLon = keepTrackApi.getInputManager().mouse.latLon;
+
+        if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
+          errorManagerInstance.warn('Please select a valid location on Earth for 24 Hour DOPs!');
+
+          return;
+        }
 
         if (!this.isMenuButtonActive) {
           (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);

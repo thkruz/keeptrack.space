@@ -4,7 +4,8 @@ import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
-import { KeepTrack } from '../../keeptrack';
+import { Engine } from '../engine';
+import { EventBus } from '../events/event-bus';
 import { lineManagerInstance } from '../rendering/line-manager';
 import { getEl, hideEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
@@ -313,6 +314,10 @@ export class InputManager {
     this.mouse.init(canvasDOM);
     this.touch.init(canvasDOM);
     this.keyboard.init();
+
+    EventBus.getInstance().on(EventBusEvent.highPerformanceRender, (dt: Milliseconds) => {
+      this.update(dt);
+    });
   }
 
   public openRmbMenu(clickedSatId: number = -1) {
@@ -437,11 +442,11 @@ export class InputManager {
      * it was looking at
      */
 
-    if (KeepTrack.isFpsAboveLimit(dt, 30)) {
+    if (Engine.isFpsAboveLimit(dt, 30)) {
       if (this.updateHoverDelayLimit > 0) {
         --this.updateHoverDelayLimit;
       }
-    } else if (KeepTrack.isFpsAboveLimit(dt, 15)) {
+    } else if (Engine.isFpsAboveLimit(dt, 15)) {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitSmall;
     } else {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;

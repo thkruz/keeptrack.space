@@ -1,5 +1,6 @@
 import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { Constructor } from '@app/engine/core/interfaces';
+import { Engine } from '@app/engine/engine';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { getEl } from '@app/engine/utils/get-el';
@@ -77,9 +78,16 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
 
 export const websiteInit = (plugin: KeepTrackPlugin) => {
   const settingsManager = new SettingsManager();
+  const engine = new Engine();
 
   settingsManager.init();
-  keepTrackApi.getColorSchemeManager().init();
+  engine.init();
+  engine.renderer.glInit();
+  engine.scene.init({
+    gl: engine.renderer.gl,
+  });
+  engine.camera.init(settingsManager);
+  keepTrackApi.getColorSchemeManager().init(engine.renderer);
   window.settingsManager = settingsManager;
   (global as unknown as Global).settingsManager = settingsManager;
   BottomMenu.createBottomMenu();

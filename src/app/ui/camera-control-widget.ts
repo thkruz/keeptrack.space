@@ -4,13 +4,14 @@ import { mat4, vec3 } from 'gl-matrix';
 import { Radians } from 'ootk';
 
 export class CameraControlWidget {
+  private static instance: CameraControlWidget;
   private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
+  private ctx: CanvasRenderingContext2D | null;
   private isDragging: boolean = false;
   private lastMousePosition: { x: number; y: number } = { x: 0, y: 0 };
   private readonly size: number = 120;
   private readonly pointSize = 15;
-  private readonly center: { x: number; y: number };
+  private center: { x: number; y: number };
   private readonly axes: { [key: string]: vec3 } = {
     'X': vec3.fromValues(1, 0, 0),
     '-X': vec3.fromValues(-1, 0, 0),
@@ -24,8 +25,19 @@ export class CameraControlWidget {
     '-X': 'rgb(160, 37, 54)', '-Y': 'rgb(53, 77, 15)', '-Z': 'rgb(31, 87, 148)',
   };
 
+  private constructor() {
+    // Singleton
+  }
 
-  constructor() {
+  static getInstance(): CameraControlWidget {
+    if (!CameraControlWidget.instance) {
+      CameraControlWidget.instance = new CameraControlWidget();
+    }
+
+    return CameraControlWidget.instance;
+  }
+
+  init() {
     this.initCanvas();
     this.addEventListeners();
     this.center = { x: this.size / 2, y: this.size / 2 };
@@ -41,7 +53,7 @@ export class CameraControlWidget {
     this.canvas.style.right = '10px';
     this.canvas.style.zIndex = '-1';
     // append to canvas-holder
-    document.getElementById('canvas-holder').appendChild(this.canvas);
+    document.getElementById('canvas-holder')?.appendChild(this.canvas);
 
     this.ctx = this.canvas.getContext('2d');
   }
@@ -102,7 +114,7 @@ export class CameraControlWidget {
     }
   }
 
-  private checkIfNeedsFlipped(axis: string): string {
+  private checkIfNeedsFlipped(axis: string | null): string | null {
     if (axis) {
       const camera = keepTrackApi.getMainCamera();
 
@@ -121,7 +133,7 @@ export class CameraControlWidget {
       }
     }
 
-    return axis;
+    return null;
   }
 
   private isInsideCircle(x: number, y: number, cx: number, cy: number, radius: number): boolean {
@@ -191,7 +203,7 @@ export class CameraControlWidget {
   }
 
   private draw() {
-    if (!settingsManager.drawCameraWidget) {
+    if (!settingsManager.drawCameraWidget || !this.ctx) {
       return;
     }
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -205,7 +217,7 @@ export class CameraControlWidget {
     mat4.rotateZ(rotationMatrix, rotationMatrix, -camera.camYaw);
 
     // Create an array to store the axes with their projected coordinates and depths
-    const axesWithDepth = [];
+    const axesWithDepth = [] as { axisName: string; screenX: number; screenY: number; depth: number }[];
 
     // Calculate the projected coordinates and depths for each axis
     for (const [axisName, axisVector] of Object.entries(this.axes)) {

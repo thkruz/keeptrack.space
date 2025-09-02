@@ -40,11 +40,11 @@ describe('DebrisScreening_form', () => {
 
   it('should have working buttons', () => {
     websiteInit(debrisScreeningPlugin);
-    expect(() => getEl(`${debrisScreeningPlugin.sideMenuElementName}-vis`).click()).not.toThrow();
+    expect(() => getEl(`${debrisScreeningPlugin.sideMenuElementName}-vis`)!.click()).not.toThrow();
     jest.advanceTimersByTime(1000);
-    expect(() => getEl(`${debrisScreeningPlugin.sideMenuElementName}-clear-vis`).click()).not.toThrow();
+    expect(() => getEl(`${debrisScreeningPlugin.sideMenuElementName}-clear-vis`)!.click()).not.toThrow();
     jest.advanceTimersByTime(1000);
-    expect(() => getEl(`${debrisScreeningPlugin.sideMenuElementName}-form`).dispatchEvent(new Event('submit'))).not.toThrow();
+    expect(() => getEl(`${debrisScreeningPlugin.sideMenuElementName}-form`)!.dispatchEvent(new Event('submit'))).not.toThrow();
     jest.advanceTimersByTime(1000);
   });
 });

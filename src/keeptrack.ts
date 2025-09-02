@@ -27,8 +27,7 @@
 
 import 'material-icons/iconfont/material-icons.css';
 
-import eruda, { ErudaConsole } from 'eruda';
-import { Milliseconds } from 'ootk';
+import eruda from 'eruda';
 import { CatalogLoader } from './app/data/catalog-loader';
 import { CatalogManager } from './app/data/catalog-manager';
 import { GroupsManager } from './app/data/groups-manager';
@@ -41,53 +40,42 @@ import { SplashScreen } from './app/ui/splash-screen';
 import { UiManager } from './app/ui/uiManager';
 import { keepTrackContainer } from './container';
 import { Singletons } from './engine/core/interfaces';
-import { Scene } from './engine/core/scene';
-import { TimeManager } from './engine/core/time-manager';
-import { Camera } from './engine/input/camera';
-import { InputManager } from './engine/input/input-manager';
+import { Engine } from './engine/engine';
+import { EventBusEvent } from './engine/events/event-bus-events';
 import { ColorSchemeManager } from './engine/rendering/color-scheme-manager';
 import { DotsManager } from './engine/rendering/dots-manager';
-import { LineManager, lineManagerInstance } from './engine/rendering/line-manager';
+import { lineManagerInstance } from './engine/rendering/line-manager';
 import { OrbitManager } from './engine/rendering/orbitManager';
-import { WebGLRenderer } from './engine/rendering/webgl-renderer';
 import { DemoManager } from './engine/utils/demo-mode';
-import { ErrorManager, errorManagerInstance } from './engine/utils/errorManager';
 import { getEl } from './engine/utils/get-el';
 import { isThisNode } from './engine/utils/isThisNode';
 import { keepTrackApi } from './keepTrackApi';
-import { SelectSatManager } from './plugins/select-sat-manager/select-sat-manager';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
-import { EventBusEvent } from './engine/events/event-bus-events';
 
 export class KeepTrack {
+  private static instance: KeepTrack;
+  private settingsOverride_: SettingsManagerOverride;
+
   isReady = false;
-  private isUpdateTimeThrottle_: boolean;
-  private lastGameLoopTimestamp_ = <Milliseconds>0;
-  private readonly settingsOverride_: SettingsManagerOverride;
+  engine: Engine;
 
-  colorManager: ColorSchemeManager;
-  demoManager: DemoManager;
-  dotsManager: DotsManager;
-  errorManager: ErrorManager;
-  lineManager: LineManager;
-  colorSchemeManager: ColorSchemeManager;
-  orbitManager: OrbitManager;
-  catalogManager: CatalogManager;
-  timeManager: TimeManager;
-  renderer: WebGLRenderer;
-  sensorManager: SensorManager;
-  uiManager: UiManager;
-  inputManager: InputManager;
-  mainCameraInstance: Camera;
-  cameraControlWidget: CameraControlWidget;
+  private constructor() {
+    // Singleton
+  }
 
-  constructor(
-    settingsOverride: SettingsManagerOverride = {
-      isPreventDefaultHtml: false,
-      isShowSplashScreen: true,
-    },
-  ) {
+  static getInstance(): KeepTrack {
+    if (!KeepTrack.instance) {
+      KeepTrack.instance = new KeepTrack();
+    }
+
+    return KeepTrack.instance;
+  }
+
+  init(settingsOverride: SettingsManagerOverride = {
+    isPreventDefaultHtml: false,
+    isShowSplashScreen: true,
+  }) {
     if (this.isReady) {
       throw new Error('KeepTrack is already started');
     }
@@ -95,9 +83,8 @@ export class KeepTrack {
     // Update the version number
     settingsManager.versionNumber = VERSION;
     this.settingsOverride_ = settingsOverride;
-  }
+    this.engine = new Engine();
 
-  init() {
     settingsManager.init(this.settingsOverride_);
 
     KeepTrack.setContainerElement();
@@ -113,94 +100,27 @@ export class KeepTrack {
     }
 
     const orbitManagerInstance = new OrbitManager();
-
-    keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
     const catalogManagerInstance = new CatalogManager();
-
-    keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
     const groupManagerInstance = new GroupsManager();
-
-    keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
-    const timeManagerInstance = new TimeManager();
-
-    keepTrackContainer.registerSingleton(Singletons.TimeManager, timeManagerInstance);
-    const rendererInstance = new WebGLRenderer();
-
-    keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, rendererInstance);
-    keepTrackContainer.registerSingleton(Singletons.MeshManager, rendererInstance.meshManager);
-    const sceneInstance = new Scene({
-      gl: keepTrackApi.getRenderer().gl,
-    });
-
-    keepTrackContainer.registerSingleton(Singletons.Scene, sceneInstance);
     const sensorManagerInstance = new SensorManager();
-
-    keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
     const dotsManagerInstance = new DotsManager();
-
-    keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
     const uiManagerInstance = new UiManager();
-
-    keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
     const colorSchemeManagerInstance = new ColorSchemeManager();
-
-    keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
-    const inputManagerInstance = new InputManager();
-
-    keepTrackContainer.registerSingleton(Singletons.InputManager, inputManagerInstance);
     const sensorMathInstance = new SensorMath();
-
-    keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
-    const mainCameraInstance = new Camera();
-
-    const cameraControlWidget = new CameraControlWidget();
-
-    this.cameraControlWidget = cameraControlWidget;
-
-    keepTrackContainer.registerSingleton(Singletons.MainCamera, mainCameraInstance);
     const hoverManagerInstance = new HoverManager();
 
+    keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
+    keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
+    keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
+    keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
+    keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
+    keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
+    keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
+    keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
     keepTrackContainer.registerSingleton(Singletons.HoverManager, hoverManagerInstance);
 
-    this.mainCameraInstance = mainCameraInstance;
-    this.errorManager = errorManagerInstance;
-    this.dotsManager = dotsManagerInstance;
-    this.lineManager = lineManagerInstance;
-    this.colorSchemeManager = colorSchemeManagerInstance;
-    this.orbitManager = orbitManagerInstance;
-    this.catalogManager = catalogManagerInstance;
-    this.timeManager = timeManagerInstance;
-    this.renderer = rendererInstance;
-    this.sensorManager = sensorManagerInstance;
-    this.uiManager = uiManagerInstance;
-    this.inputManager = inputManagerInstance;
-    this.demoManager = new DemoManager();
-  }
-
-  /** Check if the FPS is above a certain threshold */
-  static isFpsAboveLimit(dt: Milliseconds, minimumFps: number): boolean {
-    return KeepTrack.getFps_(dt) > minimumFps;
-  }
-
-  gameLoop(timestamp = <Milliseconds>0): void {
-    requestAnimationFrame(this.gameLoop.bind(this));
-    const dt = <Milliseconds>(timestamp - this.lastGameLoopTimestamp_);
-
-    this.lastGameLoopTimestamp_ = timestamp;
-
-    if (settingsManager.cruncherReady) {
-      this.update_(dt); // Do any per frame calculations
-      this.draw_(dt);
-
-      if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-        const selectedSatellite = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
-
-        if (selectedSatellite) {
-          keepTrackApi.getUiManager().
-            updateSelectBox(this.timeManager.realTime, this.timeManager.lastBoxUpdateTime, selectedSatellite);
-        }
-      }
-    }
+    CameraControlWidget.getInstance().init();
+    DemoManager.getInstance().init();
   }
 
   static getDefaultBodyHtml(): void {
@@ -273,10 +193,6 @@ export class KeepTrack {
     if (!keepTrackApi.containerRoot) {
       keepTrackApi.containerRoot = containerDom;
     }
-  }
-
-  private static getFps_(dt: Milliseconds): number {
-    return 1000 / dt;
   }
 
   /* istanbul ignore next */
@@ -392,36 +308,10 @@ theodore.kruczek at gmail dot com.
     }
   }
 
-  private draw_(dt = <Milliseconds>0) {
-    const renderer = keepTrackApi.getRenderer();
-    const camera = keepTrackApi.getMainCamera();
-
-    camera.draw(keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj, renderer.sensorPos);
-    renderer.render(keepTrackApi.getScene(), keepTrackApi.getMainCamera());
-
-    if (KeepTrack.isFpsAboveLimit(dt, 5) && !settingsManager.lowPerf && !settingsManager.isDragging && !settingsManager.isDemoModeOn) {
-      keepTrackApi.getOrbitManager().updateAllVisibleOrbits();
-      this.inputManager.update(dt);
-
-      // Only update hover if we are not on mobile
-      if (!settingsManager.isMobileModeEnabled) {
-        keepTrackApi.getHoverManager().setHoverId(this.inputManager.mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
-      }
-    }
-
-    // If Demo Mode do stuff
-    if (settingsManager.isDemoModeOn && keepTrackApi.getSensorManager()?.currentSensors[0]?.lat !== null) {
-      this.demoManager.update();
-    }
-
-    keepTrackApi.emit(EventBusEvent.endOfDraw, dt);
-  }
-
   async run(): Promise<void> {
     try {
       const catalogManagerInstance = keepTrackApi.getCatalogManager();
       const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      const timeManagerInstance = keepTrackApi.getTimeManager();
       const renderer = keepTrackApi.getRenderer();
       const sceneInstance = keepTrackApi.getScene();
       const dotsManagerInstance = keepTrackApi.getDotsManager();
@@ -429,31 +319,20 @@ theodore.kruczek at gmail dot com.
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
       const inputManagerInstance = keepTrackApi.getInputManager();
 
-      // Error Trapping
-      window.addEventListener('error', (e: ErrorEvent) => {
-        if (!settingsManager.isGlobalErrorTrapOn) {
-          return;
-        }
-        if (isThisNode()) {
-          throw e.error;
-        }
-        errorManagerInstance.error(e.error, 'Global Error Trapper', e.message);
-      });
+      this.engine.init();
 
-      keepTrackApi.getMainCamera().init(settingsManager);
+      // keepTrackApi.getMainCamera().init(settingsManager);
 
       SplashScreen.loadStr(SplashScreen.msg.science);
 
       // Load all the plugins now that we have the API initialized
-      await import('./plugins/plugins')
-        .then((mod) => mod.loadPlugins(keepTrackApi, settingsManager.plugins))
-        .catch(() => {
-          // intentionally left blank
-        });
+      await this.engine.pluginManager.loadPlugins(keepTrackApi, settingsManager.plugins);
 
       SplashScreen.loadStr(SplashScreen.msg.science2);
-      // Start initializing the rest of the website
-      timeManagerInstance.init();
+      /*
+       * Start initializing the rest of the website
+       * timeManagerInstance.init();
+       */
       uiManagerInstance.onReady();
 
       SplashScreen.loadStr(SplashScreen.msg.dots);
@@ -463,7 +342,7 @@ theodore.kruczek at gmail dot com.
        */
       await renderer.glInit();
 
-      sceneInstance.init(renderer.gl);
+      sceneInstance.init({ gl: renderer.gl });
       sceneInstance.loadScene();
 
       dotsManagerInstance.init(settingsManager);
@@ -471,7 +350,7 @@ theodore.kruczek at gmail dot com.
       catalogManagerInstance.initObjects();
 
       catalogManagerInstance.init();
-      colorSchemeManagerInstance.init();
+      colorSchemeManagerInstance.init(renderer);
 
       await CatalogLoader.load(); // Needs Object Manager and gl first
 
@@ -488,8 +367,8 @@ theodore.kruczek at gmail dot com.
       await renderer.init(settingsManager);
       renderer.meshManager.init(renderer.gl);
 
-      // Now that everything is loaded, start rendering to thg canvas
-      this.gameLoop();
+      // Now that everything is loaded, start rendering to the canvas
+      this.engine.run();
 
       this.postStart_();
       this.isReady = true;
@@ -536,7 +415,7 @@ theodore.kruczek at gmail dot com.
             useShadowDom: false,
             tool: ['console', 'elements', 'network', 'resources', 'storage', 'sources', 'info', 'snippets'],
           });
-          const console = eruda.get('console') as ErudaConsole;
+          const console = eruda.get('console');
 
           console.config.set('catchGlobalErr', false);
 
@@ -577,40 +456,6 @@ theodore.kruczek at gmail dot com.
         this.postStart_();
       }, 100);
     }
-  }
-
-  private update_(dt = <Milliseconds>0) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const renderer = keepTrackApi.getRenderer();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-
-    renderer.dt = dt;
-    renderer.dtAdjusted = <Milliseconds>(Math.min(renderer.dt / 1000.0, 1.0 / Math.max(timeManagerInstance.propRate, 0.001)) * timeManagerInstance.propRate);
-
-    this.timeManager.update();
-
-    keepTrackApi.emit(EventBusEvent.update, dt);
-
-    // Update official time for everyone else
-    timeManagerInstance.setNow(<Milliseconds>Date.now());
-    if (!this.isUpdateTimeThrottle_) {
-      this.isUpdateTimeThrottle_ = true;
-      timeManagerInstance.setSelectedDate(timeManagerInstance.simulationTimeObj);
-      setTimeout(() => {
-        this.isUpdateTimeThrottle_ = false;
-      }, 500);
-    }
-
-    // Update Draw Positions
-    keepTrackApi.getDotsManager().updatePositionBuffer();
-
-    renderer.update();
-
-    /*
-     * Update Colors
-     * NOTE: We used to skip this when isDragging was true, but its so efficient that doesn't seem necessary anymore
-     */
-    colorSchemeManagerInstance.calculateColorBuffers(false); // avoid recalculating ALL colors
   }
 
   // Make the api available

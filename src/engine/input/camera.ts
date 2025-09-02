@@ -30,10 +30,10 @@ import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime
 import { SatMath } from '../../app/analysis/sat-math';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
+import { EventBusEvent } from '../events/event-bus-events';
 import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
-import { EventBusEvent } from '../events/event-bus-events';
 
 /**
  * Represents the different types of cameras available.
@@ -91,8 +91,8 @@ export class Camera {
   /**
    * Percentage of the distance to maxZoomDistance from the minZoomDistance
    */
-  zoomLevel_ = settingsManager.initZoomLevel ?? 0.6925;
-  private zoomTarget_ = settingsManager.initZoomLevel ?? 0.6925;
+  zoomLevel_: number;
+  private zoomTarget_: number;
 
   camAngleSnappedOnSat = false;
   camMatrix = mat4.create().fill(0);
@@ -515,7 +515,9 @@ export class Camera {
    * This is intentionally complex to reduce object creation and GC
    * Splitting it into subfunctions would not be optimal
    */
-  draw(target?: DetailedSatellite | MissileObject, sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
+  draw(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
+    let target = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+
     // TODO: This should be handled better
     target ??= <DetailedSatellite>(<unknown>{
       id: -1,
@@ -732,6 +734,9 @@ export class Camera {
 
   init(settings: SettingsManager) {
     this.settings_ = settings;
+
+    this.zoomLevel_ = settingsManager.initZoomLevel ?? 0.6925;
+    this.zoomTarget_ = settingsManager.initZoomLevel ?? 0.6925;
 
     this.registerKeyboardEvents_();
 

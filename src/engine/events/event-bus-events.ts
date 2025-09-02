@@ -81,5 +81,7 @@ export enum EventBusEvent {
   userLogout = 'userLogout',
   KeyUp = 'inputEvent:keyup',
   KeyDown = 'inputEvent:keydown',
-  KeyPress = 'inputEvent:keypress'
+  KeyPress = 'inputEvent:keypress',
+  SceneReady = 'SceneReady',
+  highPerformanceRender = 'highPerformanceRender'
 }

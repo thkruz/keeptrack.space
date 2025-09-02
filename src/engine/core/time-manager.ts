@@ -5,9 +5,9 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
+import { EventBusEvent } from '../events/event-bus-events';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
-import { EventBusEvent } from '../events/event-bus-events';
 
 export class TimeManager {
   dateDOM = null;
@@ -43,7 +43,7 @@ export class TimeManager {
   /**
    * The time offset ignoring propRate (ex. New Launch)
    */
-  staticOffset = settingsManager.staticOffset ?? 0;
+  staticOffset: number;
   private simulationTimeSerialized_ = <string>null;
   timeTextStr = <string>null;
   /**
@@ -203,6 +203,8 @@ export class TimeManager {
     this.propFrozen = Date.now(); // for when propRate 0
     this.realTime = <Milliseconds>this.propFrozen; // (initialized as Date.now)
     this.propRate = 1.0; // time rate multiplier for propagation
+
+    this.staticOffset = settingsManager.staticOffset ?? 0;
 
     // Initialize
     this.calculateSimulationTime();

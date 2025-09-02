@@ -1,10 +1,10 @@
 /* eslint-disable complexity */
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BaseObject, SpaceObjectType } from 'ootk';
+import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType } from 'ootk';
 import { CameraType } from '../../input/camera';
 import { ColorScheme } from './color-scheme';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 
 export class StarlinkColorScheme extends ColorScheme {
   readonly label = 'Starlink';
@@ -13,13 +13,15 @@ export class StarlinkColorScheme extends ColorScheme {
   isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {
-    starlink: true,
+    starlinkOperational: true,
+    starlinkOther: true,
     starlinkNot: true,
   };
 
   static readonly uniqueColorTheme = {
-    starlink: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
-    starlinkNot: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
+    starlinkOperational: [0.0, 0.8, 0.0, 0.8] as rgbaArray,
+    starlinkOther: [0.8, 0.8, 0.0, 0.8] as rgbaArray,
+    starlinkNot: [0.8, 0.0, 0.0, 1.0] as rgbaArray,
   };
 
   constructor() {
@@ -81,17 +83,33 @@ export class StarlinkColorScheme extends ColorScheme {
     }
 
     if (obj.name.toLocaleLowerCase().startsWith('starlink') && obj.type === SpaceObjectType.PAYLOAD) {
-      if (this.objectTypeFlags.starlink === false) {
+      if ((obj as DetailedSatellite).status === PayloadStatus.OPERATIONAL) {
+        if (this.objectTypeFlags.starlinkOperational === false) {
+          return {
+            color: this.colorTheme.deselected,
+            pickable: Pickable.No,
+          };
+        }
+
         return {
-          color: this.colorTheme.deselected,
-          pickable: Pickable.No,
+          color: this.colorTheme.starlinkOperational,
+          pickable: Pickable.Yes,
         };
       }
 
-      return {
-        color: [0.0, 0.8, 0.0, 0.8],
-        pickable: Pickable.Yes,
-      };
+      if ((obj as DetailedSatellite).status !== PayloadStatus.OPERATIONAL) {
+        if (this.objectTypeFlags.starlinkOther === false) {
+          return {
+            color: this.colorTheme.deselected,
+            pickable: Pickable.No,
+          };
+        }
+
+        return {
+          color: this.colorTheme.starlinkOther,
+          pickable: Pickable.Yes,
+        };
+      }
 
     }
 
@@ -103,17 +121,20 @@ export class StarlinkColorScheme extends ColorScheme {
     }
 
     return {
-      color: [0.8, 0.0, 0.0, 0.8],
+      color: this.colorTheme.starlinkNot,
       pickable: Pickable.Yes,
     };
-
   }
 
   static readonly legendHtml = keepTrackApi.html`
   <ul id="legend-list-starlink">
     <li>
-      <div class="Square-Box legend-starlink-box"></div>
-      Starlink
+      <div class="Square-Box legend-starlinkOperational-box"></div>
+      Operational Starlink
+    </li>
+    <li>
+      <div class="Square-Box legend-starlinkOther-box"></div>
+      Other Starlink
     </li>
     <li>
       <div class="Square-Box legend-starlinkNot-box"></div>

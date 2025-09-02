@@ -250,16 +250,7 @@ export class HoverManager {
         this.satHoverBoxNode2.textContent = HoverManager.getLaunchYear(sat);
       }
 
-      if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass && renderer.isShowDistance) {
-        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
-          this.satHoverBoxNode3.innerHTML =
-            `${SensorMath.nextpass(sat) + SensorMath.distanceString(sat, keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat() as DetailedSatellite)}`;
-        } else {
-          this.satHoverBoxNode3.innerHTML = SensorMath.nextpass(sat);
-        }
-      } else if (renderer.isShowDistance) {
-        this.showRicOrEci_(sat);
-      } else if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass) {
+      if (sensorManagerInstance.isSensorSelected() && settingsManager.isShowNextPass) {
         this.satHoverBoxNode3.textContent = SensorMath.nextpass(sat);
       } else if (settingsManager.isEciOnHover) {
         this.showEciVel_(sat);
@@ -302,27 +293,6 @@ export class HoverManager {
 
   }
 
-  private showEciDistAndVel_(sat: DetailedSatellite) {
-    if (settingsManager.isEciOnHover) {
-      this.satHoverBoxNode3.innerHTML =
-        `X: ${sat.position.x.toFixed(2)
-        } km` +
-        ` Y: ${sat.position.y.toFixed(2)
-        } km` +
-        ` Z: ${sat.position.z.toFixed(2)
-        } km` +
-        `XDot: ${sat.velocity.x.toFixed(2)
-        } km/s` +
-        ` YDot: ${sat.velocity.y.toFixed(2)
-        } km/s` +
-        ` ZDot: ${sat.velocity.z.toFixed(2)
-        } km/s`;
-    } else {
-      this.satHoverBoxNode3.innerHTML = '';
-      this.satHoverBoxNode3.style.display = 'none';
-    }
-  }
-
   private showEciVel_(sat: DetailedSatellite) {
     this.satHoverBoxNode3.innerHTML =
       `X: ${sat.position.x.toFixed(2)
@@ -346,26 +316,6 @@ export class HoverManager {
       this.hoverOverNothing_();
     } else {
       this.hoverOverSomething_(id, satX, satY);
-    }
-  }
-
-  private showRicDistAndVel_(ric: RIC) {
-    this.satHoverBoxNode3.innerHTML =
-      `R: ${ric.position[0].toFixed(2)}km I: ${ric.position[1].toFixed(2)}km C: ${ric.position[2].toFixed(2)}km` +
-      `ΔR: ${ric.velocity[0].toFixed(2)}km/s ΔI: ${ric.velocity[1].toFixed(2)}km/s ΔC: ${ric.velocity[2].toFixed(2)}km/s`;
-  }
-
-  private showRicOrEci_(sat: DetailedSatellite) {
-    const sat2 = keepTrackApi.getPlugin(SelectSatManager)?.secondarySatObj;
-
-    if (typeof sat2 !== 'undefined' && sat2 !== null && sat !== sat2) {
-      const ric = RIC.fromJ2000(sat2.toJ2000(keepTrackApi.getTimeManager().simulationTimeObj), sat.toJ2000(keepTrackApi.getTimeManager().simulationTimeObj));
-
-      this.satHoverBoxNode2.innerHTML = `${sat.sccNum}`;
-      this.showRicDistAndVel_(ric);
-    } else {
-      this.satHoverBoxNode2.innerHTML = `${sat.sccNum}${SensorMath.distanceString(sat, sat2)}`;
-      this.showEciDistAndVel_(sat);
     }
   }
 

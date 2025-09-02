@@ -49,7 +49,6 @@ export class WebGLRenderer {
   gl: WebGL2RenderingContext;
   isDrawOrbitsAbove: boolean;
   isPostProcessingResizeNeeded: boolean;
-  isShowDistance = false;
   isUpdateTimeThrottle: boolean;
   meshManager = new MeshManager();
   /**

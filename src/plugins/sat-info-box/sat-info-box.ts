@@ -4,6 +4,7 @@ import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { DraggableBox } from '@app/plugins-pro/draggable-box';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -162,6 +163,10 @@ export class SatInfoBox extends KeepTrackPlugin {
 
         getEl('search-results')!.style.maxHeight = '80%';
       });
+
+      draggie.on('pointerDown', () => {
+        getEl(SatInfoBox.containerId_)!.style.zIndex = DraggableBox.increaseMaxZIndex().toString();
+      });
     }
 
     // If right click kill and reinit
@@ -171,6 +176,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       if (e.button === 2) {
         this.initPosition(satInfobox);
         getEl('search-results')!.style.maxHeight = '';
+        getEl(SatInfoBox.containerId_)!.style.zIndex = DraggableBox.increaseMaxZIndex().toString();
       }
     });
   }
@@ -196,7 +202,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     const elements = plugin.getElements();
 
-    getEl('ui-wrapper')?.insertAdjacentHTML(
+    getEl('canvas-holder')?.insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
         <div id="${CONTAINER_ID}" class="text-select satinfo-fixed start-hidden">

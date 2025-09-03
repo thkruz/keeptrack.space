@@ -36,7 +36,7 @@ export class TopMenu extends KeepTrackPlugin {
                     </a>
                   </li>
                   <li>
-                    <a id="legend-menu" class="top-menu-icons">
+                    <a id="legend-menu-btn" class="top-menu-icons">
                       <div id="legend-icon" class="top-menu-icons">
                         <img src=${layersPng} alt="" />
                       </div>

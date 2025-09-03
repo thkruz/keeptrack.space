@@ -25,6 +25,7 @@
  */
 
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -38,11 +39,10 @@ import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getClass } from '../../engine/utils/get-class';
 import { getEl, hideEl, setInnerHtml, showEl } from '../../engine/utils/get-el';
 import { rgbCss } from '../../engine/utils/rgbCss';
-import { LegendManager } from './legend-manager';
+import { LegendManager, LegendPopupBox } from './legend-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 import { UiValidation } from './ui-validation';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
@@ -66,6 +66,7 @@ export class UiManager {
   updateNextPassOverlay: (arg0: boolean) => void;
   searchHoverSatId = -1;
   isLegendMenuOpen = false;
+  legendPopupBox: LegendPopupBox | null = null;
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
@@ -311,21 +312,35 @@ export class UiManager {
       }
     });
 
-    getEl('legend-menu')?.addEventListener('click', () => {
+    getEl('legend-menu-btn')?.addEventListener('click', () => {
       if (this.isLegendMenuOpen) {
         // Closing Legend Menu
         hideEl('legend-hover-menu');
         getEl('legend-icon')?.classList.remove('bmenu-item-selected');
+        this.legendPopupBox?.close();
         this.isLegendMenuOpen = false;
       } else {
         // Opening Legend Menu
 
-        if (getEl('legend-hover-menu')?.innerHTML.length === 0) {
+        let legendHoverDom: HTMLElement | null;
+
+        if (settingsManager.isMobileModeEnabled) {
+          legendHoverDom = getEl('legend-hover-menu')!;
+        } else {
+          const newFloatingBox = this.legendPopupBox ? this.legendPopupBox : new LegendPopupBox();
+
+          this.legendPopupBox = newFloatingBox;
+
+          newFloatingBox.open();
+          legendHoverDom = getEl('legend-hover-menu-popup')!;
+        }
+
+        if (legendHoverDom?.innerHTML.length === 0) {
           // TODO: Figure out why it is empty sometimes
           errorManagerInstance.debug('Legend Menu is Empty');
         }
 
-        showEl('legend-hover-menu');
+        showEl(legendHoverDom);
         getEl('legend-icon')?.classList.add('bmenu-item-selected');
         this.searchManager.hideResults();
         this.isLegendMenuOpen = true;

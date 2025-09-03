@@ -3952,7 +3952,17 @@ nav {
   border-color: var(--color-dark-border);
 }
 
-#legend-hover-menu li {
+#legend-hover-menu-popup {
+  display: none;
+  color: white;
+  background: var(--color-dark-background);
+  z-index: 100;
+  overflow: auto;
+  width: 100%;
+}
+
+#legend-hover-menu li,
+#legend-hover-menu-popup li {
   display: flex;
   align-items: center;
 }

@@ -1,7 +1,9 @@
+// eslint-disable-next-line max-classes-per-file
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { addonColorSchemes } from '@app/engine/rendering/color-scheme-addons';
 import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
+import { DraggableBox } from '@app/plugins-pro/draggable-box';
 import { getEl } from '../../engine/utils/get-el';
 import { rgbCss } from '../../engine/utils/rgbCss';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -23,7 +25,7 @@ export abstract class LegendManager {
     '.legend-satGEO-box',
   ];
 
-  private static menuOptions = {
+  static menuOptions = {
     near: nearDiv,
     deep: deepDiv,
     planetarium: planetariumDiv,
@@ -51,7 +53,13 @@ export abstract class LegendManager {
   }
 
   static change(menu: string) {
-    const legendHoverDom = getEl('legend-hover-menu');
+    let legendHoverDom: HTMLElement | null;
+
+    if (settingsManager.isMobileModeEnabled) {
+      legendHoverDom = getEl('legend-hover-menu');
+    } else {
+      legendHoverDom = getEl('legend-hover-menu-popup');
+    }
 
     if (!legendHoverDom) {
       return;
@@ -97,5 +105,37 @@ export abstract class LegendManager {
       }
       colorSchemeManagerInstance.objectTypeFlags[selector.split('-')[1]] = true;
     });
+  }
+}
+
+export class LegendPopupBox extends DraggableBox {
+  constructor() {
+    super('legend-popup-box');
+  }
+
+  protected getBoxContentHtml(): string {
+    return keepTrackApi.html`
+      <div id="legend-hover-menu-popup">
+      </div>
+    `.trim();
+  }
+
+  protected onOpen(): void {
+    super.onOpen();
+
+    LegendManager.change(settingsManager.currentLegend);
+
+    getEl('legend-hover-menu-popup')?.addEventListener('click', (e: MouseEvent) => {
+      const hoverMenuItemClass = (e.target as HTMLElement)?.classList[1];
+
+      if (hoverMenuItemClass) {
+        keepTrackApi.getUiManager().legendHoverMenuClick(hoverMenuItemClass);
+      }
+    });
+  }
+
+  close(cb?: () => void): void {
+    super.close(cb);
+    keepTrackApi.getUiManager().isLegendMenuOpen = false;
   }
 }

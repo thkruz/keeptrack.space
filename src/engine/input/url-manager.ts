@@ -6,8 +6,8 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SettingsManager, settingsManager } from '@app/settings/settings';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians } from 'ootk';
-import { getEl } from '../utils/get-el';
 import { EventBusEvent } from '../events/event-bus-events';
+import { getEl } from '../utils/get-el';
 
 export abstract class UrlManager {
   private static selectedSat_: DetailedSatellite | null = null;
@@ -302,11 +302,11 @@ export abstract class UrlManager {
     if (this.selectedSat_?.sccNum && !(mainCamera.ftsPitch > -0.1 && mainCamera.ftsPitch < 0.1 && mainCamera.ftsYaw > -0.1 && mainCamera.ftsYaw < 0.1)) {
       paramSlices.push(`pitch=${(mainCamera.ftsPitch * RAD2DEG).toFixed(3)}`);
       paramSlices.push(`yaw=${(mainCamera.ftsYaw * RAD2DEG).toFixed(3)}`);
-    } else if (mainCamera.camPitch > -0.01 && mainCamera.camPitch < 0.01 && mainCamera.camYaw > -0.01 && mainCamera.camYaw < 0.01) {
+    } else if (mainCamera.state.camPitch > -0.01 && mainCamera.state.camPitch < 0.01 && mainCamera.state.camYaw > -0.01 && mainCamera.state.camYaw < 0.01) {
       // If pitch and yaw are close to zero, we don't need to include them in the URL
     } else {
-      paramSlices.push(`pitch=${(mainCamera.camPitch * RAD2DEG).toFixed(3)}`);
-      paramSlices.push(`yaw=${(mainCamera.camYaw * RAD2DEG).toFixed(3)}`);
+      paramSlices.push(`pitch=${(mainCamera.state.camPitch * RAD2DEG).toFixed(3)}`);
+      paramSlices.push(`yaw=${(mainCamera.state.camYaw * RAD2DEG).toFixed(3)}`);
     }
 
     paramSlices.push(`zoom=${mainCamera.zoomLevel().toFixed(2)}`);

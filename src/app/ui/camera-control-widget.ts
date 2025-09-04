@@ -118,17 +118,17 @@ export class CameraControlWidget {
     if (axis) {
       const camera = keepTrackApi.getMainCamera();
 
-      if (axis === 'X' && camera.camYawTarget === Math.PI / 2 as Radians) {
+      if (axis === 'X' && camera.state.camYawTarget === Math.PI / 2 as Radians) {
         return '-X';
-      } else if (axis === '-X' && camera.camYawTarget === -Math.PI / 2 as Radians) {
+      } else if (axis === '-X' && camera.state.camYawTarget === -Math.PI / 2 as Radians) {
         return 'X';
-      } else if (axis === 'Y' && camera.camYawTarget === Math.PI as Radians) {
+      } else if (axis === 'Y' && camera.state.camYawTarget === Math.PI as Radians) {
         return '-Y';
-      } else if (axis === '-Y' && camera.camYawTarget === 0 as Radians) {
+      } else if (axis === '-Y' && camera.state.camYawTarget === 0 as Radians) {
         return 'Y';
-      } else if (axis === 'Z' && camera.camPitchTarget === Math.PI / 2 as Radians) {
+      } else if (axis === 'Z' && camera.state.camPitchTarget === Math.PI / 2 as Radians) {
         return '-Z';
-      } else if (axis === '-Z' && camera.camPitchTarget === -Math.PI / 2 as Radians) {
+      } else if (axis === '-Z' && camera.state.camPitchTarget === -Math.PI / 2 as Radians) {
         return 'Z';
       }
     }
@@ -147,16 +147,16 @@ export class CameraControlWidget {
     const camera = keepTrackApi.getMainCamera();
     const rotationSpeed = 0.01;
 
-    camera.camYaw = camera.camYaw + dx * rotationSpeed as Radians;
-    camera.camPitch = camera.camPitch + dy * rotationSpeed as Radians;
+    camera.state.camYaw = camera.state.camYaw + dx * rotationSpeed as Radians;
+    camera.state.camPitch = camera.state.camPitch + dy * rotationSpeed as Radians;
   }
 
   private getClickedAxis(x: number, y: number): string | null {
     const camera = keepTrackApi.getMainCamera();
     const rotationMatrix = mat4.create();
 
-    mat4.rotateX(rotationMatrix, rotationMatrix, camera.camPitch);
-    mat4.rotateZ(rotationMatrix, rotationMatrix, -camera.camYaw);
+    mat4.rotateX(rotationMatrix, rotationMatrix, camera.state.camPitch);
+    mat4.rotateZ(rotationMatrix, rotationMatrix, -camera.state.camYaw);
 
     for (const [axisName, axisVector] of Object.entries(this.axes)) {
       const projectedAxis = vec3.transformMat4(vec3.create(), axisVector, rotationMatrix);
@@ -177,26 +177,26 @@ export class CameraControlWidget {
     camera.isAutoPitchYawToTarget = true;
     switch (axisName) {
       case 'X':
-        camera.camYawTarget = Math.PI / 2 as Radians;
-        camera.camPitchTarget = 0 as Radians;
+        camera.state.camYawTarget = Math.PI / 2 as Radians;
+        camera.state.camPitchTarget = 0 as Radians;
         break;
       case '-X':
-        camera.camYawTarget = -Math.PI / 2 as Radians;
-        camera.camPitchTarget = 0 as Radians;
+        camera.state.camYawTarget = -Math.PI / 2 as Radians;
+        camera.state.camPitchTarget = 0 as Radians;
         break;
       case 'Y':
-        camera.camYawTarget = Math.PI as Radians;
-        camera.camPitchTarget = 0 as Radians;
+        camera.state.camYawTarget = Math.PI as Radians;
+        camera.state.camPitchTarget = 0 as Radians;
         break;
       case '-Y':
-        camera.camYawTarget = 0 as Radians;
-        camera.camPitchTarget = 0 as Radians;
+        camera.state.camYawTarget = 0 as Radians;
+        camera.state.camPitchTarget = 0 as Radians;
         break;
       case 'Z':
-        camera.camPitchTarget = Math.PI / 2 as Radians;
+        camera.state.camPitchTarget = Math.PI / 2 as Radians;
         break;
       case '-Z':
-        camera.camPitchTarget = -Math.PI / 2 as Radians;
+        camera.state.camPitchTarget = -Math.PI / 2 as Radians;
         break;
       default:
     }
@@ -212,9 +212,9 @@ export class CameraControlWidget {
     const rotationMatrix = mat4.create();
 
     // Apply pitch rotation first
-    mat4.rotateX(rotationMatrix, rotationMatrix, camera.camPitch);
+    mat4.rotateX(rotationMatrix, rotationMatrix, camera.state.camPitch);
     // Then apply yaw rotation
-    mat4.rotateZ(rotationMatrix, rotationMatrix, -camera.camYaw);
+    mat4.rotateZ(rotationMatrix, rotationMatrix, -camera.state.camYaw);
 
     // Create an array to store the axes with their projected coordinates and depths
     const axesWithDepth = [] as { axisName: string; screenX: number; screenY: number; depth: number }[];

@@ -167,12 +167,12 @@ export const darkClouds = (settingsManager: SettingsManager) => {
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
       const mainCameraInstance = keepTrackApi.getMainCamera();
 
-      mainCameraInstance.camPitch = lat2pitch(DEFAULT_LATITUDE);
-      mainCameraInstance.camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
+      mainCameraInstance.state.camPitch = lat2pitch(DEFAULT_LATITUDE);
+      mainCameraInstance.state.camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
       mainCameraInstance.dragStartPitch = 0.06321641675916885 as Radians;
       mainCameraInstance.dragStartYaw = 2.244571612554059 as Radians;
-      mainCameraInstance.zoomState.zoomLevel = 0.8;
-      mainCameraInstance.zoomState.zoomTarget = 0.8;
+      mainCameraInstance.zoomLevel_ = 0.8;
+      mainCameraInstance.zoomTarget = 0.8;
 
       mainCameraInstance.screenDragPoint = [mainCameraInstance.mouseX, mainCameraInstance.mouseY];
 

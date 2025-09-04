@@ -300,9 +300,9 @@ export class GamepadPlugin {
         keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
         if (zoomTarget < keepTrackApi.getMainCamera().zoomLevel()) {
-          keepTrackApi.getMainCamera().zoomState.isZoomIn = true;
+          keepTrackApi.getMainCamera().isZoomIn = true;
         } else {
-          keepTrackApi.getMainCamera().zoomState.isZoomIn = false;
+          keepTrackApi.getMainCamera().isZoomIn = false;
         }
         break;
       case CameraType.FPS:
@@ -341,8 +341,8 @@ export class GamepadPlugin {
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().camAngleSnappedOnSat = false;
           keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
-          keepTrackApi.getMainCamera().camPitchSpeed -= (y ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
-          keepTrackApi.getMainCamera().camYawSpeed += (x ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().state.camPitchSpeed -= (y ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().state.camYawSpeed += (x ** 3 / 200) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
           break;
         case CameraType.FPS:
         case CameraType.SATELLITE:
@@ -385,8 +385,8 @@ export class GamepadPlugin {
         case CameraType.SATELLITE:
         case CameraType.PLANETARIUM:
         case CameraType.ASTRONOMY:
-          keepTrackApi.getMainCamera().camPitchSpeed += (y / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
-          keepTrackApi.getMainCamera().camYawSpeed -= (x / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().state.camPitchSpeed += (y / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
+          keepTrackApi.getMainCamera().state.camYawSpeed -= (x / 100) * drawManagerInstance.dt * settingsManager.cameraMovementSpeed;
           break;
         default:
           // Do nothing

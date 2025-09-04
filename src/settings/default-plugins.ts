@@ -272,6 +272,9 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   GithubLinkPlugin: {
     enabled: true,
   },
+  LinkedInLinkPlugin: {
+    enabled: false,
+  },
   DateTimeManager: {
     enabled: true,
   },

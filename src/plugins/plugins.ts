@@ -28,6 +28,7 @@ import { GamepadPlugin } from './gamepad/gamepad';
 import { GithubLinkPlugin } from './github-link/github-link';
 import { KeepTrackPluginsConfiguration } from './keeptrack-plugins-configuration';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
+import { LinkedInLinkPlugin } from './linkedin-link/linkedin-link';
 import { MissilePlugin } from './missile/missile-plugin';
 import { NewLaunch } from './new-launch/new-launch';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
@@ -137,7 +138,14 @@ export class PluginManager {
         },
         { init: () => new SatInfoBoxSensor().init(), config: plugins.SatInfoBoxSensor },
         { init: () => new DateTimeManager().init(), config: plugins.DateTimeManager },
+
+        /*
+         * Top Menu Plugins are loaded right to left.
+         * TODO: This should be based on an "order" property in the configuration
+         */
         { init: () => new GithubLinkPlugin().init(), config: plugins.GithubLinkPlugin },
+        { init: () => new LinkedInLinkPlugin().init(), config: plugins.LinkedInLinkPlugin },
+
         { init: () => new ClassificationBar().init(), config: plugins.ClassificationBar },
         { init: () => new SoundManager().init(), config: plugins.SoundManager },
 

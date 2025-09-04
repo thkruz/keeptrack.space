@@ -52,8 +52,8 @@ export class Collisions extends KeepTrackPlugin {
 
   dragOptions: ClickDragOptions = {
     isDraggable: true,
-    minWidth: 540,
-    maxWidth: 650,
+    minWidth: 575,
+    maxWidth: 700,
   };
 
   menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];

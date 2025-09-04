@@ -1,5 +1,6 @@
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
@@ -9,7 +10,6 @@ import { BaseObject, DetailedSatellite } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface ChannelInfo {
   satellite: string;
@@ -156,7 +156,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
       .then(async (resp) => {
         const data = await resp.json() as ChannelInfo[];
 
-        this.displayChannelData(data);
+        this.displayChannelData(this.cleanData(data));
       })
       .catch(() => {
         // If first request fails, try with altName
@@ -164,12 +164,29 @@ export class TransponderChannelData extends KeepTrackPlugin {
           .then(async (resp) => {
             const data = await resp.json() as ChannelInfo[];
 
-            this.displayChannelData(data);
+            this.displayChannelData(this.cleanData(data));
           })
           .catch(() => errorManagerInstance.warn(
             `Failed to fetch channel info for ${selectedSat.name} and ${selectedSat.altName}`,
           ));
       });
+  }
+
+  cleanData(data: ChannelInfo[]): ChannelInfo[] {
+    // Remove any duplicate entries
+    const uniqueData: ChannelInfo[] = [];
+    const seen = new Set<string>();
+
+    data.forEach((entry) => {
+      const identifier = `${entry.tvchannel}-${entry.freq}-${entry.beam}`;
+
+      if (!seen.has(identifier)) {
+        seen.add(identifier);
+        uniqueData.push(entry);
+      }
+    });
+
+    return uniqueData;
   }
 
   displayChannelData(data: ChannelInfo[]) {

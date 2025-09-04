@@ -36,11 +36,8 @@ import { ColorScheme } from '../../engine/rendering/color-schemes/color-scheme';
 import { clickAndDragHeight, clickAndDragWidth } from '../../engine/utils/click-and-drag';
 import { closeColorbox } from '../../engine/utils/colorbox';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
-import { getClass } from '../../engine/utils/get-class';
 import { getEl, hideEl, setInnerHtml, showEl } from '../../engine/utils/get-el';
-import { rgbCss } from '../../engine/utils/rgbCss';
 import { LayersManager } from './layers-manager';
-import { LayersPopupBox } from './layers-popup-box';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 import { UiValidation } from './ui-validation';
@@ -66,8 +63,7 @@ export class UiManager {
   updateInterval = 1000;
   updateNextPassOverlay: (arg0: boolean) => void;
   searchHoverSatId = -1;
-  isLayersMenuOpen = false;
-  layersPopupBox: LayersPopupBox | null = null;
+  layersManager: LayersManager;
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
@@ -254,6 +250,9 @@ export class UiManager {
     this.searchManager = new SearchManager();
     this.searchManager.init();
 
+    this.layersManager = new LayersManager();
+    this.layersManager.init();
+
     if (settingsManager.isShowPrimaryLogo) {
       getEl('logo-primary')?.classList.remove('start-hidden');
     }
@@ -306,49 +305,6 @@ export class UiManager {
   }
 
   initMenuController() {
-    getEl('layers-hover-menu')?.addEventListener('click', (e: MouseEvent) => {
-      const hoverMenuItemClass = (e.target as HTMLElement)?.classList[1];
-
-      if (hoverMenuItemClass) {
-        this.layersHoverMenuClick(hoverMenuItemClass);
-      }
-    });
-
-    getEl('layers-menu-btn')?.addEventListener('click', () => {
-      if (this.isLayersMenuOpen) {
-        // Closing Layers Menu
-        hideEl('layers-hover-menu');
-        getEl('layers-icon')?.classList.remove('bmenu-item-selected');
-        this.layersPopupBox?.close();
-        this.isLayersMenuOpen = false;
-      } else {
-        // Opening Layers Menu
-
-        let layersHoverDom: HTMLElement | null;
-
-        if (settingsManager.isMobileModeEnabled) {
-          layersHoverDom = getEl('layers-hover-menu')!;
-        } else {
-          const newFloatingBox = this.layersPopupBox ? this.layersPopupBox : new LayersPopupBox();
-
-          this.layersPopupBox = newFloatingBox;
-
-          newFloatingBox.open();
-          layersHoverDom = getEl('layers-hover-menu-popup')!;
-        }
-
-        if (layersHoverDom?.innerHTML.length === 0) {
-          // TODO: Figure out why it is empty sometimes
-          errorManagerInstance.debug('Layers Menu is Empty');
-        }
-
-        showEl(layersHoverDom);
-        getEl('layers-icon')?.classList.add('bmenu-item-selected');
-        this.searchManager.hideResults();
-        this.isLayersMenuOpen = true;
-      }
-    });
-
     // Resizing Listener
     window.addEventListener('resize', () => {
       MobileManager.checkMobileMode();
@@ -403,49 +359,11 @@ export class UiManager {
     });
   }
 
-  layersHoverMenuClick(layersType: string) {
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const colorSchemeInstance = colorSchemeManagerInstance.currentColorScheme;
-    const slug = layersType.split('-')[1];
-    let isFlagOn = true;
-
-    if (colorSchemeManagerInstance.objectTypeFlags[slug]) {
-      isFlagOn = false;
-    }
-
-    if (!isFlagOn) {
-      getClass(`layers-${slug}-box`).forEach((el) => {
-        el.style.background = 'black';
-      });
-    } else {
-      getClass(`layers-${slug}-box`).forEach((el) => {
-        const color = colorSchemeInstance?.colorTheme[slug] ?? null;
-
-        if (!color) {
-          errorManagerInstance.log(`Color not found for ${slug}`);
-        } else {
-          el.style.background = rgbCss(color);
-        }
-      });
-    }
-
-    colorSchemeManagerInstance.objectTypeFlags[slug] = isFlagOn;
-    if (colorSchemeInstance) {
-      colorSchemeInstance.objectTypeFlags[slug] = colorSchemeManagerInstance.objectTypeFlags[slug];
-    }
-
-
-    colorSchemeManagerInstance.calculateColorBuffers(true);
-  }
-
   onReady() {
     // Code Once index.htm is loaded
     if (settingsManager.offlineMode) {
       this.updateInterval = 250;
     }
-
-    // Setup Layers Colors
-    LayersManager.layersColorsChange();
 
     // Run any plugins code
     keepTrackApi.emit(EventBusEvent.uiManagerOnReady);

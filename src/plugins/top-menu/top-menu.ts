@@ -4,7 +4,6 @@ import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
-import layersPng from '@public/img/icons/layers.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TooltipsPlugin } from '../tooltips/tooltips';
 
@@ -18,15 +17,9 @@ export class TopMenu extends KeepTrackPlugin {
     order: number;
     icon: string;
     class?: string;
+    classInner?: string;
     tooltip: string;
   }[] = [
-      {
-        id: 'layers-menu-btn',
-        order: 2,
-        class: 'top-menu-icons__blue-img',
-        icon: layersPng,
-        tooltip: 'Toggle Layers',
-      },
       {
         id: 'tutorial-btn',
         order: 3,
@@ -60,7 +53,7 @@ export class TopMenu extends KeepTrackPlugin {
                 (item) => `
                   <li>
                     <a id="${item.id}" class="top-menu-icons ${item.class ? ` ${item.class}` : ''}">
-                      <div class="top-menu-icons">
+                      <div class="top-menu-icons ${item.classInner ? ` ${item.classInner}` : ''}">
                         <img
                           id="${item.id.replace('-btn', '-icon')}"
                           src="${item.icon}"
@@ -81,7 +74,6 @@ export class TopMenu extends KeepTrackPlugin {
 
         const tooltipsPlugin = keepTrackApi.getPlugin(TooltipsPlugin);
 
-        tooltipsPlugin?.createTooltip('layers-menu-btn', 'Toggle Layers');
         tooltipsPlugin?.createTooltip('tutorial-btn', 'Show Help');
         tooltipsPlugin?.createTooltip('fullscreen-icon', 'Toggle Fullscreen');
 

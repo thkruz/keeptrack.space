@@ -84,7 +84,7 @@ export class SoundManager extends KeepTrackPlugin {
     keepTrackApi.getPlugin(TopMenu)?.navItems.push({
       id: 'sound-btn',
       order: 1,
-      class: 'bmenu-item-selected',
+      classInner: 'bmenu-item-selected',
       icon: soundOnPng,
       tooltip: 'Toggle Sound On/Off',
     });

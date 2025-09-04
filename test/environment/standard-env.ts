@@ -133,7 +133,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
 
   keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
 
-  mockUiManager.searchManager = new SearchManager(mockUiManager);
+  mockUiManager.searchManager = new SearchManager();
   const soundManagerInstance = new SoundManager();
 
   // Jest all Image class objects with a mock decode method.

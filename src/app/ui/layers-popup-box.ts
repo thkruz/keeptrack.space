@@ -27,13 +27,13 @@ export class LayersPopupBox extends DraggableBox {
       const hoverMenuItemClass = (e.target as HTMLElement)?.classList[1];
 
       if (hoverMenuItemClass) {
-        keepTrackApi.getUiManager().layersHoverMenuClick(hoverMenuItemClass);
+        keepTrackApi.getUiManager().layersManager.layersHoverMenuClick(hoverMenuItemClass);
       }
     });
   }
 
   close(cb?: () => void): void {
     super.close(cb);
-    keepTrackApi.getUiManager().isLayersMenuOpen = false;
+    keepTrackApi.getUiManager().layersManager.isLayersMenuOpen = false;
   }
 }

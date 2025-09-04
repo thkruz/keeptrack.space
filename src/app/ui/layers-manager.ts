@@ -1,8 +1,14 @@
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { addonColorSchemes } from '@app/engine/rendering/color-scheme-addons';
 import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
-import { getEl } from '../../engine/utils/get-el';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getClass } from '@app/engine/utils/get-class';
+import { TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
+import layersPng from '@public/img/icons/layers.png';
+import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
 import { rgbCss } from '../../engine/utils/rgbCss';
 import { keepTrackApi } from '../../keepTrackApi';
 import {
@@ -11,8 +17,9 @@ import {
   nearDiv,
   planetariumDiv,
 } from './layers-manager/layers-divs';
+import { LayersPopupBox } from './layers-popup-box';
 
-export abstract class LayersManager {
+export class LayersManager {
   private static layersClassList = [
     '.layers-inviewAlt-box',
     '.layers-starLow-box',
@@ -32,6 +39,9 @@ export abstract class LayersManager {
     default: '',
   };
 
+  isLayersMenuOpen = false;
+  layersPopupBox: LayersPopupBox | null = null;
+
   static {
     const addonLayers = {};
     const addonLayersClassList = [] as string[];
@@ -48,6 +58,117 @@ export abstract class LayersManager {
 
     LayersManager.menuOptions = { ...LayersManager.menuOptions, ...addonLayers };
     LayersManager.layersClassList = [...LayersManager.layersClassList, ...addonLayersClassList];
+  }
+
+  init() {
+    this.setupTopMenu_();
+
+    EventBus.getInstance().on(EventBusEvent.uiManagerOnReady, () => {
+      // Setup Layers Colors
+      LayersManager.layersColorsChange();
+    });
+
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl('layers-menu-btn')?.addEventListener('click', () => {
+        const layersMenuIconContainer = getEl('layers-menu-icon')!.parentElement!;
+
+        if (this.isLayersMenuOpen) {
+          // Closing Layers Menu
+          hideEl('layers-hover-menu');
+          layersMenuIconContainer.classList.remove('bmenu-item-selected');
+          layersMenuIconContainer.classList.add('bmenu-item-error');
+          this.layersPopupBox?.close();
+          this.isLayersMenuOpen = false;
+        } else {
+          // Opening Layers Menu
+
+          let layersHoverDom: HTMLElement | null;
+
+          if (settingsManager.isMobileModeEnabled) {
+            layersHoverDom = getEl('layers-hover-menu')!;
+          } else {
+            const newFloatingBox = this.layersPopupBox ?? new LayersPopupBox();
+
+            this.layersPopupBox = newFloatingBox;
+
+            newFloatingBox.open();
+            layersHoverDom = getEl('layers-hover-menu-popup')!;
+          }
+
+          if (layersHoverDom?.innerHTML.length === 0) {
+            // TODO: Figure out why it is empty sometimes
+            errorManagerInstance.debug('Layers Menu is Empty');
+          }
+
+          showEl(layersHoverDom);
+          layersMenuIconContainer.classList.remove('bmenu-item-error');
+          layersMenuIconContainer.classList.add('bmenu-item-selected');
+          keepTrackApi.getUiManager().searchManager.hideResults();
+          this.isLayersMenuOpen = true;
+        }
+      });
+    });
+  }
+
+  private setupTopMenu_() {
+    const eventBus = EventBus.getInstance();
+
+    // This needs to happen immediately so the sound button is in the menu
+    keepTrackApi.getPlugin(TopMenu)?.navItems.push({
+      id: 'layers-menu-btn',
+      order: 2,
+      classInner: 'bmenu-item-error',
+      icon: layersPng,
+      tooltip: 'Toggle Layers',
+    });
+
+    eventBus.on(EventBusEvent.uiManagerFinal, () => {
+      getEl('layers-hover-menu')?.addEventListener('click', (e: MouseEvent) => {
+        const hoverMenuItemClass = (e.target as HTMLElement)?.classList[1];
+
+        if (hoverMenuItemClass) {
+          this.layersHoverMenuClick(hoverMenuItemClass);
+        }
+      });
+
+      keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip('layers-menu-btn', 'Toggle Layers');
+    });
+
+  }
+
+  layersHoverMenuClick(layersType: string) {
+    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeInstance = colorSchemeManagerInstance.currentColorScheme;
+    const slug = layersType.split('-')[1];
+    let isFlagOn = true;
+
+    if (colorSchemeManagerInstance.objectTypeFlags[slug]) {
+      isFlagOn = false;
+    }
+
+    if (!isFlagOn) {
+      getClass(`layers-${slug}-box`).forEach((el) => {
+        el.style.background = 'black';
+      });
+    } else {
+      getClass(`layers-${slug}-box`).forEach((el) => {
+        const color = colorSchemeInstance?.colorTheme[slug] ?? null;
+
+        if (!color) {
+          errorManagerInstance.log(`Color not found for ${slug}`);
+        } else {
+          el.style.background = rgbCss(color);
+        }
+      });
+    }
+
+    colorSchemeManagerInstance.objectTypeFlags[slug] = isFlagOn;
+    if (colorSchemeInstance) {
+      colorSchemeInstance.objectTypeFlags[slug] = colorSchemeManagerInstance.objectTypeFlags[slug];
+    }
+
+
+    colorSchemeManagerInstance.calculateColorBuffers(true);
   }
 
   static change(menu: string) {

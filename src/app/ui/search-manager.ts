@@ -52,7 +52,7 @@ export class SearchManager {
 
     keepTrackApi.on(EventBusEvent.uiManagerFinal, this.addListeners_.bind(this));
 
-    this.setupTopMenu();
+    this.setupTopMenu_();
     keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'F' && !isRepeat) {
         this.toggleSearch();
@@ -65,7 +65,7 @@ export class SearchManager {
     });
   }
 
-  private setupTopMenu() {
+  private setupTopMenu_() {
     const eventBus = EventBus.getInstance();
 
     // This needs to happen immediately so the sound button is in the menu

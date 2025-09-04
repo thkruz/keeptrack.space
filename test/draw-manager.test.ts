@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-import { CameraType } from '@app/engine/input/camera';
+import { CameraType } from '@app/engine/camera/camera';
 import { Moon } from '@app/engine/rendering/draw-manager/moon';
 import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { keepTrackApi } from '@app/keepTrackApi';

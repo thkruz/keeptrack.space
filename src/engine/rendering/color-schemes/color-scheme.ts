@@ -4,7 +4,7 @@ import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfac
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, SpaceObjectType, Star } from 'ootk';
-import { CameraType } from '../../input/camera';
+import { CameraType } from '../../camera/camera';
 
 export interface ColorSchemeColorMap {
   version: string;

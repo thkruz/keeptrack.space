@@ -4,10 +4,10 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
+import { Camera } from '../camera/camera';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
-import { Camera } from '../input/camera';
 import { ConeMeshFactory } from '../rendering/draw-manager/cone-mesh-factory';
 import { Box } from '../rendering/draw-manager/cube';
 import { AtmosphereSettings, Earth } from '../rendering/draw-manager/earth';

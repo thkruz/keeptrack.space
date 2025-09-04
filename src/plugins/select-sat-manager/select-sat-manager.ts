@@ -1,5 +1,5 @@
+import { CameraType } from '@app/engine/camera/camera';
 import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
-import { CameraType } from '@app/engine/input/camera';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 

@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
 /* eslint-disable class-methods-use-this */
+import { CameraType } from '@app/engine/camera/camera';
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { CameraType } from '@app/engine/input/camera';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class GamepadPlugin {
   readonly id = 'GamepadPlugin';

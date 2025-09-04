@@ -1,12 +1,12 @@
 import { Milliseconds } from 'ootk';
 import { keepTrackContainer } from '../container';
 import { PluginManager } from '../plugins/plugins';
+import { Camera } from './camera/camera';
 import { Singletons } from './core/interfaces';
 import { Scene } from './core/scene';
 import { TimeManager } from './core/time-manager';
 import { EventBus } from './events/event-bus';
 import { EventBusEvent } from './events/event-bus-events';
-import { Camera } from './input/camera';
 import { InputManager } from './input/input-manager';
 import { WebGLRenderer } from './rendering/webgl-renderer';
 import { errorManagerInstance } from './utils/errorManager';

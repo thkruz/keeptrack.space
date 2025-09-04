@@ -9,10 +9,10 @@ import { OrbitCruncherType, OrbitDrawTypes } from '@app/webworker/orbitCruncher'
 import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
 import { HoverManager } from '../../app/ui/hover-manager';
+import { Camera, CameraType } from '../camera/camera';
 import { GetSatType } from '../core/interfaces';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
-import { Camera, CameraType } from '../input/camera';
 import { errorManagerInstance } from '../utils/errorManager';
 import { setInnerHtml } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';

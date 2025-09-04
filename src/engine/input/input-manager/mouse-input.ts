@@ -1,6 +1,6 @@
+import { Camera, CameraType } from '@app/engine/camera/camera';
 import { GetSatType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { Camera, CameraType } from '@app/engine/input/camera';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { keepTrackApi } from '@app/keepTrackApi';

@@ -19,8 +19,9 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { CameraType } from '@app/engine/camera/camera';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { CameraType } from '@app/engine/input/camera';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { shake } from '@app/engine/utils/shake';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -29,7 +30,6 @@ import viewInAirPng from '@public/img/icons/view-in-air.png';
 import { DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
   readonly id = 'SatelliteViewPlugin';

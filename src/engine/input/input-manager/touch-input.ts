@@ -1,5 +1,5 @@
+import { Camera } from '@app/engine/camera/camera';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { Camera } from '@app/engine/input/camera';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { MouseInput } from './mouse-input';

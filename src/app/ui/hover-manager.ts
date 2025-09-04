@@ -1,7 +1,7 @@
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
+import { CameraType } from '@app/engine/camera/camera';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { CameraType } from '@app/engine/input/camera';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';

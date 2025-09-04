@@ -405,7 +405,7 @@ export class Camera {
       this.isLocalRotateReset = true;
       this.settings_.fieldOfView = 0.6;
       renderer.glInit();
-      if (selectSatManagerInstance?.selectedSat > -1) {
+      if ((selectSatManagerInstance?.selectedSat ?? -1) > -1) {
         this.camZoomSnappedOnSat = true;
         this.cameraType = CameraType.FIXED_TO_SAT;
       } else {

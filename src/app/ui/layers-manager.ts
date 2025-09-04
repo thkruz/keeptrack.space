@@ -1,10 +1,8 @@
-// eslint-disable-next-line max-classes-per-file
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { addonColorSchemes } from '@app/engine/rendering/color-scheme-addons';
 import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
-import { DraggableBox } from '@app/engine/ui/draggable-box';
-import { getEl, showEl } from '../../engine/utils/get-el';
+import { getEl } from '../../engine/utils/get-el';
 import { rgbCss } from '../../engine/utils/rgbCss';
 import { keepTrackApi } from '../../keepTrackApi';
 import {
@@ -108,36 +106,3 @@ export abstract class LayersManager {
   }
 }
 
-export class LayersPopupBox extends DraggableBox {
-  constructor() {
-    super('layers-popup-box', { title: 'Layers' });
-  }
-
-  protected getBoxContentHtml(): string {
-    return keepTrackApi.html`
-      <div id="layers-hover-menu-popup">
-      </div>
-    `.trim();
-  }
-
-  protected onOpen(): void {
-    super.onOpen();
-
-    LayersManager.change(settingsManager.currentLayer);
-
-    showEl(getEl('layers-hover-menu-popup')!);
-
-    getEl('layers-hover-menu-popup')?.addEventListener('click', (e: MouseEvent) => {
-      const hoverMenuItemClass = (e.target as HTMLElement)?.classList[1];
-
-      if (hoverMenuItemClass) {
-        keepTrackApi.getUiManager().layersHoverMenuClick(hoverMenuItemClass);
-      }
-    });
-  }
-
-  close(cb?: () => void): void {
-    super.close(cb);
-    keepTrackApi.getUiManager().isLayersMenuOpen = false;
-  }
-}

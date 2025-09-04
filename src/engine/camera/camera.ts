@@ -34,6 +34,7 @@ import { EventBusEvent } from '../events/event-bus-events';
 import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
+import { CameraZoomState } from './state/camera-zoom-state';
 
 /**
  * Represents the different types of cameras available.
@@ -54,6 +55,8 @@ export enum CameraType {
 }
 
 export class Camera {
+  zoomState = new CameraZoomState();
+
   private chaseSpeed_ = 0.0005;
   private earthCenteredPitch_ = <Radians>0;
   private earthCenteredYaw_ = <Radians>0;
@@ -88,11 +91,6 @@ export class Camera {
   };
 
   private yawErr_ = <Radians>0;
-  /**
-   * Percentage of the distance to maxZoomDistance from the minZoomDistance
-   */
-  zoomLevel_: number;
-  private zoomTarget_: number;
 
   camAngleSnappedOnSat = false;
   camMatrix = mat4.create().fill(0);
@@ -151,7 +149,6 @@ export class Camera {
   isPanReset = false;
   isScreenPan = false;
   isWorldPan = false;
-  isZoomIn = false;
   localRotateCurrent = {
     pitch: <Radians>0,
     roll: <Radians>0,
@@ -236,9 +233,9 @@ export class Camera {
 
   reset(isHardReset = false) {
     if (isHardReset) {
-      this.zoomLevel_ = 0.6925;
+      this.zoomState.zoomLevel = 0.6925;
     }
-    this.zoomTarget = 0.6925;
+    this.zoomState.zoomTarget = 0.6925;
     this.isAutoPitchYawToTarget = !!isHardReset;
     this.cameraType = CameraType.DEFAULT;
     this.isDragging = false;
@@ -247,7 +244,7 @@ export class Camera {
     this.isPanReset = false;
     this.isScreenPan = false;
     this.isWorldPan = false;
-    this.isZoomIn = false;
+    this.zoomState.isZoomIn = false;
     this.localRotateCurrent = {
       pitch: <Radians>0,
       roll: <Radians>0,
@@ -298,15 +295,11 @@ export class Camera {
   }
 
   get zoomTarget(): number {
-    return this.zoomTarget_;
+    return this.zoomState.zoomTarget;
   }
 
   set zoomTarget(val: number) {
-    // Clamp to [0.01, 1]
-    val = Math.max(val, 0.01);
-    val = Math.min(val, 1);
-
-    this.zoomTarget_ = val;
+    this.zoomState.zoomTarget = val;
   }
 
   zoomIn(): void {
@@ -415,7 +408,7 @@ export class Camera {
   }
 
   zoomWheel(delta: number): void {
-    this.isZoomIn = delta < 0;
+    this.zoomState.isZoomIn = delta < 0;
 
     if (settingsManager.isZoomStopsRotation) {
       this.autoRotate(false);
@@ -549,7 +542,7 @@ export class Camera {
         if (this.getCameraDistance() < satAlt + RADIUS_OF_EARTH + this.settings_.minDistanceFromSatellite) {
           this.zoomTarget = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
           // errorManagerInstance.debug('Zooming in to ' + this.zoomTarget_ + ' to because we are too close to the satellite');
-          this.zoomLevel_ = this.zoomTarget_;
+          this.zoomState.zoomLevel = this.zoomState.zoomTarget;
         }
       }
     }
@@ -653,7 +646,7 @@ export class Camera {
    * TODO: This should be handled before getting the zoomLevel_ value
    */
   getCameraDistance(): Kilometers {
-    return <Kilometers>(this.zoomLevel_ ** ZOOM_EXP * (this.settings_.maxZoomDistance - this.settings_.minZoomDistance) + this.settings_.minZoomDistance);
+    return <Kilometers>(this.zoomState.zoomLevel ** ZOOM_EXP * (this.settings_.maxZoomDistance - this.settings_.minZoomDistance) + this.settings_.minZoomDistance);
   }
 
   /**
@@ -735,8 +728,8 @@ export class Camera {
   init(settings: SettingsManager) {
     this.settings_ = settings;
 
-    this.zoomLevel_ = settingsManager.initZoomLevel ?? 0.6925;
-    this.zoomTarget_ = settingsManager.initZoomLevel ?? 0.6925;
+    this.zoomState.zoomLevel = settingsManager.initZoomLevel ?? 0.6925;
+    this.zoomState.zoomTarget = settingsManager.initZoomLevel ?? 0.6925;
 
     this.registerKeyboardEvents_();
 
@@ -1309,10 +1302,10 @@ export class Camera {
         settingsManager.selectedColor = settingsManager.selectedColorFallback;
       }
 
-      this.zoomLevel_ = Math.max(this.zoomLevel_, this.zoomTarget_);
+      this.zoomState.zoomLevel = Math.max(this.zoomState.zoomLevel, this.zoomState.zoomTarget);
 
       // errorManagerInstance.debug(`Zoom Target: ${this.zoomTarget_}`);
-      this.earthCenteredLastZoom = this.zoomTarget_ + 0.1;
+      this.earthCenteredLastZoom = this.zoomState.zoomTarget + 0.1;
 
       // Only Zoom in Once on Mobile
       if (settingsManager.isMobileModeEnabled) {
@@ -1409,7 +1402,7 @@ export class Camera {
   }
 
   zoomLevel(): number {
-    return this.zoomLevel_;
+    return this.zoomState.zoomLevel;
   }
 
   private drawAstronomy_(sensorPos: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
@@ -1513,26 +1506,26 @@ export class Camera {
       Number.isNaN(this.camYaw) ||
       Number.isNaN(this.camPitchTarget) ||
       Number.isNaN(this.camYawTarget) ||
-      Number.isNaN(this.zoomLevel_) ||
-      Number.isNaN(this.zoomTarget_)
+      Number.isNaN(this.zoomState.zoomLevel) ||
+      Number.isNaN(this.zoomState.zoomTarget)
     ) {
       try {
         errorManagerInstance.debug(`camPitch: ${this.camPitch}`);
         errorManagerInstance.debug(`camYaw: ${this.camYaw}`);
         errorManagerInstance.debug(`camPitchTarget: ${this.camPitchTarget}`);
         errorManagerInstance.debug(`camYawTarget: ${this.camYawTarget}`);
-        errorManagerInstance.debug(`zoomLevel: ${this.zoomLevel_}`);
-        errorManagerInstance.debug(`_zoomTarget: ${this.zoomTarget_}`);
+        errorManagerInstance.debug(`zoomLevel: ${this.zoomState.zoomLevel}`);
+        errorManagerInstance.debug(`zoomTarget: ${this.zoomState.zoomTarget}`);
         errorManagerInstance.debug(`this.settings_.cameraMovementSpeed: ${this.settings_.cameraMovementSpeed}`);
       } catch (e) {
         errorManagerInstance.info('Camera Math Error');
       }
       this.camPitch = <Radians>0.5;
       this.camYaw = <Radians>0.5;
-      this.zoomLevel_ = 0.5;
+      this.zoomState.zoomLevel = 0.5;
       this.camPitchTarget = <Radians>0;
       this.camYawTarget = <Radians>0;
-      this.zoomTarget = 0.5;
+      this.zoomState.zoomTarget = 0.5;
     }
 
     if (!sensorPos && (this.cameraType === CameraType.PLANETARIUM || this.cameraType === CameraType.ASTRONOMY)) {
@@ -1809,15 +1802,15 @@ export class Camera {
         this.panDif_.z = this.screenDragPoint[1] - this.mouseY;
 
         // Slow down the panning if a satellite is selected
-        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat > -1) {
+        if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
           this.panDif_.x /= 30;
           this.panDif_.y /= 30;
           this.panDif_.z /= 30;
         }
 
-        this.panTarget_.x = this.panStartPosition.x + this.panDif_.x * this.panMovementSpeed_ * this.zoomLevel_;
+        this.panTarget_.x = this.panStartPosition.x + this.panDif_.x * this.panMovementSpeed_ * this.zoomState.zoomLevel;
         if (this.isWorldPan) {
-          this.panTarget_.y = this.panStartPosition.y + this.panDif_.y * this.panMovementSpeed_ * this.zoomLevel_;
+          this.panTarget_.y = this.panStartPosition.y + this.panDif_.y * this.panMovementSpeed_ * this.zoomState.zoomLevel;
         }
         if (this.isScreenPan) {
           this.panTarget_.z = this.panStartPosition.z + this.panDif_.z * this.panMovementSpeed_;
@@ -1836,8 +1829,8 @@ export class Camera {
       const panResetModifier = this.isPanReset ? 0.5 : 1;
 
       // X is X no matter what
-      this.panSpeed.x = (this.panCurrent.x - this.panTarget_.x) * this.panMovementSpeed_ * this.zoomLevel_;
-      this.panSpeed.x -= this.panSpeed.x * dt * this.panMovementSpeed_ * this.zoomLevel_;
+      this.panSpeed.x = (this.panCurrent.x - this.panTarget_.x) * this.panMovementSpeed_ * this.zoomState.zoomLevel;
+      this.panSpeed.x -= this.panSpeed.x * dt * this.panMovementSpeed_ * this.zoomState.zoomLevel;
       this.panCurrent.x += panResetModifier * this.panMovementSpeed_ * this.panDif_.x;
       // If we are moving like an FPS then Y and Z are based on the angle of the this
       if (this.isWorldPan) {
@@ -1847,8 +1840,8 @@ export class Camera {
       }
       // If we are moving the screen then Z is always up and Y is not relevant
       if (this.isScreenPan || this.isPanReset) {
-        this.panSpeed.z = (this.panCurrent.z - this.panTarget_.z) * this.panMovementSpeed_ * this.zoomLevel_;
-        this.panSpeed.z -= this.panSpeed.z * dt * this.panMovementSpeed_ * this.zoomLevel_;
+        this.panSpeed.z = (this.panCurrent.z - this.panTarget_.z) * this.panMovementSpeed_ * this.zoomState.zoomLevel;
+        this.panSpeed.z -= this.panSpeed.z * dt * this.panMovementSpeed_ * this.zoomState.zoomLevel;
         this.panCurrent.z -= panResetModifier * this.panMovementSpeed_ * this.panDif_.z;
       }
 
@@ -1969,7 +1962,7 @@ export class Camera {
    * this code might be better if applied directly to the shader versus a multiplier effect
    */
   private updateZoom_(dt: number) {
-    if (this.zoomLevel_ !== this.zoomTarget_) {
+    if (this.zoomState.zoomLevel !== this.zoomState.zoomTarget) {
       this.updateSatShaderSizes();
     }
 
@@ -1999,41 +1992,41 @@ export class Camera {
       }
 
       if (this.settings_.isAutoZoomIn) {
-        this.zoomTarget_ -= dt * this.settings_.autoZoomSpeed;
+        this.zoomState.zoomTarget -= dt * this.settings_.autoZoomSpeed;
       }
       if (this.settings_.isAutoZoomOut) {
-        this.zoomTarget_ += dt * this.settings_.autoZoomSpeed;
+        this.zoomState.zoomTarget += dt * this.settings_.autoZoomSpeed;
       }
     }
 
     if (this.isAutoPitchYawToTarget) {
-      this.zoomLevel_ += (this.zoomTarget_ - this.zoomLevel_) * dt * this.settings_.zoomSpeed; // Just keep zooming
+      this.zoomState.zoomLevel += (this.zoomState.zoomTarget - this.zoomState.zoomLevel) * dt * this.settings_.zoomSpeed; // Just keep zooming
     } else {
-      const inOrOut = this.zoomLevel_ > this.zoomTarget_ ? -1 : 1;
+      const inOrOut = this.zoomState.zoomLevel > this.zoomState.zoomTarget ? -1 : 1;
 
-      this.zoomLevel_ += inOrOut * dt * this.settings_.zoomSpeed * Math.abs(this.zoomTarget_ - this.zoomLevel_);
+      this.zoomState.zoomLevel += inOrOut * dt * this.settings_.zoomSpeed * Math.abs(this.zoomState.zoomTarget - this.zoomState.zoomLevel);
 
-      if ((this.zoomLevel_ > this.zoomTarget_ && !this.isZoomIn) || (this.zoomLevel_ < this.zoomTarget_ && this.isZoomIn)) {
-        this.zoomTarget_ = this.zoomLevel_; // If we change direction then consider us at the target
+      if ((this.zoomState.zoomLevel > this.zoomState.zoomTarget && !this.zoomState.isZoomIn) || (this.zoomState.zoomLevel < this.zoomState.zoomTarget && this.zoomState.isZoomIn)) {
+        this.zoomState.zoomTarget = this.zoomState.zoomLevel; // If we change direction then consider us at the target
       }
     }
 
     // Clamp Zoom between 0 and 1
-    this.zoomLevel_ = this.zoomLevel_ > 1 ? 1 : this.zoomLevel_;
-    this.zoomLevel_ = this.zoomLevel_ < 0 ? 0.0001 : this.zoomLevel_;
+    this.zoomState.zoomLevel = this.zoomState.zoomLevel > 1 ? 1 : this.zoomState.zoomLevel;
+    this.zoomState.zoomLevel = this.zoomState.zoomLevel < 0 ? 0.0001 : this.zoomState.zoomLevel;
 
     // Try to stay out of the earth
     if (this.cameraType === CameraType.DEFAULT || this.cameraType === CameraType.OFFSET || this.cameraType === CameraType.FIXED_TO_SAT) {
       if (this.getDistFromEarth() < RADIUS_OF_EARTH + 30) {
-        this.zoomTarget = this.zoomLevel_ + 0.001;
+        this.zoomState.zoomTarget = this.zoomState.zoomLevel + 0.001;
       }
     }
   }
 
   updateSatShaderSizes() {
-    if (this.zoomLevel_ > this.settings_.satShader.largeObjectMaxZoom) {
+    if (this.zoomState.zoomLevel > this.settings_.satShader.largeObjectMaxZoom) {
       this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize * 1.5;
-    } else if (this.zoomLevel_ < this.settings_.satShader.largeObjectMinZoom) {
+    } else if (this.zoomState.zoomLevel < this.settings_.satShader.largeObjectMinZoom) {
       this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize / 3;
     } else {
       this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize;

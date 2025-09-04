@@ -300,9 +300,9 @@ export class GamepadPlugin {
         keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
         if (zoomTarget < keepTrackApi.getMainCamera().zoomLevel()) {
-          keepTrackApi.getMainCamera().isZoomIn = true;
+          keepTrackApi.getMainCamera().zoomState.isZoomIn = true;
         } else {
-          keepTrackApi.getMainCamera().isZoomIn = false;
+          keepTrackApi.getMainCamera().zoomState.isZoomIn = false;
         }
         break;
       case CameraType.FPS:

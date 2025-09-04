@@ -171,8 +171,8 @@ export const darkClouds = (settingsManager: SettingsManager) => {
       mainCameraInstance.camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
       mainCameraInstance.dragStartPitch = 0.06321641675916885 as Radians;
       mainCameraInstance.dragStartYaw = 2.244571612554059 as Radians;
-      mainCameraInstance.zoomLevel_ = 0.8;
-      mainCameraInstance.zoomTarget = 0.8;
+      mainCameraInstance.zoomState.zoomLevel = 0.8;
+      mainCameraInstance.zoomState.zoomTarget = 0.8;
 
       mainCameraInstance.screenDragPoint = [mainCameraInstance.mouseX, mainCameraInstance.mouseY];
 

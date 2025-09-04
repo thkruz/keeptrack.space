@@ -3,6 +3,7 @@ import { getEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import Draggabilly from 'draggabilly';
+import './engine-ui.css';
 
 interface DraggableBoxOptions {
   width?: string;

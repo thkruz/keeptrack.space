@@ -389,14 +389,14 @@ export const setupDefaultHtml = () => {
   keepTrackApi.containerRoot.innerHTML += `
     <input id="search"></input>
     <div id="search-holder"></div>
-    <div id="search-icon"></div>
+    <div id="search-btn"></div>
     <div id="sat-hoverbox"></div>
     <div id="sat-infobox"></div>
     <div id="sat-hoverbox1"></div>
-    <div id="fullscreen-icon"></div>
-    <div id="tutorial-icon"></div>
-    <div id="layers-icon"></div>
-    <div id="sound-icon"></div>
+    <div id="fullscreen-btn"></div>
+    <div id="tutorial-btn"></div>
+    <div id="layers-btn"></div>
+    <div id="sound-btn"></div>
     <div id="colors-rmb-menu"></div>
     `;
 };

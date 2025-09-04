@@ -999,10 +999,6 @@ input:focus {
   align-items: center;
 }
 
-#nav-mobile2 a:hover {
-  filter: brightness(2);
-}
-
 #sensor-selected-container:hover,
 #datetime-text:hover {
   background: rgba(255, 255, 255, 0.1);
@@ -1170,15 +1166,20 @@ input:focus {
   padding-bottom: 3px;
 }
 
-#layers-icon img,
-#tutorial-icon img,
-#fullscreen-icon img,
-#search-icon img,
 .top-menu-icons__blue-img,
 .bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-item-inner *,
 .bmenu-filter-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-filter-item-inner * {
   /* Convert blue to engineering red */
   filter: hue-rotate(163deg) brightness(0.7) saturate(4);
+}
+
+.top-menu-icons__blue-img:hover {
+  filter: hue-rotate(163deg) brightness(0.85) saturate(4);
+}
+
+/* Covers the error state used on the sound icon */
+.top-menu-icons.bmenu-item-selected .bmenu-item-error:hover img {
+  filter: invert(52%) sepia(130%) saturate(7323%) hue-rotate(353deg) brightness(120%) contrast(86%);
 }
 
 .bmenu-item:hover,
@@ -1187,6 +1188,8 @@ input:focus {
   border-radius: 5px;
 }
 
+.top-menu-icons__blue-img:active *,
+.top-menu-icons.bmenu-item-selected .bmenu-item-error:active *,
 .bmenu-item .bmenu-item-inner:active *,
 .bmenu-filter-item .bmenu-filter-item-inner:active * {
   scale: 0.9;

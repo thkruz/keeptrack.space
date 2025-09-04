@@ -251,7 +251,8 @@ export class UiManager {
       throw new Error('UiManager already initialized');
     }
 
-    this.searchManager = new SearchManager(this);
+    this.searchManager = new SearchManager();
+    this.searchManager.init();
 
     if (settingsManager.isShowPrimaryLogo) {
       getEl('logo-primary')?.classList.remove('start-hidden');

@@ -51,10 +51,10 @@ describe('TopMenu_class', () => {
     const soundManager = keepTrackApi.getSoundManager();
 
     soundBtn.click();
-    expect(soundManager.isMute).toBe(true);
+    expect(soundManager!.isMute).toBe(true);
     expect(soundIcon.parentElement!.classList.contains('bmenu-item-selected')).toBe(false);
     soundBtn.click();
-    expect(soundManager.isMute).toBe(false);
+    expect(soundManager!.isMute).toBe(false);
     expect(soundIcon.parentElement!.classList.contains('bmenu-item-selected')).toBe(true);
   });
 });

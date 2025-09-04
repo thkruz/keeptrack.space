@@ -1,11 +1,16 @@
 import { keepTrackContainer } from '@app/container';
 import { Singletons } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
+import soundOffPng from '@public/img/icons/sound-off.png';
+import soundOnPng from '@public/img/icons/sound-on.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { TooltipsPlugin } from '../tooltips/tooltips';
+import { TopMenu } from '../top-menu/top-menu';
 import { SoundNames, sounds } from './sounds';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface PlayingSound {
   source: AudioBufferSourceNode;
@@ -41,9 +46,6 @@ export class SoundManager extends KeepTrackPlugin {
   constructor() {
     super();
 
-    // Initialize audio context and preload
-    this.initializeAudio();
-
     // Find the maxClickClip_
     Object.keys(sounds).forEach((key) => {
       if (key.startsWith('click')) {
@@ -56,22 +58,66 @@ export class SoundManager extends KeepTrackPlugin {
     });
   }
 
-  private async initializeAudio() {
+  init() {
     try {
+      super.init();
+      this.setupTopMenu();
       // Initialize Web Audio Context
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
       // Preload all audio
-      this.audioLoadingPromise = this.preloadAllAudio();
-      await this.audioLoadingPromise;
-
-      this.isAudioReady = true;
+      this.audioLoadingPromise = this.preloadAllAudio().then(() => {
+        this.isAudioReady = true;
+      });
     } catch (error) {
       errorManagerInstance.log(`Web Audio API initialization failed, using HTML5 Audio fallback: ${error}`);
       this.audioContext = null;
       this.preloadHtmlAudio();
       this.isAudioReady = true;
     }
+  }
+
+  private setupTopMenu() {
+    const eventBus = EventBus.getInstance();
+
+    // This needs to happen immediately so the sound button is in the menu
+    keepTrackApi.getPlugin(TopMenu)?.navItems.push({
+      id: 'sound-btn',
+      order: 1,
+      class: 'bmenu-item-selected',
+      icon: soundOnPng,
+      tooltip: 'Toggle Sound On/Off',
+    });
+
+    eventBus.on(EventBusEvent.uiManagerInit, () => {
+      keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip('sound-btn', 'Toggle Sound On/Off');
+    });
+
+    eventBus.on(EventBusEvent.uiManagerFinal, () => {
+      getEl('sound-btn')!.onclick = () => {
+        const soundIcon = <HTMLImageElement>getEl('sound-icon');
+        const soundManager = keepTrackApi.getSoundManager();
+
+        if (!soundManager) {
+          errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');
+
+          return;
+        }
+
+        if (!soundManager.isMute) {
+          soundManager.isMute = true;
+          soundIcon.src = soundOffPng;
+          soundIcon.parentElement!.classList.remove('bmenu-item-selected');
+          soundIcon.parentElement!.classList.add('bmenu-item-error');
+        } else {
+          soundManager.isMute = false;
+          soundIcon.src = soundOnPng;
+          soundIcon.parentElement!.classList.add('bmenu-item-selected');
+          soundIcon.parentElement!.classList.remove('bmenu-item-error');
+        }
+      };
+    },
+    );
   }
 
   private async preloadAllAudio(): Promise<void> {

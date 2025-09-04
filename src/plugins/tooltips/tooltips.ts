@@ -46,8 +46,8 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         tooltipDiv.style.display = 'none';
         tooltipDiv.style.position = 'absolute';
         tooltipDiv.style.zIndex = '9999';
-        tooltipDiv.style.width = '120px';
-        tooltipDiv.style.marginLeft = '-60px';
+        tooltipDiv.style.width = '150px';
+        tooltipDiv.style.marginLeft = '-75px';
         tooltipDiv.style.overflow = 'visible';
         tooltipDiv.style.backgroundColor = 'var(--color-dark-background)';
         tooltipDiv.style.textAlign = 'center';
@@ -189,7 +189,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
     // Clamp position to viewport
     top = Math.max(0, Math.min(top, viewportHeight - tooltipRect.height));
-    left = Math.max(0, Math.min(left, viewportWidth - tooltipRect.width));
+    left = Math.max(0, Math.min(left, viewportWidth - (tooltipRect.width / 2)));
 
     tooltipDiv.style.left = `${left}px`;
     tooltipDiv.style.top = `${top}px`;

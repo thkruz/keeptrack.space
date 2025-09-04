@@ -68,8 +68,8 @@ export abstract class TopMenuPlugin extends KeepTrackPlugin {
     // The top menu might not exist if the TopMenu plugin is disabled
     if (topRightMenuElement) {
       topRightMenuElement.insertBefore(pluginRootEl, getEl(this.topRightMenuId)?.firstChild ?? null);
-      topRightMenuElement.onclick = () => this.onClick_();
-      keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip(`${this.id}-btn`, this.tooltipText);
+      pluginRootEl.onclick = () => this.onClick_();
+      keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip(pluginRootEl, this.tooltipText);
     }
   }
 }

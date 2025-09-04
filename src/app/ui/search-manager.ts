@@ -1,7 +1,11 @@
 import { GroupType, ObjectGroup } from '@app/app/data/object-group';
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
+import searchPng from '@public/img/icons/search.png';
 import { DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
@@ -10,8 +14,6 @@ import { keepTrackApi } from '../../keepTrackApi';
 import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
-import type { UiManager } from './uiManager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export interface SearchResult {
   id: number; // Catalog Index
@@ -40,10 +42,8 @@ export class SearchManager {
   isSearchOpen = false;
   isResultsOpen = false;
   private lastResultGroup_: ObjectGroup<GroupType> | null = null;
-  private uiManager_: UiManager;
 
-  constructor(uiManager: UiManager) {
-    this.uiManager_ = uiManager;
+  init() {
     const uiWrapper = getEl('ui-wrapper');
     const searchResults = document.createElement('div');
 
@@ -51,9 +51,8 @@ export class SearchManager {
     uiWrapper!.prepend(searchResults);
 
     keepTrackApi.on(EventBusEvent.uiManagerFinal, this.addListeners_.bind(this));
-  }
 
-  init() {
+    this.setupTopMenu();
     keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'F' && !isRepeat) {
         this.toggleSearch();
@@ -63,6 +62,23 @@ export class SearchManager {
           }, 1000);
         }
       }
+    });
+  }
+
+  private setupTopMenu() {
+    const eventBus = EventBus.getInstance();
+
+    // This needs to happen immediately so the sound button is in the menu
+    keepTrackApi.getPlugin(TopMenu)?.navItems.push({
+      id: 'search-btn',
+      order: 5,
+      class: 'top-menu-icons__blue-img',
+      icon: searchPng,
+      tooltip: 'Search',
+    });
+
+    eventBus.on(EventBusEvent.uiManagerFinal, () => {
+      keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip('search-btn', 'Search for Objects');
     });
   }
 
@@ -91,11 +107,11 @@ export class SearchManager {
       }
 
       keepTrackApi.getHoverManager().setHoverId(satId);
-      this.uiManager_.searchHoverSatId = satId;
+      keepTrackApi.getUiManager().searchHoverSatId = satId;
     });
     getEl('search-results')?.addEventListener('mouseout', () => {
       keepTrackApi.getHoverManager().setHoverId(-1);
-      this.uiManager_.searchHoverSatId = -1;
+      keepTrackApi.getUiManager().searchHoverSatId = -1;
     });
     getEl('search')?.addEventListener('input', () => {
       const searchStr = (<HTMLInputElement>getEl('search')).value;
@@ -673,7 +689,7 @@ export class SearchManager {
     this.isSearchOpen = false;
     getEl('search-holder')?.classList.remove('search-slide-down');
     getEl('search-holder')?.classList.add('search-slide-up');
-    this.uiManager_.hideSideMenus();
+    keepTrackApi.getUiManager().hideSideMenus();
     this.hideResults();
   }
 

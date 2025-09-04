@@ -70,7 +70,7 @@ export type KeepTrackPluginsConfiguration = {
   SensorFov?: PluginConfiguration;
   SensorSurvFence?: PluginConfiguration;
   ShortTermFences?: PluginConfiguration;
-  SocialMedia?: PluginConfiguration;
+  GithubLinkPlugin?: PluginConfiguration;
   sounds?: PluginConfiguration;
   StereoMap?: PluginConfiguration;
   TimeMachine?: PluginConfiguration;

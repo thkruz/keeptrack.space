@@ -269,7 +269,7 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   TopMenu: {
     enabled: true,
   },
-  SocialMedia: {
+  GithubLinkPlugin: {
     enabled: true,
   },
   DateTimeManager: {

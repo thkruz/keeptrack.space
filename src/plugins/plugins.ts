@@ -25,6 +25,7 @@ import { EarthPresetsPlugin } from './earth-presets/earth-presets';
 import { EditSat } from './edit-sat/edit-sat';
 import { FilterMenuPlugin } from './filter-menu/filter-menu';
 import { GamepadPlugin } from './gamepad/gamepad';
+import { GithubLinkPlugin } from './github-link/github-link';
 import { KeepTrackPluginsConfiguration } from './keeptrack-plugins-configuration';
 import { LaunchCalendar } from './launch-calendar/launch-calendar';
 import { MissilePlugin } from './missile/missile-plugin';
@@ -61,7 +62,6 @@ import { MultiSiteLookAnglesPlugin } from './sensor/multi-site-look-angles-plugi
 import { SensorInfoPlugin } from './sensor/sensor-info-plugin';
 import { SettingsMenuPlugin } from './settings-menu/settings-menu';
 import { ShortTermFences } from './short-term-fences/short-term-fences';
-import { SocialMedia } from './social/social';
 import { StereoMap } from './stereo-map/stereo-map';
 import { TimeMachine } from './time-machine/time-machine';
 import { SatelliteTimeline } from './timeline-satellite/satellite-timeline';
@@ -137,7 +137,7 @@ export class PluginManager {
         },
         { init: () => new SatInfoBoxSensor().init(), config: plugins.SatInfoBoxSensor },
         { init: () => new DateTimeManager().init(), config: plugins.DateTimeManager },
-        { init: () => new SocialMedia().init(), config: plugins.SocialMedia },
+        { init: () => new GithubLinkPlugin().init(), config: plugins.GithubLinkPlugin },
         { init: () => new ClassificationBar().init(), config: plugins.ClassificationBar },
         { init: () => new SoundManager().init(), config: plugins.SoundManager },
 

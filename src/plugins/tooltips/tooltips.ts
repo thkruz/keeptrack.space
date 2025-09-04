@@ -1,8 +1,9 @@
 import { MenuMode } from '@app/engine/core/interfaces';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -36,7 +37,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
         const tooltipDiv = document.createElement('div');
@@ -60,7 +61,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         this.initTooltips();
@@ -85,7 +86,11 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     });
   }
 
-  createTooltip(el: HTMLElement, text: string): void {
+  createTooltip(el: HTMLElement | string, text: string): void {
+    if (typeof el === 'string') {
+      el = getEl(el) as HTMLElement;
+    }
+
     if (!el) {
       errorManagerInstance.warn('Failed to create tooltip: Element is null or undefined.');
 

@@ -8,12 +8,14 @@ import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import type { SelectSatManager } from '../../plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '../../plugins/sounds/sounds';
+import { EventBusEvent } from '../events/event-bus-events';
 import { clickAndDragWidth } from '../utils/click-and-drag';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl, hideEl } from '../utils/get-el';
 import { shake } from '../utils/shake';
 import { slideInRight, slideOutLeft } from '../utils/slide';
-import { EventBusEvent } from '../events/event-bus-events';
+
+// TODO: Utilize the event bus to remove dependencies
 
 export interface ClickDragOptions {
   leftOffset?: number;

@@ -20,7 +20,7 @@
 
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '../../keepTrackApi';
-import { getEl } from './get-el';
+import { getEl, hideEl } from './get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';
 
 export class AdviceManager {
@@ -37,10 +37,38 @@ export class AdviceManager {
   }
 
   public init() {
-    this.helpOuterDOM = getEl('help-outer-container');
-    this.helpHeaderDOM = getEl('help-header');
-    this.helpTextDOM = getEl('help-text');
-    this.tutIconDOM = getEl('tutorial-icon');
+    // Advice only applies to things in the bottom menu
+    if (settingsManager.isDisableBottomMenu) {
+      keepTrackApi.on(
+        EventBusEvent.uiManagerFinal,
+        () => {
+          hideEl('tutorial-btn');
+        },
+      );
+
+      return;
+    }
+
+    keepTrackApi.containerRoot?.insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
+        <div id="help-outer-container" class="valign">
+          <div id="help-screen" class="valign-wrapper">
+            <div id="help-inner-container" class="valign">
+              <p>
+                <span id="help-header" class="logo-font">TITLE</span>
+              </p>
+              <span id="help-text">ADVICE</span>
+            </div>
+          </div>
+        </div>
+      `,
+    );
+
+    this.helpOuterDOM = getEl('help-outer-container')!;
+    this.helpHeaderDOM = getEl('help-header')!;
+    this.helpTextDOM = getEl('help-text')!;
+    this.tutIconDOM = getEl('tutorial-icon')!;
 
     this.tutIconDOM.addEventListener('click', () => {
       keepTrackApi.emit(EventBusEvent.onHelpMenuClick);

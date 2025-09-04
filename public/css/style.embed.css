@@ -1170,11 +1170,11 @@ input:focus {
   padding-bottom: 3px;
 }
 
-#github-share1 img,
 #layers-icon img,
 #tutorial-icon img,
 #fullscreen-icon img,
 #search-icon img,
+.top-menu-icons__blue-img,
 .bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-item-inner *,
 .bmenu-filter-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-filter-item-inner * {
   /* Convert blue to engineering red */

@@ -111,7 +111,7 @@ describe('plugins', () => {
       DateTimeManager: {
         enabled: true,
       },
-      SocialMedia: {
+      GithubLinkPlugin: {
         enabled: true,
       },
       TopMenu: {

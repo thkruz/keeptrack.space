@@ -1,6 +1,6 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
-import { getEl, hideEl } from '@app/engine/utils/get-el';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
@@ -10,6 +10,7 @@ import soundOffPng from '@public/img/icons/sound-off.png';
 import soundOnPng from '@public/img/icons/sound-on.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
+import { TooltipsPlugin } from '../tooltips/tooltips';
 
 export class TopMenu extends KeepTrackPlugin {
   readonly id = 'TopMenu';
@@ -69,33 +70,12 @@ export class TopMenu extends KeepTrackPlugin {
           `,
         );
 
-        // Advice only applies to things in the bottom menu
-        if (settingsManager.isDisableBottomMenu) {
-          keepTrackApi.on(
-            EventBusEvent.uiManagerFinal,
-            () => {
-              hideEl('tutorial-btn');
-            },
-          );
+        const tooltipsPlugin = keepTrackApi.getPlugin(TooltipsPlugin);
 
-          return;
-        }
-
-        keepTrackApi.containerRoot?.insertAdjacentHTML(
-          'beforeend',
-          keepTrackApi.html`
-            <div id="help-outer-container" class="valign">
-              <div id="help-screen" class="valign-wrapper">
-                <div id="help-inner-container" class="valign">
-                  <p>
-                    <span id="help-header" class="logo-font">TITLE</span>
-                  </p>
-                  <span id="help-text">ADVICE</span>
-                </div>
-              </div>
-            </div>
-          `,
-        );
+        tooltipsPlugin?.createTooltip('sound-btn', 'Toggle Sound On/Off');
+        tooltipsPlugin?.createTooltip('layers-menu-btn', 'Toggle Layers');
+        tooltipsPlugin?.createTooltip('tutorial-btn', 'Show Help');
+        tooltipsPlugin?.createTooltip('fullscreen-icon', 'Toggle Fullscreen');
 
         adviceManagerInstance.init();
       },

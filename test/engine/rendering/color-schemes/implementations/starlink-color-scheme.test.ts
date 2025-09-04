@@ -94,9 +94,9 @@ describe('StarlinkColorScheme', () => {
 
   describe('Lifecycle Methods', () => {
     it('should have proper legendHtml', () => {
-      expect(StarlinkColorScheme.legendHtml).toContain('Operational Starlink');
-      expect(StarlinkColorScheme.legendHtml).toContain('Other Starlink');
-      expect(StarlinkColorScheme.legendHtml).toContain('Not Starlink');
+      expect(StarlinkColorScheme.layersHtml).toContain('Operational Starlink');
+      expect(StarlinkColorScheme.layersHtml).toContain('Other Starlink');
+      expect(StarlinkColorScheme.layersHtml).toContain('Not Starlink');
     });
   });
 

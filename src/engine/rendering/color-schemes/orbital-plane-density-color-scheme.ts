@@ -123,22 +123,22 @@ export class OrbitalPlaneDensityColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-orbitalPlaneDensity">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-orbitalPlaneDensity">
     <li>
-      <div class="Square-Box legend-orbitalPlaneDensityHi-box"></div>
+      <div class="Square-Box layers-orbitalPlaneDensityHi-box"></div>
       High Orbit Density
     </li>
     <li>
-      <div class="Square-Box legend-orbitalPlaneDensityMed-box"></div>
+      <div class="Square-Box layers-orbitalPlaneDensityMed-box"></div>
       Med Orbit Density
     </li>
     <li>
-      <div class="Square-Box legend-orbitalPlaneDensityLow-box"></div>
+      <div class="Square-Box layers-orbitalPlaneDensityLow-box"></div>
       Low Orbit Density
     </li>
     <li>
-      <div class="Square-Box legend-orbitalPlaneDensityOther-box"></div>
+      <div class="Square-Box layers-orbitalPlaneDensityOther-box"></div>
       Other Debris
     </li>
   </ul>

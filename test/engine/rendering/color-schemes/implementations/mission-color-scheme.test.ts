@@ -172,9 +172,9 @@ describe('MissionColorScheme', () => {
 
   describe('Lifecycle Methods', () => {
     it('should have proper legendHtml', () => {
-      expect(MissionColorScheme.legendHtml).toContain('Military');
-      expect(MissionColorScheme.legendHtml).toContain('Communications');
-      expect(MissionColorScheme.legendHtml).toContain('Technology');
+      expect(MissionColorScheme.layersHtml).toContain('Military');
+      expect(MissionColorScheme.layersHtml).toContain('Communications');
+      expect(MissionColorScheme.layersHtml).toContain('Technology');
     });
   });
 

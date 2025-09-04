@@ -179,22 +179,22 @@ export class CountryColorScheme extends ColorScheme {
     }
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-countries">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-countries">
     <li>
-      <div class="Square-Box legend-countryUS-box"></div>
+      <div class="Square-Box layers-countryUS-box"></div>
       United States
     </li>
     <li>
-      <div class="Square-Box legend-countryCIS-box"></div>
+      <div class="Square-Box layers-countryCIS-box"></div>
       Russia
     </li>
     <li>
-      <div class="Square-Box legend-countryPRC-box"></div>
+      <div class="Square-Box layers-countryPRC-box"></div>
       China
     </li>
     <li>
-      <div class="Square-Box legend-countryOther-box"></div>
+      <div class="Square-Box layers-countryOther-box"></div>
       Other
     </li>
   </ul>

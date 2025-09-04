@@ -93,9 +93,9 @@ describe('SourceColorScheme', () => {
 
   describe('Lifecycle Methods', () => {
     it('should have proper legendHtml', () => {
-      expect(SourceColorScheme.legendHtml).toContain('Celestrak');
-      expect(SourceColorScheme.legendHtml).toContain('18 SDS');
-      expect(SourceColorScheme.legendHtml).toContain('Vimpel');
+      expect(SourceColorScheme.layersHtml).toContain('Celestrak');
+      expect(SourceColorScheme.layersHtml).toContain('18 SDS');
+      expect(SourceColorScheme.layersHtml).toContain('Vimpel');
     });
   });
 

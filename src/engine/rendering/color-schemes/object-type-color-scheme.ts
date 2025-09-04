@@ -1,13 +1,13 @@
 /* eslint-disable complexity */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../../input/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
   payload: rgbaArray;
@@ -59,12 +59,12 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ...this.objectTypeFlags, ...ObjectTypeColorScheme.uniqueObjectTypeFlags,
     };
 
-    keepTrackApi.on(EventBusEvent.legendUpdated, () => {
+    keepTrackApi.on(EventBusEvent.layerUpdated, () => {
       if (settingsManager.isDisableSensors) {
         this.objectTypeFlags.sensor = false;
         this.objectTypeFlags.inFOV = false;
-        const sensorBox = document.querySelector('.legend-sensor-box')?.parentElement as HTMLElement;
-        const inFOVBox = document.querySelector('.legend-inFOV-box')?.parentElement as HTMLElement;
+        const sensorBox = document.querySelector('.layers-sensor-box')?.parentElement as HTMLElement;
+        const inFOVBox = document.querySelector('.layers-inFOV-box')?.parentElement as HTMLElement;
 
         if (sensorBox) {
           hideEl(sensorBox);
@@ -77,7 +77,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
 
       if (settingsManager.isDisableLaunchSites) {
         this.objectTypeFlags.facility = false;
-        const launchSiteBox = document.querySelector('.legend-facility-box')?.parentElement as HTMLElement;
+        const launchSiteBox = document.querySelector('.layers-facility-box')?.parentElement as HTMLElement;
 
         if (launchSiteBox) {
           hideEl(launchSiteBox);
@@ -86,7 +86,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
 
       if (!settingsManager.plugins?.MissilePlugin) {
         this.objectTypeFlags.missile = false;
-        const missileBox = document.querySelector('.legend-missile-box')?.parentElement as HTMLElement;
+        const missileBox = document.querySelector('.layers-missile-box')?.parentElement as HTMLElement;
 
         if (missileBox) {
           hideEl(missileBox);
@@ -355,42 +355,42 @@ export class ObjectTypeColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-default-sensor">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-default-sensor">
     <li>
-      <div class="Square-Box legend-payload-box"></div>
+      <div class="Square-Box layers-payload-box"></div>
       Payload
     </li>
     <li>
-      <div class="Square-Box legend-rocketBody-box"></div>
+      <div class="Square-Box layers-rocketBody-box"></div>
       Rocket Body
     </li>
     <li>
-      <div class="Square-Box legend-debris-box"></div>
+      <div class="Square-Box layers-debris-box"></div>
       Debris
     </li>
     <li>
-      <div class="Square-Box legend-pink-box"></div>
+      <div class="Square-Box layers-pink-box"></div>
       Special Sats
     </li>
     <li>
-      <div class="Square-Box legend-inFOV-box"></div>
+      <div class="Square-Box layers-inFOV-box"></div>
       Satellite In View
     </li>
     <li>
-      <div class="Square-Box legend-missile-box"></div>
+      <div class="Square-Box layers-missile-box"></div>
       Missile
     </li>
     <li>
-      <div class="Square-Box legend-missileInview-box"></div>
+      <div class="Square-Box layers-missileInview-box"></div>
       Missile In View
     </li>
     <li>
-      <div class="Square-Box legend-sensor-box"></div>
+      <div class="Square-Box layers-sensor-box"></div>
       Sensor
     </li>
     <li>
-      <div class="Square-Box legend-facility-box"></div>
+      <div class="Square-Box layers-facility-box"></div>
       Launch Site
     </li>
   </ul>

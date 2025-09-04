@@ -1,9 +1,9 @@
 /* eslint-disable complexity */
+import { DensityBin } from '@app/app/data/catalog-manager';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { DensityBin } from '@app/app/data/catalog-manager';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   spatialDensityLow: rgbaArray;
@@ -143,22 +143,22 @@ export class SpatialDensityColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-spatialDensityHi">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-spatialDensityHi">
     <li>
-      <div class="Square-Box legend-spatialDensityHi-box"></div>
+      <div class="Square-Box layers-spatialDensityHi-box"></div>
       High Orbit Density
     </li>
     <li>
-      <div class="Square-Box legend-spatialDensityMed-box"></div>
+      <div class="Square-Box layers-spatialDensityMed-box"></div>
       Med Orbit Density
     </li>
     <li>
-      <div class="Square-Box legend-spatialDensityLow-box"></div>
+      <div class="Square-Box layers-spatialDensityLow-box"></div>
       Low Orbit Density
     </li>
     <li>
-      <div class="Square-Box legend-spatialDensityOther-box"></div>
+      <div class="Square-Box layers-spatialDensityOther-box"></div>
       Other Orbit Density
     </li>
   </ul>

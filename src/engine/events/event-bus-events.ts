@@ -71,7 +71,7 @@ export enum EventBusEvent {
   parseGetVariables = 'parseGetVariables',
   rightBtnMenuOpen = 'rightBtnMenuOpen',
   searchUpdated = 'searchUpdated',
-  legendUpdated = 'legendUpdated',
+  layerUpdated = 'legendUpdated',
   satInfoBoxAddListeners = 'satInfoBoxAddListeners',
   satInfoBoxInit = 'satInfoBoxInit',
   satInfoBoxFinal = 'satInfoBoxFinal',

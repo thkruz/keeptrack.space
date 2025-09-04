@@ -1,5 +1,6 @@
-import { LegendManager } from '@app/app/ui/legend-manager';
+import { LayersManager } from '@app/app/ui/layers-manager';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorPick } from '@app/engine/utils/color-pick';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
@@ -12,7 +13,6 @@ import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -445,7 +445,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     context.element.style.cssText = `background-color: ${context.color} !important; color: ${context.color};`;
     if (this.isNotColorPickerInitialSetup) {
       settingsManager.colors[colorStr] = parseRgba(context.color);
-      LegendManager.legendColorsChange();
+      LayersManager.layersColorsChange();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
       colorSchemeManagerInstance.calculateColorBuffers(true);

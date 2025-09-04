@@ -1,13 +1,13 @@
 /* eslint-disable complexity */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../../input/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export interface CelestrakColorSchemeColorMap extends ColorSchemeColorMap {
   celestrakDefaultRocketBody: rgbaArray;
@@ -50,12 +50,12 @@ export class CelestrakColorScheme extends ColorScheme {
       ...this.objectTypeFlags, ...CelestrakColorScheme.uniqueObjectTypeFlags,
     };
 
-    keepTrackApi.on(EventBusEvent.legendUpdated, () => {
+    keepTrackApi.on(EventBusEvent.layerUpdated, () => {
       if (settingsManager.isDisableSensors) {
         this.objectTypeFlags.celestrakDefaultSensor = false;
         this.objectTypeFlags.celestrakDefaultFov = false;
-        const sensorBox = document.querySelector('.legend-celestrakDefaultSensor-box')?.parentElement as HTMLElement;
-        const inFOVBox = document.querySelector('.legend-celestrakDefaultFov-box')?.parentElement as HTMLElement;
+        const sensorBox = document.querySelector('.layers-celestrakDefaultSensor-box')?.parentElement as HTMLElement;
+        const inFOVBox = document.querySelector('.layers-celestrakDefaultFov-box')?.parentElement as HTMLElement;
 
         if (sensorBox) {
           hideEl(sensorBox);
@@ -68,7 +68,7 @@ export class CelestrakColorScheme extends ColorScheme {
 
       if (settingsManager.isDisableLaunchSites) {
         this.objectTypeFlags.facility = false;
-        const launchSiteBox = document.querySelector('.legend-facility-box')?.parentElement as HTMLElement;
+        const launchSiteBox = document.querySelector('.layers-facility-box')?.parentElement as HTMLElement;
 
         if (launchSiteBox) {
           hideEl(launchSiteBox);
@@ -311,38 +311,38 @@ export class CelestrakColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-celestrakDefault-sensor">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-celestrakDefault-sensor">
   <li>
-      <div class="Square-Box legend-celestrakDefaultActivePayload-box"></div>
+      <div class="Square-Box layers-celestrakDefaultActivePayload-box"></div>
       Active Payload
     </li>
     <li>
-      <div class="Square-Box legend-celestrakDefaultInactivePayload-box"></div>
+      <div class="Square-Box layers-celestrakDefaultInactivePayload-box"></div>
       Inactive Payload
     </li>
     <li>
-      <div class="Square-Box legend-celestrakDefaultRocketBody-box"></div>
+      <div class="Square-Box layers-celestrakDefaultRocketBody-box"></div>
       Rocket Body
     </li>
     <li>
-      <div class="Square-Box legend-celestrakDefaultDebris-box"></div>
+      <div class="Square-Box layers-celestrakDefaultDebris-box"></div>
       Debris
     </li>
     <li>
-      <div class="Square-Box legend-celestrakDefaultUnknown-box"></div>
+      <div class="Square-Box layers-celestrakDefaultUnknown-box"></div>
       Unknown
     </li>
     <li>
-      <div class="Square-Box legend-celestrakDefaultFov-box"></div>
+      <div class="Square-Box layers-celestrakDefaultFov-box"></div>
       In Field of View
     </li>
     <li>
-      <div class="Square-Box legend-celestrakDefaultSensor-box"></div>
+      <div class="Square-Box layers-celestrakDefaultSensor-box"></div>
       Sensor
     </li>
     <li>
-      <div class="Square-Box legend-facility-box"></div>
+      <div class="Square-Box layers-facility-box"></div>
       Launch Site
     </li>
   </ul>

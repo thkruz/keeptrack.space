@@ -502,7 +502,7 @@ export class SettingsManager {
   /**
    * The current legend to display.
    */
-  currentLegend = 'CelestrakColorScheme';
+  currentLayer = 'CelestrakColorScheme';
   /**
    * The number of days before a TLE is considered lost.
    */

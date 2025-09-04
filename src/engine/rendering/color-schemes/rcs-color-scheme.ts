@@ -101,30 +101,30 @@ export class RcsColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-rcs">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-rcs">
   <li>
-      <div class="Square-Box legend-rcsXXSmall-box"></div>
+      <div class="Square-Box layers-rcsXXSmall-box"></div>
       Less Than 0.01 sq m
     </li>
     <li>
-      <div class="Square-Box legend-rcsXSmall-box"></div>
+      <div class="Square-Box layers-rcsXSmall-box"></div>
       Between 0.01 sq m and 0.05 sq m
     </li>
     <li>
-      <div class="Square-Box legend-rcsSmall-box"></div>
+      <div class="Square-Box layers-rcsSmall-box"></div>
       Between 0.05 sq m and 0.1 sq m
     </li>
     <li>
-      <div class="Square-Box legend-rcsMed-box"></div>
+      <div class="Square-Box layers-rcsMed-box"></div>
       Between 0.1 and 1 sq m
     </li>
     <li>
-      <div class="Square-Box legend-rcsLarge-box"></div>
+      <div class="Square-Box layers-rcsLarge-box"></div>
       More Than 1 sq m
     </li>
     <li>
-      <div class="Square-Box legend-rcsUnknown-box"></div>
+      <div class="Square-Box layers-rcsUnknown-box"></div>
       No Public Data
     </li>
   </ul>

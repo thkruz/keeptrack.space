@@ -74,7 +74,7 @@ export abstract class ColorScheme {
   objectTypeFlags: Record<string, boolean>;
   static readonly uniqueColorTheme: Record<string, rgbaArray>;
   static readonly uniqueObjectTypeFlags: Record<string, boolean>;
-  legendHtml: string = '';
+  layersHtml: string = '';
   /** This is used in the UI */
   readonly label: string = 'Default Color Scheme';
   /** This is used in code for matching. Must be the class name. */

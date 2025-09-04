@@ -39,7 +39,7 @@ import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getClass } from '../../engine/utils/get-class';
 import { getEl, hideEl, setInnerHtml, showEl } from '../../engine/utils/get-el';
 import { rgbCss } from '../../engine/utils/rgbCss';
-import { LegendManager, LegendPopupBox } from './legend-manager';
+import { LayersManager, LayersPopupBox } from './layers-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 import { UiValidation } from './ui-validation';
@@ -65,8 +65,8 @@ export class UiManager {
   updateInterval = 1000;
   updateNextPassOverlay: (arg0: boolean) => void;
   searchHoverSatId = -1;
-  isLegendMenuOpen = false;
-  legendPopupBox: LegendPopupBox | null = null;
+  isLayersMenuOpen = false;
+  layersPopupBox: LayersPopupBox | null = null;
 
   static fullscreenToggle() {
     if (!document.fullscreenElement) {
@@ -304,46 +304,46 @@ export class UiManager {
   }
 
   initMenuController() {
-    getEl('legend-hover-menu')?.addEventListener('click', (e: MouseEvent) => {
+    getEl('layers-hover-menu')?.addEventListener('click', (e: MouseEvent) => {
       const hoverMenuItemClass = (e.target as HTMLElement)?.classList[1];
 
       if (hoverMenuItemClass) {
-        this.legendHoverMenuClick(hoverMenuItemClass);
+        this.layersHoverMenuClick(hoverMenuItemClass);
       }
     });
 
-    getEl('legend-menu-btn')?.addEventListener('click', () => {
-      if (this.isLegendMenuOpen) {
-        // Closing Legend Menu
-        hideEl('legend-hover-menu');
-        getEl('legend-icon')?.classList.remove('bmenu-item-selected');
-        this.legendPopupBox?.close();
-        this.isLegendMenuOpen = false;
+    getEl('layers-menu-btn')?.addEventListener('click', () => {
+      if (this.isLayersMenuOpen) {
+        // Closing Layers Menu
+        hideEl('layers-hover-menu');
+        getEl('layers-icon')?.classList.remove('bmenu-item-selected');
+        this.layersPopupBox?.close();
+        this.isLayersMenuOpen = false;
       } else {
-        // Opening Legend Menu
+        // Opening Layers Menu
 
-        let legendHoverDom: HTMLElement | null;
+        let layersHoverDom: HTMLElement | null;
 
         if (settingsManager.isMobileModeEnabled) {
-          legendHoverDom = getEl('legend-hover-menu')!;
+          layersHoverDom = getEl('layers-hover-menu')!;
         } else {
-          const newFloatingBox = this.legendPopupBox ? this.legendPopupBox : new LegendPopupBox();
+          const newFloatingBox = this.layersPopupBox ? this.layersPopupBox : new LayersPopupBox();
 
-          this.legendPopupBox = newFloatingBox;
+          this.layersPopupBox = newFloatingBox;
 
           newFloatingBox.open();
-          legendHoverDom = getEl('legend-hover-menu-popup')!;
+          layersHoverDom = getEl('layers-hover-menu-popup')!;
         }
 
-        if (legendHoverDom?.innerHTML.length === 0) {
+        if (layersHoverDom?.innerHTML.length === 0) {
           // TODO: Figure out why it is empty sometimes
-          errorManagerInstance.debug('Legend Menu is Empty');
+          errorManagerInstance.debug('Layers Menu is Empty');
         }
 
-        showEl(legendHoverDom);
-        getEl('legend-icon')?.classList.add('bmenu-item-selected');
+        showEl(layersHoverDom);
+        getEl('layers-icon')?.classList.add('bmenu-item-selected');
         this.searchManager.hideResults();
-        this.isLegendMenuOpen = true;
+        this.isLayersMenuOpen = true;
       }
     });
 
@@ -401,10 +401,10 @@ export class UiManager {
     });
   }
 
-  legendHoverMenuClick(legendType: string) {
+  layersHoverMenuClick(layersType: string) {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
     const colorSchemeInstance = colorSchemeManagerInstance.currentColorScheme;
-    const slug = legendType.split('-')[1];
+    const slug = layersType.split('-')[1];
     let isFlagOn = true;
 
     if (colorSchemeManagerInstance.objectTypeFlags[slug]) {
@@ -412,11 +412,11 @@ export class UiManager {
     }
 
     if (!isFlagOn) {
-      getClass(`legend-${slug}-box`).forEach((el) => {
+      getClass(`layers-${slug}-box`).forEach((el) => {
         el.style.background = 'black';
       });
     } else {
-      getClass(`legend-${slug}-box`).forEach((el) => {
+      getClass(`layers-${slug}-box`).forEach((el) => {
         const color = colorSchemeInstance?.colorTheme[slug] ?? null;
 
         if (!color) {
@@ -442,8 +442,8 @@ export class UiManager {
       this.updateInterval = 250;
     }
 
-    // Setup Legend Colors
-    LegendManager.legendColorsChange();
+    // Setup Layers Colors
+    LayersManager.layersColorsChange();
 
     // Run any plugins code
     keepTrackApi.emit(EventBusEvent.uiManagerOnReady);

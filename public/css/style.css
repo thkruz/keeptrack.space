@@ -432,144 +432,144 @@ ul {
   margin-right: 20px;
 }
 
-.legend-payload-box {
+.layers-payload-box {
   background: rgb(68, 193, 47);
 }
 
-.legend-rocketBody-box {
+.layers-rocketBody-box {
   background: rgb(0, 48, 255);
 }
 
-.legend-debris-box {
+.layers-debris-box {
   background: rgb(157, 157, 157);
 }
 
-.legend-sensor-box {
+.layers-sensor-box {
   background: rgb(166, 5, 5);
 }
 
-.legend-facility-box {
+.layers-facility-box {
   background: rgb(108, 30, 103);
 }
 
-.legend-missile-box {
+.layers-missile-box {
   background: rgb(200, 198, 9);
 }
 
-.legend-missileInview-box {
+.layers-missileInview-box {
   background: rgb(255, 0, 0);
 }
 
-.legend-pink-box {
+.layers-pink-box {
   background: rgb(108, 0, 50);
   display: hidden;
 }
 
-.legend-inFOV-box {
+.layers-inFOV-box {
   background: rgb(255, 200, 0);
 }
 
-.legend-sensorCanObserve-box {
+.layers-sensorCanObserve-box {
   background: rgb(255, 30, 0);
 }
 
-.legend-inviewAlt-box {
+.layers-inviewAlt-box {
   background: rgb(255, 200, 0);
 }
 
-.legend-starLow-box {
+.layers-starLow-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-starMed-box {
+.layers-starMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-starHi-box {
+.layers-starHi-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-satLow-box {
+.layers-satLow-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-satMed-box {
+.layers-satMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-satHi-box {
+.layers-satHi-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-rcsSmall-box {
+.layers-rcsSmall-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-rcsMed-box {
+.layers-rcsMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-rcsLarge-box {
+.layers-rcsLarge-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-rcsUnkown-box {
+.layers-rcsUnkown-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-ageNew-box {
+.layers-ageNew-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-ageMed-box {
+.layers-ageMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-ageOld-box {
+.layers-ageOld-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-ageLost-box {
+.layers-ageLost-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-velocitySlow-box {
+.layers-velocitySlow-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-velocityMed-box {
+.layers-velocityMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-velocityFast-box {
+.layers-velocityFast-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-satLEO-box {
+.layers-satLEO-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-satGEO-box {
+.layers-satGEO-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-sourceUssf-box {
+.layers-sourceUssf-box {
   background: rgb(11, 39, 131);
 }
 
-.legend-sourceAldoria-box {
+.layers-sourceAldoria-box {
   background: rgb(15, 150, 71);
 }
 
-.legend-sourceVimpel-box {
+.layers-sourceVimpel-box {
   background: rgb(204, 14, 14);
 }
 
-.legend-sourceCelestrak-box {
+.layers-sourceCelestrak-box {
   background: rgb(206, 219, 14);
 }
 
-.legend-sourcePrismnet-box {
+.layers-sourcePrismnet-box {
   background: rgba(168, 47, 199, 0.705);
 }
 
@@ -1171,7 +1171,7 @@ input:focus {
 }
 
 #github-share1 img,
-#legend-icon img,
+#layers-icon img,
 #tutorial-icon img,
 #fullscreen-icon img,
 #search-icon img,
@@ -3937,7 +3937,7 @@ nav {
   line-height: 50px;
 }
 
-#legend-hover-menu {
+#layers-hover-menu {
   display: none;
   padding: 10px;
   color: white;
@@ -3952,7 +3952,7 @@ nav {
   border-color: var(--color-dark-border);
 }
 
-#legend-hover-menu-popup {
+#layers-hover-menu-popup {
   display: none;
   color: white;
   background: var(--color-dark-background);
@@ -3961,8 +3961,8 @@ nav {
   width: 100%;
 }
 
-#legend-hover-menu li,
-#legend-hover-menu-popup li {
+#layers-hover-menu li,
+#layers-hover-menu-popup li {
   display: flex;
   align-items: center;
 }

@@ -178,9 +178,9 @@ describe('ObjectTypeColorScheme', () => {
 
   describe('Lifecycle Methods', () => {
     it('should have proper legendHtml', () => {
-      expect(ObjectTypeColorScheme.legendHtml).toContain('Payload');
-      expect(ObjectTypeColorScheme.legendHtml).toContain('Rocket Body');
-      expect(ObjectTypeColorScheme.legendHtml).toContain('Debris');
+      expect(ObjectTypeColorScheme.layersHtml).toContain('Payload');
+      expect(ObjectTypeColorScheme.layersHtml).toContain('Rocket Body');
+      expect(ObjectTypeColorScheme.layersHtml).toContain('Debris');
     });
   });
 

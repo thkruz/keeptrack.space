@@ -166,34 +166,34 @@ export class GpAgeColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-ageOfElset">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-ageOfElset">
     <li>
-      <div class="Square-Box legend-age1-box"></div>
+      <div class="Square-Box layers-age1-box"></div>
       Less Than 0.5 Days
     </li>
     <li>
-      <div class="Square-Box legend-age2-box"></div>
+      <div class="Square-Box layers-age2-box"></div>
       Between 0.5 and 1 Days
     </li>
     <li>
-      <div class="Square-Box legend-age3-box"></div>
+      <div class="Square-Box layers-age3-box"></div>
       Between 1 and 1.5 Days
     </li>
     <li>
-      <div class="Square-Box legend-age4-box"></div>
+      <div class="Square-Box layers-age4-box"></div>
       Between 1.5 and 2 Days
     </li>
     <li>
-      <div class="Square-Box legend-age5-box"></div>
+      <div class="Square-Box layers-age5-box"></div>
       Between 2 and 2.5 Days
     </li>
     <li>
-      <div class="Square-Box legend-age6-box"></div>
+      <div class="Square-Box layers-age6-box"></div>
       Between 2.5 and 3 Days
     </li>
     <li>
-      <div class="Square-Box legend-age7-box"></div>
+      <div class="Square-Box layers-age7-box"></div>
       More Than 3 Days
     </li>
   </ul>

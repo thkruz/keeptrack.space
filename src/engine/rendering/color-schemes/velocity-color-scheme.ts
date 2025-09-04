@@ -93,18 +93,18 @@ export class VelocityColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-velocity">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-velocity">
     <li>
-      <div class="Square-Box legend-velocityFast-box"></div>
+      <div class="Square-Box layers-velocityFast-box"></div>
       ~7 km/s Velocity
     </li>
     <li>
-      <div class="Square-Box legend-velocityMed-box"></div>
+      <div class="Square-Box layers-velocityMed-box"></div>
       ~4 km/s Velocity
     </li>
     <li>
-      <div class="Square-Box legend-velocitySlow-box"></div>
+      <div class="Square-Box layers-velocitySlow-box"></div>
       ~1 km/s Velocity
     </li>
   </ul>

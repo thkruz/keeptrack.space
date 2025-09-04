@@ -395,7 +395,7 @@ export const setupDefaultHtml = () => {
     <div id="sat-hoverbox1"></div>
     <div id="fullscreen-icon"></div>
     <div id="tutorial-icon"></div>
-    <div id="legend-icon"></div>
+    <div id="layers-icon"></div>
     <div id="sound-icon"></div>
     <div id="colors-rmb-menu"></div>
     `;

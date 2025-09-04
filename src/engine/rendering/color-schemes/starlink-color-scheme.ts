@@ -126,18 +126,18 @@ export class StarlinkColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-starlink">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-starlink">
     <li>
-      <div class="Square-Box legend-starlinkOperational-box"></div>
+      <div class="Square-Box layers-starlinkOperational-box"></div>
       Operational Starlink
     </li>
     <li>
-      <div class="Square-Box legend-starlinkOther-box"></div>
+      <div class="Square-Box layers-starlinkOther-box"></div>
       Other Starlink
     </li>
     <li>
-      <div class="Square-Box legend-starlinkNot-box"></div>
+      <div class="Square-Box layers-starlinkNot-box"></div>
       Not Starlink
     </li>
   </ul>

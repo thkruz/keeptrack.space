@@ -54,10 +54,10 @@ export class SmallSatColorScheme extends ColorScheme {
 
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-small">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-small">
     <li>
-      <div class="Square-Box legend-satSmall-box"></div>
+      <div class="Square-Box layers-satSmall-box"></div>
       Small Satellite
     </li>
   </ul>

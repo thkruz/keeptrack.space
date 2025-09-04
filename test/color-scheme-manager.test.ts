@@ -1,5 +1,5 @@
 import { GroupType } from '@app/app/data/object-group';
-import { LegendManager } from '@app/app/ui/legend-manager';
+import { LayersManager } from '@app/app/ui/layers-manager';
 import { Pickable } from '@app/engine/core/interfaces';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
@@ -494,7 +494,7 @@ describe('ColorSchemeManager Block 2', () => {
     keepTrackApi.getUiManager = jest.fn().mockReturnValue(mockUiManager);
     keepTrackApi.getCatalogManager = jest.fn().mockReturnValue(mockCatalogManager);
 
-    LegendManager.change = jest.fn();
+    LayersManager.change = jest.fn();
 
     const colorSchemeManager = new ColorSchemeManager();
     const renderer = new WebGLRenderer();
@@ -513,7 +513,7 @@ describe('ColorSchemeManager Block 2', () => {
     colorSchemeManager.setColorScheme(mockColorScheme, true);
 
     // Assert
-    expect(LegendManager.change).toHaveBeenCalledWith(mockColorScheme.id);
+    expect(LayersManager.change).toHaveBeenCalledWith(mockColorScheme.id);
     expect(mockUiManager.colorSchemeChangeAlert).toHaveBeenCalledWith(mockColorScheme);
     expect(colorSchemeManager.currentColorScheme).toBe(colorSchemeManager.colorSchemeInstances[mockColorScheme.id]);
     expect(colorSchemeManager.currentColorSchemeUpdate).toBe(colorSchemeManager.colorSchemeInstances[mockColorScheme.id].update);
@@ -642,7 +642,7 @@ describe('ColorSchemeManager Block 2', () => {
     keepTrackApi.getUiManager = jest.fn().mockReturnValue(mockUiManager);
     keepTrackApi.getCatalogManager = jest.fn().mockReturnValue(mockCatalogManager);
 
-    LegendManager.change = jest.fn();
+    LayersManager.change = jest.fn();
 
     const colorSchemeManager = new ColorSchemeManager();
     const renderer = new WebGLRenderer();

@@ -29,7 +29,7 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
 
 import { DensityBin } from '@app/app/data/catalog-manager';
-import { LegendManager } from '@app/app/ui/legend-manager';
+import { LayersManager } from '@app/app/ui/layers-manager';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -226,7 +226,7 @@ export class ColorSchemeManager {
          * this can result in all dots turning black
          */
         if (cachedColorScheme) {
-          LegendManager.change(cachedColorScheme);
+          LayersManager.change(cachedColorScheme);
           possibleColorScheme = this.colorSchemeInstances[cachedColorScheme] as ColorScheme;
         }
         this.currentColorScheme = possibleColorScheme ?? this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];
@@ -256,7 +256,7 @@ export class ColorSchemeManager {
       this.calculateColorBuffers(false); // avoid recalculating ALL colors
     });
 
-    LegendManager.change(this.currentColorScheme.id);
+    LayersManager.change(this.currentColorScheme.id);
   }
 
   isInView(obj: BaseObject) {
@@ -361,7 +361,7 @@ export class ColorSchemeManager {
       const dotsManagerInstance = keepTrackApi.getDotsManager();
       const uiManagerInstance = keepTrackApi.getUiManager();
 
-      LegendManager.change(scheme.id);
+      LayersManager.change(scheme.id);
       uiManagerInstance.colorSchemeChangeAlert(scheme);
 
       scheme ??= this.colorSchemeInstances[settingsManager.defaultColorScheme] ?? Object.values(this.colorSchemeInstances)[0];

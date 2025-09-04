@@ -114,8 +114,8 @@ describe('SpatialDensityColorScheme', () => {
 
   describe.skip('Lifecycle Methods', () => {
     it('should have proper legendHtml', () => {
-      expect(SpatialDensityColorScheme.legendHtml).toContain('Low Density');
-      expect(SpatialDensityColorScheme.legendHtml).toContain('High Density');
+      expect(SpatialDensityColorScheme.layersHtml).toContain('Low Density');
+      expect(SpatialDensityColorScheme.layersHtml).toContain('High Density');
     });
   });
 

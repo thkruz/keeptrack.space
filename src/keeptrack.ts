@@ -157,7 +157,7 @@ export class KeepTrack {
             </div>
             <div id="sat-minibox"></div>
 
-            <div id="legend-hover-menu" class="start-hidden"></div>
+            <div id="layers-hover-menu" class="start-hidden"></div>
             <aside id="left-menus"></aside>
           </div>
         </div>

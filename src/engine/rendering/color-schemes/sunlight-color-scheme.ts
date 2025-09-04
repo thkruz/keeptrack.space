@@ -2,12 +2,12 @@
 import { SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { ColorScheme } from './color-scheme';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class SunlightColorScheme extends ColorScheme {
   readonly label = 'Sunlight Status';
@@ -213,22 +213,22 @@ export class SunlightColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-sunlight">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-sunlight">
     <li>
-      <div class="Square-Box legend-satLow-box"></div>
+      <div class="Square-Box layers-satLow-box"></div>
       In Umbral
     </li>
     <li>
-      <div class="Square-Box legend-satMed-box"></div>
+      <div class="Square-Box layers-satMed-box"></div>
       In Penumbral
     </li>
     <li>
-      <div class="Square-Box legend-satHi-box"></div>
+      <div class="Square-Box layers-satHi-box"></div>
       In Sunlight
     </li>
     <li>
-      <div class="Square-Box legend-sunlightFov-box"></div>
+      <div class="Square-Box layers-sunlightFov-box"></div>
       Satellite in FOV
     </li>
   </ul>

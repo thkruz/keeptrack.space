@@ -145,22 +145,22 @@ export class SourceColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-dataSource">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-dataSource">
     <li>
-      <div class="Square-Box legend-sourceCelestrak-box"></div>
+      <div class="Square-Box layers-sourceCelestrak-box"></div>
       Celestrak
     </li>
     <li>
-      <div class="Square-Box legend-sourceUssf-box"></div>
+      <div class="Square-Box layers-sourceUssf-box"></div>
       18 SDS
     </li>
     <li>
-      <div class="Square-Box legend-sourceVimpel-box"></div>
+      <div class="Square-Box layers-sourceVimpel-box"></div>
       Vimpel
     </li>
     <li>
-      <div class="Square-Box legend-countryOther-box"></div>
+      <div class="Square-Box layers-countryOther-box"></div>
       Other
     </li>
   </ul>

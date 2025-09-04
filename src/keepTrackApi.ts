@@ -193,7 +193,7 @@ export class KeepTrackApi {
     this.getUiManager().toast(toastText, type, isLong);
   }
 
-  getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager);
+  getSoundManager = () => keepTrackContainer.get<SoundManager>(Singletons.SoundManager) as SoundManager | null;
   getRenderer = () => keepTrackContainer.get<WebGLRenderer>(Singletons.WebGLRenderer);
   getScene = () => keepTrackContainer.get<Scene>(Singletons.Scene);
   getCatalogManager = () => keepTrackContainer.get<CatalogManager>(Singletons.CatalogManager);

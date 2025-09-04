@@ -268,38 +268,38 @@ export class MissionColorScheme extends ColorScheme {
     return highestScore >= 2 ? bestCategory : null;
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-countries">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-countries">
     <li>
-      <div class="Square-Box legend-missionMilitary-box"></div>
+      <div class="Square-Box layers-missionMilitary-box"></div>
       Military
     </li>
     <li>
-      <div class="Square-Box legend-missionCommunications-box"></div>
+      <div class="Square-Box layers-missionCommunications-box"></div>
       Communications
     </li>
     <li>
-      <div class="Square-Box legend-missionTechnology-box"></div>
+      <div class="Square-Box layers-missionTechnology-box"></div>
       Technology
     </li>
     <li>
-      <div class="Square-Box legend-missionEarthObservation-box"></div>
+      <div class="Square-Box layers-missionEarthObservation-box"></div>
       Earth Observation
     </li>
     <li>
-      <div class="Square-Box legend-missionScience-box"></div>
+      <div class="Square-Box layers-missionScience-box"></div>
       Science
     </li>
     <li>
-      <div class="Square-Box legend-missionAstronomy-box"></div>
+      <div class="Square-Box layers-missionAstronomy-box"></div>
       Astronomy
     </li>
     <li>
-      <div class="Square-Box legend-missionNavigation-box"></div>
+      <div class="Square-Box layers-missionNavigation-box"></div>
       Navigation
     </li>
     <li>
-      <div class="Square-Box legend-missionOther-box"></div>
+      <div class="Square-Box layers-missionOther-box"></div>
       Other
     </li>
   </ul>

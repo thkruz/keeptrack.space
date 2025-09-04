@@ -6,7 +6,7 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     order: 0,
   },
   TooltipsPlugin: {
-    enabled: false,
+    enabled: true,
     order: 1,
   },
   UserAccountPlugin: {

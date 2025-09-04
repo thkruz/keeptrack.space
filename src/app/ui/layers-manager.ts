@@ -3,8 +3,8 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { addonColorSchemes } from '@app/engine/rendering/color-scheme-addons';
 import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
-import { DraggableBox } from '@app/plugins-pro/draggable-box';
-import { getEl } from '../../engine/utils/get-el';
+import { DraggableBox } from '@app/engine/ui/draggable-box';
+import { getEl, showEl } from '../../engine/utils/get-el';
 import { rgbCss } from '../../engine/utils/rgbCss';
 import { keepTrackApi } from '../../keepTrackApi';
 import {
@@ -12,17 +12,17 @@ import {
   deepDiv,
   nearDiv,
   planetariumDiv,
-} from './legend-manager/legend-divs';
+} from './layers-manager/layers-divs';
 
-export abstract class LegendManager {
-  private static legendClassList = [
-    '.legend-inviewAlt-box',
-    '.legend-starLow-box',
-    '.legend-starMed-box',
-    '.legend-starHi-box',
-    '.legend-inviewAlt-box',
-    '.legend-satLEO-box',
-    '.legend-satGEO-box',
+export abstract class LayersManager {
+  private static layersClassList = [
+    '.layers-inviewAlt-box',
+    '.layers-starLow-box',
+    '.layers-starMed-box',
+    '.layers-starHi-box',
+    '.layers-inviewAlt-box',
+    '.layers-satLEO-box',
+    '.layers-satGEO-box',
   ];
 
   static menuOptions = {
@@ -35,64 +35,64 @@ export abstract class LegendManager {
   };
 
   static {
-    const addonLegends = {};
-    const addonlegendClassList = [] as string[];
+    const addonLayers = {};
+    const addonLayersClassList = [] as string[];
 
     for (const ColorSchemeClass of addonColorSchemes) {
-      addonLegends[ColorSchemeClass.id] = ColorSchemeClass.legendHtml;
+      addonLayers[ColorSchemeClass.id] = ColorSchemeClass.layersHtml;
 
       for (const flag in ColorSchemeClass.uniqueObjectTypeFlags) {
         if (flag) {
-          addonlegendClassList.push(`.legend-${flag}-box`);
+          addonLayersClassList.push(`.layers-${flag}-box`);
         }
       }
     }
 
-    LegendManager.menuOptions = { ...LegendManager.menuOptions, ...addonLegends };
-    LegendManager.legendClassList = [...LegendManager.legendClassList, ...addonlegendClassList];
+    LayersManager.menuOptions = { ...LayersManager.menuOptions, ...addonLayers };
+    LayersManager.layersClassList = [...LayersManager.layersClassList, ...addonLayersClassList];
   }
 
   static change(menu: string) {
-    let legendHoverDom: HTMLElement | null;
+    let layersHoverDom: HTMLElement | null;
 
     if (settingsManager.isMobileModeEnabled) {
-      legendHoverDom = getEl('legend-hover-menu');
+      layersHoverDom = getEl('layers-hover-menu');
     } else {
-      legendHoverDom = getEl('legend-hover-menu-popup');
+      layersHoverDom = getEl('layers-hover-menu-popup');
     }
 
-    if (!legendHoverDom) {
+    if (!layersHoverDom) {
       return;
     }
 
     // TODO there should be a setting that determines the defaults (Celestrak Rebase)
-    const selectedOption = LegendManager.menuOptions[menu] ?? ObjectTypeColorScheme.legendHtml;
+    const selectedOption = LayersManager.menuOptions[menu] ?? ObjectTypeColorScheme.layersHtml;
 
-    legendHoverDom.innerHTML = selectedOption;
+    layersHoverDom.innerHTML = selectedOption;
     if (menu === 'clear') {
-      legendHoverDom.style.display = 'none';
+      layersHoverDom.style.display = 'none';
     }
 
-    // Update Legend Colors
-    LegendManager.legendColorsChange();
-    settingsManager.currentLegend = menu;
-    keepTrackApi.emit(EventBusEvent.legendUpdated, menu);
+    // Update Layers Colors
+    LayersManager.layersColorsChange();
+    settingsManager.currentLayer = menu;
+    keepTrackApi.emit(EventBusEvent.layerUpdated, menu);
   }
 
-  static legendColorsChange(): void {
+  static layersColorsChange(): void {
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
     colorSchemeManagerInstance.resetObjectTypeFlags();
 
     try {
-      LegendManager.setColors_(colorSchemeManagerInstance);
+      LayersManager.setColors_(colorSchemeManagerInstance);
     } catch {
-      setTimeout(LegendManager.legendColorsChange, 100);
+      setTimeout(LayersManager.layersColorsChange, 100);
     }
   }
 
   private static setColors_(colorSchemeManagerInstance: ColorSchemeManager) {
-    LegendManager.legendClassList.forEach((selector) => {
+    LayersManager.layersClassList.forEach((selector) => {
       const elementFromClass = document.querySelector(selector);
 
       if (elementFromClass && settingsManager.colors) {
@@ -108,14 +108,14 @@ export abstract class LegendManager {
   }
 }
 
-export class LegendPopupBox extends DraggableBox {
+export class LayersPopupBox extends DraggableBox {
   constructor() {
-    super('legend-popup-box');
+    super('layers-popup-box', { title: 'Layers' });
   }
 
   protected getBoxContentHtml(): string {
     return keepTrackApi.html`
-      <div id="legend-hover-menu-popup">
+      <div id="layers-hover-menu-popup">
       </div>
     `.trim();
   }
@@ -123,19 +123,21 @@ export class LegendPopupBox extends DraggableBox {
   protected onOpen(): void {
     super.onOpen();
 
-    LegendManager.change(settingsManager.currentLegend);
+    LayersManager.change(settingsManager.currentLayer);
 
-    getEl('legend-hover-menu-popup')?.addEventListener('click', (e: MouseEvent) => {
+    showEl(getEl('layers-hover-menu-popup')!);
+
+    getEl('layers-hover-menu-popup')?.addEventListener('click', (e: MouseEvent) => {
       const hoverMenuItemClass = (e.target as HTMLElement)?.classList[1];
 
       if (hoverMenuItemClass) {
-        keepTrackApi.getUiManager().legendHoverMenuClick(hoverMenuItemClass);
+        keepTrackApi.getUiManager().layersHoverMenuClick(hoverMenuItemClass);
       }
     });
   }
 
   close(cb?: () => void): void {
     super.close(cb);
-    keepTrackApi.getUiManager().isLegendMenuOpen = false;
+    keepTrackApi.getUiManager().isLayersMenuOpen = false;
   }
 }

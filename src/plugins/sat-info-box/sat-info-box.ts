@@ -2,9 +2,9 @@ import Draggabilly from 'draggabilly';
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { DraggableBox } from '@app/plugins-pro/draggable-box';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';

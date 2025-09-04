@@ -69,18 +69,18 @@ export class ConfidenceColorScheme extends ColorScheme {
     };
   }
 
-  static readonly legendHtml = keepTrackApi.html`
-  <ul id="legend-list-confidence">
+  static readonly layersHtml = keepTrackApi.html`
+  <ul id="layers-list-confidence">
     <li>
-      <div class="Square-Box legend-confidenceLow-box"></div>
+      <div class="Square-Box layers-confidenceLow-box"></div>
       3 or Lower
     </li>
     <li>
-      <div class="Square-Box legend-confidenceMed-box"></div>
+      <div class="Square-Box layers-confidenceMed-box"></div>
       Between 3 and 7
     </li>
     <li>
-      <div class="Square-Box legend-confidenceHi-box"></div>
+      <div class="Square-Box layers-confidenceHi-box"></div>
       7 or Higher
     </li>
   </ul>

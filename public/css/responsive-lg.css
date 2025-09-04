@@ -107,7 +107,7 @@
     width: 0px;
   }
 
-  #legend-hover-menu {
+  #layers-hover-menu {
     top: var(--top-menu-height);
     padding: 5px;
   }

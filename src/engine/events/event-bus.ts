@@ -52,7 +52,7 @@ export interface EngineEventMap {
   [EventBusEvent.KeyPress]: [string, string, boolean, boolean, boolean]; // key, code, isRepeat, isShiftKey, isCtrlKey
   [EventBusEvent.parseGetVariables]: [string[]]; // params
   [EventBusEvent.searchUpdated]: [string, number, number]; // search term, result count, search limit
-  [EventBusEvent.legendUpdated]: [string]; // legend name
+  [EventBusEvent.layerUpdated]: [string]; // legend name
   [EventBusEvent.satInfoBoxAddListeners]: [];
   [EventBusEvent.satInfoBoxInit]: [];
   [EventBusEvent.satInfoBoxFinal]: [];

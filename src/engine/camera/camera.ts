@@ -34,6 +34,7 @@ import { EventBusEvent } from '../events/event-bus-events';
 import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
+import { CameraInputHandler } from './camera-input-handler';
 import { CameraState } from './state/camera-state';
 
 /**
@@ -56,154 +57,23 @@ export enum CameraType {
 
 export class Camera {
   state = new CameraState();
+  inputHandler = new CameraInputHandler(this);
 
   private chaseSpeed_ = 0.0005;
-  private earthCenteredPitch_ = <Radians>0;
-  private earthCenteredYaw_ = <Radians>0;
   private fpsLastTime_ = <Milliseconds>0;
-  private fpsPos_ = <vec3>[0, 25000, 0];
-  private isAutoRotate_ = true;
-  private isFPSForwardSpeedLock_ = false;
-  private isFPSSideSpeedLock_ = false;
-  private isFPSVertSpeedLock_ = false;
   private isRayCastingEarth_ = false;
+  private panMovementSpeed_ = 0.5;
   private localRotateMovementSpeed_ = 0.00005;
-  private localRotateTarget_ = {
-    pitch: <Radians>0,
-    roll: <Radians>0,
-    yaw: <Radians>0,
-  };
 
   private normForward_ = vec3.create();
   private normLeft_ = vec3.create();
   private normUp_ = vec3.create();
-  private panDif_ = {
-    x: 0,
-    y: 0,
-    z: 0,
-  };
-
-  private panMovementSpeed_ = 0.5;
-  private panTarget_ = {
-    x: 0,
-    y: 0,
-    z: 0,
-  };
 
   private yawErr_ = <Radians>0;
-  /**
-   * Percentage of the distance to maxZoomDistance from the minZoomDistance
-   */
-  zoomLevel_: number;
-  private zoomTarget_: number;
-
-  camAngleSnappedOnSat = false;
   camMatrix = mat4.create().fill(0);
-  /**
-   * This was used when there was only one camera mode and the camera was always centered on the earth
-   * It is the overall pitch of the camera?
-   */
-  camSnapToSat = {
-    pos: {
-      x: 0,
-      y: 0,
-      z: 0,
-    },
-    radius: 0,
-    pitch: <Radians>0,
-    yaw: <Radians>0,
-    altitude: 0,
-    camDistTarget: 0,
-  };
-
-  /**
-   * This was used when there was only one camera mode and the camera was always centered on the earth
-   * It is the overall yaw of the camera?
-   */
-  camZoomSnappedOnSat = false;
   cameraType: CameraType = CameraType.DEFAULT;
-  dragStartPitch = <Radians>0;
-  dragStartYaw = <Radians>0;
-  earthCenteredLastZoom = 0.6925;
-  fpsForwardSpeed = 0;
-  fpsPitch = <Degrees>0;
-  fpsPitchRate = 0;
-  fpsRotate = <Degrees>0;
-  fpsRotateRate = 0;
-  fpsRun = 1;
-  fpsSideSpeed = 0;
-  fpsVertSpeed = 0;
-  fpsYaw = <Degrees>0;
-  fpsYawRate = 0;
-  ftsPitch = 0;
-  ftsYaw = <Radians>0;
-  ftsRotateReset = true;
-  isAutoPitchYawToTarget = false;
-  isDragging = false;
-  isLocalRotateOverride = false;
-  isLocalRotateReset = true;
-  isLocalRotateRoll = false;
-  isLocalRotateYaw = false;
-  isPanReset = false;
-  isScreenPan = false;
-  isWorldPan = false;
-  isZoomIn = false;
-  localRotateCurrent = {
-    pitch: <Radians>0,
-    roll: <Radians>0,
-    yaw: <Radians>0,
-  };
 
-  localRotateDif = {
-    pitch: <Radians>0,
-    roll: <Radians>0,
-    yaw: <Radians>0,
-  };
-
-  localRotateSpeed = {
-    pitch: 0,
-    roll: 0,
-    yaw: 0,
-  };
-
-  localRotateStartPosition = {
-    pitch: 0,
-    roll: 0,
-    yaw: 0,
-  };
-
-  mouseX = 0;
-  mouseY = 0;
-  panCurrent = {
-    x: 0,
-    y: 0,
-    z: 0,
-  };
-
-  panSpeed = {
-    x: 0,
-    y: 0,
-    z: 0,
-  };
-
-  panStartPosition = {
-    x: 0,
-    y: 0,
-    z: 0,
-  };
-
-  screenDragPoint = [0, 0];
   settings_: SettingsManager;
-  speedModifier = 1;
-  startMouseX = 0;
-  startMouseY = 0;
-  camDistBuffer = <Kilometers>0;
-  /**
-   * 1 = off
-   *
-   * 5 = on
-   */
-  isHoldingDownAKey: number = 1;
 
   constructor() {
     this.settings_ = <SettingsManager>(<unknown>{
@@ -229,79 +99,14 @@ export class Camera {
     });
   }
 
-  reset(isHardReset = false) {
-    if (isHardReset) {
-      this.zoomLevel_ = 0.6925;
-    }
-    this.zoomTarget = 0.6925;
-    this.isAutoPitchYawToTarget = !!isHardReset;
-    this.cameraType = CameraType.DEFAULT;
-    this.isDragging = false;
-    this.isLocalRotateReset = !!isHardReset;
-    this.isLocalRotateOverride = false;
-    this.isPanReset = false;
-    this.isScreenPan = false;
-    this.isWorldPan = false;
-    this.isZoomIn = false;
-    this.localRotateCurrent = {
-      pitch: <Radians>0,
-      roll: <Radians>0,
-      yaw: <Radians>0,
-    };
-    this.localRotateDif = {
-      pitch: <Radians>0,
-      roll: <Radians>0,
-      yaw: <Radians>0,
-    };
-    this.localRotateSpeed = {
-      pitch: 0,
-      roll: 0,
-      yaw: 0,
-    };
-    this.localRotateStartPosition = {
-      pitch: 0,
-      roll: 0,
-      yaw: 0,
-    };
-    this.panCurrent = {
-      x: 0,
-      y: 0,
-      z: 0,
-    };
-    this.panSpeed = {
-      x: 0,
-      y: 0,
-      z: 0,
-    };
-    this.panStartPosition = {
-      x: 0,
-      y: 0,
-      z: 0,
-    };
-    this.state.position = <vec3>[0, 0, 0];
-    this.screenDragPoint = [0, 0];
-  }
-
   resetRotation() {
     if (this.cameraType !== CameraType.FPS) {
-      this.isPanReset = true;
+      this.state.isPanReset = true;
     }
-    this.isLocalRotateReset = true;
+    this.state.isLocalRotateReset = true;
     if (this.cameraType === CameraType.FIXED_TO_SAT) {
-      this.ftsRotateReset = true;
+      this.state.ftsRotateReset = true;
     }
-  }
-
-  get zoomTarget(): number {
-    return this.zoomTarget_;
-  }
-
-  set zoomTarget(val: number) {
-    // Clamp to [0.01, 1]
-    val = Math.max(val, 0.01);
-    val = Math.min(val, 1);
-
-    this.zoomTarget_ = val;
   }
 
   zoomIn(): void {
@@ -328,7 +133,7 @@ export class Camera {
     }
 
     if (typeof val === 'undefined') {
-      this.isAutoRotate_ = !this.isAutoRotate_;
+      this.state.isAutoRotate = !this.state.isAutoRotate;
 
       // If all auto rotate settings are off, set auto rotate left to true
       if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR && !this.settings_.isAutoRotateU) {
@@ -337,17 +142,17 @@ export class Camera {
 
       return;
     }
-    this.isAutoRotate_ = val;
+    this.state.isAutoRotate = val;
   }
 
   camSnap(pitch: Radians, yaw: Radians): void {
     // this.isPanReset = true
     this.state.camPitchTarget = pitch;
     this.state.camYawTarget = normalizeAngle(yaw);
-    this.earthCenteredPitch_ = pitch;
-    this.earthCenteredYaw_ = this.state.camYawTarget; // Use the normalized yaw
+    this.state.earthCenteredPitch = pitch;
+    this.state.earthCenteredYaw = this.state.camYawTarget; // Use the normalized yaw
     // if (this.earthCenteredYaw_ < 0) this.earthCenteredYaw_ = <Radians>(this.earthCenteredYaw_ + TAU);
-    this.isAutoPitchYawToTarget = true;
+    this.state.isAutoPitchYawToTarget = true;
   }
 
   changeCameraType(orbitManager: OrbitManager) {
@@ -397,11 +202,11 @@ export class Camera {
     if (this.cameraType >= CameraType.MAX_CAMERA_TYPES) {
       const renderer = keepTrackApi.getRenderer();
 
-      this.isLocalRotateReset = true;
+      this.state.isLocalRotateReset = true;
       this.settings_.fieldOfView = 0.6;
       renderer.glInit();
       if ((selectSatManagerInstance?.selectedSat ?? -1) > -1) {
-        this.camZoomSnappedOnSat = true;
+        this.state.camZoomSnappedOnSat = true;
         this.cameraType = CameraType.FIXED_TO_SAT;
       } else {
         this.cameraType = CameraType.DEFAULT;
@@ -410,7 +215,7 @@ export class Camera {
   }
 
   zoomWheel(delta: number): void {
-    this.isZoomIn = delta < 0;
+    this.state.isZoomIn = delta < 0;
 
     if (settingsManager.isZoomStopsRotation) {
       this.autoRotate(false);
@@ -420,17 +225,17 @@ export class Camera {
 
     // Updated zoom logic for satellite/covariance bubble proximity
     const mainCamera = this as Camera;
-    const isCameraCloseToSatellite = mainCamera.camDistBuffer < settingsManager.nearZoomLevel;
+    const isCameraCloseToSatellite = mainCamera.state.camDistBuffer < settingsManager.nearZoomLevel;
     const maxCovarianceDistance = Math.min((keepTrackApi.getPlugin(SelectSatManager)?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
     const isCameraCloseToCovarianceBubble = settingsManager.isDrawCovarianceEllipsoid &&
-      mainCamera.camDistBuffer < maxCovarianceDistance;
+      mainCamera.state.camDistBuffer < maxCovarianceDistance;
 
     if (settingsManager.isZoomStopsSnappedOnSat || !selectSatManagerInstance || selectSatManagerInstance?.selectedSat === -1) {
-      mainCamera.zoomTarget += delta / 100 / 25 / mainCamera.speedModifier; // delta is +/- 100
-      mainCamera.earthCenteredLastZoom = mainCamera.zoomTarget;
-      mainCamera.camZoomSnappedOnSat = false;
+      mainCamera.state.zoomTarget += delta / 100 / 25 / mainCamera.state.speedModifier; // delta is +/- 100
+      mainCamera.state.earthCenteredLastZoom = mainCamera.state.zoomTarget;
+      mainCamera.state.camZoomSnappedOnSat = false;
     } else if ((isCameraCloseToSatellite || isCameraCloseToCovarianceBubble) ||
-      mainCamera.zoomLevel() === -1) {
+      mainCamera.state.zoomLevel === -1) {
       // Inside camDistBuffer
       settingsManager.selectedColor = [0, 0, 0, 0];
 
@@ -438,14 +243,14 @@ export class Camera {
        * Slowly zoom in/out, scaling speed with camDistBuffer (farther = faster)
        * Exponential scaling for smoother zoom near the satellite
        */
-      const scale = Math.max(0.01, (mainCamera.camDistBuffer / 100) ** 1.15); // Exponential factor > 1 for faster scaling as distance increases
+      const scale = Math.max(0.01, (mainCamera.state.camDistBuffer / 100) ** 1.15); // Exponential factor > 1 for faster scaling as distance increases
 
-      mainCamera.camDistBuffer = <Kilometers>(mainCamera.camDistBuffer + (delta / 5) * scale); // delta is +/- 100
+      mainCamera.state.camDistBuffer = <Kilometers>(mainCamera.state.camDistBuffer + (delta / 5) * scale); // delta is +/- 100
 
       // Clamping camDistBuffer to be between minDistanceFromSatellite and maxZoomDistance
-      mainCamera.camDistBuffer = <Kilometers>Math.min(
+      mainCamera.state.camDistBuffer = <Kilometers>Math.min(
         Math.max(
-          mainCamera.camDistBuffer,
+          mainCamera.state.camDistBuffer,
           settingsManager.minDistanceFromSatellite,
         ),
         Math.max(
@@ -453,12 +258,12 @@ export class Camera {
           maxCovarianceDistance,
         ),
       );
-    } else if (mainCamera.camDistBuffer >= settingsManager.nearZoomLevel) {
+    } else if (mainCamera.state.camDistBuffer >= settingsManager.nearZoomLevel) {
       // Outside camDistBuffer
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
-      mainCamera.zoomTarget += delta / 100 / 25 / mainCamera.speedModifier; // delta is +/- 100
-      mainCamera.earthCenteredLastZoom = mainCamera.zoomTarget;
-      mainCamera.camZoomSnappedOnSat = false;
+      mainCamera.state.zoomTarget += delta / 100 / 25 / mainCamera.state.speedModifier; // delta is +/- 100
+      mainCamera.state.earthCenteredLastZoom = mainCamera.state.zoomTarget;
+      mainCamera.state.camZoomSnappedOnSat = false;
 
       // calculate camera distance from target
       const target = selectSatManagerInstance.getSelectedSat();
@@ -467,13 +272,14 @@ export class Camera {
         const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
         const curMinZoomLevel = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
 
-        if (mainCamera.zoomTarget < mainCamera.zoomLevel() && mainCamera.zoomTarget < curMinZoomLevel) {
-          mainCamera.camZoomSnappedOnSat = true;
+        if (mainCamera.state.zoomTarget < mainCamera.state.zoomLevel && mainCamera.state.zoomTarget < curMinZoomLevel) {
+          mainCamera.state.camZoomSnappedOnSat = true;
 
           if (settingsManager.isDrawCovarianceEllipsoid) {
-            mainCamera.camDistBuffer = <Kilometers>(Math.max(Math.max(mainCamera.camDistBuffer, settingsManager.nearZoomLevel), maxCovarianceDistance) - 1);
+            mainCamera.state.camDistBuffer = <Kilometers>(Math.max(Math.max(mainCamera.state.camDistBuffer, settingsManager.nearZoomLevel), maxCovarianceDistance) - 1);
           } else {
-            mainCamera.camDistBuffer = <Kilometers>Math.min(Math.max(mainCamera.camDistBuffer, settingsManager.nearZoomLevel), settingsManager.minDistanceFromSatellite);
+            mainCamera.state.camDistBuffer =
+              <Kilometers>Math.min(Math.max(mainCamera.state.camDistBuffer, settingsManager.nearZoomLevel), settingsManager.minDistanceFromSatellite);
           }
         }
       }
@@ -503,7 +309,7 @@ export class Camera {
     if (zoom > 1 || zoom < 0) {
       throw new Error('Invalid Zoom Value');
     }
-    this.zoomTarget = zoom;
+    this.state.zoomTarget = zoom;
   }
 
   /*
@@ -542,9 +348,9 @@ export class Camera {
         const satAlt = SatMath.getAlt(target.position, gmst);
 
         if (this.getCameraDistance() < satAlt + RADIUS_OF_EARTH + this.settings_.minDistanceFromSatellite) {
-          this.zoomTarget = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
+          this.state.zoomTarget = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
           // errorManagerInstance.debug('Zooming in to ' + this.zoomTarget_ + ' to because we are too close to the satellite');
-          this.zoomLevel_ = this.zoomTarget_;
+          this.state.zoomLevel = this.state.zoomTarget;
         }
       }
     }
@@ -612,16 +418,16 @@ export class Camera {
 
     const cameraDistance = this.getCameraDistance();
 
-    this.ftsRotateReset = true;
+    this.state.ftsRotateReset = true;
 
     // If within 9000km then we want to move further back to feel less jarring
     if (cameraDistance > 9000) {
       this.cameraType = CameraType.DEFAULT;
 
-      this.zoomTarget = this.getZoomFromDistance(cameraDistance) + 0.005;
-      this.state.camPitch = this.earthCenteredPitch_;
-      this.state.camYaw = this.earthCenteredYaw_;
-      this.isAutoPitchYawToTarget = true;
+      this.state.zoomTarget = this.getZoomFromDistance(cameraDistance) + 0.005;
+      this.state.camPitch = this.state.earthCenteredPitch;
+      this.state.camYaw = this.state.earthCenteredYaw;
+      this.state.isAutoPitchYawToTarget = true;
 
       // eslint-disable-next-line multiline-comment-style
       // this.camPitch = this.earthCenteredPitch_;
@@ -631,9 +437,9 @@ export class Camera {
       // this.localRotateCurrent.yaw = <Radians>(this.ftsYaw_ * -1);
       // this.isLocalRotateReset = true;
     } else {
-      this.state.camPitch = this.earthCenteredPitch_;
-      this.state.camYaw = this.earthCenteredYaw_;
-      this.zoomTarget = this.getZoomFromDistance(cameraDistance) + 0.15;
+      this.state.camPitch = this.state.earthCenteredPitch;
+      this.state.camYaw = this.state.earthCenteredYaw;
+      this.state.zoomTarget = this.getZoomFromDistance(cameraDistance) + 0.15;
     }
   }
 
@@ -648,7 +454,7 @@ export class Camera {
    * TODO: This should be handled before getting the zoomLevel_ value
    */
   getCameraDistance(): Kilometers {
-    return <Kilometers>(this.zoomLevel_ ** ZOOM_EXP * (this.settings_.maxZoomDistance - this.settings_.minZoomDistance) + this.settings_.minZoomDistance);
+    return <Kilometers>(this.state.zoomLevel ** ZOOM_EXP * (this.settings_.maxZoomDistance - this.settings_.minZoomDistance) + this.settings_.minZoomDistance);
   }
 
   /**
@@ -674,9 +480,9 @@ export class Camera {
    */
   getCameraOrientation() {
     if (this.cameraType === CameraType.FIXED_TO_SAT) {
-      const xRot = Math.sin(-this.ftsYaw) * Math.cos(this.ftsPitch);
-      const yRot = Math.cos(this.ftsYaw) * Math.cos(this.ftsPitch);
-      const zRot = Math.sin(-this.ftsPitch);
+      const xRot = Math.sin(-this.state.ftsYaw) * Math.cos(this.state.ftsPitch);
+      const yRot = Math.cos(this.state.ftsYaw) * Math.cos(this.state.ftsPitch);
+      const zRot = Math.sin(-this.state.ftsPitch);
 
 
       return vec3.fromValues(xRot, yRot, zRot);
@@ -708,8 +514,8 @@ export class Camera {
     if (target) {
       const gmst = keepTrackApi.getTimeManager().gmst;
 
-      this.camSnapToSat.altitude = SatMath.getAlt(target, gmst);
-      targetDistanceFromEarth = this.camSnapToSat.altitude + RADIUS_OF_EARTH;
+      this.state.camSnapToSat.altitude = SatMath.getAlt(target, gmst);
+      targetDistanceFromEarth = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH;
     }
     const radius = this.getCameraDistance() - targetDistanceFromEarth;
 
@@ -730,447 +536,14 @@ export class Camera {
   init(settings: SettingsManager) {
     this.settings_ = settings;
 
-    this.zoomLevel_ = settingsManager.initZoomLevel ?? 0.6925;
-    this.zoomTarget_ = settingsManager.initZoomLevel ?? 0.6925;
+    this.state.zoomLevel = settingsManager.initZoomLevel ?? 0.6925;
+    this.state.zoomTarget = settingsManager.initZoomLevel ?? 0.6925;
 
-    this.registerKeyboardEvents_();
+    this.inputHandler.init();
 
     keepTrackApi.on(EventBusEvent.selectSatData, () => {
-      this.isAutoPitchYawToTarget = false;
+      this.state.isAutoPitchYawToTarget = false;
     });
-    keepTrackApi.on(EventBusEvent.canvasMouseDown, this.canvasMouseDown_.bind(this));
-    keepTrackApi.on(EventBusEvent.touchStart, this.touchStart_.bind(this));
-    keepTrackApi.on(EventBusEvent.KeyUp, (key: string, _code, _isRepeat: boolean, isShift: boolean) => {
-      if (key === 'Shift' && !isShift) {
-        this.fpsRun = 1;
-        settingsManager.cameraMovementSpeed = 0.003;
-        settingsManager.cameraMovementSpeedMin = 0.005;
-        this.speedModifier = 1;
-      }
-    });
-  }
-
-  private registerKeyboardEvents_() {
-    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-    const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
-
-    keysDown.forEach((keyForFunc) => {
-      keepTrackApi.on(EventBusEvent.KeyDown, (key: string) => {
-        if (key === keyForFunc) {
-          this[`keyDown${key}_`].bind(this)();
-        } else if (['w', 'a', 's', 'd', 'q', 'e'].includes(key)) {
-          this[`keyDown${key.toUpperCase()}_`].bind(this)();
-        }
-      });
-    });
-    keysUp.forEach((keyForFunc) => {
-      keepTrackApi.on(EventBusEvent.KeyUp, (key: string) => {
-        if (key === keyForFunc) {
-          this[`keyUp${key}_`].bind(this)();
-        } else if (['w', 'a', 's', 'd', 'q', 'e'].includes(key)) {
-          this[`keyUp${key.toUpperCase()}_`].bind(this)();
-        }
-      });
-    });
-
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6', 'NumpadAdd', 'NumpadSubtract'].forEach((codeForFunc) => {
-      keepTrackApi.on(EventBusEvent.KeyDown, (_key: string, code: string) => {
-        if (code === codeForFunc) {
-          this[`keyDown${code}_`].bind(this)();
-        }
-      });
-    });
-    ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((codeForFunc) => {
-      keepTrackApi.on(EventBusEvent.KeyUp, (_key: string, code: string) => {
-        if (code === codeForFunc) {
-          this[`keyUp${code}_`].bind(this)();
-        }
-      });
-    });
-
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
-      if (key === '`' && !isRepeat) {
-        this.resetRotation();
-      }
-    });
-  }
-
-  canvasMouseDown_(evt: MouseEvent) {
-    if (this.speedModifier === 1) {
-      settingsManager.cameraMovementSpeed = 0.003;
-      settingsManager.cameraMovementSpeedMin = 0.005;
-    }
-
-    this.screenDragPoint = [this.mouseX, this.mouseY];
-    this.dragStartPitch = this.state.camPitch;
-    this.dragStartYaw = this.state.camYaw;
-
-    if (evt.button === 0) {
-      this.isDragging = true;
-    }
-
-    this.isAutoPitchYawToTarget = false;
-    if (!settingsManager.disableUI) {
-      this.autoRotate(false);
-    }
-  }
-
-  touchStart_() {
-    settingsManager.cameraMovementSpeed = Math.max(0.005 * this.zoomLevel(), settingsManager.cameraMovementSpeedMin);
-    this.screenDragPoint = [this.mouseX, this.mouseY];
-    this.dragStartPitch = this.state.camPitch;
-    this.dragStartYaw = this.state.camYaw;
-    this.isDragging = true;
-
-    this.isAutoPitchYawToTarget = false;
-    if (!settingsManager.disableUI) {
-      this.autoRotate(false);
-    }
-  }
-
-  keyDownArrowDown_() {
-    if (!this.settings_.isAutoPanD) {
-      this.panDown();
-    }
-  }
-
-  keyDownArrowLeft_() {
-    if (!this.settings_.isAutoPanL) {
-      this.panLeft();
-    }
-  }
-
-  keyDownArrowRight_() {
-    if (!this.settings_.isAutoPanR) {
-      this.panRight();
-    }
-  }
-
-  keyDownArrowUp_() {
-    if (!this.settings_.isAutoPanU) {
-      this.panUp();
-    }
-  }
-
-  keyUpArrowDown_() {
-    if (this.settings_.isAutoPanD) {
-      this.panDown();
-    }
-  }
-
-  keyUpArrowLeft_() {
-    if (this.settings_.isAutoPanL) {
-      this.panLeft();
-    }
-  }
-
-  keyUpArrowRight_() {
-    if (this.settings_.isAutoPanR) {
-      this.panRight();
-    }
-  }
-
-  keyUpArrowUp_() {
-    if (this.settings_.isAutoPanU) {
-      this.panUp();
-    }
-  }
-
-  keyDownV_() {
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
-
-    this.changeCameraType(orbitManagerInstance);
-
-    switch (this.cameraType) {
-      case CameraType.DEFAULT:
-        uiManagerInstance.toast('Earth Centered Camera Mode', ToastMsgType.standby);
-        this.zoomTarget = 0.5;
-        break;
-      case CameraType.OFFSET:
-        uiManagerInstance.toast('Offset Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.FIXED_TO_SAT:
-        uiManagerInstance.toast('Fixed to Satellite Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.FPS:
-        uiManagerInstance.toast('Free Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.PLANETARIUM:
-        uiManagerInstance.toast('Planetarium Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.SATELLITE:
-        uiManagerInstance.toast('Satellite Camera Mode', ToastMsgType.standby);
-        break;
-      case CameraType.ASTRONOMY:
-        uiManagerInstance.toast('Astronomy Camera Mode', ToastMsgType.standby);
-        break;
-      default:
-        errorManagerInstance.log(`Invalid Camera Type: ${this.cameraType}`);
-        break;
-    }
-  }
-
-  keyDownA_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsSideSpeed = -settingsManager.fpsSideSpeed;
-      this.isFPSSideSpeedLock_ = true;
-    }
-  }
-
-  keyDownD_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsSideSpeed = settingsManager.fpsSideSpeed;
-      this.isFPSSideSpeedLock_ = true;
-    }
-  }
-
-  keyDownE_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsVertSpeed = settingsManager.fpsVertSpeed;
-      this.isFPSVertSpeedLock_ = true;
-    }
-    if (this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = -settingsManager.fpsRotateRate / this.speedModifier;
-    }
-  }
-
-  keyDownNumpad8_() {
-    switch (this.cameraType) {
-      case CameraType.DEFAULT:
-      case CameraType.FIXED_TO_SAT:
-        this.settings_.isAutoRotateU = true;
-        this.isAutoRotate_ = true;
-        this.isHoldingDownAKey = 5;
-        break;
-      case CameraType.FPS:
-      case CameraType.SATELLITE:
-      case CameraType.PLANETARIUM:
-      case CameraType.ASTRONOMY:
-        this.fpsPitchRate = settingsManager.fpsPitchRate / this.speedModifier;
-        break;
-      default:
-        break;
-    }
-  }
-
-  keyDownNumpad2_() {
-    switch (this.cameraType) {
-      case CameraType.DEFAULT:
-      case CameraType.FIXED_TO_SAT:
-        this.settings_.isAutoRotateD = true;
-        this.isHoldingDownAKey = 5;
-        this.isAutoRotate_ = true;
-        break;
-      case CameraType.FPS:
-      case CameraType.SATELLITE:
-      case CameraType.PLANETARIUM:
-      case CameraType.ASTRONOMY:
-        this.fpsPitchRate = settingsManager.fpsPitchRate / this.speedModifier;
-        break;
-      default:
-        break;
-    }
-  }
-
-  keyDownNumpad4_() {
-    switch (this.cameraType) {
-      case CameraType.DEFAULT:
-      case CameraType.FIXED_TO_SAT:
-        this.settings_.isAutoRotateL = true;
-        this.isHoldingDownAKey = 5;
-        this.isAutoRotate_ = true;
-        break;
-      case CameraType.FPS:
-      case CameraType.SATELLITE:
-        this.fpsYawRate = -settingsManager.fpsYawRate / this.speedModifier;
-        break;
-      case CameraType.PLANETARIUM:
-      case CameraType.ASTRONOMY:
-        this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
-        break;
-      default:
-        break;
-    }
-  }
-
-  keyDownNumpad6_() {
-    switch (this.cameraType) {
-      case CameraType.DEFAULT:
-      case CameraType.FIXED_TO_SAT:
-        this.settings_.isAutoRotateR = true;
-        this.isHoldingDownAKey = 5;
-        this.isAutoRotate_ = true;
-        break;
-      case CameraType.FPS:
-      case CameraType.SATELLITE:
-        this.fpsYawRate = settingsManager.fpsYawRate / this.speedModifier;
-        break;
-      case CameraType.PLANETARIUM:
-      case CameraType.ASTRONOMY:
-        this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
-        break;
-      default:
-        break;
-    }
-  }
-
-  keyDownNumpadAdd_() {
-    this.zoomIn();
-  }
-
-  keyDownNumpadSubtract_() {
-    this.zoomOut();
-  }
-
-  keyDownQ_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsVertSpeed = -settingsManager.fpsVertSpeed;
-      this.isFPSVertSpeedLock_ = true;
-    }
-    if (this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = settingsManager.fpsRotateRate / this.speedModifier;
-    }
-  }
-
-  keyDownR_() {
-    this.autoRotate();
-  }
-
-  keyDownS_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsForwardSpeed = -settingsManager.fpsForwardSpeed;
-      this.isFPSForwardSpeedLock_ = true;
-    }
-  }
-
-  keyDownShiftRight_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsRun = 3;
-    }
-  }
-
-  keyDownShift_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsRun = 0.05;
-    }
-    this.speedModifier = 8;
-    settingsManager.cameraMovementSpeed = 0.003 / 8;
-    settingsManager.cameraMovementSpeedMin = 0.005 / 8;
-  }
-
-  keyDownW_() {
-    if (this.cameraType === CameraType.FPS) {
-      this.fpsForwardSpeed = settingsManager.fpsForwardSpeed;
-      this.isFPSForwardSpeedLock_ = true;
-    }
-  }
-
-  keyUpA_() {
-    if (this.fpsSideSpeed === -settingsManager.fpsSideSpeed) {
-      this.isFPSSideSpeedLock_ = false;
-    }
-  }
-
-  keyUpD_() {
-    if (this.fpsSideSpeed === settingsManager.fpsSideSpeed) {
-      this.isFPSSideSpeedLock_ = false;
-    }
-  }
-
-  keyUpE_() {
-    if (this.fpsVertSpeed === settingsManager.fpsVertSpeed) {
-      this.isFPSVertSpeedLock_ = false;
-    }
-    this.fpsRotateRate = 0;
-  }
-
-  keyUpNumpad8_() {
-    this.settings_.isAutoRotateU = false;
-    this.fpsPitchRate = 0;
-    if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateU && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR) {
-      this.isHoldingDownAKey = 1;
-      this.autoRotate(false);
-    }
-  }
-
-  // Intentionally the same as keyUpI_
-  keyUpNumpad2_() {
-    this.settings_.isAutoRotateD = false;
-    this.fpsPitchRate = 0;
-    if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateU && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR) {
-      this.isHoldingDownAKey = 1;
-      this.autoRotate(false);
-    }
-  }
-
-  keyUpNumpad4_() {
-    if (this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = 0;
-    } else {
-      this.fpsYawRate = 0;
-    }
-    this.settings_.isAutoRotateL = false;
-    if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateU && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR) {
-      this.isHoldingDownAKey = 1;
-      this.autoRotate(false);
-    }
-  }
-
-  // Intentionally the same as keyUpJ_
-  keyUpNumpad6_() {
-    if (this.cameraType === CameraType.ASTRONOMY) {
-      this.fpsRotateRate = 0;
-    } else {
-      this.fpsYawRate = 0;
-    }
-    this.settings_.isAutoRotateR = false;
-    if (!this.settings_.isAutoRotateD && !this.settings_.isAutoRotateU && !this.settings_.isAutoRotateL && !this.settings_.isAutoRotateR) {
-      this.isHoldingDownAKey = 1;
-      this.autoRotate(false);
-    }
-  }
-
-  keyUpQ_() {
-    if (this.fpsVertSpeed === -settingsManager.fpsVertSpeed) {
-      this.isFPSVertSpeedLock_ = false;
-    }
-    this.fpsRotateRate = 0;
-  }
-
-  keyUpS_() {
-    if (this.fpsForwardSpeed === -settingsManager.fpsForwardSpeed) {
-      this.isFPSForwardSpeedLock_ = false;
-    }
-  }
-
-  keyUpShiftRight_() {
-    this.fpsRun = 1;
-    settingsManager.cameraMovementSpeed = 0.003;
-    settingsManager.cameraMovementSpeedMin = 0.005;
-    this.speedModifier = 1;
-  }
-
-  keyUpShift_() {
-    this.fpsRun = 1;
-    settingsManager.cameraMovementSpeed = 0.003;
-    settingsManager.cameraMovementSpeedMin = 0.005;
-    this.speedModifier = 1;
-    if (!this.isFPSForwardSpeedLock_) {
-      this.fpsForwardSpeed = 0;
-    }
-    if (!this.isFPSSideSpeedLock_) {
-      this.fpsSideSpeed = 0;
-    }
-    if (!this.isFPSVertSpeedLock_) {
-      this.fpsVertSpeed = 0;
-    }
-  }
-
-  keyUpW_() {
-    if (this.fpsForwardSpeed === settingsManager.fpsForwardSpeed) {
-      this.isFPSForwardSpeedLock_ = false;
-    }
   }
 
   /**
@@ -1247,56 +620,57 @@ export class Camera {
       if (selectSatManagerInstance) {
         selectSatManagerInstance.selectSat(-1);
       }
-      this.camZoomSnappedOnSat = false;
-      this.camAngleSnappedOnSat = false;
+      this.state.camZoomSnappedOnSat = false;
+      this.state.camAngleSnappedOnSat = false;
 
       return;
     }
 
-    if (this.camAngleSnappedOnSat) {
-      this.camSnapToSat.pos = sat.position;
-      this.camSnapToSat.radius = Math.sqrt(this.camSnapToSat.pos.x ** 2 + this.camSnapToSat.pos.y ** 2);
-      this.camSnapToSat.yaw = <Radians>(Math.atan2(this.camSnapToSat.pos.y, this.camSnapToSat.pos.x) + TAU / 4);
-      this.camSnapToSat.pitch = <Radians>Math.atan2(this.camSnapToSat.pos.z, this.camSnapToSat.radius);
-      if (this.camSnapToSat.pitch === null || typeof this.camSnapToSat.pitch === 'undefined') {
+    if (this.state.camAngleSnappedOnSat) {
+      this.state.camSnapToSat.pos = sat.position;
+      this.state.camSnapToSat.radius = Math.sqrt(this.state.camSnapToSat.pos.x ** 2 + this.state.camSnapToSat.pos.y ** 2);
+      this.state.camSnapToSat.yaw = <Radians>(Math.atan2(this.state.camSnapToSat.pos.y, this.state.camSnapToSat.pos.x) + TAU / 4);
+      this.state.camSnapToSat.pitch = <Radians>Math.atan2(this.state.camSnapToSat.pos.z, this.state.camSnapToSat.radius);
+      if (this.state.camSnapToSat.pitch === null || typeof this.state.camSnapToSat.pitch === 'undefined') {
         errorManagerInstance.info('Pitch Calculation Error');
-        this.camSnapToSat.pitch = <Radians>0;
-        this.camZoomSnappedOnSat = false;
-        this.camAngleSnappedOnSat = false;
+        this.state.camSnapToSat.pitch = <Radians>0;
+        this.state.camZoomSnappedOnSat = false;
+        this.state.camAngleSnappedOnSat = false;
       }
-      if (this.camSnapToSat.yaw === null || typeof this.camSnapToSat.yaw === 'undefined') {
+      if (this.state.camSnapToSat.yaw === null || typeof this.state.camSnapToSat.yaw === 'undefined') {
         errorManagerInstance.info('Yaw Calculation Error');
-        this.camSnapToSat.yaw = <Radians>0;
-        this.camZoomSnappedOnSat = false;
-        this.camAngleSnappedOnSat = false;
+        this.state.camSnapToSat.yaw = <Radians>0;
+        this.state.camZoomSnappedOnSat = false;
+        this.state.camAngleSnappedOnSat = false;
       }
       if (this.cameraType === CameraType.PLANETARIUM) {
         // camSnap(-pitch, -yaw)
       } else {
-        this.camSnap(this.camSnapToSat.pitch, this.camSnapToSat.yaw);
+        this.camSnap(this.state.camSnapToSat.pitch, this.state.camSnapToSat.yaw);
       }
     }
 
-    if (this.camZoomSnappedOnSat && !settingsManager.isAutoZoomIn && !settingsManager.isAutoZoomOut) {
+    if (this.state.camZoomSnappedOnSat && !settingsManager.isAutoZoomIn && !settingsManager.isAutoZoomOut) {
       if (sat.active) {
         // if this is a satellite not a missile
         const { gmst } = SatMath.calculateTimeVariables(simulationTime);
 
-        this.camSnapToSat.altitude = SatMath.getAlt(sat.position, gmst);
+        this.state.camSnapToSat.altitude = SatMath.getAlt(sat.position, gmst);
       }
-      if (this.camSnapToSat.altitude) {
-        this.camSnapToSat.camDistTarget = this.camSnapToSat.altitude + RADIUS_OF_EARTH + this.camDistBuffer;
+      if (this.state.camSnapToSat.altitude) {
+        this.state.camSnapToSat.camDistTarget = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH + this.state.camDistBuffer;
       } else {
-        this.camSnapToSat.camDistTarget = RADIUS_OF_EARTH + this.camDistBuffer; // Stay out of the center of the earth. You will get stuck there.
-        errorManagerInstance.info(`Zoom Calculation Error: ${this.camSnapToSat.altitude} -- ${this.camSnapToSat.camDistTarget}`);
-        this.camZoomSnappedOnSat = false;
-        this.camAngleSnappedOnSat = false;
+        this.state.camSnapToSat.camDistTarget = RADIUS_OF_EARTH + this.state.camDistBuffer; // Stay out of the center of the earth. You will get stuck there.
+        errorManagerInstance.info(`Zoom Calculation Error: ${this.state.camSnapToSat.altitude} -- ${this.state.camSnapToSat.camDistTarget}`);
+        this.state.camZoomSnappedOnSat = false;
+        this.state.camAngleSnappedOnSat = false;
       }
 
-      this.camSnapToSat.camDistTarget = this.camSnapToSat.camDistTarget < settingsManager.minZoomDistance ? settingsManager.minZoomDistance + 10 : this.camSnapToSat.camDistTarget;
+      this.state.camSnapToSat.camDistTarget = this.state.camSnapToSat.camDistTarget < settingsManager.minZoomDistance
+        ? settingsManager.minZoomDistance + 10 : this.state.camSnapToSat.camDistTarget;
 
-      this.zoomTarget =
-        ((this.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
+      this.state.zoomTarget =
+        ((this.state.camSnapToSat.camDistTarget - settingsManager.minZoomDistance) / (settingsManager.maxZoomDistance - settingsManager.minZoomDistance)) ** (1 / ZOOM_EXP);
 
       if (!settingsManager.isMobileModeEnabled) {
         settingsManager.selectedColor = [0, 0, 0, 0];
@@ -1304,14 +678,14 @@ export class Camera {
         settingsManager.selectedColor = settingsManager.selectedColorFallback;
       }
 
-      this.zoomLevel_ = Math.max(this.zoomLevel_, this.zoomTarget_);
+      this.state.zoomLevel = Math.max(this.state.zoomLevel, this.state.zoomTarget);
 
       // errorManagerInstance.debug(`Zoom Target: ${this.zoomTarget_}`);
-      this.earthCenteredLastZoom = this.zoomTarget_ + 0.1;
+      this.state.earthCenteredLastZoom = this.state.zoomTarget + 0.1;
 
       // Only Zoom in Once on Mobile
       if (settingsManager.isMobileModeEnabled) {
-        this.camZoomSnappedOnSat = false;
+        this.state.camZoomSnappedOnSat = false;
       }
     }
 
@@ -1355,22 +729,22 @@ export class Camera {
         this.state.camYaw = <Radians>(this.state.camYaw + this.state.camYawSpeed * dt);
       }
       if (this.state.camRotateSpeed !== 0) {
-        this.fpsRotate = <Degrees>(this.fpsRotate + this.state.camRotateSpeed * dt);
+        this.state.fpsRotate = <Degrees>(this.state.fpsRotate + this.state.camRotateSpeed * dt);
       }
     }
 
-    if (this.isAutoRotate_) {
+    if (this.state.isAutoRotate) {
       if (this.settings_.isAutoRotateL) {
-        this.state.camYaw = <Radians>(this.state.camYaw - this.settings_.autoRotateSpeed * dt * (this.isHoldingDownAKey));
+        this.state.camYaw = <Radians>(this.state.camYaw - this.settings_.autoRotateSpeed * dt * (this.inputHandler.isHoldingDownAKey));
       }
       if (this.settings_.isAutoRotateR) {
-        this.state.camYaw = <Radians>(this.state.camYaw + this.settings_.autoRotateSpeed * dt * (this.isHoldingDownAKey));
+        this.state.camYaw = <Radians>(this.state.camYaw + this.settings_.autoRotateSpeed * dt * (this.inputHandler.isHoldingDownAKey));
       }
       if (this.settings_.isAutoRotateU) {
-        this.state.camPitch = <Radians>(this.state.camPitch + (this.settings_.autoRotateSpeed / 2) * dt * (this.isHoldingDownAKey));
+        this.state.camPitch = <Radians>(this.state.camPitch + (this.settings_.autoRotateSpeed / 2) * dt * (this.inputHandler.isHoldingDownAKey));
       }
       if (this.settings_.isAutoRotateD) {
-        this.state.camPitch = <Radians>(this.state.camPitch - (this.settings_.autoRotateSpeed / 2) * dt * (this.isHoldingDownAKey));
+        this.state.camPitch = <Radians>(this.state.camPitch - (this.settings_.autoRotateSpeed / 2) * dt * (this.inputHandler.isHoldingDownAKey));
       }
     }
 
@@ -1395,31 +769,31 @@ export class Camera {
     }
 
     if (this.cameraType === CameraType.DEFAULT || this.cameraType === CameraType.OFFSET) {
-      this.earthCenteredPitch_ = this.state.camPitch;
-      this.earthCenteredYaw_ = this.state.camYaw;
-      if (this.earthCenteredYaw_ < 0) {
-        this.earthCenteredYaw_ = <Radians>(this.earthCenteredYaw_ + TAU);
+      this.state.earthCenteredPitch = this.state.camPitch;
+      this.state.earthCenteredYaw = this.state.camYaw;
+      if (this.state.earthCenteredYaw < 0) {
+        this.state.earthCenteredYaw = <Radians>(this.state.earthCenteredYaw + TAU);
       }
     }
   }
 
   zoomLevel(): number {
-    return this.zoomLevel_;
+    return this.state.zoomLevel;
   }
 
   private drawAstronomy_(sensorPos: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
-    this.fpsPitch = <Degrees>(-1 * sensorPos.lat * DEG2RAD);
+    this.state.fpsPitch = <Degrees>(-1 * sensorPos.lat * DEG2RAD);
 
     const sensorPosU = vec3.fromValues(-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01);
 
-    this.fpsPos_[0] = sensorPos.x;
-    this.fpsPos_[1] = sensorPos.y;
-    this.fpsPos_[2] = sensorPos.z;
+    this.state.fpsPos[0] = sensorPos.x;
+    this.state.fpsPos[1] = sensorPos.y;
+    this.state.fpsPos[2] = sensorPos.z;
 
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsPitch + -this.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsRotate * DEG2RAD, [0, 1, 0]);
+    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsPitch + -this.state.fpsPitch * DEG2RAD, [1, 0, 0]);
+    mat4.rotate(this.camMatrix, this.camMatrix, -this.state.fpsRotate * DEG2RAD, [0, 1, 0]);
     vec3.normalize(this.normUp_, sensorPosU);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsYaw * DEG2RAD, this.normUp_);
+    mat4.rotate(this.camMatrix, this.camMatrix, -this.state.fpsYaw * DEG2RAD, this.normUp_);
 
     mat4.translate(this.camMatrix, this.camMatrix, [-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01]);
 
@@ -1434,26 +808,26 @@ export class Camera {
 
   private drawFixedToEarth_() {
     // 4. Rotate the camera around the new local origin
-    mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
-    mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
+    mat4.rotateX(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.pitch);
+    mat4.rotateY(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.roll);
+    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.yaw);
 
     // 3. Adjust for panning
-    mat4.translate(this.camMatrix, this.camMatrix, [this.panCurrent.x, this.panCurrent.y, this.panCurrent.z]);
+    mat4.translate(this.camMatrix, this.camMatrix, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
 
     // 2. Back away from the earth in the Y direction (depth)
     mat4.translate(this.camMatrix, this.camMatrix, [0, this.getCameraDistance(), 0]);
     // 1. Rotate around the earth (0,0,0)
-    mat4.rotateX(this.camMatrix, this.camMatrix, this.earthCenteredPitch_);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.earthCenteredYaw_);
+    mat4.rotateX(this.camMatrix, this.camMatrix, this.state.earthCenteredPitch);
+    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.earthCenteredYaw);
   }
 
   private drawFirstPersonView_() {
     // Rotate the camera
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsYaw * DEG2RAD, [0, 0, 1]);
+    mat4.rotate(this.camMatrix, this.camMatrix, -this.state.fpsPitch * DEG2RAD, [1, 0, 0]);
+    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsYaw * DEG2RAD, [0, 0, 1]);
     // Move the camera to the FPS position
-    mat4.translate(this.camMatrix, this.camMatrix, [this.fpsPos_[0], this.fpsPos_[1], -this.fpsPos_[2]]);
+    mat4.translate(this.camMatrix, this.camMatrix, [this.state.fpsPos[0], this.state.fpsPos[1], -this.state.fpsPos[2]]);
   }
 
   private drawFixedToSatellite_(target: DetailedSatellite | MissileObject, targetPosition: vec3) {
@@ -1466,39 +840,39 @@ export class Camera {
      * 5. Adjust for panning
      * 6. Rotate the camera FPS style
      */
-    mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
-    mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
+    mat4.rotateX(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.pitch);
+    mat4.rotateY(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.roll);
+    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.yaw);
 
-    mat4.translate(this.camMatrix, this.camMatrix, [this.panCurrent.x, this.panCurrent.y, this.panCurrent.z]);
+    mat4.translate(this.camMatrix, this.camMatrix, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
 
     mat4.translate(this.camMatrix, this.camMatrix, [0, this.getCameraRadius(target.position), 0]);
 
-    mat4.rotateX(this.camMatrix, this.camMatrix, this.ftsPitch);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.ftsYaw);
+    mat4.rotateX(this.camMatrix, this.camMatrix, this.state.ftsPitch);
+    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.ftsYaw);
 
     mat4.translate(this.camMatrix, this.camMatrix, targetPosition);
   }
 
   private drawOffsetOfEarth_() {
     // Rotate the camera
-    mat4.rotateX(this.camMatrix, this.camMatrix, -this.localRotateCurrent.pitch);
-    mat4.rotateY(this.camMatrix, this.camMatrix, -this.localRotateCurrent.roll);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.localRotateCurrent.yaw);
+    mat4.rotateX(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.pitch);
+    mat4.rotateY(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.roll);
+    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.yaw);
     // Adjust for panning
-    mat4.translate(this.camMatrix, this.camMatrix, [this.panCurrent.x, this.panCurrent.y, this.panCurrent.z]);
+    mat4.translate(this.camMatrix, this.camMatrix, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
     // Back away from the earth
     mat4.translate(this.camMatrix, this.camMatrix, [this.settings_.offsetCameraModeX, this.getCameraDistance(), this.settings_.offsetCameraModeZ]);
     // Adjust for FPS style rotation
-    mat4.rotateX(this.camMatrix, this.camMatrix, this.earthCenteredPitch_);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.earthCenteredYaw_);
+    mat4.rotateX(this.camMatrix, this.camMatrix, this.state.earthCenteredPitch);
+    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.earthCenteredYaw);
   }
 
   private drawPlanetarium_(sensorPos: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
-    this.fpsPitch = <Degrees>(-1 * sensorPos.lat * DEG2RAD);
-    this.fpsRotate = <Degrees>((90 - sensorPos.lon) * DEG2RAD - sensorPos.gmst);
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsPitch, [1, 0, 0]);
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsRotate, [0, 0, 1]);
+    this.state.fpsPitch = <Degrees>(-1 * sensorPos.lat * DEG2RAD);
+    this.state.fpsRotate = <Degrees>((90 - sensorPos.lon) * DEG2RAD - sensorPos.gmst);
+    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsPitch, [1, 0, 0]);
+    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsRotate, [0, 0, 1]);
     mat4.translate(this.camMatrix, this.camMatrix, [-sensorPos.x, -sensorPos.y, -sensorPos.z]);
   }
 
@@ -1508,23 +882,23 @@ export class Camera {
       Number.isNaN(this.state.camYaw) ||
       Number.isNaN(this.state.camPitchTarget) ||
       Number.isNaN(this.state.camYawTarget) ||
-      Number.isNaN(this.zoomLevel_) ||
-      Number.isNaN(this.zoomTarget_)
+      Number.isNaN(this.state.zoomLevel) ||
+      Number.isNaN(this.state.zoomTarget)
     ) {
       try {
         errorManagerInstance.debug(`camPitch: ${this.state.camPitch}`);
         errorManagerInstance.debug(`camYaw: ${this.state.camYaw}`);
         errorManagerInstance.debug(`camPitchTarget: ${this.state.camPitchTarget}`);
         errorManagerInstance.debug(`camYawTarget: ${this.state.camYawTarget}`);
-        errorManagerInstance.debug(`zoomLevel: ${this.zoomLevel_}`);
-        errorManagerInstance.debug(`_zoomTarget: ${this.zoomTarget_}`);
+        errorManagerInstance.debug(`zoomLevel: ${this.state.zoomLevel}`);
+        errorManagerInstance.debug(`zoomTarget: ${this.state.zoomTarget}`);
         errorManagerInstance.debug(`this.settings_.cameraMovementSpeed: ${this.settings_.cameraMovementSpeed}`);
       } catch (e) {
         errorManagerInstance.info('Camera Math Error');
       }
       this.state.camPitch = <Radians>0.5;
       this.state.camYaw = <Radians>0.5;
-      this.zoomLevel_ = 0.5;
+      this.state.zoomLevel = 0.5;
       this.state.camPitchTarget = <Radians>0;
       this.state.camYawTarget = <Radians>0;
       this.state.zoomTarget = 0.5;
@@ -1549,28 +923,28 @@ export class Camera {
 
     mat4.translate(this.camMatrix, this.camMatrix, [target.position.x, target.position.y, target.position.z]);
 
-    mat4.rotate(this.camMatrix, this.camMatrix, this.fpsPitch * DEG2RAD, this.normLeft_);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.fpsYaw * DEG2RAD, this.normUp_);
+    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsPitch * DEG2RAD, this.normLeft_);
+    mat4.rotate(this.camMatrix, this.camMatrix, -this.state.fpsYaw * DEG2RAD, this.normUp_);
 
     mat4.translate(this.camMatrix, this.camMatrix, targetPositionTemp);
   }
 
   private resetFpsPos_(): void {
-    this.fpsPitch = <Degrees>0;
-    this.fpsYaw = <Degrees>0;
-    this.fpsPos_[0] = 0;
+    this.state.fpsPitch = <Degrees>0;
+    this.state.fpsYaw = <Degrees>0;
+    this.state.fpsPos[0] = 0;
 
     // Move out from the center of the Earth in FPS Mode
     if (this.cameraType === CameraType.FPS) {
-      this.fpsPos_[1] = 25000;
+      this.state.fpsPos[1] = 25000;
     } else {
-      this.fpsPos_[1] = 0;
+      this.state.fpsPos[1] = 0;
     }
-    this.fpsPos_[2] = 0;
+    this.state.fpsPos[2] = 0;
   }
 
   private updateCameraSnapMode(dt: Milliseconds) {
-    if (this.isAutoPitchYawToTarget) {
+    if (this.state.isAutoPitchYawToTarget) {
       this.state.camPitch = <Radians>(this.state.camPitch + (this.state.camPitchTarget - this.state.camPitch) * this.chaseSpeed_ * dt);
 
       this.yawErr_ = normalizeAngle(<Radians>(this.state.camYawTarget - this.state.camYaw));
@@ -1583,28 +957,28 @@ export class Camera {
    * Splitting it into subfunctions would not be optimal
    */
   private updateFpsMovement_(dt: Milliseconds): void {
-    this.fpsPitch = <Degrees>(this.fpsPitch - 20 * this.state.camPitchSpeed * dt);
-    this.fpsYaw = <Degrees>(this.fpsYaw - 20 * this.state.camYawSpeed * dt);
-    this.fpsRotate = <Degrees>(this.fpsRotate - 20 * this.state.camRotateSpeed * dt);
+    this.state.fpsPitch = <Degrees>(this.state.fpsPitch - 20 * this.state.camPitchSpeed * dt);
+    this.state.fpsYaw = <Degrees>(this.state.fpsYaw - 20 * this.state.camYawSpeed * dt);
+    this.state.fpsRotate = <Degrees>(this.state.fpsRotate - 20 * this.state.camRotateSpeed * dt);
 
     // Prevent Over Rotation
-    if (this.fpsPitch > 90) {
-      this.fpsPitch = <Degrees>90;
+    if (this.state.fpsPitch > 90) {
+      this.state.fpsPitch = <Degrees>90;
     }
-    if (this.fpsPitch < -90) {
-      this.fpsPitch = <Degrees>-90;
+    if (this.state.fpsPitch < -90) {
+      this.state.fpsPitch = <Degrees>-90;
     }
-    if (this.fpsRotate > 360) {
-      this.fpsRotate = <Degrees>(this.fpsRotate - 360);
+    if (this.state.fpsRotate > 360) {
+      this.state.fpsRotate = <Degrees>(this.state.fpsRotate - 360);
     }
-    if (this.fpsRotate < 0) {
-      this.fpsRotate = <Degrees>(this.fpsRotate + 360);
+    if (this.state.fpsRotate < 0) {
+      this.state.fpsRotate = <Degrees>(this.state.fpsRotate + 360);
     }
-    if (this.fpsYaw > 360) {
-      this.fpsYaw = <Degrees>(this.fpsYaw - 360);
+    if (this.state.fpsYaw > 360) {
+      this.state.fpsYaw = <Degrees>(this.state.fpsYaw - 360);
     }
-    if (this.fpsYaw < 0) {
-      this.fpsYaw = <Degrees>(this.fpsYaw + 360);
+    if (this.state.fpsYaw < 0) {
+      this.state.fpsYaw = <Degrees>(this.state.fpsYaw + 360);
     }
 
     const fpsTimeNow = <Milliseconds>Date.now();
@@ -1612,71 +986,71 @@ export class Camera {
     if (this.fpsLastTime_ !== 0) {
       const fpsElapsed = <Milliseconds>(fpsTimeNow - this.fpsLastTime_);
 
-      if (this.isFPSForwardSpeedLock_ && this.fpsForwardSpeed < 0) {
-        this.fpsForwardSpeed = Math.max(this.fpsForwardSpeed + Math.min(this.fpsForwardSpeed * -1.02 * fpsElapsed, -0.2), -this.settings_.fpsForwardSpeed);
-      } else if (this.isFPSForwardSpeedLock_ && this.fpsForwardSpeed > 0) {
-        this.fpsForwardSpeed = Math.min(this.fpsForwardSpeed + Math.max(this.fpsForwardSpeed * 1.02 * fpsElapsed, 0.2), this.settings_.fpsForwardSpeed);
+      if (this.state.isFPSForwardSpeedLock && this.state.fpsForwardSpeed < 0) {
+        this.state.fpsForwardSpeed = Math.max(this.state.fpsForwardSpeed + Math.min(this.state.fpsForwardSpeed * -1.02 * fpsElapsed, -0.2), -this.settings_.fpsForwardSpeed);
+      } else if (this.state.isFPSForwardSpeedLock && this.state.fpsForwardSpeed > 0) {
+        this.state.fpsForwardSpeed = Math.min(this.state.fpsForwardSpeed + Math.max(this.state.fpsForwardSpeed * 1.02 * fpsElapsed, 0.2), this.settings_.fpsForwardSpeed);
       }
 
-      if (this.isFPSSideSpeedLock_ && this.fpsSideSpeed < 0) {
-        this.fpsSideSpeed = Math.max(this.fpsSideSpeed + Math.min(this.fpsSideSpeed * -1.02 * fpsElapsed, -0.2), -this.settings_.fpsSideSpeed);
-      } else if (this.isFPSSideSpeedLock_ && this.fpsSideSpeed > 0) {
-        this.fpsSideSpeed = Math.min(this.fpsSideSpeed + Math.max(this.fpsSideSpeed * 1.02 * fpsElapsed, 0.2), this.settings_.fpsSideSpeed);
+      if (this.state.isFPSSideSpeedLock && this.state.fpsSideSpeed < 0) {
+        this.state.fpsSideSpeed = Math.max(this.state.fpsSideSpeed + Math.min(this.state.fpsSideSpeed * -1.02 * fpsElapsed, -0.2), -this.settings_.fpsSideSpeed);
+      } else if (this.state.isFPSSideSpeedLock && this.state.fpsSideSpeed > 0) {
+        this.state.fpsSideSpeed = Math.min(this.state.fpsSideSpeed + Math.max(this.state.fpsSideSpeed * 1.02 * fpsElapsed, 0.2), this.settings_.fpsSideSpeed);
       }
 
-      if (this.isFPSVertSpeedLock_ && this.fpsVertSpeed < 0) {
-        this.fpsVertSpeed = Math.max(this.fpsVertSpeed + Math.min(this.fpsVertSpeed * -1.02 * fpsElapsed, -0.2), -this.settings_.fpsVertSpeed);
-      } else if (this.isFPSVertSpeedLock_ && this.fpsVertSpeed > 0) {
-        this.fpsVertSpeed = Math.min(this.fpsVertSpeed + Math.max(this.fpsVertSpeed * 1.02 * fpsElapsed, 0.2), this.settings_.fpsVertSpeed);
+      if (this.state.isFPSVertSpeedLock && this.state.fpsVertSpeed < 0) {
+        this.state.fpsVertSpeed = Math.max(this.state.fpsVertSpeed + Math.min(this.state.fpsVertSpeed * -1.02 * fpsElapsed, -0.2), -this.settings_.fpsVertSpeed);
+      } else if (this.state.isFPSVertSpeedLock && this.state.fpsVertSpeed > 0) {
+        this.state.fpsVertSpeed = Math.min(this.state.fpsVertSpeed + Math.max(this.state.fpsVertSpeed * 1.02 * fpsElapsed, 0.2), this.settings_.fpsVertSpeed);
       }
 
       if (this.cameraType === CameraType.FPS) {
-        if (this.fpsForwardSpeed !== 0) {
-          this.fpsPos_[0] -= Math.sin(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
-          this.fpsPos_[1] -= Math.cos(this.fpsYaw * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
-          this.fpsPos_[2] += Math.sin(this.fpsPitch * DEG2RAD) * this.fpsForwardSpeed * this.fpsRun * fpsElapsed;
+        if (this.state.fpsForwardSpeed !== 0) {
+          this.state.fpsPos[0] -= Math.sin(this.state.fpsYaw * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
+          this.state.fpsPos[1] -= Math.cos(this.state.fpsYaw * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
+          this.state.fpsPos[2] += Math.sin(this.state.fpsPitch * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
         }
-        if (this.fpsVertSpeed !== 0) {
-          this.fpsPos_[2] -= this.fpsVertSpeed * this.fpsRun * fpsElapsed;
+        if (this.state.fpsVertSpeed !== 0) {
+          this.state.fpsPos[2] -= this.state.fpsVertSpeed * this.state.fpsRun * fpsElapsed;
         }
-        if (this.fpsSideSpeed !== 0) {
-          this.fpsPos_[0] -= Math.cos(-this.fpsYaw * DEG2RAD) * this.fpsSideSpeed * this.fpsRun * fpsElapsed;
-          this.fpsPos_[1] -= Math.sin(-this.fpsYaw * DEG2RAD) * this.fpsSideSpeed * this.fpsRun * fpsElapsed;
+        if (this.state.fpsSideSpeed !== 0) {
+          this.state.fpsPos[0] -= Math.cos(-this.state.fpsYaw * DEG2RAD) * this.state.fpsSideSpeed * this.state.fpsRun * fpsElapsed;
+          this.state.fpsPos[1] -= Math.sin(-this.state.fpsYaw * DEG2RAD) * this.state.fpsSideSpeed * this.state.fpsRun * fpsElapsed;
         }
       }
 
-      if (!this.isFPSForwardSpeedLock_) {
-        this.fpsForwardSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
+      if (!this.state.isFPSForwardSpeedLock) {
+        this.state.fpsForwardSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
       }
-      if (!this.isFPSSideSpeedLock_) {
-        this.fpsSideSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
+      if (!this.state.isFPSSideSpeedLock) {
+        this.state.fpsSideSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
       }
-      if (!this.isFPSVertSpeedLock_) {
-        this.fpsVertSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-
-      if (this.fpsForwardSpeed < 0.01 && this.fpsForwardSpeed > -0.01) {
-        this.fpsForwardSpeed = 0;
-      }
-      if (this.fpsSideSpeed < 0.01 && this.fpsSideSpeed > -0.01) {
-        this.fpsSideSpeed = 0;
-      }
-      if (this.fpsVertSpeed < 0.01 && this.fpsVertSpeed > -0.01) {
-        this.fpsVertSpeed = 0;
+      if (!this.state.isFPSVertSpeedLock) {
+        this.state.fpsVertSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
       }
 
-      this.fpsPitch = <Degrees>(this.fpsPitch + this.fpsPitchRate * fpsElapsed);
-      this.fpsRotate = <Degrees>(this.fpsRotate + this.fpsRotateRate * fpsElapsed);
-      this.fpsYaw = <Degrees>(this.fpsYaw + this.fpsYawRate * fpsElapsed);
+      if (this.state.fpsForwardSpeed < 0.01 && this.state.fpsForwardSpeed > -0.01) {
+        this.state.fpsForwardSpeed = 0;
+      }
+      if (this.state.fpsSideSpeed < 0.01 && this.state.fpsSideSpeed > -0.01) {
+        this.state.fpsSideSpeed = 0;
+      }
+      if (this.state.fpsVertSpeed < 0.01 && this.state.fpsVertSpeed > -0.01) {
+        this.state.fpsVertSpeed = 0;
+      }
+
+      this.state.fpsPitch = <Degrees>(this.state.fpsPitch + this.state.fpsPitchRate * fpsElapsed);
+      this.state.fpsRotate = <Degrees>(this.state.fpsRotate + this.state.fpsRotateRate * fpsElapsed);
+      this.state.fpsYaw = <Degrees>(this.state.fpsYaw + this.state.fpsYawRate * fpsElapsed);
     }
     this.fpsLastTime_ = fpsTimeNow;
   }
 
   private updateFtsRotation_(dt: number) {
-    if (this.ftsRotateReset) {
+    if (this.state.ftsRotateReset) {
       if (this.cameraType !== CameraType.FIXED_TO_SAT) {
-        this.ftsRotateReset = false;
-        this.ftsPitch = 0;
+        this.state.ftsRotateReset = false;
+        this.state.ftsPitch = 0;
         this.state.camPitchSpeed = 0;
       }
 
@@ -1685,215 +1059,213 @@ export class Camera {
 
       const marginOfError = 3;
 
-      if (this.state.camPitch >= this.earthCenteredPitch_ - marginOfError && this.state.camPitch <= this.earthCenteredPitch_ + marginOfError) {
-        this.state.camPitch = this.earthCenteredPitch_;
+      if (this.state.camPitch >= this.state.earthCenteredPitch - marginOfError && this.state.camPitch <= this.state.earthCenteredPitch + marginOfError) {
+        this.state.camPitch = this.state.earthCenteredPitch;
         this.state.camPitchSpeed = 0;
       } else {
-        const upOrDown = this.state.camPitch - this.earthCenteredPitch_ > 0 ? -1 : 1;
+        const upOrDown = this.state.camPitch - this.state.earthCenteredPitch > 0 ? -1 : 1;
 
         this.state.camPitchSpeed = (dt * upOrDown * this.settings_.cameraMovementSpeed) / 50;
       }
 
-      if (this.state.camYaw >= this.earthCenteredYaw_ - marginOfError && this.state.camYaw <= this.earthCenteredYaw_ + marginOfError) {
-        this.state.camYaw = this.earthCenteredYaw_;
+      if (this.state.camYaw >= this.state.earthCenteredYaw - marginOfError && this.state.camYaw <= this.state.earthCenteredYaw + marginOfError) {
+        this.state.camYaw = this.state.earthCenteredYaw;
         this.state.camYawSpeed = 0;
       } else {
-        // Figure out the shortest distance back to this.earthCenteredYaw_ from this.camYaw
-        const leftOrRight = this.state.camYaw - this.earthCenteredYaw_ > 0 ? -1 : 1;
+        // Figure out the shortest distance back to this.state.earthCenteredYaw from this.state.camYaw
+        const leftOrRight = this.state.camYaw - this.state.earthCenteredYaw > 0 ? -1 : 1;
 
         this.state.camYawSpeed = (dt * leftOrRight * this.settings_.cameraMovementSpeed) / 50;
       }
 
-      if (this.state.camYaw === this.earthCenteredYaw_ && this.state.camPitch === this.earthCenteredPitch_) {
-        this.ftsRotateReset = false;
+      if (this.state.camYaw === this.state.earthCenteredYaw && this.state.camPitch === this.state.earthCenteredPitch) {
+        this.state.ftsRotateReset = false;
       }
     }
 
     if (this.cameraType === CameraType.FIXED_TO_SAT) {
       this.state.camPitch = normalizeAngle(this.state.camPitch);
-      this.ftsPitch = this.state.camPitch;
-      this.ftsYaw = this.state.camYaw;
+      this.state.ftsPitch = this.state.camPitch;
+      this.state.ftsYaw = this.state.camYaw;
     }
   }
 
   private updateLocalRotation_(dt: number) {
-    if (this.isLocalRotateRoll || this.isLocalRotateYaw || this.isLocalRotateReset || this.isLocalRotateOverride) {
-      this.localRotateTarget_.pitch = normalizeAngle(this.localRotateTarget_.pitch);
-      this.localRotateTarget_.yaw = normalizeAngle(this.localRotateTarget_.yaw);
-      this.localRotateTarget_.roll = normalizeAngle(this.localRotateTarget_.roll);
-      this.localRotateCurrent.pitch = normalizeAngle(this.localRotateCurrent.pitch);
-      this.localRotateCurrent.yaw = normalizeAngle(this.localRotateCurrent.yaw);
-      this.localRotateCurrent.roll = normalizeAngle(this.localRotateCurrent.roll);
+    if (this.state.isLocalRotateRoll || this.state.isLocalRotateYaw || this.state.isLocalRotateReset || this.state.isLocalRotateOverride) {
+      this.state.localRotateTarget.pitch = normalizeAngle(this.state.localRotateTarget.pitch);
+      this.state.localRotateTarget.yaw = normalizeAngle(this.state.localRotateTarget.yaw);
+      this.state.localRotateTarget.roll = normalizeAngle(this.state.localRotateTarget.roll);
+      this.state.localRotateCurrent.pitch = normalizeAngle(this.state.localRotateCurrent.pitch);
+      this.state.localRotateCurrent.yaw = normalizeAngle(this.state.localRotateCurrent.yaw);
+      this.state.localRotateCurrent.roll = normalizeAngle(this.state.localRotateCurrent.roll);
 
       // If user is actively moving
-      if (this.isLocalRotateRoll || this.isLocalRotateYaw) {
-        this.localRotateDif.pitch = <Radians>(this.screenDragPoint[1] - this.mouseY);
-        this.localRotateTarget_.pitch = <Radians>(this.localRotateStartPosition.pitch + this.localRotateDif.pitch * -this.settings_.cameraMovementSpeed);
-        this.localRotateSpeed.pitch = normalizeAngle(<Radians>(this.localRotateCurrent.pitch - this.localRotateTarget_.pitch)) * -this.settings_.cameraMovementSpeed;
+      if (this.state.isLocalRotateRoll || this.state.isLocalRotateYaw) {
+        this.state.localRotateDif.pitch = <Radians>(this.state.screenDragPoint[1] - this.state.mouseY);
+        this.state.localRotateTarget.pitch = <Radians>(this.state.localRotateStartPosition.pitch + this.state.localRotateDif.pitch * -this.settings_.cameraMovementSpeed);
+        this.state.localRotateSpeed.pitch =
+          normalizeAngle(<Radians>(this.state.localRotateCurrent.pitch - this.state.localRotateTarget.pitch)) * -this.settings_.cameraMovementSpeed;
 
-        if (this.isLocalRotateRoll) {
-          this.localRotateDif.roll = <Radians>(this.screenDragPoint[0] - this.mouseX);
-          this.localRotateTarget_.roll = <Radians>(this.localRotateStartPosition.roll + this.localRotateDif.roll * this.settings_.cameraMovementSpeed);
-          this.localRotateSpeed.roll = normalizeAngle(<Radians>(this.localRotateCurrent.roll - this.localRotateTarget_.roll)) * -this.settings_.cameraMovementSpeed;
+        if (this.state.isLocalRotateRoll) {
+          this.state.localRotateDif.roll = <Radians>(this.state.screenDragPoint[0] - this.state.mouseX);
+          this.state.localRotateTarget.roll = <Radians>(this.state.localRotateStartPosition.roll + this.state.localRotateDif.roll * this.settings_.cameraMovementSpeed);
+          this.state.localRotateSpeed.roll =
+            normalizeAngle(<Radians>(this.state.localRotateCurrent.roll - this.state.localRotateTarget.roll)) * -this.settings_.cameraMovementSpeed;
         }
-        if (this.isLocalRotateYaw) {
-          this.localRotateDif.yaw = <Radians>(this.screenDragPoint[0] - this.mouseX);
-          this.localRotateTarget_.yaw = <Radians>(this.localRotateStartPosition.yaw + this.localRotateDif.yaw * this.settings_.cameraMovementSpeed);
-          this.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.localRotateCurrent.yaw - this.localRotateTarget_.yaw)) * -this.settings_.cameraMovementSpeed;
+        if (this.state.isLocalRotateYaw) {
+          this.state.localRotateDif.yaw = <Radians>(this.state.screenDragPoint[0] - this.state.mouseX);
+          this.state.localRotateTarget.yaw = <Radians>(this.state.localRotateStartPosition.yaw + this.state.localRotateDif.yaw * this.settings_.cameraMovementSpeed);
+          this.state.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.state.localRotateCurrent.yaw - this.state.localRotateTarget.yaw)) * -this.settings_.cameraMovementSpeed;
         }
       }
 
-      if (this.isLocalRotateOverride) {
-        this.localRotateTarget_.pitch = <Radians>(this.localRotateStartPosition.pitch + this.localRotateDif.pitch * -this.settings_.cameraMovementSpeed);
-        this.localRotateSpeed.pitch = normalizeAngle(<Radians>(this.localRotateCurrent.pitch - this.localRotateTarget_.pitch)) * -this.settings_.cameraMovementSpeed;
-        this.localRotateTarget_.yaw = <Radians>(this.localRotateStartPosition.yaw + this.localRotateDif.yaw * this.settings_.cameraMovementSpeed);
-        this.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.localRotateCurrent.yaw - this.localRotateTarget_.yaw)) * -this.settings_.cameraMovementSpeed;
+      if (this.state.isLocalRotateOverride) {
+        this.state.localRotateTarget.pitch = <Radians>(this.state.localRotateStartPosition.pitch + this.state.localRotateDif.pitch * -this.settings_.cameraMovementSpeed);
+        this.state.localRotateSpeed.pitch =
+          normalizeAngle(<Radians>(this.state.localRotateCurrent.pitch - this.state.localRotateTarget.pitch)) * -this.settings_.cameraMovementSpeed;
+        this.state.localRotateTarget.yaw = <Radians>(this.state.localRotateStartPosition.yaw + this.state.localRotateDif.yaw * this.settings_.cameraMovementSpeed);
+        this.state.localRotateSpeed.yaw = normalizeAngle(<Radians>(this.state.localRotateCurrent.yaw - this.state.localRotateTarget.yaw)) * -this.settings_.cameraMovementSpeed;
       }
 
-      if (this.isLocalRotateReset) {
-        this.localRotateTarget_.pitch = <Radians>0;
-        this.localRotateTarget_.roll = <Radians>0;
-        this.localRotateTarget_.yaw = <Radians>0;
-        this.localRotateDif.pitch = <Radians>-this.localRotateCurrent.pitch;
-        this.localRotateDif.roll = <Radians>-this.localRotateCurrent.roll;
-        this.localRotateDif.yaw = <Radians>-this.localRotateCurrent.yaw;
+      if (this.state.isLocalRotateReset) {
+        this.state.localRotateTarget.pitch = <Radians>0;
+        this.state.localRotateTarget.roll = <Radians>0;
+        this.state.localRotateTarget.yaw = <Radians>0;
+        this.state.localRotateDif.pitch = <Radians>-this.state.localRotateCurrent.pitch;
+        this.state.localRotateDif.roll = <Radians>-this.state.localRotateCurrent.roll;
+        this.state.localRotateDif.yaw = <Radians>-this.state.localRotateCurrent.yaw;
       }
 
-      const resetModifier = this.isLocalRotateReset ? 750 : 1;
+      const resetModifier = this.state.isLocalRotateReset ? 750 : 1;
 
-      this.localRotateSpeed.pitch -= this.localRotateSpeed.pitch * dt * this.localRotateMovementSpeed_;
-      this.localRotateCurrent.pitch = <Radians>(this.localRotateCurrent.pitch + resetModifier * this.localRotateMovementSpeed_ * this.localRotateDif.pitch);
+      this.state.localRotateSpeed.pitch -= this.state.localRotateSpeed.pitch * dt * this.localRotateMovementSpeed_;
+      this.state.localRotateCurrent.pitch = <Radians>(this.state.localRotateCurrent.pitch + resetModifier * this.localRotateMovementSpeed_ * this.state.localRotateDif.pitch);
 
-      if (this.isLocalRotateRoll || this.isLocalRotateReset) {
-        this.localRotateSpeed.roll -= this.localRotateSpeed.roll * dt * this.localRotateMovementSpeed_;
-        this.localRotateCurrent.roll = <Radians>(this.localRotateCurrent.roll + resetModifier * this.localRotateMovementSpeed_ * this.localRotateDif.roll);
+      if (this.state.isLocalRotateRoll || this.state.isLocalRotateReset) {
+        this.state.localRotateSpeed.roll -= this.state.localRotateSpeed.roll * dt * this.localRotateMovementSpeed_;
+        this.state.localRotateCurrent.roll = <Radians>(this.state.localRotateCurrent.roll + resetModifier * this.localRotateMovementSpeed_ * this.state.localRotateDif.roll);
       }
 
-      if (this.isLocalRotateYaw || this.isLocalRotateReset || this.isLocalRotateOverride) {
-        const leftOrRight = this.localRotateCurrent.yaw - this.localRotateTarget_.yaw > 0 ? -1 : 1;
+      if (this.state.isLocalRotateYaw || this.state.isLocalRotateReset || this.state.isLocalRotateOverride) {
+        const leftOrRight = this.state.localRotateCurrent.yaw - this.state.localRotateTarget.yaw > 0 ? -1 : 1;
 
-        this.localRotateSpeed.yaw += leftOrRight * this.localRotateSpeed.yaw * dt * this.localRotateMovementSpeed_;
-        this.localRotateCurrent.yaw = <Radians>(this.localRotateCurrent.yaw + resetModifier * this.localRotateMovementSpeed_ * this.localRotateDif.yaw);
+        this.state.localRotateSpeed.yaw += leftOrRight * this.state.localRotateSpeed.yaw * dt * this.localRotateMovementSpeed_;
+        this.state.localRotateCurrent.yaw = <Radians>(this.state.localRotateCurrent.yaw + resetModifier * this.localRotateMovementSpeed_ * this.state.localRotateDif.yaw);
       }
 
-      if (this.isLocalRotateReset) {
-        if (this.localRotateCurrent.pitch > -0.001 && this.localRotateCurrent.pitch < 0.001) {
-          this.localRotateCurrent.pitch = <Radians>0;
+      if (this.state.isLocalRotateReset) {
+        if (this.state.localRotateCurrent.pitch > -0.001 && this.state.localRotateCurrent.pitch < 0.001) {
+          this.state.localRotateCurrent.pitch = <Radians>0;
         }
-        if (this.localRotateCurrent.roll > -0.001 && this.localRotateCurrent.roll < 0.001) {
-          this.localRotateCurrent.roll = <Radians>0;
+        if (this.state.localRotateCurrent.roll > -0.001 && this.state.localRotateCurrent.roll < 0.001) {
+          this.state.localRotateCurrent.roll = <Radians>0;
         }
-        if (this.localRotateCurrent.yaw > -0.001 && this.localRotateCurrent.yaw < 0.001) {
-          this.localRotateCurrent.yaw = <Radians>0;
+        if (this.state.localRotateCurrent.yaw > -0.001 && this.state.localRotateCurrent.yaw < 0.001) {
+          this.state.localRotateCurrent.yaw = <Radians>0;
         }
-        if (this.localRotateCurrent.pitch === 0 && this.localRotateCurrent.roll === 0 && this.localRotateCurrent.yaw === <Radians>0) {
-          this.isLocalRotateReset = false;
+        if (this.state.localRotateCurrent.pitch === 0 && this.state.localRotateCurrent.roll === 0 && this.state.localRotateCurrent.yaw === <Radians>0) {
+          this.state.isLocalRotateReset = false;
         }
       }
     }
   }
 
   private updatePan_(dt: number) {
-    if (this.isScreenPan || this.isWorldPan || this.isPanReset) {
+    if (this.state.isScreenPan || this.state.isWorldPan || this.state.isPanReset) {
       // If user is actively moving
-      if (this.isScreenPan || this.isWorldPan) {
+      if (this.state.isScreenPan || this.state.isWorldPan) {
         this.state.camPitchSpeed = 0;
         this.state.camYawSpeed = 0;
-        this.panDif_.x = this.screenDragPoint[0] - this.mouseX;
-        this.panDif_.y = this.screenDragPoint[1] - this.mouseY;
-        this.panDif_.z = this.screenDragPoint[1] - this.mouseY;
+        this.state.panDif.x = this.state.screenDragPoint[0] - this.state.mouseX;
+        this.state.panDif.y = this.state.screenDragPoint[1] - this.state.mouseY;
+        this.state.panDif.z = this.state.screenDragPoint[1] - this.state.mouseY;
 
         // Slow down the panning if a satellite is selected
         if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-          this.panDif_.x /= 30;
-          this.panDif_.y /= 30;
-          this.panDif_.z /= 30;
+          this.state.panDif.x /= 30;
+          this.state.panDif.y /= 30;
+          this.state.panDif.z /= 30;
         }
 
-        this.panTarget_.x = this.panStartPosition.x + this.panDif_.x * this.panMovementSpeed_ * this.zoomLevel_;
-        if (this.isWorldPan) {
-          this.panTarget_.y = this.panStartPosition.y + this.panDif_.y * this.panMovementSpeed_ * this.zoomLevel_;
+        this.state.panTarget.x = this.state.panStartPosition.x + this.state.panDif.x * this.panMovementSpeed_ * this.state.zoomLevel;
+        if (this.state.isWorldPan) {
+          this.state.panTarget.y = this.state.panStartPosition.y + this.state.panDif.y * this.panMovementSpeed_ * this.state.zoomLevel;
         }
-        if (this.isScreenPan) {
-          this.panTarget_.z = this.panStartPosition.z + this.panDif_.z * this.panMovementSpeed_;
+        if (this.state.isScreenPan) {
+          this.state.panTarget.z = this.state.panStartPosition.z + this.state.panDif.z * this.panMovementSpeed_ * this.state.zoomLevel;
         }
       }
 
-      if (this.isPanReset) {
-        this.panTarget_.x = 0;
-        this.panTarget_.y = 0;
-        this.panTarget_.z = 0;
-        this.panDif_.x = -this.panCurrent.x;
-        this.panDif_.y = this.panCurrent.y;
-        this.panDif_.z = this.panCurrent.z;
-      }
+      this.state.resetPan();
 
-      const panResetModifier = this.isPanReset ? 0.5 : 1;
+      const panResetModifier = this.state.isPanReset ? 0.5 : 1;
 
       // X is X no matter what
-      this.panSpeed.x = (this.panCurrent.x - this.panTarget_.x) * this.panMovementSpeed_ * this.zoomLevel_;
-      this.panSpeed.x -= this.panSpeed.x * dt * this.panMovementSpeed_ * this.zoomLevel_;
-      this.panCurrent.x += panResetModifier * this.panMovementSpeed_ * this.panDif_.x;
+      this.state.panSpeed.x = (this.state.panCurrent.x - this.state.panTarget.x) * this.panMovementSpeed_ * this.state.zoomLevel;
+      this.state.panSpeed.x -= this.state.panSpeed.x * dt * this.panMovementSpeed_ * this.state.zoomLevel;
+      this.state.panCurrent.x += panResetModifier * this.panMovementSpeed_ * this.state.panDif.x;
       // If we are moving like an FPS then Y and Z are based on the angle of the this
-      if (this.isWorldPan) {
-        this.fpsPos_[1] = <Radians>(this.fpsPos_[1] - Math.cos(this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
-        this.fpsPos_[2] = <Radians>(this.fpsPos_[1] + Math.sin(this.localRotateCurrent.pitch) * panResetModifier * this.panMovementSpeed_ * this.panDif_.y);
-        this.fpsPos_[1] = <Radians>(this.fpsPos_[1] - Math.sin(-this.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.panDif_.x);
+      if (this.state.isWorldPan) {
+        this.state.fpsPos[1] = <Radians>(this.state.fpsPos[1] - Math.cos(this.state.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.state.panDif.y);
+        this.state.fpsPos[2] = <Radians>(this.state.fpsPos[1] + Math.sin(this.state.localRotateCurrent.pitch) * panResetModifier * this.panMovementSpeed_ * this.state.panDif.y);
+        this.state.fpsPos[1] = <Radians>(this.state.fpsPos[1] - Math.sin(-this.state.localRotateCurrent.yaw) * panResetModifier * this.panMovementSpeed_ * this.state.panDif.x);
       }
       // If we are moving the screen then Z is always up and Y is not relevant
-      if (this.isScreenPan || this.isPanReset) {
-        this.panSpeed.z = (this.panCurrent.z - this.panTarget_.z) * this.panMovementSpeed_ * this.zoomLevel_;
-        this.panSpeed.z -= this.panSpeed.z * dt * this.panMovementSpeed_ * this.zoomLevel_;
-        this.panCurrent.z -= panResetModifier * this.panMovementSpeed_ * this.panDif_.z;
+      if (this.state.isScreenPan || this.state.isPanReset) {
+        this.state.panSpeed.z = (this.state.panCurrent.z - this.state.panTarget.z) * this.panMovementSpeed_ * this.state.zoomLevel;
+        this.state.panSpeed.z -= this.state.panSpeed.z * dt * this.panMovementSpeed_ * this.state.zoomLevel;
+        this.state.panCurrent.z -= panResetModifier * this.panMovementSpeed_ * this.state.panDif.z;
       }
 
-      if (this.isPanReset) {
-        this.fpsPos_[0] -= this.fpsPos_[0] / 25;
-        this.fpsPos_[1] -= this.fpsPos_[1] / 25;
-        this.fpsPos_[2] -= this.fpsPos_[2] / 25;
+      if (this.state.isPanReset) {
+        this.state.fpsPos[0] -= this.state.fpsPos[0] / 25;
+        this.state.fpsPos[1] -= this.state.fpsPos[1] / 25;
+        this.state.fpsPos[2] -= this.state.fpsPos[2] / 25;
 
-        if (this.panCurrent.x > -0.5 && this.panCurrent.x < 0.5) {
-          this.panCurrent.x = 0;
+        if (this.state.panCurrent.x > -0.5 && this.state.panCurrent.x < 0.5) {
+          this.state.panCurrent.x = 0;
         }
-        if (this.panCurrent.y > -0.5 && this.panCurrent.y < 0.5) {
-          this.panCurrent.y = 0;
+        if (this.state.panCurrent.y > -0.5 && this.state.panCurrent.y < 0.5) {
+          this.state.panCurrent.y = 0;
         }
-        if (this.panCurrent.z > -0.5 && this.panCurrent.z < 0.5) {
-          this.panCurrent.z = 0;
+        if (this.state.panCurrent.z > -0.5 && this.state.panCurrent.z < 0.5) {
+          this.state.panCurrent.z = 0;
         }
-        if (this.fpsPos_[0] > -0.5 && this.fpsPos_[0] < 0.5) {
-          this.fpsPos_[0] = 0;
+        if (this.state.fpsPos[0] > -0.5 && this.state.fpsPos[0] < 0.5) {
+          this.state.fpsPos[0] = 0;
         }
-        if (this.fpsPos_[1] > -0.5 && this.fpsPos_[1] < 0.5) {
-          this.fpsPos_[1] = 0;
+        if (this.state.fpsPos[1] > -0.5 && this.state.fpsPos[1] < 0.5) {
+          this.state.fpsPos[1] = 0;
         }
-        if (this.fpsPos_[2] > -0.5 && this.fpsPos_[2] < 0.5) {
-          this.fpsPos_[2] = 0;
+        if (this.state.fpsPos[2] > -0.5 && this.state.fpsPos[2] < 0.5) {
+          this.state.fpsPos[2] = 0;
         }
 
-        if (this.panCurrent.x === 0 && this.panCurrent.y === 0 && this.panCurrent.z === 0 && this.fpsPos_[0] === 0 && this.fpsPos_[1] === 0 && this.fpsPos_[2] === 0) {
-          this.isPanReset = false;
+        if (this.state.panCurrent.x === 0 && this.state.panCurrent.y === 0 && this.state.panCurrent.z === 0 &&
+          this.state.fpsPos[0] === 0 && this.state.fpsPos[1] === 0 && this.state.fpsPos[2] === 0) {
+          this.state.isPanReset = false;
         }
       }
     }
     if (this.settings_.isAutoPanD || this.settings_.isAutoPanU || this.settings_.isAutoPanL || this.settings_.isAutoPanR) {
       if (this.settings_.isAutoPanD) {
-        this.panCurrent.z += this.settings_.autoPanSpeed * dt;
+        this.state.panCurrent.z += this.settings_.autoPanSpeed * dt;
       }
       if (this.settings_.isAutoPanU) {
-        this.panCurrent.z -= this.settings_.autoPanSpeed * dt;
+        this.state.panCurrent.z -= this.settings_.autoPanSpeed * dt;
       }
       if (this.settings_.isAutoPanL) {
-        this.panCurrent.x += this.settings_.autoPanSpeed * dt;
+        this.state.panCurrent.x += this.settings_.autoPanSpeed * dt;
       }
       if (this.settings_.isAutoPanR) {
-        this.panCurrent.x -= this.settings_.autoPanSpeed * dt;
+        this.state.panCurrent.x -= this.settings_.autoPanSpeed * dt;
       }
     }
   }
 
   private updatePitchYawSpeeds_(dt: Milliseconds) {
-    if ((this.isDragging && !this.settings_.isMobileModeEnabled) || (this.isDragging && this.settings_.isMobileModeEnabled && (this.mouseX !== 0 || this.mouseY !== 0))) {
+    if ((this.state.isDragging && !this.settings_.isMobileModeEnabled) ||
+      (this.state.isDragging && this.settings_.isMobileModeEnabled && (this.state.mouseX !== 0 || this.state.mouseY !== 0))) {
       /*
        * Disable Raycasting for Performance
        * dragTarget = getEarthScreenPoint(mouseX, mouseY)
@@ -1908,10 +1280,10 @@ export class Camera {
         this.settings_.isMobileModeEnabled
       ) {
         // random screen drag
-        const xDif = this.screenDragPoint[0] - this.mouseX;
-        const yDif = this.screenDragPoint[1] - this.mouseY;
-        const yawTarget = <Radians>(this.dragStartYaw + xDif * this.settings_.cameraMovementSpeed);
-        const pitchTarget = <Radians>(this.dragStartPitch + yDif * -this.settings_.cameraMovementSpeed);
+        const xDif = this.state.screenDragPoint[0] - this.state.mouseX;
+        const yDif = this.state.screenDragPoint[1] - this.state.mouseY;
+        const yawTarget = <Radians>(this.state.dragStartYaw + xDif * this.settings_.cameraMovementSpeed);
+        const pitchTarget = <Radians>(this.state.dragStartPitch + yDif * -this.settings_.cameraMovementSpeed);
 
         this.state.camPitchSpeed = normalizeAngle(<Radians>(this.state.camPitch - pitchTarget)) * -this.settings_.cameraMovementSpeed;
         this.state.camYawSpeed = normalizeAngle(<Radians>(this.state.camYaw - yawTarget)) * -this.settings_.cameraMovementSpeed;
@@ -1941,7 +1313,7 @@ export class Camera {
          * // this.camYawSpeed = yawDif * this.settings_.cameraMovementSpeed;
          */
       }
-      this.isAutoPitchYawToTarget = false;
+      this.state.isAutoPitchYawToTarget = false;
     } else {
       /*
        * this block of code is what causes the momentum effect when moving the camera
@@ -1964,7 +1336,7 @@ export class Camera {
    * this code might be better if applied directly to the shader versus a multiplier effect
    */
   private updateZoom_(dt: number) {
-    if (this.zoomLevel_ !== this.zoomTarget_) {
+    if (this.state.zoomLevel !== this.state.zoomTarget) {
       this.updateSatShaderSizes();
     }
 
@@ -1994,41 +1366,41 @@ export class Camera {
       }
 
       if (this.settings_.isAutoZoomIn) {
-        this.zoomTarget_ -= dt * this.settings_.autoZoomSpeed;
+        this.state.zoomTarget -= dt * this.settings_.autoZoomSpeed;
       }
       if (this.settings_.isAutoZoomOut) {
-        this.zoomTarget_ += dt * this.settings_.autoZoomSpeed;
+        this.state.zoomTarget += dt * this.settings_.autoZoomSpeed;
       }
     }
 
-    if (this.isAutoPitchYawToTarget) {
-      this.zoomLevel_ += (this.zoomTarget_ - this.zoomLevel_) * dt * this.settings_.zoomSpeed; // Just keep zooming
+    if (this.state.isAutoPitchYawToTarget) {
+      this.state.zoomLevel += (this.state.zoomTarget - this.state.zoomLevel) * dt * this.settings_.zoomSpeed; // Just keep zooming
     } else {
-      const inOrOut = this.zoomLevel_ > this.zoomTarget_ ? -1 : 1;
+      const inOrOut = this.state.zoomLevel > this.state.zoomTarget ? -1 : 1;
 
-      this.zoomLevel_ += inOrOut * dt * this.settings_.zoomSpeed * Math.abs(this.zoomTarget_ - this.zoomLevel_);
+      this.state.zoomLevel += inOrOut * dt * this.settings_.zoomSpeed * Math.abs(this.state.zoomTarget - this.state.zoomLevel);
 
-      if ((this.zoomLevel_ > this.zoomTarget_ && !this.isZoomIn) || (this.zoomLevel_ < this.zoomTarget_ && this.isZoomIn)) {
-        this.zoomTarget_ = this.zoomLevel_; // If we change direction then consider us at the target
+      if ((this.state.zoomLevel > this.state.zoomTarget && !this.state.isZoomIn) || (this.state.zoomLevel < this.state.zoomTarget && this.state.isZoomIn)) {
+        this.state.zoomTarget = this.state.zoomLevel; // If we change direction then consider us at the target
       }
     }
 
     // Clamp Zoom between 0 and 1
-    this.zoomLevel_ = this.zoomLevel_ > 1 ? 1 : this.zoomLevel_;
-    this.zoomLevel_ = this.zoomLevel_ < 0 ? 0.0001 : this.zoomLevel_;
+    this.state.zoomLevel = this.state.zoomLevel > 1 ? 1 : this.state.zoomLevel;
+    this.state.zoomLevel = this.state.zoomLevel < 0 ? 0.0001 : this.state.zoomLevel;
 
     // Try to stay out of the earth
     if (this.cameraType === CameraType.DEFAULT || this.cameraType === CameraType.OFFSET || this.cameraType === CameraType.FIXED_TO_SAT) {
       if (this.getDistFromEarth() < RADIUS_OF_EARTH + 30) {
-        this.zoomTarget = this.zoomLevel_ + 0.001;
+        this.state.zoomTarget = this.state.zoomLevel + 0.001;
       }
     }
   }
 
   updateSatShaderSizes() {
-    if (this.zoomLevel_ > this.settings_.satShader.largeObjectMaxZoom) {
+    if (this.state.zoomLevel > this.settings_.satShader.largeObjectMaxZoom) {
       this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize * 1.5;
-    } else if (this.zoomLevel_ < this.settings_.satShader.largeObjectMinZoom) {
+    } else if (this.state.zoomLevel < this.settings_.satShader.largeObjectMinZoom) {
       this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize / 3;
     } else {
       this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize;

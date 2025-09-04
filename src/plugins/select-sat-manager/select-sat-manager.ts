@@ -190,14 +190,14 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // stop rotation if it is on
     keepTrackApi.getMainCamera().autoRotate(false);
-    keepTrackApi.getMainCamera().panCurrent = {
+    keepTrackApi.getMainCamera().state.panCurrent = {
       x: 0,
       y: 0,
       z: 0,
     };
 
     if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
-      keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
+      keepTrackApi.getMainCamera().state.earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
       keepTrackApi.emit(EventBusEvent.sensorDotSelected, sensor);
     }
 
@@ -276,7 +276,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // stop rotation if it is on
     keepTrackApi.getMainCamera().autoRotate(false);
-    keepTrackApi.getMainCamera().panCurrent = {
+    keepTrackApi.getMainCamera().state.panCurrent = {
       x: 0,
       y: 0,
       z: 0,
@@ -292,14 +292,14 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
 
     if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
-      keepTrackApi.getMainCamera().earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
+      keepTrackApi.getMainCamera().state.earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
       keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
     }
 
     // If we deselect an object but had previously selected one then disable/hide stuff
-    keepTrackApi.getMainCamera().camZoomSnappedOnSat = true;
-    keepTrackApi.getMainCamera().camDistBuffer = settingsManager.minDistanceFromSatellite;
-    keepTrackApi.getMainCamera().camAngleSnappedOnSat = true;
+    keepTrackApi.getMainCamera().state.camZoomSnappedOnSat = true;
+    keepTrackApi.getMainCamera().state.camDistBuffer = settingsManager.minDistanceFromSatellite;
+    keepTrackApi.getMainCamera().state.camAngleSnappedOnSat = true;
   }
 
   private static selectOwnerManufacturer_(obj: LandObject) {

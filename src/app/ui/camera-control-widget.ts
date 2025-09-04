@@ -108,8 +108,8 @@ export class CameraControlWidget {
 
     if (clickedAxis) {
       keepTrackApi.getMainCamera().autoRotate(false);
-      keepTrackApi.getMainCamera().camAngleSnappedOnSat = false;
-      keepTrackApi.getMainCamera().camZoomSnappedOnSat = false;
+      keepTrackApi.getMainCamera().state.camAngleSnappedOnSat = false;
+      keepTrackApi.getMainCamera().state.camZoomSnappedOnSat = false;
       this.alignCameraToAxis(clickedAxis);
     }
   }
@@ -174,7 +174,7 @@ export class CameraControlWidget {
   private alignCameraToAxis(axisName: string) {
     const camera = keepTrackApi.getMainCamera();
 
-    camera.isAutoPitchYawToTarget = true;
+    camera.state.isAutoPitchYawToTarget = true;
     switch (axisName) {
       case 'X':
         camera.state.camYawTarget = Math.PI / 2 as Radians;

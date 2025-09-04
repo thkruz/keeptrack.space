@@ -139,11 +139,11 @@ export const starTalk = (settingsManager: SettingsManager) => {
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
       setTimeout(() => {
         (keepTrackApi.getPlugin(TimeMachine)!).historyOfSatellitesPlay(); // Start Time Machine
-        keepTrackApi.getMainCamera().zoomTarget = 1; // Reset Zoom to Default
+        keepTrackApi.getMainCamera().state.zoomTarget = 1; // Reset Zoom to Default
         keepTrackApi.getMainCamera().camSnap(lat2pitch(DEFAULT_LATITUDE), lon2yaw(DEFAULT_LONGITUDE, new Date())); // Reset Camera to Default
       }, 100);
       setTimeout(() => {
-        keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
+        keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
         keepTrackApi.getMainCamera().autoRotate(true); // Start Rotating Camera
       }, DELAY_BEFORE_ROTATING);
     };

@@ -206,7 +206,7 @@ export class DotsManager {
     gl.disable(gl.BLEND);
 
     // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-    this.drawGpuPickingFrameBuffer(pMvCamMatrix, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+    this.drawGpuPickingFrameBuffer(pMvCamMatrix, keepTrackApi.getMainCamera().state.mouseX, keepTrackApi.getMainCamera().state.mouseY);
   }
 
   /**

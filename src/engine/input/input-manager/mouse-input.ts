@@ -117,13 +117,13 @@ export class MouseInput {
          * Middle Mouse Button MMB
          */
         if (evt.button === 1) {
-          keepTrackApi.getMainCamera().localRotateStartPosition = keepTrackApi.getMainCamera().localRotateCurrent;
+          keepTrackApi.getMainCamera().state.localRotateStartPosition = keepTrackApi.getMainCamera().state.localRotateCurrent;
           if (this.keyboard_.getKey('Shift')) {
-            keepTrackApi.getMainCamera().isLocalRotateRoll = true;
-            keepTrackApi.getMainCamera().isLocalRotateYaw = false;
+            keepTrackApi.getMainCamera().state.isLocalRotateRoll = true;
+            keepTrackApi.getMainCamera().state.isLocalRotateYaw = false;
           } else {
-            keepTrackApi.getMainCamera().isLocalRotateRoll = false;
-            keepTrackApi.getMainCamera().isLocalRotateYaw = true;
+            keepTrackApi.getMainCamera().state.isLocalRotateRoll = false;
+            keepTrackApi.getMainCamera().state.isLocalRotateYaw = true;
           }
 
           evt.preventDefault();
@@ -131,13 +131,13 @@ export class MouseInput {
 
         // Right Mouse Button RMB
         if (evt.button === 2 && (this.keyboard_.getKey('Shift') || this.keyboard_.getKey('Control'))) {
-          keepTrackApi.getMainCamera().panStartPosition = keepTrackApi.getMainCamera().panCurrent;
+          keepTrackApi.getMainCamera().state.panStartPosition = keepTrackApi.getMainCamera().state.panCurrent;
           if (this.keyboard_.getKey('Shift')) {
-            keepTrackApi.getMainCamera().isScreenPan = false;
-            keepTrackApi.getMainCamera().isWorldPan = true;
+            keepTrackApi.getMainCamera().state.isScreenPan = false;
+            keepTrackApi.getMainCamera().state.isWorldPan = true;
           } else {
-            keepTrackApi.getMainCamera().isScreenPan = true;
-            keepTrackApi.getMainCamera().isWorldPan = false;
+            keepTrackApi.getMainCamera().state.isScreenPan = true;
+            keepTrackApi.getMainCamera().state.isWorldPan = false;
           }
         }
       });
@@ -147,12 +147,12 @@ export class MouseInput {
       window.addEventListener('mouseup', (evt: MouseEvent) => {
         // Camera Manager Events
         if (evt.button === 1) {
-          keepTrackApi.getMainCamera().isLocalRotateRoll = false;
-          keepTrackApi.getMainCamera().isLocalRotateYaw = false;
+          keepTrackApi.getMainCamera().state.isLocalRotateRoll = false;
+          keepTrackApi.getMainCamera().state.isLocalRotateYaw = false;
         }
         if (evt.button === 2) {
-          keepTrackApi.getMainCamera().isScreenPan = false;
-          keepTrackApi.getMainCamera().isWorldPan = false;
+          keepTrackApi.getMainCamera().state.isScreenPan = false;
+          keepTrackApi.getMainCamera().state.isWorldPan = false;
         }
       });
     }
@@ -198,15 +198,15 @@ export class MouseInput {
   }
 
   private canvasMouseMoveFire_(mainCameraInstance: Camera, evt: MouseEvent) {
-    mainCameraInstance.mouseX = evt.clientX - (keepTrackApi.containerRoot.scrollLeft - window.scrollX) - keepTrackApi.containerRoot.offsetLeft;
-    mainCameraInstance.mouseY = evt.clientY - (keepTrackApi.containerRoot.scrollTop - window.scrollY) - keepTrackApi.containerRoot.offsetTop;
+    mainCameraInstance.state.mouseX = evt.clientX - (keepTrackApi.containerRoot.scrollLeft - window.scrollX) - keepTrackApi.containerRoot.offsetLeft;
+    mainCameraInstance.state.mouseY = evt.clientY - (keepTrackApi.containerRoot.scrollTop - window.scrollY) - keepTrackApi.containerRoot.offsetTop;
     if (
-      mainCameraInstance.isDragging &&
-      mainCameraInstance.screenDragPoint[0] !== mainCameraInstance.mouseX &&
-      mainCameraInstance.screenDragPoint[1] !== mainCameraInstance.mouseY
+      mainCameraInstance.state.isDragging &&
+      mainCameraInstance.state.screenDragPoint[0] !== mainCameraInstance.state.mouseX &&
+      mainCameraInstance.state.screenDragPoint[1] !== mainCameraInstance.state.mouseY
     ) {
       this.dragHasMoved = true;
-      mainCameraInstance.camAngleSnappedOnSat = false;
+      mainCameraInstance.state.camAngleSnappedOnSat = false;
     }
     this.isMouseMoving = true;
 
@@ -238,7 +238,7 @@ export class MouseInput {
     this.isStartedOnCanvas = true;
 
     if (evt.button === 2) {
-      this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+      this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().state.mouseX, keepTrackApi.getMainCamera().state.mouseY);
 
       const gmst = keepTrackApi.getTimeManager().gmst;
 
@@ -303,7 +303,7 @@ export class MouseInput {
 
     // Force the search bar to get repainted because it gets overwritten a lot
     this.dragHasMoved = false;
-    keepTrackApi.getMainCamera().isDragging = false;
+    keepTrackApi.getMainCamera().state.isDragging = false;
 
     if (settingsManager.isFreezePropRateOnDrag) {
       timeManagerInstance.calculateSimulationTime();
@@ -365,7 +365,7 @@ export class MouseInput {
         if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat !== -1) {
           keepTrackApi.getMainCamera().resetRotation();
         } else {
-          keepTrackApi.getMainCamera().reset();
+          keepTrackApi.getMainCamera().state.reset();
         }
         break;
       case 'clear-lines-rmb':

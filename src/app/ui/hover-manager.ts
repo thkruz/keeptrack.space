@@ -43,7 +43,7 @@ export class HoverManager {
     EventBus.getInstance().on(EventBusEvent.highPerformanceRender, () => {
       // Only update hover if we are not on mobile
       if (!settingsManager.isMobileModeEnabled) {
-        this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+        this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().state.mouseX, keepTrackApi.getMainCamera().state.mouseY);
       }
     });
   }
@@ -95,7 +95,7 @@ export class HoverManager {
   }
 
   private hoverOverSomething_(id: number, screenX?: number, screenY?: number) {
-    if (!keepTrackApi.getMainCamera().isDragging && settingsManager.enableHoverOverlay) {
+    if (!keepTrackApi.getMainCamera().state.isDragging && settingsManager.enableHoverOverlay) {
       // NOTE: The radar mesurement logic breaks if you call it a SatObject
 
       const catalogManagerInstance = keepTrackApi.getCatalogManager();

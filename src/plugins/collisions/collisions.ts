@@ -3,13 +3,13 @@ import CollisionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {
@@ -117,7 +117,7 @@ export class Collisions extends KeepTrackPlugin {
     const now = new Date();
 
     keepTrackApi.getTimeManager().changeStaticOffset(new Date(this.collisionList_[row].TOCA).getTime() - now.getTime() - 1000 * 30);
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
+    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     const sat1 = this.collisionList_[row].SAT1.toString().padStart(5, '0');
     const sat2 = this.collisionList_[row].SAT2.toString().padStart(5, '0');

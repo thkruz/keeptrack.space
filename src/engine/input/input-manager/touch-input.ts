@@ -90,10 +90,10 @@ export class TouchInput {
     if (evt.touches?.length === 0) {
       this.isPinching = false;
       this.isPanning = false;
-      mainCameraInstance.mouseX = 0;
-      mainCameraInstance.mouseY = 0;
+      mainCameraInstance.state.mouseX = 0;
+      mainCameraInstance.state.mouseY = 0;
       this.dragHasMoved = false;
-      mainCameraInstance.isDragging = false;
+      mainCameraInstance.state.isDragging = false;
     }
   }
 
@@ -157,8 +157,8 @@ export class TouchInput {
 
     this.touchStartX = evt.x;
     this.touchStartY = evt.y;
-    keepTrackApi.getMainCamera().mouseX = this.touchStartX; // Move this
-    keepTrackApi.getMainCamera().mouseY = this.touchStartY; // Move this
+    keepTrackApi.getMainCamera().state.mouseX = this.touchStartX; // Move this
+    keepTrackApi.getMainCamera().state.mouseY = this.touchStartY; // Move this
 
     // If you hit the canvas hide any popups
     keepTrackApi.getInputManager().hidePopUps();
@@ -170,7 +170,7 @@ export class TouchInput {
     this.lastEvent = evt;
 
     // Stop auto movement
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
+    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
     keepTrackApi.getMainCamera().autoRotate(false);
 
     // Try to select satellite
@@ -184,9 +184,9 @@ export class TouchInput {
 
     const mainCameraInstance = keepTrackApi.getMainCamera();
 
-    mainCameraInstance.mouseX = evt.x;
-    mainCameraInstance.mouseY = evt.y;
-    mainCameraInstance.camAngleSnappedOnSat = false;
+    mainCameraInstance.state.mouseX = evt.x;
+    mainCameraInstance.state.mouseY = evt.y;
+    mainCameraInstance.state.camAngleSnappedOnSat = false;
   }
 
   swipe(evt: TouchEvent) {
@@ -198,7 +198,7 @@ export class TouchInput {
     this.lastEvent = evt;
 
     // Stop auto movement
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
+    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
     keepTrackApi.getMainCamera().autoRotate(false);
 
     keepTrackApi.getInputManager().openRmbMenu();
@@ -214,11 +214,11 @@ export class TouchInput {
     const mainCameraInstance = keepTrackApi.getMainCamera();
 
     this.deltaPinchDistance = (this.startPinchDistance - evt.pinchDistance) / this.maxPinchSize;
-    let zoomTarget = mainCameraInstance.zoomTarget;
+    let zoomTarget = mainCameraInstance.state.zoomTarget;
 
     zoomTarget += this.deltaPinchDistance * settingsManager.zoomSpeed;
     zoomTarget = Math.min(Math.max(zoomTarget, 0.0001), 1); // Force between 0 and 1
-    mainCameraInstance.zoomTarget = zoomTarget;
+    mainCameraInstance.state.zoomTarget = zoomTarget;
   }
 
   rotate(evt: TouchEvent) {

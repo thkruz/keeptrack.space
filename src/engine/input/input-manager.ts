@@ -388,14 +388,14 @@ export class InputManager {
      * TODO: Make this dynamic
      */
     const mainCameraInstance = keepTrackApi.getMainCamera();
-    const offsetX = mainCameraInstance.mouseX < canvasDOM!.clientWidth / 2 ? 0 : -1 * 165;
-    const offsetY = mainCameraInstance.mouseY < canvasDOM!.clientHeight / 2 ? 0 : numMenuItems * -25;
+    const offsetX = mainCameraInstance.state.mouseX < canvasDOM!.clientWidth / 2 ? 0 : -1 * 165;
+    const offsetY = mainCameraInstance.state.mouseY < canvasDOM!.clientHeight / 2 ? 0 : numMenuItems * -25;
 
     rightBtnMenuDOM!.style.display = 'block';
     rightBtnMenuDOM!.style.textAlign = 'center';
     rightBtnMenuDOM!.style.position = 'absolute';
-    rightBtnMenuDOM!.style.left = `${mainCameraInstance.mouseX + offsetX}px`;
-    rightBtnMenuDOM!.style.top = `${mainCameraInstance.mouseY + offsetY}px`;
+    rightBtnMenuDOM!.style.left = `${mainCameraInstance.state.mouseX + offsetX}px`;
+    rightBtnMenuDOM!.style.top = `${mainCameraInstance.state.mouseY + offsetY}px`;
   }
 
   static earthClicked({ clickedSatId }: { clickedSatId: number }) {
@@ -452,7 +452,7 @@ export class InputManager {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
     }
 
-    if (keepTrackApi.getMainCamera().isDragging) {
+    if (keepTrackApi.getMainCamera().state.isDragging) {
       return;
     }
 
@@ -472,7 +472,7 @@ export class InputManager {
         this.mouse.mouseSat = uiManagerInstance.searchHoverSatId;
       } else if (!settingsManager.isMobileModeEnabled) {
         if (Date.now() - this.lastUpdateTime > 100) {
-          this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
+          this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.state.mouseX, mainCameraInstance.state.mouseY);
           this.lastUpdateTime = Date.now();
         }
       }

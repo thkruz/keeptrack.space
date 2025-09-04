@@ -299,9 +299,9 @@ export abstract class UrlManager {
       paramSlices.push(`rate=${this.propRate_}`);
     }
 
-    if (this.selectedSat_?.sccNum && !(mainCamera.ftsPitch > -0.1 && mainCamera.ftsPitch < 0.1 && mainCamera.ftsYaw > -0.1 && mainCamera.ftsYaw < 0.1)) {
-      paramSlices.push(`pitch=${(mainCamera.ftsPitch * RAD2DEG).toFixed(3)}`);
-      paramSlices.push(`yaw=${(mainCamera.ftsYaw * RAD2DEG).toFixed(3)}`);
+    if (this.selectedSat_?.sccNum && !(mainCamera.state.ftsPitch > -0.1 && mainCamera.state.ftsPitch < 0.1 && mainCamera.state.ftsYaw > -0.1 && mainCamera.state.ftsYaw < 0.1)) {
+      paramSlices.push(`pitch=${(mainCamera.state.ftsPitch * RAD2DEG).toFixed(3)}`);
+      paramSlices.push(`yaw=${(mainCamera.state.ftsYaw * RAD2DEG).toFixed(3)}`);
     } else if (mainCamera.state.camPitch > -0.01 && mainCamera.state.camPitch < 0.01 && mainCamera.state.camYaw > -0.01 && mainCamera.state.camYaw < 0.01) {
       // If pitch and yaw are close to zero, we don't need to include them in the URL
     } else {
@@ -312,7 +312,7 @@ export abstract class UrlManager {
     paramSlices.push(`zoom=${mainCamera.zoomLevel().toFixed(2)}`);
 
     if (this.selectedSat_) {
-      paramSlices.push(`camDistBuffer=${mainCamera.camDistBuffer}`);
+      paramSlices.push(`camDistBuffer=${mainCamera.state.camDistBuffer}`);
     }
 
     if (keepTrackApi.getColorSchemeManager().currentColorScheme.id !== 'CelestrakColorScheme') {
@@ -428,10 +428,10 @@ export abstract class UrlManager {
       return;
     }
 
-    keepTrackApi.getMainCamera().camZoomSnappedOnSat = false;
+    keepTrackApi.getMainCamera().state.camZoomSnappedOnSat = false;
     keepTrackApi.getMainCamera().changeZoom(zoom);
     // if camDistBuffer is not a number, set it to just outside the min zoom distance for close zoom
-    keepTrackApi.getMainCamera().camDistBuffer = isNaN(camDistBufferValue)
+    keepTrackApi.getMainCamera().state.camDistBuffer = isNaN(camDistBufferValue)
       ? settingsManager.minZoomDistance + 1 as Kilometers
       : camDistBufferValue as Kilometers;
 
@@ -466,9 +466,9 @@ export abstract class UrlManager {
     mainCameraInstance.camSnap(pitchNum * DEG2RAD as Radians, yawNum * DEG2RAD as Radians);
 
     if (kv.sat) {
-      mainCameraInstance.camAngleSnappedOnSat = false;
-      mainCameraInstance.ftsPitch = pitchNum * DEG2RAD as Radians;
-      mainCameraInstance.ftsYaw = yawNum * DEG2RAD as Radians;
+      mainCameraInstance.state.camAngleSnappedOnSat = false;
+      mainCameraInstance.state.ftsPitch = pitchNum * DEG2RAD as Radians;
+      mainCameraInstance.state.ftsYaw = yawNum * DEG2RAD as Radians;
     }
   }
 

@@ -1,5 +1,6 @@
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { GetSatType, MenuMode, SatPassTimes, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { dateFormat } from '@app/engine/utils/dateFormat';
@@ -12,7 +13,6 @@ import { DetailedSatellite, MILLISECONDS_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from './watchlist';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class WatchlistOverlay extends KeepTrackPlugin {
   readonly id = 'WatchlistOverlay';
@@ -247,7 +247,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
      */
     const mainCameraInstance = keepTrackApi.getMainCamera();
 
-    if ((Date.now() > this.lastOverlayUpdateTime * 1 + 10000 && !mainCameraInstance.isDragging) || isForceUpdate) {
+    if ((Date.now() > this.lastOverlayUpdateTime * 1 + 10000 && !mainCameraInstance.state.isDragging) || isForceUpdate) {
       this.infoOverlayDOMHtmlStrArr = [];
       this.infoOverlayDOMHtmlStrArr.push('<div>');
       for (let s = 0; s < this.nextPassArray.length; s++) {

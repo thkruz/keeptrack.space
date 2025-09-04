@@ -169,18 +169,18 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
       mainCameraInstance.state.camPitch = lat2pitch(DEFAULT_LATITUDE);
       mainCameraInstance.state.camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
-      mainCameraInstance.dragStartPitch = 0.06321641675916885 as Radians;
-      mainCameraInstance.dragStartYaw = 2.244571612554059 as Radians;
-      mainCameraInstance.zoomLevel_ = 0.8;
-      mainCameraInstance.zoomTarget = 0.8;
+      mainCameraInstance.state.dragStartPitch = 0.06321641675916885 as Radians;
+      mainCameraInstance.state.dragStartYaw = 2.244571612554059 as Radians;
+      mainCameraInstance.state.zoomLevel = 0.8;
+      mainCameraInstance.state.zoomTarget = 0.8;
 
-      mainCameraInstance.screenDragPoint = [mainCameraInstance.mouseX, mainCameraInstance.mouseY];
+      mainCameraInstance.state.screenDragPoint = [mainCameraInstance.state.mouseX, mainCameraInstance.state.mouseY];
 
       setTimeout(() => {
         (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
       }, 100);
       setTimeout(() => {
-        mainCameraInstance.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
+        mainCameraInstance.state.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
         mainCameraInstance.autoRotate(true); // Start Rotating Camera
       }, DELAY_BEFORE_ROTATING);
     };

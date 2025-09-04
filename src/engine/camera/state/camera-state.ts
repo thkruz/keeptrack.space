@@ -34,8 +34,16 @@ export class CameraState {
   ftsPitch = 0;
   ftsYaw: Radians = 0 as Radians;
   ftsRotateReset = true;
+  /**
+   * This was used when there was only one camera mode and the camera was always centered on the earth
+   * It is the overall yaw of the camera?
+   */
   camZoomSnappedOnSat = false;
   camAngleSnappedOnSat = false;
+  /**
+   * This was used when there was only one camera mode and the camera was always centered on the earth
+   * It is the overall pitch of the camera?
+   */
   camSnapToSat = {
     pos: { x: 0, y: 0, z: 0 },
     radius: 0,
@@ -66,6 +74,11 @@ export class CameraState {
   isLocalRotateReset = true;
   isLocalRotateRoll = false;
   isLocalRotateYaw = false;
+  localRotateTarget = {
+    pitch: <Radians>0,
+    roll: <Radians>0,
+    yaw: <Radians>0,
+  };
   localRotateCurrent = {
     pitch: <Radians>0,
     roll: <Radians>0,
@@ -244,6 +257,7 @@ export class CameraState {
     this.isLocalRotateOverride = false;
     this.isLocalRotateRoll = false;
     this.isLocalRotateYaw = false;
+    this.localRotateTarget = { pitch: 0 as Radians, roll: 0 as Radians, yaw: 0 as Radians };
     this.localRotateCurrent = { pitch: 0 as Radians, roll: 0 as Radians, yaw: 0 as Radians };
     this.localRotateDif = { pitch: 0 as Radians, roll: 0 as Radians, yaw: 0 as Radians };
     this.localRotateSpeed = { pitch: 0 as Radians, roll: 0 as Radians, yaw: 0 as Radians };
@@ -279,6 +293,17 @@ export class CameraState {
   resetRotation(): void {
     this.isLocalRotateReset = true;
     this.ftsRotateReset = true;
+  }
+
+  resetPan(): void {
+    if (this.isPanReset) {
+      this.panTarget.x = 0;
+      this.panTarget.y = 0;
+      this.panTarget.z = 0;
+      this.panDif.x = -this.panCurrent.x;
+      this.panDif.y = this.panCurrent.y;
+      this.panDif.z = this.panCurrent.z;
+    }
   }
 
   /**

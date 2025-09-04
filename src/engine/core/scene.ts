@@ -115,7 +115,7 @@ export class Scene {
         if (
           !settingsManager.modelsOnSatelliteViewOverride &&
           (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
-          keepTrackApi.getMainCamera().camDistBuffer <= settingsManager.nearZoomLevel
+          keepTrackApi.getMainCamera().state.camDistBuffer <= settingsManager.nearZoomLevel
         ) {
           renderer.meshManager.drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
         }
@@ -213,7 +213,7 @@ export class Scene {
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
     if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-      if (!settingsManager.modelsOnSatelliteViewOverride && camera.camDistBuffer <= settingsManager.nearZoomLevel) {
+      if (!settingsManager.modelsOnSatelliteViewOverride && camera.state.camDistBuffer <= settingsManager.nearZoomLevel) {
         renderer.meshManager.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
       }
     }

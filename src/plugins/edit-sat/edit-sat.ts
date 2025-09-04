@@ -10,13 +10,13 @@ import { saveAs } from 'file-saver';
 import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
 import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class EditSat extends KeepTrackPlugin {
   readonly id = 'EditSat';
@@ -364,7 +364,7 @@ export class EditSat extends KeepTrackPlugin {
 
       mainsat.tle1 = (mainsat.tle1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.tle1.substr(32)) as TleLine1;
 
-      keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
+      keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
 
       let TLEs;
       // Ignore argument of perigee for round orbits OPTIMIZE
@@ -489,7 +489,7 @@ export class EditSat extends KeepTrackPlugin {
       sat.active = true;
       sat.editTle(tle1, tle2);
       sat.country = country;
-      keepTrackApi.getMainCamera().zoomTarget = ZoomValue.GEO;
+      keepTrackApi.getMainCamera().state.zoomTarget = ZoomValue.GEO;
     } else {
       keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.',
         ToastMsgType.caution, true);

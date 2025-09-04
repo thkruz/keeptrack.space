@@ -363,8 +363,8 @@ export class Earth {
     if (!settingsManager.isMobileModeEnabled) {
       gl.enable(gl.SCISSOR_TEST);
       gl.scissor(
-        keepTrackApi.getMainCamera().mouseX,
-        gl.drawingBufferHeight - keepTrackApi.getMainCamera().mouseY,
+        keepTrackApi.getMainCamera().state.mouseX,
+        gl.drawingBufferHeight - keepTrackApi.getMainCamera().state.mouseY,
         keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
         keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
       );

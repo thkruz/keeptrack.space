@@ -4,9 +4,9 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
 import { DownloadModelsOptions, Layout, Mesh, MeshMap, OBJ } from 'webgl-obj-loader';
 import { MissileObject } from '../../app/data/catalog-manager/MissileObject';
-import { OcclusionProgram } from './draw-manager/post-processing';
 import { SplashScreen } from '../../app/ui/splash-screen';
 import { errorManagerInstance } from '../utils/errorManager';
+import { OcclusionProgram } from './draw-manager/post-processing';
 
 type KeepTrackMesh = Mesh & {
   vertexBuffer: WebGLBuffer & {
@@ -213,7 +213,7 @@ export class MeshManager {
     }
 
     // Don't draw meshes if the camera is too far away
-    if (keepTrackApi.getMainCamera().camDistBuffer >= settingsManager.nearZoomLevel) {
+    if (keepTrackApi.getMainCamera().state.camDistBuffer >= settingsManager.nearZoomLevel) {
       return;
     }
     if (typeof this.currentMeshObject.id === 'undefined' || typeof this.currentMeshObject.model === 'undefined' || this.currentMeshObject.id === -1) {

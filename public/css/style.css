@@ -3959,6 +3959,7 @@ nav {
   z-index: 100;
   overflow: auto;
   width: 100%;
+  padding: 1em;
 }
 
 #layers-hover-menu li,

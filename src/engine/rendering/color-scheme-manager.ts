@@ -282,18 +282,27 @@ export class ColorSchemeManager {
   isNotionalSatOff(obj: BaseObject) {
     return settingsManager.filter?.notionalSatellites === false && obj.isNotional();
   }
+  isvLeoSatOff(obj: BaseObject) {
+    return settingsManager.filter?.vLEOSatellites === false && (obj as DetailedSatellite).apogee < 400;
+  }
   isLeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.lEOSatellites === false && (obj as DetailedSatellite).apogee < 6000;
+    return settingsManager.filter?.lEOSatellites === false && (obj as DetailedSatellite).apogee < 6000 && (obj as DetailedSatellite).apogee >= 400;
   }
   isMeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.mEOSatellites === false && (obj as DetailedSatellite).perigee <= 32000 && (obj as DetailedSatellite).perigee >= 6000;
+    return settingsManager.filter?.mEOSatellites === false && (obj as DetailedSatellite).eccentricity < 0.1 && ((obj as DetailedSatellite).apogee >= 6000 &&
+      (obj as DetailedSatellite).apogee < 34786);
   }
   isHeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.hEOSatellites === false && (obj as DetailedSatellite).eccentricity >= 0.1 && ((obj as DetailedSatellite).apogee >= 6000 &&
-      (obj as DetailedSatellite).perigee < 6000);
+    return settingsManager.filter?.hEOSatellites === false &&
+      (obj as DetailedSatellite).eccentricity >= 0.1 && ((obj as DetailedSatellite).apogee <= 39786);
   }
   isGeoSatOff(obj: BaseObject) {
-    return settingsManager.filter?.gEOSatellites === false && (obj as DetailedSatellite).perigee > 32000;
+    return settingsManager.filter?.gEOSatellites === false && (obj as DetailedSatellite).eccentricity < 0.1 && ((obj as DetailedSatellite).apogee >= 34786 &&
+      (obj as DetailedSatellite).apogee < 36786);
+  }
+  isXGeoSatOff(obj: BaseObject) {
+    return settingsManager.filter?.xGEOSatellites === false &&
+      (((obj as DetailedSatellite).eccentricity < 0.1 && ((obj as DetailedSatellite).apogee > 36786)) || ((obj as DetailedSatellite).apogee > 39786));
   }
   isUnitedStatesOff(obj: BaseObject) {
     return settingsManager.filter?.unitedStates === false && (obj as DetailedSatellite)?.country === 'US';
@@ -490,6 +499,18 @@ export class ColorSchemeManager {
       };
     }
     if (this.isOtherCountriesOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isvLeoSatOff(sat)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
+    if (this.isXGeoSatOff(sat)) {
       return {
         color: [0, 0, 0, 0],
         pickable: Pickable.No,

@@ -322,6 +322,9 @@ export class WebGLRenderer {
           if (colorSchemeManagerInstance.isNotionalSatOff(sat)) {
             continue;
           }
+          if (colorSchemeManagerInstance.isvLeoSatOff(sat)) {
+            continue;
+          }
           if (colorSchemeManagerInstance.isGeoSatOff(sat)) {
             continue;
           }
@@ -332,6 +335,9 @@ export class WebGLRenderer {
             continue;
           }
           if (colorSchemeManagerInstance.isHeoSatOff(sat)) {
+            continue;
+          }
+          if (colorSchemeManagerInstance.isXGeoSatOff(sat)) {
             continue;
           }
 

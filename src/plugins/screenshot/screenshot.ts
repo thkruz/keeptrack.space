@@ -22,12 +22,13 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Classification } from '@app/app/ui/classification';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class Screenshot extends KeepTrackPlugin {
   readonly id = 'Screenshot';
@@ -123,12 +124,12 @@ export class Screenshot extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.altCanvasResize,
+      EventBusEvent.altCanvasResize,
       () => this.queuedScreenshot_,
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.endOfDraw,
+      EventBusEvent.endOfDraw,
       () => {
         if (this.queuedScreenshot_) {
           this.takeScreenShot();

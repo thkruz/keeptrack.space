@@ -1,9 +1,10 @@
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
+import { keepTrackApi } from '@app/keepTrackApi';
 
-import { MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import dayNightPng from '@public/img/icons/day-night.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class NightToggle extends KeepTrackPlugin {
   readonly id = 'NightToggle';
@@ -15,7 +16,7 @@ export class NightToggle extends KeepTrackPlugin {
   addJs() {
     super.addJs();
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'N' && !isRepeat) {
         this.toggleNightMode();
       }

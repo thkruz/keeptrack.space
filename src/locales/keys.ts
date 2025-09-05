@@ -571,5 +571,7 @@ export type TranslationKey = typeof Keys[number];
  * or another localization library implementation.
  */
 export function t7e(key: TranslationKey, options?: Record<string, any>): string {
-  return i18next.t(key, options) as string;
+  const translatedString = i18next.t(key, options);
+
+  return translatedString as string;
 }

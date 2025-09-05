@@ -1,15 +1,16 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { LayersManager } from '@app/app/ui/layers-manager';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { ColorPick } from '@app/engine/utils/color-pick';
+import { getEl, hideEl } from '@app/engine/utils/get-el';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { parseRgba } from '@app/engine/utils/rgba';
+import { rgbCss } from '@app/engine/utils/rgbCss';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { ColorPick } from '@app/lib/color-pick';
-import { getEl, hideEl } from '@app/lib/get-el';
-import { parseRgba } from '@app/lib/rgba';
-import { rgbCss } from '@app/lib/rgbCss';
 import { SettingsManager } from '@app/settings/settings';
-import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { LegendManager } from '@app/static/legend-manager';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import settingsPng from '@public/img/icons/settings.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
 
@@ -34,7 +35,7 @@ import { TimeMachine } from '../time-machine/time-machine';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-declare module '@app/interfaces' {
+declare module '@app/engine/core/interfaces' {
   interface UserSettings {
     isBlackEarth: boolean;
     isDrawMilkyWay: boolean;
@@ -273,7 +274,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
         getEl('settings-form')?.addEventListener('submit', SettingsMenuPlugin.onSubmit_);
@@ -380,7 +381,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, SettingsMenuPlugin.syncOnLoad);
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, SettingsMenuPlugin.syncOnLoad);
   }
 
   static syncOnLoad() {
@@ -444,7 +445,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     context.element.style.cssText = `background-color: ${context.color} !important; color: ${context.color};`;
     if (this.isNotColorPickerInitialSetup) {
       settingsManager.colors[colorStr] = parseRgba(context.color);
-      LegendManager.legendColorsChange();
+      LayersManager.layersColorsChange();
       const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
 
       colorSchemeManagerInstance.calculateColorBuffers(true);

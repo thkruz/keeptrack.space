@@ -6,7 +6,7 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     order: 0,
   },
   TooltipsPlugin: {
-    enabled: false,
+    enabled: true,
     order: 1,
   },
   UserAccountPlugin: {
@@ -269,8 +269,11 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   TopMenu: {
     enabled: true,
   },
-  SocialMedia: {
+  GithubLinkPlugin: {
     enabled: true,
+  },
+  LinkedInLinkPlugin: {
+    enabled: false,
   },
   DateTimeManager: {
     enabled: true,

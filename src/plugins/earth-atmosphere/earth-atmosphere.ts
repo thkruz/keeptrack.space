@@ -1,5 +1,5 @@
 import { t7e } from '@app/locales/keys';
-import { KeepTrackPlugin } from '../../plugins/KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 export class EarthAtmosphere extends KeepTrackPlugin {
   init() {

@@ -1,4 +1,4 @@
-import { CatalogSearch } from '@app/static/catalog-search';
+import { CatalogSearch } from '@app/app/data/catalog-search';
 import { SpaceObjectType, TleLine1 } from 'ootk';
 import { defaultSat } from './environment/apiMocks';
 

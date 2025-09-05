@@ -1,18 +1,19 @@
-import { sensors } from '@app/catalogs/sensors';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { getClass } from '@app/lib/get-class';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { CameraType } from '@app/singletons/camera';
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { sensors } from '@app/app/data/catalogs/sensors';
+import { CameraType } from '@app/engine/camera/camera';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getClass } from '@app/engine/utils/get-class';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import sensorPng from '@public/img/icons/sensor.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from 'ootk';
-import { SensorGroup, sensorGroups } from '../../catalogs/sensor-groups';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SensorGroup, sensorGroups } from '../../app/data/catalogs/sensor-groups';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { InputEventType, keepTrackApi } from './../../keepTrackApi';
+import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
 
 // TODO: Add a search bar and filter for sensors
@@ -70,7 +71,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+      EventBusEvent.uiManagerInit,
       () => {
         getEl('nav-mobile')?.insertAdjacentHTML(
           'beforeend',
@@ -85,11 +86,10 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     );
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {
-          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
-          keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+          this.bottomIconCallback();
         });
 
         getEl('sensor-list-content')?.addEventListener('click', (e: Event) => {
@@ -118,7 +118,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
@@ -164,7 +164,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.sensorDotSelected,
+      EventBusEvent.sensorDotSelected,
       (obj: BaseObject) => {
         if (settingsManager.isMobileModeEnabled) {
           return;
@@ -196,7 +196,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherReady,
+      EventBusEvent.onCruncherReady,
       () => {
         if (!settingsManager.disableUI && settingsManager.isLoadLastSensor && settingsManager.offlineMode) {
           keepTrackApi.getSensorManager().loadSensorJson();
@@ -204,7 +204,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'Home' && !isRepeat) {
         // If a sensor is selected rotate the camera to it
         if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&

@@ -1,18 +1,19 @@
-import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl } from '@app/lib/get-el';
+import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { getEl } from '@app/engine/utils/get-el';
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { GroupType } from '@app/app/data/object-group';
+import { StringExtractor } from '@app/app/ui/string-extractor';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { GroupType } from '@app/singletons/object-group';
-import { StringExtractor } from '@app/static/string-extractor';
 import flagPng from '@public/img/icons/flag.png';
 
+import { SearchResult } from '@app/app/ui/search-manager';
 import { Localization } from '@app/locales/locales';
-import { SearchResult } from '@app/singletons/search-manager';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
@@ -36,7 +37,7 @@ export class CountriesMenu extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('country-list')!.innerHTML = CountriesMenu.generateCountryList_();
 
@@ -56,7 +57,7 @@ export class CountriesMenu extends KeepTrackPlugin {
 
   private static generateCountryList_(): string {
     const header = keepTrackApi.html`
-    <h5 class="center-align">${Localization.plugins.CountriesMenu.bottomIconLabel!}</h5>
+    <h5 class="center-align">${Localization.getInstance().plugins.CountriesMenu.bottomIconLabel!}</h5>
     <li class="divider"></li>
     <br/>`;
 
@@ -67,6 +68,8 @@ export class CountriesMenu extends KeepTrackPlugin {
         countryCodeList.push(sat.country);
       }
     });
+
+    Localization.getInstance(); // Ensure localization is initialized
 
     const countries = countryCodeList.map((countryCode) => {
       const country = StringExtractor.extractCountry(countryCode);

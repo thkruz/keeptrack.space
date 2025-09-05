@@ -1,14 +1,15 @@
-import { openColorbox } from '@app/lib/colorbox';
-import { getEl } from '@app/lib/get-el';
-import { lat2pitch, lon2yaw } from '@app/lib/transforms';
+import { openColorbox } from '@app/engine/utils/colorbox';
+import { getEl } from '@app/engine/utils/get-el';
+import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import photoManagerPng from '@public/img/icons/photoManager.png';
 import { Degrees } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface DiscvrResponse {
   centroid_coordinates: {
@@ -47,7 +48,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('meteosat9-link')!.addEventListener('click', () => {
           // IODC is Indian Ocean Data Coverage and is Meteosat 9 as of 2022
@@ -162,7 +163,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.onKeepTrackReady,
+      EventBusEvent.onKeepTrackReady,
       () => {
         this.initDISCOVR_();
       },

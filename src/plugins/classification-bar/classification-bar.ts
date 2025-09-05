@@ -1,9 +1,9 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { Classification, ClassificationString } from '@app/app/ui/classification';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { Classification, ClassificationString } from '@app/static/classification';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 export class ClassificationBar extends KeepTrackPlugin {
   readonly id = 'ClassificationBar';
@@ -56,7 +56,7 @@ export class ClassificationBar extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerInit, this.uiManagerInit_.bind(this));
   }
 
   private createContainer_(): void {

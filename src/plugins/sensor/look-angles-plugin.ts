@@ -1,16 +1,17 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { SensorMath, TearrData, TearrType } from '@app/app/sensors/sensor-math';
+import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
+import { TimeManager } from '@app/engine/core/time-manager';
+import { dateFormat } from '@app/engine/utils/dateFormat';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { saveCsv } from '@app/engine/utils/saveVariable';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { dateFormat } from '@app/lib/dateFormat';
-import { getEl } from '@app/lib/get-el';
-import { saveCsv } from '@app/lib/saveVariable';
-import { showLoading } from '@app/lib/showLoading';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { TimeManager } from '@app/singletons/time-manager';
-import { SensorMath, TearrData, TearrType } from '@app/static/sensor-math';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, SpaceObjectType } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 type LookAngleData = TearrData & { canStationObserve: boolean };
 
@@ -137,7 +138,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('look-angles-length')!.addEventListener('change', () => {
           this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('look-angles-length')).value);
@@ -157,18 +158,18 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, (obj: BaseObject) => {
+    keepTrackApi.on(EventBusEvent.selectSatData, (obj: BaseObject) => {
       this.checkIfCanBeEnabled_(obj);
     });
 
-    keepTrackApi.on(KeepTrackApiEvents.resetSensor, () => {
+    keepTrackApi.on(EventBusEvent.resetSensor, () => {
       this.checkIfCanBeEnabled_(null);
     });
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(KeepTrackApiEvents.staticOffsetChange, () => {
+    keepTrackApi.on(EventBusEvent.staticOffsetChange, () => {
       this.refreshSideMenuData_();
     });
   }

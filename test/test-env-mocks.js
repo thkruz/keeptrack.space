@@ -38,9 +38,9 @@ global.mocks.glMock = {
   getAttribLocation: jest.fn(),
   getExtension: jest.fn(),
   getProgramInfoLog: jest.fn(),
-  getProgramParameter: jest.fn(() => true),
-  getShaderParameter: jest.fn(() => true),
-  getUniformLocation: jest.fn(() => true),
+  getProgramParameter: () => true,
+  getShaderParameter: () => true,
+  getUniformLocation: () => true,
   isContextLost: jest.fn(() => false),
   linkProgram: jest.fn(),
   readPixels: jest.fn(),
@@ -59,6 +59,7 @@ global.mocks.glMock = {
   useProgram: jest.fn(),
   viewport: jest.fn(),
   vertexAttribPointer: jest.fn(),
+  getShaderInfoLog: jest.fn(() => 'This is a mock error'),
 };
 
 // mock_requestAnimationFrame.js

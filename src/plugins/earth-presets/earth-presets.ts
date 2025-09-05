@@ -1,7 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
-import { AtmosphereSettings, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { NightToggle } from '../night-toggle/night-toggle';
 
 export class EarthPresetsPlugin extends KeepTrackPlugin {

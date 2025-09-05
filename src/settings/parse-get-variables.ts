@@ -1,6 +1,6 @@
-import { ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
+import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';

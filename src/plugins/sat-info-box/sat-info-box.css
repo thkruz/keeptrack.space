@@ -147,7 +147,7 @@
   width: 100%;
   border: 5px solid var(--color-dark-border);
   overflow: auto;
-  z-index: 1;
+  z-index: 10000;
 }
 
 .sat-info-value {

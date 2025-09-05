@@ -1,7 +1,7 @@
-import { ObjDataJson } from '@app/singletons/orbitManager';
+import { ObjDataJson } from '@app/engine/rendering/orbitManager';
 import { DEG2RAD, Degrees, EciVec3, Kilometers, SatelliteRecord, Sgp4, TAU, eci2ecf } from 'ootk';
-import { RADIUS_OF_EARTH } from '../lib/constants';
-import { jday } from '../lib/transforms';
+import { RADIUS_OF_EARTH } from '../engine/utils/constants';
+import { jday } from '../engine/utils/transforms';
 import { OrbitCruncherCachedObject } from './constants';
 import { propTime } from './positionCruncher/calculations';
 

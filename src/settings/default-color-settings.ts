@@ -1,4 +1,4 @@
-import { rgbaArray } from '@app/interfaces';
+import { rgbaArray } from '@app/engine/core/interfaces';
 
 export const defaultColorSettings = {
   version: '1.4.6', // This should match the one in settings.ts and be updated to force users cache to clear

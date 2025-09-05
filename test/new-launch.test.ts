@@ -1,6 +1,6 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { NewLaunch } from '@app/plugins/new-launch/new-launch';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees } from 'ootk';
@@ -50,8 +50,8 @@ describe('NewLaunch_form', () => {
       },
     };
 
-    keepTrackApi.emit(KeepTrackApiEvents.selectSatData, defaultSat, defaultSat.id);
-    keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
+    keepTrackApi.emit(EventBusEvent.selectSatData, defaultSat, defaultSat.id);
+    keepTrackApi.emit(EventBusEvent.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
 
     expect(() => getEl(`${newLaunchPlugin.sideMenuElementName}-submit`).click()).not.toThrow();
     jest.advanceTimersByTime(1000);

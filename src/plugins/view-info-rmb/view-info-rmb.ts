@@ -1,14 +1,15 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
-import { openColorbox } from '@app/lib/colorbox';
-import { hideEl, showEl } from '@app/lib/get-el';
-import { LaunchSite } from '@app/singletons/catalog-manager/LaunchFacility';
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
+import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
+import { openColorbox } from '@app/engine/utils/colorbox';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { hideEl, showEl } from '@app/engine/utils/get-el';
 import { DetailedSatellite, DetailedSensor, eci2lla } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorInfoPlugin } from '../sensor/sensor-info-plugin';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class ViewInfoRmbPlugin extends KeepTrackPlugin {
   readonly id = 'ViewInfoRmbPlugin';
@@ -88,7 +89,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
   addJs() {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.rightBtnMenuOpen, (_isEarth, clickedSatId) => {
+    keepTrackApi.on(EventBusEvent.rightBtnMenuOpen, (_isEarth, clickedSatId) => {
       if (typeof clickedSatId === 'undefined') {
         return;
       }

@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 
 
-import { Operators } from '@app/catalogs/sensors';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { Operators } from '@app/app/data/catalogs/sensors';
 import { PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CatalogSource, CommLink, Degrees, DetailedSatellite, Kilometers, Milliseconds, RfSensor, SpaceObjectType, TleLine1, TleLine2, ZoomValue } from 'ootk';
 

@@ -1,14 +1,15 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { openColorbox } from '@app/engine/utils/colorbox';
+import { dateFormat } from '@app/engine/utils/dateFormat';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { saveCsv } from '@app/engine/utils/saveVariable';
+import { truncateString } from '@app/engine/utils/truncate-string';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { openColorbox } from '@app/lib/colorbox';
-import { dateFormat } from '@app/lib/dateFormat';
-import { getEl } from '@app/lib/get-el';
-import { saveCsv } from '@app/lib/saveVariable';
-import { truncateString } from '@app/lib/truncate-string';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import calendar2Png from '@public/img/icons/calendar2.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 interface LaunchInfoData {
   window_start: string | number | Date;
@@ -105,7 +106,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('export-launch-info')!.addEventListener('click', () => {
           keepTrackApi.getSoundManager()?.play(SoundNames.EXPORT);

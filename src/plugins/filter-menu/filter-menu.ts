@@ -1,9 +1,10 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
 import filterPng from '@public/img/icons/filter.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
 
@@ -28,7 +29,7 @@ import { TopMenu } from '../top-menu/top-menu';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-declare module '@app/interfaces' {
+declare module '@app/engine/core/interfaces' {
   interface UserSettings {
     isBlackEarth: boolean;
     isDrawMilkyWay: boolean;
@@ -36,6 +37,8 @@ declare module '@app/interfaces' {
 }
 
 export interface FilterPluginSettings {
+  xGEOSatellites?: boolean;
+  vLEOSatellites?: boolean;
   payloads?: boolean;
   rocketBodies?: boolean;
   debris?: boolean;
@@ -83,22 +86,27 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     {
       name: 'Payloads',
       category: 'Object Types',
+      tooltip: 'Objects that are primarily used to carry a payload, such as communication or weather satellites. This includes operational and defunct satellites.',
     },
     {
       name: 'Rocket Bodies',
       category: 'Object Types',
+      tooltip: 'The upper stages of rockets that have delivered payloads to orbit and are now large pieces of space debris.',
     },
     {
       name: 'Debris',
       category: 'Object Types',
+      tooltip: 'Fragments of spacecraft and rockets, including broken satellites, that are no longer one piece.',
     },
     {
       name: 'Unknown Type',
       category: 'Object Types',
+      tooltip: 'Objects in orbit whose purpose or type is not clearly identified yet.',
     },
     {
       name: 'Notional Satellites',
       category: 'Object Types',
+      tooltip: 'Satellites that are planned or proposed but not yet launched.',
     },
     {
       name: 'Agencies',
@@ -108,60 +116,84 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       disabled: true,
     },
     {
+      name: 'vLEO Satellites',
+      category: 'Orbital Regimes',
+      tooltip: 'Very Low Earth Orbit satellites with an apogee below 400 km.',
+    },
+    {
       name: 'LEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Low Earth Orbit satellites with an apogee between 400 km and 6000 km.',
     },
     {
       name: 'HEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Highly Elliptical Orbit satellites with an eccentricity of 0.1 or greater and an apogee below 39786 km.',
     },
     {
       name: 'MEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Medium Earth Orbit satellites with an apogee between 6000 km and 34786 km.',
     },
     {
       name: 'GEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Geostationary Orbit satellites with an eccentricity below 0.1 and an apogee between 34786 km and 36786 km.',
+    },
+    {
+      name: 'xGEO Satellites',
+      category: 'Orbital Regimes',
+      tooltip: 'Ex-Geosynchronous Orbit satellites with an eccentricity below 0.1 and an apogee above 36786 km, or an eccentricity of 0.1 or greater and an apogee above 39786 km.',
     },
     {
       name: 'Vimpel Satellites',
       category: 'Source',
+      tooltip: 'Vimpel satellite catalog is maintained by the Russian joint-stock company JSC Vimpel, in cooperation with the Keldysh Institute of Applied Mathematics.',
     },
     {
       name: 'Celestrak Satellites',
       category: 'Source',
+      tooltip: 'Celestrak is a popular source for satellite orbital data, providing TLEs for a wide range of satellites and debris.',
     },
     {
       name: 'United States',
       category: 'Countries',
+      tooltip: 'Includes satellites from the United States of America.',
     },
     {
       name: 'United Kingdom',
       category: 'Countries',
+      tooltip: 'Includes satellites from the United Kingdom.',
     },
     {
       name: 'France',
       category: 'Countries',
+      tooltip: 'Includes satellites from France.',
     },
     {
       name: 'Germany',
       category: 'Countries',
+      tooltip: 'Includes satellites from Germany.',
     },
     {
       name: 'Japan',
       category: 'Countries',
+      tooltip: 'Includes satellites from Japan.',
     },
     {
       name: 'China',
       category: 'Countries',
+      tooltip: 'Includes satellites from China.',
     },
     {
       name: 'India',
       category: 'Countries',
+      tooltip: 'Includes satellites from India.',
     },
     {
       name: 'Russia',
       category: 'Countries',
+      tooltip: 'Includes satellites from Russia.',
     },
     {
       name: 'USSR',
@@ -171,10 +203,12 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     {
       name: 'South Korea',
       category: 'Countries',
+      tooltip: 'Includes satellites from South Korea.',
     },
     {
       name: 'Australia',
       category: 'Countries',
+      tooltip: 'Includes satellites from Australia.',
     },
     {
       name: 'Other Countries',
@@ -184,6 +218,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     {
       name: 'Starlink Satellites',
       category: 'Miscellaneous',
+      tooltip: 'Satellites that are part of SpaceX\'s Starlink constellation, which aims to provide global broadband internet coverage.',
     },
   ];
 
@@ -240,7 +275,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
 
               return keepTrackApi.html`
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="${filter.tooltip || ''}">
+              <label data-position="top" data-delay="50" kt-tooltip="${filter.tooltip || ''}">
                 <input id="filter-${filter.id}" type="checkbox" ${filter.checked ? 'checked' : ''} ${!filter.disabled ? '' : 'disabled'}/>
                 <span class="lever"></span>
                 ${filter.name}
@@ -261,7 +296,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('filter-form')?.addEventListener('change', this.onFormChange_.bind(this));
         getEl('filter-reset')?.addEventListener('click', this.resetToDefaults.bind(this));
@@ -269,7 +304,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+      EventBusEvent.uiManagerInit,
       () => {
         getEl('nav-mobile2')?.insertAdjacentHTML(
           'afterbegin',
@@ -288,10 +323,10 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('top-menu-filter-btn')?.addEventListener('click', () => {
-          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          this.bottomMenuClicked();
         });
       },
     );
@@ -300,14 +335,14 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         this.syncOnLoad_();
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.saveSettings, this.saveSettings_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.loadSettings, this.loadSettings_.bind(this));
+    keepTrackApi.on(EventBusEvent.saveSettings, this.saveSettings_.bind(this));
+    keepTrackApi.on(EventBusEvent.loadSettings, this.loadSettings_.bind(this));
   }
   private saveSettings_() {
     const persistenceManagerInstance = PersistenceManager.getInstance();
@@ -317,10 +352,12 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_DEBRIS, (settingsManager.filter.debris as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_UNKNOWN_TYPE, (settingsManager.filter.unknownType as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_AGENCIES, (settingsManager.filter.agencies as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_VLEO, (settingsManager.filter.vLEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_LEO, (settingsManager.filter.lEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_HEO, (settingsManager.filter.hEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_MEO, (settingsManager.filter.mEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_GEO, (settingsManager.filter.gEOSatellites as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_X_GEO, (settingsManager.filter.xGEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_VIMPEL, (settingsManager.filter.vimpelSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_CELESTRAK, (settingsManager.filter.celestrakSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_NOTIONAL, (settingsManager.filter.notionalSatellites as boolean)?.toString() ?? 'true');
@@ -347,10 +384,12 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     settingsManager.filter.debris = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_DEBRIS, settingsManager.filter.debris);
     settingsManager.filter.unknownType = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_UNKNOWN_TYPE, settingsManager.filter.unknownType);
     settingsManager.filter.agencies = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_AGENCIES, settingsManager.filter.agencies);
+    settingsManager.filter.vLEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_VLEO, settingsManager.filter.vLEOSatellites);
     settingsManager.filter.lEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_LEO, settingsManager.filter.lEOSatellites);
     settingsManager.filter.hEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_HEO, settingsManager.filter.hEOSatellites);
     settingsManager.filter.mEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_MEO, settingsManager.filter.mEOSatellites);
     settingsManager.filter.gEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_GEO, settingsManager.filter.gEOSatellites);
+    settingsManager.filter.xGEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_X_GEO, settingsManager.filter.xGEOSatellites);
     settingsManager.filter.vimpelSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_VIMPEL, settingsManager.filter.vimpelSatellites);
     settingsManager.filter.celestrakSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_CELESTRAK, settingsManager.filter.celestrakSatellites);
     settingsManager.filter.notionalSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_NOTIONAL, settingsManager.filter.notionalSatellites);
@@ -375,8 +414,8 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       const checkbox = <HTMLInputElement>getEl(`filter-${id}`);
 
       if (checkbox) {
-        checkbox.checked = typeof settingsManager.filter[id as string] !== 'undefined' ? settingsManager.filter[id as string] : checked ?? !disabled;
-        settingsManager.filter[id as string] = checkbox.checked;
+        checkbox.checked = typeof settingsManager.filter[id] !== 'undefined' ? settingsManager.filter[id] : checked ?? !disabled;
+        settingsManager.filter[id] = checkbox.checked;
       }
     });
 

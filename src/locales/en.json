@@ -107,7 +107,7 @@
   },
   "copyright": {
     "notice": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.",
-    "noticeMobile": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms."
+    "noticeMobile": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>Unauthorized use, rebranding, or removal of attribution may violate<br>trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms."
   },
   "splashScreens": {
     "1": "Satellite models appear bigger than they really are. Everything else is to scale.",

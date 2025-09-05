@@ -92,6 +92,18 @@ global.console = {
   debug: jest.fn(),
 };
 
+// TODO: Make a PR to fix this warning in the echarts-gl codebase
+
+// If console.warn tries to warn "geo3D exists." ignore it.
+const consoleWarn = global.console.warn;
+
+global.console.warn = (message, ...optionalParams) => {
+  if (typeof message === 'string' && message.includes('geo3D exists.')) {
+    return;
+  }
+  consoleWarn(message, ...optionalParams);
+};
+
 window.HTMLMediaElement.prototype.load = () => {
   /* do nothing */
 };

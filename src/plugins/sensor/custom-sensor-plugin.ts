@@ -1,21 +1,22 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl } from '@app/engine/utils/get-el';
+import { slideInRight } from '@app/engine/utils/slide';
+import { triggerSubmit } from '@app/engine/utils/trigger-submit';
+import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl } from '@app/lib/get-el';
-import { slideInRight } from '@app/lib/slide';
-import { triggerSubmit } from '@app/lib/trigger-submit';
-import { waitForCruncher } from '@app/lib/waitForCruncher';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import sensorAddPng from '@public/img/icons/sensor-add.png';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { SoundNames } from '../sounds/sounds';
 import { SensorInfoPlugin } from './sensor-info-plugin';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   readonly id = 'CustomSensorPlugin';
@@ -227,7 +228,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         CustomSensorPlugin.httpsCheck_();
         CustomSensorPlugin.addCustomSensorFormSubmitListener();

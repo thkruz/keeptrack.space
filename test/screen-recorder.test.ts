@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ScreenRecorder } from '@app/plugins/screen-recorder/screen-recorder';
 import { setupDefaultHtml } from './environment/standard-env';
@@ -33,7 +33,7 @@ describe('ScreenRecorder_class', () => {
       // Do nothing
     };
 
-    expect(() => keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.emit(EventBusEvent.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
 
   // Tests error handling
@@ -44,6 +44,6 @@ describe('ScreenRecorder_class', () => {
       throw new Error('test');
     };
 
-    expect(() => keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
+    expect(() => keepTrackApi.emit(EventBusEvent.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
 });

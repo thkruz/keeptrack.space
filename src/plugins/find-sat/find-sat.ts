@@ -1,17 +1,17 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { getEl } from '@app/lib/get-el';
-import { getUnique } from '@app/lib/get-unique';
-import { hideLoading, showLoading } from '@app/lib/showLoading';
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { CatalogExporter } from '@app/app/data/catalog-exporter';
+import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { getUnique } from '@app/engine/utils/get-unique';
+import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import findSatPng from '@public/img/icons/database-search.png';
-
-import { countryCodeList, countryNameList } from '@app/catalogs/countries';
-import { CatalogExporter } from '@app/static/catalog-exporter';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export interface SearchSatParams {
   argPe: Degrees;
@@ -229,7 +229,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   printLastResults() {

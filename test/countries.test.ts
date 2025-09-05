@@ -1,11 +1,11 @@
 /* eslint-disable dot-notation */
+import { GroupsManager } from '@app/app/data/groups-manager';
+import { ObjectGroup } from '@app/app/data/object-group';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { GroupsManager } from '@app/singletons/groups-manager';
-import { ObjectGroup } from '@app/singletons/object-group';
 import { keepTrackContainer } from '../src/container';
-import { Singletons } from '../src/interfaces';
+import { Singletons } from '../src/engine/core/interfaces';
 import { CountriesMenu } from './../src/plugins/countries/countries';
 import { defaultSat } from './environment/apiMocks';
 import { mockUiManager, setupDefaultHtml } from './environment/standard-env';

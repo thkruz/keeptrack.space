@@ -98,7 +98,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     return rows.map((row) => keepTrackApi.html`
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key" data-tooltip="${row.tooltip}">${row.key}</div>
+          <div class="sat-info-key" kt-tooltip="${row.tooltip}">${row.key}</div>
           <div class="sat-info-value" id="${row.id}">${row.value}</div>
         </div>
       `).join('');

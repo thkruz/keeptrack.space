@@ -86,22 +86,27 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     {
       name: 'Payloads',
       category: 'Object Types',
+      tooltip: 'Objects that are primarily used to carry a payload, such as communication or weather satellites. This includes operational and defunct satellites.',
     },
     {
       name: 'Rocket Bodies',
       category: 'Object Types',
+      tooltip: 'The upper stages of rockets that have delivered payloads to orbit and are now large pieces of space debris.',
     },
     {
       name: 'Debris',
       category: 'Object Types',
+      tooltip: 'Fragments of spacecraft and rockets, including broken satellites, that are no longer one piece.',
     },
     {
       name: 'Unknown Type',
       category: 'Object Types',
+      tooltip: 'Objects in orbit whose purpose or type is not clearly identified yet.',
     },
     {
       name: 'Notional Satellites',
       category: 'Object Types',
+      tooltip: 'Satellites that are planned or proposed but not yet launched.',
     },
     {
       name: 'Agencies',
@@ -113,66 +118,82 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     {
       name: 'vLEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Very Low Earth Orbit satellites with an apogee below 400 km.',
     },
     {
       name: 'LEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Low Earth Orbit satellites with an apogee between 400 km and 6000 km.',
     },
     {
       name: 'HEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Highly Elliptical Orbit satellites with an eccentricity of 0.1 or greater and an apogee below 39786 km.',
     },
     {
       name: 'MEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Medium Earth Orbit satellites with an apogee between 6000 km and 34786 km.',
     },
     {
       name: 'GEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Geostationary Orbit satellites with an eccentricity below 0.1 and an apogee between 34786 km and 36786 km.',
     },
     {
       name: 'xGEO Satellites',
       category: 'Orbital Regimes',
+      tooltip: 'Ex-Geosynchronous Orbit satellites with an eccentricity below 0.1 and an apogee above 36786 km, or an eccentricity of 0.1 or greater and an apogee above 39786 km.',
     },
     {
       name: 'Vimpel Satellites',
       category: 'Source',
+      tooltip: 'Vimpel satellite catalog is maintained by the Russian joint-stock company JSC Vimpel, in cooperation with the Keldysh Institute of Applied Mathematics.',
     },
     {
       name: 'Celestrak Satellites',
       category: 'Source',
+      tooltip: 'Celestrak is a popular source for satellite orbital data, providing TLEs for a wide range of satellites and debris.',
     },
     {
       name: 'United States',
       category: 'Countries',
+      tooltip: 'Includes satellites from the United States of America.',
     },
     {
       name: 'United Kingdom',
       category: 'Countries',
+      tooltip: 'Includes satellites from the United Kingdom.',
     },
     {
       name: 'France',
       category: 'Countries',
+      tooltip: 'Includes satellites from France.',
     },
     {
       name: 'Germany',
       category: 'Countries',
+      tooltip: 'Includes satellites from Germany.',
     },
     {
       name: 'Japan',
       category: 'Countries',
+      tooltip: 'Includes satellites from Japan.',
     },
     {
       name: 'China',
       category: 'Countries',
+      tooltip: 'Includes satellites from China.',
     },
     {
       name: 'India',
       category: 'Countries',
+      tooltip: 'Includes satellites from India.',
     },
     {
       name: 'Russia',
       category: 'Countries',
+      tooltip: 'Includes satellites from Russia.',
     },
     {
       name: 'USSR',
@@ -182,10 +203,12 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     {
       name: 'South Korea',
       category: 'Countries',
+      tooltip: 'Includes satellites from South Korea.',
     },
     {
       name: 'Australia',
       category: 'Countries',
+      tooltip: 'Includes satellites from Australia.',
     },
     {
       name: 'Other Countries',
@@ -195,6 +218,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     {
       name: 'Starlink Satellites',
       category: 'Miscellaneous',
+      tooltip: 'Satellites that are part of SpaceX\'s Starlink constellation, which aims to provide global broadband internet coverage.',
     },
   ];
 

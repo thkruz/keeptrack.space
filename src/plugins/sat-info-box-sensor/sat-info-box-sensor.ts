@@ -4,6 +4,7 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import type { TimeManager } from '@app/engine/core/time-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -14,7 +15,6 @@ import { missileManager } from '../missile/missile-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { StereoMap } from '../stereo-map/stereo-map';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 const SECTIONS = {
   SENSOR: 'sensor-sat-info',
@@ -84,7 +84,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           class="sat-info-row${row.id === EL.SUN || row.id === EL.VMAG || row.id === EL.NEXT_PASS ? ' sat-only-info' : ''}"
         >
         <div class="sat-info-key" data-position="top" data-delay="50"
-          data-tooltip="${row.tooltip}"
+          kt-tooltip="${row.tooltip}"
         >
           ${row.key}
         </div>

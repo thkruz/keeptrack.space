@@ -9,10 +9,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Function to generate TypeScript code for the Keys object
-function generateKeysFromJSON(jsonObj: unknown, prefix: string = ''): string {
+function generateKeysFromJSON(jsonObj: Record<string, string>, prefix: string = ''): string {
   const keys: string[] = [];
 
-  function traverse(obj: unknown, currentPrefix: string): void {
+  function traverse(obj: Record<string, string>, currentPrefix: string): void {
     if (typeof obj !== 'object' || obj === null) {
       return;
     }
@@ -24,21 +24,57 @@ function generateKeysFromJSON(jsonObj: unknown, prefix: string = ''): string {
       if (typeof value === 'object' && value !== null) {
         traverse(value, newPrefix);
       } else {
-        keys.push(JSON.stringify(newPrefix));
+        keys.push(JSON.stringify(newPrefix).replace(/"/gu, '\''));
       }
     });
   }
 
   traverse(jsonObj, prefix);
 
-  return `[\n  ${keys.join(',\n  ')}\n] as const`;
+  return `[\n  ${keys.join(',\n  ')},\n] as const`;
+}
+
+function findLocalesDirs(dir: string, enJsonPaths: string[] = []): string[] {
+  for (const dirent of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, dirent.name);
+
+    if (dirent.isDirectory()) {
+      if (dirent.name === 'locales') {
+        const enJsonPath = path.join(fullPath, 'en.json');
+
+        if (fs.existsSync(enJsonPath)) {
+          enJsonPaths.push(enJsonPath);
+        }
+      } else {
+        enJsonPaths = [...enJsonPaths, ...findLocalesDirs(fullPath)];
+      }
+    }
+  }
+
+  return enJsonPaths;
 }
 
 // Main function to generate the entire Keys file
 function generateKeysFile(inputJsonPath: string, outputTsPath: string): void {
   try {
-    // Read the JSON file
-    const jsonData = JSON.parse(fs.readFileSync(inputJsonPath, 'utf8'));
+    /*
+     * Search all of ../../src for any folders named locales with an en.json
+     * file inside of them and compile a list of their paths
+     */
+
+    // Recursively search for 'locales' directories containing 'en.json'
+    const enJsonPaths: string[] = findLocalesDirs(path.dirname(inputJsonPath));
+
+    console.log('Translation files found:', enJsonPaths);
+
+    // Read all the json files and merge them into one object
+    const jsonData: Record<string, string> = {};
+
+    for (const enJsonPath of enJsonPaths) {
+      const fileData = JSON.parse(fs.readFileSync(enJsonPath, 'utf8'));
+
+      Object.assign(jsonData, fileData);
+    }
 
     // Generate Keys object
     const keysObject = generateKeysFromJSON(jsonData);
@@ -46,6 +82,7 @@ function generateKeysFile(inputJsonPath: string, outputTsPath: string): void {
     // Create the complete TypeScript file content
     const tsContent = `// This file is auto-generated from the translation JSON file
 // Do not edit manually
+// Use npm run generate-t7e-keys instead!
 /* eslint-disable guard-for-in */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import i18next from 'i18next';
@@ -68,7 +105,9 @@ export type TranslationKey = typeof Keys[number];
  * or another localization library implementation.
  */
 export function t7e(key: TranslationKey, options?: Record<string, any>): string {
-  return i18next.t(key, options);
+  const translatedString = i18next.t(key, options);
+
+  return translatedString as string;
 }
 `;
 
@@ -91,6 +130,6 @@ const __dirname = path.dirname(new URL(import.meta.url).pathname).replace(/^\/+/
 console.log(__dirname);
 
 generateKeysFile(
-  `${__dirname}/../src/locales/en.json`,
-  `${__dirname}/../src/locales/keys.ts`,
+  `${__dirname}/../../src/*`,
+  `${__dirname}/../../src/locales/keys.ts`,
 );

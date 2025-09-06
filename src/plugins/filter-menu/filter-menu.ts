@@ -3,6 +3,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { t7e } from '@app/locales/keys';
 import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
@@ -84,76 +85,81 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
 
   static filters: Filters[] = [
     {
-      name: 'Payloads',
-      category: 'Object Types',
-      tooltip: 'Objects that are primarily used to carry a payload, such as communication or weather satellites. This includes operational and defunct satellites.',
+      name: t7e('filterMenu.payloads.name'),
+      category: t7e('filterMenu.payloads.category'),
+      tooltip: t7e('filterMenu.payloads.tooltip'),
     },
     {
-      name: 'Rocket Bodies',
-      category: 'Object Types',
-      tooltip: 'The upper stages of rockets that have delivered payloads to orbit and are now large pieces of space debris.',
+      name: t7e('filterMenu.rocketBodies.name'),
+      category: t7e('filterMenu.rocketBodies.category'),
+      tooltip: t7e('filterMenu.rocketBodies.tooltip'),
     },
     {
-      name: 'Debris',
-      category: 'Object Types',
-      tooltip: 'Fragments of spacecraft and rockets, including broken satellites, that are no longer one piece.',
+      name: t7e('filterMenu.debris.name'),
+      category: t7e('filterMenu.debris.category'),
+      tooltip: t7e('filterMenu.debris.tooltip'),
     },
     {
-      name: 'Unknown Type',
-      category: 'Object Types',
-      tooltip: 'Objects in orbit whose purpose or type is not clearly identified yet.',
+      name: t7e('filterMenu.unknownType.name'),
+      category: t7e('filterMenu.unknownType.category'),
+      tooltip: t7e('filterMenu.unknownType.tooltip'),
     },
     {
-      name: 'Notional Satellites',
-      category: 'Object Types',
-      tooltip: 'Satellites that are planned or proposed but not yet launched.',
+      name: t7e('filterMenu.unknownType.name'),
+      category: t7e('filterMenu.unknownType.category'),
+      tooltip: t7e('filterMenu.unknownType.tooltip'),
     },
     {
-      name: 'Agencies',
-      category: 'Object Types',
-      tooltip: 'Planned feature - This will show agencies on the globe.',
+      name: t7e('filterMenu.notionalSatellites.name'),
+      category: t7e('filterMenu.notionalSatellites.category'),
+      tooltip: t7e('filterMenu.notionalSatellites.tooltip'),
+    },
+    {
+      name: t7e('filterMenu.agencies.name'),
+      category: t7e('filterMenu.agencies.category'),
+      tooltip: t7e('filterMenu.agencies.tooltip'),
       checked: false,
       disabled: true,
     },
     {
-      name: 'vLEO Satellites',
-      category: 'Orbital Regimes',
-      tooltip: 'Very Low Earth Orbit satellites with an apogee below 400 km.',
+      name: t7e('filterMenu.vleoSatellites.name'),
+      category: t7e('filterMenu.vleoSatellites.category'),
+      tooltip: t7e('filterMenu.vleoSatellites.tooltip'),
     },
     {
-      name: 'LEO Satellites',
-      category: 'Orbital Regimes',
-      tooltip: 'Low Earth Orbit satellites with an apogee between 400 km and 6000 km.',
+      name: t7e('filterMenu.leoSatellites.name'),
+      category: t7e('filterMenu.leoSatellites.category'),
+      tooltip: t7e('filterMenu.leoSatellites.tooltip'),
     },
     {
-      name: 'HEO Satellites',
-      category: 'Orbital Regimes',
-      tooltip: 'Highly Elliptical Orbit satellites with an eccentricity of 0.1 or greater and an apogee below 39786 km.',
+      name: t7e('filterMenu.heoSatellites.name'),
+      category: t7e('filterMenu.heoSatellites.category'),
+      tooltip: t7e('filterMenu.heoSatellites.tooltip'),
     },
     {
-      name: 'MEO Satellites',
-      category: 'Orbital Regimes',
-      tooltip: 'Medium Earth Orbit satellites with an apogee between 6000 km and 34786 km.',
+      name: t7e('filterMenu.meoSatellites.name'),
+      category: t7e('filterMenu.meoSatellites.category'),
+      tooltip: t7e('filterMenu.meoSatellites.tooltip'),
     },
     {
-      name: 'GEO Satellites',
-      category: 'Orbital Regimes',
-      tooltip: 'Geostationary Orbit satellites with an eccentricity below 0.1 and an apogee between 34786 km and 36786 km.',
+      name: t7e('filterMenu.geoSatellites.name'),
+      category: t7e('filterMenu.geoSatellites.category'),
+      tooltip: t7e('filterMenu.geoSatellites.tooltip'),
     },
     {
-      name: 'xGEO Satellites',
-      category: 'Orbital Regimes',
-      tooltip: 'Ex-Geosynchronous Orbit satellites with an eccentricity below 0.1 and an apogee above 36786 km, or an eccentricity of 0.1 or greater and an apogee above 39786 km.',
+      name: t7e('filterMenu.xgeoSatellites.name'),
+      category: t7e('filterMenu.xgeoSatellites.category'),
+      tooltip: t7e('filterMenu.xgeoSatellites.tooltip'),
     },
     {
-      name: 'Vimpel Satellites',
+      name: t7e('filterMenu.vimpelSatellites.name'),
       category: 'Source',
-      tooltip: 'Vimpel satellite catalog is maintained by the Russian joint-stock company JSC Vimpel, in cooperation with the Keldysh Institute of Applied Mathematics.',
+      tooltip: t7e('filterMenu.vimpelSatellites.tooltip'),
     },
     {
-      name: 'Celestrak Satellites',
+      name: t7e('filterMenu.celestrakSatellites.name'),
       category: 'Source',
-      tooltip: 'Celestrak is a popular source for satellite orbital data, providing TLEs for a wide range of satellites and debris.',
+      tooltip: t7e('filterMenu.celestrakSatellites.tooltip'),
     },
     {
       name: 'United States',

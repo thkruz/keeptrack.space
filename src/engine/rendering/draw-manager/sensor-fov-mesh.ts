@@ -88,11 +88,8 @@ export class SensorFovMesh extends CustomMesh {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     gl.enable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
+    gl.enable(gl.DEPTH_TEST);
     gl.depthMask(false); // Disable depth writing
-
-    gl.enable(gl.POLYGON_OFFSET_FILL);
-    gl.polygonOffset(-5.0, -5.0);
 
     gl.bindVertexArray(this.vao_);
 
@@ -106,9 +103,7 @@ export class SensorFovMesh extends CustomMesh {
     gl.bindVertexArray(null);
 
     gl.depthMask(true); // Re-enable depth writing
-    gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
-    gl.disable(gl.POLYGON_OFFSET_FILL);
   }
 
   private verticesTmp_: number[] = [];

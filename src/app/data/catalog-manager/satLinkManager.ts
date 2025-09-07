@@ -31,7 +31,7 @@ export class SatLinkManager {
   iridiumUsers: string[] = [];
   starlinkUsers: string[] = [];
   galileoUsers: string[] = [];
-  aehf = [22988, 23712, 26715, 27168, 27711, 36868, 38254, 39256, 43651, 44481]; // Milstar and AEHF
+  aehf = [22988, 23712, 26715, 27168, 27711, 36868, 38254, 39256, 43651, 44481, 45465]; // Milstar and AEHF
   dscs = [23628, 25019, 26052, 27691, 27875, 22915];
   wgs = [32258, 34713, 36108, 38070, 39168, 39222, 40746, 41879, 42075, 44071];
   iridium = [

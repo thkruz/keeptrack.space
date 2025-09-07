@@ -10,11 +10,11 @@ import type { SelectSatManager } from '../../plugins/select-sat-manager/select-s
 import { SoundNames } from '../../plugins/sounds/sounds';
 import { EventBusEvent } from '../events/event-bus-events';
 import { clickAndDragWidth } from '../utils/click-and-drag';
+import { html } from '../utils/development/formatter';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl, hideEl } from '../utils/get-el';
 import { shake } from '../utils/shake';
 import { slideInRight, slideOutLeft } from '../utils/slide';
-
 // TODO: Utilize the event bus to remove dependencies
 
 export interface ClickDragOptions {
@@ -329,7 +329,7 @@ export abstract class KeepTrackPlugin {
     }
 
     if (this.sideMenuSecondaryHtml) {
-      const sideMenuHtmlWrapped = keepTrackApi.html`
+      const sideMenuHtmlWrapped = html`
         <div id="${this.sideMenuElementName}-secondary"
           class="side-menu-parent start-hidden text-select"
           style="z-index: ${this.sideMenuSecondaryOptions.zIndex.toString()};
@@ -439,7 +439,7 @@ export abstract class KeepTrackPlugin {
 
   private generateSideMenuHtml_() {
     const menuWidthStr = `${this.sideMenuSecondaryOptions.width.toString()} px !important`;
-    const downloadIconHtml = this.downloadIconCb ? keepTrackApi.html`
+    const downloadIconHtml = this.downloadIconCb ? html`
       <button id="${this.sideMenuElementName}-download-btn";
         class="center-align btn btn-ui waves-effect waves-light"
         style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--color-dark-text-accent); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
@@ -449,7 +449,7 @@ export abstract class KeepTrackPlugin {
         </i>
       </button>
     ` : '';
-    const settingsIconHtml = keepTrackApi.html`
+    const settingsIconHtml = html`
       <button id="${this.sideMenuElementName}-secondary-btn"
         class="center-align btn btn-ui waves-effect waves-light"
         style="padding: 2px; margin: 0px 0px 0px 5px; color: var(--color-dark-text-accent); background-color: rgba(0, 0, 0, 0);box-shadow: none;"
@@ -458,9 +458,9 @@ export abstract class KeepTrackPlugin {
           ${this.secondaryMenuIcon}
         </i>
       </button>`;
-    const spacerDiv = keepTrackApi.html`<div style="width: 30px; height: 30px; display: block; margin: 0px 5px 0px 0px;"></div>`;
+    const spacerDiv = html`<div style="width: 30px; height: 30px; display: block; margin: 0px 5px 0px 0px;"></div>`;
 
-    const sideMenuHtmlWrapped = keepTrackApi.html`
+    const sideMenuHtmlWrapped = html`
           <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select"
             style="z-index: 5; width: ${menuWidthStr};">
             <div id="${this.sideMenuElementName}-content" class="side-menu">
@@ -848,7 +848,7 @@ export abstract class KeepTrackPlugin {
   }
 
   protected static genH5Title_(title: string): string {
-    return keepTrackApi.html`
+    return html`
       <div class="divider flow5out"></div>
         <h5 class="center-align side-menu-row-header">${title}</h5>
       <div class="divider flow5out"></div>

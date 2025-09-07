@@ -1051,7 +1051,7 @@ export class SettingsManager {
   /**
    * The speed at which the zoom level changes when the user zooms in or out.
    */
-  zoomSpeed = 0.0025;
+  zoomSpeed = 0.005;
   /**
    * Draw Trailing Orbits
    */

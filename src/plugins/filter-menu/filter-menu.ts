@@ -8,6 +8,7 @@ import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
+import { html } from '@app/engine/utils/development/formatter';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -232,7 +233,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   bottomIconImg = filterPng;
   bottomIconLabel: string = 'Filter Menu';
   sideMenuElementName: string = 'filter-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="filter-menu" class="side-menu-parent start-hidden text-select">
     <div id="filter-content" class="side-menu">
       <div class="row">
@@ -279,7 +280,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
                 keepTrackApi.getSoundManager()?.play(checkbox.checked ? SoundNames.TOGGLE_ON : SoundNames.TOGGLE_OFF);
               };
 
-              return keepTrackApi.html`
+              return html`
             <div class="switch row">
               <label data-position="top" data-delay="50" kt-tooltip="${filter.tooltip || ''}">
                 <input id="filter-${filter.id}" type="checkbox" ${filter.checked ? 'checked' : ''} ${!filter.disabled ? '' : 'disabled'}/>
@@ -314,7 +315,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       () => {
         getEl('nav-mobile2')?.insertAdjacentHTML(
           'afterbegin',
-          keepTrackApi.html`
+          html`
             <li id="top-menu-filter-li">
               <a id="top-menu-filter-btn" class="top-menu-icons">
                 <div class="top-menu-icons bmenu-item-selected">

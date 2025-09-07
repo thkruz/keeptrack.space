@@ -4,13 +4,14 @@ import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
 import { keepTrackApi } from '@app/keepTrackApi';
 import wifiFindPng from '@public/img/icons/wifi-find.png';
 
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class ShortTermFences extends KeepTrackPlugin {
   readonly id = 'ShortTermFences';
@@ -35,7 +36,7 @@ export class ShortTermFences extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   sideMenuElementName = 'stf-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="stf-menu" class="side-menu-parent start-hidden text-select">
     <div id="stf-content" class="side-menu">
       <div class="row">
@@ -108,7 +109,7 @@ export class ShortTermFences extends KeepTrackPlugin {
         if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
           getEl('actions-section')?.insertAdjacentHTML(
             'beforeend',
-            keepTrackApi.html`
+            html`
             <div id="stf-on-object-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                   data-tooltip="Visualize Sensor Search Capability">Build Short Term Fence on this object...</div>
             `,

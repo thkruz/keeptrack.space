@@ -5,7 +5,6 @@ import { Constructor, ToastMsgType } from './engine/core/interfaces';
 import { ServiceLocator } from './engine/core/service-locator';
 import { EventBus } from './engine/events/event-bus';
 import { KeepTrackPlugin } from './engine/plugins/base-plugin';
-import { html } from './engine/utils/development/formatter';
 import { saveCsv, saveVariable } from './engine/utils/saveVariable';
 import { SettingsManager } from './settings/settings';
 
@@ -139,13 +138,6 @@ export class KeepTrackApi {
 
     return null;
   }
-
-  /**
-   * This is not a standard function. It is used in development for formatting template literals.
-   * example: keepTrackApi.html\`\<div>example\</div>\`
-   * TODO: This should be a static method
-   */
-  html = html;
 
   toast(toastText: string, type: ToastMsgType, isLong = false) {
     ServiceLocator.getUiManager().toast(toastText, type, isLong);

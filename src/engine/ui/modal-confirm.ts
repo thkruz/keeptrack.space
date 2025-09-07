@@ -1,6 +1,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import { DraggableModal } from './draggable-modal';
+import { html } from '../utils/development/formatter';
 
 interface ConfirmModalOptions {
   title?: string;
@@ -43,7 +44,7 @@ export class ModalConfirm extends DraggableModal {
       isDestructive = false,
     } = this.options;
 
-    return keepTrackApi.html`
+    return html`
       <div class="confirm-modal">
         <div class="confirm-modal__content">
           <p class="confirm-modal__message">${message}</p>

@@ -4,6 +4,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import Draggabilly from 'draggabilly';
 import './engine-ui.css';
+import { html } from '../utils/development/formatter';
 
 interface DraggableBoxOptions {
   width?: string;
@@ -51,7 +52,7 @@ export abstract class DraggableBox {
 
   open(cb?: () => void) {
     if (!this.boxEl) {
-      getEl('canvas-holder')!.insertAdjacentHTML('beforeend', keepTrackApi.html`
+      getEl('canvas-holder')!.insertAdjacentHTML('beforeend', html`
         <div id="${this.boxId}" class="draggable-box" style="pointer-events:auto;">
           <div class="draggable-box__title-bar">
             <div class="draggable-box__title">

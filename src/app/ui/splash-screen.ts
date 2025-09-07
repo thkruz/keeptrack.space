@@ -23,6 +23,7 @@ import satJpg from '@public/img/wallpaper/sat.jpg';
 import sat2Jpg from '@public/img/wallpaper/sat2.jpg';
 import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
 import thuleJpg from '@public/img/wallpaper/thule.jpg';
+import { html } from '@app/engine/utils/development/formatter';
 
 export abstract class SplashScreen {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
@@ -53,7 +54,7 @@ export abstract class SplashScreen {
    * @param rootDom The root DOM element to which the loading screen will be appended.
    */
   static initLoadingScreen(rootDom: HTMLElement) {
-    rootDom.innerHTML += keepTrackApi.html`
+    rootDom.innerHTML += html`
       <div id="loading-screen" class="valign-wrapper full-loader">
         <div id="logo-inner-container" class="valign">
           <div style="display: flex;">

@@ -1,14 +1,13 @@
 /* eslint-disable no-use-before-define */
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
+import { dateFromJday } from '@app/engine/utils/transforms';
 import { keepTrackApi } from '@app/keepTrackApi';
 import satChngPng from '@public/img/icons/sats.png';
-
-import { dateFromJday } from '@app/engine/utils/transforms';
-
 import './components/sat-changes.css';
 
 /**
@@ -31,9 +30,9 @@ let issatChngMenuOpen = false;
 
 export const uiManagerInit = () => {
   // Side Menu
-  getEl('left-menus').insertAdjacentHTML(
+  getEl('left-menus')?.insertAdjacentHTML(
     'beforeend',
-    keepTrackApi.html`
+    html`
         <div id="satChng-menu" class="side-menu-parent start-hidden text-select">
           <div id="satChng-content" class="side-menu">
             <div class="row">
@@ -48,7 +47,7 @@ export const uiManagerInit = () => {
   // Bottom Icon
   getEl('bottom-icons')?.insertAdjacentHTML(
     'beforeend',
-    keepTrackApi.html`
+    html`
         <div id="menu-satChng" class="bmenu-item">
           <div class="bmenu-item-inner">
             <img alt="satchng" src="" delayedsrc="${satChngPng}" />

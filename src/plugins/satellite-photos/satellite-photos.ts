@@ -3,13 +3,14 @@ import { getEl } from '@app/engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import photoManagerPng from '@public/img/icons/photoManager.png';
 import { Degrees } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface DiscvrResponse {
   centroid_coordinates: {
@@ -30,7 +31,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
   bottomIconImg = photoManagerPng;
   sideMenuElementName: string = 'sat-photo-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="sat-photo-menu" class="side-menu-parent start-hidden text-select">
     <div id="sat-photo-menu-content" class="side-menu">
       <ul id="sat-photo-menu-list">

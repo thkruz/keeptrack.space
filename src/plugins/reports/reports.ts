@@ -30,11 +30,12 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import analysisPng from '@public/img/icons/reports.png';
 
 
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface ReportData {
   filename: string;
@@ -62,7 +63,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   sideMenuElementName: string = 'reports-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="reports-menu" class="side-menu-parent start-hidden text-select">
     <div id="reports-content" class="side-menu">
       <div class="row">

@@ -2,6 +2,7 @@ import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { getEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { LayersManager } from './layers-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 
 export class LayersPopupBox extends DraggableBox {
@@ -10,7 +11,7 @@ export class LayersPopupBox extends DraggableBox {
   }
 
   protected getBoxContentHtml(): string {
-    return keepTrackApi.html`
+    return html`
       <div id="layers-hover-menu-popup">
       </div>
     `.trim();

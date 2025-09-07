@@ -9,15 +9,16 @@ import { hideEl } from '@app/engine/utils/get-el';
 import { DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class DrawLinesPlugin extends KeepTrackPlugin {
   readonly id = 'DrawLinesPlugin';
   dependencies_ = [];
 
   rmbL1ElementName = 'draw-rmb';
-  rmbL1Html = keepTrackApi.html`<li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>`;
+  rmbL1Html = html`<li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>`;
   rmbL2ElementName = 'draw-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
   <ul class='dropdown-contents'>
     <li id="line-eci-axis-rmb"><a href="#">ECI Axes</a></li>
     <li id="line-eci-xgrid-rmb"><a href="#">X Axes Grid</a></li>

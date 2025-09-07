@@ -169,13 +169,13 @@ test('keepTrackApi Unit Testing', () => {
   keepTrackApi.emit(EventBusEvent.selectSatData, defaultSat, 0);
 });
 
-describe('keepTrackApi.html', () => {
-  test('keepTrackApi.html Good HTML', () => {
-    expect(() => keepTrackApi.html`<div id="about-menu" class="side-menu-parent start-hidden text-select">`).not.toThrow(Error);
+describe('html', () => {
+  test('html Good HTML', () => {
+    expect(() => html`<div id="about-menu" class="side-menu-parent start-hidden text-select">`).not.toThrow(Error);
   });
 
-  test('keepTrackApi.html Bad HTML', () => {
-    expect(() => keepTrackApi.html(<TemplateStringsArray>(<unknown>'A'))).toThrow(Error);
+  test('html Bad HTML', () => {
+    expect(() => html(<TemplateStringsArray>(<unknown>'A'))).toThrow(Error);
   });
 });
 

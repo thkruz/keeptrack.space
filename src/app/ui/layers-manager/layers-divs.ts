@@ -1,6 +1,6 @@
-import { keepTrackApi } from '@app/keepTrackApi';
+import { html } from '@app/engine/utils/development/formatter';
 
-export const planetariumDiv = keepTrackApi.html`
+export const planetariumDiv = html`
 <ul id="layers-list-planetarium">
   <li>
     <div class="Square-Box layers-payload-box"></div>
@@ -20,7 +20,7 @@ export const planetariumDiv = keepTrackApi.html`
   </li>
 </ul>
 `.trim();
-export const astronomyDiv = keepTrackApi.html`
+export const astronomyDiv = html`
 <ul id="layers-list-astronomy">
   <li>
     <div class="Square-Box layers-starHi-box"></div>
@@ -36,7 +36,7 @@ export const astronomyDiv = keepTrackApi.html`
   </li>
 </ul>
 `.trim();
-export const nearDiv = keepTrackApi.html`
+export const nearDiv = html`
 <ul id="layers-list-near">
   <li>
     <div class="Square-Box layers-satLEO-box"></div>
@@ -49,7 +49,7 @@ export const nearDiv = keepTrackApi.html`
   </li>
 </ul>
 `.trim();
-export const deepDiv = keepTrackApi.html`
+export const deepDiv = html`
 <ul id="layers-list-deep">
   <li>
     <div class="Square-Box layers-satGEO-box"></div>

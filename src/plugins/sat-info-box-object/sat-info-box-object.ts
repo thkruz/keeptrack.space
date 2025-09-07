@@ -11,6 +11,7 @@ import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType } from 'o
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 const SECTIONS = {
   OBJECT: 'object-section',
@@ -68,7 +69,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
 
   private createObjectSection_(): string {
     // Object section HTML
-    return keepTrackApi.html`
+    return html`
       <div id="${SECTIONS.OBJECT}" class="sat-info-section">
         <div class="sat-info-section-header">
           Object Data
@@ -133,7 +134,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
 
   private createSecondarySection(): string {
     // Secondary satellite section HTML
-    return keepTrackApi.html`
+    return html`
         <div id="${SECTIONS.SECONDARY}">
           <div class="sat-info-section-header">
             Secondary Satellite

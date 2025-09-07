@@ -22,6 +22,7 @@ import { SoundNames } from '../sounds/sounds';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { fetchWeatherApi } from 'openmeteo';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface Pass {
   start: Date;
@@ -126,13 +127,13 @@ export class SensorTimeline extends KeepTrackPlugin {
   };
 
   sideMenuElementName = 'sensor-timeline-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div class="row"></div>
     <div class="row" style="margin: 0;">
       <canvas id="sensor-timeline-canvas"></canvas>
       <canvas id="sensor-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
-  sideMenuSecondaryHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = html`
     <div class="row">
       <div class="input-field col s12">
         <input id="sensor-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"

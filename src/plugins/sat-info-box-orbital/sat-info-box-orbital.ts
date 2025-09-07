@@ -11,6 +11,7 @@ import { BaseObject, DetailedSatellite, eci2lla, MINUTES_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 const SECTIONS = {
   ORBITAL: 'orbital-section',
@@ -64,7 +65,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   }
 
   private createOrbitalSection(): string {
-    return keepTrackApi.html`
+    return html`
         <div id="${SECTIONS.ORBITAL}">
           <div class="sat-info-section-header">
             Orbit Data
@@ -96,7 +97,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       { key: 'Cross Track Sigma', id: EL.UNCERTAINTY_CROSSTRACK, tooltip: 'Cross Track Uncertainty (meters)', value: 'xxx.xxxx' },
     ];
 
-    return rows.map((row) => keepTrackApi.html`
+    return rows.map((row) => html`
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${row.tooltip}">${row.key}</div>
           <div class="sat-info-value" id="${row.id}">${row.value}</div>

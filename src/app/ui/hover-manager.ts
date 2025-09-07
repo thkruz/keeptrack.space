@@ -14,6 +14,7 @@ import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
 import { SensorMath } from '../sensors/sensor-math';
 import { StringExtractor } from './string-extractor';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class HoverManager {
   /** The id of the object currently being hovered */
@@ -231,7 +232,7 @@ export class HoverManager {
         }
       }
 
-      this.satHoverBoxNode1.innerHTML = keepTrackApi.html`
+      this.satHoverBoxNode1.innerHTML = html`
         <span id="hoverbox-fi"></span>
         <span>${sat.name}</span>
         <span style='color:${color};'>${confidenceScoreString}</span>
@@ -266,7 +267,7 @@ export class HoverManager {
     country = country.length > 0 ? country : 'Unknown';
     this.satHoverBoxNode3.textContent = country;
 
-    this.satHoverBoxNode3.innerHTML = keepTrackApi.html`
+    this.satHoverBoxNode3.innerHTML = html`
         <span id="hoverbox-fi"></span>
         <span>${country}</span>
       `;

@@ -27,6 +27,7 @@ import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { getEl } from '../utils/get-el';
 import { KeepTrackPlugin } from './base-plugin';
+import { html } from '../utils/development/formatter';
 
 export abstract class TopMenuPlugin extends KeepTrackPlugin {
   id: string = '';
@@ -57,7 +58,7 @@ export abstract class TopMenuPlugin extends KeepTrackPlugin {
   protected uiManagerFinal_(): void {
     const pluginRootEl = document.createElement('li');
 
-    pluginRootEl.innerHTML = keepTrackApi.html`
+    pluginRootEl.innerHTML = html`
       <a id="${this.id}-btn" class="top-menu-icons">
         <img class="top-menu-icons__blue-img" src="${this.image}" />
       </a>

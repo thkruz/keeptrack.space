@@ -10,6 +10,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import './sat-info-box.css';
+import { html } from '@app/engine/utils/development/formatter';
 
 const CONTAINER_ID = 'sat-infobox';
 
@@ -204,7 +205,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     getEl('canvas-holder')?.insertAdjacentHTML(
       'beforeend',
-      keepTrackApi.html`
+      html`
         <div id="${CONTAINER_ID}" class="text-select satinfo-fixed start-hidden">
           ${elements
           .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -223,7 +224,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private createHeader(): string {
-    return keepTrackApi.html`
+    return html`
       <div id="${EL.CONTAINER}">
         <div id="${EL.TITLE}" class="center-text">
           <span id="${EL.NAME}">This is a title</span>
@@ -234,7 +235,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private createIdentifiersSection(): string {
-    return keepTrackApi.html`
+    return html`
       <div id="${SECTIONS.IDENTIFIERS}">
         <div class="sat-info-section-header">
           Identifiers

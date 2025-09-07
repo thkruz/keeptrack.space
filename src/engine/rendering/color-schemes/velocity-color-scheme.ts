@@ -3,6 +3,7 @@ import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfac
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, Star } from 'ootk';
 import { ColorScheme } from './color-scheme';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class VelocityColorScheme extends ColorScheme {
   readonly label = 'Velocity';
@@ -93,7 +94,7 @@ export class VelocityColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = keepTrackApi.html`
+  static readonly layersHtml = html`
   <ul id="layers-list-velocity">
     <li>
       <div class="Square-Box layers-velocityFast-box"></div>

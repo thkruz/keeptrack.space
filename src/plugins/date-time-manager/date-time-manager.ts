@@ -5,6 +5,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';
@@ -72,7 +73,7 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     NavWrapper?.insertAdjacentHTML(
       'afterbegin',
-      keepTrackApi.html`
+      html`
         <div id="nav-mobile">
           <div id="jday"></div>
           <div id="${this.dateTimeContainerId_}">

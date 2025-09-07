@@ -22,6 +22,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '../../keepTrackApi';
 import { getEl, hideEl } from './get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';
+import { html } from './development/formatter';
 
 export class AdviceManager {
   private helpHeaderDOM: HTMLElement;
@@ -51,7 +52,7 @@ export class AdviceManager {
 
     keepTrackApi.containerRoot?.insertAdjacentHTML(
       'beforeend',
-      keepTrackApi.html`
+      html`
         <div id="help-outer-container" class="valign">
           <div id="help-screen" class="valign-wrapper">
             <div id="help-inner-container" class="valign">

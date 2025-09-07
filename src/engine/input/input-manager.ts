@@ -12,6 +12,7 @@ import { isThisNode } from '../utils/isThisNode';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
 import { TouchInput } from './input-manager/touch-input';
+import { html } from '../utils/development/formatter';
 
 export type LatLon = {
   lat: Degrees;
@@ -244,7 +245,7 @@ export class InputManager {
     if (rmbWrapperDom) {
       rmbWrapperDom.insertAdjacentHTML(
         'beforeend',
-        keepTrackApi.html`
+        html`
       <div id="right-btn-menu" class="right-btn-menu">
         <ul id="right-btn-menu-ul" class='dropdown-contents'></ul>
       </div>
@@ -256,7 +257,7 @@ export class InputManager {
       // Now add the reset/clear options
       getEl('right-btn-menu-ul')!.insertAdjacentHTML(
         'beforeend',
-        keepTrackApi.html`
+        html`
         <li id="toggle-time-rmb"><a href="#">Pause Clock</a></li>
         <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
         <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>

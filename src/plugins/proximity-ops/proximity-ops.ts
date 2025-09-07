@@ -4,6 +4,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 
 import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
@@ -13,7 +14,7 @@ import { BaseObject, CatalogSource, Degrees, DetailedSatellite, EciVec3, Kilomet
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 enum RPOType {
   GEO = 'GEO',
@@ -68,7 +69,7 @@ export class ProximityOps extends KeepTrackPlugin {
   secondaryMenuIcon = 'view_list';
 
   sideMenuElementName = 'proximityOps-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <form id="proximityOps">
     <div class="input-field col s12">
         <input value="0" id="proximity-ops-norad" type="text" maxlength="5" />
@@ -134,7 +135,7 @@ export class ProximityOps extends KeepTrackPlugin {
     </form>
     `;
 
-  sideMenuSecondaryHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = html`
     <div class="row" style="margin: 0 10px;">
       <h5 class="center-align">${t7e('plugins.ProximityOps.titleSecondary')}</h5>
       <table id="proximity-ops-table" class="center-align striped-light centered"></table>

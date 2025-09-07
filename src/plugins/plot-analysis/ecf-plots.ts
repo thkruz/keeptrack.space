@@ -8,6 +8,7 @@ import 'echarts-gl';
 import { DetailedSatellite } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -40,7 +41,7 @@ export class EcfPlot extends KeepTrackPlugin {
   chart: echarts.ECharts;
 
   sideMenuElementName = 'ecf-plots-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="ecf-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
     <div id="plot-analysis-content" class="side-menu">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>

@@ -17,6 +17,7 @@ import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLin
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class EditSat extends KeepTrackPlugin {
   readonly id = 'EditSat';
@@ -37,7 +38,7 @@ export class EditSat extends KeepTrackPlugin {
   static readonly elementPrefix = 'es';
 
   sideMenuElementName = 'editSat-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="editSat-menu" class="side-menu-parent start-hidden text-select">
       <div id="editSat-content" class="side-menu">
         <div class="row">
@@ -199,7 +200,7 @@ export class EditSat extends KeepTrackPlugin {
   isRmbOnSat = true;
   rmbMenuOrder = 2;
   rmbL1ElementName = 'edit-rmb';
-  rmbL1Html = keepTrackApi.html`
+  rmbL1Html = html`
   <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Edit Sat &#x27A4;</a></li>`;
 
   rmbCallback = (targetId: string, clickedSat?: number): void => {
@@ -226,7 +227,7 @@ export class EditSat extends KeepTrackPlugin {
   };
 
   rmbL2ElementName = 'edit-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
     <ul class='dropdown-contents'>
       <li id="set-pri-sat-rmb"><a href="#">Set as Primary Sat</a></li>
       <li id="set-sec-sat-rmb"><a href="#">Set as Secondary Sat</a></li>

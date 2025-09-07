@@ -2,6 +2,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -23,7 +24,7 @@ import { SensorManager } from '../../app/sensors/sensorManager';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
@@ -85,12 +86,12 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   };
 
   sideMenuElementName: string = 'multi-site-look-angles-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
     <div class="row"></div>
     <div class="row">
       <table id="multi-site-look-angles-table" class="center-align striped-light centered"></table>
     </div>`;
-  sideMenuSecondaryHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = html`
     <div class="row" style="margin: 0 10px;">
       <div id="multi-site-look-angles-sensor-list">
       </div>

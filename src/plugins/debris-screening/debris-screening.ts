@@ -1,6 +1,7 @@
 import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -8,7 +9,7 @@ import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import { DetailedSatellite, Hours, Kilometers, Milliseconds, Minutes, PosVel, Seconds, Sgp4 } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class DebrisScreening extends KeepTrackPlugin {
   readonly id = 'DebrisScreening';
@@ -40,7 +41,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   bottomIconImg = frameInspectPng;
   sideMenuElementName = 'debris-screening-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
   <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select">
     <div id="${this.sideMenuElementName}-content" class="side-menu">
       <div class="row">

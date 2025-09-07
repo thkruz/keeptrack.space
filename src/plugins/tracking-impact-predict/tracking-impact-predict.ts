@@ -11,6 +11,7 @@ import { RAD2DEG } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 export interface TipMsg {
   'NORAD_CAT_ID': string,
@@ -38,7 +39,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
   bottomIconImg = sputnickPng;
   sideMenuElementName: string = 'tip-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
   <div id="tip-menu" class="side-menu-parent start-hidden text-select">
     <div id="tip-content" class="side-menu">
       <div class="row">

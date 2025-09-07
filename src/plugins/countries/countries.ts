@@ -8,12 +8,13 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import flagPng from '@public/img/icons/flag.png';
 
 import { SearchResult } from '@app/app/ui/search-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { Localization } from '@app/locales/locales';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
@@ -22,7 +23,7 @@ export class CountriesMenu extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
 
   bottomIconImg = flagPng;
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="countries-menu" class="side-menu-parent start-hidden text-select">
       <div id="country-menu" class="side-menu">
         <ul id="country-list">
@@ -56,7 +57,7 @@ export class CountriesMenu extends KeepTrackPlugin {
   }
 
   private static generateCountryList_(): string {
-    const header = keepTrackApi.html`
+    const header = html`
     <h5 class="center-align">${Localization.getInstance().plugins.CountriesMenu.bottomIconLabel!}</h5>
     <li class="divider"></li>
     <br/>`;

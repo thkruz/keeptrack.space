@@ -5,6 +5,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { CameraType } from '../../camera/camera';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { html } from '@app/engine/utils/development/formatter';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -145,7 +146,7 @@ export class SourceColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = keepTrackApi.html`
+  static readonly layersHtml = html`
   <ul id="layers-list-dataSource">
     <li>
       <div class="Square-Box layers-sourceCelestrak-box"></div>

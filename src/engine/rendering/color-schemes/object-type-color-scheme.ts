@@ -8,6 +8,7 @@ import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../../camera/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { html } from '@app/engine/utils/development/formatter';
 
 export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
   payload: rgbaArray;
@@ -355,7 +356,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = keepTrackApi.html`
+  static readonly layersHtml = html`
   <ul id="layers-list-default-sensor">
     <li>
       <div class="Square-Box layers-payload-box"></div>

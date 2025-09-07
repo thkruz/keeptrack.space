@@ -52,12 +52,13 @@ import redSquare from '@public/img/red-square.png';
 import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
 
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LlaVec3, calcGmst, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface GroundTracePoint {
   x: number;
@@ -97,7 +98,7 @@ export class StereoMap extends KeepTrackPlugin {
   };
 
   sideMenuElementName = 'map-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
    <div id="map-menu" class="side-menu-parent start-hidden side-menu valign-wrapper">
      <canvas id="map-2d"></canvas>
      <img id="map-sat" class="map-item map-look" src=${satellite2} width="40px" height="40px"/>

@@ -1,6 +1,7 @@
 import { SensorMath, TearrData, TearrType } from '@app/app/sensors/sensor-math';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -11,7 +12,7 @@ import tableChartPng from '@public/img/icons/table-chart.png';
 import { BaseObject, DetailedSatellite, DetailedSensor, SpaceObjectType } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 type LookAngleData = TearrData & { canStationObserve: boolean };
 
@@ -64,12 +65,12 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   };
 
   sideMenuElementName: string = 'look-angles-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
     <div class="row"></div>
     <div class="row">
       <table id="looks" class="center-align striped-light centered"></table>
     </div>`;
-  sideMenuSecondaryHtml = keepTrackApi.html`
+  sideMenuSecondaryHtml = html`
     <div class="switch row">
         <label>
             <input id="settings-riseset" type="checkbox" checked="true" />

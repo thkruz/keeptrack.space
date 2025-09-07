@@ -5,6 +5,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType } from 'ootk';
 import { CameraType } from '../../camera/camera';
 import { ColorScheme } from './color-scheme';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class StarlinkColorScheme extends ColorScheme {
   readonly label = 'Starlink';
@@ -126,7 +127,7 @@ export class StarlinkColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = keepTrackApi.html`
+  static readonly layersHtml = html`
   <ul id="layers-list-starlink">
     <li>
       <div class="Square-Box layers-starlinkOperational-box"></div>

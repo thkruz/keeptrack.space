@@ -15,6 +15,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
+import { html } from '@app/engine/utils/development/formatter';
 
 // TODO: Add a search bar and filter for sensors
 
@@ -50,7 +51,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
   sideMenuElementName: string = 'sensor-list-menu';
   sideMenuElementHtml: string =
-    keepTrackApi.html`
+    html`
     <div id="sensor-list-menu" class="side-menu-parent start-hidden text-select">
         <div id="sensor-list-content" class="side-menu">
         <div class="row">
@@ -59,7 +60,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
           </ul>
           <ul id="list-of-sensors">` +
     this.sensorGroups_.map((sensorGroup) => this.genericSensors_(sensorGroup.name)).join('') +
-    keepTrackApi.html`
+    html`
           </ul>
         </div>
       </div>
@@ -75,7 +76,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       () => {
         getEl('nav-mobile')?.insertAdjacentHTML(
           'beforeend',
-          keepTrackApi.html`
+          html`
           <div id="sensor-selected-container" class="start-hidden">
             <div id="sensor-selected" class="waves-effect waves-light">
 
@@ -132,7 +133,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
         if (keepTrackApi.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
           getEl('actions-section')?.insertAdjacentHTML(
             'beforeend',
-            keepTrackApi.html`
+            html`
                   <div id="sensors-in-fov-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                         data-tooltip="Visualize Sensor Coverage">Show All Sensors with FOV...</div>
                 `,
@@ -261,7 +262,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   }
 
   private static createLiForSensor_(sensor: DetailedSensor) {
-    return keepTrackApi.html`
+    return html`
       <li class="menu-selectable" data-sensor="${sensor.objName ?? 'Missing Data'}">
         <span>${sensor.uiName ?? 'Missing Data'}</span>
         <span>${sensor.system ?? 'Missing Data'}</span>
@@ -314,14 +315,14 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
       const renderedTopLink = params.topLinks
         .map(
-          (link) => keepTrackApi.html`<li class="menu-selectable sensor-top-link" data-sensor="${params.name}">
+          (link) => html`<li class="menu-selectable sensor-top-link" data-sensor="${params.name}">
               <span>${link.name}</span>
               <span class="badge dark-blue-badge" data-badge-caption="${link.badge}"></span>
             </li>`,
         )
         .join('');
 
-      return keepTrackApi.html`
+      return html`
         ${SensorListPlugin.genH5Title_(params.header)}
         ${renderedTopLink}
         ${params.sensors.map((sensor) => SensorListPlugin.createLiForSensor_(sensor)).join('')}

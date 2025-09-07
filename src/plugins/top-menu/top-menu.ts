@@ -6,6 +6,7 @@ import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TooltipsPlugin } from '../tooltips/tooltips';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class TopMenu extends KeepTrackPlugin {
   readonly id = 'TopMenu';
@@ -43,7 +44,7 @@ export class TopMenu extends KeepTrackPlugin {
       () => {
         getEl('keeptrack-header')?.insertAdjacentHTML(
           'beforeend',
-          keepTrackApi.html`
+          html`
             <nav>
               <div id="nav-wrapper" class="nav-wrapper" style="display: flex; justify-content: flex-end;">
           <ul id="nav-mobile2" class="right">

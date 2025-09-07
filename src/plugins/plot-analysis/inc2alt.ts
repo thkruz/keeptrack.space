@@ -7,6 +7,7 @@ import 'echarts-gl';
 import { DetailedSatellite, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class Inc2AltPlots extends KeepTrackPlugin {
   readonly id = 'Inc2AltPlots';
@@ -34,7 +35,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
   chart: echarts.ECharts;
 
   sideMenuElementName = 'inc2alt-plots-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="inc2alt-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal plot-analysis-menu-maximized">
     <div id="plot-analysis-content" class="side-menu" style="height: 80%">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>

@@ -1,8 +1,8 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { html } from '@app/engine/utils/development/formatter';
 
 export interface MissionColorSchemeColorMap extends ColorSchemeColorMap {
   missionMilitary: rgbaArray;
@@ -268,7 +268,7 @@ export class MissionColorScheme extends ColorScheme {
     return highestScore >= 2 ? bestCategory : null;
   }
 
-  static readonly layersHtml = keepTrackApi.html`
+  static readonly layersHtml = html`
   <ul id="layers-list-countries">
     <li>
       <div class="Square-Box layers-missionMilitary-box"></div>

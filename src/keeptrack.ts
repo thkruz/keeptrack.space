@@ -52,6 +52,7 @@ import { isThisNode } from './engine/utils/isThisNode';
 import { keepTrackApi } from './keepTrackApi';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
+import { html } from './engine/utils/development/formatter';
 
 export class KeepTrack {
   private static instance: KeepTrack;
@@ -131,7 +132,7 @@ export class KeepTrack {
     SplashScreen.initLoadingScreen(keepTrackApi.containerRoot);
 
     keepTrackApi.containerRoot.id = 'keeptrack-root';
-    keepTrackApi.containerRoot.innerHTML += keepTrackApi.html`
+    keepTrackApi.containerRoot.innerHTML += html`
       <header>
         <div id="keeptrack-header" class="start-hidden"></div>
       </header>

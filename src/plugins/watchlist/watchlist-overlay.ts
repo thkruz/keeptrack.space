@@ -13,6 +13,7 @@ import { DetailedSatellite, MILLISECONDS_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from './watchlist';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class WatchlistOverlay extends KeepTrackPlugin {
   readonly id = 'WatchlistOverlay';
@@ -63,7 +64,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   bottomIconImg = pictureInPicturePng;
 
   lastOverlayUpdateTime = 0;
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="info-overlay-menu" class="side-menu-parent start-hidden text-select">
       <div id="info-overlay-content"></div>
     </div>`;

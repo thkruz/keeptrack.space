@@ -8,6 +8,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { ColorScheme } from './color-scheme';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class SunlightColorScheme extends ColorScheme {
   readonly label = 'Sunlight Status';
@@ -213,7 +214,7 @@ export class SunlightColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = keepTrackApi.html`
+  static readonly layersHtml = html`
   <ul id="layers-list-sunlight">
     <li>
       <div class="Square-Box layers-satLow-box"></div>

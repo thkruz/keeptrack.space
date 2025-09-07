@@ -2,6 +2,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideEl, showEl } from '@app/engine/utils/get-el';
@@ -9,16 +10,16 @@ import { DetailedSatellite, DetailedSensor, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorInfoPlugin } from '../sensor/sensor-info-plugin';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class ViewInfoRmbPlugin extends KeepTrackPlugin {
   readonly id = 'ViewInfoRmbPlugin';
   dependencies_ = [];
 
   rmbL1ElementName = 'view-rmb';
-  rmbL1Html = keepTrackApi.html`<li class="rmb-menu-item" id="view-rmb"><a href="#">View &#x27A4;</a></li>`;
+  rmbL1Html = html`<li class="rmb-menu-item" id="view-rmb"><a href="#">View &#x27A4;</a></li>`;
   rmbL2ElementName = 'view-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
   <ul class='dropdown-contents'>
     <li id="view-info-rmb"><a href="#">Earth Info</a></li>
     <li id="view-sensor-info-rmb"><a href="#">Sensor Info</a></li>

@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { html } from '@app/engine/utils/development/formatter';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 
@@ -85,7 +85,7 @@ export class ReentryRiskColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = keepTrackApi.html`
+  static readonly layersHtml = html`
   <div class="layers-info-message" style="text-align: center; color: #666; font-size: 0.95em; border-radius: 6px; padding: 10px; margin-bottom: 12px;">
     Reentry risk prediction depends on many factors, including station keeping, atmospheric drag, solar cycles, and the satellite's mass-to-area ratio.
     This is a rough approximation based on perigee and average drag impact.

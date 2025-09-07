@@ -3,6 +3,7 @@
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { getUnique } from '@app/engine/utils/get-unique';
@@ -11,7 +12,7 @@ import findSatPng from '@public/img/icons/database-search.png';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 export interface SearchSatParams {
   argPe: Degrees;
@@ -53,7 +54,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   sideMenuElementName: string = 'findByLooks-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="findByLooks-menu" class="side-menu-parent start-hidden text-select">
     <div id="findByLooks-content" class="side-menu">
       <div class="row">

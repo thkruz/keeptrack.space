@@ -10,6 +10,7 @@ import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {
@@ -39,7 +40,7 @@ export class Collisions extends KeepTrackPlugin {
   bottomIconElementName: string = 'menu-satellite-collision';
   bottomIconImg = CollisionsPng;
   sideMenuElementName: string = `${this.id}-menu`;
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
   <div id="${this.id}-menu" class="side-menu-parent start-hidden text-select">
     <div id="${this.id}-content" class="side-menu">
       <div class="row">

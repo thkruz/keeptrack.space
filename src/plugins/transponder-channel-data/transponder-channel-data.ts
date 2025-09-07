@@ -10,6 +10,7 @@ import { BaseObject, DetailedSatellite } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface ChannelInfo {
   satellite: string;
@@ -124,7 +125,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
   };
 
   sideMenuElementName: string = 'transponderChannelData-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="transponderChannelData-menu" class="side-menu-parent start-hidden text-select">
     <div id="transponderChannelData-content" class="side-menu">
       <div class="row">

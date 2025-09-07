@@ -11,6 +11,7 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilomete
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '../watchlist/watchlist';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface Pass {
   start: Date;
@@ -61,13 +62,13 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   };
 
   sideMenuElementName = 'satellite-timeline-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div class="row"></div>
     <div class="row" style="margin: 0;">
       <canvas id="satellite-timeline-canvas"></canvas>
       <canvas id="satellite-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
-  sideMenuSecondaryHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = html`
     <div class="row">
       <div class="input-field col s12">
         <input id="satellite-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"

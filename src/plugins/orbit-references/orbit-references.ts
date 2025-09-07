@@ -7,6 +7,7 @@ import { BaseObject, FormatTle, Tle } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class OrbitReferences extends KeepTrackPlugin {
   readonly id = 'OrbitReferences';
@@ -44,7 +45,7 @@ export class OrbitReferences extends KeepTrackPlugin {
 
           actionsSectionElement.insertAdjacentHTML(
             'beforeend',
-            keepTrackApi.html`
+            html`
                 <div id="orbit-references-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                       data-tooltip="Create Analyst Satellites in Orbit">Generate Orbit Reference Satellites...</div>
               `,

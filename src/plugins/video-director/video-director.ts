@@ -3,9 +3,10 @@ import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
 
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -48,7 +49,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   bottomIconElementName: string = 'video-director-icon';
   bottomIconImg = videoSettingsPng;
   sideMenuElementName: string = 'video-director-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="video-director-menu" class="side-menu-parent start-hidden text-select">
     <div id="video-director-content" class="side-menu">
       <div class="row">

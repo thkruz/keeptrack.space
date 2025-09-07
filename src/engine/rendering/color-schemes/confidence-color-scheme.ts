@@ -1,6 +1,6 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { html } from '@app/engine/utils/development/formatter';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 
@@ -69,7 +69,7 @@ export class ConfidenceColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = keepTrackApi.html`
+  static readonly layersHtml = html`
   <ul id="layers-list-confidence">
     <li>
       <div class="Square-Box layers-confidenceLow-box"></div>

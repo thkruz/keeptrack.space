@@ -1,5 +1,6 @@
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { slideInRight } from '@app/engine/utils/slide';
@@ -16,7 +17,7 @@ import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { SoundNames } from '../sounds/sounds';
 import { SensorInfoPlugin } from './sensor-info-plugin';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   readonly id = 'CustomSensorPlugin';
@@ -41,7 +42,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   bottomIconImg = sensorAddPng;
 
   sideMenuElementName: string = 'custom-sensor-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
     <form id="customSensor">
       <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="Name of the Sensor">
           <input id="cs-uiName" type="text" value="Custom Sensor" />
@@ -115,7 +116,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     </div>
     </form>
     `;
-  sideMenuSecondaryHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = html`
     <div class="row" style="margin: 0 10px;">
       <div id="custom-sensors-sensor-list">
       </div>
@@ -127,7 +128,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   };
 
   rmbL1ElementName = 'create-rmb';
-  rmbL1Html = keepTrackApi.html`
+  rmbL1Html = html`
   <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Create &#x27A4;</a></li>`;
 
   isRmbOnEarth = true;
@@ -136,7 +137,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   rmbMenuOrder = 10;
 
   rmbL2ElementName = 'create-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
   <ul class='dropdown-contents'>
     <li id="create-observer-rmb"><a href="#">Create Observer Here</a></li>
     <li id="create-sensor-rmb"><a href="#">Create Sensor Here</a></li>

@@ -4,6 +4,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class ClassificationBar extends KeepTrackPlugin {
   readonly id = 'ClassificationBar';
@@ -62,7 +63,7 @@ export class ClassificationBar extends KeepTrackPlugin {
   private createContainer_(): void {
     const node = document.createElement('div');
 
-    node.innerHTML = keepTrackApi.html`<span id="${this.textStringDomId}"></span>`;
+    node.innerHTML = html`<span id="${this.textStringDomId}"></span>`;
     node.id = this.containerDomId;
     node.style.cssText = `
       height: ${this.containerHeight}px;

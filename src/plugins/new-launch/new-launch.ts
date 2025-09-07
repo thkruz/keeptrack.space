@@ -21,6 +21,7 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';
@@ -98,7 +99,7 @@ export class NewLaunch extends KeepTrackPlugin {
       </optgroup>`,
     ).join('\n');
 
-    return keepTrackApi.html`
+    return html`
       <div id="newLaunch-menu" class="side-menu-parent start-hidden text-select">
         <div id="newLaunch-content" class="side-menu">
           <div class="row">

@@ -2,13 +2,12 @@ import { errorManagerInstance } from '../errorManager';
 
 /**
  * This is not a standard function. It is used in development for formatting template literals.
- * example: keepTrackApi.html\`\<div>example\</div>\`
- * TODO: This should be a static method
+ * example: html\`\<div>example\</div>\`
  */
 export const html = (strings: TemplateStringsArray, ...placeholders: string[]) => {
   for (const placeholder of placeholders) {
     if (typeof placeholder !== 'string') {
-      errorManagerInstance.error(new Error('Invalid input'), 'keepTrackApi.html');
+      errorManagerInstance.error(new Error('Invalid input'), 'html');
     }
   }
 
@@ -18,7 +17,6 @@ export const html = (strings: TemplateStringsArray, ...placeholders: string[]) =
 /**
  * This is not a standard function. It is used in development for formatting template literals.
  * example: glsl\`uniform float example\`
- * TODO: This should be a static method
  */
 export const glsl = (literals: TemplateStringsArray, ...placeholders): string => {
   let str = '';

@@ -15,6 +15,7 @@ import { missileManager } from '../missile/missile-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { StereoMap } from '../stereo-map/stereo-map';
+import { html } from '@app/engine/utils/development/formatter';
 
 const SECTIONS = {
   SENSOR: 'sensor-sat-info',
@@ -73,13 +74,13 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       { key: 'Next Pass', id: EL.NEXT_PASS, tooltip: 'Next Time in Coverage', value: '00:00:00z' },
     ];
 
-    return keepTrackApi.html`
+    return html`
       <div id="${SECTIONS.SENSOR}">
       <div class="sat-info-section-header">
         Sensor Data
         <span id="${SECTIONS.SENSOR}-collapse" class="section-collapse material-icons">expand_less</span>
       </div>
-      ${rows.map((row) => keepTrackApi.html`
+      ${rows.map((row) => html`
         <div
           class="sat-info-row${row.id === EL.SUN || row.id === EL.VMAG || row.id === EL.NEXT_PASS ? ' sat-only-info' : ''}"
         >

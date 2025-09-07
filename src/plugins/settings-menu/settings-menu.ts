@@ -13,6 +13,7 @@ import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
+import { html } from '@app/engine/utils/development/formatter';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -51,7 +52,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   bottomIconElementName: string = 'settings-menu-icon';
   bottomIconImg = settingsPng;
   sideMenuElementName: string = 'settings-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="settings-menu" class="side-menu-parent start-hidden text-select">
     <div id="settings-content" class="side-menu">
       <div class="row">

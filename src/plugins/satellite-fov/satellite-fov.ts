@@ -29,6 +29,7 @@ import { BaseObject, Degrees } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class SatelliteFov extends KeepTrackPlugin {
   readonly id = 'SatelliteFov';
@@ -43,7 +44,7 @@ export class SatelliteFov extends KeepTrackPlugin {
   };
 
   sideMenuElementName: string = 'satellite-fov-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div>
     <div class="center">
       <button id="reset-sat-fov-cones-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button"
@@ -104,7 +105,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     <div id="sat-fov-active-cones" class="col s12">
     </div>
   </div>`;
-  sideMenuSecondaryHtml = keepTrackApi.html`
+  sideMenuSecondaryHtml = html`
   <form id="sat-fov-settings-form">
     <div class="row">
       <div class="col s12">
@@ -313,12 +314,12 @@ export class SatelliteFov extends KeepTrackPlugin {
         let nameSpan = '';
 
         if (currentSat && mesh.obj.id === currentSat.id) {
-          nameSpan = keepTrackApi.html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>`;
+          nameSpan = html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>`;
         } else {
-          nameSpan = keepTrackApi.html`<span>${mesh.obj.name}</span>`;
+          nameSpan = html`<span>${mesh.obj.name}</span>`;
         }
 
-        return keepTrackApi.html`
+        return html`
         <div class="link" style="
             display: flex;
             align-items: center;

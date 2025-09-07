@@ -40,6 +40,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { EL as SAT_INFO_EL, SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];
@@ -69,7 +70,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   isWatchlistChanged: boolean | null = null;
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
       <div id="watchlist-content" class="side-menu">
         <div class="row">
@@ -125,7 +126,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         // Optional if top-menu is enabled
         getEl('nav-mobile2', true)?.insertAdjacentHTML(
           'afterbegin',
-          keepTrackApi.html`
+          html`
                 <li id="top-menu-watchlist-li" class="hidden">
                   <a id="top-menu-watchlist-btn" class="top-menu-icons">
                     <div class="top-menu-icons bmenu-item-selected">
@@ -178,7 +179,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
   private satInfoBoxFinal_() {
     // Add html to EL.TITLE
-    getEl(SAT_INFO_EL.NAME)?.insertAdjacentHTML('beforebegin', keepTrackApi.html`
+    getEl(SAT_INFO_EL.NAME)?.insertAdjacentHTML('beforebegin', html`
       <img id="${this.EL.ADD_WATCHLIST}" src="${bookmarkAddPng}"/>
       <img id="${this.EL.REMOVE_WATCHLIST}" src="${bookmarkRemovePng}"/>
     `);

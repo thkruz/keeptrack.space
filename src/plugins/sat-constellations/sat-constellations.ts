@@ -4,12 +4,13 @@ import { showLoading } from '@app/engine/utils/showLoading';
 import { SatConstellationString } from '@app/app/data/catalog-manager/satLinkManager';
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import categoryPng from '@public/img/icons/category.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
@@ -27,7 +28,7 @@ export class SatConstellations extends KeepTrackPlugin {
   bottomIconImg = categoryPng;
   bottomIconElementName: string = 'menu-constellations';
   sideMenuElementName: string = 'constellations-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="constellations-menu" class="side-menu-parent start-hidden text-select">
     <div id="constellation-menu" class="side-menu">
       <ul>

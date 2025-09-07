@@ -4,11 +4,12 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
 
 
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 
@@ -46,7 +47,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   sideMenuElementName: string = 'polar-plot-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="polar-plot-menu" class="side-menu-parent start-hidden text-select">
     <div id="polar-plot-content" class="side-menu" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
       <span id="polar-plot-warning" class="text-center">Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours</span>

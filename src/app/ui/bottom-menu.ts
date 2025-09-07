@@ -1,5 +1,6 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -30,7 +31,7 @@ export class BottomMenu {
     const bottomMenuNode = document.createElement('div');
 
     bottomMenuNode.id = 'nav-footer';
-    bottomMenuNode.innerHTML = keepTrackApi.html`
+    bottomMenuNode.innerHTML = html`
       <div id="bottom-icons-container">
         <div id="bottom-icons-filter">
           <div id="${BottomMenu.basicMenuId}" class="bmenu-filter-item bmenu-item-selected">

@@ -2,11 +2,12 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import calculatorPng from '@public/img/icons/calculator.png';
 
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { Degrees, DetailedSensor, ecf2eci, eci2ecf, eci2rae, Kilometers, rae2eci, RaeVec3, Vector3D } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 enum CalculatorMode {
   ITRF = 'ITRF',
@@ -24,7 +25,7 @@ export class Calculator extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
 
   sideMenuElementName = 'calculator-menu';
-  private readonly itrfHtml = keepTrackApi.html`
+  private readonly itrfHtml = html`
   <div>
     <form id="calculator">
       <div class="center-align row">
@@ -111,7 +112,7 @@ export class Calculator extends KeepTrackPlugin {
       </div>
   </div>
   `;
-  private readonly raeHtml = keepTrackApi.html`
+  private readonly raeHtml = html`
   <div>
     <form id="calculator">
       <div class="center-align row">
@@ -198,7 +199,7 @@ export class Calculator extends KeepTrackPlugin {
       </div>
   </div>
   `;
-  private readonly j2000Html = keepTrackApi.html`
+  private readonly j2000Html = html`
   <div>
     <form id="calculator">
       <div class="center-align row">
@@ -286,11 +287,11 @@ export class Calculator extends KeepTrackPlugin {
   </div>
   `;
 
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="calculator-content-wrapper">
       ${this.itrfHtml}
     </div>`;
-  sideMenuSecondaryHtml = keepTrackApi.html`
+  sideMenuSecondaryHtml = html`
   <div>
     <div class="center-align row">
       <button id="calculator-itrf" class="btn btn-ui waves-effect waves-light" type="button" name="action">ITRF</button>

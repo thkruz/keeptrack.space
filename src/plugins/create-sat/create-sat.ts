@@ -16,12 +16,13 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 
 /**
  * Interface for TLE input parameters
@@ -67,7 +68,7 @@ export class CreateSat extends KeepTrackPlugin {
   /**
    * HTML template for the side menu
    */
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="createSat-menu" class="side-menu-parent start-hidden text-select">
       <div id="createSat-content" class="side-menu">
         <div class="row">

@@ -12,6 +12,7 @@ import { DopMath } from '@app/engine/math/dop-math';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';
@@ -33,7 +34,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   };
 
   helpTitle = 'Dilution of Precision (DOP) Menu';
-  helpBody = keepTrackApi.html`The Dilution of Precision (DOP) Menu is used to calculate the Dilution of Precision (DOP) for a given location and elevation mask.
+  helpBody = html`The Dilution of Precision (DOP) Menu is used to calculate the Dilution of Precision (DOP) for a given location and elevation mask.
     <br><br>
     HDOP is the Horizontal Dilution of Precision. It is a measure of the accuracy of the horizontal position.
     <br><br>
@@ -43,7 +44,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   `;
 
   sideMenuElementName = 'dops-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
   <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select">
     <div id="dops-content" class="side-menu">
       <form id="dops-form">
@@ -78,7 +79,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   </div>`;
 
   rmbL1ElementName = 'dops-rmb';
-  rmbL1Html = keepTrackApi.html`
+  rmbL1Html = html`
   <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">DOPs &#x27A4;</a></li>
 `;
 
@@ -87,7 +88,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   isRmbOnSat = false;
 
   rmbL2ElementName = 'dops-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
   <ul class='dropdown-contents'>
     <li id="dops-curdops-rmb"><a href="#">Current GPS DOPs</a></li>
     <li id="dops-24dops-rmb"><a href="#">24 Hour GPS DOPs</a></li>

@@ -14,6 +14,7 @@ import streamPng from '@public/img/icons/stream.png';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class Breakup extends KeepTrackPlugin {
   readonly id = 'Breakup';
@@ -58,7 +59,7 @@ export class Breakup extends KeepTrackPlugin {
   };
 
   sideMenuElementName: string = 'breakup-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
     <div id="breakup-content" class="side-menu">
       <div class="row">

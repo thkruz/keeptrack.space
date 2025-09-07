@@ -28,7 +28,7 @@ import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, E
 import { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import { Degrees, Kilometers, Milliseconds, Radians } from 'ootk';
 import { ClassificationString } from '../app/ui/classification';
 import { RADIUS_OF_EARTH } from '../engine/utils/constants';
 import { isThisNode } from '../engine/utils/isThisNode';
@@ -190,7 +190,7 @@ export class SettingsManager {
   /**
    * The initial field of view settings for FPS, Planetarium, Astronomy, and Satellite View
    */
-  fieldOfView = 0.6;
+  fieldOfView = 0.6 as Radians;
   db = null;
   /**
    * Catch Errors and report them via github
@@ -581,7 +581,7 @@ export class SettingsManager {
    *
    * TODO: Implement this for FPS, Planetarium, Astronomy, and Satellite View
    */
-  fieldOfViewMax = 1.2;
+  fieldOfViewMax = 1.2 as Radians;
   /**
    * @deprecated
    * The minimum value for the field of view setting.

@@ -5,6 +5,7 @@ import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec2, vec4 } from 'gl-matrix';
+import { DepthManager } from '../depth-manager';
 import { Sun } from './sun';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
@@ -290,6 +291,8 @@ export class Godrays {
         // If you don’t want tone mapping yet, use this instead:
         // vec3 rays = color.rgb * exposure;
         // fragColor = vec4(min(scene.rgb + rays, 1.0), 1.0);
+
+        ${DepthManager.getLogDepthFragCode()}
       }
     `,
     vert: keepTrackApi.glsl`
@@ -315,6 +318,8 @@ export class Godrays {
         // pass the texCoord to the fragment shader
         // The GPU will interpolate this value between points.
         v_texCoord = a_texCoord;
+
+        ${DepthManager.getLogDepthVertCode()}
       }
     `,
   };

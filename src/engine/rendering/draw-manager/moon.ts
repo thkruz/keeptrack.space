@@ -24,9 +24,11 @@ import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EciVec3, EpochUTC, Moon as MoonMath } from 'ootk';
 import { keepTrackApi } from '../../../keepTrackApi';
+import { DepthManager } from '../depth-manager';
 import { GlUtils } from '../gl-utils';
 
 // TODO: Moon doesn't occlude the sun yet!
@@ -70,7 +72,7 @@ export class Moon {
     this.setUniforms_(gl, sunPosition);
 
     gl.enable(gl.DEPTH_TEST);
-    gl.depthMask(false); // Disable depth writing
+    gl.depthMask(true); // Enable depth writing
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
@@ -78,8 +80,6 @@ export class Moon {
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
-
-    gl.depthMask(true); // Re-enable depth writing
   }
 
   /**
@@ -95,43 +95,48 @@ export class Moon {
     if (settingsManager.centerBody === 'earth') {
       gl.uniform3fv(this.mesh.material.uniforms.worldOffset, Scene.getInstance().worldShift);
     }
+    gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+    gl.uniform1f(this.mesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
   }
 
   /**
    * This is run once per session to initialize the moon.
    */
   async init(gl: WebGL2RenderingContext): Promise<void> {
-    this.gl_ = gl;
+    try {
+      this.gl_ = gl;
 
-    const geometry = new SphereGeometry(gl, {
-      radius: this.RADIUS,
-      widthSegments: this.NUM_HEIGHT_SEGS,
-      heightSegments: this.NUM_WIDTH_SEGS,
-    });
-    const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/moon-1024.jpg`);
-    const material = new ShaderMaterial(gl, {
-      uniforms: {
-        sampler: null as unknown as WebGLUniformLocation,
-        drawPosition: null as unknown as WebGLUniformLocation,
-        sunPos: null as unknown as WebGLUniformLocation,
-      },
-      map: texture,
-      vertexShader: this.shaders_.vert,
-      fragmentShader: this.shaders_.frag,
-      glslVersion: GLSL3,
-    });
+      const geometry = new SphereGeometry(gl, {
+        radius: this.RADIUS,
+        widthSegments: this.NUM_HEIGHT_SEGS,
+        heightSegments: this.NUM_WIDTH_SEGS,
+      });
+      const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/moon-1024.jpg`);
+      const material = new ShaderMaterial(gl, {
+        uniforms: {
+          sampler: null as unknown as WebGLUniformLocation,
+          // drawPosition: null as unknown as WebGLUniformLocation,
+          sunPos: null as unknown as WebGLUniformLocation,
+        },
+        map: texture,
+        vertexShader: this.shaders_.vert,
+        fragmentShader: this.shaders_.frag,
+        glslVersion: GLSL3,
+      });
 
-    this.mesh = new Mesh(gl, geometry, material, {
-      name: 'moon',
-      precision: 'highp',
-      disabledUniforms: {
-        modelMatrix: true,
-        viewMatrix: true,
-        cameraPosition: true,
-      },
-    });
-    this.mesh.geometry.initVao(this.mesh.program);
-    this.isLoaded_ = true;
+      this.mesh = new Mesh(gl, geometry, material, {
+        name: 'moon',
+        precision: 'highp',
+        disabledUniforms: {
+          modelMatrix: true,
+          viewMatrix: true,
+        },
+      });
+      this.mesh.geometry.initVao(this.mesh.program);
+      this.isLoaded_ = true;
+    } catch (e) {
+      errorManagerInstance.warn('Error initializing moon:', e);
+    }
   }
 
   /**
@@ -174,15 +179,16 @@ export class Moon {
 
       in vec2 v_texcoord;
       in vec3 v_normal;
-      in float v_dist;
+      in vec3 vVertToCamera;
 
       out vec4 fragColor;
 
       void main(void) {
-        // Don't draw the back of the sphere
-        // if (v_dist > 1.0) {
-          // discard;
-        // }
+        vec3 fragToCamera = normalize(vVertToCamera);
+      // Use fragToCamera to determine if the fragment should be culled
+      if (dot(fragToCamera, v_normal) < 0.0) {
+        discard;
+      }
 
         // sun is shining opposite of its direction from the center of the earth
         vec3 lightDirection = sunPos - vec3(0.0,0.0,0.0);
@@ -198,6 +204,8 @@ export class Moon {
 
 
         fragColor = vec4(litTexColor, 1.0);
+
+        ${DepthManager.getLogDepthFragCode()}
       }
       `,
     vert: keepTrackApi.glsl`
@@ -205,19 +213,20 @@ export class Moon {
 
       out vec2 v_texcoord;
       out vec3 v_normal;
-      out float v_dist;
+      out vec3 vVertToCamera;
 
       void main(void) {
           vec4 worldPosition = modelViewMatrix * vec4(position, 1.0);
           worldPosition.xyz += worldOffset;
-          gl_Position = projectionMatrix * worldPosition;
 
-          // Ratio of the vertex distance compared to the center of the sphere
-          // This lets us figure out which verticies are on the back half
-          v_dist = distance(worldPosition.xyz,vec3(0.0,0.0,0.0)) \/ drawPosition;
+          vVertToCamera = normalize(vec3(cameraPosition) - worldPosition.xyz);
 
           v_texcoord = uv;
           v_normal = normalMatrix * normal;
+
+          gl_Position = projectionMatrix * worldPosition;
+
+          ${DepthManager.getLogDepthVertCode()}
       }
       `,
   };

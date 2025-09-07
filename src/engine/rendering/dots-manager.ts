@@ -13,6 +13,7 @@ import { Scene } from '../core/scene';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { BufferAttribute } from './buffer-attribute';
+import { DepthManager } from './depth-manager';
 import { WebGlProgramHelper } from './webgl-program';
 import { WebGLRenderer } from './webgl-renderer';
 
@@ -97,6 +98,7 @@ export class DotsManager {
         u_minSize: <WebGLUniformLocation><unknown>null,
         u_maxSize: <WebGLUniformLocation><unknown>null,
         worldOffset: <WebGLUniformLocation><unknown>null,
+        logDepthBufFC: <WebGLUniformLocation><unknown>null,
       },
       vao: <WebGLVertexArrayObject><unknown>null,
     },
@@ -124,6 +126,7 @@ export class DotsManager {
         u_minSize: <WebGLUniformLocation><unknown>null,
         u_maxSize: <WebGLUniformLocation><unknown>null,
         worldOffset: <WebGLUniformLocation><unknown>null,
+        logDepthBufFC: <WebGLUniformLocation><unknown>null,
       },
       vao: <WebGLVertexArrayObject><unknown>null,
     },
@@ -168,6 +171,7 @@ export class DotsManager {
     gl.useProgram(this.programs.dots.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
+    gl.uniform1f(this.programs.dots.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     gl.uniform3fv(this.programs.dots.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
@@ -200,7 +204,7 @@ export class DotsManager {
      * gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
      */
     gl.enable(gl.BLEND);
-    // gl.depthMask(false);
+    gl.depthMask(false); // Disable depth writing
 
     // Should not be relying on sizeData -- but temporary
     gl.drawArrays(gl.POINTS, 0, settingsManager.dotsOnScreen);
@@ -405,7 +409,7 @@ export class DotsManager {
 
     this.pickingRenderBuffer = gl.createRenderbuffer(); // create RB to store the depth buffer
     gl.bindRenderbuffer(gl.RENDERBUFFER, this.pickingRenderBuffer);
-    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT32F, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.pickingTexture, 0);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.pickingRenderBuffer);
@@ -695,8 +699,11 @@ export class DotsManager {
   private initShaders_() {
     this.shaders_ = {
       dots: {
-        frag: `#version 300 es
-            precision mediump float;
+        frag: keepTrackApi.glsl`#version 300 es
+            #extension GL_EXT_frag_depth : enable
+            precision highp float;
+
+            uniform float logDepthBufFC;
 
             in vec4 vColor;
             in float vStar;
@@ -712,30 +719,30 @@ export class DotsManager {
             }
 
             void main(void) {
-            vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
-            float r = 0.0;
-            float alpha = 0.0;
-            // If not a star and not on the ground
-            r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-            alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+              vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
+              float r = 0.0;
+              float alpha = 0.0;
+              // If not a star and not on the ground
+              r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
+              alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
 
-            // If on the ground
-            r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
-            alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 6471.0);
+              // If on the ground
+              r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
+              alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 6471.0);
 
-            // If a star
-            r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
-            alpha += (2.0 * r - ${settingsManager.satShader.blurFactor4}) * when_ge(vDist, 200000.0);
+              // If a star
+              r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
+              alpha += (2.0 * r - ${settingsManager.satShader.blurFactor4}) * when_ge(vDist, 200000.0);
 
-            alpha = min(alpha, 1.0);
-            if (alpha == 0.0) discard;
-            fragColor = vec4(vColor.rgb, vColor.a * alpha);
+              alpha = min(alpha, 1.0);
+              if (alpha == 0.0) discard;
+              fragColor = vec4(vColor.rgb, vColor.a * alpha);
 
-            // Reduce Flickering from Depth Fighting
-            gl_FragDepth = gl_FragCoord.z * 0.99999975;
+              ${DepthManager.getLogDepthFragCode()}
             }
           `,
-        vert: `#version 300 es
+        vert: keepTrackApi.glsl`#version 300 es
+          precision highp float;
           in vec3 a_position;
           in vec4 a_color;
           in float a_star;
@@ -743,8 +750,8 @@ export class DotsManager {
           uniform float u_minSize;
           uniform float u_maxSize;
           uniform vec3 worldOffset;
-
           uniform mat4 u_pMvCamMatrix;
+          uniform float logDepthBufFC;
 
           out vec4 vColor;
           out float vStar;
@@ -759,8 +766,12 @@ export class DotsManager {
 
           void main(void) {
               vec4 position = u_pMvCamMatrix * vec4(a_position + worldOffset, 1.0);
+              gl_Position = position;
+
+              ${DepthManager.getLogDepthVertCode()}
+
               float drawSize = 0.0;
-              float dist = distance(vec3(0.0, 0.0, 0.0),a_position.xyz);
+              float dist = distance(vec3(0.0, 0.0, 0.0), a_position.xyz);
 
               // Satellite
               drawSize +=
@@ -778,7 +789,6 @@ export class DotsManager {
               (min(max(${settingsManager.satShader.starSize} * 100000.0 \/ dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.0));
 
               gl_PointSize = drawSize;
-              gl_Position = position;
               vColor = a_color;
               vStar = a_star * 1.0;
               vDist = dist;
@@ -787,18 +797,21 @@ export class DotsManager {
       },
       picking: {
         vert: `#version 300 es
+                precision mediump float;
                 in vec3 a_position;
                 in vec3 a_color;
                 in float a_pickable;
 
                 uniform mat4 u_pMvCamMatrix;
                 uniform vec3 worldOffset;
+                uniform float logDepthBufFC;
 
                 out vec3 vColor;
 
                 void main(void) {
                 vec4 position = u_pMvCamMatrix * vec4(a_position + worldOffset, 1.0);
                 gl_Position = position;
+                ${DepthManager.getLogDepthVertCode()}
                 gl_PointSize = ${settingsManager.pickingDotSize} * a_pickable;
                 vColor = a_color * a_pickable;
                 }
@@ -808,13 +821,13 @@ export class DotsManager {
 
                 in vec3 vColor;
 
+                uniform float logDepthBufFC;
+
                 out vec4 fragColor;
 
                 void main(void) {
                     fragColor = vec4(vColor, 1.0);
-
-                    // Reduce Flickering from Depth Fighting while picking
-                    gl_FragDepth = gl_FragCoord.z * 0.99999975;
+                    ${DepthManager.getLogDepthFragCode()}
                 }
             `,
       },

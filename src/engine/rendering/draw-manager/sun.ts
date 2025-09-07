@@ -29,6 +29,7 @@ import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec2, vec3 } from 'gl-matrix';
 import { EciVec3, Kilometers } from 'ootk';
+import { DepthManager } from '../depth-manager';
 
 export enum SunTextureQuality {
   POTATO = '512',
@@ -39,13 +40,13 @@ export enum SunTextureQuality {
 
 export class Sun {
   /** The radius of the sun. */
-  private readonly DRAW_RADIUS = 1500;
+  private readonly DRAW_RADIUS = 5000;
   /** The number of height segments for the sun. */
   private readonly NUM_HEIGHT_SEGS = 32;
   /** The number of width segments for the sun. */
   private readonly NUM_WIDTH_SEGS = 32;
   /** The distance scalar for the sun. */
-  private readonly SCALAR_DISTANCE = 220000;
+  private readonly SCALAR_DISTANCE = 800000;
 
   /** The WebGL context. */
   private gl_: WebGL2RenderingContext;
@@ -239,6 +240,8 @@ export class Sun {
 
             vUv = uv;
             v_normal = normalMatrix * normal;
+
+            ${DepthManager.getLogDepthVertCode()}
         }`,
   };
 }

@@ -5,6 +5,7 @@ import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { mat4, vec3 } from 'gl-matrix';
 import { Degrees, DetailedSensor, GreenwichMeanSiderealTime, Kilometers, rae2eci } from 'ootk';
 import { keepTrackApi } from '../../../keepTrackApi';
+import { DepthManager } from '../depth-manager';
 import { CustomMesh } from './custom-mesh';
 
 interface SurfaceMeshParams {
@@ -31,6 +32,7 @@ export class SensorFovMesh extends CustomMesh {
     u_mvMatrix: null as unknown as WebGLUniformLocation,
     u_color: null as unknown as WebGLUniformLocation,
     u_worldOffset: null as unknown as WebGLUniformLocation,
+    logDepthBufFC: null as unknown as WebGLUniformLocation,
   };
   /**
    * A typed array that stores the indices for the bottom part of the sensor field of view mesh.
@@ -80,12 +82,13 @@ export class SensorFovMesh extends CustomMesh {
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
     gl.uniform3fv(this.uniforms_.u_worldOffset, Scene.getInstance().worldShift);
+    gl.uniform1f(this.uniforms_.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     gl.uniform4fv(this.uniforms_.u_color, color);
 
-    gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-    gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
     gl.depthMask(false); // Disable depth writing
 
     gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -103,8 +106,8 @@ export class SensorFovMesh extends CustomMesh {
     gl.bindVertexArray(null);
 
     gl.depthMask(true); // Re-enable depth writing
+    gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
-    gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.POLYGON_OFFSET_FILL);
   }
 
@@ -390,11 +393,14 @@ export class SensorFovMesh extends CustomMesh {
       precision highp float;
 
       uniform vec4 u_color;
+      uniform float logDepthBufFC;
 
       out vec4 fragColor;
 
       void main(void) {
         fragColor = vec4(u_color.rgb, 0.15);
+
+        ${DepthManager.getLogDepthFragCode()}
       }
     `,
     vert: keepTrackApi.glsl`#version 300 es
@@ -402,6 +408,7 @@ export class SensorFovMesh extends CustomMesh {
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;
       uniform vec3 u_worldOffset;
+      uniform float logDepthBufFC;
 
       in vec3 a_position;
 
@@ -409,6 +416,8 @@ export class SensorFovMesh extends CustomMesh {
         vec4 worldPosition = u_mvMatrix * vec4(a_position, 1.0);
         worldPosition.xyz += u_worldOffset;
         gl_Position = u_pMatrix * u_camMatrix * worldPosition;
+
+        ${DepthManager.getLogDepthVertCode()}
       }
     `,
   };

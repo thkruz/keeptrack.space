@@ -4,14 +4,15 @@ import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { SettingsManager } from '@app/settings/settings';
-import { mat3, mat4 } from 'gl-matrix';
+import { mat3, mat4, vec3 } from 'gl-matrix';
 import { DEG2RAD } from 'ootk';
 import { keepTrackApi } from '../../../keepTrackApi';
+import { DepthManager } from '../depth-manager';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
 export class SkyBoxSphere {
-  private readonly DRAW_RADIUS = 200000;
+  private readonly DRAW_RADIUS = 950000;
   private readonly NUM_HEIGHT_SEGS = 16;
   private readonly NUM_WIDTH_SEGS = 16;
 
@@ -118,6 +119,7 @@ export class SkyBoxSphere {
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniform3fv(this.mesh.material.uniforms.worldOffset, vec3.negate(vec3.create(), keepTrackApi.getMainCamera().getCameraPosition()));
 
     if (!this.settings_.isDrawMilkyWay && !this.settings_.isDrawConstellationBoundaries && !this.settings_.isDrawNasaConstellations) {
       gl.uniform1i(this.mesh.material.uniforms.u_texMilkyWay, 0);
@@ -206,7 +208,6 @@ export class SkyBoxSphere {
         normalMatrix: true,
         viewMatrix: true,
         cameraPosition: true,
-        worldOffset: true,
       },
     });
     this.mesh.geometry.initVao(this.mesh.program);
@@ -287,6 +288,8 @@ export class SkyBoxSphere {
             // 60% goes to the milky way no matter what
             vec4 vecMilkyWay = texture(u_texMilkyWay, v_texcoord) * u_fMilkyWay * 0.1;
             fragColor = vecMilkyWay + vecConstellations + vecBoundaries;
+
+            ${DepthManager.getLogDepthFragCode()}
         }
         `,
     vert: keepTrackApi.glsl`
@@ -295,6 +298,7 @@ export class SkyBoxSphere {
 
         void main(void) {
             vec4 worldPosition = modelViewMatrix * vec4(position, 1.0);
+            worldPosition.xyz += worldOffset;
             gl_Position = projectionMatrix * worldPosition;
 
             // This lets us figure out which verticies are on the back half
@@ -302,7 +306,9 @@ export class SkyBoxSphere {
 
             v_texcoord = uv;
             v_texcoord.x = 1.0 - v_texcoord.x;
-        }
+
+            ${DepthManager.getLogDepthVertCode()}
+      }
         `,
   };
 }

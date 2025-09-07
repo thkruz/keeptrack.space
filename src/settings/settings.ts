@@ -818,7 +818,7 @@ export class SettingsManager {
    *
    * Used for zooming in and out in default and offset camera modes.
    */
-  maxZoomDistance = <Kilometers>250000;
+  maxZoomDistance = <Kilometers>450000;
   /**
    * Which mesh to use if meshOverride is set
    */

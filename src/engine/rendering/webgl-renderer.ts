@@ -14,6 +14,7 @@ import { EventBus } from '../events/event-bus';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
+import { DepthManager } from './depth-manager';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
 import { MeshManager } from './mesh-manager';
@@ -62,10 +63,11 @@ export class WebGLRenderer {
   sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } | null = null;
   lastResizeTime: number;
 
-  static calculatePMatrix(gl: WebGL2RenderingContext, zNear: number, zFar: number): mat4 {
+  static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
+    const depthConfig = DepthManager.getConfig();
     const pMatrix = mat4.create();
 
-    mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, zNear, zFar);
+    mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, depthConfig.near, depthConfig.far);
 
     // This converts everything from 3D space to ECI (z and y planes are swapped)
     const eciToOpenGlMat: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
@@ -90,8 +92,7 @@ export class WebGLRenderer {
       return;
     }
 
-    // Close Objects need a different zNear and zFar
-    this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl, settingsManager.zNear, settingsManager.zFar);
+    this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
   }
 
   private isAltCanvasSize_ = false;
@@ -191,8 +192,10 @@ export class WebGLRenderer {
     this.resizeCanvas();
 
     gl.getExtension('EXT_frag_depth');
-    gl.enable(gl.DEPTH_TEST);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    DepthManager.setupDepthBuffer(gl);
+    this.updatePMatrix();
 
     this.postProcessingManager = new PostProcessingManager();
     this.postProcessingManager.init(gl);

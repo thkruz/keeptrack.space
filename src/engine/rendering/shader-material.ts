@@ -38,6 +38,7 @@ export class ShaderMaterial extends Material {
         normalMatrix: null as unknown as WebGLUniformLocation,
         cameraPosition: null as unknown as WebGLUniformLocation,
         worldOffset: null as unknown as WebGLUniformLocation,
+        logDepthBufFC: null as unknown as WebGLUniformLocation,
       },
     };
 

@@ -32,6 +32,7 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, Sun } from 'ootk';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { PersistenceManager, StorageKey } from '../../utils/persistence-manager';
+import { DepthManager } from '../depth-manager';
 import {
   AtmosphereSettings, EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality,
   EarthSpecTextureQuality, EarthTextureStyle,
@@ -342,7 +343,6 @@ export class Earth {
     this.setSurfaceUniforms_(gl);
     this.setTextures_(gl);
 
-    gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
 
     gl.bindVertexArray(this.surfaceMesh.geometry.vao);
@@ -366,7 +366,6 @@ export class Earth {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
-    gl.enable(gl.DEPTH_TEST);
     gl.depthMask(false); // Disable depth writing
 
     gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -376,9 +375,10 @@ export class Earth {
     gl.drawElements(gl.TRIANGLES, this.atmosphereMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
 
-    gl.depthMask(true); // Re-enable depth writing
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.disable(gl.POLYGON_OFFSET_FILL);
+
+    gl.depthMask(true); // Re-enable depth writing
   }
 
   /**
@@ -390,6 +390,7 @@ export class Earth {
     gl.uniformMatrix3fv(this.surfaceMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
     gl.uniform3fv(this.surfaceMesh.material.uniforms.worldOffset, Scene.getInstance().worldShift);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uGlow, this.glowNumber_);
@@ -411,6 +412,7 @@ export class Earth {
     gl.uniformMatrix3fv(this.atmosphereMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.worldOffset, Scene.getInstance().worldShift);
+    gl.uniform1f(this.atmosphereMesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
   }
@@ -613,8 +615,6 @@ export class Earth {
    */
   shaders = {
     surfaceFrag: keepTrackApi.glsl`
-    precision highp float;
-
     uniform float uIsAmbientLighting;
     uniform float uGlow;
     uniform float uCloudPosition;
@@ -655,6 +655,10 @@ export class Earth {
     void main(void) {
       float fragToLightAngle = dot( vNormal, uLightDirection ) * 0.5 + 0.5; //Remake -1 > 1 to 0 > 1
       vec3 fragToCamera = normalize(vVertToCamera);
+      // Use fragToCamera to determine if the fragment should be culled
+      if (dot(fragToCamera, vNormal) < 0.0) {
+        discard;
+      }
 
       // .................................................
       // Diffuse lighting
@@ -725,6 +729,7 @@ export class Earth {
         fragColor.rgb += auroraColor * auroraIntensity * auroraStrength;
       }
 
+      ${DepthManager.getLogDepthFragCode()}
     }
     `,
     surfaceVert: keepTrackApi.glsl`
@@ -742,6 +747,8 @@ export class Earth {
         vVertToCamera = normalize(vec3(cameraPosition) - worldPosition.xyz);
 
         gl_Position = projectionMatrix * worldPosition;
+
+        ${DepthManager.getLogDepthVertCode()}
     }
     `,
     atmosphereVert: '', // Placeholder Only

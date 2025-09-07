@@ -46,6 +46,9 @@ export class Mesh {
     if (params?.disabledUniforms?.worldOffset) {
       delete this.material.uniforms.worldOffset;
     }
+    if (params?.disabledUniforms?.logDepthBufFC) {
+      delete this.material.uniforms.logDepthBufFC;
+    }
 
     this.name = params?.name ?? 'Mesh';
     this.precision = params?.precision || 'highp';
@@ -106,6 +109,9 @@ export class Mesh {
     if (!params.disabledUniforms?.worldOffset) {
       vertexShaderHeader += 'uniform vec3 worldOffset;\n';
     }
+    if (!params.disabledUniforms?.logDepthBufFC) {
+      vertexShaderHeader += 'uniform float logDepthBufFC;\n';
+    }
 
     if (this.material.glslVersion === GLSL3) {
       if (!params.disabledAttributes?.position) {
@@ -143,6 +149,9 @@ export class Mesh {
     if (this.material.glslVersion === GLSL1) {
       fragmentShaderHeader = '#version 100\n';
     }
+
+    fragmentShaderHeader += '#extension GL_EXT_frag_depth : enable\n';
+
     fragmentShaderHeader += `precision ${this.precision} float;\n\n`;
 
     if (!params.disabledUniforms?.viewMatrix) {
@@ -150,6 +159,9 @@ export class Mesh {
     }
     if (!params.disabledUniforms?.cameraPosition) {
       fragmentShaderHeader += 'uniform vec3 cameraPosition;\n';
+    }
+    if (!params.disabledUniforms?.logDepthBufFC) {
+      fragmentShaderHeader += 'uniform float logDepthBufFC;\n';
     }
 
     return fragmentShaderHeader;

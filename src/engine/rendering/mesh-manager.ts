@@ -6,6 +6,7 @@ import { DownloadModelsOptions, Layout, Mesh, MeshMap, OBJ } from 'webgl-obj-loa
 import { MissileObject } from '../../app/data/catalog-manager/MissileObject';
 import { SplashScreen } from '../../app/ui/splash-screen';
 import { errorManagerInstance } from '../utils/errorManager';
+import { DepthManager } from './depth-manager';
 import { OcclusionProgram } from './draw-manager/post-processing';
 
 type KeepTrackMesh = Mesh & {
@@ -88,6 +89,7 @@ export class MeshManager {
     uNormalMatrix: <WebGLUniformLocation><unknown>null,
     uLightDirection: <WebGLUniformLocation><unknown>null,
     uInSun: <WebGLUniformLocation><unknown>null,
+    logDepthBufFC: <WebGLUniformLocation><unknown>null,
   };
 
   calculateNadirYaw_: () => Radians;
@@ -238,6 +240,7 @@ export class MeshManager {
     gl.uniformMatrix4fv(this.uniforms_.uPMatrix, false, pMatrix);
     gl.uniformMatrix4fv(this.uniforms_.uCamMatrix, false, camMatrix);
     gl.uniform1f(this.uniforms_.uInSun, this.currentMeshObject.inSun);
+    gl.uniform1f(this.uniforms_.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.currentMeshObject.model.mesh.vertexBuffer);
     this.changeVertexAttribArrays(true);
@@ -856,6 +859,7 @@ export class MeshManager {
     this.uniforms_.uNormalMatrix = gl.getUniformLocation(this.program_, 'uNormalMatrix') as WebGLUniformLocation;
     this.uniforms_.uLightDirection = gl.getUniformLocation(this.program_, 'uLightDirection') as WebGLUniformLocation;
     this.uniforms_.uInSun = gl.getUniformLocation(this.program_, 'uInSun') as WebGLUniformLocation;
+    this.uniforms_.logDepthBufFC = gl.getUniformLocation(this.program_, 'logDepthBufFC') as WebGLUniformLocation;
   }
 
   private populateFileList(): void {
@@ -908,6 +912,7 @@ export class MeshManager {
     uniform mat3 uNormalMatrix;
     uniform vec3 uLightDirection;
     uniform float uInSun;
+    uniform float logDepthBufFC;
 
     out vec2 vTextureCoord;
     out vec3 vTransformedNormal;
@@ -932,6 +937,8 @@ export class MeshManager {
       gl_Position = uPMatrix * vPosition;
       vTextureCoord = aTextureCoord;
       vTransformedNormal  = uNormalMatrix * aVertexNormal;
+
+      ${DepthManager.getLogDepthVertCode()}
     }
   `,
   };

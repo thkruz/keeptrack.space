@@ -24,7 +24,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { mat4 } from 'gl-matrix';
-import { keepTrackContainer } from '../../src/container';
+import { Container } from '../../src/engine/core/container';
 import { Constructor, Singletons } from '../../src/engine/core/interfaces';
 import { OrbitManager } from '../../src/engine/rendering/orbitManager';
 import { WebGLRenderer } from '../../src/engine/rendering/webgl-renderer';
@@ -73,7 +73,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   clearAllCallbacks();
 
   const renderer = new WebGLRenderer();
-  const scene = new Scene();
+  const scene = Scene.getInstance();
 
   scene.init({ gl: global.mocks.glMock });
 
@@ -102,7 +102,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   } as unknown as Worker;
   catalogManagerInstance.objectCache = [defaultSat];
   catalogManagerInstance.satLinkManager = new SatLinkManager();
-  keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
 
   const orbitManagerInstance = new OrbitManager();
 
@@ -112,26 +112,26 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   } as unknown as Worker;
 
   orbitManagerInstance.init(null as unknown as LineManager, global.mocks.glMock);
-  keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
 
   const colorSchemeManagerInstance = new ColorSchemeManager();
 
-  keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
 
   const dotsManagerInstance = new DotsManager();
 
   dotsManagerInstance.inViewData = Array(100).fill(0) as unknown as Int8Array;
 
-  keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.DotsManager, dotsManagerInstance);
 
   const timeManagerInstance = new TimeManager();
 
   timeManagerInstance.simulationTimeObj = new Date(2023, 1, 1, 0, 0, 0, 0);
-  keepTrackContainer.registerSingleton(Singletons.TimeManager, timeManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.TimeManager, timeManagerInstance);
 
   const sensorManagerInstance = new SensorManager();
 
-  keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.SensorManager, sensorManagerInstance);
 
   mockUiManager.searchManager = new SearchManager();
   const soundManagerInstance = new SoundManager();
@@ -153,15 +153,15 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   const inputManagerInstance = new InputManager();
   const groupManagerInstance = new GroupsManager();
 
-  keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, renderer);
-  keepTrackContainer.registerSingleton(Singletons.Scene, scene);
-  keepTrackContainer.registerSingleton(Singletons.UiManager, mockUiManager);
-  keepTrackContainer.registerSingleton(Singletons.InputManager, inputManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.WebGLRenderer, renderer);
+  Container.getInstance().registerSingleton(Singletons.Scene, scene);
+  Container.getInstance().registerSingleton(Singletons.UiManager, mockUiManager);
+  Container.getInstance().registerSingleton(Singletons.InputManager, inputManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.GroupsManager, groupManagerInstance);
   const sensorMathInstance = new SensorMath();
 
-  keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
-  keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.SensorMath, sensorMathInstance);
+  Container.getInstance().registerSingleton(Singletons.SoundManager, soundManagerInstance);
 
   keepTrackApi.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));
   keepTrackApi.getDotsManager().sizeData = new Int8Array(Array(100).fill(0));
@@ -222,7 +222,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
 
     instance.init();
     if (instance.singletonValue) {
-      keepTrackContainer.registerSingleton(instance.singletonValue, instance);
+      Container.getInstance().registerSingleton(instance.singletonValue, instance);
     }
   });
 };

@@ -33,7 +33,7 @@ export class Engine {
     // Initialize core engine systems
     this.eventBus = EventBus.getInstance();
     this.renderer = new WebGLRenderer();
-    this.scene = new Scene();
+    this.scene = Scene.getInstance();
     this.camera = new Camera();
     this.timeManager = new TimeManager();
     this.inputManager = new InputManager();

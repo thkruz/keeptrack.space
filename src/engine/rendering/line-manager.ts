@@ -9,6 +9,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, DetailedSensor, RaeVec3 } from 'ootk';
 import { keepTrackContainer } from '../../container';
+import { EventBusEvent } from '../events/event-bus-events';
 import { Line, LineColor, LineColors } from './line-manager/line';
 import { ObjToObjLine } from './line-manager/obj-to-obj-line';
 import { RefToRefLine } from './line-manager/ref-to-ref-line';
@@ -21,7 +22,7 @@ import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
-import { EventBusEvent } from '../events/event-bus-events';
+import { Scene } from '../core/scene';
 
 export class LineManager {
   attribs = {
@@ -36,6 +37,7 @@ export class LineManager {
     u_color: null as unknown as WebGLUniformLocation,
     u_camMatrix: null as unknown as WebGLUniformLocation,
     u_pMatrix: null as unknown as WebGLUniformLocation,
+    worldOffset: null as unknown as WebGLUniformLocation,
   };
   program: WebGLProgram;
 
@@ -283,6 +285,7 @@ export class LineManager {
 
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
+    gl.uniform3fv(this.uniforms_.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
   }
 
   private shaders_ = {
@@ -304,12 +307,13 @@ export class LineManager {
       uniform vec4 u_color;
       uniform mat4 u_camMatrix;
       uniform mat4 u_pMatrix;
+      uniform vec3 worldOffset;
 
       out vec4 vColor;
       out float vAlpha;
 
       void main(void) {
-          vec4 position = u_pMatrix * u_camMatrix * vec4(a_position[0],a_position[1],a_position[2], 1.0);
+          vec4 position = u_pMatrix * u_camMatrix * vec4(vec3(a_position[0],a_position[1],a_position[2]) + worldOffset, 1.0);
           gl_Position = position;
           vColor = u_color;
           vAlpha = a_position[3];

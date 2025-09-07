@@ -43,6 +43,9 @@ export class Mesh {
     if (params?.disabledUniforms?.cameraPosition) {
       delete this.material.uniforms.cameraPosition;
     }
+    if (params?.disabledUniforms?.worldOffset) {
+      delete this.material.uniforms.worldOffset;
+    }
 
     this.name = params?.name ?? 'Mesh';
     this.precision = params?.precision || 'highp';
@@ -99,6 +102,9 @@ export class Mesh {
     }
     if (!params.disabledUniforms?.cameraPosition) {
       vertexShaderHeader += 'uniform vec3 cameraPosition;\n';
+    }
+    if (!params.disabledUniforms?.worldOffset) {
+      vertexShaderHeader += 'uniform vec3 worldOffset;\n';
     }
 
     if (this.material.glslVersion === GLSL3) {

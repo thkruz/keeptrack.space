@@ -450,6 +450,8 @@ export class SettingsManager {
     maxrange: null,
   };
 
+  centerBody: 'earth' | 'moon' = 'earth';
+
   altMsgNum = null;
   altLoadMsgs = false;
   /**
@@ -816,7 +818,7 @@ export class SettingsManager {
    *
    * Used for zooming in and out in default and offset camera modes.
    */
-  maxZoomDistance = <Kilometers>120000;
+  maxZoomDistance = <Kilometers>250000;
   /**
    * Which mesh to use if meshOverride is set
    */
@@ -1089,7 +1091,7 @@ export class SettingsManager {
    * Minimum distance from satellite when we switch to close camera mode
    * The camera will not be able to get closer than this distance
    */
-  minDistanceFromSatellite = 1.25 as Kilometers;
+  minDistanceFromSatellite = 0.75 as Kilometers;
 
   /**
    * Disable toast messages

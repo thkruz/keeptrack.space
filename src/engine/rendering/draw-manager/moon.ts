@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Scene } from '@app/engine/core/scene';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
@@ -28,11 +29,11 @@ import { EciVec3, EpochUTC, Moon as MoonMath } from 'ootk';
 import { keepTrackApi } from '../../../keepTrackApi';
 import { GlUtils } from '../gl-utils';
 
+// TODO: Moon doesn't occlude the sun yet!
+
 export class Moon {
   /** The radius of the moon. */
-  private readonly DRAW_RADIUS = 2000;
-  /** The distance scalar for the moon. */
-  private readonly SCALAR_DISTANCE = 200000;
+  private readonly RADIUS = 1737.4;
   /** The number of height segments for the moon. */
   private readonly NUM_HEIGHT_SEGS = 16;
   /** The number of width segments for the moon. */
@@ -68,12 +69,17 @@ export class Moon {
 
     this.setUniforms_(gl, sunPosition);
 
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthMask(false); // Disable depth writing
+
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
 
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
+
+    gl.depthMask(true); // Re-enable depth writing
   }
 
   /**
@@ -86,6 +92,9 @@ export class Moon {
     gl.uniform3fv(this.mesh.material.uniforms.sunPos, vec3.fromValues(sunPosition[0] * 100, sunPosition[1] * 100, sunPosition[2] * 100));
     gl.uniform1f(this.mesh.material.uniforms.drawPosition, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
     gl.uniform1i(this.mesh.material.uniforms.sampler, 0);
+    if (settingsManager.centerBody === 'earth') {
+      gl.uniform3fv(this.mesh.material.uniforms.worldOffset, Scene.getInstance().worldShift);
+    }
   }
 
   /**
@@ -95,7 +104,7 @@ export class Moon {
     this.gl_ = gl;
 
     const geometry = new SphereGeometry(gl, {
-      radius: this.DRAW_RADIUS,
+      radius: this.RADIUS,
       widthSegments: this.NUM_HEIGHT_SEGS,
       heightSegments: this.NUM_WIDTH_SEGS,
     });
@@ -136,7 +145,9 @@ export class Moon {
     this.updateEciPosition_(simTime);
 
     this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
-    mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
+    if (settingsManager.centerBody === 'earth') {
+      mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
+    }
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
   }
 
@@ -151,11 +162,7 @@ export class Moon {
     this.eci = MoonMath.eci(EpochUTC.fromDateTime(simTime));
 
     if (this.eci.x && this.eci.y && this.eci.z) {
-      const scaleFactor = this.SCALAR_DISTANCE / Math.max(Math.max(Math.abs(this.eci.x), Math.abs(this.eci.y)), Math.abs(this.eci.z));
-
-      this.position[0] = this.eci.x * scaleFactor;
-      this.position[1] = this.eci.y * scaleFactor;
-      this.position[2] = this.eci.z * scaleFactor;
+      this.position = [this.eci.x, this.eci.y, this.eci.z];
     }
   }
 
@@ -173,9 +180,9 @@ export class Moon {
 
       void main(void) {
         // Don't draw the back of the sphere
-        if (v_dist > 1.0) {
-          discard;
-        }
+        // if (v_dist > 1.0) {
+          // discard;
+        // }
 
         // sun is shining opposite of its direction from the center of the earth
         vec3 lightDirection = sunPos - vec3(0.0,0.0,0.0);
@@ -202,6 +209,7 @@ export class Moon {
 
       void main(void) {
           vec4 worldPosition = modelViewMatrix * vec4(position, 1.0);
+          worldPosition.xyz += worldOffset;
           gl_Position = projectionMatrix * worldPosition;
 
           // Ratio of the vertex distance compared to the center of the sphere

@@ -206,6 +206,7 @@ export class SkyBoxSphere {
         normalMatrix: true,
         viewMatrix: true,
         cameraPosition: true,
+        worldOffset: true,
       },
     });
     this.mesh.geometry.initVao(this.mesh.program);

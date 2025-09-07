@@ -62,10 +62,10 @@ export class WebGLRenderer {
   sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } | null = null;
   lastResizeTime: number;
 
-  static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
+  static calculatePMatrix(gl: WebGL2RenderingContext, zNear: number, zFar: number): mat4 {
     const pMatrix = mat4.create();
 
-    mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, settingsManager.zNear, settingsManager.zFar);
+    mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, zNear, zFar);
 
     // This converts everything from 3D space to ECI (z and y planes are swapped)
     const eciToOpenGlMat: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
@@ -83,6 +83,15 @@ export class WebGLRenderer {
     const vh = Math.min(keepTrackApi.containerRoot?.clientHeight ?? document.documentElement.clientHeight ?? 0, window.innerHeight ?? 0);
 
     return { vw, vh };
+  }
+
+  updatePMatrix(): void {
+    if (!this.gl) {
+      return;
+    }
+
+    // Close Objects need a different zNear and zFar
+    this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl, settingsManager.zNear, settingsManager.zFar);
   }
 
   private isAltCanvasSize_ = false;
@@ -449,6 +458,31 @@ export class WebGLRenderer {
     }
   }
 
+  setNearRenderer() {
+    if (!this.gl) {
+      return;
+    }
+
+    if (settingsManager.zNear !== 0.1) {
+      settingsManager.selectedColor = [0, 0, 0, 0];
+      settingsManager.zNear = 0.1;
+      settingsManager.zFar = 200000;
+      this.updatePMatrix();
+    }
+  }
+
+  setFarRenderer() {
+    if (!this.gl) {
+      return;
+    }
+
+    if (settingsManager.zNear !== 2) {
+      settingsManager.zNear = 2;
+      settingsManager.zFar = 450000;
+      this.updatePMatrix();
+    }
+  }
+
   getScreenCoords(obj: BaseObject): {
     x: number;
     y: number;
@@ -531,7 +565,7 @@ export class WebGLRenderer {
     }
 
     gl.viewport(0, 0, this.domElement.width, this.domElement.height);
-    this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
+    this.updatePMatrix();
     this.isPostProcessingResizeNeeded = true;
 
     // Fix the gpu picker texture size if it has already been created
@@ -585,6 +619,8 @@ export class WebGLRenderer {
       const timeManagerInstance = keepTrackApi.getTimeManager();
       const primarySat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
 
+      Scene.getInstance().worldShift = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id).map((coord) => -coord);
+
       this.meshManager.update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
       keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
       if (primarySat.isMissile()) {
@@ -593,20 +629,27 @@ export class WebGLRenderer {
 
       // If in satellite view the orbit buffer needs to be updated every time
       if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)) {
+        /*
+         * Force an update so that the orbit is always using recent data - this
+         * will not fix this draw call
+         */
         keepTrackApi.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
-        const firstPointOut = [
-          keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3],
-          keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 1],
-          keepTrackApi.getDotsManager().positionData[this.selectSatManager_.primarySatObj.id * 3 + 2],
-        ];
 
-        keepTrackApi.getOrbitManager().updateFirstPointOut(this.selectSatManager_.primarySatObj.id, firstPointOut);
+        // Now we can fix thhis draw call
+        const firstPointOut = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id);
+
+        keepTrackApi.getOrbitManager().updateOrbitData(this.selectSatManager_.primarySatObj.id, firstPointOut);
       }
 
       keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);
 
       keepTrackApi.getScene().primaryCovBubble.update(primarySat);
     } else {
+      if (settingsManager.centerBody === 'earth') {
+        Scene.getInstance().worldShift = [0, 0, 0];
+      } else if (settingsManager.centerBody === 'moon') {
+        Scene.getInstance().worldShift = keepTrackApi.getScene().moon.position.map((coord: number) => -coord) as [number, number, number];
+      }
       keepTrackApi.getScene().searchBox.update(null);
     }
   }
@@ -657,29 +700,21 @@ export class WebGLRenderer {
 
     this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
 
-    /*
-     * cone.update([
-     *   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3],
-     *   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3 + 1],
-     *   <Kilometers>dotsManagerInstance.positionData[catalogManagerInstance.selectedSat * 3 + 2],
-     * ]);
-     */
-
     keepTrackApi.emit(EventBusEvent.updateLoop);
   }
 
-  getCurrentViewport(target?: vec4): vec4 {
+  getCurrentViewport(target = vec4.create()): vec4 {
     const gl = this.gl;
 
-    vec4.set(target ?? vec4.create(), 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    vec4.set(target, 0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     return target;
   }
 
-  getDrawingBufferSize(target?: vec2): vec2 {
+  getDrawingBufferSize(target = vec2.create()): vec2 {
     const gl = this.gl;
 
-    vec2.set(target ?? vec2.create(), gl.drawingBufferWidth, gl.drawingBufferHeight);
+    vec2.set(target, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
     return target;
   }
@@ -704,13 +739,13 @@ export class WebGLRenderer {
   private validateProjectionMatrix_() {
     if (!this.projectionMatrix) {
       errorManagerInstance.log('projectionMatrix is undefined - retrying');
-      this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
+      this.updatePMatrix();
     }
 
     for (let i = 0; i < 16; i++) {
       if (isNaN(this.projectionMatrix[i])) {
         errorManagerInstance.log('projectionMatrix is NaN - retrying');
-        this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
+        this.updatePMatrix();
       }
     }
 
@@ -720,7 +755,7 @@ export class WebGLRenderer {
       }
       if (i === 15) {
         errorManagerInstance.log('projectionMatrix is all zeros - retrying');
-        this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
+        this.updatePMatrix();
       }
     }
   }

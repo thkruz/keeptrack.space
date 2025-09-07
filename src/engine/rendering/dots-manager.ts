@@ -1,4 +1,4 @@
-import { SatCruncherMessageData } from '../core/interfaces';
+import { EciArr3, SatCruncherMessageData } from '../core/interfaces';
 import { GlUtils } from './gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
@@ -9,6 +9,7 @@ import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera';
+import { Scene } from '../core/scene';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { BufferAttribute } from './buffer-attribute';
@@ -95,6 +96,7 @@ export class DotsManager {
         u_pMvCamMatrix: <WebGLUniformLocation><unknown>null,
         u_minSize: <WebGLUniformLocation><unknown>null,
         u_maxSize: <WebGLUniformLocation><unknown>null,
+        worldOffset: <WebGLUniformLocation><unknown>null,
       },
       vao: <WebGLVertexArrayObject><unknown>null,
     },
@@ -121,6 +123,7 @@ export class DotsManager {
         u_pMvCamMatrix: <WebGLUniformLocation><unknown>null,
         u_minSize: <WebGLUniformLocation><unknown>null,
         u_maxSize: <WebGLUniformLocation><unknown>null,
+        worldOffset: <WebGLUniformLocation><unknown>null,
       },
       vao: <WebGLVertexArrayObject><unknown>null,
     },
@@ -165,6 +168,7 @@ export class DotsManager {
     gl.useProgram(this.programs.dots.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
+    gl.uniform3fv(this.programs.dots.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       gl.uniform1f(this.programs.dots.uniforms.u_minSize, this.settings_.satShader.minSizePlanetarium);
@@ -196,7 +200,7 @@ export class DotsManager {
      * gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
      */
     gl.enable(gl.BLEND);
-    gl.depthMask(false);
+    // gl.depthMask(false);
 
     // Should not be relying on sizeData -- but temporary
     gl.drawArrays(gl.POINTS, 0, settingsManager.dotsOnScreen);
@@ -230,6 +234,7 @@ export class DotsManager {
     gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
 
     gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
+    gl.uniform3fv(this.programs.picking.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
     // no reason to render 100000s of pixels when we're only going to read one
     if (!settingsManager.isMobileModeEnabled) {
@@ -258,6 +263,10 @@ export class DotsManager {
       y: <Kilometers>this.positionData[i * 3 + 1],
       z: <Kilometers>this.positionData[i * 3 + 2],
     };
+  }
+
+  getPositionArray(i: number): EciArr3 {
+    return [this.positionData[i * 3], this.positionData[i * 3 + 1], this.positionData[i * 3 + 2]] as EciArr3;
   }
 
   /**
@@ -345,9 +354,7 @@ export class DotsManager {
 
     this.initProgramPicking();
 
-    EventBus.getInstance().on(EventBusEvent.update, () => {
-      this.updatePositionBuffer();
-    });
+    EventBus.getInstance().on(EventBusEvent.update, this.updatePositionBuffer.bind(this));
   }
 
   /**
@@ -383,7 +390,7 @@ export class DotsManager {
     this.programs.picking.program = new WebGlProgramHelper(gl, this.shaders_.picking.vert, this.shaders_.picking.frag).program;
 
     GlUtils.assignAttributes(this.programs.picking.attribs, gl, this.programs.picking.program, ['a_position', 'a_color', 'a_pickable']);
-    GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvCamMatrix']);
+    GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvCamMatrix', 'worldOffset']);
 
     keepTrackApi.getScene().frameBuffers.gpuPicking = gl.createFramebuffer();
     gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
@@ -735,6 +742,7 @@ export class DotsManager {
 
           uniform float u_minSize;
           uniform float u_maxSize;
+          uniform vec3 worldOffset;
 
           uniform mat4 u_pMvCamMatrix;
 
@@ -750,7 +758,7 @@ export class DotsManager {
           }
 
           void main(void) {
-              vec4 position = u_pMvCamMatrix * vec4(a_position, 1.0);
+              vec4 position = u_pMvCamMatrix * vec4(a_position + worldOffset, 1.0);
               float drawSize = 0.0;
               float dist = distance(vec3(0.0, 0.0, 0.0),a_position.xyz);
 
@@ -784,11 +792,12 @@ export class DotsManager {
                 in float a_pickable;
 
                 uniform mat4 u_pMvCamMatrix;
+                uniform vec3 worldOffset;
 
                 out vec3 vColor;
 
                 void main(void) {
-                vec4 position = u_pMvCamMatrix * vec4(a_position, 1.0);
+                vec4 position = u_pMvCamMatrix * vec4(a_position + worldOffset, 1.0);
                 gl_Position = position;
                 gl_PointSize = ${settingsManager.pickingDotSize} * a_pickable;
                 vColor = a_color * a_pickable;

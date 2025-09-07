@@ -558,12 +558,54 @@ export class OrbitManager {
     this.inProgress_[satId] = false;
   }
 
-  updateFirstPointOut(satId: number, firstPointOut: number[]): void {
-    // Update the first 3 pointsOut
+  /**
+   * Updates the orbit data for a satellite by shifting its position relative
+   * to the new first point.
+   */
+  updateOrbitData(satId: number, firstPosition: number[]): void {
+    const satOrbitData = this.getBufferData(satId);
+
+    if (!satOrbitData) {
+      return;
+    }
+
+    const deltaOfFirstPoint = [
+      firstPosition[0] - satOrbitData[0],
+      firstPosition[1] - satOrbitData[1],
+      firstPosition[2] - satOrbitData[2],
+    ];
+
+    for (let i = 0; i < satOrbitData.length; i += 4) {
+      satOrbitData[i] += deltaOfFirstPoint[0];
+      satOrbitData[i + 1] += deltaOfFirstPoint[1];
+      satOrbitData[i + 2] += deltaOfFirstPoint[2];
+      // Ignore oppacity
+    }
+
     const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, new Float32Array(firstPointOut));
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, satOrbitData);
+  }
+
+  /** Returns the current data from the buffer for the given satId. */
+  getBufferData(satId: number): Float32Array | null {
+    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+    const buffer = this.glBuffers_[satId];
+
+    if (!buffer) {
+      return null;
+    }
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+    // WebGL2 only: getBufferSubData copies buffer data into an ArrayBufferView
+    const length = (settingsManager.orbitSegments + 1) * 4;
+    const out = new Float32Array(length);
+
+    gl.getBufferSubData(gl.ARRAY_BUFFER, 0, out);
+
+    return out;
   }
 
   private writePathToGpu_(id: number) {

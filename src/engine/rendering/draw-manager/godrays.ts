@@ -128,6 +128,7 @@ export class Godrays {
         viewMatrix: true,
         normalMatrix: true,
         cameraPosition: true,
+        worldOffset: true,
       },
       disabledAttributes: {
         normal: true,

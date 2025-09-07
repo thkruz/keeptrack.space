@@ -127,6 +127,7 @@ export class Sun {
         modelMatrix: true,
         viewMatrix: true,
         cameraPosition: true,
+        worldOffset: true,
       },
     });
 

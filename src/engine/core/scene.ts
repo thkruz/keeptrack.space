@@ -27,6 +27,7 @@ export interface SceneParams {
 }
 
 export class Scene {
+  private static instance_: Scene;
   private gl_: WebGL2RenderingContext;
   background: WebGLTexture | null = null;
   skybox: SkyBoxSphere;
@@ -46,6 +47,19 @@ export class Scene {
   updateVisualsBasedOnPerformanceTime_ = 0;
   primaryCovBubble: Ellipsoid;
   secondaryCovBubble: Ellipsoid;
+  worldShift = [0, 0, 0];
+
+  static getInstance(): Scene {
+    if (!Scene.instance_) {
+      Scene.instance_ = new Scene();
+    }
+
+    return Scene.instance_;
+  }
+
+  private constructor() {
+    //
+  }
 
   init(params: SceneParams): void {
     this.gl_ = params.gl;

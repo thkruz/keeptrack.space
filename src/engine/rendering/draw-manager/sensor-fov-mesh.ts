@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { Scene } from '@app/engine/core/scene';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { mat4, vec3 } from 'gl-matrix';
@@ -29,6 +30,7 @@ export class SensorFovMesh extends CustomMesh {
     u_camMatrix: null as unknown as WebGLUniformLocation,
     u_mvMatrix: null as unknown as WebGLUniformLocation,
     u_color: null as unknown as WebGLUniformLocation,
+    u_worldOffset: null as unknown as WebGLUniformLocation,
   };
   /**
    * A typed array that stores the indices for the bottom part of the sensor field of view mesh.
@@ -77,6 +79,7 @@ export class SensorFovMesh extends CustomMesh {
     gl.uniformMatrix4fv(this.uniforms_.u_mvMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
+    gl.uniform3fv(this.uniforms_.u_worldOffset, Scene.getInstance().worldShift);
     gl.uniform4fv(this.uniforms_.u_color, color);
 
     gl.enable(gl.BLEND);
@@ -398,11 +401,14 @@ export class SensorFovMesh extends CustomMesh {
       uniform mat4 u_pMatrix;
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;
+      uniform vec3 u_worldOffset;
 
       in vec3 a_position;
 
       void main(void) {
-        gl_Position = u_pMatrix * u_camMatrix * u_mvMatrix * vec4(a_position, 1.0);
+        vec4 worldPosition = u_mvMatrix * vec4(a_position, 1.0);
+        worldPosition.xyz += u_worldOffset;
+        gl_Position = u_pMatrix * u_camMatrix * worldPosition;
       }
     `,
   };

@@ -265,15 +265,14 @@ export class MeshManager {
     const gl = this.gl_;
 
     try {
-      // Change to the earth shader
       gl.useProgram(occlusionPrgm.program);
-      // Change to the main drawing buffer
       gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
       occlusionPrgm.attrSetup(this.currentMeshObject.model.mesh.vertexBuffer, 80);
 
       // Set the uniforms
       occlusionPrgm.uniformSetup(this.mvMatrix_, pMatrix, camMatrix);
+      gl.uniform3fv(occlusionPrgm.uniform.uWorldOffset, [0, 0, 0]);
 
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.currentMeshObject.model.mesh.indexBuffer);
       gl.drawElements(gl.TRIANGLES, this.currentMeshObject.model.mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
@@ -491,7 +490,10 @@ export class MeshManager {
       y: posData[sat.id * 3 + 1],
       z: posData[sat.id * 3 + 2],
     };
-    const drawPosition = [position.x, position.y, position.z] as EciArr3;
+    let drawPosition = [position.x, position.y, position.z] as EciArr3;
+
+    // We need to avoid zero values. They break mat4.targetTo
+    drawPosition = drawPosition.map((coord) => coord / 1000000000) as EciArr3;
 
     // Move the mesh to its location in world space
     this.mvMatrix_ = mat4.create();

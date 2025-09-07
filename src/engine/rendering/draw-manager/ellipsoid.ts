@@ -4,6 +4,7 @@ import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, EciVec3 } from 'ootk';
 import { keepTrackApi } from '../../../keepTrackApi';
 import { GlUtils } from '../gl-utils';
+import { Scene } from '@app/engine/core/scene';
 
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
@@ -45,6 +46,7 @@ export class Ellipsoid {
     u_camMatrix: <WebGLUniformLocation><unknown>null,
     u_mvMatrix: <WebGLUniformLocation><unknown>null,
     u_color: <WebGLUniformLocation><unknown>null,
+    worldShift: <WebGLUniformLocation><unknown>null,
   };
 
   private radii_: vec3;
@@ -92,6 +94,7 @@ export class Ellipsoid {
     gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
     gl.uniform4fv(this.uniforms_.u_color, this.color_);
     gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
+    gl.uniform3fv(this.uniforms_.worldShift, Scene.getInstance().worldShift);
 
     gl.enable(gl.BLEND);
     gl.disable(gl.DEPTH_TEST);
@@ -166,7 +169,7 @@ export class Ellipsoid {
     this.gl_.useProgram(this.program_);
 
     GlUtils.assignAttributes(this.attribs_, gl, this.program_, ['a_position', 'a_normal']);
-    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_color']);
+    GlUtils.assignUniforms(this.uniforms_, gl, this.program_, ['u_pMatrix', 'u_camMatrix', 'u_mvMatrix', 'u_nMatrix', 'u_color', 'worldShift']);
   }
 
   private initVao_() {
@@ -204,6 +207,7 @@ export class Ellipsoid {
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;
       uniform mat3 u_nMatrix;
+      uniform vec3 worldShift;
 
       in vec3 a_position;
       in vec3 a_normal;
@@ -212,6 +216,7 @@ export class Ellipsoid {
 
       void main(void) {
         vec4 position = u_mvMatrix * vec4(a_position, 1.0);
+        position.xyz += worldShift;
         gl_Position = u_pMatrix * u_camMatrix * position;
         v_normal = u_nMatrix * a_normal;
       }

@@ -130,11 +130,15 @@ export const postProcessingShaderCode = {
                 uniform mat4 uCamMatrix;
                 uniform mat4 uMvMatrix;
                 uniform mat4 uPMatrix;
+                uniform vec3 uWorldOffset;
 
                 void main(void) {
                   float scale = 0.99;
                   mat4 scaleMatrix = mat4(vec4(scale, 0.0, 0.0, 0.0),vec4(0.0, scale, 0.0, 0.0),vec4(0.0, 0.0, scale, 0.0),vec4(0.0, 0.0, 0.0, 1.0));
-                  gl_Position = uPMatrix * uCamMatrix *  uMvMatrix * scaleMatrix * vec4(a_position, 1.0);
+
+                  vec4 worldPosition = scaleMatrix * uMvMatrix * vec4(a_position, 1.0);
+                  worldPosition.xyz += uWorldOffset;
+                  gl_Position = uPMatrix * uCamMatrix * worldPosition;
                 }
             `,
     frag: keepTrackApi.glsl`#version 300 es

@@ -11,6 +11,7 @@ export interface ProgramParams {
     viewMatrix?: boolean;
     normalMatrix?: boolean;
     cameraPosition?: boolean;
+    worldOffset?: boolean;
   };
   disabledAttributes?: {
     position?: boolean;

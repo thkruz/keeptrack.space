@@ -20,6 +20,7 @@
  */
 
 import { SplashScreen } from '@app/app/ui/splash-screen';
+import { Scene } from '@app/engine/core/scene';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -31,8 +32,10 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, Sun } from 'ootk';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { PersistenceManager, StorageKey } from '../../utils/persistence-manager';
-import { AtmosphereSettings, EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality,
-  EarthSpecTextureQuality, EarthTextureStyle } from './earth-quality-enums';
+import {
+  AtmosphereSettings, EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality,
+  EarthSpecTextureQuality, EarthTextureStyle,
+} from './earth-quality-enums';
 import { OcclusionProgram } from './post-processing';
 
 export class Earth {
@@ -106,7 +109,7 @@ export class Earth {
    */
   draw(tgtBuffer: WebGLFramebuffer | null) {
     this.drawEarthSurface_(tgtBuffer);
-    if (settingsManager.isDrawAtmosphere === AtmosphereSettings.ON) {
+    if (settingsManager.isDrawAtmosphere === AtmosphereSettings.ON && settingsManager.centerBody === 'earth') {
       this.drawEarthAtmosphere_(tgtBuffer);
     }
     this.drawBlackGpuPickingEarth_();
@@ -139,6 +142,7 @@ export class Earth {
 
     // Set the uniforms
     occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, camMatrix);
+    gl.uniform3fv(occlusionPrgm.uniform.uWorldOffset, Scene.getInstance().worldShift);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.surfaceMesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.surfaceMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -240,7 +244,7 @@ export class Earth {
 
       }
     } catch (error) {
-      errorManagerInstance.debug(error);
+      errorManagerInstance.warn(error);
     }
   }
 
@@ -385,6 +389,7 @@ export class Earth {
     gl.uniformMatrix4fv(this.surfaceMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix3fv(this.surfaceMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+    gl.uniform3fv(this.surfaceMesh.material.uniforms.worldOffset, Scene.getInstance().worldShift);
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uGlow, this.glowNumber_);
@@ -405,6 +410,7 @@ export class Earth {
     gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix3fv(this.atmosphereMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+    gl.uniform3fv(this.atmosphereMesh.material.uniforms.worldOffset, Scene.getInstance().worldShift);
 
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
   }
@@ -729,6 +735,7 @@ export class Earth {
 
     void main(void) {
         vec4 worldPosition = modelViewMatrix * vec4(position, 1.0);
+        worldPosition.xyz += worldOffset;
         vWorldPos = worldPosition.xyz;
         vNormal = normalMatrix * normal;
         vUv = uv;

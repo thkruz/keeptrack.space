@@ -1,4 +1,8 @@
 // app/keeptrack/camera/camera-state.ts
+import { SatMath } from '@app/app/analysis/sat-math';
+import { alt2zoom } from '@app/engine/utils/transforms';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { vec3 } from 'gl-matrix';
 import { Degrees, Kilometers, Radians } from 'ootk';
 
@@ -15,7 +19,7 @@ export class CameraState {
   // ============ Zoom ============
   private zoomLevel_ = 0.6925;
   private zoomTarget_ = 0.6925;
-  camDistBuffer: Kilometers = 0 as Kilometers;
+  private camDistBuffer_: Kilometers = 0 as Kilometers;
   earthCenteredLastZoom = 0.6925;
   isZoomIn = false;
 
@@ -141,6 +145,15 @@ export class CameraState {
 
   set zoomTarget(val: number) {
     this.zoomTarget_ = Math.max(0.01, Math.min(1, val));
+    this.zoomTargetChange();
+  }
+
+  get camDistBuffer(): Kilometers {
+    return this.camDistBuffer_;
+  }
+
+  set camDistBuffer(val: Kilometers) {
+    this.camDistBuffer_ = val;
   }
 
   get earthCenteredPitch(): Radians {
@@ -208,6 +221,53 @@ export class CameraState {
   }
 
   // ============ Methods ============
+
+  zoomTargetChange(): void {
+    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    const maxCovarianceDistance = Math.min((selectSatManagerInstance?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
+
+    if ((settingsManager.isZoomStopsSnappedOnSat || (selectSatManagerInstance?.selectedSat ?? -1) === -1) || (this.camDistBuffer >= settingsManager.nearZoomLevel)) {
+
+      settingsManager.selectedColor = settingsManager.selectedColorFallback;
+      keepTrackApi.getRenderer().setFarRenderer();
+      this.earthCenteredLastZoom = this.zoomTarget;
+      this.camZoomSnappedOnSat = false;
+
+      // calculate camera distance from target
+      const target = selectSatManagerInstance?.getSelectedSat();
+
+      if (target) {
+        const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(keepTrackApi.getTimeManager().simulationTimeObj).gmst);
+        const curMinZoomLevel = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
+
+        if (this.zoomTarget < this.zoomLevel && this.zoomTarget < curMinZoomLevel) {
+          this.camZoomSnappedOnSat = true;
+
+          if (settingsManager.isDrawCovarianceEllipsoid) {
+            this.camDistBuffer = <Kilometers>(Math.max(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), maxCovarianceDistance) - 1);
+          } else {
+            this.camDistBuffer =
+              <Kilometers>Math.min(Math.max(this.camDistBuffer, settingsManager.nearZoomLevel), settingsManager.minDistanceFromSatellite);
+          }
+        }
+      }
+
+    } else {
+      keepTrackApi.getRenderer().setNearRenderer();
+
+      // Clamping camDistBuffer to be between minDistanceFromSatellite and maxZoomDistance
+      this.camDistBuffer = <Kilometers>Math.min(
+        Math.max(
+          this.camDistBuffer,
+          settingsManager.minDistanceFromSatellite,
+        ),
+        Math.max(
+          settingsManager.nearZoomLevel,
+          maxCovarianceDistance,
+        ),
+      );
+    }
+  }
 
   /**
    * Reset camera state to defaults

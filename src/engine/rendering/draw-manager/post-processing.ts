@@ -4,6 +4,7 @@
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
 import { postProcessingShaderCode } from '../../utils/post-processing-shader-code';
+import { Scene } from '@app/engine/core/scene';
 
 enum ProgramType {
   OCCLUSION,
@@ -24,6 +25,7 @@ export type OcclusionProgram = {
     uPMatrix: WebGLUniformLocation;
     uMvMatrix: WebGLUniformLocation;
     uCamMatrix: WebGLUniformLocation;
+    uWorldOffset: WebGLUniformLocation;
   };
   attrSetup: (vertPosBuf: WebGLBuffer, stride?: number) => void;
   attrOff: () => void;
@@ -46,6 +48,7 @@ export class PostProcessingManager {
         uPMatrix: <WebGLUniformLocation><unknown>null,
         uMvMatrix: <WebGLUniformLocation><unknown>null,
         uCamMatrix: <WebGLUniformLocation><unknown>null,
+        uWorldOffset: <WebGLUniformLocation><unknown>null,
       },
       attrSetup: null as unknown as (combinedBuf: WebGLBuffer, stride: number) => void,
       attrOff: null as unknown as () => void,
@@ -106,8 +109,9 @@ export class PostProcessingManager {
     const uPMatrixLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uPMatrix');
     const cameraMatrixLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uCamMatrix');
     const mvMatrixLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uMvMatrix');
+    const uWorldOffsetLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uWorldOffset');
 
-    if (!uPMatrixLocation || !cameraMatrixLocation || !mvMatrixLocation) {
+    if (!uPMatrixLocation || !cameraMatrixLocation || !mvMatrixLocation || !uWorldOffsetLocation) {
       throw new Error('Failed to get uniform locations');
     }
 
@@ -115,6 +119,7 @@ export class PostProcessingManager {
       uPMatrix: uPMatrixLocation,
       uCamMatrix: cameraMatrixLocation,
       uMvMatrix: mvMatrixLocation,
+      uWorldOffset: uWorldOffsetLocation,
     };
     this.programs.occlusion.attrSetup = (combinedBuf: WebGLBuffer, stride = Float32Array.BYTES_PER_ELEMENT * 8): void => {
       gl.bindBuffer(gl.ARRAY_BUFFER, combinedBuf);
@@ -128,6 +133,7 @@ export class PostProcessingManager {
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uMvMatrix, false, mvMatrix);
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uPMatrix, false, pMatrix);
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uCamMatrix, false, camMatrix);
+      gl.uniform3fv(this.programs.occlusion.uniform.uWorldOffset, Scene.getInstance().worldShift);
     };
   }
 

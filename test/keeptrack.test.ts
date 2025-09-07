@@ -4,7 +4,7 @@ import { SettingsManagerOverride } from '@app/settings/settings';
 import { DetailedSatellite, Milliseconds, Satellite } from 'ootk';
 import { CatalogLoader } from '../src/app/data/catalog-loader';
 import { UiManager } from '../src/app/ui/uiManager';
-import { keepTrackContainer } from '../src/container';
+import { keepTrackContainer } from '../src/engine/core/container';
 import { SatCruncherMessageData, Singletons } from '../src/engine/core/interfaces';
 import { OrbitManager } from '../src/engine/rendering/orbitManager';
 import { WebGLRenderer } from '../src/engine/rendering/webgl-renderer';

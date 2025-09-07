@@ -38,7 +38,7 @@ import { CameraControlWidget } from './app/ui/camera-control-widget';
 import { HoverManager } from './app/ui/hover-manager';
 import { SplashScreen } from './app/ui/splash-screen';
 import { UiManager } from './app/ui/uiManager';
-import { keepTrackContainer } from './container';
+import { Container } from './engine/core/container';
 import { Singletons } from './engine/core/interfaces';
 import { Engine } from './engine/engine';
 import { EventBusEvent } from './engine/events/event-bus-events';
@@ -109,15 +109,15 @@ export class KeepTrack {
     const sensorMathInstance = new SensorMath();
     const hoverManagerInstance = new HoverManager();
 
-    keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
-    keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
-    keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
-    keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
-    keepTrackContainer.registerSingleton(Singletons.DotsManager, dotsManagerInstance);
-    keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
-    keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
-    keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
-    keepTrackContainer.registerSingleton(Singletons.HoverManager, hoverManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.GroupsManager, groupManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.SensorManager, sensorManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.DotsManager, dotsManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.UiManager, uiManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.SensorMath, sensorMathInstance);
+    Container.getInstance().registerSingleton(Singletons.HoverManager, hoverManagerInstance);
 
     CameraControlWidget.getInstance().init();
     DemoManager.getInstance().init();

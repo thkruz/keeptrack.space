@@ -6,7 +6,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CatalogManager } from '@app/singletons/catalog-manager';
 import { HoverManager } from '../src/app/ui/hover-manager';
-import { keepTrackContainer } from '../src/container';
+import { keepTrackContainer } from '../src/engine/core/container';
 import { Singletons } from '../src/engine/core/interfaces';
 import { setupStandardEnvironment } from './environment/standard-env';
 

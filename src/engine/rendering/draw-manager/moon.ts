@@ -33,13 +33,21 @@ import { GlUtils } from '../gl-utils';
 
 // TODO: Moon doesn't occlude the sun yet!
 
+export enum MoonTextureQuality {
+  POTATO = '512',
+  LOW = '1k',
+  MEDIUM = '2k',
+  HIGH = '4k',
+  ULTRA = '8k'
+}
+
 export class Moon {
   /** The radius of the moon. */
   private readonly RADIUS = 1737.4;
   /** The number of height segments for the moon. */
-  private readonly NUM_HEIGHT_SEGS = 16;
+  private readonly NUM_HEIGHT_SEGS = 64;
   /** The number of width segments for the moon. */
-  private readonly NUM_WIDTH_SEGS = 16;
+  private readonly NUM_WIDTH_SEGS = 64;
 
   /** The WebGL context. */
   private gl_: WebGL2RenderingContext;
@@ -111,7 +119,7 @@ export class Moon {
         widthSegments: this.NUM_HEIGHT_SEGS,
         heightSegments: this.NUM_WIDTH_SEGS,
       });
-      const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/moon-1024.jpg`);
+      const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/moonmap${MoonTextureQuality.ULTRA}.jpg`);
       const material = new ShaderMaterial(gl, {
         uniforms: {
           sampler: null as unknown as WebGLUniformLocation,
@@ -133,6 +141,10 @@ export class Moon {
         },
       });
       this.mesh.geometry.initVao(this.mesh.program);
+
+      // Flip vertically to match texture orientation
+      mat4.rotateZ(this.mesh.geometry.localMvMatrix, this.mesh.geometry.localMvMatrix, Math.PI);
+
       this.isLoaded_ = true;
     } catch (e) {
       errorManagerInstance.warn('Error initializing moon:', e);

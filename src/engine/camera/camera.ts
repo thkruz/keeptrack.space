@@ -203,7 +203,7 @@ export class Camera {
       const renderer = keepTrackApi.getRenderer();
 
       this.state.isLocalRotateReset = true;
-      this.settings_.fieldOfView = 0.6;
+      this.settings_.fieldOfView = 0.6 as Radians;
       renderer.glInit();
       if ((selectSatManagerInstance?.selectedSat ?? -1) > -1) {
         this.state.camZoomSnappedOnSat = true;
@@ -252,13 +252,13 @@ export class Camera {
 
   private zoomWheelFov_(delta: number) {
     if (this.cameraType === CameraType.PLANETARIUM || this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      settingsManager.fieldOfView += delta * 0.0002;
+      settingsManager.fieldOfView = settingsManager.fieldOfView + (delta * 0.0002) as Radians;
       // getEl('fov-text').innerHTML = 'FOV: ' + (settingsManager.fieldOfView * 100).toFixed(2) + ' deg';
       if (settingsManager.fieldOfView > settingsManager.fieldOfViewMax) {
         settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
       }
       if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) {
-        settingsManager.fieldOfView = settingsManager.fieldOfViewMin;
+        settingsManager.fieldOfView = settingsManager.fieldOfViewMin as Radians;
       }
       keepTrackApi.getRenderer().glInit();
     }

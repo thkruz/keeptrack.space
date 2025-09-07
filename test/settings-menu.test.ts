@@ -1,4 +1,4 @@
-import { keepTrackContainer } from '@app/container';
+import { keepTrackContainer } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { getEl } from '@app/engine/utils/get-el';

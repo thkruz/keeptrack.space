@@ -1,10 +1,11 @@
 // Shaders should NOT be modified
 /* eslint-disable no-useless-escape */
 
+import { Scene } from '@app/engine/core/scene';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
 import { postProcessingShaderCode } from '../../utils/post-processing-shader-code';
-import { Scene } from '@app/engine/core/scene';
+import { DepthManager } from '../depth-manager';
 
 enum ProgramType {
   OCCLUSION,
@@ -26,6 +27,7 @@ export type OcclusionProgram = {
     uMvMatrix: WebGLUniformLocation;
     uCamMatrix: WebGLUniformLocation;
     uWorldOffset: WebGLUniformLocation;
+    logDepthBufFC: WebGLUniformLocation;
   };
   attrSetup: (vertPosBuf: WebGLBuffer, stride?: number) => void;
   attrOff: () => void;
@@ -49,6 +51,7 @@ export class PostProcessingManager {
         uMvMatrix: <WebGLUniformLocation><unknown>null,
         uCamMatrix: <WebGLUniformLocation><unknown>null,
         uWorldOffset: <WebGLUniformLocation><unknown>null,
+        logDepthBufFC: <WebGLUniformLocation><unknown>null,
       },
       attrSetup: null as unknown as (combinedBuf: WebGLBuffer, stride: number) => void,
       attrOff: null as unknown as () => void,
@@ -110,8 +113,9 @@ export class PostProcessingManager {
     const cameraMatrixLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uCamMatrix');
     const mvMatrixLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uMvMatrix');
     const uWorldOffsetLocation = gl.getUniformLocation(this.programs.occlusion.program, 'uWorldOffset');
+    const logDepthBufFC = gl.getUniformLocation(this.programs.occlusion.program, 'logDepthBufFC');
 
-    if (!uPMatrixLocation || !cameraMatrixLocation || !mvMatrixLocation || !uWorldOffsetLocation) {
+    if (!uPMatrixLocation || !cameraMatrixLocation || !mvMatrixLocation || !uWorldOffsetLocation || !logDepthBufFC) {
       throw new Error('Failed to get uniform locations');
     }
 
@@ -120,6 +124,7 @@ export class PostProcessingManager {
       uCamMatrix: cameraMatrixLocation,
       uMvMatrix: mvMatrixLocation,
       uWorldOffset: uWorldOffsetLocation,
+      logDepthBufFC,
     };
     this.programs.occlusion.attrSetup = (combinedBuf: WebGLBuffer, stride = Float32Array.BYTES_PER_ELEMENT * 8): void => {
       gl.bindBuffer(gl.ARRAY_BUFFER, combinedBuf);
@@ -134,6 +139,7 @@ export class PostProcessingManager {
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uPMatrix, false, pMatrix);
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uCamMatrix, false, camMatrix);
       gl.uniform3fv(this.programs.occlusion.uniform.uWorldOffset, Scene.getInstance().worldShift);
+      gl.uniform1f(this.programs.occlusion.uniform.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     };
   }
 

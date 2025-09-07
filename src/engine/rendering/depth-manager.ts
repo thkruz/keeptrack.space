@@ -35,9 +35,10 @@ export class DepthManager {
   }
 
   static getLogDepthFragCode(): string {
+    // TODO: This doesn't work correctly - need to figure out why
     return `
-      float w = 1.0 / gl_FragCoord.w;  // Recover original gl_Position.w
-      gl_FragDepth = (log2(max(1e-6, 1.0 + w)) * logDepthBufFC - 1.0) * 0.5 + 0.5;
+      // float w = 1.0 / gl_FragCoord.w;  // Recover original gl_Position.w
+      // gl_FragDepth = (log2(max(1e-6, 1.0 + w)) * logDepthBufFC - 1.0) * 0.5 + 0.5;
     `;
   }
 }

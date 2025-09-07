@@ -3,7 +3,21 @@
  *
  * Singletons are registered here, and then injected into the modules that need them.
  */
-export class KeepTrackContainer {
+export class Container {
+  private static instance: Container;
+
+  static getInstance(): Container {
+    if (!this.instance) {
+      this.instance = new Container();
+    }
+
+    return this.instance;
+  }
+
+  private constructor() {
+    // private constructor to prevent direct instantiation
+  }
+
   registerSingleton<T>(name: string, singleton: T): void {
     this[name] = singleton;
   }
@@ -12,5 +26,3 @@ export class KeepTrackContainer {
     return this[name];
   }
 }
-
-export const keepTrackContainer = new KeepTrackContainer();

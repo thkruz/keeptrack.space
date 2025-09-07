@@ -4,7 +4,7 @@ import { ObjectGroup } from '@app/app/data/object-group';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { keepTrackContainer } from '../src/container';
+import { keepTrackContainer } from '../src/engine/core/container';
 import { Singletons } from '../src/engine/core/interfaces';
 import { CountriesMenu } from './../src/plugins/countries/countries';
 import { defaultSat } from './environment/apiMocks';

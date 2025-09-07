@@ -1,7 +1,7 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
-import { Kilometers } from 'ootk';
+import { Kilometers, Radians } from 'ootk';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -24,9 +24,9 @@ export class MobileManager {
           settingsManager.zoomSpeed = 0.025;
 
           if (settingsManager.isUseHigherFOVonMobile) {
-            settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
+            settingsManager.fieldOfView = settingsManager.fieldOfViewMax as Radians;
           } else {
-            settingsManager.fieldOfView = 0.6;
+            settingsManager.fieldOfView = 0.6 as Radians;
           }
           settingsManager.maxLabels = settingsManager.mobileMaxLabels;
 
@@ -136,7 +136,7 @@ export class MobileManager {
           if (settingsManager.isUseHigherFOVonMobile) {
             settingsManager.fieldOfView = settingsManager.fieldOfViewMax;
           } else {
-            settingsManager.fieldOfView = 0.6;
+            settingsManager.fieldOfView = 0.6 as Radians;
           }
           settingsManager.maxLabels = settingsManager.desktopMaxLabels;
         }

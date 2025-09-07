@@ -234,6 +234,8 @@ export class DotsManager {
     }
     const gl = keepTrackApi.getRenderer().gl;
 
+    gl.depthMask(true);
+
     gl.useProgram(this.programs.picking.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
 
@@ -817,6 +819,7 @@ export class DotsManager {
                 }
             `,
         frag: `#version 300 es
+                #extension GL_EXT_frag_depth : enable
                 precision mediump float;
 
                 in vec3 vColor;

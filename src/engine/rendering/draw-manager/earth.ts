@@ -110,7 +110,7 @@ export class Earth {
    */
   draw(tgtBuffer: WebGLFramebuffer | null) {
     this.drawEarthSurface_(tgtBuffer);
-    if (settingsManager.isDrawAtmosphere === AtmosphereSettings.ON && settingsManager.centerBody === 'earth') {
+    if (settingsManager.isDrawAtmosphere === AtmosphereSettings.ON) {
       this.drawEarthAtmosphere_(tgtBuffer);
     }
     this.drawBlackGpuPickingEarth_();
@@ -138,6 +138,8 @@ export class Earth {
     gl.useProgram(occlusionPrgm.program);
     // Change to the main drawing buffer
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+
+    gl.depthMask(true);
 
     occlusionPrgm.attrSetup(this.surfaceMesh.geometry.getCombinedBuffer());
 
@@ -344,6 +346,7 @@ export class Earth {
     this.setTextures_(gl);
 
     gl.disable(gl.BLEND);
+    gl.depthMask(true);
 
     gl.bindVertexArray(this.surfaceMesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.surfaceMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -366,6 +369,8 @@ export class Earth {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
+    // disable depth test and depth writing
+    gl.disable(gl.DEPTH_TEST);
     gl.depthMask(false); // Disable depth writing
 
     gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -378,6 +383,7 @@ export class Earth {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.disable(gl.POLYGON_OFFSET_FILL);
 
+    gl.enable(gl.DEPTH_TEST);
     gl.depthMask(true); // Re-enable depth writing
   }
 
@@ -394,7 +400,9 @@ export class Earth {
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uGlow, this.glowNumber_);
-    gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, keepTrackApi.getMainCamera().zoomLevel() ?? 1);
+    const isEarthCenterBody = settingsManager.centerBody === 'earth';
+
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? keepTrackApi.getMainCamera().zoomLevel() ?? 1.0 : 1.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);

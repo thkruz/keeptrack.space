@@ -8,7 +8,7 @@ import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, DetailedSensor, RaeVec3 } from 'ootk';
-import { keepTrackContainer } from '../../container';
+import { Container } from '../core/container';
 import { Scene } from '../core/scene';
 import { EventBusEvent } from '../events/event-bus-events';
 import { DepthManager } from './depth-manager';
@@ -336,4 +336,4 @@ export class LineManager {
 }
 
 export const lineManagerInstance = new LineManager();
-keepTrackContainer.registerSingleton(Singletons.LineManager, lineManagerInstance);
+Container.getInstance().registerSingleton(Singletons.LineManager, lineManagerInstance);

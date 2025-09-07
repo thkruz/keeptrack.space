@@ -1,5 +1,5 @@
 import { SensorManager } from '@app/app/sensors/sensorManager';
-import { keepTrackContainer } from '@app/container';
+import { keepTrackContainer } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';

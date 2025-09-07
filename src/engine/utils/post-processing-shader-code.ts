@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { keepTrackApi } from '../../keepTrackApi';
+import { DepthManager } from '../rendering/depth-manager';
 
 export const postProcessingShaderCode = {
   hdr: {
@@ -125,12 +126,14 @@ export const postProcessingShaderCode = {
   },
   occlusion: {
     vert: keepTrackApi.glsl`#version 300 es
+                #extension GL_EXT_frag_depth : enable
                 in vec3 a_position;
 
                 uniform mat4 uCamMatrix;
                 uniform mat4 uMvMatrix;
                 uniform mat4 uPMatrix;
                 uniform vec3 uWorldOffset;
+                uniform float logDepthBufFC;
 
                 void main(void) {
                   float scale = 0.99;
@@ -139,15 +142,18 @@ export const postProcessingShaderCode = {
                   vec4 worldPosition = scaleMatrix * uMvMatrix * vec4(a_position, 1.0);
                   worldPosition.xyz += uWorldOffset;
                   gl_Position = uPMatrix * uCamMatrix * worldPosition;
+                  ${DepthManager.getLogDepthVertCode()}
                 }
             `,
     frag: keepTrackApi.glsl`#version 300 es
-                precision mediump float;
+                precision highp float;
 
+                uniform float logDepthBufFC;
                 out vec4 fragColor;
 
                 void main(void) {
                     fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+                    ${DepthManager.getLogDepthFragCode()}
                 }
             `,
   },

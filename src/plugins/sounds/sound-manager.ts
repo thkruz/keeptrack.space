@@ -1,4 +1,4 @@
-import { keepTrackContainer } from '@app/container';
+import { Container } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -246,7 +246,7 @@ export class SoundManager extends KeepTrackPlugin {
   addJs = (): void => {
     super.addJs();
 
-    keepTrackContainer.registerSingleton<SoundManager>(Singletons.SoundManager, this);
+    Container.getInstance().registerSingleton<SoundManager>(Singletons.SoundManager, this);
 
     keepTrackApi.on(EventBusEvent.uiManagerInit, () => {
       this.voices = speechSynthesis.getVoices();

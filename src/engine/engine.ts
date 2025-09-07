@@ -1,7 +1,7 @@
 import { Milliseconds } from 'ootk';
-import { keepTrackContainer } from '../container';
 import { PluginManager } from '../plugins/plugins';
 import { Camera } from './camera/camera';
+import { Container } from './core/container';
 import { Singletons } from './core/interfaces';
 import { Scene } from './core/scene';
 import { TimeManager } from './core/time-manager';
@@ -39,12 +39,12 @@ export class Engine {
     this.inputManager = new InputManager();
     this.pluginManager = new PluginManager();
 
-    keepTrackContainer.registerSingleton(Singletons.TimeManager, this.timeManager);
-    keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, this.renderer);
-    keepTrackContainer.registerSingleton(Singletons.MeshManager, this.renderer.meshManager);
-    keepTrackContainer.registerSingleton(Singletons.Scene, this.scene);
-    keepTrackContainer.registerSingleton(Singletons.InputManager, this.inputManager);
-    keepTrackContainer.registerSingleton(Singletons.MainCamera, this.camera);
+    Container.getInstance().registerSingleton(Singletons.TimeManager, this.timeManager);
+    Container.getInstance().registerSingleton(Singletons.WebGLRenderer, this.renderer);
+    Container.getInstance().registerSingleton(Singletons.MeshManager, this.renderer.meshManager);
+    Container.getInstance().registerSingleton(Singletons.Scene, this.scene);
+    Container.getInstance().registerSingleton(Singletons.InputManager, this.inputManager);
+    Container.getInstance().registerSingleton(Singletons.MainCamera, this.camera);
   }
 
   init() {

@@ -1,6 +1,6 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { SensorMath } from '@app/app/sensors/sensor-math';
-import { keepTrackContainer } from '@app/container';
+import { keepTrackContainer } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { SatelliteRecord } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';

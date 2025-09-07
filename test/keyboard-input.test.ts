@@ -1,7 +1,7 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardInput } from '@app/engine/input/input-manager/keyboard-input';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { keepTrackContainer } from '../src/container';
+import { keepTrackContainer } from '../src/engine/core/container';
 import { Singletons } from '../src/engine/core/interfaces';
 
 describe('KeyboardInput_class', () => {

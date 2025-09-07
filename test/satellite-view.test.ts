@@ -1,6 +1,6 @@
 import { UiManager } from '@app/app/ui/uiManager';
-import { keepTrackContainer } from '@app/container';
 import { Camera, CameraType } from '@app/engine/camera/camera';
+import { keepTrackContainer } from '@app/engine/core/container';
 import { Singletons, ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';

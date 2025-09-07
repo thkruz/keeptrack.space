@@ -38,6 +38,7 @@ import {
   EarthSpecTextureQuality, EarthTextureStyle,
 } from './earth-quality-enums';
 import { OcclusionProgram } from './post-processing';
+import { glsl } from '@app/engine/utils/development/formatter';
 
 export class Earth {
   private gl_: WebGL2RenderingContext;
@@ -622,7 +623,7 @@ export class Earth {
    * NOTE: Keep these at the bottom of the file to ensure proper syntax highlighting.
    */
   shaders = {
-    surfaceFrag: keepTrackApi.glsl`
+    surfaceFrag: glsl`
     uniform float uIsAmbientLighting;
     uniform float uGlow;
     uniform float uCloudPosition;
@@ -740,7 +741,7 @@ export class Earth {
       ${DepthManager.getLogDepthFragCode()}
     }
     `,
-    surfaceVert: keepTrackApi.glsl`
+    surfaceVert: glsl`
     out vec2 vUv;
     out vec3 vNormal;
     out vec3 vWorldPos;

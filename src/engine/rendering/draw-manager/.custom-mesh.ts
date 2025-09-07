@@ -1,6 +1,5 @@
 import { mat3, mat4 } from 'gl-matrix';
 import * as Ootk from 'ootk';
-import { keepTrackApi } from '../../../keepTrackApi';
 import { BufferAttribute } from '../buffer-attribute';
 import { GlUtils } from '../gl-utils';
 import { WebGlProgramHelper } from '../webgl-program';
@@ -39,7 +38,7 @@ export class CustomMesh {
   private nMatrix_ = mat3.create();
   private program_: WebGLProgram;
   private shaders_ = {
-    frag: KeepTrackApi.glsl`#version 300 es
+    frag: glsl`#version 300 es
       #ifdef GL_FRAGMENT_PRECISION_HIGH
         precision highp float;
       #else
@@ -54,7 +53,7 @@ export class CustomMesh {
         fragColor = vec4(0.2, 0.0, 0.0, 0.7);
       }
       `,
-    vert: keepTrackApi.glsl`#version 300 es
+    vert: glsl`#version 300 es
       uniform mat4 u_pMatrix;
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;

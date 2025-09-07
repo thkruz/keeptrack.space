@@ -24,6 +24,7 @@ import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
+import { glsl } from '../utils/development/formatter';
 
 export class LineManager {
   attribs = {
@@ -292,7 +293,7 @@ export class LineManager {
   }
 
   private shaders_ = {
-    frag: keepTrackApi.glsl`#version 300 es
+    frag: glsl`#version 300 es
       precision highp float;
 
       in vec4 vColor;
@@ -308,7 +309,7 @@ export class LineManager {
         ${DepthManager.getLogDepthFragCode()}
       }
       `,
-    vert: keepTrackApi.glsl`#version 300 es
+    vert: glsl`#version 300 es
       precision highp float;
 
       in vec4 a_position;

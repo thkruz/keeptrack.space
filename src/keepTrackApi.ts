@@ -5,7 +5,7 @@ import { Constructor, ToastMsgType } from './engine/core/interfaces';
 import { ServiceLocator } from './engine/core/service-locator';
 import { EventBus } from './engine/events/event-bus';
 import { KeepTrackPlugin } from './engine/plugins/base-plugin';
-import { errorManagerInstance } from './engine/utils/errorManager';
+import { html } from './engine/utils/development/formatter';
 import { saveCsv, saveVariable } from './engine/utils/saveVariable';
 import { SettingsManager } from './settings/settings';
 
@@ -145,32 +145,7 @@ export class KeepTrackApi {
    * example: keepTrackApi.html\`\<div>example\</div>\`
    * TODO: This should be a static method
    */
-  html(strings: TemplateStringsArray, ...placeholders: string[]) {
-    for (const placeholder of placeholders) {
-      if (typeof placeholder !== 'string') {
-        errorManagerInstance.error(new Error('Invalid input'), 'keepTrackApi.html');
-      }
-    }
-
-    return String.raw(strings, ...placeholders);
-  }
-
-  /**
-   * This is not a standard function. It is used in development for formatting template literals.
-   * example: keepTrackApi.glsl\`uniform float example\`
-   * TODO: This should be a static method
-   */
-  glsl(literals: TemplateStringsArray, ...placeholders): string {
-    let str = '';
-
-    for (let i = 0; i < placeholders.length; i++) {
-      str += literals[i];
-      str += placeholders[i];
-    }
-    str += literals[literals.length - 1];
-
-    return str;
-  }
+  html = html;
 
   toast(toastText: string, type: ToastMsgType, isLong = false) {
     ServiceLocator.getUiManager().toast(toastText, type, isLong);

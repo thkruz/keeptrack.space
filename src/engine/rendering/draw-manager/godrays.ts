@@ -7,6 +7,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
 import { Sun } from './sun';
+import { glsl } from '@app/engine/utils/development/formatter';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -171,7 +172,7 @@ export class Godrays {
   }
 
   private readonly shaders_ = {
-    frag: keepTrackApi.glsl`
+    frag: glsl`
       uniform int u_samples;
       uniform float u_decay;
       uniform float u_exposure;
@@ -295,7 +296,7 @@ export class Godrays {
         ${DepthManager.getLogDepthFragCode()}
       }
     `,
-    vert: keepTrackApi.glsl`
+    vert: glsl`
       in vec2 a_position;
       in vec2 a_texCoord;
 

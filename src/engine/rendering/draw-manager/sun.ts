@@ -30,6 +30,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec2, vec3 } from 'gl-matrix';
 import { EciVec3, Kilometers } from 'ootk';
 import { DepthManager } from '../depth-manager';
+import { glsl } from '@app/engine/utils/development/formatter';
 
 export enum SunTextureQuality {
   POTATO = '512',
@@ -192,7 +193,7 @@ export class Sun {
    * NOTE: Keep these at the bottom of the file to ensure proper syntax highlighting.
    */
   private readonly shaders_ = {
-    frag: keepTrackApi.glsl`
+    frag: glsl`
         uniform bool u_isTexture;
         uniform vec3 u_lightDirection;
         uniform sampler2D u_sampler;
@@ -224,7 +225,7 @@ export class Sun {
               fragColor = vec4(vec3(r,g,b), a);
             }
         }`,
-    vert: keepTrackApi.glsl`
+    vert: glsl`
         uniform vec3 u_sizeOfSun;
         uniform float u_sunDistance;
 

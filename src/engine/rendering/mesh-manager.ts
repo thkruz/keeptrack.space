@@ -8,6 +8,7 @@ import { SplashScreen } from '../../app/ui/splash-screen';
 import { errorManagerInstance } from '../utils/errorManager';
 import { DepthManager } from './depth-manager';
 import { OcclusionProgram } from './draw-manager/post-processing';
+import { glsl } from '../utils/development/formatter';
 
 type KeepTrackMesh = Mesh & {
   vertexBuffer: WebGLBuffer & {
@@ -870,7 +871,7 @@ export class MeshManager {
   }
 
   private shader_ = {
-    frag: keepTrackApi.glsl`#version 300 es
+    frag: glsl`#version 300 es
     precision mediump float;
 
     in vec3 vLightDirection;
@@ -897,7 +898,7 @@ export class MeshManager {
       fragColor = vec4(color, 1.0);
     }
   `,
-    vert: keepTrackApi.glsl`#version 300 es
+    vert: glsl`#version 300 es
     in vec3 aVertexPosition;
     in vec3 aVertexNormal;
     in vec3 aSpecular;

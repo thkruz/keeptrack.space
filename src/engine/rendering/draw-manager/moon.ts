@@ -30,6 +30,7 @@ import { EciVec3, EpochUTC, Moon as MoonMath } from 'ootk';
 import { keepTrackApi } from '../../../keepTrackApi';
 import { DepthManager } from '../depth-manager';
 import { GlUtils } from '../gl-utils';
+import { glsl } from '@app/engine/utils/development/formatter';
 
 // TODO: Moon doesn't occlude the sun yet!
 
@@ -185,7 +186,7 @@ export class Moon {
 
   /** The shaders for the moon. */
   private readonly shaders_ = {
-    frag: keepTrackApi.glsl`
+    frag: glsl`
       uniform sampler2D sampler;
       uniform vec3 sunPos;
 
@@ -220,7 +221,7 @@ export class Moon {
         ${DepthManager.getLogDepthFragCode()}
       }
       `,
-    vert: keepTrackApi.glsl`
+    vert: glsl`
       uniform float drawPosition;
 
       out vec2 v_texcoord;

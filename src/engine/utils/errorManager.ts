@@ -1,8 +1,9 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import githubIssueUrl, { Options } from 'new-github-issue-url';
-import { keepTrackApi } from '../../keepTrackApi';
-import { isThisNode } from './isThisNode';
+import { ServiceLocator } from '../core/service-locator';
+import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
+import { isThisNode } from './isThisNode';
 
 export class ErrorManager {
   private readonly ALLOW_DEBUG = false; // window.location.hostname === 'localhost';
@@ -27,7 +28,7 @@ export class ErrorManager {
   }
 
   error(e: Error, funcName: string, toastMsg?: string) {
-    keepTrackApi.emit(EventBusEvent.error, e, funcName);
+    EventBus.getInstance().emit(EventBusEvent.error, e, funcName);
 
     // eslint-disable-next-line no-console
     console.error(e);
@@ -41,9 +42,7 @@ export class ErrorManager {
       this.lastErrorTime = Date.now();
     }
 
-    const uiManagerInstance = keepTrackApi.getUiManager();
-
-    uiManagerInstance?.toast(toastMsg, ToastMsgType.error, true);
+    ServiceLocator.getUiManager()?.toast(toastMsg, ToastMsgType.error, true);
 
     if (isThisNode()) {
       throw e;
@@ -71,9 +70,7 @@ ${e.stack}`,
 
   warn(msg: string, isHideFromConsole = false) {
     if (this.ALLOW_WARN) {
-      const uiManagerInstance = keepTrackApi.getUiManager();
-
-      uiManagerInstance?.toast(msg, ToastMsgType.serious, true);
+      ServiceLocator.getUiManager()?.toast(msg, ToastMsgType.serious, true);
     }
 
     if (!isHideFromConsole) {
@@ -88,9 +85,7 @@ ${e.stack}`,
 
   info(msg: string) {
     if (this.ALLOW_INFO) {
-      const uiManagerInstance = keepTrackApi.getUiManager();
-
-      uiManagerInstance?.toast(msg, ToastMsgType.normal, true);
+      ServiceLocator.getUiManager()?.toast(msg, ToastMsgType.normal, true);
     }
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
@@ -104,9 +99,7 @@ ${e.stack}`,
 
   log(msg: string) {
     if (this.ALLOW_LOG) {
-      const uiManagerInstance = keepTrackApi.getUiManager();
-
-      uiManagerInstance?.toast(msg, ToastMsgType.standby, true);
+      ServiceLocator.getUiManager()?.toast(msg, ToastMsgType.standby, true);
     }
     if (this.isDebug && !isThisNode()) {
       // eslint-disable-next-line no-console
@@ -120,9 +113,7 @@ ${e.stack}`,
 
   debug(msg: string) {
     if (this.ALLOW_DEBUG) {
-      const uiManagerInstance = keepTrackApi.getUiManager();
-
-      uiManagerInstance?.toast(msg, ToastMsgType.standby, true);
+      ServiceLocator.getUiManager()?.toast(msg, ToastMsgType.standby, true);
       // eslint-disable-next-line no-debugger
       debugger;
     }

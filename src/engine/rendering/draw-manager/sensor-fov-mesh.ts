@@ -7,6 +7,7 @@ import { Degrees, DetailedSensor, GreenwichMeanSiderealTime, Kilometers, rae2eci
 import { keepTrackApi } from '../../../keepTrackApi';
 import { DepthManager } from '../depth-manager';
 import { CustomMesh } from './custom-mesh';
+import { glsl } from '@app/engine/utils/development/formatter';
 
 interface SurfaceMeshParams {
   azStart: Degrees;
@@ -384,7 +385,7 @@ export class SensorFovMesh extends CustomMesh {
   }
 
   shaders_ = {
-    frag: keepTrackApi.glsl`#version 300 es
+    frag: glsl`#version 300 es
       precision highp float;
 
       uniform vec4 u_color;
@@ -398,7 +399,7 @@ export class SensorFovMesh extends CustomMesh {
         ${DepthManager.getLogDepthFragCode()}
       }
     `,
-    vert: keepTrackApi.glsl`#version 300 es
+    vert: glsl`#version 300 es
       uniform mat4 u_pMatrix;
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;

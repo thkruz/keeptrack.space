@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
-import { keepTrackApi } from '../../keepTrackApi';
 import { DepthManager } from '../rendering/depth-manager';
+import { glsl } from './development/formatter';
 
 export const postProcessingShaderCode = {
   hdr: {
@@ -125,7 +125,7 @@ export const postProcessingShaderCode = {
     `,
   },
   occlusion: {
-    vert: keepTrackApi.glsl`#version 300 es
+    vert: glsl`#version 300 es
                 #extension GL_EXT_frag_depth : enable
                 in vec3 a_position;
 
@@ -145,7 +145,7 @@ export const postProcessingShaderCode = {
                   ${DepthManager.getLogDepthVertCode()}
                 }
             `,
-    frag: keepTrackApi.glsl`#version 300 es
+    frag: glsl`#version 300 es
                 precision highp float;
 
                 uniform float logDepthBufFC;

@@ -8,6 +8,7 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { DEG2RAD } from 'ootk';
 import { keepTrackApi } from '../../../keepTrackApi';
 import { DepthManager } from '../depth-manager';
+import { glsl } from '@app/engine/utils/development/formatter';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -263,7 +264,7 @@ export class SkyBoxSphere {
    * Keep this at the bottom of the file for glsl color coding
    */
   private shaders_ = {
-    frag: keepTrackApi.glsl`
+    frag: glsl`
         uniform sampler2D u_texMilkyWay;
         uniform sampler2D u_texBoundaries;
         uniform sampler2D u_texConstellations;
@@ -292,7 +293,7 @@ export class SkyBoxSphere {
             ${DepthManager.getLogDepthFragCode()}
         }
         `,
-    vert: keepTrackApi.glsl`
+    vert: glsl`
         out vec2 v_texcoord;
         out float v_dist;
 

@@ -5,6 +5,7 @@ import { BaseObject, Degrees, Kilometers, RADIUS_OF_EARTH } from 'ootk';
 import { keepTrackApi } from '../../../keepTrackApi';
 import { DepthManager } from '../depth-manager';
 import { CustomMesh } from './custom-mesh';
+import { glsl } from '@app/engine/utils/development/formatter';
 
 export interface ConeSettings {
   /** The field of view of the cone in degrees, default is 3 */
@@ -169,7 +170,7 @@ export class ConeMesh extends CustomMesh {
   }
 
   shaders_ = {
-    frag: keepTrackApi.glsl`#version 300 es
+    frag: glsl`#version 300 es
       precision highp float;
 
       uniform vec4 u_color;
@@ -180,7 +181,7 @@ export class ConeMesh extends CustomMesh {
         fragColor = vec4(u_color.rgba);
       }
     `,
-    vert: keepTrackApi.glsl`#version 300 es
+    vert: glsl`#version 300 es
       uniform mat4 u_pMatrix;
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;

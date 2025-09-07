@@ -2,8 +2,8 @@ import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, EciVec3, Kilometers } from 'ootk';
-import { keepTrackApi } from '../../../keepTrackApi';
 import { GlUtils } from '../gl-utils';
+import { glsl } from '@app/engine/utils/development/formatter';
 
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
@@ -214,7 +214,7 @@ export class Box {
   }
 
   private shaders_ = {
-    frag: keepTrackApi.glsl`#version 300 es
+    frag: glsl`#version 300 es
       precision mediump float;
       in vec3 v_normal;
       out vec4 fragColor;
@@ -224,7 +224,7 @@ export class Box {
         fragColor = vec4(u_color.rgb * u_color.a, u_color.a);
       }
     `,
-    vert: keepTrackApi.glsl`#version 300 es
+    vert: glsl`#version 300 es
       uniform mat4 u_pMatrix;
       uniform mat4 u_camMatrix;
       uniform mat4 u_mvMatrix;

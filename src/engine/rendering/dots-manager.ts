@@ -12,6 +12,7 @@ import { CameraType } from '../camera/camera';
 import { Scene } from '../core/scene';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
+import { glsl } from '../utils/development/formatter';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
 import { WebGlProgramHelper } from './webgl-program';
@@ -701,7 +702,7 @@ export class DotsManager {
   private initShaders_() {
     this.shaders_ = {
       dots: {
-        frag: keepTrackApi.glsl`#version 300 es
+        frag: glsl`#version 300 es
             #extension GL_EXT_frag_depth : enable
             precision highp float;
 
@@ -743,7 +744,7 @@ export class DotsManager {
               ${DepthManager.getLogDepthFragCode()}
             }
           `,
-        vert: keepTrackApi.glsl`#version 300 es
+        vert: glsl`#version 300 es
           precision highp float;
           in vec3 a_position;
           in vec4 a_color;

@@ -1,4 +1,4 @@
-import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
+import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';

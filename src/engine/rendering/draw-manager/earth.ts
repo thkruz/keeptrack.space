@@ -31,67 +31,9 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, Sun } from 'ootk';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { PersistenceManager, StorageKey } from '../../utils/persistence-manager';
+import { AtmosphereSettings, EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality,
+  EarthSpecTextureQuality, EarthTextureStyle } from './earth-quality-enums';
 import { OcclusionProgram } from './post-processing';
-
-export enum EarthDayTextureQuality {
-  POTATO = '512',
-  LOW = '1k',
-  MEDIUM = '2k',
-  HIGH = '4k',
-  ULTRA = '16k',
-}
-
-export enum EarthNightTextureQuality {
-  POTATO = '512',
-  LOW = '1k',
-  MEDIUM = '2k',
-  HIGH = '4k',
-  ULTRA = '16k',
-}
-
-export enum EarthSpecTextureQuality {
-  OFF = 'off',
-  POTATO = '512',
-  LOW = '1k',
-  MEDIUM = '2k',
-  HIGH = '4k',
-  ULTRA = '16k',
-}
-
-export enum EarthBumpTextureQuality {
-  OFF = 'off',
-  LOW = '256',
-  MEDIUM = '4k',
-  HIGH = '8k',
-}
-
-export enum EarthCloudTextureQuality {
-  OFF = 'off',
-  POTATO = '512',
-  LOW = '1k',
-  MEDIUM = '2k',
-  HIGH = '4k',
-  ULTRA = '8k',
-}
-
-export enum EarthPoliticalTextureQuality {
-  OFF = 'off',
-  POTATO = '1k',
-  LOW = '2K',
-  MEDIUM = '4k',
-  HIGH = '8k',
-  ULTRA = '16k',
-}
-
-export enum EarthTextureStyle {
-  BLUE_MARBLE = 'earthmap',
-  FLAT = 'flat',
-}
-
-export enum AtmosphereSettings {
-  OFF = 0,
-  ON = 1,
-}
 
 export class Earth {
   private gl_: WebGL2RenderingContext;

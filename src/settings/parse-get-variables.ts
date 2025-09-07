@@ -1,5 +1,5 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
+import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';

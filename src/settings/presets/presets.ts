@@ -1,6 +1,6 @@
 import { GroupType } from '@app/app/data/object-group';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
+import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';

@@ -1,10 +1,10 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { Kilometers } from 'ootk';
-import { EarthTextureStyle } from '../../engine/rendering/draw-manager/earth';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
 import { keepTrackApi } from '../../keepTrackApi';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export class MobileManager {
   // eslint-disable-next-line require-await

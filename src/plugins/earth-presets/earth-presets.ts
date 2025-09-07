@@ -1,6 +1,6 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
-import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth';
+import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { NightToggle } from '../night-toggle/night-toggle';
 

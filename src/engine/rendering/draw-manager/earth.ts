@@ -27,6 +27,7 @@ import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
+import { glsl } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, Sun } from 'ootk';
@@ -38,7 +39,6 @@ import {
   EarthSpecTextureQuality, EarthTextureStyle,
 } from './earth-quality-enums';
 import { OcclusionProgram } from './post-processing';
-import { glsl } from '@app/engine/utils/development/formatter';
 
 export class Earth {
   private gl_: WebGL2RenderingContext;
@@ -371,7 +371,9 @@ export class Earth {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
     // disable depth test and depth writing
-    gl.disable(gl.DEPTH_TEST);
+    if (settingsManager.centerBody === 'earth') {
+      gl.disable(gl.DEPTH_TEST);
+    }
     gl.depthMask(false); // Disable depth writing
 
     gl.enable(gl.POLYGON_OFFSET_FILL);

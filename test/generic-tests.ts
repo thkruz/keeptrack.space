@@ -87,11 +87,11 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
     gl: engine.renderer.gl,
   });
   engine.camera.init(settingsManager);
+  engine.timeManager.init();
   keepTrackApi.getColorSchemeManager().init(engine.renderer);
   window.settingsManager = settingsManager;
   (global as unknown as Global).settingsManager = settingsManager;
   BottomMenu.createBottomMenu();
-  // clearAllCallbacks();
   plugin.init();
   keepTrackApi.emit(EventBusEvent.uiManagerInit);
   keepTrackApi.emit(EventBusEvent.uiManagerFinal);

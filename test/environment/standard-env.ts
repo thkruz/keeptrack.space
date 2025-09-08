@@ -8,6 +8,7 @@ import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { SearchManager } from '@app/app/ui/search-manager';
 import { UiManager } from '@app/app/ui/uiManager';
 import { Camera } from '@app/engine/camera/camera';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -65,7 +66,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
     },
   };
   EventBus.getInstance().unregisterAllEvents();
-  keepTrackApi.unregisterAllPlugins();
+  PluginRegistry.unregisterAllPlugins();
   // eslint-disable-next-line dot-notation
   KeepTrack['setContainerElement']();
   setupDefaultHtml();
@@ -126,6 +127,8 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
 
   const timeManagerInstance = new TimeManager();
 
+  timeManagerInstance.init();
+
   timeManagerInstance.simulationTimeObj = new Date(2023, 1, 1, 0, 0, 0, 0);
   Container.getInstance().registerSingleton(Singletons.TimeManager, timeManagerInstance);
 
@@ -156,6 +159,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   Container.getInstance().registerSingleton(Singletons.WebGLRenderer, renderer);
   Container.getInstance().registerSingleton(Singletons.Scene, scene);
   Container.getInstance().registerSingleton(Singletons.UiManager, mockUiManager);
+  Container.getInstance().registerSingleton(Singletons.TimeManager, timeManagerInstance);
   Container.getInstance().registerSingleton(Singletons.InputManager, inputManagerInstance);
   Container.getInstance().registerSingleton(Singletons.GroupsManager, groupManagerInstance);
   const sensorMathInstance = new SensorMath();
@@ -172,9 +176,6 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   sat2.id = 1;
   sat2.sccNum = '11';
   keepTrackApi.getCatalogManager().objectCache = [defaultSat, sat2];
-  const selectSatManager = new SelectSatManager();
-
-  selectSatManager.init();
 
   keepTrackApi.containerRoot.innerHTML += `
     <div id="save-rmb"></div>
@@ -346,8 +347,10 @@ export const mockCameraManager = <Camera>(<unknown>{
   localRotateDif: null,
   localRotateSpeed: null,
   localRotateStartPosition: null,
-  mouseX: 0,
-  mouseY: 0,
+  state: {
+    mouseX: 0,
+    mouseY: 0,
+  },
   panCurrent: null,
   panSpeed: null,
   panStartPosition: null,
@@ -383,7 +386,9 @@ export const mockCameraManager = <Camera>(<unknown>{
 });
 
 export const setupDefaultHtml = () => {
-  keepTrackApi.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
+  PluginRegistry.unregisterAllPlugins();
+  // keepTrackApi.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
+  Container.getInstance().registerSingleton(Singletons.MainCamera, mockCameraManager);
   KeepTrack.getDefaultBodyHtml();
   BottomMenu.init();
   keepTrackApi.containerRoot.innerHTML += `

@@ -3,7 +3,9 @@
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { getUnique } from '@app/engine/utils/get-unique';
@@ -12,7 +14,6 @@ import findSatPng from '@public/img/icons/database-search.png';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { html } from '@app/engine/utils/development/formatter';
 
 export interface SearchSatParams {
   argPe: Degrees;
@@ -238,7 +239,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   private uiManagerFinal_() {
-    const satData = keepTrackApi.getCatalogManager().objectCache;
+    const satData = ServiceLocator.getCatalogManager().objectCache;
 
     getEl('fbl-error')!.addEventListener('click', () => {
       getEl('fbl-error')!.style.display = 'none';

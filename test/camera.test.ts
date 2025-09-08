@@ -1,7 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { Camera, CameraType } from '@app/engine/camera/camera';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import { DEG2RAD, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
+import { DEG2RAD, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: Camera) => {
@@ -28,7 +28,7 @@ describe('Camera Key Input', () => {
     cameraInstance = new Camera();
   });
   it('should handle V', () => {
-    const testFunc = () => cameraInstance.keyDownV_();
+    const testFunc = () => cameraInstance.inputHandler.keyDownV_();
 
     for (let i = 0; i < 25; i++) {
       expect(testFunc).not.toThrow();
@@ -54,92 +54,92 @@ describe('Camera Key Input', () => {
     }
   });
   it('should handle W', () => {
-    let testFunc = () => cameraInstance.keyDownW_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownW_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpW_();
+    testFunc = () => cameraInstance.inputHandler.keyUpW_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle A', () => {
-    let testFunc = () => cameraInstance.keyDownA_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownA_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpA_();
+    testFunc = () => cameraInstance.inputHandler.keyUpA_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle D', () => {
-    let testFunc = () => cameraInstance.keyDownD_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownD_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpD_();
+    testFunc = () => cameraInstance.inputHandler.keyUpD_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle E', () => {
-    let testFunc = () => cameraInstance.keyDownE_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownE_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpE_();
+    testFunc = () => cameraInstance.inputHandler.keyUpE_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle Numpad8', () => {
-    let testFunc = () => cameraInstance.keyDownNumpad8_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownNumpad8_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpNumpad8_();
+    testFunc = () => cameraInstance.inputHandler.keyUpNumpad8_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle Numpad4', () => {
-    let testFunc = () => cameraInstance.keyDownNumpad4_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownNumpad4_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpNumpad4_();
+    testFunc = () => cameraInstance.inputHandler.keyUpNumpad4_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle Numpad6', () => {
-    let testFunc = () => cameraInstance.keyDownNumpad6_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownNumpad6_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpNumpad6_();
+    testFunc = () => cameraInstance.inputHandler.keyUpNumpad6_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle Numpad2', () => {
-    let testFunc = () => cameraInstance.keyDownNumpad2_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownNumpad2_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpNumpad2_();
+    testFunc = () => cameraInstance.inputHandler.keyUpNumpad2_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle Q', () => {
-    let testFunc = () => cameraInstance.keyDownQ_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownQ_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpQ_();
+    testFunc = () => cameraInstance.inputHandler.keyUpQ_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle S', () => {
-    let testFunc = () => cameraInstance.keyDownS_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownS_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpS_();
+    testFunc = () => cameraInstance.inputHandler.keyUpS_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle R', () => {
-    const testFunc = () => cameraInstance.keyDownR_();
+    const testFunc = () => cameraInstance.inputHandler.keyDownR_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle keyDownShift_', () => {
-    let testFunc = () => cameraInstance.keyDownShift_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownShift_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpShift_();
+    testFunc = () => cameraInstance.inputHandler.keyUpShift_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle keyDownShiftRight_', () => {
-    let testFunc = () => cameraInstance.keyDownShiftRight_();
+    let testFunc = () => cameraInstance.inputHandler.keyDownShiftRight_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.keyUpShiftRight_();
+    testFunc = () => cameraInstance.inputHandler.keyUpShiftRight_();
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
 });
@@ -181,7 +181,7 @@ describe('Camera Draw', () => {
   // test normal draw
   it('test_normal_draw', () => {
     const testResult = () => {
-      cameraInstance.draw(defaultSat, sensorData);
+      cameraInstance.draw(sensorData);
     };
 
     expect(testResult).not.toThrow();
@@ -190,7 +190,7 @@ describe('Camera Draw', () => {
   // test draw with no target
   it('test_draw_no_target', () => {
     const testResult = () => {
-      cameraInstance.draw(null, sensorData);
+      cameraInstance.draw(sensorData);
     };
 
     expect(testResult).not.toThrow();
@@ -199,7 +199,7 @@ describe('Camera Draw', () => {
   // test draw with no sensor
   it('test_draw_no_sensor', () => {
     const testResult = () => {
-      cameraInstance.draw(defaultSat, null);
+      cameraInstance.draw(null);
     };
 
     expect(testResult).not.toThrow();
@@ -208,7 +208,7 @@ describe('Camera Draw', () => {
   // test draw with no target and no sensor
   it('test_draw_no_target_no_sensor', () => {
     const testResult = () => {
-      cameraInstance.draw(null, null);
+      cameraInstance.draw(null);
     };
 
     expect(testResult).not.toThrow();
@@ -217,8 +217,8 @@ describe('Camera Draw', () => {
   // test draw with bad camPitch
   it('test_draw_bad_cam_pitch', () => {
     const testResult = () => {
-      cameraInstance.camPitch = NaN as unknown as Radians;
-      cameraInstance.draw(defaultSat, sensorData);
+      cameraInstance.state.camPitch = NaN as unknown as Radians;
+      cameraInstance.draw(sensorData);
     };
 
     expect(testResult).not.toThrow();
@@ -227,29 +227,29 @@ describe('Camera Draw', () => {
   // test draw with bad camYaw against all camera types
   it('test_draw_bad_cam_yaw', () => {
     let testResult = () => {
-      cameraInstance.camYaw = NaN as unknown as Radians;
-      cameraInstance.draw(defaultSat, sensorData);
+      cameraInstance.state.camYaw = NaN as unknown as Radians;
+      cameraInstance.draw(sensorData);
     };
 
     testFuncWithAllCameraTypes(testResult, cameraInstance);
 
     testResult = () => {
-      cameraInstance.camYaw = NaN as unknown as Radians;
-      cameraInstance.draw(defaultSat);
+      cameraInstance.state.camYaw = NaN as unknown as Radians;
+      cameraInstance.draw();
     };
     testFuncWithAllCameraTypes(testResult, cameraInstance);
   });
 
   // test draw with all camera types
   it('test_draw_all_camera_types', () => {
-    let testFunc = () => cameraInstance.draw(defaultSat, sensorData);
+    let testFunc = () => cameraInstance.draw(sensorData);
 
-    testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.draw(defaultSat, null);
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
     testFunc = () => cameraInstance.draw(null);
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
-    testFunc = () => cameraInstance.draw(null, null);
+    testFunc = () => cameraInstance.draw(null);
+    testFuncWithAllCameraTypes(testFunc, cameraInstance);
+    testFunc = () => cameraInstance.draw(null);
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
 });
@@ -263,14 +263,14 @@ describe('Camera snapToSat', () => {
 
   // test snapToSat with no target
   it('test_snap_to_sat_no_target', () => {
-    const testFunc = () => cameraInstance.snapToSat(null, new Date());
+    const testFunc = () => cameraInstance.snapToSat(null as unknown as DetailedSatellite, new Date());
 
     expect(testFunc).not.toThrow();
   });
 
   // test snapToSat with bad target data
   it('test_snap_to_sat_bad_target_data', () => {
-    defaultSat.position = null;
+    defaultSat.position = null as unknown as { x: Kilometers; y: Kilometers; z: Kilometers };
     const testFunc = () => cameraInstance.snapToSat(defaultSat, new Date());
 
     expect(() => testFunc()).toThrow();
@@ -287,7 +287,7 @@ describe('Camera snapToSat', () => {
   // test snapToSat with camAngleSnappedOnSat
   it('test_snap_to_sat_cam_angle_snapped_on_sat', () => {
     const testFunc = () => {
-      cameraInstance.camAngleSnappedOnSat = true;
+      cameraInstance.state.camAngleSnappedOnSat = true;
       defaultSat.position = { x: 0 as Kilometers, y: 0 as Kilometers, z: 6000 as Kilometers };
       cameraInstance.snapToSat(defaultSat, new Date());
     };
@@ -298,7 +298,7 @@ describe('Camera snapToSat', () => {
   // test snapToSat with camAngleSnappedOnSat and camSnapToSat.yaw bad
   it('test_snap_to_sat_cam_angle_snapped_on_sat_cam_snap_to_sat_yaw_bad', () => {
     const testFunc = () => {
-      cameraInstance.camAngleSnappedOnSat = true;
+      cameraInstance.state.camAngleSnappedOnSat = true;
       defaultSat.position = {
         x: 'bad' as unknown as Kilometers,
         y: 'bad' as unknown as Kilometers,
@@ -313,7 +313,7 @@ describe('Camera snapToSat', () => {
   // test snapToSat with camZoomSnappedOnSat
   it('test_snap_to_sat_cam_zoom_snapped_on_sat', () => {
     const testFunc = () => {
-      cameraInstance.camZoomSnappedOnSat = true;
+      cameraInstance.state.camZoomSnappedOnSat = true;
       cameraInstance.snapToSat(defaultSat, new Date());
     };
 
@@ -323,7 +323,7 @@ describe('Camera snapToSat', () => {
   // test snapToSat with camZoomSnappedOnSat with bad target data
   it('test_snap_to_sat_cam_zoom_snapped_on_sat_bad_target_data', () => {
     const testFunc = () => {
-      cameraInstance.camZoomSnappedOnSat = true;
+      cameraInstance.state.camZoomSnappedOnSat = true;
       defaultSat.position = {
         x: 'bad' as unknown as Kilometers,
         y: 'bad' as unknown as Kilometers,
@@ -374,182 +374,182 @@ describe('Camera update', () => {
 });
 
 const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: Camera) => {
-  cameraInstance.keyDownW_();
+  cameraInstance.inputHandler.keyDownW_();
   testFunc();
 
-  cameraInstance.keyDownA_();
+  cameraInstance.inputHandler.keyDownA_();
   testFunc();
 
-  cameraInstance.keyDownD_();
+  cameraInstance.inputHandler.keyDownD_();
   testFunc();
 
-  cameraInstance.keyDownE_();
+  cameraInstance.inputHandler.keyDownE_();
   testFunc();
 
-  cameraInstance.keyDownArrowDown_();
+  cameraInstance.inputHandler.keyDownArrowDown_();
   testFunc();
 
-  cameraInstance.keyDownArrowLeft_();
+  cameraInstance.inputHandler.keyDownArrowLeft_();
   testFunc();
 
-  cameraInstance.keyDownArrowRight_();
+  cameraInstance.inputHandler.keyDownArrowRight_();
   testFunc();
 
-  cameraInstance.keyDownArrowUp_();
+  cameraInstance.inputHandler.keyDownArrowUp_();
   testFunc();
 
-  cameraInstance.keyDownQ_();
+  cameraInstance.inputHandler.keyDownQ_();
   testFunc();
 
-  cameraInstance.keyDownS_();
+  cameraInstance.inputHandler.keyDownS_();
   testFunc();
 
-  cameraInstance.keyDownR_();
+  cameraInstance.inputHandler.keyDownR_();
   testFunc();
 
-  cameraInstance.keyDownShift_();
+  cameraInstance.inputHandler.keyDownShift_();
   testFunc();
 
-  cameraInstance.keyDownShiftRight_();
+  cameraInstance.inputHandler.keyDownShiftRight_();
   testFunc();
 
   // Combination of key presses
-  cameraInstance.keyDownW_();
-  cameraInstance.keyDownA_();
+  cameraInstance.inputHandler.keyDownW_();
+  cameraInstance.inputHandler.keyDownA_();
   testFunc();
 
-  cameraInstance.keyDownS_();
-  cameraInstance.keyDownD_();
+  cameraInstance.inputHandler.keyDownS_();
+  cameraInstance.inputHandler.keyDownD_();
   testFunc();
 
-  cameraInstance.keyDownQ_();
-  cameraInstance.keyDownE_();
+  cameraInstance.inputHandler.keyDownQ_();
+  cameraInstance.inputHandler.keyDownE_();
   testFunc();
 
-  cameraInstance.keyDownArrowUp_();
-  cameraInstance.keyDownArrowDown_();
+  cameraInstance.inputHandler.keyDownArrowUp_();
+  cameraInstance.inputHandler.keyDownArrowDown_();
   testFunc();
 
-  cameraInstance.keyDownArrowLeft_();
-  cameraInstance.keyDownArrowRight_();
+  cameraInstance.inputHandler.keyDownArrowLeft_();
+  cameraInstance.inputHandler.keyDownArrowRight_();
   testFunc();
 
-  cameraInstance.keyDownShift_();
-  cameraInstance.keyDownShiftRight_();
+  cameraInstance.inputHandler.keyDownShift_();
+  cameraInstance.inputHandler.keyDownShiftRight_();
   testFunc();
 };
 
 const testVariousKeyUpInputs = (testFunc: () => void, cameraInstance: Camera) => {
-  cameraInstance.keyUpW_();
+  cameraInstance.inputHandler.keyUpW_();
   testFunc();
 
-  cameraInstance.keyUpA_();
+  cameraInstance.inputHandler.keyUpA_();
   testFunc();
 
-  cameraInstance.keyUpD_();
+  cameraInstance.inputHandler.keyUpD_();
   testFunc();
 
-  cameraInstance.keyUpE_();
+  cameraInstance.inputHandler.keyUpE_();
   testFunc();
 
-  cameraInstance.keyUpArrowUp_();
+  cameraInstance.inputHandler.keyUpArrowUp_();
   testFunc();
 
-  cameraInstance.keyUpArrowDown_();
+  cameraInstance.inputHandler.keyUpArrowDown_();
   testFunc();
 
-  cameraInstance.keyUpArrowLeft_();
+  cameraInstance.inputHandler.keyUpArrowLeft_();
   testFunc();
 
-  cameraInstance.keyUpArrowRight_();
+  cameraInstance.inputHandler.keyUpArrowRight_();
   testFunc();
 
-  cameraInstance.keyUpQ_();
+  cameraInstance.inputHandler.keyUpQ_();
   testFunc();
 
-  cameraInstance.keyUpS_();
+  cameraInstance.inputHandler.keyUpS_();
   testFunc();
 
-  cameraInstance.keyUpShift_();
+  cameraInstance.inputHandler.keyUpShift_();
   testFunc();
 
-  cameraInstance.keyUpShiftRight_();
+  cameraInstance.inputHandler.keyUpShiftRight_();
   testFunc();
 
   // Combination of key presses
-  cameraInstance.keyUpW_();
-  cameraInstance.keyUpA_();
+  cameraInstance.inputHandler.keyUpW_();
+  cameraInstance.inputHandler.keyUpA_();
   testFunc();
 
-  cameraInstance.keyUpS_();
-  cameraInstance.keyUpD_();
+  cameraInstance.inputHandler.keyUpS_();
+  cameraInstance.inputHandler.keyUpD_();
   testFunc();
 
-  cameraInstance.keyUpQ_();
-  cameraInstance.keyUpE_();
+  cameraInstance.inputHandler.keyUpQ_();
+  cameraInstance.inputHandler.keyUpE_();
   testFunc();
 
-  cameraInstance.keyUpArrowUp_();
-  cameraInstance.keyUpArrowDown_();
+  cameraInstance.inputHandler.keyUpArrowUp_();
+  cameraInstance.inputHandler.keyUpArrowDown_();
   testFunc();
 
-  cameraInstance.keyUpArrowLeft_();
-  cameraInstance.keyUpArrowRight_();
+  cameraInstance.inputHandler.keyUpArrowLeft_();
+  cameraInstance.inputHandler.keyUpArrowRight_();
   testFunc();
 
-  cameraInstance.keyUpShift_();
-  cameraInstance.keyUpShiftRight_();
+  cameraInstance.inputHandler.keyUpShift_();
+  cameraInstance.inputHandler.keyUpShiftRight_();
   testFunc();
 };
 
 const testVariousKeyCombinationInputs = (testFunc: () => void, cameraInstance: Camera) => {
   // Combination of key presses and releases
-  cameraInstance.keyDownW_();
-  cameraInstance.keyUpA_();
+  cameraInstance.inputHandler.keyDownW_();
+  cameraInstance.inputHandler.keyUpA_();
   testFunc();
 
-  cameraInstance.keyDownS_();
-  cameraInstance.keyUpD_();
+  cameraInstance.inputHandler.keyDownS_();
+  cameraInstance.inputHandler.keyUpD_();
   testFunc();
 
-  cameraInstance.keyDownQ_();
-  cameraInstance.keyUpE_();
+  cameraInstance.inputHandler.keyDownQ_();
+  cameraInstance.inputHandler.keyUpE_();
   testFunc();
 
-  cameraInstance.keyDownArrowUp_();
-  cameraInstance.keyUpArrowDown_();
+  cameraInstance.inputHandler.keyDownArrowUp_();
+  cameraInstance.inputHandler.keyUpArrowDown_();
   testFunc();
 
-  cameraInstance.keyDownArrowLeft_();
-  cameraInstance.keyUpArrowRight_();
+  cameraInstance.inputHandler.keyDownArrowLeft_();
+  cameraInstance.inputHandler.keyUpArrowRight_();
   testFunc();
 
-  cameraInstance.keyDownShift_();
-  cameraInstance.keyUpShiftRight_();
+  cameraInstance.inputHandler.keyDownShift_();
+  cameraInstance.inputHandler.keyUpShiftRight_();
   testFunc();
 
   // Reverse combination of key presses and releases
-  cameraInstance.keyUpW_();
-  cameraInstance.keyDownA_();
+  cameraInstance.inputHandler.keyUpW_();
+  cameraInstance.inputHandler.keyDownA_();
   testFunc();
 
-  cameraInstance.keyUpS_();
-  cameraInstance.keyDownD_();
+  cameraInstance.inputHandler.keyUpS_();
+  cameraInstance.inputHandler.keyDownD_();
   testFunc();
 
-  cameraInstance.keyUpQ_();
-  cameraInstance.keyDownE_();
+  cameraInstance.inputHandler.keyUpQ_();
+  cameraInstance.inputHandler.keyDownE_();
   testFunc();
 
-  cameraInstance.keyUpArrowUp_();
-  cameraInstance.keyUpArrowDown_();
+  cameraInstance.inputHandler.keyUpArrowUp_();
+  cameraInstance.inputHandler.keyUpArrowDown_();
   testFunc();
 
-  cameraInstance.keyUpArrowLeft_();
-  cameraInstance.keyUpArrowRight_();
+  cameraInstance.inputHandler.keyUpArrowLeft_();
+  cameraInstance.inputHandler.keyUpArrowRight_();
   testFunc();
 
-  cameraInstance.keyUpShift_();
-  cameraInstance.keyDownShiftRight_();
+  cameraInstance.inputHandler.keyUpShift_();
+  cameraInstance.inputHandler.keyDownShiftRight_();
   testFunc();
 };

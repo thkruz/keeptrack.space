@@ -23,11 +23,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-/* eslint-disable no-unreachable */
-
 import 'material-icons/iconfont/material-icons.css';
 
-import eruda from 'eruda';
 import { CatalogLoader } from './app/data/catalog-loader';
 import { CatalogManager } from './app/data/catalog-manager';
 import { GroupsManager } from './app/data/groups-manager';
@@ -60,6 +57,7 @@ export class KeepTrack {
 
   isReady = false;
   engine: Engine;
+  api = keepTrackApi;
 
   private constructor() {
     // Singleton
@@ -383,18 +381,6 @@ theodore.kruczek at gmail dot com.
     UiManager.postStart();
 
     if (settingsManager.cruncherReady) {
-      /*
-       * Create Container Div
-       * NOTE: This needs to be done before uiManagerFinal
-       */
-      if (settingsManager.plugins.DebugMenuPlugin) {
-        const uiWrapperDom = getEl('ui-wrapper');
-
-        if (uiWrapperDom) {
-          uiWrapperDom.innerHTML += '<div id="eruda"></div>';
-        }
-      }
-
       if (settingsManager.isDisableCanvas) {
         const canvasHolderDom = getEl('keeptrack-canvas');
 
@@ -405,31 +391,6 @@ theodore.kruczek at gmail dot com.
 
       // Update any CSS now that we know what is loaded
       keepTrackApi.emit(EventBusEvent.uiManagerFinal);
-
-      if (settingsManager.plugins.DebugMenuPlugin) {
-        const erudaDom = getEl('eruda');
-
-        if (erudaDom) {
-          eruda.init({
-            autoScale: false,
-            container: erudaDom,
-            useShadowDom: false,
-            tool: ['console', 'elements', 'network', 'resources', 'storage', 'sources', 'info', 'snippets'],
-          });
-          const console = eruda.get('console');
-
-          console.config.set('catchGlobalErr', false);
-
-          const erudaContainerDom = getEl('eruda-console')?.parentElement?.parentElement;
-
-          if (erudaContainerDom) {
-            erudaContainerDom.style.top = 'calc(var(--top-menu-height) + 30px)';
-            erudaContainerDom.style.height = '80%';
-            erudaContainerDom.style.width = '60%';
-            erudaContainerDom.style.left = '20%';
-          }
-        }
-      }
 
       keepTrackApi.getUiManager().initMenuController();
 
@@ -458,8 +419,5 @@ theodore.kruczek at gmail dot com.
       }, 100);
     }
   }
-
-  // Make the api available
-  api = keepTrackApi;
 }
 

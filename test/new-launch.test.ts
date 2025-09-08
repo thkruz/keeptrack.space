@@ -1,3 +1,4 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -9,13 +10,9 @@ import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('NewLaunch_class', () => {
-  let newLaunchPlugin: NewLaunch;
-
   beforeEach(() => {
     keepTrackApi.containerRoot.innerHTML = '';
     setupStandardEnvironment([SelectSatManager]);
-    newLaunchPlugin = new NewLaunch();
-    newLaunchPlugin.init();
   });
 
   standardPluginSuite(NewLaunch, 'NewLaunch');
@@ -27,6 +24,7 @@ describe('NewLaunch_form', () => {
 
   beforeEach(() => {
     keepTrackApi.containerRoot.innerHTML = '';
+    PluginRegistry.unregisterAllPlugins();
     setupStandardEnvironment([SelectSatManager]);
     newLaunchPlugin = new NewLaunch();
   });
@@ -53,7 +51,7 @@ describe('NewLaunch_form', () => {
     keepTrackApi.emit(EventBusEvent.selectSatData, defaultSat, defaultSat.id);
     keepTrackApi.emit(EventBusEvent.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
 
-    expect(() => getEl(`${newLaunchPlugin.sideMenuElementName}-submit`).click()).not.toThrow();
+    expect(() => getEl(`${newLaunchPlugin.sideMenuElementName}-submit`)!.click()).not.toThrow();
     jest.advanceTimersByTime(1000);
   });
 });

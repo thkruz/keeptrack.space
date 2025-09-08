@@ -1,4 +1,6 @@
 /* eslint-disable dot-notation */
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '@app/settings/settings';
@@ -10,16 +12,17 @@ describe('drawManager', () => {
   let dotsManagerInstance: DotsManager;
 
   beforeEach(() => {
+    PluginRegistry.unregisterAllPlugins();
+    setupStandardEnvironment();
     dotsManagerInstance = new DotsManager();
   });
   // Should process getScreenCoords
   it('process_get_screen_coords', () => {
-    setupStandardEnvironment();
-    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer>null)).not.toThrow();
+    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer><unknown>null)).not.toThrow();
     dotsManagerInstance.isReady = true;
-    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer>null)).not.toThrow();
+    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer><unknown>null)).not.toThrow();
     settingsManager.cruncherReady = true;
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     colorSchemeManagerInstance.colorBuffer = new Uint8Array(4);
     dotsManagerInstance['settings_'] = <SettingsManager>{
@@ -29,7 +32,7 @@ describe('drawManager', () => {
         maxSize: 1,
       } as unknown as WebGLProgram,
     };
-    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer>null)).not.toThrow();
+    expect(() => dotsManagerInstance.draw(mat4.create(), <WebGLFramebuffer><unknown>null)).not.toThrow();
   });
 
   // Should process updatePositionBuffer

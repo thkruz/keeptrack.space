@@ -4,14 +4,12 @@
  * Singletons are registered here, and then injected into the modules that need them.
  */
 export class Container {
-  private static instance: Container;
+  private static instance_: Container;
 
   static getInstance(): Container {
-    if (!this.instance) {
-      this.instance = new Container();
-    }
+    this.instance_ ??= new Container();
 
-    return this.instance;
+    return this.instance_;
   }
 
   private constructor() {

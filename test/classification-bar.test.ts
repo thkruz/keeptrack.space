@@ -1,4 +1,5 @@
 import { ClassificationString } from '@app/app/ui/classification';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { ClassificationBar } from '@app/plugins/classification-bar/classification-bar';
@@ -9,6 +10,7 @@ describe('classification_bar_plugin', () => {
   let classificationPlugin: ClassificationBar;
 
   beforeEach(() => {
+    PluginRegistry.unregisterAllPlugins();
     classificationPlugin = new ClassificationBar();
     setupMinimumHtml();
   });
@@ -22,6 +24,7 @@ describe('classification_bar_plugin', () => {
 
   it('process_init_with_settings_classification', () => {
     ['Unclassified', 'Secret', 'Top Secret', 'Top Secret//SCI'].forEach((testClassificationStr) => {
+      PluginRegistry.unregisterAllPlugins();
       classificationPlugin = new ClassificationBar();
       setupMinimumHtml();
       settingsManager.classificationStr = testClassificationStr as ClassificationString;
@@ -30,7 +33,7 @@ describe('classification_bar_plugin', () => {
       expect(() => keepTrackApi.events.uiManagerInit.forEach((callback) => callback.cb())).not.toThrow();
       expect(() => keepTrackApi.events.uiManagerFinal.forEach((callback) => callback.cb())).not.toThrow();
 
-      expect(getEl('classification-string').innerHTML).toBe(testClassificationStr);
+      expect(getEl('classification-string')!.innerHTML).toBe(testClassificationStr);
     });
   });
 

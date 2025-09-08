@@ -1,19 +1,15 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 
 describe('SatelliteFov_class', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let satelliteFovPlugin: SatelliteFov;
-
-  // eslint-disable-next-line no-console
-  console.debug(satelliteFovPlugin);
-
   beforeEach(() => {
-    setupStandardEnvironment();
-    satelliteFovPlugin = new SatelliteFov();
+    PluginRegistry.unregisterAllPlugins();
+    setupStandardEnvironment([SelectSatManager]);
     keepTrackApi.getCatalogManager().getObject = () => defaultSat;
     keepTrackApi.getCatalogManager().satCruncher = {
       postMessage: jest.fn(),

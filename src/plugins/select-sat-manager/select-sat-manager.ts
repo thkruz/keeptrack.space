@@ -4,6 +4,7 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -11,7 +12,6 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { NewLaunch } from '../new-launch/new-launch';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
@@ -151,8 +151,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
           return;
         case SpaceObjectType.LAUNCH_SITE:
-          keepTrackApi.getPlugin(NewLaunch)?.selectLaunchSite(obj as LandObject);
-
+          // Handled elsewhere
           return;
         case SpaceObjectType.STAR:
           return; // Do nothing
@@ -340,7 +339,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
   private updateDotSizeAndColor_(i: number) {
     const dotsManagerInstance = keepTrackApi.getDotsManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
     const { gl, isContextLost } = keepTrackApi.getRenderer();
 
     if (isContextLost) {
@@ -390,7 +389,7 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   getSelectedSat(type = GetSatType.DEFAULT): DetailedSatellite | MissileObject {
-    return keepTrackApi.getCatalogManager().getObject(this.selectedSat, type) as DetailedSatellite | MissileObject;
+    return ServiceLocator.getCatalogManager().getObject(this.selectedSat, type) as DetailedSatellite | MissileObject;
   }
 
   setSecondarySat(id: number): void {

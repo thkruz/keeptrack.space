@@ -175,9 +175,9 @@ export class LayersManager {
     let layersHoverDom: HTMLElement | null;
 
     if (settingsManager.isMobileModeEnabled) {
-      layersHoverDom = getEl('layers-hover-menu');
+      layersHoverDom = getEl('layers-hover-menu', true);
     } else {
-      layersHoverDom = getEl('layers-hover-menu-popup');
+      layersHoverDom = getEl('layers-hover-menu-popup', true);
     }
 
     if (!layersHoverDom) {

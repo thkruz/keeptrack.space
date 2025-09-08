@@ -30,7 +30,7 @@ import { keepTrackApi } from '../../keepTrackApi';
  * `SatMathApi` is a singleton class that provides a wrapper around the `SatMath` class.
  * It is used to provide a more convenient interface for the `SatMath` class.
  *
- * All access to `SatMath` using singletons from `keepTrackContainer` should be done
+ * All access to `SatMath` using singletons from `Container.getInstance()` should be done
  * through this class.
  */
 export class SatMathApi {

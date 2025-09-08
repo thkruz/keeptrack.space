@@ -6,10 +6,10 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, SpaceObjectType } from 'ootk';
-import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera';
 import { Scene } from '../core/scene';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { glsl } from '../utils/development/formatter';
@@ -17,6 +17,7 @@ import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
 import { WebGlProgramHelper } from './webgl-program';
 import { WebGLRenderer } from './webgl-renderer';
+import { PluginRegistry } from '../core/plugin-registry';
 
 declare module '@app/engine/core/interfaces' {
   interface SatShader {
@@ -158,7 +159,7 @@ export class DotsManager {
     if (!this.isReady || !settingsManager.cruncherReady) {
       return;
     }
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     if (!colorSchemeManagerInstance.colorBuffer) {
       return;
@@ -167,7 +168,7 @@ export class DotsManager {
       return;
     }
 
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     gl.useProgram(this.programs.dots.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
@@ -175,7 +176,7 @@ export class DotsManager {
     gl.uniform1f(this.programs.dots.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     gl.uniform3fv(this.programs.dots.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+    if (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       gl.uniform1f(this.programs.dots.uniforms.u_minSize, this.settings_.satShader.minSizePlanetarium);
       gl.uniform1f(this.programs.dots.uniforms.u_maxSize, this.settings_.satShader.maxSizePlanetarium);
     } else {
@@ -215,7 +216,7 @@ export class DotsManager {
     gl.disable(gl.BLEND);
 
     // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-    this.drawGpuPickingFrameBuffer(pMvCamMatrix, keepTrackApi.getMainCamera().state.mouseX, keepTrackApi.getMainCamera().state.mouseY);
+    this.drawGpuPickingFrameBuffer(pMvCamMatrix, ServiceLocator.getMainCamera().state.mouseX, ServiceLocator.getMainCamera().state.mouseY);
   }
 
   /**
@@ -228,17 +229,17 @@ export class DotsManager {
     if (!this.isReady || !settingsManager.cruncherReady) {
       return;
     }
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     if (!colorSchemeManagerInstance.colorBuffer) {
       return;
     }
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     gl.depthMask(true);
 
     gl.useProgram(this.programs.picking.program);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
 
     gl.uniformMatrix4fv(this.programs.picking.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
     gl.uniform3fv(this.programs.picking.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
@@ -342,7 +343,7 @@ export class DotsManager {
    * @param settings - The user settings to use for initialization.
    */
   init(settings: SettingsManager) {
-    const renderer = keepTrackApi.getRenderer();
+    const renderer = ServiceLocator.getRenderer();
 
     this.settings_ = settings;
 
@@ -369,7 +370,7 @@ export class DotsManager {
    * @param colorBuffer The color buffer to be shared between the color manager and the dots manager.
    */
   initBuffers(colorBuffer: WebGLBuffer) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     this.setupPickingBuffer(catalogManagerInstance.objectCache.length);
     this.updateSizeBuffer(catalogManagerInstance.objectCache.length);
@@ -392,15 +393,15 @@ export class DotsManager {
    * creates a framebuffer, texture, and renderbuffer for picking, and initializes a pixel buffer.
    */
   initProgramPicking() {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     this.programs.picking.program = new WebGlProgramHelper(gl, this.shaders_.picking.vert, this.shaders_.picking.frag).program;
 
     GlUtils.assignAttributes(this.programs.picking.attribs, gl, this.programs.picking.program, ['a_position', 'a_color', 'a_pickable']);
     GlUtils.assignUniforms(this.programs.picking.uniforms, gl, this.programs.picking.program, ['u_pMvCamMatrix', 'worldOffset']);
 
-    keepTrackApi.getScene().frameBuffers.gpuPicking = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
+    ServiceLocator.getScene().frameBuffers.gpuPicking = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
 
     this.pickingTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, this.pickingTexture);
@@ -424,13 +425,13 @@ export class DotsManager {
    * Initializes the vertex array objects for the dots and picking programs.
    */
   initVao(): void {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     // Dots Program
     this.programs.dots.vao = gl.createVertexArray();
     gl.bindVertexArray(this.programs.dots.vao);
 
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
     gl.enableVertexAttribArray(this.programs.dots.attribs.a_color.location);
@@ -504,7 +505,7 @@ export class DotsManager {
       this.pickingColorData.push(byteB / 255.0);
     }
 
-    const renderer = keepTrackApi.getRenderer();
+    const renderer = ServiceLocator.getRenderer();
 
     this.pickingBuffers.color = GlUtils.createArrayBuffer(renderer.gl, new Float32Array(this.pickingColorData));
   }
@@ -601,15 +602,15 @@ export class DotsManager {
       return;
     }
 
-    const renderer = keepTrackApi.getRenderer();
+    const renderer = ServiceLocator.getRenderer();
 
     if (!settingsManager.lowPerf && renderer.dtAdjusted > settingsManager.minimumDrawDt) {
-      if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
-        const obj = keepTrackApi.getCatalogManager().objectCache[keepTrackApi.getPlugin(SelectSatManager)!.selectedSat] as DetailedSatellite | MissileObject;
+      if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
+        const obj = ServiceLocator.getCatalogManager().objectCache[PluginRegistry.getPlugin(SelectSatManager)!.selectedSat] as DetailedSatellite | MissileObject;
 
         if (obj.isSatellite()) {
           const sat = obj as DetailedSatellite;
-          const now = keepTrackApi.getTimeManager().simulationTimeObj;
+          const now = ServiceLocator.getTimeManager().simulationTimeObj;
           const pv = sat.eci(now);
 
           if (!pv) {
@@ -634,7 +635,7 @@ export class DotsManager {
     }
 
     // Check if the index is the selected satellite
-    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1;
+    const selectedSat = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1;
 
     if (i === selectedSat) {
       return 1.0; // Return size for selected satellite
@@ -654,7 +655,7 @@ export class DotsManager {
    * @param bufferLen The length of the buffer.
    */
   updateSizeBuffer(bufferLen: number = 3) {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     if (!this.isSizeBufferOneTime_) {
       this.sizeData = new Int8Array(bufferLen);
@@ -670,7 +671,7 @@ export class DotsManager {
       }
     }
 
-    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1;
+    const selectedSat = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1;
 
     if (selectedSat > -1) {
       this.sizeData[selectedSat] = 1.0;
@@ -843,7 +844,7 @@ export class DotsManager {
    * @param renderer - The WebGL renderer used to calculate the time delta.
    */
   private interpolatePositions_(renderer: WebGLRenderer) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const orbitalSats3 = catalogManagerInstance.orbitalSats * 3;
 
     for (let i = 0; i < orbitalSats3; i++) {

@@ -1,4 +1,3 @@
-import { keepTrackContainer } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -43,7 +42,7 @@ describe('SettingsMenuPlugin_class', () => {
 
     colorSchemeManagerInstance.setColorScheme = jest.fn();
     colorSchemeManagerInstance.reloadColors = jest.fn();
-    keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
     expect(() => getEl('settings-submit')?.click()).not.toThrow();
   });
 });

@@ -1,3 +1,4 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
@@ -5,12 +6,8 @@ import { disableConsoleErrors, enableConsoleErrors, setupDefaultHtml } from './e
 import { standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('WatchlistPlugin_class', () => {
-  let watchlistPlugin: WatchlistPlugin;
-
   beforeEach(() => {
-    setupDefaultHtml();
-    watchlistPlugin = new WatchlistPlugin();
-    websiteInit(watchlistPlugin);
+    PluginRegistry.unregisterAllPlugins();
   });
 
   standardPluginSuite(WatchlistPlugin);

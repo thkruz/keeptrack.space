@@ -1,6 +1,5 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { SensorMath } from '@app/app/sensors/sensor-math';
-import { keepTrackContainer } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { SatelliteRecord } from 'ootk';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
@@ -24,7 +23,7 @@ describe('sensor-math', () => {
   it('process_nextpassList', () => {
     const sensorMathInstance = new SensorMath();
 
-    keepTrackContainer.registerSingleton(Singletons.SensorMath, sensorMathInstance);
+    Container.getInstance().registerSingleton(Singletons.SensorMath, sensorMathInstance);
     const test = () => SensorMath.nextpassList([defaultSat], [defaultSensor]);
 
     expect(test).not.toThrow();

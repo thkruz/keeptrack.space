@@ -1,6 +1,7 @@
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { EditSat } from '@app/plugins/edit-sat/edit-sat';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
@@ -8,7 +9,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 describe('EditSatPlugin_class', () => {
   beforeEach(() => {
     keepTrackApi.containerRoot.innerHTML = '';
-    setupStandardEnvironment();
+    setupStandardEnvironment([SelectSatManager]);
   });
 
   standardPluginSuite(EditSat);

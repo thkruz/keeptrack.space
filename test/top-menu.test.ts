@@ -1,4 +1,3 @@
-import { keepTrackContainer } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -8,6 +7,7 @@ import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupMinimumHtml } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
+import { Container } from '@app/engine/core/container';
 
 describe('TopMenu_class', () => {
   beforeEach(() => {
@@ -30,7 +30,7 @@ describe('TopMenu_class', () => {
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
 
     errorManagerInstance.warn = jest.fn();
-    keepTrackContainer.registerSingleton(Singletons.SoundManager, null);
+    Container.getInstance().registerSingleton(Singletons.SoundManager, null);
     soundBtn.click();
     expect(errorManagerInstance.warn).toHaveBeenCalled();
   });
@@ -47,7 +47,7 @@ describe('TopMenu_class', () => {
     const soundIcon = getEl('sound-icon') as HTMLImageElement;
     const soundManagerPlugin = new SoundManager();
 
-    keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerPlugin);
+    Container.getInstance().registerSingleton(Singletons.SoundManager, soundManagerPlugin);
     const soundManager = keepTrackApi.getSoundManager();
 
     soundBtn.click();

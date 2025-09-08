@@ -1,5 +1,4 @@
 import { SensorManager } from '@app/app/sensors/sensorManager';
-import { keepTrackContainer } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -31,7 +30,7 @@ describe('SensorSurvFence_class', () => {
     const sensorManagerInstance = new SensorManager();
 
     sensorManagerInstance.isSensorSelected = jest.fn().mockReturnValue(true);
-    keepTrackContainer.registerSingleton(Singletons.SensorManager, sensorManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.SensorManager, sensorManagerInstance);
     expect(() => keepTrackApi.emit(EventBusEvent.bottomMenuClick, sensorSurvFencePlugin.bottomIconElementName)).not.toThrow();
   });
 

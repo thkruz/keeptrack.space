@@ -1043,7 +1043,7 @@ export class SettingsManager {
    * Increasing this causes z-fighting
    * Decreasing this causes clipping of stars and satellites
    */
-  zFar = 450000.0;
+  zFar = 149600000;
   /**
    * The minimum z-depth for the WebGL renderer.
    */

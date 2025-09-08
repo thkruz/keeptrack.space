@@ -54,11 +54,11 @@ import yellowSquare from '@public/img/yellow-square.png';
 
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { dateFormat } from '@app/engine/utils/dateFormat';
+import { html } from '@app/engine/utils/development/formatter';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, LlaVec3, calcGmst, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
 
 interface GroundTracePoint {
   x: number;
@@ -123,7 +123,7 @@ export class StereoMap extends KeepTrackPlugin {
           }
         });
 
-        getEl('fullscreen-icon')?.addEventListener('click', () => {
+        getEl('fullscreen-icon', true)?.addEventListener('click', () => {
           this.resize2DMap_();
         });
 

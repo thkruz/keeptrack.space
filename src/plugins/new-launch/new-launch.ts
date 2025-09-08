@@ -13,15 +13,18 @@ import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { launchSites } from '@app/app/data/catalogs/launch-sites';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
+import {
+  BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond,
+  LandObject, SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2,
+} from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';
@@ -344,6 +347,8 @@ export class NewLaunch extends KeepTrackPlugin {
           (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
           this.setBottomIconToEnabled();
           this.preValidate_(sat);
+        } else if (obj?.type === SpaceObjectType.LAUNCH_SITE) {
+          this.selectLaunchSite(obj as LandObject);
         } else {
           this.setBottomIconToDisabled();
         }

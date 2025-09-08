@@ -4,13 +4,13 @@ import { SettingsManagerOverride } from '@app/settings/settings';
 import { DetailedSatellite, Milliseconds, Satellite } from 'ootk';
 import { CatalogLoader } from '../src/app/data/catalog-loader';
 import { UiManager } from '../src/app/ui/uiManager';
-import { keepTrackContainer } from '../src/engine/core/container';
 import { SatCruncherMessageData, Singletons } from '../src/engine/core/interfaces';
 import { OrbitManager } from '../src/engine/rendering/orbitManager';
 import { WebGLRenderer } from '../src/engine/rendering/webgl-renderer';
 import { KeepTrack } from './../src/keeptrack';
 import { defaultSat } from './environment/apiMocks';
 import { mockCameraManager, setupDefaultHtml } from './environment/standard-env';
+import { Container } from '@app/engine/core/container';
 
 /*
  *Code Analysis
@@ -80,11 +80,11 @@ const setupStandardEnvironment = () => {
   // Pretend we have a working canvas
   drawManagerInstance.domElement = { style: { cursor: 'default' } } as unknown as HTMLCanvasElement;
 
-  keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, drawManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.MainCamera, mockCameraManager);
+  Container.getInstance().registerSingleton(Singletons.WebGLRenderer, drawManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.UiManager, uiManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.MainCamera, mockCameraManager);
 };
 
 describe('code_snippet', () => {

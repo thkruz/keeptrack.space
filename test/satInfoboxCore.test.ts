@@ -7,11 +7,11 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SpaceObjectType } from 'ootk';
 import { defaultMisl, defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
-import { standardPluginSuite, websiteInit } from './generic-tests';
+import { standardPluginSuite } from './generic-tests';
 
 describe('SatInfoBoxCore_class', () => {
   beforeEach(() => {
-    setupStandardEnvironment([SelectSatManager, SatInfoBox, SatInfoBoxObject]);
+    setupStandardEnvironment([SelectSatManager]);
     keepTrackApi.emit(EventBusEvent.uiManagerInit);
     keepTrackApi.emit(EventBusEvent.uiManagerFinal);
   });
@@ -20,14 +20,11 @@ describe('SatInfoBoxCore_class', () => {
 
   describe('Clicking Orbit Data Links', () => {
     beforeEach(() => {
-      const satInfoBoxCorePlugin = new SatInfoBox();
-
-      websiteInit(satInfoBoxCorePlugin);
       keepTrackApi.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));
       keepTrackApi.getDotsManager().sizeData = new Int8Array(Array(100).fill(0));
       keepTrackApi.getDotsManager().positionData = new Float32Array(Array(100).fill(0));
       keepTrackApi.getCatalogManager().objectCache = [defaultSat];
-      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0);
+      keepTrackApi.getPlugin(SelectSatManager)!.selectSat(0);
       jest.advanceTimersByTime(1000);
     });
 
@@ -59,9 +56,7 @@ describe('SatInfoBoxCore_class', () => {
 
   describe('Various Types of Objects', () => {
     beforeEach(() => {
-      const satInfoBoxCorePlugin = new SatInfoBox();
-
-      websiteInit(satInfoBoxCorePlugin);
+      setupStandardEnvironment([SelectSatManager, SatInfoBox, SatInfoBoxObject]);
       keepTrackApi.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));
       keepTrackApi.getDotsManager().sizeData = new Int8Array(Array(100).fill(0));
       keepTrackApi.getDotsManager().positionData = new Float32Array(Array(100).fill(0));

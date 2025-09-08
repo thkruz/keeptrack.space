@@ -39,7 +39,7 @@ export class TimeManager {
    *
    * simulationTime = realTime + staticOffset + dynamicOffset * propRate
    */
-  simulationTimeObj = <Date>null;
+  simulationTimeObj = new Date();
   /**
    * The time offset ignoring propRate (ex. New Launch)
    */

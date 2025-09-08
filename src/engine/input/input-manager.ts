@@ -7,12 +7,12 @@ import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
 import { lineManagerInstance } from '../rendering/line-manager';
+import { html } from '../utils/development/formatter';
 import { getEl, hideEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
 import { TouchInput } from './input-manager/touch-input';
-import { html } from '../utils/development/formatter';
 
 export type LatLon = {
   lat: Degrees;
@@ -25,10 +25,38 @@ export type KeyEvent = {
   callback: () => void;
 };
 
+type rmbMenuItem = {
+  /**
+   * Element ID of the main menu item
+   */
+  elementIdL1: string;
+  /**
+   * Element ID of the sub menu container
+   */
+  elementIdL2: string;
+  /**
+   * The sorting order for the menus
+   */
+  order: number;
+  /**
+   * Determines if the menu item is visible when right clicking on the earth
+   */
+  isRmbOnEarth: boolean;
+  /**
+   * Determines if the menu item is visible when right clicking off the earth
+   */
+  isRmbOffEarth: boolean;
+  /**
+   * Determines if the menu item is visible when right clicking on a satellite
+   */
+  isRmbOnSat: boolean;
+};
+
 export class InputManager {
   private updateHoverDelay = 0;
   private updateHoverDelayLimit = 3;
   isRmbMenuOpen = false;
+  rmbMenuItems = <rmbMenuItem[]>[];
 
   public keyboard: KeyboardInput;
   public mouse: MouseInput;
@@ -168,12 +196,12 @@ export class InputManager {
       return;
     }
     hideEl('right-btn-menu');
-    InputManager.clearRMBSubMenu();
+    this.clearRMBSubMenu();
     this.isRmbMenuOpen = false;
   }
 
-  static clearRMBSubMenu = () => {
-    keepTrackApi.rmbMenuItems.forEach((item) => {
+  clearRMBSubMenu = () => {
+    this.rmbMenuItems.forEach((item) => {
       hideEl(item.elementIdL2);
     });
     hideEl('colors-rmb-menu');
@@ -271,8 +299,8 @@ export class InputManager {
       const rmbWrapperChildrenArray = Array.from(rmbWrapperChildren);
 
       rmbWrapperChildrenArray.sort((a, b) => {
-        const aOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === a.id)?.order || 9999;
-        const bOrder = keepTrackApi.rmbMenuItems.find((item) => item.elementIdL1 === b.id)?.order || 9999;
+        const aOrder = this.rmbMenuItems.find((item) => item.elementIdL1 === a.id)?.order || 9999;
+        const bOrder = this.rmbMenuItems.find((item) => item.elementIdL1 === b.id)?.order || 9999;
 
 
         return aOrder - bOrder;
@@ -332,7 +360,7 @@ export class InputManager {
     const rightBtnMenuDOM = getEl('right-btn-menu');
     const satHoverBoxDOM = getEl('sat-hoverbox');
 
-    keepTrackApi.rmbMenuItems.forEach((item) => {
+    this.rmbMenuItems.forEach((item) => {
       hideEl(item.elementIdL1);
     });
 
@@ -351,7 +379,7 @@ export class InputManager {
 
     if (typeof this.mouse.latLon === 'undefined' || isNaN(this.mouse.latLon.lat) || isNaN(this.mouse.latLon.lon)) {
       // Not Earth
-      keepTrackApi.rmbMenuItems
+      this.rmbMenuItems
         .filter((item) => item.isRmbOffEarth || (item.isRmbOnSat && clickedSatId !== -1))
         .forEach((item) => {
           const dom = getEl(item.elementIdL1);
@@ -363,7 +391,7 @@ export class InputManager {
     } else {
       // This is the Earth
       isEarth = true;
-      InputManager.earthClicked({
+      this.earthClicked({
         clickedSatId,
       });
     }
@@ -376,7 +404,7 @@ export class InputManager {
     // Loop through all the menu items and determine how many are visible
     let numMenuItems = 0;
 
-    keepTrackApi.rmbMenuItems.forEach((item) => {
+    this.rmbMenuItems.forEach((item) => {
       const dom = getEl(item.elementIdL1);
 
       if (dom && dom.style.display !== 'none') {
@@ -399,8 +427,8 @@ export class InputManager {
     rightBtnMenuDOM!.style.top = `${mainCameraInstance.state.mouseY + offsetY}px`;
   }
 
-  static earthClicked({ clickedSatId }: { clickedSatId: number }) {
-    keepTrackApi.rmbMenuItems
+  earthClicked({ clickedSatId }: { clickedSatId: number }) {
+    this.rmbMenuItems
       .filter((item) => item.isRmbOnEarth || (item.isRmbOnSat && clickedSatId !== -1))
       .sort((a, b) => a.order - b.order)
       .forEach((item) => {

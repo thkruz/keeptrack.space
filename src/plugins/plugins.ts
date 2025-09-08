@@ -4,12 +4,13 @@ import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view'
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { KeepTrackPlugin } from '../engine/plugins/base-plugin';
 import { errorManagerInstance } from '../engine/utils/errorManager';
 import { getEl } from '../engine/utils/get-el';
-import { KeepTrackApi } from '../keepTrackApi';
 import { AnalysisMenu } from './analysis/analysis';
 import { Breakup } from './breakup/breakup';
 import { Calculator } from './calculator/calculator';
@@ -77,7 +78,7 @@ import { WatchlistOverlay } from './watchlist/watchlist-overlay';
 
 export class PluginManager {
   // Register all core modules
-  async loadPlugins(keepTrackApi: KeepTrackApi, plugins: KeepTrackPluginsConfiguration): Promise<void> {
+  async loadPlugins(plugins: KeepTrackPluginsConfiguration): Promise<void> {
     if (isThisNode()) {
       // Don't load plugins when running Jest in Node environment
       return;
@@ -90,7 +91,7 @@ export class PluginManager {
           init: async () => {
             const proPlugin = await import('../plugins-pro/telemetry/telemetry');
 
-            keepTrackApi.loadedPlugins.push(new proPlugin.Telemetry() as unknown as KeepTrackPlugin);
+            PluginRegistry.addPlugin(new proPlugin.Telemetry() as unknown as KeepTrackPlugin);
           }, config: {
             enabled: true,
           },
@@ -275,9 +276,9 @@ export class PluginManager {
       }
 
       // Load any settings from local storage after all plugins are loaded
-      keepTrackApi.emit(EventBusEvent.loadSettings);
+      EventBus.getInstance().emit(EventBusEvent.loadSettings);
 
-      keepTrackApi.on(
+      EventBus.getInstance().on(
         EventBusEvent.uiManagerFinal,
         () => {
           this.uiManagerFinal_();

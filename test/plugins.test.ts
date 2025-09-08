@@ -1,11 +1,10 @@
-import { keepTrackApi } from '@app/keepTrackApi';
 import { PluginManager } from '@app/plugins/plugins';
 
 describe('plugins', () => {
   it('should be able to initialize all plugins', () => {
     const pluginManager = new PluginManager();
 
-    pluginManager.loadPlugins(keepTrackApi, {
+    pluginManager.loadPlugins({
       DebugMenuPlugin: {
         enabled: true,
       },

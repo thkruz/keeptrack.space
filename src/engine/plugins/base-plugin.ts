@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { MenuMode, Singletons } from '@app/engine/core/interfaces';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
@@ -8,6 +9,7 @@ import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import type { SelectSatManager } from '../../plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '../../plugins/sounds/sounds';
+import { PluginRegistry } from '../core/plugin-registry';
 import { EventBusEvent } from '../events/event-bus-events';
 import { clickAndDragWidth } from '../utils/click-and-drag';
 import { html } from '../utils/development/formatter';
@@ -53,6 +55,9 @@ export abstract class KeepTrackPlugin {
   static readonly iconSelectedClassString = 'bmenu-item-selected';
   static readonly iconDisabledClassString = 'bmenu-item-disabled';
 
+  /**
+   * This should be the same as the class name, but won't be impacted by minification.
+   */
   id: string;
 
   /**
@@ -244,7 +249,7 @@ export abstract class KeepTrackPlugin {
    */
   checkDependencies(): void {
     this.dependencies_?.forEach((dependency) => {
-      if (!keepTrackApi.loadedPlugins.find((plugin) => plugin.constructor.name === dependency)) {
+      if (!PluginRegistry.checkIfLoaded(dependency)) {
         throw new Error(`${this.constructor.name} depends on ${dependency}. Please adjust the load order of the plugins.`);
       }
     });
@@ -278,7 +283,7 @@ export abstract class KeepTrackPlugin {
       throw new Error(`${this.id} help title and body must both be defined.`);
     }
 
-    keepTrackApi.loadedPlugins.push(this);
+    PluginRegistry.addPlugin(this);
   }
 
   protected isSettingsMenuEnabled_ = true;
@@ -403,7 +408,7 @@ export abstract class KeepTrackPlugin {
     }
 
     if (this.rmbL1Html && this.rmbL1ElementName && this.rmbL2Html && this.rmbL2ElementName) {
-      keepTrackApi.rmbMenuItems.push({
+      keepTrackApi.getInputManager().rmbMenuItems.push({
         elementIdL1: this.rmbL1ElementName,
         elementIdL2: this.rmbL2ElementName,
         order: this.rmbMenuOrder,

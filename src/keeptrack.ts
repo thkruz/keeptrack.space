@@ -47,12 +47,12 @@ import { DotsManager } from './engine/rendering/dots-manager';
 import { lineManagerInstance } from './engine/rendering/line-manager';
 import { OrbitManager } from './engine/rendering/orbitManager';
 import { DemoManager } from './engine/utils/demo-mode';
+import { html } from './engine/utils/development/formatter';
 import { getEl } from './engine/utils/get-el';
 import { isThisNode } from './engine/utils/isThisNode';
 import { keepTrackApi } from './keepTrackApi';
 import { settingsManager, SettingsManagerOverride } from './settings/settings';
 import { VERSION } from './settings/version.js';
-import { html } from './engine/utils/development/formatter';
 
 export class KeepTrack {
   private static instance: KeepTrack;
@@ -327,7 +327,7 @@ theodore.kruczek at gmail dot com.
       SplashScreen.loadStr(SplashScreen.msg.science);
 
       // Load all the plugins now that we have the API initialized
-      await this.engine.pluginManager.loadPlugins(keepTrackApi, settingsManager.plugins);
+      await this.engine.pluginManager.loadPlugins(settingsManager.plugins);
 
       SplashScreen.loadStr(SplashScreen.msg.science2);
       /*

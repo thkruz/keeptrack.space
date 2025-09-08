@@ -1,5 +1,7 @@
 import { Camera, CameraType } from '@app/engine/camera/camera';
 import { GetSatType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
@@ -76,7 +78,7 @@ export class MouseInput {
       }
 
       // Create Event Listeners for Right Menu Buttons
-      keepTrackApi.rmbMenuItems
+      ServiceLocator.getInputManager().rmbMenuItems
         .map(({ elementIdL2 }) => getEl(elementIdL2))
         .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
         .forEach((el) => {
@@ -89,7 +91,7 @@ export class MouseInput {
           });
         });
 
-      keepTrackApi.rmbMenuItems.forEach(({ elementIdL1, elementIdL2 }) => {
+      ServiceLocator.getInputManager().rmbMenuItems.forEach(({ elementIdL1, elementIdL2 }) => {
         const el1 = getEl(elementIdL1);
         const el2 = getEl(elementIdL2);
 
@@ -100,7 +102,7 @@ export class MouseInput {
         }
 
         el1?.addEventListener('mouseenter', () => {
-          InputManager.clearRMBSubMenu();
+          ServiceLocator.getInputManager().clearRMBSubMenu();
           InputManager.showDropdownSubMenu(rightBtnMenuDOM, el2, canvasDOM, el1);
         });
         el2?.addEventListener('mouseleave', () => {
@@ -112,18 +114,20 @@ export class MouseInput {
     if (!settingsManager.disableCameraControls) {
       // prettier-ignore
       window.addEventListener('mousedown', (evt) => {
+        const cameraState = ServiceLocator.getMainCamera().state;
+
         /*
          * Camera Manager Events
          * Middle Mouse Button MMB
          */
         if (evt.button === 1) {
-          keepTrackApi.getMainCamera().state.localRotateStartPosition = keepTrackApi.getMainCamera().state.localRotateCurrent;
+          cameraState.localRotateStartPosition = cameraState.localRotateCurrent;
           if (this.keyboard_.getKey('Shift')) {
-            keepTrackApi.getMainCamera().state.isLocalRotateRoll = true;
-            keepTrackApi.getMainCamera().state.isLocalRotateYaw = false;
+            cameraState.isLocalRotateRoll = true;
+            cameraState.isLocalRotateYaw = false;
           } else {
-            keepTrackApi.getMainCamera().state.isLocalRotateRoll = false;
-            keepTrackApi.getMainCamera().state.isLocalRotateYaw = true;
+            cameraState.isLocalRotateRoll = false;
+            cameraState.isLocalRotateYaw = true;
           }
 
           evt.preventDefault();
@@ -131,13 +135,13 @@ export class MouseInput {
 
         // Right Mouse Button RMB
         if (evt.button === 2 && (this.keyboard_.getKey('Shift') || this.keyboard_.getKey('Control'))) {
-          keepTrackApi.getMainCamera().state.panStartPosition = keepTrackApi.getMainCamera().state.panCurrent;
+          cameraState.panStartPosition = cameraState.panCurrent;
           if (this.keyboard_.getKey('Shift')) {
-            keepTrackApi.getMainCamera().state.isScreenPan = false;
-            keepTrackApi.getMainCamera().state.isWorldPan = true;
+            cameraState.isScreenPan = false;
+            cameraState.isWorldPan = true;
           } else {
-            keepTrackApi.getMainCamera().state.isScreenPan = true;
-            keepTrackApi.getMainCamera().state.isWorldPan = false;
+            cameraState.isScreenPan = true;
+            cameraState.isWorldPan = false;
           }
         }
       });
@@ -145,14 +149,16 @@ export class MouseInput {
 
     if (!settingsManager.disableCameraControls) {
       window.addEventListener('mouseup', (evt: MouseEvent) => {
+        const cameraState = ServiceLocator.getMainCamera().state;
+
         // Camera Manager Events
         if (evt.button === 1) {
-          keepTrackApi.getMainCamera().state.isLocalRotateRoll = false;
-          keepTrackApi.getMainCamera().state.isLocalRotateYaw = false;
+          cameraState.isLocalRotateRoll = false;
+          cameraState.isLocalRotateYaw = false;
         }
         if (evt.button === 2) {
-          keepTrackApi.getMainCamera().state.isScreenPan = false;
-          keepTrackApi.getMainCamera().state.isWorldPan = false;
+          cameraState.isScreenPan = false;
+          cameraState.isWorldPan = false;
         }
       });
     }
@@ -166,13 +172,13 @@ export class MouseInput {
     }
 
     getEl('nav-wrapper', true)?.addEventListener('click', () => {
-      keepTrackApi.getInputManager().hidePopUps();
+      ServiceLocator.getInputManager().hidePopUps();
     });
     getEl('nav-footer', true)?.addEventListener('click', () => {
-      keepTrackApi.getInputManager().hidePopUps();
+      ServiceLocator.getInputManager().hidePopUps();
     });
     getEl('ui-wrapper', true)?.addEventListener('click', () => {
-      keepTrackApi.getInputManager().hidePopUps();
+      ServiceLocator.getInputManager().hidePopUps();
     });
   }
 
@@ -225,7 +231,7 @@ export class MouseInput {
     if (settingsManager.disableNormalEvents) {
       evt.preventDefault();
     }
-    keepTrackApi.getInputManager().hidePopUps();
+    ServiceLocator.getInputManager().hidePopUps();
     closeColorbox();
   }
 
@@ -233,14 +239,14 @@ export class MouseInput {
     if (settingsManager.disableNormalEvents) {
       evt.preventDefault();
     }
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     this.isStartedOnCanvas = true;
 
     if (evt.button === 2) {
-      this.dragPosition = InputManager.getEarthScreenPoint(keepTrackApi.getMainCamera().state.mouseX, keepTrackApi.getMainCamera().state.mouseY);
+      this.dragPosition = InputManager.getEarthScreenPoint(ServiceLocator.getMainCamera().state.mouseX, keepTrackApi.getMainCamera().state.mouseY);
 
-      const gmst = keepTrackApi.getTimeManager().gmst;
+      const gmst = ServiceLocator.getTimeManager().gmst;
 
       this.latLon = eci2lla({ x: this.dragPosition[0], y: this.dragPosition[1], z: this.dragPosition[2] }, gmst);
     }
@@ -253,16 +259,16 @@ export class MouseInput {
       }
     }
 
-    keepTrackApi.getInputManager().hidePopUps();
+    ServiceLocator.getInputManager().hidePopUps();
 
-    keepTrackApi.emit(EventBusEvent.canvasMouseDown, evt);
+    EventBus.getInstance().emit(EventBusEvent.canvasMouseDown, evt);
   }
 
   private canvasMouseUp_(evt: MouseEvent) {
     if (settingsManager.disableNormalEvents) {
       evt.preventDefault();
     }
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     if (!this.isStartedOnCanvas) {
       return;
@@ -272,17 +278,17 @@ export class MouseInput {
     if (!this.dragHasMoved) {
       /*
        * if (settingsManager.isMobileModeEnabled) {
-       *   keepTrackApi.getMainCamera().mouseX = isNaN(keepTrackApi.getMainCamera().mouseX) ? 0 : keepTrackApi.getMainCamera().mouseX;
-       *   keepTrackApi.getMainCamera().mouseY = isNaN(keepTrackApi.getMainCamera().mouseY) ? 0 : keepTrackApi.getMainCamera().mouseY;
-       *   this.mouseSat = keepTrackApi.getInputManager().getSatIdFromCoord(keepTrackApi.getMainCamera().mouseX, keepTrackApi.getMainCamera().mouseY);
+       *   ServiceLocator.getMainCamera().mouseX = isNaN(ServiceLocator.getMainCamera().mouseX) ? 0 : ServiceLocator.getMainCamera().mouseX;
+       *   ServiceLocator.getMainCamera().mouseY = isNaN(ServiceLocator.getMainCamera().mouseY) ? 0 : ServiceLocator.getMainCamera().mouseY;
+       *   this.mouseSat = ServiceLocator.getInputManager().getSatIdFromCoord(ServiceLocator.getMainCamera().mouseX, ServiceLocator.getMainCamera().mouseY);
        * }
        */
       this.clickedSat = this.mouseSat;
       if (evt.button === 0) {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
         // Left Mouse Button Clicked
-        if (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE) {
+        if (ServiceLocator.getMainCamera().cameraType === CameraType.SATELLITE) {
           if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY)?.isStatic()) {
             keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
           }
@@ -294,7 +300,7 @@ export class MouseInput {
       if (evt.button === 2) {
         // Right Mouse Button Clicked
         if (!this.keyboard_.getKey('Control') && !this.keyboard_.getKey('Shift')) {
-          keepTrackApi.getInputManager().openRmbMenu(this.clickedSat);
+          ServiceLocator.getInputManager().openRmbMenu(this.clickedSat);
         }
       }
     }
@@ -398,6 +404,6 @@ export class MouseInput {
     if (rightButtonMenuElement) {
       rightButtonMenuElement.style.display = 'none';
     }
-    InputManager.clearRMBSubMenu();
+    ServiceLocator.getInputManager().clearRMBSubMenu();
   }
 }

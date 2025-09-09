@@ -137,6 +137,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 232,
   },
+  PlanetsMenuPlugin: {
+    enabled: true,
+    order: 233,
+  },
   SatellitePhotos: {
     enabled: true,
     order: 240,

@@ -29,6 +29,7 @@ import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { Body } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, Sun } from 'ootk';
 import { errorManagerInstance } from '../../utils/errorManager';
@@ -371,7 +372,7 @@ export class Earth {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
     // disable depth test and depth writing
-    if (settingsManager.centerBody === 'earth') {
+    if (settingsManager.centerBody === Body.Earth) {
       gl.disable(gl.DEPTH_TEST);
     }
     gl.depthMask(false); // Disable depth writing
@@ -403,7 +404,7 @@ export class Earth {
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uGlow, this.glowNumber_);
-    const isEarthCenterBody = settingsManager.centerBody === 'earth';
+    const isEarthCenterBody = settingsManager.centerBody === Body.Earth;
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? keepTrackApi.getMainCamera().zoomLevel() ?? 1.0 : 1.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);

@@ -14,6 +14,8 @@ import { Earth } from '../rendering/draw-manager/earth';
 import { AtmosphereSettings } from '../rendering/draw-manager/earth-quality-enums';
 import { Ellipsoid } from '../rendering/draw-manager/ellipsoid';
 import { Godrays } from '../rendering/draw-manager/godrays';
+import { Mars } from '../rendering/draw-manager/mars';
+import { Mercury } from '../rendering/draw-manager/mercury';
 import { Moon } from '../rendering/draw-manager/moon';
 import { SensorFovMeshFactory } from '../rendering/draw-manager/sensor-fov-mesh-factory';
 import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
@@ -34,6 +36,8 @@ export class Scene {
   isScene = true;
   earth: Earth;
   moon: Moon;
+  mars: Mars;
+  mercury: Mercury;
   sun: Sun;
   godrays: Godrays;
   sensorFovFactory: SensorFovMeshFactory;
@@ -68,6 +72,8 @@ export class Scene {
     this.skybox = new SkyBoxSphere();
     this.earth = new Earth();
     this.moon = new Moon();
+    this.mars = new Mars();
+    this.mercury = new Mercury();
     this.sun = new Sun();
     this.godrays = new Godrays();
     this.searchBox = new Box();
@@ -85,6 +91,8 @@ export class Scene {
     this.sun.update();
     this.earth.update();
     this.moon.update(simulationTime);
+    this.mars.update(simulationTime);
+    this.mercury.update(simulationTime);
     this.skybox.update();
 
     keepTrackApi.getLineManager().update();
@@ -146,6 +154,9 @@ export class Scene {
       if (!settingsManager.isDisableMoon) {
         this.moon.draw(this.sun.position);
       }
+
+      this.mars.draw(this.sun.position);
+      this.mercury.draw(this.sun.position);
 
       keepTrackApi.emit(EventBusEvent.drawOptionalScenery);
     }
@@ -292,6 +303,9 @@ export class Scene {
       if (!settingsManager.isDisableMoon) {
         await this.moon.init(this.gl_);
       }
+
+      await this.mars.init(this.gl_);
+      await this.mercury.init(this.gl_);
 
       if (!settingsManager.isDisableSearchBox) {
         this.searchBox.init(this.gl_);

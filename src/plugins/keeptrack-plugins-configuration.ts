@@ -43,6 +43,7 @@ export type KeepTrackPluginsConfiguration = {
   Collisions?: PluginConfiguration;
   TrackingImpactPredict?: PluginConfiguration;
   ColorMenu?: PluginConfiguration;
+  PlanetsMenuPlugin?: PluginConfiguration;
   SatConstellations?: PluginConfiguration;
   countriesMenu?: PluginConfiguration;
   DateTimeManager?: PluginConfiguration;

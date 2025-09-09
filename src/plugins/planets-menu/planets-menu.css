@@ -1,0 +1,9 @@
+#planets-menu-content ul li {
+  padding: 2px !important;
+  overflow: hidden !important;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}

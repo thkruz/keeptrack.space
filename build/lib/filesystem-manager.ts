@@ -334,7 +334,7 @@ export class FileSystemManager {
         logWithStyle(`Reading source locale file: ${srcPath}`, ConsoleStyles.DEBUG);
         const srcContent = JSON.parse(this.readFile(srcPath));
 
-        mergedContent = { ...mergedContent, ...srcContent };
+        mergedContent = { ...mergedContent, ...srcContent, ...{ plugins: { ...mergedContent.plugins, ...srcContent.plugins } } };
       }
 
       // Use the relative path of the first file for output
@@ -402,7 +402,7 @@ export class FileSystemManager {
     const srcJson = JSON.parse(srcContent);
     const pluginJson = JSON.parse(pluginContent);
 
-    const mergedJson = { ...srcJson, ...pluginJson };
+    const mergedJson = { ...srcJson, ...pluginJson, ...{ plugins: { ...srcJson.plugins, ...pluginJson.plugins } } };
 
     console.log(`Merged locale files: ${srcPath} + ${pluginPath}`);
 

@@ -35,6 +35,7 @@ import { NewLaunch } from './new-launch/new-launch';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
 import { OrbitReferences } from './orbit-references/orbit-references';
+import { PlanetsMenuPlugin } from './planets-menu/planets-menu';
 import { EcfPlot } from './plot-analysis/ecf-plots';
 import { EciPlot } from './plot-analysis/eci-plots';
 import { Inc2AltPlots } from './plot-analysis/inc2alt';
@@ -208,6 +209,7 @@ export class PluginManager {
         { init: () => new SatConstellations().init(), config: plugins.SatConstellations },
         { init: () => new CountriesMenu().init(), config: plugins.CountriesMenu },
         { init: () => new ColorMenu().init(), config: plugins.ColorMenu },
+        { init: () => new PlanetsMenuPlugin().init(), config: plugins.PlanetsMenuPlugin },
         { init: () => new Screenshot().init(), config: plugins.Screenshot },
         { init: () => new LaunchCalendar().init(), config: plugins.LaunchCalendar },
         { init: () => new TimeMachine().init(), config: plugins.TimeMachine },

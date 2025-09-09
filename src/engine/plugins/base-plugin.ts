@@ -300,10 +300,12 @@ export abstract class KeepTrackPlugin {
 
     this.sideMenuSecondaryOptions.leftOffset = typeof this.sideMenuSecondaryOptions.leftOffset === 'number' ? this.sideMenuSecondaryOptions.leftOffset : null;
 
-    this.helpTitle = Localization.getInstance().plugins[this.id]?.title ?? this.helpTitle ?? this.sideMenuTitle;
-    this.helpBody = Localization.getInstance().plugins[this.id]?.helpBody ?? this.helpBody;
-    this.sideMenuTitle = Localization.getInstance().plugins[this.id]?.title ?? this.sideMenuTitle;
-    this.bottomIconLabel = Localization.getInstance().plugins[this.id]?.bottomIconLabel ?? this.bottomIconLabel;
+    const localizationInstance = Localization.getInstance();
+
+    this.helpTitle = localizationInstance.plugins[this.id]?.title ?? this.helpTitle ?? this.sideMenuTitle;
+    this.helpBody = localizationInstance.plugins[this.id]?.helpBody ?? this.helpBody;
+    this.sideMenuTitle = localizationInstance.plugins[this.id]?.title ?? this.sideMenuTitle;
+    this.bottomIconLabel = localizationInstance.plugins[this.id]?.bottomIconLabel ?? this.bottomIconLabel;
 
     if (this.bottomIconLabel) {
       const bottomIconSlug = this.bottomIconLabel.toLowerCase().replace(' ', '-');

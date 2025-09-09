@@ -9,6 +9,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import { Body } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -226,6 +227,8 @@ export class SelectSatManager extends KeepTrackPlugin {
     // If deselecting a satellite, clear the selected orbit
     if (id === -1 && this.lastSelectedSat_ > -1) {
       keepTrackApi.getOrbitManager().clearSelectOrbit();
+    } else {
+      settingsManager.centerBody = Body.Earth; // Always center on Earth when selecting a satellite
     }
   }
 

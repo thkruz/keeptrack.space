@@ -3,6 +3,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
+import { Body } from 'astronomy-engine';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { GroupType } from '../../app/data/object-group';
@@ -10,6 +11,7 @@ import { SettingsManager } from '../../settings/settings';
 import { Camera, CameraType } from '../camera/camera';
 import { GetSatType } from '../core/interfaces';
 import { Scene } from '../core/scene';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
@@ -648,10 +650,19 @@ export class WebGLRenderer {
 
       keepTrackApi.getScene().primaryCovBubble.update(primarySat);
     } else {
-      if (settingsManager.centerBody === 'earth') {
-        Scene.getInstance().worldShift = [0, 0, 0];
-      } else if (settingsManager.centerBody === 'moon') {
-        Scene.getInstance().worldShift = keepTrackApi.getScene().moon.position.map((coord: number) => -coord) as [number, number, number];
+      switch (settingsManager.centerBody) {
+        case Body.Mercury:
+          Scene.getInstance().worldShift = ServiceLocator.getScene().mercury.position.map((coord: number) => -coord) as [number, number, number];
+          break;
+        case Body.Moon:
+          Scene.getInstance().worldShift = ServiceLocator.getScene().moon.position.map((coord: number) => -coord) as [number, number, number];
+          break;
+        case Body.Mars:
+          Scene.getInstance().worldShift = ServiceLocator.getScene().mars.position.map((coord: number) => -coord) as [number, number, number];
+          break;
+        case Body.Earth:
+        default:
+          Scene.getInstance().worldShift = [0, 0, 0];
       }
       keepTrackApi.getScene().searchBox.update(null);
     }

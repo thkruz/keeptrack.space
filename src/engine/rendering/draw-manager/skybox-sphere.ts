@@ -3,17 +3,17 @@ import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
+import { glsl } from '@app/engine/utils/development/formatter';
 import { SettingsManager } from '@app/settings/settings';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { DEG2RAD } from 'ootk';
 import { keepTrackApi } from '../../../keepTrackApi';
 import { DepthManager } from '../depth-manager';
-import { glsl } from '@app/engine/utils/development/formatter';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
 export class SkyBoxSphere {
-  private readonly DRAW_RADIUS = 950000;
+  private readonly DRAW_RADIUS = DepthManager.getConfig().far - 1000;
   private readonly NUM_HEIGHT_SEGS = 16;
   private readonly NUM_WIDTH_SEGS = 16;
 
@@ -219,9 +219,9 @@ export class SkyBoxSphere {
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
 
-    const cameraPos = keepTrackApi.getMainCamera().getCameraPosition();
+    // const cameraPos = keepTrackApi.getMainCamera().getCameraPosition();
 
-    mat4.translate(this.mvMatrix_, this.mvMatrix_, cameraPos);
+    // mat4.translate(this.mvMatrix_, this.mvMatrix_, cameraPos);
 
     mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, -90 * DEG2RAD);
     mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);

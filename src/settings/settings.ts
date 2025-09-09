@@ -28,6 +28,7 @@ import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, E
 import { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
+import { Body } from 'astronomy-engine';
 import { Degrees, Kilometers, Milliseconds, Radians } from 'ootk';
 import { ClassificationString } from '../app/ui/classification';
 import { RADIUS_OF_EARTH } from '../engine/utils/constants';
@@ -450,7 +451,7 @@ export class SettingsManager {
     maxrange: null,
   };
 
-  centerBody: 'earth' | 'moon' = 'earth';
+  centerBody: Body = Body.Earth;
 
   altMsgNum = null;
   altLoadMsgs = false;
@@ -818,7 +819,7 @@ export class SettingsManager {
    *
    * Used for zooming in and out in default and offset camera modes.
    */
-  maxZoomDistance = <Kilometers>450000;
+  maxZoomDistance = <Kilometers>1200000; // 1 million km
   /**
    * Which mesh to use if meshOverride is set
    */

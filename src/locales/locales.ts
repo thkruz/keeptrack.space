@@ -324,6 +324,11 @@ export class Localization implements LocaleInformation {
         title: t7e('plugins.ManeuverPlugin.title'),
         helpBody: t7e('plugins.ManeuverPlugin.helpBody'),
       },
+      PlanetsMenuPlugin: {
+        bottomIconLabel: t7e('plugins.PlanetsMenuPlugin.bottomIconLabel'),
+        title: t7e('plugins.PlanetsMenuPlugin.title'),
+        helpBody: t7e('plugins.PlanetsMenuPlugin.helpBody'),
+      },
     };
   }
 }

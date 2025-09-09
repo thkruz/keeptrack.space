@@ -19,18 +19,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { Scene } from '@app/engine/core/scene';
-import { GLSL3 } from '@app/engine/rendering/material';
-import { Mesh } from '@app/engine/rendering/mesh';
-import { ShaderMaterial } from '@app/engine/rendering/shader-material';
-import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EciVec3, EpochUTC, Moon as MoonMath } from 'ootk';
-import { keepTrackApi } from '../../../keepTrackApi';
-import { DepthManager } from '../depth-manager';
-import { GlUtils } from '../gl-utils';
-import { glsl } from '@app/engine/utils/development/formatter';
+import { BackdatePosition as backdatePosition, Body, KM_PER_AU } from 'astronomy-engine';
+import { vec3 } from 'gl-matrix';
+import { EciVec3 } from 'ootk';
+import { settingsManager } from '../../../settings/settings';
+import { CelestialBody } from './celestial-body';
 
 // TODO: Moon doesn't occlude the sun yet!
 
@@ -42,205 +35,31 @@ export enum MoonTextureQuality {
   ULTRA = '8k'
 }
 
-export class Moon {
-  /** The radius of the moon. */
-  private readonly RADIUS = 1737.4;
-  /** The number of height segments for the moon. */
-  private readonly NUM_HEIGHT_SEGS = 64;
-  /** The number of width segments for the moon. */
-  private readonly NUM_WIDTH_SEGS = 64;
-
-  /** The WebGL context. */
-  private gl_: WebGL2RenderingContext;
-  /** Whether the moon has been loaded. */
-  private isLoaded_ = false;
-  /** The model view matrix. */
-  private modelViewMatrix_ = null as unknown as mat4;
-  /** The normal matrix. */
-  private readonly normalMatrix_ = mat3.create();
-
-  /** The position of the moon in WebGL coordinates. */
-  position = [0, 0, 0] as vec3;
-  /** The position of the moon in ECI coordinates. */
+export class Moon extends CelestialBody {
+  protected readonly RADIUS = 1737.4;
+  protected readonly NUM_HEIGHT_SEGS = 64;
+  protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
-  /** The mesh for the moon. */
-  mesh: Mesh;
+  rotation = [0, 0, Math.PI] as vec3;
 
-  /**
-   * This is run once per frame to render the moon.
-   */
+  getTexturePath(): string {
+    return `${settingsManager.installDirectory}textures/moonmap${MoonTextureQuality.ULTRA}.jpg`;
+  }
+
+  getName(): string {
+    return Body.Moon;
+  }
+
+  updatePosition(simTime: Date): void {
+    const pos = backdatePosition(simTime, Body.Earth, Body.Moon, false);
+
+    this.position = [pos.x * KM_PER_AU, pos.y * KM_PER_AU, pos.z * KM_PER_AU];
+  }
+
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_ || settingsManager.isDisableMoon) {
       return;
     }
-    const gl = this.gl_;
-
-    this.mesh.program.use();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
-
-    this.setUniforms_(gl, sunPosition);
-
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthMask(true); // Enable depth writing
-
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
-
-    gl.bindVertexArray(this.mesh.geometry.vao);
-    gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
-    gl.bindVertexArray(null);
+    super.draw(sunPosition, tgtBuffer);
   }
-
-  /**
-   * This is run once per session to initialize the moon.
-   */
-  private setUniforms_(gl: WebGL2RenderingContext, sunPosition: vec3) {
-    gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
-    gl.uniform3fv(this.mesh.material.uniforms.sunPos, vec3.fromValues(sunPosition[0] * 100, sunPosition[1] * 100, sunPosition[2] * 100));
-    gl.uniform1f(this.mesh.material.uniforms.drawPosition, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
-    gl.uniform1i(this.mesh.material.uniforms.sampler, 0);
-    if (settingsManager.centerBody === 'earth') {
-      gl.uniform3fv(this.mesh.material.uniforms.worldOffset, Scene.getInstance().worldShift);
-    }
-    gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
-    gl.uniform1f(this.mesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
-  }
-
-  /**
-   * This is run once per session to initialize the moon.
-   */
-  async init(gl: WebGL2RenderingContext): Promise<void> {
-    try {
-      this.gl_ = gl;
-
-      const geometry = new SphereGeometry(gl, {
-        radius: this.RADIUS,
-        widthSegments: this.NUM_HEIGHT_SEGS,
-        heightSegments: this.NUM_WIDTH_SEGS,
-      });
-      const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/moonmap${MoonTextureQuality.ULTRA}.jpg`);
-      const material = new ShaderMaterial(gl, {
-        uniforms: {
-          sampler: null as unknown as WebGLUniformLocation,
-          // drawPosition: null as unknown as WebGLUniformLocation,
-          sunPos: null as unknown as WebGLUniformLocation,
-        },
-        map: texture,
-        vertexShader: this.shaders_.vert,
-        fragmentShader: this.shaders_.frag,
-        glslVersion: GLSL3,
-      });
-
-      this.mesh = new Mesh(gl, geometry, material, {
-        name: 'moon',
-        precision: 'highp',
-        disabledUniforms: {
-          modelMatrix: true,
-          viewMatrix: true,
-        },
-      });
-      this.mesh.geometry.initVao(this.mesh.program);
-
-      // Flip vertically to match texture orientation
-      mat4.rotateZ(this.mesh.geometry.localMvMatrix, this.mesh.geometry.localMvMatrix, Math.PI);
-
-      this.isLoaded_ = true;
-    } catch (e) {
-      errorManagerInstance.warn('Error initializing moon:', e);
-    }
-  }
-
-  /**
-   * This is run once per frame to update the moon.
-   */
-  update(simTime: Date) {
-    if (!this.isLoaded_) {
-      return;
-    }
-
-    this.updateEciPosition_(simTime);
-
-    this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
-    if (settingsManager.centerBody === 'earth') {
-      mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
-    }
-    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
-  }
-
-  /**
-   * Updates the ECI (Earth-Centered Inertial) position of the moon. We calculate the range, azimuth, and elevation of the moon
-   * at lat/lon 0/0, then convert that to ECF (Earth-Centered Fixed) coordinates, then convert that to ECI coordinates.
-   *
-   * @param simTime - The simulation time.
-   * @param gmst - The Greenwich Mean Sidereal Time.
-   */
-  private updateEciPosition_(simTime: Date) {
-    this.eci = MoonMath.eci(EpochUTC.fromDateTime(simTime));
-
-    if (this.eci.x && this.eci.y && this.eci.z) {
-      this.position = [this.eci.x, this.eci.y, this.eci.z];
-    }
-  }
-
-  /** The shaders for the moon. */
-  private readonly shaders_ = {
-    frag: glsl`
-      uniform sampler2D sampler;
-      uniform vec3 sunPos;
-
-      in vec2 v_texcoord;
-      in vec3 v_normal;
-      in vec3 vVertToCamera;
-
-      out vec4 fragColor;
-
-      void main(void) {
-        vec3 fragToCamera = normalize(vVertToCamera);
-      // Use fragToCamera to determine if the fragment should be culled
-      if (dot(fragToCamera, v_normal) < 0.0) {
-        discard;
-      }
-
-        // sun is shining opposite of its direction from the center of the earth
-        vec3 lightDirection = sunPos - vec3(0.0,0.0,0.0);
-
-        // Normalize this to a max of 1.0
-        lightDirection = normalize(lightDirection);
-
-        // Smooth the light across the sphere
-        float lightFrommoon = max(dot(v_normal, lightDirection), 0.0)  * 1.0;
-
-        // Calculate the color by merging the texture with the light
-        vec3 litTexColor = texture(sampler, v_texcoord).rgb * (vec3(0.0025, 0.0025, 0.0025) + lightFrommoon);
-
-
-        fragColor = vec4(litTexColor, 1.0);
-
-        ${DepthManager.getLogDepthFragCode()}
-      }
-      `,
-    vert: glsl`
-      uniform float drawPosition;
-
-      out vec2 v_texcoord;
-      out vec3 v_normal;
-      out vec3 vVertToCamera;
-
-      void main(void) {
-          vec4 worldPosition = modelViewMatrix * vec4(position, 1.0);
-          worldPosition.xyz += worldOffset;
-
-          vVertToCamera = normalize(vec3(cameraPosition) - worldPosition.xyz);
-
-          v_texcoord = uv;
-          v_normal = normalMatrix * normal;
-
-          gl_Position = projectionMatrix * worldPosition;
-
-          ${DepthManager.getLogDepthVertCode()}
-      }
-      `,
-  };
 }

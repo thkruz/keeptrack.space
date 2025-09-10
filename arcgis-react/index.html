@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>KeepTrack ArcGIS (React)</title>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/dark/main.css" />
+  <script>var __oldDefine = window.define; try { window.define = undefined; } catch (e) { }</script>
+  <script src="https://cdn.jsdelivr.net/npm/satellite.js@6.0.0/dist/satellite.min.js"></script>
+  <script>window.define = __oldDefine;</script>
+  <script src="https://js.arcgis.com/4.29/"></script>
+
+  <style>
+    html,
+    body,
+    #root {
+      height: 100%;
+      margin: 0;
+      background: #111;
+    }
+
+    #viewDiv {
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body style="margin:0;overflow:hidden;height:100vh">
+  <div id="root" style="position:relative;height:100%;width:100%"></div>
+  <script src="/arcgis/modules/data-loader.js"></script>
+  <script src="/arcgis/modules/ui.js"></script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

@@ -19,6 +19,14 @@ export const ArcGlobe: React.FC = () => {
         let debrisLayer: any;
         let tracksLayer: any;
         const graphics: any[] = [];
+        const useInstanced = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('instanced') === '1';
+        let instancedApi: any = null;
+
+        // If instanced flag is on, load glue scripts early
+        if (useInstanced) {
+            const s1 = document.createElement('script'); s1.src = '/arcgis/instanced/renderer.js'; s1.async = true; document.head.appendChild(s1);
+            const s2 = document.createElement('script'); s2.src = '/arcgis/instanced/customLayer.js'; s2.async = true; document.head.appendChild(s2);
+        }
 
         function getSatPointFromTle(date: Date, tle1: string, tle2: string) {
             try {
@@ -80,6 +88,16 @@ export const ArcGlobe: React.FC = () => {
             debrisLayer = new GraphicsLayer();
             tracksLayer = new GraphicsLayer();
             map.addMany([satelliteLayer, debrisLayer, tracksLayer]);
+
+            // If instanced, attach external renderer
+            if (useInstanced) {
+                const id = setInterval(() => {
+                    if ((window as any).ArcgisInstanced && view) {
+                        clearInterval(id);
+                        try { instancedApi = (window as any).ArcgisInstanced.create(view, {}); } catch { }
+                    }
+                }, 50);
+            }
 
             function addSatGraphic(sat: any) {
                 const now = new Date();
@@ -150,9 +168,18 @@ export const ArcGlobe: React.FC = () => {
                     });
                 });
 
-                setInterval(() => {
-                    view.environment.lighting.date = new Date();
-                }, 1000);
+                if (useInstanced) {
+                    // In instanced mode, refresh lighting continuously to avoid visible lag
+                    try {
+                        view.on('frame-update', () => { view.environment.lighting.date = new Date(); });
+                    } catch {
+                        // Fallback: frequent timer
+                        const lid = setInterval(() => { try { view.environment.lighting.date = new Date(); } catch { } }, 33);
+                        // best effort cleanup on destroy handled below
+                    }
+                } else {
+                    setInterval(() => { view.environment.lighting.date = new Date(); }, 1000);
+                }
 
                 let uiRef: any = null;
                 if (window.ArcgisUI?.createUI) {
@@ -212,11 +239,15 @@ export const ArcGlobe: React.FC = () => {
                             const data: any = ev.data || {};
                             if (data.type === 'positions' && data.positions && (data.positions as ArrayBuffer)) {
                                 const arr = new Float32Array(data.positions);
-                                for (let i = 0; i < graphics.length; i++) {
-                                    const j = i * 3;
-                                    const x = arr[j], y = arr[j + 1], z = arr[j + 2];
-                                    if (!Number.isNaN(x) && !Number.isNaN(y) && !Number.isNaN(z)) {
-                                        graphics[i].geometry = { type: 'point', x, y, z, spatialReference: { wkid: 4326 } };
+                                if (useInstanced && instancedApi) {
+                                    instancedApi.updatePositions((data.positions as ArrayBuffer), Math.floor(arr.length / 3));
+                                } else {
+                                    for (let i = 0; i < graphics.length; i++) {
+                                        const j = i * 3;
+                                        const x = arr[j], y = arr[j + 1], z = arr[j + 2];
+                                        if (!Number.isNaN(x) && !Number.isNaN(y) && !Number.isNaN(z)) {
+                                            graphics[i].geometry = { type: 'point', x, y, z, spatialReference: { wkid: 4326 } };
+                                        }
                                     }
                                 }
                             } else if (data.type === 'track' && data.positions) {

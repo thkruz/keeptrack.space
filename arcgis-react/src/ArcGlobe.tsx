@@ -19,7 +19,8 @@ export const ArcGlobe: React.FC = () => {
         let debrisLayer: any;
         let tracksLayer: any;
         const graphics: any[] = [];
-        const useInstanced = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('instanced') === '1';
+        const useInstanced = true;
+        const DEBUG = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
         let instancedApi: any = null;
 
         // If instanced flag is on, load glue scripts early
@@ -94,7 +95,9 @@ export const ArcGlobe: React.FC = () => {
                 const id = setInterval(() => {
                     if ((window as any).ArcgisInstanced && view) {
                         clearInterval(id);
-                        try { instancedApi = (window as any).ArcgisInstanced.create(view, {}); } catch { }
+                        try {
+                            instancedApi = (window as any).ArcgisInstanced.create(view, {});
+                        } catch (e) { if (DEBUG) console.error('[ArcGlobe] instanced create failed', e); }
                     }
                 }, 50);
             }
@@ -160,13 +163,15 @@ export const ArcGlobe: React.FC = () => {
             view.when(() => {
                 view.popup.autoOpenEnabled = false;
 
-                view.on('immediate-click', (evt: any) => {
-                    view.hitTest(evt).then((res: any) => {
-                        const feat = res.results && res.results.find((r: any) => r.layer === satelliteLayer)?.graphic;
-                        tracksLayer.removeAll();
-                        if (feat) drawTrackForGraphic(feat);
+                if (!useInstanced) {
+                    view.on('immediate-click', (evt: any) => {
+                        view.hitTest(evt).then((res: any) => {
+                            const feat = res.results && res.results.find((r: any) => r.layer === satelliteLayer)?.graphic;
+                            tracksLayer.removeAll();
+                            if (feat) drawTrackForGraphic(feat);
+                        });
                     });
-                });
+                }
 
                 if (useInstanced) {
                     // In instanced mode, refresh lighting continuously to avoid visible lag
@@ -174,47 +179,49 @@ export const ArcGlobe: React.FC = () => {
                         view.on('frame-update', () => { view.environment.lighting.date = new Date(); });
                     } catch {
                         // Fallback: frequent timer
-                        const lid = setInterval(() => { try { view.environment.lighting.date = new Date(); } catch { } }, 33);
+                        setInterval(() => { try { view.environment.lighting.date = new Date(); } catch { } }, 33);
                         // best effort cleanup on destroy handled below
                     }
                 } else {
                     setInterval(() => { view.environment.lighting.date = new Date(); }, 1000);
                 }
 
-                let uiRef: any = null;
-                if (window.ArcgisUI?.createUI) {
-                    uiRef = window.ArcgisUI.createUI({
-                        root: document.body,
-                        sets: ['Satellites', 'Debris'],
-                        selected: ['Satellites', 'Debris'],
-                        onChange: (sel: string[]) => {
-                            satelliteLayer.visible = sel.includes('Satellites');
-                            debrisLayer.visible = sel.includes('Debris');
-                        },
+                if (!useInstanced) {
+                    let uiRef: any = null;
+                    if (window.ArcgisUI?.createUI) {
+                        uiRef = window.ArcgisUI.createUI({
+                            root: document.body,
+                            sets: ['Satellites', 'Debris'],
+                            selected: ['Satellites', 'Debris'],
+                            onChange: (sel: string[]) => {
+                                satelliteLayer.visible = sel.includes('Satellites');
+                                debrisLayer.visible = sel.includes('Debris');
+                            },
+                        });
+                    }
+
+                    view.on('pointer-move', (evt: any) => {
+                        if (!uiRef) return;
+                        view.hitTest(evt).then((res: any) => {
+                            const hit = res.results && res.results.find((r: any) => r.layer === satelliteLayer)?.graphic;
+                            if (!hit) { uiRef.hideHover(); return; }
+                            const attr = hit.attributes || {};
+                            const name = attr.name || 'SAT';
+                            const norad = attr.norad ? String(attr.norad) : '—';
+                            const launch = attr.launchDate || '—';
+                            const country = (attr.country || '').toString().toUpperCase();
+                            const flagUrl = country && country.length <= 3 ? `/flags/${country.toLowerCase()}.png` : '';
+                            const img = flagUrl ? `<img src="${flagUrl}" alt="${country}" style="height:12px;vertical-align:middle;margin-right:6px"/>` : '';
+                            const html = `${img}<b>${name}</b><br/>NORAD: ${norad}<br/>Launched: ${launch}`;
+                            uiRef.showHover(html, evt.x, evt.y);
+                        });
                     });
                 }
-
-                view.on('pointer-move', (evt: any) => {
-                    if (!uiRef) return;
-                    view.hitTest(evt).then((res: any) => {
-                        const hit = res.results && res.results.find((r: any) => r.layer === satelliteLayer)?.graphic;
-                        if (!hit) { uiRef.hideHover(); return; }
-                        const attr = hit.attributes || {};
-                        const name = attr.name || 'SAT';
-                        const norad = attr.norad ? String(attr.norad) : '—';
-                        const launch = attr.launchDate || '—';
-                        const country = (attr.country || '').toString().toUpperCase();
-                        const flagUrl = country && country.length <= 3 ? `/flags/${country.toLowerCase()}.png` : '';
-                        const img = flagUrl ? `<img src="${flagUrl}" alt="${country}" style="height:12px;vertical-align:middle;margin-right:6px"/>` : '';
-                        const html = `${img}<b>${name}</b><br/>NORAD: ${norad}<br/>Launched: ${launch}`;
-                        uiRef.showHover(html, evt.x, evt.y);
-                    });
-                });
             });
 
             (async function loadData() {
                 try {
-                    const MAX_SATS = 1000;
+                    const MAX_SATS = 30000;
                     const datasets = (window.ArcgisDataLoader?.loadAllSources)
                         ? await window.ArcgisDataLoader.loadAllSources({
                             apiUrl: '/api-keeptrack/v3/sats',
@@ -226,8 +233,10 @@ export const ArcGlobe: React.FC = () => {
                         })
                         : { main: [], debris: [], vimpel: [], extra: [], celestrak: {} };
 
-                    (datasets.main || []).slice(0, MAX_SATS).forEach(addSatGraphic);
-                    (datasets.debris || []).slice(0, 5000).forEach(addDebrisGraphic);
+                    if (!useInstanced) {
+                        (datasets.main || []).slice(0, MAX_SATS).forEach(addSatGraphic);
+                        (datasets.debris || []).slice(0, 5000).forEach(addDebrisGraphic);
+                    }
 
                     try {
                         // Use classic worker served from public to avoid bundler issues
@@ -237,10 +246,12 @@ export const ArcGlobe: React.FC = () => {
 
                         worker.onmessage = (ev: MessageEvent) => {
                             const data: any = ev.data || {};
-                            if (data.type === 'positions' && data.positions && (data.positions as ArrayBuffer)) {
-                                const arr = new Float32Array(data.positions);
+                            if (data.type === 'log' && DEBUG) { console.log('[worker]', data.msg); return; }
+                            // Ignore PV for now; renderer expects lon/lat/h. Use 'positions' path below.
+                            if (data.type === 'positions' && data.positions) {
+                                const arr = data.positions instanceof Float32Array ? data.positions : new Float32Array(data.positions as ArrayBuffer);
                                 if (useInstanced && instancedApi) {
-                                    instancedApi.updatePositions((data.positions as ArrayBuffer), Math.floor(arr.length / 3));
+                                    instancedApi.updatePositions(arr.buffer, Math.floor(arr.length / 3));
                                 } else {
                                     for (let i = 0; i < graphics.length; i++) {
                                         const j = i * 3;

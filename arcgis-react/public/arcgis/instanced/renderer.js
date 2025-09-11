@@ -15,12 +15,11 @@
     uniform mat4 uView;
     uniform mat4 uProj;
     uniform float uPointSize;
-    uniform vec3 uCameraECEF;
-    // WGS84 constants (approx) and spherical radius for occlusion
-    const float a = 6378137.0; // equatorial radius in meters
-    const float e2 = 6.69437999014e-3; // eccentricity squared
-    const float R = 6371000.0; // spherical radius for occlusion test
-    
+
+    // WGS84 constants
+    const float a = 6378137.0;
+    const float e2 = 6.69437999014e-3;
+
     vec3 wgs84ToECEF(float lonDeg, float latDeg, float h){
         float lon = radians(lonDeg);
         float lat = radians(latDeg);
@@ -35,23 +34,8 @@
         return vec3(x, y, z);
     }
 
-    bool occludedByEarth(vec3 cam, vec3 p){
-        vec3 v = p - cam;
-        float A = dot(v, v);
-        float B = 2.0 * dot(cam, v);
-        float C = dot(cam, cam) - R*R;
-        float D = B*B - 4.0*A*C;
-        if (D < 0.0) return false;
-        float sqrtD = sqrt(max(D, 0.0));
-        float inv2A = 0.5 / A;
-        float t0 = (-B - sqrtD) * inv2A;
-        float t1 = (-B + sqrtD) * inv2A;
-        return (t0 > 0.0 && t0 < 1.0) || (t1 > 0.0 && t1 < 1.0);
-    }
-
     void main(){
         vec3 ecef = wgs84ToECEF(aLonLatH.x, aLonLatH.y, aLonLatH.z);
-        if (occludedByEarth(uCameraECEF, ecef)) { gl_Position = vec4(0.0); gl_PointSize = 0.0; return; }
         gl_Position = uProj * uView * vec4(ecef, 1.0);
         gl_PointSize = uPointSize;
     }`;
@@ -88,6 +72,7 @@
     }
 
     function create(gl, options) {
+        const DEBUG = (typeof location !== 'undefined' && (location.search || '').includes('debug=1'));
         const isWebGL2 = !!gl.texStorage2D;
         if (!isWebGL2) { console.warn('Instanced renderer requires WebGL2.'); }
 
@@ -97,15 +82,16 @@
         const uViewLoc = gl.getUniformLocation(program, 'uView');
         const uProjLoc = gl.getUniformLocation(program, 'uProj');
         const uPointSizeLoc = gl.getUniformLocation(program, 'uPointSize');
-        const uCameraLoc = gl.getUniformLocation(program, 'uCameraECEF');
 
         const vao = gl.createVertexArray();
         gl.bindVertexArray(vao);
 
+        // Dummy vbo for base primitive
         const vbo = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0]), gl.STATIC_DRAW);
 
+        // Per-instance buffer: lon/lat/h at location 0
         const instanceBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer);
         gl.enableVertexAttribArray(0);
@@ -125,7 +111,7 @@
             disposed: false,
             frontBuffer: null,
             backBuffer: null,
-            packedBuffer: null
+            packedBuffer: null,
         };
 
         function ensureCapacity(n) {
@@ -151,6 +137,10 @@
             } catch (e) { }
         }
 
+        function updatePV(posBuf, velBuf, count) { // map PV → positions (lon/lat/h path)
+            return updatePositions(posBuf, count);
+        }
+
         function uploadIfNeeded(params) {
             if (state.count <= 0) return;
             // swap front/back
@@ -169,19 +159,19 @@
                 for (let i = 0; i < state.count; i++) {
                     const j = i * 3;
                     const lon = src[j], lat = src[j + 1], h = src[j + 2];
-                    // ECEF conversion on CPU for culling; matches shader math
+                    // Convert lon/lat/h → ECEF (same as shader) for culling
                     const latR = lat * Math.PI / 180.0; const lonR = lon * Math.PI / 180.0;
                     const s = Math.sin(latR); const N = 6378137.0 / Math.sqrt(1.0 - 6.69437999014e-3 * s * s);
                     const cosLat = Math.cos(latR); const cosLon = Math.cos(lonR); const sinLon = Math.sin(lonR);
                     const x = (N + h) * cosLat * cosLon; const y = (N + h) * cosLat * sinLon; const z = (N * (1.0 - 6.69437999014e-3) + h) * s;
-                    const v = mulMat4Vec4(mvp, x, y, z, 1.0);
+                    // Draw all initially: skip CPU cull until verified
+                    const v = [x, y, z, 1.0];
                     const w = v[3]; if (w <= 0.0) continue;
                     const nx = v[0] / w, ny = v[1] / w, nz = v[2] / w;
-                    if (nx < -1.1 || nx > 1.1 || ny < -1.1 || ny > 1.1 || nz < -1.1 || nz > 1.1) continue;
+                    // if (nx < -1.1 || nx > 1.1 || ny < -1.1 || ny > 1.1 || nz < -1.1 || nz > 1.1) continue;
                     dst[write++] = lon; dst[write++] = lat; dst[write++] = h;
                 }
             } else {
-                // No matrices: upload all
                 dst.set(src); write = src.length;
             }
             state.visibleCount = Math.floor(write / 3);
@@ -197,26 +187,28 @@
             if (state.count <= 0) return;
 
             uploadIfNeeded(params);
-
-            if (state.visibleCount <= 0) return;
+            console.log('called uploadIfNeeded: ')
+            console.log('visibleCount: ', state.visibleCount)
+            if (state.visibleCount <= 0) {
+                return;
+            };
 
             gl.useProgram(state.program);
             gl.bindVertexArray(state.vao);
-
+            console.log('called gl.useProgram: ')
             if (params && params.viewMatrix && params.projectionMatrix) {
                 gl.uniformMatrix4fv(uViewLoc, false, params.viewMatrix);
                 gl.uniformMatrix4fv(uProjLoc, false, params.projectionMatrix);
             }
-            if (params && params.cameraPosition && params.cameraPosition.length === 3) {
-                gl.uniform3fv(uCameraLoc, new Float32Array(params.cameraPosition));
-            }
             gl.uniform1f(uPointSizeLoc, state.pointSize);
+            console.log('called gl.uniform1f: ')
 
             gl.enable(gl.DEPTH_TEST);
             gl.depthFunc(gl.LEQUAL);
             gl.enable(gl.BLEND);
             gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-
+            console.log('called gl.blendFuncSeparate: ')
+            console.log('[instanced] draw visibleCount=', state.visibleCount);
             gl.drawArraysInstanced(gl.POINTS, 0, 1, state.visibleCount);
 
             gl.bindVertexArray(null);
@@ -230,8 +222,14 @@
             try { gl.deleteProgram(program); } catch (e) { }
         }
 
+        function updatePV(posBuf, _velBuf, count) {
+            // Ignore velocity in this path; positions buffer is lon/lat/h
+            return updatePositions(posBuf, count);
+        }
+
         return {
             updatePositions: updatePositions,
+            updatePV: updatePV,
             draw: draw,
             dispose: dispose
         };

@@ -2,26 +2,33 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
+import { Body } from 'astronomy-engine';
 import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { Camera } from '../camera/camera';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
+import { CelestialBody } from '../rendering/draw-manager/celestial-bodies/celestial-body';
+import { Jupiter } from '../rendering/draw-manager/celestial-bodies/jupiter';
+import { Mars } from '../rendering/draw-manager/celestial-bodies/mars';
+import { Mercury } from '../rendering/draw-manager/celestial-bodies/mercury';
+import { Moon } from '../rendering/draw-manager/celestial-bodies/moon';
+import { Neptune } from '../rendering/draw-manager/celestial-bodies/neptune';
+import { Uranus } from '../rendering/draw-manager/celestial-bodies/uranus';
+import { Venus } from '../rendering/draw-manager/celestial-bodies/venus';
 import { ConeMeshFactory } from '../rendering/draw-manager/cone-mesh-factory';
 import { Box } from '../rendering/draw-manager/cube';
 import { Earth } from '../rendering/draw-manager/earth';
 import { AtmosphereSettings } from '../rendering/draw-manager/earth-quality-enums';
 import { Ellipsoid } from '../rendering/draw-manager/ellipsoid';
 import { Godrays } from '../rendering/draw-manager/godrays';
-import { Mars } from '../rendering/draw-manager/mars';
-import { Mercury } from '../rendering/draw-manager/mercury';
-import { Moon } from '../rendering/draw-manager/moon';
 import { SensorFovMeshFactory } from '../rendering/draw-manager/sensor-fov-mesh-factory';
 import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
+import { Saturn } from '../rendering/draw-manager/celestial-bodies/saturn';
 
 export interface SceneParams {
   gl: WebGL2RenderingContext;
@@ -35,9 +42,17 @@ export class Scene {
   skybox: SkyBoxSphere;
   isScene = true;
   earth: Earth;
-  moon: Moon;
-  mars: Mars;
-  mercury: Mercury;
+  planets: {
+    [Body.Moon]: Moon;
+    [Body.Mars]: Mars;
+    [Body.Mercury]: Mercury;
+    [Body.Venus]: Venus;
+    [Body.Jupiter]: Jupiter;
+    [Body.Saturn]?: CelestialBody;
+    [Body.Uranus]?: CelestialBody;
+    [Body.Neptune]?: CelestialBody;
+    [Body.Pluto]?: CelestialBody;
+  };
   sun: Sun;
   godrays: Godrays;
   sensorFovFactory: SensorFovMeshFactory;
@@ -71,9 +86,16 @@ export class Scene {
 
     this.skybox = new SkyBoxSphere();
     this.earth = new Earth();
-    this.moon = new Moon();
-    this.mars = new Mars();
-    this.mercury = new Mercury();
+    this.planets = {
+      [Body.Moon]: new Moon(),
+      [Body.Mars]: new Mars(),
+      [Body.Mercury]: new Mercury(),
+      [Body.Venus]: new Venus(),
+      [Body.Jupiter]: new Jupiter(),
+      [Body.Saturn]: new Saturn(),
+      [Body.Uranus]: new Uranus(),
+      [Body.Neptune]: new Neptune(),
+    };
     this.sun = new Sun();
     this.godrays = new Godrays();
     this.searchBox = new Box();
@@ -90,9 +112,9 @@ export class Scene {
   update(simulationTime: Date) {
     this.sun.update();
     this.earth.update();
-    this.moon.update(simulationTime);
-    this.mars.update(simulationTime);
-    this.mercury.update(simulationTime);
+    for (const planet of Object.values(this.planets)) {
+      planet.update(simulationTime);
+    }
     this.skybox.update();
 
     keepTrackApi.getLineManager().update();
@@ -150,13 +172,11 @@ export class Scene {
 
       this.skybox.render(renderer.postProcessingManager.curBuffer);
 
-      // Draw the moon
-      if (!settingsManager.isDisableMoon) {
-        this.moon.draw(this.sun.position);
+      if (!settingsManager.isDisablePlanets) {
+        Object.values(this.planets).forEach((planet) => {
+          planet.draw(this.sun.position, renderer.postProcessingManager.curBuffer);
+        });
       }
-
-      this.mars.draw(this.sun.position);
-      this.mercury.draw(this.sun.position);
 
       keepTrackApi.emit(EventBusEvent.drawOptionalScenery);
     }
@@ -165,7 +185,7 @@ export class Scene {
   }
 
   private updateVisualsBasedOnPerformance_() {
-    if ((!settingsManager.isDisableMoon ||
+    if ((!settingsManager.isDisablePlanets ||
       !settingsManager.isDisableGodrays ||
       settingsManager.isDrawSun ||
       settingsManager.isDrawAurora ||
@@ -192,8 +212,8 @@ export class Scene {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAtmosphere'), ToastMsgType.caution);
           break;
         }
-        if (!settingsManager.isDisableMoon) {
-          settingsManager.isDisableMoon = true;
+        if (!settingsManager.isDisablePlanets) {
+          settingsManager.isDisablePlanets = true;
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingMoon'), ToastMsgType.caution);
           break;
         }
@@ -300,12 +320,11 @@ export class Scene {
         keepTrackApi.getScene().godrays?.init(this.gl_, this.sun);
       }
 
-      if (!settingsManager.isDisableMoon) {
-        await this.moon.init(this.gl_);
+      if (!settingsManager.isDisablePlanets) {
+        for (const planet of Object.values(this.planets)) {
+          planet.init(this.gl_);
+        }
       }
-
-      await this.mars.init(this.gl_);
-      await this.mercury.init(this.gl_);
 
       if (!settingsManager.isDisableSearchBox) {
         this.searchBox.init(this.gl_);

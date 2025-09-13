@@ -11,7 +11,6 @@ import { SettingsManager } from '../../settings/settings';
 import { Camera, CameraType } from '../camera/camera';
 import { GetSatType } from '../core/interfaces';
 import { Scene } from '../core/scene';
-import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
@@ -650,19 +649,23 @@ export class WebGLRenderer {
 
       keepTrackApi.getScene().primaryCovBubble.update(primarySat);
     } else {
+      const scene = Scene.getInstance();
+
       switch (settingsManager.centerBody) {
         case Body.Mercury:
-          Scene.getInstance().worldShift = ServiceLocator.getScene().mercury.position.map((coord: number) => -coord) as [number, number, number];
-          break;
+        case Body.Venus:
         case Body.Moon:
-          Scene.getInstance().worldShift = ServiceLocator.getScene().moon.position.map((coord: number) => -coord) as [number, number, number];
-          break;
         case Body.Mars:
-          Scene.getInstance().worldShift = ServiceLocator.getScene().mars.position.map((coord: number) => -coord) as [number, number, number];
+        case Body.Jupiter:
+        case Body.Saturn:
+        case Body.Uranus:
+        case Body.Neptune:
+        case Body.Pluto:
+          scene.worldShift = scene.planets[settingsManager.centerBody]!.position.map((coord: number) => -coord) as [number, number, number];
           break;
         case Body.Earth:
         default:
-          Scene.getInstance().worldShift = [0, 0, 0];
+          scene.worldShift = [0, 0, 0];
       }
       keepTrackApi.getScene().searchBox.update(null);
     }

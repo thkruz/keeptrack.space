@@ -21,6 +21,7 @@
 /* eslint-disable camelcase */
 import { SatMath } from '@app/app/analysis/sat-math';
 import { EciArr3 } from '@app/engine/core/interfaces';
+import { Scene } from '@app/engine/core/scene';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -28,8 +29,9 @@ import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { Body, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { mat3, mat4, vec2, vec3 } from 'gl-matrix';
-import { EciVec3, Kilometers } from 'ootk';
+import { DEG2RAD, EciVec3, Kilometers } from 'ootk';
 import { DepthManager } from '../depth-manager';
 
 export enum SunTextureQuality {
@@ -47,7 +49,7 @@ export class Sun {
   /** The number of width segments for the sun. */
   private readonly NUM_WIDTH_SEGS = 32;
   /** The distance scalar for the sun. */
-  private readonly SCALAR_DISTANCE = 149600000;
+  private readonly DISTANCE_FROM_EARTH = 149600000;
 
   /** The WebGL context. */
   private gl_: WebGL2RenderingContext;
@@ -152,14 +154,30 @@ export class Sun {
 
     const sunMaxDist = Math.max(Math.max(Math.abs(eci[0]), Math.abs(eci[1])), Math.abs(eci[2]));
 
-    this.position[0] = (eci[0] / sunMaxDist) * this.SCALAR_DISTANCE;
-    this.position[1] = (eci[1] / sunMaxDist) * this.SCALAR_DISTANCE;
-    this.position[2] = (eci[2] / sunMaxDist) * this.SCALAR_DISTANCE;
+    const worldShift = Scene.getInstance().worldShift;
+
+    this.position[0] = ((eci[0] + worldShift[0]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
+    this.position[1] = ((eci[1] + worldShift[1]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
+    this.position[2] = ((eci[2] + worldShift[2]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
 
     this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
 
     // Translate the sphere to the sun position
     mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
+
+    /*
+     * Since everything is drawn in ECI with the north pole aligned to the +Z axis,
+     * we need to rotate the sun to match the Earth's current orientation.
+     * This is only necessary if the Earth or Moon is the center body.
+     * TODO: We should be rotating the unvierse not just the sun
+     */
+    if (settingsManager.centerBody === Body.Earth || settingsManager.centerBody === Body.Moon) {
+
+      const ros = rotationAxis(Body.Earth, keepTrackApi.getTimeManager().simulationTimeObj);
+
+      mat4.rotateY(this.modelViewMatrix_, this.modelViewMatrix_, (ros.dec - 90) * DEG2RAD);
+    }
+
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
   }
 

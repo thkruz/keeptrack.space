@@ -20,6 +20,7 @@
  */
 
 import { SplashScreen } from '@app/app/ui/splash-screen';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
@@ -29,6 +30,7 @@ import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Body } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { EpochUTC, Sun } from 'ootk';
@@ -147,7 +149,6 @@ export class Earth {
 
     // Set the uniforms
     occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, camMatrix);
-    gl.uniform3fv(occlusionPrgm.uniform.uWorldOffset, Scene.getInstance().worldShift);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.surfaceMesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.surfaceMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -214,6 +215,7 @@ export class Earth {
           disabledUniforms: {
             modelMatrix: true,
             viewMatrix: true,
+            worldOffset: true,
           },
         });
 
@@ -264,6 +266,13 @@ export class Earth {
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
     this.modelViewMatrix_ = mat4.copy(mat4.create(), this.surfaceMesh.geometry.localMvMatrix);
+
+    if (settingsManager.centerBody !== Body.Earth || (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) !== -1) {
+      const worldShift = Scene.getInstance().worldShift;
+
+      mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, vec3.fromValues(worldShift[0], worldShift[1], worldShift[2]));
+    }
+
     mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, gmst);
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
 
@@ -399,7 +408,6 @@ export class Earth {
     gl.uniformMatrix4fv(this.surfaceMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix3fv(this.surfaceMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
-    gl.uniform3fv(this.surfaceMesh.material.uniforms.worldOffset, Scene.getInstance().worldShift);
     gl.uniform1f(this.surfaceMesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
@@ -423,7 +431,6 @@ export class Earth {
     gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix3fv(this.atmosphereMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
-    gl.uniform3fv(this.atmosphereMesh.material.uniforms.worldOffset, Scene.getInstance().worldShift);
     gl.uniform1f(this.atmosphereMesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
@@ -752,7 +759,6 @@ export class Earth {
 
     void main(void) {
         vec4 worldPosition = modelViewMatrix * vec4(position, 1.0);
-        worldPosition.xyz += worldOffset;
         vWorldPos = worldPosition.xyz;
         vNormal = normalMatrix * normal;
         vUv = uv;

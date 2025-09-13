@@ -13,7 +13,7 @@ import { DepthManager } from '../depth-manager';
 /* eslint-disable camelcase */
 
 export class SkyBoxSphere {
-  private readonly DRAW_RADIUS = DepthManager.getConfig().far - 1000;
+  private readonly DRAW_RADIUS = 1e10; // 10 billion km
   private readonly NUM_HEIGHT_SEGS = 16;
   private readonly NUM_WIDTH_SEGS = 16;
 

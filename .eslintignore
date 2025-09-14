@@ -8,6 +8,7 @@ src/lib/external
 dist/**/*
 dist/*
 dist
+.vscode
 src/tle
 **/**/tle.js
 embed

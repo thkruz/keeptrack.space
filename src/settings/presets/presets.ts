@@ -13,7 +13,7 @@ export class SettingsPresets {
     settings.maxZoomDistance = <Kilometers>200000;
     settings.zFar = 600000;
     settings.isDrawSun = false;
-    settings.isDisableMoon = true;
+    settings.isDisablePlanets = true;
     settings.satShader.minSize = 2.0;
     settings.isDisableSensors = true;
     settings.isDisableControlSites = true;
@@ -162,7 +162,7 @@ export class SettingsPresets {
     settings.isDisableAsciiCatalog = true;
     settings.plugins.VideoDirectorPlugin = { enabled: true };
     settings.zFar = 1250000.0;
-    settings.isDisableMoon = false;
+    settings.isDisablePlanets = false;
 
     settings.hiresMilkWay = true;
     settings.earthNumLatSegs = 128;

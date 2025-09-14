@@ -128,7 +128,7 @@ export class MobileManager {
 
           settingsManager.isDisableGodrays = false;
           settingsManager.isDisableSkybox = false;
-          settingsManager.isDisableMoon = false;
+          settingsManager.isDisablePlanets = false;
 
           settingsManager.isMobileModeEnabled = false;
           settingsManager.cameraMovementSpeed = 0.003;

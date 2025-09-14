@@ -15,6 +15,7 @@ import { Mars } from '../rendering/draw-manager/celestial-bodies/mars';
 import { Mercury } from '../rendering/draw-manager/celestial-bodies/mercury';
 import { Moon } from '../rendering/draw-manager/celestial-bodies/moon';
 import { Neptune } from '../rendering/draw-manager/celestial-bodies/neptune';
+import { Saturn } from '../rendering/draw-manager/celestial-bodies/saturn';
 import { Uranus } from '../rendering/draw-manager/celestial-bodies/uranus';
 import { Venus } from '../rendering/draw-manager/celestial-bodies/venus';
 import { ConeMeshFactory } from '../rendering/draw-manager/cone-mesh-factory';
@@ -28,7 +29,6 @@ import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
-import { Saturn } from '../rendering/draw-manager/celestial-bodies/saturn';
 
 export interface SceneParams {
   gl: WebGL2RenderingContext;
@@ -60,8 +60,8 @@ export class Scene {
   /** The pizza box shaped search around a satellite. */
   searchBox: Box;
   frameBuffers = {
-    gpuPicking: null as WebGLFramebuffer,
-    godrays: null as WebGLFramebuffer,
+    gpuPicking: null as unknown as WebGLFramebuffer,
+    godrays: null as unknown as WebGLFramebuffer,
   };
   updateVisualsBasedOnPerformanceTime_ = 0;
   primaryCovBubble: Ellipsoid;

@@ -57,8 +57,8 @@ export class BufferGeometry {
     this.id = BufferGeometry.id++;
     this.uuid = uuidv4();
     this.type = type;
-    this.attributes = attributes || {};
-    this.setAttributes(attributes);
+    this.attributes = attributes ?? {} as Record<string, BufferAttribute>;
+    this.setAttributes(this.attributes);
   }
 
   /**

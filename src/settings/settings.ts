@@ -819,7 +819,7 @@ export class SettingsManager {
    *
    * Used for zooming in and out in default and offset camera modes.
    */
-  maxZoomDistance = <Kilometers>1200000; // 1 million km
+  maxZoomDistance = <Kilometers>1.2e6; // 1.2 million km
   /**
    * Which mesh to use if meshOverride is set
    */
@@ -1112,7 +1112,7 @@ export class SettingsManager {
    */
   isDisableGodrays = false;
   isDisableSkybox = false;
-  isDisableMoon = false;
+  isDisablePlanets = false;
   isDisableSearchBox = false;
   isDisableAsyncReadPixels = false;
   /**

@@ -11,7 +11,7 @@ export class Mesh {
   program: WebGlProgramHelper;
   precision: 'highp' | 'mediump' | 'lowp';
 
-  constructor(gl: WebGL2RenderingContext, geometry: BufferGeometry, material: Material, params: ProgramParams) {
+  constructor(gl: WebGL2RenderingContext, geometry: BufferGeometry | FlatGeometry, material: Material, params: ProgramParams) {
     this.gl = gl;
     this.geometry = geometry;
     if (params?.disabledAttributes?.position) {

@@ -6,6 +6,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import planetPng from '@public/img/icons/planet.png';
 import { Body } from 'astronomy-engine';
+import { Kilometers } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './planets-menu.css';
@@ -103,6 +104,16 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect any selected satellite
     settingsManager.centerBody = planetName;
     keepTrackApi.getUiManager().hideSideMenus();
+
+    settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
+
+    return;
+
+    if (planetName === Body.Earth) {
+      settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
+    } else {
+      settingsManager.maxZoomDistance = 1e9 as Kilometers; // 1 billion km
+    }
   }
 
   dragOptions: ClickDragOptions = {

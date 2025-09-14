@@ -1319,12 +1319,14 @@ export class Camera {
       if (cameraDistance > 350000) {
         this.settings_.satShader.minSize = 3;
       }
-      if (cameraDistance > 400000) {
-        this.settings_.satShader.minSize = 2;
-      }
-      if (cameraDistance > 450000) {
-        this.settings_.satShader.minSize = 1;
-      }
+      /*
+       * if (cameraDistance > 400000) {
+       *   this.settings_.satShader.minSize = 2;
+       * }
+       * if (cameraDistance > 450000) {
+       *   this.settings_.satShader.minSize = 1;
+       * }
+       */
 
       if (this.settings_.isAutoZoomIn) {
         this.state.zoomTarget -= dt * this.settings_.autoZoomSpeed;

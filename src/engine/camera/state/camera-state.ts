@@ -154,7 +154,7 @@ export class CameraState {
   }
 
   set camDistBuffer(val: Kilometers) {
-    this.camDistBuffer_ = val;
+    this.camDistBuffer_ = Math.max(val, settingsManager.minDistanceFromSatellite) as Kilometers;
   }
 
   get earthCenteredPitch(): Radians {

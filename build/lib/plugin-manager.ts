@@ -28,6 +28,14 @@ export class PluginManager {
    * **Add new Pro plugins here to make them available in the application.**
    */
   private readonly pluginPaths: Record<string, PluginPathMapping> = {
+    'telemetry': {
+      openSourcePath: '../plugins/telemetry/telemetry',
+      proPath: '../plugins-pro/telemetry/telemetry',
+    },
+    'user-account': {
+      openSourcePath: '../plugins/user-account/user-account',
+      proPath: '../plugins-pro/user-account/user-account',
+    },
     'about-menu': {
       openSourcePath: '../plugins/about-menu/about-menu',
       proPath: '../plugins-pro/about-menu/about-menu',

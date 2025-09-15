@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -28,8 +28,8 @@ describe('ShortTermFences_class', () => {
     const stf = new ShortTermFences();
 
     websiteInit(stf);
-    expect(() => keepTrackApi.emit(KeepTrackApiEvents.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.emit(KeepTrackApiEvents.setSensor, defaultSensor, 1)).not.toThrow();
+    expect(() => keepTrackApi.emit(EventBusEvent.setSensor, null, null)).not.toThrow();
+    expect(() => keepTrackApi.emit(EventBusEvent.setSensor, defaultSensor, 1)).not.toThrow();
   });
 
   // test stfFormOnSubmit static method

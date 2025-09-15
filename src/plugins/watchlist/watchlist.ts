@@ -22,23 +22,25 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { SensorToSatLine } from '@app/engine/rendering/line-manager/sensor-to-sat-line';
+import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { isThisNode } from '@app/engine/utils/isThisNode';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { SensorToSatLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sat-line';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
-import { isThisNode } from '@app/static/isThisNode';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import bookmarksPng from '@public/img/icons/bookmarks.png';
 import saveAs from 'file-saver';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { EL as SAT_INFO_EL, SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];
@@ -68,7 +70,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   isWatchlistChanged: boolean | null = null;
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="watchlist-menu" class="side-menu-parent start-hidden text-select">
       <div id="watchlist-content" class="side-menu">
         <div class="row">
@@ -110,12 +112,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.onCruncherReady, this.onCruncherReady_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    keepTrackApi.on(EventBusEvent.onCruncherReady, this.onCruncherReady_.bind(this));
+    keepTrackApi.on(EventBusEvent.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+      EventBusEvent.uiManagerInit,
       () => {
         if (!settingsManager.isWatchlistTopMenuNotification) {
           return;
@@ -124,7 +126,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         // Optional if top-menu is enabled
         getEl('nav-mobile2', true)?.insertAdjacentHTML(
           'afterbegin',
-          keepTrackApi.html`
+          html`
                 <li id="top-menu-watchlist-li" class="hidden">
                   <a id="top-menu-watchlist-btn" class="top-menu-icons">
                     <div class="top-menu-icons bmenu-item-selected">
@@ -139,7 +141,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         if (!settingsManager.isWatchlistTopMenuNotification) {
           return;
@@ -147,7 +149,16 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
         // Optional if top-menu is enabled
         getEl('top-menu-watchlist-btn', true)?.addEventListener('click', () => {
-          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+
+          if (!this.isMenuButtonActive) {
+            this.openSideMenu();
+            this.setBottomIconToSelected();
+            this.bottomIconCallback();
+          } else {
+            this.setBottomIconToUnselected();
+            this.closeSideMenu();
+          }
         });
       },
     );
@@ -158,17 +169,17 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     const satInfoBoxPlugin = keepTrackApi.getPlugin(SatInfoBox)!;
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxAddListeners, () => {
+    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, () => {
       getEl(this.EL.ADD_WATCHLIST)?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
       getEl(this.EL.REMOVE_WATCHLIST)?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
     });
 
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.selectSatData_.bind(this));
+    keepTrackApi.on(EventBusEvent.selectSatData, this.selectSatData_.bind(this));
   }
 
   private satInfoBoxFinal_() {
     // Add html to EL.TITLE
-    getEl(SAT_INFO_EL.NAME)?.insertAdjacentHTML('beforebegin', keepTrackApi.html`
+    getEl(SAT_INFO_EL.NAME)?.insertAdjacentHTML('beforebegin', html`
       <img id="${this.EL.ADD_WATCHLIST}" src="${bookmarkAddPng}"/>
       <img id="${this.EL.REMOVE_WATCHLIST}" src="${bookmarkRemovePng}"/>
     `);
@@ -397,7 +408,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       watchlistElement.innerHTML = watchlistListHTML;
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.onWatchlistUpdated, this.watchlistList);
+    keepTrackApi.emit(EventBusEvent.onWatchlistUpdated, this.watchlistList);
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       // No duplicates
@@ -451,7 +462,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     });
 
     this.updateWatchlist();
-    keepTrackApi.emit(KeepTrackApiEvents.onWatchlistRemove, this.watchlistList);
+    keepTrackApi.emit(EventBusEvent.onWatchlistRemove, this.watchlistList);
 
     const uiManagerInstance = keepTrackApi.getUiManager();
     const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
@@ -491,7 +502,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         return parseInt(satA.sccNum) - parseInt(satB.sccNum);
       });
       this.updateWatchlist();
-      keepTrackApi.emit(KeepTrackApiEvents.onWatchlistAdd, this.watchlistList);
+      keepTrackApi.emit(EventBusEvent.onWatchlistAdd, this.watchlistList);
     }
   }
 

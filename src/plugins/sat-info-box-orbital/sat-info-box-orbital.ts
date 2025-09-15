@@ -1,16 +1,17 @@
 /* eslint-disable max-lines */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { SensorMath } from '@app/app/sensors/sensor-math';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
-import { SatMath } from '@app/static/sat-math';
-import { SensorMath } from '@app/static/sensor-math';
 import { BaseObject, DetailedSatellite, eci2lla, MINUTES_PER_DAY } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 const SECTIONS = {
   ORBITAL: 'orbital-section',
@@ -45,7 +46,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxInit, () => {
+    keepTrackApi.on(EventBusEvent.satInfoBoxInit, () => {
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createOrbitalSection(), order: 4 });
     });
   }
@@ -53,8 +54,8 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.updateOrbitData_.bind(this));
+    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
+    keepTrackApi.on(EventBusEvent.selectSatData, this.updateOrbitData_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {
@@ -64,7 +65,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   }
 
   private createOrbitalSection(): string {
-    return keepTrackApi.html`
+    return html`
         <div id="${SECTIONS.ORBITAL}">
           <div class="sat-info-section-header">
             Orbit Data
@@ -96,9 +97,9 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       { key: 'Cross Track Sigma', id: EL.UNCERTAINTY_CROSSTRACK, tooltip: 'Cross Track Uncertainty (meters)', value: 'xxx.xxxx' },
     ];
 
-    return rows.map((row) => keepTrackApi.html`
+    return rows.map((row) => html`
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key" data-tooltip="${row.tooltip}">${row.key}</div>
+          <div class="sat-info-key" kt-tooltip="${row.tooltip}">${row.key}</div>
           <div class="sat-info-value" id="${row.id}">${row.value}</div>
         </div>
       `).join('');

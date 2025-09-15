@@ -1,12 +1,13 @@
-import { keepTrackContainer } from '@app/container';
-import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { Singletons } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import { setupMinimumHtml } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
+import { Container } from '@app/engine/core/container';
 
 describe('TopMenu_class', () => {
   beforeEach(() => {
@@ -24,12 +25,12 @@ describe('TopMenu_class', () => {
     const topMenu = new TopMenu();
 
     topMenu.init();
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(EventBusEvent.uiManagerInit);
+    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
 
     errorManagerInstance.warn = jest.fn();
-    keepTrackContainer.registerSingleton(Singletons.SoundManager, null);
+    Container.getInstance().registerSingleton(Singletons.SoundManager, null);
     soundBtn.click();
     expect(errorManagerInstance.warn).toHaveBeenCalled();
   });
@@ -39,21 +40,21 @@ describe('TopMenu_class', () => {
     const topMenu = new TopMenu();
 
     topMenu.init();
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
+    keepTrackApi.emit(EventBusEvent.uiManagerInit);
+    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
 
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     const soundIcon = getEl('sound-icon') as HTMLImageElement;
     const soundManagerPlugin = new SoundManager();
 
-    keepTrackContainer.registerSingleton(Singletons.SoundManager, soundManagerPlugin);
+    Container.getInstance().registerSingleton(Singletons.SoundManager, soundManagerPlugin);
     const soundManager = keepTrackApi.getSoundManager();
 
     soundBtn.click();
-    expect(soundManager.isMute).toBe(true);
-    expect(soundIcon.parentElement.classList.contains('bmenu-item-selected')).toBe(false);
+    expect(soundManager!.isMute).toBe(true);
+    expect(soundIcon.parentElement!.classList.contains('bmenu-item-selected')).toBe(false);
     soundBtn.click();
-    expect(soundManager.isMute).toBe(false);
-    expect(soundIcon.parentElement.classList.contains('bmenu-item-selected')).toBe(true);
+    expect(soundManager!.isMute).toBe(false);
+    expect(soundIcon.parentElement!.classList.contains('bmenu-item-selected')).toBe(true);
   });
 });

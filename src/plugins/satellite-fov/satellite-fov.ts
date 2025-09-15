@@ -19,15 +19,17 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
+import { keepTrackApi } from '@app/keepTrackApi';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
 import { BaseObject, Degrees } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class SatelliteFov extends KeepTrackPlugin {
   readonly id = 'SatelliteFov';
@@ -42,7 +44,7 @@ export class SatelliteFov extends KeepTrackPlugin {
   };
 
   sideMenuElementName: string = 'satellite-fov-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div>
     <div class="center">
       <button id="reset-sat-fov-cones-button" class="center-align btn btn-ui waves-effect waves-light menu-selectable" type="button"
@@ -103,7 +105,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     <div id="sat-fov-active-cones" class="col s12">
     </div>
   </div>`;
-  sideMenuSecondaryHtml = keepTrackApi.html`
+  sideMenuSecondaryHtml = html`
   <form id="sat-fov-settings-form">
     <div class="row">
       <div class="col s12">
@@ -159,7 +161,7 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('sat-fov-settings-form')!.addEventListener('change', this.handleFormChange_.bind(this));
         getEl('sat-fov-settings-form')!.addEventListener('submit', this.handleFormChange_.bind(this));
@@ -170,7 +172,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('reset-sat-fov-cones-button')!.addEventListener('click', () => {
           keepTrackApi.getScene().coneFactory.clear();
@@ -184,7 +186,7 @@ export class SatelliteFov extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'C' && !isRepeat) {
         const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
 
@@ -206,10 +208,10 @@ export class SatelliteFov extends KeepTrackPlugin {
     });
 
     keepTrackApi.on(
-      KeepTrackApiEvents.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
+      EventBusEvent.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         this.updateListOfFovMeshes_();
 
@@ -312,12 +314,12 @@ export class SatelliteFov extends KeepTrackPlugin {
         let nameSpan = '';
 
         if (currentSat && mesh.obj.id === currentSat.id) {
-          nameSpan = keepTrackApi.html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>`;
+          nameSpan = html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>`;
         } else {
-          nameSpan = keepTrackApi.html`<span>${mesh.obj.name}</span>`;
+          nameSpan = html`<span>${mesh.obj.name}</span>`;
         }
 
-        return keepTrackApi.html`
+        return html`
         <div class="link" style="
             display: flex;
             align-items: center;

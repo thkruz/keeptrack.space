@@ -1,15 +1,17 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 
-import { shake } from '@app/lib/shake';
-import { SatMath } from '@app/static/sat-math';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { shake } from '@app/engine/utils/shake';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord, Seconds } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '../watchlist/watchlist';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface Pass {
   start: Date;
@@ -60,13 +62,13 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   };
 
   sideMenuElementName = 'satellite-timeline-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div class="row"></div>
     <div class="row" style="margin: 0;">
       <canvas id="satellite-timeline-canvas"></canvas>
       <canvas id="satellite-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
-  sideMenuSecondaryHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = html`
     <div class="row">
       <div class="input-field col s12">
         <input id="satellite-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
@@ -118,7 +120,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas-static');
@@ -156,7 +158,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!sat && keepTrackApi.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
           this.setBottomIconToDisabled();
@@ -173,8 +175,8 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         }
       },
     );
-    keepTrackApi.on(KeepTrackApiEvents.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.resize, this.resizeCanvas_.bind(this));
+    keepTrackApi.on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
+    keepTrackApi.on(EventBusEvent.resize, this.resizeCanvas_.bind(this));
   }
 
   private onWatchlistUpdated_(watchlistList: number[]) {

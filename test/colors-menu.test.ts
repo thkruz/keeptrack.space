@@ -34,5 +34,5 @@ describe('ColorMenu_class', () => {
         jest.advanceTimersByTime(1000);
       }).not.toThrow();
     });
-  }, 15000);
+  }, 20000); // NOTE: Increase the timeout if there are more items in the menu in the future
 });

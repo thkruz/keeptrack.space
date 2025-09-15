@@ -1,0 +1,140 @@
+import { MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl } from '@app/engine/utils/get-el';
+import { keepTrackApi } from '@app/keepTrackApi';
+import planetPng from '@public/img/icons/planet.png';
+import { Body } from 'astronomy-engine';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import './planets-menu.css';
+
+export class PlanetsMenuPlugin extends KeepTrackPlugin {
+  readonly id = 'PlanetsMenuPlugin';
+  dependencies_ = [];
+  bottomIconImg = planetPng;
+
+  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
+
+  init(): void {
+    super.init();
+  }
+
+  PLANETS = [Body.Mercury, Body.Venus, Body.Earth, Body.Mars, Body.Jupiter, Body.Saturn, Body.Uranus, Body.Neptune];
+  DWARF_PLANETS = [Body.Pluto];
+  OTHER_CELESTIAL_BODIES = [Body.Moon];
+
+  bottomIconElementName: string = 'menu-planets';
+  sideMenuElementName: string = 'planets-menu';
+  sideMenuElementHtml: string = html`
+  <div id="planets-menu" class="side-menu-parent start-hidden text-select">
+    <div id="planets-menu-content" class="side-menu">
+      <div class="row"></div>
+      <ul>
+        ${this.getSideMenuElementHtmlExtras()}
+      </ul>
+    </div>
+  </div>`;
+
+  rmbL1ElementName = 'planets-rmb';
+  rmbL1Html = html`<li class="rmb-menu-item" id="${this.rmbL1ElementName}"><a href="#">Planets &#x27A4;</a></li>`;
+
+  isRmbOnEarth = true;
+  isRmbOffEarth = true;
+  rmbMenuOrder = 70;
+
+  rmbL2ElementName = 'planets-rmb-menu';
+  rmbL2Html = html`
+  <ul class='dropdown-contents'>
+    ${this.getRmbL2HtmlExtras()}
+  </ul>`;
+
+  getSideMenuElementHtmlExtras() {
+
+    let html_ = '';
+
+    html_ += html`
+      <h5 class="center-align side-menu-row-header">Planets</h5>
+    `;
+
+    for (const object of this.PLANETS) {
+      html_ += `<li class="menu-selectable" data-planet="${object}">${object}</li>`;
+    }
+
+    html_ += html`
+      <h5 class="center-align side-menu-row-header">Dwarf Planets</h5>
+    `;
+
+    for (const object of this.DWARF_PLANETS) {
+      html_ += `<li class="menu-selectable" data-planet="${object}">${object}</li>`;
+    }
+
+    html_ += html`
+      <h5 class="center-align side-menu-row-header">Other Celestial Bodies</h5>
+    `;
+
+    for (const object of this.OTHER_CELESTIAL_BODIES) {
+      html_ += `<li class="menu-selectable" data-planet="${object}">${object}</li>`;
+    }
+
+    return html_;
+  }
+
+  getRmbL2HtmlExtras() {
+    let html = '';
+
+    for (const planet of this.PLANETS) {
+      html += `<li id="planets-${planet}-rmb"><a href="#">${planet}</a></li>`;
+    }
+
+    return html;
+  }
+
+  rmbCallback: (targetId: string | null, clickedSat?: number) => void = (targetId: string | null) => {
+    // convert 'planets-moon-rmb' to 'moon'
+    if (targetId?.startsWith('planets-') && targetId.endsWith('-rmb')) {
+      targetId = targetId.slice(8, -4);
+    }
+    this.changePlanet(targetId as Body ?? Body.Earth);
+  };
+
+  changePlanet(planetName: Body) {
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect any selected satellite
+    settingsManager.centerBody = planetName;
+    keepTrackApi.getUiManager().hideSideMenus();
+  }
+
+  dragOptions: ClickDragOptions = {
+    isDraggable: true,
+  };
+
+  addHtml(): void {
+    super.addHtml();
+    keepTrackApi.on(
+      EventBusEvent.uiManagerFinal,
+      () => {
+        getEl('planets-menu')
+          ?.querySelectorAll('li')
+          .forEach((element) => {
+            element.addEventListener('click', () => {
+              const planetName = element.dataset.planet;
+
+              if (!planetName) {
+                console.error('Planet name not found in dataset');
+
+                return;
+              }
+
+              this.planetsMenuClick(planetName ?? '');
+            });
+          });
+      },
+    );
+  }
+
+  planetsMenuClick = (planetName: string) => {
+    this.rmbCallback(planetName);
+  };
+}
+

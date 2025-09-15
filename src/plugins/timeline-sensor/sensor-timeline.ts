@@ -2,25 +2,27 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable max-lines */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
-import { SatMath, SunStatus } from '@app/static/sat-math';
+import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import {
   BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Hours, Kilometers, lla2eci, Milliseconds, MILLISECONDS_PER_SECOND, Radians,
   SatelliteRecord,
   Seconds, SpaceObjectType, Sun,
 } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { SensorManager } from '../../app/sensors/sensorManager';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SensorManager } from '../sensor/sensorManager';
 import { SoundNames } from '../sounds/sounds';
 
-import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { fetchWeatherApi } from 'openmeteo';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface Pass {
   start: Date;
@@ -125,13 +127,13 @@ export class SensorTimeline extends KeepTrackPlugin {
   };
 
   sideMenuElementName = 'sensor-timeline-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div class="row"></div>
     <div class="row" style="margin: 0;">
       <canvas id="sensor-timeline-canvas"></canvas>
       <canvas id="sensor-timeline-canvas-static" style="display: none;"></canvas>
     </div>`;
-  sideMenuSecondaryHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = html`
     <div class="row">
       <div class="input-field col s12">
         <input id="sensor-timeline-setting-total-length" value="${this.lengthOfLookAngles_.toString()}" type="text"
@@ -238,7 +240,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
         this.canvasStatic_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas-static');
@@ -290,7 +292,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
     // We need to wait for the sensorIds to be assigned before we can use them. Once they are ready we will reload the users last selected sensors
     keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherReady,
+      EventBusEvent.onCruncherReady,
       () => {
         const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
         let enabledSensors = [] as number[];
@@ -312,7 +314,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {
           return;

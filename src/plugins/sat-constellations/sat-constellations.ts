@@ -1,14 +1,16 @@
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { SatConstellationString } from '@app/app/data/catalog-manager/satLinkManager';
+import { GroupType } from '@app/app/data/object-group';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SatConstellationString } from '@app/singletons/catalog-manager/satLinkManager';
-import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
-import { GroupType } from '@app/singletons/object-group';
 import categoryPng from '@public/img/icons/category.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
@@ -26,7 +28,7 @@ export class SatConstellations extends KeepTrackPlugin {
   bottomIconImg = categoryPng;
   bottomIconElementName: string = 'menu-constellations';
   sideMenuElementName: string = 'constellations-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="constellations-menu" class="side-menu-parent start-hidden text-select">
     <div id="constellation-menu" class="side-menu">
       <ul>
@@ -57,7 +59,7 @@ export class SatConstellations extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         // Add additional constellations
         getEl('constellations-menu')!.querySelector('ul')!.insertAdjacentHTML(

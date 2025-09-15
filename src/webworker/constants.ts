@@ -1,5 +1,5 @@
 import { Degrees, Kilometers, Radians, SatelliteRecord, ZoomValue } from 'ootk';
-import { SensorObjectCruncher } from '../interfaces';
+import { SensorObjectCruncher } from '../engine/core/interfaces';
 import { CruncerMessageTypes, MarkerMode } from './positionCruncher';
 
 // Typing

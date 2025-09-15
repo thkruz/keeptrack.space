@@ -1,16 +1,17 @@
 /* eslint-disable max-lines */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { StringExtractor } from '@app/app/ui/string-extractor';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { openColorbox } from '@app/engine/utils/colorbox';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { openColorbox } from '@app/lib/colorbox';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
-import { StringExtractor } from '@app/static/string-extractor';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 const SECTIONS = {
   OBJECT: 'object-section',
@@ -46,7 +47,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxInit, () => {
+    keepTrackApi.on(EventBusEvent.satInfoBoxInit, () => {
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createObjectSection_(), order: 6 });
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createSecondarySection(), order: 8 });
     });
@@ -55,8 +56,8 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.updateObjectData_.bind(this));
+    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
+    keepTrackApi.on(EventBusEvent.selectSatData, this.updateObjectData_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {
@@ -68,7 +69,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
 
   private createObjectSection_(): string {
     // Object section HTML
-    return keepTrackApi.html`
+    return html`
       <div id="${SECTIONS.OBJECT}" class="sat-info-section">
         <div class="sat-info-section-header">
           Object Data
@@ -76,22 +77,22 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
         </div>
         <div class="sat-info-row">
           <div class="sat-info-key" data-position="top" data-delay="50"
-            data-tooltip="Type of Object">Type</div>
+            kt-tooltip="Type of Object">Type</div>
           <div class="sat-info-value" id="${EL.TYPE}">PAYLOAD</div>
         </div>
         <div class="sat-info-row">
           <div class="sat-info-key" data-position="top" data-delay="50"
-            data-tooltip="Type of Object">Status</div>
+            kt-tooltip="Type of Object">Status</div>
           <div class="sat-info-value" id="${EL.STATUS}">STATUS</div>
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" data-position="top" data-delay="50"
-            data-tooltip="Country That Owns the Object">Country</div>
+            kt-tooltip="Country That Owns the Object">Country</div>
           <div class="sat-info-value" id="${EL.COUNTRY}">COUNTRY</div>
         </div>
         <div class="sat-info-row" id="${EL.SITE_ROW}">
           <div class="sat-info-key" data-position="top" data-delay="50"
-            data-tooltip="Location Where Object Launched From">Launch Site</div>
+            kt-tooltip="Location Where Object Launched From">Launch Site</div>
           <div class="sat-info-value">
             <div id="${EL.LAUNCH_SITE}">LAUNCH SITE</div>
             <div id="${EL.LAUNCH_PAD}">LAUNCH PAD</div>
@@ -99,12 +100,12 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
           </div>
         <div class="sat-info-row">
           <div class="sat-info-key" data-position="top" data-delay="50"
-            data-tooltip="Space Lift Vehicle That Launched Object">Rocket</div>
+            kt-tooltip="Space Lift Vehicle That Launched Object">Rocket</div>
           <div class="sat-info-value pointable" id="${EL.VEHICLE}">VEHICLE</div>
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" data-position="top" data-delay="50"
-            data-tooltip="Configuration of the Rocket">
+            kt-tooltip="Configuration of the Rocket">
             Configuration
           </div>
           <div class="sat-info-value" id="${EL.CONFIGURATION}">
@@ -113,14 +114,14 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" data-position="top" data-delay="50"
-            data-tooltip="Radar Cross Section - How reflective the object is to a radar">
+            kt-tooltip="Radar Cross Section - How reflective the object is to a radar">
             RCS
           </div>
           <div class="sat-info-value" data-position="top" data-delay="50" id="${EL.RCS}">NO DATA</div>
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" data-position="top" data-delay="50"
-            data-tooltip="Standard Magnitude - Smaller Numbers Are Brighter">
+            kt-tooltip="Standard Magnitude - Smaller Numbers Are Brighter">
             Standard Mag
           </div>
           <div class="sat-info-value" id="${EL.STDMAG}">
@@ -133,7 +134,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
 
   private createSecondarySection(): string {
     // Secondary satellite section HTML
-    return keepTrackApi.html`
+    return html`
         <div id="${SECTIONS.SECONDARY}">
           <div class="sat-info-section-header">
             Secondary Satellite
@@ -141,28 +142,28 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
           </div>
           <div class="sat-info-row">
             <div class="sat-info-key" data-position="top" data-delay="50"
-              data-tooltip="Linear Distance from Secondary Satellite">
+              kt-tooltip="Linear Distance from Secondary Satellite">
               Linear
             </div>
             <div class="sat-info-value" id="${EL.DIST}">xxxx km</div>
           </div>
           <div class="sat-info-row">
             <div class="sat-info-key" data-position="top" data-delay="50"
-              data-tooltip="Radial Distance">
+              kt-tooltip="Radial Distance">
               Radial
             </div>
             <div class="sat-info-value" id="${EL.RAD}">XX deg</div>
           </div>
           <div class="sat-info-row">
             <div class="sat-info-key" data-position="top" data-delay="50"
-              data-tooltip="In-Track Distance from Secondary Satellite">
+              kt-tooltip="In-Track Distance from Secondary Satellite">
               In-Track
             </div>
             <div class="sat-info-value" id="${EL.INTRACK}">XX deg</div>
           </div>
           <div class="sat-info-row">
             <div class="sat-info-key" data-position="top" data-delay="50"
-              data-tooltip="Cross-Track Distance from Secondary Satellite">
+              kt-tooltip="Cross-Track Distance from Secondary Satellite">
               Cross-Track
             </div>
             <div class="sat-info-value" id="${EL.CROSSTRACK}">xxxx km</div>
@@ -440,22 +441,22 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
 
       if (estRcs !== null) {
         satRcsEl.innerHTML = `H-Est ${estRcs.toFixed(4)} m<sup>2</sup>`;
-        satRcsEl.setAttribute('data-tooltip', `${SatMath.mag2db(estRcs).toFixed(2)} dBsm (Historical Estimate)`);
+        satRcsEl.setAttribute('kt-tooltip', `${SatMath.mag2db(estRcs).toFixed(2)} dBsm (Historical Estimate)`);
       } else if (sat.length && sat.diameter && sat.span && sat.shape) {
         const rcs = SatMath.estimateRcs(parseFloat(sat.length), parseFloat(sat.diameter), parseFloat(sat.span), sat.shape);
 
         satRcsEl.innerHTML = `Est ${rcs.toFixed(4)} m<sup>2</sup>`;
-        satRcsEl.setAttribute('data-tooltip', `Est ${SatMath.mag2db(rcs).toFixed(2)} dBsm`);
+        satRcsEl.setAttribute('kt-tooltip', `Est ${SatMath.mag2db(rcs).toFixed(2)} dBsm`);
       } else {
         satRcsEl.innerHTML = 'Unknown';
-        satRcsEl.setAttribute('data-tooltip', 'Unknown');
+        satRcsEl.setAttribute('kt-tooltip', 'Unknown');
       }
     } else if (!isNaN(sat.rcs)) {
       satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
     } else {
       satRcsEl.innerHTML = 'Unknown';
-      satRcsEl.setAttribute('data-tooltip', 'Unknown');
-      // satRcsEl.setAttribute('data-tooltip', `${SatMath.mag2db(sat.rcs).toFixed(2)} dBsm`);
+      satRcsEl.setAttribute('kt-tooltip', 'Unknown');
+      // satRcsEl.setAttribute('kt-tooltip', `${SatMath.mag2db(sat.rcs).toFixed(2)} dBsm`);
     }
   }
 

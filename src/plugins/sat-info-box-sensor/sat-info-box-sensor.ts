@@ -1,19 +1,21 @@
 /* eslint-disable max-lines */
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
+import { ToastMsgType } from '@app/engine/core/interfaces';
+import type { TimeManager } from '@app/engine/core/time-manager';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import type { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import type { TimeManager } from '@app/singletons/time-manager';
-import { SatMath, SunStatus } from '@app/static/sat-math';
-import { SensorMath, TearrData } from '@app/static/sensor-math';
 import { BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, RfSensor, SpaceObjectType, Sun, SunTime } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import type { SensorManager } from '../../app/sensors/sensorManager';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import type { SensorManager } from '../sensor/sensorManager';
 import { StereoMap } from '../stereo-map/stereo-map';
+import { html } from '@app/engine/utils/development/formatter';
 
 const SECTIONS = {
   SENSOR: 'sensor-sat-info',
@@ -40,7 +42,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxInit, () => {
+    keepTrackApi.on(EventBusEvent.satInfoBoxInit, () => {
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createSensorSection_(), order: 5 });
     });
   }
@@ -48,9 +50,9 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.updateSensorInfo_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.updateSelectBox, this.updateSelectBox_.bind(this));
+    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
+    keepTrackApi.on(EventBusEvent.selectSatData, this.updateSensorInfo_.bind(this));
+    keepTrackApi.on(EventBusEvent.updateSelectBox, this.updateSelectBox_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {
@@ -72,18 +74,18 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       { key: 'Next Pass', id: EL.NEXT_PASS, tooltip: 'Next Time in Coverage', value: '00:00:00z' },
     ];
 
-    return keepTrackApi.html`
+    return html`
       <div id="${SECTIONS.SENSOR}">
       <div class="sat-info-section-header">
         Sensor Data
         <span id="${SECTIONS.SENSOR}-collapse" class="section-collapse material-icons">expand_less</span>
       </div>
-      ${rows.map((row) => keepTrackApi.html`
+      ${rows.map((row) => html`
         <div
           class="sat-info-row${row.id === EL.SUN || row.id === EL.VMAG || row.id === EL.NEXT_PASS ? ' sat-only-info' : ''}"
         >
         <div class="sat-info-key" data-position="top" data-delay="50"
-          data-tooltip="${row.tooltip}"
+          kt-tooltip="${row.tooltip}"
         >
           ${row.key}
         </div>

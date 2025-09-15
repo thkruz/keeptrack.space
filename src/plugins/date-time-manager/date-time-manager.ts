@@ -1,10 +1,11 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
+import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { isThisNode } from '@app/static/isThisNode';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';
@@ -17,10 +18,10 @@ export class DateTimeManager extends KeepTrackPlugin {
   init(): void {
     super.init();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.updateDateTime, this.updateDateTime.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => this.updateDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+    keepTrackApi.on(EventBusEvent.uiManagerInit, this.uiManagerInit.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal.bind(this));
+    keepTrackApi.on(EventBusEvent.updateDateTime, this.updateDateTime.bind(this));
+    keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => this.updateDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
   }
 
   updateDateTime(date: Date) {
@@ -72,7 +73,7 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     NavWrapper?.insertAdjacentHTML(
       'afterbegin',
-      keepTrackApi.html`
+      html`
         <div id="nav-mobile">
           <div id="jday"></div>
           <div id="${this.dateTimeContainerId_}">

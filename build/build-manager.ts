@@ -85,9 +85,9 @@ class BuildManager {
 
       if (config.isPro) {
         // Merge locales files
-        fileManager.mergeLocales('src/locales', 'src/plugins-pro/locales');
+        fileManager.mergeLocales('src', 'src/plugins-pro');
       } else {
-        fileManager.compileLocales('src/locales');
+        fileManager.compileLocales('src');
       }
 
       // Configure plugins

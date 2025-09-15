@@ -22,23 +22,25 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, lookanglesRow, MenuMode, ToastMsgType } from '@app/interfaces';
+import { lookanglesRow, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
 
-import { SatMath } from '@app/static/sat-math';
+import { SatMath } from '@app/app/analysis/sat-math';
 
-import { getUnique } from '@app/lib/get-unique';
-import { saveCsv } from '@app/lib/saveVariable';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { CatalogExporter } from '@app/static/catalog-exporter';
-import { CatalogSearch } from '@app/static/catalog-search';
+import { CatalogExporter } from '@app/app/data/catalog-exporter';
+import { CatalogSearch } from '@app/app/data/catalog-search';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getUnique } from '@app/engine/utils/get-unique';
+import { saveCsv } from '@app/engine/utils/saveVariable';
 import folderCodePng from '@public/img/icons/folder-code.png';
 import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
@@ -46,7 +48,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.ANALYSIS, MenuMode.ALL];
   bottomIconImg = folderCodePng;
   sideMenuElementName = 'analysis-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
   <div id="analysis-menu" class="side-menu-parent start-hidden text-select">
     <div id="analysis-inner-menu" class="side-menu">
       <h5 class="center-align">Export Catalog</h5>
@@ -210,7 +212,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('analysis-bpt')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
@@ -260,7 +262,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.setSensor, (sensor) => {
+    keepTrackApi.on(EventBusEvent.setSensor, (sensor) => {
       if (!sensor) {
         return;
       }

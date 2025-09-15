@@ -1,7 +1,7 @@
 /* eslint-disable dot-notation */
+import * as OrbitFinderFile from '@app/app/analysis/orbit-finder';
 import { Breakup } from '@app/plugins/breakup/breakup';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import * as OrbitFinderFile from '@app/singletons/orbit-finder';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';

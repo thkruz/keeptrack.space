@@ -9,18 +9,20 @@ import {
   Sgp4,
   Tle,
 } from 'ootk';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
-import { countryCodeList, countryNameList } from '@app/catalogs/countries';
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { getEl } from '@app/lib/get-el';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
+import { html } from '@app/engine/utils/development/formatter';
 
 /**
  * Interface for TLE input parameters
@@ -66,7 +68,7 @@ export class CreateSat extends KeepTrackPlugin {
   /**
    * HTML template for the side menu
    */
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="createSat-menu" class="side-menu-parent start-hidden text-select">
       <div id="createSat-content" class="side-menu">
         <div class="row">
@@ -152,7 +154,7 @@ export class CreateSat extends KeepTrackPlugin {
    */
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   /**

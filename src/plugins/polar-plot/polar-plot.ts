@@ -1,13 +1,15 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { keepTrackApi } from '@app/keepTrackApi';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
 
 
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { html } from '@app/engine/utils/development/formatter';
 
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 
@@ -45,7 +47,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   sideMenuElementName: string = 'polar-plot-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="polar-plot-menu" class="side-menu-parent start-hidden text-select">
     <div id="polar-plot-content" class="side-menu" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
       <span id="polar-plot-warning" class="text-center">Satellite is not in view for the next ${(this.plotDuration_ * 24).toFixed(0)} hours</span>
@@ -65,7 +67,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('polar-plot-save')!.addEventListener('click', () => {
           const canvas = document.getElementById('polar-plot') as HTMLCanvasElement;
@@ -84,7 +86,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.staticOffsetChange,
+      EventBusEvent.staticOffsetChange,
       () => {
         if (this.isMenuButtonActive) {
           this.updatePlot_();
@@ -93,7 +95,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
           getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-disabled');
@@ -109,7 +111,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'P' && !isRepeat) {
         if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
           return;

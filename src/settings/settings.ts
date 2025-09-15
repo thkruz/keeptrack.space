@@ -18,20 +18,22 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, SensorGeolocation } from '@app/interfaces';
+import { MobileManager } from '@app/app/ui/mobileManager';
+import { MenuMode, SensorGeolocation } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { UrlManager } from '@app/engine/input/url-manager';
+import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
+import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
+import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
 import { keepTrackApi } from '@app/keepTrackApi';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
-import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
-import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
-import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
-import { SunTextureQuality } from '@app/singletons/draw-manager/sun';
-import { MobileManager } from '@app/singletons/mobileManager';
-import { UrlManager } from '@app/static/url-manager';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
-import { RADIUS_OF_EARTH } from '../lib/constants';
-import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
-import { ClassificationString } from '../static/classification';
-import { isThisNode } from '../static/isThisNode';
+import { Body } from 'astronomy-engine';
+import { Degrees, Kilometers, Milliseconds, Radians } from 'ootk';
+import { ClassificationString } from '../app/ui/classification';
+import { RADIUS_OF_EARTH } from '../engine/utils/constants';
+import { isThisNode } from '../engine/utils/isThisNode';
+import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import { defaultColorSettings } from './default-color-settings';
 import { defaultPlugins } from './default-plugins';
 import { parseGetVariables } from './parse-get-variables';
@@ -138,7 +140,7 @@ export class SettingsManager {
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality?.toString());
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.saveSettings);
+    keepTrackApi.emit(EventBusEvent.saveSettings);
   }
 
   colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
@@ -189,7 +191,7 @@ export class SettingsManager {
   /**
    * The initial field of view settings for FPS, Planetarium, Astronomy, and Satellite View
    */
-  fieldOfView = 0.6;
+  fieldOfView = 0.6 as Radians;
   db = null;
   /**
    * Catch Errors and report them via github
@@ -449,6 +451,8 @@ export class SettingsManager {
     maxrange: null,
   };
 
+  centerBody: Body = Body.Earth;
+
   altMsgNum = null;
   altLoadMsgs = false;
   /**
@@ -501,7 +505,7 @@ export class SettingsManager {
   /**
    * The current legend to display.
    */
-  currentLegend = 'default';
+  currentLayer = 'CelestrakColorScheme';
   /**
    * The number of days before a TLE is considered lost.
    */
@@ -578,7 +582,7 @@ export class SettingsManager {
    *
    * TODO: Implement this for FPS, Planetarium, Astronomy, and Satellite View
    */
-  fieldOfViewMax = 1.2;
+  fieldOfViewMax = 1.2 as Radians;
   /**
    * @deprecated
    * The minimum value for the field of view setting.
@@ -815,7 +819,7 @@ export class SettingsManager {
    *
    * Used for zooming in and out in default and offset camera modes.
    */
-  maxZoomDistance = <Kilometers>120000;
+  maxZoomDistance = <Kilometers>1200000; // 1 million km
   /**
    * Which mesh to use if meshOverride is set
    */
@@ -1040,7 +1044,7 @@ export class SettingsManager {
    * Increasing this causes z-fighting
    * Decreasing this causes clipping of stars and satellites
    */
-  zFar = 450000.0;
+  zFar = 149600000;
   /**
    * The minimum z-depth for the WebGL renderer.
    */
@@ -1048,7 +1052,7 @@ export class SettingsManager {
   /**
    * The speed at which the zoom level changes when the user zooms in or out.
    */
-  zoomSpeed = 0.0025;
+  zoomSpeed = 0.005;
   /**
    * Draw Trailing Orbits
    */
@@ -1088,7 +1092,7 @@ export class SettingsManager {
    * Minimum distance from satellite when we switch to close camera mode
    * The camera will not be able to get closer than this distance
    */
-  minDistanceFromSatellite = 1.25 as Kilometers;
+  minDistanceFromSatellite = 0.75 as Kilometers;
 
   /**
    * Disable toast messages

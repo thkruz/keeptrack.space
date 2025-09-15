@@ -272,7 +272,7 @@ const settingsOverride = {
     TopMenu: {
       enabled: true,
     },
-    SocialMedia: {
+    GithubLinkPlugin: {
       enabled: true,
     },
     DateTimeManager: {

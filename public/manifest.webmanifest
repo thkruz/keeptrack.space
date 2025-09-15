@@ -4,13 +4,13 @@
   "description": "3D Satellite Toolkit",
   "icons": [
     {
-      "src": "./img/favicons/android-chrome-512x512.png",
+      "src": "./img/favicons/web-app-manifest-512x512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
     },
     {
-      "src": "./img/favicons/android-chrome-192x192.png",
+      "src": "./img/favicons/web-app-manifest-192x192.png",
       "type": "image/png",
       "sizes": "192x192"
     }

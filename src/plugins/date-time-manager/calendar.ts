@@ -1,8 +1,9 @@
-import { ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class Calendar {
   private readonly containerId: string;
@@ -320,7 +321,7 @@ export class Calendar {
     const propRateRange = this.propRateLimitMax - this.propRateLimitMin;
     const propagationPercentage = ((propRate - this.propRateLimitMin) / propRateRange) * 100;
 
-    return keepTrackApi.html`
+    return html`
       <div class="ui-timepicker-div">
         <dl>
           <dt class="ui_tpicker_time_label">${t7e('time.calendar.time')}</dt>

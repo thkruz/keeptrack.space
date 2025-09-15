@@ -1,15 +1,17 @@
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import sputnickPng from '@public/img/icons/sputnick.png';
 import './tracking-impact-predict.css';
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
-import { SatMath } from '@app/static/sat-math';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { RAD2DEG } from 'ootk';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { html } from '@app/engine/utils/development/formatter';
 
 export interface TipMsg {
   'NORAD_CAT_ID': string,
@@ -37,7 +39,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
   bottomIconImg = sputnickPng;
   sideMenuElementName: string = 'tip-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
   <div id="tip-menu" class="side-menu-parent start-hidden text-select">
     <div id="tip-content" class="side-menu">
       <div class="row">
@@ -66,12 +68,12 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       this.uiManagerFinal_.bind(this),
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherMessage,
+      EventBusEvent.onCruncherMessage,
       () => {
         if (this.selectSatIdOnCruncher_ !== null) {
           // If selectedSatManager is loaded, set the selected sat to the one that was just added
@@ -151,7 +153,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     ));
 
     keepTrackApi.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
+    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
 
 
     keepTrackApi.getUiManager().doSearch(`${sat.sccNum5}`);

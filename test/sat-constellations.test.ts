@@ -1,30 +1,21 @@
+import { GroupsManager } from '@app/app/data/groups-manager';
+import { GroupType } from '@app/app/data/object-group';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { SatConstellations } from '@app/plugins/sat-constellations/sat-constellations';
-import { GroupsManager } from '@app/singletons/groups-manager';
-import { GroupType } from '@app/singletons/object-group';
-import { setupDefaultHtml, setupStandardEnvironment } from './environment/standard-env';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('SatConstellations_class', () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let satConstellationsPlugin: SatConstellations;
-
-  // eslint-disable-next-line no-console
-  console.debug(satConstellationsPlugin);
-
   beforeEach(() => {
-    setupDefaultHtml();
-    window.M = {
-      AutoInit: () => {
-        // Do nothing
-      },
-    } as unknown as typeof window.M;
-    satConstellationsPlugin = new SatConstellations();
+    PluginRegistry.unregisterAllPlugins();
+    setupStandardEnvironment([SelectSatManager]);
   });
 
-  standardPluginSuite(SatConstellations, 'SatConstellations');
-  standardPluginMenuButtonTests(SatConstellations, 'SatConstellations');
+  standardPluginSuite(SatConstellations);
+  standardPluginMenuButtonTests(SatConstellations);
 });
 
 /*
@@ -32,12 +23,15 @@ describe('SatConstellations_class', () => {
  * test the menu items.
  */
 describe('SatConstellations_test_all_links', () => {
-  const links = [];
+  const links = [] as HTMLElement[];
+  const selectSatManager = new SelectSatManager();
+
+  selectSatManager.init();
   const tempSatConstellationsPlugin = new SatConstellations();
 
   websiteInit(tempSatConstellationsPlugin);
 
-  getEl('constellation-menu')
+  getEl('constellation-menu')!
     .querySelectorAll('li')
     .forEach((element) => {
       links.push(element);
@@ -46,7 +40,8 @@ describe('SatConstellations_test_all_links', () => {
   let satConstellationsPlugin: SatConstellations;
 
   beforeEach(() => {
-    setupStandardEnvironment();
+    PluginRegistry.unregisterAllPlugins();
+    setupStandardEnvironment([SelectSatManager]);
     window.M = {
       AutoInit: () => {
         // Do nothing

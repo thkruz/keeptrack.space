@@ -22,12 +22,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { Classification } from '@app/app/ui/classification';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { Classification } from '@app/static/classification';
 import cameraPng from '@public/img/icons/camera.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class Screenshot extends KeepTrackPlugin {
   readonly id = 'Screenshot';
@@ -83,7 +85,7 @@ export class Screenshot extends KeepTrackPlugin {
   };
 
   rmbL1ElementName = 'save-rmb';
-  rmbL1Html = keepTrackApi.html`<li class="rmb-menu-item" id="${this.rmbL1ElementName}"><a href="#">Save Image &#x27A4;</a></li>`;
+  rmbL1Html = html`<li class="rmb-menu-item" id="${this.rmbL1ElementName}"><a href="#">Save Image &#x27A4;</a></li>`;
 
   isRmbOnEarth = true;
   isRmbOffEarth = true;
@@ -91,7 +93,7 @@ export class Screenshot extends KeepTrackPlugin {
   rmbMenuOrder = 20;
 
   rmbL2ElementName = 'save-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
     <ul class='dropdown-contents'>
       <li id="save-hd-rmb"><a href="#">HD (1920 x 1080)</a></li>
       <li id="save-4k-rmb"><a href="#">4K (3840 x 2160)</a></li>
@@ -123,12 +125,12 @@ export class Screenshot extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.altCanvasResize,
+      EventBusEvent.altCanvasResize,
       () => this.queuedScreenshot_,
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.endOfDraw,
+      EventBusEvent.endOfDraw,
       () => {
         if (this.queuedScreenshot_) {
           this.takeScreenShot();

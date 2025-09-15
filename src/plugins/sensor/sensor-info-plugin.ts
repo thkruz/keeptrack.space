@@ -1,13 +1,15 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { LineManager } from '@app/engine/rendering/line-manager';
+import { SensorToMoonLine } from '@app/engine/rendering/line-manager/sensor-to-moon-line';
+import { SensorToSunLine } from '@app/engine/rendering/line-manager/sensor-to-sun-line';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { LineManager } from '@app/singletons/draw-manager/line-manager';
-import { SensorToMoonLine } from '@app/singletons/draw-manager/line-manager/sensor-to-moon-line';
-import { SensorToSunLine } from '@app/singletons/draw-manager/line-manager/sensor-to-sun-line';
 import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { RfSensor, SpaceObjectType } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
+import { html } from '@app/engine/utils/development/formatter';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   readonly id = 'SensorInfoPlugin';
@@ -27,7 +29,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
   isIconDisabled = true;
 
   sideMenuElementName: string = 'sensor-info-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
     <div id="sensor-info-menu" class="side-menu-parent start-hidden text-select">
     <div id="sensor-content" class="side-menu">
         <div class="row">
@@ -100,7 +102,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
     keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+      EventBusEvent.uiManagerFinal,
       () => {
         this.addSensorToSunBtnListener_();
         this.addSensorToMoonBtnListener();
@@ -108,7 +110,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
     );
 
     keepTrackApi.on(
-      KeepTrackApiEvents.onLineAdded,
+      EventBusEvent.onLineAdded,
       (lineManager: LineManager) => {
         this.checkIfLinesVisible_(lineManager);
       },

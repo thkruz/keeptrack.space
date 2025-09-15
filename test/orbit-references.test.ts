@@ -1,6 +1,6 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { OrbitReferences } from '@app/plugins/orbit-references/orbit-references';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -20,9 +20,9 @@ describe('OrbitReferences', () => {
     const orbitReferences = new OrbitReferences();
 
     expect(() => orbitReferences.init()).not.toThrow();
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerInit);
-    keepTrackApi.emit(KeepTrackApiEvents.uiManagerFinal);
-    expect(() => keepTrackApi.emit(KeepTrackApiEvents.selectSatData, defaultSat, 0)).not.toThrow();
+    keepTrackApi.emit(EventBusEvent.uiManagerInit);
+    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+    expect(() => keepTrackApi.emit(EventBusEvent.selectSatData, defaultSat, 0)).not.toThrow();
 
     keepTrackApi.getCatalogManager().analSatSet = [defaultSat];
     keepTrackApi.getPlugin(SelectSatManager).selectSat(0);

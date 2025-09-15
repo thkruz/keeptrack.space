@@ -1,10 +1,10 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { GroupType } from '@app/app/data/object-group';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, setInnerHtml } from '@app/lib/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
-import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
-import { GroupType } from '@app/singletons/object-group';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
 
@@ -366,7 +366,7 @@ export class SettingsPresets {
     settings.colors.unknown = [0.5, 0.5, 0.5, 0.1];
     settings.colors.pink = [0.5, 0.5, 0.5, 0.1];
     keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherReady,
+      EventBusEvent.onCruncherReady,
       () => {
         setTimeout(() => {
           keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(43721) ?? -1);

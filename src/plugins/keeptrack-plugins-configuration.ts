@@ -43,6 +43,7 @@ export type KeepTrackPluginsConfiguration = {
   Collisions?: PluginConfiguration;
   TrackingImpactPredict?: PluginConfiguration;
   ColorMenu?: PluginConfiguration;
+  PlanetsMenuPlugin?: PluginConfiguration;
   SatConstellations?: PluginConfiguration;
   countriesMenu?: PluginConfiguration;
   DateTimeManager?: PluginConfiguration;
@@ -70,7 +71,8 @@ export type KeepTrackPluginsConfiguration = {
   SensorFov?: PluginConfiguration;
   SensorSurvFence?: PluginConfiguration;
   ShortTermFences?: PluginConfiguration;
-  SocialMedia?: PluginConfiguration;
+  GithubLinkPlugin?: PluginConfiguration;
+  LinkedInLinkPlugin?: PluginConfiguration;
   sounds?: PluginConfiguration;
   StereoMap?: PluginConfiguration;
   TimeMachine?: PluginConfiguration;

@@ -1,13 +1,14 @@
-import { sensors } from '@app/catalogs/sensors';
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { sensors } from '@app/app/data/catalogs/sensors';
+import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { dateFormat } from '@app/engine/utils/dateFormat';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { saveCsv } from '@app/engine/utils/saveVariable';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { dateFormat } from '@app/lib/dateFormat';
-import { getEl } from '@app/lib/get-el';
-import { saveCsv } from '@app/lib/saveVariable';
-import { showLoading } from '@app/lib/showLoading';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { SatMath } from '@app/static/sat-math';
-import { SensorMath, TearrData } from '@app/static/sensor-math';
 import tableRowsPng from '@public/img/icons/table-rows.png';
 import {
   BaseObject,
@@ -18,11 +19,12 @@ import {
   SpaceObjectType,
   TAU,
 } from 'ootk';
-import { sensorGroups } from '../../catalogs/sensor-groups';
-import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
+import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
+import { SensorManager } from '../../app/sensors/sensorManager';
+import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { SensorManager } from './sensorManager';
+import { html } from '@app/engine/utils/development/formatter';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
@@ -84,12 +86,12 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   };
 
   sideMenuElementName: string = 'multi-site-look-angles-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
     <div class="row"></div>
     <div class="row">
       <table id="multi-site-look-angles-table" class="center-align striped-light centered"></table>
     </div>`;
-  sideMenuSecondaryHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = html`
     <div class="row" style="margin: 0 10px;">
       <div id="multi-site-look-angles-sensor-list">
       </div>
@@ -118,7 +120,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         this.checkIfCanBeEnabled_(obj);
       },
@@ -142,7 +144,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
     keepTrackApi.on(
-      KeepTrackApiEvents.staticOffsetChange,
+      EventBusEvent.staticOffsetChange,
       () => {
         const sat = this.selectSatManager_?.getSelectedSat();
 

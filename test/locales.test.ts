@@ -1,4 +1,4 @@
-import { loadLocalization, LocaleInformation } from '@app/locales/locales';
+import { LocaleInformation, Localization } from '@app/locales/locales';
 import i18next from 'i18next';
 
 describe('Locales', () => {
@@ -22,7 +22,7 @@ describe('Locales', () => {
 
   it('should have a valid English translations', () => {
     i18next.changeLanguage('en');
-    const localization = loadLocalization();
+    const localization = Localization.getInstance();
 
     setup(localization);
     validateLocalizationKeys(localization, flatMapOfAllKeys);
@@ -30,7 +30,7 @@ describe('Locales', () => {
 
   it('should have a valid French translations', () => {
     i18next.changeLanguage('fr');
-    const localization = loadLocalization();
+    const localization = Localization.getInstance();
 
     setup(localization);
     validateLocalizationKeys(localization, flatMapOfAllKeys);
@@ -38,7 +38,7 @@ describe('Locales', () => {
 
   it('should have a valid Spanish translations', () => {
     i18next.changeLanguage('es');
-    const localization = loadLocalization();
+    const localization = Localization.getInstance();
 
     setup(localization);
     validateLocalizationKeys(localization, flatMapOfAllKeys);
@@ -46,7 +46,7 @@ describe('Locales', () => {
 
   it('should have a valid German translations', () => {
     i18next.changeLanguage('de');
-    const localization = loadLocalization();
+    const localization = Localization.getInstance();
 
     setup(localization);
     validateLocalizationKeys(localization, flatMapOfAllKeys);

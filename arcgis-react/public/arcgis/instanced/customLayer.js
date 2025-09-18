@@ -71,15 +71,12 @@
                 } catch (e) { if (DEBUG) console.error('updatePV failed', e); }
             },
             pick: function (mouseX, mouseY) {
-                console.log('CustomLayer pick called:', mouseX, mouseY);
                 if (!state.renderer || state.disposed) {
-                    console.log('Pick failed: no renderer or disposed', { renderer: !!state.renderer, disposed: state.disposed });
                     return -1;
                 }
                 try {
                     // Use stored matrices from last render
                     if (!state.lastViewMatrix || !state.lastProjectionMatrix) {
-                        console.log('No stored matrices available for picking');
                         return -1;
                     }
 
@@ -91,7 +88,6 @@
                         viewportWidth: state.view.width || state.view.container.clientWidth || 800,
                         viewportHeight: state.view.height || state.view.container.clientHeight || 600
                     };
-                    console.log('Pick params with stored matrices:', params);
                     return state.renderer.pick(params);
                 } catch (e) {
                     console.error('pick failed', e);

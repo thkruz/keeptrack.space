@@ -137,25 +137,17 @@ export const ArcGlobe: React.FC = () => {
                         clearInterval(id);
                         try {
                             instancedApi = (window as any).ArcgisInstanced.create(view, {});
-                            console.log('Instanced API created:', instancedApi);
 
                             // Add event handlers after API is ready
-                            console.log('Adding click event handler...');
                             view.on('click', (evt: any) => {
-                                console.log('Click event triggered!', evt);
-                                console.log('Event properties:', Object.keys(evt));
-                                console.log('Event x, y:', evt.x, evt.y);
                                 evt.stopPropagation();
                                 if (!instancedApi) {
-                                    console.log('No instanced API available');
                                     return;
                                 }
 
                                 const id = instancedApi.pick(evt.x, evt.y);
-                                console.log('Click picked ID:', id, 'at position:', evt.x, evt.y);
                                 if (id < 0) {
                                     // Clicked on empty space - clear selection
-                                    console.log('Clicked on empty space');
                                     if (selectedId !== null) {
                                         tracksLayer.removeAll();
                                         selectedId = null;
@@ -163,16 +155,13 @@ export const ArcGlobe: React.FC = () => {
                                     return;
                                 }
 
-                                console.log('Clicked on satellite ID:', id);
                                 if (id === selectedId) {
                                     // Clicked on same satellite - toggle off
-                                    console.log('Toggling off satellite');
                                     tracksLayer.removeAll();
                                     selectedId = null;
                                     hideTooltip();
                                 } else {
                                     // Clicked on different satellite - show orbit and info
-                                    console.log('Showing orbit for satellite:', id);
                                     selectedId = id;
 
                                     // Show satellite info tooltip
@@ -196,10 +185,8 @@ export const ArcGlobe: React.FC = () => {
                             });
 
                             // Hover handler for satellite info
-                            console.log('Adding hover event handler...');
                             view.on('pointer-move', (evt: any) => {
                                 if (!instancedApi) {
-                                    console.log('No instanced API for hover');
                                     return;
                                 }
 
@@ -210,7 +197,6 @@ export const ArcGlobe: React.FC = () => {
 
                                 hoverTimeout = setTimeout(() => {
                                     const id = instancedApi.pick(evt.x, evt.y);
-                                    console.log('Hover picked ID:', id, 'at position:', evt.x, evt.y);
                                     if (id >= 0 && metaRef[id] && id !== selectedId) {
                                         const sat = metaRef[id];
                                         const name = sat.name || 'SAT';
@@ -223,11 +209,9 @@ export const ArcGlobe: React.FC = () => {
 
                                         // Show hover tooltip (only if not already selected)
                                         showTooltip(evt.x, evt.y, html);
-                                        console.log('Hover info:', html);
                                     } else if (id < 0) {
                                         // Hide tooltip when not hovering over satellite
                                         hideTooltip();
-                                        console.log('No satellite found at hover position');
                                     }
                                 }, 100);
                             });

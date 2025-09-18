@@ -14,7 +14,10 @@
             lastPosBuf: null,
             lastVelBuf: null,
             lastCount: 0,
-            hasStash: false
+            hasStash: false,
+            // store last known matrices for picking
+            lastViewMatrix: null,
+            lastProjectionMatrix: null
         };
 
         const api = {
@@ -67,6 +70,34 @@
                     }
                 } catch (e) { if (DEBUG) console.error('updatePV failed', e); }
             },
+            pick: function (mouseX, mouseY) {
+                console.log('CustomLayer pick called:', mouseX, mouseY);
+                if (!state.renderer || state.disposed) {
+                    console.log('Pick failed: no renderer or disposed', { renderer: !!state.renderer, disposed: state.disposed });
+                    return -1;
+                }
+                try {
+                    // Use stored matrices from last render
+                    if (!state.lastViewMatrix || !state.lastProjectionMatrix) {
+                        console.log('No stored matrices available for picking');
+                        return -1;
+                    }
+
+                    const params = {
+                        viewMatrix: state.lastViewMatrix,
+                        projectionMatrix: state.lastProjectionMatrix,
+                        mouseX: mouseX,
+                        mouseY: mouseY,
+                        viewportWidth: state.view.width || state.view.container.clientWidth || 800,
+                        viewportHeight: state.view.height || state.view.container.clientHeight || 600
+                    };
+                    console.log('Pick params with stored matrices:', params);
+                    return state.renderer.pick(params);
+                } catch (e) {
+                    console.error('pick failed', e);
+                    return -1;
+                }
+            },
             dispose: function () { state.disposed = true; try { state.renderer && state.renderer.dispose && state.renderer.dispose(); } catch (e) { } }
         };
 
@@ -91,10 +122,18 @@
                         if (!state.renderer) return;
                         try {
                             const cam = context.camera;
+                            // Calculate camera ECEF position for distance-based sizing
+                            const cameraECEF = cam.position ? [cam.position.x, cam.position.y, cam.position.z] : [0, 0, 0];
+
+                            // Store matrices for picking
+                            state.lastViewMatrix = cam.viewMatrix;
+                            state.lastProjectionMatrix = cam.projectionMatrix;
+
                             const params = {
                                 viewMatrix: cam.viewMatrix,
                                 projectionMatrix: cam.projectionMatrix,
                                 worldFromEcef: context.spatialReference ? context.spatialReference.worldMatrix : null,
+                                cameraECEF: cameraECEF,
                                 nowMs: (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now(),
                                 epochMs: state.epochMs
                             };

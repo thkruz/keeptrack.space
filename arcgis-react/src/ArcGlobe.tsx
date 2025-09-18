@@ -22,6 +22,10 @@ export const ArcGlobe: React.FC = () => {
         const useInstanced = true;
         const DEBUG = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
         let instancedApi: any = null;
+        let selectedId: number | null = null;
+        let metaRef: any[] = [];
+        let hoverTimeout: NodeJS.Timeout | null = null;
+        let tooltip: HTMLElement | null = null;
 
         // If instanced flag is on, load glue scripts early
         if (useInstanced) {
@@ -69,6 +73,42 @@ export const ArcGlobe: React.FC = () => {
             return { type: 'polyline', paths: [pointsLngLatZ], spatialReference: { wkid: 4326 } } as const;
         }
 
+        function createTooltip() {
+            if (tooltip) return tooltip;
+
+            tooltip = document.createElement('div');
+            tooltip.style.cssText = `
+                position: absolute;
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 8px 12px;
+                border-radius: 4px;
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                pointer-events: none;
+                z-index: 1000;
+                max-width: 200px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            `;
+            document.body.appendChild(tooltip);
+            return tooltip;
+        }
+
+        function showTooltip(x: number, y: number, content: string) {
+            const tooltipEl = createTooltip();
+            tooltipEl.innerHTML = content;
+            tooltipEl.style.left = `${x + 10}px`;
+            tooltipEl.style.top = `${y - 10}px`;
+            tooltipEl.style.display = 'block';
+        }
+
+        function hideTooltip() {
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        }
+
         function start(Map: any, SceneView: any, GraphicsLayer: any, Graphic: any) {
             const map = new Map({ basemap: 'satellite', ground: 'world-elevation' });
 
@@ -78,7 +118,7 @@ export const ArcGlobe: React.FC = () => {
                 qualityProfile: 'high',
                 constraints: { altitude: { max: 12000000000 } },
                 environment: {
-                    lighting: { date: new Date(), directShadowsEnabled: false },
+                    lighting: { date: new Date(), directShadowsEnabled: true },
                     atmosphereEnabled: true,
                     starsEnabled: true,
                 },
@@ -97,6 +137,101 @@ export const ArcGlobe: React.FC = () => {
                         clearInterval(id);
                         try {
                             instancedApi = (window as any).ArcgisInstanced.create(view, {});
+                            console.log('Instanced API created:', instancedApi);
+
+                            // Add event handlers after API is ready
+                            console.log('Adding click event handler...');
+                            view.on('click', (evt: any) => {
+                                console.log('Click event triggered!', evt);
+                                console.log('Event properties:', Object.keys(evt));
+                                console.log('Event x, y:', evt.x, evt.y);
+                                evt.stopPropagation();
+                                if (!instancedApi) {
+                                    console.log('No instanced API available');
+                                    return;
+                                }
+
+                                const id = instancedApi.pick(evt.x, evt.y);
+                                console.log('Click picked ID:', id, 'at position:', evt.x, evt.y);
+                                if (id < 0) {
+                                    // Clicked on empty space - clear selection
+                                    console.log('Clicked on empty space');
+                                    if (selectedId !== null) {
+                                        tracksLayer.removeAll();
+                                        selectedId = null;
+                                    }
+                                    return;
+                                }
+
+                                console.log('Clicked on satellite ID:', id);
+                                if (id === selectedId) {
+                                    // Clicked on same satellite - toggle off
+                                    console.log('Toggling off satellite');
+                                    tracksLayer.removeAll();
+                                    selectedId = null;
+                                    hideTooltip();
+                                } else {
+                                    // Clicked on different satellite - show orbit and info
+                                    console.log('Showing orbit for satellite:', id);
+                                    selectedId = id;
+
+                                    // Show satellite info tooltip
+                                    if (metaRef[id]) {
+                                        const sat = metaRef[id];
+                                        const name = sat.name || 'SAT';
+                                        const norad = sat.norad ? String(sat.norad) : '—';
+                                        const launch = sat.launchDate || '—';
+                                        const country = (sat.country || '').toString().toUpperCase();
+                                        const flagUrl = country && country.length <= 3 ? `/flags/${country.toLowerCase()}.png` : '';
+                                        const img = flagUrl ? `<img src="${flagUrl}" alt="${country}" style="height:12px;vertical-align:middle;margin-right:6px"/>` : '';
+                                        const html = `${img}<b>${name}</b><br/>NORAD: ${norad}<br/>Launched: ${launch}`;
+
+                                        showTooltip(evt.x, evt.y, html);
+                                    }
+
+                                    if (worker) {
+                                        worker.postMessage({ type: 'track', id: id });
+                                    }
+                                }
+                            });
+
+                            // Hover handler for satellite info
+                            console.log('Adding hover event handler...');
+                            view.on('pointer-move', (evt: any) => {
+                                if (!instancedApi) {
+                                    console.log('No instanced API for hover');
+                                    return;
+                                }
+
+                                // Debounce hover picking
+                                if (hoverTimeout) {
+                                    clearTimeout(hoverTimeout);
+                                }
+
+                                hoverTimeout = setTimeout(() => {
+                                    const id = instancedApi.pick(evt.x, evt.y);
+                                    console.log('Hover picked ID:', id, 'at position:', evt.x, evt.y);
+                                    if (id >= 0 && metaRef[id] && id !== selectedId) {
+                                        const sat = metaRef[id];
+                                        const name = sat.name || 'SAT';
+                                        const norad = sat.norad ? String(sat.norad) : '—';
+                                        const launch = sat.launchDate || '—';
+                                        const country = (sat.country || '').toString().toUpperCase();
+                                        const flagUrl = country && country.length <= 3 ? `/flags/${country.toLowerCase()}.png` : '';
+                                        const img = flagUrl ? `<img src="${flagUrl}" alt="${country}" style="height:12px;vertical-align:middle;margin-right:6px"/>` : '';
+                                        const html = `${img}<b>${name}</b><br/>NORAD: ${norad}<br/>Launched: ${launch}`;
+
+                                        // Show hover tooltip (only if not already selected)
+                                        showTooltip(evt.x, evt.y, html);
+                                        console.log('Hover info:', html);
+                                    } else if (id < 0) {
+                                        // Hide tooltip when not hovering over satellite
+                                        hideTooltip();
+                                        console.log('No satellite found at hover position');
+                                    }
+                                }, 100);
+                            });
+
                         } catch (e) { if (DEBUG) console.error('[ArcGlobe] instanced create failed', e); }
                     }
                 }, 50);
@@ -173,18 +308,25 @@ export const ArcGlobe: React.FC = () => {
                     });
                 }
 
-                if (useInstanced) {
-                    // In instanced mode, refresh lighting continuously to avoid visible lag
+                // Set lighting date and update it periodically for dynamic lighting
+                view.environment.lighting.date = new Date();
+
+                // Update lighting every second for dynamic terminator
+                setInterval(() => {
                     try {
-                        view.on('frame-update', () => { view.environment.lighting.date = new Date(); });
-                    } catch {
-                        // Fallback: frequent timer
-                        setInterval(() => { try { view.environment.lighting.date = new Date(); } catch { } }, 33);
-                        // best effort cleanup on destroy handled below
-                    }
-                } else {
-                    setInterval(() => { view.environment.lighting.date = new Date(); }, 1000);
-                }
+                        view.environment.lighting.date = new Date();
+                    } catch (e) { }
+                }, 1000);
+
+                // Watch camera changes to trigger re-renders
+                view.watch('camera', () => {
+                    try {
+                        require(['esri/views/3d/externalRenderers'], function (externalRenderers) {
+                            externalRenderers.requestRender(view);
+                        });
+                    } catch (e) { }
+                });
+
 
                 if (!useInstanced) {
                     let uiRef: any = null;
@@ -239,9 +381,12 @@ export const ArcGlobe: React.FC = () => {
                     }
 
                     try {
+                        // Store metadata reference for picking
+                        metaRef = (datasets.main || []).slice(0, MAX_SATS);
+
                         // Use classic worker served from public to avoid bundler issues
                         worker = new Worker('/arcgis/worker.js');
-                        const payload = (datasets.main || []).slice(0, MAX_SATS).map((s: any, idx: number) => ({ id: idx, name: s.name || 'SAT', tle1: s.tle1, tle2: s.tle2 }));
+                        const payload = metaRef.map((s: any, idx: number) => ({ id: idx, name: s.name || 'SAT', tle1: s.tle1, tle2: s.tle2 }));
                         worker.postMessage({ type: 'init', payload });
 
                         worker.onmessage = (ev: MessageEvent) => {
@@ -318,6 +463,8 @@ export const ArcGlobe: React.FC = () => {
         return () => {
             try { (view as any)?.destroy?.(); } catch { }
             try { worker?.terminate?.(); } catch { }
+            try { if (hoverTimeout) clearTimeout(hoverTimeout); } catch { }
+            try { if (tooltip) tooltip.remove(); } catch { }
         };
     }, []);
 

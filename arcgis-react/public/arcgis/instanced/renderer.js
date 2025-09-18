@@ -14,7 +14,11 @@
     layout(location=0) in vec3 aLonLatH; // degrees, degrees, meters
     uniform mat4 uView;
     uniform mat4 uProj;
-    uniform float uPointSize;
+    uniform float uBaseSize;
+    uniform float uMinSize;
+    uniform float uMaxSize;
+    uniform float uSizeD0;
+    uniform vec3 uCameraECEF;
 
     // WGS84 constants
     const float a = 6378137.0;
@@ -37,7 +41,11 @@
     void main(){
         vec3 ecef = wgs84ToECEF(aLonLatH.x, aLonLatH.y, aLonLatH.z);
         gl_Position = uProj * uView * vec4(ecef, 1.0);
-        gl_PointSize = uPointSize;
+        
+        // Distance-based sizing
+        float dist = length(ecef - uCameraECEF);
+        float size = uBaseSize * (uSizeD0 / (dist + uSizeD0));
+        gl_PointSize = clamp(size, uMinSize, uMaxSize);
     }`;
 
     const FS = `#version 300 es
@@ -81,7 +89,11 @@
 
         const uViewLoc = gl.getUniformLocation(program, 'uView');
         const uProjLoc = gl.getUniformLocation(program, 'uProj');
-        const uPointSizeLoc = gl.getUniformLocation(program, 'uPointSize');
+        const uBaseSizeLoc = gl.getUniformLocation(program, 'uBaseSize');
+        const uMinSizeLoc = gl.getUniformLocation(program, 'uMinSize');
+        const uMaxSizeLoc = gl.getUniformLocation(program, 'uMaxSize');
+        const uSizeD0Loc = gl.getUniformLocation(program, 'uSizeD0');
+        const uCameraECEFLoc = gl.getUniformLocation(program, 'uCameraECEF');
 
         const vao = gl.createVertexArray();
         gl.bindVertexArray(vao);
@@ -107,7 +119,10 @@
             instanceBuffer: instanceBuffer,
             count: 0,
             visibleCount: 0,
-            pointSize: (options && options.pointSize) || 4.0,
+            baseSize: (options && options.baseSize) || 9.0,
+            minSize: (options && options.minSize) || 2.5,
+            maxSize: (options && options.maxSize) || 14.0,
+            sizeD0: (options && options.sizeD0) || 7.0e6,
             disposed: false,
             frontBuffer: null,
             backBuffer: null,
@@ -187,31 +202,105 @@
             if (state.count <= 0) return;
 
             uploadIfNeeded(params);
-            console.log('called uploadIfNeeded: ')
-            console.log('visibleCount: ', state.visibleCount)
             if (state.visibleCount <= 0) {
                 return;
             };
 
             gl.useProgram(state.program);
             gl.bindVertexArray(state.vao);
-            console.log('called gl.useProgram: ')
             if (params && params.viewMatrix && params.projectionMatrix) {
                 gl.uniformMatrix4fv(uViewLoc, false, params.viewMatrix);
                 gl.uniformMatrix4fv(uProjLoc, false, params.projectionMatrix);
             }
-            gl.uniform1f(uPointSizeLoc, state.pointSize);
-            console.log('called gl.uniform1f: ')
+            gl.uniform1f(uBaseSizeLoc, state.baseSize);
+            gl.uniform1f(uMinSizeLoc, state.minSize);
+            gl.uniform1f(uMaxSizeLoc, state.maxSize);
+            gl.uniform1f(uSizeD0Loc, state.sizeD0);
+            if (params && params.cameraECEF) {
+                gl.uniform3fv(uCameraECEFLoc, params.cameraECEF);
+            }
 
             gl.enable(gl.DEPTH_TEST);
             gl.depthFunc(gl.LEQUAL);
             gl.enable(gl.BLEND);
             gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-            console.log('called gl.blendFuncSeparate: ')
-            console.log('[instanced] draw visibleCount=', state.visibleCount);
             gl.drawArraysInstanced(gl.POINTS, 0, 1, state.visibleCount);
 
             gl.bindVertexArray(null);
+        }
+
+        function pick(params) {
+            if (state.disposed || state.visibleCount <= 0) {
+                return -1;
+            }
+            if (!params || !params.viewMatrix || !params.projectionMatrix ||
+                typeof params.mouseX !== 'number' || typeof params.mouseY !== 'number' ||
+                typeof params.viewportWidth !== 'number' || typeof params.viewportHeight !== 'number') {
+                return -1;
+            }
+
+            const src = new Float32Array(state.frontBuffer);
+            const dst = new Float32Array(state.packedBuffer);
+            let write = 0;
+
+            // Rebuild visible list for picking
+            if (params && params.viewMatrix && params.projectionMatrix) {
+                const mvp = new Float32Array(16);
+                mat4Multiply(mvp, params.projectionMatrix, params.viewMatrix);
+
+                for (let i = 0; i < state.count; i++) {
+                    const j = i * 3;
+                    const lon = src[j], lat = src[j + 1], h = src[j + 2];
+                    // Convert lon/lat/h → ECEF for culling
+                    const latR = lat * Math.PI / 180.0; const lonR = lon * Math.PI / 180.0;
+                    const s = Math.sin(latR); const N = 6378137.0 / Math.sqrt(1.0 - 6.69437999014e-3 * s * s);
+                    const cosLat = Math.cos(latR); const cosLon = Math.cos(lonR); const sinLon = Math.sin(lonR);
+                    const x = (N + h) * cosLat * cosLon; const y = (N + h) * cosLat * sinLon; const z = (N * (1.0 - 6.69437999014e-3) + h) * s;
+                    const v = [x, y, z, 1.0];
+                    const w = v[3]; if (w <= 0.0) continue;
+                    const nx = v[0] / w, ny = v[1] / w, nz = v[2] / w;
+                    // Skip frustum culling for picking - we want all visible points
+                    dst[write++] = lon; dst[write++] = lat; dst[write++] = h;
+                }
+            } else {
+                dst.set(src); write = src.length;
+            }
+
+            const visibleCount = Math.floor(write / 3);
+            if (visibleCount <= 0) return -1;
+
+            // Convert mouse coordinates to normalized device coordinates
+            const x = (2.0 * params.mouseX) / params.viewportWidth - 1.0;
+            const y = 1.0 - (2.0 * params.mouseY) / params.viewportHeight;
+
+            let closestId = -1;
+            let closestDist = Infinity;
+            const pickRadius = 0.02; // Adjust for sensitivity
+
+            for (let i = 0; i < visibleCount; i++) {
+                const j = i * 3;
+                const lon = dst[j], lat = dst[j + 1], h = dst[j + 2];
+
+                // Convert to ECEF and project
+                const latR = lat * Math.PI / 180.0; const lonR = lon * Math.PI / 180.0;
+                const s = Math.sin(latR); const N = 6378137.0 / Math.sqrt(1.0 - 6.69437999014e-3 * s * s);
+                const cosLat = Math.cos(latR); const cosLon = Math.cos(lonR); const sinLon = Math.sin(lonR);
+                const ecefX = (N + h) * cosLat * cosLon; const ecefY = (N + h) * cosLat * sinLon; const ecefZ = (N * (1.0 - 6.69437999014e-3) + h) * s;
+
+                const mvp = new Float32Array(16);
+                mat4Multiply(mvp, params.projectionMatrix, params.viewMatrix);
+                const v = mulMat4Vec4(mvp, ecefX, ecefY, ecefZ, 1.0);
+                const w = v[3]; if (w <= 0.0) continue;
+                const px = v[0] / w, py = v[1] / w;
+
+                const dist = Math.sqrt((px - x) * (px - x) + (py - y) * (py - y));
+                if (dist < pickRadius && dist < closestDist) {
+                    closestDist = dist;
+                    closestId = i; // Return visible index
+                }
+            }
+
+            return closestId;
         }
 
         function dispose() {
@@ -231,6 +320,7 @@
             updatePositions: updatePositions,
             updatePV: updatePV,
             draw: draw,
+            pick: pick,
             dispose: dispose
         };
     }

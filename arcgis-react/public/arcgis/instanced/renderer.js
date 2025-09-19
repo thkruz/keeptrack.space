@@ -151,6 +151,7 @@
             maxSize: (options && options.maxSize) || 14.0,
             sizeD0: (options && options.sizeD0) || 7.0e6,
             selectedId: -1, // -1 means no selection
+            highlightedSatellites: [], // Array of satellite IDs to highlight
             disposed: false,
             frontBuffer: null,
             backBuffer: null,
@@ -349,12 +350,19 @@
             state.selectedId = id;
         }
 
+        function setHighlightedSatellites(satelliteIds) {
+            state.highlightedSatellites = satelliteIds || [];
+            console.log('Highlighting satellites:', satelliteIds);
+            // For now, just log the highlighting - we'll implement visual highlighting later
+        }
+
         return {
             updatePositions: updatePositions,
             updatePV: updatePV,
             draw: draw,
             pick: pick,
             setSelectedId: setSelectedId,
+            setHighlightedSatellites: setHighlightedSatellites,
             dispose: dispose
         };
     }

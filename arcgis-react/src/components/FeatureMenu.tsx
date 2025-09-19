@@ -8,13 +8,15 @@ interface FeatureMenuProps {
     selectedFeature: string | null;
     onSearchSatellites?: (query: string) => void;
     onShowUserCreated?: () => void;
+    onTestConstellations?: () => void;
 }
 
 export const FeatureMenu: React.FC<FeatureMenuProps> = ({
     onFeatureSelect,
     selectedFeature,
     onSearchSatellites,
-    onShowUserCreated
+    onShowUserCreated,
+    onTestConstellations
 }) => {
     const [activeTab, setActiveTab] = useState<MenuTab>('basic');
     const [isExpanded, setIsExpanded] = useState(false);
@@ -24,6 +26,7 @@ export const FeatureMenu: React.FC<FeatureMenuProps> = ({
         basic: [
             { id: 'collision', name: 'Collision Analysis', icon: '⚠️', description: 'View potential satellite collisions' },
             { id: 'create-satellite', name: 'Create Satellite', icon: '🛰️', description: 'Add new satellite to simulation' },
+            { id: 'test-constellations', name: 'Test Constellations', icon: '🌌', description: 'Analyze satellite constellations' },
             { id: 'new-launch', name: 'New Launch', icon: '🚀', description: 'Simulate satellite launch' }
         ],
         advanced: [
@@ -35,7 +38,11 @@ export const FeatureMenu: React.FC<FeatureMenuProps> = ({
     };
 
     const handleFeatureClick = (featureId: string) => {
-        onFeatureSelect(featureId);
+        if (featureId === 'test-constellations') {
+            handleTestConstellations();
+        } else {
+            onFeatureSelect(featureId);
+        }
     };
 
     const handleTabClick = (tab: MenuTab) => {
@@ -53,6 +60,12 @@ export const FeatureMenu: React.FC<FeatureMenuProps> = ({
     const handleShowUserCreated = () => {
         if (onShowUserCreated) {
             onShowUserCreated();
+        }
+    };
+
+    const handleTestConstellations = () => {
+        if (onTestConstellations) {
+            onTestConstellations();
         }
     };
 

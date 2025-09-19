@@ -198,6 +198,7 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    position: relative;
 }
 
 .list-header {
@@ -257,6 +258,7 @@
     padding: 0;
     min-height: 0;
     max-height: 400px;
+    position: relative;
 }
 
 .table-header {
@@ -264,7 +266,7 @@
     grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
     gap: 16px;
     padding: 12px 24px;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(15, 15, 15, 0.95);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     font-weight: 600;
     font-size: 12px;
@@ -275,6 +277,8 @@
     top: 0;
     z-index: 10;
     flex-shrink: 0;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .collision-row {

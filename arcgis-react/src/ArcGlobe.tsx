@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { CollisionAnalysis, type CollisionEvent } from './components/CollisionAnalysis';
+import { ConstellationAnalysis, type Constellation } from './components/ConstellationAnalysis';
 import { CreateSatellite, type SatelliteFormData } from './components/CreateSatellite';
 import { FeatureMenu } from './components/FeatureMenu';
 import { SatelliteService, type SatelliteData } from './services/satelliteService';
@@ -16,6 +17,7 @@ declare global {
 
 export const ArcGlobe: React.FC = () => {
     const divRef = useRef<HTMLDivElement | null>(null);
+    const instancedApiRef = useRef<any>(null);
     const satelliteService = SatelliteService.getInstance();
     const tooltipService = TooltipService.getInstance();
 
@@ -23,6 +25,7 @@ export const ArcGlobe: React.FC = () => {
     const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
     const [showCollisionAnalysis, setShowCollisionAnalysis] = useState(false);
     const [showCreateSatellite, setShowCreateSatellite] = useState(false);
+    const [showConstellationAnalysis, setShowConstellationAnalysis] = useState(false);
 
     // Feature handlers
     const handleFeatureSelect = (feature: string) => {
@@ -65,6 +68,30 @@ export const ArcGlobe: React.FC = () => {
     const handleCloseCreateSatellite = () => {
         setShowCreateSatellite(false);
         setSelectedFeature(null);
+    };
+
+    const handleTestConstellations = () => {
+        setShowConstellationAnalysis(true);
+    };
+
+    const handleCloseConstellationAnalysis = () => {
+        setShowConstellationAnalysis(false);
+    };
+
+    const handleConstellationSelect = (constellation: Constellation) => {
+        console.log('Constellation selected:', constellation);
+    };
+
+    const handleConstellationHighlight = (constellation: Constellation | null) => {
+        // Highlight constellation satellites on the globe
+        if (constellation && instancedApiRef.current) {
+            const satelliteIds = constellation.satellites.map(sat => sat.id);
+            instancedApiRef.current.setHighlightedSatellites(satelliteIds);
+            console.log(`Highlighting constellation ${constellation.name} with ${satelliteIds.length} satellites`);
+        } else if (instancedApiRef.current) {
+            instancedApiRef.current.setHighlightedSatellites([]);
+            console.log('Clearing constellation highlight');
+        }
     };
 
     const handleSatelliteCreated = (satelliteData: SatelliteFormData) => {
@@ -140,6 +167,7 @@ export const ArcGlobe: React.FC = () => {
                         clearInterval(id);
                         try {
                             instancedApi = (window as any).ArcgisInstanced.create(view, {});
+                            instancedApiRef.current = instancedApi;
 
                             // Add event handlers after API is ready
                             view.on('click', (evt: any) => {
@@ -316,42 +344,48 @@ export const ArcGlobe: React.FC = () => {
                             launchDate: s.launchDate,
                             country: s.country
                         }));
-                        worker.postMessage({ type: 'init', payload });
+                        if (worker) {
+                            worker.postMessage({ type: 'init', payload });
 
-                        // Test if worker is responding
-                        setTimeout(() => {
-                            console.log('ArcGlobe: Testing worker communication...');
-                            worker.postMessage({ type: 'test', message: 'Hello worker' });
-                        }, 1000);
+                            // Test if worker is responding
+                            setTimeout(() => {
+                                console.log('ArcGlobe: Testing worker communication...');
+                                if (worker) {
+                                    worker.postMessage({ type: 'test', message: 'Hello worker' });
+                                }
+                            }, 1000);
 
-                        // Initialize satellite service
-                        satelliteService.initialize(satelliteData, worker);
+                            // Initialize satellite service
+                            satelliteService.initialize(satelliteData, worker);
+                        }
 
-                        worker.onmessage = (ev: MessageEvent) => {
-                            const data: any = ev.data || {};
-                            if (data.type === 'log' && DEBUG) { console.log('[worker]', data.msg); return; }
-                            // Ignore PV for now; renderer expects lon/lat/h. Use 'positions' path below.
-                            if (data.type === 'positions' && data.positions) {
-                                const arr = data.positions instanceof Float32Array ? data.positions : new Float32Array(data.positions as ArrayBuffer);
-                                if (useInstanced && instancedApi) {
-                                    instancedApi.updatePositions(arr.buffer, Math.floor(arr.length / 3));
+                        if (worker) {
+                            worker.onmessage = (ev: MessageEvent) => {
+                                const data: any = ev.data || {};
+                                if (data.type === 'log' && DEBUG) { console.log('[worker]', data.msg); return; }
+                                // Ignore PV for now; renderer expects lon/lat/h. Use 'positions' path below.
+                                if (data.type === 'positions' && data.positions) {
+                                    const arr = data.positions instanceof Float32Array ? data.positions : new Float32Array(data.positions as ArrayBuffer);
+                                    if (useInstanced && instancedApi) {
+                                        instancedApi.updatePositions(arr.buffer, Math.floor(arr.length / 3));
+                                    }
+                                } else if (data.type === 'track' && data.positions) {
+                                    const arr = new Float32Array(data.positions);
+                                    const path: number[][] = [];
+                                    for (let k = 0; k < arr.length; k += 3) {
+                                        const x = arr[k], y = arr[k + 1], z = arr[k + 2];
+                                        if (!Number.isNaN(x) && !Number.isNaN(y) && !Number.isNaN(z)) path.push([x, y, z]);
+                                    }
+                                    if (path.length > 1) {
+                                        const line = new Graphic({
+                                            geometry: createTrackPolyline(path),
+                                            symbol: { type: 'line-3d', symbolLayers: [{ type: 'line', size: 2, material: { color: [192, 192, 192, 0.6] } }] },
+                                        });
+                                        tracksLayer.add(line);
+                                    }
                                 }
-                            } else if (data.type === 'track' && data.positions) {
-                                const arr = new Float32Array(data.positions);
-                                const path: number[][] = [];
-                                for (let k = 0; k < arr.length; k += 3) {
-                                    const x = arr[k], y = arr[k + 1], z = arr[k + 2];
-                                    if (!Number.isNaN(x) && !Number.isNaN(y) && !Number.isNaN(z)) path.push([x, y, z]);
-                                }
-                                if (path.length > 1) {
-                                    const line = new Graphic({
-                                        geometry: createTrackPolyline(path),
-                                        symbol: { type: 'line-3d', symbolLayers: [{ type: 'line', size: 2, material: { color: [192, 192, 192, 0.6] } }] },
-                                    });
-                                    tracksLayer.add(line);
-                                }
-                            }
-                        };
+                            };
+                        }
 
                         setInterval(() => {
                             if (worker) worker.postMessage({ type: 'tick', time: Date.now() });
@@ -400,6 +434,7 @@ export const ArcGlobe: React.FC = () => {
                 selectedFeature={selectedFeature}
                 onSearchSatellites={handleSearchSatellites}
                 onShowUserCreated={handleShowUserCreated}
+                onTestConstellations={handleTestConstellations}
             />
             <CollisionAnalysis
                 isVisible={showCollisionAnalysis}
@@ -410,6 +445,12 @@ export const ArcGlobe: React.FC = () => {
                 isVisible={showCreateSatellite}
                 onClose={handleCloseCreateSatellite}
                 onSatelliteCreated={handleSatelliteCreated}
+            />
+            <ConstellationAnalysis
+                isVisible={showConstellationAnalysis}
+                onClose={handleCloseConstellationAnalysis}
+                onConstellationSelect={handleConstellationSelect}
+                onConstellationHighlight={handleConstellationHighlight}
             />
         </>
     );

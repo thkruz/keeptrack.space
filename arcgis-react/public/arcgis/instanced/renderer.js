@@ -19,6 +19,10 @@
     uniform float uMaxSize;
     uniform float uSizeD0;
     uniform vec3 uCameraECEF;
+    uniform int uSelectedId;
+
+    out float vInstanceId;
+    out float vIsSelected;
 
     // WGS84 constants
     const float a = 6378137.0;
@@ -42,21 +46,38 @@
         vec3 ecef = wgs84ToECEF(aLonLatH.x, aLonLatH.y, aLonLatH.z);
         gl_Position = uProj * uView * vec4(ecef, 1.0);
         
-        // Distance-based sizing
+        // Pass instance ID and selection status to fragment shader
+        vInstanceId = float(gl_InstanceID);
+        vIsSelected = float(gl_InstanceID == uSelectedId ? 1.0 : 0.0);
+        
+        // Distance-based sizing with larger size for selected satellite
         float dist = length(ecef - uCameraECEF);
         float size = uBaseSize * (uSizeD0 / (dist + uSizeD0));
+        if (gl_InstanceID == uSelectedId) {
+            size *= 2.0; // Make selected satellite twice as big
+        }
         gl_PointSize = clamp(size, uMinSize, uMaxSize);
     }`;
 
     const FS = `#version 300 es
     precision mediump float;
+    in float vInstanceId;
+    in float vIsSelected;
     out vec4 outColor;
     void main(){
         vec2 c = gl_PointCoord * 2.0 - 1.0;
         float r2 = dot(c, c);
         if (r2 > 1.0) discard;
         float alpha = smoothstep(1.0, 0.8, 1.0 - r2);
-        outColor = vec4(1.0, 0.8, 0.1, alpha);
+        
+        // Check if this is the selected satellite
+        if (vIsSelected > 0.5) {
+            // Selected satellite: green and brighter
+            outColor = vec4(0.2, 1.0, 0.2, alpha * 1.2);
+        } else {
+            // Normal satellite: yellow
+            outColor = vec4(1.0, 0.8, 0.1, alpha);
+        }
     }`;
 
     function mulMat4Vec4(m, x, y, z, w) {
@@ -94,6 +115,7 @@
         const uMaxSizeLoc = gl.getUniformLocation(program, 'uMaxSize');
         const uSizeD0Loc = gl.getUniformLocation(program, 'uSizeD0');
         const uCameraECEFLoc = gl.getUniformLocation(program, 'uCameraECEF');
+        const uSelectedIdLoc = gl.getUniformLocation(program, 'uSelectedId');
 
         const vao = gl.createVertexArray();
         gl.bindVertexArray(vao);
@@ -123,6 +145,7 @@
             minSize: (options && options.minSize) || 2.5,
             maxSize: (options && options.maxSize) || 14.0,
             sizeD0: (options && options.sizeD0) || 7.0e6,
+            selectedId: -1, // -1 means no selection
             disposed: false,
             frontBuffer: null,
             backBuffer: null,
@@ -216,6 +239,7 @@
             gl.uniform1f(uMinSizeLoc, state.minSize);
             gl.uniform1f(uMaxSizeLoc, state.maxSize);
             gl.uniform1f(uSizeD0Loc, state.sizeD0);
+            gl.uniform1i(uSelectedIdLoc, state.selectedId);
             if (params && params.cameraECEF) {
                 gl.uniform3fv(uCameraECEFLoc, params.cameraECEF);
             }
@@ -316,11 +340,16 @@
             return updatePositions(posBuf, count);
         }
 
+        function setSelectedId(id) {
+            state.selectedId = id;
+        }
+
         return {
             updatePositions: updatePositions,
             updatePV: updatePV,
             draw: draw,
             pick: pick,
+            setSelectedId: setSelectedId,
             dispose: dispose
         };
     }

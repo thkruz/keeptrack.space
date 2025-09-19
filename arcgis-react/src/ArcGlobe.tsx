@@ -156,6 +156,8 @@ export const ArcGlobe: React.FC = () => {
                                             tracksLayer.removeAll();
                                             selectedId = null;
                                             hideTooltip();
+                                            // Clear selection in renderer
+                                            instancedApi.setSelectedId(-1);
                                         }
                                         return;
                                     }
@@ -165,9 +167,13 @@ export const ArcGlobe: React.FC = () => {
                                         tracksLayer.removeAll();
                                         selectedId = null;
                                         hideTooltip();
+                                        // Clear selection in renderer
+                                        instancedApi.setSelectedId(-1);
                                     } else {
                                         // Clicked on different satellite - show orbit and info
                                         selectedId = id;
+                                        // Highlight selected satellite in renderer
+                                        instancedApi.setSelectedId(id);
 
                                         // Show satellite info tooltip
                                         if (metaRef[id]) {

@@ -50,11 +50,13 @@
         vInstanceId = float(gl_InstanceID);
         vIsSelected = float(gl_InstanceID == uSelectedId ? 1.0 : 0.0);
         
-        // Distance-based sizing with larger size for selected satellite
+        // Distance-based sizing with larger size for selected satellite and user-created satellites
         float dist = length(ecef - uCameraECEF);
         float size = uBaseSize * (uSizeD0 / (dist + uSizeD0));
         if (gl_InstanceID == uSelectedId) {
             size *= 2.0; // Make selected satellite twice as big
+        } else if (float(gl_InstanceID) >= 30000.0) {
+            size *= 5.5; // Make user-created satellites 5.5x bigger
         }
         gl_PointSize = clamp(size, uMinSize, uMaxSize);
     }`;
@@ -74,6 +76,9 @@
         if (vIsSelected > 0.5) {
             // Selected satellite: green and brighter
             outColor = vec4(0.2, 1.0, 0.2, alpha * 1.2);
+        } else if (vInstanceId >= 30000.0) {
+            // User-created satellites: bright cyan and larger
+            outColor = vec4(0.0, 1.0, 1.0, alpha * 1.5);
         } else {
             // Normal satellite: yellow
             outColor = vec4(1.0, 0.8, 0.1, alpha);

@@ -24,7 +24,7 @@ export const ArcGlobe: React.FC = () => {
         let instancedApi: any = null;
         let selectedId: number | null = null;
         let metaRef: any[] = [];
-        let hoverTimeout: NodeJS.Timeout | null = null;
+        let hoverTimeout: number | null = null;
         let tooltip: HTMLElement | null = null;
 
         // If instanced flag is on, load glue scripts early
@@ -79,17 +79,19 @@ export const ArcGlobe: React.FC = () => {
             tooltip = document.createElement('div');
             tooltip.style.cssText = `
                 position: absolute;
-                background: rgba(0, 0, 0, 0.8);
+                background: rgba(15, 15, 15, 0.95);
                 color: white;
-                padding: 8px 12px;
-                border-radius: 4px;
-                font-family: Arial, sans-serif;
+                padding: 12px 16px;
+                border-radius: 8px;
+                font-family: 'Segoe UI', Arial, sans-serif;
                 font-size: 12px;
                 pointer-events: none;
                 z-index: 1000;
-                max-width: 200px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-                border: 1px solid rgba(255, 255, 255, 0.2);
+                max-width: 250px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(10px);
+                transition: opacity 0.2s ease-in-out;
             `;
             document.body.appendChild(tooltip);
             return tooltip;
@@ -145,43 +147,74 @@ export const ArcGlobe: React.FC = () => {
                                     return;
                                 }
 
-                                const id = instancedApi.pick(evt.x, evt.y);
-                                if (id < 0) {
-                                    // Clicked on empty space - clear selection
-                                    if (selectedId !== null) {
+                                // Add small delay to ensure picking is stable
+                                setTimeout(() => {
+                                    const id = instancedApi.pick(evt.x, evt.y);
+                                    if (id < 0) {
+                                        // Clicked on empty space - clear selection
+                                        if (selectedId !== null) {
+                                            tracksLayer.removeAll();
+                                            selectedId = null;
+                                            hideTooltip();
+                                        }
+                                        return;
+                                    }
+
+                                    if (id === selectedId) {
+                                        // Clicked on same satellite - toggle off
                                         tracksLayer.removeAll();
                                         selectedId = null;
+                                        hideTooltip();
+                                    } else {
+                                        // Clicked on different satellite - show orbit and info
+                                        selectedId = id;
+
+                                        // Show satellite info tooltip
+                                        if (metaRef[id]) {
+                                            const sat = metaRef[id];
+                                            const name = sat.name || 'Unknown Satellite';
+                                            const norad = sat.norad ? String(sat.norad) : 'N/A';
+                                            const launch = sat.launchDate ? new Date(sat.launchDate).toLocaleDateString() : 'Unknown';
+                                            const country = (sat.country || '').toString().toUpperCase();
+                                            const flagUrl = country && country.length <= 3 ? `/flags/${country.toLowerCase()}.png` : '';
+                                            const img = flagUrl ? `<img src="${flagUrl}" alt="${country}" style="height:16px;vertical-align:middle;margin-right:8px;border-radius:2px"/>` : '';
+
+                                            // Better formatted HTML for click tooltip
+                                            const html = `
+                                            <div style="line-height: 1.5; min-width: 200px;">
+                                                <div style="border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 6px; margin-bottom: 6px;">
+                                                    ${img}<strong style="color: #4CAF50; font-size: 14px;">${name}</strong>
+                                                </div>
+                                                <div style="color: #B0BEC5; font-size: 12px;">
+                                                    <div style="margin-bottom: 4px;">
+                                                        <span style="color: #B0BEC5;">NORAD ID:</span> 
+                                                        <span style="color: #FFC107; font-weight: bold;">${norad}</span>
+                                                    </div>
+                                                    <div style="margin-bottom: 4px;">
+                                                        <span style="color: #B0BEC5;">Launch Date:</span> 
+                                                        <span style="color: #E1F5FE;">${launch}</span>
+                                                    </div>
+                                                    ${country ? `
+                                                        <div style="margin-bottom: 4px;">
+                                                            <span style="color: #B0BEC5;">Country:</span> 
+                                                            <span style="color: #F3E5F5;">${country}</span>
+                                                        </div>
+                                                    ` : ''}
+                                                    <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); color: #81C784; font-size: 11px;">
+                                                        Click again to hide orbit
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+
+                                            showTooltip(evt.x, evt.y, html);
+                                        }
+
+                                        if (worker) {
+                                            worker.postMessage({ type: 'track', id: id });
+                                        }
                                     }
-                                    return;
-                                }
-
-                                if (id === selectedId) {
-                                    // Clicked on same satellite - toggle off
-                                    tracksLayer.removeAll();
-                                    selectedId = null;
-                                    hideTooltip();
-                                } else {
-                                    // Clicked on different satellite - show orbit and info
-                                    selectedId = id;
-
-                                    // Show satellite info tooltip
-                                    if (metaRef[id]) {
-                                        const sat = metaRef[id];
-                                        const name = sat.name || 'SAT';
-                                        const norad = sat.norad ? String(sat.norad) : '—';
-                                        const launch = sat.launchDate || '—';
-                                        const country = (sat.country || '').toString().toUpperCase();
-                                        const flagUrl = country && country.length <= 3 ? `/flags/${country.toLowerCase()}.png` : '';
-                                        const img = flagUrl ? `<img src="${flagUrl}" alt="${country}" style="height:12px;vertical-align:middle;margin-right:6px"/>` : '';
-                                        const html = `${img}<b>${name}</b><br/>NORAD: ${norad}<br/>Launched: ${launch}`;
-
-                                        showTooltip(evt.x, evt.y, html);
-                                    }
-
-                                    if (worker) {
-                                        worker.postMessage({ type: 'track', id: id });
-                                    }
-                                }
+                                }, 50); // Small delay for stable picking
                             });
 
                             // Hover handler for satellite info
@@ -190,7 +223,7 @@ export const ArcGlobe: React.FC = () => {
                                     return;
                                 }
 
-                                // Debounce hover picking
+                                // Debounce hover picking with longer delay to reduce jitter
                                 if (hoverTimeout) {
                                     clearTimeout(hoverTimeout);
                                 }
@@ -199,13 +232,24 @@ export const ArcGlobe: React.FC = () => {
                                     const id = instancedApi.pick(evt.x, evt.y);
                                     if (id >= 0 && metaRef[id] && id !== selectedId) {
                                         const sat = metaRef[id];
-                                        const name = sat.name || 'SAT';
-                                        const norad = sat.norad ? String(sat.norad) : '—';
-                                        const launch = sat.launchDate || '—';
+                                        const name = sat.name || 'Unknown Satellite';
+                                        const norad = sat.norad ? String(sat.norad) : 'N/A';
+                                        const launch = sat.launchDate ? new Date(sat.launchDate).toLocaleDateString() : 'Unknown';
                                         const country = (sat.country || '').toString().toUpperCase();
                                         const flagUrl = country && country.length <= 3 ? `/flags/${country.toLowerCase()}.png` : '';
-                                        const img = flagUrl ? `<img src="${flagUrl}" alt="${country}" style="height:12px;vertical-align:middle;margin-right:6px"/>` : '';
-                                        const html = `${img}<b>${name}</b><br/>NORAD: ${norad}<br/>Launched: ${launch}`;
+                                        const img = flagUrl ? `<img src="${flagUrl}" alt="${country}" style="height:14px;vertical-align:middle;margin-right:8px;border-radius:2px"/>` : '';
+
+                                        // Better formatted HTML with improved styling
+                                        const html = `
+                                            <div style="line-height: 1.4;">
+                                                ${img}<strong style="color: #4CAF50;">${name}</strong>
+                                                <br/>
+                                                <span style="color: #B0BEC5;">NORAD ID:</span> <span style="color: #FFC107;">${norad}</span>
+                                                <br/>
+                                                <span style="color: #B0BEC5;">Launch Date:</span> <span style="color: #E1F5FE;">${launch}</span>
+                                                ${country ? `<br/><span style="color: #B0BEC5;">Country:</span> <span style="color: #F3E5F5;">${country}</span>` : ''}
+                                            </div>
+                                        `;
 
                                         // Show hover tooltip (only if not already selected)
                                         showTooltip(evt.x, evt.y, html);
@@ -213,7 +257,7 @@ export const ArcGlobe: React.FC = () => {
                                         // Hide tooltip when not hovering over satellite
                                         hideTooltip();
                                     }
-                                }, 100);
+                                }, 150); // Increased debounce time from 100ms to 150ms
                             });
 
                         } catch (e) { if (DEBUG) console.error('[ArcGlobe] instanced create failed', e); }
@@ -292,20 +336,21 @@ export const ArcGlobe: React.FC = () => {
                     });
                 }
 
-                // Set lighting date and update it periodically for dynamic lighting
+                // Set lighting date once for dynamic lighting
                 view.environment.lighting.date = new Date();
 
-                // Update lighting every second for dynamic terminator
+                // Update lighting less frequently to reduce fidgeting
                 setInterval(() => {
                     try {
                         view.environment.lighting.date = new Date();
                     } catch (e) { }
-                }, 1000);
+                }, 5000); // Reduced from 1000ms to 5000ms (5 seconds)
 
                 // Watch camera changes to trigger re-renders
                 view.watch('camera', () => {
                     try {
-                        require(['esri/views/3d/externalRenderers'], function (externalRenderers) {
+                        // @ts-ignore - ArcGIS module loading
+                        require(['esri/views/3d/externalRenderers'], function (externalRenderers: any) {
                             externalRenderers.requestRender(view);
                         });
                     } catch (e) { }

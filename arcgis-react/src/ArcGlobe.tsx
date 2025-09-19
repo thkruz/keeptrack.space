@@ -1,4 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { CollisionAnalysis, type CollisionEvent } from './components/CollisionAnalysis';
+import { ConstellationAnalysis, type Constellation } from './components/ConstellationAnalysis';
+import { CreateSatellite, type SatelliteFormData } from './components/CreateSatellite';
+import { FeatureMenu } from './components/FeatureMenu';
+import { SatelliteService, type SatelliteData } from './services/satelliteService';
+import { TooltipService } from './services/tooltipService';
 
 declare global {
     interface Window {
@@ -11,54 +17,129 @@ declare global {
 
 export const ArcGlobe: React.FC = () => {
     const divRef = useRef<HTMLDivElement | null>(null);
+    const instancedApiRef = useRef<any>(null);
+    const satelliteService = SatelliteService.getInstance();
+    const tooltipService = TooltipService.getInstance();
+
+    // Menu state
+    const [selectedFeature, setSelectedFeature] = useState<string | null>(null);
+    const [showCollisionAnalysis, setShowCollisionAnalysis] = useState(false);
+    const [showCreateSatellite, setShowCreateSatellite] = useState(false);
+    const [showConstellationAnalysis, setShowConstellationAnalysis] = useState(false);
+
+    // Feature handlers
+    const handleFeatureSelect = (feature: string) => {
+        setSelectedFeature(feature);
+
+        switch (feature) {
+            case 'collision':
+                setShowCollisionAnalysis(true);
+                break;
+            case 'create-satellite':
+                setShowCreateSatellite(true);
+                break;
+            case 'new-launch':
+                // TODO: Implement new launch
+                console.log('New Launch feature selected');
+                break;
+            case 'create-breakup':
+                // TODO: Implement create breakup
+                console.log('Create Breakup feature selected');
+                break;
+            case 'debris-scanner':
+                // TODO: Implement debris scanner
+                console.log('Debris Scanner feature selected');
+                break;
+            default:
+                break;
+        }
+    };
+
+    const handleCollisionSelect = (collision: CollisionEvent) => {
+        console.log('Collision selected:', collision);
+        // TODO: Highlight collision on globe, show details
+    };
+
+    const handleCloseCollisionAnalysis = () => {
+        setShowCollisionAnalysis(false);
+        setSelectedFeature(null);
+    };
+
+    const handleCloseCreateSatellite = () => {
+        setShowCreateSatellite(false);
+        setSelectedFeature(null);
+    };
+
+    const handleTestConstellations = () => {
+        setShowConstellationAnalysis(true);
+    };
+
+    const handleCloseConstellationAnalysis = () => {
+        setShowConstellationAnalysis(false);
+    };
+
+    const handleConstellationSelect = (constellation: Constellation) => {
+        console.log('Constellation selected:', constellation);
+    };
+
+    const handleConstellationHighlight = (constellation: Constellation | null) => {
+        // Highlight constellation satellites on the globe
+        if (constellation && instancedApiRef.current) {
+            const satelliteIds = constellation.satellites.map(sat => sat.id);
+            instancedApiRef.current.setHighlightedSatellites(satelliteIds);
+            console.log(`Highlighting constellation ${constellation.name} with ${satelliteIds.length} satellites`);
+        } else if (instancedApiRef.current) {
+            instancedApiRef.current.setHighlightedSatellites([]);
+            console.log('Clearing constellation highlight');
+        }
+    };
+
+    const handleSatelliteCreated = (satelliteData: SatelliteFormData) => {
+        console.log('Creating satellite:', satelliteData);
+        try {
+            const newSatellite = satelliteService.createSatellite(satelliteData);
+            console.log('Satellite created successfully:', newSatellite);
+        } catch (error) {
+            console.error('Error creating satellite:', error);
+        }
+    };
+
+    const handleSearchSatellites = (query: string) => {
+        console.log('Searching for satellites:', query);
+        const results = satelliteService.searchSatellites(query);
+        console.log('Search results:', results);
+        // TODO: Implement visual filtering on the globe
+    };
+
+    const handleShowUserCreated = () => {
+        console.log('Showing user-created satellites');
+        const userCreated = satelliteService.getUserCreatedSatellites();
+        console.log('User-created satellites:', userCreated);
+        // TODO: Implement visual highlighting on the globe
+    };
 
     useEffect(() => {
         let view: any;
         let worker: Worker | null = null;
-        let satelliteLayer: any;
-        let debrisLayer: any;
         let tracksLayer: any;
-        const graphics: any[] = [];
+        const useInstanced = true;
+        const DEBUG = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug') === '1';
+        let instancedApi: any = null;
+        let selectedId: number | null = null;
+        let metaRef: any[] = [];
+        let hoverTimeout: number | null = null;
 
-        function getSatPointFromTle(date: Date, tle1: string, tle2: string) {
-            try {
-                const satrec = window.satellite.twoline2satrec(tle1, tle2);
-                const pv = window.satellite.propagate(
-                    satrec,
-                    date.getUTCFullYear(),
-                    date.getUTCMonth() + 1,
-                    date.getUTCDate(),
-                    date.getUTCHours(),
-                    date.getUTCMinutes(),
-                    date.getUTCSeconds()
-                );
-                const positionEci = pv.position;
-                if (!positionEci) return null;
-                const gmst = window.satellite.gstime(date);
-                const gd = window.satellite.eciToGeodetic(positionEci, gmst);
-                if (!gd) return null;
-                let lon = gd.longitude;
-                const lat = gd.latitude;
-                const hKm = gd.height;
-                if ([lon, lat, hKm].some((v) => Number.isNaN(v))) return null;
-                const rad2deg = 180 / Math.PI;
-                while (lon < -Math.PI) lon += 2 * Math.PI;
-                while (lon > Math.PI) lon -= 2 * Math.PI;
-                return {
-                    type: 'point',
-                    x: lon * rad2deg,
-                    y: lat * rad2deg,
-                    z: hKm * 1000,
-                    spatialReference: { wkid: 4326 },
-                } as const;
-            } catch {
-                return null;
-            }
+        // If instanced flag is on, load glue scripts early
+        if (useInstanced) {
+            const s1 = document.createElement('script'); s1.src = '/arcgis/instanced/renderer.js'; s1.async = true; document.head.appendChild(s1);
+            const s2 = document.createElement('script'); s2.src = '/arcgis/instanced/customLayer.js'; s2.async = true; document.head.appendChild(s2);
         }
+
 
         function createTrackPolyline(pointsLngLatZ: number[][]) {
             return { type: 'polyline', paths: [pointsLngLatZ], spatialReference: { wkid: 4326 } } as const;
         }
+
 
         function start(Map: any, SceneView: any, GraphicsLayer: any, Graphic: any) {
             const map = new Map({ basemap: 'satellite', ground: 'world-elevation' });
@@ -69,125 +150,134 @@ export const ArcGlobe: React.FC = () => {
                 qualityProfile: 'high',
                 constraints: { altitude: { max: 12000000000 } },
                 environment: {
-                    lighting: { date: new Date(), directShadowsEnabled: false },
+                    lighting: { date: new Date(), directShadowsEnabled: true },
                     atmosphereEnabled: true,
                     starsEnabled: true,
                 },
                 popup: { dockEnabled: true, dockOptions: { breakpoint: false } },
             });
 
-            satelliteLayer = new GraphicsLayer();
-            debrisLayer = new GraphicsLayer();
             tracksLayer = new GraphicsLayer();
-            map.addMany([satelliteLayer, debrisLayer, tracksLayer]);
+            map.add(tracksLayer);
 
-            function addSatGraphic(sat: any) {
-                const now = new Date();
-                const pt = getSatPointFromTle(now, sat.tle1, sat.tle2);
-                if (!pt) return;
-                const g = new Graphic({
-                    geometry: pt,
-                    symbol: { type: 'picture-marker', url: 'https://i.ibb.co/0y1d3Zk/Sat-PNG.png', width: 8, height: 8 },
-                    attributes: {
-                        name: sat.name || 'SAT',
-                        id: graphics.length,
-                        tle1: sat.tle1,
-                        tle2: sat.tle2,
-                        t0: Date.now(),
-                        norad: sat.norad || null,
-                        launchDate: sat.launchDate || null,
-                        country: sat.country || null,
-                    },
-                    popupEnabled: false,
-                });
-                satelliteLayer.add(g);
-                graphics.push(g);
-            }
+            // If instanced, attach external renderer
+            if (useInstanced) {
+                const id = setInterval(() => {
+                    if ((window as any).ArcgisInstanced && view) {
+                        clearInterval(id);
+                        try {
+                            instancedApi = (window as any).ArcgisInstanced.create(view, {});
+                            instancedApiRef.current = instancedApi;
 
-            function addDebrisGraphic(sat: any) {
-                const now = new Date();
-                const pt = getSatPointFromTle(now, sat.tle1, sat.tle2);
-                if (!pt) return;
-                const g = new Graphic({
-                    geometry: pt,
-                    symbol: { type: 'simple-marker', style: 'circle', color: [200, 200, 200, 0.7], size: 2 },
-                    attributes: { name: sat.name || 'DEBRIS', tle1: sat.tle1, tle2: sat.tle2 },
-                });
-                debrisLayer.add(g);
-            }
+                            // Add event handlers after API is ready
+                            view.on('click', (evt: any) => {
+                                evt.stopPropagation();
+                                if (!instancedApi) {
+                                    return;
+                                }
 
-            function drawTrackForGraphic(graphic: any) {
-                tracksLayer.removeAll();
-                if (!worker) {
-                    const positions: number[][] = [];
-                    const minutes = 60 * 24;
-                    const startTime = new Date();
-                    for (let i = 0; i < minutes; i++) {
-                        const t = new Date(startTime.getTime() + i * 60 * 1000);
-                        const pt = getSatPointFromTle(t, graphic.attributes.tle1, graphic.attributes.tle2);
-                        if (pt) positions.push([pt.x, pt.y, pt.z]);
+                                // Add small delay to ensure picking is stable
+                                setTimeout(() => {
+                                    const id = instancedApi.pick(evt.x, evt.y);
+                                    if (id < 0) {
+                                        // Clicked on empty space - clear selection
+                                        if (selectedId !== null) {
+                                            tracksLayer.removeAll();
+                                            selectedId = null;
+                                            tooltipService.hideTooltip();
+                                            // Clear selection in renderer
+                                            instancedApi.setSelectedId(-1);
+                                        }
+                                        return;
+                                    }
+
+                                    if (id === selectedId) {
+                                        // Clicked on same satellite - toggle off
+                                        tracksLayer.removeAll();
+                                        selectedId = null;
+                                        tooltipService.hideTooltip();
+                                        // Clear selection in renderer
+                                        instancedApi.setSelectedId(-1);
+                                    } else {
+                                        // Clicked on different satellite - show orbit and info
+                                        selectedId = id;
+                                        // Highlight selected satellite in renderer
+                                        instancedApi.setSelectedId(id);
+
+                                        // Show satellite info tooltip
+                                        const html = tooltipService.generateSatelliteTooltip(id, false);
+                                        if (html) {
+                                            tooltipService.showTooltip(evt.x, evt.y, html);
+                                        }
+
+                                        if (worker) {
+                                            worker.postMessage({ type: 'track', id: id });
+                                        }
+                                    }
+                                }, 50); // Small delay for stable picking
+                            });
+
+                            // Hover handler for satellite info
+                            view.on('pointer-move', (evt: any) => {
+                                if (!instancedApi) {
+                                    return;
+                                }
+
+                                // Debounce hover picking with longer delay to reduce jitter
+                                if (hoverTimeout) {
+                                    clearTimeout(hoverTimeout);
+                                }
+
+                                hoverTimeout = setTimeout(() => {
+                                    const id = instancedApi.pick(evt.x, evt.y);
+                                    if (id >= 0 && id !== selectedId) {
+                                        const html = tooltipService.generateSatelliteTooltip(id, true);
+                                        if (html) {
+                                            tooltipService.showTooltip(evt.x, evt.y, html);
+                                        }
+                                    } else if (id < 0) {
+                                        // Hide tooltip when not hovering over satellite
+                                        tooltipService.hideTooltip();
+                                    }
+                                }, 150); // Increased debounce time from 100ms to 150ms
+                            });
+
+                        } catch (e) { if (DEBUG) console.error('[ArcGlobe] instanced create failed', e); }
                     }
-                    if (positions.length > 1) {
-                        const line = new Graphic({
-                            geometry: createTrackPolyline(positions),
-                            symbol: { type: 'line-3d', symbolLayers: [{ type: 'line', size: 2, material: { color: [192, 192, 192, 0.6] } }] },
-                        });
-                        tracksLayer.add(line);
-                    }
-                    return;
-                }
-                worker.postMessage({ type: 'track', id: graphic.attributes.id });
+                }, 50);
             }
+
 
             view.when(() => {
                 view.popup.autoOpenEnabled = false;
 
-                view.on('immediate-click', (evt: any) => {
-                    view.hitTest(evt).then((res: any) => {
-                        const feat = res.results && res.results.find((r: any) => r.layer === satelliteLayer)?.graphic;
-                        tracksLayer.removeAll();
-                        if (feat) drawTrackForGraphic(feat);
-                    });
-                });
 
+                // Set lighting date once for dynamic lighting
+                view.environment.lighting.date = new Date();
+
+                // Update lighting less frequently to reduce fidgeting
                 setInterval(() => {
-                    view.environment.lighting.date = new Date();
-                }, 1000);
+                    try {
+                        view.environment.lighting.date = new Date();
+                    } catch (e) { }
+                }, 5000); // Reduced from 1000ms to 5000ms (5 seconds)
 
-                let uiRef: any = null;
-                if (window.ArcgisUI?.createUI) {
-                    uiRef = window.ArcgisUI.createUI({
-                        root: document.body,
-                        sets: ['Satellites', 'Debris'],
-                        selected: ['Satellites', 'Debris'],
-                        onChange: (sel: string[]) => {
-                            satelliteLayer.visible = sel.includes('Satellites');
-                            debrisLayer.visible = sel.includes('Debris');
-                        },
-                    });
-                }
-
-                view.on('pointer-move', (evt: any) => {
-                    if (!uiRef) return;
-                    view.hitTest(evt).then((res: any) => {
-                        const hit = res.results && res.results.find((r: any) => r.layer === satelliteLayer)?.graphic;
-                        if (!hit) { uiRef.hideHover(); return; }
-                        const attr = hit.attributes || {};
-                        const name = attr.name || 'SAT';
-                        const norad = attr.norad ? String(attr.norad) : '—';
-                        const launch = attr.launchDate || '—';
-                        const country = (attr.country || '').toString().toUpperCase();
-                        const flagUrl = country && country.length <= 3 ? `/flags/${country.toLowerCase()}.png` : '';
-                        const img = flagUrl ? `<img src="${flagUrl}" alt="${country}" style="height:12px;vertical-align:middle;margin-right:6px"/>` : '';
-                        const html = `${img}<b>${name}</b><br/>NORAD: ${norad}<br/>Launched: ${launch}`;
-                        uiRef.showHover(html, evt.x, evt.y);
-                    });
+                // Watch camera changes to trigger re-renders
+                view.watch('camera', () => {
+                    try {
+                        // @ts-ignore - ArcGIS module loading
+                        require(['esri/views/3d/externalRenderers'], function (externalRenderers: any) {
+                            externalRenderers.requestRender(view);
+                        });
+                    } catch (e) { }
                 });
+
+
             });
 
             (async function loadData() {
                 try {
-                    const MAX_SATS = 1000;
+                    const MAX_SATS = 30000;
                     const datasets = (window.ArcgisDataLoader?.loadAllSources)
                         ? await window.ArcgisDataLoader.loadAllSources({
                             apiUrl: '/api-keeptrack/v3/sats',
@@ -199,60 +289,115 @@ export const ArcGlobe: React.FC = () => {
                         })
                         : { main: [], debris: [], vimpel: [], extra: [], celestrak: {} };
 
-                    (datasets.main || []).slice(0, MAX_SATS).forEach(addSatGraphic);
-                    (datasets.debris || []).slice(0, 5000).forEach(addDebrisGraphic);
 
                     try {
-                        // Use classic worker served from public to avoid bundler issues
-                        worker = new Worker('/arcgis/worker.js');
-                        const payload = (datasets.main || []).slice(0, MAX_SATS).map((s: any, idx: number) => ({ id: idx, name: s.name || 'SAT', tle1: s.tle1, tle2: s.tle2 }));
-                        worker.postMessage({ type: 'init', payload });
+                        // Store metadata reference for picking
+                        metaRef = (datasets.main || []).slice(0, MAX_SATS);
 
-                        worker.onmessage = (ev: MessageEvent) => {
-                            const data: any = ev.data || {};
-                            if (data.type === 'positions' && data.positions && (data.positions as ArrayBuffer)) {
-                                const arr = new Float32Array(data.positions);
-                                for (let i = 0; i < graphics.length; i++) {
-                                    const j = i * 3;
-                                    const x = arr[j], y = arr[j + 1], z = arr[j + 2];
-                                    if (!Number.isNaN(x) && !Number.isNaN(y) && !Number.isNaN(z)) {
-                                        graphics[i].geometry = { type: 'point', x, y, z, spatialReference: { wkid: 4326 } };
-                                    }
-                                }
-                            } else if (data.type === 'track' && data.positions) {
-                                const arr = new Float32Array(data.positions);
-                                const path: number[][] = [];
-                                for (let k = 0; k < arr.length; k += 3) {
-                                    const x = arr[k], y = arr[k + 1], z = arr[k + 2];
-                                    if (!Number.isNaN(x) && !Number.isNaN(y) && !Number.isNaN(z)) path.push([x, y, z]);
-                                }
-                                if (path.length > 1) {
-                                    const line = new Graphic({
-                                        geometry: createTrackPolyline(path),
-                                        symbol: { type: 'line-3d', symbolLayers: [{ type: 'line', size: 2, material: { color: [192, 192, 192, 0.6] } }] },
-                                    });
-                                    tracksLayer.add(line);
+                        // Convert to SatelliteData format and initialize service
+                        const satelliteData: SatelliteData[] = metaRef.map((s: any, idx: number) => {
+                            // Extract NORAD ID from TLE line 1 (first 5 digits after the '1' and space)
+                            let noradId = 'N/A';
+                            if (s.tle1 && s.tle1.length > 7) {
+                                const noradMatch = s.tle1.match(/^1\s+(\d{5})/);
+                                if (noradMatch) {
+                                    noradId = noradMatch[1];
                                 }
                             }
-                        };
+
+                            return {
+                                id: idx,
+                                name: s.name || 'SAT',
+                                tle1: s.tle1,
+                                tle2: s.tle2,
+                                norad: noradId,
+                                launchDate: s.launchDate || new Date().toISOString(),
+                                country: s.country || 'TBD',
+                                type: 1,
+                                source: s.source || 'Unknown',
+                                isUserCreated: false
+                            };
+                        });
+
+                        // Use classic worker served from public to avoid bundler issues
+                        try {
+                            worker = new Worker('/arcgis/worker.js');
+                            console.log('ArcGlobe: Worker created successfully');
+
+                            // Add error handling for worker
+                            worker.onerror = (error) => {
+                                console.error('ArcGlobe: Worker error:', error);
+                            };
+
+                            worker.onmessageerror = (error) => {
+                                console.error('ArcGlobe: Worker message error:', error);
+                            };
+                        } catch (error) {
+                            console.error('ArcGlobe: Failed to create worker:', error);
+                        }
+                        const payload = satelliteData.map(s => ({
+                            id: s.id,
+                            name: s.name,
+                            tle1: s.tle1,
+                            tle2: s.tle2,
+                            norad: s.norad,
+                            launchDate: s.launchDate,
+                            country: s.country
+                        }));
+                        if (worker) {
+                            worker.postMessage({ type: 'init', payload });
+
+                            // Test if worker is responding
+                            setTimeout(() => {
+                                console.log('ArcGlobe: Testing worker communication...');
+                                if (worker) {
+                                    worker.postMessage({ type: 'test', message: 'Hello worker' });
+                                }
+                            }, 1000);
+
+                            // Initialize satellite service
+                            satelliteService.initialize(satelliteData, worker);
+                        }
+
+                        if (worker) {
+                            worker.onmessage = (ev: MessageEvent) => {
+                                const data: any = ev.data || {};
+                                if (data.type === 'log' && DEBUG) { console.log('[worker]', data.msg); return; }
+                                // Ignore PV for now; renderer expects lon/lat/h. Use 'positions' path below.
+                                if (data.type === 'positions' && data.positions) {
+                                    const arr = data.positions instanceof Float32Array ? data.positions : new Float32Array(data.positions as ArrayBuffer);
+                                    if (useInstanced && instancedApi) {
+                                        instancedApi.updatePositions(arr.buffer, Math.floor(arr.length / 3));
+                                    }
+                                } else if (data.type === 'track' && data.positions) {
+                                    const arr = new Float32Array(data.positions);
+                                    const path: number[][] = [];
+                                    for (let k = 0; k < arr.length; k += 3) {
+                                        const x = arr[k], y = arr[k + 1], z = arr[k + 2];
+                                        if (!Number.isNaN(x) && !Number.isNaN(y) && !Number.isNaN(z)) path.push([x, y, z]);
+                                    }
+                                    if (path.length > 1) {
+                                        const line = new Graphic({
+                                            geometry: createTrackPolyline(path),
+                                            symbol: { type: 'line-3d', symbolLayers: [{ type: 'line', size: 2, material: { color: [192, 192, 192, 0.6] } }] },
+                                        });
+                                        tracksLayer.add(line);
+                                    }
+                                }
+                            };
+                        }
 
                         setInterval(() => {
                             if (worker) worker.postMessage({ type: 'tick', time: Date.now() });
                         }, 1000);
-                    } catch {
-                        setInterval(() => {
-                            const now = new Date();
-                            for (let i = 0; i < graphics.length; i++) {
-                                const g = graphics[i];
-                                const pt = getSatPointFromTle(now, g.attributes.tle1, g.attributes.tle2);
-                                if (pt) g.geometry = pt;
-                            }
-                        }, 1000);
+                    } catch (e) {
+                        console.error(e);
                     }
                 } catch (e) {
                     console.error(e);
                 }
             })();
+
         }
 
         function boot() {
@@ -276,10 +421,39 @@ export const ArcGlobe: React.FC = () => {
         return () => {
             try { (view as any)?.destroy?.(); } catch { }
             try { worker?.terminate?.(); } catch { }
+            try { if (hoverTimeout) clearTimeout(hoverTimeout); } catch { }
+            try { tooltipService.dispose(); } catch { }
         };
     }, []);
 
-    return <div id="viewDiv" ref={divRef} style={{ position: 'absolute', inset: 0 }} />;
+    return (
+        <>
+            <div id="viewDiv" ref={divRef} style={{ position: 'absolute', inset: 0 }} />
+            <FeatureMenu
+                onFeatureSelect={handleFeatureSelect}
+                selectedFeature={selectedFeature}
+                onSearchSatellites={handleSearchSatellites}
+                onShowUserCreated={handleShowUserCreated}
+                onTestConstellations={handleTestConstellations}
+            />
+            <CollisionAnalysis
+                isVisible={showCollisionAnalysis}
+                onClose={handleCloseCollisionAnalysis}
+                onCollisionSelect={handleCollisionSelect}
+            />
+            <CreateSatellite
+                isVisible={showCreateSatellite}
+                onClose={handleCloseCreateSatellite}
+                onSatelliteCreated={handleSatelliteCreated}
+            />
+            <ConstellationAnalysis
+                isVisible={showConstellationAnalysis}
+                onClose={handleCloseConstellationAnalysis}
+                onConstellationSelect={handleConstellationSelect}
+                onConstellationHighlight={handleConstellationHighlight}
+            />
+        </>
+    );
 };
 
 

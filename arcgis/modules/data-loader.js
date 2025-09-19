@@ -63,7 +63,6 @@
     async function loadSatTLEs(opts) {
         const apiUrl = opts?.apiUrl || 'https://api.keeptrack.space/v3/sats';
         const asciiUrl = opts?.asciiUrl || '../tle/TLE.txt';
-        console.log('loading tles from', apiUrl, asciiUrl);
         try {
             return await fetchApiTles(apiUrl);
         } catch (e) {

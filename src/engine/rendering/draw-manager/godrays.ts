@@ -3,11 +3,11 @@ import { FlatGeometry } from '@app/engine/rendering/flat-geometry';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
+import { glsl } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
 import { Sun } from './sun';
-import { glsl } from '@app/engine/utils/development/formatter';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -63,13 +63,6 @@ export class Godrays {
     gl.uniform1i(this.mesh.material.uniforms.u_sampler, 0);
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
-
-    gl.uniform1i(this.mesh.material.uniforms.u_samples, settingsManager.godraysSamples ?? 32);
-    gl.uniform1f(this.mesh.material.uniforms.u_decay, settingsManager.godraysDecay ?? 0.985);
-    gl.uniform1f(this.mesh.material.uniforms.u_exposure, settingsManager.godraysExposure ?? 0.4);
-    gl.uniform1f(this.mesh.material.uniforms.u_density, settingsManager.godraysDensity ?? 1.05);
-    gl.uniform1f(this.mesh.material.uniforms.u_weight, settingsManager.godraysWeight ?? 0.075);
-    gl.uniform1f(this.mesh.material.uniforms.u_illuminationDecay, settingsManager.godraysIlluminationDecay ?? 1.0);
     gl.uniform2f(this.mesh.material.uniforms.u_sunPosition, screenPosition[0], screenPosition[1]);
     gl.uniform2f(this.mesh.material.uniforms.u_resolution, gl.canvas.width, gl.canvas.height);
 
@@ -103,15 +96,9 @@ export class Godrays {
     });
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
-        u_samples: <WebGLUniformLocation><unknown>null,
         u_sunPosition: <WebGLUniformLocation><unknown>null,
         u_sampler: <WebGLUniformLocation><unknown>null,
         u_resolution: <WebGLUniformLocation><unknown>null,
-        u_decay: <WebGLUniformLocation><unknown>null,
-        u_exposure: <WebGLUniformLocation><unknown>null,
-        u_density: <WebGLUniformLocation><unknown>null,
-        u_weight: <WebGLUniformLocation><unknown>null,
-        u_illuminationDecay: <WebGLUniformLocation><unknown>null,
       },
       map: gl.createTexture(),
       textureType: 'flat',
@@ -171,6 +158,10 @@ export class Godrays {
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this.renderBuffer);
   }
 
+  /*
+   * Instead of a large kernel, use a separable blur or multi-pass radial sampling.
+   * Here, we use a wide radial sampling for godrays, which is much cheaper than a huge blur kernel.
+   */
   private readonly shaders_ = {
     frag: glsl`
       uniform int u_samples;
@@ -178,63 +169,40 @@ export class Godrays {
       uniform float u_exposure;
       uniform float u_density;
       uniform float u_weight;
-      uniform float u_illuminationDecay;
       uniform sampler2D u_sampler;
       uniform vec2 u_sunPosition;
       uniform vec2 u_resolution;
 
-      // the texCoords passed in from the vertex shader.
       in vec2 v_texCoord;
       out vec4 fragColor;
 
-      // Gaussian blur function (3x3 kernel) with variable blur amount
-      vec4 blur(sampler2D tex, vec2 uv, vec2 resolution, float blurScale) {
-        // Account for aspect ratio to prevent stretching
-        float aspectRatio = resolution.x / resolution.y;
-        // Scale the blur size by blurScale
-        vec2 blurSize = vec2(1.5 / resolution.x, 1.5 / resolution.y) * blurScale;
-        vec4 sum = vec4(0.0);
-        float totalWeight = 0.0;
-
-        // 5x5 kernel for Gaussian blur
-        for (int x = -1; x <= 1; x++) {
-          for (int y = -1; y <= 1; y++) {
-                vec2 offset = vec2(float(x) * blurSize.x, float(y) * blurSize.y);
-                vec2 sampleCoord = clamp(uv + offset, 0.0, 1.0);
-                float weight = exp(-dot(offset * vec2(1.0, aspectRatio), offset * vec2(1.0, aspectRatio)) * 0.5);
-                sum += texture(tex, sampleCoord) * weight;
-                totalWeight += weight;
-            }
-        }
-
-        return sum / totalWeight;
+      float rand(vec2 co){
+        return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
       }
 
       void main() {
-        // Use uniforms if provided, otherwise use defaults
-        float decay = 0.983;
-        float exposure = 0.4;
-        float density = 1.8;
-        float weight = 0.085;
-        float illuminationDecay = 2.7;
+        int samples = 40;
+        float decay = 0.95;
+        float exposure = 0.2;
+        float density = 1.0;
+        float weight = 0.6;
 
-        // Override with uniforms if set
+        if (u_samples > 0) samples = u_samples;
         if (u_decay > 0.0) decay = u_decay;
         if (u_exposure > 0.0) exposure = u_exposure;
         if (u_density > 0.0) density = u_density;
         if (u_weight > 0.0) weight = u_weight;
-        if (u_illuminationDecay > 0.0) illuminationDecay = u_illuminationDecay;
 
         vec2 lightPositionOnScreen = vec2(u_sunPosition.x, 1.0 - u_sunPosition.y);
         vec2 texCoord = v_texCoord;
 
-        // Calculate vector from pixel to light source
         vec2 deltaTexCoord = (texCoord - lightPositionOnScreen.xy);
 
-        // Distance from current pixel to light source (0 to sqrt(2))
-        float dist = length(deltaTexCoord);
+        float dist = length(deltaTexCoord * vec2(u_resolution.x / u_resolution.y, 1.0));
 
-        // Early out: if the sun is offscreen or too far, skip effect
+        // Define sun radius in normalized screen space (now aspect-corrected)
+        float sunRadius = 0.02;
+
         if (lightPositionOnScreen.x < 0.0 || lightPositionOnScreen.x > 1.0 ||
             lightPositionOnScreen.y < 0.0 || lightPositionOnScreen.y > 1.0 ||
             dist > 1.5) {
@@ -242,56 +210,43 @@ export class Godrays {
           return;
         }
 
-        // Blur increases with distance, min 1.0, max 3.0 (tweak as needed)
-        float blurScale = mix(1.0, 3.0, clamp(dist / 1.4142, 0.0, 1.0));
-
-        deltaTexCoord *= 1.0 / float(u_samples) * density;
-
-        // Initial blur
-        vec4 color = blur(u_sampler, texCoord.xy, u_resolution, blurScale);
-
-        // Early out: if initial blur is almost black, skip further computation
-        if (color.a < 0.01 && color.r < 0.01 && color.g < 0.01 && color.b < 0.01) {
-          fragColor = color;
-          return;
+        float noise = 0.0;
+        if (dist > sunRadius) {
+          noise = rand(v_texCoord * u_resolution + float(gl_FragCoord.x + gl_FragCoord.y));
         }
 
-        for(int i = 0; i <= u_samples; i++) {
-          texCoord -= deltaTexCoord;
+        vec4 color = vec4(0.0);
+        float illum = 1.0;
 
-          // Early out: if texCoord is out of bounds, break the loop
+        float angle = rand(v_texCoord * 100.0 + gl_FragCoord.xy) * 6.2831853;
+        float sinA = sin(angle) * 0.0002;
+        float cosA = cos(angle) * 0.0002;
+        vec2 randomOffset = vec2(cosA, sinA);
+
+        vec2 step = (deltaTexCoord + randomOffset) * density / float(samples);
+
+        texCoord -= step * noise;
+
+        for(int i = 0; i < samples; i++) {
+          texCoord -= step;
+
           if (texCoord.x < 0.0 || texCoord.x > 1.0 || texCoord.y < 0.0 || texCoord.y > 1.0) {
             break;
           }
 
-          // Increase blur as we move away from the sun
-          float sampleDist = length(texCoord - lightPositionOnScreen.xy);
-          float sampleBlurScale = mix(1.0, 3.0, clamp(sampleDist / 1.4142, 0.0, 1.0));
-
-          vec4 sampleColor = blur(u_sampler, texCoord, u_resolution, sampleBlurScale);
-
-          // Early out: if sampleColor is almost black, skip further computation
-          if (sampleColor.a < 0.01 && sampleColor.r < 0.01 && sampleColor.g < 0.01 && sampleColor.b < 0.01) {
-            break;
-          }
-
-          sampleColor *= illuminationDecay * weight;
-          // Accumulate the color
+          vec4 sampleColor = texture(u_sampler, texCoord);
+          sampleColor *= illum * weight;
           color += sampleColor;
-          // Update the illumination decay factor
-          illuminationDecay *= decay;
+          illum *= decay;
         }
-        vec4 scene = texture(u_sampler, v_texCoord);
 
-        // Optional simple tone map for stability (prevents blowout):
+        vec4 scene = texture(u_sampler, v_texCoord);
         vec3 rays = 1.0 - exp(-color.rgb * exposure);
 
-        // Additive compose the shafts over the scene
-        fragColor = vec4(scene.rgb + rays, 1.0);
+        float blendFactor = 0.7 + 0.3 * noise;
+        vec3 blended = dist > sunRadius ? mix(scene.rgb + rays, rays, blendFactor) : scene.rgb + rays;
 
-        // If you don’t want tone mapping yet, use this instead:
-        // vec3 rays = color.rgb * exposure;
-        // fragColor = vec4(min(scene.rgb + rays, 1.0), 1.0);
+        fragColor = vec4(blended, 1.0);
 
         ${DepthManager.getLogDepthFragCode()}
       }
@@ -305,19 +260,11 @@ export class Godrays {
       out vec2 v_texCoord;
 
       void main() {
-        // convert the rectangle from pixels to 0.0 to 1.0
         vec2 zeroToOne = a_position / u_resolution;
-
-        // convert from 0->1 to 0->2
         vec2 zeroToTwo = zeroToOne * 2.0;
-
-        // convert from 0->2 to -1->+1 (clipspace)
         vec2 clipSpace = zeroToTwo - 1.0;
 
         gl_Position = vec4(clipSpace, 0, 1);
-
-        // pass the texCoord to the fragment shader
-        // The GPU will interpolate this value between points.
         v_texCoord = a_texCoord;
 
         ${DepthManager.getLogDepthVertCode()}

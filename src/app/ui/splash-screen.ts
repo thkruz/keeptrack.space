@@ -4,12 +4,14 @@ import { keepTrackApi } from '../../keepTrackApi';
 import { MobileManager } from './mobileManager';
 
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
 import cubesatJpg from '@public/img/wallpaper/cubesat.jpg';
 import earthJpg from '@public/img/wallpaper/Earth.jpg';
 import epfl1Jpg from '@public/img/wallpaper/epfl-1.jpg';
 import epfl2Jpg from '@public/img/wallpaper/epfl-2.jpg';
 import issJpg from '@public/img/wallpaper/iss.jpg';
+import marsJpg from '@public/img/wallpaper/mars.jpg';
 import moonJpg from '@public/img/wallpaper/moon.jpg';
 import observatoryJpg from '@public/img/wallpaper/observatory.jpg';
 import opsJpg from '@public/img/wallpaper/ops.jpg';
@@ -23,7 +25,6 @@ import satJpg from '@public/img/wallpaper/sat.jpg';
 import sat2Jpg from '@public/img/wallpaper/sat2.jpg';
 import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
 import thuleJpg from '@public/img/wallpaper/thule.jpg';
-import { html } from '@app/engine/utils/development/formatter';
 
 export abstract class SplashScreen {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
@@ -31,6 +32,7 @@ export abstract class SplashScreen {
     [
       blueMarbleJpg, moonJpg, observatoryJpg, thuleJpg, rocketJpg, rocket2Jpg, telescopeJpg, issJpg, rocket3Jpg, rocket4Jpg, cubesatJpg, satJpg, sat2Jpg, earthJpg,
       epfl1Jpg, epfl2Jpg, opsJpg, ops2Jpg, ops3Jpg,
+      marsJpg,
     ];
 
   static readonly msg = {

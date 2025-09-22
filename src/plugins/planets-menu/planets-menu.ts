@@ -1,12 +1,13 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import planetPng from '@public/img/icons/planet.png';
 import { Body } from 'astronomy-engine';
-import { Kilometers } from 'ootk';
+import { Kilometers, RADIUS_OF_EARTH } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './planets-menu.css';
@@ -24,7 +25,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
 
   PLANETS = [Body.Mercury, Body.Venus, Body.Earth, Body.Mars, Body.Jupiter, Body.Saturn, Body.Uranus, Body.Neptune];
   DWARF_PLANETS = [Body.Pluto];
-  OTHER_CELESTIAL_BODIES = [Body.Moon];
+  OTHER_CELESTIAL_BODIES = [Body.Moon, Body.Sun];
 
   bottomIconElementName: string = 'menu-planets';
   sideMenuElementName: string = 'planets-menu';
@@ -105,14 +106,15 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     settingsManager.centerBody = planetName;
     keepTrackApi.getUiManager().hideSideMenus();
 
-    settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
-
-    return;
-
-    if (planetName === Body.Earth) {
+    if (planetName === Body.Sun) {
+      settingsManager.minZoomDistance = 62000000 as Kilometers; // 62 million km
+      settingsManager.maxZoomDistance = 1e9 as Kilometers; // 1 billion km
+    } else if (planetName === Body.Earth) {
+      settingsManager.minZoomDistance = RADIUS_OF_EARTH * 1.2 as Kilometers;
       settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
     } else {
-      settingsManager.maxZoomDistance = 1e9 as Kilometers; // 1 billion km
+      settingsManager.minZoomDistance = ServiceLocator.getScene().planets[planetName].RADIUS * 1.2 as Kilometers;
+      settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
     }
   }
 

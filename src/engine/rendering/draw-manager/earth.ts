@@ -380,9 +380,11 @@ export class Earth {
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
-    // disable depth test and depth writing
-    if (settingsManager.centerBody === Body.Earth) {
+    // disable depth test unless zoomed out (avoid atmosphere showing through the moon when zoomed out)
+    if (settingsManager.centerBody === Body.Earth && ServiceLocator.getMainCamera().getCameraDistance() < 2e5) {
       gl.disable(gl.DEPTH_TEST);
+    } else {
+      gl.enable(gl.DEPTH_TEST);
     }
     gl.depthMask(false); // Disable depth writing
 

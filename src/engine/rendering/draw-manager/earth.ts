@@ -22,6 +22,7 @@
 import { SplashScreen } from '@app/app/ui/splash-screen';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -416,7 +417,7 @@ export class Earth {
     gl.uniform1f(this.surfaceMesh.material.uniforms.uGlow, this.glowNumber_);
     const isEarthCenterBody = settingsManager.centerBody === Body.Earth;
 
-    gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? keepTrackApi.getMainCamera().zoomLevel() ?? 1.0 : 1.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? (keepTrackApi.getMainCamera().zoomLevel() ?? 1.0) ** (1 / 3) : 1.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);
@@ -722,7 +723,7 @@ export class Earth {
         uv.x -= uCloudPosition;
 
         vec3 cloudsColor = textureLod(uCloudsMap, uv, -1.0).rgb * diffuse;
-        fragColor.rgb += cloudsColor * 1.0 * pow(uZoomLevel, 2.0);
+        fragColor.rgb += cloudsColor * 2.0 * pow(uZoomLevel, 2.0);
 
       // ...............................................
 

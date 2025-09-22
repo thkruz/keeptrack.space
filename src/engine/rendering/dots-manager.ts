@@ -8,6 +8,7 @@ import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, SpaceObjectType } from 'ootk';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera';
+import { PluginRegistry } from '../core/plugin-registry';
 import { Scene } from '../core/scene';
 import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
@@ -17,7 +18,6 @@ import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
 import { WebGlProgramHelper } from './webgl-program';
 import { WebGLRenderer } from './webgl-renderer';
-import { PluginRegistry } from '../core/plugin-registry';
 
 declare module '@app/engine/core/interfaces' {
   interface SatShader {
@@ -724,21 +724,11 @@ export class DotsManager {
 
             void main(void) {
               vec2 ptCoord = gl_PointCoord * 2.0 - vec2(1.0, 1.0);
-              float r = 0.0;
-              float alpha = 0.0;
-              // If not a star and not on the ground
-              r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-              alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 200000.0) * when_ge(vDist, 6421.0);
-
-              // If on the ground
-              r += (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0)) * when_lt(vDist, 6421.0);
-              alpha += (2.0 * r + ${settingsManager.satShader.blurFactor2}) * when_lt(vDist, 6471.0);
-
-              // If a star
-              r += (${settingsManager.satShader.blurFactor3} - min(abs(length(ptCoord)), 1.0)) * when_ge(vDist, 200000.0);
-              alpha += (2.0 * r - ${settingsManager.satShader.blurFactor4}) * when_ge(vDist, 200000.0);
+              float r = (${settingsManager.satShader.blurFactor1} - min(abs(length(ptCoord)), 1.0));
+              float alpha = (2.0 * r + ${settingsManager.satShader.blurFactor2});
 
               alpha = min(alpha, 1.0);
+
               if (alpha == 0.0) discard;
               fragColor = vec4(vColor.rgb, vColor.a * alpha);
 
@@ -776,21 +766,17 @@ export class DotsManager {
 
               float drawSize = 0.0;
               float dist = distance(vec3(0.0, 0.0, 0.0), a_position.xyz);
+              float baseSize = pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1);
 
               // Satellite
               drawSize +=
               when_lt(a_star, 0.5) *
-              (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), u_minSize * 0.9), u_maxSize) * 1.0);
+              (min(max(baseSize, u_minSize), u_maxSize) * 1.0);
 
               // Something on the ground
               drawSize +=
               when_lt(a_star, 0.5) * when_lt(dist, 6421.0) *
-              (min(max(pow(${settingsManager.satShader.distanceBeforeGrow} \/ position.z, 2.1), u_minSize * 0.5), u_maxSize) * 1.0);
-
-              // Star or Searched Object
-              drawSize +=
-              when_ge(a_star, 0.5) * when_ge(dist, 6421.0) *
-              (min(max(${settingsManager.satShader.starSize} * 100000.0 \/ dist, ${settingsManager.satShader.starSize}),${settingsManager.satShader.starSize} * 1.0));
+              (min(max(baseSize, u_minSize * 0.5), u_maxSize) * 1.0);
 
               gl_PointSize = drawSize;
               vColor = a_color;

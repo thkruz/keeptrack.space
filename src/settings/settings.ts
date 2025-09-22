@@ -941,6 +941,10 @@ export class SettingsManager {
      */
     minSize: 5.5,
     /**
+     * The maximum size of objects in the shader.
+     */
+    maxSize: 70.0,
+    /**
      * The minimum size of objects in the shader when in planetarium mode.
      */
     minSizePlanetarium: 20.0,
@@ -987,10 +991,6 @@ export class SettingsManager {
      * The blur alpha factor used for stars.
      */
     blurFactor4: '0.25',
-    /**
-     * The maximum size of objects in the shader.
-     */
-    maxSize: 70.0,
   };
 
   /**

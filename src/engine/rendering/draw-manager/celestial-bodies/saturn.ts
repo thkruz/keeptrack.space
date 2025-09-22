@@ -24,6 +24,7 @@ import { vec3 } from 'gl-matrix';
 import { DEG2RAD, EciVec3 } from 'ootk';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody } from './celestial-body';
+import { SaturnRings } from './saturn-rings';
 
 // TODO: Saturn doesn't occlude the sun yet!
 
@@ -33,10 +34,22 @@ export enum SaturnTextureQuality {
 }
 
 export class Saturn extends CelestialBody {
-  protected readonly RADIUS = 69911;
+  radius = 69911;
+  protected readonly RADIUS = this.radius;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
+  private readonly rings_: SaturnRings;
+
+  constructor() {
+    super();
+    this.rings_ = new SaturnRings(this);
+  }
+
+  async init(gl: WebGL2RenderingContext): Promise<void> {
+    await super.init(gl);
+    await this.rings_.init(gl);
+  }
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/saturn${SaturnTextureQuality.ULTRA}.jpg`;
@@ -54,10 +67,17 @@ export class Saturn extends CelestialBody {
     this.rotation = [0, (ros.dec - 90) * DEG2RAD, ros.spin * DEG2RAD];
   }
 
+  update(simTime: Date): void {
+    super.update(simTime);
+    this.rings_.update(simTime);
+  }
+
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_ || settingsManager.isDisablePlanets) {
       return;
     }
+
     super.draw(sunPosition, tgtBuffer);
+    this.rings_.draw(sunPosition, tgtBuffer);
   }
 }

@@ -663,6 +663,9 @@ export class WebGLRenderer {
         case Body.Pluto:
           scene.worldShift = scene.planets[settingsManager.centerBody]!.position.map((coord: number) => -coord) as [number, number, number];
           break;
+        case Body.Sun:
+          scene.worldShift = [scene.sun.eci.x, scene.sun.eci.y, scene.sun.eci.z].map((coord: number) => -coord) as [number, number, number];
+          break;
         case Body.Earth:
         default:
           scene.worldShift = [0, 0, 0];

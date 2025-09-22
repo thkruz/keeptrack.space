@@ -24,6 +24,7 @@ import { vec3 } from 'gl-matrix';
 import { DEG2RAD, EciVec3 } from 'ootk';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody } from './celestial-body';
+import { UranusRings } from './uranus-rings';
 
 // TODO: Uranus doesn't occlude the sun yet!
 
@@ -33,10 +34,21 @@ export enum UranusTextureQuality {
 }
 
 export class Uranus extends CelestialBody {
-  protected readonly RADIUS = 24622;
+  radius = 24622;
+  protected readonly RADIUS = this.radius;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
+  private readonly rings_: UranusRings;
+
+  constructor() {
+    super();
+    this.rings_ = new UranusRings(this);
+  }
+  async init(gl: WebGL2RenderingContext): Promise<void> {
+    await super.init(gl);
+    await this.rings_.init(gl);
+  }
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/uranus${UranusTextureQuality.ULTRA}.jpg`;
@@ -54,10 +66,17 @@ export class Uranus extends CelestialBody {
     this.rotation = [0, (ros.dec - 90) * DEG2RAD, ros.spin * DEG2RAD];
   }
 
+  update(simTime: Date): void {
+    super.update(simTime);
+    this.rings_.update(simTime);
+  }
+
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
     if (!this.isLoaded_ || settingsManager.isDisablePlanets) {
       return;
     }
+
     super.draw(sunPosition, tgtBuffer);
+    this.rings_.draw(sunPosition, tgtBuffer);
   }
 }

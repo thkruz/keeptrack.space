@@ -24,6 +24,7 @@ export class Material {
   gl: WebGL2RenderingContext;
   glslVersion?: GLSLVersion;
   map: WebGLTexture | null = null;
+  alphaMap: WebGLTexture | null = null;
   static id = -1;
   ambient?: vec3;
   diffuse?: vec3;

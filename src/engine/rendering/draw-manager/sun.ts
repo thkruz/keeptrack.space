@@ -22,6 +22,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { Scene } from '@app/engine/core/scene';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -72,6 +73,7 @@ export class Sun {
    */
   sunDirectionCache: { jd: number; sunDirection: EciArr3; } = { jd: 0, sunDirection: [0, 0, 0] };
   textureDirection = [0, 0] as vec2;
+  rotation: vec3 = [0, 0, 0];
 
   /**
    * This is run once per frame to render the sun.
@@ -108,7 +110,7 @@ export class Sun {
       widthSegments: this.NUM_WIDTH_SEGS,
       heightSegments: this.NUM_HEIGHT_SEGS,
     });
-    const sunTextureQuality = settingsManager.sunTextureQuality ?? SunTextureQuality.LOW;
+    const sunTextureQuality = settingsManager.sunTextureQuality ?? SunTextureQuality.HIGH;
     const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun${sunTextureQuality}.jpg`);
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
@@ -117,6 +119,8 @@ export class Sun {
         u_sizeOfSun: null as unknown as WebGLUniformLocation,
         u_sunDistance: null as unknown as WebGLUniformLocation,
         u_isTexture: null as unknown as WebGLUniformLocation,
+        u_textureBlend: null as unknown as WebGLUniformLocation,
+        u_time: null as unknown as WebGLUniformLocation,
       },
       map: texture,
       vertexShader: this.shaders_.vert,
@@ -154,7 +158,7 @@ export class Sun {
 
     const sunMaxDist = Math.max(Math.max(Math.abs(eci[0]), Math.abs(eci[1])), Math.abs(eci[2]));
 
-    const worldShift = Scene.getInstance().worldShift;
+    const worldShift = Scene.getInstance().worldShift as [number, number, number];
 
     this.position[0] = ((eci[0] + worldShift[0]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
     this.position[1] = ((eci[1] + worldShift[1]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
@@ -178,6 +182,27 @@ export class Sun {
       mat4.rotateY(this.modelViewMatrix_, this.modelViewMatrix_, (ros.dec - 90) * DEG2RAD);
     }
 
+    if (settingsManager.centerBody === Body.Sun) {
+      this.rotation[0] += 0.001 * (Math.random() - 0.5);
+      this.rotation[1] += 0.001 * (Math.random() - 0.5);
+      this.rotation[2] += 0.001 * (Math.random() - 0.5);
+
+      // Trend back to 0 over time
+      this.rotation[0] *= 0.99;
+      this.rotation[1] *= 0.99;
+      this.rotation[2] *= 0.99;
+
+      // Clamp the rotation to prevent it from getting too large
+      this.rotation[0] = Math.max(-15 * DEG2RAD, Math.min(15 * DEG2RAD, this.rotation[0]));
+      this.rotation[1] = Math.max(-15 * DEG2RAD, Math.min(15 * DEG2RAD, this.rotation[1]));
+      this.rotation[2] = Math.max(-15 * DEG2RAD, Math.min(15 * DEG2RAD, this.rotation[2]));
+
+      // Apply the rotation
+      mat4.rotateX(this.modelViewMatrix_, this.modelViewMatrix_, this.rotation[0]);
+      mat4.rotateY(this.modelViewMatrix_, this.modelViewMatrix_, this.rotation[1]);
+      mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, this.rotation[2]);
+    }
+
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
   }
 
@@ -190,19 +215,32 @@ export class Sun {
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
-    // Apply a random factor to the sun size (±0.1% per frame, clamped to ±5% total)
 
-    // Add a small random change (±0.25%)
-    this.sizeRandomFactor_ += (Math.random() - 0.5) * 0.01;
-    // Clamp to ±5% range
-    this.sizeRandomFactor_ = Math.max(0.85, Math.min(1.15, this.sizeRandomFactor_));
-    const adjustedSize = settingsManager.isUseSunTexture ? settingsManager.sizeOfSun * 1.5 : settingsManager.sizeOfSun * this.sizeRandomFactor_;
+    // Animate the fireball effect by passing time to the shader
+    const time = performance.now() * 0.0001;
+
+    gl.uniform1f(this.mesh.material.uniforms.u_time, time);
+
+    let adjustedSize = settingsManager.sizeOfSun;
+
+    // Apply a random factor to the sun size (±0.1% per frame, clamped to ±5% total)
+    if (settingsManager.centerBody === Body.Sun && ServiceLocator.getMainCamera().zoomLevel() < 0.4) {
+      // No random size changes if we are centered on the sun and zoomed in very close
+    } else {
+      this.sizeRandomFactor_ += (Math.random() - 0.5) * 0.01;
+      this.sizeRandomFactor_ = Math.max(0.85, Math.min(1.15, this.sizeRandomFactor_));
+      adjustedSize = settingsManager.isUseSunTexture ? settingsManager.sizeOfSun * 1.5 : settingsManager.sizeOfSun * this.sizeRandomFactor_;
+    }
 
     gl.uniform3fv(this.mesh.material.uniforms.u_sizeOfSun, [adjustedSize, adjustedSize, adjustedSize]);
     gl.uniform3fv(this.mesh.material.uniforms.u_lightDirection, earthLightDirection);
     gl.uniform1f(this.mesh.material.uniforms.u_sunDistance, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
     gl.uniform1i(this.mesh.material.uniforms.u_sampler, 0);
+    gl.uniform1f(this.mesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     gl.uniform1i(this.mesh.material.uniforms.u_isTexture, settingsManager.isUseSunTexture ? 1 : 0);
+    const isSunCenterBody = settingsManager.centerBody === Body.Sun;
+
+    gl.uniform1f(this.mesh.material.uniforms.u_textureBlend, isSunCenterBody ? 0.001 : 0.0);
   }
 
   /**
@@ -212,40 +250,58 @@ export class Sun {
    */
   private readonly shaders_ = {
     frag: glsl`
-        uniform bool u_isTexture;
-        uniform vec3 u_lightDirection;
-        uniform sampler2D u_sampler;
+    uniform sampler2D u_sampler;
+    uniform bool u_isTexture;
+    uniform vec3 u_lightDirection;
+    uniform float u_textureBlend;
+    uniform float u_time;
 
-        in vec3 v_normal;
-        in float v_dist;
-        in vec2 vUv;
+    in vec3 v_normal;
+    in float v_dist;
+    in vec2 vUv;
 
-        out vec4 fragColor;
+    out vec4 fragColor;
 
-        void main(void) {
-            // Hide the Back Side of the Sphere to prevent duplicate suns and z-fighting
-            if (v_dist > 1.0) {
-              discard;
-            }
+    // Enhanced fireball noise function for more visible effect
+    // Seamless fireball noise function
+    float fireNoise(vec2 uv, float t) {
+      // Wrap UVs to [0,1] for seamless tiling
+      vec2 wrappedUv = vec2(mod(uv.x, 1.0), mod(uv.y, 1.0));
+      float n = sin(wrappedUv.x * 2.0 * 3.1415926 + t * 4.0) * cos(wrappedUv.y * 2.0 * 3.1415926 - t * 3.0);
+      n += sin(wrappedUv.x * 4.0 * 3.1415926 - t * 2.4) * 0.7;
+      n += cos(wrappedUv.y * 4.0 * 3.1415926 + t * 3.4) * 0.7;
+      n += sin((wrappedUv.x + wrappedUv.y) * 8.0 * 3.1415926 + t * 6.0) * 0.3;
+      return n * 0.5;
+    }
 
-            if (u_isTexture) {
-              fragColor = texture(u_sampler, vUv);
-            } else {
-              // Improved sun appearance with smoother gradient
-              float a = max(dot(v_normal, -u_lightDirection), 0.1);
+    void main(void) {
+        vec3 baseColor = texture(u_sampler, vUv).rgb;
+        float fire = fireNoise(vUv, u_time);
 
-              // Apply a more realistic falloff using pow() for solar limb darkening
-              a = pow(a, 0.005); // Softer falloff
+        if (u_isTexture) {
+          // Stronger animated fireball effect to the texture
+          vec3 fireColor = vec3(1.0, 0.7, 0.2) * (1.0 + fire * 0.7);
+          baseColor = mix(baseColor, fireColor, 0.7 + fire * 0.3);
+          fragColor = vec4(baseColor, 1.0);
+        } else {
+          float a = max(dot(v_normal, -u_lightDirection), 0.1);
+          a = pow(a, 0.005);
 
-              float r = 0.9 * a;
-              float g = 0.8 * a;
-              float b = 0.65 * a;
-              fragColor = vec4(vec3(r,g,b), a);
-            }
-        }`,
+          float r = 1.0 * a + fire * 0.5;
+          float g = 0.85 * a + fire * 0.3;
+          float b = 0.7 * a + fire * 0.2;
+
+          vec3 sunColor = vec3(r, g, b);
+          vec3 blendedColor = mix(sunColor, baseColor, u_textureBlend);
+
+          fragColor = vec4(blendedColor, 1.0);
+        }
+        ${DepthManager.getLogDepthFragCode()}
+    }`,
     vert: glsl`
         uniform vec3 u_sizeOfSun;
         uniform float u_sunDistance;
+        uniform float u_time;
 
         out vec2 vUv;
         out vec3 v_normal;

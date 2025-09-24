@@ -164,11 +164,6 @@ export class Godrays {
    */
   private readonly shaders_ = {
     frag: glsl`
-      uniform int u_samples;
-      uniform float u_decay;
-      uniform float u_exposure;
-      uniform float u_density;
-      uniform float u_weight;
       uniform sampler2D u_sampler;
       uniform vec2 u_sunPosition;
       uniform vec2 u_resolution;
@@ -183,15 +178,9 @@ export class Godrays {
       void main() {
         int samples = 40;
         float decay = 0.95;
-        float exposure = 0.2;
-        float density = 1.0;
-        float weight = 0.6;
-
-        if (u_samples > 0) samples = u_samples;
-        if (u_decay > 0.0) decay = u_decay;
-        if (u_exposure > 0.0) exposure = u_exposure;
-        if (u_density > 0.0) density = u_density;
-        if (u_weight > 0.0) weight = u_weight;
+        float exposure = 0.21;
+        float density = 0.965;
+        float weight = 0.65;
 
         vec2 lightPositionOnScreen = vec2(u_sunPosition.x, 1.0 - u_sunPosition.y);
         vec2 texCoord = v_texCoord;
@@ -202,39 +191,57 @@ export class Godrays {
 
         // Define sun radius in normalized screen space (now aspect-corrected)
         float sunRadius = 0.02;
+        float margin = 0.15;
+        bool sunVisible =
+          lightPositionOnScreen.x > -margin && lightPositionOnScreen.x < 1.0 + margin &&
+          lightPositionOnScreen.y > -margin && lightPositionOnScreen.y < 1.0 + margin &&
+          dist <= 1.5 + margin;
 
-        if (lightPositionOnScreen.x < 0.0 || lightPositionOnScreen.x > 1.0 ||
-            lightPositionOnScreen.y < 0.0 || lightPositionOnScreen.y > 1.0 ||
-            dist > 1.5) {
+        if (!sunVisible) {
           fragColor = texture(u_sampler, v_texCoord);
           return;
         }
 
         float noise = 0.0;
         if (dist > sunRadius) {
-          noise = rand(v_texCoord * u_resolution + float(gl_FragCoord.x + gl_FragCoord.y));
+          // Incorporate u_sunPosition.x and u_sunPosition.y into noise calculation
+          noise = rand(v_texCoord * u_resolution + float(gl_FragCoord.x + gl_FragCoord.y) + u_sunPosition.x * 100.0 + u_sunPosition.y * 1000.0);
         }
 
         vec4 color = vec4(0.0);
         float illum = 1.0;
 
-        float angle = rand(v_texCoord * 100.0 + gl_FragCoord.xy) * 6.2831853;
-        float sinA = sin(angle) * 0.0002;
-        float cosA = cos(angle) * 0.0002;
+        // Add more randomness to the sampling direction and step
+        float angle = rand(v_texCoord * 100.0 + gl_FragCoord.xy + u_sunPosition.xy * 50.0) * 6.2831853;
+        float sinA = sin(angle) * (0.0002 + rand(v_texCoord * 200.0 + u_sunPosition.xy * 20.0) * 0.0003);
+        float cosA = cos(angle) * (0.0002 + rand(v_texCoord * 300.0 + u_sunPosition.xy * 30.0) * 0.0003);
         vec2 randomOffset = vec2(cosA, sinA);
 
-        vec2 step = (deltaTexCoord + randomOffset) * density / float(samples);
+        // Randomize density per pixel
+        float densityJitter = density + (rand(v_texCoord * 400.0 + gl_FragCoord.xy + u_sunPosition.xy * 40.0) - 0.5) * 0.05;
+
+        vec2 step = (deltaTexCoord + randomOffset) * densityJitter / float(samples);
 
         texCoord -= step * noise;
+
+        // Vary starting illumination slightly
+        illum *= 1.0 + (rand(v_texCoord * 500.0 + gl_FragCoord.xy + u_sunPosition.xy * 60.0) - 0.5) * 0.1;
 
         for(int i = 0; i < samples; i++) {
           texCoord -= step;
 
-          if (texCoord.x < 0.0 || texCoord.x > 1.0 || texCoord.y < 0.0 || texCoord.y > 1.0) {
+          // Add random jitter to each sample position
+          vec2 jitter = vec2(
+            (rand(texCoord * 600.0 + float(i) + u_sunPosition.x * 70.0) - 0.5) * 0.001,
+            (rand(texCoord * 700.0 + float(i) + u_sunPosition.y * 80.0) - 0.5) * 0.001
+          );
+          vec2 sampleCoord = texCoord + jitter;
+
+          if (sampleCoord.x < 0.0 || sampleCoord.x > 1.0 || sampleCoord.y < 0.0 || sampleCoord.y > 1.0) {
             break;
           }
 
-          vec4 sampleColor = texture(u_sampler, texCoord);
+          vec4 sampleColor = texture(u_sampler, sampleCoord);
           sampleColor *= illum * weight;
           color += sampleColor;
           illum *= decay;

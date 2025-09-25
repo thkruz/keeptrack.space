@@ -35,6 +35,7 @@ export const CollisionAnalysis: React.FC<CollisionAnalysisProps> = ({
     const [selectedCollision, setSelectedCollision] = useState<CollisionEvent | null>(null);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [isAutoRefresh, setIsAutoRefresh] = useState(true);
+    const [isMinimized, setIsMinimized] = useState(false);
 
     const SOCRATES_API_URL = 'https://api.keeptrack.space/v2/socrates/latest';
 
@@ -128,11 +129,11 @@ export const CollisionAnalysis: React.FC<CollisionAnalysisProps> = ({
 
     return (
         <div className="collision-analysis-overlay">
-            <div className="collision-analysis-panel">
+            <div className={`collision-analysis-panel ${isMinimized ? 'minimized' : ''}`} style={{ pointerEvents: 'auto' }}>
                 <div className="panel-header">
                     <div className="header-left">
                         <h2>Collision Analysis</h2>
-                        {lastUpdated && (
+                        {lastUpdated && !isMinimized && (
                             <div className="last-updated">
                                 Last updated: {formatLastUpdated(lastUpdated)}
                             </div>
@@ -145,6 +146,15 @@ export const CollisionAnalysis: React.FC<CollisionAnalysisProps> = ({
                             title={isAutoRefresh ? 'Auto-refresh enabled (every 5 min)' : 'Auto-refresh disabled'}
                         >
                             🔄
+                        </button>
+                        <button
+                            className="minimize-button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsMinimized(!isMinimized);
+                            }}
+                        >
+                            {isMinimized ? '▲' : '▼'}
                         </button>
                         <button className="close-button" onClick={onClose}>×</button>
                     </div>

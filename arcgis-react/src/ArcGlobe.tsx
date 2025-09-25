@@ -55,14 +55,77 @@ export const ArcGlobe: React.FC = () => {
         }
     };
 
+    const resolveSatelliteId = (noradValue: string | number, name: string): number | undefined => {
+        const attempts: string[] = [];
+        const raw = typeof noradValue === 'number' ? noradValue.toString() : (noradValue || '').toString().trim();
+        if (raw) {
+            attempts.push(raw);
+            if (/^\d+$/.test(raw)) {
+                attempts.push(raw.padStart(5, '0'));
+                const numeric = parseInt(raw, 10);
+                if (!Number.isNaN(numeric)) {
+                    attempts.push(numeric.toString());
+                    attempts.push(numeric.toString().padStart(5, '0'));
+                }
+            }
+        }
+
+        for (const candidate of attempts) {
+            const sat = satelliteService.getSatelliteByNorad(candidate);
+            if (sat) {
+                return sat.id;
+            }
+        }
+
+        const lowerName = name.toLowerCase();
+        if (lowerName) {
+            const exactByName = satelliteService.getAllSatellites().find((sat) => sat.name.toLowerCase() === lowerName);
+            if (exactByName) {
+                return exactByName.id;
+            }
+
+            const searchMatches = satelliteService.searchSatellites(name);
+            if (searchMatches.length > 0) {
+                return searchMatches[0].id;
+            }
+        }
+
+        return undefined;
+    };
+
     const handleCollisionSelect = (collision: CollisionEvent) => {
         console.log('Collision selected:', collision);
-        // TODO: Highlight collision on globe, show details
+        if (instancedApiRef.current) {
+            const ids: number[] = [];
+            const sat1Id = resolveSatelliteId(collision.SAT1, collision.SAT1_NAME || '');
+            const sat2Id = resolveSatelliteId(collision.SAT2, collision.SAT2_NAME || '');
+
+            if (typeof sat1Id === 'number') {
+                ids.push(sat1Id);
+            }
+            if (typeof sat2Id === 'number') {
+                ids.push(sat2Id);
+            }
+
+            if (ids.length > 0) {
+                instancedApiRef.current.resetVisibility();
+                instancedApiRef.current.setVisibleSatellites(ids, [1.0, 0.5, 0.0]);
+                instancedApiRef.current.setHighlightedSatellite(null);
+                console.log(`Highlighting collision satellites: ${collision.SAT1_NAME}${typeof sat2Id === 'number' ? ` and ${collision.SAT2_NAME}` : ''}`);
+            } else {
+                console.warn('No matching satellites found for collision pair', collision.SAT1, collision.SAT2);
+                instancedApiRef.current.resetVisibility();
+            }
+        }
     };
 
     const handleCloseCollisionAnalysis = () => {
         setShowCollisionAnalysis(false);
         setSelectedFeature(null);
+        if (instancedApiRef.current) {
+            instancedApiRef.current.resetVisibility();
+            instancedApiRef.current.setHighlightedSatellite(null);
+        }
     };
 
     const handleCloseCreateSatellite = () => {
@@ -76,22 +139,41 @@ export const ArcGlobe: React.FC = () => {
 
     const handleCloseConstellationAnalysis = () => {
         setShowConstellationAnalysis(false);
+        if (instancedApiRef.current) {
+            instancedApiRef.current.resetVisibility();
+            instancedApiRef.current.setHighlightedSatellite(null);
+        }
     };
 
     const handleConstellationSelect = (constellation: Constellation) => {
         console.log('Constellation selected:', constellation);
     };
 
-    const handleConstellationHighlight = (constellation: Constellation | null) => {
-        // Highlight constellation satellites on the globe
-        if (constellation && instancedApiRef.current) {
-            const satelliteIds = constellation.satellites.map(sat => sat.id);
-            instancedApiRef.current.setHighlightedSatellites(satelliteIds);
-            console.log(`Highlighting constellation ${constellation.name} with ${satelliteIds.length} satellites`);
-        } else if (instancedApiRef.current) {
-            instancedApiRef.current.setHighlightedSatellites([]);
-            console.log('Clearing constellation highlight');
+    const handleConstellationHighlight = (constellation: Constellation | null, interaction: 'hover' | 'select' | 'clear' = 'hover') => {
+        if (!instancedApiRef.current) {
+            return;
         }
+
+        if (interaction === 'hover') {
+            // Do not change visibility on hover to avoid disruptive flicker
+            return;
+        }
+
+        if (interaction === 'select' && constellation) {
+            const ids = constellation.satellites.map(s => s.id).filter(id => typeof id === 'number');
+            if (ids.length > 0) {
+                instancedApiRef.current.resetVisibility();
+                instancedApiRef.current.setVisibleSatellites(ids, [1.0, 0.5, 0.0]);
+                instancedApiRef.current.setHighlightedSatellite(null);
+                console.log(`Highlighting ${ids.length} satellites of constellation ${constellation.name}`);
+            }
+            return;
+        }
+
+        // Handle clearing (either explicit clear or a deselection)
+        instancedApiRef.current.resetVisibility();
+        instancedApiRef.current.setHighlightedSatellite(null);
+        console.log('Clearing constellation highlight');
     };
 
     const handleSatelliteCreated = (satelliteData: SatelliteFormData) => {

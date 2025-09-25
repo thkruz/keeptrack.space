@@ -17,7 +17,7 @@ export interface ConstellationAnalysisProps {
     isVisible: boolean;
     onClose: () => void;
     onConstellationSelect: (constellation: Constellation) => void;
-    onConstellationHighlight: (constellation: Constellation | null) => void;
+    onConstellationHighlight: (constellation: Constellation | null, interaction?: 'hover' | 'select' | 'clear') => void;
 }
 
 export const ConstellationAnalysis: React.FC<ConstellationAnalysisProps> = ({
@@ -30,6 +30,7 @@ export const ConstellationAnalysis: React.FC<ConstellationAnalysisProps> = ({
     const [selectedConstellation, setSelectedConstellation] = useState<Constellation | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [analysisProgress, setAnalysisProgress] = useState(0);
+    const [isMinimized, setIsMinimized] = useState(false);
 
     const satelliteService = SatelliteService.getInstance();
 
@@ -158,27 +159,38 @@ export const ConstellationAnalysis: React.FC<ConstellationAnalysisProps> = ({
         } else {
             setSelectedConstellation(constellation);
             onConstellationSelect(constellation);
-            onConstellationHighlight(constellation);
+            onConstellationHighlight(constellation, 'select');
         }
     };
 
     const handleConstellationHover = (constellation: Constellation | null) => {
-        onConstellationHighlight(constellation);
+        onConstellationHighlight(constellation, 'hover');
     };
 
     const handleClearHighlight = () => {
         setSelectedConstellation(null);
-        onConstellationHighlight(null);
+        onConstellationHighlight(null, 'clear');
     };
 
     if (!isVisible) return null;
 
     return (
-        <div className="constellation-analysis-overlay" onClick={onClose}>
-            <div className="constellation-analysis-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="constellation-analysis-overlay">
+            <div className={`constellation-analysis-modal ${isMinimized ? 'minimized' : ''}`} style={{ pointerEvents: 'auto' }}>
                 <div className="constellation-analysis-header">
                     <h2>Constellation Analysis</h2>
-                    <button className="close-button" onClick={onClose}>×</button>
+                    <div className="header-buttons">
+                        <button
+                            className="minimize-button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setIsMinimized(!isMinimized);
+                            }}
+                        >
+                            {isMinimized ? '▲' : '▼'}
+                        </button>
+                        <button className="close-button" onClick={onClose}>×</button>
+                    </div>
                 </div>
 
                 {selectedConstellation && (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './FeatureMenu.css';
 
 export type MenuTab = 'basic' | 'advanced' | 'analysis';
@@ -21,6 +21,44 @@ export const FeatureMenu: React.FC<FeatureMenuProps> = ({
     const [activeTab, setActiveTab] = useState<MenuTab>('basic');
     const [isExpanded, setIsExpanded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isAnimating, setIsAnimating] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
+    // Handle keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (!isExpanded) return;
+
+            switch (e.key) {
+                case 'Escape':
+                    setIsExpanded(false);
+                    break;
+                case 'Tab':
+                    // Allow default tab behavior
+                    break;
+                case 'Enter':
+                case ' ':
+                    if (document.activeElement?.classList.contains('feature-item')) {
+                        e.preventDefault();
+                        (document.activeElement as HTMLElement).click();
+                    }
+                    break;
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isExpanded]);
+
+    // Focus search input when menu expands
+    useEffect(() => {
+        if (isExpanded && searchInputRef.current) {
+            setTimeout(() => {
+                searchInputRef.current?.focus();
+            }, 300); // Wait for animation to complete
+        }
+    }, [isExpanded]);
 
     const menuItems = {
         basic: [
@@ -70,9 +108,32 @@ export const FeatureMenu: React.FC<FeatureMenuProps> = ({
     };
 
     return (
-        <div className={`feature-menu ${isExpanded ? 'expanded' : 'collapsed'}`}>
+        <div
+            ref={menuRef}
+            className={`feature-menu ${isExpanded ? 'expanded' : 'collapsed'} ${isAnimating ? 'animating' : ''}`}>
             {/* Menu Toggle Button */}
-            <div className="menu-toggle" onClick={() => setIsExpanded(!isExpanded)}>
+            <div
+                className="menu-toggle"
+                onClick={() => {
+                    if (isAnimating) return;
+                    setIsAnimating(true);
+                    setIsExpanded(!isExpanded);
+                    setTimeout(() => setIsAnimating(false), 300);
+                }}
+                role="button"
+                tabIndex={0}
+                aria-label={isExpanded ? 'Close menu' : 'Open menu'}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (!isAnimating) {
+                            setIsAnimating(true);
+                            setIsExpanded(!isExpanded);
+                            setTimeout(() => setIsAnimating(false), 300);
+                        }
+                    }
+                }}
+            >
                 <div className="menu-icon">
                     <div className="hamburger-line"></div>
                     <div className="hamburger-line"></div>
@@ -89,18 +150,36 @@ export const FeatureMenu: React.FC<FeatureMenuProps> = ({
                         <button
                             className={`tab ${activeTab === 'basic' ? 'active' : ''}`}
                             onClick={() => handleTabClick('basic')}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleTabClick('basic');
+                                }
+                            }}
                         >
                             Basic
                         </button>
                         <button
                             className={`tab ${activeTab === 'advanced' ? 'active' : ''}`}
                             onClick={() => handleTabClick('advanced')}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleTabClick('advanced');
+                                }
+                            }}
                         >
                             Advanced
                         </button>
                         <button
                             className={`tab ${activeTab === 'analysis' ? 'active' : ''}`}
                             onClick={() => handleTabClick('analysis')}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleTabClick('analysis');
+                                }
+                            }}
                         >
                             Analysis
                         </button>
@@ -115,6 +194,14 @@ export const FeatureMenu: React.FC<FeatureMenuProps> = ({
                                 value={searchQuery}
                                 onChange={handleSearchChange}
                                 className="search-input"
+                                ref={searchInputRef}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && searchQuery.trim()) {
+                                        if (onSearchSatellites) {
+                                            onSearchSatellites(searchQuery);
+                                        }
+                                    }
+                                }}
                             />
                             <div className="search-icon">🔍</div>
                         </div>
@@ -133,6 +220,14 @@ export const FeatureMenu: React.FC<FeatureMenuProps> = ({
                                 key={item.id}
                                 className={`feature-item ${selectedFeature === item.id ? 'selected' : ''}`}
                                 onClick={() => handleFeatureClick(item.id)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleFeatureClick(item.id);
+                                    }
+                                }}
                             >
                                 <div className="feature-icon">{item.icon}</div>
                                 <div className="feature-info">

@@ -105,6 +105,10 @@ export class SatelliteService {
         );
     }
 
+    getSatelliteByNorad(noradId: string): SatelliteData | undefined {
+        return this.metaRef.find(sat => sat.norad === noradId);
+    }
+
     private generateTLE1(formData: SatelliteFormData): string {
         const scc = formData.scc.padStart(5, '0');
         const epoch = `${formData.year}${formData.day.padStart(12, '0').substring(0, 12)}`;

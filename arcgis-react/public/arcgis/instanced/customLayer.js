@@ -100,6 +100,24 @@
                     try { require(['esri/views/3d/externalRenderers'], function (externalRenderers) { externalRenderers.requestRender(view); }); } catch (e) { }
                 }
             },
+            setHighlightedSatellite: function (id, color, hideOthers) {
+                if (state.renderer && state.renderer.setHighlightedSatellite) {
+                    state.renderer.setHighlightedSatellite(id, color, hideOthers);
+                    try { require(['esri/views/3d/externalRenderers'], function (externalRenderers) { externalRenderers.requestRender(view); }); } catch (e) { }
+                }
+            },
+            setVisibleSatellites: function (ids, color) {
+                if (state.renderer && state.renderer.setVisibleSatellites) {
+                    state.renderer.setVisibleSatellites(ids, color);
+                    try { require(['esri/views/3d/externalRenderers'], function (externalRenderers) { externalRenderers.requestRender(view); }); } catch (e) { }
+                }
+            },
+            resetVisibility: function () {
+                if (state.renderer && state.renderer.resetVisibility) {
+                    state.renderer.resetVisibility();
+                    try { require(['esri/views/3d/externalRenderers'], function (externalRenderers) { externalRenderers.requestRender(view); }); } catch (e) { }
+                }
+            },
             dispose: function () { state.disposed = true; try { state.renderer && state.renderer.dispose && state.renderer.dispose(); } catch (e) { } }
         };
 

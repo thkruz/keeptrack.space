@@ -4,12 +4,12 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: flex-start;
     justify-content: flex-end;
     z-index: 2000;
     padding: 20px;
+    pointer-events: none;
 }
 
 .collision-analysis-panel {
@@ -25,6 +25,28 @@
     flex-direction: column;
     margin-top: 20px;
     animation: slideInRight 0.3s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.collision-analysis-panel.minimized {
+    max-height: 64px;
+    overflow: hidden;
+}
+
+.minimize-button {
+    background: none;
+    border: none;
+    color: #B0BEC5;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.minimize-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
 }
 
 @keyframes slideInRight {

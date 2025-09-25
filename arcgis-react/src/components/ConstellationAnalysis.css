@@ -4,12 +4,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
     z-index: 2000;
-    backdrop-filter: blur(2px);
     pointer-events: none;
 }
 
@@ -27,6 +25,37 @@
     right: 20px;
     transform: none;
     pointer-events: auto;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.constellation-analysis-modal.minimized {
+    max-height: 64px;
+    overflow: hidden;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.minimize-button {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.minimize-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .constellation-analysis-header {

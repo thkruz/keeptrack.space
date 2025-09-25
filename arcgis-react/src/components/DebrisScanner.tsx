@@ -140,6 +140,7 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
     const [isPickerOpen, setIsPickerOpen] = useState(false);
     const [pickerSearch, setPickerSearch] = useState('');
     const [pickerPage, setPickerPage] = useState(0);
+    const [viewFiltered, setViewFiltered] = useState(false);
 
     const allSatellites = useMemo(() => satelliteService.getAllSatellites(), [satelliteService, version]);
 
@@ -269,12 +270,23 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
             if (api && typeof api.setVisibleSatellites === 'function') {
                 const ids = screened.map((obj) => obj.id);
                 api.setVisibleSatellites(ids, [1, 0.6, 0.2]);
+                setViewFiltered(ids.length > 0);
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to screen for debris.');
         } finally {
             setIsComputing(false);
         }
+    };
+
+    const handleResetView = () => {
+        const api = getInstancedApi();
+        setResults([]);
+        setError(null);
+        if (api && typeof api.resetVisibility === 'function') {
+            api.resetVisibility();
+        }
+        setViewFiltered(false);
     };
 
     if (!isVisible) {
@@ -385,6 +397,9 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
                 <footer className="panel-footer">
                     <button className="btn primary" onClick={handleScan} disabled={isComputing}>
                         {isComputing ? 'Analyzing…' : 'Screen for Debris'}
+                    </button>
+                    <button className="btn secondary" onClick={handleResetView} disabled={!viewFiltered && results.length === 0}>
+                        Reset View
                     </button>
                     <button className="btn secondary" onClick={onClose}>
                         Close

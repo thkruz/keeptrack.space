@@ -1,0 +1,58 @@
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 9000;
+    backdrop-filter: blur(4px);
+}
+
+.loading-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 28px;
+    border-radius: 16px;
+    background: rgba(15, 20, 30, 0.9);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #4bb8ff;
+    animation: loading-spin 1s linear infinite;
+}
+
+.loading-text {
+    display: flex;
+    flex-direction: column;
+    color: #f4f7ff;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+}
+
+.loading-text p {
+    margin: 0;
+}
+
+.loading-subtext {
+    font-size: 13px;
+    margin-top: 4px;
+    color: rgba(244, 247, 255, 0.7);
+}
+
+@keyframes loading-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

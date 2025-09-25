@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import './ArcGlobe.css';
 import { CollisionAnalysis, type CollisionEvent } from './components/CollisionAnalysis';
 import { ConstellationAnalysis, type Constellation } from './components/ConstellationAnalysis';
 import { CreateSatellite, type SatelliteFormData } from './components/CreateSatellite';
@@ -18,6 +19,8 @@ declare global {
 export const ArcGlobe: React.FC = () => {
     const divRef = useRef<HTMLDivElement | null>(null);
     const instancedApiRef = useRef<any>(null);
+    const isLoadingRef = useRef(true);
+    const [isLoading, setIsLoading] = useState(true);
     const satelliteService = SatelliteService.getInstance();
     const tooltipService = TooltipService.getInstance();
 
@@ -56,41 +59,8 @@ export const ArcGlobe: React.FC = () => {
     };
 
     const resolveSatelliteId = (noradValue: string | number, name: string): number | undefined => {
-        const attempts: string[] = [];
-        const raw = typeof noradValue === 'number' ? noradValue.toString() : (noradValue || '').toString().trim();
-        if (raw) {
-            attempts.push(raw);
-            if (/^\d+$/.test(raw)) {
-                attempts.push(raw.padStart(5, '0'));
-                const numeric = parseInt(raw, 10);
-                if (!Number.isNaN(numeric)) {
-                    attempts.push(numeric.toString());
-                    attempts.push(numeric.toString().padStart(5, '0'));
-                }
-            }
-        }
-
-        for (const candidate of attempts) {
-            const sat = satelliteService.getSatelliteByNorad(candidate);
-            if (sat) {
-                return sat.id;
-            }
-        }
-
-        const lowerName = name.toLowerCase();
-        if (lowerName) {
-            const exactByName = satelliteService.getAllSatellites().find((sat) => sat.name.toLowerCase() === lowerName);
-            if (exactByName) {
-                return exactByName.id;
-            }
-
-            const searchMatches = satelliteService.searchSatellites(name);
-            if (searchMatches.length > 0) {
-                return searchMatches[0].id;
-            }
-        }
-
-        return undefined;
+        const sat = satelliteService.resolveSatellite(noradValue?.toString(), name);
+        return sat?.id;
     };
 
     const handleCollisionSelect = (collision: CollisionEvent) => {
@@ -99,6 +69,20 @@ export const ArcGlobe: React.FC = () => {
             const ids: number[] = [];
             const sat1Id = resolveSatelliteId(collision.SAT1, collision.SAT1_NAME || '');
             const sat2Id = resolveSatelliteId(collision.SAT2, collision.SAT2_NAME || '');
+
+            if (typeof sat1Id !== 'number') {
+                console.warn('[Collision] SAT1 unresolved', {
+                    ID: collision.SAT1,
+                    name: collision.SAT1_NAME
+                });
+            }
+
+            if (typeof sat2Id !== 'number') {
+                console.warn('[Collision] SAT2 unresolved', {
+                    ID: collision.SAT2,
+                    name: collision.SAT2_NAME
+                });
+            }
 
             if (typeof sat1Id === 'number') {
                 ids.push(sat1Id);
@@ -210,6 +194,21 @@ export const ArcGlobe: React.FC = () => {
         let selectedId: number | null = null;
         let metaRef: any[] = [];
         let hoverTimeout: number | null = null;
+        let cancelled = false;
+        let expectedSatelliteCount = 0;
+
+        isLoadingRef.current = true;
+        setIsLoading(true);
+
+        const markLoaded = () => {
+            if (cancelled) {
+                return;
+            }
+            if (isLoadingRef.current) {
+                isLoadingRef.current = false;
+                setIsLoading(false);
+            }
+        };
 
         // If instanced flag is on, load glue scripts early
         if (useInstanced) {
@@ -401,6 +400,8 @@ export const ArcGlobe: React.FC = () => {
                             };
                         });
 
+                        expectedSatelliteCount = satelliteData.length;
+
                         // Use classic worker served from public to avoid bundler issues
                         try {
                             worker = new Worker('/arcgis/worker.js');
@@ -449,7 +450,15 @@ export const ArcGlobe: React.FC = () => {
                                 if (data.type === 'positions' && data.positions) {
                                     const arr = data.positions instanceof Float32Array ? data.positions : new Float32Array(data.positions as ArrayBuffer);
                                     if (useInstanced && instancedApi) {
-                                        instancedApi.updatePositions(arr.buffer, Math.floor(arr.length / 3));
+                                        const count = Math.floor(arr.length / 3);
+                                        instancedApi.updatePositions(arr.buffer, count);
+                                        if (expectedSatelliteCount > 0 && count >= expectedSatelliteCount && isLoadingRef.current) {
+                                            requestAnimationFrame(() => {
+                                                setTimeout(() => {
+                                                    markLoaded();
+                                                }, 150);
+                                            });
+                                        }
                                     }
                                 } else if (data.type === 'track' && data.positions) {
                                     const arr = new Float32Array(data.positions);
@@ -501,16 +510,30 @@ export const ArcGlobe: React.FC = () => {
         boot();
 
         return () => {
+            cancelled = true;
             try { (view as any)?.destroy?.(); } catch { }
             try { worker?.terminate?.(); } catch { }
             try { if (hoverTimeout) clearTimeout(hoverTimeout); } catch { }
             try { tooltipService.dispose(); } catch { }
+            setIsLoading(false);
+            isLoadingRef.current = false;
         };
     }, []);
 
     return (
         <>
             <div id="viewDiv" ref={divRef} style={{ position: 'absolute', inset: 0 }} />
+            {isLoading && (
+                <div className="loading-overlay">
+                    <div className="loading-card">
+                        <div className="loading-spinner" />
+                        <div className="loading-text">
+                            <p>Loading Deepspace</p>
+                            <p className="loading-subtext">Fetching orbital data and rendering satellites…</p>
+                        </div>
+                    </div>
+                </div>
+            )}
             <FeatureMenu
                 onFeatureSelect={handleFeatureSelect}
                 selectedFeature={selectedFeature}

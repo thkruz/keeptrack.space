@@ -204,8 +204,10 @@
             packedBuffer: null,
             visibility: null,
             visibilityPacked: null,
+            positionsECEF: null,
+            velocitiesECEF: null,
             lastViewMatrix: null,
-            lastProjectionMatrix: null,
+            lastProjectionMatrix: null
         };
 
         function ensureCapacity(n) {
@@ -240,6 +242,11 @@
         }
 
         function updatePV(posBuf, velBuf, count) { // map PV → positions (lon/lat/h path)
+            if (state.disposed) {
+                return;
+            }
+            state.positionsECEF = posBuf instanceof Float32Array ? posBuf : new Float32Array(posBuf);
+            state.velocitiesECEF = velBuf instanceof Float32Array ? velBuf : new Float32Array(velBuf);
             return updatePositions(posBuf, count);
         }
 
@@ -437,6 +444,14 @@
             }
         }
 
+        function getSelectedId() {
+            return state.selectedId;
+        }
+
+        function setSearchBox(dimensions) {
+            state.searchBoxDimensions = dimensions;
+        }
+
         function resetVisibility() {
             if (!state.visibility) {
                 return;
@@ -446,6 +461,41 @@
             if (DEBUG) {
                 console.log('resetVisibility');
             }
+        }
+
+        function getPositionSnapshot() {
+            const count = state.visibleCount;
+            const positions = new Float32Array(count * 3);
+            const velocities = new Float32Array(count * 3);
+
+            const posSrc = new Float32Array(state.frontBuffer);
+
+            const positionsECEF = state.positionsECEF;
+            const velocitiesECEF = state.velocitiesECEF;
+
+            let write = 0;
+            for (let i = 0; i < count; i++) {
+                const idx = i * 3;
+                let lon = posSrc[idx];
+                let lat = posSrc[idx + 1];
+                let h = posSrc[idx + 2];
+
+                if (!Number.isFinite(lon) || !Number.isFinite(lat) || !Number.isFinite(h)) {
+                    lon = 0;
+                    lat = 0;
+                    h = 0;
+                }
+
+                positions[write++] = lon;
+                positions[write++] = lat;
+                positions[write++] = h;
+            }
+
+            if (positionsECEF && velocitiesECEF) {
+                velocities.set(velocitiesECEF.subarray(0, count * 3));
+            }
+
+            return { count, positions, velocities };
         }
 
 
@@ -458,6 +508,9 @@
             setHighlightedSatellite,
             setVisibleSatellites,
             resetVisibility,
+            getSelectedId,
+            setSearchBox,
+            getPositionSnapshot,
             dispose
         };
     }

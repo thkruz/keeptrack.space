@@ -3,6 +3,7 @@ import './ArcGlobe.css';
 import { CollisionAnalysis, type CollisionEvent } from './components/CollisionAnalysis';
 import { ConstellationAnalysis, type Constellation } from './components/ConstellationAnalysis';
 import { CreateSatellite, type SatelliteFormData } from './components/CreateSatellite';
+import { DebrisScanner } from './components/DebrisScanner';
 import { FeatureMenu } from './components/FeatureMenu';
 import { SatelliteService, type SatelliteData } from './services/satelliteService';
 import { TooltipService } from './services/tooltipService';
@@ -29,6 +30,7 @@ export const ArcGlobe: React.FC = () => {
     const [showCollisionAnalysis, setShowCollisionAnalysis] = useState(false);
     const [showCreateSatellite, setShowCreateSatellite] = useState(false);
     const [showConstellationAnalysis, setShowConstellationAnalysis] = useState(false);
+    const [showDebrisScanner, setShowDebrisScanner] = useState(false);
 
     // Feature handlers
     const handleFeatureSelect = (feature: string) => {
@@ -37,6 +39,9 @@ export const ArcGlobe: React.FC = () => {
         switch (feature) {
             case 'collision':
                 setShowCollisionAnalysis(true);
+                break;
+            case 'constellation':
+                setShowConstellationAnalysis(true);
                 break;
             case 'create-satellite':
                 setShowCreateSatellite(true);
@@ -50,8 +55,7 @@ export const ArcGlobe: React.FC = () => {
                 console.log('Create Breakup feature selected');
                 break;
             case 'debris-scanner':
-                // TODO: Implement debris scanner
-                console.log('Debris Scanner feature selected');
+                setShowDebrisScanner(true);
                 break;
             default:
                 break;
@@ -127,6 +131,11 @@ export const ArcGlobe: React.FC = () => {
             instancedApiRef.current.resetVisibility();
             instancedApiRef.current.setHighlightedSatellite(null);
         }
+    };
+
+    const handleCloseDebrisScanner = () => {
+        setShowDebrisScanner(false);
+        setSelectedFeature(null);
     };
 
     const handleConstellationSelect = (constellation: Constellation) => {
@@ -556,6 +565,12 @@ export const ArcGlobe: React.FC = () => {
                 onClose={handleCloseConstellationAnalysis}
                 onConstellationSelect={handleConstellationSelect}
                 onConstellationHighlight={handleConstellationHighlight}
+            />
+            <DebrisScanner
+                isVisible={showDebrisScanner}
+                onClose={handleCloseDebrisScanner}
+                getInstancedApi={() => instancedApiRef.current}
+                satelliteService={satelliteService}
             />
         </>
     );

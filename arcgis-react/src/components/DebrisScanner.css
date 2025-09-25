@@ -1,0 +1,335 @@
+.debris-scanner-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(8, 11, 17, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 9500;
+}
+
+.debris-scanner-panel {
+    width: min(720px, 94vw);
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(18, 24, 36, 0.94);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+    color: #f7fafd;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 26px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.panel-header h2 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 0.04em;
+}
+
+.close-button {
+    background: transparent;
+    border: none;
+    color: rgba(247, 250, 253, 0.8);
+    font-size: 26px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.close-button:hover {
+    color: #ffffff;
+}
+
+.panel-content {
+    padding: 22px 26px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.panel-section+.panel-section {
+    margin-top: 28px;
+}
+
+.panel-section h3 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(247, 250, 253, 0.82);
+}
+
+.field-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(247, 250, 253, 0.65);
+}
+
+.field select,
+.picker-trigger {
+    background: rgba(11, 15, 23, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: #f7fafd;
+    padding: 10px 12px;
+    font-size: 14px;
+}
+
+.picker-trigger {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    cursor: pointer;
+    transition: border 0.2s ease;
+}
+
+.picker-trigger:hover {
+    border-color: rgba(75, 184, 255, 0.65);
+}
+
+.picker-trigger strong {
+    font-size: 15px;
+    color: #f7fafd;
+}
+
+.picker-subtext,
+.picker-hint {
+    font-size: 12px;
+    color: rgba(247, 250, 253, 0.55);
+}
+
+.results-table {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.table-header,
+.table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 16px;
+}
+
+.table-header {
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.table-body {
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.table-row {
+    background: transparent;
+    border: none;
+    color: #f7fafd;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.table-row span {
+    display: flex;
+    align-items: center;
+}
+
+.table-row:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.table-row.active,
+.table-row:focus {
+    outline: 2px solid rgba(75, 184, 255, 0.65);
+    outline-offset: -2px;
+}
+
+.status {
+    padding: 16px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(247, 250, 253, 0.78);
+    font-size: 13px;
+}
+
+.status.error {
+    color: #ff9898;
+    background: rgba(255, 99, 132, 0.12);
+}
+
+.panel-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 26px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.btn {
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn.primary {
+    background: #4bb8ff;
+    color: #041020;
+}
+
+.btn.primary:hover {
+    transform: translateY(-1px);
+}
+
+.btn.secondary {
+    background: rgba(255, 255, 255, 0.12);
+    color: #f7fafd;
+}
+
+.btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+/* Satellite picker overlay */
+.satellite-picker-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 11, 17, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 9600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.satellite-picker-panel {
+    width: min(560px, 90vw);
+    max-height: 82vh;
+    display: flex;
+    flex-direction: column;
+    background: rgba(18, 24, 36, 0.95);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+.picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.picker-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #f7fafd;
+}
+
+.picker-content {
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+    overflow: hidden;
+}
+
+.picker-search {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(11, 15, 23, 0.85);
+    color: #f7fafd;
+    font-size: 14px;
+}
+
+.picker-list {
+    flex: 1;
+    overflow-y: auto;
+    display: grid;
+    gap: 4px;
+}
+
+.picker-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #f7fafd;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border 0.15s ease, background 0.15s ease;
+}
+
+.picker-item:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.picker-item.active {
+    border-color: rgba(75, 184, 255, 0.65);
+    background: rgba(75, 184, 255, 0.12);
+}
+
+.picker-item-name {
+    font-weight: 500;
+}
+
+.picker-item-norad {
+    font-size: 12px;
+    color: rgba(247, 250, 253, 0.6);
+}
+
+.picker-empty {
+    padding: 32px;
+    text-align: center;
+    color: rgba(247, 250, 253, 0.65);
+    font-size: 14px;
+}
+
+.picker-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 22px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.picker-page-indicator {
+    font-size: 13px;
+    color: rgba(247, 250, 253, 0.7);
+}

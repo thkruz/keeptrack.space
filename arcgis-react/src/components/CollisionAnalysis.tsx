@@ -125,10 +125,8 @@ export const CollisionAnalysis: React.FC<CollisionAnalysisProps> = ({
         setIsAutoRefresh(!isAutoRefresh);
     };
 
-    if (!isVisible) return null;
-
     return (
-        <div className="collision-analysis-overlay">
+        <div className={`collision-analysis-overlay ${!isVisible ? 'hidden' : ''}`}>
             <div className={`collision-analysis-panel ${isMinimized ? 'minimized' : ''}`} style={{ pointerEvents: 'auto' }}>
                 <div className="panel-header">
                     <div className="header-left">

@@ -12,6 +12,10 @@
     pointer-events: none;
 }
 
+.collision-analysis-overlay.hidden {
+    opacity: 0;
+}
+
 .collision-analysis-panel {
     background: rgba(15, 15, 15, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.15);

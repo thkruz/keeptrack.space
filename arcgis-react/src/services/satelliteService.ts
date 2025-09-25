@@ -35,6 +35,7 @@ export class SatelliteService {
     private nextUserSatelliteId = 30000;
     private noradIndex = new Map<string, SatelliteData>();
     private nameIndex = new Map<string, SatelliteData>();
+    private listeners: Array<() => void> = [];
 
     static getInstance(): SatelliteService {
         if (!SatelliteService.instance) {
@@ -75,6 +76,7 @@ export class SatelliteService {
             addNameVariant(sat.name, sat);
         }
         console.log('SatelliteService: Initialized with', metadata.length, 'satellites and worker:', !!worker);
+        this.notifyListeners();
     }
 
     createSatellite(formData: SatelliteFormData): SatelliteData {
@@ -111,6 +113,8 @@ export class SatelliteService {
             }
         }
 
+        this.notifyListeners();
+
         // Update worker with new satellite
         if (this.worker) {
             console.log('SatelliteService: Sending satellite to worker:', newSatellite);
@@ -132,6 +136,13 @@ export class SatelliteService {
 
     getAllSatellites(): SatelliteData[] {
         return this.metaRef;
+    }
+
+    subscribe(listener: () => void): () => void {
+        this.listeners.push(listener);
+        return () => {
+            this.listeners = this.listeners.filter((l) => l !== listener);
+        };
     }
 
     getUserCreatedSatellites(): SatelliteData[] {
@@ -205,6 +216,16 @@ export class SatelliteService {
     private normalizeName(value: string | undefined): string {
         if (!value) return '';
         return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    private notifyListeners(): void {
+        for (const listener of this.listeners) {
+            try {
+                listener();
+            } catch (error) {
+                console.error('SatelliteService listener error:', error);
+            }
+        }
     }
 
     private generateTLE1(formData: SatelliteFormData): string {

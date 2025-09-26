@@ -4,7 +4,7 @@ import { CollisionAnalysis, type CollisionEvent } from './components/CollisionAn
 import { ConstellationAnalysis, type Constellation } from './components/ConstellationAnalysis';
 import { CreateSatellite, type SatelliteFormData } from './components/CreateSatellite';
 import { DebrisScanner } from './components/DebrisScanner';
-import { FeatureMenu } from './components/FeatureMenu';
+import { Header } from './components/header';
 import { SatelliteService, type SatelliteData } from './services/satelliteService';
 import { TooltipService } from './services/tooltipService';
 
@@ -247,6 +247,8 @@ export const ArcGlobe: React.FC = () => {
                 popup: { dockEnabled: true, dockOptions: { breakpoint: false } },
             });
 
+            try { (view as any).padding = { top: 50 }; } catch (e) { }
+
             tracksLayer = new GraphicsLayer();
             map.add(tracksLayer);
 
@@ -361,8 +363,6 @@ export const ArcGlobe: React.FC = () => {
                         });
                     } catch (e) { }
                 });
-
-
             });
 
             (async function loadData() {
@@ -543,7 +543,7 @@ export const ArcGlobe: React.FC = () => {
                     </div>
                 </div>
             )}
-            <FeatureMenu
+            <Header
                 onFeatureSelect={handleFeatureSelect}
                 selectedFeature={selectedFeature}
                 onSearchSatellites={handleSearchSatellites}

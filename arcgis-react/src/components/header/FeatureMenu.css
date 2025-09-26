@@ -1,28 +1,21 @@
 .feature-menu {
     position: fixed;
-    bottom: 20px;
-    left: 20px;
+    top: 50px;
+    left: 12px;
     background: rgba(15, 15, 15, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 12px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
+    z-index: 1099;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-width: 280px;
     max-width: 400px;
-    transform-origin: bottom left;
+    transform-origin: top left;
 }
 
 .feature-menu.animating {
     pointer-events: none;
-}
-
-.feature-menu.collapsed {
-    height: 60px;
-    width: 60px;
-    min-width: 60px;
-    max-width: 60px;
 }
 
 .feature-menu.expanded {
@@ -31,57 +24,6 @@
     width: 320px;
     min-width: 320px;
     max-width: 320px;
-}
-
-.menu-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.3s ease;
-    height: 60px;
-    width: 60px;
-    border-radius: 12px;
-}
-
-.menu-toggle:hover {
-    background: rgba(76, 175, 80, 0.1);
-    transform: scale(1.05);
-}
-
-.menu-icon {
-    display: flex;
-    flex-direction: column;
-    width: 20px;
-    height: 20px;
-    justify-content: center;
-}
-
-.hamburger-line {
-    width: 100%;
-    height: 2px;
-    background: #4CAF50;
-    margin: 2px 0;
-    transition: all 0.3s ease;
-    border-radius: 1px;
-}
-
-.feature-menu.expanded .hamburger-line:nth-child(1) {
-    transform: rotate(45deg) translate(5px, 5px);
-}
-
-.feature-menu.expanded .hamburger-line:nth-child(2) {
-    opacity: 0;
-}
-
-.feature-menu.expanded .hamburger-line:nth-child(3) {
-    transform: rotate(-45deg) translate(7px, -6px);
-}
-
-.menu-title {
-    display: none;
 }
 
 .menu-content {
@@ -312,14 +254,7 @@
 @media (max-width: 768px) {
     .feature-menu {
         left: 10px;
-        bottom: 10px;
-    }
-
-    .feature-menu.collapsed {
-        width: 50px;
-        height: 50px;
-        min-width: 50px;
-        max-width: 50px;
+        top: 50px;
     }
 
     .feature-menu.expanded {
@@ -327,24 +262,5 @@
         min-width: 280px;
         max-width: 280px;
         max-height: 60vh;
-    }
-
-    .menu-toggle {
-        height: 50px;
-        width: 50px;
-        padding: 12px;
-    }
-
-    .feature-item {
-        padding: 6px 12px;
-        margin: 1px 6px;
-    }
-
-    .feature-name {
-        font-size: 12px;
-    }
-
-    .feature-description {
-        font-size: 10px;
     }
 }

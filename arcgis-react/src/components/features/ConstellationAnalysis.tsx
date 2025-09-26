@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { SatelliteService } from '../services/satelliteService';
-import './ConstellationAnalysis.css';
+import '~/styles/features/ConstellationAnalysis.css';
+import { SatelliteService } from '../../services/satelliteService';
 
 export interface Constellation {
     id: string;

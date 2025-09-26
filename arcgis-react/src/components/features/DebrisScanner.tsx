@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { SatelliteService, type SatelliteData } from '../services/satelliteService';
-import './DebrisScanner.css';
+import '~/styles/features/DebrisScanner.css';
+import { SatelliteService, type SatelliteData } from '../../services/satelliteService';
 
 export interface DebrisScannerProps {
     isVisible: boolean;

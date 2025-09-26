@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './FeatureMenu.css';
+import '~/styles/features/FeatureMenu.css';
 
 export type MenuTab = 'basic' | 'advanced' | 'analysis';
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './CreateSatellite.css';
+import '~/styles/features/CreateSatellite.css';
 
 export interface SatelliteFormData {
     scc: string;

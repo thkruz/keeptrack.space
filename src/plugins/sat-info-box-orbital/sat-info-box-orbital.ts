@@ -5,7 +5,7 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl } from '@app/engine/utils/get-el';
+import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, eci2lla, MINUTES_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -111,31 +111,35 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     }
 
     if (obj instanceof DetailedSatellite) {
-      getEl(EL.APOGEE)!.innerHTML = `${obj.apogee.toFixed(0)} km`;
-      getEl(EL.PERIGEE)!.innerHTML = `${obj.perigee.toFixed(0)} km`;
-      getEl(EL.INCLINATION)!.innerHTML = `${obj.inclination.toFixed(2)}°`;
-      getEl(EL.ECCENTRICITY)!.innerHTML = obj.eccentricity.toFixed(3);
-      getEl(EL.RAAN)!.innerHTML = `${obj.rightAscension.toFixed(2)}°`;
-      getEl(EL.ARG_PE)!.innerHTML = `${obj.argOfPerigee.toFixed(2)}°`;
+      setInnerHtml(EL.APOGEE, `${obj.apogee.toFixed(0)} km`);
+      setInnerHtml(EL.PERIGEE, `${obj.perigee.toFixed(0)} km`);
+      setInnerHtml(EL.INCLINATION, `${obj.inclination.toFixed(2)}°`);
+      setInnerHtml(EL.ECCENTRICITY, obj.eccentricity.toFixed(3));
+      setInnerHtml(EL.RAAN, `${obj.rightAscension.toFixed(2)}°`);
+      setInnerHtml(EL.ARG_PE, `${obj.argOfPerigee.toFixed(2)}°`);
 
-      const periodDom = getEl(EL.PERIOD)!;
+      const periodDom = getEl(EL.PERIOD);
 
-      periodDom.innerHTML = `${obj.period.toFixed(2)} min`;
-      periodDom.dataset.position = 'top';
-      periodDom.dataset.delay = '50';
-      periodDom.dataset.tooltip = `Mean Motion: ${(MINUTES_PER_DAY / obj.period).toFixed(2)}`;
+      if(periodDom) {
+        periodDom.innerHTML = `${obj.period.toFixed(2)} min`;
+        periodDom.dataset.position = 'top';
+        periodDom.dataset.delay = '50';
+        periodDom.dataset.tooltip = `Mean Motion: ${(MINUTES_PER_DAY / obj.period).toFixed(2)}`;
+      }
 
       const now: Date | number | string = new Date();
       const daysold = obj.ageOfElset(now);
       const age = daysold >= 1 ? daysold : daysold * 24;
       const units = daysold >= 1 ? 'Days' : 'Hours';
-      const elsetAgeDom = getEl(EL.ELSET_AGE)!;
 
-      elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
+      const elsetAgeDom = getEl(EL.ELSET_AGE);
 
-      elsetAgeDom.dataset.position = 'top';
-      elsetAgeDom.dataset.delay = '50';
-      elsetAgeDom.dataset.tooltip = `Epoch Year: ${obj.tle1.substr(18, 2).toString()} Day: ${obj.tle1.substr(20, 8).toString()}`;
+      if(elsetAgeDom) {
+        elsetAgeDom.innerHTML = `${age.toFixed(2)} ${units}`;
+        elsetAgeDom.dataset.position = 'top';
+        elsetAgeDom.dataset.delay = '50';
+        elsetAgeDom.dataset.tooltip = `Epoch Year: ${obj.tle1.substr(18, 2).toString()} Day: ${obj.tle1.substr(20, 8).toString()}`;
+      }
 
       const gmst = keepTrackApi.getTimeManager().gmst;
       const lla = eci2lla(obj.position, gmst);
@@ -192,21 +196,21 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         covInTrack > 0.5;
 
       if (useKm) {
-        getEl('sat-uncertainty-radial')!.innerHTML = `${(covMatrix[0]).toFixed(2)} km`;
-        getEl('sat-uncertainty-crosstrack')!.innerHTML = `${(covMatrix[1]).toFixed(2)} km`;
-        getEl('sat-uncertainty-intrack')!.innerHTML = `${(covMatrix[2]).toFixed(2)} km`;
+        setInnerHtml('sat-uncertainty-radial', `${(covMatrix[0]).toFixed(2)} km`);
+        setInnerHtml('sat-uncertainty-crosstrack', `${(covMatrix[1]).toFixed(2)} km`);
+        setInnerHtml('sat-uncertainty-intrack', `${(covMatrix[2]).toFixed(2)} km`);
       } else {
         covRadial *= 1000;
         covCrossTrack *= 1000;
         covInTrack *= 1000;
-        getEl('sat-uncertainty-radial')!.innerHTML = `${covRadial.toFixed(2)} m`;
-        getEl('sat-uncertainty-crosstrack')!.innerHTML = `${covCrossTrack.toFixed(2)} m`;
-        getEl('sat-uncertainty-intrack')!.innerHTML = `${covInTrack.toFixed(2)} m`;
+        setInnerHtml('sat-uncertainty-radial', `${covRadial.toFixed(2)} m`);
+        setInnerHtml('sat-uncertainty-crosstrack', `${covCrossTrack.toFixed(2)} m`);
+        setInnerHtml('sat-uncertainty-intrack', `${covInTrack.toFixed(2)} m`);
       }
     } else {
-      getEl('sat-uncertainty-radial')!.innerHTML = 'Unknown';
-      getEl('sat-uncertainty-crosstrack')!.innerHTML = 'Unknown';
-      getEl('sat-uncertainty-intrack')!.innerHTML = 'Unknown';
+      setInnerHtml('sat-uncertainty-radial', 'Unknown');
+      setInnerHtml('sat-uncertainty-crosstrack', 'Unknown');
+      setInnerHtml('sat-uncertainty-intrack', 'Unknown');
     }
 
     const secondarySatObj = keepTrackApi.getPlugin(SelectSatManager)!.secondarySatObj;

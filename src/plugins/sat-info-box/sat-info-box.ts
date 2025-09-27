@@ -3,7 +3,7 @@ import Draggabilly from 'draggabilly';
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { DraggableBox } from '@app/engine/ui/draggable-box';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -283,7 +283,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     const isHasAltName: boolean = !!((obj as DetailedSatellite)?.altName && (obj as DetailedSatellite).altName !== '');
     const isHasAltId: boolean = !!((obj as DetailedSatellite)?.altId && (obj as DetailedSatellite).altId !== '');
 
-    getEl(EL.NAME)!.innerHTML = obj.name;
+    setInnerHtml(EL.NAME, obj.name);
 
     if (obj instanceof DetailedSatellite) {
       keepTrackApi.containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
@@ -291,24 +291,44 @@ export class SatInfoBox extends KeepTrackPlugin {
       });
     }
 
-    if (obj.isSatellite() && (obj as DetailedSatellite).sccNum5 === '25544') {
-      getEl(EL.FLAG)!.classList.value = 'fi fi-iss';
-    } else {
-      getEl(EL.FLAG)!.classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
+    const flagEl = getEl(EL.FLAG, true);
+
+    if (flagEl) {
+      if (obj.isSatellite() && (obj as DetailedSatellite).sccNum5 === '25544') {
+        flagEl.classList.value = 'fi fi-iss';
+      } else {
+        flagEl.classList.value = `fi ${country2flagIcon((obj as DetailedSatellite).country)}`;
+      }
     }
 
     if (isHasAltName) {
-      showEl(getEl(EL.ALT_NAME)!.parentElement!, 'flex');
-      getEl(EL.ALT_NAME)!.innerHTML = (obj as DetailedSatellite).altName;
+      const altNameEl = getEl(EL.ALT_NAME, true);
+
+      if (altNameEl && altNameEl.parentElement) {
+        showEl(altNameEl.parentElement, 'flex');
+        altNameEl.innerHTML = (obj as DetailedSatellite).altName;
+      }
     } else {
-      hideEl(getEl(EL.ALT_NAME)!.parentElement!);
+      const altNameEl = getEl(EL.ALT_NAME, true);
+
+      if (altNameEl && altNameEl.parentElement) {
+        hideEl(altNameEl.parentElement);
+      }
     }
 
     if (isHasAltId) {
-      showEl(getEl(EL.ALT_ID)!.parentElement!, 'flex');
-      getEl(EL.ALT_ID)!.innerHTML = (obj as DetailedSatellite).altId;
+      const altIdEl = getEl(EL.ALT_ID, true);
+
+      if (altIdEl && altIdEl.parentElement) {
+        showEl(altIdEl.parentElement, 'flex');
+        altIdEl.innerHTML = (obj as DetailedSatellite).altId;
+      }
     } else {
-      hideEl(getEl(EL.ALT_ID)!.parentElement!);
+      const altIdEl = getEl(EL.ALT_ID, true);
+
+      if (altIdEl && altIdEl.parentElement) {
+        hideEl(altIdEl.parentElement);
+      }
     }
 
     /*
@@ -317,22 +337,22 @@ export class SatInfoBox extends KeepTrackPlugin {
      */
 
     if (obj.isMissile()) {
-      getEl(EL.INTL_DES)!.innerHTML = 'N/A';
-      getEl(EL.OBJNUM)!.innerHTML = 'N/A';
-      getEl(EL.SOURCE)!.innerHTML = 'N/A';
+      setInnerHtml(EL.INTL_DES, 'N/A');
+      setInnerHtml(EL.OBJNUM, 'N/A');
+      setInnerHtml(EL.SOURCE, 'N/A');
     } else {
       const sat = obj as DetailedSatellite;
 
-      getEl(EL.INTL_DES)!.innerHTML = sat.intlDes === 'none' ? 'N/A' : sat.intlDes;
+      setInnerHtml(EL.INTL_DES, sat.intlDes === 'none' ? 'N/A' : sat.intlDes);
       if (sat.source && sat.source === CatalogSource.VIMPEL) {
-        getEl(EL.OBJNUM)!.innerHTML = 'N/A';
-        getEl(EL.INTL_DES)!.innerHTML = 'N/A';
+        setInnerHtml(EL.OBJNUM, 'N/A');
+        setInnerHtml(EL.INTL_DES, 'N/A');
       } else {
-        getEl(EL.OBJNUM)!.innerHTML = sat.sccNum;
+        setInnerHtml(EL.OBJNUM, sat.sccNum);
         // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
       }
 
-      getEl(EL.SOURCE)!.innerHTML = sat.source || CatalogSource.CELESTRAK;
+      setInnerHtml(EL.SOURCE, sat.source || CatalogSource.CELESTRAK);
 
       this.updateConfidenceDom_(sat);
     }

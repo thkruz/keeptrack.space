@@ -534,7 +534,8 @@ export class SearchManager {
 
     const satData = catalogManagerInstance.objectCache;
 
-    getEl('search-results')!.innerHTML = results.reduce((html, result) => {
+    const resultsBox = getEl('search-results', true);
+    const htmlStr = results.reduce((html, result) => {
       const obj = <DetailedSatellite | MissileObject>satData[result.id];
 
       html += `<div class="search-result" data-obj-id="${obj.id}">`;
@@ -657,6 +658,9 @@ export class SearchManager {
       return html;
     }, '');
 
+    if (resultsBox) {
+      resultsBox.innerHTML = htmlStr;
+    }
     const satInfoboxDom = getEl('sat-infobox', true);
     const satInfoBoxPlugin = keepTrackApi.getPlugin(SatInfoBox);
 
@@ -665,8 +669,12 @@ export class SearchManager {
     }
 
     if (!settingsManager.isEmbedMode) {
-      slideInDown(getEl('search-results')!, 1000);
-      this.isResultsOpen = true;
+      const searchResultsEl = getEl('search-results', true);
+
+      if (searchResultsEl) {
+        slideInDown(searchResultsEl, 1000);
+        this.isResultsOpen = true;
+      }
     }
 
     colorSchemeManagerInstance.isUseGroupColorScheme = true;

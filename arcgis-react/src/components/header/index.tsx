@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FeatureMenu } from './FeatureMenu.tsx';
+import { FilterPanel, type FilterCriteria } from './FilterPanel';
 
 interface HeaderProps {
     onFeatureSelect: (feature: string) => void;
@@ -7,6 +8,9 @@ interface HeaderProps {
     onSearchSatellites?: (query: string) => void;
     onShowUserCreated?: () => void;
     onTestConstellations?: () => void;
+    isFilterOpen: boolean;
+    onToggleFilters: (nextOpen: boolean) => void;
+    onApplyFilters: (criteria: FilterCriteria) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -14,95 +18,59 @@ export const Header: React.FC<HeaderProps> = ({
     selectedFeature,
     onSearchSatellites,
     onShowUserCreated,
-    onTestConstellations
+    onTestConstellations,
+    isFilterOpen,
+    onToggleFilters,
+    onApplyFilters
 }) => {
     const [menuOpen, setMenuOpen] = useState(false);
 
     return (
         <>
-            <div
-                style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 50,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0 12px',
-                    background: 'rgba(15, 15, 15, 0.95)',
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.15)',
-                    zIndex: 1100,
-                    backdropFilter: 'blur(10px)'
-                }}
-            >
-                {/* Left: Menu toggle */}
-                <button
-                    aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                    onClick={() => setMenuOpen(!menuOpen)}
-                    style={{
-                        height: 36,
-                        width: 36,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        borderRadius: 8,
-                        padding: 0
-                    }}
-                >
-                    <div style={{ position: 'relative', width: 20, height: 20 }}>
-                        {/* Three lines that morph into an X */}
-                        <span
-                            style={{
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                top: 2,
-                                height: 2,
-                                background: '#4CAF50',
-                                borderRadius: 1,
-                                transform: menuOpen ? 'rotate(45deg) translate(3px, 3px)' : 'none',
-                                transition: 'transform 0.2s ease, opacity 0.2s ease'
-                            }}
-                        />
-                        <span
-                            style={{
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                top: 9,
-                                height: 2,
-                                background: '#4CAF50',
-                                borderRadius: 1,
-                                opacity: menuOpen ? 0 : 1,
-                                transition: 'opacity 0.2s ease'
-                            }}
-                        />
-                        <span
-                            style={{
-                                position: 'absolute',
-                                left: 0,
-                                right: 0,
-                                bottom: 2,
-                                height: 2,
-                                background: '#4CAF50',
-                                borderRadius: 1,
-                                transform: menuOpen ? 'rotate(-45deg) translate(4px, -4px)' : 'none',
-                                transition: 'transform 0.2s ease'
-                            }}
-                        />
-                    </div>
-                </button>
+            <div className="app-header">
+                {/* Left: Menu toggle + Filters */}
+                <div className="header-left">
+                    <button
+                        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                        onClick={() => {
+                            setMenuOpen((prev) => {
+                                const next = !prev;
+                                if (next) {
+                                    onToggleFilters(false);
+                                }
+                                return next;
+                            });
+                        }}
+                        className="header-icon-button"
+                    >
+                        <div className="menu-toggle-icon">
+                            <span className={menuOpen ? 'line top open' : 'line top'} />
+                            <span className={menuOpen ? 'line middle open' : 'line middle'} />
+                            <span className={menuOpen ? 'line bottom open' : 'line bottom'} />
+                        </div>
+                    </button>
 
-                {/* Right: ArcGIS controls slot */}
-                <div
-                    id="arcgis-controls-right"
-                    style={{ display: 'flex', alignItems: 'center', gap: 8 }}
-                />
+                </div>
+
+                {/* Right: ArcGIS controls slot + Filters */}
+                <div className="header-right">
+                    <div id="arcgis-controls-right" className="header-controls-slot" />
+                    <button
+                        className={`header-filter-button${isFilterOpen ? ' active' : ''}`}
+                        type="button"
+                        title="Filter satellites"
+                        onClick={() => {
+                            const willOpen = !isFilterOpen;
+                            if (willOpen) {
+                                setMenuOpen(false);
+                            }
+                            onToggleFilters(willOpen);
+                        }}
+                    >
+                        <span className="filter-icon">⛭</span>
+                        <span>Filters</span>
+                    </button>
+                </div>
             </div>
 
             {/* Feature menu panel below header, top-left */}
@@ -114,8 +82,25 @@ export const Header: React.FC<HeaderProps> = ({
                     onSearchSatellites={onSearchSatellites}
                     onShowUserCreated={onShowUserCreated}
                     onTestConstellations={onTestConstellations}
+                    onClose={() => setMenuOpen(false)}
                 />
             )}
+
+            <FilterPanel
+                isOpen={isFilterOpen}
+                countries={[
+                    'USA',
+                    'Russia',
+                    'China',
+                    'India',
+                    'Japan',
+                    'France',
+                    'UK'
+                ]}
+                initialCriteria={{}}
+                onApply={onApplyFilters}
+                onClose={() => onToggleFilters(false)}
+            />
         </>
     );
 };

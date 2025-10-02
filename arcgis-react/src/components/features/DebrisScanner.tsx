@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import '~/styles/features/DebrisScanner.css';
 import { SatelliteService, type SatelliteData } from '../../services/satelliteService';
 
@@ -134,6 +135,7 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
     const [durationIndex, setDurationIndex] = useState(0);
     const [primaryId, setPrimaryId] = useState<number | null>(null);
     const [results, setResults] = useState<ScreenedObject[]>([]);
+    const [lastScanResults, setLastScanResults] = useState<ScreenedObject[]>([]);
     const [isComputing, setIsComputing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [version, setVersion] = useState(0);
@@ -161,23 +163,10 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
 
     useEffect(() => {
         if (!isVisible) {
-            return;
+            setResults([]);
+            setError(null);
         }
-
-        const api = getInstancedApi();
-        const first = allSatellites[0];
-        if (!api) {
-            setPrimaryId(first ? first.id : null);
-            return;
-        }
-
-        const selected = api.getSelectedId?.() ?? null;
-        if (selected !== null && selected >= 0 && selected < allSatellites.length) {
-            setPrimaryId(selected);
-        } else if (!primaryId && first) {
-            setPrimaryId(first.id);
-        }
-    }, [isVisible, allSatellites, getInstancedApi, primaryId]);
+    }, [isVisible]);
 
     const filteredSatellites = useMemo(() => {
         const query = pickerSearch.trim().toLowerCase();
@@ -202,6 +191,10 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
             setError(null);
         }
     }, [isVisible]);
+
+    useEffect(() => {
+        setViewFiltered(results.length > 0 && results !== lastScanResults);
+    }, [results, lastScanResults]);
 
     const handleScan = () => {
         if (primaryId === null) {
@@ -263,6 +256,7 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
 
             const screened = screenSatellites(primaryDecorated as any, decorated as any, radius, duration);
             setResults(screened);
+            setLastScanResults(screened);
 
             if (api && typeof api.setSelectedId === 'function') {
                 api.setSelectedId(primaryId);
@@ -271,6 +265,9 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
                 const ids = screened.map((obj) => obj.id);
                 api.setVisibleSatellites(ids, [1, 0.6, 0.2]);
                 setViewFiltered(ids.length > 0);
+            } else if (api && typeof api.resetVisibility === 'function') {
+                api.resetVisibility();
+                setViewFiltered(false);
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to screen for debris.');
@@ -281,11 +278,13 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
 
     const handleResetView = () => {
         const api = getInstancedApi();
-        setResults([]);
-        setError(null);
         if (api && typeof api.resetVisibility === 'function') {
             api.resetVisibility();
         }
+        if (api && typeof api.setSelectedId === 'function') {
+            api.setSelectedId(-1);
+        }
+        setResults(lastScanResults);
         setViewFiltered(false);
     };
 
@@ -407,71 +406,74 @@ export const DebrisScanner: React.FC<DebrisScannerProps> = ({ isVisible, onClose
                 </footer>
             </div>
 
-            {isPickerOpen && (
-                <div className="satellite-picker-overlay">
-                    <div className="satellite-picker-panel">
-                        <header className="picker-header">
-                            <h3>Select Satellite</h3>
-                            <button className="close-button" onClick={() => setIsPickerOpen(false)} aria-label="Close satellite picker">
-                                ×
-                            </button>
-                        </header>
-                        <div className="picker-content">
-                            <input
-                                className="picker-search"
-                                type="search"
-                                placeholder="Search by name or NORAD"
-                                value={pickerSearch}
-                                onChange={(e) => {
-                                    setPickerSearch(e.target.value);
-                                    setPickerPage(0);
-                                }}
-                                autoFocus
-                            />
-                            <div className="picker-list">
-                                {pagedSatellites.length === 0 ? (
-                                    <div className="picker-empty">No satellites match “{pickerSearch}”.</div>
-                                ) : (
-                                    pagedSatellites.map((sat, idx) => (
-                                        <button
-                                            key={sat.id}
-                                            className={`picker-item ${sat.id === primaryId ? 'active' : ''}`}
-                                            onClick={() => {
-                                                setPrimaryId(sat.id);
-                                                setIsPickerOpen(false);
-                                            }}
-                                        >
-                                            <span className="picker-item-name">{sat.name}</span>
-                                            <span className="picker-item-norad">NORAD {sat.norad}</span>
-                                        </button>
-                                    ))
-                                )}
+            {isPickerOpen && typeof document !== 'undefined'
+                ? createPortal(
+                    <div className="satellite-picker-overlay" role="dialog" aria-modal="true">
+                        <div className="satellite-picker-panel">
+                            <header className="picker-header">
+                                <h3>Select Satellite</h3>
+                                <button className="close-button" onClick={() => setIsPickerOpen(false)} aria-label="Close satellite picker">
+                                    ×
+                                </button>
+                            </header>
+                            <div className="picker-content">
+                                <input
+                                    className="picker-search"
+                                    type="search"
+                                    placeholder="Search by name or NORAD"
+                                    value={pickerSearch}
+                                    onChange={(e) => {
+                                        setPickerSearch(e.target.value);
+                                        setPickerPage(0);
+                                    }}
+                                    autoFocus
+                                />
+                                <div className="picker-list">
+                                    {pagedSatellites.length === 0 ? (
+                                        <div className="picker-empty">No satellites match “{pickerSearch}”.</div>
+                                    ) : (
+                                        pagedSatellites.map((sat) => (
+                                            <button
+                                                key={sat.id}
+                                                className={`picker-item ${sat.id === primaryId ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    setPrimaryId(sat.id);
+                                                    setIsPickerOpen(false);
+                                                }}
+                                            >
+                                                <span className="picker-item-name">{sat.name}</span>
+                                                <span className="picker-item-norad">NORAD {sat.norad}</span>
+                                            </button>
+                                        ))
+                                    )}
+                                </div>
                             </div>
+                            <footer className="picker-footer">
+                                <button
+                                    className="btn secondary"
+                                    onClick={() => setPickerPage((p) => Math.max(0, p - 1))}
+                                    disabled={currentPage === 0}
+                                >
+                                    Previous
+                                </button>
+                                <span className="picker-page-indicator">
+                                    {pagedSatellites.length === 0
+                                        ? 'No results'
+                                        : `Page ${currentPage + 1} of ${totalPages}`}
+                                </span>
+                                <button
+                                    className="btn secondary"
+                                    onClick={() => setPickerPage((p) => Math.min(totalPages - 1, p + 1))}
+                                    disabled={currentPage >= totalPages - 1}
+                                >
+                                    Next
+                                </button>
+                            </footer>
                         </div>
-                        <footer className="picker-footer">
-                            <button
-                                className="btn secondary"
-                                onClick={() => setPickerPage((p) => Math.max(0, p - 1))}
-                                disabled={currentPage === 0}
-                            >
-                                Previous
-                            </button>
-                            <span className="picker-page-indicator">
-                                {pagedSatellites.length === 0
-                                    ? 'No results'
-                                    : `Page ${currentPage + 1} of ${totalPages}`}
-                            </span>
-                            <button
-                                className="btn secondary"
-                                onClick={() => setPickerPage((p) => Math.min(totalPages - 1, p + 1))}
-                                disabled={currentPage >= totalPages - 1}
-                            >
-                                Next
-                            </button>
-                        </footer>
-                    </div>
-                </div>
-            )}
+                    </div>,
+                    document.body
+                )
+                : null}
         </div>
     );
 };

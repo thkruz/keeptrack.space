@@ -10,6 +10,7 @@ interface FeatureMenuProps {
     onShowUserCreated?: () => void;
     onTestConstellations?: () => void;
     isOpen?: boolean;
+    onClose?: () => void;
 }
 
 export const FeatureMenu: React.FC<FeatureMenuProps> = ({
@@ -18,7 +19,8 @@ export const FeatureMenu: React.FC<FeatureMenuProps> = ({
     onSearchSatellites,
     onShowUserCreated,
     onTestConstellations,
-    isOpen = false
+    isOpen = false,
+    onClose
 }) => {
     const [activeTab, setActiveTab] = useState<MenuTab>('basic');
     const [isAnimating, setIsAnimating] = useState(false);

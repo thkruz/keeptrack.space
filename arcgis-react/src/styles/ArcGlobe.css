@@ -1,12 +1,197 @@
-.loading-overlay {
+.app-header {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    background: rgba(15, 15, 15, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    z-index: 1100;
+    backdrop-filter: blur(10px);
+}
+
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-icon-button {
+    height: 36px;
+    width: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 9000;
-    backdrop-filter: blur(4px);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 0;
+    transition: background 0.2s ease;
+}
+
+.header-icon-button:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.menu-toggle-icon {
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+.menu-toggle-icon .line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #4caf50;
+    border-radius: 1px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.menu-toggle-icon .line.top {
+    top: 2px;
+}
+
+.menu-toggle-icon .line.middle {
+    top: 9px;
+}
+
+.menu-toggle-icon .line.bottom {
+    bottom: 2px;
+}
+
+.menu-toggle-icon .line.top.open {
+    transform: rotate(45deg) translate(3px, 3px);
+}
+
+.menu-toggle-icon .line.middle.open {
+    opacity: 0;
+}
+
+.menu-toggle-icon .line.bottom.open {
+    transform: rotate(-45deg) translate(4px, -4px);
+}
+
+.header-filter-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: #e0f2f1;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s ease, border 0.2s ease;
+}
+
+.header-filter-button:hover {
+    background: rgba(76, 175, 80, 0.25);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+.header-filter-button.active {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: rgba(76, 175, 80, 0.45);
+    color: #ffffff;
+}
+
+.filter-icon {
+    font-size: 14px;
+}
+
+.header-controls-slot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-panel {
+    position: fixed;
+    top: 60px;
+    right: 12px;
+    width: 260px;
+    padding: 16px;
+    border-radius: 12px;
+    background: rgba(19, 22, 28, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e0f2f1;
+    z-index: 1100;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+}
+
+.filter-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.filter-panel__header h4 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #c8f7ff;
+}
+
+.filter-panel__close {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    cursor: pointer;
+}
+
+.filter-panel__content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.filter-field select,
+.filter-field input {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.35);
+    color: #e0f2f1;
+}
+
+.filter-field--inline {
+    flex-direction: row;
+    gap: 12px;
+}
+
+.filter-field--inline label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-panel__footer {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
 }
 
 .loading-card {
@@ -55,4 +240,37 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 9000;
+    backdrop-filter: blur(4px);
+}
+
+.reset-view-button {
+    position: fixed;
+    left: 14px;
+    bottom: 18px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(15, 20, 30, 0.9);
+    color: #e0f2f1;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    z-index: 1100;
+    transition: background 0.2s ease, border 0.2s ease;
+}
+
+.reset-view-button:hover {
+    background: rgba(76, 175, 80, 0.25);
+    border-color: rgba(76, 175, 80, 0.45);
 }

@@ -6,6 +6,7 @@ import { type Constellation } from './components/features/ConstellationAnalysis'
 import { type SatelliteFormData } from './components/features/CreateSatellite';
 import { Footer } from './components/footer';
 import { Header } from './components/header';
+import type { FilterCriteria } from './components/header/FilterPanel';
 import { SatelliteService, type SatelliteData } from './services/satelliteService';
 import { TooltipService } from './services/tooltipService';
 
@@ -32,6 +33,24 @@ export const ArcGlobe: React.FC = () => {
     const [showCreateSatellite, setShowCreateSatellite] = useState(false);
     const [showConstellationAnalysis, setShowConstellationAnalysis] = useState(false);
     const [showDebrisScanner, setShowDebrisScanner] = useState(false);
+
+    const [filterPanelVisible, setFilterPanelVisible] = useState(false);
+
+    const handleGlobalReset = () => {
+        const api = instancedApiRef.current;
+        if (api) {
+            api.resetVisibility?.();
+            api.setHighlightedSatellite?.(null, undefined, false);
+            api.setSelectedId?.(-1);
+        }
+        tooltipService.hideTooltip();
+
+        setShowCollisionAnalysis(false);
+        setShowConstellationAnalysis(false);
+        setShowDebrisScanner(false);
+        setShowCreateSatellite(false);
+        setSelectedFeature(null);
+    };
 
     const handleConstellationSelect = (constellation: Constellation) => {
         console.log('Constellation selected:', constellation);
@@ -211,6 +230,42 @@ export const ArcGlobe: React.FC = () => {
         // TODO: Implement visual highlighting on the globe
     };
 
+    const handleToggleFilters = (nextOpen: boolean) => {
+        setFilterPanelVisible(nextOpen);
+        console.log('Toggled filters panel:', nextOpen ? 'open' : 'closed');
+        // TODO: render actual filter controls (country / NORAD / year)
+    };
+
+    const handleApplyFilters = (criteria: FilterCriteria) => {
+        console.log('Applying filters:', criteria);
+        const api = instancedApiRef.current;
+        if (!api) return;
+
+        const allSatellites = satelliteService.getAllSatellites();
+        const filteredIds: number[] = allSatellites
+            .filter((sat) => {
+                if (criteria.country && sat.country !== criteria.country) return false;
+                if (criteria.norad && !sat.norad.includes(criteria.norad)) return false;
+                if (criteria.yearFrom) {
+                    const year = new Date(sat.launchDate).getUTCFullYear();
+                    if (year < criteria.yearFrom) return false;
+                }
+                if (criteria.yearTo) {
+                    const year = new Date(sat.launchDate).getUTCFullYear();
+                    if (year > criteria.yearTo) return false;
+                }
+                return true;
+            })
+            .map((sat) => sat.id);
+
+        api.resetVisibility?.();
+        if (filteredIds.length > 0) {
+            api.setVisibleSatellites?.(filteredIds, [0.6, 0.9, 1.0]);
+        }
+
+        setFilterPanelVisible(false);
+    };
+
     useEffect(() => {
         let view: any;
         let worker: Worker | null = null;
@@ -235,13 +290,9 @@ export const ArcGlobe: React.FC = () => {
         setIsLoading(true);
 
         const markLoaded = () => {
-            if (cancelled) {
-                return;
-            }
-            if (isLoadingRef.current) {
-                isLoadingRef.current = false;
-                setIsLoading(false);
-            }
+            if (!isLoadingRef.current) return;
+            isLoadingRef.current = false;
+            setIsLoading(false);
         };
 
         // If instanced flag is on, load glue scripts early
@@ -588,7 +639,13 @@ export const ArcGlobe: React.FC = () => {
                 onSearchSatellites={handleSearchSatellites}
                 onShowUserCreated={handleShowUserCreated}
                 onTestConstellations={handleTestConstellations}
+                isFilterOpen={filterPanelVisible}
+                onToggleFilters={handleToggleFilters}
+                onApplyFilters={handleApplyFilters}
             />
+            <button className="reset-view-button" onClick={handleGlobalReset} type="button" title="Reset to all satellites">
+                Reset View
+            </button>
             <Footer
                 isVisible={!!activeFeature}
                 title={activeFeatureTitle}
@@ -602,6 +659,12 @@ export const ArcGlobe: React.FC = () => {
             >
                 <FeatureHost active={activeFeature} />
             </Footer>
+            {filterPanelVisible && (
+                <div className="filter-panel-placeholder">
+                    <h4>Satellite Filters</h4>
+                    <p>Filter by Country, NORAD, or Year (coming soon).</p>
+                </div>
+            )}
         </>
     );
 };

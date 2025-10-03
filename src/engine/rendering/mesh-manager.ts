@@ -131,14 +131,14 @@ export class MeshManager {
   }
 
   setCurrentModel(model: MeshModel) {
-    this.currentMeshObject.id = model.id;
+    if (this.currentMeshObject.model?.name !== model.name) {
+      this.currentMeshObject.rotation = {
+        x: 0 as Degrees,
+        y: 0 as Degrees,
+        z: 0 as Degrees,
+      };
+    }
     this.currentMeshObject.model = model;
-
-    this.currentMeshObject.rotation = {
-      x: 0 as Degrees,
-      y: 0 as Degrees,
-      z: 0 as Degrees,
-    };
   }
 
   update(selectedDate: Date, sat: DetailedSatellite | MissileObject) {
@@ -256,11 +256,12 @@ export class MeshManager {
       }
 
       const modelName = this.modelResolver_.resolve(obj);
-
-      this.currentMeshObject.model = this.meshRegistry_.get(modelName) ?? {
+      const resolvedMesh = this.meshRegistry_.get(modelName) ?? {
         id: -1,
         name: modelName,
       };
+
+      this.setCurrentModel(resolvedMesh);
     } catch {
       // Don't Let meshManager break everything
     }

@@ -113,7 +113,13 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
       settingsManager.minZoomDistance = RADIUS_OF_EARTH * 1.2 as Kilometers;
       settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
     } else {
-      settingsManager.minZoomDistance = ServiceLocator.getScene().planets[planetName].RADIUS * 1.2 as Kilometers;
+      const selectedPlanet = ServiceLocator.getScene().planets[planetName];
+
+      // Validate ServiceLocator.getScene().planets[planetName]
+      if (!selectedPlanet) {
+        return;
+      }
+      settingsManager.minZoomDistance = selectedPlanet.RADIUS * 1.2 as Kilometers;
       settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
     }
   }

@@ -107,6 +107,7 @@ export class Scene {
     this.skybox.init(settingsManager, params.gl);
 
     EventBus.getInstance().emit(EventBusEvent.SceneReady);
+    EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, this.loadSceneLowPriority.bind(this));
   }
 
   update(simulationTime: Date) {
@@ -320,17 +321,24 @@ export class Scene {
         keepTrackApi.getScene().godrays?.init(this.gl_, this.sun);
       }
 
-      if (!settingsManager.isDisablePlanets) {
-        for (const planet of Object.values(this.planets)) {
-          planet.init(this.gl_);
-        }
-      }
-
       if (!settingsManager.isDisableSearchBox) {
         this.searchBox.init(this.gl_);
       }
       if (!settingsManager.isDisableSkybox) {
         this.skybox.init(settingsManager, this.gl_);
+      }
+    } catch (error) {
+      errorManagerInstance.log(error);
+      // Errors aren't showing as toast messages
+    }
+  }
+  // eslint-disable-next-line require-await
+  async loadSceneLowPriority(): Promise<void> {
+    try {
+      if (!settingsManager.isDisablePlanets) {
+        for (const planet of Object.values(this.planets)) {
+          planet.init(this.gl_);
+        }
       }
     } catch (error) {
       errorManagerInstance.log(error);

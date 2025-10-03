@@ -128,6 +128,7 @@ describe('uiManager', () => {
   it('process_initMenuController', () => {
     setupStandardEnvironment();
     (keepTrackApi.containerRoot as HTMLDivElement).innerHTML += `
+    <div id="fullscreen-icon"></div>
     <div id="layers-menu-btn"></div>
     <div id="layers-hover-menu"></div>
     <div id="layers-icon"></div>

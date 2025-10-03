@@ -59,6 +59,10 @@ export class SoundManager extends KeepTrackPlugin {
   }
 
   init() {
+    if (this.isAudioReady) {
+      throw new Error('SoundManager is already initialized.');
+    }
+
     try {
       super.init();
       this.setupTopMenu();

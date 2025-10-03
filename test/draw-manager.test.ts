@@ -34,7 +34,7 @@ describe('drawManager', () => {
   it('should calculate the moon\'s position', () => {
     const moon = new Moon();
     const date = new Date(2023, 1, 1);
-    const updateResults = () => moon['updateEciPosition_'](date);
+    const updateResults = () => moon.updatePosition(date);
 
     expect(() => updateResults()).not.toThrow();
     expect(moon.position).toMatchSnapshot();

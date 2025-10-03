@@ -73,7 +73,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       }
 
       // Avoid unnecessary dom updates
-      if (cssStyle !== this.lastCssStyle && getEl(TopMenu.SEARCH_RESULT_ID)) {
+      if (cssStyle !== this.lastCssStyle && getEl(TopMenu.SEARCH_RESULT_ID, true)) {
         this.lastCssStyle = cssStyle;
       }
     }

@@ -1,4 +1,5 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from 'ootk';
@@ -60,14 +61,6 @@ test('keepTrackApi Unit Testing', () => {
 
   keepTrackApi.on({
     event: EventBusEvent.hideSideMenus,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
-  });
-
-  keepTrackApi.on({
-    event: EventBusEvent.nightToggle,
     cbName: 'test',
     cb: () => {
       // Do nothing

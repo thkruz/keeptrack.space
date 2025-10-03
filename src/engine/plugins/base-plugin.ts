@@ -231,6 +231,7 @@ export abstract class KeepTrackPlugin {
    * This is used to ensure that the bottom icons are sorted correctly.
    */
   static readonly MAX_BOTTOM_ICON_ORDER: number = 600;
+  private isInitialized_ = false;
 
   /**
    * Creates a new instance of the KeepTrackPlugin class.
@@ -260,6 +261,10 @@ export abstract class KeepTrackPlugin {
    * @returns void
    */
   init(): void {
+    if (this.isInitialized_) {
+      throw new Error(`${this.id} is already initialized.`);
+    }
+
     this.checkDependencies();
 
     if (settingsManager.plugins[this.id]?.isEnabled === false) {
@@ -284,6 +289,8 @@ export abstract class KeepTrackPlugin {
     }
 
     PluginRegistry.addPlugin(this);
+
+    this.isInitialized_ = true;
   }
 
   protected isSettingsMenuEnabled_ = true;

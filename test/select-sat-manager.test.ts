@@ -10,8 +10,11 @@ import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('SelectSatManager_dots', () => {
+  let selectSatManager: SelectSatManager;
+
   beforeEach(() => {
     setupStandardEnvironment([TopMenu]);
+    selectSatManager = new SelectSatManager();
   });
 
   standardPluginSuite(SelectSatManager, 'SelectSatManager');
@@ -29,7 +32,6 @@ describe('SelectSatManager_dots', () => {
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-    const selectSatManager = new SelectSatManager();
 
     selectSatManager.selectSat(0);
     expect(selectSatManager.selectedSat).toBe(0);
@@ -38,7 +40,7 @@ describe('SelectSatManager_dots', () => {
   });
 
   it('should be able to select a sensor dot', () => {
-    const selectSatManager = new SelectSatManager();
+    selectSatManager.init();
 
     websiteInit(new SatInfoBox());
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;

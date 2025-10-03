@@ -1,3 +1,4 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
@@ -12,13 +13,23 @@ describe('UpdateSatManager_class', () => {
   beforeEach(() => {
     // Mock DateTimeManager uiManagerFinal to prevent errors
     DateTimeManager.prototype.uiManagerFinal = jest.fn();
-    setupStandardEnvironment([TopMenu, SelectSatManager, SatInfoBox, DateTimeManager]);
+    PluginRegistry.unregisterAllPlugins();
+    setupStandardEnvironment([TopMenu, SelectSatManager, DateTimeManager]);
   });
 
-  standardPluginSuite(SelectSatManager, 'SelectSatManager');
+  standardPluginSuite(SatInfoBox, 'SatInfoBox');
 });
 
 describe('SatInfoBoxCore_class2', () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let satinfobox: SatInfoBox;
+
+  beforeEach(() => {
+    PluginRegistry.unregisterAllPlugins();
+    setupStandardEnvironment([TopMenu, SelectSatManager, DateTimeManager]);
+    satinfobox = new SatInfoBox();
+  });
+
   it('should be able to select a satellite', () => {
     keepTrackApi.getCatalogManager().objectCache = [defaultSat];
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
@@ -27,7 +38,6 @@ describe('SatInfoBoxCore_class2', () => {
     keepTrackApi.isInitialized = true;
     const selectSatManager = new SelectSatManager();
 
-    selectSatManager.init();
     keepTrackApi.emit(EventBusEvent.uiManagerInit);
     keepTrackApi.emit(EventBusEvent.uiManagerFinal);
     keepTrackApi.emit(EventBusEvent.uiManagerOnReady);

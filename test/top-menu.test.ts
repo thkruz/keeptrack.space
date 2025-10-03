@@ -1,30 +1,32 @@
+import { Container } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { setupMinimumHtml } from './environment/standard-env';
+import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
-import { Container } from '@app/engine/core/container';
 
 describe('TopMenu_class', () => {
+  let topMenu: TopMenu;
+
   beforeEach(() => {
-    // eslint-disable-next-line guard-for-in
-    for (const callback in keepTrackApi.events) {
-      keepTrackApi.events[callback] = [];
-    }
-    setupMinimumHtml();
+    setupStandardEnvironment();
+    topMenu = new TopMenu();
+    const soundManagerPlugin = new SoundManager();
+
+    Container.getInstance().registerSingleton(Singletons.SoundManager, soundManagerPlugin);
   });
 
   standardPluginSuite(TopMenu, 'TopMenu');
 
   // Tests that sound button throws warning if sound plugin is not loaded
   it('test_sound_button_toggle_without_sound_plugin', () => {
-    const topMenu = new TopMenu();
-
     topMenu.init();
+    ServiceLocator.getSoundManager()?.init();
     keepTrackApi.emit(EventBusEvent.uiManagerInit);
     keepTrackApi.emit(EventBusEvent.uiManagerFinal);
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
@@ -37,9 +39,8 @@ describe('TopMenu_class', () => {
 
   // Tests that sound button toggles sound on/off
   it('test_sound_button_toggle', () => {
-    const topMenu = new TopMenu();
-
     topMenu.init();
+    ServiceLocator.getSoundManager()?.init();
     keepTrackApi.emit(EventBusEvent.uiManagerInit);
     keepTrackApi.emit(EventBusEvent.uiManagerFinal);
 

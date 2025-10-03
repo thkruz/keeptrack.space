@@ -102,6 +102,10 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   };
 
   changePlanet(planetName: Body) {
+    if (!this.PLANETS.includes(planetName) && !this.DWARF_PLANETS.includes(planetName) && !this.OTHER_CELESTIAL_BODIES.includes(planetName)) {
+      return;
+    }
+
     PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect any selected satellite
     settingsManager.centerBody = planetName;
     keepTrackApi.getUiManager().hideSideMenus();
@@ -115,10 +119,6 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     } else {
       const selectedPlanet = ServiceLocator.getScene().planets[planetName];
 
-      // Validate ServiceLocator.getScene().planets[planetName]
-      if (!selectedPlanet) {
-        return;
-      }
       settingsManager.minZoomDistance = selectedPlanet.RADIUS * 1.2 as Kilometers;
       settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
     }

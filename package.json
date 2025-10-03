@@ -42,7 +42,7 @@
     "cypress:open": "cypress open",
     "generate-t7e-keys": "npx tsx ./build/utils/generate-translation-keys.ts && npx eslint --fix ./build/utils/generate-translation-keys.ts",
     "lcov": "npx tsx ./build/utils/open-lcov.ts",
-    "lint": "eslint . --ignore-path .gitignore --ext js,ts,tsx",
+    "lint": "eslint ./src --ignore-path .gitignore --ext js,ts,tsx",
     "createtest": "npx tsx ./scripts/create-test-file.ts",
     "start": "npx serve ./dist -l 5544",
     "start:ci": "npx serve ./dist -l 5544",

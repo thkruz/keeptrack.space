@@ -109,7 +109,7 @@ export class PluginManager {
         },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/debug/debug');
+            const proPlugin = await import('../plugins-pro/debug/debug');
 
             new proPlugin.DebugMenuPlugin().init();
           }, config: plugins.DebugMenuPlugin,
@@ -117,14 +117,14 @@ export class PluginManager {
         { init: () => new SatInfoBox().init(), config: plugins.SatInfoBoxCore },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/sat-info-box-actions/sat-info-box-actions');
+            const proPlugin = await import('../plugins-pro/sat-info-box-actions/sat-info-box-actions');
 
             new proPlugin.SatInfoBoxActions().init();
           }, config: plugins.SatInfoBoxActions,
         },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/sat-info-box-links/sat-info-box-links');
+            const proPlugin = await import('../plugins-pro/sat-info-box-links/sat-info-box-links');
 
             new proPlugin.SatInfoBoxLinks().init();
           }, config: plugins.SatInfoBoxLinks,
@@ -133,7 +133,7 @@ export class PluginManager {
         { init: () => new SatInfoBoxObject().init(), config: plugins.SatInfoBoxObject },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/sat-info-box-mission/sat-info-box-mission');
+            const proPlugin = await import('../plugins-pro/sat-info-box-mission/sat-info-box-mission');
 
             new proPlugin.SatInfoBoxMission().init();
           }, config: plugins.SatInfoBoxMission,
@@ -153,7 +153,7 @@ export class PluginManager {
 
         {
           init: async () => {
-            const proPlugin = await import('../plugins/earth-atmosphere/earth-atmosphere');
+            const proPlugin = await import('../plugins-pro/earth-atmosphere/earth-atmosphere');
 
             new proPlugin.EarthAtmosphere().init();
           }, config: plugins.EarthAtmosphere,
@@ -192,14 +192,14 @@ export class PluginManager {
         { init: () => new StereoMap().init(), config: plugins.StereoMap },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/planetarium/planetarium');
+            const proPlugin = await import('../plugins-pro/planetarium/planetarium');
 
             new proPlugin.Planetarium().init();
           }, config: plugins.Planetarium,
         },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/astronomy/astronomy');
+            const proPlugin = await import('../plugins-pro/astronomy/astronomy');
 
             new proPlugin.Astronomy().init();
           }, config: plugins.Astronomy,
@@ -218,14 +218,14 @@ export class PluginManager {
         { init: () => new AnalysisMenu().init(), config: plugins.AnalysisMenu },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/maneuver/maneuver');
+            const proPlugin = await import('../plugins-pro/maneuver/maneuver');
 
             new proPlugin.ManeuverPlugin().init();
           }, config: plugins.ManeuverPlugin,
         },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/initial-orbit/initial-orbit');
+            const proPlugin = await import('../plugins-pro/initial-orbit/initial-orbit');
 
             new proPlugin.InitialOrbitDeterminationPlugin().init();
           }, config: plugins.InitialOrbitDeterminationPlugin,
@@ -242,7 +242,7 @@ export class PluginManager {
         { init: () => new SettingsMenuPlugin().init(), config: plugins.SettingsMenuPlugin },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/graphics-menu/graphics-menu');
+            const proPlugin = await import('../plugins-pro/graphics-menu/graphics-menu');
 
             new proPlugin.GraphicsMenuPlugin().init();
           }, config: plugins.GraphicsMenuPlugin,
@@ -251,7 +251,7 @@ export class PluginManager {
         { init: () => new VideoDirectorPlugin().init(), config: plugins.VideoDirectorPlugin },
         {
           init: async () => {
-            const proPlugin = await import('../plugins/about-menu/about-menu');
+            const proPlugin = await import('../plugins-pro/about-menu/about-menu');
 
             new proPlugin.AboutMenuPlugin().init();
           }, config: plugins.AboutMenuPlugin,

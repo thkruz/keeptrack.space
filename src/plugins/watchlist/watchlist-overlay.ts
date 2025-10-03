@@ -4,7 +4,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { dateFormat } from '@app/engine/utils/dateFormat';
-import { getEl } from '@app/engine/utils/get-el';
+import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { shake } from '@app/engine/utils/shake';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -255,7 +255,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
         this.pushOverlayElement_(s, timeManagerInstance.simulationTimeObj.getTime(), this.infoOverlayDOMHtmlStrArr);
       }
       this.infoOverlayDOMHtmlStrArr.push('</div>');
-      getEl('info-overlay-content')!.innerHTML = this.infoOverlayDOMHtmlStrArr.join('');
+      setInnerHtml('info-overlay-content', this.infoOverlayDOMHtmlStrArr.join(''));
       this.lastOverlayUpdateTime = timeManagerInstance.realTime;
     }
   }

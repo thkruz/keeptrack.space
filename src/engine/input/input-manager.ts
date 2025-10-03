@@ -283,30 +283,36 @@ export class InputManager {
       keepTrackApi.emit(EventBusEvent.rightBtnMenuAdd);
 
       // Now add the reset/clear options
-      getEl('right-btn-menu-ul')!.insertAdjacentHTML(
-        'beforeend',
-        html`
-        <li id="toggle-time-rmb"><a href="#">Pause Clock</a></li>
-        <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
-        <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
-        <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
-        `,
-      );
+      const menuUl = getEl('right-btn-menu-ul', true);
 
-      // sort getEl('rmb-wrapper').children by order in rmbMenuItems
-      const rmbWrapper = getEl('right-btn-menu-ul');
-      const rmbWrapperChildren = rmbWrapper!.children;
-      const rmbWrapperChildrenArray = Array.from(rmbWrapperChildren);
+      if (menuUl) {
+        menuUl.insertAdjacentHTML(
+          'beforeend',
+          html`
+          <li id="toggle-time-rmb"><a href="#">Pause Clock</a></li>
+          <li id="reset-camera-rmb"><a href="#">Reset Camera</a></li>
+          <li id="clear-lines-rmb"><a href="#">Clear Lines</a></li>
+          <li id="clear-screen-rmb"><a href="#">Clear Screen</a></li>
+          `,
+        );
 
-      rmbWrapperChildrenArray.sort((a, b) => {
-        const aOrder = this.rmbMenuItems.find((item) => item.elementIdL1 === a.id)?.order || 9999;
-        const bOrder = this.rmbMenuItems.find((item) => item.elementIdL1 === b.id)?.order || 9999;
+        // sort getEl('rmb-wrapper').children by order in rmbMenuItems
+        const rmbWrapper = getEl('right-btn-menu-ul', true);
 
+        if (rmbWrapper) {
+          const rmbWrapperChildren = rmbWrapper.children;
+          const rmbWrapperChildrenArray = Array.from(rmbWrapperChildren);
 
-        return aOrder - bOrder;
-      });
-      rmbWrapper!.innerHTML = '';
-      rmbWrapperChildrenArray.forEach((child) => rmbWrapper!.appendChild(child));
+          rmbWrapperChildrenArray.sort((a, b) => {
+            const aOrder = this.rmbMenuItems.find((item) => item.elementIdL1 === a.id)?.order || 9999;
+            const bOrder = this.rmbMenuItems.find((item) => item.elementIdL1 === b.id)?.order || 9999;
+
+            return aOrder - bOrder;
+          });
+          rmbWrapper.innerHTML = '';
+          rmbWrapperChildrenArray.forEach((child) => rmbWrapper.appendChild(child));
+        }
+      }
     }
 
     const canvasDOM = <HTMLCanvasElement>getEl('keeptrack-canvas');
@@ -360,6 +366,10 @@ export class InputManager {
     const rightBtnMenuDOM = getEl('right-btn-menu');
     const satHoverBoxDOM = getEl('sat-hoverbox');
 
+    if (!canvasDOM || !rightBtnMenuDOM || !satHoverBoxDOM) {
+      return;
+    }
+
     this.rmbMenuItems.forEach((item) => {
       hideEl(item.elementIdL1);
     });
@@ -367,7 +377,11 @@ export class InputManager {
     hideEl('clear-lines-rmb');
 
     if (lineManagerInstance.lines.length > 0) {
-      getEl('clear-lines-rmb')!.style.display = 'block';
+    const clearLinesEl = getEl('clear-lines-rmb', true);
+
+      if (clearLinesEl) {
+        clearLinesEl.style.display = 'block';
+      }
     }
 
     if (this.mouse.mouseSat !== -1 || clickedSatId !== -1) {

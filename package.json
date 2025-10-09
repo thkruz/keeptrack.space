@@ -156,7 +156,7 @@
     "eruda": "^3.4.3",
     "file-saver": "^2.0.5",
     "flag-icons": "^7.2.3",
-    "gl-matrix": "^3.4.3",
+    "gl-matrix": "^3.4.4",
     "gremlins.js": "^2.2.0",
     "i18next": "^23.14.0",
     "i18next-browser-languagedetector": "^8.0.0",

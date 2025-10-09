@@ -40,7 +40,7 @@ export class Moon extends CelestialBody {
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
-  rotation = [0, 0, Math.PI] as vec3;
+  rotation = [0, 0, Math.PI];
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/moonmap${MoonTextureQuality.ULTRA}.jpg`;

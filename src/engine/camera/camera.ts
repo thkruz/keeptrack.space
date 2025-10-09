@@ -70,7 +70,7 @@ export class Camera {
   private normUp_ = vec3.create();
 
   private yawErr_ = <Radians>0;
-  camMatrix = mat4.create().fill(0);
+  camMatrix = mat4.create();
   cameraType: CameraType = CameraType.DEFAULT;
 
   settings_: SettingsManager;

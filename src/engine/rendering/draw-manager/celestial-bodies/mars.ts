@@ -37,7 +37,7 @@ export class Mars extends CelestialBody {
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
-  rotation = [0, 0, Math.PI * 7 / 10] as vec3;
+  rotation = [0, 0, Math.PI * 7 / 10];
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/mars${MarsTextureQuality.ULTRA}.jpg`;

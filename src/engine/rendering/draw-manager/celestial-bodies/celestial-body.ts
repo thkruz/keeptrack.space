@@ -23,8 +23,8 @@ export abstract class CelestialBody {
   protected modelViewMatrix_ = null as unknown as mat4;
   protected readonly normalMatrix_ = mat3.create();
 
-  position = [0, 0, 0] as vec3;
-  rotation = [0, 0, 0] as vec3;
+  position = [0, 0, 0];
+  rotation = [0, 0, 0];
   mesh: Mesh;
 
   abstract getName(): string;

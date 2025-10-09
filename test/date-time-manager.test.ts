@@ -1,5 +1,3 @@
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -13,9 +11,6 @@ describe('DateTimeManager_class', () => {
     DateTimeManager.prototype.uiManagerFinal = jest.fn();
     setupStandardEnvironment([TopMenu]);
     dtm = new DateTimeManager();
-    dtm.init();
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
   });
 
   standardPluginSuite(DateTimeManager, 'DateTimeManager');

@@ -1,11 +1,11 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';
@@ -32,7 +32,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
 
     //  Jday isn't initalized right away, so we need to check if it exists
-    if (!getEl('jday')) {
+    if (!getEl('jday', true)) {
       return;
     }
 

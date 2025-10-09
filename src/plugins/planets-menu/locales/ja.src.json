@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "PlanetsMenuPlugin": {
+      "bottomIconLabel": "惑星",
+      "title": "惑星リストメニュー",
+      "helpBody": "このメニューでは、シミュレーション内のさまざまな惑星を選択して表示できます。"
+    }
+  }
+}

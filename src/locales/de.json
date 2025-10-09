@@ -1,112 +1,4 @@
 {
-  "loadingScreen": {
-    "startButton": "Klicken Sie, um zu Beginnen"
-  },
-  "time": {
-    "days": {
-      "0": "Sonntag",
-      "1": "Montag",
-      "2": "Dienstag",
-      "3": "Mittwoch",
-      "4": "Donnerstag",
-      "5": "Freitag",
-      "6": "Samstag"
-    },
-    "days-short": {
-      "0": "So",
-      "1": "Mo",
-      "2": "Di",
-      "3": "Mi",
-      "4": "Do",
-      "5": "Fr",
-      "6": "Sa"
-    },
-    "months": {
-      "1": "Januar",
-      "2": "Februar",
-      "3": "März",
-      "4": "April",
-      "5": "Mai",
-      "6": "Juni",
-      "7": "Juli",
-      "8": "August",
-      "9": "September",
-      "10": "Oktober",
-      "11": "November",
-      "12": "Dezember"
-    },
-    "calendar": {
-      "time": "Zeit",
-      "hour": "Stunde",
-      "minute": "Minute",
-      "second": "Sekunde",
-      "now": "Jetzt",
-      "done": "Fertig",
-      "pause": "Pause",
-      "propagation": "Ausbreitung"
-    }
-  },
-  "errorMsgs": {
-    "catalogNotFullyInitialized": "Der Katalog ist noch nicht vollständig initialisiert. Bitte warten Sie ein paar Sekunden und versuchen Sie es erneut.",
-    "sensorGroupsApiEmpty": "Keine Sensorgruppen in der API gefunden, es wird auf die mitgelieferte Sensorgruppen-Datenbank zurückgegriffen.",
-    "SelectSensorFirst": "Wählen Sie zuerst einen Sensor aus!",
-    "SelectSatelliteFirst": "Wählen Sie zuerst einen Satelliten aus!",
-    "SelectSecondarySatellite": "Wählen Sie zuerst einen sekundären Satelliten aus!",
-    "SatelliteNotDetailedSatellite": "Satellit ist kein DetailedSatellite!",
-    "SensorNotFound": "Sensor nicht gefunden!",
-    "Scene": {
-      "disablingGodrays": "Ihr Computer hat Schwierigkeiten! Lichtstrahlen werden deaktiviert.",
-      "disablingAurora": "Ihr Computer hat Schwierigkeiten! Aurora wird deaktiviert.",
-      "disablingAtmosphere": "Ihr Computer hat Schwierigkeiten! Atmosphäre wird deaktiviert.",
-      "disablingMoon": "Ihr Computer hat Schwierigkeiten! Mond wird deaktiviert.",
-      "disablingMilkyWay": "Ihr Computer hat Schwierigkeiten! Milchstraße wird deaktiviert.",
-      "disablingSun": "Ihr Computer hat Schwierigkeiten! Sonne wird deaktiviert."
-    },
-    "Breakup": {
-      "CannotCreateBreakupForNonCircularOrbits": "Für nicht-kreisförmige Umlaufbahnen kann kein Zerfall erstellt werden. Wir arbeiten an einer Lösung.",
-      "CannotCalcDirectionOfSatellite": "Die Richtung des Satelliten kann nicht berechnet werden. Versuchen Sie es später erneut.",
-      "ErrorCreatingBreakup": "Fehler beim Erstellen des Zerfalls!",
-      "InvalidStartNum": "Ungültige Satellitenstartnummer! Standardmäßig auf 90000 gesetzt!",
-      "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!",
-      "SatelliteNotFound": "Satellit nicht gefunden!"
-    },
-    "Collisions": {
-      "noCollisionsData": "Keine Kollisionsdaten gefunden!",
-      "errorProcessingCollisions": "Fehler bei der Verarbeitung der SOCRATES-Daten!"
-    },
-    "EditSat": {
-      "errorReadingFile": "Fehler beim Lesen der Datei!",
-      "satelliteNotFound": "Satellit nicht gefunden!"
-    },
-    "CreateSat": {
-      "errorCreatingSat": "Fehler beim Erstellen des Satelliten!"
-    },
-    "Reports": {
-      "popupBlocker": "Bitte erlauben Sie Popups für diese Seite, um Berichte anzuzeigen."
-    },
-    "SensorManager": {
-      "errorUpdatingUi": "Fehler beim Aktualisieren des Sensor-UI-Stylings."
-    }
-  },
-  "hoverManager": {
-    "launched": "Gestartet",
-    "launchedPlanned": "Gestartet: Geplant",
-    "launchedUnknown": "Gestartet: Unbekannt"
-  },
-  "loadingScreenMsgs": {
-    "math": "Versuche zu rechnen...",
-    "science": "Wissenschaft wird lokalisiert...",
-    "science2": "Wissenschaft gefunden...",
-    "dots": "Zeichne Punkte im Weltraum...",
-    "satIntel": "Integriere Satelliten-Informationen...",
-    "painting": "Male die Erde...",
-    "coloring": "Färbe innerhalb der Linien...",
-    "elsets": "Lokalisiere GPs...",
-    "models": "Erstelle 3D-Modelle...",
-    "cunningPlan": "Erstelle einen hinterhältigen Plan...",
-    "copyrightNotice": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben.<br>Es wurde keine kommerzielle Lizenz erteilt und dem Rechteinhaber wurde keine Vergütung gewährt.<br>Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen.",
-    "copyrightNoticeMobile": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben. Es wurde keine kommerzielle Lizenz erteilt. Dem Rechteinhaber wurde keine Vergütung gewährt. Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen."
-  },
   "splashScreens": {
     "1": "Satellitenmodelle erscheinen größer als sie in Wirklichkeit sind. Alles andere ist maßstabsgetreu.",
     "2": "Drücken Sie die 'L'-Taste, um Satellitenumlaufbahnen ein-/auszuschalten.",
@@ -138,13 +30,9 @@
     "28": "Setzen Sie ein Objekt als Sekundärobjekt, um dessen relativen Abstand zum Primärobjekt zu sehen.",
     "29": "Wechseln Sie ein Objekt zwischen Primär/Sekundär mit der '['-Taste."
   },
-  "darkClouds": {
-    "in": "In",
-    "satellites": "Satelliten",
-    "and": "und",
-    "debris": "Trümmer",
-    "buildingBuffers": "Puffer werden erstellt...",
-    "presentDay": "Gegenwart"
+  "copyright": {
+    "notice": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben.<br>Es wurde keine kommerzielle Lizenz erteilt und keine Vergütung an den Rechteinhaber gezahlt.<br>Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen.",
+    "noticeMobile": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben. Es wurde keine kommerzielle Lizenz erteilt. Es wurde keine Vergütung an den Rechteinhaber gezahlt. Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen."
   },
   "plugins": {
     "proOnlyMsg": "Dieses Plugin ist ein Pro-Plugin. Ihre .env-Datei ist falsch konfiguriert oder Ihnen fehlen Dateien! Weitere Informationen finden Sie unter https://keeptrack.space/pro.",
@@ -414,7 +302,128 @@
       "bottomIconLabel": "Grafikmenü",
       "title": "Grafikmenü",
       "helpBody": "Das Grafikmenü wird verwendet, um die Grafikeinstellungen der Anwendung zu ändern."
+    },
+    "PlanetsMenuPlugin": {
+      "bottomIconLabel": "Planeten",
+      "title": "Planetenlisten-Menü",
+      "helpBody": "Dieses Menü ermöglicht es Ihnen, verschiedene Planeten in der Simulation auszuwählen und anzusehen."
     }
+  },
+  "loadingScreen": {
+    "startButton": "Klicken Sie, um zu Beginnen"
+  },
+  "time": {
+    "days": {
+      "0": "Sonntag",
+      "1": "Montag",
+      "2": "Dienstag",
+      "3": "Mittwoch",
+      "4": "Donnerstag",
+      "5": "Freitag",
+      "6": "Samstag"
+    },
+    "days-short": {
+      "0": "So",
+      "1": "Mo",
+      "2": "Di",
+      "3": "Mi",
+      "4": "Do",
+      "5": "Fr",
+      "6": "Sa"
+    },
+    "months": {
+      "1": "Januar",
+      "2": "Februar",
+      "3": "März",
+      "4": "April",
+      "5": "Mai",
+      "6": "Juni",
+      "7": "Juli",
+      "8": "August",
+      "9": "September",
+      "10": "Oktober",
+      "11": "November",
+      "12": "Dezember"
+    },
+    "calendar": {
+      "time": "Zeit",
+      "hour": "Stunde",
+      "minute": "Minute",
+      "second": "Sekunde",
+      "now": "Jetzt",
+      "done": "Fertig",
+      "pause": "Pause",
+      "propagation": "Ausbreitung"
+    }
+  },
+  "errorMsgs": {
+    "catalogNotFullyInitialized": "Der Katalog ist noch nicht vollständig initialisiert. Bitte warten Sie ein paar Sekunden und versuchen Sie es erneut.",
+    "sensorGroupsApiEmpty": "Keine Sensorgruppen in der API gefunden, es wird auf die mitgelieferte Sensorgruppen-Datenbank zurückgegriffen.",
+    "SelectSensorFirst": "Wählen Sie zuerst einen Sensor aus!",
+    "SelectSatelliteFirst": "Wählen Sie zuerst einen Satelliten aus!",
+    "SelectSecondarySatellite": "Wählen Sie zuerst einen sekundären Satelliten aus!",
+    "SatelliteNotDetailedSatellite": "Satellit ist kein DetailedSatellite!",
+    "SensorNotFound": "Sensor nicht gefunden!",
+    "Scene": {
+      "disablingGodrays": "Ihr Computer hat Schwierigkeiten! Lichtstrahlen werden deaktiviert.",
+      "disablingAurora": "Ihr Computer hat Schwierigkeiten! Aurora wird deaktiviert.",
+      "disablingAtmosphere": "Ihr Computer hat Schwierigkeiten! Atmosphäre wird deaktiviert.",
+      "disablingMoon": "Ihr Computer hat Schwierigkeiten! Mond wird deaktiviert.",
+      "disablingMilkyWay": "Ihr Computer hat Schwierigkeiten! Milchstraße wird deaktiviert.",
+      "disablingSun": "Ihr Computer hat Schwierigkeiten! Sonne wird deaktiviert."
+    },
+    "Breakup": {
+      "CannotCreateBreakupForNonCircularOrbits": "Für nicht-kreisförmige Umlaufbahnen kann kein Zerfall erstellt werden. Wir arbeiten an einer Lösung.",
+      "CannotCalcDirectionOfSatellite": "Die Richtung des Satelliten kann nicht berechnet werden. Versuchen Sie es später erneut.",
+      "ErrorCreatingBreakup": "Fehler beim Erstellen des Zerfalls!",
+      "InvalidStartNum": "Ungültige Satellitenstartnummer! Standardmäßig auf 90000 gesetzt!",
+      "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!",
+      "SatelliteNotFound": "Satellit nicht gefunden!"
+    },
+    "Collisions": {
+      "noCollisionsData": "Keine Kollisionsdaten gefunden!",
+      "errorProcessingCollisions": "Fehler bei der Verarbeitung der SOCRATES-Daten!"
+    },
+    "EditSat": {
+      "errorReadingFile": "Fehler beim Lesen der Datei!",
+      "satelliteNotFound": "Satellit nicht gefunden!"
+    },
+    "CreateSat": {
+      "errorCreatingSat": "Fehler beim Erstellen des Satelliten!"
+    },
+    "Reports": {
+      "popupBlocker": "Bitte erlauben Sie Popups für diese Seite, um Berichte anzuzeigen."
+    },
+    "SensorManager": {
+      "errorUpdatingUi": "Fehler beim Aktualisieren des Sensor-UI-Stylings."
+    }
+  },
+  "hoverManager": {
+    "launched": "Gestartet",
+    "launchedPlanned": "Gestartet: Geplant",
+    "launchedUnknown": "Gestartet: Unbekannt"
+  },
+  "loadingScreenMsgs": {
+    "math": "Versuche zu rechnen...",
+    "science": "Wissenschaft wird lokalisiert...",
+    "science2": "Wissenschaft gefunden...",
+    "dots": "Zeichne Punkte im Weltraum...",
+    "satIntel": "Integriere Satelliten-Informationen...",
+    "painting": "Male die Erde...",
+    "coloring": "Färbe innerhalb der Linien...",
+    "elsets": "Lokalisiere GPs...",
+    "models": "Erstelle 3D-Modelle...",
+    "cunningPlan": "Erstelle einen hinterhältigen Plan...",
+    "copyrightNotice": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben.<br>Es wurde keine kommerzielle Lizenz erteilt und dem Rechteinhaber wurde keine Vergütung gewährt.<br>Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen.",
+    "copyrightNoticeMobile": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben. Es wurde keine kommerzielle Lizenz erteilt. Dem Rechteinhaber wurde keine Vergütung gewährt. Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen."
+  },
+  "darkClouds": {
+    "in": "In",
+    "satellites": "Satelliten",
+    "and": "und",
+    "debris": "Trümmer",
+    "buildingBuffers": "Puffer werden erstellt...",
+    "presentDay": "Gegenwart"
   },
   "countries": {
     "AAT": "AAT",
@@ -695,5 +704,79 @@
     "BH": "Bahrain",
     "BW": "Botswana",
     "ESA/JAXA": "ESA/JAXA"
+  },
+  "filterMenu": {
+    "payloads": {
+      "name": "Nutzlasten",
+      "category": "Objekttypen",
+      "tooltip": "Objekte, die hauptsächlich zum Transport einer Nutzlast verwendet werden, wie Kommunikations- oder Wettersatelliten. Dies umfasst sowohl betriebsfähige als auch außer Betrieb gesetzte Satelliten."
+    },
+    "rocketBodies": {
+      "name": "Raketenstufen",
+      "category": "Objekttypen",
+      "tooltip": "Die oberen Stufen von Raketen, die Nutzlasten in den Orbit gebracht haben und nun große Teile von Weltraummüll sind."
+    },
+    "debris": {
+      "name": "Trümmer",
+      "category": "Objekttypen",
+      "tooltip": "Fragmente von Raumfahrzeugen und Raketen, einschließlich zerbrochener Satelliten, die nicht mehr als ein Stück existieren."
+    },
+    "unknownType": {
+      "name": "Unbekannter Typ",
+      "category": "Objekttypen",
+      "tooltip": "Objekte im Orbit, deren Zweck oder Typ noch nicht eindeutig identifiziert ist."
+    },
+    "notionalSatellites": {
+      "name": "Konzeptionelle Satelliten",
+      "category": "Objekttypen",
+      "tooltip": "Satelliten, die geplant oder vorgeschlagen sind, aber noch nicht gestartet wurden."
+    },
+    "agencies": {
+      "name": "Agenturen",
+      "category": "Objekttypen",
+      "tooltip": "Geplante Funktion – Dies wird Agenturen auf dem Globus anzeigen.",
+      "checked": false,
+      "disabled": true
+    },
+    "vleoSatellites": {
+      "name": "vLEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im sehr niedrigen Erdorbit mit einem Apogäum unter 400 km."
+    },
+    "leoSatellites": {
+      "name": "LEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im niedrigen Erdorbit mit einem Apogäum zwischen 400 km und 6000 km."
+    },
+    "heoSatellites": {
+      "name": "HEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im stark elliptischen Orbit mit einer Exzentrizität von 0,1 oder mehr und einem Apogäum unter 39786 km."
+    },
+    "meoSatellites": {
+      "name": "MEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im mittleren Erdorbit mit einem Apogäum zwischen 6000 km und 34786 km."
+    },
+    "geoSatellites": {
+      "name": "GEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im geostationären Orbit mit einer Exzentrizität unter 0,1 und einem Apogäum zwischen 34786 km und 36786 km."
+    },
+    "xgeoSatellites": {
+      "name": "xGEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im Ex-Geosynchronen Orbit mit einer Exzentrizität unter 0,1 und einem Apogäum über 36786 km oder einer Exzentrizität von 0,1 oder mehr und einem Apogäum über 39786 km."
+    },
+    "vimpelSatellites": {
+      "name": "Vimpel-Satelliten",
+      "category": "Quelle",
+      "tooltip": "Der Vimpel-Satellitenkatalog wird von der russischen Aktiengesellschaft JSC Vimpel in Zusammenarbeit mit dem Keldysh-Institut für Angewandte Mathematik gepflegt."
+    },
+    "celestrakSatellites": {
+      "name": "Celestrak-Satelliten",
+      "category": "Quelle",
+      "tooltip": "Celestrak ist eine beliebte Quelle für Satellitenbahndaten und bietet TLEs für eine Vielzahl von Satelliten und Trümmern."
+    }
   }
 }

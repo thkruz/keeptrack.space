@@ -137,7 +137,6 @@
     "papaparse": "^5.4.1",
     "path-to-regexp": "^8.1.0",
     "prettier-plugin-organize-imports": "^4.3.0",
-    "retire": "^4.3.1",
     "serve": "^14.2.4",
     "source-map-loader": "^4.0.2",
     "style-loader": "^3.3.4",

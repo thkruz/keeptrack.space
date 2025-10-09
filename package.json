@@ -131,7 +131,6 @@
     "jsdom-worker": "^0.3.0",
     "mini-css-extract-plugin": "^2.7.6",
     "mkdirp": "^3.0.1",
-    "opener": "^1.5.2",
     "papaparse": "^5.4.1",
     "path-to-regexp": "^8.1.0",
     "prettier-plugin-organize-imports": "^4.3.0",

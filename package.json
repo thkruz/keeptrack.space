@@ -118,7 +118,6 @@
     "css-loader": "^6.8.1",
     "cypress": "^13.17.0",
     "dotenv-webpack": "^8.1.1",
-    "download-file": "^0.1.5",
     "eslint": "^8.50.0",
     "eslint-plugin-jest": "^27.4.0",
     "http-server": "^14.1.1",

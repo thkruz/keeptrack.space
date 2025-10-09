@@ -130,7 +130,6 @@
     "jsdom-worker": "^0.3.0",
     "mini-css-extract-plugin": "^2.7.6",
     "papaparse": "^5.4.1",
-    "path-to-regexp": "^8.1.0",
     "prettier-plugin-organize-imports": "^4.3.0",
     "serve": "^14.2.4",
     "source-map-loader": "^4.0.2",

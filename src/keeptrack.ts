@@ -24,6 +24,7 @@
  */
 
 import 'material-icons/iconfont/material-icons.css';
+import { Localization } from './locales/locales'; // Ensure localization is imported first
 
 import { CatalogLoader } from './app/data/catalog-loader';
 import { CatalogManager } from './app/data/catalog-manager';
@@ -82,6 +83,7 @@ export class KeepTrack {
     // Update the version number
     settingsManager.versionNumber = VERSION;
     this.settingsOverride_ = settingsOverride;
+    Localization.getInstance(); // Initialize localization early
     this.engine = new Engine();
 
     settingsManager.init(this.settingsOverride_);

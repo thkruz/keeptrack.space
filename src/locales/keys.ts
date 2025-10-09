@@ -1,6 +1,8 @@
-// This file is auto-generated from the translation JSON file
-// Do not edit manually
-// Use npm run generate-t7e-keys instead!
+/*
+ * This file is auto-generated from the translation JSON file
+ * Do not edit manually
+ * Use npm run generate-t7e-keys instead!
+ */
 /* eslint-disable guard-for-in */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import i18next from 'i18next';

@@ -32,7 +32,7 @@ import { defaultSensor } from './environment/apiMocks';
  *- menuOptions: a list of menu options and corresponding HTML templates
  */
 
-describe('LegendManager_class', () => {
+describe('LegendManager_class_mobile', () => {
   const objectTypeFlags = {
     velocitySlow: false,
     velocityMed: false,
@@ -44,6 +44,7 @@ describe('LegendManager_class', () => {
   };
 
   beforeEach(() => {
+    settingsManager.isMobileModeEnabled = true;
     keepTrackApi.containerRoot.innerHTML = '';
     Container.getInstance().registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
   });
@@ -65,6 +66,7 @@ describe('LegendManager_class', () => {
       keepTrackApi.containerRoot?.appendChild(legendHoverDom);
 
       // Act
+      settingsManager.isMobileModeEnabled = true;
       LayersManager.change(menu);
       // Remove all styles from legendHoverDom.innerHTML
       legendHoverDom.innerHTML = legendHoverDom.innerHTML.replace(/style="[^"]*"/gu, '');
@@ -91,6 +93,96 @@ describe('LegendManager_class', () => {
     const legendHoverDom = document.createElement('div');
 
     legendHoverDom.id = 'layers-hover-menu';
+    keepTrackApi.containerRoot?.appendChild(legendHoverDom);
+
+    const catalogManagerInstance = {
+      isSensorManagerLoaded: true,
+    };
+    const sensorManagerInstance = {
+      currentSensors: [defaultSensor],
+    };
+    const colorSchemeManagerInstance = {
+      resetObjectTypeFlags: jest.fn(),
+    };
+
+    Container.getInstance().get = jest.fn().mockImplementation((singleton) => {
+      if (singleton === Singletons.CatalogManager) {
+        return catalogManagerInstance;
+      } else if (singleton === Singletons.SensorManager) {
+        return sensorManagerInstance;
+      } else if (singleton === Singletons.ColorSchemeManager) {
+        return colorSchemeManagerInstance;
+      }
+
+      return null;
+    });
+
+    LayersManager.change(ObjectTypeColorScheme.name);
+
+    expect(legendHoverDom.innerHTML).toBe(ObjectTypeColorScheme.layersHtml);
+  });
+});
+
+describe('LegendManager_class_desktop', () => {
+  const objectTypeFlags = {
+    velocitySlow: false,
+    velocityMed: false,
+    velocityFast: false,
+  };
+  const colorSchemeManagerInstance = {
+    resetObjectTypeFlags: jest.fn(),
+    objectTypeFlags,
+  };
+
+  beforeEach(() => {
+    settingsManager.isMobileModeEnabled = false;
+    keepTrackApi.containerRoot.innerHTML = '';
+    Container.getInstance().registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
+  });
+
+  // Tests that the legend menu changes to a valid option
+  it('test_change_valid_option', () => {
+    const legendHoverDom = document.createElement('div');
+
+    [
+      GpAgeColorScheme, RcsColorScheme, ObjectTypeColorScheme, SunlightColorScheme,
+      VelocityColorScheme, CelestrakColorScheme, StarlinkColorScheme, SmallSatColorScheme,
+    ].forEach((ThisColorScheme) => {
+      // Arrange
+      const menu = ThisColorScheme.name;
+
+      legendHoverDom.innerHTML = '';
+
+      legendHoverDom.id = 'layers-hover-menu-popup';
+      keepTrackApi.containerRoot?.appendChild(legendHoverDom);
+
+      // Act
+      LayersManager.change(menu);
+      // Remove all styles from legendHoverDom.innerHTML
+      legendHoverDom.innerHTML = legendHoverDom.innerHTML.replace(/style="[^"]*"/gu, '');
+
+      // Assert
+      expect(legendHoverDom.innerHTML).toEqual(ThisColorScheme.layersHtml);
+    });
+  });
+
+  // Tests the behavior when the legend menu is cleared
+  it('test_change_legend_menu_cleared', () => {
+    const legendHoverDom = document.createElement('div');
+
+    legendHoverDom.id = 'layers-hover-menu-popup';
+    keepTrackApi.containerRoot?.appendChild(legendHoverDom);
+
+    LayersManager.change('clear');
+
+    expect(legendHoverDom.style.display).toBe('none');
+  });
+
+  // Tests the behavior when a sensor is selected
+  it('test_change_sensor_selected', () => {
+    const legendHoverDom = document.createElement('div');
+
+    legendHoverDom.id = 'layers-hover-menu-popup';
     keepTrackApi.containerRoot?.appendChild(legendHoverDom);
 
     const catalogManagerInstance = {

@@ -1259,6 +1259,7 @@ input:focus {
   border-bottom: 0px !important;
   text-align: center !important;
   font-size: 20px !important;
+  width: 150px !important;
 }
 
 .ui_tpicker_hour,
@@ -1396,7 +1397,8 @@ input:focus {
 
 .ui_tpicker_time {
   height: 31px;
-  text-align: center;
+  display: flex;
+  justify-content: space-around;
 }
 
 .dropdown-content {
@@ -1584,7 +1586,14 @@ input:focus {
 }
 
 .ui-timepicker-div .ui_tpicker_time .ui_tpicker_time_input:focus {
-  border-bottom-color: #aaa;
+  border-bottom: 1px solid #aaa !important;
+  -webkit-box-shadow: 0 1px 0 0 #aaa !important;
+  box-shadow: 0 1px 0 0 #aaa !important;
+}
+
+#calendar-time-prop-rate {
+  width: 4em;
+  margin-left: 1em;
 }
 
 .ui-timepicker-rtl {

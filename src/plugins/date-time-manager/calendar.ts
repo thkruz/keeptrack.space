@@ -1,9 +1,10 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { setInnerHtml } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class Calendar {
   private readonly containerId: string;
@@ -125,6 +126,21 @@ export class Calendar {
     this.attachSliderEvents('ui_tpicker_minute_slider', this.updateMinute.bind(this));
     this.attachSliderEvents('ui_tpicker_second_slider', this.updateSecond.bind(this));
     this.attachSliderEvents('ui_tpicker_proprate_slider', this.updatePropRate.bind(this));
+
+    // Attach event for time text input
+    const timeInput = document.getElementById('calendar-time-input') as HTMLInputElement;
+
+    if (timeInput) {
+      timeInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          timeInput.blur();
+        }
+      });
+      timeInput.addEventListener('blur', () => {
+        this.onTextInputChange();
+      });
+    }
 
     // Attach events for time adjustment buttons
     this.attachTimeAdjustmentEvents('hour');
@@ -326,7 +342,8 @@ export class Calendar {
         <dl>
           <dt class="ui_tpicker_time_label">${t7e('time.calendar.time')}</dt>
           <dd class="ui_tpicker_time">
-            <input id="calendar-time-input" class="ui_tpicker_time_input" value="${this.formatTime(hours, minutes, seconds)} | (x${propRate.toString()})" disabled>
+            <input id="calendar-time-input" class="ui_tpicker_time_input keyboard-priority" value="${this.formatTime(hours, minutes, seconds)}">
+            <span id="calendar-time-prop-rate">(x${propRate.toString()})</span>
           </dd>
           <dt class="ui_tpicker_hour_label">${t7e('time.calendar.hour')}</dt>
           <dd class="ui_tpicker_hour">
@@ -577,7 +594,49 @@ export class Calendar {
     }
   }
 
+  private onTextInputChange(): void {
+    const timeInput = document.getElementById('calendar-time-input') as HTMLInputElement;
+
+    if (!timeInput) {
+      return;
+    }
+
+    // Expecting 6 or 8 characters (HHMMSS or HH:MM:SS)
+    if (timeInput.value.length < 6 || timeInput.value.length > 8) {
+      errorManagerInstance.warn('Invalid time format entered! Expected HH:MM:SS or HHMMSS');
+
+      return;
+    }
+
+    // Expecting format HH:MM:SS or HHMMSS
+    if (!timeInput.value.includes(':') && timeInput.value.length === 6) {
+      timeInput.value = `${timeInput.value.slice(0, 2)}:${timeInput.value.slice(2, 4)}:${timeInput.value.slice(4, 6)}`;
+    }
+
+
+    const timeParts = timeInput.value.split(':');
+
+    if (timeParts.length === 3) {
+      const hours = parseInt(timeParts[0], 10);
+      const minutes = parseInt(timeParts[1], 10);
+      const seconds = parseInt(timeParts[2], 10);
+
+      if (!isNaN(hours) && !isNaN(minutes) && !isNaN(seconds)) {
+        this.simulationDate.setUTCHours(Math.max(0, Math.min(23, hours)));
+        this.simulationDate.setUTCMinutes(Math.max(0, Math.min(59, minutes)));
+        this.simulationDate.setUTCSeconds(Math.max(0, Math.min(59, seconds)));
+
+        this.datetimeInputFormChange();
+        this.updateTimeInput();
+        this.render();
+        this.attachEvents();
+      }
+    }
+  }
+
   private updateTimeInput(): void {
+    setInnerHtml('calendar-time-prop-rate', `(x${this.propagationRate.toString()})`);
+
     const timeInput = document.getElementById('calendar-time-input') as HTMLInputElement;
 
     if (timeInput) {
@@ -585,7 +644,7 @@ export class Calendar {
         this.simulationDate.getUTCHours(),
         this.simulationDate.getUTCMinutes(),
         this.simulationDate.getUTCSeconds(),
-      )} | (x${this.propagationRate.toString()})`;
+      )}`;
     }
   }
 

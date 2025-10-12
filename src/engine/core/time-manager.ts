@@ -28,7 +28,6 @@ export class TimeManager {
    * The rate of change applied to the dynamicOffset
    */
   propRate = <number>null;
-  propRate0 = <number>null;
   /**
    * The time in the real world
    */
@@ -120,7 +119,7 @@ export class TimeManager {
 
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    if (!settingsManager.isAlwaysHidePropRate && this.propRate0 !== this.propRate) {
+    if (!settingsManager.isAlwaysHidePropRate) {
       if (this.propRate > 1.01 || this.propRate < 0.99) {
         if (this.propRate < 10) {
           uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.standby);
@@ -432,7 +431,6 @@ export class TimeManager {
             this.timeTextStr += this.simulationTimeSerialized_[this.iText - 1];
           }
         }
-        this.propRate0 = this.propRate;
       }
 
       // Avoid race condition

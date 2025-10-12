@@ -378,6 +378,7 @@ const settingsOverride = {
     maxSize: 70.0,
   },
   isEnableJscCatalog: false,
+  isAutoStart: true,
 };
 
 // Expose these to the console

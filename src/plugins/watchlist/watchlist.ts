@@ -26,6 +26,7 @@ import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces'
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SensorToSatLine } from '@app/engine/rendering/line-manager/sensor-to-sat-line';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
@@ -40,7 +41,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { EL as SAT_INFO_EL, SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
+import { TopMenu } from '../top-menu/top-menu';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];
@@ -124,7 +125,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
         }
 
         // Optional if top-menu is enabled
-        getEl('nav-mobile2', true)?.insertAdjacentHTML(
+        getEl(TopMenu.TOP_RIGHT_ID, true)?.insertAdjacentHTML(
           'afterbegin',
           html`
                 <li id="top-menu-watchlist-li" class="hidden">

@@ -91,4 +91,5 @@ export type KeepTrackPluginsConfiguration = {
   EarthPresetsPlugin?: PluginConfiguration;
   DrawLinesPlugin?: PluginConfiguration;
   ViewInfoRmbPlugin?: PluginConfiguration;
+  VcrPlugin?: PluginConfiguration;
 };

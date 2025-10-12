@@ -1,5 +1,6 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -8,7 +9,6 @@ import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
-import { html } from '@app/engine/utils/development/formatter';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -313,7 +313,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     keepTrackApi.on(
       EventBusEvent.uiManagerInit,
       () => {
-        getEl('nav-mobile2')?.insertAdjacentHTML(
+        getEl(TopMenu.TOP_RIGHT_ID)?.insertAdjacentHTML(
           'afterbegin',
           html`
             <li id="top-menu-filter-li">

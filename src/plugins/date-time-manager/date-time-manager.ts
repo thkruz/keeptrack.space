@@ -74,7 +74,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     NavWrapper?.insertAdjacentHTML(
       'afterbegin',
       html`
-        <div id="nav-mobile">
+        <div id="nav-top-left">
           <div id="jday"></div>
           <div id="${this.dateTimeContainerId_}">
             <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>

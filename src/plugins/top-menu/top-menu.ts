@@ -1,17 +1,19 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TooltipsPlugin } from '../tooltips/tooltips';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class TopMenu extends KeepTrackPlugin {
   readonly id = 'TopMenu';
   dependencies_ = [];
   static readonly SEARCH_RESULT_ID = 'search-results';
+  static readonly TOP_LEFT_ID = 'nav-top-left';
+  static readonly TOP_RIGHT_ID = 'nav-top-right';
 
   navItems: {
     id: string;
@@ -47,7 +49,7 @@ export class TopMenu extends KeepTrackPlugin {
           html`
             <nav>
               <div id="nav-wrapper" class="nav-wrapper" style="display: flex; justify-content: flex-end;">
-          <ul id="nav-mobile2" class="right">
+          <ul id="nav-top-right" class="right">
             ${this.navItems // NOSONAR
               .sort((a, b) => a.order - b.order)
               .map(

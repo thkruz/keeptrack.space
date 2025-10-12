@@ -980,7 +980,7 @@ input:focus {
   border-width: 0px;
 }
 
-#nav-mobile {
+#nav-top-left {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -992,14 +992,14 @@ input:focus {
   margin-left: 10px;
 }
 
-#nav-mobile2 {
+#nav-top-right {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: center;
 }
 
-#nav-mobile2 a:hover {
+#nav-top-right a:hover {
   filter: brightness(3);
 }
 
@@ -3911,9 +3911,17 @@ a.ui-button:active,
   padding-left: 0px;
 }
 
-#nav-mobile2 li {
+#nav-top-right li {
   line-height: normal;
   height: 100%;
+}
+
+.vcr-container {
+  display: flex;
+}
+
+.vcr-btn {
+  cursor: pointer;
 }
 
 .top-menu-icons {

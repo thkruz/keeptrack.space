@@ -25,14 +25,13 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { v4 as uuidv4 } from 'uuid';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
+import { html } from '../utils/development/formatter';
 import { getEl } from '../utils/get-el';
 import { KeepTrackPlugin } from './base-plugin';
-import { html } from '../utils/development/formatter';
 
 export abstract class TopMenuPlugin extends KeepTrackPlugin {
   id: string = '';
   protected dependencies_ = [TopMenu.name];
-  protected readonly topRightMenuId = 'nav-mobile2';
 
   protected image: string = ''; // Override in subclass
   protected tooltipText: string = 'Tooltip Text'; // Override in subclass
@@ -64,11 +63,11 @@ export abstract class TopMenuPlugin extends KeepTrackPlugin {
       </a>
     `;
 
-    const topRightMenuElement = getEl(this.topRightMenuId, true);
+    const topRightMenuElement = getEl(TopMenu.TOP_RIGHT_ID, true);
 
     // The top menu might not exist if the TopMenu plugin is disabled
     if (topRightMenuElement) {
-      topRightMenuElement.insertBefore(pluginRootEl, getEl(this.topRightMenuId)?.firstChild ?? null);
+      topRightMenuElement.insertBefore(pluginRootEl, getEl(TopMenu.TOP_RIGHT_ID)?.firstChild ?? null);
       pluginRootEl.onclick = () => this.onClick_();
       keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip(pluginRootEl, this.tooltipText);
     }

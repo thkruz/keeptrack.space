@@ -76,6 +76,7 @@ import { VideoDirectorPlugin } from './video-director/video-director';
 import { ViewInfoRmbPlugin } from './view-info-rmb/view-info-rmb';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
+import { VcrPlugin } from './vcr/vcr';
 
 export class PluginManager {
   // Register all core modules
@@ -259,6 +260,7 @@ export class PluginManager {
         { init: () => new EarthPresetsPlugin().init(), config: plugins.EarthPresetsPlugin },
         { init: () => new DrawLinesPlugin().init(), config: plugins.DrawLinesPlugin },
         { init: () => new ViewInfoRmbPlugin().init(), config: plugins.ViewInfoRmbPlugin },
+        { init: () => new VcrPlugin().init(), config: plugins.VcrPlugin },
       ];
 
       for (const { init, config } of pluginList) {

@@ -248,6 +248,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: false,
     order: 601,
   },
+  VcrPlugin: {
+    enabled: true,
+    order: 1000,
+  },
   // Non-Menu plugins
   SatInfoBoxCore: {
     enabled: true,

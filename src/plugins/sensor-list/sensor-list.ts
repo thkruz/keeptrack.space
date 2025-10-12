@@ -2,6 +2,7 @@ import { sensors } from '@app/app/data/catalogs/sensors';
 import { CameraType } from '@app/engine/camera/camera';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
@@ -15,7 +16,6 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
-import { html } from '@app/engine/utils/development/formatter';
 
 // TODO: Add a search bar and filter for sensors
 
@@ -74,7 +74,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     keepTrackApi.on(
       EventBusEvent.uiManagerInit,
       () => {
-        getEl('nav-mobile')?.insertAdjacentHTML(
+        getEl('nav-top-left')?.insertAdjacentHTML(
           'beforeend',
           html`
           <div id="sensor-selected-container" class="start-hidden">

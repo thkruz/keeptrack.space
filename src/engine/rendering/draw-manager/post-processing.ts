@@ -1,7 +1,6 @@
 // Shaders should NOT be modified
 /* eslint-disable no-useless-escape */
 
-import { Scene } from '@app/engine/core/scene';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { mat4, vec4 } from 'gl-matrix';
 import { postProcessingShaderCode } from '../../utils/post-processing-shader-code';
@@ -138,7 +137,7 @@ export class PostProcessingManager {
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uMvMatrix, false, mvMatrix);
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uPMatrix, false, pMatrix);
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uCamMatrix, false, camMatrix);
-      gl.uniform3fv(this.programs.occlusion.uniform.uWorldOffset, Scene.getInstance().worldShift);
+      gl.uniform3fv(this.programs.occlusion.uniform.uWorldOffset, [0, 0, 0]); // Scene.getInstance().worldShift);
       gl.uniform1f(this.programs.occlusion.uniform.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     };
   }

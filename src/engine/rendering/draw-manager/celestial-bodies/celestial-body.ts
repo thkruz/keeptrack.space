@@ -12,6 +12,7 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { keepTrackApi } from '../../../../keepTrackApi';
 import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';
+import { OcclusionProgram } from '../post-processing';
 
 export abstract class CelestialBody {
   protected readonly RADIUS: number;
@@ -82,6 +83,32 @@ export abstract class CelestialBody {
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
     gl.bindVertexArray(null);
+  }
+
+  drawOcclusion(pMatrix: mat4, camMatrix: mat4, occlusionPrgm: OcclusionProgram, tgtBuffer: WebGLFramebuffer): void {
+    if (!this.isLoaded_) {
+      return;
+    }
+    if (settingsManager.isDisableGodrays) {
+      return;
+    }
+
+    const gl = this.gl_;
+    // Change to the earth shader
+
+    gl.useProgram(occlusionPrgm.program);
+    // Change to the main drawing buffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
+
+    gl.depthMask(true);
+
+    occlusionPrgm.attrSetup(this.mesh.geometry.getCombinedBuffer());
+
+    // Set the uniforms
+    occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, camMatrix);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
+    gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
   }
 
   protected setUniforms_(gl: WebGL2RenderingContext, sunPosition: vec3) {

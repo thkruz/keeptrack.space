@@ -84,7 +84,7 @@ export class DotsManager {
           vertices: 4,
           offset: 0,
         }),
-        a_star: new BufferAttribute({
+        a_size: new BufferAttribute({
           location: 2,
           vertices: 1,
           offset: 0,
@@ -438,8 +438,8 @@ export class DotsManager {
     gl.vertexAttribPointer(this.programs.dots.attribs.a_color.location, 4, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.buffers.size);
-    gl.enableVertexAttribArray(this.programs.dots.attribs.a_star.location);
-    gl.vertexAttribPointer(this.programs.dots.attribs.a_star.location, 1, gl.UNSIGNED_BYTE, false, 0, 0);
+    gl.enableVertexAttribArray(this.programs.dots.attribs.a_size.location);
+    gl.vertexAttribPointer(this.programs.dots.attribs.a_size.location, 1, gl.UNSIGNED_BYTE, false, 0, 0);
 
     gl.bindVertexArray(null);
 
@@ -710,7 +710,7 @@ export class DotsManager {
             uniform float logDepthBufFC;
 
             in vec4 vColor;
-            in float vStar;
+            in float vSize;
             in float vDist;
 
             out vec4 fragColor;
@@ -739,7 +739,7 @@ export class DotsManager {
           precision highp float;
           in vec3 a_position;
           in vec4 a_color;
-          in float a_star;
+          in float a_size;
 
           uniform float u_minSize;
           uniform float u_maxSize;
@@ -748,7 +748,7 @@ export class DotsManager {
           uniform float logDepthBufFC;
 
           out vec4 vColor;
-          out float vStar;
+          out float vSize;
           out float vDist;
 
           float when_lt(float x, float y) {
@@ -770,17 +770,20 @@ export class DotsManager {
 
               // Satellite
               drawSize +=
-              when_lt(a_star, 0.5) *
+              when_lt(a_size, 0.5) *
               (min(max(baseSize, u_minSize), u_maxSize) * 1.0);
 
               // Something on the ground
               drawSize +=
-              when_lt(a_star, 0.5) * when_lt(dist, 6421.0) *
+              when_lt(a_size, 0.5) * when_lt(dist, 6421.0) *
               (min(max(baseSize, u_minSize * 0.5), u_maxSize) * 1.0);
+
+              // Searched Object
+              drawSize += when_ge(a_size, 0.5) * ${settingsManager.satShader.starSize};
 
               gl_PointSize = drawSize;
               vColor = a_color;
-              vStar = a_star * 1.0;
+              vSize = a_size * 1.0;
               vDist = dist;
           }
         `,

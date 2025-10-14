@@ -26,7 +26,7 @@ import { ColorRuleSet } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '../../keepTrackApi';
 import { ColorInformation, Pickable, rgbaArray } from '../core/interfaces';
 import { errorManagerInstance } from '../utils/errorManager';
-import { getEl } from '../utils/get-el';
+import { getEl, hideEl } from '../utils/get-el';
 
 import { DensityBin } from '@app/app/data/catalog-manager';
 import { LayersManager } from '@app/app/ui/layers-manager';
@@ -249,6 +249,29 @@ export class ColorSchemeManager {
 
       },
     );
+
+    keepTrackApi.on(EventBusEvent.layerUpdated, () => {
+      if (settingsManager.isDisableSensors) {
+        const sensorBox = document.querySelector('.layers-sensor-box')?.parentElement as HTMLElement;
+        const inFOVBox = document.querySelector('.layers-inFOV-box')?.parentElement as HTMLElement;
+
+        if (sensorBox) {
+          hideEl(sensorBox);
+        }
+
+        if (inFOVBox) {
+          hideEl(inFOVBox);
+        }
+      }
+
+      if (settingsManager.isDisableLaunchSites) {
+        const launchSiteBox = document.querySelector('.layers-facility-box')?.parentElement as HTMLElement;
+
+        if (launchSiteBox) {
+          hideEl(launchSiteBox);
+        }
+      }
+    });
 
     EventBus.getInstance().on(EventBusEvent.update, () => {
       /*

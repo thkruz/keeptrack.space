@@ -3,12 +3,13 @@ import { SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { hideEl } from '@app/engine/utils/get-el';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { ColorScheme } from './color-scheme';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class SunlightColorScheme extends ColorScheme {
   readonly label = 'Sunlight Status';
@@ -51,6 +52,17 @@ export class SunlightColorScheme extends ColorScheme {
         }
       },
     );
+
+    keepTrackApi.on(EventBusEvent.layerUpdated, () => {
+      if (settingsManager.isDisableSensors) {
+        this.objectTypeFlags.sunlightFov = false;
+        const sunlightFovBox = document.querySelector('.layers-sunlightFov-box')?.parentElement as HTMLElement;
+
+        if (sunlightFovBox) {
+          hideEl(sunlightFovBox);
+        }
+      }
+    });
   }
 
   onSelected(): void {
@@ -231,6 +243,10 @@ export class SunlightColorScheme extends ColorScheme {
     <li>
       <div class="Square-Box layers-sunlightFov-box"></div>
       Satellite in FOV
+    </li>
+    <li>
+      <div class="Square-Box layers-facility-box"></div>
+      Launch Site
     </li>
   </ul>
   `.trim();

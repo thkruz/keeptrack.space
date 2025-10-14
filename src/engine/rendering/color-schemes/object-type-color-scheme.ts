@@ -2,13 +2,13 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../../camera/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { html } from '@app/engine/utils/development/formatter';
 
 export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
   payload: rgbaArray;
@@ -64,28 +64,13 @@ export class ObjectTypeColorScheme extends ColorScheme {
       if (settingsManager.isDisableSensors) {
         this.objectTypeFlags.sensor = false;
         this.objectTypeFlags.inFOV = false;
-        const sensorBox = document.querySelector('.layers-sensor-box')?.parentElement as HTMLElement;
-        const inFOVBox = document.querySelector('.layers-inFOV-box')?.parentElement as HTMLElement;
-
-        if (sensorBox) {
-          hideEl(sensorBox);
-        }
-
-        if (inFOVBox) {
-          hideEl(inFOVBox);
-        }
       }
 
       if (settingsManager.isDisableLaunchSites) {
         this.objectTypeFlags.facility = false;
-        const launchSiteBox = document.querySelector('.layers-facility-box')?.parentElement as HTMLElement;
-
-        if (launchSiteBox) {
-          hideEl(launchSiteBox);
-        }
       }
 
-      if (!settingsManager.plugins?.MissilePlugin) {
+      if (!settingsManager.plugins?.MissilePlugin?.enabled) {
         this.objectTypeFlags.missile = false;
         const missileBox = document.querySelector('.layers-missile-box')?.parentElement as HTMLElement;
 

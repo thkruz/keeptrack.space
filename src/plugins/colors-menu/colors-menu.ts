@@ -1,13 +1,13 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import palettePng from '@public/img/icons/palette.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class ColorMenu extends KeepTrackPlugin {
   readonly id = 'ColorMenu';
@@ -48,7 +48,7 @@ export class ColorMenu extends KeepTrackPlugin {
     let html = '';
 
     for (const colorScheme in colorSchemes) {
-      if (!colorSchemes[colorScheme].isOptionInColorMenu) {
+      if (!colorSchemes[colorScheme].isOptionInColorMenu || !settingsManager.colorSchemeInstances[colorScheme]?.enabled) {
         continue;
       }
 
@@ -64,7 +64,7 @@ export class ColorMenu extends KeepTrackPlugin {
     let html = '';
 
     for (const colorScheme in colorSchemes) {
-      if (!colorSchemes[colorScheme].isOptionInRmbMenu) {
+      if (!colorSchemes[colorScheme].isOptionInRmbMenu || !settingsManager.colorSchemeInstances[colorScheme]?.enabled) {
         continue;
       }
 

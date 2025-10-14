@@ -1,8 +1,8 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { html } from '@app/engine/utils/development/formatter';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { html } from '@app/engine/utils/development/formatter';
 
 export interface MissionColorSchemeColorMap extends ColorSchemeColorMap {
   missionMilitary: rgbaArray;

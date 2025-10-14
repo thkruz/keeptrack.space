@@ -1,10 +1,10 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { html } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
 import { CameraType } from '../../camera/camera';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { html } from '@app/engine/utils/development/formatter';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -197,6 +197,10 @@ export class CountryColorScheme extends ColorScheme {
     <li>
       <div class="Square-Box layers-countryOther-box"></div>
       Other
+    </li>
+    <li>
+      <div class="Square-Box layers-facility-box"></div>
+      Launch Site
     </li>
   </ul>
   `.trim();

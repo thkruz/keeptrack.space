@@ -151,6 +151,54 @@ export class SettingsManager {
    */
   defaultColorScheme = 'CelestrakColorScheme';
 
+  colorSchemeInstances = {
+    CelestrakColorScheme: {
+      enabled: true,
+    },
+    ObjectTypeColorScheme: {
+      enabled: true,
+    },
+    CountryColorScheme: {
+      enabled: true,
+    },
+    RcsColorScheme: {
+      enabled: true,
+    },
+    ReentryRiskColorScheme: {
+      enabled: true,
+    },
+    MissionColorScheme: {
+      enabled: true,
+    },
+    ConfidenceColorScheme: {
+      enabled: true,
+    },
+    OrbitalPlaneDensityColorScheme: {
+      enabled: true,
+    },
+    SpatialDensityColorScheme: {
+      enabled: true,
+    },
+    SunlightColorScheme: {
+      enabled: true,
+    },
+    GpAgeColorScheme: {
+      enabled: true,
+    },
+    SourceColorScheme: {
+      enabled: true,
+    },
+    VelocityColorScheme: {
+      enabled: true,
+    },
+    StarlinkColorScheme: {
+      enabled: true,
+    },
+    SmallSatColorScheme: {
+      enabled: true,
+    },
+  };
+
   /** Ensures no html is injected into the page */
   isPreventDefaultHtml = false;
   /**
@@ -1458,7 +1506,7 @@ export class SettingsManager {
 // Create a type based on the parameters of SettingsManager (ignore methods)
 export type SettingsManagerOverride = Partial<Omit<SettingsManager,
   'exportSettingsToJSON' | 'loadOverridesFromUrl_' | 'loadLastMapTexture_' | 'setEmbedOverrides_' | 'setMobileSettings_' | 'setInstallDirectory_' | 'setColorSettings_' |
-  'checkIfIframe_' | 'initParseFromGETVariables_' | 'loadOverrides_' | 'setMobileSettings_' | 'setEmbedOverrides_' | 'loadLastMapTexture_' | 'setColorSettings_'>>;
+  'checkIfIframe_' | 'initParseFromGETVariables_' | 'loadOverrides_' | 'setColorSettings_'>>;
 
 // Export the settings manager instance
 

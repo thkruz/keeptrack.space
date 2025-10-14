@@ -34,15 +34,15 @@ const settingsOverride = {
       order: 1,
     },
     UserAccountPlugin: {
-      enabled: true,
+      enabled: false,
       order: 2,
     },
     SensorListPlugin: {
-      enabled: true,
+      enabled: false,
       order: 10,
     },
     SensorInfoPlugin: {
-      enabled: true,
+      enabled: false,
       order: 11,
     },
     CustomSensorPlugin: {
@@ -50,7 +50,7 @@ const settingsOverride = {
       order: 12,
     },
     SensorFov: {
-      enabled: true,
+      enabled: false,
       order: 13,
     },
     SensorSurvFence: {
@@ -62,7 +62,7 @@ const settingsOverride = {
       order: 15,
     },
     LookAnglesPlugin: {
-      enabled: true,
+      enabled: false,
       order: 20,
     },
     MultiSiteLookAnglesPlugin: {
@@ -91,7 +91,7 @@ const settingsOverride = {
       order: 50,
     },
     PolarPlotPlugin: {
-      enabled: true,
+      enabled: false,
       order: 60,
     },
     CreateSat: {
@@ -162,6 +162,10 @@ const settingsOverride = {
       enabled: true,
       order: 232,
     },
+    PlanetsMenuPlugin: {
+      enabled: false,
+      order: 233,
+    },
     SatellitePhotos: {
       enabled: true,
       order: 240,
@@ -221,6 +225,10 @@ const settingsOverride = {
       enabled: false,
       order: 400,
     },
+    ManeuverPlugin: {
+      enabled: false,
+      order: 409,
+    },
     InitialOrbitDeterminationPlugin: {
       enabled: false,
       order: 410,
@@ -265,6 +273,10 @@ const settingsOverride = {
       enabled: false,
       order: 601,
     },
+    VcrPlugin: {
+      enabled: true, // Disabled by default
+      order: 1000,
+    },
     // Non-Menu plugins
     SatInfoBox: {
       enabled: true,
@@ -299,7 +311,7 @@ const settingsOverride = {
     },
     ViewInfoRmbPlugin: {
       enabled: true,
-    },
+    }
   },
   dataSources: {
     tle: 'https://api.keeptrack.space/v2/sats/celestrak',
@@ -379,6 +391,54 @@ const settingsOverride = {
   },
   isEnableJscCatalog: false,
   isAutoStart: true,
+  isDisableSensors: true,
+  colorSchemeInstances: {
+    CelestrakColorScheme: {
+      enabled: true,
+    },
+    ObjectTypeColorScheme: {
+      enabled: true,
+    },
+    CountryColorScheme: {
+      enabled: true,
+    },
+    RcsColorScheme: {
+      enabled: true,
+    },
+    ReentryRiskColorScheme: {
+      enabled: true,
+    },
+    MissionColorScheme: {
+      enabled: false,
+    },
+    ConfidenceColorScheme: {
+      enabled: false,
+    },
+    OrbitalPlaneDensityColorScheme: {
+      enabled: false,
+    },
+    SpatialDensityColorScheme: {
+      enabled: false,
+    },
+    SunlightColorScheme: {
+      enabled: true,
+    },
+    GpAgeColorScheme: {
+      enabled: true,
+    },
+    SourceColorScheme: {
+      enabled: false,
+    },
+    VelocityColorScheme: {
+      enabled: true,
+    },
+    StarlinkColorScheme: {
+      enabled: true,
+    },
+    SmallSatColorScheme: {
+      enabled: true,
+    },
+  },
 };
 
 // Expose these to the console

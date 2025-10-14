@@ -55,8 +55,8 @@ export class TopMenu extends KeepTrackPlugin {
               .map(
                 (item) => `
                   <li>
-                    <a id="${item.id}" class="top-menu-icons ${item.class ? ` ${item.class}` : ''}">
-                      <div class="top-menu-icons ${item.classInner ? ` ${item.classInner}` : ''}">
+                    <a id="${item.id}" class="top-menu-icons ${item.class ? `${item.class}` : ''}">
+                      <div class="top-menu-icons ${item.classInner ? `${item.classInner}` : ''}">
                         <img
                           id="${item.id.replace('-btn', '-icon')}"
                           src="${item.icon}"

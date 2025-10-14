@@ -249,7 +249,7 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     order: 601,
   },
   VcrPlugin: {
-    enabled: true,
+    enabled: false, // Disabled by default
     order: 1000,
   },
   // Non-Menu plugins

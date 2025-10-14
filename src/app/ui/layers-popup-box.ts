@@ -1,8 +1,8 @@
 import { DraggableBox } from '@app/engine/ui/draggable-box';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { LayersManager } from './layers-manager';
-import { html } from '@app/engine/utils/development/formatter';
 
 
 export class LayersPopupBox extends DraggableBox {
@@ -35,6 +35,10 @@ export class LayersPopupBox extends DraggableBox {
 
   close(cb?: () => void): void {
     super.close(cb);
+    const layersMenuIconContainer = getEl('layers-menu-icon')!.parentElement!;
+
+    layersMenuIconContainer.classList.remove('bmenu-item-selected');
+    layersMenuIconContainer.classList.add('top-menu-icons__blue-img');
     keepTrackApi.getUiManager().layersManager.isLayersMenuOpen = false;
   }
 }

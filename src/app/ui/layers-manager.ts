@@ -76,7 +76,7 @@ export class LayersManager {
           // Closing Layers Menu
           hideEl('layers-hover-menu');
           layersMenuIconContainer.classList.remove('bmenu-item-selected');
-          layersMenuIconContainer.classList.add('bmenu-item-error');
+          layersMenuIconContainer.classList.add('top-menu-icons__blue-img');
           this.layersPopupBox?.close();
           this.isLayersMenuOpen = false;
         } else {
@@ -101,7 +101,7 @@ export class LayersManager {
           }
 
           showEl(layersHoverDom);
-          layersMenuIconContainer.classList.remove('bmenu-item-error');
+          layersMenuIconContainer.classList.remove('top-menu-icons__blue-img');
           layersMenuIconContainer.classList.add('bmenu-item-selected');
           keepTrackApi.getUiManager().searchManager.hideResults();
           this.isLayersMenuOpen = true;
@@ -117,7 +117,7 @@ export class LayersManager {
     keepTrackApi.getPlugin(TopMenu)?.navItems.push({
       id: 'layers-menu-btn',
       order: 2,
-      classInner: 'bmenu-item-error',
+      classInner: 'top-menu-icons__blue-img',
       icon: layersPng,
       tooltip: 'Toggle Layers',
     });

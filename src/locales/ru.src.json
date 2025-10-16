@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "unknown": "Неизвестно"
+  },
   "loadingScreen": {
     "startButton": "Нажмите, чтобы начать"
   },

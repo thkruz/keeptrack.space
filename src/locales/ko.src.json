@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "unknown": "알 수 없음"
+  },
   "loadingScreen": {
     "startButton": "클릭하여 시작"
   },

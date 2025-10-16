@@ -583,8 +583,11 @@
     "29": "'[' 키로 객체를 주/보조 사이에서 전환합니다."
   },
   "copyright": {
-    "notice": "KeepTrack™ 및 KeepTrack.Space™는 Kruczek Labs LLC의 상표입니다.<br>이 인스턴스는 GNU AGPL v3.0에 따라 라이선스가 부여되었습니다. 저작자 표시, 소스 접근, 그리고 이 고지는 반드시 표시되어야 합니다.<br>상업적 라이선스가 부여되지 않았으며, 권리자에게 어떠한 보상도 제공되지 않았습니다.<br>무단 사용, 리브랜딩 또는 저작자 표시 제거는 상표 및 오픈 소스 라이선스 조건을 위반할 수 있습니다.<br>© 2025 Kruczek Labs LLC. 모든 권리 보유. 전체 조건은 LICENSE를 참조하세요.",
-    "noticeMobile": "KeepTrack™ 및 KeepTrack.Space™는 Kruczek Labs LLC의 상표입니다.<br>이 인스턴스는 GNU AGPL v3.0에 따라 라이선스가 부여되었습니다. 저작자 표시, 소스 접근, 그리고 이 고지는 반드시 표시되어야 합니다. 상업적 라이선스가 부여되지 않았으며, 권리자에게 어떠한 보상도 제공되지 않았습니다. 무단 사용, 리브랜딩 또는 저작자 표시 제거는 상표 및 오픈 소스 라이선스 조건을 위반할 수 있습니다.<br>© 2025 Kruczek Labs LLC. 모든 권리 보유. 전체 조건은 LICENSE를 참조하세요."
+    "notice": "KeepTrack™ 및 KeepTrack.Space™는 Kruczek Labs LLC의 상표입니다.<br>무단 사용, 리브랜딩 또는 출처 제거는 상표권 및 오픈 소스 라이선스 조건을 위반할 수 있습니다.<br>© 2025 Kruczek Labs LLC. 모든 권리 보유. 전체 조건은 LICENSE를 참조하세요.",
+    "noticeMobile": "KeepTrack™ 및 KeepTrack.Space™는 Kruczek Labs LLC의 상표입니다.<br>무단 사용, 리브랜딩 또는 출처 제거는 상표권 및 오픈 소스 라이선스 조건을 위반할 수 있습니다.<br>© 2025 Kruczek Labs LLC. 모든 권리 보유. 전체 조건은 LICENSE를 참조하세요."
+  },
+  "Common": {
+    "unknown": "알 수 없음"
   },
   "loadingScreen": {
     "startButton": "클릭하여 시작"
@@ -775,5 +778,136 @@
       "category": "출처",
       "tooltip": "Celestrak은 다양한 위성과 파편의 궤도 데이터를 제공하는 인기 있는 소스입니다."
     }
+  },
+  "SatInfoBoxActions": {
+    "title": "동작",
+    "tooltip": "선택한 위성에 관련된 동작을 수행합니다",
+    "DrawLine": {
+      "sunAngle": "위성에서 태양까지 선 그리기",
+      "RicLine": {
+        "label": "RIC 축선 그리기",
+        "tooltip": "위성 위치에서 반지름, 궤도 내, 궤도 횡단 축을 그립니다"
+      },
+      "nadirLine": "위성에서 지구 중심까지 선 그리기",
+      "secLine": "위성에서 보조 위성까지 선 그리기"
+    },
+    "SearchLinks": {
+      "LaunchObjects": {
+        "label": "이 발사에서 모든 객체 찾기",
+        "tooltip": "국제 식별자(예: 2020-001A)를 기반으로 동일한 발사 날짜의 객체를 검색합니다"
+      },
+      "nearOrbits": {
+        "label": "이 궤도 근처의 모든 객체 찾기",
+        "tooltip": "동일한 경사, 주기, 승교점 경도의 객체를 검색합니다"
+      },
+      "nearObjects1": {
+        "label": "100km 이내의 모든 객체 찾기",
+        "tooltip": "선택한 위성에서 100km 이내의 객체를 검색합니다"
+      },
+      "nearObjects2": {
+        "label": "200km 이내의 모든 객체 찾기",
+        "tooltip": "선택한 위성에서 200km 이내의 객체를 검색합니다"
+      },
+      "nearObjects4": {
+        "label": "400km 이내의 모든 객체 찾기",
+        "tooltip": "선택한 위성에서 400km 이내의 객체를 검색합니다"
+      }
+    },
+    "noSatelliteSelected": "위성이 선택되지 않았습니다!",
+    "noSecondarySatelliteSelected": "보조 위성이 선택되지 않았습니다!"
+  },
+  "SatInfoBoxLinks": {
+    "title": "링크",
+    "tooltip": "추가 정보를 위한 외부 링크",
+    "Celestrak": {
+      "link": "CelesTrak에서 더 많은 정보 보기",
+      "title": "CelesTrak"
+    },
+    "Kayhan": {
+      "link": "Kayhan Space에서 더 많은 정보 보기"
+    },
+    "N2YO": {
+      "link": "N2YO에서 더 많은 정보 보기",
+      "title": "N2YO"
+    },
+    "Heavens_Above": {
+      "link": "Heavens-Above에서 더 많은 정보 보기",
+      "title": "Heavens-Above"
+    },
+    "notASatellite": "선택한 객체는 위성이 아닙니다."
+  },
+  "SatInfoBoxMission": {
+    "title": "임무",
+    "Mission": {
+      "label": "임무",
+      "tooltip": "위성 임무 개요"
+    },
+    "User": {
+      "label": "사용자",
+      "tooltip": "위성의 주요 사용자"
+    },
+    "Purpose": {
+      "label": "목적",
+      "tooltip": "위성의 목적"
+    },
+    "Contractor": {
+      "label": "제작사",
+      "tooltip": "위성을 제작한 계약자"
+    },
+    "LiftMass": {
+      "label": "발사 질량",
+      "tooltip": "발사 시 질량"
+    },
+    "DryMass": {
+      "label": "건조 질량",
+      "tooltip": "연료 없는 질량"
+    },
+    "LifeExpectancy": {
+      "label": "수명",
+      "tooltip": "위성이 작동할 것으로 예상되는 기간"
+    },
+    "Bus": {
+      "label": "버스",
+      "tooltip": "위성 버스 유형"
+    },
+    "Payload": {
+      "label": "탑재체",
+      "tooltip": "위성 탑재체 정보"
+    },
+    "Equipment": {
+      "label": "장비",
+      "tooltip": "위성 장비 정보"
+    },
+    "Motor": {
+      "label": "모터",
+      "tooltip": "위성 모터 정보"
+    },
+    "Length": {
+      "label": "길이",
+      "tooltip": "위성의 길이"
+    },
+    "Diameter": {
+      "label": "직경",
+      "tooltip": "위성의 직경"
+    },
+    "Span": {
+      "label": "날개폭",
+      "tooltip": "위성의 날개폭"
+    },
+    "Shape": {
+      "label": "형상",
+      "tooltip": "위성의 대략적인 형상"
+    },
+    "Power": {
+      "label": "전원",
+      "tooltip": "위성의 전원 공급원"
+    },
+    "missingElements": "하나 이상의 updateSatMissionData_ 요소를 찾을 수 없습니다!",
+    "kg": "kg",
+    "m": "m",
+    "w": "w",
+    "yrs": "년",
+    "unknown": "알 수 없음",
+    "noData": "데이터 없음"
   }
 }

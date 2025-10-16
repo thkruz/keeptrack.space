@@ -583,8 +583,11 @@
     "29": "Switch an object between Primary/Secondary with the '[' key."
   },
   "copyright": {
-    "notice": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible.<br>No commercial license has been granted, and no compensation has been provided to the rights holder.<br>Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.",
-    "noticeMobile": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible. No commercial license has been granted. No compensation has been provided to the rights holder. Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms."
+    "notice": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.",
+    "noticeMobile": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>Unauthorized use, rebranding, or removal of attribution may violate<br>trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms."
+  },
+  "Common": {
+    "unknown": "Unknown"
   },
   "loadingScreen": {
     "startButton": "Click to Begin"
@@ -773,5 +776,290 @@
       "category": "Source",
       "tooltip": "Celestrak is a popular source for satellite orbital data, providing TLEs for a wide range of satellites and debris."
     }
+  },
+  "satInfoBox": {
+    "title": "Identifiers",
+    "Cospar": {
+      "label": "COSPAR",
+      "tooltip": "International Designator"
+    },
+    "Norad": {
+      "label": "NORAD",
+      "tooltip": "North American Aerospace Defense Command Catalog Number"
+    },
+    "AltName": {
+      "label": "Alt. Name",
+      "tooltip": "Alternate Satellite Name"
+    },
+    "AltId": {
+      "label": "Alt. ID",
+      "tooltip": "Alternate Satellite ID"
+    },
+    "Source": {
+      "label": "Source",
+      "tooltip": "Data Source for the Satellite Information"
+    },
+    "Confidence": {
+      "label": "Confidence",
+      "tooltip": "Confidence Level of the Data (Higher Is Better) on a 1-10. Based on the source and age of the data"
+    }
+  },
+  "SatInfoBoxObject": {
+    "title": "Object Data",
+    "Type": {
+      "label": "Type",
+      "tooltip": "Type of Object",
+      "unknown": "To Be Announced",
+      "payload": "Payload",
+      "rocketBody": "Rocket Body",
+      "debris": "Debris",
+      "special": "Special",
+      "missile": "Ballistic Missile"
+    },
+    "Status": {
+      "label": "Status",
+      "tooltip": "Operational status of the object",
+      "operational": "Operational",
+      "nonOperational": "Non-Operational",
+      "partiallyOperational": "Partially Operational",
+      "extendedMission": "Extended Mission",
+      "backupStandby": "Backup/Standby",
+      "spare": "Spare",
+      "unknown": "Unknown"
+    },
+    "Country": {
+      "label": "Country",
+      "tooltip": "Country of Origin"
+    },
+    "LaunchSite": {
+      "label": "Launch Site",
+      "tooltip": "Location from which the object was launched"
+    },
+    "LaunchVehicle": {
+      "label": "Launch Vehicle",
+      "tooltip": "Rocket or vehicle used to launch the object"
+    },
+    "Configuration": {
+      "label": "Configuration",
+      "tooltip": "Configuration of the rocket or launch vehicle"
+    },
+    "RCS": {
+      "label": "RCS",
+      "tooltip": "Radar Cross Section - How reflective the object is to a radar signal (in m²)"
+    },
+    "StdMag": {
+      "label": "Standard Mag",
+      "tooltip": "Standard Magnitude - Smaller Numbers Are Brighter"
+    },
+    "unknown": "Unknown"
+  },
+  "SatInfoBoxOrbital": {
+    "title": "Orbital Data",
+    "Apogee": {
+      "label": "Apogee",
+      "tooltip": "Highest Point in the Orbit"
+    },
+    "Perigee": {
+      "label": "Perigee",
+      "tooltip": "Lowest Point in the Orbit"
+    },
+    "Inclination": {
+      "label": "Inclination",
+      "tooltip": "Angle Measured from Equator on the Ascending Node"
+    },
+    "Eccentricity": {
+      "label": "Eccentricity",
+      "tooltip": "How Circular the Orbit Is (0 is a Circle)"
+    },
+    "RightAsc": {
+      "label": "Right Asc.",
+      "tooltip": "Where it Rises Above the Equator"
+    },
+    "ArgOfPerigee": {
+      "label": "Arg of Perigee",
+      "tooltip": "Where the Lowest Part of the Orbit Is"
+    },
+    "Latitude": {
+      "label": "Latitude",
+      "tooltip": "Current Latitude Over Earth",
+      "north": "N",
+      "south": "S"
+    },
+    "Longitude": {
+      "label": "Longitude",
+      "tooltip": "Current Longitude Over Earth",
+      "east": "E",
+      "west": "W"
+    },
+    "Altitude": {
+      "label": "Altitude",
+      "tooltip": "Current Altitude Above Sea Level"
+    },
+    "Period": {
+      "label": "Period",
+      "tooltip": "Time for One Complete Revolution Around Earth",
+      "meanMotion": "Mean Motion",
+      "revPerDay": "rev/day",
+      "min": "min"
+    },
+    "Velocity": {
+      "label": "Velocity",
+      "tooltip": "Current Velocity of the Satellite (Higher the Closer to Earth it Is)"
+    },
+    "AgeOfGP": {
+      "label": "Age of GP",
+      "tooltip": "Time Since Official Orbit Calculated (Older GP Data is Less Accurate Usually)",
+      "days": "Days",
+      "hours": "Hours",
+      "epochYear": "Epoch Year",
+      "epochDay": "Epoch Day"
+    },
+    "RadialSigma": {
+      "label": "Radial Sigma",
+      "tooltip": "Radial Uncertainty (meters)"
+    },
+    "InTrackSigma": {
+      "label": "In Track Sigma",
+      "tooltip": "In Track Uncertainty (meters)"
+    },
+    "CrossTrackSigma": {
+      "label": "Cross Track Sigma",
+      "tooltip": "Cross Track Uncertainty (meters)"
+    },
+    "meter": "m",
+    "kilometer": "km",
+    "second": "s",
+    "unknown": "Unknown"
+  },
+  "SatInfoBoxActions": {
+    "title": "Actions",
+    "tooltip": "Perform actions related to the selected satellite",
+    "DrawLine": {
+      "sunAngle": "Draw line from satellite to sun",
+      "RicLine": {
+        "label": "Draw RIC axis lines",
+        "tooltip": "Draw the radial, in-track, and cross-track axes from the satellite position"
+      },
+      "nadirLine": "Draw line from satellite to earth center",
+      "secLine": "Draw line from satellite to secondary satellite"
+    },
+    "SearchLinks": {
+      "LaunchObjects": {
+        "label": "Find all objects from this launch",
+        "tooltip": "Search for any object with the same launch date based on international designator (e.g. 2020-001A)"
+      },
+      "nearOrbits": {
+        "label": "Find all objects near this orbit",
+        "tooltip": "Search for objects with the same inclination, period, and right ascension"
+      },
+      "nearObjects1": {
+        "label": "Find all objects within 100 km",
+        "tooltip": "Search for objects within 100 km of the selected satellite"
+      },
+      "nearObjects2": {
+        "label": "Find all objects within 200 km",
+        "tooltip": "Search for objects within 200 km of the selected satellite"
+      },
+      "nearObjects4": {
+        "label": "Find all objects within 400 km",
+        "tooltip": "Search for objects within 400 km of the selected satellite"
+      }
+    },
+    "noSatelliteSelected": "No satellite selected!",
+    "noSecondarySatelliteSelected": "No secondary satellite selected!"
+  },
+  "SatInfoBoxLinks": {
+    "title": "Links",
+    "tooltip": "External Links for More Information",
+    "Celestrak": {
+      "link": "More info from CelesTrak",
+      "title": "CelesTrak"
+    },
+    "Kayhan": {
+      "link": "More info from Kayhan Space"
+    },
+    "N2YO": {
+      "link": "More info from N2YO",
+      "title": "N2YO"
+    },
+    "Heavens_Above": {
+      "link": "More info from Heavens-Above",
+      "title": "Heavens-Above"
+    },
+    "notASatellite": "Selected object is not a satellite."
+  },
+  "SatInfoBoxMission": {
+    "title": "Mission",
+    "Mission": {
+      "label": "Mission",
+      "tooltip": "Overview of the Satellite's Mission"
+    },
+    "User": {
+      "label": "User",
+      "tooltip": "Primary User of the Satellite"
+    },
+    "Purpose": {
+      "label": "Purpose",
+      "tooltip": "Purpose of the Satellite"
+    },
+    "Contractor": {
+      "label": "Contractor",
+      "tooltip": "Contractor that Built the Satellite"
+    },
+    "LiftMass": {
+      "label": "Lift Mass",
+      "tooltip": "Mass at Lift Off"
+    },
+    "DryMass": {
+      "label": "Dry Mass",
+      "tooltip": "Mass Without Fuel"
+    },
+    "LifeExpectancy": {
+      "label": "Life Expectancy",
+      "tooltip": "How long the Satellite is Expected to be Operational"
+    },
+    "Bus": {
+      "label": "Bus",
+      "tooltip": "Satellite Bus Type"
+    },
+    "Payload": {
+      "label": "Payload",
+      "tooltip": "Details on the Satellite's Payload"
+    },
+    "Equipment": {
+      "label": "Equipment",
+      "tooltip": "Details on the Satellite's Equipment"
+    },
+    "Motor": {
+      "label": "Motor",
+      "tooltip": "Details on the Satellite's Motor"
+    },
+    "Length": {
+      "label": "Length",
+      "tooltip": "Length of the Satellite"
+    },
+    "Diameter": {
+      "label": "Diameter",
+      "tooltip": "Diameter of the Satellite"
+    },
+    "Span": {
+      "label": "Span",
+      "tooltip": "Wingspan of the Satellite"
+    },
+    "Shape": {
+      "label": "Shape",
+      "tooltip": "Rough shape of the Satellite"
+    },
+    "Power": {
+      "label": "Power",
+      "tooltip": "Power Source of the Satellite"
+    },
+    "missingElements": "One or more updateSatMissionData_ elements not found!",
+    "kg": "kg",
+    "m": "m",
+    "w": "w",
+    "yrs": "yrs",
+    "unknown": "Unknown",
+    "noData": "NO DATA"
   }
 }

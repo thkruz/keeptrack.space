@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "unknown": "未知"
+  },
   "loadingScreen": {
     "startButton": "点击开始"
   },

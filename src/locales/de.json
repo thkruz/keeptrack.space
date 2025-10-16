@@ -31,8 +31,8 @@
     "29": "Wechseln Sie ein Objekt zwischen Primär/Sekundär mit der '['-Taste."
   },
   "copyright": {
-    "notice": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben.<br>Es wurde keine kommerzielle Lizenz erteilt und keine Vergütung an den Rechteinhaber gezahlt.<br>Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen.",
-    "noticeMobile": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Diese Instanz ist unter der GNU AGPL v3.0 lizenziert. Die Namensnennung, der Quellzugriff und dieser Hinweis müssen sichtbar bleiben. Es wurde keine kommerzielle Lizenz erteilt. Es wurde keine Vergütung an den Rechteinhaber gezahlt. Unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen."
+    "notice": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Die unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen.",
+    "noticeMobile": "KeepTrack™ und KeepTrack.Space™ sind Marken von Kruczek Labs LLC.<br>Die unbefugte Nutzung, Umbenennung oder Entfernung der Namensnennung kann gegen Marken- und Open-Source-Lizenzbedingungen verstoßen.<br>© 2025 Kruczek Labs LLC. Alle Rechte vorbehalten. Siehe LICENSE für vollständige Bedingungen."
   },
   "plugins": {
     "proOnlyMsg": "Dieses Plugin ist ein Pro-Plugin. Ihre .env-Datei ist falsch konfiguriert oder Ihnen fehlen Dateien! Weitere Informationen finden Sie unter https://keeptrack.space/pro.",
@@ -308,6 +308,9 @@
       "title": "Planetenlisten-Menü",
       "helpBody": "Dieses Menü ermöglicht es Ihnen, verschiedene Planeten in der Simulation auszuwählen und anzusehen."
     }
+  },
+  "Common": {
+    "unknown": "Unbekannt"
   },
   "loadingScreen": {
     "startButton": "Klicken Sie, um zu Beginnen"
@@ -778,5 +781,136 @@
       "category": "Quelle",
       "tooltip": "Celestrak ist eine beliebte Quelle für Satellitenbahndaten und bietet TLEs für eine Vielzahl von Satelliten und Trümmern."
     }
+  },
+  "SatInfoBoxActions": {
+    "title": "Aktionen",
+    "tooltip": "Führen Sie Aktionen im Zusammenhang mit dem ausgewählten Satelliten aus",
+    "DrawLine": {
+      "sunAngle": "Linie vom Satelliten zur Sonne zeichnen",
+      "RicLine": {
+        "label": "RIC-Achsenlinien zeichnen",
+        "tooltip": "Zeichnet die radialen, in-Track- und Cross-Track-Achsen vom Satellitenstandort"
+      },
+      "nadirLine": "Linie vom Satelliten zum Erdmittelpunkt zeichnen",
+      "secLine": "Linie vom Satelliten zum sekundären Satelliten zeichnen"
+    },
+    "SearchLinks": {
+      "LaunchObjects": {
+        "label": "Alle Objekte dieses Starts finden",
+        "tooltip": "Suche nach allen Objekten mit dem gleichen Startdatum basierend auf dem internationalen Designator (z.B. 2020-001A)"
+      },
+      "nearOrbits": {
+        "label": "Alle Objekte in ähnlicher Umlaufbahn finden",
+        "tooltip": "Suche nach Objekten mit gleicher Inklination, Periode und Rektaszension"
+      },
+      "nearObjects1": {
+        "label": "Alle Objekte innerhalb von 100 km finden",
+        "tooltip": "Suche nach Objekten innerhalb von 100 km des ausgewählten Satelliten"
+      },
+      "nearObjects2": {
+        "label": "Alle Objekte innerhalb von 200 km finden",
+        "tooltip": "Suche nach Objekten innerhalb von 200 km des ausgewählten Satelliten"
+      },
+      "nearObjects4": {
+        "label": "Alle Objekte innerhalb von 400 km finden",
+        "tooltip": "Suche nach Objekten innerhalb von 400 km des ausgewählten Satelliten"
+      }
+    },
+    "noSatelliteSelected": "Kein Satellit ausgewählt!",
+    "noSecondarySatelliteSelected": "Kein sekundärer Satellit ausgewählt!"
+  },
+  "SatInfoBoxLinks": {
+    "title": "Links",
+    "tooltip": "Externe Links für weitere Informationen",
+    "Celestrak": {
+      "link": "Mehr Informationen von CelesTrak",
+      "title": "CelesTrak"
+    },
+    "Kayhan": {
+      "link": "Mehr Informationen von Kayhan Space"
+    },
+    "N2YO": {
+      "link": "Mehr Informationen von N2YO",
+      "title": "N2YO"
+    },
+    "Heavens_Above": {
+      "link": "Mehr Informationen von Heavens-Above",
+      "title": "Heavens-Above"
+    },
+    "notASatellite": "Das ausgewählte Objekt ist kein Satellit."
+  },
+  "SatInfoBoxMission": {
+    "title": "Mission",
+    "Mission": {
+      "label": "Mission",
+      "tooltip": "Übersicht über die Mission des Satelliten"
+    },
+    "User": {
+      "label": "Nutzer",
+      "tooltip": "Hauptnutzer des Satelliten"
+    },
+    "Purpose": {
+      "label": "Zweck",
+      "tooltip": "Zweck des Satelliten"
+    },
+    "Contractor": {
+      "label": "Auftragnehmer",
+      "tooltip": "Auftragnehmer, der den Satelliten gebaut hat"
+    },
+    "LiftMass": {
+      "label": "Startmasse",
+      "tooltip": "Masse beim Start"
+    },
+    "DryMass": {
+      "label": "Trockenmasse",
+      "tooltip": "Masse ohne Treibstoff"
+    },
+    "LifeExpectancy": {
+      "label": "Lebenserwartung",
+      "tooltip": "Wie lange der Satellit voraussichtlich in Betrieb ist"
+    },
+    "Bus": {
+      "label": "Bus",
+      "tooltip": "Satelliten-Bustyp"
+    },
+    "Payload": {
+      "label": "Nutzlast",
+      "tooltip": "Details zur Nutzlast des Satelliten"
+    },
+    "Equipment": {
+      "label": "Ausrüstung",
+      "tooltip": "Details zur Ausrüstung des Satelliten"
+    },
+    "Motor": {
+      "label": "Motor",
+      "tooltip": "Details zum Motor des Satelliten"
+    },
+    "Length": {
+      "label": "Länge",
+      "tooltip": "Länge des Satelliten"
+    },
+    "Diameter": {
+      "label": "Durchmesser",
+      "tooltip": "Durchmesser des Satelliten"
+    },
+    "Span": {
+      "label": "Spannweite",
+      "tooltip": "Flügelspannweite des Satelliten"
+    },
+    "Shape": {
+      "label": "Form",
+      "tooltip": "Ungefähre Form des Satelliten"
+    },
+    "Power": {
+      "label": "Stromversorgung",
+      "tooltip": "Energiequelle des Satelliten"
+    },
+    "missingElements": "Ein oder mehrere updateSatMissionData_-Elemente nicht gefunden!",
+    "kg": "kg",
+    "m": "m",
+    "w": "w",
+    "yrs": "Jahre",
+    "unknown": "Unbekannt",
+    "noData": "KEINE DATEN"
   }
 }

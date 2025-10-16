@@ -583,8 +583,11 @@
     "29": "'['キーでオブジェクトをプライマリ/セカンダリ間で切り替えます。"
   },
   "copyright": {
-    "notice": "KeepTrack™およびKeepTrack.Space™はKruczek Labs LLCの商標です。<br>このインスタンスはGNU AGPL v3.0の下でライセンスされています。帰属表示、ソースアクセス、およびこの通知は常に表示されている必要があります。<br>商用ライセンスは付与されておらず、権利者への報酬も提供されていません。<br>無断使用、リブランディング、帰属表示の削除は、商標およびオープンソースライセンスの条件に違反する可能性があります。<br>© 2025 Kruczek Labs LLC. 無断転載を禁じます。詳細はLICENSEをご覧ください。",
-    "noticeMobile": "KeepTrack™およびKeepTrack.Space™はKruczek Labs LLCの商標です。<br>このインスタンスはGNU AGPL v3.0の下でライセンスされています。帰属表示、ソースアクセス、およびこの通知は常に表示されている必要があります。商用ライセンスは付与されておらず、権利者への報酬も提供されていません。無断使用、リブランディング、帰属表示の削除は、商標およびオープンソースライセンスの条件に違反する可能性があります。<br>© 2025 Kruczek Labs LLC. 無断転載を禁じます。詳細はLICENSEをご覧ください。"
+    "notice": "KeepTrack™およびKeepTrack.Space™はKruczek Labs LLCの商標です。<br>無断使用、リブランディング、または帰属の削除は、商標およびオープンソースライセンスの条件に違反する可能性があります。<br>© 2025 Kruczek Labs LLC. 無断転載を禁じます。詳細はLICENSEをご覧ください。",
+    "noticeMobile": "KeepTrack™およびKeepTrack.Space™はKruczek Labs LLCの商標です。<br>無断使用、リブランディング、または帰属の削除は、商標およびオープンソースライセンスの条件に違反する可能性があります。<br>© 2025 Kruczek Labs LLC. 無断転載を禁じます。詳細はLICENSEをご覧ください。"
+  },
+  "Common": {
+    "unknown": "不明"
   },
   "loadingScreen": {
     "startButton": "クリックで開始"
@@ -775,5 +778,136 @@
       "category": "ソース",
       "tooltip": "セレストラックは、幅広い衛星やデブリの軌道データ（TLE）を提供する人気のある情報源です。"
     }
+  },
+  "SatInfoBoxActions": {
+    "title": "操作",
+    "tooltip": "選択した衛星に関連する操作を実行します",
+    "DrawLine": {
+      "sunAngle": "衛星から太陽への線を描画",
+      "RicLine": {
+        "label": "RIC軸線を描画",
+        "tooltip": "衛星位置から放射方向、軌道方向、横方向の軸を描画します"
+      },
+      "nadirLine": "衛星から地球中心への線を描画",
+      "secLine": "衛星から副衛星への線を描画"
+    },
+    "SearchLinks": {
+      "LaunchObjects": {
+        "label": "この打ち上げからの全ての物体を検索",
+        "tooltip": "国際設計者（例: 2020-001A）に基づき、同じ打ち上げ日の物体を検索します"
+      },
+      "nearOrbits": {
+        "label": "この軌道付近の全ての物体を検索",
+        "tooltip": "同じ傾斜角、周期、昇交点経度を持つ物体を検索します"
+      },
+      "nearObjects1": {
+        "label": "100km以内の全ての物体を検索",
+        "tooltip": "選択した衛星から100km以内の物体を検索します"
+      },
+      "nearObjects2": {
+        "label": "200km以内の全ての物体を検索",
+        "tooltip": "選択した衛星から200km以内の物体を検索します"
+      },
+      "nearObjects4": {
+        "label": "400km以内の全ての物体を検索",
+        "tooltip": "選択した衛星から400km以内の物体を検索します"
+      }
+    },
+    "noSatelliteSelected": "衛星が選択されていません！",
+    "noSecondarySatelliteSelected": "副衛星が選択されていません！"
+  },
+  "SatInfoBoxLinks": {
+    "title": "リンク",
+    "tooltip": "詳細情報のための外部リンク",
+    "Celestrak": {
+      "link": "CelesTrakの詳細情報",
+      "title": "CelesTrak"
+    },
+    "Kayhan": {
+      "link": "Kayhan Spaceの詳細情報"
+    },
+    "N2YO": {
+      "link": "N2YOの詳細情報",
+      "title": "N2YO"
+    },
+    "Heavens_Above": {
+      "link": "Heavens-Aboveの詳細情報",
+      "title": "Heavens-Above"
+    },
+    "notASatellite": "選択されたオブジェクトは人工衛星ではありません。"
+  },
+  "SatInfoBoxMission": {
+    "title": "ミッション",
+    "Mission": {
+      "label": "ミッション",
+      "tooltip": "衛星のミッション概要"
+    },
+    "User": {
+      "label": "ユーザー",
+      "tooltip": "衛星の主なユーザー"
+    },
+    "Purpose": {
+      "label": "目的",
+      "tooltip": "衛星の目的"
+    },
+    "Contractor": {
+      "label": "契約者",
+      "tooltip": "衛星を製造した契約者"
+    },
+    "LiftMass": {
+      "label": "打上げ質量",
+      "tooltip": "打上げ時の質量"
+    },
+    "DryMass": {
+      "label": "乾燥質量",
+      "tooltip": "燃料なしの質量"
+    },
+    "LifeExpectancy": {
+      "label": "寿命",
+      "tooltip": "衛星の運用予定期間"
+    },
+    "Bus": {
+      "label": "バス",
+      "tooltip": "衛星バスタイプ"
+    },
+    "Payload": {
+      "label": "ペイロード",
+      "tooltip": "衛星のペイロード詳細"
+    },
+    "Equipment": {
+      "label": "装備",
+      "tooltip": "衛星の装備詳細"
+    },
+    "Motor": {
+      "label": "モーター",
+      "tooltip": "衛星のモーター詳細"
+    },
+    "Length": {
+      "label": "長さ",
+      "tooltip": "衛星の長さ"
+    },
+    "Diameter": {
+      "label": "直径",
+      "tooltip": "衛星の直径"
+    },
+    "Span": {
+      "label": "翼幅",
+      "tooltip": "衛星の翼幅"
+    },
+    "Shape": {
+      "label": "形状",
+      "tooltip": "衛星のおおよその形状"
+    },
+    "Power": {
+      "label": "電源",
+      "tooltip": "衛星の電源"
+    },
+    "missingElements": "updateSatMissionData_ の要素が見つかりません！",
+    "kg": "kg",
+    "m": "m",
+    "w": "w",
+    "yrs": "年",
+    "unknown": "不明",
+    "noData": "データなし"
   }
 }

@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "unknown": "Unbekannt"
+  },
   "loadingScreen": {
     "startButton": "Klicken Sie, um zu Beginnen"
   },

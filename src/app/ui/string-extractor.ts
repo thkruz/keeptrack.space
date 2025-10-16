@@ -43,7 +43,7 @@ export abstract class StringExtractor {
 
   static extractLaunchSite(LS: string): { site: string; country: string, wikiUrl: string | null } {
     if (!LS || LS === '') {
-      return { site: 'Unknown', country: 'Unknown', wikiUrl: null };
+      return { site: t7e('Common.unknown'), country: t7e('Common.unknown'), wikiUrl: null };
     }
 
     const launchSite = launchSiteMap[LS];
@@ -53,13 +53,13 @@ export abstract class StringExtractor {
     }
     errorManagerInstance.debug(`Unknown launch site: ${LS}`);
 
-    return { site: 'Unknown', country: 'Unknown', wikiUrl: null };
+    return { site: t7e('Common.unknown'), country: t7e('Common.unknown'), wikiUrl: null };
 
   }
 
   static extractLiftVehicle(LV?: string): string {
     if (!LV || LV === 'U' || LV === 'TBD' || LV === '') {
-      return 'Unknown';
+      return t7e('Common.unknown');
     }
     const rocketUrl = rocketUrls.filter((url) => url.rocket === LV);
 
@@ -72,7 +72,7 @@ export abstract class StringExtractor {
 
   static extractUserUrl(user: string): string {
     if (!user || user === '') {
-      return 'Unknown';
+      return t7e('Common.unknown');
     }
 
     const userUrl = userUrls.filter((url) => url.user === user);

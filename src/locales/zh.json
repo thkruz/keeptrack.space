@@ -583,8 +583,11 @@
     "29": "用\"[\"键在主要/次要对象之间切换。"
   },
   "copyright": {
-    "notice": "KeepTrack™ 和 KeepTrack.Space™ 是 Kruczek Labs LLC 的商标。<br>本实例根据 GNU AGPL v3.0 许可。归属、源代码访问和本声明必须保持可见。<br>未授予商业许可，权利持有人未获得任何补偿。<br>未经授权的使用、重新品牌或移除归属可能违反商标和开源许可条款。<br>© 2025 Kruczek Labs LLC。保留所有权利。详见 LICENSE 获取完整条款。",
-    "noticeMobile": "KeepTrack™ 和 KeepTrack.Space™ 是 Kruczek Labs LLC 的商标。<br>本实例根据 GNU AGPL v3.0 许可。归属、源代码访问和本声明必须保持可见。未授予商业许可，权利持有人未获得任何补偿。未经授权的使用、重新品牌或移除归属可能违反商标和开源许可条款。<br>© 2025 Kruczek Labs LLC。保留所有权利。详见 LICENSE 获取完整条款。"
+    "notice": "KeepTrack™ 和 KeepTrack.Space™ 是 Kruczek Labs LLC 的商标。<br>未经授权的使用、重新品牌化或移除归属可能违反商标和开源许可条款。<br>© 2025 Kruczek Labs LLC。保留所有权利。完整条款请参见 LICENSE。",
+    "noticeMobile": "KeepTrack™ 和 KeepTrack.Space™ 是 Kruczek Labs LLC 的商标。<br>未经授权的使用、重新品牌化或移除归属可能违反商标和开源许可条款。<br>© 2025 Kruczek Labs LLC。保留所有权利。完整条款请参见 LICENSE。"
+  },
+  "Common": {
+    "unknown": "未知"
   },
   "loadingScreen": {
     "startButton": "点击开始"
@@ -775,5 +778,136 @@
       "category": "来源",
       "tooltip": "Celestrak 是卫星轨道数据的热门来源，提供各种卫星和碎片的 TLE 数据。"
     }
+  },
+  "SatInfoBoxActions": {
+    "title": "操作",
+    "tooltip": "对选定卫星执行相关操作",
+    "DrawLine": {
+      "sunAngle": "绘制卫星到太阳的连线",
+      "RicLine": {
+        "label": "绘制RIC坐标轴线",
+        "tooltip": "从卫星位置绘制径向、轨道内和轨道横向坐标轴"
+      },
+      "nadirLine": "绘制卫星到地心的连线",
+      "secLine": "绘制卫星到次级卫星的连线"
+    },
+    "SearchLinks": {
+      "LaunchObjects": {
+        "label": "查找本次发射的所有对象",
+        "tooltip": "根据国际编号（如2020-001A）搜索具有相同发射日期的所有对象"
+      },
+      "nearOrbits": {
+        "label": "查找轨道附近的所有对象",
+        "tooltip": "搜索具有相同倾角、周期和赤经的对象"
+      },
+      "nearObjects1": {
+        "label": "查找100公里范围内的所有对象",
+        "tooltip": "搜索距离选定卫星100公里以内的对象"
+      },
+      "nearObjects2": {
+        "label": "查找200公里范围内的所有对象",
+        "tooltip": "搜索距离选定卫星200公里以内的对象"
+      },
+      "nearObjects4": {
+        "label": "查找400公里范围内的所有对象",
+        "tooltip": "搜索距离选定卫星400公里以内的对象"
+      }
+    },
+    "noSatelliteSelected": "未选择卫星！",
+    "noSecondarySatelliteSelected": "未选择次级卫星！"
+  },
+  "SatInfoBoxLinks": {
+    "title": "链接",
+    "tooltip": "更多信息的外部链接",
+    "Celestrak": {
+      "link": "来自 CelesTrak 的更多信息",
+      "title": "CelesTrak"
+    },
+    "Kayhan": {
+      "link": "来自 Kayhan Space 的更多信息"
+    },
+    "N2YO": {
+      "link": "来自 N2YO 的更多信息",
+      "title": "N2YO"
+    },
+    "Heavens_Above": {
+      "link": "来自 Heavens-Above 的更多信息",
+      "title": "Heavens-Above"
+    },
+    "notASatellite": "所选对象不是卫星。"
+  },
+  "SatInfoBoxMission": {
+    "title": "任务",
+    "Mission": {
+      "label": "任务",
+      "tooltip": "卫星任务概述"
+    },
+    "User": {
+      "label": "用户",
+      "tooltip": "卫星主要用户"
+    },
+    "Purpose": {
+      "label": "用途",
+      "tooltip": "卫星用途"
+    },
+    "Contractor": {
+      "label": "承包商",
+      "tooltip": "卫星制造承包商"
+    },
+    "LiftMass": {
+      "label": "起飞质量",
+      "tooltip": "起飞时的质量"
+    },
+    "DryMass": {
+      "label": "干质量",
+      "tooltip": "无燃料质量"
+    },
+    "LifeExpectancy": {
+      "label": "寿命期望",
+      "tooltip": "卫星预计运行时间"
+    },
+    "Bus": {
+      "label": "平台",
+      "tooltip": "卫星平台类型"
+    },
+    "Payload": {
+      "label": "载荷",
+      "tooltip": "卫星载荷详情"
+    },
+    "Equipment": {
+      "label": "设备",
+      "tooltip": "卫星设备详情"
+    },
+    "Motor": {
+      "label": "发动机",
+      "tooltip": "卫星发动机详情"
+    },
+    "Length": {
+      "label": "长度",
+      "tooltip": "卫星长度"
+    },
+    "Diameter": {
+      "label": "直径",
+      "tooltip": "卫星直径"
+    },
+    "Span": {
+      "label": "翼展",
+      "tooltip": "卫星翼展"
+    },
+    "Shape": {
+      "label": "形状",
+      "tooltip": "卫星大致形状"
+    },
+    "Power": {
+      "label": "电源",
+      "tooltip": "卫星电源类型"
+    },
+    "missingElements": "未找到一个或多个 updateSatMissionData_ 元素！",
+    "kg": "kg",
+    "m": "m",
+    "w": "w",
+    "yrs": "年",
+    "unknown": "未知",
+    "noData": "无数据"
   }
 }

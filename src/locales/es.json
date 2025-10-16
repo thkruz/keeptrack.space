@@ -583,8 +583,11 @@
     "29": "Cambia un objeto entre Primario/Secundario con la tecla '['."
   },
   "copyright": {
-    "notice": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles.<br>No se ha otorgado ninguna licencia comercial, y no se ha proporcionado compensación al titular de los derechos.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulta el archivo LICENSE para ver los términos completos.",
-    "noticeMobile": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles. No se ha otorgado ninguna licencia comercial. No se ha proporcionado compensación al titular de los derechos. El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulta el archivo LICENSE para ver los términos completos."
+    "notice": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para ver los términos completos.",
+    "noticeMobile": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para ver los términos completos."
+  },
+  "Common": {
+    "unknown": "Desconocido"
   },
   "loadingScreen": {
     "startButton": "Haga Clic para Comenzar"
@@ -775,5 +778,290 @@
       "category": "Fuente",
       "tooltip": "Celestrak es una fuente popular de datos orbitales de satélites, proporcionando TLEs para una amplia gama de satélites y desechos."
     }
+  },
+  "satInfoBox": {
+    "title": "Identificadores",
+    "Cospar": {
+      "label": "COSPAR",
+      "tooltip": "Designador Internacional"
+    },
+    "Norad": {
+      "label": "NORAD",
+      "tooltip": "Número de Catálogo del Comando de Defensa Aeroespacial de Norteamérica"
+    },
+    "AltName": {
+      "label": "Nombre Alt.",
+      "tooltip": "Nombre Alternativo del Satélite"
+    },
+    "AltId": {
+      "label": "ID Alt.",
+      "tooltip": "ID Alternativo del Satélite"
+    },
+    "Source": {
+      "label": "Fuente",
+      "tooltip": "Fuente de los Datos de Información del Satélite"
+    },
+    "Confidence": {
+      "label": "Confianza",
+      "tooltip": "Nivel de Confianza de los Datos (Mayor es Mejor) en una escala de 1-10. Basado en la fuente y antigüedad de los datos"
+    }
+  },
+  "SatInfoBoxObject": {
+    "title": "Datos del Objeto",
+    "Type": {
+      "label": "Tipo",
+      "tooltip": "Tipo de Objeto",
+      "unknown": "Por Anunciar",
+      "payload": "Carga Útil",
+      "rocketBody": "Cuerpo del Cohete",
+      "debris": "Escombros",
+      "special": "Especial",
+      "missile": "Misil Balístico"
+    },
+    "Status": {
+      "label": "Estado",
+      "tooltip": "Estado operacional del objeto",
+      "operational": "Operacional",
+      "nonOperational": "No Operacional",
+      "partiallyOperational": "Parcialmente Operacional",
+      "extendedMission": "Misión Extendida",
+      "backupStandby": "Respaldo/Espera",
+      "spare": "Repuesto",
+      "unknown": "Desconocido"
+    },
+    "Country": {
+      "label": "País",
+      "tooltip": "País de Origen"
+    },
+    "LaunchSite": {
+      "label": "Sitio de Lanzamiento",
+      "tooltip": "Lugar desde el que se lanzó el objeto"
+    },
+    "LaunchVehicle": {
+      "label": "Vehículo de Lanzamiento",
+      "tooltip": "Cohete o vehículo usado para lanzar el objeto"
+    },
+    "Configuration": {
+      "label": "Configuración",
+      "tooltip": "Configuración del cohete o vehículo de lanzamiento"
+    },
+    "RCS": {
+      "label": "RCS",
+      "tooltip": "Sección Transversal de Radar - Qué tan reflectante es el objeto a una señal de radar (en m²)"
+    },
+    "StdMag": {
+      "label": "Magnitud Estándar",
+      "tooltip": "Magnitud Estándar - Números más pequeños son más brillantes"
+    },
+    "unknown": "Desconocido"
+  },
+  "SatInfoBoxOrbital": {
+    "title": "Datos Orbitales",
+    "Apogee": {
+      "label": "Apogeo",
+      "tooltip": "Punto más alto en la órbita"
+    },
+    "Perigee": {
+      "label": "Perigeo",
+      "tooltip": "Punto más bajo en la órbita"
+    },
+    "Inclination": {
+      "label": "Inclinación",
+      "tooltip": "Ángulo medido desde el ecuador en el nodo ascendente"
+    },
+    "Eccentricity": {
+      "label": "Excentricidad",
+      "tooltip": "Qué tan circular es la órbita (0 es un círculo)"
+    },
+    "RightAsc": {
+      "label": "Asc. Recta",
+      "tooltip": "Dónde cruza sobre el ecuador"
+    },
+    "ArgOfPerigee": {
+      "label": "Arg. del Perigeo",
+      "tooltip": "Dónde está la parte más baja de la órbita"
+    },
+    "Latitude": {
+      "label": "Latitud",
+      "tooltip": "Latitud actual sobre la Tierra",
+      "north": "N",
+      "south": "S"
+    },
+    "Longitude": {
+      "label": "Longitud",
+      "tooltip": "Longitud actual sobre la Tierra",
+      "east": "E",
+      "west": "O"
+    },
+    "Altitude": {
+      "label": "Altitud",
+      "tooltip": "Altitud actual sobre el nivel del mar"
+    },
+    "Period": {
+      "label": "Período",
+      "tooltip": "Tiempo para una revolución completa alrededor de la Tierra",
+      "meanMotion": "Movimiento medio",
+      "revPerDay": "rev/día",
+      "min": "min"
+    },
+    "Velocity": {
+      "label": "Velocidad",
+      "tooltip": "Velocidad actual del satélite (mayor cuanto más cerca de la Tierra)"
+    },
+    "AgeOfGP": {
+      "label": "Edad del GP",
+      "tooltip": "Tiempo desde el cálculo oficial de la órbita (datos GP más antiguos suelen ser menos precisos)",
+      "days": "Días",
+      "hours": "Horas",
+      "epochYear": "Año de época",
+      "epochDay": "Día de época"
+    },
+    "RadialSigma": {
+      "label": "Sigma Radial",
+      "tooltip": "Incertidumbre radial (metros)"
+    },
+    "InTrackSigma": {
+      "label": "Sigma en Trayectoria",
+      "tooltip": "Incertidumbre en trayectoria (metros)"
+    },
+    "CrossTrackSigma": {
+      "label": "Sigma Cruzada",
+      "tooltip": "Incertidumbre cruzada (metros)"
+    },
+    "meter": "m",
+    "kilometer": "km",
+    "second": "s",
+    "unknown": "Desconocido"
+  },
+  "SatInfoBoxActions": {
+    "title": "Acciones",
+    "tooltip": "Realizar acciones relacionadas con el satélite seleccionado",
+    "DrawLine": {
+      "sunAngle": "Dibujar línea del satélite al sol",
+      "RicLine": {
+        "label": "Dibujar líneas de los ejes RIC",
+        "tooltip": "Dibujar los ejes radial, en pista y transversal desde la posición del satélite"
+      },
+      "nadirLine": "Dibujar línea del satélite al centro de la Tierra",
+      "secLine": "Dibujar línea del satélite al satélite secundario"
+    },
+    "SearchLinks": {
+      "LaunchObjects": {
+        "label": "Encontrar todos los objetos de este lanzamiento",
+        "tooltip": "Buscar cualquier objeto con la misma fecha de lanzamiento según el designador internacional (ej. 2020-001A)"
+      },
+      "nearOrbits": {
+        "label": "Encontrar todos los objetos cerca de esta órbita",
+        "tooltip": "Buscar objetos con la misma inclinación, período y ascensión recta"
+      },
+      "nearObjects1": {
+        "label": "Encontrar todos los objetos dentro de 100 km",
+        "tooltip": "Buscar objetos dentro de 100 km del satélite seleccionado"
+      },
+      "nearObjects2": {
+        "label": "Encontrar todos los objetos dentro de 200 km",
+        "tooltip": "Buscar objetos dentro de 200 km del satélite seleccionado"
+      },
+      "nearObjects4": {
+        "label": "Encontrar todos los objetos dentro de 400 km",
+        "tooltip": "Buscar objetos dentro de 400 km del satélite seleccionado"
+      }
+    },
+    "noSatelliteSelected": "¡Ningún satélite seleccionado!",
+    "noSecondarySatelliteSelected": "¡Ningún satélite secundario seleccionado!"
+  },
+  "SatInfoBoxLinks": {
+    "title": "Enlaces",
+    "tooltip": "Enlaces externos para más información",
+    "Celestrak": {
+      "link": "Más información de CelesTrak",
+      "title": "CelesTrak"
+    },
+    "Kayhan": {
+      "link": "Más información de Kayhan Space"
+    },
+    "N2YO": {
+      "link": "Más información de N2YO",
+      "title": "N2YO"
+    },
+    "Heavens_Above": {
+      "link": "Más información de Heavens-Above",
+      "title": "Heavens-Above"
+    },
+    "notASatellite": "El objeto seleccionado no es un satélite."
+  },
+  "SatInfoBoxMission": {
+    "title": "Misión",
+    "Mission": {
+      "label": "Misión",
+      "tooltip": "Resumen de la misión del satélite"
+    },
+    "User": {
+      "label": "Usuario",
+      "tooltip": "Usuario principal del satélite"
+    },
+    "Purpose": {
+      "label": "Propósito",
+      "tooltip": "Propósito del satélite"
+    },
+    "Contractor": {
+      "label": "Contratista",
+      "tooltip": "Contratista que construyó el satélite"
+    },
+    "LiftMass": {
+      "label": "Masa de lanzamiento",
+      "tooltip": "Masa al momento del lanzamiento"
+    },
+    "DryMass": {
+      "label": "Masa seca",
+      "tooltip": "Masa sin combustible"
+    },
+    "LifeExpectancy": {
+      "label": "Vida útil",
+      "tooltip": "Tiempo esperado de operación del satélite"
+    },
+    "Bus": {
+      "label": "Bus",
+      "tooltip": "Tipo de bus del satélite"
+    },
+    "Payload": {
+      "label": "Carga útil",
+      "tooltip": "Detalles de la carga útil del satélite"
+    },
+    "Equipment": {
+      "label": "Equipo",
+      "tooltip": "Detalles del equipo del satélite"
+    },
+    "Motor": {
+      "label": "Motor",
+      "tooltip": "Detalles del motor del satélite"
+    },
+    "Length": {
+      "label": "Longitud",
+      "tooltip": "Longitud del satélite"
+    },
+    "Diameter": {
+      "label": "Diámetro",
+      "tooltip": "Diámetro del satélite"
+    },
+    "Span": {
+      "label": "Envergadura",
+      "tooltip": "Envergadura del satélite"
+    },
+    "Shape": {
+      "label": "Forma",
+      "tooltip": "Forma aproximada del satélite"
+    },
+    "Power": {
+      "label": "Energía",
+      "tooltip": "Fuente de energía del satélite"
+    },
+    "missingElements": "¡Uno o más elementos de updateSatMissionData_ no encontrados!",
+    "kg": "kg",
+    "m": "m",
+    "w": "w",
+    "yrs": "años",
+    "unknown": "Desconocido",
+    "noData": "SIN DATOS"
   }
 }

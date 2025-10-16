@@ -1,4 +1,7 @@
 {
+  "Common": {
+    "unknown": "不明"
+  },
   "loadingScreen": {
     "startButton": "クリックで開始"
   },

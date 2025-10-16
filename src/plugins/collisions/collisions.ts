@@ -4,13 +4,13 @@ import './collisions.css';
 
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { html } from '@app/engine/utils/development/formatter';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {
@@ -82,19 +82,19 @@ export class Collisions extends KeepTrackPlugin {
 
   private uiManagerFinal_() {
     getEl(this.sideMenuElementName)!.addEventListener('click', (evt: MouseEvent) => {
-      showLoading(() => {
-        const el = (<HTMLElement>evt.target).parentElement;
+      const el = (<HTMLElement>evt.target).parentElement;
 
-        if (!el!.classList.contains(`${this.id}-object`)) {
-          return;
-        }
-        // Might be better code for this.
-        const hiddenRow = el!.dataset?.row;
+      if (!el!.classList.contains(`${this.id}-object`)) {
+        return;
+      }
+      // Might be better code for this.
+      const hiddenRow = el!.dataset?.row;
 
-        if (hiddenRow !== null) {
+      if (hiddenRow !== null) {
+        showLoading(() => {
           this.eventClicked_(parseInt(hiddenRow!));
-        }
-      });
+        });
+      }
     });
   }
 

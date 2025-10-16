@@ -1,80 +1,80 @@
 {
   "SatInfoBoxOrbital": {
-    "title": "Orbital Data",
+    "title": "Орбітальні дані",
     "Apogee": {
-      "label": "Apogee",
-      "tooltip": "Highest Point in the Orbit"
+      "label": "Апогей",
+      "tooltip": "Найвища точка орбіти"
     },
     "Perigee": {
-      "label": "Perigee",
-      "tooltip": "Lowest Point in the Orbit"
+      "label": "Перигей",
+      "tooltip": "Найнижча точка орбіти"
     },
     "Inclination": {
-      "label": "Inclination",
-      "tooltip": "Angle Measured from Equator on the Ascending Node"
+      "label": "Нахил",
+      "tooltip": "Кут, виміряний від екватора на висхідному вузлі"
     },
     "Eccentricity": {
-      "label": "Eccentricity",
-      "tooltip": "How Circular the Orbit Is (0 is a Circle)"
+      "label": "Ексцентриситет",
+      "tooltip": "Наскільки кругова орбіта (0 — це коло)"
     },
     "RightAsc": {
-      "label": "Right Asc.",
-      "tooltip": "Where it Rises Above the Equator"
+      "label": "Пряме піднесення",
+      "tooltip": "Де піднімається над екватором"
     },
     "ArgOfPerigee": {
-      "label": "Arg of Perigee",
-      "tooltip": "Where the Lowest Part of the Orbit Is"
+      "label": "Аргумент перигею",
+      "tooltip": "Де знаходиться найнижча частина орбіти"
     },
     "Latitude": {
-      "label": "Latitude",
-      "tooltip": "Current Latitude Over Earth",
-      "north": "N",
-      "south": "S"
+      "label": "Широта",
+      "tooltip": "Поточна широта над Землею",
+      "north": "Пн",
+      "south": "Пд"
     },
     "Longitude": {
-      "label": "Longitude",
-      "tooltip": "Current Longitude Over Earth",
-      "east": "E",
-      "west": "W"
+      "label": "Довгота",
+      "tooltip": "Поточна довгота над Землею",
+      "east": "Сх",
+      "west": "Зх"
     },
     "Altitude": {
-      "label": "Altitude",
-      "tooltip": "Current Altitude Above Sea Level"
+      "label": "Висота",
+      "tooltip": "Поточна висота над рівнем моря"
     },
     "Period": {
-      "label": "Period",
-      "tooltip": "Time for One Complete Revolution Around Earth",
-      "meanMotion": "Mean Motion",
-      "revPerDay": "rev/day",
-      "min": "min"
+      "label": "Період",
+      "tooltip": "Час одного повного оберту навколо Землі",
+      "meanMotion": "Середній рух",
+      "revPerDay": "об/день",
+      "min": "хв"
     },
     "Velocity": {
-      "label": "Velocity",
-      "tooltip": "Current Velocity of the Satellite (Higher the Closer to Earth it Is)"
+      "label": "Швидкість",
+      "tooltip": "Поточна швидкість супутника (чим ближче до Землі, тим вища)"
     },
     "AgeOfGP": {
-      "label": "Age of GP",
-      "tooltip": "Time Since Official Orbit Calculated (Older GP Data is Less Accurate Usually)",
-      "days": "Days",
-      "hours": "Hours",
-      "epochYear": "Epoch Year",
-      "epochDay": "Epoch Day"
+      "label": "Вік GP",
+      "tooltip": "Час з моменту офіційного розрахунку орбіти (старіші дані GP зазвичай менш точні)",
+      "days": "Днів",
+      "hours": "Годин",
+      "epochYear": "Рік епохи",
+      "epochDay": "День епохи"
     },
     "RadialSigma": {
-      "label": "Radial Sigma",
-      "tooltip": "Radial Uncertainty (meters)"
+      "label": "Радіальна сигма",
+      "tooltip": "Радіальна невизначеність (метри)"
     },
     "InTrackSigma": {
-      "label": "In Track Sigma",
-      "tooltip": "In Track Uncertainty (meters)"
+      "label": "Вздовж треку сигма",
+      "tooltip": "Невизначеність вздовж треку (метри)"
     },
     "CrossTrackSigma": {
-      "label": "Cross Track Sigma",
-      "tooltip": "Cross Track Uncertainty (meters)"
+      "label": "Поперек треку сигма",
+      "tooltip": "Невизначеність поперек треку (метри)"
     },
-    "meter": "m",
-    "kilometer": "km",
-    "second": "s",
-    "unknown": "Unknown"
+    "meter": "м",
+    "kilometer": "км",
+    "second": "с",
+    "unknown": "Невідомо"
   }
 }

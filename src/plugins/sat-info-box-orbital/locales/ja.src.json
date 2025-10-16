@@ -45,7 +45,7 @@
       "label": "周期",
       "tooltip": "地球を一周するのにかかる時間",
       "meanMotion": "平均運動",
-      "revPerDay": "回/日",
+      "revPerDay": "周/日",
       "min": "分"
     },
     "Velocity": {

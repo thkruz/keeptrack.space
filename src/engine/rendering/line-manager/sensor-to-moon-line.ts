@@ -17,6 +17,6 @@ export class SensorToMoonLine extends Line {
     const eci = this.sensor_.eci(keepTrackApi.getTimeManager().simulationTimeObj);
     const eciArr = [eci.x, eci.y, eci.z] as EciArr3;
 
-    this.updateVertBuf(eciArr, keepTrackApi.getScene().moon.position as EciArr3);
+    this.updateVertBuf(eciArr, keepTrackApi.getScene().planets.Moon.position as EciArr3);
   }
 }

@@ -128,3 +128,6 @@ stats.json
 # Cypress Testing Files
 cypress
 cypress.config.ts
+
+# Generated Locale Files
+src/locales/*.json

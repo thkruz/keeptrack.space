@@ -2,8 +2,7 @@
 import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { MenuMode, Singletons } from '@app/engine/core/interfaces';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
-import { t7e } from '@app/locales/keys';
-import { Localization } from '@app/locales/locales';
+import { t7e, TranslationKey } from '@app/locales/keys';
 import Module from 'module';
 import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
@@ -307,12 +306,10 @@ export abstract class KeepTrackPlugin {
 
     this.sideMenuSecondaryOptions.leftOffset = typeof this.sideMenuSecondaryOptions.leftOffset === 'number' ? this.sideMenuSecondaryOptions.leftOffset : null;
 
-    const localizationInstance = Localization.getInstance();
-
-    this.helpTitle = localizationInstance.plugins[this.id]?.title ?? this.helpTitle ?? this.sideMenuTitle;
-    this.helpBody = localizationInstance.plugins[this.id]?.helpBody ?? this.helpBody;
-    this.sideMenuTitle = localizationInstance.plugins[this.id]?.title ?? this.sideMenuTitle;
-    this.bottomIconLabel = localizationInstance.plugins[this.id]?.bottomIconLabel ?? this.bottomIconLabel;
+    this.helpTitle = t7e(`plugins.${[this.id]}.title` as TranslationKey) ?? this.helpTitle ?? this.sideMenuTitle;
+    this.helpBody = t7e(`plugins.${[this.id]}.helpBody` as TranslationKey) ?? this.helpBody;
+    this.sideMenuTitle = t7e(`plugins.${[this.id]}.title` as TranslationKey) ?? this.sideMenuTitle;
+    this.bottomIconLabel = t7e(`plugins.${[this.id]}.bottomIconLabel` as TranslationKey) ?? this.bottomIconLabel;
 
     if (this.bottomIconLabel) {
       const bottomIconSlug = this.bottomIconLabel.toLowerCase().replace(' ', '-');
@@ -320,13 +317,13 @@ export abstract class KeepTrackPlugin {
       this.bottomIconElementName = this.bottomIconElementName ?? `${bottomIconSlug}-bottom-icon`;
     }
 
-    if (this.bottomIconElementName || this.bottomIconLabel) {
+    if (this.bottomIconImg || this.bottomIconElementName || this.bottomIconLabel) {
       if (!this.bottomIconElementName || !this.bottomIconLabel) {
         throw new Error(`${this.id} bottom icon element name, image, and label must all be defined.`);
       }
     }
 
-    if (this.bottomIconElementName) {
+    if (this.bottomIconImg && this.bottomIconElementName) {
       this.addBottomIcon(this.bottomIconImg, this.isIconDisabledOnLoad);
     }
 

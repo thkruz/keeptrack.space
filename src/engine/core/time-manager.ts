@@ -61,6 +61,8 @@ export class TimeManager {
   j: number;
   readonly timeUntilChangingEnabled = 10000;
   isTimeChangingEnabled = false;
+  isKeyboardBindingsInitialized_ = false;
+  isInitialized = false;
 
   static currentEpoch(currentDate: Date): [string, string] {
     const currentDateObj = new Date(currentDate);
@@ -74,7 +76,7 @@ export class TimeManager {
   }
 
   // Propagation Time Functions
-  calculateSimulationTime(newSimulationTime?: Date): Date {
+  calculateSimulationTime(newSimulationTime?: Date | null): Date {
     if (typeof newSimulationTime !== 'undefined' && newSimulationTime !== null) {
       this.simulationTimeObj.setTime(newSimulationTime.getTime());
 
@@ -101,10 +103,16 @@ export class TimeManager {
       return;
     } // no change
 
+    this.propRate = propRate;
+    keepTrackApi.emit(EventBusEvent.propRateChanged, this.propRate);
+
+    if (!this.isInitialized) {
+      return;
+    }
+
     this.staticOffset = this.simulationTimeObj.getTime() - Date.now();
     // Changing propRate or dynamicOffsetEpoch before calculating the staticOffset will give incorrect results
     this.dynamicOffsetEpoch = Date.now();
-    this.propRate = propRate;
     this.calculateSimulationTime();
 
     this.synchronize();
@@ -151,8 +159,6 @@ export class TimeManager {
         }
       }
     }
-
-    keepTrackApi.emit(EventBusEvent.propRateChanged, this.propRate);
   }
 
   static isLeapYear(dateIn: Date) {
@@ -201,9 +207,9 @@ export class TimeManager {
 
     this.propFrozen = Date.now(); // for when propRate 0
     this.realTime = <Milliseconds>this.propFrozen; // (initialized as Date.now)
-    this.propRate = 1.0; // time rate multiplier for propagation
+    this.propRate = settingsManager.propRate ?? 1.0; // time rate multiplier for propagation
 
-    this.staticOffset = settingsManager.staticOffset ?? 0;
+    this.staticOffset = settingsManager.simulationTime ? settingsManager.simulationTime.getTime() - Date.now() : 0;
 
     // Initialize
     this.calculateSimulationTime();
@@ -213,6 +219,8 @@ export class TimeManager {
     setTimeout(() => {
       this.isTimeChangingEnabled = true;
     }, this.timeUntilChangingEnabled);
+
+    this.isInitialized = true;
   }
 
   update() {
@@ -223,6 +231,9 @@ export class TimeManager {
   }
 
   private initializeKeyboardBindings_() {
+    if (this.isKeyboardBindingsInitialized_) {
+      return;
+    }
     keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 't' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
@@ -383,6 +394,8 @@ export class TimeManager {
         this.changeStaticOffset(this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall);
       }
     });
+
+    this.isKeyboardBindingsInitialized_ = true;
   }
 
   setNow(realTime: Milliseconds) {

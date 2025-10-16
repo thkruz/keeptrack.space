@@ -40,7 +40,7 @@ export abstract class UrlManager {
       this.updateURL();
     });
 
-    keepTrackApi.on(EventBusEvent.propRateChanged, (propRate) => {
+    keepTrackApi.on(EventBusEvent.propRateChanged, (propRate: number) => {
       this.propRate_ = propRate;
       this.updateURL();
     });
@@ -119,6 +119,9 @@ export abstract class UrlManager {
       switch (key) {
         case 'date':
           this.handleDateParam_(kv[key]);
+          break;
+        case 'rate':
+          this.handleRateParam_(kv[key]);
           break;
         case 'plugins':
           {
@@ -260,7 +263,7 @@ export abstract class UrlManager {
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const mainCamera = keepTrackApi.getMainCamera();
 
-    if (!uiManagerInstance.searchManager) {
+    if (!uiManagerInstance?.searchManager) {
       return;
     }
     if (settingsManager.isDisableUrlBar) {
@@ -271,15 +274,13 @@ export abstract class UrlManager {
     let url = arr[0];
     const paramSlices = [] as string[];
 
-    if (settingsManager.limitSats) {
-      paramSlices.push(`limitSats=${settingsManager.limitSats}`);
+    // Handle Time First
+    if (isMaxData || timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
+      paramSlices.push(`date=${new Date(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset).toISOString()}`);
     }
 
-    if (settingsManager.dataSources.externalTLEsOnly) {
-      paramSlices.push(`tle="${encodeURIComponent(settingsManager.dataSources.externalTLEs)}"`);
-      paramSlices.push('external-only=true');
-    } else if (!settingsManager.dataSources.tle.includes('keeptrack.space') && isMaxData) {
-      paramSlices.push(`tle="${encodeURIComponent(settingsManager.dataSources.tle)}"`);
+    if (this.propRate_ < 0.99 || this.propRate_ > 1.01) {
+      paramSlices.push(`rate=${this.propRate_}`);
     }
 
     if (this.selectedSat_?.sccNum) {
@@ -295,8 +296,8 @@ export abstract class UrlManager {
       paramSlices.push(`search=${this.searchString_}`);
     }
 
-    if (this.propRate_ < 0.99 || this.propRate_ > 1.01) {
-      paramSlices.push(`rate=${this.propRate_}`);
+    if (settingsManager.limitSats) {
+      paramSlices.push(`limitSats=${settingsManager.limitSats}`);
     }
 
     if (this.selectedSat_?.sccNum && !(mainCamera.state.ftsPitch > -0.1 && mainCamera.state.ftsPitch < 0.1 && mainCamera.state.ftsYaw > -0.1 && mainCamera.state.ftsYaw < 0.1)) {
@@ -323,12 +324,8 @@ export abstract class UrlManager {
       paramSlices.push(`color=${shorthandFromDefinition}`);
     }
 
-    if (settingsManager.isOrbitCruncherInEcf) {
+    if (settingsManager.isOrbitCruncherInEcf && settingsManager.numberOfEcfOrbitsToDraw !== 1) {
       paramSlices.push(`ecf=${settingsManager.numberOfEcfOrbitsToDraw}`);
-    }
-
-    if (isMaxData || timeManagerInstance.staticOffset < -1000 || timeManagerInstance.staticOffset > 1000) {
-      paramSlices.push(`date=${(timeManagerInstance.dynamicOffsetEpoch + timeManagerInstance.staticOffset).toString()}`);
     }
 
     if (settingsManager.isDisableSensors) {
@@ -340,6 +337,13 @@ export abstract class UrlManager {
 
     if (settingsManager.isDisableBottomMenu) {
       paramSlices.push('bottomMenu=false');
+    }
+
+    if (settingsManager.dataSources.externalTLEsOnly) {
+      paramSlices.push(`tle="${encodeURIComponent(settingsManager.dataSources.externalTLEs)}"`);
+      paramSlices.push('external-only=true');
+    } else if (!settingsManager.dataSources.tle.includes('keeptrack.space') && isMaxData) {
+      paramSlices.push(`tle="${encodeURIComponent(settingsManager.dataSources.tle)}"`);
     }
 
     if (paramSlices.length > 0) {
@@ -389,12 +393,33 @@ export abstract class UrlManager {
   }
 
   private static handleDateParam_(val: string) {
-    if (isNaN(parseInt(val))) {
-      keepTrackApi.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+    // There are two acceptable versions of date param:
+    // 1. A unix timestamp in milliseconds (13 digits)
+    // 2. An ISO 8601 date string (e.g. 2023-10-05T14:48:00.000Z)
+    if (val.includes('-')) {
+      const date = new Date(val);
 
-      return;
+      if (isNaN(date.getTime())) {
+        keepTrackApi.toast(`Date value of "${val}" is not a proper ISO 8601 date string!`, ToastMsgType.caution, true);
+
+        return;
+      }
+
+      settingsManager.simulationTime = date;
+    } else {
+      if (val.length !== 13) {
+        keepTrackApi.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+
+        return;
+      }
+      if (isNaN(parseInt(val))) {
+        keepTrackApi.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+
+        return;
+      }
+
+      settingsManager.simulationTime = new Date(parseFloat(val));
     }
-    settingsManager.staticOffset = Number(val) - Date.now();
   }
 
   private static handleRateParam_(val: string) {
@@ -409,7 +434,11 @@ export abstract class UrlManager {
     rate = Math.min(rate, 1000);
     // could run time backwards, but let's not!
     rate = Math.max(rate, 0);
-    timeManagerInstance.changePropRate(Number(rate));
+
+    settingsManager.propRate = rate;
+    if (timeManagerInstance) {
+      timeManagerInstance.changePropRate(Number(rate));
+    }
   }
 
   private static handleZoomParam_(val: string, camDistBuffer: string) {

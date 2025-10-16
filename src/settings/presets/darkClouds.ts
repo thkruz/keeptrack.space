@@ -21,7 +21,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   settingsManager.plugins.TimeMachine = { enabled: true };
   settingsManager.plugins.TopMenu = { enabled: false };
 
-  settingsManager.staticOffset = 1743483637000 - Date.now(); // Set to April 1, 2025
+  settingsManager.simulationTime = new Date('2025-04-01T00:00:00Z'); // Set to April 1, 2025
 
   settingsManager.isEnableJscCatalog = false;
 

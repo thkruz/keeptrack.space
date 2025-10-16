@@ -309,6 +309,7 @@ export class CatalogLoader {
       asciiCatalog = externalCatalog || asciiCatalog;
 
       // Make sure everyone agrees on what time it is
+      keepTrackApi.getTimeManager().init();
       keepTrackApi.getTimeManager().synchronize();
 
       /*

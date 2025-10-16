@@ -95,8 +95,9 @@ export class SettingsManager {
    * plugins that use the bottom menu.
    */
   isDisableBottomMenu = false;
-  /** The initial time offset */
-  staticOffset: number = 0; // in seconds
+  /** The initial time */
+  simulationTime: Date | null = null;
+  propRate = 1.0;
   isDrawNightAsDay = false;
   isEmbedMode = false;
   splashScreenList: string[] | null = null;

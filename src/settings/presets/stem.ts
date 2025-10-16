@@ -1,9 +1,9 @@
 import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '../settings';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.isBlockPersistence = true;
@@ -27,7 +27,7 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.isShowSplashScreen = true;
 
 
-  settingsManager.staticOffset = 1743483637000 - Date.now(); // Set to April 1, 2025
+  settingsManager.simulationTime = new Date('2025-04-01T00:00:00Z'); // Set to April 1, 2025
 
   settingsManager.isEnableJscCatalog = false;
 

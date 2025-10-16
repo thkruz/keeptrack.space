@@ -779,6 +779,160 @@
       "tooltip": "Celestrak 是卫星轨道数据的热门来源，提供各种卫星和碎片的 TLE 数据。"
     }
   },
+  "satInfoBox": {
+    "title": "标识符",
+    "Cospar": {
+      "label": "COSPAR",
+      "tooltip": "国际设计ator"
+    },
+    "Norad": {
+      "label": "NORAD",
+      "tooltip": "北美防空司令部目录编号"
+    },
+    "AltName": {
+      "label": "别名",
+      "tooltip": "卫星别名"
+    },
+    "AltId": {
+      "label": "备用ID",
+      "tooltip": "备用卫星ID"
+    },
+    "Source": {
+      "label": "来源",
+      "tooltip": "卫星信息的数据来源"
+    },
+    "Confidence": {
+      "label": "置信度",
+      "tooltip": "数据置信度等级（越高越好），范围1-10。基于数据来源和数据时效"
+    }
+  },
+  "SatInfoBoxObject": {
+    "title": "对象数据",
+    "Type": {
+      "label": "类型",
+      "tooltip": "对象类型",
+      "unknown": "待公布",
+      "payload": "有效载荷",
+      "rocketBody": "火箭体",
+      "debris": "碎片",
+      "special": "特殊",
+      "missile": "弹道导弹"
+    },
+    "Status": {
+      "label": "状态",
+      "tooltip": "对象的运行状态",
+      "operational": "运行中",
+      "nonOperational": "未运行",
+      "partiallyOperational": "部分运行",
+      "extendedMission": "扩展任务",
+      "backupStandby": "备份/待命",
+      "spare": "备用",
+      "unknown": "未知"
+    },
+    "Country": {
+      "label": "国家",
+      "tooltip": "原产国"
+    },
+    "LaunchSite": {
+      "label": "发射场",
+      "tooltip": "对象发射地点"
+    },
+    "LaunchVehicle": {
+      "label": "运载工具",
+      "tooltip": "用于发射对象的火箭或运载工具"
+    },
+    "Configuration": {
+      "label": "配置",
+      "tooltip": "火箭或运载工具的配置"
+    },
+    "RCS": {
+      "label": "雷达截面",
+      "tooltip": "雷达截面 - 物体对雷达信号的反射能力（单位：平方米）"
+    },
+    "StdMag": {
+      "label": "标准星等",
+      "tooltip": "标准星等 - 数值越小越亮"
+    },
+    "unknown": "未知"
+  },
+  "SatInfoBoxOrbital": {
+    "title": "轨道数据",
+    "Apogee": {
+      "label": "远地点",
+      "tooltip": "轨道上的最高点"
+    },
+    "Perigee": {
+      "label": "近地点",
+      "tooltip": "轨道上的最低点"
+    },
+    "Inclination": {
+      "label": "倾角",
+      "tooltip": "从赤道升交点测量的角度"
+    },
+    "Eccentricity": {
+      "label": "偏心率",
+      "tooltip": "轨道的圆度（0为圆形）"
+    },
+    "RightAsc": {
+      "label": "赤经",
+      "tooltip": "在赤道上升起的位置"
+    },
+    "ArgOfPerigee": {
+      "label": "近地点幅角",
+      "tooltip": "轨道最低点的位置"
+    },
+    "Latitude": {
+      "label": "纬度",
+      "tooltip": "当前地球上的纬度",
+      "north": "北",
+      "south": "南"
+    },
+    "Longitude": {
+      "label": "经度",
+      "tooltip": "当前地球上的经度",
+      "east": "东",
+      "west": "西"
+    },
+    "Altitude": {
+      "label": "高度",
+      "tooltip": "当前海拔高度"
+    },
+    "Period": {
+      "label": "周期",
+      "tooltip": "绕地球一圈所需时间",
+      "meanMotion": "平均运动",
+      "revPerDay": "圈/天",
+      "min": "分钟"
+    },
+    "Velocity": {
+      "label": "速度",
+      "tooltip": "卫星当前速度（越接近地球越快）"
+    },
+    "AgeOfGP": {
+      "label": "轨道数据年龄",
+      "tooltip": "官方轨道计算以来的时间（数据越旧通常越不准确）",
+      "days": "天",
+      "hours": "小时",
+      "epochYear": "历元年份",
+      "epochDay": "历元日"
+    },
+    "RadialSigma": {
+      "label": "径向不确定度",
+      "tooltip": "径向不确定度（米）"
+    },
+    "InTrackSigma": {
+      "label": "轨道内不确定度",
+      "tooltip": "轨道内不确定度（米）"
+    },
+    "CrossTrackSigma": {
+      "label": "轨道横向不确定度",
+      "tooltip": "轨道横向不确定度（米）"
+    },
+    "meter": "米",
+    "kilometer": "千米",
+    "second": "秒",
+    "unknown": "未知"
+  },
   "SatInfoBoxActions": {
     "title": "操作",
     "tooltip": "对选定卫星执行相关操作",

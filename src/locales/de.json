@@ -782,6 +782,160 @@
       "tooltip": "Celestrak ist eine beliebte Quelle für Satellitenbahndaten und bietet TLEs für eine Vielzahl von Satelliten und Trümmern."
     }
   },
+  "satInfoBox": {
+    "title": "識別子",
+    "Cospar": {
+      "label": "COSPAR",
+      "tooltip": "国際デザイン番号"
+    },
+    "Norad": {
+      "label": "NORAD",
+      "tooltip": "北米航空宇宙防衛司令部のカタログ番号"
+    },
+    "AltName": {
+      "label": "別名",
+      "tooltip": "衛星の別名"
+    },
+    "AltId": {
+      "label": "別ID",
+      "tooltip": "衛星の別ID"
+    },
+    "Source": {
+      "label": "情報源",
+      "tooltip": "衛星情報のデータソース"
+    },
+    "Confidence": {
+      "label": "信頼度",
+      "tooltip": "データの信頼度（高いほど良い）、1～10のスケール。情報源とデータの新しさに基づく"
+    }
+  },
+  "SatInfoBoxObject": {
+    "title": "Objektdaten",
+    "Type": {
+      "label": "Typ",
+      "tooltip": "Objekttyp",
+      "unknown": "Wird bekannt gegeben",
+      "payload": "Nutzlast",
+      "rocketBody": "Raketenstufe",
+      "debris": "Trümmer",
+      "special": "Spezial",
+      "missile": "Ballistische Rakete"
+    },
+    "Status": {
+      "label": "Status",
+      "tooltip": "Betriebsstatus des Objekts",
+      "operational": "Betriebsbereit",
+      "nonOperational": "Nicht betriebsbereit",
+      "partiallyOperational": "Teilweise betriebsbereit",
+      "extendedMission": "Erweiterte Mission",
+      "backupStandby": "Reserve/Bereitschaft",
+      "spare": "Ersatz",
+      "unknown": "Unbekannt"
+    },
+    "Country": {
+      "label": "Land",
+      "tooltip": "Ursprungsland"
+    },
+    "LaunchSite": {
+      "label": "Startplatz",
+      "tooltip": "Ort, von dem das Objekt gestartet wurde"
+    },
+    "LaunchVehicle": {
+      "label": "Trägerrakete",
+      "tooltip": "Rakete oder Fahrzeug, das zum Start verwendet wurde"
+    },
+    "Configuration": {
+      "label": "Konfiguration",
+      "tooltip": "Konfiguration der Rakete oder des Trägers"
+    },
+    "RCS": {
+      "label": "RCS",
+      "tooltip": "Radarquerschnitt - Wie stark das Objekt Radarstrahlen reflektiert (in m²)"
+    },
+    "StdMag": {
+      "label": "Standard-Mag",
+      "tooltip": "Standardhelligkeit - Kleinere Zahlen sind heller"
+    },
+    "unknown": "Unbekannt"
+  },
+  "SatInfoBoxOrbital": {
+    "title": "Orbitale Daten",
+    "Apogee": {
+      "label": "Apogäum",
+      "tooltip": "Höchster Punkt der Umlaufbahn"
+    },
+    "Perigee": {
+      "label": "Perigäum",
+      "tooltip": "Tiefster Punkt der Umlaufbahn"
+    },
+    "Inclination": {
+      "label": "Inklination",
+      "tooltip": "Winkel vom Äquator am aufsteigenden Knoten gemessen"
+    },
+    "Eccentricity": {
+      "label": "Exzentrizität",
+      "tooltip": "Wie kreisförmig die Umlaufbahn ist (0 ist ein Kreis)"
+    },
+    "RightAsc": {
+      "label": "Rektaszension",
+      "tooltip": "Wo sie über dem Äquator aufsteigt"
+    },
+    "ArgOfPerigee": {
+      "label": "Argument des Perigäums",
+      "tooltip": "Wo der tiefste Teil der Umlaufbahn ist"
+    },
+    "Latitude": {
+      "label": "Breitengrad",
+      "tooltip": "Aktueller Breitengrad über der Erde",
+      "north": "N",
+      "south": "S"
+    },
+    "Longitude": {
+      "label": "Längengrad",
+      "tooltip": "Aktueller Längengrad über der Erde",
+      "east": "O",
+      "west": "W"
+    },
+    "Altitude": {
+      "label": "Höhe",
+      "tooltip": "Aktuelle Höhe über dem Meeresspiegel"
+    },
+    "Period": {
+      "label": "Periode",
+      "tooltip": "Zeit für eine vollständige Umrundung der Erde",
+      "meanMotion": "Mittlere Bewegung",
+      "revPerDay": "Uml./Tag",
+      "min": "Min."
+    },
+    "Velocity": {
+      "label": "Geschwindigkeit",
+      "tooltip": "Aktuelle Geschwindigkeit des Satelliten (höher, je näher an der Erde)"
+    },
+    "AgeOfGP": {
+      "label": "Alter der GP",
+      "tooltip": "Zeit seit offizieller Umlaufbahnberechnung (ältere GP-Daten sind meist weniger genau)",
+      "days": "Tage",
+      "hours": "Stunden",
+      "epochYear": "Epoche Jahr",
+      "epochDay": "Epoche Tag"
+    },
+    "RadialSigma": {
+      "label": "Radiale Sigma",
+      "tooltip": "Radiale Unsicherheit (Meter)"
+    },
+    "InTrackSigma": {
+      "label": "In-Track Sigma",
+      "tooltip": "Unsicherheit in Flugrichtung (Meter)"
+    },
+    "CrossTrackSigma": {
+      "label": "Cross-Track Sigma",
+      "tooltip": "Unsicherheit quer zur Flugrichtung (Meter)"
+    },
+    "meter": "m",
+    "kilometer": "km",
+    "second": "s",
+    "unknown": "Unbekannt"
+  },
   "SatInfoBoxActions": {
     "title": "Aktionen",
     "tooltip": "Führen Sie Aktionen im Zusammenhang mit dem ausgewählten Satelliten aus",

@@ -1442,16 +1442,50 @@ export class SettingsManager {
     a.click();
   }
 
+  private deepMerge(target: object, source: object): object {
+    for (const key of Object.keys(source)) {
+      const sourceValue = source[key];
+      const targetValue = target[key];
+
+      if (
+        typeof sourceValue === 'object' &&
+        sourceValue !== null &&
+        !Array.isArray(sourceValue) &&
+        typeof targetValue === 'object' &&
+        targetValue !== null &&
+        !Array.isArray(targetValue)
+      ) {
+        // Recursively merge objects
+        target[key] = this.deepMerge({ ...targetValue }, sourceValue);
+      } else {
+        target[key] = sourceValue;
+      }
+    }
+
+    return target;
+  }
+
   private loadOverrides_(settingsOverride: SettingsManagerOverride) {
     // combine settingsOverride with window.settingsOverride
     const overrides = { ...settingsOverride, ...window.settingsOverride };
     // override values in this with overrides
 
+
     for (const key of Object.keys(overrides)) {
-      if (typeof overrides[key] === 'object' && overrides[key] !== null) {
-        this[key] = { ...this[key], ...overrides[key] };
+      const overrideValue = overrides[key];
+      const currentValue = this[key];
+
+      if (
+        typeof overrideValue === 'object' &&
+        overrideValue !== null &&
+        !Array.isArray(overrideValue) &&
+        typeof currentValue === 'object' &&
+        currentValue !== null &&
+        !Array.isArray(currentValue)
+      ) {
+        this[key] = this.deepMerge({ ...currentValue }, overrideValue);
       } else {
-        this[key] = overrides[key];
+        this[key] = overrideValue;
       }
     }
   }

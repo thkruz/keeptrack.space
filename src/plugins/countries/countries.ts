@@ -1,5 +1,6 @@
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { getEl } from '@app/engine/utils/get-el';
+import { t7e, TranslationKey } from '@app/locales/keys';
 
 import { GroupType } from '@app/app/data/object-group';
 import { StringExtractor } from '@app/app/ui/string-extractor';
@@ -9,12 +10,11 @@ import flagPng from '@public/img/icons/flag.png';
 
 import { SearchResult } from '@app/app/ui/search-manager';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { Localization } from '@app/locales/locales';
+import { html } from '@app/engine/utils/development/formatter';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
@@ -58,7 +58,7 @@ export class CountriesMenu extends KeepTrackPlugin {
 
   private static generateCountryList_(): string {
     const header = html`
-    <h5 class="center-align">${Localization.getInstance().plugins.CountriesMenu.bottomIconLabel!}</h5>
+    <h5 class="center-align">${t7e(`plugins.${CountriesMenu.name}.bottomIconLabel` as TranslationKey)}</h5>
     <li class="divider"></li>
     <br/>`;
 
@@ -69,8 +69,6 @@ export class CountriesMenu extends KeepTrackPlugin {
         countryCodeList.push(sat.country);
       }
     });
-
-    Localization.getInstance(); // Ensure localization is initialized
 
     const countries = countryCodeList.map((countryCode) => {
       const country = StringExtractor.extractCountry(countryCode);

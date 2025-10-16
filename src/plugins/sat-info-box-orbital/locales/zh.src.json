@@ -1,0 +1,80 @@
+{
+  "SatInfoBoxOrbital": {
+    "title": "轨道数据",
+    "Apogee": {
+      "label": "远地点",
+      "tooltip": "轨道上的最高点"
+    },
+    "Perigee": {
+      "label": "近地点",
+      "tooltip": "轨道上的最低点"
+    },
+    "Inclination": {
+      "label": "倾角",
+      "tooltip": "从赤道升交点测量的角度"
+    },
+    "Eccentricity": {
+      "label": "偏心率",
+      "tooltip": "轨道的圆度（0为圆形）"
+    },
+    "RightAsc": {
+      "label": "赤经",
+      "tooltip": "在赤道上升起的位置"
+    },
+    "ArgOfPerigee": {
+      "label": "近地点幅角",
+      "tooltip": "轨道最低点的位置"
+    },
+    "Latitude": {
+      "label": "纬度",
+      "tooltip": "当前地球上的纬度",
+      "north": "北",
+      "south": "南"
+    },
+    "Longitude": {
+      "label": "经度",
+      "tooltip": "当前地球上的经度",
+      "east": "东",
+      "west": "西"
+    },
+    "Altitude": {
+      "label": "高度",
+      "tooltip": "当前海拔高度"
+    },
+    "Period": {
+      "label": "周期",
+      "tooltip": "绕地球一圈所需时间",
+      "meanMotion": "平均运动",
+      "revPerDay": "圈/天",
+      "min": "分钟"
+    },
+    "Velocity": {
+      "label": "速度",
+      "tooltip": "卫星当前速度（越接近地球越快）"
+    },
+    "AgeOfGP": {
+      "label": "轨道数据年龄",
+      "tooltip": "官方轨道计算以来的时间（数据越旧通常越不准确）",
+      "days": "天",
+      "hours": "小时",
+      "epochYear": "历元年份",
+      "epochDay": "历元日"
+    },
+    "RadialSigma": {
+      "label": "径向不确定度",
+      "tooltip": "径向不确定度（米）"
+    },
+    "InTrackSigma": {
+      "label": "轨道内不确定度",
+      "tooltip": "轨道内不确定度（米）"
+    },
+    "CrossTrackSigma": {
+      "label": "轨道横向不确定度",
+      "tooltip": "轨道横向不确定度（米）"
+    },
+    "meter": "米",
+    "kilometer": "千米",
+    "second": "秒",
+    "unknown": "未知"
+  }
+}

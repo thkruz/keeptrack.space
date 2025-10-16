@@ -1,0 +1,80 @@
+{
+  "SatInfoBoxOrbital": {
+    "title": "Datos Orbitales",
+    "Apogee": {
+      "label": "Apogeo",
+      "tooltip": "Punto más alto en la órbita"
+    },
+    "Perigee": {
+      "label": "Perigeo",
+      "tooltip": "Punto más bajo en la órbita"
+    },
+    "Inclination": {
+      "label": "Inclinación",
+      "tooltip": "Ángulo medido desde el ecuador en el nodo ascendente"
+    },
+    "Eccentricity": {
+      "label": "Excentricidad",
+      "tooltip": "Qué tan circular es la órbita (0 es un círculo)"
+    },
+    "RightAsc": {
+      "label": "Asc. Recta",
+      "tooltip": "Dónde cruza sobre el ecuador"
+    },
+    "ArgOfPerigee": {
+      "label": "Arg. del Perigeo",
+      "tooltip": "Dónde está la parte más baja de la órbita"
+    },
+    "Latitude": {
+      "label": "Latitud",
+      "tooltip": "Latitud actual sobre la Tierra",
+      "north": "N",
+      "south": "S"
+    },
+    "Longitude": {
+      "label": "Longitud",
+      "tooltip": "Longitud actual sobre la Tierra",
+      "east": "E",
+      "west": "O"
+    },
+    "Altitude": {
+      "label": "Altitud",
+      "tooltip": "Altitud actual sobre el nivel del mar"
+    },
+    "Period": {
+      "label": "Período",
+      "tooltip": "Tiempo para una revolución completa alrededor de la Tierra",
+      "meanMotion": "Movimiento medio",
+      "revPerDay": "rev/día",
+      "min": "min"
+    },
+    "Velocity": {
+      "label": "Velocidad",
+      "tooltip": "Velocidad actual del satélite (mayor cuanto más cerca de la Tierra)"
+    },
+    "AgeOfGP": {
+      "label": "Edad del GP",
+      "tooltip": "Tiempo desde el cálculo oficial de la órbita (datos GP más antiguos suelen ser menos precisos)",
+      "days": "Días",
+      "hours": "Horas",
+      "epochYear": "Año de época",
+      "epochDay": "Día de época"
+    },
+    "RadialSigma": {
+      "label": "Sigma Radial",
+      "tooltip": "Incertidumbre radial (metros)"
+    },
+    "InTrackSigma": {
+      "label": "Sigma en Trayectoria",
+      "tooltip": "Incertidumbre en trayectoria (metros)"
+    },
+    "CrossTrackSigma": {
+      "label": "Sigma Cruzada",
+      "tooltip": "Incertidumbre cruzada (metros)"
+    },
+    "meter": "m",
+    "kilometer": "km",
+    "second": "s",
+    "unknown": "Desconocido"
+  }
+}

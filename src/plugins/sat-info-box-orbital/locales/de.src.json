@@ -1,0 +1,80 @@
+{
+  "SatInfoBoxOrbital": {
+    "title": "Orbitale Daten",
+    "Apogee": {
+      "label": "Apogäum",
+      "tooltip": "Höchster Punkt der Umlaufbahn"
+    },
+    "Perigee": {
+      "label": "Perigäum",
+      "tooltip": "Tiefster Punkt der Umlaufbahn"
+    },
+    "Inclination": {
+      "label": "Inklination",
+      "tooltip": "Winkel vom Äquator am aufsteigenden Knoten gemessen"
+    },
+    "Eccentricity": {
+      "label": "Exzentrizität",
+      "tooltip": "Wie kreisförmig die Umlaufbahn ist (0 ist ein Kreis)"
+    },
+    "RightAsc": {
+      "label": "Rektaszension",
+      "tooltip": "Wo sie über dem Äquator aufsteigt"
+    },
+    "ArgOfPerigee": {
+      "label": "Argument des Perigäums",
+      "tooltip": "Wo der tiefste Teil der Umlaufbahn ist"
+    },
+    "Latitude": {
+      "label": "Breitengrad",
+      "tooltip": "Aktueller Breitengrad über der Erde",
+      "north": "N",
+      "south": "S"
+    },
+    "Longitude": {
+      "label": "Längengrad",
+      "tooltip": "Aktueller Längengrad über der Erde",
+      "east": "O",
+      "west": "W"
+    },
+    "Altitude": {
+      "label": "Höhe",
+      "tooltip": "Aktuelle Höhe über dem Meeresspiegel"
+    },
+    "Period": {
+      "label": "Periode",
+      "tooltip": "Zeit für eine vollständige Umrundung der Erde",
+      "meanMotion": "Mittlere Bewegung",
+      "revPerDay": "Uml./Tag",
+      "min": "Min."
+    },
+    "Velocity": {
+      "label": "Geschwindigkeit",
+      "tooltip": "Aktuelle Geschwindigkeit des Satelliten (höher, je näher an der Erde)"
+    },
+    "AgeOfGP": {
+      "label": "Alter der GP",
+      "tooltip": "Zeit seit offizieller Umlaufbahnberechnung (ältere GP-Daten sind meist weniger genau)",
+      "days": "Tage",
+      "hours": "Stunden",
+      "epochYear": "Epoche Jahr",
+      "epochDay": "Epoche Tag"
+    },
+    "RadialSigma": {
+      "label": "Radiale Sigma",
+      "tooltip": "Radiale Unsicherheit (Meter)"
+    },
+    "InTrackSigma": {
+      "label": "In-Track Sigma",
+      "tooltip": "Unsicherheit in Flugrichtung (Meter)"
+    },
+    "CrossTrackSigma": {
+      "label": "Cross-Track Sigma",
+      "tooltip": "Unsicherheit quer zur Flugrichtung (Meter)"
+    },
+    "meter": "m",
+    "kilometer": "km",
+    "second": "s",
+    "unknown": "Unbekannt"
+  }
+}

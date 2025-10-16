@@ -451,7 +451,7 @@ export abstract class UrlManager {
       return;
     }
 
-    if (zoom < 0.1 || zoom > 100) {
+    if (zoom < 0.06 || zoom > 1) {
       keepTrackApi.toast(`Zoom value of "${val}" is out of bounds!`, ToastMsgType.caution, true);
 
       return;

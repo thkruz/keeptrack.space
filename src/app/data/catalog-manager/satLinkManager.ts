@@ -140,7 +140,10 @@ export class SatLinkManager {
     }
   }
 
+  /** Currently not used */
   showLinks(lineManager: LineManager, group: SatConstellationString, timeManager: TimeManager) {
+    lineManager.clear();
+
     let satlist: number[];
     let userlist: string[] = [];
     let minTheta: number;
@@ -152,7 +155,7 @@ export class SatLinkManager {
         satlist = this.aehf;
         userlist = this.aehfUsers;
         minTheta = 10;
-        linkType = 1;
+        linkType = LinkType.Users;
         elevationMask = 5;
         break;
       case SatConstellationString.Dscs:
@@ -254,10 +257,10 @@ export class SatLinkManager {
             const sat = catalogManagerInstance.getObject(satId) as DetailedSatellite;
             const tearr = SensorMath.getTearr(sat, [user], timeManager.simulationTimeObj);
 
-            if (tearr.el > elevationMask) {
-              if (tearr.rng < bestRange) {
+            if ((tearr.el ?? -Infinity) > elevationMask) {
+              if ((tearr.rng ?? Infinity) < bestRange) {
                 bestSat = sat;
-                bestRange = tearr.rng;
+                bestRange = tearr.rng!;
               }
             }
           }
@@ -303,15 +306,15 @@ export class SatLinkManager {
              * horizon.
              *
              */
-            if (tearr.el > elevationMask) {
+            if ((tearr.el ?? -Infinity) > elevationMask) {
               /*
                * If the satellite is visible, then check to see if it is the best
                * satellite to draw a line to. The best satellite is the one that
                * is closest to the user.
                */
-              if (tearr.rng < bestRange) {
+              if ((tearr.rng ?? Infinity) < bestRange) {
                 bestSat = sat;
-                bestRange = tearr.rng;
+                bestRange = tearr.rng!;
               }
             }
           }

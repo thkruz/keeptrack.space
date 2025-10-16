@@ -1,16 +1,13 @@
 import { getEl } from '@app/engine/utils/get-el';
-import { showLoading } from '@app/engine/utils/showLoading';
 
-import { SatConstellationString } from '@app/app/data/catalog-manager/satLinkManager';
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { lineManagerInstance } from '@app/engine/rendering/line-manager';
+import { html } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
 import categoryPng from '@public/img/icons/category.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
@@ -87,7 +84,7 @@ export class SatConstellations extends KeepTrackPlugin {
   }
 
   private constellationMenuClick_(groupName: string) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    // const timeManagerInstance = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const groupManagerInstance = keepTrackApi.getGroupsManager();
 
@@ -159,10 +156,9 @@ export class SatConstellations extends KeepTrackPlugin {
         if (!groupManagerInstance.groupList[groupName]) {
           groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(catalogManagerInstance.satLinkManager.aehf), groupName);
         }
-        showLoading(() => {
-          lineManagerInstance.clear();
-          catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Aehf, timeManagerInstance);
-        });
+        // showLoading(() => {
+        //   catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Aehf, timeManagerInstance);
+        // });
         break;
       case 'wgs':
         if (!groupManagerInstance.groupList[groupName]) {
@@ -171,10 +167,9 @@ export class SatConstellations extends KeepTrackPlugin {
 
           groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(wgs), groupName);
         }
-        showLoading(() => {
-          lineManagerInstance.clear();
-          catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Wgs, timeManagerInstance);
-        });
+        // showLoading(() => {
+        //   catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Wgs, timeManagerInstance);
+        // });
         break;
       case 'starlink':
         if (!groupManagerInstance.groupList[groupName]) {

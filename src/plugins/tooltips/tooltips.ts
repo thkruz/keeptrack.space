@@ -46,8 +46,8 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         tooltipDiv.style.display = 'none';
         tooltipDiv.style.position = 'absolute';
         tooltipDiv.style.zIndex = '999999';
-        tooltipDiv.style.width = '150px';
-        tooltipDiv.style.marginLeft = '-75px';
+        tooltipDiv.style.width = '200px';
+        tooltipDiv.style.marginLeft = '-100px';
         tooltipDiv.style.overflow = 'visible';
         tooltipDiv.style.backgroundColor = 'var(--color-primary-dark)';
         tooltipDiv.style.textAlign = 'center';
@@ -111,6 +111,8 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       this.hideTooltip();
       this.isVisible_ = false;
     });
+
+    el.style.cursor = 'pointer';
   }
 
   hideTooltip() {
@@ -139,8 +141,8 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
     tooltipDiv.style.visibility = 'visible';
 
-    // Set tooltip text
-    tooltipDiv.textContent = text;
+    // Set tooltip HTML (allow <br />)
+    tooltipDiv.innerHTML = text;
 
     // Calculate available space in each direction
     const spaceAbove = event.clientY / viewportHeight;

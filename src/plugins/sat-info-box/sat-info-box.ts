@@ -1,39 +1,18 @@
+import { t7e } from '@app/locales/keys';
 import Draggabilly from 'draggabilly';
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { DraggableBox } from '@app/engine/ui/draggable-box';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { CONTAINER_ID, EL, SECTIONS } from './sat-info-box-html';
 import './sat-info-box.css';
-import { html } from '@app/engine/utils/development/formatter';
-
-const CONTAINER_ID = 'sat-infobox';
-
-// Section IDs
-const SECTIONS = {
-  IDENTIFIERS: 'sat-identifier-data',
-};
-
-export const EL = { // DOM element IDs organized by section
-  // Header elements
-  CONTAINER: 'sat-info-header',
-  TITLE: 'sat-info-title',
-  NAME: 'sat-info-title-name',
-  FLAG: 'sat-infobox-fi',
-
-  // Identifier elements
-  INTL_DES: 'sat-intl-des',
-  OBJNUM: 'sat-objnum',
-  ALT_NAME: 'sat-alt-name',
-  ALT_ID: 'sat-alt-id',
-  SOURCE: 'sat-source',
-  CONFIDENCE: 'sat-confidence',
-};
 
 /**
  * This class controls all the functionality of the satellite info box.
@@ -72,8 +51,12 @@ export class SatInfoBox extends KeepTrackPlugin {
           }
         });
 
-        const addRemoveWatchlistDom = getEl('sat-add-watchlist');
+        const addRemoveWatchlistDom = getEl('sat-add-watchlist', true);
 
+        /*
+         * TODO: There should be a placeholder on the left side to keep the
+         * satellite name centered when the add/remove watchlist icon is not shown.
+         */
         if (addRemoveWatchlistDom) {
           if (isOnList) {
             (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'block';
@@ -238,31 +221,31 @@ export class SatInfoBox extends KeepTrackPlugin {
     return html`
       <div id="${SECTIONS.IDENTIFIERS}">
         <div class="sat-info-section-header">
-          Identifiers
+          <span>${t7e('satInfoBox.title')}</span>
           <span id="${SECTIONS.IDENTIFIERS}-collapse" class="section-collapse material-icons">expand_less</span>
         </div>
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key">COSPAR</div>
+          <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.Cospar.tooltip')}">${t7e('satInfoBox.Cospar.label')}</div>
           <div class="sat-info-value" id="${EL.INTL_DES}">xxxx-xxxA</div>
         </div>
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key">NORAD</div>
+          <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.Norad.tooltip')}">${t7e('satInfoBox.Norad.label')}</div>
           <div class="sat-info-value" id="${EL.OBJNUM}">99999</div>
         </div>
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key">Alt Name</div>
+          <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.AltName.tooltip')}">${t7e('satInfoBox.AltName.label')}</div>
           <div class="sat-info-value" id="${EL.ALT_NAME}">Alt Name</div>
         </div>
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key">Alt ID</div>
+          <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.AltId.tooltip')}">${t7e('satInfoBox.AltId.label')}</div>
           <div class="sat-info-value" id="${EL.ALT_ID}">99999</div>
         </div>
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key">Source</div>
+          <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.Source.tooltip')}">${t7e('satInfoBox.Source.label')}</div>
           <div class="sat-info-value" id="${EL.SOURCE}">USSF</div>
         </div>
         <div class="sat-info-row sat-only-info">
-          <div class="sat-info-key">Confidence</div>
+          <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.Confidence.tooltip')}">${t7e('satInfoBox.Confidence.label')}</div>
           <div class="sat-info-value" id="${EL.CONFIDENCE}">High</div>
         </div>
       </div>

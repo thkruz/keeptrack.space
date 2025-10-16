@@ -1,0 +1,29 @@
+{
+  "satInfoBox": {
+    "title": "标识符",
+    "Cospar": {
+      "label": "COSPAR",
+      "tooltip": "国际设计ator"
+    },
+    "Norad": {
+      "label": "NORAD",
+      "tooltip": "北美防空司令部目录编号"
+    },
+    "AltName": {
+      "label": "别名",
+      "tooltip": "卫星别名"
+    },
+    "AltId": {
+      "label": "备用ID",
+      "tooltip": "备用卫星ID"
+    },
+    "Source": {
+      "label": "来源",
+      "tooltip": "卫星信息的数据来源"
+    },
+    "Confidence": {
+      "label": "置信度",
+      "tooltip": "数据置信度等级（越高越好），范围1-10。基于数据来源和数据时效"
+    }
+  }
+}

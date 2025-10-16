@@ -1,0 +1,29 @@
+{
+  "satInfoBox": {
+    "title": "識別子",
+    "Cospar": {
+      "label": "COSPAR",
+      "tooltip": "国際デザイン番号"
+    },
+    "Norad": {
+      "label": "NORAD",
+      "tooltip": "北米航空宇宙防衛司令部のカタログ番号"
+    },
+    "AltName": {
+      "label": "別名",
+      "tooltip": "衛星の別名"
+    },
+    "AltId": {
+      "label": "別ID",
+      "tooltip": "衛星の別ID"
+    },
+    "Source": {
+      "label": "情報源",
+      "tooltip": "衛星情報のデータソース"
+    },
+    "Confidence": {
+      "label": "信頼度",
+      "tooltip": "データの信頼度（高いほど良い）、1～10のスケール。情報源とデータの新しさに基づく"
+    }
+  }
+}

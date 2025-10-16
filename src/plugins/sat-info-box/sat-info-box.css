@@ -76,6 +76,7 @@
 }
 
 .sat-info-key {
+  max-width: 75px;
   font-size: 12px;
   color: white;
   float: left;

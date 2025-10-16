@@ -1,0 +1,29 @@
+{
+  "satInfoBox": {
+    "title": "Identifiants",
+    "Cospar": {
+      "label": "COSPAR",
+      "tooltip": "Désignateur International"
+    },
+    "Norad": {
+      "label": "NORAD",
+      "tooltip": "Numéro de catalogue du Commandement de la défense aérospatiale de l'Amérique du Nord"
+    },
+    "AltName": {
+      "label": "Nom alt.",
+      "tooltip": "Nom alternatif du satellite"
+    },
+    "AltId": {
+      "label": "ID alt.",
+      "tooltip": "ID alternatif du satellite"
+    },
+    "Source": {
+      "label": "Source",
+      "tooltip": "Source des données pour les informations du satellite"
+    },
+    "Confidence": {
+      "label": "Confiance",
+      "tooltip": "Niveau de confiance des données (plus élevé est meilleur) sur une échelle de 1 à 10. Basé sur la source et l'ancienneté des données"
+    }
+  }
+}

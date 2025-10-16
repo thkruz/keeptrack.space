@@ -289,22 +289,25 @@ export class FileSystemManager {
   /**
    * Merges all .json locale files found in 'locales' folders under srcDir and pluginDir.
    * Files from pluginDir overwrite those from srcDir if conflicts exist.
-   * @param srcDir The source directory to search for locales.
-   * @param pluginDir The plugin directory to search for locales.
+   * @param srcDir The public directory to search for locales.
+   * @param proDir The pro directory to search for locales.
    */
-  mergeLocales(srcDir: string, pluginDir: string) {
-    logWithStyle(`Merging locales from: ${srcDir} and ${pluginDir}`, ConsoleStyles.INFO);
+  mergeLocales(srcDir: string, proDir: string) {
+    logWithStyle(`Merging locales from: ${srcDir} and ${proDir}`, ConsoleStyles.INFO);
 
     // Find all .json files in 'locales' folders under srcDir (excluding pluginDir)
     const srcJsonFiles = this.findLocalesJsonFiles(srcDir)
-      .filter((p) => !p.startsWith(this.resolvePath(pluginDir)));
+      .filter((p) => !p.startsWith(this.resolvePath(proDir)));
 
-    logWithStyle(`Source locale files: ${JSON.stringify(srcJsonFiles, null, 2)}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Source locale files: ${JSON.stringify(srcJsonFiles, null, 2)}`, ConsoleStyles.SUCCESS);
 
     // Find all .json files in 'locales' folders under pluginDir
-    const pluginJsonFiles = this.findLocalesJsonFiles(pluginDir);
+    const pluginJsonFiles = this.findLocalesJsonFiles(proDir);
 
-    logWithStyle(`Plugin locale files: ${JSON.stringify(pluginJsonFiles, null, 2)}`, ConsoleStyles.DEBUG);
+    // Append plugin files to src files, plugin files take precedence
+    srcJsonFiles.push(...pluginJsonFiles);
+
+    logWithStyle(`Plugin locale files: ${JSON.stringify(pluginJsonFiles, null, 2)}`, ConsoleStyles.SUCCESS);
 
     // Helper to get relative path from rootDir for matching
     const getRel = (absPath: string) => absPath.replace(this.rootDir, '');
@@ -343,34 +346,8 @@ export class FileSystemManager {
       mergedLocales[rel] = mergedContent;
     }
 
-    // Merge plugin locale files, overwriting any conflicts based on file name only (ignoring directories)
-    for (const pluginPath of pluginJsonFiles) {
-      const pluginFileName = pluginPath.split(/[\\/]/u).pop()!;
-
-      logWithStyle(`Reading plugin locale file: ${pluginPath}`, ConsoleStyles.DEBUG);
-      const pluginContent = JSON.parse(this.readFile(pluginPath));
-
-      // Find any src locale with the same file name
-      const matchingRel = Object.keys(mergedLocales).find((rel) => rel.split(/[\\/]/u).pop() === pluginFileName);
-
-      if (matchingRel) {
-        logWithStyle(`Merging plugin locale into source: ${pluginPath} -> ${matchingRel}`, ConsoleStyles.DEBUG);
-
-        // Merge using mergeLocaleFiles to ensure .src.json is used for source
-        const srcAbsPath = join(this.rootDir, matchingRel);
-        const mergedContent = JSON.parse(this.mergeLocaleFiles(srcAbsPath, pluginPath));
-
-        mergedLocales[matchingRel] = mergedContent;
-      } else {
-        // Place plugin locale at root with its file name
-        const rel = `/${pluginFileName}`;
-
-        mergedLocales[rel] = pluginContent;
-      }
-    }
-
     // Write merged locales to /src/locales/, removing the .src from *.src.json
-    const targetDir = this.resolvePath('src/locales');
+    const targetDir = this.resolvePath(`${srcDir}/locales`);
 
     this.createDirectory(targetDir);
 
@@ -395,7 +372,7 @@ export class FileSystemManager {
    */
   mergeLocaleFiles(srcPath: string, pluginPath: string): string {
     // Read the source file as .src.json even if srcPath is .json
-    const srcPathSrcJson = srcPath.replace(/\.json$/u, '.src.json');
+    const srcPathSrcJson = srcPath.endsWith('.src.json') ? srcPath : srcPath.replace(/\.json$/u, '.src.json');
     const srcContent = this.readFile(srcPathSrcJson);
     const pluginContent = this.readFile(pluginPath);
 

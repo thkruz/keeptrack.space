@@ -7,6 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { ConsoleStyles, logWithStyle } from '../lib/build-error';
 
 // Function to generate TypeScript code for the Keys object
 function generateKeysFromJSON(jsonObj: Record<string, string>, prefix: string = ''): string {
@@ -55,8 +56,10 @@ function findLocalesDirs(dir: string, enJsonPaths: string[] = []): string[] {
 }
 
 // Main function to generate the entire Keys file
-function generateKeysFile(inputJsonPath: string, outputTsPath: string): void {
+export function generateKeysFile(inputJsonPath: string, outputTsPath: string): void {
   try {
+    logWithStyle(`Input JSON Path: ${inputJsonPath}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Output TS Path: ${outputTsPath}`, ConsoleStyles.DEBUG);
     /*
      * Search all of ../../src for any folders named locales with an en.json
      * file inside of them and compile a list of their paths
@@ -71,6 +74,7 @@ function generateKeysFile(inputJsonPath: string, outputTsPath: string): void {
     const jsonData: Record<string, string> = {};
 
     for (const enJsonPath of enJsonPaths) {
+      logWithStyle(`Processing translation file: ${enJsonPath}`, ConsoleStyles.DEBUG);
       const fileData = JSON.parse(fs.readFileSync(enJsonPath, 'utf8'));
 
       Object.assign(jsonData, fileData);
@@ -82,7 +86,7 @@ function generateKeysFile(inputJsonPath: string, outputTsPath: string): void {
     // Create the complete TypeScript file content
     const tsContent = `// This file is auto-generated from the translation JSON file
 // Do not edit manually
-// Use npm run generate-t7e-keys instead!
+// Use npm run generate-t7e instead!
 /* eslint-disable guard-for-in */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import i18next from 'i18next';
@@ -119,17 +123,3 @@ export function t7e(key: TranslationKey, options?: Record<string, any>): string 
     console.error('Error generating Keys file:', error);
   }
 }
-
-/*
- * Usage
- * Assuming your JSON is in "../locales/en/translation.json"
- * and you want to output to "./src/i18n/keys.ts"
- */
-const __dirname = path.dirname(new URL(import.meta.url).pathname).replace(/^\/+/u, '');
-
-console.log(__dirname);
-
-generateKeysFile(
-  `${__dirname}/../../src/*`,
-  `${__dirname}/../../src/locales/keys.ts`,
-);

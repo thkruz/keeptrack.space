@@ -40,7 +40,7 @@
     "build:watch": "npx --max-old-space-size=8192 tsx ./build/build-manager.ts development --watch",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs -o ./docs/CHANGELOG.md",
     "cypress:open": "cypress open",
-    "generate-t7e-keys": "npx tsx ./build/utils/generate-translation-keys.ts && npx eslint --fix ./build/utils/generate-translation-keys.ts",
+    "generate-t7e": "npx tsx ./build/generate-translation.ts",
     "lcov": "npx tsx ./build/utils/open-lcov.ts",
     "lint": "eslint ./src --ignore-path .gitignore --ext js,ts,tsx",
     "createtest": "npx tsx ./scripts/create-test-file.ts",

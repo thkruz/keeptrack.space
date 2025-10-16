@@ -8,6 +8,24 @@ import { ServiceLocator } from './engine/core/service-locator';
 import { EventBus } from './engine/events/event-bus';
 import { saveCsv, saveVariable } from './engine/utils/saveVariable';
 
+import type { CatalogManager } from './app/data/catalog-manager';
+import type { GroupsManager } from './app/data/groups-manager';
+import type { SensorMath } from './app/sensors/sensor-math';
+import type { SensorManager } from './app/sensors/sensorManager';
+import type { HoverManager } from './app/ui/hover-manager';
+import type { UiManager } from './app/ui/uiManager';
+import type { Camera } from './engine/camera/camera';
+import type { Scene } from './engine/core/scene';
+import type { TimeManager } from './engine/core/time-manager';
+import type { InputManager } from './engine/input/input-manager';
+import type { ColorSchemeManager } from './engine/rendering/color-scheme-manager';
+import type { DotsManager } from './engine/rendering/dots-manager';
+import type { LineManager } from './engine/rendering/line-manager';
+import type { MeshManager } from './engine/rendering/mesh-manager';
+import type { OrbitManager } from './engine/rendering/orbitManager';
+import type { WebGLRenderer } from './engine/rendering/webgl-renderer';
+import type { SoundManager } from './plugins/sounds/sound-manager';
+
 
 declare global {
   interface Window {
@@ -104,23 +122,23 @@ export class KeepTrackApi {
   unregisterAllPlugins = PluginRegistry.unregisterAllPlugins.bind(PluginRegistry);
 
   // Service locator methods
-  getSoundManager = ServiceLocator.getSoundManager.bind(ServiceLocator);
-  getRenderer = ServiceLocator.getRenderer.bind(ServiceLocator);
-  getScene = ServiceLocator.getScene.bind(ServiceLocator);
-  getCatalogManager = ServiceLocator.getCatalogManager.bind(ServiceLocator);
-  getSensorManager = ServiceLocator.getSensorManager.bind(ServiceLocator);
-  getUiManager = ServiceLocator.getUiManager.bind(ServiceLocator);
-  getInputManager = ServiceLocator.getInputManager.bind(ServiceLocator);
-  getGroupsManager = ServiceLocator.getGroupsManager.bind(ServiceLocator);
-  getTimeManager = ServiceLocator.getTimeManager.bind(ServiceLocator);
-  getOrbitManager = ServiceLocator.getOrbitManager.bind(ServiceLocator);
-  getColorSchemeManager = ServiceLocator.getColorSchemeManager.bind(ServiceLocator);
-  getDotsManager = ServiceLocator.getDotsManager.bind(ServiceLocator);
-  getSensorMath = ServiceLocator.getSensorMath.bind(ServiceLocator);
-  getLineManager = ServiceLocator.getLineManager.bind(ServiceLocator);
-  getHoverManager = ServiceLocator.getHoverManager.bind(ServiceLocator);
-  getMainCamera = ServiceLocator.getMainCamera.bind(ServiceLocator);
-  getMeshManager = ServiceLocator.getMeshManager.bind(ServiceLocator);
+  getSoundManager: () => SoundManager = ServiceLocator.getSoundManager.bind(ServiceLocator);
+  getRenderer: () => WebGLRenderer = ServiceLocator.getRenderer.bind(ServiceLocator);
+  getScene: () => Scene = ServiceLocator.getScene.bind(ServiceLocator);
+  getCatalogManager: () => CatalogManager = ServiceLocator.getCatalogManager.bind(ServiceLocator);
+  getSensorManager: () => SensorManager = ServiceLocator.getSensorManager.bind(ServiceLocator);
+  getUiManager: () => UiManager = ServiceLocator.getUiManager.bind(ServiceLocator);
+  getInputManager: () => InputManager = ServiceLocator.getInputManager.bind(ServiceLocator);
+  getGroupsManager: () => GroupsManager = ServiceLocator.getGroupsManager.bind(ServiceLocator);
+  getTimeManager: () => TimeManager = ServiceLocator.getTimeManager.bind(ServiceLocator);
+  getOrbitManager: () => OrbitManager = ServiceLocator.getOrbitManager.bind(ServiceLocator);
+  getColorSchemeManager: () => ColorSchemeManager = ServiceLocator.getColorSchemeManager.bind(ServiceLocator);
+  getDotsManager: () => DotsManager = ServiceLocator.getDotsManager.bind(ServiceLocator);
+  getSensorMath: () => SensorMath = ServiceLocator.getSensorMath.bind(ServiceLocator);
+  getLineManager: () => LineManager = ServiceLocator.getLineManager.bind(ServiceLocator);
+  getHoverManager: () => HoverManager = ServiceLocator.getHoverManager.bind(ServiceLocator);
+  getMainCamera: () => Camera = ServiceLocator.getMainCamera.bind(ServiceLocator);
+  getMeshManager: () => MeshManager = ServiceLocator.getMeshManager.bind(ServiceLocator);
 
   // Save utilities
   saveCsv = saveCsv;

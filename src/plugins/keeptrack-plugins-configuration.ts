@@ -1,3 +1,5 @@
+// Ensure imports are type only to avoid circular dependencies
+import type { SatInfoBoxOrbitalConfiguration } from './sat-info-box-orbital/sat-info-box-orbital-settings';
 
 export type PluginConfiguration = {
   enabled: boolean;
@@ -23,7 +25,7 @@ export type KeepTrackPluginsConfiguration = {
   SatInfoBoxCore?: PluginConfiguration;
   SatInfoBoxActions?: PluginConfiguration;
   SatInfoBoxLinks?: PluginConfiguration;
-  SatInfoBoxOrbital?: PluginConfiguration;
+  SatInfoBoxOrbital?: SatInfoBoxOrbitalConfiguration;
   SatInfoBoxObject?: PluginConfiguration;
   SatInfoBoxMission?: PluginConfiguration;
   SatInfoBoxSensor?: PluginConfiguration;

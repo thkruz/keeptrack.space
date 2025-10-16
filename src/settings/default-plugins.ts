@@ -1,4 +1,7 @@
-import { KeepTrackPluginsConfiguration } from '@app/plugins/keeptrack-plugins-configuration';
+// Ensure imports are type only to avoid circular dependencies
+import type { KeepTrackPluginsConfiguration } from '@app/plugins/keeptrack-plugins-configuration';
+// These imports can be direct only because they have no dependencies
+import { satInfoBoxOrbitalConfigurationDefaults } from '@app/plugins/sat-info-box-orbital/sat-info-box-orbital-settings';
 
 export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   DebugMenuPlugin: {
@@ -268,9 +271,7 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   SatInfoBoxMission: {
     enabled: true,
   },
-  SatInfoBoxOrbital: {
-    enabled: true,
-  },
+  SatInfoBoxOrbital: satInfoBoxOrbitalConfigurationDefaults,
   SatInfoBoxSensor: {
     enabled: true,
   },

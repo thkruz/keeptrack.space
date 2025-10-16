@@ -1,0 +1,51 @@
+{
+  "SatInfoBoxObject": {
+    "title": "Données de l'objet",
+    "Type": {
+      "label": "Type",
+      "tooltip": "Type d'objet",
+      "unknown": "À annoncer",
+      "payload": "Charge utile",
+      "rocketBody": "Corps de fusée",
+      "debris": "Débris",
+      "special": "Spécial",
+      "missile": "Missile balistique"
+    },
+    "Status": {
+      "label": "Statut",
+      "tooltip": "Statut opérationnel de l'objet",
+      "operational": "Opérationnel",
+      "nonOperational": "Non opérationnel",
+      "partiallyOperational": "Partiellement opérationnel",
+      "extendedMission": "Mission prolongée",
+      "backupStandby": "Sauvegarde/Attente",
+      "spare": "De rechange",
+      "unknown": "Inconnu"
+    },
+    "Country": {
+      "label": "Pays",
+      "tooltip": "Pays d'origine"
+    },
+    "LaunchSite": {
+      "label": "Site de lancement",
+      "tooltip": "Lieu de lancement de l'objet"
+    },
+    "LaunchVehicle": {
+      "label": "Véhicule de lancement",
+      "tooltip": "Fusée ou véhicule utilisé pour lancer l'objet"
+    },
+    "Configuration": {
+      "label": "Configuration",
+      "tooltip": "Configuration de la fusée ou du véhicule de lancement"
+    },
+    "RCS": {
+      "label": "RCS",
+      "tooltip": "Section efficace radar - Réflectivité de l'objet au signal radar (en m²)"
+    },
+    "StdMag": {
+      "label": "Magnitude standard",
+      "tooltip": "Magnitude standard - Les nombres plus petits sont plus brillants"
+    },
+    "unknown": "Inconnu"
+  }
+}

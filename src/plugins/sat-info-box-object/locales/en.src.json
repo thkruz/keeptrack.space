@@ -1,0 +1,51 @@
+{
+  "SatInfoBoxObject": {
+    "title": "Object Data",
+    "Type": {
+      "label": "Type",
+      "tooltip": "Type of Object",
+      "unknown": "To Be Announced",
+      "payload": "Payload",
+      "rocketBody": "Rocket Body",
+      "debris": "Debris",
+      "special": "Special",
+      "missile": "Ballistic Missile"
+    },
+    "Status": {
+      "label": "Status",
+      "tooltip": "Operational status of the object",
+      "operational": "Operational",
+      "nonOperational": "Non-Operational",
+      "partiallyOperational": "Partially Operational",
+      "extendedMission": "Extended Mission",
+      "backupStandby": "Backup/Standby",
+      "spare": "Spare",
+      "unknown": "Unknown"
+    },
+    "Country": {
+      "label": "Country",
+      "tooltip": "Country of Origin"
+    },
+    "LaunchSite": {
+      "label": "Launch Site",
+      "tooltip": "Location from which the object was launched"
+    },
+    "LaunchVehicle": {
+      "label": "Launch Vehicle",
+      "tooltip": "Rocket or vehicle used to launch the object"
+    },
+    "Configuration": {
+      "label": "Configuration",
+      "tooltip": "Configuration of the rocket or launch vehicle"
+    },
+    "RCS": {
+      "label": "RCS",
+      "tooltip": "Radar Cross Section - How reflective the object is to a radar signal (in m²)"
+    },
+    "StdMag": {
+      "label": "Standard Mag",
+      "tooltip": "Standard Magnitude - Smaller Numbers Are Brighter"
+    },
+    "unknown": "Unknown"
+  }
+}

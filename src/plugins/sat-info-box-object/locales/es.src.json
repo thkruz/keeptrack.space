@@ -1,0 +1,51 @@
+{
+  "SatInfoBoxObject": {
+    "title": "Datos del Objeto",
+    "Type": {
+      "label": "Tipo",
+      "tooltip": "Tipo de Objeto",
+      "unknown": "Por Anunciar",
+      "payload": "Carga Útil",
+      "rocketBody": "Cuerpo del Cohete",
+      "debris": "Escombros",
+      "special": "Especial",
+      "missile": "Misil Balístico"
+    },
+    "Status": {
+      "label": "Estado",
+      "tooltip": "Estado operacional del objeto",
+      "operational": "Operacional",
+      "nonOperational": "No Operacional",
+      "partiallyOperational": "Parcialmente Operacional",
+      "extendedMission": "Misión Extendida",
+      "backupStandby": "Respaldo/Espera",
+      "spare": "Repuesto",
+      "unknown": "Desconocido"
+    },
+    "Country": {
+      "label": "País",
+      "tooltip": "País de Origen"
+    },
+    "LaunchSite": {
+      "label": "Sitio de Lanzamiento",
+      "tooltip": "Lugar desde el que se lanzó el objeto"
+    },
+    "LaunchVehicle": {
+      "label": "Vehículo de Lanzamiento",
+      "tooltip": "Cohete o vehículo usado para lanzar el objeto"
+    },
+    "Configuration": {
+      "label": "Configuración",
+      "tooltip": "Configuración del cohete o vehículo de lanzamiento"
+    },
+    "RCS": {
+      "label": "RCS",
+      "tooltip": "Sección Transversal de Radar - Qué tan reflectante es el objeto a una señal de radar (en m²)"
+    },
+    "StdMag": {
+      "label": "Magnitud Estándar",
+      "tooltip": "Magnitud Estándar - Números más pequeños son más brillantes"
+    },
+    "unknown": "Desconocido"
+  }
+}

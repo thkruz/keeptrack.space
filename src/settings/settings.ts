@@ -25,9 +25,7 @@ import { UrlManager } from '@app/engine/input/url-manager';
 import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
-import { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
 import { keepTrackApi } from '@app/keepTrackApi';
-import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
 import { Body } from 'astronomy-engine';
 import { Degrees, Kilometers, Milliseconds, Radians } from 'ootk';
 import { ClassificationString } from '../app/ui/classification';
@@ -39,6 +37,10 @@ import { defaultPlugins } from './default-plugins';
 import { parseGetVariables } from './parse-get-variables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
+
+import type { MilkyWayTextureQuality } from '@app/engine/rendering/draw-manager/skybox-sphere';
+import type { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
+import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
 
 export class SettingsManager {
   /**
@@ -103,6 +105,8 @@ export class SettingsManager {
   splashScreenList: string[] | null = null;
   preset: string | null = null; // Used to force a preset to be loaded without GET variable
   isDisableCanvas = false; // Used to disable the canvas for debugging purposes
+  /** Default resolution for Milky Way texture */
+  milkyWayTextureQuality: MilkyWayTextureQuality;
 
 
   static preserveSettings() {

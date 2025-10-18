@@ -104,7 +104,6 @@ export class Scene {
     this.secondaryCovBubble = new Ellipsoid(([0, 0, 0]));
     this.sensorFovFactory = new SensorFovMeshFactory();
     this.coneFactory = new ConeMeshFactory();
-    this.skybox.init(settingsManager, params.gl);
 
     EventBus.getInstance().emit(EventBusEvent.SceneReady);
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, this.loadSceneLowPriority.bind(this));
@@ -342,7 +341,7 @@ export class Scene {
         this.searchBox.init(this.gl_);
       }
       if (!settingsManager.isDisableSkybox) {
-        this.skybox.init(settingsManager, this.gl_);
+        this.skybox.init(this.gl_);
       }
     } catch (error) {
       errorManagerInstance.log(error);

@@ -12,6 +12,14 @@ import { DepthManager } from '../depth-manager';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
+export enum MilkyWayTextureQuality {
+  OFF = 'off',
+  LOW = '1k',
+  MEDIUM = '4k',
+  HIGH = '8k',
+  ULTRA = '16k'
+}
+
 export class SkyBoxSphere {
   private readonly DRAW_RADIUS = 1e10; // 10 billion km
   private readonly NUM_HEIGHT_SEGS = 16;
@@ -22,16 +30,23 @@ export class SkyBoxSphere {
   private isReadyBoundaries_ = false;
   private isReadyConstellations_ = false;
   private isReadyGraySkybox_ = false;
-  private isReadyMilkyWay_ = false;
   private mvMatrix_ = mat4.create();
   private nMatrix_ = mat3.create();
   private settings_: SettingsManager;
   private textureBoundaries_ = <WebGLTexture><unknown>null;
   private textureConstellations_ = <WebGLTexture><unknown>null;
   private textureGraySkybox_: WebGLTexture;
-  private textureMilkyWay_ = <WebGLTexture><unknown>null;
   mesh: Mesh;
   private isLoaded_ = false;
+  DEFAULT_RESOLUTION = MilkyWayTextureQuality.HIGH;
+  MILKYWAY_SRC_BASE = 'skybox';
+  textureMilkyWay: Record<MilkyWayTextureQuality, WebGLTexture> = {
+    [MilkyWayTextureQuality.OFF]: <WebGLTexture><unknown>null,
+    [MilkyWayTextureQuality.LOW]: <WebGLTexture><unknown>null,
+    [MilkyWayTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
+    [MilkyWayTextureQuality.HIGH]: <WebGLTexture><unknown>null,
+    [MilkyWayTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+  };
 
   static getSrcBoundaries(settings: SettingsManager): string {
     if (!settings.installDirectory) {
@@ -63,19 +78,15 @@ export class SkyBoxSphere {
     return src;
   }
 
-  static getSrcMilkyWay(settings: SettingsManager): string {
-    if (!settings.installDirectory) {
-      throw new Error('installDirectory is not defined');
+  private getSrc_(base: string, resolution: string | undefined, extension = 'jpg'): string {
+    if (!settingsManager.installDirectory) {
+      throw new Error('settingsManager.installDirectory is undefined');
     }
 
-    let src = `${settings.installDirectory}textures/skybox4k.jpg`;
+    let src = `${settingsManager.installDirectory}textures/${base}${resolution ?? this.DEFAULT_RESOLUTION}.${extension}`;
 
-    if (!settings.isMobileModeEnabled) {
-      src = `${settings.installDirectory}textures/skybox8k.jpg`;
-    }
-
-    if (settings.hiresMilkWay) {
-      src = `${settings.installDirectory}textures/skybox16k.jpg`;
+    if (settingsManager.smallImages || settingsManager.isMobileModeEnabled) {
+      src = `${settingsManager.installDirectory}textures/${base}4k.${extension}`;
     }
 
     return src;
@@ -131,7 +142,7 @@ export class SkyBoxSphere {
       if (this.settings_.isDrawMilkyWay) {
         gl.uniform1i(this.mesh.material.uniforms.u_texMilkyWay, 0);
         gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay_);
+        gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay[settingsManager.milkyWayTextureQuality]);
       }
 
       if (this.settings_.isDrawConstellationBoundaries) {
@@ -141,7 +152,7 @@ export class SkyBoxSphere {
       } else {
         gl.uniform1i(this.mesh.material.uniforms.u_texMilkyWay, 1);
         gl.activeTexture(gl.TEXTURE1);
-        gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay_);
+        gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay[settingsManager.milkyWayTextureQuality]);
       }
 
       if (this.settings_.isDrawNasaConstellations) {
@@ -151,7 +162,7 @@ export class SkyBoxSphere {
       } else {
         gl.uniform1i(this.mesh.material.uniforms.u_texMilkyWay, 2);
         gl.activeTexture(gl.TEXTURE2);
-        gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay_);
+        gl.bindTexture(gl.TEXTURE_2D, this.textureMilkyWay[settingsManager.milkyWayTextureQuality]);
       }
 
       /*
@@ -178,9 +189,9 @@ export class SkyBoxSphere {
     }
   }
 
-  init(settings: SettingsManager, gl: WebGL2RenderingContext): void {
+  init(gl: WebGL2RenderingContext): void {
     this.gl_ = gl;
-    this.settings_ = settings;
+    this.settings_ = settingsManager;
 
     const geometry = new SphereGeometry(gl, {
       radius: this.DRAW_RADIUS,
@@ -228,29 +239,33 @@ export class SkyBoxSphere {
   }
 
   private initTextures_(): void {
-    if (this.settings_.isDrawMilkyWay && !this.isReadyMilkyWay_) {
-      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcMilkyWay(this.settings_)).then((texture) => {
-        this.textureMilkyWay_ = texture;
-        this.isReadyMilkyWay_ = true;
+    const sm = this.settings_;
+
+    sm.milkyWayTextureQuality ??= this.DEFAULT_RESOLUTION;
+
+    if (sm.isDrawMilkyWay && !this.textureMilkyWay[sm.milkyWayTextureQuality] && sm.milkyWayTextureQuality !== MilkyWayTextureQuality.OFF) {
+      this.textureMilkyWay[sm.milkyWayTextureQuality] = this.gl_.createTexture();
+      GlUtils.initTexture(this.gl_, `${this.getSrc_(this.MILKYWAY_SRC_BASE, sm.milkyWayTextureQuality, 'jpg')}`).then((texture) => {
+        this.textureMilkyWay[sm.milkyWayTextureQuality] = texture;
         this.isTexturesReady_ = true;
       });
     }
-    if (this.settings_.isDrawConstellationBoundaries && !this.isReadyBoundaries_) {
-      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcBoundaries(this.settings_)).then((texture) => {
+    if (sm.isDrawConstellationBoundaries && !this.isReadyBoundaries_) {
+      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcBoundaries(sm)).then((texture) => {
         this.textureBoundaries_ = texture;
         this.isReadyBoundaries_ = true;
         this.isTexturesReady_ = true;
       });
     }
-    if (this.settings_.isDrawNasaConstellations && !this.isReadyConstellations_) {
-      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcConstellations(this.settings_)).then((texture) => {
+    if (sm.isDrawNasaConstellations && !this.isReadyConstellations_) {
+      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcConstellations(sm)).then((texture) => {
         this.textureConstellations_ = texture;
         this.isReadyConstellations_ = true;
         this.isTexturesReady_ = true;
       });
     }
-    if (this.settings_.isGraySkybox && !this.isReadyGraySkybox_) {
-      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcGraySkybox(this.settings_)).then((texture) => {
+    if (sm.isGraySkybox && !this.isReadyGraySkybox_) {
+      GlUtils.initTexture(this.gl_, SkyBoxSphere.getSrcGraySkybox(sm)).then((texture) => {
         this.textureGraySkybox_ = texture;
         this.isReadyGraySkybox_ = true;
         this.isTexturesReady_ = true;

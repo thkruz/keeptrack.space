@@ -30,6 +30,20 @@
     "28": "Establece un objeto como Secundario para ver su distancia relativa con el objeto primario.",
     "29": "Cambia un objeto entre Primario/Secundario con la tecla '['."
   },
+  "loadingScreenMsgs": {
+    "math": "Intentando hacer matemáticas...",
+    "science": "Localizando ciencia...",
+    "science2": "Ciencia encontrada...",
+    "dots": "Dibujando puntos en el espacio...",
+    "satIntel": "Integrando inteligencia satelital...",
+    "painting": "Pintando la Tierra...",
+    "coloring": "Coloreando dentro de las líneas...",
+    "elsets": "Localizando Datos de GP...",
+    "models": "Construyendo modelos 3D...",
+    "cunningPlan": "Desarrollando un plan astuto...",
+    "copyrightNotice": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles.<br>No se ha concedido una licencia comercial, y no se ha proporcionado compensación al titular de los derechos.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para los términos completos.",
+    "copyrightNoticeMobile": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles. No se ha concedido una licencia comercial. No se ha proporcionado compensación al titular de los derechos. El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para los términos completos."
+  },
   "copyright": {
     "notice": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles.<br>No se ha otorgado ninguna licencia comercial, y no se ha proporcionado compensación al titular de los derechos.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulta el archivo LICENSE para ver los términos completos.",
     "noticeMobile": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles. No se ha otorgado ninguna licencia comercial. No se ha proporcionado compensación al titular de los derechos. El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulta el archivo LICENSE para ver los términos completos."

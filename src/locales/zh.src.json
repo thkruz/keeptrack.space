@@ -96,20 +96,6 @@
     "launchedPlanned": "发射年份待定",
     "launchedUnknown": "发射年份不详"
   },
-  "loadingScreenMsgs": {
-    "math": "正在尝试数学计算...",
-    "science": "正在定位科学...",
-    "science2": "已找到科学...",
-    "dots": "正在太空中绘制点...",
-    "satIntel": "正在整合卫星情报...",
-    "painting": "正在绘制地球...",
-    "coloring": "正在线内着色...",
-    "elsets": "正在定位轨道参数...",
-    "models": "正在构建3D模型...",
-    "cunningPlan": "正在制定狡猾的计划...",
-    "copyrightNotice": "KeepTrack™ 和 KeepTrack.Space™ 是 Kruczek Labs LLC 的商标。<br>本实例根据 GNU AGPL v3.0 授权。必须保留署名、源码访问权和本声明。<br>未授予商业许可，权利人未获得任何补偿。<br>未经授权的使用、重命名或移除署名可能违反商标和开源许可条款。<br>© 2025 Kruczek Labs LLC。保留所有权利。完整条款请参见 LICENSE。",
-    "copyrightNoticeMobile": "KeepTrack™ 和 KeepTrack.Space™ 是 Kruczek Labs LLC 的商标。<br>本实例根据 GNU AGPL v3.0 授权。必须保留署名、源码访问权和本声明。未授予商业许可，权利人未获得任何补偿。未经授权的使用、重命名或移除署名可能违反商标和开源许可条款。<br>© 2025 Kruczek Labs LLC。保留所有权利。完整条款请参见 LICENSE。"
-  },
   "splashScreens": {
     "1": "卫星模型看起来比实际大小要大。其他一切都是按比例显示的。",
     "2": "按\"L\"键切换卫星轨道显示/隐藏。",

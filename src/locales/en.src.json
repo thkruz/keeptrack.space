@@ -96,18 +96,6 @@
     "launchedPlanned": "Launched: Planned",
     "launchedUnknown": "Launched: Unknown"
   },
-  "loadingScreenMsgs": {
-    "math": "Attempting to Math...",
-    "science": "Locating Science...",
-    "science2": "Found Science...",
-    "dots": "Drawing Dots in Space...",
-    "satIntel": "Integrating Satellite Intel...",
-    "painting": "Painting the Earth...",
-    "coloring": "Coloring Inside the Lines..",
-    "elsets": "Locating GPs...",
-    "models": "Building 3D Models...",
-    "cunningPlan": "Crafting a Cunning Plan..."
-  },
   "darkClouds": {
     "in": "In",
     "satellites": "Satellites",

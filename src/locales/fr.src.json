@@ -96,20 +96,6 @@
     "launchedPlanned": "Lancé : Prévu",
     "launchedUnknown": "Lancé : Inconnu"
   },
-  "loadingScreenMsgs": {
-    "math": "Tentative de mathématiques...",
-    "science": "Localisation de la science...",
-    "science2": "Science trouvée...",
-    "dots": "Dessiner des points dans l'espace...",
-    "satIntel": "Intégration des informations satellites...",
-    "painting": "Peindre la Terre...",
-    "coloring": "Coloriage dans les lignes...",
-    "elsets": "Localisation des GPs...",
-    "models": "Construction de modèles 3D...",
-    "cunningPlan": "Élaboration d'un plan astucieux...",
-    "copyrightNotice": "KeepTrack™ et KeepTrack.Space™ sont des marques déposées de Kruczek Labs LLC.<br>Cette instance est sous licence GNU AGPL v3.0. L'attribution, l'accès au code source et cet avis doivent rester visibles.<br>Aucune licence commerciale n'a été accordée et aucune compensation n'a été fournie au titulaire des droits.<br>L'utilisation non autorisée, le rebranding ou la suppression de l'attribution peuvent enfreindre les conditions de la marque et de la licence open source.<br>© 2025 Kruczek Labs LLC. Tous droits réservés. Voir LICENSE pour les conditions complètes.",
-    "copyrightNoticeMobile": "KeepTrack™ et KeepTrack.Space™ sont des marques déposées de Kruczek Labs LLC.<br>Cette instance est sous licence GNU AGPL v3.0. L'attribution, l'accès au code source et cet avis doivent rester visibles. Aucune licence commerciale n'a été accordée. Aucune compensation n'a été fournie au titulaire des droits. L'utilisation non autorisée, le rebranding ou la suppression de l'attribution peuvent enfreindre les conditions de la marque et de la licence open source.<br>© 2025 Kruczek Labs LLC. Tous droits réservés. Voir LICENSE pour les conditions complètes."
-  },
   "darkClouds": {
     "in": "Dans",
     "satellites": "Satellites",

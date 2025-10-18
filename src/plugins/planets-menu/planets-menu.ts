@@ -24,8 +24,8 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   }
 
   PLANETS = [Body.Mercury, Body.Venus, Body.Earth, Body.Mars, Body.Jupiter, Body.Saturn, Body.Uranus, Body.Neptune];
-  DWARF_PLANETS = [Body.Pluto];
-  OTHER_CELESTIAL_BODIES = [Body.Moon, Body.Sun];
+  DWARF_PLANETS = [Body.Pluto, 'Eris', 'Haumea', 'Makemake', 'Ceres'];
+  OTHER_CELESTIAL_BODIES = [Body.Moon, Body.Sun, 'Io', 'Europa', 'Ganymede', 'Callisto', 'Titan', 'Rhea', 'Iapetus', 'Dione', 'Tethys', 'Enceladus'];
 
   bottomIconElementName: string = 'menu-planets';
   sideMenuElementName: string = 'planets-menu';
@@ -61,23 +61,31 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     `;
 
     for (const object of this.PLANETS) {
-      html_ += `<li class="menu-selectable" data-planet="${object}">${object}</li>`;
+      html_ += `<li class="menu-selectable" kt-tooltip="Center the camera on ${object}." data-planet="${object}">${object}</li>`;
     }
 
     html_ += html`
+      <div class="divider flow5out"></div>
       <h5 class="center-align side-menu-row-header">Dwarf Planets</h5>
     `;
 
     for (const object of this.DWARF_PLANETS) {
-      html_ += `<li class="menu-selectable" data-planet="${object}">${object}</li>`;
+      html_ += `<li class="disabled" kt-tooltip="Planned for future update." aria-disabled="true" disabled>${object}</li>`;
     }
 
     html_ += html`
+      <div class="divider flow5out"></div>
       <h5 class="center-align side-menu-row-header">Other Celestial Bodies</h5>
     `;
 
     for (const object of this.OTHER_CELESTIAL_BODIES) {
-      html_ += `<li class="menu-selectable" data-planet="${object}">${object}</li>`;
+      const isDisabled = ['Io', 'Europa', 'Ganymede', 'Callisto', 'Titan', 'Rhea', 'Iapetus', 'Dione', 'Tethys', 'Enceladus'].includes(object) ? ' disabled' : '';
+
+      if (isDisabled) {
+        html_ += `<li class="disabled" kt-tooltip="Planned for future update." aria-disabled="true" disabled>${object}</li>`;
+      } else {
+        html_ += `<li class="menu-selectable" kt-tooltip="Center the camera on ${object}." data-planet="${object}">${object}</li>`;
+      }
     }
 
     return html_;

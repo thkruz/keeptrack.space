@@ -1,5 +1,6 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
@@ -38,14 +39,14 @@ export class VcrPlugin extends KeepTrackPlugin {
           topLeftMenuElement.innerHTML +=
             html`
             <div id="vcr-container" class="vcr-container">
-              <div id="vcr-rewind-btn" class="vcr-btn top-menu-icons" title="Rewind">
-                <img class="top-menu-icons__blue-img" src="${rewindPng}" alt="Rewind">
+              <div id="vcr-rewind-btn" class="vcr-btn top-menu-icons" kt-tooltip="Click to Rewind">
+                <img class="top-menu-icons__blue-img" src="${rewindPng}">
               </div>
-              <div id="vcr-play-pause-btn" class="vcr-btn top-menu-icons bmenu-item-selected" title="Pause">
-                <img class="top-menu-icons__blue-img" src="${pausePng}" alt="Pause">
+              <div id="vcr-play-pause-btn" class="vcr-btn top-menu-icons bmenu-item-selected" kt-tooltip="Click to Pause">
+                <img class="top-menu-icons__blue-img" src="${pausePng}">
               </div>
-              <div id="vcr-fast-forward-btn" class="vcr-btn top-menu-icons" title="Fast Forward">
-                <img class="top-menu-icons__blue-img" src="${fastForwardPng}" alt="Fast Forward">
+              <div id="vcr-fast-forward-btn" class="vcr-btn top-menu-icons" kt-tooltip="Click to Fast Forward">
+                <img class="top-menu-icons__blue-img" src="${fastForwardPng}">
               </div>
             </div>
           `;
@@ -66,6 +67,9 @@ export class VcrPlugin extends KeepTrackPlugin {
       this.playPauseBtn?.addEventListener('click', this.handlePlayPause.bind(this));
       this.fastForwardBtn?.addEventListener('click', this.handleFastForward.bind(this));
     });
+
+    EventBus.getInstance().on(EventBusEvent.propRateChanged, this.onPropRateChanged_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, this.onPropRateChanged_.bind(this));
   }
 
   verifyTimeControl(): boolean {
@@ -90,18 +94,19 @@ export class VcrPlugin extends KeepTrackPlugin {
     }
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
+    if (keepTrackApi.getTimeManager().simulationTimeObj.getTime() === settingsManager.scenarioStopTime?.getTime()) {
+      keepTrackApi.toast('Cannot Play: Simulation time is at the end of the scenario.', ToastMsgType.caution, true);
+
+      return;
+    }
+
     if (timeManagerInstance.propRate === 1) {
-      this.isPlaying = false;
-      this.playPauseBtn.innerHTML = html`<img class="top-menu-icons__blue-img" src="${playPng}" alt="Play">`;
       timeManagerInstance.changePropRate(0);
     } else {
-      this.isPlaying = true;
-      this.playPauseBtn.innerHTML = html`<img class="top-menu-icons__blue-img" src="${pausePng}" alt="Pause">`;
       timeManagerInstance.changePropRate(1);
     }
 
-    this.playPauseBtn?.classList.add('bmenu-item-selected');
-
+    this.updatePausePlayBtn();
     this.stopRewind();
     this.stopFastForward();
   }
@@ -165,18 +170,56 @@ export class VcrPlugin extends KeepTrackPlugin {
   private updatePausePlayBtn() {
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
+    this.playPauseBtn?.classList.remove('bmenu-item-help');
+
     if (timeManagerInstance.propRate === 0) {
       this.isPlaying = false;
-      this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${pausePng}" alt="Pause">`;
-      this.playPauseBtn?.classList.remove('bmenu-item-selected');
+      this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${playPng}">`;
+      if (timeManagerInstance.simulationTimeObj.getTime() === settingsManager.scenarioStopTime?.getTime()) {
+        // Change tooltip to indicate end of scenario
+        this.playPauseBtn?.classList.add('bmenu-item-help');
+        this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${playPng}">`;
+        this.playPauseBtn!.setAttribute('kt-tooltip', 'Scenario Ended');
+      } else {
+        this.playPauseBtn?.classList.add('bmenu-item-selected');
+        this.playPauseBtn!.setAttribute('kt-tooltip', 'Click to Play');
+      }
     } else if (timeManagerInstance.propRate === 1) {
       this.isPlaying = true;
-      this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${playPng}" alt="Play">`;
+      this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${pausePng}">`;
+      this.playPauseBtn!.setAttribute('kt-tooltip', 'Click to Pause');
       this.playPauseBtn?.classList.add('bmenu-item-selected');
     } else {
       this.isPlaying = false;
-      this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${resumePng}" alt="Pause">`;
+      this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${resumePng}">`;
+      this.playPauseBtn!.setAttribute('kt-tooltip', 'Click to Resume');
       this.playPauseBtn?.classList.remove('bmenu-item-selected');
+    }
+  }
+
+  private onPropRateChanged_(propRate?: number): void {
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+
+    propRate ??= timeManagerInstance.propRate;
+
+    if (propRate === 0 || propRate === 1) {
+      this.isFastForwarding = false;
+      this.isRewinding = false;
+      this.fastForwardBtn?.classList.remove('bmenu-item-selected');
+      this.rewindBtn?.classList.remove('bmenu-item-selected');
+      this.updatePausePlayBtn();
+    } else if (propRate > 1) {
+      this.isFastForwarding = true;
+      this.isRewinding = false;
+      this.fastForwardBtn?.classList.add('bmenu-item-selected');
+      this.rewindBtn?.classList.remove('bmenu-item-selected');
+      this.updatePausePlayBtn();
+    } else if (propRate <= -1) {
+      this.isRewinding = true;
+      this.isFastForwarding = false;
+      this.rewindBtn?.classList.add('bmenu-item-selected');
+      this.fastForwardBtn?.classList.remove('bmenu-item-selected');
+      this.updatePausePlayBtn();
     }
   }
 }

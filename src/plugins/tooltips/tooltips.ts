@@ -33,6 +33,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   menuMode: MenuMode[] = [];
 
   isVisible_ = false;
+  tooltipTag = 'kt-tooltip';
 
   addHtml(): void {
     super.addHtml();
@@ -72,10 +73,10 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
   initTooltips(): void {
     // Search the entire dom tree for kt-tooltip attributes
-    const elements = document.querySelectorAll('[kt-tooltip]');
+    const elements = document.querySelectorAll(`[${this.tooltipTag}]`);
 
     elements.forEach((el) => {
-      const text = el.getAttribute('kt-tooltip');
+      const text = el.getAttribute(this.tooltipTag);
 
       if (!text) {
         errorManagerInstance.warn('Failed to create tooltip: Element has no kt-tooltip attribute.');
@@ -83,11 +84,11 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         return;
       }
 
-      this.createTooltip(el as HTMLElement, text);
+      this.createTooltip(el as HTMLElement);
     });
   }
 
-  createTooltip(el: HTMLElement | string, text: string): void {
+  createTooltip(el: HTMLElement | string): void {
     if (typeof el === 'string') {
       el = getEl(el) as HTMLElement;
     }
@@ -103,7 +104,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       if (this.isVisible_) {
         return;
       }
-      this.showTooltip(event, text);
+      this.showTooltip(event, (event.target as HTMLElement).getAttribute(this.tooltipTag) ?? '');
       this.isVisible_ = true;
     });
 

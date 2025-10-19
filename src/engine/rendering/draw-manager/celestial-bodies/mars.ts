@@ -33,7 +33,7 @@ export enum MarsTextureQuality {
 }
 
 export class Mars extends CelestialBody {
-  protected readonly RADIUS = 3389.5;
+  readonly RADIUS = 3389.5;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
@@ -43,7 +43,7 @@ export class Mars extends CelestialBody {
     return `${settingsManager.installDirectory}textures/mars${MarsTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): string {
+  getName(): Body {
     return Body.Mars;
   }
 

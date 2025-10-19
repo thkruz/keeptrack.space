@@ -33,7 +33,7 @@ export enum MercuryTextureQuality {
 }
 
 export class Mercury extends CelestialBody {
-  protected readonly RADIUS = 2439.7;
+  readonly RADIUS = 2439.7;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
@@ -42,7 +42,7 @@ export class Mercury extends CelestialBody {
     return `${settingsManager.installDirectory}textures/mercury${MercuryTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): string {
+  getName(): Body {
     return Body.Mercury;
   }
 

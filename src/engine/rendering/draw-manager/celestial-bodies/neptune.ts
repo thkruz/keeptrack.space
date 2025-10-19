@@ -33,7 +33,7 @@ export enum NeptuneTextureQuality {
 }
 
 export class Neptune extends CelestialBody {
-  protected readonly RADIUS = 24622;
+  readonly RADIUS = 24622;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
@@ -42,7 +42,7 @@ export class Neptune extends CelestialBody {
     return `${settingsManager.installDirectory}textures/neptune${NeptuneTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): string {
+  getName(): Body {
     return Body.Neptune;
   }
 

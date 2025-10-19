@@ -35,7 +35,7 @@ export enum UranusTextureQuality {
 
 export class Uranus extends CelestialBody {
   radius = 24622;
-  protected readonly RADIUS = this.radius;
+  readonly RADIUS = this.radius;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
@@ -54,7 +54,7 @@ export class Uranus extends CelestialBody {
     return `${settingsManager.installDirectory}textures/uranus${UranusTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): string {
+  getName(): Body {
     return Body.Uranus;
   }
 

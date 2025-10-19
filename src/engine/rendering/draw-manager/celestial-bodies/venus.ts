@@ -33,7 +33,7 @@ export enum VenusTextureQuality {
 }
 
 export class Venus extends CelestialBody {
-  protected readonly RADIUS = 6051.8;
+  readonly RADIUS = 6051.8;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
@@ -42,7 +42,7 @@ export class Venus extends CelestialBody {
     return `${settingsManager.installDirectory}textures/venus${VenusTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): string {
+  getName(): Body {
     return Body.Venus;
   }
 

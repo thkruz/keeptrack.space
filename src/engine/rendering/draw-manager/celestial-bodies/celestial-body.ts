@@ -1,6 +1,7 @@
 /**
  * Base class for rendering non-Earth celestial bodies (Moon, Mars, etc.)
  */
+import { EciArr3 } from '@app/engine/core/interfaces';
 import { Scene } from '@app/engine/core/scene';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -8,14 +9,16 @@ import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { Body, KM_PER_AU, BackdatePosition as backdatePosition } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
+import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, TEME, Vector3D } from 'ootk';
 import { keepTrackApi } from '../../../../keepTrackApi';
 import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';
 import { OcclusionProgram } from '../post-processing';
 
 export abstract class CelestialBody {
-  protected readonly RADIUS: number;
+  readonly RADIUS: number;
   protected readonly NUM_HEIGHT_SEGS: number;
   protected readonly NUM_WIDTH_SEGS: number;
 
@@ -24,13 +27,12 @@ export abstract class CelestialBody {
   protected modelViewMatrix_ = null as unknown as mat4;
   protected readonly normalMatrix_ = mat3.create();
 
-  position = [0, 0, 0];
+  position = [0, 0, 0] as EciArr3;
   rotation = [0, 0, 0];
   mesh: Mesh;
 
-  abstract getName(): string;
+  abstract getName(): Body;
   abstract getTexturePath(): string;
-  abstract updatePosition(simTime: Date): void;
 
   async init(gl: WebGL2RenderingContext): Promise<void> {
     try {
@@ -65,6 +67,26 @@ export abstract class CelestialBody {
     } catch (e) {
       errorManagerInstance.warn(`Error initializing ${this.getName()}:`, e);
     }
+  }
+
+  getJ2000(simTime: Date): J2000 {
+    const pos = backdatePosition(simTime, Body.Earth, this.getName(), false);
+
+    return new J2000(
+      new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
+      new Vector3D(pos.x * KM_PER_AU as Kilometers, pos.y * KM_PER_AU as Kilometers, pos.z * KM_PER_AU as Kilometers),
+      new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond),
+    );
+  }
+
+  getTeme(simTime: Date): TEME {
+    return this.getJ2000(simTime).toTEME();
+  }
+
+  updatePosition(simTime: Date): void {
+    const posTeme = this.getTeme(simTime).position;
+
+    this.position = [posTeme.x, posTeme.y, posTeme.z];
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {

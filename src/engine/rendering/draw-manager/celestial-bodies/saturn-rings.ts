@@ -42,7 +42,7 @@ export enum SaturnRingsTextureQuality {
 }
 
 export class SaturnRings extends CelestialBody {
-  protected readonly RADIUS = 69911;
+  readonly RADIUS = 69911;
   protected readonly NUM_HEIGHT_SEGS = 256;
   protected readonly NUM_WIDTH_SEGS = 256;
   private readonly saturn_: Saturn;
@@ -105,7 +105,7 @@ export class SaturnRings extends CelestialBody {
     return `${settingsManager.installDirectory}textures/saturn-rings-alpha${SaturnRingsTextureQuality.ULTRA}.png`;
   }
 
-  getName(): string {
+  getName(): Body {
     return Body.Saturn;
   }
 

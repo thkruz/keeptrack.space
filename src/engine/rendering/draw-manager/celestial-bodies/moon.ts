@@ -19,10 +19,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { BackdatePosition as backdatePosition, Body, KM_PER_AU } from 'astronomy-engine';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { Body } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
-import { EciVec3 } from 'ootk';
+import { Seconds } from 'ootk';
 import { settingsManager } from '../../../../settings/settings';
+import { LineColors } from '../../line-manager/line';
 import { CelestialBody } from './celestial-body';
 
 // TODO: Moon doesn't occlude the sun yet!
@@ -36,24 +38,18 @@ export enum MoonTextureQuality {
 }
 
 export class Moon extends CelestialBody {
-  protected readonly RADIUS = 1737.4;
-  protected readonly NUM_HEIGHT_SEGS = 64;
-  protected readonly NUM_WIDTH_SEGS = 64;
-  eci: EciVec3;
+  readonly RADIUS = 1737.4;
+  protected readonly NUM_HEIGHT_SEGS = 128;
+  protected readonly NUM_WIDTH_SEGS = 128;
   rotation = [0, 0, Math.PI];
+  moonOrbitPathSegments_ = 512;
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/moonmap${MoonTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): string {
+  getName(): Body {
     return Body.Moon;
-  }
-
-  updatePosition(simTime: Date): void {
-    const pos = backdatePosition(simTime, Body.Earth, Body.Moon, false);
-
-    this.position = [pos.x * KM_PER_AU, pos.y * KM_PER_AU, pos.z * KM_PER_AU];
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
@@ -61,5 +57,28 @@ export class Moon extends CelestialBody {
       return;
     }
     super.draw(sunPosition, tgtBuffer);
+  }
+
+  drawOrbitPath(): void {
+    const timeForOneOrbit = 27.321661 * 24 * 3600; // in seconds
+    const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
+    const timeslice = timeForOneOrbit / this.moonOrbitPathSegments_;
+    const orbitPositions: [number, number, number][] = [];
+    const lineManagerInstance = ServiceLocator.getLineManager();
+
+    for (let i = 0; i < this.moonOrbitPathSegments_; i++) {
+      const t = now + i * timeslice;
+      const sv = this.getTeme(new Date(t * 1000)).position; // convert s to ms
+
+      orbitPositions.push([sv.x as number, sv.y as number, sv.z as number]);
+    }
+
+    for (let i = 0; i < (this.moonOrbitPathSegments_ - 1); i++) {
+      lineManagerInstance.createRef2Ref(
+        orbitPositions[i],
+        orbitPositions[(i + 1) % this.moonOrbitPathSegments_],
+        LineColors.WHITE,
+      );
+    }
   }
 }

@@ -35,7 +35,7 @@ export enum SaturnTextureQuality {
 
 export class Saturn extends CelestialBody {
   radius = 69911;
-  protected readonly RADIUS = this.radius;
+  readonly RADIUS = this.radius;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
@@ -55,7 +55,7 @@ export class Saturn extends CelestialBody {
     return `${settingsManager.installDirectory}textures/saturn${SaturnTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): string {
+  getName(): Body {
     return Body.Saturn;
   }
 

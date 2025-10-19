@@ -33,7 +33,7 @@ export enum JupiterTextureQuality {
 }
 
 export class Jupiter extends CelestialBody {
-  protected readonly RADIUS = 69911;
+  readonly RADIUS = 69911;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
@@ -42,7 +42,7 @@ export class Jupiter extends CelestialBody {
     return `${settingsManager.installDirectory}textures/jupiter${JupiterTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): string {
+  getName(): Body {
     return Body.Jupiter;
   }
 

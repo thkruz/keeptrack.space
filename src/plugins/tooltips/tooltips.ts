@@ -47,8 +47,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         tooltipDiv.style.display = 'none';
         tooltipDiv.style.position = 'absolute';
         tooltipDiv.style.zIndex = '999999';
-        tooltipDiv.style.width = '200px';
-        tooltipDiv.style.marginLeft = '-100px';
+        tooltipDiv.style.maxWidth = '200px';
         tooltipDiv.style.overflow = 'visible';
         tooltipDiv.style.backgroundColor = 'var(--color-primary-dark)';
         tooltipDiv.style.textAlign = 'center';
@@ -157,36 +156,43 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
     type TooltipDirection = 'top' | 'bottom' | 'left' | 'right';
 
-    const spaces = [
+    const upDown = [
       { dir: 'top', value: spaceAbove },
       { dir: 'bottom', value: spaceBelow },
+    ];
+    const leftRight = [
       { dir: 'left', value: spaceLeft },
       { dir: 'right', value: spaceRight },
     ];
 
-    spaces.sort((a, b) => b.value - a.value);
-    const direction = spaces[0].dir as TooltipDirection;
+    upDown.sort((a, b) => b.value - a.value);
+    leftRight.sort((a, b) => b.value - a.value);
+    const upOrDown = upDown[0].dir as TooltipDirection;
+    const leftOrRight = leftRight[0].dir as TooltipDirection;
 
     // Position tooltip based on direction
-    switch (direction) {
+    switch (upOrDown) {
       case 'top':
         top = event.pageY - tooltipRect.height - 10;
-        left = event.pageX;
         break;
       case 'bottom':
-        top = event.pageY + tooltipRect.height / 2 + 5;
-        left = event.pageX;
-        break;
-      case 'left':
-        top = event.pageY - tooltipRect.height / 2;
-        left = event.pageX - tooltipRect.width / 2 - 20;
-        break;
-      case 'right':
-        top = event.pageY - tooltipRect.height / 2;
-        left = event.pageX + tooltipRect.width / 2 + 20;
+        top = event.pageY + 10;
         break;
       default:
-        errorManagerInstance.warn(`Unknown tooltip direction: ${direction}`);
+        errorManagerInstance.warn(`Unknown tooltip direction: ${upOrDown}`);
+
+        return;
+    }
+
+    switch (leftOrRight) {
+      case 'left':
+        left = event.pageX - tooltipRect.width / 2;
+        break;
+      case 'right':
+        left = event.pageX + 10;
+        break;
+      default:
+        errorManagerInstance.warn(`Unknown tooltip direction: ${upOrDown}`);
 
         return;
     }

@@ -7,9 +7,11 @@
   --search-box-bottom: 0px;
   --nav-bar-height: 35px;
   /** The combination of title bar and classification bar */
-  --top-menu-height: calc(var(--nav-bar-height) + var(--classification-bar-height));
+  --top-menu-height: calc(var(--nav-bar-height) + var(--classification-bar-height) + var(--time-slider-height));
   /** The height of the classification bar */
   --classification-bar-height: 0px;
+  /** The height of the time slider bar */
+  --time-slider-height: 0px;
 }
 
 /*Min Scrollbar for Webkit Browsers */

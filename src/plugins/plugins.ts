@@ -67,6 +67,7 @@ import { SettingsMenuPlugin } from './settings-menu/settings-menu';
 import { ShortTermFences } from './short-term-fences/short-term-fences';
 import { StereoMap } from './stereo-map/stereo-map';
 import { TimeMachine } from './time-machine/time-machine';
+import { TimeSlider } from './time-slider/time-slider';
 import { SatelliteTimeline } from './timeline-satellite/satellite-timeline';
 import { SensorTimeline } from './timeline-sensor/sensor-timeline';
 import { TooltipsPlugin } from './tooltips/tooltips';
@@ -100,6 +101,7 @@ export class PluginManager {
         },
         { init: () => new SelectSatManager().init(), config: { enabled: true } },
         { init: () => new TopMenu().init(), config: plugins.TopMenu },
+        { init: () => new TimeSlider().init(), config: plugins.TimeSlider },
         { init: () => new TooltipsPlugin().init(), config: plugins.TooltipsPlugin },
         {
           init: async () => {

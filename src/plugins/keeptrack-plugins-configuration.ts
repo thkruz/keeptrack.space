@@ -94,4 +94,5 @@ export type KeepTrackPluginsConfiguration = {
   DrawLinesPlugin?: PluginConfiguration;
   ViewInfoRmbPlugin?: PluginConfiguration;
   VcrPlugin?: PluginConfiguration;
+  TimeSlider?: PluginConfiguration;
 };

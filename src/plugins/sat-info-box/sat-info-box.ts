@@ -7,6 +7,7 @@ import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { BaseObject, CatalogSource, DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -319,7 +320,7 @@ export class SatInfoBox extends KeepTrackPlugin {
      * getEl('edit-satinfo-link').innerHTML = "<a class='iframe' href='editor.htm?scc=" + sat.sccNum + "&popup=true'>Edit Satellite Info</a>";
      */
 
-    if (obj.isMissile()) {
+    if (obj.isMissile() || obj instanceof OemSatellite) {
       setInnerHtml(EL.INTL_DES, 'N/A');
       setInnerHtml(EL.OBJNUM, 'N/A');
       setInnerHtml(EL.SOURCE, 'N/A');

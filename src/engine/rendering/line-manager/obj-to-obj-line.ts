@@ -1,15 +1,16 @@
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { DetailedSatellite } from 'ootk';
 import { Line, LineColors } from './line';
-import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 
 export class ObjToObjLine extends Line {
-  obj: DetailedSatellite | MissileObject;
-  obj2: DetailedSatellite | MissileObject;
+  obj: DetailedSatellite | MissileObject | OemSatellite;
+  obj2: DetailedSatellite | MissileObject | OemSatellite;
 
-  constructor(obj: DetailedSatellite | MissileObject, obj2: DetailedSatellite | MissileObject, color = LineColors.ORANGE) {
+  constructor(obj: DetailedSatellite | MissileObject | OemSatellite, obj2: DetailedSatellite | MissileObject | OemSatellite, color = LineColors.ORANGE) {
     super();
     this.obj = obj;
     this.obj2 = obj2;
@@ -20,10 +21,17 @@ export class ObjToObjLine extends Line {
     let eciArr: EciArr3;
     let eciArr2: EciArr3;
 
-    if (this.obj instanceof MissileObject) {
+    if (this.obj instanceof MissileObject || this.obj instanceof OemSatellite) {
       eciArr = [this.obj.position.x, this.obj.position.y, this.obj.position.z] as EciArr3;
     } else if (this.obj instanceof DetailedSatellite) {
       const eci = this.obj.eci(keepTrackApi.getTimeManager().simulationTimeObj);
+
+      if (!eci) {
+        errorManagerInstance.debug(`ObjToObjLine: DetailedSatellite ${this.obj.sccNum} is not in orbit.`);
+        this.isGarbage = true;
+
+        return;
+      }
 
       eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
     } else {
@@ -37,6 +45,13 @@ export class ObjToObjLine extends Line {
       eciArr2 = [this.obj2.position.x, this.obj2.position.y, this.obj2.position.z] as EciArr3;
     } else if (this.obj2 instanceof DetailedSatellite) {
       const eci = this.obj2.eci(keepTrackApi.getTimeManager().simulationTimeObj);
+
+      if (!eci) {
+        errorManagerInstance.debug(`ObjToObjLine: DetailedSatellite ${this.obj2.sccNum} is not in orbit.`);
+        this.isGarbage = true;
+
+        return;
+      }
 
       eciArr2 = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
     } else {

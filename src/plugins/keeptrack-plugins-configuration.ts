@@ -95,4 +95,5 @@ export type KeepTrackPluginsConfiguration = {
   ViewInfoRmbPlugin?: PluginConfiguration;
   VcrPlugin?: PluginConfiguration;
   TimeSlider?: PluginConfiguration;
+  OemReaderPlugin?: PluginConfiguration;
 };

@@ -1,6 +1,7 @@
 import { ModelResolver } from '@app/app/rendering/mesh/model-resolver';
 import { EciArr3, GetSatType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, PayloadStatus, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
 import { Layout, Mesh } from 'webgl-obj-loader';
@@ -141,7 +142,7 @@ export class MeshManager {
     this.currentMeshObject.model = model;
   }
 
-  update(selectedDate: Date, sat: DetailedSatellite | MissileObject) {
+  update(selectedDate: Date, sat: DetailedSatellite | OemSatellite | MissileObject) {
     if (!sat.isSatellite() && !sat.isMissile()) {
       return;
     }
@@ -169,7 +170,11 @@ export class MeshManager {
     this.mvMatrix_ = mat4.create();
     mat4.translate(this.mvMatrix_, this.mvMatrix_, drawPosition);
 
-    if (this.currentMeshObject.isRotationStable || (sat.type === SpaceObjectType.PAYLOAD && (sat as DetailedSatellite).status === PayloadStatus.OPERATIONAL)) {
+    if (
+      this.currentMeshObject.isRotationStable ||
+      (sat.type === SpaceObjectType.PAYLOAD && (sat as DetailedSatellite).status === PayloadStatus.OPERATIONAL) ||
+      (sat as OemSatellite).isStable
+    ) {
       // Rotate the Satellite to Face Nadir if needed
       this.updateRotationToNadir_(drawPosition);
     } else {

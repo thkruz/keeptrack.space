@@ -1,16 +1,20 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
+import { Body } from 'astronomy-engine';
 import { DetailedSatellite } from 'ootk';
+import { CelestialBody } from '../draw-manager/celestial-bodies/celestial-body';
 import { Line, LineColors } from './line';
 
-export class SatToSunLine extends Line {
-  private sat: DetailedSatellite | OemSatellite;
+export class SatToCelestialBodyLine extends Line {
+  private readonly sat: DetailedSatellite | OemSatellite;
+  private readonly body: Body;
 
-  constructor(sat: DetailedSatellite | OemSatellite) {
+  constructor(sat: DetailedSatellite | OemSatellite, body: Body) {
     super();
     this.sat = sat;
-    this.color_ = LineColors.ORANGE;
+    this.body = body;
+    this.color_ = LineColors.CYAN;
   }
 
   update(): void {
@@ -24,6 +28,6 @@ export class SatToSunLine extends Line {
 
     const eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
 
-    this.updateVertBuf(eciArr, keepTrackApi.getScene().sun.position as EciArr3);
+    this.updateVertBuf(eciArr, (keepTrackApi.getScene().planets[this.body] as CelestialBody).position);
   }
 }

@@ -2,6 +2,7 @@
 
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';
@@ -11,6 +12,7 @@ import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
 import { HoverManager } from '../../app/ui/hover-manager';
 import { Camera, CameraType } from '../camera/camera';
 import { GetSatType } from '../core/interfaces';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { errorManagerInstance } from '../utils/errorManager';
@@ -383,6 +385,8 @@ export class OrbitManager {
           lonList: missileParams?.lonList,
           altList: missileParams?.altList,
         });
+      } else if (obj instanceof OemSatellite) {
+        this.setOemSatelliteOrbitBuffer_(id, obj.getOrbitPath(settingsManager.oemOrbitSegments));
       } else {
         // Then it is a satellite
         if (!this.orbitWorker) {
@@ -420,12 +424,12 @@ export class OrbitManager {
     );
   }
 
-  private allocateBuffer(): WebGLBuffer {
+  private allocateBuffer(bufferLength = (settingsManager.orbitSegments + 1) * 4): WebGLBuffer {
     const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
     const buf = gl.createBuffer();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bufferLength), gl.DYNAMIC_DRAW);
 
     return buf;
   }
@@ -445,7 +449,7 @@ export class OrbitManager {
           return;
         } // Skip inactive objects
 
-        OrbitManager.checColorBuffersValidity_(id, colorData);
+        OrbitManager.checkColorBuffersValidity_(id, colorData);
 
         // if color is black, we probably have old data, so recalculate color buffers
         if (
@@ -499,13 +503,13 @@ export class OrbitManager {
     const hoverId = hoverManagerInstance.getHoverId();
 
     if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !keepTrackApi.getCatalogManager().getObject(hoverId, GetSatType.EXTRA_ONLY)?.isStatic()) {
-      OrbitManager.checColorBuffersValidity_(hoverId, colorSchemeManagerInstance.colorData);
+      OrbitManager.checkColorBuffersValidity_(hoverId, colorSchemeManagerInstance.colorData);
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitHoverColor);
       this.writePathToGpu_(hoverId);
     }
   }
 
-  private static checColorBuffersValidity_(hoverId: number, colorData: Float32Array) {
+  private static checkColorBuffersValidity_(hoverId: number, colorData: Float32Array) {
     const hoverIdIndex = hoverId * 4;
 
     OrbitManager.checkColorBufferValidity_(hoverIdIndex, colorData);
@@ -558,11 +562,30 @@ export class OrbitManager {
     this.inProgress_[satId] = false;
   }
 
+  private setOemSatelliteOrbitBuffer_(satId: number, pointsOut: Float32Array): void {
+    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
+
+    // get current buffer size
+    const currentBufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
+
+    if (currentBufferSize !== pointsOut.byteLength) {
+      // reallocate buffer if size has changed
+      gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
+    } else {
+      // update buffer data
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, pointsOut);
+    }
+
+    this.inProgress_[satId] = false;
+  }
+
   /**
    * Updates the orbit data for a satellite by shifting its position relative
    * to the new first point.
    */
-  updateOrbitData(satId: number, firstPosition: number[]): void {
+  updateOrbitData(satId: number, firstPosition: number[], isShiftFirstOnly = false): void {
     const satOrbitData = this.getBufferData(satId);
 
     if (!satOrbitData) {
@@ -575,7 +598,7 @@ export class OrbitManager {
       firstPosition[2] - satOrbitData[2],
     ];
 
-    for (let i = 0; i < satOrbitData.length; i += 4) {
+    for (let i = 0; i < (isShiftFirstOnly ? 4 : satOrbitData.length); i += 4) {
       satOrbitData[i] += deltaOfFirstPoint[0];
       satOrbitData[i + 1] += deltaOfFirstPoint[1];
       satOrbitData[i + 2] += deltaOfFirstPoint[2];
@@ -585,7 +608,22 @@ export class OrbitManager {
     const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
-    gl.bufferSubData(gl.ARRAY_BUFFER, 0, satOrbitData);
+
+    // get current buffer size
+    const currentBufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
+
+    if (currentBufferSize !== satOrbitData.byteLength) {
+      // Delete the buffer first
+      gl.deleteBuffer(this.glBuffers_[satId]);
+      // Create a new buffer
+      this.glBuffers_[satId] = this.allocateBuffer(settingsManager.oemOrbitSegments * 4);
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
+      // reallocate buffer if size has changed
+      gl.bufferData(gl.ARRAY_BUFFER, satOrbitData, gl.DYNAMIC_DRAW);
+    } else {
+      // update buffer data
+      gl.bufferSubData(gl.ARRAY_BUFFER, 0, satOrbitData);
+    }
   }
 
   /** Returns the current data from the buffer for the given satId. */
@@ -598,10 +636,10 @@ export class OrbitManager {
     }
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    const currentBufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
 
     // WebGL2 only: getBufferSubData copies buffer data into an ArrayBufferView
-    const length = (settingsManager.orbitSegments + 1) * 4;
-    const out = new Float32Array(length);
+    const out = new Float32Array(currentBufferSize / 4);
 
     gl.getBufferSubData(gl.ARRAY_BUFFER, 0, out);
 
@@ -615,7 +653,18 @@ export class OrbitManager {
     if (typeof this.glBuffers_[id] === 'undefined') {
       throw new Error(`orbit buffer ${id} not allocated`);
     }
-    this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], settingsManager.orbitSegments + 1);
+
+    const obj = ServiceLocator.getCatalogManager().getObject(id, GetSatType.EXTRA_ONLY);
+
+    if (!obj) {
+      return;
+    }
+
+    if (obj instanceof OemSatellite && obj.orbitPathCache_) {
+      this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], settingsManager.oemOrbitSegments);
+    } else {
+      this.lineManagerInstance_.setAttribsAndDrawLineStrip(this.glBuffers_[id], settingsManager.orbitSegments + 1);
+    }
   }
 
   updateOrbitType() {

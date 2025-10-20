@@ -4,12 +4,14 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideEl } from '@app/engine/utils/get-el';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
+import { Body } from 'astronomy-engine';
 import { DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class DrawLinesPlugin extends KeepTrackPlugin {
   readonly id = 'DrawLinesPlugin';
@@ -28,6 +30,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
     <li id="line-sensor-sat-rmb"><a href="#">Sensor to Satellite</a></li>
     <li id="line-sat-sat-rmb"><a href="#">Satellite to Satellite</a></li>
     <li id="line-sat-sun-rmb"><a href="#">Satellite to Sun</a></li>
+    <li id="line-sat-moon-rmb"><a href="#">Satellite to Moon</a></li>
   </ul>
   `;
   rmbMenuOrder = 5;
@@ -36,10 +39,10 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   isRmbOnSat = true;
 
   rmbCallback = (targetId: string, clickedSat?: number): void => {
-    let clickSatObj: DetailedSatellite | MissileObject | null = null;
+    let clickSatObj: DetailedSatellite | MissileObject | OemSatellite | null = null;
     const obj = keepTrackApi.getCatalogManager().getObject(clickedSat);
 
-    if ((obj instanceof DetailedSatellite) || (obj instanceof MissileObject)) {
+    if ((obj instanceof DetailedSatellite) || (obj instanceof OemSatellite) || (obj instanceof MissileObject)) {
       clickSatObj = obj;
     }
 
@@ -78,6 +81,9 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
         break;
       case 'line-sat-sun-rmb':
         lineManagerInstance.createSat2Sun(clickSatObj);
+        break;
+      case 'line-sat-moon-rmb':
+        lineManagerInstance.createSat2CelestialBody(clickSatObj, Body.Moon);
         break;
       default:
         break;

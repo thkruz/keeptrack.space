@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 /* eslint-disable max-lines */
 import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath } from '@app/app/analysis/sat-math';
@@ -9,7 +10,9 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, DetailedSatellite, eci2lla, MINUTES_PER_DAY } from 'ootk';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
+import { Body } from 'astronomy-engine';
+import { BaseObject, DetailedSatellite, eci2lla, Kilometers, MINUTES_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -38,7 +41,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     super.addJs();
 
     keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(EventBusEvent.selectSatData, this.updateOrbitData_.bind(this));
+    keepTrackApi.on(EventBusEvent.updateSelectBox, this.updateOrbitData_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {
@@ -164,10 +167,23 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (satAltitudeElement && satVelocityElement) {
 
-      if (obj instanceof DetailedSatellite) {
+      if (obj instanceof DetailedSatellite || obj instanceof OemSatellite) {
         const gmst = keepTrackApi.getTimeManager().gmst;
 
-        satAltitudeElement.innerHTML = `${SatMath.getAlt(obj.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+        if (((obj as OemSatellite).centerBody ?? Body.Earth) !== Body.Earth) {
+          const moon = keepTrackApi.getScene().planets.Moon;
+          const position = {
+            x: obj.position.x - moon.position[0] as Kilometers,
+            y: obj.position.y - moon.position[1] as Kilometers,
+            z: obj.position.z - moon.position[2] as Kilometers,
+          };
+
+          satAltitudeElement.innerHTML = `${SatMath.getAlt(position, gmst, moon.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+        } else {
+          satAltitudeElement.innerHTML = `${SatMath.getAlt(obj.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+        }
+
+
         satVelocityElement.innerHTML = `${obj.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
       } else {
         const misl = obj as MissileObject;

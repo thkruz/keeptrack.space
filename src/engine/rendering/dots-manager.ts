@@ -3,9 +3,10 @@ import { GlUtils } from './gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
-import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, SpaceObjectType } from 'ootk';
+import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType } from 'ootk';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera';
 import { PluginRegistry } from '../core/plugin-registry';
@@ -363,6 +364,7 @@ export class DotsManager {
     this.initProgramPicking();
 
     EventBus.getInstance().on(EventBusEvent.update, this.updatePositionBuffer.bind(this));
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, this.interpolatePositionsOfOemSatellites_.bind(this));
   }
 
   /**
@@ -608,7 +610,7 @@ export class DotsManager {
       if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
         const obj = ServiceLocator.getCatalogManager().objectCache[PluginRegistry.getPlugin(SelectSatManager)!.selectedSat] as DetailedSatellite | MissileObject;
 
-        if (obj.isSatellite()) {
+        if (obj instanceof DetailedSatellite) {
           const sat = obj as DetailedSatellite;
           const now = ServiceLocator.getTimeManager().simulationTimeObj;
           const pv = sat.eci(now);
@@ -622,10 +624,26 @@ export class DotsManager {
           this.velocityData[sat.id * 3] = pv.velocity.x;
           this.velocityData[sat.id * 3 + 1] = pv.velocity.y;
           this.velocityData[sat.id * 3 + 2] = pv.velocity.z;
+        } else if (obj instanceof OemSatellite) {
+          const sat = obj as OemSatellite;
+          const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds;
+          const pv = sat.updatePosAndVel(now);
+
+          if (!pv) {
+            return;
+          }
+          this.positionData[sat.id * 3] = pv[0];
+          this.positionData[sat.id * 3 + 1] = pv[1];
+          this.positionData[sat.id * 3 + 2] = pv[2];
+          this.velocityData[sat.id * 3] = pv[3];
+          this.velocityData[sat.id * 3 + 1] = pv[4];
+          this.velocityData[sat.id * 3 + 2] = pv[5];
         }
       }
-      this.interpolatePositions_(renderer);
+      this.interpolatePositionsOfSatellites_(renderer);
     }
+
+    this.interpolatePositionsOfOemSatellites_();
   }
 
   getSize(i: number): number {
@@ -639,11 +657,6 @@ export class DotsManager {
 
     if (i === selectedSat) {
       return 1.0; // Return size for selected satellite
-    }
-
-    // Check if the index is a star
-    if (i >= this.starIndex1 && i <= this.starIndex2) {
-      return 1.0; // Return size for stars
     }
 
     // Default size for other satellites
@@ -832,12 +845,38 @@ export class DotsManager {
    * Updates the velocities of the dots based on the renderer's time delta and the current position data.
    * @param renderer - The WebGL renderer used to calculate the time delta.
    */
-  private interpolatePositions_(renderer: WebGLRenderer) {
+  private interpolatePositionsOfSatellites_(renderer: WebGLRenderer) {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const orbitalSats3 = catalogManagerInstance.orbitalSats * 3;
 
     for (let i = 0; i < orbitalSats3; i++) {
       this.positionData[i] += this.velocityData[i] * renderer.dtAdjusted;
+    }
+  }
+
+  private interpolatePositionsOfOemSatellites_() {
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const simTime = (ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000) as Seconds;
+
+    for (let i = 0; i < settingsManager.maxOemSatellites; i++) {
+      const oemSat = catalogManagerInstance.objectCache[catalogManagerInstance.numSatellites + i];
+
+      if (!oemSat || !(oemSat instanceof OemSatellite)) {
+        continue;
+      }
+
+      const pv = oemSat.updatePosAndVel(simTime);
+
+      if (!pv) {
+        continue;
+      }
+
+      this.positionData[oemSat.id * 3] = pv[0];
+      this.positionData[oemSat.id * 3 + 1] = pv[1];
+      this.positionData[oemSat.id * 3 + 2] = pv[2];
+      this.velocityData[oemSat.id * 3] = pv[3];
+      this.velocityData[oemSat.id * 3 + 1] = pv[4];
+      this.velocityData[oemSat.id * 3 + 2] = pv[5];
     }
   }
 }

@@ -1,8 +1,9 @@
 import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import type { MeshModel } from '@app/engine/rendering/mesh-manager';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
 
-const SatelliteModels = {
+export const SatelliteModels = {
   aehf: 'aehf',
   debris0: 'debris0',
   debris1: 'debris1',
@@ -104,6 +105,13 @@ export class ModelResolver {
   private resolveModelName_(obj: BaseObject): string {
     if (obj.isMissile()) {
       this.resolveMislModelName_(obj as MissileObject);
+    } else if (obj instanceof OemSatellite) {
+      if (obj.model) {
+        return obj.model;
+      }
+
+      // Currently no specific model for OEM satellites - default to aehf
+      return SatelliteModels.aehf;
     } else {
       const sat = obj as DetailedSatellite;
 

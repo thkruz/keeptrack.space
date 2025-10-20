@@ -187,6 +187,13 @@ export class PluginManager {
         { init: () => new DebrisScreening().init(), config: plugins.DebrisScreening },
         { init: () => new TransponderChannelData().init(), config: plugins.transponderChannelData },
         { init: () => new CreateSat().init(), config: plugins.CreateSat },
+        {
+          init: async () => {
+            const proPlugin = await import('../plugins-pro/oem-reader/oem-reader');
+
+            new proPlugin.OemReaderPlugin().init();
+          }, config: plugins.OemReaderPlugin,
+        },
         { init: () => new EditSat().init(), config: plugins.EditSat },
         { init: () => new NewLaunch().init(), config: plugins.NewLaunch },
         { init: () => new MissilePlugin().init(), config: plugins.MissilePlugin },

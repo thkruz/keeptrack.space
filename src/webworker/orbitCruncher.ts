@@ -1,5 +1,5 @@
 import { ObjDataJson } from '@app/engine/rendering/orbitManager';
-import { DEG2RAD, Degrees, EciVec3, Kilometers, SatelliteRecord, Sgp4, TAU, eci2ecf } from 'ootk';
+import { DEG2RAD, Degrees, EciVec3, Kilometers, Sgp4, TAU, eci2ecf } from 'ootk';
 import { RADIUS_OF_EARTH } from '../engine/utils/constants';
 import { jday } from '../engine/utils/transforms';
 import { OrbitCruncherCachedObject } from './constants';
@@ -157,7 +157,15 @@ export const onmessageProcessing = (m: {
       const nowJ =
         jday(nowDate.getUTCFullYear(), nowDate.getUTCMonth() + 1, nowDate.getUTCDate(), nowDate.getUTCHours(), nowDate.getUTCMinutes(), nowDate.getUTCSeconds()) +
         nowDate.getUTCMilliseconds() * 1.15741e-8; // days per millisecond
-      const satrec = objCache[id].satrec as SatelliteRecord;
+      const satrec = objCache[id].satrec;
+
+      if (!satrec) {
+        // OemSatellite with no TLEs
+        postMessageProcessing({ pointsOut, satId: id });
+
+        return;
+      }
+
       const now = (nowJ - satrec.jdsatepoch) * 1440.0; // in minutes
 
       // Calculate Satellite Orbits

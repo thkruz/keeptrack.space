@@ -5,17 +5,18 @@ import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import type { TimeManager } from '@app/engine/core/time-manager';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, RfSensor, SpaceObjectType, Sun, SunTime } from 'ootk';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
+import { BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, eci2rae, RfSensor, SpaceObjectType, Sun, SunTime } from 'ootk';
 import type { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { StereoMap } from '../stereo-map/stereo-map';
-import { html } from '@app/engine/utils/development/formatter';
 
 const SECTIONS = {
   SENSOR: 'sensor-sat-info',
@@ -212,17 +213,15 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       const timeManagerInstance = keepTrackApi.getTimeManager();
       const sensorManagerInstance = keepTrackApi.getSensorManager();
 
-      if (obj.isSatellite()) {
-        const sat = obj as DetailedSatellite;
-
-        if (!sat.position?.x || !sat.position?.y || !sat.position?.z || isNaN(sat.position?.x) || isNaN(sat.position?.y) || isNaN(sat.position?.z)) {
-          const newPosition = SatMath.getEci(sat, timeManagerInstance.simulationTimeObj).position as { x: number; y: number; z: number };
+      if (obj instanceof DetailedSatellite) {
+        if (!obj.position?.x || !obj.position?.y || !obj.position?.z || isNaN(obj.position?.x) || isNaN(obj.position?.y) || isNaN(obj.position?.z)) {
+          const newPosition = SatMath.getEci(obj, timeManagerInstance.simulationTimeObj).position as { x: number; y: number; z: number };
 
           if (!newPosition || (newPosition?.x === 0 && newPosition?.y === 0 && newPosition?.z === 0)) {
             keepTrackApi
               .getUiManager()
               .toast(
-                `Satellite ${sat.sccNum} is not in orbit!<br>Sim time is ${timeManagerInstance.simulationTimeObj.toUTCString()}.<br>Be sure to check you have the right TLE.`,
+                `Satellite ${obj.sccNum} is not in orbit!<br>Sim time is ${timeManagerInstance.simulationTimeObj.toUTCString()}.<br>Be sure to check you have the right TLE.`,
                 ToastMsgType.error,
                 true,
               );
@@ -237,7 +236,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         if (keepTrackApi.getSensorManager().isSensorSelected()) {
           const sensor = keepTrackApi.getSensorManager().currentSensors[0];
 
-          rae = sensor.rae(sat, timeManagerInstance.simulationTimeObj);
+          rae = sensor.rae(obj, timeManagerInstance.simulationTimeObj);
           isInView = sensor.isRaeInFov(rae);
         } else {
           rae = {
@@ -248,13 +247,44 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           isInView = false;
         }
 
-        const lla = eci2lla(sat.position, keepTrackApi.getTimeManager().gmst);
+        const lla = eci2lla(obj.position, keepTrackApi.getTimeManager().gmst);
         const currentTearr: TearrData = {
           time: timeManagerInstance.simulationTimeObj.toISOString(),
           az: rae.az,
           el: rae.el,
           rng: rae.rng,
-          objName: sat.name,
+          objName: obj.name,
+          lat: lla.lat,
+          lon: lla.lon,
+          alt: lla.alt,
+          inView: isInView,
+        };
+
+        keepTrackApi.getSensorManager().currentTEARR = currentTearr;
+      } else if (obj instanceof OemSatellite) {
+        let isInView, rae;
+
+        if (keepTrackApi.getSensorManager().isSensorSelected()) {
+          const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+
+          rae = eci2rae(timeManagerInstance.simulationTimeObj, obj.position, sensor);
+          isInView = sensor.isRaeInFov(rae);
+        } else {
+          rae = {
+            az: 0,
+            el: 0,
+            rng: 0,
+          };
+          isInView = false;
+        }
+
+        const lla = eci2lla(obj.position, keepTrackApi.getTimeManager().gmst);
+        const currentTearr: TearrData = {
+          time: timeManagerInstance.simulationTimeObj.toISOString(),
+          az: rae.az,
+          el: rae.el,
+          rng: rae.rng,
+          objName: obj.name,
           lat: lla.lat,
           lon: lla.lon,
           alt: lla.alt,

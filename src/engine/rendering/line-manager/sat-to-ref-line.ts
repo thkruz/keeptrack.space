@@ -1,14 +1,15 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { vec3, vec4 } from 'gl-matrix';
 import { DetailedSatellite } from 'ootk';
 import { Line } from './line';
 
 export class SatToRefLine extends Line {
-  private sat: DetailedSatellite;
+  private sat: DetailedSatellite | OemSatellite;
   private ref2_: vec3;
 
-  constructor(sat: DetailedSatellite, ref2: vec3, color: vec4) {
+  constructor(sat: DetailedSatellite | OemSatellite, ref2: vec3, color: vec4) {
     super();
     this.sat = sat;
     this.ref2_ = ref2;

@@ -1,17 +1,18 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { vec4 } from 'gl-matrix';
-import { DetailedSatellite, DetailedSensor } from 'ootk';
+import { DetailedSatellite, DetailedSensor, eci2rae } from 'ootk';
 import { Line, LineColors } from './line';
 
 export class SensorToSatLine extends Line {
-  sat: DetailedSatellite;
+  sat: DetailedSatellite | OemSatellite;
   sensor: DetailedSensor;
   private isDrawFovOnly_ = false;
   private isDrawSelectedOnly_ = false;
 
-  constructor(sensor: DetailedSensor, sat: DetailedSatellite, color?: vec4) {
+  constructor(sensor: DetailedSensor, sat: DetailedSatellite | OemSatellite, color?: vec4) {
     super();
     this.sat = sat;
     this.sensor = sensor;
@@ -37,7 +38,15 @@ export class SensorToSatLine extends Line {
     this.isDraw_ = true;
 
     if (this.isDrawFovOnly_) {
-      const isInFov = this.sensor.isSatInFov(this.sat, keepTrackApi.getTimeManager().simulationTimeObj);
+      let isInFov = false;
+
+      if (this.sat instanceof OemSatellite) {
+        const rae = eci2rae(keepTrackApi.getTimeManager().simulationTimeObj, this.sat.position, this.sensor);
+
+        isInFov = this.sensor.isRaeInFov(rae);
+      } else if (this.sat instanceof DetailedSatellite) {
+        isInFov = this.sensor.isSatInFov(this.sat, keepTrackApi.getTimeManager().simulationTimeObj);
+      }
 
       if (!isInFov) {
         this.isDraw_ = false;

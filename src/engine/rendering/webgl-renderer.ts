@@ -5,7 +5,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { Body } from 'astronomy-engine';
 import { mat4, vec2, vec4 } from 'gl-matrix';
-import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
+import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds } from 'ootk';
 import { GroupType } from '../../app/data/object-group';
 import { SettingsManager } from '../../settings/settings';
 import { Camera, CameraType } from '../camera/camera';
@@ -504,6 +504,11 @@ export class WebGLRenderer {
         throw new Error(`No Position for Sat ${obj.id}`);
       }
 
+      // We need to account for Scene.getInstance().worldShift and modify x, y, z accordingly
+      pos.x = pos.x + Scene.getInstance().worldShift[0] as Kilometers;
+      pos.y = pos.y + Scene.getInstance().worldShift[1] as Kilometers;
+      pos.z = pos.z + Scene.getInstance().worldShift[2] as Kilometers;
+
       const posVec4 = <[number, number, number, number]>vec4.fromValues(pos.x, pos.y, pos.z, 1);
 
       vec4.transformMat4(posVec4, posVec4, camMatrix);
@@ -632,7 +637,10 @@ export class WebGLRenderer {
       }
 
       // If in satellite view the orbit buffer needs to be updated every time
-      if (!primarySat.isMissile() && (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)) {
+      if (
+        !primarySat.isMissile() &&
+        (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)
+      ) {
         /*
          * Force an update so that the orbit is always using recent data - this
          * will not fix this draw call
@@ -642,7 +650,11 @@ export class WebGLRenderer {
         // Now we can fix thhis draw call
         const firstPointOut = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id);
 
-        keepTrackApi.getOrbitManager().updateOrbitData(this.selectSatManager_.primarySatObj.id, firstPointOut);
+        if (primarySat instanceof DetailedSatellite) {
+          keepTrackApi.getOrbitManager().updateOrbitData(this.selectSatManager_.primarySatObj.id, firstPointOut);
+        } else {
+          keepTrackApi.getOrbitManager().updateOrbitData(this.selectSatManager_.primarySatObj.id, firstPointOut, true);
+        }
       }
 
       keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);

@@ -1,11 +1,11 @@
 /* eslint-disable complexity */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { html } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { CameraType } from '../../camera/camera';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { html } from '@app/engine/utils/development/formatter';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -22,12 +22,14 @@ export class SourceColorScheme extends ColorScheme {
     sourceUssf: true,
     sourceCelestrak: true,
     sourceVimpel: true,
+    sourceOemImport: true,
   };
 
   static readonly uniqueColorTheme = {
     sourceUssf: [0.2, 1.0, 1.0, 0.7] as rgbaArray,
     sourceCelestrak: [0, 0.2, 1.0, 0.85] as rgbaArray,
     sourceVimpel: [1.0, 0, 0, 0.6] as rgbaArray,
+    sourceOemImport: [1.0, 1.0, 0.2, 1.0] as rgbaArray,
   };
 
   constructor() {
@@ -106,6 +108,19 @@ export class SourceColorScheme extends ColorScheme {
             pickable: Pickable.Yes,
           };
 
+        case 'OEM Import':
+          if (this.objectTypeFlags.sourceOemImport === false) {
+            return {
+              color: this.colorTheme.deselected,
+              pickable: Pickable.No,
+            };
+          }
+
+          return {
+            color: this.colorTheme.sourceOemImport,
+            pickable: Pickable.Yes,
+          };
+
         case 'JSC Vimpel':
           if (this.objectTypeFlags.sourceVimpel === false) {
             return {
@@ -159,6 +174,10 @@ export class SourceColorScheme extends ColorScheme {
     <li>
       <div class="Square-Box layers-sourceVimpel-box"></div>
       Vimpel
+    </li>
+    <li>
+      <div class="Square-Box layers-sourceOemImport-box"></div>
+      OEM Import
     </li>
     <li>
       <div class="Square-Box layers-countryOther-box"></div>

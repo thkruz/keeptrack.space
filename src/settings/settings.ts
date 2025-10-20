@@ -105,8 +105,11 @@ export class SettingsManager {
   splashScreenList: string[] | null = null;
   preset: string | null = null; // Used to force a preset to be loaded without GET variable
   isDisableCanvas = false; // Used to disable the canvas for debugging purposes
+  maxOemSatellites: number = 10; // Maximum number of OEM satellites to load
   /** Default resolution for Milky Way texture */
   milkyWayTextureQuality: MilkyWayTextureQuality;
+  /** Number of segments to use when drawing OEM orbits */
+  oemOrbitSegments = 64;
 
 
   static preserveSettings() {

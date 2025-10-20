@@ -6,17 +6,21 @@ import { Singletons } from '@app/engine/core/interfaces';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
+import { Body } from 'astronomy-engine';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, DetailedSensor, RaeVec3 } from 'ootk';
 import { Container } from '../core/container';
 import { Scene } from '../core/scene';
 import { EventBusEvent } from '../events/event-bus-events';
+import { glsl } from '../utils/development/formatter';
 import { DepthManager } from './depth-manager';
 import { Line, LineColor, LineColors } from './line-manager/line';
 import { ObjToObjLine } from './line-manager/obj-to-obj-line';
 import { RefToRefLine } from './line-manager/ref-to-ref-line';
 import { SatRicLine } from './line-manager/sat-ric-line';
 import { SatScanEarthLine } from './line-manager/sat-scan-earth-line';
+import { SatToCelestialBodyLine } from './line-manager/sat-to-celestial-body';
 import { SatToRefLine } from './line-manager/sat-to-ref-line';
 import { SatToSunLine } from './line-manager/sat-to-sun-line';
 import { SensorScanHorizonLine } from './line-manager/sensor-scan-horizon-line';
@@ -24,7 +28,6 @@ import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
-import { glsl } from '../utils/development/formatter';
 
 export class LineManager {
   attribs = {
@@ -48,7 +51,8 @@ export class LineManager {
 
   clear(): void {
     this.lines = [];
-    keepTrackApi.emit(EventBusEvent.onLineAdded, keepTrackApi.getLineManager());
+    keepTrackApi.emit(EventBusEvent.onLineAdded, this);
+    keepTrackApi.emit(EventBusEvent.onLinesCleared, this);
   }
 
   add(line: Line): void {
@@ -66,20 +70,28 @@ export class LineManager {
     this.add(new SatRicLine(sat, 'C', LineColors.BLUE));
   }
 
-  createSatToRef(sat: DetailedSatellite | MissileObject | null, ref: vec3, color = LineColors.PURPLE): void {
-    if (!sat || !(sat instanceof DetailedSatellite)) {
+  createSatToRef(sat: DetailedSatellite | OemSatellite | MissileObject | null, ref: vec3, color = LineColors.PURPLE): void {
+    if (!sat || !(sat instanceof DetailedSatellite || sat instanceof OemSatellite)) {
       return;
     }
 
     this.add(new SatToRefLine(sat, ref, color));
   }
 
-  createSat2Sun(sat: DetailedSatellite | MissileObject | null): void {
-    if (!sat || !(sat instanceof DetailedSatellite)) {
+  createSat2Sun(sat: DetailedSatellite | MissileObject | OemSatellite | null): void {
+    if (!sat || !(sat instanceof DetailedSatellite || sat instanceof OemSatellite)) {
       return;
     }
 
     this.add(new SatToSunLine(sat));
+  }
+
+  createSat2CelestialBody(sat: DetailedSatellite | MissileObject | OemSatellite | null, body: Body): void {
+    if (!sat || !(sat instanceof DetailedSatellite || sat instanceof OemSatellite)) {
+      return;
+    }
+
+    this.add(new SatToCelestialBodyLine(sat, body));
   }
 
   createRef2Ref(ref1: vec3, ref2: vec3, color: vec4): void {
@@ -123,15 +135,15 @@ export class LineManager {
     this.add(new SensorToRaeLine(sensor, rae, color));
   }
 
-  createSensorToSat(sensor: DetailedSensor | null, sat: DetailedSatellite | MissileObject | null, color?: vec4): void {
-    if (!sensor || !sat || !(sat instanceof DetailedSatellite)) {
+  createSensorToSat(sensor: DetailedSensor | null, sat: DetailedSatellite | MissileObject | OemSatellite | null, color?: vec4): void {
+    if (!sensor || !sat || !(sat instanceof DetailedSatellite || sat instanceof OemSatellite)) {
       return;
     }
 
     this.add(new SensorToSatLine(sensor, sat, color));
   }
 
-  createObjToObj(obj1: DetailedSatellite | MissileObject | null, obj2: DetailedSatellite | MissileObject | null, color?: vec4): void {
+  createObjToObj(obj1: DetailedSatellite | OemSatellite | MissileObject | null, obj2: DetailedSatellite | MissileObject | null, color?: vec4): void {
     if (!obj1 || !obj2) {
       return;
     }
@@ -273,6 +285,16 @@ export class LineManager {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(this.attribs.a_position.location, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(this.attribs.a_position.location);
+
+    // Validate the buffer has enough data
+    const bufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
+    const requiredSize = segments * 4 * Float32Array.BYTES_PER_ELEMENT;
+
+    if (bufferSize < requiredSize) {
+      console.warn(`LineManager: Buffer size (${bufferSize} bytes) is less than required size (${requiredSize} bytes). Adjusting segments to fit buffer.`);
+      segments = Math.floor(bufferSize / (4 * Float32Array.BYTES_PER_ELEMENT));
+    }
+
     gl.drawArrays(gl.LINE_STRIP, 0, segments);
     gl.disableVertexAttribArray(this.attribs.a_position.location);
   }
@@ -292,7 +314,7 @@ export class LineManager {
     gl.uniform3fv(this.uniforms_.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
   }
 
-  private shaders_ = {
+  private readonly shaders_ = {
     frag: glsl`#version 300 es
       precision highp float;
 

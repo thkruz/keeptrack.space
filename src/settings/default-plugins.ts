@@ -80,6 +80,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 71,
   },
+  OemReaderPlugin: {
+    enabled: true,
+    order: 71.5,
+  },
   NewLaunch: {
     enabled: true,
     order: 72,

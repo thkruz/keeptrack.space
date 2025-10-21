@@ -272,7 +272,7 @@ export class SoundManager extends KeepTrackPlugin {
    * Create a new utterance for the specified text and add it to the queue.
    */
   speak(text: string) {
-    if (this.isMute) {
+    if (this.isMute || !speechSynthesis.getVoices) {
       return;
     }
 

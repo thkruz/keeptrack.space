@@ -15,7 +15,7 @@ export class RefToRefLine extends Line {
     this.validateColor(color);
     this.color_ = color;
 
-    this.updateVertBuf(this.ref1_ as EciArr3, this.ref2_ as EciArr3);
+    this.updateVertBuf([this.ref1_ as EciArr3, this.ref2_ as EciArr3]);
   }
 
   update(): void {

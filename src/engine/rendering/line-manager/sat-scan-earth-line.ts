@@ -36,7 +36,7 @@ export class SatScanEarthLine extends Line {
         const pos = lla2ecf(lla);
         const eciArr2 = [pos.x, pos.y, pos.z] as EciArr3;
 
-        this.updateVertBuf(eciArr, eciArr2);
+        this.updateVertBuf([eciArr, eciArr2]);
         break;
       }
 

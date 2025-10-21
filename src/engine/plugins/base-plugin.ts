@@ -580,6 +580,10 @@ export abstract class KeepTrackPlugin {
   }
 
   showBottomIcon(): void {
+    if (!this.bottomIconImg) {
+      return;
+    }
+
     const bottomIconElement = getEl(this.bottomIconElementName);
 
     if (bottomIconElement) {
@@ -588,6 +592,10 @@ export abstract class KeepTrackPlugin {
   }
 
   hideBottomIcon(): void {
+    if (!this.bottomIconImg) {
+      return;
+    }
+
     const bottomIconElement = getEl(this.bottomIconElementName);
 
     if (bottomIconElement) {

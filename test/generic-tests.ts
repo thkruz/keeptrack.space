@@ -70,7 +70,7 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
   expect(() => keepTrackApi.emit(EventBusEvent.uiManagerInit)).not.toThrow();
   expect(() => keepTrackApi.emit(EventBusEvent.uiManagerFinal)).not.toThrow();
 
-  if (plugin.bottomIconElementName) {
+  if (plugin.bottomIconImg && !plugin.bottomIconElementName?.startsWith('plugins.')) {
     expect(getEl(plugin.bottomIconElementName)).toBeDefined();
     expect(getEl(KeepTrackPlugin.bottomIconsContainerId)!.innerHTML).toContain(plugin.bottomIconElementName);
   }

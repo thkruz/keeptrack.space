@@ -115,49 +115,49 @@ export class CameraInputHandler {
   }
 
   keyDownArrowDown_() {
-    if (!this.camera.settings_.isAutoPanD) {
+    if (!settingsManager.isAutoPanD) {
       this.camera.panDown();
     }
   }
 
   keyDownArrowLeft_() {
-    if (!this.camera.settings_.isAutoPanL) {
+    if (!settingsManager.isAutoPanL) {
       this.camera.panLeft();
     }
   }
 
   keyDownArrowRight_() {
-    if (!this.camera.settings_.isAutoPanR) {
+    if (!settingsManager.isAutoPanR) {
       this.camera.panRight();
     }
   }
 
   keyDownArrowUp_() {
-    if (!this.camera.settings_.isAutoPanU) {
+    if (!settingsManager.isAutoPanU) {
       this.camera.panUp();
     }
   }
 
   keyUpArrowDown_() {
-    if (this.camera.settings_.isAutoPanD) {
+    if (settingsManager.isAutoPanD) {
       this.camera.panDown();
     }
   }
 
   keyUpArrowLeft_() {
-    if (this.camera.settings_.isAutoPanL) {
+    if (settingsManager.isAutoPanL) {
       this.camera.panLeft();
     }
   }
 
   keyUpArrowRight_() {
-    if (this.camera.settings_.isAutoPanR) {
+    if (settingsManager.isAutoPanR) {
       this.camera.panRight();
     }
   }
 
   keyUpArrowUp_() {
-    if (this.camera.settings_.isAutoPanU) {
+    if (settingsManager.isAutoPanU) {
       this.camera.panUp();
     }
   }
@@ -225,7 +225,7 @@ export class CameraInputHandler {
     switch (this.camera.cameraType) {
       case CameraType.DEFAULT:
       case CameraType.FIXED_TO_SAT:
-        this.camera.settings_.isAutoRotateU = true;
+        settingsManager.isAutoRotateU = true;
         this.state.isAutoRotate = true;
         this.isHoldingDownAKey = 5;
         break;
@@ -244,7 +244,7 @@ export class CameraInputHandler {
     switch (this.camera.cameraType) {
       case CameraType.DEFAULT:
       case CameraType.FIXED_TO_SAT:
-        this.camera.settings_.isAutoRotateD = true;
+        settingsManager.isAutoRotateD = true;
         this.isHoldingDownAKey = 5;
         this.state.isAutoRotate = true;
         break;
@@ -263,7 +263,7 @@ export class CameraInputHandler {
     switch (this.camera.cameraType) {
       case CameraType.DEFAULT:
       case CameraType.FIXED_TO_SAT:
-        this.camera.settings_.isAutoRotateL = true;
+        settingsManager.isAutoRotateL = true;
         this.isHoldingDownAKey = 5;
         this.state.isAutoRotate = true;
         break;
@@ -284,7 +284,7 @@ export class CameraInputHandler {
     switch (this.camera.cameraType) {
       case CameraType.DEFAULT:
       case CameraType.FIXED_TO_SAT:
-        this.camera.settings_.isAutoRotateR = true;
+        settingsManager.isAutoRotateR = true;
         this.isHoldingDownAKey = 5;
         this.state.isAutoRotate = true;
         break;
@@ -341,8 +341,8 @@ export class CameraInputHandler {
       this.state.fpsRun = 0.05;
     }
     this.state.speedModifier = 8;
-    this.camera.settings_.cameraMovementSpeed = 0.003 / 8;
-    this.camera.settings_.cameraMovementSpeedMin = 0.005 / 8;
+    settingsManager.cameraMovementSpeed = 0.003 / 8;
+    settingsManager.cameraMovementSpeedMin = 0.005 / 8;
   }
 
   keyDownW_() {
@@ -372,9 +372,9 @@ export class CameraInputHandler {
   }
 
   keyUpNumpad8_() {
-    this.camera.settings_.isAutoRotateU = false;
+    settingsManager.isAutoRotateU = false;
     this.state.fpsPitchRate = 0;
-    if (!this.camera.settings_.isAutoRotateD && !this.camera.settings_.isAutoRotateU && !this.camera.settings_.isAutoRotateL && !this.camera.settings_.isAutoRotateR) {
+    if (!settingsManager.isAutoRotateD && !settingsManager.isAutoRotateU && !settingsManager.isAutoRotateL && !settingsManager.isAutoRotateR) {
       this.isHoldingDownAKey = 1;
       this.camera.autoRotate(false);
     }
@@ -382,9 +382,9 @@ export class CameraInputHandler {
 
   // Intentionally the same as keyUpI_
   keyUpNumpad2_() {
-    this.camera.settings_.isAutoRotateD = false;
+    settingsManager.isAutoRotateD = false;
     this.state.fpsPitchRate = 0;
-    if (!this.camera.settings_.isAutoRotateD && !this.camera.settings_.isAutoRotateU && !this.camera.settings_.isAutoRotateL && !this.camera.settings_.isAutoRotateR) {
+    if (!settingsManager.isAutoRotateD && !settingsManager.isAutoRotateU && !settingsManager.isAutoRotateL && !settingsManager.isAutoRotateR) {
       this.isHoldingDownAKey = 1;
       this.camera.autoRotate(false);
     }
@@ -396,8 +396,8 @@ export class CameraInputHandler {
     } else {
       this.state.fpsYawRate = 0;
     }
-    this.camera.settings_.isAutoRotateL = false;
-    if (!this.camera.settings_.isAutoRotateD && !this.camera.settings_.isAutoRotateU && !this.camera.settings_.isAutoRotateL && !this.camera.settings_.isAutoRotateR) {
+    settingsManager.isAutoRotateL = false;
+    if (!settingsManager.isAutoRotateD && !settingsManager.isAutoRotateU && !settingsManager.isAutoRotateL && !settingsManager.isAutoRotateR) {
       this.isHoldingDownAKey = 1;
       this.camera.autoRotate(false);
     }
@@ -410,8 +410,8 @@ export class CameraInputHandler {
     } else {
       this.state.fpsYawRate = 0;
     }
-    this.camera.settings_.isAutoRotateR = false;
-    if (!this.camera.settings_.isAutoRotateD && !this.camera.settings_.isAutoRotateU && !this.camera.settings_.isAutoRotateL && !this.camera.settings_.isAutoRotateR) {
+    settingsManager.isAutoRotateR = false;
+    if (!settingsManager.isAutoRotateD && !settingsManager.isAutoRotateU && !settingsManager.isAutoRotateL && !settingsManager.isAutoRotateR) {
       this.isHoldingDownAKey = 1;
       this.camera.autoRotate(false);
     }

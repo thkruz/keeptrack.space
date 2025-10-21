@@ -24,6 +24,6 @@ export class SatToSunLine extends Line {
 
     const eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
 
-    this.updateVertBuf(eciArr, keepTrackApi.getScene().sun.position as EciArr3);
+    this.updateVertBuf([eciArr, keepTrackApi.getScene().sun.position as EciArr3]);
   }
 }

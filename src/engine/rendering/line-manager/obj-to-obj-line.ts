@@ -61,6 +61,6 @@ export class ObjToObjLine extends Line {
       return;
     }
 
-    this.updateVertBuf(eciArr, eciArr2);
+    this.updateVertBuf([eciArr, eciArr2]);
   }
 }

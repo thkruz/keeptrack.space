@@ -19,6 +19,7 @@ import { glsl } from '../utils/development/formatter';
 import { DepthManager } from './depth-manager';
 import { Line, LineColor, LineColors } from './line-manager/line';
 import { ObjToObjLine } from './line-manager/obj-to-obj-line';
+import { OrbitPathLine } from './line-manager/orbit-path';
 import { RefToRefLine } from './line-manager/ref-to-ref-line';
 import { SatRicLine } from './line-manager/sat-ric-line';
 import { SatScanEarthLine } from './line-manager/sat-scan-earth-line';
@@ -98,6 +99,14 @@ export class LineManager {
 
   createRef2Ref(ref1: vec3, ref2: vec3, color: vec4): void {
     this.add(new RefToRefLine(ref1, ref2, color));
+  }
+
+  createOrbitPath(path: vec3[], color: vec4): void {
+    if (!path || path.length === 0) {
+      return;
+    }
+
+    this.add(new OrbitPathLine(path, color));
   }
 
   createSensorToSun(sensor: DetailedSensor | null): void {
@@ -417,6 +426,7 @@ export class LineManager {
     }
 
     const modelViewMatrix = mat4.create();
+    const gl = keepTrackApi.getRenderer().gl;
 
     // Default to 1 so no transformation
     mat4.identity(modelViewMatrix);
@@ -433,7 +443,7 @@ export class LineManager {
     const j2000Lines = this.lines.filter((line) => line.referenceFrame === 'J2000');
 
     for (const line of temeLines) {
-      line.draw(this);
+      line.draw(gl, this);
     }
 
 
@@ -443,10 +453,10 @@ export class LineManager {
 
     mat4.rotateX(temeToJ2000Matrix, temeToJ2000Matrix, EARTH_OBLIQUITY_RADIANS);
 
-    keepTrackApi.getRenderer().gl.uniformMatrix4fv(this.uniforms_.u_mVMatrix, false, temeToJ2000Matrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_mVMatrix, false, temeToJ2000Matrix);
 
     for (const line of j2000Lines) {
-      line.draw(this);
+      line.draw(gl, this);
     }
 
     this.runAfterDraw();

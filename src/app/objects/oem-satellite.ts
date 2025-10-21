@@ -66,6 +66,19 @@ export class OemSatellite extends BaseObject {
   /** Cached points for drawing the full orbit path */
   pointsForOrbitPath: [number, number, number][] | null = null;
 
+  eci(date: Date): { position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } } | null {
+    const posAndVel = this.updatePosAndVel(date.getTime() / 1000 as Seconds);
+
+    if (!posAndVel) {
+      return null;
+    }
+
+    return {
+      position: { x: posAndVel[0], y: posAndVel[1], z: posAndVel[2] },
+      velocity: { x: posAndVel[3], y: posAndVel[4], z: posAndVel[5] },
+    };
+  }
+
   centerBody: Body = Body.Earth;
   isInertialMoonFrame = false;
 
@@ -188,18 +201,7 @@ export class OemSatellite extends BaseObject {
     const posAndVel = [0, 0, 0, 0, 0, 0] as [number, number, number, number, number, number];
     let dt = 0;
 
-    for (let i = 0; i < this.OemDataBlocks.length; i++) {
-      for (let j = 0; j < this.OemDataBlocks[i].stateVectors.length; j++) {
-        if (
-          (this.OemDataBlocks[i].stateVectors[j].epoch.posix <= simTime && this.OemDataBlocks[i].stateVectors[j + 1]?.epoch.posix > simTime) ||
-          (i === this.OemDataBlocks.length - 1 && j === this.OemDataBlocks[i].stateVectors.length - 1 && simTime >= this.OemDataBlocks[i].stateVectors[j].epoch.posix)
-        ) {
-          this.dataBlockIdx = i;
-          this.stateVectorIdx = j;
-          break;
-        }
-      }
-    }
+    this.findStateVectorTime_(simTime);
 
     dt = (simTime - this.OemDataBlocks[this.dataBlockIdx].stateVectors[this.stateVectorIdx].epoch.posix) as Seconds;
 
@@ -247,26 +249,96 @@ export class OemSatellite extends BaseObject {
     return posAndVel;
   }
 
-  eci(simTime: Date) {
-    const simTimePosix = simTime.getTime() / 1000;
-    const posAndVel = this.updatePosAndVel(simTimePosix as Seconds);
+  private findStateVectorTime_(simTime: number): void {
+    // Start from last known position (cache optimization)
+    const startBlock = this.dataBlockIdx ?? 0;
+    const startVector = this.stateVectorIdx ?? 0;
 
-    if (!posAndVel) {
-      return null;
+    // First check if we're still in the same vector range (common case for sequential access)
+    if (startBlock < this.OemDataBlocks.length) {
+      const vectors = this.OemDataBlocks[startBlock].stateVectors;
+
+      if (startVector < vectors.length) {
+        const currentTime = vectors[startVector].epoch.posix;
+        const nextTime = vectors[startVector + 1]?.epoch.posix ?? Infinity;
+
+        if (currentTime <= simTime && nextTime > simTime) {
+          // Still in same position, no search needed
+          return;
+        }
+      }
     }
 
-    return {
-      position: {
-        x: posAndVel[0],
-        y: posAndVel[1],
-        z: posAndVel[2],
-      },
-      velocity: {
-        x: posAndVel[3],
-        y: posAndVel[4],
-        z: posAndVel[5],
-      },
-    };
+    // Determine search direction and range based on whether time moved forward or backward
+    let searchStart = 0;
+    let searchEnd = this.OemDataBlocks.length;
+
+    if (startBlock < this.OemDataBlocks.length) {
+      const currentBlockVectors = this.OemDataBlocks[startBlock].stateVectors;
+      const cachedTime = currentBlockVectors[startVector]?.epoch.posix;
+
+      if (cachedTime) {
+        if (simTime >= cachedTime) {
+          // Time moved forward, search from current position onward
+          searchStart = startBlock;
+        } else {
+          // Time moved backward, search from beginning up to current position
+          searchEnd = startBlock + 1;
+        }
+      }
+    }
+
+    // Search through the determined range
+    for (let i = searchStart; i < searchEnd; i++) {
+      const vectors = this.OemDataBlocks[i].stateVectors;
+
+      // Skip this block if simTime is before it starts
+      if (simTime < vectors[0].epoch.posix) {
+        continue;
+      }
+
+      // Skip this block if simTime is after it ends (unless it's the last block)
+      if (i < this.OemDataBlocks.length - 1 &&
+        simTime >= vectors[vectors.length - 1].epoch.posix) {
+        continue;
+      }
+
+      // Binary search within this block
+      let left = 0;
+      let right = vectors.length - 1;
+
+      // Optimize starting position for forward time progression in same block
+      if (i === startBlock && simTime >= vectors[startVector]?.epoch.posix) {
+        left = startVector;
+      }
+
+      while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        const currentTime = vectors[mid].epoch.posix;
+        const nextTime = vectors[mid + 1]?.epoch.posix ?? Infinity;
+
+        if (currentTime <= simTime && nextTime > simTime) {
+          // Found the correct interval
+          this.dataBlockIdx = i;
+          this.stateVectorIdx = mid;
+
+          return;
+        } else if (currentTime > simTime) {
+          right = mid - 1;
+        } else {
+          left = mid + 1;
+        }
+      }
+
+      // Handle last vector in last block
+      if (i === this.OemDataBlocks.length - 1 &&
+        simTime >= vectors[vectors.length - 1].epoch.posix) {
+        this.dataBlockIdx = i;
+        this.stateVectorIdx = vectors.length - 1;
+
+        return;
+      }
+    }
   }
 
   getOrbitPath(segments?: number): Float32Array {
@@ -401,13 +473,9 @@ export class OemSatellite extends BaseObject {
       }
 
       this.pointsForOrbitPath = points;
-    } else {
-      points.push(...this.pointsForOrbitPath);
     }
 
-    for (let i = 1; i < points.length; i++) {
-      lineManager.createRef2Ref(points[i - 1], points[i], LineColors.BLUE);
-    }
+    lineManager.createOrbitPath(this.pointsForOrbitPath, LineColors.BLUE);
 
     this.isDrawingFullOrbitPath = true;
   }

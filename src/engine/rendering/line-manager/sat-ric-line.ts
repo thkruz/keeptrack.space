@@ -92,6 +92,6 @@ export class SatRicLine extends Line {
         throw new Error('Invalid type');
     }
 
-    this.updateVertBuf(eciArr, satArr);
+    this.updateVertBuf([eciArr, satArr]);
   }
 }

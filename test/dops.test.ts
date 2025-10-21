@@ -7,7 +7,7 @@ describe('Dops_class', () => {
     setupStandardEnvironment();
   });
 
-  standardPluginSuite(DopsPlugin, 'DopsPlugin');
-  standardPluginMenuButtonTests(DopsPlugin, 'DopsPlugin');
-  standardPluginRmbTests(DopsPlugin, 'DopsPlugin');
+  standardPluginSuite(DopsPlugin);
+  standardPluginMenuButtonTests(DopsPlugin);
+  standardPluginRmbTests(DopsPlugin);
 });

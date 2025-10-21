@@ -33,7 +33,7 @@ export class SensorScanHorizonLine extends Line {
     this.updateAzimuth_();
     const eciArr2 = this.calculateEciPosition_();
 
-    this.updateVertBuf(eciArr, eciArr2);
+    this.updateVertBuf([eciArr, eciArr2]);
   }
 
   private updateAzimuth_(): void {

@@ -27,6 +27,6 @@ export class SatToRefLine extends Line {
     };
     const satArr = [position.x, position.y, position.z] as EciArr3;
 
-    this.updateVertBuf(satArr, this.ref2_ as EciArr3);
+    this.updateVertBuf([satArr, this.ref2_ as EciArr3]);
   }
 }

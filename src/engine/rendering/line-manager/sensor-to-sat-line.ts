@@ -61,6 +61,6 @@ export class SensorToSatLine extends Line {
       }
     }
 
-    this.updateVertBuf(eciArr, sensorEciArr);
+    this.updateVertBuf([eciArr, sensorEciArr]);
   }
 }

@@ -27,6 +27,6 @@ export class SensorToRaeLine extends Line {
 
     this.isDraw_ = true;
 
-    this.updateVertBuf(eciArr, sensorEciArr);
+    this.updateVertBuf([eciArr, sensorEciArr]);
   }
 }

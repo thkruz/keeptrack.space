@@ -28,6 +28,6 @@ export class SatToCelestialBodyLine extends Line {
 
     const eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
 
-    this.updateVertBuf(eciArr, (keepTrackApi.getScene().planets[this.body] as CelestialBody).position);
+    this.updateVertBuf([eciArr, (keepTrackApi.getScene().planets[this.body] as CelestialBody).position]);
   }
 }

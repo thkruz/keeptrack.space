@@ -93,6 +93,8 @@ jobs:
       - name: Run Unit Tests
         if: matrix.task == 'unit-test'
         run: |
+          echo "Creating tranlation files..."
+          npm run generate-t7e
           echo "Running Unit Tests..."
           npm test
           echo '### Unit Tests Passed' >> $GITHUB_STEP_SUMMARY

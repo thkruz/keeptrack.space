@@ -35,9 +35,9 @@
   ],
   "scripts": {
     "setenv": "npx tsx ./build/set-env.ts",
-    "build": "npx tsx ./build/build-manager.ts production",
-    "build:dev": "npx tsx ./build/build-manager.ts development",
-    "build:watch": "npx --max-old-space-size=8192 tsx ./build/build-manager.ts development --watch",
+    "build": "npx tsx ./build/generate-translation.ts && npx tsx ./build/build-manager.ts production",
+    "build:dev": "npx tsx ./build/generate-translation.ts && npx tsx ./build/build-manager.ts development",
+    "build:watch": "npx tsx ./build/generate-translation.ts && npx --max-old-space-size=8192 tsx ./build/build-manager.ts development --watch",
     "changelog": "auto-changelog --tag-prefix v --commit-limit false -t ./changelog.hbs -o ./docs/CHANGELOG.md",
     "cypress:open": "cypress open",
     "generate-t7e": "npx tsx ./build/generate-translation.ts",

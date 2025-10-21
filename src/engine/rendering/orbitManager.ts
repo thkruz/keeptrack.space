@@ -1,8 +1,8 @@
 /* */
 
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';

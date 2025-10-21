@@ -1,18 +1,18 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { ReferenceFrame } from '@app/engine/math/reference-frames';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideEl } from '@app/engine/utils/get-el';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { Body } from 'astronomy-engine';
 import { DetailedSatellite, Kilometers } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { ReferenceFrame } from '@app/engine/math/reference-frames';
 
 export class DrawLinesPlugin extends KeepTrackPlugin {
   readonly id = 'DrawLinesPlugin';

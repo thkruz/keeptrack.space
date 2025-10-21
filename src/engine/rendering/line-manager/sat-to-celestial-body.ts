@@ -1,6 +1,6 @@
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { Body } from 'astronomy-engine';
 import { DetailedSatellite } from 'ootk';
 import { CelestialBody } from '../draw-manager/celestial-bodies/celestial-body';

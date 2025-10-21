@@ -1,7 +1,7 @@
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ModelResolver } from '@app/app/rendering/mesh/model-resolver';
 import { EciArr3, GetSatType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, PayloadStatus, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from 'ootk';
 import { Layout, Mesh } from 'webgl-obj-loader';

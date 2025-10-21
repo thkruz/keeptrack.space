@@ -4,12 +4,12 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { Body } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -32,7 +32,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     static: false,
   });
 
-  primarySatObj: DetailedSatellite | MissileObject = this.noSatObj_;
+  primarySatObj: DetailedSatellite | MissileObject | OemSatellite = this.noSatObj_;
   /** Ellipsoid radii for the primary satellite in RCI coordinates */
   primarySatCovMatrix: vec3 | null = null;
   secondarySat = -1;
@@ -228,7 +228,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (id === -1 && this.lastSelectedSat_ > -1) {
       keepTrackApi.getOrbitManager().clearSelectOrbit();
     } else {
-      settingsManager.centerBody = Body.Earth; // Always center on Earth when selecting a satellite
+      // settingsManager.centerBody = Body.Earth; // Always center on Earth when selecting a satellite
     }
   }
 

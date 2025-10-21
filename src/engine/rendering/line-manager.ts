@@ -2,11 +2,11 @@
 /* eslint-disable complexity */
 /* eslint-disable camelcase */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Singletons } from '@app/engine/core/interfaces';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { Body } from 'astronomy-engine';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, RaeVec3 } from 'ootk';

@@ -378,11 +378,18 @@ export class CatalogLoader {
 
     catalogManagerInstance.numSatellites = tempObjData.length;
 
+    for (let i = 0; i < settingsManager.maxOemSatellites; i++) {
+      tempObjData.push(new BaseObject({
+        id: tempObjData.length,
+        name: `OEM Satellite ${i + 1}`,
+      }));
+    }
+
     for (const missileObj of catalogManagerInstance.missileSet) {
       tempObjData.push(missileObj);
     }
 
-    catalogManagerInstance.missileSats = tempObjData.length; // This is the start of the missiles index
+    catalogManagerInstance.missileSats = tempObjData.length; // This is the end of the missiles index
 
     for (const fieldOfViewMarker of catalogManagerInstance.fieldOfViewSet) {
       fieldOfViewMarker.id = tempObjData.length;

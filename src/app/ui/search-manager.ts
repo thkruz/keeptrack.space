@@ -1,7 +1,7 @@
 import { GroupType, ObjectGroup } from '@app/app/data/object-group';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import searchPng from '@public/img/icons/search.png';

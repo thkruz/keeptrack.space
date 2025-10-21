@@ -1,8 +1,8 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { DetailedSatellite } from 'ootk';
 import { Line, LineColors } from './line';
 

@@ -1,6 +1,6 @@
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { vec4 } from 'gl-matrix';
 import { DetailedSatellite, DetailedSensor, eci2rae } from 'ootk';

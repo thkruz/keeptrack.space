@@ -3,6 +3,7 @@
 import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
@@ -11,7 +12,6 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { Body } from 'astronomy-engine';
 import { BaseObject, DetailedSatellite, eci2lla, Kilometers, MINUTES_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';

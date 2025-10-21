@@ -3,7 +3,7 @@ import { GlUtils } from './gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType } from 'ootk';

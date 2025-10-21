@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import type { TimeManager } from '@app/engine/core/time-manager';
@@ -9,7 +10,6 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, eci2rae, RfSensor, SpaceObjectType, Sun, SunTime } from 'ootk';
 import type { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';

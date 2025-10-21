@@ -1,6 +1,6 @@
 import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import type { MeshModel } from '@app/engine/rendering/mesh-manager';
-import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
 
 export const SatelliteModels = {

@@ -1,10 +1,9 @@
 import { GroupType, ObjectGroup } from '@app/app/data/object-group';
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
 import searchPng from '@public/img/icons/search.png';
 import { DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
@@ -66,8 +65,6 @@ export class SearchManager {
   }
 
   private setupTopMenu_() {
-    const eventBus = EventBus.getInstance();
-
     // This needs to happen immediately so the sound button is in the menu
     keepTrackApi.getPlugin(TopMenu)?.navItems.push({
       id: 'search-btn',
@@ -75,10 +72,6 @@ export class SearchManager {
       class: 'top-menu-icons__blue-img',
       icon: searchPng,
       tooltip: 'Search',
-    });
-
-    eventBus.on(EventBusEvent.uiManagerFinal, () => {
-      keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip('search-btn', 'Search for Objects');
     });
   }
 
@@ -536,7 +529,7 @@ export class SearchManager {
 
     const resultsBox = getEl('search-results', true);
     const htmlStr = results.reduce((html, result) => {
-      const obj = <DetailedSatellite | MissileObject>satData[result.id];
+      const obj = <DetailedSatellite | OemSatellite | MissileObject>satData[result.id];
 
       html += `<div class="search-result" data-obj-id="${obj.id}">`;
       html += '<div class="truncate-search">';
@@ -639,16 +632,14 @@ export class SearchManager {
           html += 'Star';
           break;
         default:
-          if (obj.isMissile()) {
-            const misl = obj as MissileObject;
-
-            html += misl.desc;
-          } else if (obj.isStar()) {
+          if (obj instanceof MissileObject) {
+            html += obj.desc;
+          } else if (obj instanceof Star) {
             html += 'Star';
-          } else if (obj.isSatellite()) {
-            const sat = obj as DetailedSatellite;
-
-            html += sat.sccNum;
+          } else if (obj instanceof OemSatellite) {
+            html += (obj as OemSatellite).OemDataBlocks[0]?.metadata.OBJECT_ID;
+          } else {
+            html += (obj as DetailedSatellite).sccNum;
           }
           break;
       }

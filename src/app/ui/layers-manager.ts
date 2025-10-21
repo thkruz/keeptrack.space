@@ -5,7 +5,6 @@ import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-mana
 import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
-import { TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import layersPng from '@public/img/icons/layers.png';
 import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
@@ -130,8 +129,6 @@ export class LayersManager {
           this.layersHoverMenuClick(hoverMenuItemClass);
         }
       });
-
-      keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip('layers-menu-btn', 'Toggle Layers');
     });
 
   }

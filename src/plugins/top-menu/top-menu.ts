@@ -6,7 +6,6 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { TooltipsPlugin } from '../tooltips/tooltips';
 
 export class TopMenu extends KeepTrackPlugin {
   readonly id = 'TopMenu';
@@ -14,6 +13,7 @@ export class TopMenu extends KeepTrackPlugin {
   static readonly SEARCH_RESULT_ID = 'search-results';
   static readonly TOP_LEFT_ID = 'nav-top-left';
   static readonly TOP_RIGHT_ID = 'nav-top-right';
+  static readonly NAV_WRAPPER_ID = 'nav-wrapper';
 
   navItems: {
     id: string;
@@ -48,14 +48,16 @@ export class TopMenu extends KeepTrackPlugin {
           'beforeend',
           html`
             <nav>
-              <div id="nav-wrapper" class="nav-wrapper" style="display: flex; justify-content: flex-end;">
+              <div id="${TopMenu.NAV_WRAPPER_ID}" class="nav-wrapper" style="display: flex; justify-content: flex-end;">
           <ul id="nav-top-right" class="right">
             ${this.navItems // NOSONAR
               .sort((a, b) => a.order - b.order)
               .map(
                 (item) => `
                   <li>
-                    <a id="${item.id}" class="top-menu-icons ${item.class ? `${item.class}` : ''}">
+                    <a id="${item.id}" class="top-menu-icons ${item.class ? `${item.class}` : ''}"
+                      kt-tooltip="${item.tooltip}"
+                    >
                       <div class="top-menu-icons ${item.classInner ? `${item.classInner}` : ''}">
                         <img
                           id="${item.id.replace('-btn', '-icon')}"
@@ -74,11 +76,6 @@ export class TopMenu extends KeepTrackPlugin {
             </nav>
           `,
         );
-
-        const tooltipsPlugin = keepTrackApi.getPlugin(TooltipsPlugin);
-
-        tooltipsPlugin?.createTooltip('tutorial-btn', 'Show Help');
-        tooltipsPlugin?.createTooltip('fullscreen-icon', 'Toggle Fullscreen');
 
         adviceManagerInstance.init();
       },

@@ -19,8 +19,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { keepTrackApi } from '@app/keepTrackApi';
-import { TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { v4 as uuidv4 } from 'uuid';
 import { EventBus } from '../events/event-bus';
@@ -58,7 +56,7 @@ export abstract class TopMenuPlugin extends KeepTrackPlugin {
     const pluginRootEl = document.createElement('li');
 
     pluginRootEl.innerHTML = html`
-      <a id="${this.id}-btn" class="top-menu-icons">
+      <a id="${this.id}-btn" class="top-menu-icons" kt-tooltip="${this.tooltipText}">
         <img class="top-menu-icons__blue-img" src="${this.image}" />
       </a>
     `;
@@ -69,7 +67,6 @@ export abstract class TopMenuPlugin extends KeepTrackPlugin {
     if (topRightMenuElement) {
       topRightMenuElement.insertBefore(pluginRootEl, getEl(TopMenu.TOP_RIGHT_ID)?.firstChild ?? null);
       pluginRootEl.onclick = () => this.onClick_();
-      keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip(pluginRootEl, this.tooltipText);
     }
   }
 }

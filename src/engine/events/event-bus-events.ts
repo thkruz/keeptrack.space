@@ -83,5 +83,8 @@ export enum EventBusEvent {
   KeyDown = 'inputEvent:keydown',
   KeyPress = 'inputEvent:keypress',
   SceneReady = 'SceneReady',
-  highPerformanceRender = 'highPerformanceRender'
+  highPerformanceRender = 'highPerformanceRender',
+  onLinesCleared = 'onLinesCleared',
+  selectedDateChange = 'selectedDateChange',
+  calculateSimulationTime = 'calculateSimulationTime',
 }

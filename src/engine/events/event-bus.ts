@@ -18,6 +18,8 @@ export interface EngineEventMap {
   [EventBusEvent.rightBtnMenuOpen]: [boolean, number];
   [EventBusEvent.rightBtnMenuAdd]: [];
   [EventBusEvent.updateDateTime]: [Date];
+  [EventBusEvent.calculateSimulationTime]: [Date];
+  [EventBusEvent.selectedDateChange]: [Date];
   [EventBusEvent.propRateChanged]: [number];
   [EventBusEvent.uiManagerFinal]: [];
   [EventBusEvent.resetSensor]: [];
@@ -31,6 +33,7 @@ export interface EngineEventMap {
   [EventBusEvent.onWatchlistRemove]: [{ id: number, inView: boolean }[]];
   [EventBusEvent.staticOffsetChange]: [number];
   [EventBusEvent.onLineAdded]: [LineManager];
+  [EventBusEvent.onLinesCleared]: [LineManager];
   [EventBusEvent.sensorDotSelected]: [DetailedSensor];
   [EventBusEvent.canvasMouseDown]: [MouseEvent];
   [EventBusEvent.touchStart]: [TapTouchEvent | PanTouchEvent];

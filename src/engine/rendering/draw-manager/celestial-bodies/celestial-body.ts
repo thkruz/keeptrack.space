@@ -1,7 +1,9 @@
 /**
  * Base class for rendering non-Earth celestial bodies (Moon, Mars, etc.)
  */
+import { SatMath } from '@app/app/analysis/sat-math';
 import { EciArr3 } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -9,9 +11,10 @@ import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Body, KM_PER_AU, BackdatePosition as backdatePosition } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, TEME, Vector3D } from 'ootk';
+import { EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, TEME, Vector3D } from 'ootk';
 import { keepTrackApi } from '../../../../keepTrackApi';
 import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';
@@ -30,6 +33,7 @@ export abstract class CelestialBody {
   position = [0, 0, 0] as EciArr3;
   rotation = [0, 0, 0];
   mesh: Mesh;
+  relativeSatPos: EciVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
 
   abstract getName(): Body;
   abstract getTexturePath(): string;
@@ -127,7 +131,7 @@ export abstract class CelestialBody {
     occlusionPrgm.attrSetup(this.mesh.geometry.getCombinedBuffer());
 
     // Set the uniforms
-    occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, camMatrix);
+    occlusionPrgm.uniformSetup(this.modelViewMatrix_, pMatrix, camMatrix, [-this.relativeSatPos.x, -this.relativeSatPos.y, -this.relativeSatPos.z]);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.mesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.mesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -138,6 +142,7 @@ export abstract class CelestialBody {
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
     gl.uniform3fv(this.mesh.material.uniforms.sunPos, vec3.fromValues(sunPosition[0] * 100, sunPosition[1] * 100, sunPosition[2] * 100));
+    gl.uniform3fv(this.mesh.material.uniforms.worldOffset, [-this.relativeSatPos.x, -this.relativeSatPos.y, -this.relativeSatPos.z]);
     gl.uniform1f(this.mesh.material.uniforms.drawPosition, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
     gl.uniform1i(this.mesh.material.uniforms.sampler, 0);
     gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
@@ -160,6 +165,8 @@ export abstract class CelestialBody {
     mat4.rotateY(this.modelViewMatrix_, this.modelViewMatrix_, this.rotation[1]);
     mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, this.rotation[2]);
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
+
+    this.calculateRelativeSatPos();
   }
 
   protected readonly shaders = {
@@ -199,4 +206,14 @@ export abstract class CelestialBody {
       }
     `,
   };
+
+  protected calculateRelativeSatPos() {
+    const selectedSatPos = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj.position;
+
+    this.relativeSatPos = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
+
+    if (selectedSatPos) {
+      this.relativeSatPos = SatMath.getPositionFromCenterBody(selectedSatPos, this);
+    }
+  }
 }

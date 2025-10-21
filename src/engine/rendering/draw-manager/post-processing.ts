@@ -2,7 +2,7 @@
 /* eslint-disable no-useless-escape */
 
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
-import { mat4, vec4 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 import { postProcessingShaderCode } from '../../utils/post-processing-shader-code';
 import { DepthManager } from '../depth-manager';
 
@@ -30,7 +30,7 @@ export type OcclusionProgram = {
   };
   attrSetup: (vertPosBuf: WebGLBuffer, stride?: number) => void;
   attrOff: () => void;
-  uniformSetup: (mvMatrix: mat4, pMatrix: mat4, camMatrix: mat4) => void;
+  uniformSetup: (mvMatrix: mat4, pMatrix: mat4, camMatrix: mat4, worldOffset?: vec3) => void;
 };
 
 export class PostProcessingManager {
@@ -133,11 +133,11 @@ export class PostProcessingManager {
     this.programs.occlusion.attrOff = (): void => {
       gl.disableVertexAttribArray(this.programs.occlusion.attr.position);
     };
-    this.programs.occlusion.uniformSetup = (mvMatrix: mat4, pMatrix: mat4, camMatrix: mat4): void => {
+    this.programs.occlusion.uniformSetup = (mvMatrix: mat4, pMatrix: mat4, camMatrix: mat4, worldOffset = [0, 0, 0]): void => {
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uMvMatrix, false, mvMatrix);
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uPMatrix, false, pMatrix);
       gl.uniformMatrix4fv(this.programs.occlusion.uniform.uCamMatrix, false, camMatrix);
-      gl.uniform3fv(this.programs.occlusion.uniform.uWorldOffset, [0, 0, 0]); // Scene.getInstance().worldShift);
+      gl.uniform3fv(this.programs.occlusion.uniform.uWorldOffset, worldOffset);
       gl.uniform1f(this.programs.occlusion.uniform.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     };
   }

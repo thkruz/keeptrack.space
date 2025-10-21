@@ -9,9 +9,10 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideEl } from '@app/engine/utils/get-el';
 import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { Body } from 'astronomy-engine';
-import { DetailedSatellite } from 'ootk';
+import { DetailedSatellite, Kilometers } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { ReferenceFrame } from '@app/engine/math/reference-frames';
 
 export class DrawLinesPlugin extends KeepTrackPlugin {
   readonly id = 'DrawLinesPlugin';
@@ -26,6 +27,9 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
     <li id="line-eci-xgrid-rmb"><a href="#">X Axes Grid</a></li>
     <li id="line-eci-ygrid-rmb"><a href="#">Y Axes Grid</a></li>
     <li id="line-eci-zgrid-rmb"><a href="#">Z Axes Grid</a></li>
+    <li id="line-eci-radial-xgrid-rmb"><a href="#">X Axes Radial Grid</a></li>
+    <li id="line-eci-radial-ygrid-rmb"><a href="#">Y Axes Radial Grid</a></li>
+    <li id="line-eci-radial-zgrid-rmb"><a href="#">Z Axes Radial Grid</a></li>
     <li id="line-earth-sat-rmb"><a href="#">Earth to Satellite</a></li>
     <li id="line-sensor-sat-rmb"><a href="#">Sensor to Satellite</a></li>
     <li id="line-sat-sat-rmb"><a href="#">Satellite to Satellite</a></li>
@@ -53,13 +57,40 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
         lineManagerInstance.createRef2Ref([0, 0, 0], [0, 0, 25000], LineColors.BLUE);
         break;
       case 'line-eci-xgrid-rmb':
-        lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 1], 1);
+        lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 0.3]);
         break;
       case 'line-eci-ygrid-rmb':
-        lineManagerInstance.createGrid('y', [0.2, 0.6, 0.2, 1], 1);
+        lineManagerInstance.createGrid('y', [0.2, 0.6, 0.2, 0.3]);
         break;
       case 'line-eci-zgrid-rmb':
-        lineManagerInstance.createGrid('z', [0.2, 0.2, 0.6, 1], 1);
+        lineManagerInstance.createGrid('z', [0.2, 0.2, 0.6, 0.3]);
+        break;
+      case 'line-eci-radial-xgrid-rmb':
+        lineManagerInstance.createGridRadial({
+          axis: 'x',
+          color: LineColors.RED,
+          opacity: 0.3,
+          circleInterval: 50000 as Kilometers,
+          referenceFrame: ReferenceFrame.J2000,
+        });
+        break;
+      case 'line-eci-radial-ygrid-rmb':
+        lineManagerInstance.createGridRadial({
+          axis: 'y',
+          color: LineColors.GREEN,
+          opacity: 0.3,
+          circleInterval: 50000 as Kilometers,
+          referenceFrame: ReferenceFrame.J2000,
+        });
+        break;
+      case 'line-eci-radial-zgrid-rmb':
+        lineManagerInstance.createGridRadial({
+          axis: 'z',
+          color: LineColors.BLUE,
+          opacity: 0.3,
+          circleInterval: 50000 as Kilometers,
+          referenceFrame: ReferenceFrame.J2000,
+        });
         break;
       case 'line-earth-sat-rmb':
         lineManagerInstance.createSatToRef(clickSatObj, [0, 0, 0], LineColors.PURPLE);

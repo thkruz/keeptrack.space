@@ -1,18 +1,20 @@
 /* eslint-disable max-depth */
 /* eslint-disable complexity */
 /* eslint-disable camelcase */
+import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { Singletons } from '@app/engine/core/interfaces';
+import { ReferenceFrame, Singletons } from '@app/engine/core/interfaces';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { Body } from 'astronomy-engine';
 import { mat4, vec3, vec4 } from 'gl-matrix';
-import { BaseObject, DetailedSatellite, DetailedSensor, RaeVec3 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, RaeVec3 } from 'ootk';
 import { Container } from '../core/container';
 import { Scene } from '../core/scene';
 import { EventBusEvent } from '../events/event-bus-events';
+import { EARTH_OBLIQUITY_RADIANS } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
 import { DepthManager } from './depth-manager';
 import { Line, LineColor, LineColors } from './line-manager/line';
@@ -40,8 +42,8 @@ export class LineManager {
   };
   uniforms_ = {
     u_color: null as unknown as WebGLUniformLocation,
-    u_camMatrix: null as unknown as WebGLUniformLocation,
-    u_pMatrix: null as unknown as WebGLUniformLocation,
+    u_mVMatrix: null as unknown as WebGLUniformLocation,
+    u_pCamMatrix: null as unknown as WebGLUniformLocation,
     worldOffset: null as unknown as WebGLUniformLocation,
     logDepthBufFC: null as unknown as WebGLUniformLocation,
   };
@@ -189,28 +191,68 @@ export class LineManager {
       throw new Error('Invalid type');
     }
 
-    const num1 = 10000 / scalar;
+    const num1 = 100000 / scalar;
     const num2 = num1 * 7 * scalar;
     const min = -7 * scalar;
     const max = 7 * scalar;
 
+    // Split lines into 10 segments to reduce maximum length
+    const segments = 10;
+    const segmentLength = (num2 * 2) / segments; // Total length divided by segments
+
     switch (type) {
       case 'x':
         for (let i = min; i <= max; i++) {
-          this.add(new RefToRefLine([num2, i * num1, 0], [-num2, i * num1, 0], color));
-          this.add(new RefToRefLine([i * num1, num2, 0], [i * num1, -num2, 0], color));
+          // Horizontal lines (varying x)
+          for (let seg = 0; seg < segments; seg++) {
+            const startX = -num2 + seg * segmentLength;
+            const endX = startX + segmentLength;
+
+            this.add(new RefToRefLine([startX, i * num1, 0], [endX, i * num1, 0], color));
+          }
+          // Vertical lines (varying y)
+          for (let seg = 0; seg < segments; seg++) {
+            const startY = -num2 + seg * segmentLength;
+            const endY = startY + segmentLength;
+
+            this.add(new RefToRefLine([i * num1, startY, 0], [i * num1, endY, 0], color));
+          }
         }
         break;
       case 'y':
         for (let i = min; i <= max; i++) {
-          this.add(new RefToRefLine([0, num2, i * num1], [0, -num2, i * num1], color));
-          this.add(new RefToRefLine([0, i * num1, num2], [0, i * num1, -num2], color));
+          // Lines parallel to y-axis (varying y)
+          for (let seg = 0; seg < segments; seg++) {
+            const startY = -num2 + seg * segmentLength;
+            const endY = startY + segmentLength;
+
+            this.add(new RefToRefLine([0, startY, i * num1], [0, endY, i * num1], color));
+          }
+          // Lines perpendicular to y-axis (varying z)
+          for (let seg = 0; seg < segments; seg++) {
+            const startZ = -num2 + seg * segmentLength;
+            const endZ = startZ + segmentLength;
+
+            this.add(new RefToRefLine([0, i * num1, startZ], [0, i * num1, endZ], color));
+          }
         }
         break;
       case 'z':
         for (let i = min; i <= max; i++) {
-          this.add(new RefToRefLine([i * num1, 0, num2], [i * num1, 0, -num2], color));
-          this.add(new RefToRefLine([num2, 0, i * num1], [-num2, 0, i * num1], color));
+          // Lines parallel to z-axis (varying z)
+          for (let seg = 0; seg < segments; seg++) {
+            const startZ = -num2 + seg * segmentLength;
+            const endZ = startZ + segmentLength;
+
+            this.add(new RefToRefLine([i * num1, 0, startZ], [i * num1, 0, endZ], color));
+          }
+          // Lines perpendicular to z-axis (varying x)
+          for (let seg = 0; seg < segments; seg++) {
+            const startX = -num2 + seg * segmentLength;
+            const endX = startX + segmentLength;
+
+            this.add(new RefToRefLine([startX, 0, i * num1], [endX, 0, i * num1], color));
+          }
         }
         break;
       default:
@@ -218,12 +260,168 @@ export class LineManager {
     }
   }
 
-  draw(tgtBuffer = null as WebGLFramebuffer | null): void {
+  createGridRadial(params: {
+    axis: 'x' | 'y' | 'z';
+    color: LineColor;
+    opacity?: number;
+    gridRadius?: number;
+    angleStep?: number;
+    segments?: number;
+    circleInterval?: number;
+    circleSegments?: number;
+    referenceFrame?: ReferenceFrame;
+  }): void {
+    const {
+      axis,
+      color,
+      opacity = 1.0,
+      gridRadius = 700000,
+      angleStep = 20 as Degrees,
+      segments = 5,
+      circleInterval = 10000 as Kilometers, // Circle every 10,000km
+      circleSegments = 36 as Degrees, // Number of segments per circle (10 degrees each)
+      referenceFrame = ReferenceFrame.J2000,
+    } = params;
+
+    color[3] = opacity;
+
+    if (axis !== 'x' && axis !== 'y' && axis !== 'z') {
+      throw new Error('Invalid axis');
+    }
+
+    const segmentLength = gridRadius / segments;
+
+    switch (axis) {
+      case 'y':
+        // Fan out in the YZ plane (perpendicular to X axis)
+        for (let angle = 0; angle < 360; angle += angleStep) {
+          const radians = (angle * Math.PI) / 180;
+
+          // Create segmented radial line from origin to outer edge
+          for (let seg = 0; seg < segments; seg++) {
+            const startDist = Math.max(seg * segmentLength, 1000);
+            const endDist = (seg + 1) * segmentLength;
+            const startY = startDist * Math.cos(radians);
+            const startZ = startDist * Math.sin(radians);
+            const segEndY = endDist * Math.cos(radians);
+            const segEndZ = endDist * Math.sin(radians);
+            const radialLineSegment = new RefToRefLine([0, startY, startZ], [0, segEndY, segEndZ], color);
+
+            radialLineSegment.referenceFrame = referenceFrame;
+            this.add(radialLineSegment);
+          }
+        }
+
+        // Add concentric circles
+        for (let r = circleInterval; r <= gridRadius; r += circleInterval) {
+          for (let i = 0; i < circleSegments; i++) {
+            const angle1 = (i * 360 / circleSegments) * Math.PI / 180;
+            const angle2 = ((i + 1) * 360 / circleSegments) * Math.PI / 180;
+
+            const y1 = r * Math.cos(angle1);
+            const z1 = r * Math.sin(angle1);
+            const y2 = r * Math.cos(angle2);
+            const z2 = r * Math.sin(angle2);
+            const radialLineSegment = new RefToRefLine([0, y1, z1], [0, y2, z2], color);
+
+            radialLineSegment.referenceFrame = referenceFrame;
+            this.add(radialLineSegment);
+          }
+        }
+        break;
+
+      case 'z':
+        // Fan out in the XZ plane (perpendicular to Y axis)
+        for (let angle = 0; angle < 360; angle += angleStep) {
+          const radians = (angle * Math.PI) / 180;
+
+          // Create segmented radial line from origin to outer edge
+          for (let seg = 0; seg < segments; seg++) {
+            const startDist = Math.max(seg * segmentLength, 1000);
+            const endDist = (seg + 1) * segmentLength;
+            const startX = startDist * Math.cos(radians);
+            const startZ = startDist * Math.sin(radians);
+            const segEndX = endDist * Math.cos(radians);
+            const segEndZ = endDist * Math.sin(radians);
+            const radialLineSegment = new RefToRefLine([startX, 0, startZ], [segEndX, 0, segEndZ], color);
+
+            radialLineSegment.referenceFrame = referenceFrame;
+            this.add(radialLineSegment);
+          }
+        }
+
+        // Add concentric circles
+        for (let r = circleInterval; r <= gridRadius; r += circleInterval) {
+          for (let i = 0; i < circleSegments; i++) {
+            const angle1 = (i * 360 / circleSegments) * Math.PI / 180;
+            const angle2 = ((i + 1) * 360 / circleSegments) * Math.PI / 180;
+
+            const x1 = r * Math.cos(angle1);
+            const z1 = r * Math.sin(angle1);
+            const x2 = r * Math.cos(angle2);
+            const z2 = r * Math.sin(angle2);
+            const radialLineSegment = new RefToRefLine([x1, 0, z1], [x2, 0, z2], color);
+
+            radialLineSegment.referenceFrame = referenceFrame;
+            this.add(radialLineSegment);
+          }
+        }
+        break;
+
+      case 'x':
+        // Fan out in the XY plane (perpendicular to Z axis)
+        for (let angle = 0; angle < 360; angle += angleStep) {
+          const radians = (angle * Math.PI) / 180;
+
+          // Create segmented radial line from origin to outer edge
+          for (let seg = 0; seg < segments; seg++) {
+            const startDist = Math.max(seg * segmentLength, 1000);
+            const endDist = (seg + 1) * segmentLength;
+            const startX = startDist * Math.cos(radians);
+            const startY = startDist * Math.sin(radians);
+            const segEndX = endDist * Math.cos(radians);
+            const segEndY = endDist * Math.sin(radians);
+            const radialLineSegment = new RefToRefLine([startX, startY, 0], [segEndX, segEndY, 0], color);
+
+            radialLineSegment.referenceFrame = referenceFrame;
+            this.add(radialLineSegment);
+          }
+        }
+
+        // Add concentric circles
+        for (let r = circleInterval; r <= gridRadius; r += circleInterval) {
+          for (let i = 0; i < circleSegments; i++) {
+            const angle1 = (i * 360 / circleSegments) * Math.PI / 180;
+            const angle2 = ((i + 1) * 360 / circleSegments) * Math.PI / 180;
+
+            const x1 = r * Math.cos(angle1);
+            const y1 = r * Math.sin(angle1);
+            const x2 = r * Math.cos(angle2);
+            const y2 = r * Math.sin(angle2);
+            const radialLineSegment = new RefToRefLine([x1, y1, 0], [x2, y2, 0], color);
+
+            radialLineSegment.referenceFrame = referenceFrame;
+            this.add(radialLineSegment);
+          }
+        }
+        break;
+
+      default:
+        break;
+    }
+  }
+
+  draw(projectionCameraMatrix: mat4, tgtBuffer = null as WebGLFramebuffer | null): void {
     if (this.lines.length === 0) {
       return;
     }
 
-    this.runBeforeDraw(tgtBuffer);
+    const modelViewMatrix = mat4.create();
+
+    // Default to 1 so no transformation
+    mat4.identity(modelViewMatrix);
+
+    this.runBeforeDraw(modelViewMatrix, projectionCameraMatrix, tgtBuffer);
 
     for (let i = this.lines.length - 1; i >= 0; i--) {
       if (this.lines[i].isGarbage) {
@@ -231,7 +429,23 @@ export class LineManager {
       }
     }
 
-    for (const line of this.lines) {
+    const temeLines = this.lines.filter((line) => line.referenceFrame === 'TEME');
+    const j2000Lines = this.lines.filter((line) => line.referenceFrame === 'J2000');
+
+    for (const line of temeLines) {
+      line.draw(this);
+    }
+
+
+    // Apply ecliptic rotation to modelMatrix
+    // TEME to J2000 transformation
+    const temeToJ2000Matrix = SatMath.j200ToTemeMatrix(keepTrackApi.getTimeManager().simulationTimeObj);
+
+    mat4.rotateX(temeToJ2000Matrix, temeToJ2000Matrix, EARTH_OBLIQUITY_RADIANS);
+
+    keepTrackApi.getRenderer().gl.uniformMatrix4fv(this.uniforms_.u_mVMatrix, false, temeToJ2000Matrix);
+
+    for (const line of j2000Lines) {
       line.draw(this);
     }
 
@@ -244,14 +458,15 @@ export class LineManager {
     }
   }
 
-  runBeforeDraw(tgtBuffer = null as WebGLFramebuffer | null): void {
-    const { projectionMatrix, gl } = keepTrackApi.getRenderer();
+  runBeforeDraw(modelViewMatrix: mat4, projectionCameraMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
+    const { gl } = keepTrackApi.getRenderer();
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.program);
 
-    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, keepTrackApi.getMainCamera().camMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, projectionMatrix);
+    gl.enable(gl.BLEND);
+    gl.enable(gl.DEPTH_TEST);
+    this.setWorldUniforms(modelViewMatrix, projectionCameraMatrix);
 
     gl.enableVertexAttribArray(this.attribs.a_position.location); // Enable
   }
@@ -259,6 +474,7 @@ export class LineManager {
   runAfterDraw() {
     const gl = keepTrackApi.getRenderer().gl;
 
+    gl.enable(gl.DEPTH_TEST);
     gl.disableVertexAttribArray(this.attribs.a_position.location); // Disable
   }
 
@@ -305,11 +521,11 @@ export class LineManager {
     gl.uniform4fv(this.uniforms_.u_color, color);
   }
 
-  setWorldUniforms(camMatrix: mat4, pMatrix: mat4) {
+  setWorldUniforms(modelViewMatrix: mat4, projectionCameraMatrix: mat4) {
     const gl = keepTrackApi.getRenderer().gl;
 
-    gl.uniformMatrix4fv(this.uniforms_.u_camMatrix, false, camMatrix);
-    gl.uniformMatrix4fv(this.uniforms_.u_pMatrix, false, pMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_pCamMatrix, false, projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.uniforms_.u_mVMatrix, false, modelViewMatrix);
     gl.uniform1f(this.uniforms_.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     gl.uniform3fv(this.uniforms_.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
   }
@@ -337,8 +553,8 @@ export class LineManager {
       in vec4 a_position;
 
       uniform vec4 u_color;
-      uniform mat4 u_camMatrix;
-      uniform mat4 u_pMatrix;
+      uniform mat4 u_mVMatrix;
+      uniform mat4 u_pCamMatrix;
       uniform vec3 worldOffset;
       uniform float logDepthBufFC;
 
@@ -346,7 +562,9 @@ export class LineManager {
       out float vAlpha;
 
       void main(void) {
-          vec4 position = u_pMatrix * u_camMatrix * vec4(vec3(a_position[0],a_position[1],a_position[2]) + worldOffset, 1.0);
+          // Apply offset in world space, then transform
+          vec4 worldPosition = u_mVMatrix * vec4(a_position.xyz, 1.0);
+          vec4 position = u_pCamMatrix * vec4(worldPosition.xyz + worldOffset, 1.0);
           gl_Position = position;
 
           ${DepthManager.getLogDepthVertCode()}

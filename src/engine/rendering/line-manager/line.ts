@@ -27,6 +27,7 @@ export abstract class Line {
   private readonly vertBuf_: WebGLBuffer;
   protected color_: vec4;
   protected isDraw_ = true;
+  referenceFrame: 'J2000' | 'TEME' = 'TEME';
   /** This flag is set to true when the line is no longer needed. The garbage collector will handle removing it */
   isGarbage = false;
 
@@ -34,7 +35,7 @@ export abstract class Line {
     const gl = keepTrackApi.getRenderer().gl;
 
     this.vertBuf_ = gl.createBuffer();
-    GlUtils.bindBufferStreamDraw(gl, this.vertBuf_, new Float32Array(6));
+    GlUtils.bindBufferDynamicDraw(gl, this.vertBuf_, new Float32Array(8));
   }
 
   /**
@@ -50,9 +51,9 @@ export abstract class Line {
     gl.uniform4fv(lineManager.uniforms_.u_color, this.color_);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertBuf_);
-    gl.vertexAttribPointer(lineManager.attribs.a_position.location, 3, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(lineManager.attribs.a_position.location, 4, gl.FLOAT, false, 0, 0);
 
-    gl.drawArrays(gl.LINES, 0, 2);
+    gl.drawArrays(gl.LINE_STRIP, 0, 2);
   }
 
   abstract update(): void;
@@ -60,7 +61,7 @@ export abstract class Line {
   updateVertBuf(pt1: EciArr3, pt2: EciArr3) {
     const gl = keepTrackApi.getRenderer().gl;
 
-    GlUtils.bindBufferStreamDraw(gl, this.vertBuf_, new Float32Array([pt1[0], pt1[1], pt1[2], pt2[0], pt2[1], pt2[2]]));
+    GlUtils.bindBufferDynamicDraw(gl, this.vertBuf_, new Float32Array([pt1[0], pt1[1], pt1[2], 1.0, pt2[0], pt2[1], pt2[2], 1.0]));
   }
 
   protected validateColor(color: vec4): void {

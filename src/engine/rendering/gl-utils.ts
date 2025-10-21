@@ -78,9 +78,9 @@ export abstract class GlUtils {
   /**
    * Upload the buffer to the GPU and bind it to the current ARRAY_BUFFER
    */
-  public static bindBufferStreamDraw(gl: WebGL2RenderingContext, buffer: WebGLBuffer, data: Float32Array | Uint16Array): WebGLBuffer {
+  public static bindBufferDynamicDraw(gl: WebGL2RenderingContext, buffer: WebGLBuffer, data: Float32Array | Uint16Array): WebGLBuffer {
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STREAM_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
 
     return buffer;
   }

@@ -92,3 +92,13 @@ export const STAR_DISTANCE = <Kilometers>250000;
  * Distance from Earth to the Sun in kilometers
  */
 export const DISTANCE_TO_SUN = <Kilometers>149597870; // Distance from Earth to the Sun in kilometers
+
+/**
+ * Earth's Obliquity in degrees
+ */
+export const EARTH_OBLIQUITY_DEGREES = 23.438480461241912;
+
+/**
+ * Earth's Obliquity in radians
+ */
+export const EARTH_OBLIQUITY_RADIANS = EARTH_OBLIQUITY_DEGREES * (Math.PI / 180);

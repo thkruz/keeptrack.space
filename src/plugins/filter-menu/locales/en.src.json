@@ -1,4 +1,11 @@
 {
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "Filter Menu",
+      "bottomIconLabel": "Filter Menu",
+      "helpBody": "This menu allows you to filter the objects displayed on the globe based on their type, orbital regime, and data source."
+    }
+  },
   "filterMenu": {
     "payloads": {
       "name": "Payloads",

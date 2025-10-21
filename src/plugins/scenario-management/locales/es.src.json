@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "ScenarioManagementPlugin": {
+      "title": "Gestión de escenarios",
+      "bottomIconLabel": "Gestión de escenarios",
+      "helpBody": "El complemento de gestión de escenarios le permite organizar su trabajo para diferentes proyectos o contextos.<br/>Las funciones actuales son:<br/><br/>  - Nombre y descripción para cada escenario<br/>  - Fecha/hora de inicio y fin del período de análisis<br/>  - Guardar/Cargar escenarios<br/><br/>El objetivo es proporcionar eventualmente un único archivo que contenga toda la información necesaria para la gestión de escenarios. ¡Más funciones próximamente!"
+    }
+  }
+}

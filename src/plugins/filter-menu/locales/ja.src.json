@@ -1,4 +1,11 @@
 {
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "フィルタメニュー",
+      "bottomIconLabel": "フィルタメニュー",
+      "helpBody": "このメニューでは、種類、軌道領域、データソースに基づいて地球儀に表示されるオブジェクトをフィルタリングできます。"
+    }
+  },
   "filterMenu": {
     "payloads": {
       "name": "ペイロード",

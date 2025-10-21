@@ -1,4 +1,11 @@
 {
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "Filtermenü",
+      "bottomIconLabel": "Filtermenü",
+      "helpBody": "Dieses Menü ermöglicht es Ihnen, die auf dem Globus angezeigten Objekte nach Typ, orbitalen Bereichen und Datenquellen zu filtern."
+    }
+  },
   "filterMenu": {
     "payloads": {
       "name": "Nutzlasten",

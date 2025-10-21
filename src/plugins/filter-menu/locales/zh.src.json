@@ -1,4 +1,11 @@
 {
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "过滤菜单",
+      "bottomIconLabel": "过滤菜单",
+      "helpBody": "此菜单允许您根据对象的类型、轨道类型和数据来源筛选地球仪上显示的对象。"
+    }
+  },
   "filterMenu": {
     "payloads": {
       "name": "载荷",

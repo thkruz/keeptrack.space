@@ -1,4 +1,11 @@
 {
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "Menú de filtros",
+      "bottomIconLabel": "Menú de filtros",
+      "helpBody": "Este menú permite filtrar los objetos mostrados en el globo según su tipo, régimen orbital y fuente de datos."
+    }
+  },
   "filterMenu": {
     "payloads": {
       "name": "Cargas útiles",

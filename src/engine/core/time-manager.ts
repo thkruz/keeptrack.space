@@ -5,23 +5,17 @@ import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
+import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
-import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
 
 export class TimeManager {
-  dateDOM = null;
-  datetimeInputDOM = <HTMLInputElement>null;
+  datetimeInputDOM: HTMLInputElement | null = null;
   /**
    * The real time at the moment when dynamicOffset or propRate changes
    */
   dynamicOffsetEpoch = <number>null;
-  private iText = <number>null;
   lastPropRate = <number>1;
-  /**
-   * Time in Milliseconds the last time sim time was updated
-   */
-  private lastTime = <Milliseconds>0;
   propFrozen = 0;
   propOffset = 0;
   /**
@@ -43,12 +37,6 @@ export class TimeManager {
    * The time offset ignoring propRate (ex. New Launch)
    */
   staticOffset: number;
-  private simulationTimeSerialized_ = <string>null;
-  timeTextStr = <string>null;
-  /**
-   * Reusable empty text string to reduce garbage collection
-   */
-  private timeTextStrEmpty_ = <string>null;
   lastBoxUpdateTime = <Milliseconds>0;
   /**
    * dynamicOffset: The time offset that is impacted by propRate
@@ -56,7 +44,6 @@ export class TimeManager {
    * dynamicOffset = realTime - dynamicOffsetEpoch
    */
   private dynamicOffset_: number;
-  isCreateClockDOMOnce_ = false;
   gmst: GreenwichMeanSiderealTime = 0 as GreenwichMeanSiderealTime;
   j: number;
   readonly timeUntilChangingEnabled = 10000;
@@ -95,10 +82,12 @@ export class TimeManager {
       this.simulationTimeObj.setTime(simulationTime);
     }
 
+    keepTrackApi.emit(EventBusEvent.calculateSimulationTime, this.simulationTimeObj);
+
     return this.simulationTimeObj;
   }
 
-  changePropRate(propRate: number) {
+  changePropRate(propRate: number, isShowToast = true) {
     if (this.propRate === propRate) {
       return;
     } // no change
@@ -127,7 +116,7 @@ export class TimeManager {
 
     const uiManagerInstance = keepTrackApi.getUiManager();
 
-    if (!settingsManager.isAlwaysHidePropRate) {
+    if (!settingsManager.isAlwaysHidePropRate && isShowToast) {
       if (this.propRate > 1.01 || this.propRate < 0.99) {
         if (this.propRate < 10) {
           uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.standby);
@@ -140,23 +129,6 @@ export class TimeManager {
         }
       } else {
         uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.normal);
-      }
-
-      if (!settingsManager.disableUI) {
-        const datetimeTextElement = getEl('datetime-text', true);
-
-        if (!datetimeTextElement) {
-          errorManagerInstance.debug('Datetime text element not found');
-
-          return;
-        }
-
-        if (!this.isCreateClockDOMOnce_) {
-          datetimeTextElement.innerText = this.timeTextStr;
-          this.isCreateClockDOMOnce_ = true;
-        } else {
-          datetimeTextElement.childNodes[0].nodeValue = this.timeTextStr;
-        }
       }
     }
   }
@@ -201,9 +173,6 @@ export class TimeManager {
   init() {
     this.dynamicOffsetEpoch = Date.now();
     this.simulationTimeObj = new Date();
-
-    this.timeTextStr = '';
-    this.timeTextStrEmpty_ = '';
 
     this.propFrozen = Date.now(); // for when propRate 0
     this.realTime = <Milliseconds>this.propFrozen; // (initialized as Date.now)
@@ -400,7 +369,6 @@ export class TimeManager {
 
   setNow(realTime: Milliseconds) {
     this.realTime = realTime;
-    this.lastTime = <Milliseconds>this.simulationTimeObj.getTime();
 
     // NOTE: This should be the only regular call to calculateSimulationTime!!
     this.calculateSimulationTime();
@@ -434,50 +402,7 @@ export class TimeManager {
   setSelectedDate(selectedDate: Date) {
     this.selectedDate = selectedDate;
 
-    // This function only applies when datetime plugin is enabled
-    if (settingsManager.plugins.DateTimeManager) {
-      if (this.lastTime - this.simulationTimeObj.getTime() < <Milliseconds>300) {
-        this.simulationTimeSerialized_ = this.simulationTimeObj.toJSON();
-        this.timeTextStr = this.timeTextStrEmpty_;
-        for (this.iText = 11; this.iText < 20; this.iText++) {
-          if (this.iText > 11) {
-            this.timeTextStr += this.simulationTimeSerialized_[this.iText - 1];
-          }
-        }
-      }
-
-      // Avoid race condition
-      if (!this.dateDOM) {
-        try {
-          this.dateDOM = getEl('datetime-text');
-          if (!this.dateDOM) {
-            return;
-          }
-        } catch {
-          errorManagerInstance.debug('Date DOM not found');
-
-          return;
-        }
-      }
-
-      // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
-      this.dateDOM.textContent = this.timeTextStr;
-    }
-
-    // Passing datetimeInput eliminates needing jQuery in main module
-    if (
-      this.lastTime - this.simulationTimeObj.getTime() < 300 &&
-      ((keepTrackApi.getPlugin(DateTimeManager))?.isEditTimeOpen || !settingsManager.cruncherReady || !keepTrackApi.getPlugin(DateTimeManager))
-    ) {
-      if (settingsManager.plugins.DateTimeManager) {
-        if (!this.datetimeInputDOM) {
-          this.datetimeInputDOM = <HTMLInputElement>getEl('datetime-input-tb', true);
-        }
-        if (!this.datetimeInputDOM) {
-          this.datetimeInputDOM.value = `${this.selectedDate.toISOString().slice(0, 10)} ${this.selectedDate.toISOString().slice(11, 19)}`;
-        }
-      }
-    }
+    EventBus.getInstance().emit(EventBusEvent.selectedDateChange, this.selectedDate);
   }
 
   synchronize() {

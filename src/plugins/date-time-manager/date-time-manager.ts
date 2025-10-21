@@ -1,8 +1,10 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { Milliseconds } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
@@ -13,6 +15,15 @@ export class DateTimeManager extends KeepTrackPlugin {
   isEditTimeOpen = false;
   private readonly dateTimeContainerId_ = 'datetime';
   private readonly dateTimeInputTbId_ = 'datetime-input-tb';
+  private iText: number | null = null;
+  private simulationTimeSerialized_: string | null = null;
+  /** Reusable empty text string to reduce garbage collection */
+  private readonly timeTextStrEmpty_ = '' as const;
+  timeTextStr: string = '';
+  isCreateClockDOMOnce_ = false;
+  dateDOM: HTMLElement | null = null;
+  /** Time in Milliseconds the last time sim time was updated */
+  private lastTime = 0 as Milliseconds;
   calendar: Calendar;
 
   init(): void {
@@ -22,6 +33,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal.bind(this));
     keepTrackApi.on(EventBusEvent.updateDateTime, this.updateDateTime.bind(this));
     keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => this.updateDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+    keepTrackApi.on(EventBusEvent.selectedDateChange, (date: Date) => this.updateDateTime(date));
   }
 
   updateDateTime(date: Date) {
@@ -43,6 +55,54 @@ export class DateTimeManager extends KeepTrackPlugin {
     } else {
       getEl('jday')!.innerHTML = keepTrackApi.getTimeManager().simulationTimeObj.toLocaleDateString();
     }
+
+    const timeManagerInstance = keepTrackApi.getTimeManager();
+
+    if (!this.simulationTimeSerialized_ || Math.abs(this.lastTime - timeManagerInstance.simulationTimeObj.getTime()) > (1000 as Milliseconds)) {
+      this.simulationTimeSerialized_ = timeManagerInstance.simulationTimeObj.toJSON();
+      this.timeTextStr = this.timeTextStrEmpty_;
+      for (this.iText = 11; this.iText < 20; this.iText++) {
+        if (this.iText > 11) {
+          this.timeTextStr += this.simulationTimeSerialized_[this.iText - 1];
+        }
+      }
+
+      this.lastTime = timeManagerInstance.simulationTimeObj.getTime() as Milliseconds;
+    }
+
+    // Avoid race condition
+    if (!this.dateDOM) {
+      try {
+        this.dateDOM = getEl('datetime-text');
+        if (!this.dateDOM) {
+          return;
+        }
+      } catch {
+        errorManagerInstance.debug('Date DOM not found');
+
+        return;
+      }
+    }
+
+    if (!settingsManager.disableUI) {
+      const datetimeTextElement = getEl('datetime-text', true);
+
+      if (!datetimeTextElement) {
+        errorManagerInstance.debug('Datetime text element not found');
+
+        return;
+      }
+
+      if (!this.isCreateClockDOMOnce_ || datetimeTextElement.childNodes.length === 0) {
+        datetimeTextElement.innerText = this.timeTextStr;
+        this.isCreateClockDOMOnce_ = true;
+      } else {
+        datetimeTextElement.childNodes[0].nodeValue = this.timeTextStr;
+      }
+    }
+
+    // textContent doesn't remove the Node! No unecessary DOM changes everytime time updates.
+    this.dateDOM.textContent = this.timeTextStr;
   }
 
   datetimeTextClick(): void {

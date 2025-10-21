@@ -2,7 +2,7 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { mat4, vec3, vec4 } from 'gl-matrix';
+import { vec3, vec4 } from 'gl-matrix';
 import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
@@ -229,13 +229,8 @@ export class InputManager {
     const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
     const glScreenY = 1.0 - (y / gl.drawingBufferHeight) * 2;
     const screenVec = <vec4>[glScreenX, glScreenY, -0.01, 1.0]; // gl screen coords
-
-    const comboPMat = mat4.create();
-
-    mat4.mul(comboPMat, renderer.projectionMatrix, keepTrackApi.getMainCamera().camMatrix);
-    const invMat = mat4.create();
-
-    mat4.invert(invMat, comboPMat);
+    const mainCamera = keepTrackApi.getMainCamera();
+    const invMat = mainCamera.matrixWorldInverse;
     const worldVec = <[number, number, number, number]>(<unknown>vec4.create());
 
     vec4.transformMat4(worldVec, screenVec, invMat);
@@ -377,7 +372,7 @@ export class InputManager {
     hideEl('clear-lines-rmb');
 
     if (lineManagerInstance.lines.length > 0) {
-    const clearLinesEl = getEl('clear-lines-rmb', true);
+      const clearLinesEl = getEl('clear-lines-rmb', true);
 
       if (clearLinesEl) {
         clearLinesEl.style.display = 'block';

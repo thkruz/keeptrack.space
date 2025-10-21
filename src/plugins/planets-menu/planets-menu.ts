@@ -88,6 +88,13 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
       }
     }
 
+    html_ += html`
+      <div class="row"></div>
+      <div class="row center">
+        <button id="${this.sideMenuElementName}-drawMoonOrbitPath-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Draw Moon Orbit Path &#9658;</button>
+      </div>
+    `;
+
     return html_;
   }
 
@@ -156,6 +163,12 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
               this.planetsMenuClick(planetName ?? '');
             });
           });
+
+        getEl('planets-menu-drawMoonOrbitPath-btn')?.addEventListener('click', () => {
+          const moon = ServiceLocator.getScene().planets[Body.Moon];
+
+          moon.drawOrbitPath();
+        });
       },
     );
   }

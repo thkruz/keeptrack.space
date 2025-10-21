@@ -164,7 +164,7 @@ export class MeshManager {
     let drawPosition = [position.x, position.y, position.z] as EciArr3;
 
     // We need to avoid zero values. They break mat4.targetTo
-    drawPosition = drawPosition.map((coord) => coord / 1000000000) as EciArr3;
+    drawPosition = drawPosition.map((coord) => coord / 1e11) as EciArr3;
 
     // Move the mesh to its location in world space
     this.mvMatrix_ = mat4.create();

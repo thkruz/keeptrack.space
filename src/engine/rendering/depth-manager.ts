@@ -29,7 +29,12 @@ export class DepthManager {
   static getLogDepthVertCode(): string {
     return `
       if (logDepthBufFC > 0.0) {
-        gl_Position.z = (log2(max(1e-6, 1.0 + gl_Position.w)) * logDepthBufFC - 1.0) * gl_Position.w;
+        // Guard against non-positive or extremely large gl_Position.w values which
+        // can produce NaNs or Infs when used inside a log2. Clamp to a sensible
+        // positive minimum to keep depth calculations stable for very large world
+        // coordinates (e.g. grid lines).
+        float w = clamp(gl_Position.w, 1e-9, 1e20);
+        gl_Position.z = (log2(1.0 + w) * logDepthBufFC - 1.0) * w;
       }
     `;
   }

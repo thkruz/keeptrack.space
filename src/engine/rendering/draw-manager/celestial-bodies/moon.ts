@@ -81,4 +81,8 @@ export class Moon extends CelestialBody {
       );
     }
   }
+
+  protected calculateRelativeSatPos() {
+    // Nothing to do in the test cases we have
+  }
 }

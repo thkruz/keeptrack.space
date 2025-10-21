@@ -5,6 +5,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
@@ -171,14 +172,20 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         const gmst = keepTrackApi.getTimeManager().gmst;
 
         if (((obj as OemSatellite).centerBody ?? Body.Earth) !== Body.Earth) {
-          const moon = keepTrackApi.getScene().planets.Moon;
+          const centerBody = keepTrackApi.getScene().getBodyById((obj as OemSatellite).centerBody) as CelestialBody | null;
+
+          if (!centerBody) {
+            errorManagerInstance.debug(`Error calculating altitude for non-Earth centered object ${obj.name}: center body not found.`);
+
+            return;
+          }
           const position = {
-            x: obj.position.x - moon.position[0] as Kilometers,
-            y: obj.position.y - moon.position[1] as Kilometers,
-            z: obj.position.z - moon.position[2] as Kilometers,
+            x: obj.position.x - centerBody.position[0] as Kilometers,
+            y: obj.position.y - centerBody.position[1] as Kilometers,
+            z: obj.position.z - centerBody.position[2] as Kilometers,
           };
 
-          satAltitudeElement.innerHTML = `${SatMath.getAlt(position, gmst, moon.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+          satAltitudeElement.innerHTML = `${SatMath.getAlt(position, gmst, centerBody.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
         } else {
           satAltitudeElement.innerHTML = `${SatMath.getAlt(obj.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
         }

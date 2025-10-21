@@ -53,6 +53,7 @@ import { SatInfoBoxSensor } from './sat-info-box-sensor/sat-info-box-sensor';
 import { SatInfoBox } from './sat-info-box/sat-info-box';
 import { SatelliteFov } from './satellite-fov/satellite-fov';
 import { SatellitePhotos } from './satellite-photos/satellite-photos';
+import { ScenarioManagementPlugin } from './scenario-management/scenario-management';
 import { ScreenRecorder } from './screen-recorder/screen-recorder';
 import { Screenshot } from './screenshot/screenshot';
 import { SelectSatManager } from './select-sat-manager/select-sat-manager';
@@ -73,11 +74,11 @@ import { SensorTimeline } from './timeline-sensor/sensor-timeline';
 import { TooltipsPlugin } from './tooltips/tooltips';
 import { TrackingImpactPredict } from './tracking-impact-predict/tracking-impact-predict';
 import { TransponderChannelData } from './transponder-channel-data/transponder-channel-data';
+import { VcrPlugin } from './vcr/vcr';
 import { VideoDirectorPlugin } from './video-director/video-director';
 import { ViewInfoRmbPlugin } from './view-info-rmb/view-info-rmb';
 import { WatchlistPlugin } from './watchlist/watchlist';
 import { WatchlistOverlay } from './watchlist/watchlist-overlay';
-import { VcrPlugin } from './vcr/vcr';
 
 export class PluginManager {
   // Register all core modules
@@ -100,6 +101,7 @@ export class PluginManager {
           },
         },
         { init: () => new SelectSatManager().init(), config: { enabled: true } },
+        { init: () => new ScenarioManagementPlugin().init(), config: plugins.ScenarioManagementPlugin },
         { init: () => new TopMenu().init(), config: plugins.TopMenu },
         { init: () => new TimeSlider().init(), config: plugins.TimeSlider },
         { init: () => new TooltipsPlugin().init(), config: plugins.TooltipsPlugin },

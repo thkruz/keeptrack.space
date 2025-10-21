@@ -29,6 +29,7 @@ export abstract class UrlManager {
     'starlink': 'StarlinkColorScheme',
     'smallsat': 'SmallSatColorScheme',
   };
+  static lastUpdateTime_: number;
 
   static {
     keepTrackApi.on(EventBusEvent.selectSatData, (sat) => {
@@ -259,6 +260,12 @@ export abstract class UrlManager {
   }
 
   static updateURL(isMaxData: boolean = false): void {
+    // Throttling navigation to prevent the browser from hanging.
+    if (Date.now() - this.lastUpdateTime_ < 250) {
+      return;
+    }
+    this.lastUpdateTime_ = Date.now();
+
     const uiManagerInstance = keepTrackApi.getUiManager();
     const timeManagerInstance = keepTrackApi.getTimeManager();
     const mainCamera = keepTrackApi.getMainCamera();

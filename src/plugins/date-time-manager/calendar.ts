@@ -670,10 +670,9 @@ export class Calendar {
     const today = new Date();
 
     timeManagerInstance.changeStaticOffset(this.simulationDate.getTime() - today.getTime());
-    colorSchemeManagerInstance.calculateColorBuffers(true);
-    timeManagerInstance.calculateSimulationTime();
-
     timeManagerInstance.lastBoxUpdateTime = timeManagerInstance.realTime;
+
+    colorSchemeManagerInstance.calculateColorBuffers(true);
 
     try {
       const watchlistOverlay = keepTrackApi.getPlugin(WatchlistOverlay);

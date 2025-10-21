@@ -307,6 +307,10 @@ export abstract class UrlManager {
       paramSlices.push(`limitSats=${settingsManager.limitSats}`);
     }
 
+    if (settingsManager.isEnableJscCatalog === false) {
+      paramSlices.push('vimpel=false');
+    }
+
     if (this.selectedSat_?.sccNum && !(mainCamera.state.ftsPitch > -0.1 && mainCamera.state.ftsPitch < 0.1 && mainCamera.state.ftsYaw > -0.1 && mainCamera.state.ftsYaw < 0.1)) {
       paramSlices.push(`pitch=${(mainCamera.state.ftsPitch * RAD2DEG).toFixed(3)}`);
       paramSlices.push(`yaw=${(mainCamera.state.ftsYaw * RAD2DEG).toFixed(3)}`);

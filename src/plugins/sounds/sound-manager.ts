@@ -8,7 +8,6 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import soundOffPng from '@public/img/icons/sound-off.png';
 import soundOnPng from '@public/img/icons/sound-on.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { TooltipsPlugin } from '../tooltips/tooltips';
 import { TopMenu } from '../top-menu/top-menu';
 import { SoundNames, sounds } from './sounds';
 
@@ -91,10 +90,6 @@ export class SoundManager extends KeepTrackPlugin {
       classInner: 'bmenu-item-selected',
       icon: soundOnPng,
       tooltip: 'Toggle Sound On/Off',
-    });
-
-    eventBus.on(EventBusEvent.uiManagerInit, () => {
-      keepTrackApi.getPlugin(TooltipsPlugin)?.createTooltip('sound-btn', 'Toggle Sound On/Off');
     });
 
     eventBus.on(EventBusEvent.uiManagerFinal, () => {
@@ -254,11 +249,6 @@ export class SoundManager extends KeepTrackPlugin {
 
     keepTrackApi.on(EventBusEvent.uiManagerInit, () => {
       this.voices = speechSynthesis.getVoices();
-
-      // Resume audio context if suspended (required by browser autoplay policies)
-      if (this.audioContext?.state === 'suspended') {
-        this.audioContext.resume();
-      }
     });
   };
 
@@ -292,6 +282,11 @@ export class SoundManager extends KeepTrackPlugin {
     msg.volume = 0.5;
     msg.rate = 1;
     msg.pitch = 1;
+
+    if (this.voices.length === 0) {
+      this.voices = speechSynthesis.getVoices();
+    }
+
     msg.voice = this.voices.filter((voice) => voice.name === 'Google UK English Female')[0];
 
     window.speechSynthesis.speak(msg);

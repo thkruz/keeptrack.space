@@ -25,11 +25,11 @@
 import { Classification } from '@app/app/ui/classification';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class Screenshot extends KeepTrackPlugin {
   readonly id = 'Screenshot';
@@ -176,7 +176,7 @@ export class Screenshot extends KeepTrackPlugin {
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
 
-    const logoHeight = 200;
+    const logoHeight = 200 * (settingsManager.hiResWidth ?? 3840) / 3840;
     let logoWidth: number; // with will be calculated based on height
     const padding = 50;
 

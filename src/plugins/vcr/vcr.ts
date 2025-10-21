@@ -1,4 +1,5 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -12,6 +13,7 @@ import playPng from '@public/img/icons/play.png';
 import resumePng from '@public/img/icons/resume.png';
 import rewindPng from '@public/img/icons/rewind.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { ScenarioData, ScenarioManagementPlugin } from '../scenario-management/scenario-management';
 import { TopMenu } from '../top-menu/top-menu';
 
 export class VcrPlugin extends KeepTrackPlugin {
@@ -27,6 +29,7 @@ export class VcrPlugin extends KeepTrackPlugin {
   rewindBtn: HTMLElement | null = null;
   playPauseBtn: HTMLElement | null = null;
   fastForwardBtn: HTMLElement | null = null;
+  scenario: ScenarioData | null = null;
 
   addHtml() {
     super.addHtml();
@@ -58,6 +61,8 @@ export class VcrPlugin extends KeepTrackPlugin {
   addJs() {
     super.addJs();
 
+    this.scenario = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
+
     keepTrackApi.on(EventBusEvent.uiManagerInit, () => {
       this.rewindBtn = document.getElementById('vcr-rewind-btn');
       this.playPauseBtn = document.getElementById('vcr-play-pause-btn');
@@ -70,6 +75,7 @@ export class VcrPlugin extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.propRateChanged, this.onPropRateChanged_.bind(this));
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, this.onPropRateChanged_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, this.onStaticOffsetChanged_.bind(this));
   }
 
   verifyTimeControl(): boolean {
@@ -94,7 +100,7 @@ export class VcrPlugin extends KeepTrackPlugin {
     }
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
-    if (keepTrackApi.getTimeManager().simulationTimeObj.getTime() === settingsManager.scenarioStopTime?.getTime()) {
+    if (keepTrackApi.getTimeManager().simulationTimeObj.getTime() === this.scenario!.endTime?.getTime()) {
       keepTrackApi.toast('Cannot Play: Simulation time is at the end of the scenario.', ToastMsgType.caution, true);
 
       return;
@@ -175,7 +181,7 @@ export class VcrPlugin extends KeepTrackPlugin {
     if (timeManagerInstance.propRate === 0) {
       this.isPlaying = false;
       this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${playPng}">`;
-      if (timeManagerInstance.simulationTimeObj.getTime() === settingsManager.scenarioStopTime?.getTime()) {
+      if (timeManagerInstance.simulationTimeObj.getTime() === this.scenario!.endTime?.getTime()) {
         // Change tooltip to indicate end of scenario
         this.playPauseBtn?.classList.add('bmenu-item-help');
         this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${playPng}">`;
@@ -194,6 +200,12 @@ export class VcrPlugin extends KeepTrackPlugin {
       this.playPauseBtn!.innerHTML = html`<img class="top-menu-icons__blue-img" src="${resumePng}">`;
       this.playPauseBtn!.setAttribute('kt-tooltip', 'Click to Resume');
       this.playPauseBtn?.classList.remove('bmenu-item-selected');
+    }
+  }
+
+  private onStaticOffsetChanged_(): void {
+    if ((this.scenario?.endTime?.getTime() ?? -Infinity) >= keepTrackApi.getTimeManager().simulationTimeObj.getTime()) {
+      this.updatePausePlayBtn();
     }
   }
 

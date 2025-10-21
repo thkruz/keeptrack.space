@@ -1,9 +1,8 @@
 /* eslint-disable max-depth */
 /* eslint-disable complexity */
 /* eslint-disable camelcase */
-import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { ReferenceFrame, Singletons } from '@app/engine/core/interfaces';
+import { Singletons } from '@app/engine/core/interfaces';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -14,6 +13,7 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, Rae
 import { Container } from '../core/container';
 import { Scene } from '../core/scene';
 import { EventBusEvent } from '../events/event-bus-events';
+import { getTemeToJ2000Matrix, ReferenceFrame } from '../math/reference-frames';
 import { EARTH_OBLIQUITY_RADIANS } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
 import { DepthManager } from './depth-manager';
@@ -439,7 +439,7 @@ export class LineManager {
 
     // Apply ecliptic rotation to modelMatrix
     // TEME to J2000 transformation
-    const temeToJ2000Matrix = SatMath.j200ToTemeMatrix(keepTrackApi.getTimeManager().simulationTimeObj);
+    const temeToJ2000Matrix = getTemeToJ2000Matrix(keepTrackApi.getTimeManager().simulationTimeObj);
 
     mat4.rotateX(temeToJ2000Matrix, temeToJ2000Matrix, EARTH_OBLIQUITY_RADIANS);
 

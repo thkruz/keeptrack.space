@@ -103,6 +103,9 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
 
     for (const planet of this.PLANETS) {
       html += `<li id="planets-${planet}-rmb"><a href="#">${planet}</a></li>`;
+      if (planet === Body.Earth) {
+        html += `<li id="planets-${Body.Moon}-rmb"><a href="#">Moon</a></li>`;
+      }
     }
 
     return html;

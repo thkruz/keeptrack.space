@@ -44,6 +44,7 @@ export class TimeSlider extends KeepTrackPlugin {
   }
 
   getSliderValue(date: Date): number {
+    this.scenario = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
     // When scenario has no bounds
     if (!this.scenario?.startTime && !this.scenario?.endTime) {
       const hours = date.getUTCHours();
@@ -72,6 +73,7 @@ export class TimeSlider extends KeepTrackPlugin {
 
     keepTrackApi.on(EventBusEvent.uiManagerFinal, () => {
       this.attachSliderEvents('time-slider-container-slider', (value: number) => {
+        this.scenario = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
         if (!this.scenario?.startTime && !this.scenario?.endTime) {
           this.sliderWithoutBounds(value);
         } else {

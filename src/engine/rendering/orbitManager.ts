@@ -102,8 +102,7 @@ export class OrbitManager {
   }
 
   draw(
-    pMatrix: mat4,
-    camMatrix: mat4,
+    projectionCameraMatrix: mat4,
     tgtBuffer: WebGLFramebuffer | null,
     hoverManagerInstance: HoverManager,
     colorSchemeManagerInstance: ColorSchemeManager,
@@ -126,7 +125,12 @@ export class OrbitManager {
         gl.enable(gl.DEPTH_TEST);
       }
 
-      this.lineManagerInstance_.setWorldUniforms(camMatrix, pMatrix);
+      const modelViewMatrix = mat4.create();
+
+      // Default to 1 so no transformation
+      mat4.identity(modelViewMatrix);
+
+      this.lineManagerInstance_.setWorldUniforms(modelViewMatrix, projectionCameraMatrix);
 
       this.drawGroupObjectOrbit(hoverManagerInstance, colorSchemeManagerInstance);
       this.drawInViewObjectOrbit_(mainCameraInstance);

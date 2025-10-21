@@ -150,13 +150,14 @@ export class DotsManager {
   starIndex1: number;
   starIndex2: number;
   velocityData: Float32Array;
+  lastUpdateSimTime = 0;
 
   /**
    * Draws dots on a WebGLFramebuffer.
-   * @param pMvCamMatrix - The projection matrix.
+   * @param projectionCameraMatrix - The projection matrix.
    * @param tgtBuffer - The WebGLFramebuffer to draw on.
    */
-  draw(pMvCamMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
+  draw(projectionCameraMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
     if (!this.isReady || !settingsManager.cruncherReady) {
       return;
     }
@@ -165,7 +166,7 @@ export class DotsManager {
     if (!colorSchemeManagerInstance.colorBuffer) {
       return;
     }
-    if (!pMvCamMatrix) {
+    if (!projectionCameraMatrix) {
       return;
     }
 
@@ -173,7 +174,8 @@ export class DotsManager {
 
     gl.useProgram(this.programs.dots.program);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
-    gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvCamMatrix, false, pMvCamMatrix);
+
+    gl.uniformMatrix4fv(this.programs.dots.uniforms.u_pMvCamMatrix, false, projectionCameraMatrix);
     gl.uniform1f(this.programs.dots.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     gl.uniform3fv(this.programs.dots.uniforms.worldOffset, Scene.getInstance().worldShift ?? [0, 0, 0]);
 
@@ -217,7 +219,7 @@ export class DotsManager {
     gl.disable(gl.BLEND);
 
     // Draw GPU Picking Overlay -- This is what lets us pick a satellite
-    this.drawGpuPickingFrameBuffer(pMvCamMatrix, ServiceLocator.getMainCamera().state.mouseX, ServiceLocator.getMainCamera().state.mouseY);
+    this.drawGpuPickingFrameBuffer(projectionCameraMatrix, ServiceLocator.getMainCamera().state.mouseX, ServiceLocator.getMainCamera().state.mouseY);
   }
 
   /**
@@ -605,8 +607,9 @@ export class DotsManager {
     }
 
     const renderer = ServiceLocator.getRenderer();
+    const simTime = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
 
-    if (!settingsManager.lowPerf && renderer.dtAdjusted > settingsManager.minimumDrawDt) {
+    if (!settingsManager.lowPerf && (renderer.dtAdjusted > settingsManager.minimumDrawDt || Math.abs(this.lastUpdateSimTime - simTime) > 1000)) {
       if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
         const obj = ServiceLocator.getCatalogManager().objectCache[PluginRegistry.getPlugin(SelectSatManager)!.selectedSat] as DetailedSatellite | MissileObject;
 
@@ -644,6 +647,8 @@ export class DotsManager {
     }
 
     this.interpolatePositionsOfOemSatellites_();
+
+    this.lastUpdateSimTime = simTime;
   }
 
   getSize(i: number): number {

@@ -130,8 +130,8 @@ export class Scene {
     this.renderOpaque(renderer, camera);
     this.renderTransparent(renderer, camera);
 
-    this.sensorFovFactory.drawAll(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
-    this.coneFactory.drawAll(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+    this.sensorFovFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
+    this.coneFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
   }
 
   averageDrawTime = 0;
@@ -156,20 +156,28 @@ export class Scene {
         // Draw a black earth mesh on top of the sun in the godrays frame buffer
         switch (settingsManager.centerBody) {
           case Body.Mercury:
-            this.planets[Body.Mercury].drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
+            this.planets[Body.Mercury].drawOcclusion(
+              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+            );
             break;
           case Body.Venus:
-            this.planets[Body.Venus].drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
+            this.planets[Body.Venus].drawOcclusion(
+              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+            );
             break;
           case Body.Mars:
-            this.planets[Body.Mars].drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
+            this.planets[Body.Mars].drawOcclusion(
+              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+            );
             break;
           case Body.Moon:
-            this.planets[Body.Moon].drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
+            this.planets[Body.Moon].drawOcclusion(
+              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+            );
             break;
           case Body.Earth:
           default:
-            this.earth.drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
+            this.earth.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
             break;
         }
 
@@ -179,12 +187,12 @@ export class Scene {
           (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
           keepTrackApi.getMainCamera().state.camDistBuffer <= settingsManager.nearZoomLevel
         ) {
-          renderer.meshManager.drawOcclusion(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
+          renderer.meshManager.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
         }
 
         // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two
         renderer.postProcessingManager.curBuffer = null;
-        this.godrays.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+        this.godrays.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
       }
 
       this.skybox.render(renderer.postProcessingManager.curBuffer);
@@ -270,14 +278,14 @@ export class Scene {
     // Draw Dots
     dotsManagerInstance.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
 
-    orbitManagerInstance.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera);
+    orbitManagerInstance.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera);
 
-    keepTrackApi.getLineManager().draw(null);
+    keepTrackApi.getLineManager().draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
     if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
       if (!settingsManager.modelsOnSatelliteViewOverride && camera.state.camDistBuffer <= settingsManager.nearZoomLevel) {
-        renderer.meshManager.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+        renderer.meshManager.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
       }
     }
   }
@@ -290,11 +298,11 @@ export class Scene {
     }
 
     if (selectedSatelliteManager.selectedSat > -1) {
-      this.searchBox.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
-      this.primaryCovBubble.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+      this.searchBox.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
+      this.primaryCovBubble.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
     }
     if (selectedSatelliteManager.secondarySat > -1) {
-      this.secondaryCovBubble.draw(renderer.projectionMatrix, camera.camMatrix, renderer.postProcessingManager.curBuffer);
+      this.secondaryCovBubble.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
     }
   }
 
@@ -325,6 +333,31 @@ export class Scene {
      * Setup Initial Frame Buffer for Offscreen Drawing
      * gl.bindFramebuffer(gl.FRAMEBUFFER, postProcessingManager.curBuffer);
      */
+  }
+
+  getBodyById(id: Body): CelestialBody | Earth | null {
+    switch (id) {
+      case Body.Earth:
+        return this.earth;
+      case Body.Moon:
+        return this.planets[Body.Moon];
+      case Body.Mars:
+        return this.planets[Body.Mars];
+      case Body.Mercury:
+        return this.planets[Body.Mercury];
+      case Body.Venus:
+        return this.planets[Body.Venus];
+      case Body.Jupiter:
+        return this.planets[Body.Jupiter];
+      case Body.Saturn:
+        return this.planets[Body.Saturn] ?? null;
+      case Body.Uranus:
+        return this.planets[Body.Uranus] ?? null;
+      case Body.Neptune:
+        return this.planets[Body.Neptune] ?? null;
+      default:
+        return null;
+    }
   }
 
   async loadScene(): Promise<void> {

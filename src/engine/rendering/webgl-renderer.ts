@@ -1,6 +1,8 @@
+import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { OemSatellite } from '@app/plugins-pro/oem-reader/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { Body } from 'astronomy-engine';
@@ -53,30 +55,12 @@ export class WebGLRenderer {
   isPostProcessingResizeNeeded: boolean;
   isUpdateTimeThrottle: boolean;
   meshManager = new MeshManager();
-  /**
-   * Main source of projection matrix for rest of the application
-   */
-  projectionMatrix: mat4;
   projectionCameraMatrix: mat4;
   postProcessingManager: PostProcessingManager;
 
   private selectSatManager_: SelectSatManager;
   sensorPos: { x: number; y: number; z: number; lat: number; lon: number; gmst: GreenwichMeanSiderealTime } | null = null;
   lastResizeTime: number;
-
-  static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
-    const depthConfig = DepthManager.getConfig();
-    const pMatrix = mat4.create();
-
-    mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, depthConfig.near, depthConfig.far);
-
-    // This converts everything from 3D space to ECI (z and y planes are swapped)
-    const eciToOpenGlMat: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
-
-    mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
-
-    return pMatrix;
-  }
 
   static getCanvasInfo(): { vw: number; vh: number } {
     // Using minimum allows the canvas to be full screen without fighting with scrollbars
@@ -93,7 +77,7 @@ export class WebGLRenderer {
       return;
     }
 
-    this.projectionMatrix = WebGLRenderer.calculatePMatrix(this.gl);
+    keepTrackApi.getMainCamera().projectionMatrix = Camera.calculatePMatrix(this.gl);
   }
 
   private isAltCanvasSize_ = false;
@@ -111,8 +95,10 @@ export class WebGLRenderer {
       this.isAltCanvasSize_ = false;
     }
 
+    const mainCamera = keepTrackApi.getMainCamera();
+
     // Apply the camera matrix
-    this.projectionCameraMatrix = mat4.mul(mat4.create(), this.projectionMatrix, keepTrackApi.getMainCamera().camMatrix);
+    this.projectionCameraMatrix = mat4.mul(mat4.create(), mainCamera.projectionMatrix, mainCamera.matrixWorldInverse);
 
     scene.render(this, camera);
   }
@@ -493,8 +479,10 @@ export class WebGLRenderer {
     z: number;
     error: boolean;
   } {
-    const pMatrix = this.projectionMatrix;
-    const camMatrix = keepTrackApi.getMainCamera().camMatrix;
+    const mainCamera = keepTrackApi.getMainCamera();
+
+    const pMatrix = mainCamera.projectionMatrix;
+    const camMatrix = mainCamera.matrixWorldInverse;
     const screenPos = { x: 0, y: 0, z: 0, error: false };
 
     try {
@@ -557,7 +545,7 @@ export class WebGLRenderer {
          */
         const isKeyboardOut = Math.abs((vw - oldWidth) / oldWidth) < 0.35 && Math.abs((vh - oldHeight) / oldHeight) > 0.35;
 
-        if (!settingsManager.isMobileModeEnabled || isKeyboardOut || this.isRotationEvent_ || !this.projectionMatrix) {
+        if (!settingsManager.isMobileModeEnabled || isKeyboardOut || this.isRotationEvent_ || !keepTrackApi.getMainCamera().projectionMatrix) {
           this.setCanvasSize(vh, vw);
           this.isRotationEvent_ = false;
         } else {
@@ -624,11 +612,37 @@ export class WebGLRenderer {
       // this.selectSatManager_.selectSat(this.selectSatManager_?.selectedSat);
     }
 
+    const sceneInstance = Scene.getInstance();
+
+    switch (settingsManager.centerBody) {
+      case Body.Mercury:
+      case Body.Venus:
+      case Body.Moon:
+      case Body.Mars:
+      case Body.Jupiter:
+      case Body.Saturn:
+      case Body.Uranus:
+      case Body.Neptune:
+      case Body.Pluto:
+        sceneInstance.worldShift = sceneInstance.planets[settingsManager.centerBody]!.position.map((coord: number) => -coord) as [number, number, number];
+        break;
+      case Body.Sun:
+        sceneInstance.worldShift = [sceneInstance.sun.eci.x, sceneInstance.sun.eci.y, sceneInstance.sun.eci.z].map((coord: number) => -coord) as [number, number, number];
+        break;
+      case Body.Earth:
+      default:
+        sceneInstance.worldShift = [0, 0, 0];
+    }
+
     if (this.selectSatManager_?.primarySatObj.id !== -1) {
       const timeManagerInstance = keepTrackApi.getTimeManager();
       const primarySat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
+      const satelliteOffset = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id).map((coord) => -coord);
 
-      Scene.getInstance().worldShift = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id).map((coord) => -coord);
+      sceneInstance.worldShift = satelliteOffset as [number, number, number];
+      // sceneInstance.worldShift[0] = satelliteOffset[0] - sceneInstance.worldShift[0];
+      // sceneInstance.worldShift[1] = satelliteOffset[1] - sceneInstance.worldShift[1];
+      // sceneInstance.worldShift[2] = satelliteOffset[2] - sceneInstance.worldShift[2];
 
       this.meshManager.update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
       keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
@@ -649,40 +663,34 @@ export class WebGLRenderer {
 
         // Now we can fix thhis draw call
         const firstPointOut = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id);
+        const firstRelativePointOut = SatMath.getPositionFromCenterBody({
+          x: firstPointOut[0] as Kilometers,
+          y: firstPointOut[1] as Kilometers,
+          z: firstPointOut[2] as Kilometers,
+        });
 
         if (primarySat instanceof DetailedSatellite) {
-          keepTrackApi.getOrbitManager().updateOrbitData(this.selectSatManager_.primarySatObj.id, firstPointOut);
+          keepTrackApi.getOrbitManager().updateOrbitData(this.selectSatManager_.primarySatObj.id, [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z]);
+        } else if (primarySat instanceof OemSatellite && primarySat.isInertialMoonFrame) {
+          keepTrackApi.getOrbitManager().updateOrbitData(
+            this.selectSatManager_.primarySatObj.id,
+            [firstPointOut[0], firstPointOut[1], firstPointOut[2]],
+            false,
+          );
         } else {
-          keepTrackApi.getOrbitManager().updateOrbitData(this.selectSatManager_.primarySatObj.id, firstPointOut, true);
+          keepTrackApi.getOrbitManager().updateOrbitData(
+            this.selectSatManager_.primarySatObj.id,
+            [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
+            true,
+          );
         }
       }
 
-      keepTrackApi.getScene().searchBox.update(primarySat, timeManagerInstance.selectedDate);
+      sceneInstance.searchBox.update(primarySat, timeManagerInstance.selectedDate);
 
-      keepTrackApi.getScene().primaryCovBubble.update(primarySat);
+      sceneInstance.primaryCovBubble.update(primarySat);
     } else {
-      const scene = Scene.getInstance();
-
-      switch (settingsManager.centerBody) {
-        case Body.Mercury:
-        case Body.Venus:
-        case Body.Moon:
-        case Body.Mars:
-        case Body.Jupiter:
-        case Body.Saturn:
-        case Body.Uranus:
-        case Body.Neptune:
-        case Body.Pluto:
-          scene.worldShift = scene.planets[settingsManager.centerBody]!.position.map((coord: number) => -coord) as [number, number, number];
-          break;
-        case Body.Sun:
-          scene.worldShift = [scene.sun.eci.x, scene.sun.eci.y, scene.sun.eci.z].map((coord: number) => -coord) as [number, number, number];
-          break;
-        case Body.Earth:
-        default:
-          scene.worldShift = [0, 0, 0];
-      }
-      keepTrackApi.getScene().searchBox.update(null);
+      sceneInstance.searchBox.update(null);
     }
   }
 
@@ -769,20 +777,22 @@ export class WebGLRenderer {
   }
 
   private validateProjectionMatrix_() {
-    if (!this.projectionMatrix) {
+    const projectionMatrix = keepTrackApi.getMainCamera().projectionMatrix;
+
+    if (!projectionMatrix) {
       errorManagerInstance.log('projectionMatrix is undefined - retrying');
       this.updatePMatrix();
     }
 
     for (let i = 0; i < 16; i++) {
-      if (isNaN(this.projectionMatrix[i])) {
+      if (isNaN(projectionMatrix[i])) {
         errorManagerInstance.log('projectionMatrix is NaN - retrying');
         this.updatePMatrix();
       }
     }
 
     for (let i = 0; i < 16; i++) {
-      if (this.projectionMatrix[i] !== 0) {
+      if (projectionMatrix[i] !== 0) {
         break;
       }
       if (i === 15) {

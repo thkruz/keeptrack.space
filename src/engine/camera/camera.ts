@@ -31,6 +31,9 @@ import { SatMath } from '../../app/analysis/sat-math';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
 import { EventBusEvent } from '../events/event-bus-events';
+import { DepthManager } from '../rendering/depth-manager';
+import { CelestialBody } from '../rendering/draw-manager/celestial-bodies/celestial-body';
+import { Earth } from '../rendering/draw-manager/earth';
 import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
@@ -70,7 +73,14 @@ export class Camera {
   private normUp_ = vec3.create();
 
   private yawErr_ = <Radians>0;
-  camMatrix = mat4.create();
+  /**
+     * Main source of projection matrix for rest of the application
+     */
+  projectionMatrix: mat4 = mat4.create();
+  get matrixWorld(): mat4 {
+    return mat4.invert(mat4.create(), this.matrixWorldInverse)!;
+  }
+  matrixWorldInverse = mat4.create();
   cameraType: CameraType = CameraType.DEFAULT;
 
   settings_: SettingsManager;
@@ -300,14 +310,14 @@ export class Camera {
     }
 
     this.drawPreValidate_(sensorPos);
-    mat4.identity(this.camMatrix);
+    mat4.identity(this.matrixWorldInverse);
 
     // Ensure we don't zoom in past our satellite
     if (this.cameraType === CameraType.FIXED_TO_SAT) {
       if (target.id === -1 || target.type === SpaceObjectType.STAR) {
         this.cameraType = CameraType.DEFAULT;
       } else {
-        const satAlt = SatMath.getAlt(target.position, gmst);
+        const satAlt = SatMath.getAlt(SatMath.getPositionFromCenterBody(target.position), gmst);
 
         if (this.getCameraDistance() < satAlt + RADIUS_OF_EARTH + this.settings_.minDistanceFromSatellite) {
           this.state.zoomTarget = alt2zoom(satAlt, this.settings_.minZoomDistance, this.settings_.maxZoomDistance, this.settings_.minDistanceFromSatellite);
@@ -424,7 +434,7 @@ export class Camera {
    * Used in RayCasting
    */
   getCamPos(): vec3 {
-    vec3.transformMat4(this.state.position, this.state.position, this.camMatrix);
+    vec3.transformMat4(this.state.position, this.state.position, this.matrixWorldInverse);
 
     return this.state.position;
   }
@@ -463,19 +473,19 @@ export class Camera {
   getCameraPosition(target?: EciVec3, orientation: vec3 = this.getCameraOrientation()) {
     const centerOfEarth = vec3.fromValues(0, 0, 0);
 
-    const radius = this.getCameraRadius(target);
+    const radius = this.getCameraRadius(target, keepTrackApi.getScene().getBodyById(this.settings_.centerBody)!);
 
 
     return vec3.fromValues(centerOfEarth[0] - orientation[0] * radius, centerOfEarth[1] - orientation[1] * radius, centerOfEarth[2] - orientation[2] * radius);
   }
 
-  getCameraRadius(target?: EciVec3) {
+  getCameraRadius(target: EciVec3, centerBody: CelestialBody | Earth) {
     let targetDistanceFromEarth = 0;
 
     if (target) {
       const gmst = keepTrackApi.getTimeManager().gmst;
 
-      this.state.camSnapToSat.altitude = SatMath.getAlt(target, gmst);
+      this.state.camSnapToSat.altitude = SatMath.getAlt(target, gmst, centerBody.RADIUS as Kilometers);
       targetDistanceFromEarth = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH;
     }
     const radius = this.getCameraDistance() - targetDistanceFromEarth;
@@ -488,7 +498,7 @@ export class Camera {
     const inverted = mat4.create();
     const forward = vec3.create();
 
-    mat4.invert(inverted, this.camMatrix);
+    mat4.invert(inverted, this.matrixWorldInverse);
     vec3.transformMat4(forward, forward, inverted);
 
     return forward;
@@ -616,7 +626,15 @@ export class Camera {
         // if this is a satellite not a missile
         const { gmst } = SatMath.calculateTimeVariables(simulationTime);
 
-        this.state.camSnapToSat.altitude = SatMath.getAlt(sat.position, gmst);
+        const centerBodyPosition = keepTrackApi.getScene().getBodyById(this.settings_.centerBody)!.position;
+        const relativePosition = {
+          x: sat.position.x - centerBodyPosition[0] as Kilometers,
+          y: sat.position.y - centerBodyPosition[1] as Kilometers,
+          z: sat.position.z - centerBodyPosition[2] as Kilometers,
+        };
+        const centerBody = keepTrackApi.getScene().getBodyById(this.settings_.centerBody)!;
+
+        this.state.camSnapToSat.altitude = SatMath.getAlt(relativePosition, gmst, centerBody.RADIUS as Kilometers);
       }
       if (this.state.camSnapToSat.altitude) {
         this.state.camSnapToSat.camDistTarget = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH + this.state.camDistBuffer;
@@ -751,12 +769,12 @@ export class Camera {
     this.state.fpsPos[1] = sensorPos.y;
     this.state.fpsPos[2] = sensorPos.z;
 
-    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsPitch + -this.state.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.state.fpsRotate * DEG2RAD, [0, 1, 0]);
+    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsPitch + -this.state.fpsPitch * DEG2RAD, [1, 0, 0]);
+    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.fpsRotate * DEG2RAD, [0, 1, 0]);
     vec3.normalize(this.normUp_, sensorPosU);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.state.fpsYaw * DEG2RAD, this.normUp_);
+    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.fpsYaw * DEG2RAD, this.normUp_);
 
-    mat4.translate(this.camMatrix, this.camMatrix, [-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01]);
 
     /*
      * const q = quat.create();
@@ -769,26 +787,26 @@ export class Camera {
 
   private drawFixedToEarth_() {
     // 4. Rotate the camera around the new local origin
-    mat4.rotateX(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.pitch);
-    mat4.rotateY(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.roll);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.yaw);
+    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.pitch);
+    mat4.rotateY(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.roll);
+    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.yaw);
 
     // 3. Adjust for panning
-    mat4.translate(this.camMatrix, this.camMatrix, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
 
     // 2. Back away from the earth in the Y direction (depth)
-    mat4.translate(this.camMatrix, this.camMatrix, [0, this.getCameraDistance(), 0]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [0, this.getCameraDistance(), 0]);
     // 1. Rotate around the earth (0,0,0)
-    mat4.rotateX(this.camMatrix, this.camMatrix, this.state.earthCenteredPitch);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.earthCenteredYaw);
+    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.earthCenteredPitch);
+    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.earthCenteredYaw);
   }
 
   private drawFirstPersonView_() {
     // Rotate the camera
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.state.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsYaw * DEG2RAD, [0, 0, 1]);
+    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.fpsPitch * DEG2RAD, [1, 0, 0]);
+    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsYaw * DEG2RAD, [0, 0, 1]);
     // Move the camera to the FPS position
-    mat4.translate(this.camMatrix, this.camMatrix, [this.state.fpsPos[0], this.state.fpsPos[1], -this.state.fpsPos[2]]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.fpsPos[0], this.state.fpsPos[1], -this.state.fpsPos[2]]);
   }
 
   private drawFixedToSatellite_(target: DetailedSatellite | MissileObject) {
@@ -801,40 +819,44 @@ export class Camera {
      * 5. Adjust for panning
      * 6. Rotate the camera FPS style
      */
-    mat4.rotateX(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.pitch);
-    mat4.rotateY(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.roll);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.yaw);
+    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.pitch);
+    mat4.rotateY(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.roll);
+    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.yaw);
 
-    mat4.translate(this.camMatrix, this.camMatrix, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
 
-    mat4.translate(this.camMatrix, this.camMatrix, [0, this.getCameraRadius(target.position), 0]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [
+      0,
+      this.getCameraRadius(SatMath.getPositionFromCenterBody(target.position), keepTrackApi.getScene().getBodyById(this.settings_.centerBody)!),
+      0,
+    ]);
 
-    mat4.rotateX(this.camMatrix, this.camMatrix, this.state.ftsPitch);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.ftsYaw);
+    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.ftsPitch);
+    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.ftsYaw);
 
     // mat4.translate(this.camMatrix, this.camMatrix, targetPosition);
   }
 
   private drawOffsetOfEarth_() {
     // Rotate the camera
-    mat4.rotateX(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.pitch);
-    mat4.rotateY(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.roll);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.localRotateCurrent.yaw);
+    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.pitch);
+    mat4.rotateY(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.roll);
+    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.yaw);
     // Adjust for panning
-    mat4.translate(this.camMatrix, this.camMatrix, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
     // Back away from the earth
-    mat4.translate(this.camMatrix, this.camMatrix, [this.settings_.offsetCameraModeX, this.getCameraDistance(), this.settings_.offsetCameraModeZ]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.settings_.offsetCameraModeX, this.getCameraDistance(), this.settings_.offsetCameraModeZ]);
     // Adjust for FPS style rotation
-    mat4.rotateX(this.camMatrix, this.camMatrix, this.state.earthCenteredPitch);
-    mat4.rotateZ(this.camMatrix, this.camMatrix, -this.state.earthCenteredYaw);
+    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.earthCenteredPitch);
+    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.earthCenteredYaw);
   }
 
   private drawPlanetarium_(sensorPos: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
     this.state.fpsPitch = <Degrees>(-1 * sensorPos.lat * DEG2RAD);
     this.state.fpsRotate = <Degrees>((90 - sensorPos.lon) * DEG2RAD - sensorPos.gmst);
-    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsPitch, [1, 0, 0]);
-    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsRotate, [0, 0, 1]);
-    mat4.translate(this.camMatrix, this.camMatrix, [-sensorPos.x, -sensorPos.y, -sensorPos.z]);
+    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsPitch, [1, 0, 0]);
+    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsRotate, [0, 0, 1]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [-sensorPos.x, -sensorPos.y, -sensorPos.z]);
   }
 
   private drawPreValidate_(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null) {
@@ -874,20 +896,20 @@ export class Camera {
   private drawSatellite_(target: DetailedSatellite | MissileObject) {
     const targetPositionTemp = vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
 
-    mat4.translate(this.camMatrix, this.camMatrix, targetPositionTemp);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, targetPositionTemp);
     vec3.normalize(this.normUp_, targetPositionTemp);
     vec3.normalize(this.normForward_, [target.velocity.x, target.velocity.y, target.velocity.z]);
     vec3.transformQuat(this.normLeft_, this.normUp_, quat.fromValues(this.normForward_[0], this.normForward_[1], this.normForward_[2], 90 * DEG2RAD));
     const targetNextPosition = vec3.fromValues(target.position.x + target.velocity.x, target.position.y + target.velocity.y, target.position.z + target.velocity.z);
 
-    mat4.lookAt(this.camMatrix, targetNextPosition, targetPositionTemp, this.normUp_);
+    mat4.lookAt(this.matrixWorldInverse, targetNextPosition, targetPositionTemp, this.normUp_);
 
-    mat4.translate(this.camMatrix, this.camMatrix, [target.position.x, target.position.y, target.position.z]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [target.position.x, target.position.y, target.position.z]);
 
-    mat4.rotate(this.camMatrix, this.camMatrix, this.state.fpsPitch * DEG2RAD, this.normLeft_);
-    mat4.rotate(this.camMatrix, this.camMatrix, -this.state.fpsYaw * DEG2RAD, this.normUp_);
+    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsPitch * DEG2RAD, this.normLeft_);
+    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.fpsYaw * DEG2RAD, this.normUp_);
 
-    mat4.translate(this.camMatrix, this.camMatrix, targetPositionTemp);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, targetPositionTemp);
   }
 
   private resetFpsPos_(): void {
@@ -1366,5 +1388,19 @@ export class Camera {
     } else {
       this.settings_.satShader.maxSize = this.settings_.satShader.maxAllowedSize;
     }
+  }
+
+  static calculatePMatrix(gl: WebGL2RenderingContext): mat4 {
+    const depthConfig = DepthManager.getConfig();
+    const pMatrix = mat4.create();
+
+    mat4.perspective(pMatrix, settingsManager.fieldOfView, gl.drawingBufferWidth / gl.drawingBufferHeight, depthConfig.near, depthConfig.far);
+
+    // This converts everything from 3D space to ECI (z and y planes are swapped)
+    const eciToOpenGlMat: mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
+
+    mat4.mul(pMatrix, pMatrix, eciToOpenGlMat); // pMat = pMat * ecioglMat
+
+    return pMatrix;
   }
 }

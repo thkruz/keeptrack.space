@@ -21,6 +21,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
+import { Earth } from '@app/engine/rendering/draw-manager/earth';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { vec3 } from 'gl-matrix';
 import numeric from 'numeric';
@@ -460,19 +462,36 @@ export abstract class SatMath {
    * @returns The altitude of the satellite in kilometers.
    * If the altitude calculation fails, returns 0.
    */
-  static getAlt(positionEci: EciVec3, gmst: GreenwichMeanSiderealTime): Kilometers {
+  static getAlt(positionEci: EciVec3, gmst: GreenwichMeanSiderealTime, radius?: Kilometers): Kilometers {
     let alt: number;
 
     try {
-      alt = eci2lla(positionEci, gmst).alt;
+      if (!radius) {
+        alt = eci2lla(positionEci, gmst).alt;
+      } else {
+        alt = Math.sqrt(positionEci.x ** 2 + positionEci.y ** 2 + positionEci.z ** 2) - radius;
+      }
+
       if (isNaN(alt)) {
         return <Kilometers>0;
       }
-    } catch (e) {
-      return <Kilometers>0; // Auto fail the altitude check
+    } catch {
+      return 0 as Kilometers; // Auto fail the altitude check
     }
 
-    return <Kilometers>alt;
+    return alt as Kilometers;
+  }
+
+  static getPositionFromCenterBody(position: EciVec3, centerBody?: Earth | CelestialBody): EciVec3 {
+    centerBody ??= keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!;
+
+    const centerBodyPosition = centerBody.position;
+
+    return {
+      x: position.x - centerBodyPosition[0] as Kilometers,
+      y: position.y - centerBodyPosition[1] as Kilometers,
+      z: position.z - centerBodyPosition[2] as Kilometers,
+    };
   }
 
   static estimateRcsUsingHistoricalData(satInput: DetailedSatellite): number | null {

@@ -8,7 +8,7 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 0,
   },
-  TooltipsPlugin: {
+  ScenarioManagementPlugin: {
     enabled: true,
     order: 1,
   },
@@ -256,10 +256,17 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     order: 601,
   },
   VcrPlugin: {
-    enabled: false, // Disabled by default
+    enabled: true, // Disabled by default
     order: 1000,
   },
+  TimeSlider: {
+    enabled: true,
+    order: 1001,
+  },
   // Non-Menu plugins
+  TooltipsPlugin: {
+    enabled: true,
+  },
   SatInfoBoxCore: {
     enabled: true,
   },

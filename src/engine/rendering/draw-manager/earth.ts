@@ -103,6 +103,8 @@ export class Earth {
   atmosphereMesh: Mesh | null = null;
   imageCache: Record<string, HTMLImageElement> = {};
   cloudPosition_: number = Math.random() * 8192; // Randomize the cloud position
+  RADIUS: number = RADIUS_OF_EARTH;
+  position = <vec3>[0, 0, 0];
 
   private readonly BUMP_SRC_BASE = 'earthbump';
   private readonly SPEC_SRC_BASE = 'earthspec';

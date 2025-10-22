@@ -20,11 +20,14 @@
  */
 
 import { Body } from 'astronomy-engine';
-import { vec3 } from 'gl-matrix';
+import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Seconds } from 'ootk';
 import { settingsManager } from '../../../../settings/settings';
 import { LineColors } from '../../line-manager/line';
 import { CelestialBody } from './celestial-body';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { Scene } from '@app/engine/core/scene';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 
 // TODO: Moon doesn't occlude the sun yet!
 
@@ -50,6 +53,26 @@ export class Moon extends CelestialBody {
 
   getName(): Body {
     return Body.Moon;
+  }
+
+  update(simTime: Date) {
+    if (!this.isLoaded_) {
+      return;
+    }
+    this.updatePosition(simTime);
+    this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
+    if (settingsManager.centerBody !== this.getName() || (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) !== -1) {
+      mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
+      const worldShift = Scene.getInstance().worldShift;
+
+      mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, vec3.fromValues(worldShift[0], worldShift[1], worldShift[2]));
+    }
+    mat4.rotateX(this.modelViewMatrix_, this.modelViewMatrix_, this.rotation[0]);
+    mat4.rotateY(this.modelViewMatrix_, this.modelViewMatrix_, this.rotation[1]);
+    mat4.rotateZ(this.modelViewMatrix_, this.modelViewMatrix_, this.rotation[2]);
+    mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
+
+    this.calculateRelativeSatPos();
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {

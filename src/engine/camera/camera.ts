@@ -1300,26 +1300,20 @@ export class Camera {
     const cameraDistance = this.getCameraDistance();
 
     if (settingsManager.maxZoomDistance < 2e6) {
-      if (cameraDistance > 140000) {
-        settingsManager.satShader.minSize = 7;
-      }
-      if (cameraDistance > 180000) {
-        settingsManager.satShader.minSize = 6;
-      }
-      if (cameraDistance > 220000) {
-        settingsManager.satShader.minSize = 5;
-      }
-      if (cameraDistance > 280000) {
-        settingsManager.satShader.minSize = 4;
-      }
-      if (cameraDistance > 350000) {
-        settingsManager.satShader.minSize = 3;
-      }
-      if (cameraDistance > 400000) {
-        settingsManager.satShader.minSize = 2;
-      }
-      if (cameraDistance > 450000) {
-        settingsManager.satShader.minSize = 1;
+      // Scale minSize smoothly from 5.5 down to 3 as cameraDistance increases
+      const minSizeMax = 5.5;
+      const minSizeMin = 3.0;
+      const startDist = 140000;
+      const endDist = 280000;
+
+      if (cameraDistance <= startDist) {
+        settingsManager.satShader.minSize = minSizeMax;
+      } else if (cameraDistance >= endDist) {
+        settingsManager.satShader.minSize = minSizeMin;
+      } else {
+        const t = (cameraDistance - startDist) / (endDist - startDist); // 0..1
+
+        settingsManager.satShader.minSize = minSizeMax + (minSizeMin - minSizeMax) * t;
       }
     }
 

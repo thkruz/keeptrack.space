@@ -671,7 +671,7 @@ export class WebGLRenderer {
 
         if (primarySat instanceof DetailedSatellite) {
           keepTrackApi.getOrbitManager().updateOrbitData(this.selectSatManager_.primarySatObj.id, [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z]);
-        } else if (primarySat instanceof OemSatellite && primarySat.isInertialMoonFrame) {
+        } else if (primarySat instanceof OemSatellite) {
           keepTrackApi.getOrbitManager().updateOrbitData(
             this.selectSatManager_.primarySatObj.id,
             [firstPointOut[0], firstPointOut[1], firstPointOut[2]],

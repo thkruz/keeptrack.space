@@ -4,7 +4,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { OrbitPathLine } from '@app/engine/rendering/line-manager/orbit-path';
 import { Body } from 'astronomy-engine';
-import { BaseObject, J2000, Seconds, SpaceObjectType, TEME } from 'ootk';
+import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType, TEME } from 'ootk';
 import { SatelliteModels } from '../rendering/mesh/model-resolver';
 
 export interface OemHeader {
@@ -248,6 +248,8 @@ export class OemSatellite extends BaseObject {
       posAndVel[2] = currentSv.position.z + offsetOrigin.position.z;
     }
 
+    this.position = { x: posAndVel[0] as Kilometers, y: posAndVel[1] as Kilometers, z: posAndVel[2] as Kilometers };
+
     // set velocity to current state vector velocity
     posAndVel[3] = currentSv.velocity.x;
     posAndVel[4] = currentSv.velocity.y;
@@ -429,33 +431,46 @@ export class OemSatellite extends BaseObject {
 
     // Fill pointsOut starting from currentIndex
     for (let i = 0; i < segments; i++) {
-      const idx = (currentIndex + i);
-
-      if (idx < this.orbitFullPathCache_.length / 4) {
-        let deltaOffsetPos = { x: 0, y: 0, z: 0 };
-
-        if (this.isInertialMoonFrame) {
-          const newOffsetPos = ServiceLocator.getScene().planets.Moon.getTeme(new Date(this.orbitFullPathCache_[idx * 4 + 3]));
-
-          deltaOffsetPos = {
-            x: newOffsetPos.position.x - offsetOrigin.position.x,
-            y: newOffsetPos.position.y - offsetOrigin.position.y,
-            z: newOffsetPos.position.z - offsetOrigin.position.z,
-          };
+      if (i === 0) {
+        if (settingsManager.centerBody !== Body.Earth) {
+          pointsOut[i * 4] = this.position.x - offsetOrigin.position.x;
+          pointsOut[i * 4 + 1] = this.position.y - offsetOrigin.position.y;
+          pointsOut[i * 4 + 2] = this.position.z - offsetOrigin.position.z;
+        } else {
+          pointsOut[i * 4] = this.position.x;
+          pointsOut[i * 4 + 1] = this.position.y;
+          pointsOut[i * 4 + 2] = this.position.z;
         }
-
-        pointsOut[i * 4] = this.orbitFullPathCache_[idx * 4] - deltaOffsetPos.x;
-        pointsOut[i * 4 + 1] = this.orbitFullPathCache_[idx * 4 + 1] - deltaOffsetPos.y;
-        pointsOut[i * 4 + 2] = this.orbitFullPathCache_[idx * 4 + 2] - deltaOffsetPos.z;
         pointsOut[i * 4 + 3] = 1.0; // Alpha channel
-
-        loopIdx = i;
       } else {
-        // If we exceed the available points, continue using the last point in a looped fashion
-        pointsOut[i * 4] = pointsOut[loopIdx * 4];
-        pointsOut[i * 4 + 1] = pointsOut[loopIdx * 4 + 1];
-        pointsOut[i * 4 + 2] = pointsOut[loopIdx * 4 + 2];
-        pointsOut[i * 4 + 3] = 1.0; // Alpha channel
+        const idx = (currentIndex + i);
+
+        if (idx < this.orbitFullPathCache_.length / 4) {
+          let deltaOffsetPos = { x: 0, y: 0, z: 0 };
+
+          if (this.isInertialMoonFrame) {
+            const newOffsetPos = ServiceLocator.getScene().planets.Moon.getTeme(new Date(this.orbitFullPathCache_[idx * 4 + 3]));
+
+            deltaOffsetPos = {
+              x: newOffsetPos.position.x - offsetOrigin.position.x,
+              y: newOffsetPos.position.y - offsetOrigin.position.y,
+              z: newOffsetPos.position.z - offsetOrigin.position.z,
+            };
+          }
+
+          pointsOut[i * 4] = this.orbitFullPathCache_[idx * 4] - deltaOffsetPos.x;
+          pointsOut[i * 4 + 1] = this.orbitFullPathCache_[idx * 4 + 1] - deltaOffsetPos.y;
+          pointsOut[i * 4 + 2] = this.orbitFullPathCache_[idx * 4 + 2] - deltaOffsetPos.z;
+          pointsOut[i * 4 + 3] = 1.0; // Alpha channel
+
+          loopIdx = i;
+        } else {
+          // If we exceed the available points, continue using the last point in a looped fashion
+          pointsOut[i * 4] = pointsOut[loopIdx * 4];
+          pointsOut[i * 4 + 1] = pointsOut[loopIdx * 4 + 1];
+          pointsOut[i * 4 + 2] = pointsOut[loopIdx * 4 + 2];
+          pointsOut[i * 4 + 3] = 1.0; // Alpha channel
+        }
       }
     }
 
@@ -491,6 +506,15 @@ export class OemSatellite extends BaseObject {
           this.orbitFullPathCache_![idx * 4 + 2],
         ]);
       }
+    }
+
+    // Set the last point to the current position
+    if (this.position) {
+      points[0] = [
+        this.position.x,
+        this.position.y,
+        this.position.z,
+      ];
     }
 
     if (this.orbitHistoryLine) {

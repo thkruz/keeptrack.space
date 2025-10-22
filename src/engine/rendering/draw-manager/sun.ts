@@ -232,6 +232,14 @@ export class Sun {
       adjustedSize = settingsManager.isUseSunTexture ? settingsManager.sizeOfSun * 1.5 : settingsManager.sizeOfSun * this.sizeRandomFactor_;
     }
 
+    // TODO: We actually want distance from the sun, not from origin
+    const distanceFromOrigin = keepTrackApi.getMainCamera().zoomLevel() * settingsManager.maxZoomDistance;
+
+    // Increase sun size when zoomed out very far
+    if (distanceFromOrigin > 2.5e9) {
+      adjustedSize *= 1.0 + (keepTrackApi.getMainCamera().zoomLevel() * settingsManager.maxZoomDistance - 2.5e9) / 5e8;
+    }
+
     gl.uniform3fv(this.mesh.material.uniforms.u_sizeOfSun, [adjustedSize, adjustedSize, adjustedSize]);
     gl.uniform3fv(this.mesh.material.uniforms.u_lightDirection, earthLightDirection);
     gl.uniform1f(this.mesh.material.uniforms.u_sunDistance, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));

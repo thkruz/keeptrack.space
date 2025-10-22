@@ -51,6 +51,7 @@ export enum EarthPoliticalTextureQuality {
 
 export enum EarthTextureStyle {
   BLUE_MARBLE = 'earthmap',
+  NADIR = 'earthmapalt',
   FLAT = 'flat'
 }
 

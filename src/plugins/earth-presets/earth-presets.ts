@@ -1,9 +1,9 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
 import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { html } from '@app/engine/utils/development/formatter';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { NightToggle } from '../night-toggle/night-toggle';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class EarthPresetsPlugin extends KeepTrackPlugin {
   readonly id = 'EarthPresetsPlugin';
@@ -15,6 +15,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
   rmbL2Html = html`
   <ul class='dropdown-contents'>
     <li id="earth-satellite-rmb"><a href="#">Satellite Images</a></li>
+    <li id="earth-nadir-rmb"><a href="#">Alternate Satellite Images</a></li>
     <li id="earth-engineer-rmb"><a href="#">Engineering Tool</a></li>
     <li id="earth-opscenter-rmb"><a href="#">Operations Center</a></li>
     <li id="earth-90sGraphics-rmb"><a href="#">90s Graphics</a></li>
@@ -32,6 +33,18 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawCloudsMap = true;
         settingsManager.isDrawBumpMap = true;
         settingsManager.isDrawSpecMap = true;
+        settingsManager.isEarthGrayScale = false;
+        settingsManager.isDrawPoliticalMap = true;
+        settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
+        settingsManager.isEarthAmbientLighting = true;
+        keepTrackApi.getPlugin(NightToggle)?.setBottomIconToUnselected();
+        keepTrackApi.getPlugin(NightToggle)?.off();
+        break;
+      case 'earth-nadir-rmb':
+        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.NADIR);
+        settingsManager.isDrawCloudsMap = false;
+        settingsManager.isDrawBumpMap = false;
+        settingsManager.isDrawSpecMap = false;
         settingsManager.isEarthGrayScale = false;
         settingsManager.isDrawPoliticalMap = true;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;

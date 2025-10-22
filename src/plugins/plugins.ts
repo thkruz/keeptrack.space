@@ -107,11 +107,6 @@ export class PluginManager {
         { init: () => new TooltipsPlugin().init(), config: plugins.TooltipsPlugin },
         {
           init: async () => {
-            // Only works on keeptrack.space and its subdomains - otherwise return
-            if (window.location.hostname.endsWith('keeptrack.space') === false) {
-              return;
-            }
-
             const proPlugin = await import('../plugins-pro/user-account/user-account');
 
             new proPlugin.UserAccountPlugin().init();

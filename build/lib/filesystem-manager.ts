@@ -292,22 +292,32 @@ export class FileSystemManager {
    * @param srcDir The public directory to search for locales.
    * @param proDir The pro directory to search for locales.
    */
-  mergeLocales(srcDir: string, proDir: string) {
-    logWithStyle(`Merging locales from: ${srcDir} and ${proDir}`, ConsoleStyles.INFO);
+  mergeLocales(srcDir: string, proDir?: string) {
+    let srcJsonFiles: string[] = [];
 
-    // Find all .json files in 'locales' folders under srcDir (excluding pluginDir)
-    const srcJsonFiles = this.findLocalesJsonFiles(srcDir)
-      .filter((p) => !p.startsWith(this.resolvePath(proDir)));
+    if (!proDir) {
+      logWithStyle('No proDir specified, compiling locales only from srcDir', ConsoleStyles.INFO);
 
-    logWithStyle(`Source locale files: ${JSON.stringify(srcJsonFiles, null, 2)}`, ConsoleStyles.SUCCESS);
+      srcJsonFiles = this.findLocalesJsonFiles(srcDir);
+    } else {
+      logWithStyle(`ProDir specified: ${proDir}`, ConsoleStyles.INFO);
 
-    // Find all .json files in 'locales' folders under pluginDir
-    const pluginJsonFiles = this.findLocalesJsonFiles(proDir);
+      logWithStyle(`Merging locales from: ${srcDir} and ${proDir}`, ConsoleStyles.INFO);
+      // Find all .json files in 'locales' folders under srcDir (excluding pluginDir)
+      srcJsonFiles = this.findLocalesJsonFiles(srcDir)
+        .filter((p) => !p.startsWith(this.resolvePath(proDir)));
 
-    // Append plugin files to src files, plugin files take precedence
-    srcJsonFiles.push(...pluginJsonFiles);
+      logWithStyle(`Source locale files: ${JSON.stringify(srcJsonFiles, null, 2)}`, ConsoleStyles.SUCCESS);
 
-    logWithStyle(`Plugin locale files: ${JSON.stringify(pluginJsonFiles, null, 2)}`, ConsoleStyles.SUCCESS);
+      // Find all .json files in 'locales' folders under pluginDir
+      const pluginJsonFiles = this.findLocalesJsonFiles(proDir);
+
+      // Append plugin files to src files, plugin files take precedence
+      srcJsonFiles.push(...pluginJsonFiles);
+
+      logWithStyle(`Plugin locale files: ${JSON.stringify(pluginJsonFiles, null, 2)}`, ConsoleStyles.SUCCESS);
+    }
+
 
     // Helper to get relative path from rootDir for matching
     const getRel = (absPath: string) => absPath.replace(this.rootDir, '');

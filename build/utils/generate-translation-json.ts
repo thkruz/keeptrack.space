@@ -19,9 +19,8 @@ export function mergeAllLocales(): void {
   const config = configManager.loadConfig(process.argv.slice(2));
 
   if (config.isPro) {
-    // Merge locales files
     fileManager.mergeLocales('../src', '../src/plugins-pro');
   } else {
-    fileManager.compileLocales('../src');
+    fileManager.mergeLocales('../src');
   }
 }

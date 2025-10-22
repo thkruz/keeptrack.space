@@ -57,12 +57,6 @@ export const lat2pitch = (lat: Degrees): Radians => {
 };
 
 /**
- * 0.123 puts the camera at the ground level
- */
-const MIN_ZOOM_LEVEL = 0.123;
-const MAX_ZOOM_LEVEL = 1;
-
-/**
  * This function converts altitude in kilometers to a zoom level between MIN_ZOOM_LEVEL and MAX_ZOOM_LEVEL for the camera.
  */
 export const alt2zoom = (alt: Kilometers, minZoomDistance: Kilometers, maxZoomDistance: Kilometers, minDistanceFromSatellite: Kilometers): number => {
@@ -74,7 +68,7 @@ export const alt2zoom = (alt: Kilometers, minZoomDistance: Kilometers, maxZoomDi
   const zoomLevel = ((distanceFromCenter - minZoomDistance) / (maxZoomDistance - minZoomDistance)) ** (1 / ZOOM_EXP);
 
 
-  return Number.isNaN(zoomLevel) ? MIN_ZOOM_LEVEL : Math.min(Math.max(zoomLevel, MIN_ZOOM_LEVEL), MAX_ZOOM_LEVEL);
+  return Number.isNaN(zoomLevel) ? 0.5 : Math.min(Math.max(zoomLevel, 0), 1);
 };
 
 const isLeapYear_ = (dateIn: Date) => {

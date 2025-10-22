@@ -76,6 +76,10 @@ export class PluginManager {
       openSourcePath: '../plugins/oem-reader/oem-reader',
       proPath: '../plugins-pro/oem-reader/oem-reader',
     },
+    'user-account': {
+      openSourcePath: '../plugins/user-account/user-account',
+      proPath: '../plugins-pro/user-account/user-account',
+    },
   };
 
   constructor(fileManager: FileSystemManager) {

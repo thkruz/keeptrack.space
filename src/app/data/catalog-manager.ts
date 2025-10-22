@@ -30,6 +30,7 @@ import { launchSiteObjects, launchSites } from '@app/app/data/catalogs/launch-si
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { stars } from '@app/app/data/catalogs/stars';
 import { GetSatType, MissileParams, SatCruncherMessageData } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -41,7 +42,6 @@ import { StringExtractor } from '../ui/string-extractor';
 import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 
 declare module '@app/engine/core/interfaces' {
   interface SatCruncherMessageData {

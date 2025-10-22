@@ -15,6 +15,8 @@ export const LineColors = {
   CYAN: [0.0, 1.0, 1.0, 1.0] as vec4,
   PURPLE: [1.0, 0.0, 1.0, 1.0] as vec4,
   WHITE: [1.0, 1.0, 1.0, 1.0] as vec4,
+  GRAY: [0.5, 0.5, 0.5, 1.0] as vec4,
+  BROWN: [0.6, 0.4, 0.2, 1.0] as vec4,
 };
 
 /**

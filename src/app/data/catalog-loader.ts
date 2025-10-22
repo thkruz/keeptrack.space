@@ -1,7 +1,13 @@
 /* eslint-disable max-lines */
+import { rgbaArray } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { StringPad } from '@app/engine/utils/stringPad';
+import { PlanetsMenuPlugin } from '@app/plugins/planets-menu/planets-menu';
 import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCruncher';
+import { Body } from 'astronomy-engine';
 import {
   BaseObject,
   CatalogSource,
@@ -19,6 +25,7 @@ import {
 } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
+import { Planet } from '../objects/planet';
 import { CatalogManager } from './catalog-manager';
 import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
@@ -385,11 +392,58 @@ export class CatalogLoader {
       }));
     }
 
+    dotsManagerInstance.planetDot1 = tempObjData.length;
+
+    const planetNames = PluginRegistry.getPlugin(PlanetsMenuPlugin)?.PLANETS;
+    const planetList = ServiceLocator.getScene().planets;
+
+    if (planetNames && planetList) {
+      planetNames.forEach((planet) => {
+        const planetDot = new Planet({
+          id: tempObjData.length,
+          name: planet,
+        });
+
+        planetDot.color = planetList[planet]?.color ?? [1.0, 1.0, 1.0, 1.0] as rgbaArray;
+        if (planetList[planet]) {
+          (planetList[planet] as CelestialBody).planetObject = planetDot;
+        }
+
+        tempObjData.push(planetDot);
+      });
+
+      // Add the Moon if Earth is present
+      if (planetNames.includes(Body.Earth)) {
+        const earth = new Planet({
+          id: tempObjData.length,
+          name: Body.Earth,
+        });
+
+        earth.color = (planetList[Body.Earth]?.color ?? [0.0, 0.5, 1.0, 1.0]) as rgbaArray;
+        keepTrackApi.getScene().earth.planetObject = earth;
+        tempObjData.push(earth);
+
+        const moonDot = new Planet({
+          id: tempObjData.length,
+          name: Body.Moon,
+        });
+
+        moonDot.color = (planetList[Body.Moon]?.color ?? [1.0, 1.0, 1.0, 1.0]) as rgbaArray;
+        keepTrackApi.getScene().planets.Moon.planetObject = moonDot;
+
+        tempObjData.push(moonDot);
+      }
+    }
+
+    dotsManagerInstance.planetDot2 = tempObjData.length;
+
     for (const missileObj of catalogManagerInstance.missileSet) {
       tempObjData.push(missileObj);
     }
 
     catalogManagerInstance.missileSats = tempObjData.length; // This is the end of the missiles index
+
+    // FOV Markers must go last!!!
 
     for (const fieldOfViewMarker of catalogManagerInstance.fieldOfViewSet) {
       fieldOfViewMarker.id = tempObjData.length;

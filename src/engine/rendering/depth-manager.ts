@@ -7,7 +7,7 @@ export interface DepthConfig {
 
 export class DepthManager {
   private static readonly SATELLITE_NEAR = 0.1;
-  private static readonly SATELLITE_FAR = 3496000000;
+  private static readonly SATELLITE_FAR = 1e10; // 3496000000;
   private static readonly LOG_DEPTH_FC = 2.0 / Math.log2(DepthManager.SATELLITE_FAR + 1.0);
 
   static getConfig(): DepthConfig {

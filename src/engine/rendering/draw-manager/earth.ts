@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { Planet } from '@app/app/objects/planet';
 import { SplashScreen } from '@app/app/ui/splash-screen';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
@@ -105,6 +106,7 @@ export class Earth {
   cloudPosition_: number = Math.random() * 8192; // Randomize the cloud position
   RADIUS: number = RADIUS_OF_EARTH;
   position = <vec3>[0, 0, 0];
+  planetObject: Planet | null = null;
 
   private readonly BUMP_SRC_BASE = 'earthbump';
   private readonly SPEC_SRC_BASE = 'earthspec';

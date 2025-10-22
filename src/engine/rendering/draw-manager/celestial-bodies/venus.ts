@@ -23,6 +23,7 @@ import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as 
 import { vec3 } from 'gl-matrix';
 import { DEG2RAD, EciVec3 } from 'ootk';
 import { settingsManager } from '../../../../settings/settings';
+import { LineColors } from '../../line-manager/line';
 import { CelestialBody } from './celestial-body';
 
 // TODO: Venus doesn't occlude the sun yet!
@@ -36,6 +37,7 @@ export class Venus extends CelestialBody {
   readonly RADIUS = 6051.8;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
+  color = LineColors.YELLOW;
   eci: EciVec3;
 
   getTexturePath(): string {

@@ -5,6 +5,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -14,6 +15,7 @@ import { Body } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { PlanetsMenuPlugin } from '../planets-menu/planets-menu';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
@@ -116,7 +118,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       this.selectSatReset_();
     } else {
 
-      if (obj.position.x === 0 && obj.position.y === 0 && obj.position.z === 0) {
+      if (obj.position.x === 0 && obj.position.y === 0 && obj.position.z === 0 && obj.name !== Body.Earth) {
         keepTrackApi.getUiManager().toast('Object is inside the Earth, cannot select it', ToastMsgType.caution);
 
         return;
@@ -162,6 +164,10 @@ export class SelectSatManager extends KeepTrackPlugin {
           hideEl('draw-line-links');
           this.selectSatObject_(obj as MissileObject);
           break;
+        case ('Planet' as unknown as SpaceObjectType):
+          PluginRegistry.getPlugin(PlanetsMenuPlugin)?.changePlanet(obj.name as Body);
+
+          return;
         default:
           errorManagerInstance.log(`SelectSatManager.selectSat: Unknown SpaceObjectType: ${obj.type}`);
 

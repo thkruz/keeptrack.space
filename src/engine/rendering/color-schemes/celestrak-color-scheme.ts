@@ -1,14 +1,15 @@
 /* eslint-disable complexity */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { Planet } from '@app/app/objects/planet';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../../camera/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { html } from '@app/engine/utils/development/formatter';
 
 export interface CelestrakColorSchemeColorMap extends ColorSchemeColorMap {
   celestrakDefaultRocketBody: rgbaArray;
@@ -81,10 +82,23 @@ export class CelestrakColorScheme extends ColorScheme {
   update(obj: BaseObject): ColorInformation {
     /*
      * NOTE: The order of these checks is important
-     * Grab reference to outside managers for their functions
-     * @ts-expect-error
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+    if (obj.type === 'Planet' as unknown as SpaceObjectType) {
+      return {
+        color: (obj as Planet).color,
+        pickable: Pickable.Yes,
+      };
+    }
+
+    if (settingsManager.maxZoomDistance > 1.2e6) {
+      // If zoomed out beyond 1.2 million km, hide everything except planets
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
+
     if (obj.isNotional()) {
       return {
         color: this.colorTheme.deselected,

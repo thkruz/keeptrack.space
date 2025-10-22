@@ -23,6 +23,7 @@ import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as 
 import { vec3 } from 'gl-matrix';
 import { DEG2RAD, EciVec3 } from 'ootk';
 import { settingsManager } from '../../../../settings/settings';
+import { LineColors } from '../../line-manager/line';
 import { CelestialBody } from './celestial-body';
 import { SaturnRings } from './saturn-rings';
 
@@ -40,6 +41,7 @@ export class Saturn extends CelestialBody {
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
   private readonly rings_: SaturnRings;
+  color = LineColors.YELLOW;
 
   constructor() {
     super();

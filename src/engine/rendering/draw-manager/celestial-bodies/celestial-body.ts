@@ -2,9 +2,13 @@
  * Base class for rendering non-Earth celestial bodies (Moon, Mars, etc.)
  */
 import { SatMath } from '@app/app/analysis/sat-math';
+import { Planet } from '@app/app/objects/planet';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
@@ -18,6 +22,7 @@ import { EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, TEM
 import { keepTrackApi } from '../../../../keepTrackApi';
 import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';
+import { LineColors } from '../../line-manager/line';
 import { OcclusionProgram } from '../post-processing';
 
 export abstract class CelestialBody {
@@ -30,10 +35,16 @@ export abstract class CelestialBody {
   protected modelViewMatrix_ = null as unknown as mat4;
   protected readonly normalMatrix_ = mat3.create();
 
+  color = LineColors.BLUE;
   position = [0, 0, 0] as EciArr3;
   rotation = [0, 0, 0];
   mesh: Mesh;
+  planetObject: Planet | null = null;
   relativeSatPos: EciVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
+
+  orbitPathSegments_ = 4096;
+  isDrawingFullOrbitPath: boolean = false;
+  protected timeForOneOrbit: Seconds = 2 * 365 * 24 * 3600 as Seconds; // Default to 2 Earth year
 
   abstract getName(): Body;
   abstract getTexturePath(): string;
@@ -67,6 +78,11 @@ export abstract class CelestialBody {
         },
       });
       this.mesh.geometry.initVao(this.mesh.program);
+
+      EventBus.getInstance().on(EventBusEvent.onLinesCleared, () => {
+        this.isDrawingFullOrbitPath = false;
+      });
+
       this.isLoaded_ = true;
     } catch (e) {
       errorManagerInstance.warn(`Error initializing ${this.getName()}:`, e);
@@ -206,6 +222,42 @@ export abstract class CelestialBody {
       }
     `,
   };
+
+  drawFullOrbitPath(): void {
+    if (this.isDrawingFullOrbitPath) {
+      return;
+    }
+
+    const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
+    const lineManager = ServiceLocator.getLineManager();
+    const timeslice = this.timeForOneOrbit / this.orbitPathSegments_;
+    const orbitPositions: [number, number, number][] = [];
+
+    for (let i = 0; i < this.orbitPathSegments_; i++) {
+      const t = now + i * timeslice;
+      const sv = this.getTeme(new Date(t * 1000)).position; // convert s to ms
+
+      if (settingsManager.centerBody === Body.Sun) {
+        const sunPos = ServiceLocator.getScene().sun.position;
+
+        sv.x = sv.x + sunPos[0] as Kilometers;
+        sv.y = sv.y + sunPos[1] as Kilometers;
+        sv.z = sv.z + sunPos[2] as Kilometers;
+      } else if (settingsManager.centerBody !== Body.Earth) {
+        const centerBodyPlanet = ServiceLocator.getScene().planets[settingsManager.centerBody];
+
+        sv.x += centerBodyPlanet.position[0];
+        sv.y += centerBodyPlanet.position[1];
+        sv.z += centerBodyPlanet.position[2];
+      }
+
+      orbitPositions.push([sv.x as number, sv.y as number, sv.z as number]);
+    }
+
+    lineManager.createOrbitPath(orbitPositions, this.color);
+
+    this.isDrawingFullOrbitPath = true;
+  }
 
   protected calculateRelativeSatPos() {
     const selectedSatPos = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj.position;

@@ -1297,9 +1297,9 @@ export class Camera {
       this.updateSatShaderSizes();
     }
 
-    if (settingsManager.isAutoZoomIn || settingsManager.isAutoZoomOut) {
-      const cameraDistance = this.getCameraDistance();
+    const cameraDistance = this.getCameraDistance();
 
+    if (settingsManager.maxZoomDistance < 1.2e6) {
       if (cameraDistance > 140000) {
         settingsManager.satShader.minSize = 7;
       }
@@ -1321,6 +1321,9 @@ export class Camera {
       if (cameraDistance > 450000) {
         settingsManager.satShader.minSize = 1;
       }
+    }
+
+    if (settingsManager.isAutoZoomIn || settingsManager.isAutoZoomOut) {
 
       if (settingsManager.isAutoZoomIn) {
         this.state.zoomTarget -= dt * settingsManager.autoZoomSpeed;

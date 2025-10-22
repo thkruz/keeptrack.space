@@ -4,7 +4,9 @@ import { GlUtils } from './gl-utils';
 /* eslint-disable no-useless-escape */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { Body } from 'astronomy-engine';
 import { mat4 } from 'gl-matrix';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType } from 'ootk';
 import { SettingsManager } from '../../settings/settings';
@@ -149,6 +151,10 @@ export class DotsManager {
   sizeData: Int8Array;
   starIndex1: number;
   starIndex2: number;
+  // Start of the planet dots in the object cache
+  planetDot1: number;
+  // End of the planet dots in the object cache
+  planetDot2: number;
   velocityData: Float32Array;
   lastUpdateSimTime = 0;
 
@@ -647,6 +653,7 @@ export class DotsManager {
     }
 
     this.interpolatePositionsOfOemSatellites_();
+    this.updatePlanetPositionDots_();
 
     this.lastUpdateSimTime = simTime;
   }
@@ -655,6 +662,17 @@ export class DotsManager {
     // Check if the index is part of lastSearchResults
     if (settingsManager.lastSearchResults.includes(i)) {
       return 1.0; // Return size for search results
+    }
+
+    if ((i >= this.starIndex1 && i <= this.starIndex2)) {
+      return 1.0; // Return size for stars
+    }
+
+    // If a planet and we aren't centered on Earth or Moon
+    if ((i >= this.planetDot1 && i <= this.planetDot2) &&
+      // TODO: This is hacky. We need better logic for determining when to show planet dots
+      (settingsManager.maxZoomDistance > (1.3e6 as Kilometers) || (settingsManager.centerBody !== Body.Earth && settingsManager.centerBody !== Body.Moon))) {
+      return 1.0; // Return size for planets
     }
 
     // Check if the index is the selected satellite
@@ -882,6 +900,35 @@ export class DotsManager {
       this.velocityData[oemSat.id * 3] = pv[3];
       this.velocityData[oemSat.id * 3 + 1] = pv[4];
       this.velocityData[oemSat.id * 3 + 2] = pv[5];
+    }
+  }
+
+  private updatePlanetPositionDots_() {
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+
+    for (let i = this.planetDot1; i < this.planetDot2; i++) {
+      const planet = catalogManagerInstance.objectCache[i];
+
+      if (!planet || planet.type !== ('Planet' as unknown as SpaceObjectType)) {
+        continue;
+      }
+
+      const planetName = planet.name as Body;
+      const position = keepTrackApi.getScene().getBodyById(planetName)?.position;
+
+      if (!position) {
+        continue;
+      }
+
+      this.positionData[planet.id * 3] = position[0];
+      this.positionData[planet.id * 3 + 1] = position[1];
+      this.positionData[planet.id * 3 + 2] = position[2];
+
+      if (settingsManager.centerBody === planetName) {
+        this.sizeData[planet.id] = 0.0;
+      } else {
+        this.sizeData[planet.id] = 1.0;
+      }
     }
   }
 }

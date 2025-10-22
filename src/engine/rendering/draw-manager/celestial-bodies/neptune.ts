@@ -23,6 +23,7 @@ import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as 
 import { vec3 } from 'gl-matrix';
 import { DEG2RAD, EciVec3 } from 'ootk';
 import { settingsManager } from '../../../../settings/settings';
+import { LineColors } from '../../line-manager/line';
 import { CelestialBody } from './celestial-body';
 
 // TODO: Neptune doesn't occlude the sun yet!
@@ -37,6 +38,7 @@ export class Neptune extends CelestialBody {
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
+  color = LineColors.BLUE;
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/neptune${NeptuneTextureQuality.ULTRA}.jpg`;

@@ -23,6 +23,7 @@ import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as 
 import { vec3 } from 'gl-matrix';
 import { DEG2RAD, EciVec3 } from 'ootk';
 import { settingsManager } from '../../../../settings/settings';
+import { LineColors } from '../../line-manager/line';
 import { CelestialBody } from './celestial-body';
 
 // TODO: Mars doesn't occlude the sun yet!
@@ -38,6 +39,7 @@ export class Mars extends CelestialBody {
   protected readonly NUM_WIDTH_SEGS = 64;
   eci: EciVec3;
   rotation = [0, 0, Math.PI * 7 / 10];
+  color = LineColors.RED;
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/mars${MarsTextureQuality.ULTRA}.jpg`;

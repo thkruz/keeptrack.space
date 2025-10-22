@@ -19,7 +19,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Body } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
 import { Seconds } from 'ootk';
@@ -41,8 +40,9 @@ export class Moon extends CelestialBody {
   readonly RADIUS = 1737.4;
   protected readonly NUM_HEIGHT_SEGS = 128;
   protected readonly NUM_WIDTH_SEGS = 128;
+  protected timeForOneOrbit = 27.321661 * 24 * 3600 as Seconds;
+  color = LineColors.WHITE;
   rotation = [0, 0, Math.PI];
-  moonOrbitPathSegments_ = 512;
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/moonmap${MoonTextureQuality.ULTRA}.jpg`;
@@ -57,29 +57,6 @@ export class Moon extends CelestialBody {
       return;
     }
     super.draw(sunPosition, tgtBuffer);
-  }
-
-  drawOrbitPath(): void {
-    const timeForOneOrbit = 27.321661 * 24 * 3600; // in seconds
-    const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
-    const timeslice = timeForOneOrbit / this.moonOrbitPathSegments_;
-    const orbitPositions: [number, number, number][] = [];
-    const lineManagerInstance = ServiceLocator.getLineManager();
-
-    for (let i = 0; i < this.moonOrbitPathSegments_; i++) {
-      const t = now + i * timeslice;
-      const sv = this.getTeme(new Date(t * 1000)).position; // convert s to ms
-
-      orbitPositions.push([sv.x as number, sv.y as number, sv.z as number]);
-    }
-
-    for (let i = 0; i < (this.moonOrbitPathSegments_ - 1); i++) {
-      lineManagerInstance.createRef2Ref(
-        orbitPositions[i],
-        orbitPositions[(i + 1) % this.moonOrbitPathSegments_],
-        LineColors.WHITE,
-      );
-    }
   }
 
   protected calculateRelativeSatPos() {

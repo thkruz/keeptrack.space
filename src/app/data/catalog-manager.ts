@@ -586,8 +586,6 @@ export class CatalogManager {
   }
 
   private onCruncherReady_() {
-    SplashScreen.hideSplashScreen();
-
     const stars = this.objectCache.filter((sat) => sat?.type === SpaceObjectType.STAR);
 
     if (stars.length > 0) {

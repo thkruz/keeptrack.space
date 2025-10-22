@@ -415,6 +415,8 @@ theodore.kruczek at gmail dot com.
       if (settingsManager.onLoadCb) {
         settingsManager.onLoadCb();
       }
+
+      SplashScreen.hideSplashScreen();
     } else {
       setTimeout(() => {
         this.postStart_();

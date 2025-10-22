@@ -39,7 +39,7 @@ export class LayersManager {
   };
 
   isLayersMenuOpen = false;
-  layersPopupBox: LayersPopupBox | null = null;
+  layersPopupBox: LayersPopupBox = new LayersPopupBox();
 
   static {
     const addonLayers = {};
@@ -86,7 +86,7 @@ export class LayersManager {
           if (settingsManager.isMobileModeEnabled) {
             layersHoverDom = getEl('layers-hover-menu')!;
           } else {
-            const newFloatingBox = this.layersPopupBox ?? new LayersPopupBox();
+            const newFloatingBox = this.layersPopupBox;
 
             this.layersPopupBox = newFloatingBox;
 
@@ -169,6 +169,8 @@ export class LayersManager {
   }
 
   static change(menu: string) {
+    settingsManager.currentLayer = menu;
+
     let layersHoverDom: HTMLElement | null;
 
     if (settingsManager.isMobileModeEnabled) {
@@ -191,7 +193,6 @@ export class LayersManager {
 
     // Update Layers Colors
     LayersManager.layersColorsChange();
-    settingsManager.currentLayer = menu;
     keepTrackApi.emit(EventBusEvent.layerUpdated, menu);
   }
 

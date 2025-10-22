@@ -1,5 +1,7 @@
 /* eslint-disable complexity */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { Planet } from '@app/app/objects/planet';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -84,10 +86,30 @@ export class ObjectTypeColorScheme extends ColorScheme {
   update(obj: BaseObject): ColorInformation {
     /*
      * NOTE: The order of these checks is important
-     * Grab reference to outside managers for their functions
-     * @ts-expect-error
      */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+    if (obj.type === 'Planet' as unknown as SpaceObjectType) {
+      return {
+        color: (obj as Planet).color,
+        pickable: Pickable.Yes,
+      };
+    }
+
+    if (((obj as OemSatellite).source ?? '') === 'OEM Import') {
+      return {
+        color: [1.0, 0.5, 0.0, 1.0],
+        pickable: Pickable.Yes,
+      };
+    }
+
+    if (settingsManager.maxZoomDistance > 2e6) {
+      // If zoomed out beyond 2 million km, hide everything except planets
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
+
     if (obj.isNotional()) {
       return {
         color: this.colorTheme.deselected,

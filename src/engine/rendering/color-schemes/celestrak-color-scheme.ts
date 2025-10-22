@@ -1,5 +1,6 @@
 /* eslint-disable complexity */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Planet } from '@app/app/objects/planet';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -87,6 +88,13 @@ export class CelestrakColorScheme extends ColorScheme {
     if (obj.type === 'Planet' as unknown as SpaceObjectType) {
       return {
         color: (obj as Planet).color,
+        pickable: Pickable.Yes,
+      };
+    }
+
+    if (((obj as OemSatellite).source ?? '') === 'OEM Import') {
+      return {
+        color: [1.0, 0.5, 0.0, 1.0],
         pickable: Pickable.Yes,
       };
     }

@@ -101,12 +101,16 @@ export class LineManager {
     this.add(new RefToRefLine(ref1, ref2, color));
   }
 
-  createOrbitPath(path: vec3[], color: vec4): void {
+  createOrbitPath(path: vec3[], color: vec4): OrbitPathLine | null {
     if (!path || path.length === 0) {
-      return;
+      return null;
     }
 
-    this.add(new OrbitPathLine(path, color));
+    const orbitPathLine = new OrbitPathLine(path, color);
+
+    this.add(orbitPathLine);
+
+    return orbitPathLine;
   }
 
   createSensorToSun(sensor: DetailedSensor | null): void {

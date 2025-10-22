@@ -671,7 +671,7 @@ export class DotsManager {
     // If a planet and we aren't centered on Earth or Moon
     if ((i >= this.planetDot1 && i <= this.planetDot2) &&
       // TODO: This is hacky. We need better logic for determining when to show planet dots
-      (settingsManager.maxZoomDistance > (1.3e6 as Kilometers) || (settingsManager.centerBody !== Body.Earth && settingsManager.centerBody !== Body.Moon))) {
+      (settingsManager.maxZoomDistance > (2e6 as Kilometers) || (settingsManager.centerBody !== Body.Earth && settingsManager.centerBody !== Body.Moon))) {
       return 1.0; // Return size for planets
     }
 

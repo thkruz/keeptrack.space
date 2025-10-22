@@ -91,8 +91,8 @@ export class CelestrakColorScheme extends ColorScheme {
       };
     }
 
-    if (settingsManager.maxZoomDistance > 1.2e6) {
-      // If zoomed out beyond 1.2 million km, hide everything except planets
+    if (settingsManager.maxZoomDistance > 2e6) {
+      // If zoomed out beyond 2 million km, hide everything except planets
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,

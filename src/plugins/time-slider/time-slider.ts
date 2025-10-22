@@ -82,8 +82,12 @@ export class TimeSlider extends KeepTrackPlugin {
       });
     });
 
-    keepTrackApi.on(EventBusEvent.updateDateTime, () => {
-      this.updateSliderPosition_();
+    keepTrackApi.on(EventBusEvent.selectedDateChange, () => {
+      this.updateSliderPosition();
+    });
+
+    keepTrackApi.on(EventBusEvent.staticOffsetChange, () => {
+      this.updateSliderPosition();
     });
   }
 
@@ -125,7 +129,7 @@ export class TimeSlider extends KeepTrackPlugin {
     keepTrackApi.emit(EventBusEvent.updateDateTime, newDate);
   }
 
-  private updateSliderPosition_() {
+  updateSliderPosition() {
     const slider = getEl('time-slider-container-slider');
     const handle = slider?.querySelector('.ui-slider-handle') as HTMLElement | null;
 

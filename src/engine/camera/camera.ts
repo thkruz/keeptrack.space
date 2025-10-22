@@ -1299,7 +1299,7 @@ export class Camera {
 
     const cameraDistance = this.getCameraDistance();
 
-    if (settingsManager.maxZoomDistance < 1.2e6) {
+    if (settingsManager.maxZoomDistance < 2e6) {
       if (cameraDistance > 140000) {
         settingsManager.satShader.minSize = 7;
       }

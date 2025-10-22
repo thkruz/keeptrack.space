@@ -144,6 +144,10 @@ export abstract class UrlManager {
         case 'canvas':
           settingsManager.isDisableCanvas = kv[key].toLowerCase() === 'false';
           break;
+        case 'planets':
+          settingsManager.isDisablePlanets = kv[key].toLowerCase() === 'false';
+          isUsingParsedVariables = true;
+          break;
         case 'vimpel':
           settingsManager.isEnableJscCatalog = kv[key].toLowerCase() === 'true';
           break;

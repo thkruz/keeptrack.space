@@ -2,6 +2,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
+import { OrbitPathLine } from '@app/engine/rendering/line-manager/orbit-path';
 import { Body } from 'astronomy-engine';
 import { BaseObject, J2000, Seconds, SpaceObjectType, TEME } from 'ootk';
 import { SatelliteModels } from '../rendering/mesh/model-resolver';
@@ -55,16 +56,18 @@ export interface ParsedOem {
 export class OemSatellite extends BaseObject {
   header: OemHeader;
   OemDataBlocks: OemDataBlock[];
-  model: keyof typeof SatelliteModels = SatelliteModels.s6u;
+  model: keyof typeof SatelliteModels = SatelliteModels.aehf;
   isStable = true;
   source: string;
   orbitPathCache_: Float32Array | null = null;
   stateVectorIdx_: number = 0;
   dataBlockIdx_: number = 0;
   orbitFullPathCache_: Float32Array | null = null;
-  isDrawingFullOrbitPath = false;
   /** Cached points for drawing the full orbit path */
   pointsForOrbitPath: [number, number, number][] | null = null;
+  orbitFullPathLine: OrbitPathLine | null = null;
+  orbitHistoryLine: OrbitPathLine | null = null;
+  isDrawOrbitHistory = true;
 
   eci(date: Date): { position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } } | null {
     const posAndVel = this.updatePosAndVel(date.getTime() / 1000 as Seconds);
@@ -149,7 +152,7 @@ export class OemSatellite extends BaseObject {
     this.header = oem.header;
 
     EventBus.getInstance().on(EventBusEvent.onLinesCleared, () => {
-      this.isDrawingFullOrbitPath = false;
+      this.removeFullOrbitPath();
     });
   }
 
@@ -196,6 +199,10 @@ export class OemSatellite extends BaseObject {
   updatePosAndVel(simTime: Seconds): [number, number, number, number, number, number] | null {
     if (!this?.OemDataBlocks || this.OemDataBlocks.length === 0) {
       return null;
+    }
+
+    if (this.isDrawOrbitHistory) {
+      this.drawOrbitHistory();
     }
 
     const posAndVel = [0, 0, 0, 0, 0, 0] as [number, number, number, number, number, number];
@@ -457,8 +464,51 @@ export class OemSatellite extends BaseObject {
     return pointsOut;
   }
 
+  drawOrbitHistory(): void {
+    if (!this.orbitFullPathCache_) {
+      this.generateOrbitPath_();
+    }
+
+    const lineManager = ServiceLocator.getLineManager();
+    const points: [number, number, number][] = [];
+
+    // Calculate current position based on this.dataBlockIdx and this.stateVectorIdx
+    let currentIndex = 0;
+
+    for (let i = 0; i < this.dataBlockIdx; i++) {
+      currentIndex += this.OemDataBlocks[i].stateVectors.length;
+    }
+    currentIndex += this.stateVectorIdx;
+
+    // Starting at currentIndex, go backwards to the start
+    for (let i = currentIndex; i >= 0; i--) {
+      const idx = i;
+
+      if (idx < this.orbitFullPathCache_!.length / 4) {
+        points.push([
+          this.orbitFullPathCache_![idx * 4],
+          this.orbitFullPathCache_![idx * 4 + 1],
+          this.orbitFullPathCache_![idx * 4 + 2],
+        ]);
+      }
+    }
+
+    if (this.orbitHistoryLine) {
+      this.orbitHistoryLine.isGarbage = true;
+    }
+
+    this.orbitHistoryLine = lineManager.createOrbitPath(points, LineColors.GREEN);
+  }
+
+  removeOrbitHistory(): void {
+    if (this.orbitHistoryLine) {
+      this.orbitHistoryLine.isGarbage = true;
+      this.orbitHistoryLine = null;
+    }
+  }
+
   drawFullOrbitPath(): void {
-    if (this.isDrawingFullOrbitPath) {
+    if (this.orbitFullPathLine) {
       return;
     }
 
@@ -475,8 +525,13 @@ export class OemSatellite extends BaseObject {
       this.pointsForOrbitPath = points;
     }
 
-    lineManager.createOrbitPath(this.pointsForOrbitPath, LineColors.BLUE);
+    this.orbitFullPathLine = lineManager.createOrbitPath(this.pointsForOrbitPath, LineColors.BLUE);
+  }
 
-    this.isDrawingFullOrbitPath = true;
+  removeFullOrbitPath(): void {
+    if (this.orbitFullPathLine) {
+      this.orbitFullPathLine.isGarbage = true;
+      this.orbitFullPathLine = null;
+    }
   }
 }

@@ -168,15 +168,19 @@ export class SoundManager extends KeepTrackPlugin {
 
   private getVolumeForSound(soundKey: string): number {
     if (soundKey.startsWith('click')) {
-      return 0.25;
+      return 0.15;
     } else if (soundKey.startsWith('chatter')) {
       return 0.15;
-    } else if (soundKey === 'loading') {
+    } else if (soundKey === SoundNames.LOADING) {
       return 0.25;
-    } else if (soundKey === 'export') {
+    } else if (soundKey === SoundNames.EXPORT) {
       return 0.3;
     } else if (soundKey === 'error2') {
       return 0.5;
+    } else if (soundKey.startsWith('beep') || soundKey.startsWith('genericBeep')) {
+      return 0.3;
+    } else if (soundKey === SoundNames.MENU_BUTTON) {
+      return 0.25;
     }
 
     return 1.0;

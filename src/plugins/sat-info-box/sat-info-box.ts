@@ -449,12 +449,12 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private onKeyDownLowerI_(satInfoBox: SatInfoBox, key: string): void {
+  private onKeyDownLowerI_(key: string): void {
     if (key !== 'i') {
       return;
     }
 
-    satInfoBox.toggle();
+    this.toggle();
   }
 
   hide(): void {

@@ -935,7 +935,7 @@ export class CatalogLoader {
   private static processAsciiCatalog_(asciiCatalog: AsciiTleSat[], catalogManagerInstance: CatalogManager, tempSatData: DetailedSatellite[]) {
     if (settingsManager.dataSources.externalTLEs) {
       if (settingsManager.dataSources.externalTLEs !== 'https://storage.keeptrack.space/data/celestrak.txt') {
-        errorManagerInstance.info(`Processing ${settingsManager.dataSources.externalTLEs}`);
+        errorManagerInstance.log(`Processing ${settingsManager.dataSources.externalTLEs}`);
       }
     } else {
       errorManagerInstance.log('Processing ASCII Catalog');

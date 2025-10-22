@@ -211,6 +211,16 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     );
   }
 
+  addJs(): void {
+    super.addJs();
+
+    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+      if (key === 'Home' && !isRepeat) {
+        this.changePlanet(Body.Earth);
+      }
+    });
+  }
+
   setAllPlanetsDotSize(size = 1): void {
     const gl = keepTrackApi.getRenderer().gl;
     const moon = ServiceLocator.getScene().planets[Body.Moon];

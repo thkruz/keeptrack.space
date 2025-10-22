@@ -154,31 +154,20 @@ export class Scene {
         this.sun.draw(this.earth.lightDirection, fb);
 
         // Draw a black earth mesh on top of the sun in the godrays frame buffer
-        switch (settingsManager.centerBody) {
-          case Body.Mercury:
-            this.planets[Body.Mercury].drawOcclusion(
-              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-            );
-            break;
-          case Body.Venus:
-            this.planets[Body.Venus].drawOcclusion(
-              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-            );
-            break;
-          case Body.Mars:
-            this.planets[Body.Mars].drawOcclusion(
-              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-            );
-            break;
-          case Body.Moon:
-            this.planets[Body.Moon].drawOcclusion(
-              camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-            );
-            break;
-          case Body.Earth:
-          default:
-            this.earth.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays);
-            break;
+        this.planets[settingsManager.centerBody]?.drawOcclusion(
+          camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+        );
+
+        if (settingsManager.centerBody === Body.Earth) {
+          this.planets[Body.Moon].drawOcclusion(
+            camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+          );
+        }
+
+        if (settingsManager.centerBody === Body.Moon) {
+          this.earth.drawOcclusion(
+            camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+          );
         }
 
         // Draw a black object mesh on top of the sun in the godrays frame buffer

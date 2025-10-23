@@ -2,7 +2,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec3 } from 'gl-matrix';
-import { Radians } from 'ootk';
+import { Radians } from '@ootk/src/main';
 
 export class CameraControlWidget {
   private static instance: CameraControlWidget;

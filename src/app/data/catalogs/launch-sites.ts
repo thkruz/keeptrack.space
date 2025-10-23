@@ -1,4 +1,4 @@
-import { Degrees } from 'ootk';
+import { Degrees } from '@ootk/src/main';
 import { AFETRList } from './launch-sites/afetr-list';
 import { AFWTRList } from './launch-sites/afwtr-list';
 import { LaunchSite } from '../catalog-manager/LaunchFacility';

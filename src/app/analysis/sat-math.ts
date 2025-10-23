@@ -24,8 +24,6 @@
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { Earth } from '@app/engine/rendering/draw-manager/earth';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { vec3 } from 'gl-matrix';
-import numeric from 'numeric';
 import {
   BaseObject,
   DEG2RAD,
@@ -53,7 +51,9 @@ import {
   eci2ecf,
   eci2lla,
   eci2rae,
-} from 'ootk';
+} from '@ootk/src/main';
+import { vec3 } from 'gl-matrix';
+import numeric from 'numeric';
 import { EciArr3 } from '../../engine/core/interfaces';
 import type { Sun } from '../../engine/rendering/draw-manager/sun';
 import { DISTANCE_TO_SUN, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '../../engine/utils/constants';
@@ -165,7 +165,7 @@ export abstract class SatMath {
 
         return <Kilometers>0;
       }
-    } catch (e) {
+    } catch {
       errorManagerInstance.log(`Error propagating satrec at ${now}`);
 
       return <Kilometers>0;

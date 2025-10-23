@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { MissileParams } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BaseObject, BaseObjectParams, DEG2RAD, Degrees, Kilometers, Radians, SpaceObjectType, Vector3D, calcGmst, eci2lla, lla2eci } from 'ootk';
+import { BaseObject, BaseObjectParams, DEG2RAD, Degrees, Kilometers, Radians, SpaceObjectType, Vector3D, calcGmst, eci2lla, lla2eci } from '@ootk/src/main';
 
 export class MissileObject extends BaseObject {
   type = SpaceObjectType.BALLISTIC_MISSILE;

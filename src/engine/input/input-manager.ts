@@ -2,8 +2,8 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { mat4, vec3, vec4 } from 'gl-matrix';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
 import { lineManagerInstance } from '../rendering/line-manager';
@@ -468,7 +468,7 @@ export class InputManager {
 
       gl.deleteBuffer(buf);
       this.isAsyncWorking = true;
-    } catch (error) {
+    } catch {
       this.isAsyncWorking = false;
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, null);
     }

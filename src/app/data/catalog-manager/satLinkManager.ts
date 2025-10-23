@@ -1,14 +1,14 @@
 /* eslint-disable max-depth */
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { DetailedSatellite, DetailedSensor, RAD2DEG } from '@ootk/src/main';
 import numeric from 'numeric';
-import { DetailedSatellite, DetailedSensor, RAD2DEG } from 'ootk';
 import type { ControlSite } from './ControlSite';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export enum SatConstellationString {
   Aehf = 'aehf',
@@ -113,7 +113,7 @@ export class SatLinkManager {
           this.starlinkUsers.push(controlSiteList[controlSite].name);
         }
       }
-    } catch (e) {
+    } catch {
       errorManagerInstance.info('controlSiteManager unable to load!');
     }
 
@@ -269,7 +269,7 @@ export class SatLinkManager {
             lineManager.createSensorToSat(keepTrackApi.getSensorManager().getSensor(), bestSat, [0, 1.0, 0.6, 1.0]);
           }
         }
-      } catch (e) {
+      } catch {
         // Intentionally empty
       }
     }

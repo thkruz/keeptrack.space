@@ -18,7 +18,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Body, KM_PER_AU, BackdatePosition as backdatePosition } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, TEME, Vector3D } from 'ootk';
+import { EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, TEME, Vector3D } from '@ootk/src/main';
 import { keepTrackApi } from '../../../../keepTrackApi';
 import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';

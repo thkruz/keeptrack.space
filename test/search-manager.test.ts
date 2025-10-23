@@ -5,7 +5,7 @@ import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CatalogManager } from '@app/singletons/catalog-manager';
-import { DetailedSatellite } from 'ootk';
+import { DetailedSatellite } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 
 describe('SearchManager', () => {

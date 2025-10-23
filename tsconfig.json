@@ -36,6 +36,7 @@
     "coverage/**/*",
     "tsconfig.json",
     "src/tools/**/*",
+    "src/engine/ootk/examples/**/*"
   ],
   "filesGlob": [
     "src/**/*.ts",

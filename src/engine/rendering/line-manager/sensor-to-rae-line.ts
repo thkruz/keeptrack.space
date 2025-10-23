@@ -1,7 +1,7 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { vec4 } from 'gl-matrix';
-import { DetailedSensor, rae2eci, RaeVec3 } from 'ootk';
+import { DetailedSensor, rae2eci, RaeVec3 } from '@ootk/src/main';
 import { Line, LineColors } from './line';
 
 export class SensorToRaeLine extends Line {

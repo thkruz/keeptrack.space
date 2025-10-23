@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
-import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
+import { BaseObject, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
 
 export class SmallSatColorScheme extends ColorScheme {

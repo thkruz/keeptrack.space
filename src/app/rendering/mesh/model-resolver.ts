@@ -1,7 +1,7 @@
 import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import type { MeshModel } from '@app/engine/rendering/mesh-manager';
-import { BaseObject, DetailedSatellite, SpaceObjectType } from 'ootk';
+import { BaseObject, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
 
 export const SatelliteModels = {
   aehf: 'aehf',

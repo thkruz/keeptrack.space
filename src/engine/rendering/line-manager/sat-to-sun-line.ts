@@ -1,7 +1,7 @@
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { DetailedSatellite } from 'ootk';
+import { DetailedSatellite } from '@ootk/src/main';
 import { Line, LineColors } from './line';
 
 export class SatToSunLine extends Line {

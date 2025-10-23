@@ -1,4 +1,4 @@
-import { DetailedSatellite, Milliseconds } from 'ootk';
+import { DetailedSatellite, Milliseconds } from '@ootk/src/main';
 
 import { keepTrackApi } from '../../keepTrackApi';
 import { EventBus } from '../events/event-bus';

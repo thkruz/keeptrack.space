@@ -1,10 +1,11 @@
 import { DensityBin } from '@app/app/data/catalog-manager';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { BaseObject, Star } from '@app/engine/ootk/src/objects';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../../camera/camera';
+import { SpaceObjectType } from '@ootk/src/main';
 
 export interface ColorSchemeColorMap {
   version: string;

@@ -5,7 +5,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import searchPng from '@public/img/icons/search.png';
-import { DetailedSatellite, SpaceObjectType, Star } from 'ootk';
+import { DetailedSatellite, SpaceObjectType, Star } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { slideInDown, slideOutUp } from '../../engine/utils/slide';

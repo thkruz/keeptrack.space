@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BaseObject, Star } from 'ootk';
+import { BaseObject, Star } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
 import { html } from '@app/engine/utils/development/formatter';
 

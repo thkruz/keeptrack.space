@@ -21,7 +21,7 @@
 
 import { Body } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { Seconds } from 'ootk';
+import { Seconds } from '@ootk/src/main';
 import { settingsManager } from '../../../../settings/settings';
 import { LineColors } from '../../line-manager/line';
 import { CelestialBody } from './celestial-body';

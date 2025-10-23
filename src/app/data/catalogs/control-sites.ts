@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-import { SpaceObjectType } from 'ootk';
+import { SpaceObjectType } from '@ootk/src/main';
 import { ControlSite } from '../catalog-manager/ControlSite';
 
 export interface ControlSiteParams {

@@ -1,6 +1,6 @@
 import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
 import { keepTrackApi } from '../../keepTrackApi';

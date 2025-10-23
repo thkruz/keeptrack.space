@@ -4,8 +4,8 @@
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { Sun } from '@app/engine/rendering/draw-manager/sun';
 import { DISTANCE_TO_SUN, RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import * as Ootk from 'ootk';
-import { EciVec3, SatelliteRecord, Sgp4 } from 'ootk';
+import * as Ootk from '@ootk/src/main';
+import { EciVec3, SatelliteRecord, Sgp4 } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors } from './environment/standard-env';
 

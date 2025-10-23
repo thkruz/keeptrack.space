@@ -1,4 +1,4 @@
-import { Milliseconds } from 'ootk';
+import { Milliseconds } from '@ootk/src/main';
 import { PluginManager } from '../plugins/plugins';
 import { Camera } from './camera/camera';
 import { Container } from './core/container';

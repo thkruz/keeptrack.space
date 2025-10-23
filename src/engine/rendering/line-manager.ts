@@ -9,7 +9,7 @@ import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Body } from 'astronomy-engine';
 import { mat4, vec3, vec4 } from 'gl-matrix';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, RaeVec3 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, RaeVec3 } from '@ootk/src/main';
 import { Container } from '../core/container';
 import { Scene } from '../core/scene';
 import { EventBusEvent } from '../events/event-bus-events';

@@ -7,7 +7,6 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { StringPad } from '@app/engine/utils/stringPad';
 import { PlanetsMenuPlugin } from '@app/plugins/planets-menu/planets-menu';
 import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCruncher';
-import { Body } from 'astronomy-engine';
 import {
   BaseObject,
   CatalogSource,
@@ -22,7 +21,8 @@ import {
   Tle,
   TleLine1,
   TleLine2,
-} from 'ootk';
+} from '@ootk/src/main';
+import { Body } from 'astronomy-engine';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
 import { Planet } from '../objects/planet';
@@ -285,7 +285,7 @@ export class CatalogLoader {
             }
           });
       }
-    } catch (e) {
+    } catch {
       errorManagerInstance.warn('Failed to load TLE catalog(s)!');
     }
   }
@@ -877,7 +877,7 @@ export class CatalogLoader {
       const satellite = new DetailedSatellite(tempSatData[i]);
 
       tempSatData[i] = satellite;
-    } catch (e) {
+    } catch {
       errorManagerInstance.warn(`Failed to process satellite: ${element.ON} (${element.SCC})`);
     }
   }
@@ -927,7 +927,7 @@ export class CatalogLoader {
       satellite.altId = 'EXTERNAL_SAT'; // TODO: This is a hack to make sure the satellite is not removed by the filter
 
       tempSatData.push(satellite);
-    } catch (e) {
+    } catch {
       errorManagerInstance.warn(`Failed to process satellite: ${element.ON} (${element.SCC})`);
     }
   }

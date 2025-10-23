@@ -21,7 +21,7 @@
 
 import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
-import { DEG2RAD, EciVec3 } from 'ootk';
+import { DEG2RAD, EciVec3 } from '@ootk/src/main';
 import { settingsManager } from '../../../../settings/settings';
 import { LineColors } from '../../line-manager/line';
 import { CelestialBody } from './celestial-body';

@@ -1,5 +1,5 @@
 import { t7e } from '@app/locales/keys';
-import { BaseObject, SpaceObjectType } from 'ootk';
+import { BaseObject, SpaceObjectType } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { countryCodeList, getCountryMapList, launchSiteMap } from '../data/catalogs/countries';
 import { rocketUrls } from '../data/catalogs/rocket-urls';

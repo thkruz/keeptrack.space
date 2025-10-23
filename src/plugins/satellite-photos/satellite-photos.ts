@@ -3,15 +3,15 @@ import { getEl } from '@app/engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { Degrees } from '@ootk/src/main';
 import photoManagerPng from '@public/img/icons/photoManager.png';
-import { Degrees } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBus } from '@app/engine/events/event-bus';
 
 interface DiscvrResponse {
   centroid_coordinates: {

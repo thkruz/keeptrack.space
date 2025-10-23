@@ -1,4 +1,4 @@
-import { Degrees, getDayOfYear, Kilometers, Radians, TAU } from 'ootk';
+import { Degrees, getDayOfYear, Kilometers, Radians, TAU } from '@ootk/src/main';
 import { RADIUS_OF_EARTH } from '../src/engine/utils/constants';
 import { alt2zoom, dateFromJday, dateToLocalInIso, jday, lat2pitch, localToZulu, lon2yaw, normalizeAngle } from '../src/engine/utils/transforms';
 

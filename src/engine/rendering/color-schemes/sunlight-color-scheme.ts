@@ -8,7 +8,7 @@ import { hideEl } from '@app/engine/utils/get-el';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, Star } from 'ootk';
+import { BaseObject, DetailedSatellite, Star } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
 import { EventBus } from '@app/engine/events/event-bus';
 

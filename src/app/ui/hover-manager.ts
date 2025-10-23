@@ -7,7 +7,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import i18next from 'i18next';
-import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType, Star, spaceObjType2Str } from 'ootk';
+import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType, Star, spaceObjType2Str } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';

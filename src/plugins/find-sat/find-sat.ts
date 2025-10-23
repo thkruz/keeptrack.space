@@ -4,17 +4,17 @@ import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { getUnique } from '@app/engine/utils/get-unique';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
+import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from '@ootk/src/main';
 import findSatPng from '@public/img/icons/database-search.png';
-import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export interface SearchSatParams {
   argPe: Degrees;

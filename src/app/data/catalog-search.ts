@@ -21,7 +21,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { BaseObject, CatalogSource, Degrees, DetailedSatellite, Minutes, SpaceObjectType } from 'ootk';
+import { BaseObject, CatalogSource, Degrees, DetailedSatellite, Minutes, SpaceObjectType } from '@ootk/src/main';
 import { SatMath } from '../analysis/sat-math';
 
 /**

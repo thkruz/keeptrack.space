@@ -1,6 +1,6 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { DetailedSatellite, KilometersPerSecond } from 'ootk';
+import { DetailedSatellite, KilometersPerSecond } from '@ootk/src/main';
 import { Line, LineColors } from './line';
 
 export class SatRicLine extends Line {

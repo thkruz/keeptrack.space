@@ -4,8 +4,8 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { alt2zoom } from '@app/engine/utils/transforms';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { Degrees, Kilometers, Radians } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
-import { Degrees, Kilometers, Radians } from 'ootk';
 
 /**
  * Centralized state management for the camera system.

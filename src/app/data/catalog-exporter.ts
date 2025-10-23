@@ -1,6 +1,6 @@
 import { saveCsv } from '@app/engine/utils/saveVariable';
 import { saveAs } from 'file-saver';
-import { BaseObject, DetailedSatellite } from 'ootk';
+import { BaseObject, DetailedSatellite } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { keepTrackApi } from '../../keepTrackApi';
 

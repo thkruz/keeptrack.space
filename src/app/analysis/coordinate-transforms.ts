@@ -1,5 +1,5 @@
 import { mat3, vec3 } from 'gl-matrix';
-import { DetailedSatellite, PosVel } from 'ootk';
+import { DetailedSatellite, PosVel } from '@ootk/src/main';
 
 /**
  * This class provides static methods for converting between different coordinate systems used in satellite tracking.

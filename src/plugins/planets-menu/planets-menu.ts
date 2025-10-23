@@ -1,18 +1,18 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
 import planetPng from '@public/img/icons/planet.png';
 import { Body } from 'astronomy-engine';
-import { Kilometers, RADIUS_OF_EARTH } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './planets-menu.css';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class PlanetsMenuPlugin extends KeepTrackPlugin {
   readonly id = 'PlanetsMenuPlugin';
@@ -147,7 +147,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
       settingsManager.maxZoomDistance = 4.5e9 as Kilometers; // 4.5 billion km
       this.setAllPlanetsDotSize(1);
     } else if (planetName === Body.Earth) {
-      settingsManager.minZoomDistance = RADIUS_OF_EARTH * 1.2 as Kilometers;
+      settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
       settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
       this.setAllPlanetsDotSize(0);
     } else if (planetName === Body.Moon) {

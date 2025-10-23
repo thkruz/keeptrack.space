@@ -1,4 +1,4 @@
-import { Degrees, DetailedSatellite, EciVec3, Kilometers, Sgp4, TleLine1, TleLine2, eci2lla } from 'ootk';
+import { Degrees, DetailedSatellite, EciVec3, Kilometers, Sgp4, TleLine1, TleLine2, eci2lla } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { SatMath } from './sat-math';
 

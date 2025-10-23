@@ -32,16 +32,16 @@ import { SatMath } from '@app/app/analysis/sat-math';
 
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { CatalogSearch } from '@app/app/data/catalog-search';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getUnique } from '@app/engine/utils/get-unique';
 import { saveCsv } from '@app/engine/utils/saveVariable';
+import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from '@ootk/src/main';
 import folderCodePng from '@public/img/icons/folder-code.png';
-import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';

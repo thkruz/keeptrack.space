@@ -1,7 +1,7 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { vec4 } from 'gl-matrix';
-import { Degrees, DetailedSensor, ecf2eci, rae2ecf } from 'ootk';
+import { Degrees, DetailedSensor, ecf2eci, rae2ecf } from '@ootk/src/main';
 import { Line, LineColors } from './line';
 
 export class SensorScanHorizonLine extends Line {

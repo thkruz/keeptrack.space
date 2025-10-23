@@ -261,7 +261,7 @@ export class KeepTrack {
           // This is intentional
         });
       }
-    } catch (e) {
+    } catch {
       // intentionally left blank
     }
   }

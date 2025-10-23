@@ -2,8 +2,8 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
+import { Milliseconds } from '@ootk/src/main';
 import { Body } from 'astronomy-engine';
-import { Milliseconds } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import { Camera } from '../camera/camera';
 import { Engine } from '../engine';
@@ -29,6 +29,7 @@ import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
+import { PluginRegistry } from './plugin-registry';
 
 export interface SceneParams {
   gl: WebGL2RenderingContext;
@@ -109,6 +110,7 @@ export class Scene {
   }
 
   update(simulationTime: Date) {
+    this.updateWorldShift();
     this.sun.update();
     this.earth.update();
     for (const planet of Object.values(this.planets)) {
@@ -120,6 +122,38 @@ export class Scene {
 
     this.sensorFovFactory.updateAll();
     this.coneFactory.updateAll();
+  }
+
+  updateWorldShift() {
+    switch (settingsManager.centerBody) {
+      case Body.Mercury:
+      case Body.Venus:
+      case Body.Moon:
+      case Body.Mars:
+      case Body.Jupiter:
+      case Body.Saturn:
+      case Body.Uranus:
+      case Body.Neptune:
+      case Body.Pluto:
+        this.worldShift = this.planets[settingsManager.centerBody]!.position.map((coord: number) => -coord) as [number, number, number];
+        break;
+      case Body.Sun:
+        this.worldShift = [this.sun.eci.x, this.sun.eci.y, this.sun.eci.z].map((coord: number) => -coord) as [number, number, number];
+        break;
+      case Body.Earth:
+      default:
+        this.worldShift = [0, 0, 0];
+    }
+
+    // Satellite position is ALWAYS relative to Earth center and selecting a
+    // satellite should have changed the centerBody to Earth already
+    const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+
+    if (selectSatManager && selectSatManager.primarySatObj.id !== -1) {
+      const satelliteOffset = keepTrackApi.getDotsManager().getPositionArray(selectSatManager.primarySatObj.id).map((coord) => -coord);
+
+      this.worldShift = satelliteOffset as [number, number, number];
+    }
   }
 
   render(renderer: WebGLRenderer, camera: Camera): void {
@@ -343,6 +377,8 @@ export class Scene {
         return this.planets[Body.Uranus] ?? null;
       case Body.Neptune:
         return this.planets[Body.Neptune] ?? null;
+      case Body.Sun:
+        return this.sun as unknown as CelestialBody;
       default:
         return null;
     }

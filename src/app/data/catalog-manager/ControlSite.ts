@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { ControlSiteParams } from '@app/app/data/catalogs/control-sites';
-import { BaseObject } from 'ootk';
+import { BaseObject } from '@ootk/src/main';
 
 export class ControlSite extends BaseObject {
   TStop: string;

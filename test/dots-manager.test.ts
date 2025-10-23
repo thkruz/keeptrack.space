@@ -5,7 +5,7 @@ import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '@app/settings/settings';
 import { mat4 } from 'gl-matrix';
-import { Milliseconds } from 'ootk';
+import { Milliseconds } from '@ootk/src/main';
 import { setupStandardEnvironment } from './environment/standard-env';
 
 describe('drawManager', () => {

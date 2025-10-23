@@ -10,15 +10,15 @@ import { saveAs } from 'file-saver';
 import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
 import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from 'ootk';
+import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class EditSat extends KeepTrackPlugin {
   readonly id = 'EditSat';
@@ -517,7 +517,7 @@ export class EditSat extends KeepTrackPlugin {
       });
 
       saveAs(blob, `${scc}.tle`);
-    } catch (error) {
+    } catch {
       // intentionally left blank
     }
     e.preventDefault();

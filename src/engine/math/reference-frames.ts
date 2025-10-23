@@ -1,5 +1,5 @@
 import { mat4 } from 'gl-matrix';
-import { Earth as EarthOotk, EpochUTC, Seconds } from 'ootk';
+import { Earth as EarthOotk, EpochUTC, Seconds } from '@ootk/src/main';
 
 export enum ReferenceFrame {
   J2000 = 'J2000',

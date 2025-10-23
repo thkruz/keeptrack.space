@@ -1,4 +1,4 @@
-import { EciVec3, FormatTle, Kilometers, MINUTES_PER_DAY, Meters, RAD2DEG, TAU } from 'ootk';
+import { EciVec3, FormatTle, Kilometers, MINUTES_PER_DAY, Meters, RAD2DEG, TAU } from '@ootk/src/main';
 import { StringifiedNumber } from '../../app/analysis/sat-math';
 import { TimeManager } from '../core/time-manager';
 import { EARTHS_GRAV_CONST, MASS_OF_EARTH } from '../utils/constants';

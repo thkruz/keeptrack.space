@@ -3,12 +3,13 @@ import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { MenuMode, Singletons } from '@app/engine/core/interfaces';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { t7e, TranslationKey } from '@app/locales/keys';
+import { BaseObject } from '@ootk/src/main';
 import Module from 'module';
-import { BaseObject } from 'ootk';
 import { keepTrackApi } from '../../keepTrackApi';
 import type { SelectSatManager } from '../../plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '../../plugins/sounds/sounds';
 import { PluginRegistry } from '../core/plugin-registry';
+import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { clickAndDragWidth } from '../utils/click-and-drag';
 import { html } from '../utils/development/formatter';
@@ -16,7 +17,6 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl, hideEl } from '../utils/get-el';
 import { shake } from '../utils/shake';
 import { slideInRight, slideOutLeft } from '../utils/slide';
-import { EventBus } from '../events/event-bus';
 // TODO: Utilize the event bus to remove dependencies
 
 export interface ClickDragOptions {

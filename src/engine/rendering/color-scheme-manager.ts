@@ -34,10 +34,11 @@ import { UrlManager } from '@app/engine/input/url-manager';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { BaseObject, CatalogSource, DetailedSatellite, SpaceObjectType } from 'ootk';
+import { CatalogSource, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
+import { BaseObject } from '../ootk/src/objects';
 import { PersistenceManager, StorageKey } from '../utils/persistence-manager';
 import { CelestrakColorScheme } from './color-schemes/celestrak-color-scheme';
 import { ColorScheme, ColorSchemeColorMap, ColorSchemeParams } from './color-schemes/color-scheme';
@@ -303,7 +304,7 @@ export class ColorSchemeManager {
     return settingsManager.filter?.unknownType === false && obj.type === SpaceObjectType.UNKNOWN;
   }
   isNotionalSatOff(obj: BaseObject) {
-    return settingsManager.filter?.notionalSatellites === false && obj.isNotional();
+    return settingsManager.filter?.notionalSatellites === false && obj.type === SpaceObjectType.NOTIONAL;
   }
   isvLeoSatOff(obj: BaseObject) {
     return settingsManager.filter?.vLEOSatellites === false && (obj as DetailedSatellite).apogee < 400;

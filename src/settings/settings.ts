@@ -26,8 +26,8 @@ import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-s
 import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { Degrees, Kilometers, Milliseconds, Radians } from '@ootk/src/main';
 import { Body } from 'astronomy-engine';
-import { Degrees, Kilometers, Milliseconds, Radians } from 'ootk';
 import { ClassificationString } from '../app/ui/classification';
 import { RADIUS_OF_EARTH } from '../engine/utils/constants';
 import { isThisNode } from '../engine/utils/isThisNode';

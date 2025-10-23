@@ -1,5 +1,5 @@
 import { SatObject } from '@app/engine/core/interfaces';
-import { Degrees, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
+import { Degrees, Kilometers, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from '@ootk/src/main';
 import { keepTrackApi } from '../keepTrackApi';
 import { StringPad } from '../lib/stringPad';
 import { errorManagerInstance } from '../singletons/errorManager';

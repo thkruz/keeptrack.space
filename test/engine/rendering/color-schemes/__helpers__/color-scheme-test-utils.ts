@@ -1,6 +1,6 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
-import { DetailedSatellite, PayloadStatus, SpaceObjectType, TleLine1, TleLine2 } from 'ootk';
+import { DetailedSatellite, PayloadStatus, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 
 /**
  * Utility functions for testing color schemes

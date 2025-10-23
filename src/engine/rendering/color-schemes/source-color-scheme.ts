@@ -3,7 +3,7 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BaseObject, DetailedSatellite, Star } from 'ootk';
+import { BaseObject, DetailedSatellite, Star } from '@ootk/src/main';
 import { CameraType } from '../../camera/camera';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
 

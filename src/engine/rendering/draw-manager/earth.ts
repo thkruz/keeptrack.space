@@ -35,7 +35,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Body } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EpochUTC, Sun } from 'ootk';
+import { EpochUTC, Sun } from '@ootk/src/main';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { PersistenceManager, StorageKey } from '../../utils/persistence-manager';
 import { DepthManager } from '../depth-manager';

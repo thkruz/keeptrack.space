@@ -5,7 +5,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { BaseObject } from 'ootk';
+import { BaseObject } from '@ootk/src/main';
 import { setupStandardEnvironment } from './environment/standard-env';
 
 describe('UrlManager_class', () => {

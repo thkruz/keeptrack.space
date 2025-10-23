@@ -1,7 +1,7 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
-import { Milliseconds } from 'ootk';
+import { Milliseconds } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';

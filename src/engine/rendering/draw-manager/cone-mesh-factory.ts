@@ -1,7 +1,7 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4 } from 'gl-matrix';
-import { BaseObject, Degrees } from 'ootk';
+import { BaseObject, Degrees } from '@ootk/src/main';
 import { ConeMesh, ConeSettings } from './cone-mesh';
 import { CustomMeshFactory } from './custom-mesh-factory';
 

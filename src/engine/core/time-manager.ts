@@ -2,7 +2,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from 'ootk';
+import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from '@ootk/src/main';
 import { keepTrackApi } from '../../keepTrackApi';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
 import { EventBus } from '../events/event-bus';

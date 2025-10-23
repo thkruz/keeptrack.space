@@ -2,7 +2,7 @@
 /* eslint-disable no-undefined */
 import { Pickable } from '@app/engine/core/interfaces';
 import { StarlinkColorScheme } from '@app/engine/rendering/color-schemes/starlink-color-scheme';
-import { PayloadStatus } from 'ootk';
+import { PayloadStatus } from '@ootk/src/main';
 import { ColorSchemeTestUtils } from '../__helpers__/color-scheme-test-utils';
 
 // Mock dependencies

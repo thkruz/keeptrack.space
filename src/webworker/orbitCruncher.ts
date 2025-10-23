@@ -1,5 +1,5 @@
 import { ObjDataJson } from '@app/engine/rendering/orbitManager';
-import { DEG2RAD, Degrees, EciVec3, Kilometers, Sgp4, TAU, eci2ecf } from 'ootk';
+import { DEG2RAD, Degrees, EciVec3, Kilometers, Sgp4, TAU, eci2ecf } from '@ootk/src/main';
 import { RADIUS_OF_EARTH } from '../engine/utils/constants';
 import { jday } from '../engine/utils/transforms';
 import { OrbitCruncherCachedObject } from './constants';

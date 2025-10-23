@@ -5,7 +5,7 @@ import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CreateSat } from '@app/plugins/create-sat/create-sat';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { FormatTle, Sgp4 } from 'ootk';
+import { FormatTle, Sgp4 } from '@ootk/src/main';
 
 describe('CreateSat', () => {
 

@@ -4,7 +4,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { OrbitPathLine } from '@app/engine/rendering/line-manager/orbit-path';
 import { Body } from 'astronomy-engine';
-import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType, TEME } from 'ootk';
+import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType, TEME } from '@ootk/src/main';
 import { SatelliteModels } from '../rendering/mesh/model-resolver';
 
 export interface OemHeader {

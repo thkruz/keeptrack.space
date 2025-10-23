@@ -53,6 +53,12 @@
       "@app/*": [
         "src/*"
       ],
+      "@engine/*": [
+        "src/engine/*"
+      ],
+      "@ootk/*": [
+        "src/engine/ootk/*"
+      ],
       "@public/*": [
         "public/*"
       ],

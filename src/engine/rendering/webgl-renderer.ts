@@ -5,9 +5,8 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
-import { Body } from 'astronomy-engine';
+import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds } from '@ootk/src/main';
 import { mat4, vec2, vec4 } from 'gl-matrix';
-import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds } from 'ootk';
 import { GroupType } from '../../app/data/object-group';
 import { SettingsManager } from '../../settings/settings';
 import { Camera, CameraType } from '../camera/camera';
@@ -242,7 +241,7 @@ export class WebGLRenderer {
       // Catch race condition where sensor has been reset but camera hasn't been updated
       try {
         this.sensorPos = sensorManagerInstance.calculateSensorPos(timeManagerInstance.simulationTimeObj, sensorManagerInstance.currentSensors);
-      } catch (e) {
+      } catch {
         errorManagerInstance.debug('Sensor not found, clearing orbits above!');
         this.sensorPos = null;
         keepTrackApi.getOrbitManager().clearInViewOrbit();
@@ -613,26 +612,6 @@ export class WebGLRenderer {
     }
 
     const sceneInstance = Scene.getInstance();
-
-    switch (settingsManager.centerBody) {
-      case Body.Mercury:
-      case Body.Venus:
-      case Body.Moon:
-      case Body.Mars:
-      case Body.Jupiter:
-      case Body.Saturn:
-      case Body.Uranus:
-      case Body.Neptune:
-      case Body.Pluto:
-        sceneInstance.worldShift = sceneInstance.planets[settingsManager.centerBody]!.position.map((coord: number) => -coord) as [number, number, number];
-        break;
-      case Body.Sun:
-        sceneInstance.worldShift = [sceneInstance.sun.eci.x, sceneInstance.sun.eci.y, sceneInstance.sun.eci.z].map((coord: number) => -coord) as [number, number, number];
-        break;
-      case Body.Earth:
-      default:
-        sceneInstance.worldShift = [0, 0, 0];
-    }
 
     if (this.selectSatManager_?.primarySatObj.id !== -1) {
       const timeManagerInstance = keepTrackApi.getTimeManager();

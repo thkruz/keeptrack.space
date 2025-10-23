@@ -3,7 +3,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SensorTimeline } from '@app/plugins/timeline-sensor/sensor-timeline';
-import { DetailedSatellite, DetailedSensor, Hours } from 'ootk';
+import { DetailedSatellite, DetailedSensor, Hours } from '@ootk/src/main';
 import { setupStandardEnvironment } from '../environment/standard-env';
 import { websiteInit } from '../generic-tests';
 

@@ -4,15 +4,15 @@ import './tracking-impact-predict.css';
 
 import { SatMath } from '@app/app/analysis/sat-math';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { RAD2DEG } from 'ootk';
+import { RAD2DEG } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export interface TipMsg {
   'NORAD_CAT_ID': string,
@@ -172,7 +172,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
       TrackingImpactPredict.createHeaders_(tbl);
 
       this.createBody_(tbl);
-    } catch (e) {
+    } catch {
       errorManagerInstance.warn('Error processing reentry data!');
     }
   }

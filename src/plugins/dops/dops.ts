@@ -7,13 +7,13 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import type { GroupsManager } from '@app/app/data/groups-manager';
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { DopMath } from '@app/engine/math/dop-math';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
+import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';

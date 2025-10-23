@@ -4,7 +4,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBoxObject } from '@app/plugins/sat-info-box-object/sat-info-box-object';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { SpaceObjectType } from 'ootk';
+import { SpaceObjectType } from '@ootk/src/main';
 import { defaultMisl, defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';

@@ -1,5 +1,5 @@
 import { mat3, mat4 } from 'gl-matrix';
-import * as Ootk from 'ootk';
+import * as Ootk from '@ootk/src/main';
 import { BufferAttribute } from '../buffer-attribute';
 import { GlUtils } from '../gl-utils';
 import { WebGlProgramHelper } from '../webgl-program';

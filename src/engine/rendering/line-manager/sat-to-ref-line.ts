@@ -2,7 +2,7 @@ import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { vec3, vec4 } from 'gl-matrix';
-import { DetailedSatellite } from 'ootk';
+import { DetailedSatellite } from '@ootk/src/main';
 import { Line } from './line';
 
 export class SatToRefLine extends Line {

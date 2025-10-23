@@ -1,7 +1,7 @@
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { mat3, mat4, vec3, vec4 } from 'gl-matrix';
-import { BaseObject, EciVec3, Kilometers } from 'ootk';
+import { BaseObject, EciVec3, Kilometers } from '@ootk/src/main';
 import { GlUtils } from '../gl-utils';
 import { glsl } from '@app/engine/utils/development/formatter';
 

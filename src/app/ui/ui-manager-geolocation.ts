@@ -1,7 +1,7 @@
 import { GeolocationPosition, SensorGeolocation } from '@app/engine/core/interfaces';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { Degrees, DetailedSensor, Kilometers, ZoomValue } from 'ootk';
+import { Degrees, DetailedSensor, Kilometers, ZoomValue } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
@@ -40,8 +40,13 @@ export class UiGeolocation {
     keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
     const mainCameraInstance = keepTrackApi.getMainCamera();
 
-    // eslint-disable-next-line no-unused-expressions
-    maxrange > 6000 ? mainCameraInstance.changeZoom(ZoomValue.GEO) : mainCameraInstance.changeZoom(ZoomValue.LEO);
+    // Default to GEO view if maxrange > 6000 km, otherwise LEO view
+    if ((maxrange ?? Infinity) > 6000) {
+      mainCameraInstance.changeZoom(ZoomValue.GEO);
+    } else {
+      mainCameraInstance.changeZoom(ZoomValue.LEO);
+    }
+
     mainCameraInstance.camSnap(lat2pitch(lat), lon2yaw(lon, timeManagerInstance.simulationTimeObj));
   }
 

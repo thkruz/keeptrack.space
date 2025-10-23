@@ -3,6 +3,7 @@ import CollisionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
@@ -11,7 +12,6 @@ import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBus } from '@app/engine/events/event-bus';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {
@@ -139,7 +139,7 @@ export class Collisions extends KeepTrackPlugin {
       Collisions.createHeaders_(tbl);
 
       this.createBody_(tbl);
-    } catch (e) {
+    } catch {
       errorManagerInstance.warn(t7e('errorMsgs.Collisions.errorProcessingCollisions'));
     }
   }

@@ -11,9 +11,9 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
+import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, Kilometers, LandObject, RADIUS_OF_EARTH, SpaceObjectType } from '@ootk/src/main';
 import { Body } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
-import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { PlanetsMenuPlugin } from '../planets-menu/planets-menu';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
@@ -237,6 +237,9 @@ export class SelectSatManager extends KeepTrackPlugin {
     } else if (!(obj instanceof OemSatellite)) {
       // Currently DetailedSatellites and Missiles assume Earth center
       settingsManager.centerBody = Body.Earth;
+      settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
+      settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
+      PluginRegistry.getPlugin(PlanetsMenuPlugin)?.setAllPlanetsDotSize(0);
     }
   }
 

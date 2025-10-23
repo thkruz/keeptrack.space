@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { Kilometers } from 'ootk';
+import { Kilometers } from '@ootk/src/main';
 
 /**
  * Exponent used for calculating zoom distance.

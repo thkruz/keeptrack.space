@@ -22,7 +22,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { Degrees, DetailedSatellite, Kilometers } from 'ootk';
+import { Degrees, DetailedSatellite, Kilometers } from '@ootk/src/main';
 import { SatMath } from '../../app/analysis/sat-math';
 import { keepTrackApi } from '../../keepTrackApi';
 

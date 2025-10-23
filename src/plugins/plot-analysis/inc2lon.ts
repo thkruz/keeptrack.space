@@ -1,13 +1,13 @@
 import { EChartsData, MenuMode } from '@app/engine/core/interfaces';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
 import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { DetailedSatellite, SpaceObjectType } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class Inc2LonPlots extends KeepTrackPlugin {
   readonly id = 'Inc2LonPlots';

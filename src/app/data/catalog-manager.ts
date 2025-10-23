@@ -35,7 +35,9 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, EciVec3, KilometersPerSecond, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2 } from 'ootk';
+import {
+  BaseObject, Degrees, DetailedSatellite, EciVec3, KilometersPerSecond, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2,
+} from '@ootk/src/main';
 import { SatMath } from '../analysis/sat-math';
 import { SplashScreen } from '../ui/splash-screen';
 import { StringExtractor } from '../ui/string-extractor';
@@ -478,7 +480,7 @@ export class CatalogManager {
 
       satLinkManager.init(controlSites);
       this.satLinkManager = satLinkManager;
-    } catch (e) {
+    } catch {
       errorManagerInstance.debug('satLinkManager Failed to Initialize!');
     }
   }

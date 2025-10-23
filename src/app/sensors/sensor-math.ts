@@ -21,7 +21,7 @@ import {
   eci2ecf,
   eci2lla,
   lla2eci,
-} from 'ootk';
+} from '@ootk/src/main';
 import { dateFormat } from '../../engine/utils/dateFormat';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SatMath, SunStatus } from '../analysis/sat-math';

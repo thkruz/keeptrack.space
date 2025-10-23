@@ -6,7 +6,7 @@ import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { SettingsManager } from '@app/settings/settings';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { DEG2RAD } from 'ootk';
+import { DEG2RAD } from '@ootk/src/main';
 import { keepTrackApi } from '../../../keepTrackApi';
 import { DepthManager } from '../depth-manager';
 /* eslint-disable no-useless-escape */

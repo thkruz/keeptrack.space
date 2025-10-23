@@ -9,7 +9,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as getEl from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { settingsManager } from '@app/settings/settings';
-import { BaseObject, Degrees, DetailedSatellite, SpaceObjectType, TleLine1 } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, SpaceObjectType, TleLine1 } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 
 const obj1 = defaultSat.clone();

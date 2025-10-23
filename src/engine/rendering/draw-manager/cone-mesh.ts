@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { Scene } from '@app/engine/core/scene';
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { BaseObject, Degrees, Kilometers, RADIUS_OF_EARTH } from 'ootk';
+import { BaseObject, Degrees, Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
 import { keepTrackApi } from '../../../keepTrackApi';
 import { DepthManager } from '../depth-manager';
 import { CustomMesh } from './custom-mesh';

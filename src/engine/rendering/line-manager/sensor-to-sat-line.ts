@@ -3,7 +3,7 @@ import { EciArr3 } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { vec4 } from 'gl-matrix';
-import { DetailedSatellite, DetailedSensor, eci2rae } from 'ootk';
+import { DetailedSatellite, DetailedSensor, eci2rae } from '@ootk/src/main';
 import { Line, LineColors } from './line';
 
 export class SensorToSatLine extends Line {

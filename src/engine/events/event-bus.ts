@@ -1,6 +1,6 @@
 import type { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import type { User } from '@supabase/supabase-js';
-import type { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from 'ootk';
+import type { BaseObject, DetailedSatellite, DetailedSensor, Milliseconds } from '@ootk/src/main';
 import type { PanTouchEvent, TapTouchEvent } from '../input/input-manager/touch-input';
 import type { LineManager } from '../rendering/line-manager';
 import { errorManagerInstance } from '../utils/errorManager';

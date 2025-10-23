@@ -2,7 +2,7 @@
 /* eslint-disable no-undefined */
 import { Pickable } from '@app/engine/core/interfaces';
 import { CelestrakColorScheme } from '@app/engine/rendering/color-schemes/celestrak-color-scheme';
-import { PayloadStatus, SpaceObjectType } from 'ootk';
+import { PayloadStatus, SpaceObjectType } from '@ootk/src/main';
 import { mockSatellites } from '../__fixtures__/mock-satellites';
 import { ColorSchemeTestUtils } from '../__helpers__/color-scheme-test-utils';
 

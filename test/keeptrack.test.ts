@@ -1,7 +1,7 @@
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManagerOverride } from '@app/settings/settings';
-import { DetailedSatellite, Milliseconds, Satellite } from 'ootk';
+import { DetailedSatellite, Milliseconds, Satellite } from '@ootk/src/main';
 import { CatalogLoader } from '../src/app/data/catalog-loader';
 import { UiManager } from '../src/app/ui/uiManager';
 import { SatCruncherMessageData, Singletons } from '../src/engine/core/interfaces';

@@ -13,17 +13,17 @@ import {
   BaseObject, calcGmst, DEG2RAD, Degrees, DetailedSatellite, DetailedSensor, EpochUTC, Hours, Kilometers, lla2eci, Milliseconds, MILLISECONDS_PER_SECOND, Radians,
   SatelliteRecord,
   Seconds, SpaceObjectType, Sun,
-} from 'ootk';
+} from '@ootk/src/main';
 import { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { fetchWeatherApi } from 'openmeteo';
-import { EventBus } from '@app/engine/events/event-bus';
 
 interface Pass {
   start: Date;

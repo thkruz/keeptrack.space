@@ -8,7 +8,7 @@ import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';
 import { OrbitCruncherType, OrbitDrawTypes } from '@app/webworker/orbitCruncher';
 import { mat4 } from 'gl-matrix';
-import { BaseObject, Degrees, DetailedSatellite, Kilometers } from 'ootk';
+import { BaseObject, Degrees, DetailedSatellite, Kilometers } from '@ootk/src/main';
 import { HoverManager } from '../../app/ui/hover-manager';
 import { Camera, CameraType } from '../camera/camera';
 import { GetSatType } from '../core/interfaces';

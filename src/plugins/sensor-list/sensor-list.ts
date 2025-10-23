@@ -1,13 +1,14 @@
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { CameraType } from '@app/engine/camera/camera';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from '@ootk/src/main';
 import sensorPng from '@public/img/icons/sensor.png';
-import { BaseObject, DetailedSatellite, DetailedSensor, ZoomValue } from 'ootk';
 import { SensorGroup, sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
@@ -16,7 +17,6 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
-import { EventBus } from '@app/engine/events/event-bus';
 
 // TODO: Add a search bar and filter for sensors
 

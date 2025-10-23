@@ -38,7 +38,7 @@ import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from 'ootk';
+import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from '@ootk/src/main';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SensorFov } from '../../plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../../plugins/sensor-surv/sensor-surv-fence';
@@ -488,7 +488,7 @@ export class SensorManager {
       } else if (getEl('reset-sensor-button', true)) {
         (getEl('reset-sensor-button') as HTMLButtonElement).disabled = true;
       }
-    } catch (error) {
+    } catch {
       errorManagerInstance.warn(t7e('errorMsgs.SensorManager.errorUpdatingUi'));
     }
   }

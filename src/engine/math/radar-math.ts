@@ -1,4 +1,4 @@
-import { Kilometers, Meters, Radians } from 'ootk';
+import { Kilometers, Meters, Radians } from '@ootk/src/main';
 
 type Distinct<T, DistinctName> = T & {
   __TYPE__: DistinctName;

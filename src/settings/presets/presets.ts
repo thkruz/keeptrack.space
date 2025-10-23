@@ -1,13 +1,13 @@
 import { GroupType } from '@app/app/data/object-group';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
-import { Kilometers, Milliseconds } from 'ootk';
+import { Kilometers, Milliseconds } from '@ootk/src/main';
 import { SettingsManager } from '../settings';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class SettingsPresets {
   static loadPresetMillionYear(settings: SettingsManager) {

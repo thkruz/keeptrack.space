@@ -30,9 +30,9 @@ import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { DEG2RAD, EciVec3, Kilometers } from '@ootk/src/main';
 import { Body, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { mat3, mat4, vec2, vec3 } from 'gl-matrix';
-import { DEG2RAD, EciVec3, Kilometers } from 'ootk';
 import { DepthManager } from '../depth-manager';
 
 export enum SunTextureQuality {

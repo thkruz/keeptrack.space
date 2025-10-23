@@ -2,6 +2,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
@@ -10,7 +11,6 @@ import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import tableRowsPng from '@public/img/icons/table-rows.png';
 import {
   BaseObject,
   Degrees, DetailedSatellite, DetailedSensor,
@@ -19,13 +19,13 @@ import {
   SatelliteRecord, Seconds,
   SpaceObjectType,
   TAU,
-} from 'ootk';
+} from '@ootk/src/main';
+import tableRowsPng from '@public/img/icons/table-rows.png';
 import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { SensorManager } from '../../app/sensors/sensorManager';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { EventBus } from '@app/engine/events/event-bus';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
@@ -293,7 +293,11 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
     sensorManagerInstance.lastMultiSiteArray = multiSiteArray;
 
     // eslint-disable-next-line no-unused-expressions
-    isResetToDefault ? sensorManagerInstance.setCurrentSensor(null) : sensorManagerInstance.setCurrentSensor(tempSensor);
+    if (isResetToDefault) {
+      sensorManagerInstance.setCurrentSensor(null);
+    } else {
+      sensorManagerInstance.setCurrentSensor(tempSensor);
+    }
 
     this.populateMultiSiteTable_(multiSiteArray);
   }

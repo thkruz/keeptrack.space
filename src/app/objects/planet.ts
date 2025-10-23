@@ -1,6 +1,6 @@
 import { rgbaArray } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { BaseObject, SpaceObjectType } from 'ootk';
+import { BaseObject, SpaceObjectType } from '@ootk/src/main';
 
 
 export class Planet extends BaseObject {

@@ -9,7 +9,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
-import { Kilometers, eci2lla } from 'ootk';
+import { Kilometers, eci2lla } from '@ootk/src/main';
 import { closeColorbox } from '../../utils/colorbox';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';

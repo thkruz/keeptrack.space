@@ -25,11 +25,14 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import {
+  DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
+} from '@ootk/src/main';
 import { mat4, quat, vec3 } from 'gl-matrix';
-import { DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla } from 'ootk';
 import { SatMath } from '../../app/analysis/sat-math';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
+import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { DepthManager } from '../rendering/depth-manager';
 import { CelestialBody } from '../rendering/draw-manager/celestial-bodies/celestial-body';
@@ -39,7 +42,6 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
 import { CameraInputHandler } from './camera-input-handler';
 import { CameraState } from './state/camera-state';
-import { EventBus } from '../events/event-bus';
 
 /**
  * Represents the different types of cameras available.
@@ -851,7 +853,7 @@ export class Camera {
         errorManagerInstance.debug(`zoomLevel: ${this.state.zoomLevel}`);
         errorManagerInstance.debug(`zoomTarget: ${this.state.zoomTarget}`);
         errorManagerInstance.debug(`settingsManager.cameraMovementSpeed: ${settingsManager.cameraMovementSpeed}`);
-      } catch (e) {
+      } catch {
         errorManagerInstance.info('Camera Math Error');
       }
       this.state.camPitch = <Radians>0.5;

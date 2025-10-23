@@ -1,4 +1,4 @@
-import { BaseObject, DetailedSatellite } from 'ootk';
+import { BaseObject, DetailedSatellite } from '@ootk/src/main';
 import { keepTrackApi } from '../../keepTrackApi';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { CatalogSearch } from './catalog-search';

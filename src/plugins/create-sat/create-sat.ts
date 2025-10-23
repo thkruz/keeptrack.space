@@ -1,4 +1,3 @@
-import addSatellitePnng from '@public/img/icons/add-satellite.png';
 import {
   DetailedSatellite,
   DetailedSatelliteParams,
@@ -8,7 +7,8 @@ import {
   SatelliteRecord,
   Sgp4,
   Tle,
-} from 'ootk';
+} from '@ootk/src/main';
+import addSatellitePnng from '@public/img/icons/add-satellite.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -16,6 +16,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -23,7 +24,6 @@ import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
-import { EventBus } from '@app/engine/events/event-bus';
 
 /**
  * Interface for TLE input parameters

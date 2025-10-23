@@ -1,3 +1,140 @@
+# GIT ignore file
+### Git ###
+# Created by git for backups. To disable backups in Git:
+# $ git config --global mergetool.keepBackup false
+*.orig
+
+# Created by git when using merge tools for conflicts
+*.BACKUP.*
+./.git/*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+*_BACKUP_*.txt
+*_BASE_*.txt
+*_LOCAL_*.txt
+*_REMOTE_*.txt
+
+### Node ###
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules
+jspm_packages
+
+# Optional npm cache directory
+.npm
+
+# Package Lock
+# package-lock.json
+
+# Optional eslint cache
+.eslintcache
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+### vscode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.idea/
+
+# Prettier
+.prettierignore
+
+# .github stuff
+.github/workflows/.*
+
+# Large Production Files
+public/social
+public/social/*
+public/textures-extra
+public/tle/2006*
+public/tle/TLE.json.bak
+public/tle/mw*
+public/tle/retr*
+public/tle/trus*
+public/tle/TLEAltNemo*
+.notes.js
+classfd.tle
+public/audio/samples
+public/img/wallpaper/.archive
+public/img/*.xcf
+
+# Jest Coverage
+coverage/
+
+# Build Folder
+dist
+embed
+/lib
+
+# nyc Output
+.nyc_output
+
+#ssl
+cert.pem
+key.pem
+
+# dccache
+.dccache
+.dcignore
+.cache/server.pem
+
+# TLE History
+public/analysis/sathist/*.json
+
+# Extended TLE
+public/tle/tle4.js
+public/tle/*.bak
+public/tle/TLEold.json
+
+# Custom Builds
+custom-builds
+
+# Library Build
+lib/keepTrack
+lib/example*
+
+# Tools
+src/tools
+
+# Notes
+**/leolabs.json
+
+stats.json
+.qodo
+
+# Local env files
+.env
+
+# Cypress Testing Files
+cypress
+cypress.config.ts
+
+# Generated Locale Files
+src/locales/keys.ts
+src/locales/*.json
+
+# ESLINT ignore file
 package.json
 webpack.config.js
 README.md
@@ -15,4 +152,4 @@ embed
 public
 public/analysis/js/analysis-tools.js
 
-src/engine/ootk
+src/engine/ootk/

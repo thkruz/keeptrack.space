@@ -1,5 +1,5 @@
 /* eslint-disable no-undefined */
-import { PayloadStatus, SpaceObjectType, TleLine1, TleLine2 } from 'ootk';
+import { PayloadStatus, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 import { ColorSchemeTestUtils } from '../__helpers__/color-scheme-test-utils';
 
 export const mockSatellites = {

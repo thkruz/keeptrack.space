@@ -2,16 +2,16 @@ import { keepTrackApi } from '@app/keepTrackApi';
 
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideEl, showEl } from '@app/engine/utils/get-el';
-import { DetailedSatellite, DetailedSensor, eci2lla } from 'ootk';
+import { DetailedSatellite, DetailedSensor, eci2lla } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorInfoPlugin } from '../sensor/sensor-info-plugin';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class ViewInfoRmbPlugin extends KeepTrackPlugin {
   readonly id = 'ViewInfoRmbPlugin';

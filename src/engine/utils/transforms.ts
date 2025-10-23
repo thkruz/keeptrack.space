@@ -1,4 +1,4 @@
-import { DEG2RAD, Degrees, getDayOfYear, Kilometers, Radians, TAU } from 'ootk';
+import { DEG2RAD, Degrees, getDayOfYear, Kilometers, Radians, TAU } from '@ootk/src/main';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from './constants';
 
 /**

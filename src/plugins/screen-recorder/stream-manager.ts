@@ -163,7 +163,7 @@ export class StreamManager {
         this.recordedBlobs = [];
         try {
           this.mediaRecorder_ = new window.MediaRecorder(this.stream_, options);
-        } catch (e) {
+        } catch {
           this.onMinorError_();
           this.isVideoRecording = false;
 

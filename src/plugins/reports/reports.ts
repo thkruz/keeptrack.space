@@ -30,13 +30,13 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import analysisPng from '@public/img/icons/reports.png';
 
 
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
+import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBus } from '@app/engine/events/event-bus';
 
 interface ReportData {
   filename: string;

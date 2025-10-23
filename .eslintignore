@@ -14,3 +14,5 @@ src/tle
 embed
 public
 public/analysis/js/analysis-tools.js
+
+src/engine/ootk

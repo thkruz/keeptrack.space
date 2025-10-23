@@ -120,6 +120,7 @@
     "dotenv-webpack": "^8.1.1",
     "eslint": "^8.50.0",
     "eslint-plugin-jest": "^27.4.0",
+    "eslint-plugin-jsdoc": "^61.1.5",
     "http-server": "^14.1.1",
     "husky": "^8.0.1",
     "imports-loader": "^4.0.1",

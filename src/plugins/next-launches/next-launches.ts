@@ -2,6 +2,7 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { dateFormat } from '@app/engine/utils/dateFormat';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
@@ -10,7 +11,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import calendar2Png from '@public/img/icons/calendar2.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 interface LaunchInfoData {
   window_start: string | number | Date;
@@ -106,7 +107,7 @@ export class NextLaunchesPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('export-launch-info')!.addEventListener('click', () => {

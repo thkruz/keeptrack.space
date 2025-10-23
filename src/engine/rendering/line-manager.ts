@@ -31,6 +31,7 @@ import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
+import { EventBus } from '../events/event-bus';
 
 export class LineManager {
   attribs = {
@@ -497,7 +498,7 @@ export class LineManager {
 
     this.program = new WebGlProgramHelper(gl, this.shaders_.vert, this.shaders_.frag, this.attribs, this.uniforms_).program;
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (sat) {

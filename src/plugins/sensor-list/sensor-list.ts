@@ -16,6 +16,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
+import { EventBus } from '@app/engine/events/event-bus';
 
 // TODO: Add a search bar and filter for sensors
 
@@ -71,7 +72,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
         getEl('nav-top-left')?.insertAdjacentHTML(
@@ -86,7 +87,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
         );
       },
     );
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('sensor-selected-container')?.addEventListener('click', () => {
@@ -118,7 +119,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
@@ -164,7 +165,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.sensorDotSelected,
       (obj: BaseObject) => {
         if (settingsManager.isMobileModeEnabled) {
@@ -196,7 +197,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onCruncherReady,
       () => {
         if (!settingsManager.disableUI && settingsManager.isLoadLastSensor && settingsManager.offlineMode) {
@@ -205,7 +206,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'Home' && !isRepeat) {
         // If a sensor is selected rotate the camera to it
         if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&

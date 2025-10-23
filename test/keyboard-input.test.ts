@@ -1,8 +1,8 @@
+import { Container } from '@app/engine/core/container';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardInput } from '@app/engine/input/input-manager/keyboard-input';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Singletons } from '../src/engine/core/interfaces';
-import { Container } from '@app/engine/core/container';
 
 describe('KeyboardInput_class', () => {
   // Tests that keyHandler does not execute if uiManagerInstance.isCurrentlyTyping is true
@@ -15,7 +15,7 @@ describe('KeyboardInput_class', () => {
 
     Container.getInstance().registerSingleton(Singletons.UiManager, uiManagerInstance);
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string) => {
       if (key === 'R') {
         test = true;
       }
@@ -33,7 +33,7 @@ describe('KeyboardInput_class', () => {
     let test = false;
 
     keyboardInput.init();
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string) => {
       if (key === 'R') {
         test = true;
       }

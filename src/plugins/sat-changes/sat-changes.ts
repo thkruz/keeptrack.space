@@ -1,4 +1,5 @@
 /* eslint-disable no-use-before-define */
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { html } from '@app/engine/utils/development/formatter';
@@ -60,12 +61,12 @@ export const uiManagerInit = () => {
 
 export const init = (): void => {
   // Add HTML
-  keepTrackApi.on(EventBusEvent.uiManagerInit, uiManagerInit);
-  keepTrackApi.on(EventBusEvent.uiManagerFinal, uiManagerFinal);
+  EventBus.getInstance().on(EventBusEvent.uiManagerInit, uiManagerInit);
+  EventBus.getInstance().on(EventBusEvent.uiManagerFinal, uiManagerFinal);
 
   // Add JavaScript
-  keepTrackApi.on(EventBusEvent.bottomMenuClick, bottomMenuClick);
-  keepTrackApi.on(EventBusEvent.hideSideMenus, hideSideMenus);
+  EventBus.getInstance().on(EventBusEvent.bottomMenuClick, bottomMenuClick);
+  EventBus.getInstance().on(EventBusEvent.hideSideMenus, hideSideMenus);
 };
 
 const uiManagerFinal = () => {
@@ -125,7 +126,7 @@ export const satChng = (row: number, testOverride?: undefined): void => {
 
 export const hideSideMenus = (): void => {
   slideOutLeft(getEl('satChng-menu'), 1000);
-  getEl('menu-satChng').classList.remove('bmenu-item-selected');
+  getEl('menu-satChng')?.classList.remove('bmenu-item-selected');
   issatChngMenuOpen = false;
 };
 
@@ -145,7 +146,7 @@ export const bottomMenuClick = (iconName: string): void => {
       slideInRight(getEl('satChng-menu'), 1000);
       issatChngMenuOpen = true;
       satChng(-1);
-      getEl('menu-satChng').classList.add('bmenu-item-selected');
+      getEl('menu-satChng')?.classList.add('bmenu-item-selected');
 
     }
   }

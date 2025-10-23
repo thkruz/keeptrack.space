@@ -33,6 +33,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { CatalogSearch } from '@app/app/data/catalog-search';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getUnique } from '@app/engine/utils/get-unique';
 import { saveCsv } from '@app/engine/utils/saveVariable';
@@ -40,7 +41,7 @@ import folderCodePng from '@public/img/icons/folder-code.png';
 import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLISECONDS_PER_SECOND, MINUTES_PER_DAY, RaeVec3, SatelliteRecord, TAU } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
@@ -211,7 +212,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('analysis-bpt')?.addEventListener('submit', (e: Event) => {
@@ -262,7 +263,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(EventBusEvent.setSensor, (sensor) => {
+    EventBus.getInstance().on(EventBusEvent.setSensor, (sensor) => {
       if (!sensor) {
         return;
       }

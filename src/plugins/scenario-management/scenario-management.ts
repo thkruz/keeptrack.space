@@ -126,7 +126,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl(`${this.formPrefix_}-start-date`)?.addEventListener('change', this.onDateChange_.bind(this));

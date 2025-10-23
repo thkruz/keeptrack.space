@@ -11,6 +11,7 @@ import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from 'ootk';
 import { CameraType } from '../../camera/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
   payload: rgbaArray;
@@ -62,7 +63,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ...this.objectTypeFlags, ...ObjectTypeColorScheme.uniqueObjectTypeFlags,
     };
 
-    keepTrackApi.on(EventBusEvent.layerUpdated, () => {
+    EventBus.getInstance().on(EventBusEvent.layerUpdated, () => {
       if (settingsManager.isDisableSensors) {
         this.objectTypeFlags.sensor = false;
         this.objectTypeFlags.inFOV = false;

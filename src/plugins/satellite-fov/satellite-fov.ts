@@ -21,6 +21,7 @@
 
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
@@ -29,7 +30,7 @@ import { BaseObject, Degrees } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SatelliteFov extends KeepTrackPlugin {
   readonly id = 'SatelliteFov';
@@ -160,7 +161,7 @@ export class SatelliteFov extends KeepTrackPlugin {
   addHtml(): void {
 
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('sat-fov-settings-form')!.addEventListener('change', this.handleFormChange_.bind(this));
@@ -171,7 +172,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('reset-sat-fov-cones-button')!.addEventListener('click', () => {
@@ -186,7 +187,7 @@ export class SatelliteFov extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'C' && !isRepeat) {
         const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
 
@@ -207,10 +208,10 @@ export class SatelliteFov extends KeepTrackPlugin {
       }
     });
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.ConeMeshUpdate, this.updateListOfFovMeshes_.bind(this));
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         this.updateListOfFovMeshes_();

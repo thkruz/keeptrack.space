@@ -5,13 +5,14 @@ import './tracking-impact-predict.css';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { RAD2DEG } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export interface TipMsg {
   'NORAD_CAT_ID': string,
@@ -67,12 +68,12 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       this.uiManagerFinal_.bind(this),
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onCruncherMessage,
       () => {
         if (this.selectSatIdOnCruncher_ !== null) {

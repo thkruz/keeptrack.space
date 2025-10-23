@@ -18,6 +18,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SatInfoBoxOrbital extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxOrbital';
@@ -33,7 +34,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(EventBusEvent.satInfoBoxInit, () => {
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createOrbitalSection(), order: 4 });
     });
   }
@@ -41,8 +42,8 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(EventBusEvent.updateSelectBox, this.updateOrbitData_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateSelectBox, this.updateOrbitData_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {

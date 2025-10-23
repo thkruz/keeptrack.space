@@ -17,12 +17,13 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 /**
  * Interface for TLE input parameters
@@ -154,7 +155,7 @@ export class CreateSat extends KeepTrackPlugin {
    */
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   /**

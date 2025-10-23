@@ -11,6 +11,7 @@ import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {
@@ -68,9 +69,9 @@ export class Collisions extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    keepTrackApi.on(EventBusEvent.onCruncherMessage, () => {
+    EventBus.getInstance().on(EventBusEvent.onCruncherMessage, () => {
       if (this.selectSatIdOnCruncher_ !== null) {
         // If selectedSatManager is loaded, set the selected sat to the one that was just added
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);

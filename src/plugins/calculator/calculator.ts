@@ -3,11 +3,12 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import calculatorPng from '@public/img/icons/calculator.png';
 
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { Degrees, DetailedSensor, ecf2eci, eci2ecf, eci2rae, Kilometers, rae2eci, RaeVec3, Vector3D } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 enum CalculatorMode {
   ITRF = 'ITRF',
@@ -313,7 +314,7 @@ export class Calculator extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         // Nothing to do here
@@ -323,7 +324,7 @@ export class Calculator extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('calculator-itrf')!.addEventListener('click', () => {

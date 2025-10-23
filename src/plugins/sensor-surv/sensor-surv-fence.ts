@@ -20,13 +20,14 @@
  */
 
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import fencePng from '@public/img/icons/fence.png';
 import { DetailedSensor } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SensorSurvFence extends KeepTrackPlugin {
   readonly id = 'SensorSurvFence';
@@ -49,8 +50,8 @@ export class SensorSurvFence extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.setSensor, this.enableIfSensorSelected.bind(this));
-    keepTrackApi.on(EventBusEvent.sensorDotSelected, this.enableIfSensorSelected.bind(this));
+    EventBus.getInstance().on(EventBusEvent.setSensor, this.enableIfSensorSelected.bind(this));
+    EventBus.getInstance().on(EventBusEvent.sensorDotSelected, this.enableIfSensorSelected.bind(this));
   }
 
   enableIfSensorSelected(sensor?: DetailedSensor): void {

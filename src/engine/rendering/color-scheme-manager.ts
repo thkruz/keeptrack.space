@@ -216,7 +216,7 @@ export class ColorSchemeManager {
     this.pickableBuffer = renderer.gl.createBuffer();
 
     // Create the color buffers as soon as the position cruncher is ready
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onCruncherReady,
       (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -241,7 +241,7 @@ export class ColorSchemeManager {
         this.isReady = true;
 
         // This helps keep the inview colors up to date
-        keepTrackApi.on(EventBusEvent.staticOffsetChange, () => {
+        EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
           setTimeout(() => {
             this.calcColorBufsNextCruncher();
           }, 1000);
@@ -250,7 +250,7 @@ export class ColorSchemeManager {
       },
     );
 
-    keepTrackApi.on(EventBusEvent.layerUpdated, () => {
+    EventBus.getInstance().on(EventBusEvent.layerUpdated, () => {
       if (settingsManager.isDisableSensors) {
         const sensorBox = document.querySelector('.layers-sensor-box')?.parentElement as HTMLElement;
         const inFOVBox = document.querySelector('.layers-inFOV-box')?.parentElement as HTMLElement;

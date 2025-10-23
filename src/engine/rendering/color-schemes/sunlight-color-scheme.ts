@@ -10,6 +10,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Star } from 'ootk';
 import { ColorScheme } from './color-scheme';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SunlightColorScheme extends ColorScheme {
   readonly label = 'Sunlight Status';
@@ -38,7 +39,7 @@ export class SunlightColorScheme extends ColorScheme {
     this.objectTypeFlags = {
       ...this.objectTypeFlags, ...SunlightColorScheme.uniqueObjectTypeFlags,
     };
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onKeepTrackReady,
       (): void => {
         const catalogManagerInstance = keepTrackApi.getCatalogManager();
@@ -53,7 +54,7 @@ export class SunlightColorScheme extends ColorScheme {
       },
     );
 
-    keepTrackApi.on(EventBusEvent.layerUpdated, () => {
+    EventBus.getInstance().on(EventBusEvent.layerUpdated, () => {
       if (settingsManager.isDisableSensors) {
         this.objectTypeFlags.sunlightFov = false;
         const sunlightFovBox = document.querySelector('.layers-sunlightFov-box')?.parentElement as HTMLElement;

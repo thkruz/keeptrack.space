@@ -11,7 +11,7 @@ test('keepTrackApi Unit Testing', () => {
     keepTrackApi.unregister({ event: EventBusEvent.touchStart, cbName: 'test' });
   }).toThrow(Error);
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.updateSelectBox,
     cbName: 'test',
     cb: () => {
@@ -19,7 +19,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.onCruncherReady,
     cbName: 'test',
     cb: () => {
@@ -27,7 +27,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.onCruncherMessage,
     cbName: 'test',
     cb: () => {
@@ -35,7 +35,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.uiManagerInit,
     cbName: 'test',
     cb: () => {
@@ -43,7 +43,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.uiManagerOnReady,
     cbName: 'test',
     cb: () => {
@@ -51,7 +51,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.bottomMenuClick,
     cbName: 'test',
     cb: () => {
@@ -59,7 +59,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.hideSideMenus,
     cbName: 'test',
     cb: () => {
@@ -67,7 +67,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.orbitManagerInit,
     cbName: 'test',
     cb: () => {
@@ -75,7 +75,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.drawManagerLoadScene,
     cbName: 'test',
     cb: () => {
@@ -83,7 +83,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.drawOptionalScenery,
     cbName: 'test',
     cb: () => {
@@ -91,7 +91,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.updateLoop,
     cbName: 'test',
     cb: () => {
@@ -99,7 +99,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.rmbMenuActions,
     cbName: 'test',
     cb: () => {
@@ -107,7 +107,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.updateDateTime,
     cbName: 'test',
     cb: () => {
@@ -115,7 +115,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.uiManagerFinal,
     cbName: 'test',
     cb: () => {
@@ -123,7 +123,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.rightBtnMenuAdd,
     cbName: 'test',
     cb: () => {
@@ -131,7 +131,7 @@ test('keepTrackApi Unit Testing', () => {
     },
   });
 
-  keepTrackApi.on({
+  EventBus.getInstance().on({
     event: EventBusEvent.selectSatData,
     cbName: 'test',
     cb: () => {

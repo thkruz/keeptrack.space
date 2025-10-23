@@ -251,7 +251,7 @@ export class SoundManager extends KeepTrackPlugin {
 
     Container.getInstance().registerSingleton<SoundManager>(Singletons.SoundManager, this);
 
-    keepTrackApi.on(EventBusEvent.uiManagerInit, () => {
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
       this.voices = speechSynthesis.getVoices();
     });
   };

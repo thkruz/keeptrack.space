@@ -8,6 +8,7 @@ import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
 import { keepTrackApi } from '../../keepTrackApi';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export const darkClouds = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>0; // NOTE: 0 will make the geosynchronous satellites more apparent
@@ -39,7 +40,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
   settingsManager.splashScreenList = ['epfl-1', 'epfl-2']; // Set Splash Screens to EPFL
 
-  keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
+  EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
     hideEl('logo-primary');
   });
   settingsManager.isDisableAsciiCatalog = true;

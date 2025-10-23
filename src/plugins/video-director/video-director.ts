@@ -4,9 +4,10 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
 
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -162,7 +163,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);

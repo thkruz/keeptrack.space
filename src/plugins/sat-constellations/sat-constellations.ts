@@ -8,6 +8,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import categoryPng from '@public/img/icons/category.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
@@ -55,7 +56,7 @@ export class SatConstellations extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         // Add additional constellations

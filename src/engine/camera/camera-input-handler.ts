@@ -4,6 +4,7 @@ import { EventBusEvent } from '../events/event-bus-events';
 import { errorManagerInstance } from '../utils/errorManager';
 import { Camera, CameraType } from './camera';
 import { CameraState } from './state/camera-state';
+import { EventBus } from '../events/event-bus';
 
 export class CameraInputHandler {
   private readonly camera: Camera;
@@ -24,9 +25,9 @@ export class CameraInputHandler {
   init() {
     this.registerKeyboardEvents();
 
-    keepTrackApi.on(EventBusEvent.canvasMouseDown, this.canvasMouseDown_.bind(this));
-    keepTrackApi.on(EventBusEvent.touchStart, this.touchStart_.bind(this));
-    keepTrackApi.on(EventBusEvent.KeyUp, (key: string, _code, _isRepeat: boolean, isShift: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.canvasMouseDown, this.canvasMouseDown_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.touchStart, this.touchStart_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.KeyUp, (key: string, _code, _isRepeat: boolean, isShift: boolean) => {
       if (key === 'Shift' && !isShift) {
         this.state.fpsRun = 1;
         settingsManager.cameraMovementSpeed = 0.003;
@@ -74,7 +75,7 @@ export class CameraInputHandler {
     const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
     keysDown.forEach((keyForFunc) => {
-      keepTrackApi.on(EventBusEvent.KeyDown, (key: string) => {
+      EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string) => {
         if (key === keyForFunc) {
           this[`keyDown${key}_`].bind(this)();
         } else if (['w', 'a', 's', 'd', 'q', 'e'].includes(key)) {
@@ -83,7 +84,7 @@ export class CameraInputHandler {
       });
     });
     keysUp.forEach((keyForFunc) => {
-      keepTrackApi.on(EventBusEvent.KeyUp, (key: string) => {
+      EventBus.getInstance().on(EventBusEvent.KeyUp, (key: string) => {
         if (key === keyForFunc) {
           this[`keyUp${key}_`].bind(this)();
         } else if (['w', 'a', 's', 'd', 'q', 'e'].includes(key)) {
@@ -93,21 +94,21 @@ export class CameraInputHandler {
     });
 
     ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6', 'NumpadAdd', 'NumpadSubtract'].forEach((codeForFunc) => {
-      keepTrackApi.on(EventBusEvent.KeyDown, (_key: string, code: string) => {
+      EventBus.getInstance().on(EventBusEvent.KeyDown, (_key: string, code: string) => {
         if (code === codeForFunc) {
           this[`keyDown${code}_`].bind(this)();
         }
       });
     });
     ['Numpad8', 'Numpad2', 'Numpad4', 'Numpad6'].forEach((codeForFunc) => {
-      keepTrackApi.on(EventBusEvent.KeyUp, (_key: string, code: string) => {
+      EventBus.getInstance().on(EventBusEvent.KeyUp, (_key: string, code: string) => {
         if (code === codeForFunc) {
           this[`keyUp${code}_`].bind(this)();
         }
       });
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '`' && !isRepeat) {
         this.camera.resetRotation();
       }

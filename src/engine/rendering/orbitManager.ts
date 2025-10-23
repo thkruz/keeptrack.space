@@ -214,7 +214,7 @@ export class OrbitManager {
     });
     this.isInitialized_ = true;
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (!isRepeat) {
         switch (key) {
           case 'L':

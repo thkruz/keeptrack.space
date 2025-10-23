@@ -4,6 +4,7 @@ import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { dateFormat } from '@app/engine/utils/dateFormat';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
@@ -24,7 +25,7 @@ import { SensorManager } from '../../app/sensors/sensorManager';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSiteLookAnglesPlugin';
   dependencies_ = [SelectSatManager.name];
@@ -119,7 +120,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         this.checkIfCanBeEnabled_(obj);
@@ -143,7 +144,7 @@ export class MultiSiteLookAnglesPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.staticOffsetChange,
       () => {
         const sat = this.selectSatManager_?.getSelectedSat();

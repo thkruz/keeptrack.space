@@ -3,13 +3,14 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { SensorToMoonLine } from '@app/engine/rendering/line-manager/sensor-to-moon-line';
 import { SensorToSunLine } from '@app/engine/rendering/line-manager/sensor-to-sun-line';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { RfSensor, SpaceObjectType } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   readonly id = 'SensorInfoPlugin';
@@ -101,7 +102,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         this.addSensorToSunBtnListener_();
@@ -109,7 +110,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onLineAdded,
       (lineManager: LineManager) => {
         this.checkIfLinesVisible_(lineManager);

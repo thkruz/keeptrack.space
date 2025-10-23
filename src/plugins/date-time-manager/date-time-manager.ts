@@ -8,6 +8,7 @@ import { Milliseconds } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';
@@ -29,11 +30,11 @@ export class DateTimeManager extends KeepTrackPlugin {
   init(): void {
     super.init();
 
-    keepTrackApi.on(EventBusEvent.uiManagerInit, this.uiManagerInit.bind(this));
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal.bind(this));
-    keepTrackApi.on(EventBusEvent.updateDateTime, this.updateDateTime.bind(this));
-    keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => this.updateDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
-    keepTrackApi.on(EventBusEvent.selectedDateChange, (date: Date) => this.updateDateTime(date));
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, this.uiManagerInit.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateDateTime, this.updateDateTime.bind(this));
+    EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => this.updateDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+    EventBus.getInstance().on(EventBusEvent.selectedDateChange, (date: Date) => this.updateDateTime(date));
   }
 
   updateDateTime(date: Date) {

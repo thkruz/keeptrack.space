@@ -2,6 +2,7 @@ import { LayersManager } from '@app/app/ui/layers-manager';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorPick } from '@app/engine/utils/color-pick';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { parseRgba } from '@app/engine/utils/rgba';
@@ -13,7 +14,7 @@ import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -274,7 +275,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('settings-form')?.addEventListener('change', SettingsMenuPlugin.onFormChange_);
@@ -382,7 +383,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, SettingsMenuPlugin.syncOnLoad);
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, SettingsMenuPlugin.syncOnLoad);
   }
 
   static syncOnLoad() {

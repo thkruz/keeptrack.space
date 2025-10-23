@@ -13,6 +13,7 @@ import { keepTrackApi } from '../../keepTrackApi';
 import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export interface SearchResult {
   id: number; // Catalog Index
@@ -49,10 +50,10 @@ export class SearchManager {
     searchResults.id = TopMenu.SEARCH_RESULT_ID;
     uiWrapper!.prepend(searchResults);
 
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.addListeners_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.addListeners_.bind(this));
 
     this.setupTopMenu_();
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'F' && !isRepeat) {
         this.toggleSearch();
         if (this.isSearchOpen) {

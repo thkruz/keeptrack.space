@@ -14,6 +14,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-object-html';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SatInfoBoxObject extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxObject';
@@ -25,7 +26,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(EventBusEvent.satInfoBoxInit, () => {
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createObjectSection_(), order: 6 });
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createSecondarySection(), order: 8 });
     });
@@ -34,8 +35,8 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(EventBusEvent.selectSatData, this.updateObjectData_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateObjectData_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {

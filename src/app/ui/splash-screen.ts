@@ -25,6 +25,7 @@ import satJpg from '@public/img/wallpaper/sat.jpg';
 import sat2Jpg from '@public/img/wallpaper/sat2.jpg';
 import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
 import thuleJpg from '@public/img/wallpaper/thule.jpg';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export abstract class SplashScreen {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
@@ -89,7 +90,7 @@ export abstract class SplashScreen {
       hideEl('loading-hint');
     }
 
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, () => {
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
       getEl('start-app-btn')?.addEventListener('click', () => {
         SplashScreen.handleStartAppButton();
       });

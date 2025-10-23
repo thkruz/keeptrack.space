@@ -4,6 +4,7 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
@@ -14,7 +15,7 @@ import streamPng from '@public/img/icons/stream.png';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class Breakup extends KeepTrackPlugin {
   readonly id = 'Breakup';
@@ -155,7 +156,7 @@ export class Breakup extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('breakup')!.addEventListener('submit', (e: Event) => {
@@ -165,7 +166,7 @@ export class Breakup extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!sat?.isSatellite()) {

@@ -1,3 +1,4 @@
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec3 } from 'gl-matrix';
@@ -64,7 +65,7 @@ export class CameraControlWidget {
     document.addEventListener('mouseup', this.onMouseUp.bind(this));
     this.canvas.addEventListener('click', this.onClick.bind(this));
 
-    keepTrackApi.on(EventBusEvent.updateLoop, this.draw.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateLoop, this.draw.bind(this));
   }
 
   private onMouseDown(event: MouseEvent) {

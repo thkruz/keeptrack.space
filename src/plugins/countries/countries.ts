@@ -15,6 +15,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
@@ -37,7 +38,7 @@ export class CountriesMenu extends KeepTrackPlugin {
   addHtml() {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('country-list')!.innerHTML = CountriesMenu.generateCountryList_();

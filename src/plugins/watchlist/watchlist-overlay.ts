@@ -4,6 +4,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { dateFormat } from '@app/engine/utils/dateFormat';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { shake } from '@app/engine/utils/shake';
 import { showLoading } from '@app/engine/utils/showLoading';
@@ -13,7 +14,7 @@ import { DetailedSatellite, MILLISECONDS_PER_DAY } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from './watchlist';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class WatchlistOverlay extends KeepTrackPlugin {
   readonly id = 'WatchlistOverlay';
@@ -88,9 +89,9 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(EventBusEvent.updateLoop, this.updateLoop.bind(this));
-    keepTrackApi.on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, WatchlistOverlay.uiManagerFinal.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateLoop, this.updateLoop.bind(this));
+    EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, WatchlistOverlay.uiManagerFinal.bind(this));
   }
 
   updateLoop() {

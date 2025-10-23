@@ -6,12 +6,13 @@ import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 
 import { SatMath } from '@app/app/analysis/sat-math';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { shake } from '@app/engine/utils/shake';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Hours, Kilometers, MILLISECONDS_PER_SECOND, SatelliteRecord, Seconds } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '../watchlist/watchlist';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 interface Pass {
   start: Date;
@@ -119,7 +120,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         this.canvas_ = <HTMLCanvasElement>getEl('satellite-timeline-canvas');
@@ -157,7 +158,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!sat && keepTrackApi.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
@@ -175,8 +176,8 @@ export class SatelliteTimeline extends KeepTrackPlugin {
         }
       },
     );
-    keepTrackApi.on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
-    keepTrackApi.on(EventBusEvent.resize, this.resizeCanvas_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.resize, this.resizeCanvas_.bind(this));
   }
 
   private onWatchlistUpdated_(watchlistList: number[]) {

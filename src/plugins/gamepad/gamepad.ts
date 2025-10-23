@@ -7,6 +7,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Radians } from 'ootk';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class GamepadPlugin {
   readonly id = 'GamepadPlugin';
@@ -22,7 +23,7 @@ export class GamepadPlugin {
       if (settingsManager.cruncherReady) {
         this.initializeGamepad(e.gamepad);
       } else {
-        keepTrackApi.once(EventBusEvent.uiManagerInit, () => this.initializeGamepad(e.gamepad));
+        EventBus.getInstance().once(EventBusEvent.uiManagerInit, () => this.initializeGamepad(e.gamepad));
       }
     });
     window.addEventListener('gamepaddisconnected', () => {
@@ -36,7 +37,7 @@ export class GamepadPlugin {
 
     // Only initialize once
     if (!this.currentController) {
-      keepTrackApi.on(EventBusEvent.updateLoop, this.updateGamepad.bind(this));
+      EventBus.getInstance().on(EventBusEvent.updateLoop, this.updateGamepad.bind(this));
     }
 
     this.currentController = gamepad;

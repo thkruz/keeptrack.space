@@ -1,4 +1,5 @@
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -21,10 +22,10 @@ export class BottomMenu {
 
   static init() {
     if (!settingsManager.isDisableBottomMenu) {
-      keepTrackApi.on(EventBusEvent.uiManagerInit, BottomMenu.createBottomMenu);
-      keepTrackApi.on(EventBusEvent.uiManagerFinal, BottomMenu.addBottomMenuFilterButtons);
+      EventBus.getInstance().on(EventBusEvent.uiManagerInit, BottomMenu.createBottomMenu);
+      EventBus.getInstance().on(EventBusEvent.uiManagerFinal, BottomMenu.addBottomMenuFilterButtons);
     }
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, BottomMenu.updateBottomMenuVisibility_);
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, BottomMenu.updateBottomMenuVisibility_);
 
   }
   static createBottomMenu(): void {

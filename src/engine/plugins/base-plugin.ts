@@ -16,6 +16,7 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl, hideEl } from '../utils/get-el';
 import { shake } from '../utils/shake';
 import { slideInRight, slideOutLeft } from '../utils/slide';
+import { EventBus } from '../events/event-bus';
 // TODO: Utilize the event bus to remove dependencies
 
 export interface ClickDragOptions {
@@ -355,7 +356,7 @@ export abstract class KeepTrackPlugin {
 
       this.addSideMenu(sideMenuHtmlWrapped);
 
-      keepTrackApi.on(
+      EventBus.getInstance().on(
         EventBusEvent.uiManagerFinal,
         () => {
           getEl(`${this.sideMenuElementName}-secondary-btn`)?.addEventListener('click', () => {
@@ -571,7 +572,7 @@ export abstract class KeepTrackPlugin {
   }
 
   registerMenuMode(): void {
-    keepTrackApi.on(EventBusEvent.bottomMenuModeChange, (): void => {
+    EventBus.getInstance().on(EventBusEvent.bottomMenuModeChange, (): void => {
       this.hideBottomIcon();
       if (this.menuMode.includes(settingsManager.activeMenuMode)) {
         this.showBottomIcon();
@@ -604,11 +605,11 @@ export abstract class KeepTrackPlugin {
   }
 
   registerRmbCallback(callback: (targetId: string, clickedSatId?: number) => void): void {
-    keepTrackApi.on(EventBusEvent.rmbMenuActions, callback);
+    EventBus.getInstance().on(EventBusEvent.rmbMenuActions, callback);
   }
 
   addContextMenuLevel1Item(html: string): void {
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.rightBtnMenuAdd,
       () => {
         const item = document.createElement('div');
@@ -633,7 +634,7 @@ export abstract class KeepTrackPlugin {
   }
 
   addContextMenuLevel2Item(elementId: string, html: string): void {
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
         const item = document.createElement('div');
@@ -651,7 +652,7 @@ export abstract class KeepTrackPlugin {
    * @param icon The icon to add to the bottom menu.
    */
   addBottomIcon(icon: Module, isDisabled = false): void {
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
         const button = document.createElement('div');
@@ -760,7 +761,7 @@ export abstract class KeepTrackPlugin {
   }
 
   addSideMenu(sideMenuHtml: string): void {
-    keepTrackApi.on(EventBusEvent.uiManagerInit, () => {
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
       getEl(KeepTrackPlugin.sideMenuContainerId)?.insertAdjacentHTML('beforeend', sideMenuHtml);
     });
   }
@@ -774,7 +775,7 @@ export abstract class KeepTrackPlugin {
     // Do Nothing
   }) {
     if (this.isRequireSensorSelected && this.isRequireSatelliteSelected) {
-      keepTrackApi.on(
+      EventBus.getInstance().on(
         EventBusEvent.selectSatData,
         (obj: BaseObject): void => {
           if (!obj?.isSatellite() || !keepTrackApi.getSensorManager().isSensorSelected()) {
@@ -787,7 +788,7 @@ export abstract class KeepTrackPlugin {
       );
     }
     if (this.isRequireSatelliteSelected && !this.isRequireSensorSelected) {
-      keepTrackApi.on(
+      EventBus.getInstance().on(
         EventBusEvent.selectSatData,
         (obj: BaseObject): void => {
           if (!obj) {
@@ -801,7 +802,7 @@ export abstract class KeepTrackPlugin {
     }
 
     if (this.isRequireSensorSelected && !this.isRequireSatelliteSelected) {
-      keepTrackApi.on(
+      EventBus.getInstance().on(
         EventBusEvent.setSensor,
         (sensor, sensorId): void => {
           if (!sensor && !sensorId) {
@@ -814,7 +815,7 @@ export abstract class KeepTrackPlugin {
       );
     }
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.bottomMenuClick,
       (iconName: string): void => {
         if (iconName === this.bottomIconElementName) {
@@ -932,7 +933,7 @@ export abstract class KeepTrackPlugin {
   }
 
   registerSubmitButtonClicked(callback: ((() => void) | null) = null) {
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         const form = getEl(`${this.sideMenuElementName}-form`);
@@ -953,7 +954,7 @@ export abstract class KeepTrackPlugin {
   }
 
   registerClickAndDragOptions(opts: ClickDragOptions = {} as ClickDragOptions): void {
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         if (this.sideMenuSecondaryHtml) {
@@ -968,7 +969,7 @@ export abstract class KeepTrackPlugin {
   }
 
   registerClickAndDragOptionsSecondary(opts: ClickDragOptions = {} as ClickDragOptions): void {
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         const edgeEl = clickAndDragWidth(getEl(`${this.sideMenuElementName}-secondary`), opts);
@@ -987,7 +988,7 @@ export abstract class KeepTrackPlugin {
    * @param helpText The help text to show.
    */
   registerHelp(helpTitle: string, helpText: string) {
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onHelpMenuClick,
       (): boolean => {
         if (this.isMenuButtonActive) {
@@ -1007,7 +1008,7 @@ export abstract class KeepTrackPlugin {
    * @param slideCb The callback function to run when the side menu is hidden.
    */
   registerHideSideMenu(bottomIconElementName: string, slideCb: () => void): void {
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.hideSideMenus,
       (): void => {
         slideCb();

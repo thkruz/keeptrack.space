@@ -1,4 +1,5 @@
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
 import { html } from '@app/engine/utils/development/formatter';
@@ -95,7 +96,7 @@ export class ColorMenu extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('colors-menu')

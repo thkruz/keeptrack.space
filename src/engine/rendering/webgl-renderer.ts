@@ -134,7 +134,7 @@ export class WebGLRenderer {
       throw new Error('The canvas DOM is missing. This could be due to a firewall (ex. Menlo). Contact your LAN Office or System Adminstrator.');
     }
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.resize,
       () => {
         // Clear any existing resize timer

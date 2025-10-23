@@ -9,6 +9,7 @@ import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
+import { EventBus } from '@app/engine/events/event-bus';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -302,7 +303,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('filter-form')?.addEventListener('change', this.onFormChange_.bind(this));
@@ -310,7 +311,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
         getEl(TopMenu.TOP_RIGHT_ID)?.insertAdjacentHTML(
@@ -329,7 +330,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('top-menu-filter-btn')?.addEventListener('click', () => {
@@ -341,15 +342,15 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         this.syncOnLoad_();
       },
     );
 
-    keepTrackApi.on(EventBusEvent.saveSettings, this.saveSettings_.bind(this));
-    keepTrackApi.on(EventBusEvent.loadSettings, this.loadSettings_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.saveSettings, this.saveSettings_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.loadSettings, this.loadSettings_.bind(this));
   }
   private saveSettings_() {
     const persistenceManagerInstance = PersistenceManager.getInstance();

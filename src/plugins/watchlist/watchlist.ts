@@ -43,6 +43,7 @@ import { EL as SAT_INFO_EL } from '../sat-info-box/sat-info-box-html';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
+import { EventBus } from '@app/engine/events/event-bus';
 
 interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number, inView: boolean }[];
@@ -114,11 +115,11 @@ export class WatchlistPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
-    keepTrackApi.on(EventBusEvent.onCruncherReady, this.onCruncherReady_.bind(this));
-    keepTrackApi.on(EventBusEvent.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.onCruncherReady, this.onCruncherReady_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxFinal, this.satInfoBoxFinal_.bind(this));
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
         if (!settingsManager.isWatchlistTopMenuNotification) {
@@ -142,7 +143,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         if (!settingsManager.isWatchlistTopMenuNotification) {
@@ -171,12 +172,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
     const satInfoBoxPlugin = keepTrackApi.getPlugin(SatInfoBox)!;
 
-    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, () => {
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, () => {
       getEl(this.EL.ADD_WATCHLIST)?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
       getEl(this.EL.REMOVE_WATCHLIST)?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
     });
 
-    keepTrackApi.on(EventBusEvent.selectSatData, this.selectSatData_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, this.selectSatData_.bind(this));
   }
 
   private satInfoBoxFinal_() {

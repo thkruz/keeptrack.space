@@ -33,7 +33,7 @@ export class VcrPlugin extends KeepTrackPlugin {
 
   addHtml() {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
         const topLeftMenuElement = getEl(TopMenu.TOP_LEFT_ID);
@@ -63,7 +63,7 @@ export class VcrPlugin extends KeepTrackPlugin {
 
     this.scenario = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
 
-    keepTrackApi.on(EventBusEvent.uiManagerInit, () => {
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
       this.rewindBtn = document.getElementById('vcr-rewind-btn');
       this.playPauseBtn = document.getElementById('vcr-play-pause-btn');
       this.fastForwardBtn = document.getElementById('vcr-fast-forward-btn');

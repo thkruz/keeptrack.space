@@ -13,6 +13,7 @@ import { Body } from 'astronomy-engine';
 import { DetailedSatellite, Kilometers } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class DrawLinesPlugin extends KeepTrackPlugin {
   readonly id = 'DrawLinesPlugin';
@@ -124,7 +125,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   addJs() {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.rightBtnMenuOpen, (isEarth, clickedSatId) => {
+    EventBus.getInstance().on(EventBusEvent.rightBtnMenuOpen, (isEarth, clickedSatId) => {
       if (!isEarth) {
         hideEl('line-eci-axis-rmb');
       }

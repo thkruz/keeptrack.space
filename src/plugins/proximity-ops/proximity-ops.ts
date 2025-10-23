@@ -5,6 +5,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
@@ -14,7 +15,7 @@ import { BaseObject, CatalogSource, Degrees, DetailedSatellite, EciVec3, Kilomet
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 enum RPOType {
   GEO = 'GEO',
@@ -148,7 +149,7 @@ export class ProximityOps extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
 
@@ -190,7 +191,7 @@ export class ProximityOps extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (this.isMenuButtonActive && obj?.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl('proximity-ops-norad')).value) {

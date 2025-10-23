@@ -41,6 +41,7 @@ import { LayersManager } from './layers-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 import { UiValidation } from './ui-validation';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
@@ -269,13 +270,13 @@ export class UiManager {
     // Initialize Navigation and Select Menus
     const elems = document.querySelectorAll('.dropdown-button');
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
       if (key === 'F2' && isShift && !isRepeat) {
         this.hideUi();
       }
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'B' && !isRepeat) {
         this.toggleBottomMenu();
       }
@@ -368,7 +369,7 @@ export class UiManager {
     // Run any plugins code
     keepTrackApi.emit(EventBusEvent.uiManagerOnReady);
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         this.bottomIconPress = (el: HTMLElement) => {

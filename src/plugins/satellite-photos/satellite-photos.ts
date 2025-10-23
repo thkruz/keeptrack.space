@@ -4,13 +4,14 @@ import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import photoManagerPng from '@public/img/icons/photoManager.png';
 import { Degrees } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 interface DiscvrResponse {
   centroid_coordinates: {
@@ -48,7 +49,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('meteosat9-link')!.addEventListener('click', () => {
@@ -163,7 +164,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onKeepTrackReady,
       () => {
         this.initDISCOVR_();

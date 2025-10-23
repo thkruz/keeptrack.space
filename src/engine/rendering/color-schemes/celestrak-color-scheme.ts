@@ -11,6 +11,7 @@ import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType, Star } f
 import { CameraType } from '../../camera/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export interface CelestrakColorSchemeColorMap extends ColorSchemeColorMap {
   celestrakDefaultRocketBody: rgbaArray;
@@ -53,7 +54,7 @@ export class CelestrakColorScheme extends ColorScheme {
       ...this.objectTypeFlags, ...CelestrakColorScheme.uniqueObjectTypeFlags,
     };
 
-    keepTrackApi.on(EventBusEvent.layerUpdated, () => {
+    EventBus.getInstance().on(EventBusEvent.layerUpdated, () => {
       if (settingsManager.isDisableSensors) {
         this.objectTypeFlags.celestrakDefaultSensor = false;
         this.objectTypeFlags.celestrakDefaultFov = false;

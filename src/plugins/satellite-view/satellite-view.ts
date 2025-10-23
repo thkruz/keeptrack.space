@@ -30,6 +30,7 @@ import viewInAirPng from '@public/img/icons/view-in-air.png';
 import { DetailedSatellite } from 'ootk';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
   readonly id = 'SatelliteViewPlugin';
@@ -50,7 +51,7 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj) => {
         if (obj instanceof DetailedSatellite) {

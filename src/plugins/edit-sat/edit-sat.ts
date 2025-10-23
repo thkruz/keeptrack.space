@@ -11,13 +11,14 @@ import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class EditSat extends KeepTrackPlugin {
   readonly id = 'EditSat';
@@ -125,7 +126,7 @@ export class EditSat extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('editSat-newTLE')!.addEventListener('click', this.editSatNewTleClick_.bind(this));
@@ -182,7 +183,7 @@ export class EditSat extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (!obj) {

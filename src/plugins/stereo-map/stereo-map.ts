@@ -52,6 +52,7 @@ import redSquare from '@public/img/red-square.png';
 import satellite2 from '@public/img/satellite-2.png';
 import yellowSquare from '@public/img/yellow-square.png';
 
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
@@ -110,7 +111,7 @@ export class StereoMap extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         this.canvas_ = <HTMLCanvasElement>getEl('map-2d');
@@ -139,12 +140,12 @@ export class StereoMap extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onCruncherMessage,
       this.onCruncherMessage_.bind(this),
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {
@@ -156,7 +157,7 @@ export class StereoMap extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'M' && !isRepeat) {
         if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
           return;

@@ -5,6 +5,7 @@ import { Kilometers, Radians } from 'ootk';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
 import { keepTrackApi } from '../../keepTrackApi';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class MobileManager {
   // eslint-disable-next-line require-await
@@ -100,7 +101,7 @@ export class MobileManager {
             maxSize: 70,
           });
 
-          keepTrackApi.on(
+          EventBus.getInstance().on(
             EventBusEvent.selectSatData,
             () => {
               keepTrackApi.getUiManager().searchManager.closeSearch();
@@ -108,7 +109,7 @@ export class MobileManager {
             },
           );
 
-          keepTrackApi.on(
+          EventBus.getInstance().on(
             EventBusEvent.uiManagerFinal,
             () => {
               hideEl('tutorial-btn');

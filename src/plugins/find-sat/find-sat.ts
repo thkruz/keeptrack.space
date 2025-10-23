@@ -14,6 +14,7 @@ import findSatPng from '@public/img/icons/database-search.png';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export interface SearchSatParams {
   argPe: Degrees;
@@ -231,7 +232,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   printLastResults() {

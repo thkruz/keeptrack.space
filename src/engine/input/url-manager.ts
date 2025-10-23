@@ -8,6 +8,7 @@ import { DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians } fro
 import { EventBusEvent } from '../events/event-bus-events';
 import { AtmosphereSettings, EarthTextureStyle } from '../rendering/draw-manager/earth-quality-enums';
 import { getEl } from '../utils/get-el';
+import { EventBus } from '../events/event-bus';
 
 export abstract class UrlManager {
   private static selectedSat_: DetailedSatellite | null = null;
@@ -32,7 +33,7 @@ export abstract class UrlManager {
   static lastUpdateTime_: number;
 
   static {
-    keepTrackApi.on(EventBusEvent.selectSatData, (sat) => {
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (sat) => {
       if (sat instanceof DetailedSatellite) {
         this.selectedSat_ = sat;
       } else {
@@ -41,21 +42,21 @@ export abstract class UrlManager {
       this.updateURL();
     });
 
-    keepTrackApi.on(EventBusEvent.propRateChanged, (propRate: number) => {
+    EventBus.getInstance().on(EventBusEvent.propRateChanged, (propRate: number) => {
       this.propRate_ = propRate;
       this.updateURL();
     });
 
-    keepTrackApi.on(EventBusEvent.searchUpdated, (searchString: string) => {
+    EventBus.getInstance().on(EventBusEvent.searchUpdated, (searchString: string) => {
       this.searchString_ = searchString;
       this.updateURL();
     });
 
-    keepTrackApi.on(EventBusEvent.updateDateTime, () => {
+    EventBus.getInstance().on(EventBusEvent.updateDateTime, () => {
       this.updateURL();
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key) => {
       if (key === 'U') {
         this.updateURL(true);
       }
@@ -193,7 +194,7 @@ export abstract class UrlManager {
               settingsManager.isOrbitCruncherInEcf = !!ecfValue;
               settingsManager.numberOfEcfOrbitsToDraw = ecfValue;
 
-              keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
+              EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
                 keepTrackApi.getOrbitManager().orbitWorker.postMessage({
                   typ: OrbitCruncherType.SETTINGS_UPDATE,
                   numberOfOrbitsToDraw: settingsManager.numberOfEcfOrbitsToDraw,
@@ -206,11 +207,11 @@ export abstract class UrlManager {
           UrlManager.assignColorScheme_(kv, settingsManager);
           break;
         default:
-          // Do nothing for other keys, they will be handled in the keepTrackApi.onKeepTrackReady event
+          // Do nothing for other keys, they will be handled in the EventBus.getInstance().onKeepTrackReady event
           break;
       }
 
-      keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
+      EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
         switch (key) {
           case 'search':
             if (!settingsManager.disableUI) {
@@ -574,7 +575,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAurora = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
+        EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
           keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
@@ -588,7 +589,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAurora = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
+        EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
           keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
@@ -602,7 +603,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAurora = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.on(EventBusEvent.onKeepTrackReady, () => {
+        EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
           keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;

@@ -30,6 +30,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class Screenshot extends KeepTrackPlugin {
   readonly id = 'Screenshot';
@@ -124,12 +125,12 @@ export class Screenshot extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.altCanvasResize,
       () => this.queuedScreenshot_,
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.endOfDraw,
       () => {
         if (this.queuedScreenshot_) {

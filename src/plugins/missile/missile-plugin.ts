@@ -1,13 +1,14 @@
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
 import rocketPng from '@public/img/icons/rocket.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from './missile-manager';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class MissilePlugin extends KeepTrackPlugin {
   readonly id = 'MissilePlugin';
@@ -182,14 +183,14 @@ export class MissilePlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {
     super.addJs();
 
     // Missile orbits have to be updated every draw or they quickly become inaccurate
-    keepTrackApi.on(EventBusEvent.updateLoop, this.updateLoop_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateLoop, this.updateLoop_.bind(this));
   }
 
   private searchForRvs_() {

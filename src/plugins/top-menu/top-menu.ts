@@ -6,6 +6,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class TopMenu extends KeepTrackPlugin {
   readonly id = 'TopMenu';
@@ -41,7 +42,7 @@ export class TopMenu extends KeepTrackPlugin {
 
   addHtml() {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
         getEl('keeptrack-header')?.insertAdjacentHTML(
@@ -85,7 +86,7 @@ export class TopMenu extends KeepTrackPlugin {
   addJs() {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.setSensor, this.updateSensorName.bind(this));
+    EventBus.getInstance().on(EventBusEvent.setSensor, this.updateSensorName.bind(this));
   }
 
   updateSensorName() {

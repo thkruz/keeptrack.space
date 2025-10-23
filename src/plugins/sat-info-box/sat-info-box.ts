@@ -14,6 +14,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { CONTAINER_ID, EL, SECTIONS } from './sat-info-box-html';
 import './sat-info-box.css';
+import { EventBus } from '@app/engine/events/event-bus';
 
 /**
  * This class controls all the functionality of the satellite info box.
@@ -36,12 +37,12 @@ export class SatInfoBox extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onWatchlistUpdated,
       (watchlistList: { id: number, inView: boolean }[]) => {
         let isOnList = false;
@@ -70,10 +71,10 @@ export class SatInfoBox extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(EventBusEvent.selectSatData, this.updateHeaderData_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateHeaderData_.bind(this));
 
-    keepTrackApi.on(EventBusEvent.KeyDown, this.onKeyDownLowerI_.bind(this));
-    keepTrackApi.on(EventBusEvent.selectSatData, (obj?: BaseObject) => this.selectSat_(this, obj));
+    EventBus.getInstance().on(EventBusEvent.KeyDown, this.onKeyDownLowerI_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: BaseObject) => this.selectSat_(this, obj));
   }
 
   addElement(element: { html: string | null; order: number }): void {

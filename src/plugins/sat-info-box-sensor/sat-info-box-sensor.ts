@@ -17,6 +17,7 @@ import { missileManager } from '../missile/missile-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { StereoMap } from '../stereo-map/stereo-map';
+import { EventBus } from '@app/engine/events/event-bus';
 
 const SECTIONS = {
   SENSOR: 'sensor-sat-info',
@@ -43,7 +44,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(EventBusEvent.satInfoBoxInit, () => {
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createSensorSection_(), order: 5 });
     });
   }
@@ -51,9 +52,9 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(EventBusEvent.selectSatData, this.updateSensorInfo_.bind(this));
-    keepTrackApi.on(EventBusEvent.updateSelectBox, this.updateSelectBox_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateSensorInfo_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateSelectBox, this.updateSelectBox_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {

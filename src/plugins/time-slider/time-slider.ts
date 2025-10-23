@@ -7,6 +7,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { ScenarioData, ScenarioManagementPlugin } from '../scenario-management/scenario-management';
 import { TopMenu } from '../top-menu/top-menu';
 import './time-slider.css';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class TimeSlider extends KeepTrackPlugin {
   readonly id = 'TimeSlider';
@@ -16,7 +17,7 @@ export class TimeSlider extends KeepTrackPlugin {
 
   addHtml() {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
         const navWrapperElement = getEl(TopMenu.NAV_WRAPPER_ID);
@@ -71,7 +72,7 @@ export class TimeSlider extends KeepTrackPlugin {
 
     this.scenario = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
 
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, () => {
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
       this.attachSliderEvents('time-slider-container-slider', (value: number) => {
         this.scenario = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
         if (!this.scenario?.startTime && !this.scenario?.endTime) {
@@ -82,11 +83,11 @@ export class TimeSlider extends KeepTrackPlugin {
       });
     });
 
-    keepTrackApi.on(EventBusEvent.selectedDateChange, () => {
+    EventBus.getInstance().on(EventBusEvent.selectedDateChange, () => {
       this.updateSliderPosition();
     });
 
-    keepTrackApi.on(EventBusEvent.staticOffsetChange, () => {
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
       this.updateSliderPosition();
     });
   }

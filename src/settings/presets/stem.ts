@@ -2,8 +2,8 @@ import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '../settings';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.isBlockPersistence = true;
@@ -59,7 +59,7 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
 
   settingsManager.isDisableExtraCatalog = false;
 
-  keepTrackApi.on(EventBusEvent.uiManagerFinal, () => {
+  EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
     BottomMenu.changeMenuMode(MenuMode.ALL);
 
     getEl('bottom-icons-filter')!.style.display = 'none';

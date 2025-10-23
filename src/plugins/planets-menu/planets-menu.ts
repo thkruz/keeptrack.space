@@ -12,6 +12,7 @@ import { Kilometers, RADIUS_OF_EARTH } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './planets-menu.css';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class PlanetsMenuPlugin extends KeepTrackPlugin {
   readonly id = 'PlanetsMenuPlugin';
@@ -170,7 +171,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('planets-menu')
@@ -214,7 +215,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'Home' && !isRepeat) {
         this.changePlanet(Body.Earth);
       }

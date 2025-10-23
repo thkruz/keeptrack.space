@@ -49,7 +49,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     this.registerKeyboardEvents_();
 
-    keepTrackApi.on(EventBusEvent.updateLoop, this.checkIfSelectSatVisible.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateLoop, this.checkIfSelectSatVisible.bind(this));
 
     EventBus.getInstance().on(EventBusEvent.endOfDraw, () => {
       if ((this.selectedSat ?? -1) > -1) {
@@ -484,7 +484,7 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private registerKeyboardEvents_() {
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if ((key === '[' || key === ']') && !isRepeat) {
         this.switchPrimarySecondary();
       }

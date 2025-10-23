@@ -203,7 +203,7 @@ export class TimeManager {
     if (this.isKeyboardBindingsInitialized_) {
       return;
     }
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 't' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -215,7 +215,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === ',' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -250,7 +250,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '.' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -285,7 +285,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '<' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -298,7 +298,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '>' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -311,7 +311,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '/' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -338,7 +338,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
       if (code === 'Equal' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
@@ -351,7 +351,7 @@ export class TimeManager {
       }
     });
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
       if (code === 'Minus' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
           keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);

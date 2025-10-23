@@ -1,6 +1,7 @@
 import { EChartsData, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
+import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -11,7 +12,7 @@ import 'echarts-gl';
 import { BaseObject, DetailedSatellite } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -72,7 +73,7 @@ export class RicPlot extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.setSecondarySat,
       (obj: BaseObject | null) => {
         if (!obj || this.selectSatManager_.selectedSat === -1) {
@@ -86,7 +87,7 @@ export class RicPlot extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (!obj || this.selectSatManager_.secondarySat === -1) {

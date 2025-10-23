@@ -5,11 +5,12 @@ import polarPlotPng from '@public/img/icons/polar-plot.png';
 
 
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, secondsPerDay } from 'ootk';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 interface PolarPlotData extends Array<[Degrees, Degrees]> { }
 
@@ -66,7 +67,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('polar-plot-save')!.addEventListener('click', () => {
@@ -85,7 +86,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.staticOffsetChange,
       () => {
         if (this.isMenuButtonActive) {
@@ -94,7 +95,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
@@ -111,7 +112,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'P' && !isRepeat) {
         if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
           return;

@@ -20,9 +20,10 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { fetchWeatherApi } from 'openmeteo';
-import { html } from '@app/engine/utils/development/formatter';
+import { EventBus } from '@app/engine/events/event-bus';
 
 interface Pass {
   start: Date;
@@ -239,7 +240,7 @@ export class SensorTimeline extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         this.canvas_ = <HTMLCanvasElement>getEl('sensor-timeline-canvas');
@@ -291,7 +292,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     super.addJs();
 
     // We need to wait for the sensorIds to be assigned before we can use them. Once they are ready we will reload the users last selected sensors
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onCruncherReady,
       () => {
         const cachedEnabledSensors = PersistenceManager.getInstance().getItem(StorageKey.SENSOR_TIMELINE_ENABLED_SENSORS);
@@ -313,7 +314,7 @@ export class SensorTimeline extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!this.isMenuButtonActive) {

@@ -25,6 +25,7 @@ import {
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';
@@ -324,7 +325,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', () => {
@@ -338,7 +339,7 @@ export class NewLaunch extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (obj?.isSatellite()) {

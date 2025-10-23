@@ -8,6 +8,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import numeric from 'numeric';
 import { DetailedSatellite, DetailedSensor, RAD2DEG } from 'ootk';
 import type { ControlSite } from './ControlSite';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export enum SatConstellationString {
   Aehf = 'aehf',
@@ -81,7 +82,7 @@ export class SatLinkManager {
   }
 
   init(controlSiteList: ControlSite[]) {
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onCruncherReady,
       () => this.onCruncher_(controlSiteList),
     );

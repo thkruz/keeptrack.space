@@ -39,6 +39,7 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
 import { CameraInputHandler } from './camera-input-handler';
 import { CameraState } from './state/camera-state';
+import { EventBus } from '../events/event-bus';
 
 /**
  * Represents the different types of cameras available.
@@ -486,7 +487,7 @@ export class Camera {
 
     this.inputHandler.init();
 
-    keepTrackApi.on(EventBusEvent.selectSatData, () => {
+    EventBus.getInstance().on(EventBusEvent.selectSatData, () => {
       this.state.isAutoPitchYawToTarget = false;
     });
   }

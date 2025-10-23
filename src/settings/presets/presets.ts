@@ -7,6 +7,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Kilometers, Milliseconds } from 'ootk';
 import { SettingsManager } from '../settings';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SettingsPresets {
   static loadPresetMillionYear(settings: SettingsManager) {
@@ -365,7 +366,7 @@ export class SettingsPresets {
     settings.colors.debris = [0.5, 0.5, 0.5, 0.1];
     settings.colors.unknown = [0.5, 0.5, 0.5, 0.1];
     settings.colors.pink = [0.5, 0.5, 0.5, 0.1];
-    keepTrackApi.on(
+    EventBus.getInstance().on(
       EventBusEvent.onCruncherReady,
       () => {
         setTimeout(() => {

@@ -341,6 +341,7 @@ const settingsOverride = {
   earthTextureStyle: 'earthmap', // 'earthmap' or 'flat'
   isEmbedMode: true,
   isDisableToasts: true,
+  isAutoStart: true,
 };
 
 // Expose these to the console

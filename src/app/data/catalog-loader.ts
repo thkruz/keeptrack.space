@@ -423,15 +423,15 @@ export class CatalogLoader {
         keepTrackApi.getScene().earth.planetObject = earth;
         tempObjData.push(earth);
 
-        const moonDot = new Planet({
-          id: tempObjData.length,
-          name: Body.Moon,
-        });
+        // const moonDot = new Planet({
+        //   id: tempObjData.length,
+        //   name: Body.Moon,
+        // });
 
-        moonDot.color = (planetList[Body.Moon]?.color ?? [1.0, 1.0, 1.0, 1.0]) as rgbaArray;
-        keepTrackApi.getScene().planets.Moon.planetObject = moonDot;
+        // moonDot.color = (planetList[Body.Moon]?.color ?? [1.0, 1.0, 1.0, 1.0]) as rgbaArray;
+        // keepTrackApi.getScene().planets.Moon.planetObject = moonDot;
 
-        tempObjData.push(moonDot);
+        // tempObjData.push(moonDot);
       }
     }
 

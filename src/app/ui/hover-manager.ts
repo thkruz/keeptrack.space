@@ -1,20 +1,23 @@
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
+import { html } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { CatalogSource, DetailedSatellite, DetailedSensor, KM_PER_AU, LandObject, SpaceObjectType, spaceObjType2Str, Star } from '@ootk/src/main';
+import { Body } from 'astronomy-engine';
 import i18next from 'i18next';
-import { CatalogSource, DetailedSatellite, DetailedSensor, LandObject, SpaceObjectType, Star, spaceObjType2Str } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { Planet } from '../objects/planet';
 import { SensorMath } from '../sensors/sensor-math';
 import { StringExtractor } from './string-extractor';
-import { html } from '@app/engine/utils/development/formatter';
 
 export class HoverManager {
   /** The id of the object currently being hovered */
@@ -80,6 +83,23 @@ export class HoverManager {
       `${obj.country + SensorMath.distanceString(obj, catalogManagerInstance.getObject(keepTrackApi.getSensorManager().currentSensors[0]?.id) as DetailedSensor)}`;
     this.satHoverBoxNode3.textContent = '';
     this.satHoverBoxNode3.style.display = 'none';
+  }
+
+  private planet_(planet_: Planet) {
+    const planet = ServiceLocator.getScene().getBodyById(planet_.name as Body);
+
+    if (!planet) {
+      return;
+    }
+
+    const orbitInSeconds = planet.orbitalPeriod;
+    const distanceFromSunInAU = planet.meanDistanceToSun / KM_PER_AU;
+    const distanceFromSunInMillionKm = planet.meanDistanceToSun / 1000000;
+    const orbitPeriodInEarthDays = orbitInSeconds / 86400;
+
+    this.satHoverBoxNode1.textContent = `${planet_.name} - (Planet)`;
+    this.satHoverBoxNode2.textContent = `Distance from Sun: ${(distanceFromSunInAU).toFixed(2)} AU (${(distanceFromSunInMillionKm).toFixed(2)} million km)`;
+    this.satHoverBoxNode3.textContent = `Orbit Period: ${(orbitPeriodInEarthDays).toFixed(1)} Earth Days`;
   }
 
   private hoverOverNothing_() {
@@ -351,6 +371,8 @@ export class HoverManager {
       this.launchFacility_(obj as LandObject);
     } else if (obj.type === SpaceObjectType.CONTROL_FACILITY) {
       this.controlFacility_(obj as LandObject);
+    } else if (obj.type === 'Planet' as unknown as SpaceObjectType) {
+      this.planet_(obj as unknown as Planet);
     } else if (obj.type === SpaceObjectType.STAR) {
       // Do nothing
     } else {

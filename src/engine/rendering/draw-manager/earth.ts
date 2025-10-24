@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SatMath } from '@app/app/analysis/sat-math';
 import { Planet } from '@app/app/objects/planet';
 import { SplashScreen } from '@app/app/ui/splash-screen';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -33,12 +34,14 @@ import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Body } from 'astronomy-engine';
+import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
+import { BackdatePosition as backdatePosition, Body, KM_PER_AU } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EpochUTC, Sun } from '@ootk/src/main';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { PersistenceManager, StorageKey } from '../../utils/persistence-manager';
 import { DepthManager } from '../depth-manager';
+import { LineColors } from '../line-manager/line';
+import { OrbitPathLine } from '../line-manager/orbit-path';
 import {
   AtmosphereSettings, EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality,
   EarthSpecTextureQuality, EarthTextureStyle,
@@ -113,6 +116,14 @@ export class Earth {
   private readonly POLITICAL_SRC_BASE = 'boundaries';
   private readonly CLOUDS_SRC_BASE = 'clouds';
   private readonly DEFAULT_RESOLUTION = '1k';
+  orbitalPeriod: Seconds = 365.25 * 24 * 3600 as Seconds;
+  meanDistanceToSun: Kilometers = 149597870.7 as Kilometers;
+  orbitPathSegments_ = 8192;
+  svCache: { x: Kilometers; y: Kilometers; z: Kilometers }[] = [];
+  fullOrbitPath: OrbitPathLine | null = null;
+  color = LineColors.BLUE;
+  isDrawOrbitPath: boolean = false;
+  lastOrbitCalcTime_: number;
 
   /**
    * This is run once per frame to render the earth.
@@ -267,6 +278,10 @@ export class Earth {
     const gmst = keepTrackApi.getTimeManager().gmst;
     const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
 
+    if (this.isDrawOrbitPath) {
+      this.drawFullOrbitPath();
+    }
+
     this.lightDirection = [pos.x, pos.y, pos.z];
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
@@ -303,6 +318,75 @@ export class Earth {
     }
 
     return src;
+  }
+
+  getJ2000(simTime: Date, centerBody = Body.Earth): J2000 {
+    const pos = backdatePosition(simTime, centerBody, Body.Earth, false);
+
+    return new J2000(
+      new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
+      new Vector3D(pos.x * KM_PER_AU as Kilometers, pos.y * KM_PER_AU as Kilometers, pos.z * KM_PER_AU as Kilometers),
+      new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond),
+    );
+  }
+
+  getTeme(simTime: Date, centerBody = Body.Earth): TEME {
+    if (centerBody === Body.Earth) {
+      return new TEME(
+        new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
+        new Vector3D(0 as Kilometers, 0 as Kilometers, 0 as Kilometers),
+        new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond),
+      );
+    }
+
+    return this.getJ2000(simTime, centerBody).toTEME();
+  }
+
+  drawFullOrbitPath(): void {
+    const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
+
+    if (this.fullOrbitPath && Math.abs(simulationTimeObj.getTime() - this.lastOrbitCalcTime_) < 1000 * 60 * 60 * 24) { // 24 hour
+      return;
+    }
+    this.lastOrbitCalcTime_ = simulationTimeObj.getTime();
+
+    const now = simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
+    const lineManager = ServiceLocator.getLineManager();
+    const timeslice = this.orbitalPeriod / this.orbitPathSegments_;
+    const orbitPositions: [number, number, number][] = [];
+    const { j } = SatMath.calculateTimeVariables(simulationTimeObj);
+    const sunPos = ServiceLocator.getScene().sun.getEci(j);
+
+    for (let i = 0; i < this.orbitPathSegments_; i++) {
+      const t = now + i * timeslice;
+      const newTime = new Date(t * 1000);
+
+      this.svCache[i] ??= this.getTeme(newTime, settingsManager.centerBody).position; // convert s to ms
+      let x = this.svCache[i].x;
+      let y = this.svCache[i].y;
+      let z = this.svCache[i].z;
+
+      if (settingsManager.centerBody === Body.Sun) {
+
+        x = x + sunPos[0] as Kilometers;
+        y = y + sunPos[1] as Kilometers;
+        z = z + sunPos[2] as Kilometers;
+      } else if (settingsManager.centerBody !== Body.Earth && settingsManager.centerBody !== Body.Moon) {
+        const centerBodyPlanet = ServiceLocator.getScene().planets[settingsManager.centerBody];
+
+        x += centerBodyPlanet.position[0];
+        y += centerBodyPlanet.position[1];
+        z += centerBodyPlanet.position[2];
+      }
+
+      orbitPositions.push([x, y, z]);
+    }
+
+    if (this.fullOrbitPath) {
+      this.fullOrbitPath.isGarbage = true;
+    }
+
+    this.fullOrbitPath = lineManager.createOrbitPath(orbitPositions, this.color);
   }
 
   /**

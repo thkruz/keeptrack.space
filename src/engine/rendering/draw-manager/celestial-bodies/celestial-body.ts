@@ -3,7 +3,7 @@
  */
 import { SatMath } from '@app/app/analysis/sat-math';
 import { Planet } from '@app/app/objects/planet';
-import { EciArr3 } from '@app/engine/core/interfaces';
+import { EciArr3, rgbaArray } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -16,14 +16,26 @@ import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, TEME, Vector3D } from '@ootk/src/main';
 import { Body, KM_PER_AU, BackdatePosition as backdatePosition } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, TEME, Vector3D } from '@ootk/src/main';
 import { keepTrackApi } from '../../../../keepTrackApi';
 import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';
-import { LineColors } from '../../line-manager/line';
+import { OrbitPathLine } from '../../line-manager/orbit-path';
 import { OcclusionProgram } from '../post-processing';
+
+export const PlanetColors = {
+  MERCURY: [0.6, 0.6, 0.6, 0.7] as rgbaArray,
+  VENUS: [0.9, 0.8, 0.45, 0.7] as rgbaArray,
+  EARTH: [0, 0.6, 0.8, 0.7] as rgbaArray,
+  MOON: [0, 0.6, 0.8, 0.7] as rgbaArray,
+  MARS: [0.89, 0.51, 0.35, 0.7] as rgbaArray,
+  JUPITER: [0.95, 0.71, 0.64, 0.7] as rgbaArray,
+  SATURN: [0.72, 0.65, 0.52, 0.7] as rgbaArray,
+  URANUS: [0.67, 0.92, 1, 0.7] as rgbaArray,
+  NEPTUNE: [0.48, 0.69, 1, 0.7] as rgbaArray,
+} as const;
 
 export abstract class CelestialBody {
   readonly RADIUS: number;
@@ -35,16 +47,22 @@ export abstract class CelestialBody {
   protected modelViewMatrix_ = null as unknown as mat4;
   protected readonly normalMatrix_ = mat3.create();
 
-  color = LineColors.BLUE;
+  color = PlanetColors.EARTH;
+  /** Position in EME2000 */
   position = [0, 0, 0] as EciArr3;
   rotation = [0, 0, 0];
   mesh: Mesh;
   planetObject: Planet | null = null;
   relativeSatPos: EciVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
 
-  orbitPathSegments_ = 4096;
-  isDrawingFullOrbitPath: boolean = false;
-  protected timeForOneOrbit: Seconds = 2 * 365 * 24 * 3600 as Seconds; // Default to 2 Earth year
+  orbitPathSegments_ = 8192;
+  orbitalPeriod: Seconds;
+  meanDistanceToSun: Kilometers;
+  fullOrbitPath: OrbitPathLine | null = null;
+  fullOrbitPathEarthCentered: OrbitPathLine | null = null;
+  isDrawOrbitPath: boolean = false;
+  svCache: { x: Kilometers; y: Kilometers; z: Kilometers }[] = [];
+  lastOrbitCalcTime_: number = 0;
 
   abstract getName(): Body;
   abstract getTexturePath(): string;
@@ -80,7 +98,15 @@ export abstract class CelestialBody {
       this.mesh.geometry.initVao(this.mesh.program);
 
       EventBus.getInstance().on(EventBusEvent.onLinesCleared, () => {
-        this.isDrawingFullOrbitPath = false;
+        this.isDrawOrbitPath = false;
+        if (this.fullOrbitPath) {
+          this.fullOrbitPath.isGarbage = true;
+          this.fullOrbitPath = null;
+        }
+        if (this.fullOrbitPathEarthCentered) {
+          this.fullOrbitPathEarthCentered.isGarbage = true;
+          this.fullOrbitPathEarthCentered = null;
+        }
       });
 
       this.isLoaded_ = true;
@@ -89,8 +115,8 @@ export abstract class CelestialBody {
     }
   }
 
-  getJ2000(simTime: Date): J2000 {
-    const pos = backdatePosition(simTime, Body.Earth, this.getName(), false);
+  getJ2000(simTime: Date, centerBody = Body.Earth): J2000 {
+    const pos = backdatePosition(simTime, centerBody, this.getName(), false);
 
     return new J2000(
       new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
@@ -99,12 +125,12 @@ export abstract class CelestialBody {
     );
   }
 
-  getTeme(simTime: Date): TEME {
-    return this.getJ2000(simTime).toTEME();
+  getTeme(simTime: Date, centerBody = Body.Earth): TEME {
+    return this.getJ2000(simTime, centerBody).toTEME();
   }
 
   updatePosition(simTime: Date): void {
-    const posTeme = this.getTeme(simTime).position;
+    const posTeme = this.getTeme(simTime, Body.Earth).position;
 
     this.position = [posTeme.x, posTeme.y, posTeme.z];
   }
@@ -170,6 +196,9 @@ export abstract class CelestialBody {
       return;
     }
     this.updatePosition(simTime);
+    if (this.isDrawOrbitPath) {
+      this.drawFullOrbitPath();
+    }
     this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
     if (settingsManager.centerBody !== this.getName()) {
       mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, this.position);
@@ -224,13 +253,56 @@ export abstract class CelestialBody {
   };
 
   drawFullOrbitPath(): void {
-    if (this.isDrawingFullOrbitPath) {
+    const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
+
+    if (this.fullOrbitPath && Math.abs(simulationTimeObj.getTime() - this.lastOrbitCalcTime_) < 1000 * 60 * 60 * 24) { // 24 hour
       return;
     }
+    this.lastOrbitCalcTime_ = simulationTimeObj.getTime();
 
+    const now = simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
+    const lineManager = ServiceLocator.getLineManager();
+    const timeslice = this.orbitalPeriod / this.orbitPathSegments_;
+    const orbitPositions: [number, number, number][] = [];
+    const { j } = SatMath.calculateTimeVariables(simulationTimeObj);
+    const sunPos = ServiceLocator.getScene().sun.getEci(j);
+
+    for (let i = 0; i < this.orbitPathSegments_; i++) {
+      const t = now + i * timeslice;
+      const newTime = new Date(t * 1000);
+
+      this.svCache[i] ??= this.getTeme(newTime, settingsManager.centerBody).position; // convert s to ms
+      let x = this.svCache[i].x;
+      let y = this.svCache[i].y;
+      let z = this.svCache[i].z;
+
+      if (settingsManager.centerBody === Body.Sun) {
+
+        x = x + sunPos[0] as Kilometers;
+        y = y + sunPos[1] as Kilometers;
+        z = z + sunPos[2] as Kilometers;
+      } else if (settingsManager.centerBody !== Body.Earth && settingsManager.centerBody !== Body.Moon) {
+        const centerBodyPlanet = ServiceLocator.getScene().planets[settingsManager.centerBody];
+
+        x += centerBodyPlanet.position[0];
+        y += centerBodyPlanet.position[1];
+        z += centerBodyPlanet.position[2];
+      }
+
+      orbitPositions.push([x, y, z]);
+    }
+
+    if (this.fullOrbitPath) {
+      this.fullOrbitPath.isGarbage = true;
+    }
+
+    this.fullOrbitPath = lineManager.createOrbitPath(orbitPositions, this.color);
+  }
+
+  drawFullOrbitPathRelativeToEarth(): void {
     const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
     const lineManager = ServiceLocator.getLineManager();
-    const timeslice = this.timeForOneOrbit / this.orbitPathSegments_;
+    const timeslice = this.orbitalPeriod / this.orbitPathSegments_;
     const orbitPositions: [number, number, number][] = [];
 
     for (let i = 0; i < this.orbitPathSegments_; i++) {
@@ -254,9 +326,10 @@ export abstract class CelestialBody {
       orbitPositions.push([sv.x as number, sv.y as number, sv.z as number]);
     }
 
-    lineManager.createOrbitPath(orbitPositions, this.color);
-
-    this.isDrawingFullOrbitPath = true;
+    if (this.fullOrbitPathEarthCentered) {
+      this.fullOrbitPathEarthCentered.isGarbage = true;
+    }
+    this.fullOrbitPathEarthCentered = lineManager.createOrbitPath(orbitPositions, this.color);
   }
 
   protected calculateRelativeSatPos() {

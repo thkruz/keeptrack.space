@@ -19,17 +19,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { Body } from 'astronomy-engine';
-import { mat3, mat4, vec3 } from 'gl-matrix';
-import { Seconds } from '@ootk/src/main';
-import { settingsManager } from '../../../../settings/settings';
-import { LineColors } from '../../line-manager/line';
-import { CelestialBody } from './celestial-body';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-
-// TODO: Moon doesn't occlude the sun yet!
+import { Seconds } from '@ootk/src/main';
+import { Body } from 'astronomy-engine';
+import { mat3, mat4, vec3 } from 'gl-matrix';
+import { settingsManager } from '../../../../settings/settings';
+import { CelestialBody, PlanetColors } from './celestial-body';
 
 export enum MoonTextureQuality {
   POTATO = '512',
@@ -43,8 +40,8 @@ export class Moon extends CelestialBody {
   readonly RADIUS = 1737.4;
   protected readonly NUM_HEIGHT_SEGS = 128;
   protected readonly NUM_WIDTH_SEGS = 128;
-  protected timeForOneOrbit = 27.321661 * 24 * 3600 as Seconds;
-  color = LineColors.WHITE;
+  orbitalPeriod = 27.321661 * 24 * 3600 as Seconds;
+  color = PlanetColors.MOON;
   rotation = [0, 0, Math.PI];
 
   getTexturePath(): string {
@@ -73,6 +70,12 @@ export class Moon extends CelestialBody {
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
 
     this.calculateRelativeSatPos();
+  }
+
+  updatePosition(simTime: Date): void {
+    const posTeme = this.getTeme(simTime, Body.Earth).position;
+
+    this.position = [posTeme.x, posTeme.y, posTeme.z];
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {

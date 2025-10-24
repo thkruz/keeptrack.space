@@ -21,9 +21,9 @@
 
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { DEG2RAD, EciVec3 } from '@ootk/src/main';
 import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
-import { DEG2RAD, EciVec3 } from '@ootk/src/main';
 import { settingsManager } from '../../../../settings/settings';
 import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';
@@ -51,6 +51,8 @@ export class UranusRings extends CelestialBody {
   constructor(uranus_: Uranus) {
     super();
     this.uranus_ = uranus_;
+    this.meanDistanceToSun = uranus_.meanDistanceToSun;
+    this.orbitalPeriod = uranus_.orbitalPeriod;
   }
 
   async init(gl: WebGL2RenderingContext): Promise<void> {

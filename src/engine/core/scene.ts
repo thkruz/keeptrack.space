@@ -110,6 +110,7 @@ export class Scene {
   }
 
   update(simulationTime: Date) {
+    this.sun.getEci();
     this.updateWorldShift();
     this.sun.update();
     this.earth.update();

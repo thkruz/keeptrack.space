@@ -19,15 +19,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { DEG2RAD, EciVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
-import { DEG2RAD, EciVec3 } from '@ootk/src/main';
 import { settingsManager } from '../../../../settings/settings';
-import { LineColors } from '../../line-manager/line';
-import { CelestialBody } from './celestial-body';
+import { CelestialBody, PlanetColors } from './celestial-body';
 import { UranusRings } from './uranus-rings';
-
-// TODO: Uranus doesn't occlude the sun yet!
 
 export enum UranusTextureQuality {
   HIGH = '4k',
@@ -39,9 +36,11 @@ export class Uranus extends CelestialBody {
   readonly RADIUS = this.radius;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
+  orbitalPeriod = 84 * 365.25 * 24 * 3600 as Seconds;
+  meanDistanceToSun = 2870658186 as Kilometers;
   eci: EciVec3;
   private readonly rings_: UranusRings;
-  color = LineColors.CYAN;
+  color = PlanetColors.URANUS;
 
   constructor() {
     super();

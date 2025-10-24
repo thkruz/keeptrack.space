@@ -62,7 +62,7 @@ export class Sun {
   private readonly normalMatrix_ = mat3.create();
 
   /** The position of the sun in ECI coordinates. */
-  eci: EciVec3;
+  eci: EciVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
   /** The mesh for the sun. */
   mesh: Mesh;
   /** The position of the sun in WebGL coordinates. */
@@ -151,18 +151,13 @@ export class Sun {
       return;
     }
 
-    const j = keepTrackApi.getTimeManager().j;
-    const eci = SatMath.getSunDirection(j);
-
-    this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
-
-    const sunMaxDist = Math.max(Math.max(Math.abs(eci[0]), Math.abs(eci[1])), Math.abs(eci[2]));
+    const sunMaxDist = Math.max(Math.max(Math.abs(this.eci.x), Math.abs(this.eci.y)), Math.abs(this.eci.z));
 
     const worldShift = Scene.getInstance().worldShift as [number, number, number];
 
-    this.position[0] = ((eci[0] + worldShift[0]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
-    this.position[1] = ((eci[1] + worldShift[1]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
-    this.position[2] = ((eci[2] + worldShift[2]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
+    this.position[0] = ((this.eci.x + worldShift[0]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
+    this.position[1] = ((this.eci.y + worldShift[1]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
+    this.position[2] = ((this.eci.z + worldShift[2]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
 
     this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
 
@@ -204,6 +199,14 @@ export class Sun {
     }
 
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
+  }
+
+  getEci(j = keepTrackApi.getTimeManager().j) {
+    const eci = SatMath.getSunDirection(j);
+
+    this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
+
+    return eci;
   }
 
   /**

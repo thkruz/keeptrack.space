@@ -19,14 +19,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { DEG2RAD, EciVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
-import { DEG2RAD, EciVec3 } from '@ootk/src/main';
 import { settingsManager } from '../../../../settings/settings';
-import { LineColors } from '../../line-manager/line';
-import { CelestialBody } from './celestial-body';
-
-// TODO: Jupiter doesn't occlude the sun yet!
+import { CelestialBody, PlanetColors } from './celestial-body';
 
 export enum JupiterTextureQuality {
   HIGH = '2k',
@@ -37,8 +34,10 @@ export class Jupiter extends CelestialBody {
   readonly RADIUS = 69911;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
+  orbitalPeriod = 11.862 * 365.25 * 24 * 3600 as Seconds;
+  meanDistanceToSun = 778340821 as Kilometers;
   eci: EciVec3;
-  color = LineColors.BROWN;
+  color = PlanetColors.JUPITER;
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/jupiter${JupiterTextureQuality.ULTRA}.jpg`;

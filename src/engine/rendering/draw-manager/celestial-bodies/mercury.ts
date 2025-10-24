@@ -19,14 +19,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { DEG2RAD, EciVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
-import { DEG2RAD, EciVec3 } from '@ootk/src/main';
 import { settingsManager } from '../../../../settings/settings';
-import { LineColors } from '../../line-manager/line';
-import { CelestialBody } from './celestial-body';
-
-// TODO: Mercury doesn't occlude the sun yet!
+import { CelestialBody, PlanetColors } from './celestial-body';
 
 export enum MercuryTextureQuality {
   HIGH = '4k',
@@ -37,7 +34,9 @@ export class Mercury extends CelestialBody {
   readonly RADIUS = 2439.7;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
-  color = LineColors.GRAY;
+  color = PlanetColors.MERCURY;
+  orbitalPeriod = 0.2408467 * 365 * 24 * 3600 as Seconds;
+  meanDistanceToSun = 57909227 as Kilometers;
   eci: EciVec3;
 
   getTexturePath(): string {

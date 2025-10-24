@@ -191,20 +191,22 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
           });
 
         getEl('planets-menu-drawPlanetsOrbitPath-btn')?.addEventListener('click', () => {
-          this.changePlanet(Body.Earth); // Center on the Earth since all orbits are relative to Earth
+          this.changePlanet(Body.Sun); // Center on the Earth since all orbits are relative to Earth
           settingsManager.maxZoomDistance = (4.8e9) as Kilometers; // 4.8 billion km to see full orbits
 
           const moon = ServiceLocator.getScene().planets[Body.Moon];
           const gl = keepTrackApi.getRenderer().gl;
 
-          moon.drawFullOrbitPath();
+          moon.isDrawOrbitPath = true;
           moon.planetObject?.setHoverDotSize(gl, 1);
 
           for (const planetBody of this.PLANETS.filter((p) => p !== Body.Moon && p !== Body.Earth)) {
             const planet = ServiceLocator.getScene().planets[planetBody] as CelestialBody;
 
-            planet.drawFullOrbitPath();
+            planet.isDrawOrbitPath = true;
           }
+
+          ServiceLocator.getScene().earth.isDrawOrbitPath = true;
 
           this.setAllPlanetsDotSize(1);
         });

@@ -19,14 +19,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { DEG2RAD, EciVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
-import { DEG2RAD, EciVec3 } from '@ootk/src/main';
 import { settingsManager } from '../../../../settings/settings';
-import { LineColors } from '../../line-manager/line';
-import { CelestialBody } from './celestial-body';
-
-// TODO: Mars doesn't occlude the sun yet!
+import { CelestialBody, PlanetColors } from './celestial-body';
 
 export enum MarsTextureQuality {
   HIGH = '4k',
@@ -37,9 +34,11 @@ export class Mars extends CelestialBody {
   readonly RADIUS = 3389.5;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
+  orbitalPeriod = 1.8808 * 365.25 * 24 * 3600 as Seconds;
+  meanDistanceToSun = 227943824 as Kilometers;
   eci: EciVec3;
   rotation = [0, 0, Math.PI * 7 / 10];
-  color = LineColors.RED;
+  color = PlanetColors.MARS;
 
   getTexturePath(): string {
     return `${settingsManager.installDirectory}textures/mars${MarsTextureQuality.ULTRA}.jpg`;

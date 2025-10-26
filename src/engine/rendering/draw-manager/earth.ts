@@ -19,12 +19,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { SatMath } from '@app/app/analysis/sat-math';
 import { Planet } from '@app/app/objects/planet';
 import { SplashScreen } from '@app/app/ui/splash-screen';
+import { SolarBody } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -40,8 +42,8 @@ import { mat3, mat4, vec3 } from 'gl-matrix';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { PersistenceManager, StorageKey } from '../../utils/persistence-manager';
 import { DepthManager } from '../depth-manager';
-import { LineColors } from '../line-manager/line';
 import { OrbitPathLine } from '../line-manager/orbit-path';
+import { PlanetColors } from './celestial-bodies/celestial-body';
 import {
   AtmosphereSettings, EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality,
   EarthSpecTextureQuality, EarthTextureStyle,
@@ -121,7 +123,7 @@ export class Earth {
   orbitPathSegments_ = 8192;
   svCache: { x: Kilometers; y: Kilometers; z: Kilometers }[] = [];
   fullOrbitPath: OrbitPathLine | null = null;
-  color = LineColors.BLUE;
+  color = PlanetColors.EARTH;
   isDrawOrbitPath: boolean = false;
   lastOrbitCalcTime_: number;
 
@@ -265,10 +267,22 @@ export class Earth {
           this.initVaoAtmosphere_();
         }
 
+        EventBus.getInstance().on(EventBusEvent.onLinesCleared, () => {
+          this.isDrawOrbitPath = false;
+          if (this.fullOrbitPath) {
+            this.fullOrbitPath.isGarbage = true;
+            this.fullOrbitPath = null;
+          }
+        });
+
       }
     } catch (error) {
       errorManagerInstance.warn(error);
     }
+  }
+
+  typeToString(): string {
+    return 'Terrestrial Planet';
   }
 
   /**
@@ -276,18 +290,18 @@ export class Earth {
    */
   update(): void {
     const gmst = keepTrackApi.getTimeManager().gmst;
-    const pos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+    const sunPos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
 
-    if (this.isDrawOrbitPath) {
+    if (this.isDrawOrbitPath && (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon)) {
       this.drawFullOrbitPath();
     }
 
-    this.lightDirection = [pos.x, pos.y, pos.z];
+    this.lightDirection = [sunPos.x, sunPos.y, sunPos.z];
     vec3.normalize(<vec3>(<unknown>this.lightDirection), <vec3>(<unknown>this.lightDirection));
 
     this.modelViewMatrix_ = mat4.copy(mat4.create(), this.surfaceMesh.geometry.localMvMatrix);
 
-    if (settingsManager.centerBody !== Body.Earth || (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) !== -1) {
+    if (settingsManager.centerBody !== SolarBody.Earth || (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) !== -1) {
       const worldShift = Scene.getInstance().worldShift;
 
       mat4.translate(this.modelViewMatrix_, this.modelViewMatrix_, vec3.fromValues(worldShift[0], worldShift[1], worldShift[2]));
@@ -320,8 +334,8 @@ export class Earth {
     return src;
   }
 
-  getJ2000(simTime: Date, centerBody = Body.Earth): J2000 {
-    const pos = backdatePosition(simTime, centerBody, Body.Earth, false);
+  getJ2000(simTime: Date, centerBody = SolarBody.Earth): J2000 {
+    const pos = backdatePosition(simTime, centerBody as unknown as Body, SolarBody.Earth as unknown as Body, false);
 
     return new J2000(
       new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
@@ -330,8 +344,8 @@ export class Earth {
     );
   }
 
-  getTeme(simTime: Date, centerBody = Body.Earth): TEME {
-    if (centerBody === Body.Earth) {
+  getTeme(simTime: Date, centerBody = SolarBody.Earth): TEME {
+    if (centerBody === SolarBody.Earth) {
       return new TEME(
         new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
         new Vector3D(0 as Kilometers, 0 as Kilometers, 0 as Kilometers),
@@ -343,19 +357,15 @@ export class Earth {
   }
 
   drawFullOrbitPath(): void {
-    const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
-
-    if (this.fullOrbitPath && Math.abs(simulationTimeObj.getTime() - this.lastOrbitCalcTime_) < 1000 * 60 * 60 * 24) { // 24 hour
+    if (this.fullOrbitPath) {
       return;
     }
-    this.lastOrbitCalcTime_ = simulationTimeObj.getTime();
 
+    const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
     const now = simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
     const lineManager = ServiceLocator.getLineManager();
     const timeslice = this.orbitalPeriod / this.orbitPathSegments_;
     const orbitPositions: [number, number, number][] = [];
-    const { j } = SatMath.calculateTimeVariables(simulationTimeObj);
-    const sunPos = ServiceLocator.getScene().sun.getEci(j);
 
     for (let i = 0; i < this.orbitPathSegments_; i++) {
       const t = now + i * timeslice;
@@ -366,27 +376,20 @@ export class Earth {
       let y = this.svCache[i].y;
       let z = this.svCache[i].z;
 
-      if (settingsManager.centerBody === Body.Sun) {
+      if (settingsManager.centerBody === SolarBody.Sun) {
+        // Do nothing
+      } else if (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon) {
+        const centerBodyPlanet = ServiceLocator.getScene().getBodyById(settingsManager.centerBody);
 
-        x = x + sunPos[0] as Kilometers;
-        y = y + sunPos[1] as Kilometers;
-        z = z + sunPos[2] as Kilometers;
-      } else if (settingsManager.centerBody !== Body.Earth && settingsManager.centerBody !== Body.Moon) {
-        const centerBodyPlanet = ServiceLocator.getScene().planets[settingsManager.centerBody];
-
-        x += centerBodyPlanet.position[0];
-        y += centerBodyPlanet.position[1];
-        z += centerBodyPlanet.position[2];
+        x = x + (centerBodyPlanet?.position[0] ?? 0) as Kilometers;
+        y = y + (centerBodyPlanet?.position[1] ?? 0) as Kilometers;
+        z = z + (centerBodyPlanet?.position[2] ?? 0) as Kilometers;
       }
 
       orbitPositions.push([x, y, z]);
     }
 
-    if (this.fullOrbitPath) {
-      this.fullOrbitPath.isGarbage = true;
-    }
-
-    this.fullOrbitPath = lineManager.createOrbitPath(orbitPositions, this.color);
+    this.fullOrbitPath = lineManager.createOrbitPath(orbitPositions, this.color, SolarBody.Sun);
   }
 
   /**
@@ -470,7 +473,7 @@ export class Earth {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 
     // disable depth test unless zoomed out (avoid atmosphere showing through the moon when zoomed out)
-    if (settingsManager.centerBody === Body.Earth && ServiceLocator.getMainCamera().getCameraDistance() < 2e5) {
+    if (settingsManager.centerBody === SolarBody.Earth && ServiceLocator.getMainCamera().getCameraDistance() < 2e5) {
       gl.disable(gl.DEPTH_TEST);
     } else {
       gl.enable(gl.DEPTH_TEST);
@@ -503,7 +506,7 @@ export class Earth {
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uGlow, this.glowNumber_);
-    const isEarthCenterBody = settingsManager.centerBody === Body.Earth;
+    const isEarthCenterBody = settingsManager.centerBody === SolarBody.Earth;
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? (keepTrackApi.getMainCamera().zoomLevel() ?? 1.0) ** (1 / 3) : 1.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);

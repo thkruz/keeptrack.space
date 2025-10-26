@@ -18,6 +18,7 @@ import type { Camera } from './engine/camera/camera';
 import type { Scene } from './engine/core/scene';
 import type { TimeManager } from './engine/core/time-manager';
 import type { InputManager } from './engine/input/input-manager';
+import HorizonsAPI from './engine/ootk/src/fetch/horizons';
 import type { ColorSchemeManager } from './engine/rendering/color-scheme-manager';
 import type { DotsManager } from './engine/rendering/dots-manager';
 import type { LineManager } from './engine/rendering/line-manager';
@@ -143,6 +144,8 @@ export class KeepTrackApi {
   // Save utilities
   saveCsv = saveCsv;
   saveVariable = saveVariable;
+
+  horizonsApi = new HorizonsAPI();
 }
 
 export const keepTrackApi = new KeepTrackApi();

@@ -86,7 +86,13 @@ export class CelestrakColorScheme extends ColorScheme {
      * NOTE: The order of these checks is important
      */
 
-    if (obj.type === 'Planet' as unknown as SpaceObjectType) {
+    if (
+      obj.type === SpaceObjectType.TERRESTRIAL_PLANET ||
+      obj.type === SpaceObjectType.GAS_GIANT ||
+      obj.type === SpaceObjectType.ICE_GIANT ||
+      obj.type === SpaceObjectType.DWARF_PLANET ||
+      obj.type === SpaceObjectType.MOON
+    ) {
       return {
         color: (obj as Planet).color,
         pickable: Pickable.Yes,

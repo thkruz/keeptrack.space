@@ -1,5 +1,6 @@
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera';
+import { SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -9,13 +10,12 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CatalogSource, DetailedSatellite, DetailedSensor, KM_PER_AU, LandObject, SpaceObjectType, spaceObjType2Str, Star } from '@ootk/src/main';
-import { Body } from 'astronomy-engine';
 import i18next from 'i18next';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
-import { Planet } from '../objects/planet';
+import { Planet as PlanetDot } from '../objects/planet';
 import { SensorMath } from '../sensors/sensor-math';
 import { StringExtractor } from './string-extractor';
 
@@ -85,21 +85,25 @@ export class HoverManager {
     this.satHoverBoxNode3.style.display = 'none';
   }
 
-  private planet_(planet_: Planet) {
-    const planet = ServiceLocator.getScene().getBodyById(planet_.name as Body);
+  private planet_(planetDot: PlanetDot) {
+    const planetEntity = ServiceLocator.getScene().getBodyById(planetDot.name as SolarBody);
 
-    if (!planet) {
+    if (!planetEntity) {
       return;
     }
 
-    const orbitInSeconds = planet.orbitalPeriod;
-    const distanceFromSunInAU = planet.meanDistanceToSun / KM_PER_AU;
-    const distanceFromSunInMillionKm = planet.meanDistanceToSun / 1000000;
+    const orbitInSeconds = planetEntity.orbitalPeriod;
+    const distanceFromSunInAU = planetEntity.meanDistanceToSun / KM_PER_AU;
+    const distanceFromSunInMillionKm = planetEntity.meanDistanceToSun / 1000000;
     const orbitPeriodInEarthDays = orbitInSeconds / 86400;
 
-    this.satHoverBoxNode1.textContent = `${planet_.name} - (Planet)`;
+    this.satHoverBoxNode1.textContent = `${planetDot.name} - (${planetEntity.typeToString()})`;
     this.satHoverBoxNode2.textContent = `Distance from Sun: ${(distanceFromSunInAU).toFixed(2)} AU (${(distanceFromSunInMillionKm).toFixed(2)} million km)`;
-    this.satHoverBoxNode3.textContent = `Orbit Period: ${(orbitPeriodInEarthDays).toFixed(1)} Earth Days`;
+    if (orbitPeriodInEarthDays < 1_000) {
+      this.satHoverBoxNode3.textContent = `Orbit Period: ${(orbitPeriodInEarthDays).toFixed(1)} Earth Days`;
+    } else {
+      this.satHoverBoxNode3.textContent = `Orbit Period: ${(orbitPeriodInEarthDays / 365.25).toFixed(2)} Earth Years`;
+    }
   }
 
   private hoverOverNothing_() {
@@ -371,8 +375,14 @@ export class HoverManager {
       this.launchFacility_(obj as LandObject);
     } else if (obj.type === SpaceObjectType.CONTROL_FACILITY) {
       this.controlFacility_(obj as LandObject);
-    } else if (obj.type === 'Planet' as unknown as SpaceObjectType) {
-      this.planet_(obj as unknown as Planet);
+    } else if (
+      obj.type === SpaceObjectType.TERRESTRIAL_PLANET ||
+      obj.type === SpaceObjectType.GAS_GIANT ||
+      obj.type === SpaceObjectType.ICE_GIANT ||
+      obj.type === SpaceObjectType.DWARF_PLANET ||
+      obj.type === SpaceObjectType.MOON
+    ) {
+      this.planet_(obj as unknown as PlanetDot);
     } else if (obj.type === SpaceObjectType.STAR) {
       // Do nothing
     } else {

@@ -3,15 +3,15 @@
 /* eslint-disable camelcase */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
-import { Singletons } from '@app/engine/core/interfaces';
+import { Singletons, SolarBody } from '@app/engine/core/interfaces';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { Body } from 'astronomy-engine';
-import { mat4, vec3, vec4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, RaeVec3 } from '@ootk/src/main';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Container } from '../core/container';
 import { Scene } from '../core/scene';
+import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { getTemeToJ2000Matrix, ReferenceFrame } from '../math/reference-frames';
 import { EARTH_OBLIQUITY_RADIANS } from '../utils/constants';
@@ -31,7 +31,6 @@ import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
-import { EventBus } from '../events/event-bus';
 
 export class LineManager {
   attribs = {
@@ -90,7 +89,7 @@ export class LineManager {
     this.add(new SatToSunLine(sat));
   }
 
-  createSat2CelestialBody(sat: DetailedSatellite | MissileObject | OemSatellite | null, body: Body): void {
+  createSat2CelestialBody(sat: DetailedSatellite | MissileObject | OemSatellite | null, body: SolarBody): void {
     if (!sat || !(sat instanceof DetailedSatellite || sat instanceof OemSatellite)) {
       return;
     }
@@ -102,12 +101,12 @@ export class LineManager {
     this.add(new RefToRefLine(ref1, ref2, color));
   }
 
-  createOrbitPath(path: vec3[], color: vec4): OrbitPathLine | null {
+  createOrbitPath(path: vec3[], color: vec4, solarBody = SolarBody.Sun): OrbitPathLine | null {
     if (!path || path.length === 0) {
       return null;
     }
 
-    const orbitPathLine = new OrbitPathLine(path, color);
+    const orbitPathLine = new OrbitPathLine(path, color, solarBody);
 
     this.add(orbitPathLine);
 

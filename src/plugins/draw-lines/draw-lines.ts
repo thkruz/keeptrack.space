@@ -2,6 +2,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { SolarBody } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ReferenceFrame } from '@app/engine/math/reference-frames';
@@ -11,7 +12,6 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { hideEl } from '@app/engine/utils/get-el';
 import { DetailedSatellite, Kilometers } from '@ootk/src/main';
-import { Body } from 'astronomy-engine';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -115,7 +115,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
         lineManagerInstance.createSat2Sun(clickSatObj);
         break;
       case 'line-sat-moon-rmb':
-        lineManagerInstance.createSat2CelestialBody(clickSatObj, Body.Moon);
+        lineManagerInstance.createSat2CelestialBody(clickSatObj, SolarBody.Moon);
         break;
       default:
         break;

@@ -20,9 +20,11 @@
  */
 /* eslint-disable camelcase */
 import { SatMath } from '@app/app/analysis/sat-math';
-import { EciArr3 } from '@app/engine/core/interfaces';
+import { EciArr3, SolarBody } from '@app/engine/core/interfaces';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -50,7 +52,7 @@ export class Sun {
   /** The number of width segments for the sun. */
   private readonly NUM_WIDTH_SEGS = 32;
   /** The distance scalar for the sun. */
-  private readonly DISTANCE_FROM_EARTH = 149600000;
+  readonly DISTANCE_FROM_EARTH = 149600000;
 
   /** The WebGL context. */
   private gl_: WebGL2RenderingContext;
@@ -74,6 +76,7 @@ export class Sun {
   sunDirectionCache: { jd: number; sunDirection: EciArr3; } = { jd: 0, sunDirection: [0, 0, 0] };
   textureDirection = [0, 0] as vec2;
   rotation: vec3 = [0, 0, 0];
+  lastUpdateJ: number;
 
   /**
    * This is run once per frame to render the sun.
@@ -141,6 +144,10 @@ export class Sun {
 
     this.mesh.geometry.initVao(this.mesh.program);
     this.isLoaded_ = true;
+
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
+      this.updateEci();
+    });
   }
 
   /**
@@ -151,13 +158,11 @@ export class Sun {
       return;
     }
 
-    const sunMaxDist = Math.max(Math.max(Math.abs(this.eci.x), Math.abs(this.eci.y)), Math.abs(this.eci.z));
-
     const worldShift = Scene.getInstance().worldShift as [number, number, number];
 
-    this.position[0] = ((this.eci.x + worldShift[0]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
-    this.position[1] = ((this.eci.y + worldShift[1]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
-    this.position[2] = ((this.eci.z + worldShift[2]) / sunMaxDist) * this.DISTANCE_FROM_EARTH;
+    this.position[0] = this.eci.x + worldShift[0];
+    this.position[1] = this.eci.y + worldShift[1];
+    this.position[2] = this.eci.z + worldShift[2];
 
     this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
 
@@ -170,14 +175,14 @@ export class Sun {
      * This is only necessary if the Earth or Moon is the center body.
      * TODO: We should be rotating the unvierse not just the sun
      */
-    if (settingsManager.centerBody === Body.Earth || settingsManager.centerBody === Body.Moon) {
+    if (settingsManager.centerBody === SolarBody.Earth || settingsManager.centerBody === SolarBody.Moon) {
 
       const ros = rotationAxis(Body.Earth, keepTrackApi.getTimeManager().simulationTimeObj);
 
       mat4.rotateY(this.modelViewMatrix_, this.modelViewMatrix_, (ros.dec - 90) * DEG2RAD);
     }
 
-    if (settingsManager.centerBody === Body.Sun) {
+    if (settingsManager.centerBody === SolarBody.Sun) {
       this.rotation[0] += 0.001 * (Math.random() - 0.5);
       this.rotation[1] += 0.001 * (Math.random() - 0.5);
       this.rotation[2] += 0.001 * (Math.random() - 0.5);
@@ -201,12 +206,31 @@ export class Sun {
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
   }
 
-  getEci(j = keepTrackApi.getTimeManager().j) {
+  getEci(j: number): EciArr3 {
+    if (keepTrackApi.getTimeManager().j === j) {
+      return [this.eci.x, this.eci.y, this.eci.z];
+    }
+
     const eci = SatMath.getSunDirection(j);
 
     this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
+    this.position = [this.eci.x, this.eci.y, this.eci.z];
 
     return eci;
+  }
+
+  updateEci() {
+    const j = keepTrackApi.getTimeManager().j;
+
+    if (this.lastUpdateJ === j) {
+      return;
+    }
+
+    const eci = SatMath.getSunDirection(j);
+
+    this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
+    this.position = [this.eci.x, this.eci.y, this.eci.z];
+    this.lastUpdateJ = j;
   }
 
   /**
@@ -227,7 +251,7 @@ export class Sun {
     let adjustedSize = settingsManager.sizeOfSun;
 
     // Apply a random factor to the sun size (±0.1% per frame, clamped to ±5% total)
-    if (settingsManager.centerBody === Body.Sun && ServiceLocator.getMainCamera().zoomLevel() < 0.4) {
+    if (settingsManager.centerBody === SolarBody.Sun && ServiceLocator.getMainCamera().zoomLevel() < 0.4) {
       // No random size changes if we are centered on the sun and zoomed in very close
     } else {
       this.sizeRandomFactor_ += (Math.random() - 0.5) * 0.01;
@@ -235,12 +259,13 @@ export class Sun {
       adjustedSize = settingsManager.isUseSunTexture ? settingsManager.sizeOfSun * 1.5 : settingsManager.sizeOfSun * this.sizeRandomFactor_;
     }
 
+    const distanceFromOrigin = keepTrackApi.getMainCamera().getCameraDistance();
     // TODO: We actually want distance from the sun, not from origin
-    const distanceFromOrigin = keepTrackApi.getMainCamera().zoomLevel() * settingsManager.maxZoomDistance;
+    // TODO: This is ugly...
 
     // Increase sun size when zoomed out very far
-    if (distanceFromOrigin > 2.5e9) {
-      adjustedSize *= 1.0 + (keepTrackApi.getMainCamera().zoomLevel() * settingsManager.maxZoomDistance - 2.5e9) / 5e8;
+    if (distanceFromOrigin >= settingsManager.minZoomDistance) {
+      adjustedSize *= 1.0 + (Math.max(0.3, keepTrackApi.getMainCamera().zoomLevel()) * settingsManager.maxZoomDistance) / 5e8;
     }
 
     gl.uniform3fv(this.mesh.material.uniforms.u_sizeOfSun, [adjustedSize, adjustedSize, adjustedSize]);
@@ -249,7 +274,7 @@ export class Sun {
     gl.uniform1i(this.mesh.material.uniforms.u_sampler, 0);
     gl.uniform1f(this.mesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     gl.uniform1i(this.mesh.material.uniforms.u_isTexture, settingsManager.isUseSunTexture ? 1 : 0);
-    const isSunCenterBody = settingsManager.centerBody === Body.Sun;
+    const isSunCenterBody = settingsManager.centerBody === SolarBody.Sun;
 
     gl.uniform1f(this.mesh.material.uniforms.u_textureBlend, isSunCenterBody ? 0.001 : 0.0);
   }

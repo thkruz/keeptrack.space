@@ -19,38 +19,37 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { EciVec3, Kilometers, Seconds } from '@ootk/src/main';
-import { vec3 } from 'gl-matrix';
-import { settingsManager } from '../../../../settings/settings';
-import { CelestialBody, PlanetColors } from './celestial-body';
+import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { KM_PER_AU } from 'astronomy-engine';
+import { PlanetColors } from './celestial-body';
+import { DwarfPlanet } from './dwarf-planet';
+import { makemakeEarthSvs } from './makemake-state-vectors';
 import { SolarBody } from '@app/engine/core/interfaces';
 
-export enum VenusTextureQuality {
-  HIGH = '4k',
-  ULTRA = '8k'
+export enum MakemakeTextureQuality {
+  MEDIUM = '2k',
+  HIGH = '4k'
 }
 
-export class Venus extends CelestialBody {
-  readonly RADIUS = 6051.8;
+export class Makemake extends DwarfPlanet {
+  readonly RADIUS = 717;
   protected readonly NUM_HEIGHT_SEGS = 64;
   protected readonly NUM_WIDTH_SEGS = 64;
-  color = PlanetColors.VENUS;
-  orbitalPeriod = 0.61519726 * 365 * 24 * 3600 as Seconds;
-  meanDistanceToSun = 108209475 as Kilometers;
+  orbitalPeriod = 306.70 * 365.25 * 24 * 3600 as Seconds;
+  meanDistanceToSun = 45.499 * KM_PER_AU as Kilometers;
+  type: SpaceObjectType = SpaceObjectType.DWARF_PLANET;
   eci: EciVec3;
-
-  getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/venus${VenusTextureQuality.ULTRA}.jpg`;
-  }
+  rotation = [0, 0, Math.PI * 7 / 10];
+  color = PlanetColors.MARS;
+  svDatabase = {
+    [SolarBody.Earth]: makemakeEarthSvs,
+    [SolarBody.Sun]: makemakeEarthSvs,
+  };
 
   getName(): SolarBody {
-    return SolarBody.Venus;
+    return 'Makemake' as SolarBody;
   }
-
-  draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
-    if (!this.isLoaded_ || settingsManager.isDisablePlanets) {
-      return;
-    }
-    super.draw(sunPosition, tgtBuffer);
+  getTexturePath(): string {
+    return `${settingsManager.installDirectory}textures/makemake${MakemakeTextureQuality.HIGH}.jpg`;
   }
 }

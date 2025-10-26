@@ -1,9 +1,9 @@
+import { SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { OrbitPathLine } from '@app/engine/rendering/line-manager/orbit-path';
-import { Body } from 'astronomy-engine';
 import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType, TEME } from '@ootk/src/main';
 import { SatelliteModels } from '../rendering/mesh/model-resolver';
 
@@ -82,7 +82,7 @@ export class OemSatellite extends BaseObject {
     };
   }
 
-  centerBody: Body = Body.Earth;
+  centerBody: SolarBody = SolarBody.Earth;
   isInertialMoonFrame = false;
 
   get stateVectorIdx(): number {
@@ -139,11 +139,11 @@ export class OemSatellite extends BaseObject {
 
     switch (oem.dataBlocks[0].metadata.CENTER_NAME) {
       case 'MARS BARYCENTER':
-        this.centerBody = Body.Mars;
+        this.centerBody = SolarBody.Mars;
         break;
       case 'EARTH':
       default:
-        this.centerBody = Body.Earth;
+        this.centerBody = SolarBody.Earth;
         break;
     }
 
@@ -216,9 +216,9 @@ export class OemSatellite extends BaseObject {
 
     let offsetOrigin = { position: { x: 0, y: 0, z: 0 } };
 
-    if (this.isInertialMoonFrame && this.centerBody === Body.Moon) {
-      offsetOrigin = ServiceLocator.getScene().planets.Moon.getTeme(ServiceLocator.getTimeManager().simulationTimeObj);
-    } else if (this.centerBody === Body.Mars) {
+    if (this.isInertialMoonFrame && this.centerBody === SolarBody.Moon) {
+      offsetOrigin = ServiceLocator.getScene().moons.Moon.getTeme(ServiceLocator.getTimeManager().simulationTimeObj);
+    } else if (this.centerBody === SolarBody.Mars) {
       const eci = ServiceLocator.getScene().planets.Mars.position;
 
       offsetOrigin = {
@@ -405,8 +405,8 @@ export class OemSatellite extends BaseObject {
     let offsetOrigin = { position: { x: 0, y: 0, z: 0 } };
 
     if (this.isInertialMoonFrame) {
-      offsetOrigin = ServiceLocator.getScene().planets.Moon.getTeme(ServiceLocator.getTimeManager().simulationTimeObj);
-    } else if (this.centerBody === Body.Mars) {
+      offsetOrigin = ServiceLocator.getScene().moons.Moon.getTeme(ServiceLocator.getTimeManager().simulationTimeObj);
+    } else if (this.centerBody === SolarBody.Mars) {
       const eci = ServiceLocator.getScene().planets.Mars.position;
 
       offsetOrigin = {
@@ -432,7 +432,7 @@ export class OemSatellite extends BaseObject {
     // Fill pointsOut starting from currentIndex
     for (let i = 0; i < segments; i++) {
       if (i === 0) {
-        if (settingsManager.centerBody !== Body.Earth) {
+        if (settingsManager.centerBody !== SolarBody.Earth) {
           pointsOut[i * 4] = this.position.x - offsetOrigin.position.x;
           pointsOut[i * 4 + 1] = this.position.y - offsetOrigin.position.y;
           pointsOut[i * 4 + 2] = this.position.z - offsetOrigin.position.z;
@@ -449,7 +449,7 @@ export class OemSatellite extends BaseObject {
           let deltaOffsetPos = { x: 0, y: 0, z: 0 };
 
           if (this.isInertialMoonFrame) {
-            const newOffsetPos = ServiceLocator.getScene().planets.Moon.getTeme(new Date(this.orbitFullPathCache_[idx * 4 + 3]));
+            const newOffsetPos = ServiceLocator.getScene().moons.Moon.getTeme(new Date(this.orbitFullPathCache_[idx * 4 + 3]));
 
             deltaOffsetPos = {
               x: newOffsetPos.position.x - offsetOrigin.position.x,
@@ -521,7 +521,7 @@ export class OemSatellite extends BaseObject {
       this.orbitHistoryLine.isGarbage = true;
     }
 
-    this.orbitHistoryLine = lineManager.createOrbitPath(points, LineColors.GREEN);
+    this.orbitHistoryLine = lineManager.createOrbitPath(points, LineColors.GREEN, SolarBody.Earth);
   }
 
   removeOrbitHistory(): void {
@@ -549,7 +549,7 @@ export class OemSatellite extends BaseObject {
       this.pointsForOrbitPath = points;
     }
 
-    this.orbitFullPathLine = lineManager.createOrbitPath(this.pointsForOrbitPath, LineColors.BLUE);
+    this.orbitFullPathLine = lineManager.createOrbitPath(this.pointsForOrbitPath, LineColors.BLUE, SolarBody.Earth);
   }
 
   removeFullOrbitPath(): void {

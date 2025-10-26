@@ -1,5 +1,5 @@
 import { CameraType } from '@app/engine/camera/camera';
-import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
+import { GetSatType, SolarBody, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 
@@ -12,7 +12,6 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { createSampleCovarianceFromTle, DetailedSatellite, DetailedSensor, Kilometers, LandObject, RADIUS_OF_EARTH, SpaceObjectType } from '@ootk/src/main';
-import { Body } from 'astronomy-engine';
 import { vec3 } from 'gl-matrix';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { PlanetsMenuPlugin } from '../planets-menu/planets-menu';
@@ -118,7 +117,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       this.selectSatReset_();
     } else {
 
-      if (obj.position.x === 0 && obj.position.y === 0 && obj.position.z === 0 && obj.name !== Body.Earth) {
+      if (obj.position.x === 0 && obj.position.y === 0 && obj.position.z === 0 && obj.name !== SolarBody.Earth) {
         keepTrackApi.getUiManager().toast('Object is inside the Earth, cannot select it', ToastMsgType.caution);
 
         return;
@@ -164,8 +163,12 @@ export class SelectSatManager extends KeepTrackPlugin {
           hideEl('draw-line-links');
           this.selectSatObject_(obj as MissileObject);
           break;
-        case ('Planet' as unknown as SpaceObjectType):
-          PluginRegistry.getPlugin(PlanetsMenuPlugin)?.changePlanet(obj.name as Body);
+        case (SpaceObjectType.TERRESTRIAL_PLANET):
+        case (SpaceObjectType.GAS_GIANT):
+        case (SpaceObjectType.ICE_GIANT):
+        case (SpaceObjectType.DWARF_PLANET):
+        case (SpaceObjectType.MOON):
+          PluginRegistry.getPlugin(PlanetsMenuPlugin)?.changePlanet(obj.name as SolarBody);
 
           return;
         default:
@@ -236,7 +239,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       keepTrackApi.getOrbitManager().clearSelectOrbit();
     } else if (!(obj instanceof OemSatellite)) {
       // Currently DetailedSatellites and Missiles assume Earth center
-      settingsManager.centerBody = Body.Earth;
+      settingsManager.centerBody = SolarBody.Earth;
       settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
       settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
       PluginRegistry.getPlugin(PlanetsMenuPlugin)?.setAllPlanetsDotSize(0);

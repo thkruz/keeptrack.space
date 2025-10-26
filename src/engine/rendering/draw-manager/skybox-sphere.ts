@@ -21,7 +21,7 @@ export enum MilkyWayTextureQuality {
 }
 
 export class SkyBoxSphere {
-  private readonly DRAW_RADIUS = 1e10; // 10 billion km
+  private readonly DRAW_RADIUS = 3.5e10; // 10 billion km
   private readonly NUM_HEIGHT_SEGS = 16;
   private readonly NUM_WIDTH_SEGS = 16;
 

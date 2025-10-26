@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SolarBody } from '@app/engine/core/interfaces';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { DEG2RAD, EciVec3 } from '@ootk/src/main';
@@ -107,13 +108,13 @@ export class UranusRings extends CelestialBody {
     return `${settingsManager.installDirectory}textures/uranus-rings-alpha${UranusRingsTextureQuality.ULTRA}.png`;
   }
 
-  getName(): Body {
-    return Body.Uranus;
+  getName(): SolarBody {
+    return SolarBody.Uranus;
   }
 
   updatePosition(simTime: Date): void {
-    const pos = backdatePosition(simTime, Body.Earth, Body.Uranus, false);
-    const ros = rotationAxis(Body.Uranus, simTime);
+    const pos = backdatePosition(simTime, SolarBody.Earth as unknown as Body, SolarBody.Uranus as unknown as Body, false);
+    const ros = rotationAxis(SolarBody.Uranus as unknown as Body, simTime);
 
     this.position = [pos.x * KM_PER_AU, pos.y * KM_PER_AU, pos.z * KM_PER_AU];
     this.rotation = [0, (ros.dec - 90) * DEG2RAD, ros.spin * DEG2RAD];

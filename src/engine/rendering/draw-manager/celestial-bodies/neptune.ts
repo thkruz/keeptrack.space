@@ -19,11 +19,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { DEG2RAD, EciVec3, Kilometers, Seconds } from '@ootk/src/main';
-import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
+import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
+import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum NeptuneTextureQuality {
   HIGH = '4k',
@@ -36,6 +36,7 @@ export class Neptune extends CelestialBody {
   protected readonly NUM_WIDTH_SEGS = 64;
   orbitalPeriod = 164.8 * 365.25 * 24 * 3600 as Seconds;
   meanDistanceToSun = 4498396441 as Kilometers;
+  type = SpaceObjectType.ICE_GIANT;
   eci: EciVec3;
   color = PlanetColors.NEPTUNE;
 
@@ -43,16 +44,8 @@ export class Neptune extends CelestialBody {
     return `${settingsManager.installDirectory}textures/neptune${NeptuneTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): Body {
-    return Body.Neptune;
-  }
-
-  updatePosition(simTime: Date): void {
-    const pos = backdatePosition(simTime, Body.Earth, Body.Neptune, false);
-    const ros = rotationAxis(Body.Neptune, simTime);
-
-    this.position = [pos.x * KM_PER_AU, pos.y * KM_PER_AU, pos.z * KM_PER_AU];
-    this.rotation = [0, (ros.dec - 90) * DEG2RAD, ros.spin * DEG2RAD];
+  getName(): SolarBody {
+    return SolarBody.Neptune;
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {

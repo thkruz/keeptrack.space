@@ -19,11 +19,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { DEG2RAD, EciVec3, Kilometers, Seconds } from '@ootk/src/main';
-import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
+import { EciVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
+import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum MercuryTextureQuality {
   HIGH = '4k',
@@ -43,16 +43,8 @@ export class Mercury extends CelestialBody {
     return `${settingsManager.installDirectory}textures/mercury${MercuryTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): Body {
-    return Body.Mercury;
-  }
-
-  updatePosition(simTime: Date): void {
-    const pos = backdatePosition(simTime, Body.Earth, Body.Mercury, false);
-    const ros = rotationAxis(Body.Mercury, simTime);
-
-    this.position = [pos.x * KM_PER_AU, pos.y * KM_PER_AU, pos.z * KM_PER_AU];
-    this.rotation = [0, (ros.dec - 90) * DEG2RAD, ros.spin * DEG2RAD];
+  getName(): SolarBody {
+    return SolarBody.Mercury;
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {

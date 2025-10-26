@@ -19,8 +19,8 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { DEG2RAD, EciVec3, Kilometers, Seconds } from '@ootk/src/main';
-import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
+import { SolarBody } from '@app/engine/core/interfaces';
+import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
@@ -36,6 +36,7 @@ export class Jupiter extends CelestialBody {
   protected readonly NUM_WIDTH_SEGS = 64;
   orbitalPeriod = 11.862 * 365.25 * 24 * 3600 as Seconds;
   meanDistanceToSun = 778340821 as Kilometers;
+  type: SpaceObjectType = SpaceObjectType.GAS_GIANT;
   eci: EciVec3;
   color = PlanetColors.JUPITER;
 
@@ -43,16 +44,8 @@ export class Jupiter extends CelestialBody {
     return `${settingsManager.installDirectory}textures/jupiter${JupiterTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): Body {
-    return Body.Jupiter;
-  }
-
-  updatePosition(simTime: Date): void {
-    const pos = backdatePosition(simTime, Body.Earth, Body.Jupiter, false);
-    const ros = rotationAxis(Body.Jupiter, simTime);
-
-    this.position = [pos.x * KM_PER_AU, pos.y * KM_PER_AU, pos.z * KM_PER_AU];
-    this.rotation = [0, (ros.dec - 90) * DEG2RAD, ros.spin * DEG2RAD];
+  getName(): SolarBody {
+    return SolarBody.Jupiter;
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {

@@ -19,11 +19,11 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SolarBody } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Seconds } from '@ootk/src/main';
-import { Body } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
@@ -48,8 +48,8 @@ export class Moon extends CelestialBody {
     return `${settingsManager.installDirectory}textures/moonmap${MoonTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): Body {
-    return Body.Moon;
+  getName(): SolarBody {
+    return SolarBody.Moon;
   }
 
   update(simTime: Date) {
@@ -73,7 +73,7 @@ export class Moon extends CelestialBody {
   }
 
   updatePosition(simTime: Date): void {
-    const posTeme = this.getTeme(simTime, Body.Earth).position;
+    const posTeme = this.getTeme(simTime, SolarBody.Earth).position;
 
     this.position = [posTeme.x, posTeme.y, posTeme.z];
   }

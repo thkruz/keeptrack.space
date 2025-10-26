@@ -19,12 +19,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { DEG2RAD, EciVec3, Kilometers, Seconds } from '@ootk/src/main';
-import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
+import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
 import { SaturnRings } from './saturn-rings';
+import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum SaturnTextureQuality {
   HIGH = '2k',
@@ -39,6 +39,7 @@ export class Saturn extends CelestialBody {
   orbitalPeriod = 29.4571 * 365.25 * 24 * 3600 as Seconds;
   meanDistanceToSun = 1426666422 as Kilometers;
   eci: EciVec3;
+  type: SpaceObjectType = SpaceObjectType.GAS_GIANT;
   private readonly rings_: SaturnRings;
   color = PlanetColors.SATURN;
 
@@ -56,16 +57,8 @@ export class Saturn extends CelestialBody {
     return `${settingsManager.installDirectory}textures/saturn${SaturnTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): Body {
-    return Body.Saturn;
-  }
-
-  updatePosition(simTime: Date): void {
-    const pos = backdatePosition(simTime, Body.Earth, Body.Saturn, false);
-    const ros = rotationAxis(Body.Saturn, simTime);
-
-    this.position = [pos.x * KM_PER_AU, pos.y * KM_PER_AU, pos.z * KM_PER_AU];
-    this.rotation = [0, (ros.dec - 90) * DEG2RAD, ros.spin * DEG2RAD];
+  getName(): SolarBody {
+    return SolarBody.Saturn;
   }
 
   update(simTime: Date): void {

@@ -3,7 +3,7 @@
  */
 import { SatMath } from '@app/app/analysis/sat-math';
 import { Planet } from '@app/app/objects/planet';
-import { EciArr3, rgbaArray } from '@app/engine/core/interfaces';
+import { EciArr3, SolarBody, rgbaArray } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -16,8 +16,8 @@ import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, TEME, Vector3D } from '@ootk/src/main';
-import { Body, KM_PER_AU, BackdatePosition as backdatePosition } from 'astronomy-engine';
+import { DEG2RAD, EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType, TEME, Vector3D } from '@ootk/src/main';
+import { Body, KM_PER_AU, BackdatePosition as backdatePosition, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { keepTrackApi } from '../../../../keepTrackApi';
 import { DepthManager } from '../../depth-manager';
@@ -26,11 +26,11 @@ import { OrbitPathLine } from '../../line-manager/orbit-path';
 import { OcclusionProgram } from '../post-processing';
 
 export const PlanetColors = {
-  MERCURY: [0.6, 0.6, 0.6, 0.7] as rgbaArray,
-  VENUS: [0.9, 0.8, 0.45, 0.7] as rgbaArray,
-  EARTH: [0, 0.6, 0.8, 0.7] as rgbaArray,
+  MERCURY: [0.59, 0.4, 0.6, 0.95] as rgbaArray,
+  VENUS: [0.69, 0.47, 0.1, 0.95] as rgbaArray,
+  EARTH: [0, 0.6, 0.8, 0.95] as rgbaArray,
   MOON: [0, 0.6, 0.8, 0.7] as rgbaArray,
-  MARS: [0.89, 0.51, 0.35, 0.7] as rgbaArray,
+  MARS: [0.6, 0.3, 0.1, 0.95] as rgbaArray,
   JUPITER: [0.95, 0.71, 0.64, 0.7] as rgbaArray,
   SATURN: [0.72, 0.65, 0.52, 0.7] as rgbaArray,
   URANUS: [0.67, 0.92, 1, 0.7] as rgbaArray,
@@ -52,6 +52,7 @@ export abstract class CelestialBody {
   position = [0, 0, 0] as EciArr3;
   rotation = [0, 0, 0];
   mesh: Mesh;
+  type: SpaceObjectType = SpaceObjectType.TERRESTRIAL_PLANET;
   planetObject: Planet | null = null;
   relativeSatPos: EciVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
 
@@ -64,8 +65,25 @@ export abstract class CelestialBody {
   svCache: { x: Kilometers; y: Kilometers; z: Kilometers }[] = [];
   lastOrbitCalcTime_: number = 0;
 
-  abstract getName(): Body;
+  abstract getName(): SolarBody;
   abstract getTexturePath(): string;
+
+  typeToString(): string {
+    switch (this.type) {
+      case SpaceObjectType.TERRESTRIAL_PLANET:
+        return 'Terrestrial Planet';
+      case SpaceObjectType.GAS_GIANT:
+        return 'Gas Planet';
+      case SpaceObjectType.ICE_GIANT:
+        return 'Ice Giant';
+      case SpaceObjectType.DWARF_PLANET:
+        return 'Dwarf Planet';
+      case SpaceObjectType.MOON:
+        return 'Moon';
+      default:
+        return 'Planet';
+    }
+  }
 
   async init(gl: WebGL2RenderingContext): Promise<void> {
     try {
@@ -115,8 +133,8 @@ export abstract class CelestialBody {
     }
   }
 
-  getJ2000(simTime: Date, centerBody = Body.Earth): J2000 {
-    const pos = backdatePosition(simTime, centerBody, this.getName(), false);
+  getJ2000(simTime: Date, centerBody = SolarBody.Earth): J2000 {
+    const pos = backdatePosition(simTime, centerBody as unknown as Body, this.getName() as unknown as Body, false);
 
     return new J2000(
       new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
@@ -125,14 +143,31 @@ export abstract class CelestialBody {
     );
   }
 
-  getTeme(simTime: Date, centerBody = Body.Earth): TEME {
+  getTeme(simTime: Date, centerBody = SolarBody.Earth): TEME {
     return this.getJ2000(simTime, centerBody).toTEME();
   }
 
+  /**
+   * Update the position of the celestial body relative to earth based on the simulation time.
+   */
   updatePosition(simTime: Date): void {
-    const posTeme = this.getTeme(simTime, Body.Earth).position;
+    const posTeme = this.getTeme(simTime, SolarBody.Sun).position;
+    const sunEntity = ServiceLocator.getScene().sun;
+
+    sunEntity.updateEci();
+    const sunPos = sunEntity.eci;
+
+    posTeme.x = posTeme.x + sunPos.x as Kilometers;
+    posTeme.y = posTeme.y + sunPos.y as Kilometers;
+    posTeme.z = posTeme.z + sunPos.z as Kilometers;
 
     this.position = [posTeme.x, posTeme.y, posTeme.z];
+
+    if (settingsManager.centerBody === this.getName()) {
+      const ros = rotationAxis(this.getName() as unknown as Body, simTime);
+
+      this.rotation = [0, (ros.dec - 90) * DEG2RAD, ros.spin * DEG2RAD];
+    }
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {
@@ -196,7 +231,7 @@ export abstract class CelestialBody {
       return;
     }
     this.updatePosition(simTime);
-    if (this.isDrawOrbitPath) {
+    if (this.isDrawOrbitPath && settingsManager.centerBody !== this.getName()) {
       this.drawFullOrbitPath();
     }
     this.modelViewMatrix_ = mat4.clone(this.mesh.geometry.localMvMatrix);
@@ -212,6 +247,14 @@ export abstract class CelestialBody {
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
 
     this.calculateRelativeSatPos();
+
+    const positionData = ServiceLocator.getDotsManager().positionData;
+
+    if (positionData && this.planetObject?.id) {
+      positionData[this.planetObject.id * 3] = this.position[0];
+      positionData[this.planetObject.id * 3 + 1] = this.position[1];
+      positionData[this.planetObject.id * 3 + 2] = this.position[2];
+    }
   }
 
   protected readonly shaders = {
@@ -253,50 +296,39 @@ export abstract class CelestialBody {
   };
 
   drawFullOrbitPath(): void {
-    const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
-
-    if (this.fullOrbitPath && Math.abs(simulationTimeObj.getTime() - this.lastOrbitCalcTime_) < 1000 * 60 * 60 * 24) { // 24 hour
+    if (this.fullOrbitPath) {
       return;
     }
-    this.lastOrbitCalcTime_ = simulationTimeObj.getTime();
 
+    const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
     const now = simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
     const lineManager = ServiceLocator.getLineManager();
     const timeslice = this.orbitalPeriod / this.orbitPathSegments_;
     const orbitPositions: [number, number, number][] = [];
-    const { j } = SatMath.calculateTimeVariables(simulationTimeObj);
-    const sunPos = ServiceLocator.getScene().sun.getEci(j);
 
     for (let i = 0; i < this.orbitPathSegments_; i++) {
       const t = now + i * timeslice;
       const newTime = new Date(t * 1000);
 
-      this.svCache[i] ??= this.getTeme(newTime, settingsManager.centerBody).position; // convert s to ms
+      this.svCache[i] ??= this.getTeme(newTime, SolarBody.Sun).position; // convert s to ms
       let x = this.svCache[i].x;
       let y = this.svCache[i].y;
       let z = this.svCache[i].z;
 
-      if (settingsManager.centerBody === Body.Sun) {
+      if (settingsManager.centerBody === SolarBody.Sun) {
+        // Do nothing
+      } else if (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon) {
+        const centerBodyPlanet = ServiceLocator.getScene().getBodyById(settingsManager.centerBody);
 
-        x = x + sunPos[0] as Kilometers;
-        y = y + sunPos[1] as Kilometers;
-        z = z + sunPos[2] as Kilometers;
-      } else if (settingsManager.centerBody !== Body.Earth && settingsManager.centerBody !== Body.Moon) {
-        const centerBodyPlanet = ServiceLocator.getScene().planets[settingsManager.centerBody];
-
-        x += centerBodyPlanet.position[0];
-        y += centerBodyPlanet.position[1];
-        z += centerBodyPlanet.position[2];
+        x = x + (centerBodyPlanet?.position[0] ?? 0) as Kilometers;
+        y = y + (centerBodyPlanet?.position[1] ?? 0) as Kilometers;
+        z = z + (centerBodyPlanet?.position[2] ?? 0) as Kilometers;
       }
 
       orbitPositions.push([x, y, z]);
     }
 
-    if (this.fullOrbitPath) {
-      this.fullOrbitPath.isGarbage = true;
-    }
-
-    this.fullOrbitPath = lineManager.createOrbitPath(orbitPositions, this.color);
+    this.fullOrbitPath = lineManager.createOrbitPath(orbitPositions, this.color, SolarBody.Sun);
   }
 
   drawFullOrbitPathRelativeToEarth(): void {
@@ -309,18 +341,18 @@ export abstract class CelestialBody {
       const t = now + i * timeslice;
       const sv = this.getTeme(new Date(t * 1000)).position; // convert s to ms
 
-      if (settingsManager.centerBody === Body.Sun) {
+      if (settingsManager.centerBody === SolarBody.Sun) {
         const sunPos = ServiceLocator.getScene().sun.position;
 
         sv.x = sv.x + sunPos[0] as Kilometers;
         sv.y = sv.y + sunPos[1] as Kilometers;
         sv.z = sv.z + sunPos[2] as Kilometers;
-      } else if (settingsManager.centerBody !== Body.Earth) {
-        const centerBodyPlanet = ServiceLocator.getScene().planets[settingsManager.centerBody];
+      } else if (settingsManager.centerBody !== SolarBody.Earth) {
+        const centerBodyPlanet = ServiceLocator.getScene().getBodyById(settingsManager.centerBody);
 
-        sv.x += centerBodyPlanet.position[0];
-        sv.y += centerBodyPlanet.position[1];
-        sv.z += centerBodyPlanet.position[2];
+        sv.x = sv.x + (centerBodyPlanet?.position[0] ?? 0) as Kilometers;
+        sv.y = sv.y + (centerBodyPlanet?.position[1] ?? 0) as Kilometers;
+        sv.z = sv.z + (centerBodyPlanet?.position[2] ?? 0) as Kilometers;
       }
 
       orbitPositions.push([sv.x as number, sv.y as number, sv.z as number]);
@@ -329,7 +361,7 @@ export abstract class CelestialBody {
     if (this.fullOrbitPathEarthCentered) {
       this.fullOrbitPathEarthCentered.isGarbage = true;
     }
-    this.fullOrbitPathEarthCentered = lineManager.createOrbitPath(orbitPositions, this.color);
+    this.fullOrbitPathEarthCentered = lineManager.createOrbitPath(orbitPositions, this.color, SolarBody.Sun);
   }
 
   protected calculateRelativeSatPos() {

@@ -1,13 +1,11 @@
-import { EciArr3, SatCruncherMessageData } from '../core/interfaces';
+import { EciArr3, SatCruncherMessageData, SolarBody } from '../core/interfaces';
 import { GlUtils } from './gl-utils';
 /* eslint-disable camelcase */
 /* eslint-disable no-useless-escape */
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { BaseObject, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType } from '@ootk/src/main';
-import { Body } from 'astronomy-engine';
 import { mat4 } from 'gl-matrix';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera';
@@ -372,7 +370,7 @@ export class DotsManager {
     this.initProgramPicking();
 
     EventBus.getInstance().on(EventBusEvent.update, this.updatePositionBuffer.bind(this));
-    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, this.interpolatePositionsOfOemSatellites_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, this.interpolatePositionsOfOemSatellites.bind(this));
   }
 
   /**
@@ -615,6 +613,8 @@ export class DotsManager {
     const renderer = ServiceLocator.getRenderer();
     const simTime = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
 
+    // TODO: Decouple OEM logic from TLE logic
+
     if (!settingsManager.lowPerf && (renderer.dtAdjusted > settingsManager.minimumDrawDt || Math.abs(this.lastUpdateSimTime - simTime) > 1000)) {
       if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
         const obj = ServiceLocator.getCatalogManager().objectCache[PluginRegistry.getPlugin(SelectSatManager)!.selectedSat] as DetailedSatellite | MissileObject;
@@ -636,6 +636,7 @@ export class DotsManager {
         } else if (obj instanceof OemSatellite) {
           const sat = obj as OemSatellite;
           const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000 as Seconds;
+          // WARN: Necessary for orbit history
           const pv = sat.updatePosAndVel(now);
 
           if (!pv) {
@@ -649,11 +650,13 @@ export class DotsManager {
           this.velocityData[sat.id * 3 + 2] = pv[5];
         }
       }
-      this.interpolatePositionsOfSatellites_(renderer);
+
+      if (settingsManager.centerBody === SolarBody.Earth || settingsManager.centerBody === SolarBody.Moon) {
+        this.interpolatePositionsOfTleSatellites_(renderer);
+      }
     }
 
-    this.interpolatePositionsOfOemSatellites_();
-    this.updatePlanetPositionDots_();
+    this.interpolatePositionsOfOemSatellites();
 
     this.lastUpdateSimTime = simTime;
   }
@@ -671,7 +674,7 @@ export class DotsManager {
     // If a planet and we aren't centered on Earth or Moon
     if ((i >= this.planetDot1 && i <= this.planetDot2) &&
       // TODO: This is hacky. We need better logic for determining when to show planet dots
-      (settingsManager.maxZoomDistance > (2e6 as Kilometers) || (settingsManager.centerBody !== Body.Earth && settingsManager.centerBody !== Body.Moon))) {
+      (settingsManager.maxZoomDistance > (2e6 as Kilometers) || (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon))) {
       return 1.0; // Return size for planets
     }
 
@@ -868,7 +871,7 @@ export class DotsManager {
    * Updates the velocities of the dots based on the renderer's time delta and the current position data.
    * @param renderer - The WebGL renderer used to calculate the time delta.
    */
-  private interpolatePositionsOfSatellites_(renderer: WebGLRenderer) {
+  private interpolatePositionsOfTleSatellites_(renderer: WebGLRenderer) {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const orbitalSats3 = catalogManagerInstance.orbitalSats * 3;
 
@@ -877,7 +880,7 @@ export class DotsManager {
     }
   }
 
-  private interpolatePositionsOfOemSatellites_() {
+  interpolatePositionsOfOemSatellites() {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const simTime = (ServiceLocator.getTimeManager().simulationTimeObj.getTime() / 1000) as Seconds;
 
@@ -900,35 +903,6 @@ export class DotsManager {
       this.velocityData[oemSat.id * 3] = pv[3];
       this.velocityData[oemSat.id * 3 + 1] = pv[4];
       this.velocityData[oemSat.id * 3 + 2] = pv[5];
-    }
-  }
-
-  private updatePlanetPositionDots_() {
-    const catalogManagerInstance = ServiceLocator.getCatalogManager();
-
-    for (let i = this.planetDot1; i < this.planetDot2; i++) {
-      const planet = catalogManagerInstance.objectCache[i];
-
-      if (!planet || planet.type !== ('Planet' as unknown as SpaceObjectType)) {
-        continue;
-      }
-
-      const planetName = planet.name as Body;
-      const position = keepTrackApi.getScene().getBodyById(planetName)?.position;
-
-      if (!position) {
-        continue;
-      }
-
-      this.positionData[planet.id * 3] = position[0];
-      this.positionData[planet.id * 3 + 1] = position[1];
-      this.positionData[planet.id * 3 + 2] = position[2];
-
-      if (settingsManager.centerBody === planetName) {
-        this.sizeData[planet.id] = 0.0;
-      } else {
-        this.sizeData[planet.id] = 1.0;
-      }
     }
   }
 }

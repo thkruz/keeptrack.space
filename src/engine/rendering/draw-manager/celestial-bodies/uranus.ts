@@ -19,12 +19,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { DEG2RAD, EciVec3, Kilometers, Seconds } from '@ootk/src/main';
-import { BackdatePosition as backdatePosition, Body, KM_PER_AU, RotationAxis as rotationAxis } from 'astronomy-engine';
+import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
 import { UranusRings } from './uranus-rings';
+import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum UranusTextureQuality {
   HIGH = '4k',
@@ -39,6 +39,7 @@ export class Uranus extends CelestialBody {
   orbitalPeriod = 84 * 365.25 * 24 * 3600 as Seconds;
   meanDistanceToSun = 2870658186 as Kilometers;
   eci: EciVec3;
+  type: SpaceObjectType = SpaceObjectType.ICE_GIANT;
   private readonly rings_: UranusRings;
   color = PlanetColors.URANUS;
 
@@ -55,16 +56,8 @@ export class Uranus extends CelestialBody {
     return `${settingsManager.installDirectory}textures/uranus${UranusTextureQuality.ULTRA}.jpg`;
   }
 
-  getName(): Body {
-    return Body.Uranus;
-  }
-
-  updatePosition(simTime: Date): void {
-    const pos = backdatePosition(simTime, Body.Earth, Body.Uranus, false);
-    const ros = rotationAxis(Body.Uranus, simTime);
-
-    this.position = [pos.x * KM_PER_AU, pos.y * KM_PER_AU, pos.z * KM_PER_AU];
-    this.rotation = [0, (ros.dec - 90) * DEG2RAD, ros.spin * DEG2RAD];
+  getName(): SolarBody {
+    return SolarBody.Uranus;
   }
 
   update(simTime: Date): void {

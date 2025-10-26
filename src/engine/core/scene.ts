@@ -1,16 +1,17 @@
-import { ToastMsgType } from '@app/engine/core/interfaces';
+import { SolarBody, ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { Milliseconds } from '@ootk/src/main';
-import { Body } from 'astronomy-engine';
 import { keepTrackApi } from '../../keepTrackApi';
 import { Camera } from '../camera/camera';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { CelestialBody } from '../rendering/draw-manager/celestial-bodies/celestial-body';
+import { DwarfPlanet } from '../rendering/draw-manager/celestial-bodies/dwarf-planet';
 import { Jupiter } from '../rendering/draw-manager/celestial-bodies/jupiter';
+import { Makemake } from '../rendering/draw-manager/celestial-bodies/makemake';
 import { Mars } from '../rendering/draw-manager/celestial-bodies/mars';
 import { Mercury } from '../rendering/draw-manager/celestial-bodies/mercury';
 import { Moon } from '../rendering/draw-manager/celestial-bodies/moon';
@@ -30,6 +31,7 @@ import { Sun } from '../rendering/draw-manager/sun';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
 import { PluginRegistry } from './plugin-registry';
+import { ServiceLocator } from './service-locator';
 
 export interface SceneParams {
   gl: WebGL2RenderingContext;
@@ -44,15 +46,33 @@ export class Scene {
   isScene = true;
   earth: Earth;
   planets: {
-    [Body.Moon]: Moon;
-    [Body.Mars]: Mars;
-    [Body.Mercury]: Mercury;
-    [Body.Venus]: Venus;
-    [Body.Jupiter]: Jupiter;
-    [Body.Saturn]?: CelestialBody;
-    [Body.Uranus]?: CelestialBody;
-    [Body.Neptune]?: CelestialBody;
-    [Body.Pluto]?: CelestialBody;
+    [SolarBody.Mars]: Mars;
+    [SolarBody.Mercury]: Mercury;
+    [SolarBody.Venus]: Venus;
+    [SolarBody.Jupiter]: Jupiter;
+    [SolarBody.Saturn]: CelestialBody;
+    [SolarBody.Uranus]: CelestialBody;
+    [SolarBody.Neptune]: CelestialBody;
+  };
+  moons: {
+    [SolarBody.Moon]: Moon;
+    [SolarBody.Io]?: CelestialBody;
+    [SolarBody.Europa]?: CelestialBody;
+    [SolarBody.Ganymede]?: CelestialBody;
+    [SolarBody.Callisto]?: CelestialBody;
+    [SolarBody.Titan]?: CelestialBody;
+    [SolarBody.Rhea]?: CelestialBody;
+    [SolarBody.Iapetus]?: CelestialBody;
+    [SolarBody.Dione]?: CelestialBody;
+    [SolarBody.Tethys]?: CelestialBody;
+    [SolarBody.Enceladus]?: CelestialBody;
+  };
+  dwarfPlanets: {
+    [SolarBody.Makemake]?: DwarfPlanet;
+    [SolarBody.Pluto]?: CelestialBody;
+    [SolarBody.Eris]?: CelestialBody;
+    [SolarBody.Haumea]?: CelestialBody;
+    [SolarBody.Ceres]?: CelestialBody;
   };
   sun: Sun;
   godrays: Godrays;
@@ -88,14 +108,19 @@ export class Scene {
     this.skybox = new SkyBoxSphere();
     this.earth = new Earth();
     this.planets = {
-      [Body.Moon]: new Moon(),
-      [Body.Mars]: new Mars(),
-      [Body.Mercury]: new Mercury(),
-      [Body.Venus]: new Venus(),
-      [Body.Jupiter]: new Jupiter(),
-      [Body.Saturn]: new Saturn(),
-      [Body.Uranus]: new Uranus(),
-      [Body.Neptune]: new Neptune(),
+      [SolarBody.Mars]: new Mars(),
+      [SolarBody.Mercury]: new Mercury(),
+      [SolarBody.Venus]: new Venus(),
+      [SolarBody.Jupiter]: new Jupiter(),
+      [SolarBody.Saturn]: new Saturn(),
+      [SolarBody.Uranus]: new Uranus(),
+      [SolarBody.Neptune]: new Neptune(),
+    };
+    this.dwarfPlanets = {
+      [SolarBody.Makemake]: new Makemake(),
+    };
+    this.moons = {
+      [SolarBody.Moon]: new Moon(),
     };
     this.sun = new Sun();
     this.godrays = new Godrays();
@@ -110,12 +135,18 @@ export class Scene {
   }
 
   update(simulationTime: Date) {
-    this.sun.getEci();
+    this.sun.updateEci();
     this.updateWorldShift();
     this.sun.update();
     this.earth.update();
     for (const planet of Object.values(this.planets)) {
       planet.update(simulationTime);
+    }
+    for (const moon of Object.values(this.moons)) {
+      moon.update(simulationTime);
+    }
+    for (const dwarfPlanet of Object.values(this.dwarfPlanets)) {
+      dwarfPlanet.update(simulationTime);
     }
     this.skybox.update();
 
@@ -127,21 +158,24 @@ export class Scene {
 
   updateWorldShift() {
     switch (settingsManager.centerBody) {
-      case Body.Mercury:
-      case Body.Venus:
-      case Body.Moon:
-      case Body.Mars:
-      case Body.Jupiter:
-      case Body.Saturn:
-      case Body.Uranus:
-      case Body.Neptune:
-      case Body.Pluto:
-        this.worldShift = this.planets[settingsManager.centerBody]!.position.map((coord: number) => -coord) as [number, number, number];
+      case SolarBody.Mercury:
+      case SolarBody.Venus:
+      case SolarBody.Moon:
+      case SolarBody.Mars:
+      case SolarBody.Jupiter:
+      case SolarBody.Saturn:
+      case SolarBody.Uranus:
+      case SolarBody.Neptune:
+      case SolarBody.Pluto:
+        this.worldShift = (this.getBodyById(settingsManager.centerBody)!.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
         break;
-      case Body.Sun:
+      case SolarBody.Makemake:
+        this.worldShift = (this.dwarfPlanets[settingsManager.centerBody]!.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
+        break;
+      case SolarBody.Sun:
         this.worldShift = [this.sun.eci.x, this.sun.eci.y, this.sun.eci.z].map((coord: number) => -coord) as [number, number, number];
         break;
-      case Body.Earth:
+      case SolarBody.Earth:
       default:
         this.worldShift = [0, 0, 0];
     }
@@ -164,8 +198,8 @@ export class Scene {
     this.renderOpaque(renderer, camera);
     this.renderTransparent(renderer, camera);
 
-    this.sensorFovFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
-    this.coneFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
+    this.sensorFovFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer as WebGLBuffer);
+    this.coneFactory.drawAll(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer as WebGLBuffer);
   }
 
   averageDrawTime = 0;
@@ -187,18 +221,23 @@ export class Scene {
         // Draw the Sun to the Godrays Frame Buffer
         this.sun.draw(this.earth.lightDirection, fb);
 
-        // Draw a black earth mesh on top of the sun in the godrays frame buffer
-        this.planets[settingsManager.centerBody]?.drawOcclusion(
-          camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
-        );
+        const sceneManager = ServiceLocator.getScene();
+        const centerBodyEntity = sceneManager.getBodyById(settingsManager.centerBody);
 
-        if (settingsManager.centerBody === Body.Earth) {
-          this.planets[Body.Moon].drawOcclusion(
+        // Draw a black earth mesh on top of the sun in the godrays frame buffer
+        if (centerBodyEntity?.drawOcclusion) {
+          centerBodyEntity?.drawOcclusion(
             camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
           );
         }
 
-        if (settingsManager.centerBody === Body.Moon) {
+        if (settingsManager.centerBody === SolarBody.Earth) {
+          sceneManager.getBodyById(SolarBody.Moon)?.drawOcclusion(
+            camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
+          );
+        }
+
+        if (settingsManager.centerBody === SolarBody.Moon) {
           this.earth.drawOcclusion(
             camera.projectionMatrix, camera.matrixWorldInverse, renderer?.postProcessingManager?.programs?.occlusion, this.frameBuffers.godrays,
           );
@@ -221,9 +260,14 @@ export class Scene {
       this.skybox.render(renderer.postProcessingManager.curBuffer);
 
       if (!settingsManager.isDisablePlanets) {
-        Object.values(this.planets).forEach((planet) => {
-          planet.draw(this.sun.position, renderer.postProcessingManager.curBuffer);
-        });
+        if (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Sun) {
+          this.getBodyById(settingsManager.centerBody)?.draw(this.sun.position, renderer.postProcessingManager.curBuffer);
+        }
+
+        if (settingsManager.centerBody === SolarBody.Earth || settingsManager.centerBody === SolarBody.Moon) {
+          this.earth.draw(renderer.postProcessingManager.curBuffer);
+          this.getBodyById(SolarBody.Moon)?.draw(this.sun.position, renderer.postProcessingManager.curBuffer);
+        }
       }
 
       keepTrackApi.emit(EventBusEvent.drawOptionalScenery);
@@ -358,27 +402,24 @@ export class Scene {
      */
   }
 
-  getBodyById(id: Body): CelestialBody | Earth | null {
-    switch (id) {
-      case Body.Earth:
+  getBodyById(solarBody: SolarBody): CelestialBody | Earth | null {
+    switch (solarBody) {
+      case SolarBody.Earth:
         return this.earth;
-      case Body.Moon:
-        return this.planets[Body.Moon];
-      case Body.Mars:
-        return this.planets[Body.Mars];
-      case Body.Mercury:
-        return this.planets[Body.Mercury];
-      case Body.Venus:
-        return this.planets[Body.Venus];
-      case Body.Jupiter:
-        return this.planets[Body.Jupiter];
-      case Body.Saturn:
-        return this.planets[Body.Saturn] ?? null;
-      case Body.Uranus:
-        return this.planets[Body.Uranus] ?? null;
-      case Body.Neptune:
-        return this.planets[Body.Neptune] ?? null;
-      case Body.Sun:
+      case SolarBody.Moon:
+        return this.moons[SolarBody.Moon] ?? null;
+      case SolarBody.Mercury:
+      case SolarBody.Venus:
+      case SolarBody.Mars:
+      case SolarBody.Jupiter:
+      case SolarBody.Saturn:
+      case SolarBody.Uranus:
+      case SolarBody.Neptune:
+        return this.planets[solarBody] ?? null;
+      case SolarBody.Pluto:
+      case SolarBody.Makemake:
+        return this.dwarfPlanets[solarBody] ?? null;
+      case SolarBody.Sun:
         return this.sun as unknown as CelestialBody;
       default:
         return null;
@@ -398,6 +439,12 @@ export class Scene {
       if (!settingsManager.isDisablePlanets) {
         for (const planet of Object.values(this.planets)) {
           planet.init(this.gl_);
+        }
+        for (const moon of Object.values(this.moons)) {
+          moon.init(this.gl_);
+        }
+        for (const dwarfPlanet of Object.values(this.dwarfPlanets)) {
+          dwarfPlanet.init(this.gl_);
         }
       }
 

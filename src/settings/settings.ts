@@ -19,7 +19,7 @@
  */
 
 import { MobileManager } from '@app/app/ui/mobileManager';
-import { MenuMode, SensorGeolocation } from '@app/engine/core/interfaces';
+import { MenuMode, SensorGeolocation, SolarBody } from '@app/engine/core/interfaces';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
@@ -27,7 +27,6 @@ import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schem
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { Degrees, Kilometers, Milliseconds, Radians } from '@ootk/src/main';
-import { Body } from 'astronomy-engine';
 import { ClassificationString } from '../app/ui/classification';
 import { RADIUS_OF_EARTH } from '../engine/utils/constants';
 import { isThisNode } from '../engine/utils/isThisNode';
@@ -507,7 +506,7 @@ export class SettingsManager {
     maxrange: null,
   };
 
-  centerBody: Body = Body.Earth;
+  centerBody: SolarBody = SolarBody.Earth;
 
   altMsgNum = null;
   altLoadMsgs = false;

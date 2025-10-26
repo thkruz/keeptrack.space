@@ -1,11 +1,9 @@
 /* eslint-disable max-lines */
-import { rgbaArray } from '@app/engine/core/interfaces';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { rgbaArray, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { StringPad } from '@app/engine/utils/stringPad';
-import { PlanetsMenuPlugin } from '@app/plugins/planets-menu/planets-menu';
 import { CruncerMessageTypes, CruncherSat } from '@app/webworker/positionCruncher';
 import {
   BaseObject,
@@ -22,7 +20,6 @@ import {
   TleLine1,
   TleLine2,
 } from '@ootk/src/main';
-import { Body } from 'astronomy-engine';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
 import { Planet } from '../objects/planet';
@@ -394,14 +391,23 @@ export class CatalogLoader {
 
     dotsManagerInstance.planetDot1 = tempObjData.length;
 
-    const planetNames = PluginRegistry.getPlugin(PlanetsMenuPlugin)?.PLANETS;
     const planetList = ServiceLocator.getScene().planets;
+    const dwarfPlanetList = ServiceLocator.getScene().dwarfPlanets;
 
-    if (planetNames && planetList) {
-      planetNames.forEach((planet) => {
+    dwarfPlanetList.Makemake!.planetObject = new Planet({
+      id: tempObjData.length,
+      name: 'Makemake',
+      type: SpaceObjectType.DWARF_PLANET,
+    });
+    dwarfPlanetList.Makemake!.planetObject.color = [1.0, 0.8, 0.6, 1.0] as rgbaArray;
+    tempObjData.push(dwarfPlanetList.Makemake!.planetObject);
+
+    if (planetList) {
+      Object.keys(planetList).forEach((planet) => {
         const planetDot = new Planet({
           id: tempObjData.length,
           name: planet,
+          type: planetList[planet]?.type ?? SpaceObjectType.UNKNOWN,
         });
 
         planetDot.color = planetList[planet]?.color ?? [1.0, 1.0, 1.0, 1.0] as rgbaArray;
@@ -413,26 +419,25 @@ export class CatalogLoader {
       });
 
       // Add the Moon if Earth is present
-      if (planetNames.includes(Body.Earth)) {
-        const earth = new Planet({
-          id: tempObjData.length,
-          name: Body.Earth,
-        });
+      const earthDot = new Planet({
+        id: tempObjData.length,
+        name: SolarBody.Earth,
+        type: SpaceObjectType.TERRESTRIAL_PLANET,
+      });
 
-        earth.color = (planetList[Body.Earth]?.color ?? [0.0, 0.5, 1.0, 1.0]) as rgbaArray;
-        keepTrackApi.getScene().earth.planetObject = earth;
-        tempObjData.push(earth);
+      earthDot.color = (planetList[SolarBody.Earth]?.color ?? [0.0, 0.5, 1.0, 1.0]) as rgbaArray;
+      keepTrackApi.getScene().earth.planetObject = earthDot;
+      tempObjData.push(earthDot);
 
-        // const moonDot = new Planet({
-        //   id: tempObjData.length,
-        //   name: Body.Moon,
-        // });
+      // const moonDot = new Planet({
+      //   id: tempObjData.length,
+      //   name: SolarBody.Moon,
+      // });
 
-        // moonDot.color = (planetList[Body.Moon]?.color ?? [1.0, 1.0, 1.0, 1.0]) as rgbaArray;
-        // keepTrackApi.getScene().planets.Moon.planetObject = moonDot;
+      // moonDot.color = (planetList[SolarBody.Moon]?.color ?? [1.0, 1.0, 1.0, 1.0]);
+      // keepTrackApi.getScene().planets.Moon.planetObject = moonDot;
 
-        // tempObjData.push(moonDot);
-      }
+      // tempObjData.push(moonDot);
     }
 
     dotsManagerInstance.planetDot2 = tempObjData.length;

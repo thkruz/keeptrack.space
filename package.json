@@ -167,5 +167,8 @@
     "resizable": "^1.2.1",
     "uuid": "^11.1.0",
     "webgl-obj-loader": "^2.0.8"
+  },
+  "volta": {
+    "node": "25.0.0"
   }
 }

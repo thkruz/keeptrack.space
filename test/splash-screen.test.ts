@@ -26,8 +26,6 @@ describe('SplashScreen_class', () => {
 
   // Tests that the loading screen is resized and hidden after a timeout when running on desktop
   it('test_hide_splash_screen_desktop', () => {
-    keepTrackApi.getScene().earth.isUseHiRes = true;
-    keepTrackApi.getScene().earth.isHiResReady = true;
     SplashScreen.hideSplashScreen();
     // Wait for timers to finish
     jest.advanceTimersByTime(1000);

@@ -101,8 +101,6 @@ export class Earth {
     [EarthCloudTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
   };
   private vaoOcclusion_: WebGLVertexArrayObject;
-  isHiResReady: boolean;
-  isUseHiRes: boolean;
   /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
   surfaceMesh: Mesh;
@@ -147,14 +145,7 @@ export class Earth {
   }
 
   useHighestQualityTexture(): void {
-    settingsManager.earthDayTextureQuality = EarthDayTextureQuality.HIGH;
-    settingsManager.earthNightTextureQuality = EarthNightTextureQuality.HIGH;
-    settingsManager.earthBumpTextureQuality = EarthBumpTextureQuality.HIGH;
-    settingsManager.earthSpecTextureQuality = EarthSpecTextureQuality.HIGH;
-    settingsManager.earthPoliticalTextureQuality = EarthPoliticalTextureQuality.HIGH;
-    settingsManager.earthCloudTextureQuality = EarthCloudTextureQuality.ULTRA;
-
-    this.initTextures_();
+    // Nothing to do here since we always load the highest quality first
   }
 
   /**

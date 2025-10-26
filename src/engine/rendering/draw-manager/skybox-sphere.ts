@@ -1,5 +1,3 @@
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -40,7 +38,7 @@ export class SkyBoxSphere {
   private textureGraySkybox_: WebGLTexture;
   mesh: Mesh;
   private isLoaded_ = false;
-  DEFAULT_RESOLUTION = MilkyWayTextureQuality.LOW;
+  DEFAULT_RESOLUTION = MilkyWayTextureQuality.MEDIUM;
   MILKYWAY_SRC_BASE = 'skybox';
   textureMilkyWay: Record<MilkyWayTextureQuality, WebGLTexture> = {
     [MilkyWayTextureQuality.OFF]: <WebGLTexture><unknown>null,
@@ -226,11 +224,6 @@ export class SkyBoxSphere {
     });
     this.mesh.geometry.initVao(this.mesh.program);
 
-    EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
-      settingsManager.milkyWayTextureQuality = MilkyWayTextureQuality.ULTRA;
-      this.initTextures_();
-    });
-
     this.isLoaded_ = true;
   }
 
@@ -252,7 +245,6 @@ export class SkyBoxSphere {
     sm.milkyWayTextureQuality ??= this.DEFAULT_RESOLUTION;
 
     if (sm.isDrawMilkyWay && !this.textureMilkyWay[sm.milkyWayTextureQuality] && sm.milkyWayTextureQuality !== MilkyWayTextureQuality.OFF) {
-      this.textureMilkyWay[sm.milkyWayTextureQuality] = this.gl_.createTexture();
       GlUtils.initTexture(this.gl_, `${this.getSrc_(this.MILKYWAY_SRC_BASE, sm.milkyWayTextureQuality, 'jpg')}`).then((texture) => {
         this.textureMilkyWay[sm.milkyWayTextureQuality] = texture;
         this.isTexturesReady_ = true;

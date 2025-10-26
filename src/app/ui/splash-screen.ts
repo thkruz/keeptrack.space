@@ -1,8 +1,8 @@
 import { t7e, TranslationKey } from '@app/locales/keys';
 import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
-import { keepTrackApi } from '../../keepTrackApi';
 import { MobileManager } from './mobileManager';
 
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import blueMarbleJpg from '@public/img/wallpaper/blue-marble.jpg';
@@ -25,7 +25,6 @@ import satJpg from '@public/img/wallpaper/sat.jpg';
 import sat2Jpg from '@public/img/wallpaper/sat2.jpg';
 import telescopeJpg from '@public/img/wallpaper/telescope.jpg';
 import thuleJpg from '@public/img/wallpaper/thule.jpg';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export abstract class SplashScreen {
   /** An image is picked at random and then if the screen is bigger than 1080p then it loads the next one in the list */
@@ -105,15 +104,6 @@ export abstract class SplashScreen {
   }
 
   static hideSplashScreen() {
-    // Don't wait if we are running Jest
-    if (keepTrackApi.getScene().earth.isUseHiRes && keepTrackApi.getScene().earth.isHiResReady !== true) {
-      setTimeout(() => {
-        SplashScreen.hideSplashScreen();
-      }, 100);
-
-      return;
-    }
-
     MobileManager.checkMobileMode();
 
     if (settingsManager.isMobileModeEnabled) {
@@ -192,13 +182,13 @@ export abstract class SplashScreen {
       loadingDom.style.backgroundRepeat = 'no-repeat';
     }
 
-    // Preload the rest of the images after 30 seconds
+    // Preload the rest of the images after 3 minutes
     setTimeout(() => {
       this.splashScreenImgList_.forEach((img) => {
         const preloadImg = new Image();
 
         preloadImg.src = img;
       });
-    }, 30000);
+    }, 3 * 60 * 1000);
   }
 }

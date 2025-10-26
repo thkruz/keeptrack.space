@@ -109,10 +109,6 @@ export abstract class GlUtils {
       gl.bindTexture(gl.TEXTURE_2D, texture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgBitmap);
 
-      // eslint-disable-next-line no-sync
-      gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
-      gl.flush(); // don’t block
-
       if (GlUtils.isPowerOf2(imgBitmap.width) && GlUtils.isPowerOf2(imgBitmap.height)) {
         // power of 2: generate mipmaps and set trilinear filtering + repeat
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
@@ -143,6 +139,28 @@ export abstract class GlUtils {
     } catch (err) {
       throw new Error(`Failed to load image: ${url} - ${err instanceof Error ? err.message : String(err)}`);
     }
+  }
+
+  static getBestTexture(textureMap: Record<string, WebGLTexture>): WebGLTexture {
+    const qualityOrder = [
+      '16k',
+      '8k',
+      '4k',
+      '2k',
+      '1k',
+      '512',
+    ];
+
+    for (const quality of qualityOrder) {
+      const texture = textureMap[quality];
+
+      if (texture) {
+        return texture;
+      }
+    }
+
+    // If no texture is found, return null
+    return null as unknown as WebGLTexture;
   }
 
   /**

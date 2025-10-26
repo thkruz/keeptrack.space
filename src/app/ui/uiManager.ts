@@ -42,6 +42,7 @@ import { LayersManager } from './layers-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 import { UiValidation } from './ui-validation';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
@@ -89,6 +90,7 @@ export class UiManager {
   /** This runs after the drawManagerInstance starts */
   static postStart() {
     UiValidation.initUiValidation();
+    ServiceLocator.getRenderer().resizeCanvas(true);
 
     setTimeout(() => {
       const imageElements = document.querySelectorAll('img') as unknown as {

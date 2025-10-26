@@ -19,13 +19,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SolarBody } from '@app/engine/core/interfaces';
 import { EciVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
-import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum MarsTextureQuality {
+  POTATO = '512',
+  LOW = '1k',
   HIGH = '4k',
   ULTRA = '8k'
 }
@@ -39,9 +41,15 @@ export class Mars extends CelestialBody {
   eci: EciVec3;
   rotation = [0, 0, Math.PI * 7 / 10];
   color = PlanetColors.MARS;
+  textureQuality = MarsTextureQuality.POTATO;
 
   getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/mars${MarsTextureQuality.ULTRA}.jpg`;
+    return `${settingsManager.installDirectory}textures/mars${this.textureQuality}.jpg`;
+  }
+
+  useHighestQualityTexture(): void {
+    this.textureQuality = MarsTextureQuality.ULTRA;
+    this.loadTexture();
   }
 
   getName(): SolarBody {

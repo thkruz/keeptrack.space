@@ -19,13 +19,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SolarBody } from '@app/engine/core/interfaces';
 import { EciVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
-import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum VenusTextureQuality {
+  POTATO = '512',
   HIGH = '4k',
   ULTRA = '8k'
 }
@@ -38,9 +39,15 @@ export class Venus extends CelestialBody {
   orbitalPeriod = 0.61519726 * 365 * 24 * 3600 as Seconds;
   meanDistanceToSun = 108209475 as Kilometers;
   eci: EciVec3;
+  textureQuality: VenusTextureQuality = VenusTextureQuality.POTATO;
 
   getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/venus${VenusTextureQuality.ULTRA}.jpg`;
+    return `${settingsManager.installDirectory}textures/venus${this.textureQuality}.jpg`;
+  }
+
+  useHighestQualityTexture(): void {
+    this.textureQuality = VenusTextureQuality.ULTRA;
+    this.loadTexture();
   }
 
   getName(): SolarBody {

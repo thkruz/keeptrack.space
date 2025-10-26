@@ -19,15 +19,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SolarBody } from '@app/engine/core/interfaces';
 import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
 import { UranusRings } from './uranus-rings';
-import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum UranusTextureQuality {
-  HIGH = '4k',
+  POTATO = '512',
   ULTRA = '2k'
 }
 
@@ -42,6 +42,7 @@ export class Uranus extends CelestialBody {
   type: SpaceObjectType = SpaceObjectType.ICE_GIANT;
   private readonly rings_: UranusRings;
   color = PlanetColors.URANUS;
+  textureQuality: UranusTextureQuality = UranusTextureQuality.POTATO;
 
   constructor() {
     super();
@@ -53,7 +54,12 @@ export class Uranus extends CelestialBody {
   }
 
   getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/uranus${UranusTextureQuality.ULTRA}.jpg`;
+    return `${settingsManager.installDirectory}textures/uranus${this.textureQuality}.jpg`;
+  }
+
+  useHighestQualityTexture(): void {
+    this.textureQuality = UranusTextureQuality.ULTRA;
+    this.loadTexture();
   }
 
   getName(): SolarBody {

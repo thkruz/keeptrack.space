@@ -133,6 +133,18 @@ export abstract class CelestialBody {
     }
   }
 
+  loadTexture(): void {
+    const gl = this.gl_;
+
+    GlUtils.initTexture(gl, this.getTexturePath()).then((texture) => {
+      this.mesh.material.map = texture;
+    }).catch((e) => {
+      errorManagerInstance.warn(`Error updating texture for ${this.getName()}:`, e);
+    });
+  }
+
+  abstract useHighestQualityTexture(): void
+
   getJ2000(simTime: Date, centerBody = SolarBody.Earth): J2000 {
     const pos = backdatePosition(simTime, centerBody as unknown as Body, this.getName() as unknown as Body, false);
 

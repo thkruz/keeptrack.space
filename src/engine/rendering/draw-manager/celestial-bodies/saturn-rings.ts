@@ -102,6 +102,10 @@ export class SaturnRings extends CelestialBody {
     return `${settingsManager.installDirectory}textures/saturn-rings${SaturnRingsTextureQuality.ULTRA}.jpg`;
   }
 
+  useHighestQualityTexture(): void {
+    // Do nothing for now
+  }
+
   getAlphaPath(): string {
     return `${settingsManager.installDirectory}textures/saturn-rings-alpha${SaturnRingsTextureQuality.ULTRA}.png`;
   }

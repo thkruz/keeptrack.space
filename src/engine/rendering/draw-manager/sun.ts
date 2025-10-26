@@ -114,7 +114,7 @@ export class Sun {
       widthSegments: this.NUM_WIDTH_SEGS,
       heightSegments: this.NUM_HEIGHT_SEGS,
     });
-    const sunTextureQuality = settingsManager.sunTextureQuality ?? SunTextureQuality.HIGH;
+    const sunTextureQuality = settingsManager.sunTextureQuality ?? SunTextureQuality.POTATO;
     const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun${sunTextureQuality}.jpg`);
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
@@ -259,11 +259,12 @@ export class Sun {
     }
 
     const distanceFromOrigin = keepTrackApi.getMainCamera().getCameraDistance();
+    const centerBody = settingsManager.centerBody;
     // TODO: We actually want distance from the sun, not from origin
     // TODO: This is ugly...
 
     // Increase sun size when zoomed out very far
-    if (distanceFromOrigin >= settingsManager.minZoomDistance) {
+    if (((centerBody === SolarBody.Mercury || centerBody === SolarBody.Venus || centerBody === SolarBody.Mars) && distanceFromOrigin >= 3e9) || distanceFromOrigin >= 1e9) {
       adjustedSize *= 1.0 + (Math.max(0.3, keepTrackApi.getMainCamera().zoomLevel()) * settingsManager.maxZoomDistance) / 5e8;
     }
 

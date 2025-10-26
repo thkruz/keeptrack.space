@@ -19,13 +19,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SolarBody } from '@app/engine/core/interfaces';
 import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
-import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum NeptuneTextureQuality {
+  POTATO = '512',
   HIGH = '4k',
   ULTRA = '2k'
 }
@@ -39,13 +40,19 @@ export class Neptune extends CelestialBody {
   type = SpaceObjectType.ICE_GIANT;
   eci: EciVec3;
   color = PlanetColors.NEPTUNE;
+  textureQuality: NeptuneTextureQuality = NeptuneTextureQuality.POTATO;
 
   getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/neptune${NeptuneTextureQuality.ULTRA}.jpg`;
+    return `${settingsManager.installDirectory}textures/neptune${this.textureQuality}.jpg`;
   }
 
   getName(): SolarBody {
     return SolarBody.Neptune;
+  }
+
+  useHighestQualityTexture(): void {
+    this.textureQuality = NeptuneTextureQuality.ULTRA;
+    this.loadTexture();
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {

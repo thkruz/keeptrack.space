@@ -17,7 +17,7 @@ export enum EarthNightTextureQuality {
 
 export enum EarthSpecTextureQuality {
   OFF = 'off',
-  POTATO = '512',
+  POTATO = '256',
   LOW = '1k',
   MEDIUM = '2k',
   HIGH = '4k',

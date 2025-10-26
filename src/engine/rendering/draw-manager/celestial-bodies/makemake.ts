@@ -19,14 +19,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SolarBody } from '@app/engine/core/interfaces';
 import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { KM_PER_AU } from 'astronomy-engine';
 import { PlanetColors } from './celestial-body';
 import { DwarfPlanet } from './dwarf-planet';
 import { makemakeEarthSvs } from './makemake-state-vectors';
-import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum MakemakeTextureQuality {
+  POTATO = '512',
   MEDIUM = '2k',
   HIGH = '4k'
 }
@@ -41,6 +42,7 @@ export class Makemake extends DwarfPlanet {
   eci: EciVec3;
   rotation = [0, 0, Math.PI * 7 / 10];
   color = PlanetColors.MARS;
+  textureQuality: MakemakeTextureQuality = MakemakeTextureQuality.POTATO;
   svDatabase = {
     [SolarBody.Earth]: makemakeEarthSvs,
     [SolarBody.Sun]: makemakeEarthSvs,
@@ -50,6 +52,11 @@ export class Makemake extends DwarfPlanet {
     return 'Makemake' as SolarBody;
   }
   getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/makemake${MakemakeTextureQuality.HIGH}.jpg`;
+    return `${settingsManager.installDirectory}textures/makemake${this.textureQuality}.jpg`;
+  }
+
+  useHighestQualityTexture(): void {
+    this.textureQuality = MakemakeTextureQuality.HIGH;
+    this.loadTexture();
   }
 }

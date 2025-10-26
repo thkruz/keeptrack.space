@@ -146,6 +146,17 @@ export class Earth {
     PersistenceManager.getInstance().saveItem(StorageKey.LAST_MAP, style);
   }
 
+  useHighestQualityTexture(): void {
+    settingsManager.earthDayTextureQuality = EarthDayTextureQuality.HIGH;
+    settingsManager.earthNightTextureQuality = EarthNightTextureQuality.HIGH;
+    settingsManager.earthBumpTextureQuality = EarthBumpTextureQuality.HIGH;
+    settingsManager.earthSpecTextureQuality = EarthSpecTextureQuality.HIGH;
+    settingsManager.earthPoliticalTextureQuality = EarthPoliticalTextureQuality.HIGH;
+    settingsManager.earthCloudTextureQuality = EarthCloudTextureQuality.ULTRA;
+
+    this.initTextures_();
+  }
+
   /**
    * This is run once per frame to render the earth in godrays buffer.
    */

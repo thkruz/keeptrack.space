@@ -26,6 +26,7 @@ import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
 
 export enum JupiterTextureQuality {
+  POTATO = '512',
   HIGH = '2k',
   ULTRA = '4k'
 }
@@ -39,13 +40,19 @@ export class Jupiter extends CelestialBody {
   type: SpaceObjectType = SpaceObjectType.GAS_GIANT;
   eci: EciVec3;
   color = PlanetColors.JUPITER;
+  textureQuality: JupiterTextureQuality = JupiterTextureQuality.POTATO;
 
   getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/jupiter${JupiterTextureQuality.ULTRA}.jpg`;
+    return `${settingsManager.installDirectory}textures/jupiter${this.textureQuality}.jpg`;
   }
 
   getName(): SolarBody {
     return SolarBody.Jupiter;
+  }
+
+  useHighestQualityTexture(): void {
+    this.textureQuality = JupiterTextureQuality.ULTRA;
+    this.loadTexture();
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {

@@ -19,13 +19,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SolarBody } from '@app/engine/core/interfaces';
 import { EciVec3, Kilometers, Seconds } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
-import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum MercuryTextureQuality {
+  POTATO = '512',
   HIGH = '4k',
   ULTRA = '8k'
 }
@@ -38,13 +39,19 @@ export class Mercury extends CelestialBody {
   orbitalPeriod = 0.2408467 * 365 * 24 * 3600 as Seconds;
   meanDistanceToSun = 57909227 as Kilometers;
   eci: EciVec3;
+  textureQuality: MercuryTextureQuality = MercuryTextureQuality.POTATO;
 
   getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/mercury${MercuryTextureQuality.ULTRA}.jpg`;
+    return `${settingsManager.installDirectory}textures/mercury${this.textureQuality}.jpg`;
   }
 
   getName(): SolarBody {
     return SolarBody.Mercury;
+  }
+
+  useHighestQualityTexture(): void {
+    this.textureQuality = MercuryTextureQuality.ULTRA;
+    this.loadTexture();
   }
 
   draw(sunPosition: vec3, tgtBuffer: WebGLFramebuffer | null = null) {

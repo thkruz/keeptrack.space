@@ -19,14 +19,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { SolarBody } from '@app/engine/core/interfaces';
 import { EciVec3, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { settingsManager } from '../../../../settings/settings';
 import { CelestialBody, PlanetColors } from './celestial-body';
 import { SaturnRings } from './saturn-rings';
-import { SolarBody } from '@app/engine/core/interfaces';
 
 export enum SaturnTextureQuality {
+  POTATO = '512',
   HIGH = '2k',
   ULTRA = '4k'
 }
@@ -42,6 +43,7 @@ export class Saturn extends CelestialBody {
   type: SpaceObjectType = SpaceObjectType.GAS_GIANT;
   private readonly rings_: SaturnRings;
   color = PlanetColors.SATURN;
+  textureQuality: SaturnTextureQuality = SaturnTextureQuality.POTATO;
 
   constructor() {
     super();
@@ -54,7 +56,12 @@ export class Saturn extends CelestialBody {
   }
 
   getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/saturn${SaturnTextureQuality.ULTRA}.jpg`;
+    return `${settingsManager.installDirectory}textures/saturn${this.textureQuality}.jpg`;
+  }
+
+  useHighestQualityTexture(): void {
+    this.textureQuality = SaturnTextureQuality.ULTRA;
+    this.loadTexture();
   }
 
   getName(): SolarBody {

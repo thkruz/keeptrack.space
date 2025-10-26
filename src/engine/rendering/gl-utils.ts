@@ -91,20 +91,58 @@ export abstract class GlUtils {
   // eslint-disable-next-line require-await
   static async initTexture(gl: WebGL2RenderingContext, url: string): Promise<WebGLTexture> {
     const texture = gl.createTexture();
-    const img = new Image();
 
-    img.decoding = 'async';
-    img.src = url;
+    try {
+      const resp = await fetch(url);
 
-    return new Promise<WebGLTexture>((resolve, reject) => {
-      img.onload = () => {
-        GlUtils.bindImageToTexture(gl, texture, img);
-        resolve(texture);
-      };
-      img.onerror = () => {
-        reject(new Error(`Failed to load image: ${url}`));
-      };
-    });
+      if (!resp.ok) {
+        throw new Error(`Failed to fetch image: ${url} (${resp.status})`);
+      }
+
+      const blob = await resp.blob();
+      const imgBitmap = await createImageBitmap(blob, { premultiplyAlpha: 'none', imageOrientation: 'none' });
+
+      gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+      gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
+
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgBitmap);
+
+      // eslint-disable-next-line no-sync
+      gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+      gl.flush(); // don’t block
+
+      if (GlUtils.isPowerOf2(imgBitmap.width) && GlUtils.isPowerOf2(imgBitmap.height)) {
+        // power of 2: generate mipmaps and set trilinear filtering + repeat
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+
+        const ext = gl.getExtension('EXT_texture_filter_anisotropic');
+
+        if (ext) {
+          const maxAnisotropy = gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+
+          gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy);
+        }
+
+        gl.generateMipmap(gl.TEXTURE_2D);
+      } else {
+        // not power of 2: clamp and linear filtering
+        // eslint-disable-next-line no-console
+        console.warn(`Texture ${url} is not power of 2!`);
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      }
+
+      return texture;
+    } catch (err) {
+      throw new Error(`Failed to load image: ${url} - ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   /**

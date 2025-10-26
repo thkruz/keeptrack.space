@@ -104,6 +104,10 @@ export class UranusRings extends CelestialBody {
     return `${settingsManager.installDirectory}textures/uranus-rings${UranusRingsTextureQuality.ULTRA}.jpg`;
   }
 
+  useHighestQualityTexture(): void {
+    // Do nothing for now
+  }
+
   getAlphaPath(): string {
     return `${settingsManager.installDirectory}textures/uranus-rings-alpha${UranusRingsTextureQuality.ULTRA}.png`;
   }

@@ -43,13 +43,19 @@ export class Moon extends CelestialBody {
   orbitalPeriod = 27.321661 * 24 * 3600 as Seconds;
   color = PlanetColors.MOON;
   rotation = [0, 0, Math.PI];
+  textureQuality: MoonTextureQuality = MoonTextureQuality.POTATO;
 
   getTexturePath(): string {
-    return `${settingsManager.installDirectory}textures/moonmap${MoonTextureQuality.ULTRA}.jpg`;
+    return `${settingsManager.installDirectory}textures/moonmap${this.textureQuality}.jpg`;
   }
 
   getName(): SolarBody {
     return SolarBody.Moon;
+  }
+
+  useHighestQualityTexture(): void {
+    this.textureQuality = MoonTextureQuality.ULTRA;
+    this.loadTexture();
   }
 
   update(simTime: Date) {

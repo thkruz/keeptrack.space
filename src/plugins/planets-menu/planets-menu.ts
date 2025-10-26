@@ -165,6 +165,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     } else if (planetName === SolarBody.Moon) {
       const selectedPlanet = ServiceLocator.getScene().moons.Moon;
 
+      selectedPlanet.useHighestQualityTexture();
       settingsManager.minZoomDistance = selectedPlanet.RADIUS * 1.2 as Kilometers;
       settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
       this.setAllPlanetsDotSize(0);
@@ -179,6 +180,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
         return;
       }
 
+      selectedPlanet.useHighestQualityTexture();
       settingsManager.minZoomDistance = selectedPlanet.RADIUS * 1.2 as Kilometers;
       settingsManager.maxZoomDistance = 1.5e10 as Kilometers; // 15 billion km
       this.setAllPlanetsDotSize(1);

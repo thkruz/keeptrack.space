@@ -67,7 +67,8 @@ export class Sun {
   eci: EciVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
   /** The mesh for the sun. */
   mesh: Mesh;
-  /** The position of the sun in WebGL coordinates. */
+  /** The position of the sun in WebGL coordinates accounting for worldShift
+   * from earth. This is NOT the same as the eci parameter */
   position = [0, 0, 0] as vec3;
   sizeRandomFactor_ = 0.0;
   /**
@@ -214,7 +215,6 @@ export class Sun {
     const eci = SatMath.getSunDirection(j);
 
     this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
-    this.position = [this.eci.x, this.eci.y, this.eci.z];
 
     return eci;
   }
@@ -229,7 +229,6 @@ export class Sun {
     const eci = SatMath.getSunDirection(j);
 
     this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
-    this.position = [this.eci.x, this.eci.y, this.eci.z];
     this.lastUpdateJ = j;
   }
 

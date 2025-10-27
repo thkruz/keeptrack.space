@@ -152,7 +152,7 @@
     "analytics": "^0.8.14",
     "dotenv": "^16.5.0",
     "draggabilly": "^3.0.0",
-    "echarts": "^5.4.3",
+    "echarts": "^5.6.0",
     "echarts-gl": "^2.0.9",
     "eruda": "^2.5.0",
     "file-saver": "^2.0.5",

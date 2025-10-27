@@ -46,8 +46,8 @@ export class SettingsManager {
   activeMenuMode: MenuMode = MenuMode.BASIC;
   // This controls which of the built-in plugins are loaded
   plugins = defaultPlugins;
-  changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
-  changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute
+  changeTimeWithKeyboardAmountBig = (1000 * 60 * 60) as Milliseconds; // 1 hour
+  changeTimeWithKeyboardAmountSmall = (1000 * 60) as Milliseconds; // 1 minute
   earthDayTextureQuality;
   earthNightTextureQuality;
   earthSpecTextureQuality;
@@ -97,7 +97,6 @@ export class SettingsManager {
   isEmbedMode = false;
   splashScreenList: string[] | null = null;
   preset: string | null = null; // Used to force a preset to be loaded without GET variable
-
 
   static preserveSettings() {
     PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DRAW_CAMERA_WIDGET, settingsManager.drawCameraWidget.toString());
@@ -306,7 +305,7 @@ export class SettingsManager {
    * Callback function that is called when the settings are loaded.
    */
   // eslint-disable-next-line no-empty-function
-  onLoadCb = () => { };
+  onLoadCb = () => {};
   /**
    * Disables Toasts During Time Machine
    */
@@ -406,7 +405,7 @@ export class SettingsManager {
   /**
    * Show GEO Orbits in ECF vs ECI
    */
-  isOrbitCruncherInEcf = true;
+  isOrbitCruncherInEcf = false;
   lastSearch: string | string[] = '';
   isGroupOverlayDisabled: boolean | null = null;
   /**
@@ -1204,7 +1203,9 @@ export class SettingsManager {
     }
 
     if (settingsManager.preset) {
-      switch (settingsManager.preset) { // NOSONAR
+      switch (
+        settingsManager.preset // NOSONAR
+      ) {
         case 'dark-clouds':
           darkClouds(settingsManager);
           break;
@@ -1222,7 +1223,6 @@ export class SettingsManager {
        * URL Params > Local Storage > Default
        */
       this.loadPersistedSettings();
-
     }
 
     // If No UI Reduce Overhead
@@ -1450,9 +1450,25 @@ export class SettingsManager {
 }
 
 // Create a type based on the parameters of SettingsManager (ignore methods)
-export type SettingsManagerOverride = Partial<Omit<SettingsManager,
-  'exportSettingsToJSON' | 'loadOverridesFromUrl_' | 'loadLastMapTexture_' | 'setEmbedOverrides_' | 'setMobileSettings_' | 'setInstallDirectory_' | 'setColorSettings_' |
-  'checkIfIframe_' | 'initParseFromGETVariables_' | 'loadOverrides_' | 'setMobileSettings_' | 'setEmbedOverrides_' | 'loadLastMapTexture_' | 'setColorSettings_'>>;
+export type SettingsManagerOverride = Partial<
+  Omit<
+    SettingsManager,
+    | 'exportSettingsToJSON'
+    | 'loadOverridesFromUrl_'
+    | 'loadLastMapTexture_'
+    | 'setEmbedOverrides_'
+    | 'setMobileSettings_'
+    | 'setInstallDirectory_'
+    | 'setColorSettings_'
+    | 'checkIfIframe_'
+    | 'initParseFromGETVariables_'
+    | 'loadOverrides_'
+    | 'setMobileSettings_'
+    | 'setEmbedOverrides_'
+    | 'loadLastMapTexture_'
+    | 'setColorSettings_'
+  >
+>;
 
 // Export the settings manager instance
 

@@ -19,6 +19,11 @@
   height: 12px;
 }
 
+body {
+  /* Prevents Safari from bouncing */
+  overflow: hidden;
+}
+
 ::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
 }
@@ -427,144 +432,144 @@ ul {
   margin-right: 20px;
 }
 
-.legend-payload-box {
+.layers-payload-box {
   background: rgb(68, 193, 47);
 }
 
-.legend-rocketBody-box {
+.layers-rocketBody-box {
   background: rgb(0, 48, 255);
 }
 
-.legend-debris-box {
+.layers-debris-box {
   background: rgb(157, 157, 157);
 }
 
-.legend-sensor-box {
+.layers-sensor-box {
   background: rgb(166, 5, 5);
 }
 
-.legend-facility-box {
+.layers-facility-box {
   background: rgb(108, 30, 103);
 }
 
-.legend-missile-box {
+.layers-missile-box {
   background: rgb(200, 198, 9);
 }
 
-.legend-missileInview-box {
+.layers-missileInview-box {
   background: rgb(255, 0, 0);
 }
 
-.legend-pink-box {
+.layers-pink-box {
   background: rgb(108, 0, 50);
   display: hidden;
 }
 
-.legend-inFOV-box {
+.layers-inFOV-box {
   background: rgb(255, 200, 0);
 }
 
-.legend-sensorCanObserve-box {
+.layers-sensorCanObserve-box {
   background: rgb(255, 30, 0);
 }
 
-.legend-inviewAlt-box {
+.layers-inviewAlt-box {
   background: rgb(255, 200, 0);
 }
 
-.legend-starLow-box {
+.layers-starLow-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-starMed-box {
+.layers-starMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-starHi-box {
+.layers-starHi-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-satLow-box {
+.layers-satLow-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-satMed-box {
+.layers-satMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-satHi-box {
+.layers-satHi-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-rcsSmall-box {
+.layers-rcsSmall-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-rcsMed-box {
+.layers-rcsMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-rcsLarge-box {
+.layers-rcsLarge-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-rcsUnkown-box {
+.layers-rcsUnkown-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-ageNew-box {
+.layers-ageNew-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-ageMed-box {
+.layers-ageMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-ageOld-box {
+.layers-ageOld-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-ageLost-box {
+.layers-ageLost-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-velocitySlow-box {
+.layers-velocitySlow-box {
   background: rgb(100, 100, 100);
 }
 
-.legend-velocityMed-box {
+.layers-velocityMed-box {
   background: rgb(150, 150, 150);
 }
 
-.legend-velocityFast-box {
+.layers-velocityFast-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-satLEO-box {
+.layers-satLEO-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-satGEO-box {
+.layers-satGEO-box {
   background: rgb(200, 200, 200);
 }
 
-.legend-sourceUssf-box {
+.layers-sourceUssf-box {
   background: rgb(11, 39, 131);
 }
 
-.legend-sourceAldoria-box {
+.layers-sourceAldoria-box {
   background: rgb(15, 150, 71);
 }
 
-.legend-sourceVimpel-box {
+.layers-sourceVimpel-box {
   background: rgb(204, 14, 14);
 }
 
-.legend-sourceCelestrak-box {
+.layers-sourceCelestrak-box {
   background: rgb(206, 219, 14);
 }
 
-.legend-sourcePrismnet-box {
+.layers-sourcePrismnet-box {
   background: rgba(168, 47, 199, 0.705);
 }
 
@@ -701,7 +706,7 @@ ul {
 }
 
 /** Stylize each row in the transparent overlay */
-#info-overlay-content>div>div {
+#info-overlay-content > div > div {
   padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 5px;
@@ -709,7 +714,7 @@ ul {
   margin-bottom: 10px;
 }
 
-#info-overlay-content>div>div>h5 {
+#info-overlay-content > div > div > h5 {
   margin: 0;
 }
 
@@ -751,7 +756,7 @@ ul {
   transition: all 1s ease-in-out;
   transform: translateX(-100%);
   background: var(--color-dark-background);
-  border-top: solid 5px var(--color-dark-border)
+  border-top: solid 5px var(--color-dark-border);
 }
 
 .divider {
@@ -772,7 +777,7 @@ input[type='checkbox'].css-checkbox {
   border: 0;
 }
 
-input[type='checkbox'].css-checkbox+label.css-label {
+input[type='checkbox'].css-checkbox + label.css-label {
   padding-left: 25px;
   height: 20px;
   display: inline-block;
@@ -784,7 +789,7 @@ input[type='checkbox'].css-checkbox+label.css-label {
   cursor: pointer;
 }
 
-input[type='checkbox'].css-checkbox:checked+label.css-label {
+input[type='checkbox'].css-checkbox:checked + label.css-label {
   background-position: 0px -20px;
 }
 
@@ -1128,7 +1133,6 @@ input:focus {
   align-items: center;
 }
 
-
 .bmenu-item-inner {
   display: flex;
   flex-direction: row;
@@ -1165,11 +1169,11 @@ input:focus {
   padding-bottom: 3px;
 }
 
-#github-share1 img,
-#legend-icon img,
+#layers-icon img,
 #tutorial-icon img,
 #fullscreen-icon img,
 #search-icon img,
+.top-menu-icons__blue-img,
 .bmenu-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-item-inner *,
 .bmenu-filter-item:not(.bmenu-item-disabled, .bmenu-item-selected, .bmenu-item-help) .bmenu-filter-item-inner * {
   /* Convert blue to engineering red */
@@ -1268,6 +1272,7 @@ input:focus {
   border-bottom: 0px !important;
   text-align: center !important;
   font-size: 20px !important;
+  width: 150px !important;
 }
 
 .ui_tpicker_hour,
@@ -1329,7 +1334,9 @@ input:focus {
   pointer-events: none;
   background: none;
   z-index: 1000;
-  text-shadow: 0 0px 2px rgba(0, 0, 0, 1), 0 0px 2px #000;
+  text-shadow:
+    0 0px 2px rgba(0, 0, 0, 1),
+    0 0px 2px #000;
 }
 
 #copyright-notice {
@@ -1344,7 +1351,9 @@ input:focus {
   pointer-events: none;
   background: none;
   z-index: 1000;
-  text-shadow: 0 0px 2px rgba(0, 0, 0, 1), 0 0px 2px #000;
+  text-shadow:
+    0 0px 2px rgba(0, 0, 0, 1),
+    0 0px 2px #000;
 }
 
 #logo-secondary {
@@ -1405,7 +1414,8 @@ input:focus {
 
 .ui_tpicker_time {
   height: 31px;
-  text-align: center;
+  display: flex;
+  justify-content: space-around;
 }
 
 .dropdown-content {
@@ -1602,7 +1612,14 @@ input:focus {
 }
 
 .ui-timepicker-div .ui_tpicker_time .ui_tpicker_time_input:focus {
-  border-bottom-color: #aaa;
+  border-bottom: 1px solid #aaa !important;
+  -webkit-box-shadow: 0 1px 0 0 #aaa !important;
+  box-shadow: 0 1px 0 0 #aaa !important;
+}
+
+#calendar-time-prop-rate {
+  width: 4em;
+  margin-left: 1em;
 }
 
 .ui-timepicker-rtl {
@@ -1642,7 +1659,7 @@ input:focus {
 }
 
 .ui-timepicker-div.ui-timepicker-oneLine dl dd,
-.ui-timepicker-div.ui-timepicker-oneLine dl dd>div {
+.ui-timepicker-div.ui-timepicker-oneLine dl dd > div {
   display: inline-block;
   margin: 0;
 }
@@ -1882,18 +1899,18 @@ button.ui-button::-moz-focus-inner {
   display: inline-block;
 }
 
-.ui-controlgroup>.ui-controlgroup-item {
+.ui-controlgroup > .ui-controlgroup-item {
   float: left;
   margin-left: 0;
   margin-right: 0;
 }
 
-.ui-controlgroup>.ui-controlgroup-item:focus,
-.ui-controlgroup>.ui-controlgroup-item.ui-visual-focus {
+.ui-controlgroup > .ui-controlgroup-item:focus,
+.ui-controlgroup > .ui-controlgroup-item.ui-visual-focus {
   z-index: 9999;
 }
 
-.ui-controlgroup-vertical>.ui-controlgroup-item {
+.ui-controlgroup-vertical > .ui-controlgroup-item {
   display: block;
   float: none;
   width: 100%;
@@ -1914,11 +1931,11 @@ button.ui-button::-moz-focus-inner {
   font-size: 80%;
 }
 
-.ui-controlgroup-horizontal .ui-controlgroup-label+.ui-controlgroup-item {
+.ui-controlgroup-horizontal .ui-controlgroup-label + .ui-controlgroup-item {
   border-left: none;
 }
 
-.ui-controlgroup-vertical .ui-controlgroup-label+.ui-controlgroup-item {
+.ui-controlgroup-vertical .ui-controlgroup-label + .ui-controlgroup-item {
   border-top: none;
 }
 
@@ -2495,7 +2512,7 @@ button.ui-button::-moz-focus-inner {
 
 .ui-slider-horizontal {
   height: 0px;
-  border: 2px solid var(--color-primary) !important
+  border: 2px solid var(--color-primary) !important;
 }
 
 .ui-slider-horizontal .ui-slider-handle {
@@ -3771,8 +3788,6 @@ a.ui-button:active,
   background-color: #323232;
 }
 
-
-
 #menu-launches,
 #menu-record,
 #menu-color-scheme,
@@ -3924,7 +3939,7 @@ nav {
   line-height: 50px;
 }
 
-#legend-hover-menu {
+#layers-hover-menu {
   display: none;
   padding: 10px;
   color: white;
@@ -3939,7 +3954,7 @@ nav {
   border-color: var(--color-dark-border);
 }
 
-#legend-hover-menu li {
+#layers-hover-menu li {
   display: flex;
   align-items: center;
 }

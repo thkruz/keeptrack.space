@@ -1,16 +1,15 @@
 import i18next, { InitOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import de from './de.json';
-import en from './en.json';
-import es from './es.json';
-import fr from './fr.json';
-import ja from './ja.json';
+import de from './de.src.json';
+import en from './en.src.json';
+import es from './es.src.json';
+import fr from './fr.src.json';
+import ja from './ja.src.json';
 import { t7e } from './keys';
-import ko from './ko.json';
-import ru from './ru.json';
-import uk from './uk.json';
-import zh from './zh.json';
-
+import ko from './ko.src.json';
+import ru from './ru.src.json';
+import uk from './uk.src.json';
+import zh from './zh.src.json';
 
 const opts: InitOptions = {
   interpolation: {

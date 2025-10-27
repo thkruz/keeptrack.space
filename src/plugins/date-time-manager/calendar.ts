@@ -265,16 +265,23 @@ export class Calendar {
 
   private renderDayHeaders(): string {
     const daysOfWeek = [
-      t7e('time.days-short.1'), t7e('time.days-short.2'), t7e('time.days-short.3'),
-      t7e('time.days-short.4'), t7e('time.days-short.5'), t7e('time.days-short.6'), t7e('time.days-short.0'),
+      t7e('time.days-short.1'),
+      t7e('time.days-short.2'),
+      t7e('time.days-short.3'),
+      t7e('time.days-short.4'),
+      t7e('time.days-short.5'),
+      t7e('time.days-short.6'),
+      t7e('time.days-short.0'),
     ];
 
-
-    return daysOfWeek.map((day, index) =>
-      `<th scope="col" class="${index === 0 || index === 6 ? 'ui-datepicker-week-end' : ''}">
+    return daysOfWeek
+      .map(
+        (day, index) =>
+          `<th scope="col" class="${index === 0 || index === 6 ? 'ui-datepicker-week-end' : ''}">
         <span title="${this.getUTCDayFullName(index)}">${day}</span>
       </th>`,
-    ).join('');
+      )
+      .join('');
   }
 
   private renderCalendarDays(): string {
@@ -291,18 +298,16 @@ export class Calendar {
         if (i === 0 && j < firstDay) {
           row += '<td class="ui-datepicker-other-month ui-datepicker-unselectable ui-state-disabled">&nbsp;</td>';
         } else if (dayCount <= daysInMonth) {
-          const isToday = this.calendarDate.getUTCFullYear() === today.getUTCFullYear() &&
-            this.calendarDate.getUTCMonth() === today.getUTCMonth() &&
-            dayCount === today.getUTCDate();
-          const isSelected = this.simulationDate &&
+          const isToday =
+            this.calendarDate.getUTCFullYear() === today.getUTCFullYear() && this.calendarDate.getUTCMonth() === today.getUTCMonth() && dayCount === today.getUTCDate();
+          const isSelected =
+            this.simulationDate &&
             this.simulationDate.getUTCFullYear() === this.calendarDate.getUTCFullYear() &&
             this.simulationDate.getUTCMonth() === this.calendarDate.getUTCMonth() &&
             this.simulationDate.getUTCDate() === dayCount;
-          const classes = [
-            j === 0 || j === 6 ? 'ui-datepicker-week-end' : '',
-            isToday ? 'ui-datepicker-today' : '',
-            isSelected ? 'ui-datepicker-current-day' : '',
-          ].filter(Boolean).join(' ');
+          const classes = [j === 0 || j === 6 ? 'ui-datepicker-week-end' : '', isToday ? 'ui-datepicker-today' : '', isSelected ? 'ui-datepicker-current-day' : '']
+            .filter(Boolean)
+            .join(' ');
 
           const jday = keepTrackApi.getTimeManager().getUTCDayOfYear(new Date(this.calendarDate.getUTCFullYear(), this.calendarDate.getUTCMonth(), dayCount));
 
@@ -403,7 +408,7 @@ export class Calendar {
           <dd class="ui_tpicker_proprate">
             <div id="ui_tpicker_proprate_slider" class="ui_tpicker_proprate_slider ui-slider ui-corner-all ui-slider-horizontal ui-widget ui-widget-content"
             style="display: inline-block; width: 100px;" data-min="${this.propRateLimitMin.toString()}" data-max="${this.propRateLimitMax.toString()}" data-step="1">
-              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${(propagationPercentage).toString()}%;"></span>
+              <span tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default" style="left: ${propagationPercentage.toString()}%;"></span>
             </div>
             <span class="ui-slider-access ui-controlgroup ui-controlgroup-horizontal ui-helper-clearfix ui-corner-left" role="toolbar"
             style="margin-left: 10px; margin-right: 0px;">
@@ -424,22 +429,25 @@ export class Calendar {
 
   private getUTCMonthName(monthIndex: number): string {
     const monthNames = [
-      t7e('time.months.1'), t7e('time.months.2'), t7e('time.months.3'),
-      t7e('time.months.4'), t7e('time.months.5'), t7e('time.months.6'),
-      t7e('time.months.7'), t7e('time.months.8'), t7e('time.months.9'),
-      t7e('time.months.10'), t7e('time.months.11'), t7e('time.months.12'),
+      t7e('time.months.1'),
+      t7e('time.months.2'),
+      t7e('time.months.3'),
+      t7e('time.months.4'),
+      t7e('time.months.5'),
+      t7e('time.months.6'),
+      t7e('time.months.7'),
+      t7e('time.months.8'),
+      t7e('time.months.9'),
+      t7e('time.months.10'),
+      t7e('time.months.11'),
+      t7e('time.months.12'),
     ];
-
 
     return monthNames[monthIndex];
   }
 
   private getUTCDayFullName(dayIndex: number): string {
-    const dayNames = [
-      t7e('time.days.0'), t7e('time.days.1'), t7e('time.days.2'),
-      t7e('time.days.3'), t7e('time.days.4'), t7e('time.days.5'), t7e('time.days.6'),
-    ];
-
+    const dayNames = [t7e('time.days.0'), t7e('time.days.1'), t7e('time.days.2'), t7e('time.days.3'), t7e('time.days.4'), t7e('time.days.5'), t7e('time.days.6')];
 
     return dayNames[dayIndex];
   }
@@ -464,11 +472,11 @@ export class Calendar {
       const jdayElement: HTMLElement | null | undefined = target.parentElement?.querySelector('.ui-datepicker-jday');
 
       // If we pick the calendar day, find the parent, then get the second span (class === ui-datepicker-jday)
-      dayOfYear = parseInt((jdayElement)?.innerText ?? '-1');
+      dayOfYear = parseInt(jdayElement?.innerText ?? '-1');
     } else if (target.tagName === 'A') {
       const jdayElement: HTMLElement | null = target.querySelector('.ui-datepicker-jday');
 
-      dayOfYear = parseInt((jdayElement)?.innerText ?? '-1');
+      dayOfYear = parseInt(jdayElement?.innerText ?? '-1');
     } else if (target.classList.contains('ui-datepicker-jday')) {
       dayOfYear = parseInt(target.innerText);
     }
@@ -558,7 +566,7 @@ export class Calendar {
     timeManagerInstance.changePropRate(propRate);
     this.propagationRate = propRate;
     this.updateTimeInput();
-    this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, (this.propRateLimitMax - this.propRateLimitMin), this.propRateLimitMin);
+    this.updateSliderPosition('ui_tpicker_proprate_slider', propRate, this.propRateLimitMax - this.propRateLimitMin, this.propRateLimitMin);
   }
 
   private updateHour(hour: number): void {
@@ -612,7 +620,6 @@ export class Calendar {
     if (!timeInput.value.includes(':') && timeInput.value.length === 6) {
       timeInput.value = `${timeInput.value.slice(0, 2)}:${timeInput.value.slice(2, 4)}:${timeInput.value.slice(4, 6)}`;
     }
-
 
     const timeParts = timeInput.value.split(':');
 

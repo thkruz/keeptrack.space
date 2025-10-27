@@ -746,7 +746,7 @@ ul {
   transition: all 1s ease-in-out;
   transform: translateX(-100%);
   background: var(--color-dark-background);
-  border-top: solid 5px var(--color-dark-border)
+  border-top: solid 5px var(--color-dark-border);
 }
 
 .divider {
@@ -1130,7 +1130,6 @@ input:focus {
   align-items: center;
 }
 
-
 .bmenu-item-inner {
   display: flex;
   flex-direction: row;
@@ -1331,7 +1330,9 @@ input:focus {
   pointer-events: none;
   background: none;
   z-index: 1000;
-  text-shadow: 0 0px 2px rgba(0, 0, 0, 1), 0 0px 2px #000;
+  text-shadow:
+    0 0px 2px rgba(0, 0, 0, 1),
+    0 0px 2px #000;
 }
 
 #copyright-notice {
@@ -1346,7 +1347,9 @@ input:focus {
   pointer-events: none;
   background: none;
   z-index: 1000;
-  text-shadow: 0 0px 2px rgba(0, 0, 0, 1), 0 0px 2px #000;
+  text-shadow:
+    0 0px 2px rgba(0, 0, 0, 1),
+    0 0px 2px #000;
 }
 
 #logo-secondary {
@@ -2496,7 +2499,7 @@ button.ui-button::-moz-focus-inner {
 
 .ui-slider-horizontal {
   height: 0px;
-  border: 2px solid var(--color-primary) !important
+  border: 2px solid var(--color-primary) !important;
 }
 
 .ui-slider-horizontal .ui-slider-handle {
@@ -3779,8 +3782,6 @@ a.ui-button:active,
   display: none !important;
   background-color: #323232;
 }
-
-
 
 #menu-launches,
 #menu-record,

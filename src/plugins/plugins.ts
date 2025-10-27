@@ -34,6 +34,7 @@ import { MissilePlugin } from './missile/missile-plugin';
 import { NewLaunch } from './new-launch/new-launch';
 import { NextLaunchesPlugin } from './next-launches/next-launches';
 import { NightToggle } from './night-toggle/night-toggle';
+import { OrbitGuardMenuPlugin } from './orbit-guard-menu/orbit-guard-menu';
 import { OrbitReferences } from './orbit-references/orbit-references';
 import { PlanetsMenuPlugin } from './planets-menu/planets-menu';
 import { EcfPlot } from './plot-analysis/ecf-plots';
@@ -48,6 +49,7 @@ import { ProximityOps } from './proximity-ops/proximity-ops';
 import { ReportsPlugin } from './reports/reports';
 import { SatConstellations } from './sat-constellations/sat-constellations';
 import { SatInfoBoxObject } from './sat-info-box-object/sat-info-box-object';
+import { SatInfoBoxOrbitGuard } from './sat-info-box-orbit-guard/sat-info-box-orbit-guard';
 import { SatInfoBoxOrbital } from './sat-info-box-orbital/sat-info-box-orbital';
 import { SatInfoBoxSensor } from './sat-info-box-sensor/sat-info-box-sensor';
 import { SatInfoBox } from './sat-info-box/sat-info-box';
@@ -135,6 +137,7 @@ export class PluginManager {
           }, config: plugins.SatInfoBoxLinks,
         },
         { init: () => new SatInfoBoxOrbital().init(), config: plugins.SatInfoBoxOrbital },
+        { init: () => new SatInfoBoxOrbitGuard().init(), config: plugins.SatInfoBoxManeuver },
         { init: () => new SatInfoBoxObject().init(), config: plugins.SatInfoBoxObject },
         {
           init: async () => {
@@ -184,6 +187,7 @@ export class PluginManager {
         { init: () => new ProximityOps().init(), config: plugins.ProximityOps },
         { init: () => new OrbitReferences().init(), config: plugins.OrbitReferences },
         { init: () => new Collisions().init(), config: plugins.Collisions },
+        { init: () => new OrbitGuardMenuPlugin().init(), config: plugins.OrbitGuardMenuPlugin },
         { init: () => new TrackingImpactPredict().init(), config: plugins.TrackingImpactPredict },
         { init: () => new Breakup().init(), config: plugins.Breakup },
         { init: () => new DebrisScreening().init(), config: plugins.DebrisScreening },

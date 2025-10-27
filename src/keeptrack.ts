@@ -72,6 +72,10 @@ export class KeepTrack {
     return KeepTrack.instance;
   }
 
+  static reset(): void {
+    KeepTrack.instance = new KeepTrack();
+  }
+
   init(settingsOverride: SettingsManagerOverride = {
     isPreventDefaultHtml: false,
     isShowSplashScreen: true,

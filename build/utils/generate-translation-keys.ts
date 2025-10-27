@@ -39,6 +39,11 @@ function findLocalesDirs(dir: string, enJsonPaths: string[] = []): string[] {
   for (const dirent of fs.readdirSync(dir, { withFileTypes: true })) {
     const fullPath = path.join(dir, dirent.name);
 
+    // skip ootk and its children
+    if (fullPath.includes('ootk')) {
+      continue;
+    }
+
     if (dirent.isDirectory()) {
       if (dirent.name === 'locales') {
         const enJsonPath = path.join(fullPath, 'en.json');

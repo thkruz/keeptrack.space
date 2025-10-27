@@ -1,4 +1,5 @@
 import { Container } from '@app/engine/core/container';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardInput } from '@app/engine/input/input-manager/keyboard-input';
 import { keepTrackApi } from '@app/keepTrackApi';

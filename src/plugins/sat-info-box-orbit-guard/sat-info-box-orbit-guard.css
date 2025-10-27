@@ -1,0 +1,6 @@
+#maneuver-sat-info:not(.collapsed) {
+  transition: max-height 0.5s ease-in-out;
+  max-height: 2000px;
+  overflow: hidden;
+  margin: 5px 0px;
+}

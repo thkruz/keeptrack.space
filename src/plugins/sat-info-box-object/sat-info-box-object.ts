@@ -425,14 +425,14 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
         satRcsEl.innerHTML = `Est ${rcs.toFixed(4)} m<sup>2</sup>`;
         satRcsEl.setAttribute('kt-tooltip', `Est ${SatMath.mag2db(rcs).toFixed(2)} dBsm`);
       } else {
-        satRcsEl.innerHTML = t7e('SatInfoBoxObject.unknown');
-        satRcsEl.setAttribute('kt-tooltip', t7e('SatInfoBoxObject.unknown'));
+        satRcsEl.innerHTML = t7e('Common.unknown');
+        satRcsEl.setAttribute('kt-tooltip', t7e('Common.unknown'));
       }
     } else if (!isNaN(sat.rcs)) {
       satRcsEl.innerHTML = `${sat.rcs} m<sup>2</sup>`;
     } else {
-      satRcsEl.innerHTML = t7e('SatInfoBoxObject.unknown');
-      satRcsEl.setAttribute('kt-tooltip', t7e('SatInfoBoxObject.unknown'));
+      satRcsEl.innerHTML = t7e('Common.unknown');
+      satRcsEl.setAttribute('kt-tooltip', t7e('Common.unknown'));
       // satRcsEl.setAttribute('kt-tooltip', `${SatMath.mag2db(sat.rcs).toFixed(2)} dBsm`);
     }
   }

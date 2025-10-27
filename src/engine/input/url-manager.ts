@@ -5,10 +5,10 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SettingsManager, settingsManager } from '@app/settings/settings';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians } from '@ootk/src/main';
+import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { AtmosphereSettings, EarthTextureStyle } from '../rendering/draw-manager/earth-quality-enums';
 import { getEl } from '../utils/get-el';
-import { EventBus } from '../events/event-bus';
 
 export abstract class UrlManager {
   private static selectedSat_: DetailedSatellite | null = null;
@@ -205,6 +205,10 @@ export abstract class UrlManager {
           break;
         case 'color':
           UrlManager.assignColorScheme_(kv, settingsManager);
+          break;
+        case 'msbai':
+          settingsManager.plugins.OrbitGuardMenuPlugin = { ...settingsManager.plugins.OrbitGuardMenuPlugin, ...{ enabled: true } };
+          settingsManager.plugins.SatInfoBoxManeuver = { ...settingsManager.plugins.SatInfoBoxManeuver, ...{ enabled: true } };
           break;
         default:
           // Do nothing for other keys, they will be handled in the EventBus.getInstance().onKeepTrackReady event

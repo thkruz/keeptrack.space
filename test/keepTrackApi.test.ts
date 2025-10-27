@@ -1,3 +1,4 @@
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { isThisNode } from '@app/engine/utils/isThisNode';
@@ -11,132 +12,68 @@ test('keepTrackApi Unit Testing', () => {
     keepTrackApi.unregister({ event: EventBusEvent.touchStart, cbName: 'test' });
   }).toThrow(Error);
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.updateSelectBox,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.updateSelectBox, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.onCruncherReady,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.onCruncherReady, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.onCruncherMessage,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.onCruncherMessage, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.uiManagerInit,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.uiManagerOnReady,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.uiManagerOnReady, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.bottomMenuClick,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.bottomMenuClick, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.hideSideMenus,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.orbitManagerInit,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.orbitManagerInit, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.drawManagerLoadScene,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.drawManagerLoadScene, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.drawOptionalScenery,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.drawOptionalScenery, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.updateLoop,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.updateLoop, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.rmbMenuActions,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.rmbMenuActions, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.updateDateTime,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.updateDateTime, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.uiManagerFinal,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.rightBtnMenuAdd,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.rightBtnMenuAdd, () => {
+    // Do nothing
   });
 
-  EventBus.getInstance().on({
-    event: EventBusEvent.selectSatData,
-    cbName: 'test',
-    cb: () => {
-      // Do nothing
-    },
+  EventBus.getInstance().on(EventBusEvent.selectSatData, () => {
+    // Do nothing
   });
 
   keepTrackApi.emit(EventBusEvent.updateSelectBox, 'test' as unknown as DetailedSatellite);

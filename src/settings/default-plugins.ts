@@ -112,9 +112,13 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 90,
   },
+  OrbitGuardMenuPlugin: {
+    enabled: false,
+    order: 91,
+  },
   TrackingImpactPredict: {
     enabled: true,
-    order: 91,
+    order: 92,
   },
   StereoMap: {
     enabled: true,
@@ -281,6 +285,9 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   },
   SatInfoBoxMission: {
     enabled: true,
+  },
+  SatInfoBoxManeuver: {
+    enabled: false,
   },
   SatInfoBoxOrbital: satInfoBoxOrbitalConfigurationDefaults,
   SatInfoBoxSensor: {

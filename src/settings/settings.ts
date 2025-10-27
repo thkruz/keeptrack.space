@@ -49,8 +49,8 @@ export class SettingsManager {
   activeMenuMode: MenuMode = MenuMode.BASIC;
   // This controls which of the built-in plugins are loaded
   plugins = defaultPlugins;
-  changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
-  changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute
+  changeTimeWithKeyboardAmountBig = (1000 * 60 * 60) as Milliseconds; // 1 hour
+  changeTimeWithKeyboardAmountSmall = (1000 * 60) as Milliseconds; // 1 minute
   earthDayTextureQuality;
   earthNightTextureQuality;
   earthSpecTextureQuality;
@@ -109,7 +109,6 @@ export class SettingsManager {
   milkyWayTextureQuality: MilkyWayTextureQuality;
   /** Number of segments to use when drawing OEM orbits */
   oemOrbitSegments = 64;
-
 
   static preserveSettings() {
     if (settingsManager.offlineMode) {
@@ -1292,7 +1291,6 @@ export class SettingsManager {
        * URL Params > Local Storage > Default
        */
       this.loadPersistedSettings();
-
     }
 
     // If No UI Reduce Overhead
@@ -1545,9 +1543,21 @@ export class SettingsManager {
 }
 
 // Create a type based on the parameters of SettingsManager (ignore methods)
-export type SettingsManagerOverride = Partial<Omit<SettingsManager,
-  'exportSettingsToJSON' | 'loadOverridesFromUrl_' | 'loadLastMapTexture_' | 'setEmbedOverrides_' | 'setMobileSettings_' | 'setInstallDirectory_' | 'setColorSettings_' |
-  'checkIfIframe_' | 'initParseFromGETVariables_' | 'loadOverrides_' | 'setColorSettings_'>>;
+export type SettingsManagerOverride = Partial<
+  Omit<
+    SettingsManager,
+    | 'exportSettingsToJSON'
+    | 'loadOverridesFromUrl_'
+    | 'loadLastMapTexture_'
+    | 'setEmbedOverrides_'
+    | 'setMobileSettings_'
+    | 'setInstallDirectory_'
+    | 'setColorSettings_'
+    | 'checkIfIframe_'
+    | 'initParseFromGETVariables_'
+    | 'loadOverrides_'
+  >
+>;
 
 // Export the settings manager instance
 

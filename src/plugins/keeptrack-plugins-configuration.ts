@@ -12,6 +12,8 @@ export type KeepTrackPluginsConfiguration = {
   EarthAtmosphere?: PluginConfiguration;
   TooltipsPlugin?: PluginConfiguration;
   UserAccountPlugin?: PluginConfiguration;
+  OrbitGuardMenuPlugin?: PluginConfiguration;
+  SatInfoBoxManeuver?: PluginConfiguration;
   ManeuverPlugin?: PluginConfiguration;
   DebugMenuPlugin?: PluginConfiguration;
   SensorListPlugin?: PluginConfiguration;

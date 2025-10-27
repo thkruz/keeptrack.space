@@ -62,6 +62,7 @@ global.mocks.glMock = {
   getShaderInfoLog: jest.fn(() => 'This is a mock error'),
   depthFunc: jest.fn(),
   clearDepth: jest.fn(),
+  pixelStorei: jest.fn(),
 };
 
 // mock_requestAnimationFrame.js

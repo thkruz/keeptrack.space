@@ -967,7 +967,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     getEl(SatInfoBox.containerId_)?.insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
-          <div id="launch-section">
+          <div id="launch-section" class="collapsed">
             <div class="sat-info-section-header">
               Object Data
               <span id="object-data-section-collapse" class="section-collapse material-icons" style="position: absolute; right: 0;">expand_less</span>
@@ -1087,6 +1087,23 @@ export class SatInfoBox extends KeepTrackPlugin {
     );
   }
 
+  private static createManeuverData_() {
+    getEl('actions-section')?.insertAdjacentHTML(
+      'beforebegin',
+      keepTrackApi.html`
+        <div id="maneuver-sat-info">
+        <div class="sat-info-section-header">
+          Maneuver Data
+          <span id="maneuver-sat-info-collapse" class="section-collapse material-icons" style="position: absolute; right: 0;">expand_less</span>
+        </div>
+        <div id="sat-info-maneuver-data">
+          <span>This is where your canvas would go for the 3D plot.</span>
+        </div>
+        </div>
+      `,
+    );
+  }
+
   private static createOrbitalData_() {
     getEl('ui-wrapper')?.insertAdjacentHTML(
       'beforeend',
@@ -1118,7 +1135,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             data-tooltip="Visualize Angle to Secondary Satellite">Draw sat to second sat line...</div>
           </div>
         </div>
-        <div id="sat-identifier-data">
+        <div id="sat-identifier-data" class="collapsed">
           <div class="sat-info-section-header">
             Identifiers
             <span id="identifiers-section-collapse" class="section-collapse material-icons" style="position: absolute; right: 0;">expand_less</span>
@@ -1150,7 +1167,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             <div class="sat-info-value" id="sat-confidence">High</div>
           </div>
         </div>
-        <div id="orbital-section">
+        <div id="orbital-section" class="collapsed">
           <div class="sat-info-section-header">
             Orbit Data
             <span id="orbit-data-section-collapse" class="section-collapse material-icons" style="position: absolute; right: 0;">expand_less</span>
@@ -2032,7 +2049,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     getEl(SatInfoBox.containerId_)?.insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
-        <div id="sat-mission-data" class="start hidden">
+        <div id="sat-mission-data" class="start hidden collapsed">
           <div class="sat-info-section-header">
             Mission
             <span id="mission-section-collapse" class="section-collapse material-icons" style="position: absolute; right: 0;">expand_less</span>
@@ -2291,7 +2308,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     getEl(SatInfoBox.containerId_)?.insertAdjacentHTML(
       'beforeend',
       keepTrackApi.html`
-      <div id="sensor-sat-info">
+      <div id="sensor-sat-info" class="collapsed">
         <div class="sat-info-section-header">
           Sensor Data
           <span id="sensor-data-section-collapse" class="section-collapse material-icons" style="position: absolute; right: 0;">expand_less</span>

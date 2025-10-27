@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/catalogs/countries';
-import { GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { EChartsData, GetSatType, KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
 import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
 import { openColorbox } from '@app/lib/colorbox';
 import { getEl, hideEl, showEl } from '@app/lib/get-el';
@@ -18,6 +18,8 @@ import { StringExtractor } from '@app/static/string-extractor';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import Draggabilly from 'draggabilly';
+// import echarts from 'echarts/types/dist/echarts';
+import * as echarts from 'echarts';
 import { BaseObject, CatalogSource, DEG2RAD, DetailedSatellite, MINUTES_PER_DAY, PayloadStatus, RfSensor, SpaceObjectType, Sun, SunTime, cKmPerMs, eci2lla } from 'ootk';
 import { KeepTrackPlugin } from '../KeepTrackPlugin';
 import { missileManager } from '../missile/missile-manager';
@@ -50,6 +52,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   private issensorInfoLoaded_ = false;
   private islaunchDataLoaded_ = false;
   private issatMissionDataLoaded_ = false;
+  private isManeuverDataLoaded_ = false;
   private isTopLinkEventListenersAdded_ = false;
 
   // Starting values of the collapsable sections
@@ -78,10 +81,12 @@ export class SatInfoBox extends KeepTrackPlugin {
     // NOTE: This has to go first.
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.orbitalData.bind(this));
     // -------------------------------------------------
+
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSensorInfo_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateLaunchData_.bind(this));
     keepTrackApi.on(InputEventType.KeyDown, this.onKeyDownLowerI_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateSatMissionData_.bind(this));
+    keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateManeuverData_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, SatInfoBox.updateObjectData_.bind(this));
     keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
@@ -128,7 +133,7 @@ export class SatInfoBox extends KeepTrackPlugin {
                   .toast(
                     `Satellite ${sat.sccNum} is not in orbit!<br>Sim time is ${timeManagerInstance.simulationTimeObj.toUTCString()}.<br>Be sure to check you have the right TLE.`,
                     ToastMsgType.error,
-                    true,
+                    true
                   );
                 this.selectSatManager_.selectSat(-1);
 
@@ -195,15 +200,12 @@ export class SatInfoBox extends KeepTrackPlugin {
           let covCrossTrack = covMatrix[1];
           let covInTrack = covMatrix[2];
 
-          const useKm =
-            covRadial > 0.5 &&
-            covCrossTrack > 0.5 &&
-            covInTrack > 0.5;
+          const useKm = covRadial > 0.5 && covCrossTrack > 0.5 && covInTrack > 0.5;
 
           if (useKm) {
-            getEl('sat-uncertainty-radial')!.innerHTML = `${(covMatrix[0]).toFixed(2)} km`;
-            getEl('sat-uncertainty-crosstrack')!.innerHTML = `${(covMatrix[1]).toFixed(2)} km`;
-            getEl('sat-uncertainty-intrack')!.innerHTML = `${(covMatrix[2]).toFixed(2)} km`;
+            getEl('sat-uncertainty-radial')!.innerHTML = `${covMatrix[0].toFixed(2)} km`;
+            getEl('sat-uncertainty-crosstrack')!.innerHTML = `${covMatrix[1].toFixed(2)} km`;
+            getEl('sat-uncertainty-intrack')!.innerHTML = `${covMatrix[2].toFixed(2)} km`;
           } else {
             covRadial *= 1000;
             covCrossTrack *= 1000;
@@ -226,7 +228,6 @@ export class SatInfoBox extends KeepTrackPlugin {
           const satVelocityElement = getEl('sat-velocity');
 
           if (satAltitudeElement && satVelocityElement) {
-
             if (obj.isSatellite()) {
               const sat = obj as DetailedSatellite;
               const gmst = keepTrackApi.getTimeManager().gmst;
@@ -313,33 +314,30 @@ export class SatInfoBox extends KeepTrackPlugin {
         } catch (e) {
           errorManagerInstance.debug('Error updating satellite info!');
         }
-      },
+      }
     );
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.onWatchlistUpdated,
-      (watchlistList: { id: number, inView: boolean }[]) => {
-        let isOnList = false;
+    keepTrackApi.on(KeepTrackApiEvents.onWatchlistUpdated, (watchlistList: { id: number; inView: boolean }[]) => {
+      let isOnList = false;
 
-        watchlistList.forEach(({ id }) => {
-          if (id === this.selectSatManager_.selectedSat) {
-            isOnList = true;
-          }
-        });
-
-        const addRemoveWatchlistDom = getEl('sat-add-watchlist');
-
-        if (addRemoveWatchlistDom) {
-          if (isOnList) {
-            (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'block';
-            (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'none';
-          } else {
-            (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'block';
-            (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'none';
-          }
+      watchlistList.forEach(({ id }) => {
+        if (id === this.selectSatManager_.selectedSat) {
+          isOnList = true;
         }
-      },
-    );
+      });
+
+      const addRemoveWatchlistDom = getEl('sat-add-watchlist');
+
+      if (addRemoveWatchlistDom) {
+        if (isOnList) {
+          (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'block';
+          (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'none';
+        } else {
+          (<HTMLImageElement>getEl('sat-add-watchlist')).style.display = 'block';
+          (<HTMLImageElement>getEl('sat-remove-watchlist')).style.display = 'none';
+        }
+      }
+    });
 
     keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.selectSat_.bind(this));
   }
@@ -361,10 +359,17 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private updateSatTearrOutFov_(elements: {
-    az: HTMLElement | null; el: HTMLElement | null; rng: HTMLElement | null; vmag: HTMLElement | null; beamwidth: HTMLElement | null;
-    maxTmx: HTMLElement | null;
-  }, sensorManagerInstance: SensorManager) {
+  private updateSatTearrOutFov_(
+    elements: {
+      az: HTMLElement | null;
+      el: HTMLElement | null;
+      rng: HTMLElement | null;
+      vmag: HTMLElement | null;
+      beamwidth: HTMLElement | null;
+      maxTmx: HTMLElement | null;
+    },
+    sensorManagerInstance: SensorManager
+  ) {
     if (elements.vmag) {
       elements.vmag.innerHTML = 'Out of FOV';
     }
@@ -399,10 +404,19 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
-  private updateSatTearrInFov_(elements: {
-    az: HTMLElement | null; el: HTMLElement | null; rng: HTMLElement | null; vmag: HTMLElement | null; beamwidth: HTMLElement | null;
-    maxTmx: HTMLElement | null;
-  }, obj: BaseObject, sensorManagerInstance: SensorManager, timeManagerInstance: TimeManager) {
+  private updateSatTearrInFov_(
+    elements: {
+      az: HTMLElement | null;
+      el: HTMLElement | null;
+      rng: HTMLElement | null;
+      vmag: HTMLElement | null;
+      beamwidth: HTMLElement | null;
+      maxTmx: HTMLElement | null;
+    },
+    obj: BaseObject,
+    sensorManagerInstance: SensorManager,
+    timeManagerInstance: TimeManager
+  ) {
     if (elements.az) {
       elements.az.innerHTML = `${this.currentTEARR.az.toFixed(0)}°`;
     } // Convert to Degrees
@@ -464,7 +478,12 @@ export class SatInfoBox extends KeepTrackPlugin {
       this.issatMissionDataLoaded_ = true;
     }
 
-    // Now that is is loaded, reset the sizing and location
+    if (!this.isManeuverDataLoaded_) {
+      SatInfoBox.createManeuverData_();
+      this.isManeuverDataLoaded_ = true;
+    }
+
+    // Now that it is loaded, reset the sizing and location
     SatInfoBox.resetMenuLocation(getEl(SatInfoBox.containerId_), false);
 
     this.addListenerToCollapseElement_(getEl('actions-section-collapse'), getEl('actions-section'), { value: this.isActionsSectionCollapsed_ });
@@ -474,6 +493,9 @@ export class SatInfoBox extends KeepTrackPlugin {
     this.addListenerToCollapseElement_(getEl('sensor-data-section-collapse'), getEl('sensor-sat-info'), { value: this.isSensorDataSectionCollapsed_ });
     this.addListenerToCollapseElement_(getEl('object-data-section-collapse'), getEl('launch-section'), { value: this.isObjectDataSectionCollapsed_ });
     this.addListenerToCollapseElement_(getEl('mission-section-collapse'), getEl('sat-mission-data'), { value: this.isMissionSectionCollapsed_ });
+
+    // Use dedicated maneuver collapse wiring
+    this.wireManeuverCollapse_();
   }
 
   private addListenerToCollapseElement_(collapseEl: HTMLElement | null, section: HTMLElement | null, isCollapsedRef: { value: boolean }): void {
@@ -921,7 +943,6 @@ export class SatInfoBox extends KeepTrackPlugin {
       launchSiteElement.innerHTML = site.site;
       launchSiteElement.classList.remove('pointable');
     }
-
   }
 
   private static updateCountryCorrelationTable_(obj: DetailedSatellite | MissileObject) {
@@ -1005,7 +1026,7 @@ export class SatInfoBox extends KeepTrackPlugin {
               </div>
             </div>
           </div>
-          `,
+          `
     );
   }
 
@@ -1047,7 +1068,22 @@ export class SatInfoBox extends KeepTrackPlugin {
               <div class="sat-info-value" id="sat-sec-crosstrack">xxxx km</div>
             </div>
           </div>
-          `,
+          `
+    );
+  }
+
+  private static createManeuverData_() {
+    getEl(SatInfoBox.containerId_)?.insertAdjacentHTML(
+      'beforeend',
+      keepTrackApi.html`
+      <div id="maneuver-sat-info" style="display:none;">
+        <div class="sat-info-section-header" style="position:relative; z-index:2;">
+          OrbitGuard
+          <span id="maneuver-sat-info-collapse" class="section-collapse material-icons" style="position: absolute; right: 0;">expand_less</span>
+        </div>
+        <div id="sat-info-maneuver-data"></div>
+      </div>
+    `
     );
   }
 
@@ -1226,7 +1262,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           </div>
         </div>
       </div>
-    `,
+    `
     );
 
     // Create a Sat Info Box Initializing Script
@@ -1383,7 +1419,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       return;
     }
 
-    if ((sat.rcs === null || typeof sat.rcs === 'undefined')) {
+    if (sat.rcs === null || typeof sat.rcs === 'undefined') {
       const estRcs = SatMath.estimateRcsUsingHistoricalData(sat);
 
       if (estRcs !== null) {
@@ -1442,7 +1478,6 @@ export class SatInfoBox extends KeepTrackPlugin {
         satUserDom.classList.remove('pointable');
       }
 
-
       const satMissionElement = getEl('sat-mission');
       const satPurposeElement = getEl('sat-purpose');
       const satContractorElement = getEl('sat-contractor');
@@ -1461,9 +1496,25 @@ export class SatInfoBox extends KeepTrackPlugin {
       const satSpanElement = getEl('sat-span');
       const satShapeElement = getEl('sat-shape');
 
-      if (!satMissionElement || !satPurposeElement || !satContractorElement || !satLaunchMassElement || !satDryMassElement || !satLifetimeElement || !satPowerElement ||
-        !satStandardMagnitudeElement || !satBusElement || !satConfigurationElement || !satPayloadElement || !satEquipmentElement || !satMotorElement || !satLengthElement ||
-        !satDiameterElement || !satSpanElement || !satShapeElement) {
+      if (
+        !satMissionElement ||
+        !satPurposeElement ||
+        !satContractorElement ||
+        !satLaunchMassElement ||
+        !satDryMassElement ||
+        !satLifetimeElement ||
+        !satPowerElement ||
+        !satStandardMagnitudeElement ||
+        !satBusElement ||
+        !satConfigurationElement ||
+        !satPayloadElement ||
+        !satEquipmentElement ||
+        !satMotorElement ||
+        !satLengthElement ||
+        !satDiameterElement ||
+        !satSpanElement ||
+        !satShapeElement
+      ) {
         errorManagerInstance.warn('One or more updateSatMissionData_ elements not found');
 
         return;
@@ -1499,6 +1550,425 @@ export class SatInfoBox extends KeepTrackPlugin {
         errorManagerInstance.debug('sat-only-info element not found');
       }
     }
+  }
+
+  private static async fetchHistoricalPlotData_(sccNum: string): Promise<EChartsData> {
+    try {
+      const response = await fetch(`http://192.34.81.138:8501/orbitguard/historical_data`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer guruspace5172x2',
+        },
+        body: JSON.stringify({
+          satNo: [sccNum],
+          last_days: 5,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const elsets = data[sccNum]?.elset ?? [];
+      const eoData = data[sccNum]?.eo ?? [];
+      const detection = data[sccNum]?.detection ?? {};
+
+      const values = elsets.map((entry: any) => [entry.eccentricity, entry.inclination, entry.semiMajorAxis, entry.epoch]);
+      const eoValues = eoData.map((entry: any) => [entry.ra, entry.declination, entry.range, entry.epoch]);
+
+      const eventDetails = {
+        event_start_timestamp: detection.event_start_timestamp,
+        event_end_timestamp: detection.event_end_timestamp,
+        maneuver_class: detection.maneuver_class || null,
+        maneuver_probability: detection.maneuver_probability || 0,
+        oof_detection: detection.oof_detection === 1,
+        stability_change_detection: detection.stability_change_detection === 1,
+        stability_change_probability: detection.stability_change_probability || 0,
+      };
+
+      return [
+        { name: `SAT-${sccNum}`, value: values },
+        { name: `SAT-${sccNum} EO Data`, value: eoValues },
+        { name: `SAT-${sccNum} Event`, value: eventDetails },
+      ];
+    } catch (err) {
+      console.error('Error fetching historical orbit data:', err);
+      return [];
+    }
+  }
+
+  private static createHistorical2dPlot_(data: EChartsData): void {
+    const container = document.getElementById('sat-info-maneuver-data') as HTMLElement | null;
+    if (!container) return;
+
+    const chartContainer = document.createElement('div');
+    chartContainer.style.display = 'grid';
+    chartContainer.style.gridTemplateColumns = '1fr';
+    chartContainer.style.gap = '20px';
+    chartContainer.style.marginTop = '0';
+    chartContainer.style.paddingTop = '0';
+    chartContainer.style.overflow = 'hidden';
+    chartContainer.style.position = 'relative';
+    chartContainer.style.zIndex = '1';
+    container.innerHTML = '';
+    container.appendChild(chartContainer);
+
+    // ---------- Detection header (centered) ----------
+    const detectionItem = data.find((item) => item.name.endsWith('Event')) as { name: string; value: any } | undefined;
+
+    if (detectionItem && detectionItem.value) {
+      const det = detectionItem.value as {
+        event_start_timestamp?: string;
+        event_end_timestamp?: string;
+        maneuver_class?: string | null;
+        maneuver_probability?: number;
+        oof_detection?: boolean;
+        stability_change_detection?: boolean;
+        stability_change_probability?: number;
+      };
+
+      const parts: string[] = [];
+      if (det.maneuver_class) {
+        const p = typeof det.maneuver_probability === 'number' ? Math.round(det.maneuver_probability * 100) : 0;
+        parts.push(`${det.maneuver_class} (${p}%)`);
+      }
+      if (det.oof_detection) {
+        parts.push('Orbit Out of Family');
+      }
+      if (det.stability_change_detection) {
+        const sp = typeof det.stability_change_probability === 'number' ? Math.round(det.stability_change_probability * 100) : 0;
+        parts.push(`Stability Change (${sp}%)`);
+      }
+
+      const header = document.createElement('div');
+      header.style.textAlign = 'center';
+      header.style.color = '#fff';
+      header.style.margin = '6px 0 4px';
+      header.style.fontFamily = 'inherit';
+
+      const eventLine = document.createElement('div');
+      eventLine.style.fontSize = '16px';
+      eventLine.style.fontWeight = '600';
+      eventLine.textContent = parts.length ? parts.join(' • ') : 'No Event Detected';
+
+      const startLine = document.createElement('div');
+      startLine.style.fontSize = '12px';
+      startLine.style.opacity = '0.9';
+      startLine.textContent = `Start: ${det.event_start_timestamp ?? '—'}`;
+
+      const endLine = document.createElement('div');
+      endLine.style.fontSize = '12px';
+      endLine.style.opacity = '0.9';
+      endLine.textContent = `End: ${det.event_end_timestamp ?? '—'}`;
+
+      header.appendChild(eventLine);
+      header.appendChild(startLine);
+      header.appendChild(endLine);
+
+      // Put header above charts
+      chartContainer.appendChild(header);
+    }
+
+    // --- Fullscreen helper with toggle callback ---
+    const attachFullscreenToggle = (el: HTMLElement, chart: echarts.ECharts, onToggle?: (isFs: boolean) => void) => {
+      let isFs = false;
+      let prevParent: HTMLElement | null = null;
+      let prevNext: ChildNode | null = null;
+      let prevStyle = '';
+      let prevBodyOverflow = '';
+      let keyHandler: ((e: KeyboardEvent) => void) | null = null;
+      let resizeHandler: (() => void) | null = null;
+
+      const enterFs = () => {
+        if (isFs) return;
+        isFs = true;
+        prevParent = el.parentElement;
+        prevNext = el.nextSibling;
+        prevStyle = el.getAttribute('style') || '';
+        prevBodyOverflow = document.body.style.overflow;
+
+        document.body.appendChild(el);
+        Object.assign(el.style, {
+          position: 'fixed',
+          top: '0',
+          left: '0',
+          width: '100vw',
+          height: '100vh',
+          zIndex: '9999',
+          background: '#000',
+          margin: '0',
+          padding: '0',
+          cursor: 'zoom-out',
+        } as Partial<CSSStyleDeclaration>);
+
+        document.body.style.overflow = 'hidden';
+        onToggle?.(true);
+        chart.resize();
+
+        keyHandler = (e: KeyboardEvent) => {
+          if (e.key === 'Escape') exitFs();
+        };
+        window.addEventListener('keydown', keyHandler);
+        resizeHandler = () => chart.resize();
+        window.addEventListener('resize', resizeHandler);
+      };
+
+      const exitFs = () => {
+        if (!isFs) return;
+        isFs = false;
+
+        if (prevParent) {
+          if (prevNext) prevParent.insertBefore(el, prevNext);
+          else prevParent.appendChild(el);
+        }
+        el.setAttribute('style', prevStyle);
+        document.body.style.overflow = prevBodyOverflow;
+        el.style.cursor = 'zoom-in';
+
+        if (keyHandler) window.removeEventListener('keydown', keyHandler);
+        if (resizeHandler) window.removeEventListener('resize', resizeHandler);
+        keyHandler = null;
+        resizeHandler = null;
+
+        onToggle?.(false);
+        chart.resize();
+      };
+
+      el.style.cursor = 'zoom-in';
+      el.addEventListener('click', () => (isFs ? exitFs() : enterFs()));
+    };
+
+    // --- Chart factory ---
+    const createChart = (chartId: string, title: string, yAxisName: string, yFieldIndex: number, chartData: any[]) => {
+      const chartDom = document.createElement('div');
+      chartDom.id = chartId;
+      chartDom.style.height = '300px';
+      chartDom.style.width = '100%';
+      chartDom.style.boxSizing = 'border-box';
+      chartContainer.appendChild(chartDom);
+
+      const chart = echarts.init(chartDom);
+      const rawSeries = chartData.map((entry) => [new Date(entry[3]).getTime(), entry[yFieldIndex]]);
+
+      // Compact number formatter for non-fullscreen mode
+      const shortNum = (v: number): string => {
+        if (!isFinite(v)) return '';
+        const av = Math.abs(v);
+
+        // Big numbers: compact units
+        if (av >= 1e9) return (v / 1e9).toFixed(Math.abs(v / 1e9) >= 10 ? 0 : 1) + 'B';
+        if (av >= 1e6) return (v / 1e6).toFixed(Math.abs(v / 1e6) >= 10 ? 0 : 1) + 'M';
+        if (av >= 1e3) return (v / 1e3).toFixed(Math.abs(v / 1e3) >= 10 ? 0 : 1) + 'k';
+
+        // Very small numbers: scientific
+        if (av > 0 && av < 1e-3) {
+          let s = v.toExponential(1).replace('+', '');
+          s = s.replace(/\.0+e/, 'e');
+          return s; // e.g., 8e-6
+        }
+
+        // 0 < |v| < 1: drop leading zero and cap to 4 decimals -> ".xxxx"
+        if (av > 0 && av < 1) {
+          const fixed = av.toFixed(4).substring(1); // remove leading "0"
+          return (v < 0 ? '-' : '') + fixed; // keep sign
+        }
+
+        // Everything else
+        const s = av >= 100 ? v.toFixed(0) : av >= 10 ? v.toFixed(1) : v.toPrecision(3);
+        return s.replace(/\.0+$/, '');
+      };
+
+      const tooltipPosition = (point: number[], _params: unknown, _el: unknown, _rect: unknown, size: { contentSize: [number, number] }): [number, number] => {
+        const offset = 12;
+        let [px, py] = point;
+        const vw = window.innerWidth,
+          vh = window.innerHeight;
+        const [tw, th] = size.contentSize;
+        px = Math.max(8, Math.min(px + offset, vw - tw - 8));
+        py = Math.max(8, Math.min(py + offset, vh - th - 8));
+        return [px, py];
+      };
+
+      const buildOption = (isFs: boolean): echarts.EChartsOption => {
+        const axisNameFont = isFs ? 20 : 14;
+        const axisTickFont = isFs ? 16 : 12;
+        const symbolSize = isFs ? 10 : 6;
+
+        // fixed margins so all charts have identical plot widths
+        const gridLeft = isFs ? 120 : 96;
+        const gridRight = isFs ? 50 : 40;
+        const gridTop = isFs ? 80 : 60;
+        const gridBottom = isFs ? 80 : 60;
+
+        return {
+          title: {
+            text: title,
+            left: 'center',
+            textStyle: { fontSize: isFs ? 22 : 16, color: '#fff' },
+          },
+          animation: false,
+          axisPointer: { type: 'cross', label: { show: false } },
+          tooltip: {
+            trigger: 'axis',
+            confine: true,
+            backgroundColor: 'rgba(20,20,20,0.92)',
+            borderColor: '#444',
+            textStyle: { color: '#fff' },
+            axisPointer: { type: 'cross' },
+            position: tooltipPosition as any,
+            formatter: (p: any) => {
+              const list = Array.isArray(p) ? p : [p];
+              const pt = list?.[0];
+              if (!pt || !pt.data) return '';
+              const t = pt.data[0];
+              const v = pt.data[1];
+              const valueStr = typeof v === 'number' && isFinite(v) ? (isFs ? v.toPrecision(6) : shortNum(v)) : 'N/A';
+              return `
+              <div>
+                <b>${pt.seriesName ?? title}</b><br/>
+                Time: ${new Date(t).toLocaleString()}<br/>
+                Value: ${valueStr}
+              </div>
+            `;
+            },
+          },
+          xAxis: {
+            type: 'time',
+            name: 'Epoch (UTC)',
+            nameLocation: 'middle',
+            nameGap: isFs ? 40 : 28,
+            axisLabel: { color: '#fff', fontSize: axisTickFont },
+            nameTextStyle: { color: '#fff', fontSize: axisNameFont },
+            axisLine: { lineStyle: { color: '#999' } },
+            axisPointer: { label: { show: false } },
+          },
+          yAxis: {
+            type: 'value',
+            name: yAxisName,
+            nameLocation: 'middle',
+            nameGap: isFs ? 60 : 45,
+            axisLabel: {
+              color: '#fff',
+              fontSize: axisTickFont,
+              margin: 8,
+              formatter: (value: number | string): string => (isFs ? String(value) : shortNum(Number(value))),
+            },
+            nameTextStyle: { color: '#fff', fontSize: axisNameFont },
+            axisLine: { lineStyle: { color: '#999' } },
+            axisPointer: { label: { show: false } },
+            scale: true, // don't force zero into view
+            boundaryGap: ['5%', '5%'], // visual padding / auto-fit feel
+          },
+          grid: {
+            top: gridTop,
+            bottom: gridBottom,
+            left: gridLeft,
+            right: gridRight,
+            containLabel: false, // keeps plot widths uniform across charts
+          },
+          series: [
+            {
+              name: title,
+              type: 'scatter',
+              large: true,
+              largeThreshold: 2000,
+              symbolSize,
+              hoverLayerThreshold: 3000,
+              data: rawSeries,
+              clip: true,
+            } as any,
+          ],
+          // dataZoom: [{ type: 'inside' }, { type: 'slider' }],
+        };
+      };
+
+      chart.setOption(buildOption(false));
+      attachFullscreenToggle(chartDom, chart, (isFs) => {
+        chart.setOption(buildOption(isFs), true);
+      });
+    };
+
+    // Elset charts
+    const elsetData = data.find((item) => !item.name.includes('EO Data'));
+    if (elsetData?.value?.length) {
+      createChart('eccentricity-chart', 'Eccentricity', 'Eccentricity (dimensionless)', 0, elsetData.value);
+      createChart('inclination-chart', 'Inclination (°)', 'Inclination (°)', 1, elsetData.value);
+      createChart('semiMajorAxis-chart', 'Semi-Major Axis (km)', 'Semi-Major Axis (km)', 2, elsetData.value);
+    }
+
+    // EO charts
+    const eoData = data.find((item) => item.name.includes('EO Data'));
+    if (eoData?.value?.length) {
+      createChart('rightAscension-chart', 'Right Ascension (°)', 'Right Ascension (°)', 0, eoData.value);
+      createChart('declination-chart', 'Declination (°)', 'Declination (°)', 1, eoData.value);
+      createChart('range-chart', 'Range (km)', 'Range (km)', 2, eoData.value);
+    }
+  }
+
+  private static updateManeuverData_(obj?: BaseObject) {
+    const section = getEl('maneuver-sat-info');
+    const content = getEl('sat-info-maneuver-data');
+
+    if (!(obj instanceof DetailedSatellite)) {
+      if (section) section.style.display = 'none';
+      return;
+    }
+
+    const sccNum = obj.sccNum;
+    if (content) content.innerHTML = '';
+
+    SatInfoBox.fetchHistoricalPlotData_(sccNum)
+      .then((plotData) => {
+        const elsetLen = plotData.find((it) => !it.name.includes('EO Data'))?.value?.length ?? 0;
+        const eoLen = plotData.find((it) => it.name.includes('EO Data'))?.value?.length ?? 0;
+
+        if (elsetLen === 0 && eoLen === 0) {
+          if (section) section.style.display = 'none';
+          return;
+        }
+
+        if (section) section.style.display = 'block';
+        SatInfoBox.createHistorical2dPlot_(plotData);
+      })
+      .catch(() => {
+        if (section) section.style.display = 'none';
+      });
+  }
+
+  // Manually wire the Maneuver collapse to toggle just the charts area
+  private wireManeuverCollapse_(): void {
+    const icon = getEl('maneuver-sat-info-collapse');
+    const content = getEl('sat-info-maneuver-data');
+    if (!icon || !content) return;
+
+    // Start expanded
+    let isCollapsed = false;
+
+    // Remove any previous listeners by cloning
+    const cloned = icon.cloneNode(true) as HTMLElement;
+    icon.parentElement?.replaceChild(cloned, icon);
+
+    cloned.addEventListener('click', () => {
+      isCollapsed = !isCollapsed;
+
+      if (isCollapsed) {
+        (content as HTMLElement).style.display = 'none';
+        cloned.classList.add('collapse-closed');
+        cloned.textContent = 'expand_more';
+      } else {
+        (content as HTMLElement).style.display = 'block';
+        cloned.classList.remove('collapse-closed');
+        cloned.textContent = 'expand_less';
+        // Ensure any existing charts resize properly when re-opened
+        content.querySelectorAll<HTMLElement>('div[id$="-chart"]').forEach((div) => {
+          try {
+            (echarts.getInstanceByDom(div) as any)?.resize?.();
+          } catch {}
+        });
+      }
+    });
   }
 
   private static calculateStdMag_(obj: DetailedSatellite): number | null {
@@ -1551,7 +2021,6 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (similarVmag.length > 0) {
       const avgVmag = similarVmag.reduce((a, b) => a + b, 0) / similarVmag.length;
-
 
       return avgVmag;
     }
@@ -1712,7 +2181,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             </div>
           </div>
         </div>
-        `,
+        `
     );
   }
 
@@ -1787,7 +2256,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       }
 
       // If we are in the sun exclusion zone, then say so
-      if (sunTime?.sunriseStart.getTime() - now.getTime() < 0 && (sunTime?.sunsetEnd.getTime() - now.getTime() > 0)) {
+      if (sunTime?.sunriseStart.getTime() - now.getTime() < 0 && sunTime?.sunsetEnd.getTime() - now.getTime() > 0) {
         // Unless you are in sun exclusion
         satSunDom.innerHTML = 'Sun Exclusion';
         satSunDom.style.color = 'red';
@@ -1884,7 +2353,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           <div id="sat-nextpass" class="sat-info-value">00:00:00z</div>
         </div>
       </div>
-      `,
+      `
     );
   }
 
@@ -1929,7 +2398,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           return;
         }
         hideEl(el.parentElement);
-      },
+      }
     );
 
     const satMissionData = getEl('sat-mission-data', true);
@@ -1955,7 +2424,7 @@ export class SatInfoBox extends KeepTrackPlugin {
           return;
         }
         el.parentElement.style.display = 'flex';
-      },
+      }
     );
 
     const satMissionData = getEl('sat-mission-data', true);

@@ -101,48 +101,48 @@ export class Earth {
   private modelViewMatrix_: mat4;
   private readonly normalMatrix_: mat3 = mat3.create();
   textureDay: Record<string, WebGLTexture> = {
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthDayTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthDayTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   textureNight: Record<string, WebGLTexture> = {
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [settingsManager.earthTextureStyle + EarthNightTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [settingsManager.earthTextureStyle + EarthNightTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   textureSpec: Record<EarthSpecTextureQuality, WebGLTexture> = {
-    [EarthSpecTextureQuality.OFF]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [EarthSpecTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [EarthSpecTextureQuality.OFF]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [EarthSpecTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   textureBump: Record<EarthBumpTextureQuality, WebGLTexture> = {
-    [EarthBumpTextureQuality.OFF]: <WebGLTexture><unknown>null,
-    [EarthBumpTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [EarthBumpTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [EarthBumpTextureQuality.HIGH]: <WebGLTexture><unknown>null,
+    [EarthBumpTextureQuality.OFF]: <WebGLTexture>(<unknown>null),
+    [EarthBumpTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [EarthBumpTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [EarthBumpTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
   };
   texturePolitical: Record<EarthPoliticalTextureQuality, WebGLTexture> = {
-    [EarthPoliticalTextureQuality.OFF]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [EarthPoliticalTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [EarthPoliticalTextureQuality.OFF]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [EarthPoliticalTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   textureClouds: Record<EarthCloudTextureQuality, WebGLTexture> = {
-    [EarthCloudTextureQuality.OFF]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.POTATO]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.LOW]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.MEDIUM]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.HIGH]: <WebGLTexture><unknown>null,
-    [EarthCloudTextureQuality.ULTRA]: <WebGLTexture><unknown>null,
+    [EarthCloudTextureQuality.OFF]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.POTATO]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.LOW]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.MEDIUM]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.HIGH]: <WebGLTexture>(<unknown>null),
+    [EarthCloudTextureQuality.ULTRA]: <WebGLTexture>(<unknown>null),
   };
   private vaoOcclusion_: WebGLVertexArrayObject;
   isHiResReady: boolean;
@@ -213,14 +213,12 @@ export class Earth {
       }
       this.gl_ ??= gl!;
 
-      if (!settingsManager.plugins.GraphicsMenuPlugin) {
-        settingsManager.earthBumpTextureQuality ??= EarthBumpTextureQuality.OFF;
-        settingsManager.earthSpecTextureQuality ??= EarthSpecTextureQuality.OFF;
-        settingsManager.earthDayTextureQuality ??= EarthDayTextureQuality.MEDIUM;
-        settingsManager.earthNightTextureQuality ??= EarthNightTextureQuality.MEDIUM;
-        settingsManager.earthPoliticalTextureQuality ??= EarthPoliticalTextureQuality.OFF;
-        settingsManager.earthCloudTextureQuality ??= EarthCloudTextureQuality.OFF;
-      }
+      settingsManager.earthBumpTextureQuality ??= EarthBumpTextureQuality.OFF;
+      settingsManager.earthSpecTextureQuality ??= EarthSpecTextureQuality.OFF;
+      settingsManager.earthDayTextureQuality ??= EarthDayTextureQuality.MEDIUM;
+      settingsManager.earthNightTextureQuality ??= EarthNightTextureQuality.MEDIUM;
+      settingsManager.earthPoliticalTextureQuality ??= EarthPoliticalTextureQuality.OFF;
+      settingsManager.earthCloudTextureQuality ??= EarthCloudTextureQuality.OFF;
 
       this.initTextures_();
 
@@ -233,20 +231,20 @@ export class Earth {
         });
         const material = new ShaderMaterial(this.gl_, {
           uniforms: {
-            uIsAmbientLighting: <WebGLUniformLocation><unknown>null,
-            uGlow: <WebGLUniformLocation><unknown>null,
-            uZoomLevel: <WebGLUniformLocation><unknown>null,
-            uisGrayScale: <WebGLUniformLocation><unknown>null,
-            uCloudPosition: <WebGLUniformLocation><unknown>null,
-            uAtmosphereType: <WebGLUniformLocation><unknown>null,
-            uIsDrawAurora: <WebGLUniformLocation><unknown>null,
-            uLightDirection: <WebGLUniformLocation><unknown>null,
-            uDayMap: <WebGLUniformLocation><unknown>null,
-            uNightMap: <WebGLUniformLocation><unknown>null,
-            uBumpMap: <WebGLUniformLocation><unknown>null,
-            uSpecMap: <WebGLUniformLocation><unknown>null,
-            uPoliticalMap: <WebGLUniformLocation><unknown>null,
-            uCloudsMap: <WebGLUniformLocation><unknown>null,
+            uIsAmbientLighting: <WebGLUniformLocation>(<unknown>null),
+            uGlow: <WebGLUniformLocation>(<unknown>null),
+            uZoomLevel: <WebGLUniformLocation>(<unknown>null),
+            uisGrayScale: <WebGLUniformLocation>(<unknown>null),
+            uCloudPosition: <WebGLUniformLocation>(<unknown>null),
+            uAtmosphereType: <WebGLUniformLocation>(<unknown>null),
+            uIsDrawAurora: <WebGLUniformLocation>(<unknown>null),
+            uLightDirection: <WebGLUniformLocation>(<unknown>null),
+            uDayMap: <WebGLUniformLocation>(<unknown>null),
+            uNightMap: <WebGLUniformLocation>(<unknown>null),
+            uBumpMap: <WebGLUniformLocation>(<unknown>null),
+            uSpecMap: <WebGLUniformLocation>(<unknown>null),
+            uPoliticalMap: <WebGLUniformLocation>(<unknown>null),
+            uCloudsMap: <WebGLUniformLocation>(<unknown>null),
           },
           vertexShader: this.shaders_.vert,
           fragmentShader: this.shaders_.frag,
@@ -334,7 +332,7 @@ export class Earth {
         keepTrackApi.getMainCamera().mouseX,
         gl.drawingBufferHeight - keepTrackApi.getMainCamera().mouseY,
         keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
-        keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
+        keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE
       );
     }
 
@@ -408,11 +406,13 @@ export class Earth {
       this.textureNight[sm.earthTextureStyle + sm.earthNightTextureQuality] = this.gl_.createTexture();
       const nightTextureStyle = `${sm.earthTextureStyle}-night`;
 
-      GlUtils.initTexture(this.gl_, `${this.getSrc_(nightTextureStyle, sm.earthNightTextureQuality)}`).then((texture) => {
-        this.textureNight[sm.earthTextureStyle + sm.earthNightTextureQuality] = texture;
-      }).catch(() => {
-        delete this.textureNight[sm.earthTextureStyle + sm.earthNightTextureQuality];
-      });
+      GlUtils.initTexture(this.gl_, `${this.getSrc_(nightTextureStyle, sm.earthNightTextureQuality)}`)
+        .then((texture) => {
+          this.textureNight[sm.earthTextureStyle + sm.earthNightTextureQuality] = texture;
+        })
+        .catch(() => {
+          delete this.textureNight[sm.earthTextureStyle + sm.earthNightTextureQuality];
+        });
     }
     if (!this.textureBump[sm.earthBumpTextureQuality] && sm.earthBumpTextureQuality && sm.earthBumpTextureQuality !== EarthBumpTextureQuality.OFF) {
       this.textureBump[sm.earthBumpTextureQuality] = this.gl_.createTexture();
@@ -512,8 +512,11 @@ export class Earth {
     gl.uniform1i(this.mesh.material.uniforms.uNightMap, 1);
     gl.activeTexture(gl.TEXTURE1);
 
-    if ((!this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality] &&
-      !this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]) || settingsManager.isBlackEarth) {
+    if (
+      (!this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality] &&
+        !this.textureDay[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]) ||
+      settingsManager.isBlackEarth
+    ) {
       gl.bindTexture(gl.TEXTURE_2D, null);
     } else if (!settingsManager.isDrawNightAsDay && this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]) {
       gl.bindTexture(gl.TEXTURE_2D, this.textureNight[settingsManager.earthTextureStyle + settingsManager.earthNightTextureQuality]);

@@ -12,20 +12,20 @@ import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export interface TipMsg {
-  'NORAD_CAT_ID': string,
-  'MSG_EPOCH': string,
-  'INSERT_EPOCH': string,
-  'DECAY_EPOCH': string,
-  'WINDOW': string,
-  'REV': string,
-  'DIRECTION': string,
-  'LAT': string,
-  'LON': string,
-  'INCL': string,
-  'NEXT_REPORT': string,
-  'ID': string,
-  'HIGH_INTEREST': string,
-  'OBJECT_NUMBER': string,
+  NORAD_CAT_ID: string;
+  MSG_EPOCH: string;
+  INSERT_EPOCH: string;
+  DECAY_EPOCH: string;
+  WINDOW: string;
+  REV: string;
+  DIRECTION: string;
+  LAT: string;
+  LON: string;
+  INCL: string;
+  NEXT_REPORT: string;
+  ID: string;
+  HIGH_INTEREST: string;
+  OBJECT_NUMBER: string;
 }
 
 export class TrackingImpactPredict extends KeepTrackPlugin {
@@ -65,22 +65,16 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
-      this.uiManagerFinal_.bind(this),
-    );
+    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherMessage,
-      () => {
-        if (this.selectSatIdOnCruncher_ !== null) {
-          // If selectedSatManager is loaded, set the selected sat to the one that was just added
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+    keepTrackApi.on(KeepTrackApiEvents.onCruncherMessage, () => {
+      if (this.selectSatIdOnCruncher_ !== null) {
+        // If selectedSatManager is loaded, set the selected sat to the one that was just added
+        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
 
-          this.selectSatIdOnCruncher_ = null;
-        }
-      },
-    );
+        this.selectSatIdOnCruncher_ = null;
+      }
+    });
   }
 
   private uiManagerFinal_() {
@@ -139,20 +133,20 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
       return;
     }
 
-
     const now = new Date();
-    const decayEpoch = new Date(Date.UTC(
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(0, 4)), // year
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(5, 7)) - 1, // month (0-based)
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(8, 10)), // day
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(11, 13)), // hour
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(14, 16)), // minute
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(17, 19)), // second
-    ));
+    const decayEpoch = new Date(
+      Date.UTC(
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(0, 4)), // year
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(5, 7)) - 1, // month (0-based)
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(8, 10)), // day
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(11, 13)), // hour
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(14, 16)), // minute
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(17, 19)) // second
+      )
+    );
 
     keepTrackApi.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
-
 
     keepTrackApi.getUiManager().doSearch(`${sat.sccNum5}`);
 
@@ -183,9 +177,17 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   private static createHeaders_(tbl: HTMLTableElement) {
     const tr = tbl.insertRow();
     const names = [
-      'NORAD', 'Decay Date', 'Latitude', 'Longitude', 'Window (min)',
-      'Next Report (hrs)', 'Reentry Angle (deg)', 'RCS (m^2)', 'GP Age (hrs)',
-      'Dry Mass (kg)', 'Volume (m^3)',
+      'NORAD',
+      'Decay Date',
+      'Latitude',
+      'Longitude',
+      'Window (min)',
+      'Next Report (hrs)',
+      'Reentry Angle (deg)',
+      'RCS (m^2)',
+      'GP Age (hrs)',
+      'Dry Mass (kg)',
+      'Volume (m^3)',
     ];
 
     for (const name of names) {

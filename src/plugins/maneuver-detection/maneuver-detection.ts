@@ -1,5 +1,5 @@
 import { errorManagerInstance } from '@app/singletons/errorManager';
-import sputnickPng from '@public/img/icons/sputnick.png';
+import orbitguardPng from '@public/img/icons/orbitguard.png';
 import './maneuver-detection.css';
 
 import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
@@ -25,19 +25,28 @@ export interface ManeuverDataMsg {
 export class ManeuverDetection extends KeepTrackPlugin {
   readonly id = 'ManeuverDetection';
   dependencies_ = [];
-  private readonly maneuverDataSrc = '/data/orbitguard_output.json'; // Updated data source
+  private readonly maneuverDataSrc = 'http://192.34.81.138:8501/orbitguard'; // API endpoint
   private selectSatIdOnCruncher_: number | null = null;
   private maneuverEvents_ = <ManeuverDataMsg[]>[];
 
-  bottomIconImg = sputnickPng;
+  // Pagination variables
+  private pageSize: number = 20; // Set to 20 rows per page
+  private currentPage: number = 1; // Current page number
+
+  bottomIconImg = orbitguardPng;
   sideMenuElementName: string = 'maneuver-detection-menu';
   sideMenuElementHtml = keepTrackApi.html`
     <div id="maneuver-detection-menu" class="side-menu-parent start-hidden text-select">
       <div id="maneuver-detection-content" class="side-menu">
         <div class="row">
-          <h5 class="center-align">OrbitGuard Anomaly Detection</h5>
+          <h1 class="center-align">OrbitGuard</h1>
           <table id="maneuver-detection-table" class="center-align"></table>
           <sub class="center-align">*OrbitGuard Data provided by MSBAI.</sub>
+          <div id="pagination-controls" class="pagination">
+            <button id="prev-page" class="pagination-btn">Previous</button>
+            <span id="current-page" class="pagination-text">Page 1</span>
+            <button id="next-page" class="pagination-btn">Next</button>
+          </div>
         </div>
       </div>
     </div>`;
@@ -46,7 +55,7 @@ export class ManeuverDetection extends KeepTrackPlugin {
   dragOptions: ClickDragOptions = {
     isDraggable: true,
     minWidth: 1200,
-    maxWidth: 1600, // Increased to accommodate two time columns
+    maxWidth: 1600,
   };
 
   bottomIconCallback: () => void = () => {
@@ -83,29 +92,10 @@ export class ManeuverDetection extends KeepTrackPlugin {
         }
       });
     });
-  }
 
-  private parseManeuverData_() {
-    if (this.maneuverEvents_.length === 0) {
-      fetch(this.maneuverDataSrc)
-        .then((response) => response.json())
-        .then((maneuverList: ManeuverDataMsg[]) => {
-          this.setManeuverList_(maneuverList);
-          this.createTable_();
-          if (this.maneuverEvents_.length === 0) {
-            errorManagerInstance.warn('No OrbitGuard data found!');
-          }
-        })
-        .catch(() => {
-          errorManagerInstance.warn('Error fetching OrbitGuard data!');
-        });
-    }
-  }
-
-  private setManeuverList_(maneuverList: ManeuverDataMsg[]) {
-    this.maneuverEvents_ = maneuverList;
-    this.maneuverEvents_.sort((a, b) => new Date(b.event_end_timestamp).getTime() - new Date(a.event_end_timestamp).getTime());
-    this.maneuverEvents_ = this.maneuverEvents_.filter((v, i, a) => a.findIndex((t) => t.satNo === v.satNo) === i);
+    // Add event listeners for pagination buttons
+    getEl('prev-page')!.addEventListener('click', this.goToPreviousPage.bind(this));
+    getEl('next-page')!.addEventListener('click', this.goToNextPage.bind(this));
   }
 
   private eventClicked_(row: number) {
@@ -117,13 +107,80 @@ export class ManeuverDetection extends KeepTrackPlugin {
     }
 
     const now = new Date();
-    const eventTime = new Date(this.maneuverEvents_[row].event_end_timestamp); // Using event_end_timestamp for consistency with sorting
+    const eventTime = new Date(this.maneuverEvents_[row].event_end_timestamp);
     keepTrackApi.getTimeManager().changeStaticOffset(eventTime.getTime() - now.getTime());
     keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
 
     keepTrackApi.getUiManager().doSearch(`${sat.sccNum5}`);
     this.selectSatIdOnCruncher_ = sat.id;
     this.closeSideMenu();
+  }
+
+  private parseManeuverData_() {
+    if (this.maneuverEvents_.length === 0) {
+      fetch(this.maneuverDataSrc, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer guruspace5172x2', // Add Bearer token from your script
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((maneuverList: ManeuverDataMsg[]) => {
+          this.setManeuverList_(maneuverList);
+          this.createTable_();
+          if (this.maneuverEvents_.length === 0) {
+            errorManagerInstance.warn('No OrbitGuard data found!');
+          }
+        })
+        .catch((error) => {
+          errorManagerInstance.warn(`Error fetching OrbitGuard data: ${error.message}`);
+        });
+    }
+  }
+
+  private setManeuverList_(maneuverList: ManeuverDataMsg[]) {
+    this.maneuverEvents_ = maneuverList;
+    this.maneuverEvents_.sort((a, b) => new Date(b.event_end_timestamp).getTime() - new Date(a.event_end_timestamp).getTime());
+    this.maneuverEvents_ = this.maneuverEvents_.filter((v, i, a) => a.findIndex((t) => t.satNo === v.satNo) === i);
+
+    this.currentPage = 1; // Reset to the first page whenever new data is loaded
+    this.updatePaginationControls(); // Update pagination controls for the first page
+  }
+
+  private updatePaginationControls() {
+    const totalPages = Math.ceil(this.maneuverEvents_.length / this.pageSize);
+    const pageText = getEl('current-page') as HTMLElement;
+    pageText.innerText = `Page ${this.currentPage} of ${totalPages}`;
+
+    const prevBtn = getEl('prev-page') as HTMLButtonElement;
+    const nextBtn = getEl('next-page') as HTMLButtonElement;
+
+    // Disable/Enable the previous/next buttons based on current page
+    prevBtn.disabled = this.currentPage <= 1;
+    nextBtn.disabled = this.currentPage >= totalPages;
+  }
+
+  private goToNextPage() {
+    const totalPages = Math.ceil(this.maneuverEvents_.length / this.pageSize);
+    if (this.currentPage < totalPages) {
+      this.currentPage++;
+      this.createTable_(); // Rebuild the table for the new page
+      this.updatePaginationControls(); // Update pagination controls
+    }
+  }
+
+  private goToPreviousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.createTable_(); // Rebuild the table for the new page
+      this.updatePaginationControls(); // Update pagination controls
+    }
   }
 
   private createTable_(): void {
@@ -140,15 +197,21 @@ export class ManeuverDetection extends KeepTrackPlugin {
   }
 
   private createBody_(tbl: HTMLTableElement) {
-    for (let i = 0; i < this.maneuverEvents_.length; i++) {
-      this.createRow_(tbl, i);
-    }
+    // Calculate the starting and ending indices for the current page
+    const startIdx = (this.currentPage - 1) * this.pageSize;
+    const endIdx = startIdx + this.pageSize;
+    const pageData = this.maneuverEvents_.slice(startIdx, endIdx);
+
+    // Create rows for the current page data
+    pageData.forEach((_, i) => {
+      this.createRow_(tbl, startIdx + i); // Adjust row index
+    });
   }
 
   private static createHeaders_(tbl: HTMLTableElement) {
     const tr = tbl.insertRow();
     const names = [
-      'NORAD ID',
+      'NORAD',
       'Event Start Time',
       'Event End Time',
       'Maneuver Class',
@@ -171,20 +234,66 @@ export class ManeuverDetection extends KeepTrackPlugin {
     tr.setAttribute('class', 'maneuver-object link');
     tr.setAttribute('data-row', i.toString());
 
-    ManeuverDetection.createCell_(tr, this.maneuverEvents_[i].satNo);
-    ManeuverDetection.createCell_(tr, this.maneuverEvents_[i].event_start_timestamp);
-    ManeuverDetection.createCell_(tr, this.maneuverEvents_[i].event_end_timestamp);
-    ManeuverDetection.createCell_(tr, this.maneuverEvents_[i].maneuver_class ?? 'None');
-    ManeuverDetection.createCell_(tr, (this.maneuverEvents_[i].maneuver_probability * 100).toFixed(2));
-    ManeuverDetection.createCell_(tr, this.maneuverEvents_[i].oof_detection === 0 ? 'false' : 'true');
-    ManeuverDetection.createCell_(tr, this.maneuverEvents_[i].stability_change_detection === 0 ? 'false' : 'true');
-    ManeuverDetection.createCell_(tr, (this.maneuverEvents_[i].stability_change_probability * 100).toFixed(2));
+    const formatDateTime = (isoString: string) => {
+      const date = new Date(isoString);
+      const pad = (n: number) => String(n).padStart(2, '0');
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` + `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    };
+
+    const cells = [
+      this.maneuverEvents_[i].satNo,
+      formatDateTime(this.maneuverEvents_[i].event_start_timestamp),
+      formatDateTime(this.maneuverEvents_[i].event_end_timestamp),
+      this.maneuverEvents_[i].maneuver_class ?? 'None',
+      (this.maneuverEvents_[i].maneuver_probability * 100).toFixed(2),
+      this.maneuverEvents_[i].oof_detection === 0 ? 'false' : 'true',
+      this.maneuverEvents_[i].stability_change_detection === 0 ? 'false' : 'true',
+      (this.maneuverEvents_[i].stability_change_probability * 100).toFixed(2),
+    ];
+
+    cells.forEach((cellText, index) => {
+      const cell = ManeuverDetection.createCell_(tr, cellText);
+      if (this.shouldHighlightRed(index, i)) {
+        cell.classList.add('highlight-red');
+      }
+    });
 
     return tr;
   }
 
-  private static createCell_(tr: HTMLTableRowElement, text: string): void {
+  private shouldHighlightRed(index: number, rowIndex: number): boolean {
+    const event = this.maneuverEvents_[rowIndex];
+
+    // Highlight based on column index
+    switch (index) {
+      case 3: // "Maneuver Class" column (index 3)
+        if (event.maneuver_class !== null) {
+          return true; // Highlight "maneuver_class" if it's not None
+        }
+        break;
+      case 5: // "Orbit Out of Family" column (index 5)
+        if (event.oof_detection !== 0) {
+          return true; // Highlight "Orbit Out of Family" if it's true
+        }
+        break;
+      case 6: // "Stability Change Detection" column (index 6)
+        if (event.stability_change_detection !== 0) {
+          return true; // Highlight "stability_change_detection" if it's not 0
+        }
+        break;
+      case 7: // "Stability Change Probability" column (index 7)
+        if (event.stability_change_probability !== 0.0) {
+          return true; // Highlight "stability_change_probability" if it's not 0.0
+        }
+        break;
+    }
+
+    return false;
+  }
+
+  private static createCell_(tr: HTMLTableRowElement, text: string): HTMLTableCellElement {
     const cell = tr.insertCell();
     cell.appendChild(document.createTextNode(text));
+    return cell;
   }
 }

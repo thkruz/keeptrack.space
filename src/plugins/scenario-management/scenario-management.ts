@@ -57,7 +57,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
   readonly id = 'ScenarioManagementPlugin';
   dependencies_ = [];
 
-  menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.SETTINGS, MenuMode.ALL];
+  menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.SETTINGS, MenuMode.ALL];
 
   defaultScenarioName = 'My Scenario';
   defaultScenarioDescription = 'Description of My Scenario';

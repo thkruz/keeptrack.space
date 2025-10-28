@@ -6,10 +6,9 @@ import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { SettingsManager } from '@app/settings/settings';
 import { DEG2RAD } from '@ootk/src/main';
-import { mat3, mat4, vec3 } from 'gl-matrix';
+import { mat3, mat4 } from 'gl-matrix';
 import { keepTrackApi } from '../../../keepTrackApi';
 import { DepthManager } from '../depth-manager';
-import { Scene } from '@app/engine/core/scene';
 /* eslint-disable no-useless-escape */
 /* eslint-disable camelcase */
 
@@ -132,7 +131,7 @@ export class SkyBoxSphere {
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.nMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.mvMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
-    gl.uniform3fv(this.mesh.material.uniforms.worldOffset, vec3.negate(vec3.create(), keepTrackApi.getMainCamera().getCamPos(Scene.getInstance().worldShift)));
+    gl.uniform3fv(this.mesh.material.uniforms.worldOffset, keepTrackApi.getMainCamera().getCamPos());
 
     if (!this.settings_.isDrawMilkyWay && !this.settings_.isDrawConstellationBoundaries && !this.settings_.isDrawNasaConstellations) {
       gl.uniform1i(this.mesh.material.uniforms.u_texMilkyWay, 0);
@@ -231,10 +230,6 @@ export class SkyBoxSphere {
   update(): void {
     this.mvMatrix_ = mat4.create();
     mat4.identity(this.mvMatrix_);
-
-    // const cameraPos = keepTrackApi.getMainCamera().getCameraPosition();
-
-    // mat4.translate(this.mvMatrix_, this.mvMatrix_, cameraPos);
 
     mat4.rotateZ(this.mvMatrix_, this.mvMatrix_, -90 * DEG2RAD);
     mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);

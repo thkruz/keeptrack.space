@@ -79,9 +79,16 @@ export abstract class DwarfPlanet extends CelestialBody {
     );
   }
 
+  lastUpdateTime: number = 0;
+  minimumUpdateInterval: number = 7 * 24 * 3600 * 1000;
+
   drawFullOrbitPath(): void {
-    if (this.fullOrbitPath) {
-      // return;
+    const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+    const isDataOld = Math.abs(nowMs - this.lastUpdateTime) > this.minimumUpdateInterval;
+
+    if (this.fullOrbitPath?.isGarbage === false && !isDataOld) {
+      // We are already drawing the full orbit path
+      return;
     }
 
     // If orbital period is less than 20 years, use the parent class method
@@ -94,35 +101,58 @@ export abstract class DwarfPlanet extends CelestialBody {
     const lineManager = ServiceLocator.getLineManager();
     const orbitPositions: [number, number, number, number][] = [];
 
-    const isTrail = true;
-    const startMs = Date.UTC(1990, 0, 1, 0, 0, 0); // 1 Jan 1990 UTC
-    const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
-    const endMs = Date.UTC(2048, 0, 1, 0, 0, 0); // 1 Jan 2048 UTC
-    const totalMs = endMs - startMs;
-    const segments = this.orbitPathSegments_ > 1 ? this.orbitPathSegments_ : 2;
-    const timesliceMs = totalMs / (segments - 1);
+    // If the absolute difference between now and last update time is greater
+    // than minimum interval do math
+    if (isDataOld) {
+      const isTrail = true;
+      const startMs = Date.UTC(1990, 0, 1, 0, 0, 0); // 1 Jan 1990 UTC
+      const endMs = Date.UTC(2048, 0, 1, 0, 0, 0); // 1 Jan 2048 UTC
+      const totalMs = endMs - startMs;
+      const segments = this.orbitPathSegments_ > 1 ? this.orbitPathSegments_ : 2;
+      const timesliceMs = totalMs / (segments - 1);
 
-    for (let i = 0; i < this.orbitPathSegments_; i++) {
-      const tMs = startMs + i * timesliceMs;
-      const newTime = new Date(tMs);
+      for (let i = 0; i < this.orbitPathSegments_; i++) {
+        const tMs = startMs + i * timesliceMs;
 
-      this.svCache[i] ??= this.getTeme(newTime, SolarBody.Sun).position;
-      const x = this.svCache[i].x;
-      const y = this.svCache[i].y;
-      const z = this.svCache[i].z;
+        this.svCache[i] ??= this.getTeme(new Date(tMs), SolarBody.Sun).position;
+        const x = this.svCache[i].x;
+        const y = this.svCache[i].y;
+        const z = this.svCache[i].z;
 
-      if (isTrail && tMs <= nowMs) {
-        orbitPositions.push([x, y, z, (i * timesliceMs) / (nowMs - startMs)]);
-      } else if (isTrail && tMs > nowMs) {
-        // Don't add future points in trail mode
-      } else {
-        orbitPositions.push([x, y, z, 1.0]);
+        if (isTrail && tMs <= nowMs) {
+          orbitPositions.push([x, y, z, (i * timesliceMs) / (nowMs - startMs)]);
+        } else if (isTrail && tMs > nowMs) {
+          // Don't add future points in trail mode
+          break;
+        } else {
+          orbitPositions.push([x, y, z, 1.0]);
+        }
       }
+
+      this.lastUpdateTime = nowMs;
     }
 
+    // Try to reuse existing fullOrbitPath
     if (this.fullOrbitPath) {
-      this.fullOrbitPath.isGarbage = true;
+      this.fullOrbitPath.isGarbage = false;
+
+      // Loop through lineManager.lines to find this.fullOrbitPath. Replace the entry.
+      for (let i = 0; i < lineManager.lines.length; i++) {
+        if (lineManager.lines[i] === this.fullOrbitPath) {
+
+          // If new positions were calculated, update the vertex buffer
+          if (orbitPositions.length !== 0) {
+            this.fullOrbitPath.updateVertBuf(orbitPositions);
+          }
+          lineManager.lines[i] = this.fullOrbitPath;
+
+          return;
+        }
+      }
+
     }
+
+    // Looks like we need a new fullOrbitPath
     this.fullOrbitPath = lineManager.createOrbitPath(orbitPositions, this.color, SolarBody.Sun);
   }
 

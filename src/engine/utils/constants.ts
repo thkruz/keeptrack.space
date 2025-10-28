@@ -27,7 +27,7 @@ import { Kilometers } from '@ootk/src/main';
 /**
  * Exponent used for calculating zoom distance.
  */
-export const ZOOM_EXP = 3;
+export const ZOOM_EXP = 3.8;
 
 /**
  * Earths gravitational constant.

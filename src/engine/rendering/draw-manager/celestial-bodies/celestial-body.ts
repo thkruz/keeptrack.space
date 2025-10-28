@@ -121,11 +121,9 @@ export abstract class CelestialBody {
         this.isDrawOrbitPath = false;
         if (this.fullOrbitPath) {
           this.fullOrbitPath.isGarbage = true;
-          this.fullOrbitPath = null;
         }
         if (this.fullOrbitPathEarthCentered) {
           this.fullOrbitPathEarthCentered.isGarbage = true;
-          this.fullOrbitPathEarthCentered = null;
         }
       });
 
@@ -147,14 +145,29 @@ export abstract class CelestialBody {
 
   abstract useHighestQualityTexture(): void
 
-  getJ2000(simTime: Date, centerBody = SolarBody.Earth): J2000 {
-    const pos = backdatePosition(simTime, centerBody as unknown as Body, this.getName() as unknown as Body, false);
+  lastJ2000: J2000 | null = null;
+  lastCenterBody: SolarBody | null = null;
+  minimumUpdateIntervalSeconds = 600; // 10 minutes
 
-    return new J2000(
+  getJ2000(simTime: Date, centerBody = SolarBody.Earth): J2000 {
+    if (
+      this.lastJ2000 && Math.abs(simTime.getTime() - this.lastJ2000.epoch.posix * 1000) < this.minimumUpdateIntervalSeconds * 1000 &&
+      this.lastCenterBody === centerBody
+    ) {
+      return this.lastJ2000;
+    }
+
+    const pos = backdatePosition(simTime, centerBody as unknown as Body, this.getName() as unknown as Body, false);
+    const j2000Data = new J2000(
       new EpochUTC((simTime.getTime() / 1000) as Seconds), // convert ms to s
       new Vector3D(pos.x * KM_PER_AU as Kilometers, pos.y * KM_PER_AU as Kilometers, pos.z * KM_PER_AU as Kilometers),
       new Vector3D(0 as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond),
     );
+
+    this.lastJ2000 = j2000Data;
+    this.lastCenterBody = centerBody;
+
+    return j2000Data;
   }
 
   getTeme(simTime: Date, centerBody = SolarBody.Earth): TEME {
@@ -310,13 +323,22 @@ export abstract class CelestialBody {
   };
 
   drawFullOrbitPath(): void {
-    if (this.fullOrbitPath) {
+    if (this.fullOrbitPath?.isGarbage === false) {
       return;
+    }
+
+    const lineManager = ServiceLocator.getLineManager();
+
+    if (this.fullOrbitPath) {
+      this.fullOrbitPath.isGarbage = false;
+      lineManager.add(this.fullOrbitPath);
+
+      return;
+
     }
 
     const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
     const now = simulationTimeObj.getTime() / 1000 as Seconds; // convert ms to s
-    const lineManager = ServiceLocator.getLineManager();
     const timeslice = this.orbitalPeriod / this.orbitPathSegments_;
     const orbitPositions: [number, number, number][] = [];
 

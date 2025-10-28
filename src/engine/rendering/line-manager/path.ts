@@ -62,10 +62,17 @@ export abstract class Path extends Line {
     const gl = keepTrackApi.getRenderer().gl;
 
     this.pathLength_ = points.length;
-    // we need a vec4 for each point
-    const vec4Points = points.map((p) => [p[0], p[1], p[2], p[3] ?? 1.0]);
 
-    GlUtils.bindBufferDynamicDraw(gl, this.vertBuf_, new Float32Array(vec4Points.flat()));
+    // we need a vec4 for each point
+    let newData: Float32Array;
+
+    if (points[0].length === 3) {
+      newData = new Float32Array(points.map((p) => [p[0], p[1], p[2], p[3] ?? 1.0]).flat());
+    } else {
+      newData = new Float32Array(points.flat() as ArrayLike<number>);
+    }
+
+    GlUtils.bindBufferDynamicDraw(gl, this.vertBuf_, newData);
   }
 
   protected validateColor(color: vec4): void {

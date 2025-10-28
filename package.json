@@ -110,7 +110,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "@typescript-eslint/typescript-estree": "^8.46.0",
     "auto-changelog-thkruz": "^1.0.0",
-    "babel-loader": "^9.1.3",
+    "babel-loader": "^10.0.0",
     "babel-plugin-istanbul": "^6.1.1",
     "clean-terminal-webpack-plugin": "^3.0.0",
     "codecov": "^3.8.3",

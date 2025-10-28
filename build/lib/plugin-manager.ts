@@ -80,6 +80,10 @@ export class PluginManager {
       openSourcePath: '../plugins/user-account/user-account',
       proPath: '../plugins-pro/user-account/user-account',
     },
+    'telemetry': {
+      openSourcePath: '../plugins/telemetry/telemetry',
+      proPath: '../plugins-pro/telemetry/telemetry',
+    },
   };
 
   constructor(fileManager: FileSystemManager) {

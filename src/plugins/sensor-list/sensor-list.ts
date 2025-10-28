@@ -206,8 +206,8 @@ export class SensorListPlugin extends KeepTrackPlugin {
       },
     );
 
-    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
-      if (key === 'Home' && !isRepeat) {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
+      if (key === 'Home' && !isShift && !isRepeat) {
         // If a sensor is selected rotate the camera to it
         if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&
           (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT)) {

@@ -158,7 +158,7 @@ export class StereoMap extends KeepTrackPlugin {
     );
 
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
-      if (key === 'M' && !isRepeat) {
+      if (key === 'm' && !isRepeat) {
         if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
           return;
         }

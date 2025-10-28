@@ -1,10 +1,10 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
+import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { errorManagerInstance } from '../utils/errorManager';
 import { Camera, CameraType } from './camera';
 import { CameraState } from './state/camera-state';
-import { EventBus } from '../events/event-bus';
 
 export class CameraInputHandler {
   private readonly camera: Camera;
@@ -71,7 +71,7 @@ export class CameraInputHandler {
   }
 
   registerKeyboardEvents() {
-    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'R', 'V', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+    const keysDown = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'r', 'v', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
     const keysUp = ['Shift', 'ShiftRight', 'W', 'A', 'S', 'D', 'Q', 'E', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
     keysDown.forEach((keyForFunc) => {
@@ -163,7 +163,7 @@ export class CameraInputHandler {
     }
   }
 
-  keyDownV_() {
+  keyDownv_() {
     const uiManagerInstance = keepTrackApi.getUiManager();
     const orbitManagerInstance = keepTrackApi.getOrbitManager();
 
@@ -320,7 +320,7 @@ export class CameraInputHandler {
     }
   }
 
-  keyDownR_() {
+  keyDownr_() {
     this.camera.autoRotate();
   }
 

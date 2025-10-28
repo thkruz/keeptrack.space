@@ -255,9 +255,17 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
-      if (key === 'Home' && !isRepeat) {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
+      if (key === 'Home' && isShift && !isRepeat) {
         this.changePlanet(SolarBody.Earth);
+      }
+    });
+
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
+      if (key === 'Home' && !isShift && !isRepeat) {
+        settingsManager.centerBody = SolarBody.Earth;
+        settingsManager.minZoomDistance = RADIUS_OF_EARTH + 50 as Kilometers;
+        settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
       }
     });
   }

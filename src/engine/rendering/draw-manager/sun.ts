@@ -19,7 +19,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 /* eslint-disable camelcase */
-import { SatMath } from '@app/app/analysis/sat-math';
 import { EciArr3, SolarBody } from '@app/engine/core/interfaces';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -63,7 +62,7 @@ export class Sun {
   /** The normal matrix. */
   private readonly normalMatrix_ = mat3.create();
 
-  /** The position of the sun in ECI coordinates. */
+  /** The position of the sun in TEME ECI coordinates. */
   eci: EciVec3 = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
   /** The mesh for the sun. */
   mesh: Mesh;
@@ -77,7 +76,7 @@ export class Sun {
   sunDirectionCache: { jd: number; sunDirection: EciArr3; } = { jd: 0, sunDirection: [0, 0, 0] };
   textureDirection = [0, 0] as vec2;
   rotation: vec3 = [0, 0, 0];
-  lastUpdateJ: number;
+  lastUpdateTime: number;
 
   /**
    * This is run once per frame to render the sun.
@@ -207,29 +206,30 @@ export class Sun {
     mat3.normalFromMat4(this.normalMatrix_, this.modelViewMatrix_);
   }
 
-  getEci(j: number): EciArr3 {
-    if (keepTrackApi.getTimeManager().j === j) {
+  getEci(simulationTimeObj: Date): EciArr3 {
+    if (keepTrackApi.getTimeManager().simulationTimeObj.getTime() === simulationTimeObj.getTime()) {
       return [this.eci.x, this.eci.y, this.eci.z];
     }
 
-    const eci = SatMath.getSunDirection(j);
+    const eci = Scene.getInstance().earth.getTeme(simulationTimeObj, SolarBody.Sun).position.toArray();
 
-    this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
+    this.eci = { x: <Kilometers>-eci[0], y: <Kilometers>-eci[1], z: <Kilometers>-eci[2] };
 
-    return eci;
+    return [this.eci.x, this.eci.y, this.eci.z];
   }
 
   updateEci() {
-    const j = keepTrackApi.getTimeManager().j;
+    const simulationTimeObj = keepTrackApi.getTimeManager().simulationTimeObj;
 
-    if (this.lastUpdateJ === j) {
+    if (simulationTimeObj.getTime() === this.lastUpdateTime) {
       return;
     }
 
-    const eci = SatMath.getSunDirection(j);
+    const eci = Scene.getInstance().earth.getTeme(simulationTimeObj, SolarBody.Sun).position.toArray();
 
-    this.eci = { x: <Kilometers>eci[0], y: <Kilometers>eci[1], z: <Kilometers>eci[2] };
-    this.lastUpdateJ = j;
+    this.eci = { x: <Kilometers>-eci[0], y: <Kilometers>-eci[1], z: <Kilometers>-eci[2] };
+
+    this.lastUpdateTime = simulationTimeObj.getTime();
   }
 
   /**
@@ -258,14 +258,12 @@ export class Sun {
       adjustedSize = settingsManager.isUseSunTexture ? settingsManager.sizeOfSun * 1.5 : settingsManager.sizeOfSun * this.sizeRandomFactor_;
     }
 
-    const distanceFromOrigin = keepTrackApi.getMainCamera().getCameraDistance();
-    const centerBody = settingsManager.centerBody;
-    // TODO: We actually want distance from the sun, not from origin
-    // TODO: This is ugly...
+    const sunEci = Scene.getInstance().sun.eci;
+    const distanceFromSun = ServiceLocator.getMainCamera().getDistFromEntity([sunEci.x, sunEci.y, sunEci.z]);
 
-    // Increase sun size when zoomed out very far
-    if (((centerBody === SolarBody.Mercury || centerBody === SolarBody.Venus || centerBody === SolarBody.Mars) && distanceFromOrigin >= 3e9) || distanceFromOrigin >= 1e9) {
-      adjustedSize *= 1.0 + (Math.max(0.3, keepTrackApi.getMainCamera().zoomLevel()) * settingsManager.maxZoomDistance) / 5e8;
+    // Increase sun size when far away to keep it visible
+    if (distanceFromSun >= 1e9) {
+      adjustedSize *= 1.0 + (distanceFromSun - 1e9) / 1e9;
     }
 
     gl.uniform3fv(this.mesh.material.uniforms.u_sizeOfSun, [adjustedSize, adjustedSize, adjustedSize]);

@@ -4,7 +4,7 @@ import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager, settingsManager } from '@app/settings/settings';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
-import { DEG2RAD, Degrees, DetailedSatellite, Kilometers, RAD2DEG, Radians } from '@ootk/src/main';
+import { DEG2RAD, Degrees, DetailedSatellite, RAD2DEG, Radians } from '@ootk/src/main';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { AtmosphereSettings, EarthTextureStyle } from '../rendering/draw-manager/earth-quality-enums';
@@ -477,12 +477,7 @@ export abstract class UrlManager {
       return;
     }
 
-    keepTrackApi.getMainCamera().state.camZoomSnappedOnSat = false;
-    keepTrackApi.getMainCamera().changeZoom(zoom);
-    // if camDistBuffer is not a number, set it to just outside the min zoom distance for close zoom
-    keepTrackApi.getMainCamera().state.camDistBuffer = isNaN(camDistBufferValue)
-      ? settingsManager.minZoomDistance + 1 as Kilometers
-      : camDistBufferValue as Kilometers;
+    keepTrackApi.getMainCamera().state.zoomTarget = zoom;
 
     if (camDistBufferValue >= settingsManager.nearZoomLevel) {
       // Outside camDistBuffer

@@ -1,7 +1,6 @@
 /**
  * Base class for rendering non-Earth celestial bodies (Moon, Mars, etc.)
  */
-import { SatMath } from '@app/app/analysis/sat-math';
 import { rgbaArray, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Milliseconds, Seconds, TEME, Vector3D } from '@ootk/src/main';
@@ -189,8 +188,7 @@ export abstract class DwarfPlanet extends CelestialBody {
 
     if (centerBody === SolarBody.Sun) {
       // Subtract the Sun's position to get heliocentric values
-      const { j } = SatMath.calculateTimeVariables(new Date(simTime));
-      const sunEci = ServiceLocator.getScene().sun.getEci(j);
+      const sunEci = ServiceLocator.getScene().sun.getEci(new Date(simTime));
 
       posAndVel[0] -= sunEci[0];
       posAndVel[1] -= sunEci[1];

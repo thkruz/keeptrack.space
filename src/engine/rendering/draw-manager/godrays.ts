@@ -1,8 +1,10 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { FlatGeometry } from '@app/engine/rendering/flat-geometry';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
+import { RADIUS_OF_SUN } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec2, vec4 } from 'gl-matrix';
@@ -55,6 +57,16 @@ export class Godrays {
 
     const gl = this.gl_;
 
+    // Calculate sun's screen-space radius
+    const sunPosArr = [this.sun_.eci.x, this.sun_.eci.y, this.sun_.eci.z];
+    const distanceFromSun = ServiceLocator.getMainCamera().getDistFromEntity(sunPosArr);
+
+    // sunRadius is 0.02 at 62e6 km and 1.0 at 10000 km - scale it accordingly
+    // with 0.02 being the max size
+    let sunRadius = RADIUS_OF_SUN / distanceFromSun * 6250;
+
+    sunRadius = Math.min(Math.max(sunRadius, 0.02), 1.0);
+
     this.mesh.program.use();
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
@@ -65,6 +77,7 @@ export class Godrays {
     gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
     gl.uniform2f(this.mesh.material.uniforms.u_sunPosition, screenPosition[0], screenPosition[1]);
     gl.uniform2f(this.mesh.material.uniforms.u_resolution, gl.canvas.width, gl.canvas.height);
+    gl.uniform1f(this.mesh.material.uniforms.u_sunRadius, sunRadius);
 
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -99,6 +112,7 @@ export class Godrays {
         u_sunPosition: <WebGLUniformLocation><unknown>null,
         u_sampler: <WebGLUniformLocation><unknown>null,
         u_resolution: <WebGLUniformLocation><unknown>null,
+        u_sunRadius: <WebGLUniformLocation><unknown>null,
       },
       map: gl.createTexture(),
       textureType: 'flat',
@@ -167,6 +181,7 @@ export class Godrays {
       uniform sampler2D u_sampler;
       uniform vec2 u_sunPosition;
       uniform vec2 u_resolution;
+      uniform float u_sunRadius;
 
       in vec2 v_texCoord;
       out vec4 fragColor;
@@ -190,7 +205,6 @@ export class Godrays {
         float dist = length(deltaTexCoord * vec2(u_resolution.x / u_resolution.y, 1.0));
 
         // Define sun radius in normalized screen space (now aspect-corrected)
-        float sunRadius = 0.02;
         float margin = 0.15;
         bool sunVisible =
           lightPositionOnScreen.x > -margin && lightPositionOnScreen.x < 1.0 + margin &&
@@ -202,10 +216,16 @@ export class Godrays {
           return;
         }
 
+        float softEdge = 0.15; // Transition zone
+
+        // Calculate smooth falloff
+        float edgeFactor = smoothstep(u_sunRadius, u_sunRadius + softEdge, dist);
+
         float noise = 0.0;
-        if (dist > sunRadius) {
+        if (dist > u_sunRadius) {
           // Incorporate u_sunPosition.x and u_sunPosition.y into noise calculation
           noise = rand(v_texCoord * u_resolution + float(gl_FragCoord.x + gl_FragCoord.y) + u_sunPosition.x * 100.0 + u_sunPosition.y * 1000.0);
+          noise *= edgeFactor; // Fade noise in gradually
         }
 
         vec4 color = vec4(0.0);
@@ -251,7 +271,7 @@ export class Godrays {
         vec3 rays = 1.0 - exp(-color.rgb * exposure);
 
         float blendFactor = 0.7 + 0.3 * noise;
-        vec3 blended = dist > sunRadius ? mix(scene.rgb + rays, rays, blendFactor) : scene.rgb + rays;
+        vec3 blended = dist > u_sunRadius ? mix(scene.rgb + rays, rays, blendFactor) : scene.rgb + rays;
 
         fragColor = vec4(blended, 1.0);
 

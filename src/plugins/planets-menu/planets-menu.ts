@@ -155,7 +155,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
 
     if (planetName === SolarBody.Sun) {
       this.drawOrbits_(planetName);
-      settingsManager.minZoomDistance = 1e9 as Kilometers; // 1 billion km
+      settingsManager.minZoomDistance = 62e6 as Kilometers; // 62 million km
       settingsManager.maxZoomDistance = 1.5e10 as Kilometers; // 15 billion km
       this.setAllPlanetsDotSize(1);
     } else if (planetName === SolarBody.Earth) {
@@ -182,7 +182,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
 
       selectedPlanet.useHighestQualityTexture();
       settingsManager.minZoomDistance = selectedPlanet.RADIUS * 1.2 as Kilometers;
-      settingsManager.maxZoomDistance = 1.5e10 as Kilometers; // 15 billion km
+      settingsManager.maxZoomDistance = 1.3e10 as Kilometers; // 13 billion km
       this.setAllPlanetsDotSize(1);
     }
   }

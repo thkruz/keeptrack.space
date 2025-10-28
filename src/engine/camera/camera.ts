@@ -32,6 +32,7 @@ import { mat4, quat, vec3 } from 'gl-matrix';
 import { SatMath } from '../../app/analysis/sat-math';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
+import { Scene } from '../core/scene';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { DepthManager } from '../rendering/depth-manager';
@@ -296,7 +297,7 @@ export class Camera {
       } else {
         const satAlt = SatMath.getAlt(SatMath.getPositionFromCenterBody(target.position), gmst);
 
-        if (this.getCameraDistance() < satAlt + RADIUS_OF_EARTH + settingsManager.minDistanceFromSatellite) {
+        if (this.getCameraDistanceFromEarth() < satAlt + RADIUS_OF_EARTH + settingsManager.minDistanceFromSatellite) {
           this.state.zoomTarget = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
           // errorManagerInstance.debug('Zooming in to ' + this.zoomTarget_ + ' to because we are too close to the satellite');
           this.state.zoomLevel = this.state.zoomTarget;
@@ -364,7 +365,7 @@ export class Camera {
       return;
     }
 
-    const cameraDistance = this.getCameraDistance();
+    const cameraDistance = this.getCameraDistanceFromEarth();
 
     this.state.ftsRotateReset = true;
 
@@ -400,25 +401,42 @@ export class Camera {
    *
    * Zoom level is ALWAYS raised to the power of ZOOM_EXP to ensure that zooming out is faster than zooming in
    * TODO: This should be handled before getting the zoomLevel_ value
+   * @deprecated This is old logic that assumes earth is the origin of the scene
    */
-  getCameraDistance(): Kilometers {
+  getCameraDistanceFromEarth(): Kilometers {
     return <Kilometers>(this.state.zoomLevel ** ZOOM_EXP * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance);
   }
 
   /**
-   * Calculates the ECI of the Camera based on the camMatrix
+   * Calculates the X, Y, Z of the Camera based on the matrixWorld
    *
    * Used in RayCasting
    */
-  getCamPos(): vec3 {
-    vec3.transformMat4(this.state.position, this.state.position, this.matrixWorldInverse);
+  getCamPos(origin = [0, 0, 0]): vec3 {
+    this.state.position = vec3.fromValues(this.matrixWorld[12], this.matrixWorld[13], this.matrixWorld[14]);
 
-    return this.state.position;
+    const relativePosition = vec3.create();
+
+    vec3.subtract(relativePosition, this.state.position, origin);
+
+    return relativePosition;
+  }
+
+  getDistFromEntity(entityPos: vec3): Kilometers {
+    const position = this.getCamPosEarthCentered();
+
+    return <Kilometers>Math.sqrt((position[0] - entityPos[0]) ** 2 + (position[1] - entityPos[1]) ** 2 + (position[2] - entityPos[2]) ** 2);
+  }
+
+  /**
+   * Gets the camera position in Earth-Centered coordinates where the north pole is +Z
+   */
+  getCamPosEarthCentered(): vec3 {
+    return this.getCamPos(Scene.getInstance().worldShift);
   }
 
   getDistFromEarth(): Kilometers {
-    const position = this.getCamPos();
-
+    const position = this.getCamPosEarthCentered();
 
     return <Kilometers>Math.sqrt(position[0] ** 2 + position[1] ** 2 + position[2] ** 2);
   }
@@ -465,7 +483,7 @@ export class Camera {
       this.state.camSnapToSat.altitude = SatMath.getAlt(target, gmst, centerBody.RADIUS as Kilometers);
       targetDistanceFromEarth = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH;
     }
-    const radius = this.getCameraDistance() - targetDistanceFromEarth;
+    const radius = this.getCameraDistanceFromEarth() - targetDistanceFromEarth;
 
 
     return radius;
@@ -772,7 +790,7 @@ export class Camera {
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
 
     // 2. Back away from the earth in the Y direction (depth)
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [0, this.getCameraDistance(), 0]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [0, this.getCameraDistanceFromEarth(), 0]);
     // 1. Rotate around the earth (0,0,0)
     mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.earthCenteredPitch);
     mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.earthCenteredYaw);
@@ -822,7 +840,7 @@ export class Camera {
     // Adjust for panning
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
     // Back away from the earth
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [settingsManager.offsetCameraModeX, this.getCameraDistance(), settingsManager.offsetCameraModeZ]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [settingsManager.offsetCameraModeX, this.getCameraDistanceFromEarth(), settingsManager.offsetCameraModeZ]);
     // Adjust for FPS style rotation
     mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.earthCenteredPitch);
     mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.earthCenteredYaw);
@@ -1300,7 +1318,7 @@ export class Camera {
       this.updateSatShaderSizes();
     }
 
-    const cameraDistance = this.getCameraDistance();
+    const cameraDistance = this.getCameraDistanceFromEarth();
 
     if (settingsManager.maxZoomDistance < 2e6) {
       // Scale minSize smoothly from 5.5 down to 3 as cameraDistance increases

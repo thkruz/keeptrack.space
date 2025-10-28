@@ -2,10 +2,11 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
-import { mat4 } from 'gl-matrix';
 import { DetailedSensor, SpaceObjectType } from '@ootk/src/main';
+import { mat4 } from 'gl-matrix';
 import { CustomMeshFactory } from './custom-mesh-factory';
 import { SensorFovMesh } from './sensor-fov-mesh';
+import { Scene } from '@app/engine/core/scene';
 
 // TODO: Sensors should be indpeneent of the object they are attached to. This will remove minAz2 and maxAz2 type of properties
 
@@ -150,6 +151,6 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
 
     this.add(sensorFovMesh);
 
-    sensorFovMesh.sortFacesByDistance(keepTrackApi.getMainCamera().getCamPos());
+    sensorFovMesh.sortFacesByDistance(keepTrackApi.getMainCamera().getCamPos(Scene.getInstance().worldShift));
   }
 }

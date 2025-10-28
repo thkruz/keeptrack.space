@@ -2,9 +2,10 @@ import { SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { LagrangeInterpolator } from '@app/engine/ootk/src/interpolator/LagrangeInterpolator';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { OrbitPathLine } from '@app/engine/rendering/line-manager/orbit-path';
-import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType, TEME } from '@ootk/src/main';
+import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
 import { SatelliteModels } from '../rendering/mesh/model-resolver';
 
 export interface OemHeader {
@@ -43,7 +44,7 @@ export interface OemCovarianceMatrix {
 
 export interface OemDataBlock {
   metadata: OemMetadata;
-  stateVectors: (J2000 | TEME)[];
+  ephemeris: J2000[];
   covariance?: OemCovarianceMatrix[] | null;
 }
 
@@ -68,6 +69,7 @@ export class OemSatellite extends BaseObject {
   orbitFullPathLine: OrbitPathLine | null = null;
   orbitHistoryLine: OrbitPathLine | null = null;
   isDrawOrbitHistory = true;
+  lagrangeInterpolator: LagrangeInterpolator | null = null;
 
   eci(date: Date): { position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } } | null {
     const posAndVel = this.updatePosAndVel(date.getTime() / 1000 as Seconds);
@@ -118,11 +120,11 @@ export class OemSatellite extends BaseObject {
       throw new Error('No data blocks found in OEM file.');
     }
 
-    if (lastDataBlock.stateVectors.length === 0) {
+    if (lastDataBlock.ephemeris.length === 0) {
       throw new Error('No state vectors found in the last data block of the OEM file.');
     }
 
-    const lastStateVector = lastDataBlock.stateVectors[lastDataBlock.stateVectors.length - 1];
+    const lastStateVector = lastDataBlock.ephemeris[lastDataBlock.ephemeris.length - 1];
 
     if (!lastStateVector) {
       throw new Error('No state vectors found in the last data block of the OEM file.');
@@ -148,6 +150,7 @@ export class OemSatellite extends BaseObject {
     }
 
     this.OemDataBlocks = oem.dataBlocks;
+    this.lagrangeInterpolator = LagrangeInterpolator.fromEphemeris(this.OemDataBlocks.flatMap((block) => block.ephemeris), this.OemDataBlocks[0].metadata.INTERPOLATION_DEGREE);
     this.source = 'OEM Import';
     this.header = oem.header;
 
@@ -210,9 +213,9 @@ export class OemSatellite extends BaseObject {
 
     this.findStateVectorTime_(simTime);
 
-    dt = (simTime - this.OemDataBlocks[this.dataBlockIdx].stateVectors[this.stateVectorIdx].epoch.posix) as Seconds;
+    dt = (simTime - this.OemDataBlocks[this.dataBlockIdx].ephemeris[this.stateVectorIdx].epoch.posix) as Seconds;
 
-    const currentSv = this.OemDataBlocks[this.dataBlockIdx].stateVectors[this.stateVectorIdx];
+    const currentSv = this.OemDataBlocks[this.dataBlockIdx].ephemeris[this.stateVectorIdx];
 
     let offsetOrigin = { position: { x: 0, y: 0, z: 0 } };
 
@@ -231,8 +234,8 @@ export class OemSatellite extends BaseObject {
     }
 
     const nextSv =
-      this.OemDataBlocks[this.dataBlockIdx].stateVectors[this.stateVectorIdx + 1] ??
-      this.OemDataBlocks[this.dataBlockIdx + 1]?.stateVectors[0] ??
+      this.OemDataBlocks[this.dataBlockIdx].ephemeris[this.stateVectorIdx + 1] ??
+      this.OemDataBlocks[this.dataBlockIdx + 1]?.ephemeris[0] ??
       currentSv;
 
     // interpolate position linearly between current and next state vector
@@ -265,7 +268,7 @@ export class OemSatellite extends BaseObject {
 
     // First check if we're still in the same vector range (common case for sequential access)
     if (startBlock < this.OemDataBlocks.length) {
-      const vectors = this.OemDataBlocks[startBlock].stateVectors;
+      const vectors = this.OemDataBlocks[startBlock].ephemeris;
 
       if (startVector < vectors.length) {
         const currentTime = vectors[startVector].epoch.posix;
@@ -283,7 +286,7 @@ export class OemSatellite extends BaseObject {
     let searchEnd = this.OemDataBlocks.length;
 
     if (startBlock < this.OemDataBlocks.length) {
-      const currentBlockVectors = this.OemDataBlocks[startBlock].stateVectors;
+      const currentBlockVectors = this.OemDataBlocks[startBlock].ephemeris;
       const cachedTime = currentBlockVectors[startVector]?.epoch.posix;
 
       if (cachedTime) {
@@ -299,7 +302,7 @@ export class OemSatellite extends BaseObject {
 
     // Search through the determined range
     for (let i = searchStart; i < searchEnd; i++) {
-      const vectors = this.OemDataBlocks[i].stateVectors;
+      const vectors = this.OemDataBlocks[i].ephemeris;
 
       // Skip this block if simTime is before it starts
       if (simTime < vectors[0].epoch.posix) {
@@ -377,8 +380,10 @@ export class OemSatellite extends BaseObject {
     const points: [number, number, number, number][] = [];
 
     for (const block of this.OemDataBlocks) {
-      for (const stateVector of block.stateVectors) {
-        points.push([stateVector.epoch.posix * 1000, stateVector.position.x, stateVector.position.y, stateVector.position.z]);
+      for (const stateVector of block.ephemeris) {
+        const teme = stateVector.toTEME();
+
+        points.push([teme.epoch.posix * 1000, teme.position.x, teme.position.y, teme.position.z]);
       }
     }
 
@@ -422,7 +427,7 @@ export class OemSatellite extends BaseObject {
     let currentIndex = 0;
 
     for (let i = 0; i < this.dataBlockIdx; i++) {
-      currentIndex += this.OemDataBlocks[i].stateVectors.length;
+      currentIndex += this.OemDataBlocks[i].ephemeris.length;
     }
     currentIndex += this.stateVectorIdx;
 
@@ -491,7 +496,7 @@ export class OemSatellite extends BaseObject {
     let currentIndex = 0;
 
     for (let i = 0; i < this.dataBlockIdx; i++) {
-      currentIndex += this.OemDataBlocks[i].stateVectors.length;
+      currentIndex += this.OemDataBlocks[i].ephemeris.length;
     }
     currentIndex += this.stateVectorIdx;
 
@@ -541,8 +546,10 @@ export class OemSatellite extends BaseObject {
 
     if (!this.pointsForOrbitPath) {
       for (const block of this.OemDataBlocks) {
-        for (const stateVector of block.stateVectors) {
-          points.push([stateVector.position.x, stateVector.position.y, stateVector.position.z]);
+        for (const stateVector of block.ephemeris) {
+          const teme = stateVector.toTEME();
+
+          points.push([teme.position.x, teme.position.y, teme.position.z]);
         }
       }
 

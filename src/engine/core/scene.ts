@@ -16,6 +16,7 @@ import { Mars } from '../rendering/draw-manager/celestial-bodies/mars';
 import { Mercury } from '../rendering/draw-manager/celestial-bodies/mercury';
 import { Moon } from '../rendering/draw-manager/celestial-bodies/moon';
 import { Neptune } from '../rendering/draw-manager/celestial-bodies/neptune';
+import { Pluto } from '../rendering/draw-manager/celestial-bodies/pluto';
 import { Saturn } from '../rendering/draw-manager/celestial-bodies/saturn';
 import { Uranus } from '../rendering/draw-manager/celestial-bodies/uranus';
 import { Venus } from '../rendering/draw-manager/celestial-bodies/venus';
@@ -118,6 +119,7 @@ export class Scene {
     };
     this.dwarfPlanets = {
       [SolarBody.Makemake]: new Makemake(),
+      [SolarBody.Pluto]: new Pluto(),
     };
     this.moons = {
       [SolarBody.Moon]: new Moon(),
@@ -166,9 +168,9 @@ export class Scene {
       case SolarBody.Saturn:
       case SolarBody.Uranus:
       case SolarBody.Neptune:
-      case SolarBody.Pluto:
         this.worldShift = (this.getBodyById(settingsManager.centerBody)!.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
         break;
+      case SolarBody.Pluto:
       case SolarBody.Makemake:
         this.worldShift = (this.dwarfPlanets[settingsManager.centerBody]!.position as [number, number, number]).map((coord: number) => -coord) as [number, number, number];
         break;

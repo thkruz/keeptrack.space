@@ -394,14 +394,6 @@ export class CatalogLoader {
     const planetList = ServiceLocator.getScene().planets;
     const dwarfPlanetList = ServiceLocator.getScene().dwarfPlanets;
 
-    dwarfPlanetList.Makemake!.planetObject = new Planet({
-      id: tempObjData.length,
-      name: 'Makemake',
-      type: SpaceObjectType.DWARF_PLANET,
-    });
-    dwarfPlanetList.Makemake!.planetObject.color = [1.0, 0.8, 0.6, 1.0] as rgbaArray;
-    tempObjData.push(dwarfPlanetList.Makemake!.planetObject);
-
     if (planetList) {
       Object.keys(planetList).forEach((planet) => {
         const planetDot = new Planet({
@@ -438,6 +430,23 @@ export class CatalogLoader {
       // keepTrackApi.getScene().planets.Moon.planetObject = moonDot;
 
       // tempObjData.push(moonDot);
+    }
+
+    if (dwarfPlanetList) {
+      Object.keys(dwarfPlanetList).forEach((dwarfPlanet) => {
+        const dwarfPlanetDot = new Planet({
+          id: tempObjData.length,
+          name: dwarfPlanet,
+          type: dwarfPlanetList[dwarfPlanet]?.type ?? SpaceObjectType.UNKNOWN,
+        });
+
+        dwarfPlanetDot.color = dwarfPlanetList[dwarfPlanet]?.color ?? [1.0, 1.0, 1.0, 1.0] as rgbaArray;
+        if (dwarfPlanetList[dwarfPlanet]) {
+          (dwarfPlanetList[dwarfPlanet] as CelestialBody).planetObject = dwarfPlanetDot;
+        }
+
+        tempObjData.push(dwarfPlanetDot);
+      });
     }
 
     dotsManagerInstance.planetDot2 = tempObjData.length;

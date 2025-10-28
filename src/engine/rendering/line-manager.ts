@@ -101,7 +101,7 @@ export class LineManager {
     this.add(new RefToRefLine(ref1, ref2, color));
   }
 
-  createOrbitPath(path: vec3[], color: vec4, solarBody = SolarBody.Sun): OrbitPathLine | null {
+  createOrbitPath(path: vec3[] | vec4[], color: vec4, solarBody = SolarBody.Sun): OrbitPathLine | null {
     if (!path || path.length === 0) {
       return null;
     }

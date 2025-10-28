@@ -52,6 +52,7 @@ export abstract class DwarfPlanet extends CelestialBody {
     posTeme.x = posTeme.x + sunPos.x as Kilometers;
     posTeme.y = posTeme.y + sunPos.y as Kilometers;
     posTeme.z = posTeme.z + sunPos.z as Kilometers;
+
     this.position = [posTeme.x, posTeme.y, posTeme.z];
 
     // There is intentionally no rotation update for dwarf planets at this time
@@ -80,7 +81,7 @@ export abstract class DwarfPlanet extends CelestialBody {
 
   drawFullOrbitPath(): void {
     if (this.fullOrbitPath) {
-      return;
+      // return;
     }
 
     // If orbital period is less than 20 years, use the parent class method
@@ -91,9 +92,11 @@ export abstract class DwarfPlanet extends CelestialBody {
     }
 
     const lineManager = ServiceLocator.getLineManager();
-    const orbitPositions: [number, number, number][] = [];
+    const orbitPositions: [number, number, number, number][] = [];
 
+    const isTrail = true;
     const startMs = Date.UTC(1990, 0, 1, 0, 0, 0); // 1 Jan 1990 UTC
+    const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
     const endMs = Date.UTC(2048, 0, 1, 0, 0, 0); // 1 Jan 2048 UTC
     const totalMs = endMs - startMs;
     const segments = this.orbitPathSegments_ > 1 ? this.orbitPathSegments_ : 2;
@@ -104,23 +107,22 @@ export abstract class DwarfPlanet extends CelestialBody {
       const newTime = new Date(tMs);
 
       this.svCache[i] ??= this.getTeme(newTime, SolarBody.Sun).position;
-      let x = this.svCache[i].x;
-      let y = this.svCache[i].y;
-      let z = this.svCache[i].z;
+      const x = this.svCache[i].x;
+      const y = this.svCache[i].y;
+      const z = this.svCache[i].z;
 
-      if (settingsManager.centerBody === SolarBody.Sun) {
-        // Do nothing
-      } else if (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon) {
-        const centerBodyPlanet = ServiceLocator.getScene().getBodyById(settingsManager.centerBody);
-
-        x = x + (centerBodyPlanet?.position[0] ?? 0) as Kilometers;
-        y = y + (centerBodyPlanet?.position[1] ?? 0) as Kilometers;
-        z = z + (centerBodyPlanet?.position[2] ?? 0) as Kilometers;
+      if (isTrail && tMs <= nowMs) {
+        orbitPositions.push([x, y, z, (i * timesliceMs) / (nowMs - startMs)]);
+      } else if (isTrail && tMs > nowMs) {
+        // Don't add future points in trail mode
+      } else {
+        orbitPositions.push([x, y, z, 1.0]);
       }
-
-      orbitPositions.push([x, y, z]);
     }
 
+    if (this.fullOrbitPath) {
+      this.fullOrbitPath.isGarbage = true;
+    }
     this.fullOrbitPath = lineManager.createOrbitPath(orbitPositions, this.color, SolarBody.Sun);
   }
 
@@ -193,6 +195,13 @@ export abstract class DwarfPlanet extends CelestialBody {
       posAndVel[0] -= sunEci[0];
       posAndVel[1] -= sunEci[1];
       posAndVel[2] -= sunEci[2];
+    } else if (centerBody !== SolarBody.Earth && centerBody !== SolarBody.Moon) {
+      const centerBodyPlanet = ServiceLocator.getScene().getBodyById(centerBody);
+      const centerBodyEci = centerBodyPlanet?.getTeme(new Date(simTime)) ?? [0, 0, 0];
+
+      posAndVel[0] -= centerBodyEci[0];
+      posAndVel[1] -= centerBodyEci[1];
+      posAndVel[2] -= centerBodyEci[2];
     }
 
     return posAndVel;

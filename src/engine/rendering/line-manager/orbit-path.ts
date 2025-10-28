@@ -7,7 +7,7 @@ export class OrbitPathLine extends Path {
   color: vec4;
   solarBody: SolarBody;
 
-  constructor(path: vec3[], color: vec4, solarBody: SolarBody) {
+  constructor(path: vec3[] | vec4[], color: vec4, solarBody: SolarBody) {
     super(path.length, solarBody);
     this.path_ = path;
 

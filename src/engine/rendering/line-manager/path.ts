@@ -58,12 +58,12 @@ export abstract class Path extends Line {
 
   abstract update(): void;
 
-  updateVertBuf(points: vec3[]): void {
+  updateVertBuf(points: vec3[] | vec4[]): void {
     const gl = keepTrackApi.getRenderer().gl;
 
     this.pathLength_ = points.length;
     // we need a vec4 for each point
-    const vec4Points = points.map((p) => [p[0], p[1], p[2], 1.0]);
+    const vec4Points = points.map((p) => [p[0], p[1], p[2], p[3] ?? 1.0]);
 
     GlUtils.bindBufferDynamicDraw(gl, this.vertBuf_, new Float32Array(vec4Points.flat()));
   }

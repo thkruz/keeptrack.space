@@ -35,6 +35,8 @@ export const PlanetColors = {
   SATURN: [0.72, 0.65, 0.52, 0.7] as rgbaArray,
   URANUS: [0.67, 0.92, 1, 0.7] as rgbaArray,
   NEPTUNE: [0.48, 0.69, 1, 0.7] as rgbaArray,
+  PLUTO: [0.8, 0.7, 0.5, 0.7] as rgbaArray,
+  MAKEMAKE: [1.0, 0.8, 0.6, 1.0] as rgbaArray,
 } as const;
 
 export abstract class CelestialBody {

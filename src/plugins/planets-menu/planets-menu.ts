@@ -74,7 +74,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     `;
 
     for (const object of this.DWARF_PLANETS) {
-      const isDisabled = ['Pluto', 'Eris', 'Haumea', 'Ceres'].includes(object) ? ' disabled' : '';
+      const isDisabled = ['Eris', 'Haumea', 'Ceres'].includes(object) ? ' disabled' : '';
 
       if (isDisabled) {
         html_ += `<li class="disabled" kt-tooltip="Planned for future update." aria-disabled="true" disabled>${object}</li>`;

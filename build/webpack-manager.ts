@@ -70,12 +70,16 @@ export class WebpackManager {
 
     // split entry points of main and webworkers
     const mainConfig = this.createMainConfig_(baseConfig, dirName, 'dist');
-    const authConfig = this.createAuthConfig_(baseConfig, dirName, 'dist', 'auth/');
     const webWorkerConfig = this.createWorkerConfig_(baseConfig, dirName, 'dist', '');
 
     webpackConfig.push(mainConfig);
-    webpackConfig.push(authConfig);
     webpackConfig.push(webWorkerConfig);
+
+    if (this.config.isPro) {
+      const authConfig = this.createAuthConfig_(baseConfig, dirName, 'dist', 'auth/');
+
+      webpackConfig.push(authConfig);
+    }
 
     // Modify the resolve configuration to handle web worker imports
     baseConfig.resolve!.fallback = {

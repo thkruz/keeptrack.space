@@ -517,13 +517,13 @@ export class LineManager {
     gl.enableVertexAttribArray(this.attribs.a_position.location);
 
     // Validate the buffer has enough data
-    const bufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
-    const requiredSize = segments * 4 * Float32Array.BYTES_PER_ELEMENT;
-
-    if (bufferSize < requiredSize) {
-      console.warn(`LineManager: Buffer size (${bufferSize} bytes) is less than required size (${requiredSize} bytes). Adjusting segments to fit buffer.`);
-      segments = Math.floor(bufferSize / (4 * Float32Array.BYTES_PER_ELEMENT));
-    }
+    // DEBUGGING CODE - Uncomment if needed
+    // const bufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
+    // const requiredSize = segments * 4 * Float32Array.BYTES_PER_ELEMENT;
+    // if (bufferSize < requiredSize) {
+    //   console.warn(`LineManager: Buffer size (${bufferSize} bytes) is less than required size (${requiredSize} bytes). Adjusting segments to fit buffer.`);
+    //   segments = Math.floor(bufferSize / (4 * Float32Array.BYTES_PER_ELEMENT));
+    // }
 
     gl.drawArrays(gl.LINE_STRIP, 0, segments);
     gl.disableVertexAttribArray(this.attribs.a_position.location);

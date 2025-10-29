@@ -285,5 +285,3 @@ export class RicPlot extends KeepTrackPlugin {
     return data;
   }
 }
-
-export const ricPlotPlugin = new RicPlot();

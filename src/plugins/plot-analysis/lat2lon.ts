@@ -242,5 +242,3 @@ export class Lat2LonPlots extends KeepTrackPlugin {
     return data;
   }
 }
-
-export const Lat2LonPlotsPlugin = new Lat2LonPlots();

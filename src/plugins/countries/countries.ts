@@ -9,13 +9,13 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import flagPng from '@public/img/icons/flag.png';
 
 import { SearchResult } from '@app/app/ui/search-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
@@ -60,8 +60,7 @@ export class CountriesMenu extends KeepTrackPlugin {
   private static generateCountryList_(): string {
     const header = html`
     <h5 class="center-align">${t7e(`plugins.${CountriesMenu.name}.bottomIconLabel` as TranslationKey)}</h5>
-    <li class="divider"></li>
-    <br/>`;
+    <li class="divider"></li>`;
 
     const countryCodeList = [] as string[];
 

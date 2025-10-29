@@ -11,7 +11,7 @@ export interface ShaderMaterialParameters extends MaterialParameters {
   lights?: boolean;
   clipping?: boolean;
   fog?: boolean;
-  map?: WebGLTexture;
+  map?: WebGLTexture | null;
   image?: HTMLImageElement;
   alphaMap?: WebGLTexture;
   alphaImage?: HTMLImageElement;

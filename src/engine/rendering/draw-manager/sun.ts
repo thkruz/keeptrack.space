@@ -114,7 +114,7 @@ export class Sun {
       heightSegments: this.NUM_HEIGHT_SEGS,
     });
     const sunTextureQuality = settingsManager.sunTextureQuality ?? SunTextureQuality.POTATO;
-    const texture = await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun${sunTextureQuality}.jpg`);
+    const texture = settingsManager.isDrawSun ? await GlUtils.initTexture(gl, `${settingsManager.installDirectory}textures/sun${sunTextureQuality}.jpg`) : null;
     const material = new ShaderMaterial(this.gl_, {
       uniforms: {
         u_sampler: null as unknown as WebGLUniformLocation,

@@ -98,6 +98,8 @@ import i18next from 'i18next';
 
 export const Keys = ${keysObject};
 
+const translationCache: Map<TranslationKey, string> = new Map();
+
 // Type for all valid translation keys
 export type TranslationKey = typeof Keys[number];
 
@@ -114,9 +116,18 @@ export type TranslationKey = typeof Keys[number];
  * or another localization library implementation.
  */
 export function t7e(key: TranslationKey, options?: Record<string, any>): string {
-  const translatedString = i18next.t(key, options);
+  // Check if the translation is already cached
+  if (translationCache.has(key)) {
+    return translationCache.get(key)!;
+  }
 
-  return translatedString as string;
+  // Perform the translation using i18next
+  const translatedString = i18next.t(key, options) as string;
+
+  // Cache the translation
+  translationCache.set(key, translatedString);
+
+  return translatedString;
 }
 `;
 

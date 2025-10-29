@@ -214,7 +214,9 @@ export class SatelliteFov extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (sat: BaseObject) => {
-        this.updateListOfFovMeshes_();
+        if (this.isMenuButtonActive) {
+          this.updateListOfFovMeshes_();
+        }
 
         if (sat?.isSatellite()) {
           this.isSettingsMenuEnabled_ = true;

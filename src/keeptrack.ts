@@ -24,6 +24,8 @@
  */
 
 import 'material-icons/iconfont/material-icons.css';
+import 'requestidlecallback-polyfill';
+
 import { Localization } from './locales/locales'; // Ensure localization is imported first
 
 import { CatalogLoader } from './app/data/catalog-loader';

@@ -197,33 +197,41 @@ export class MouseInput {
 
   private canvasMouseMove_(evt: MouseEvent, mainCameraInstance: Camera): void {
     if (this.mouseMoveTimeout === -1) {
-      this.mouseMoveTimeout = window.setTimeout(() => {
+      this.mouseMoveTimeout = requestAnimationFrame(() => {
         this.canvasMouseMoveFire_(mainCameraInstance, evt);
-      }, 16);
+      });
     }
   }
 
   private canvasMouseMoveFire_(mainCameraInstance: Camera, evt: MouseEvent) {
-    mainCameraInstance.state.mouseX = evt.clientX - (keepTrackApi.containerRoot.scrollLeft - window.scrollX) - keepTrackApi.containerRoot.offsetLeft;
-    mainCameraInstance.state.mouseY = evt.clientY - (keepTrackApi.containerRoot.scrollTop - window.scrollY) - keepTrackApi.containerRoot.offsetTop;
-    if (
-      mainCameraInstance.state.isDragging &&
-      mainCameraInstance.state.screenDragPoint[0] !== mainCameraInstance.state.mouseX &&
-      mainCameraInstance.state.screenDragPoint[1] !== mainCameraInstance.state.mouseY
-    ) {
+    // Cache DOM lookups
+    const container = keepTrackApi.containerRoot;
+    const offsetX = container.scrollLeft - window.scrollX + container.offsetLeft;
+    const offsetY = container.scrollTop - window.scrollY + container.offsetTop;
+
+    const state = mainCameraInstance.state;
+
+    state.mouseX = evt.clientX - offsetX;
+    state.mouseY = evt.clientY - offsetY;
+
+    // Check for drag movement
+    if (state.isDragging &&
+      (state.screenDragPoint[0] !== state.mouseX ||
+        state.screenDragPoint[1] !== state.mouseY)) {
       this.dragHasMoved = true;
-      mainCameraInstance.state.camAngleSnappedOnSat = false;
+      state.camAngleSnappedOnSat = false;
     }
+
     this.isMouseMoving = true;
 
-    // This is so you have to keep moving the mouse or the ui says it has stopped (why?)
+    // Reset mouse moving state
     clearTimeout(this.mouseTimeout);
     this.mouseTimeout = window.setTimeout(() => {
       this.isMouseMoving = false;
     }, 150);
 
-    // This is to prevent mousemove being called between drawframes (who cares if it has moved at that point)
-    window.clearTimeout(this.mouseMoveTimeout);
+    // Clear RAF instead of setTimeout
+    cancelAnimationFrame(this.mouseMoveTimeout);
     this.mouseMoveTimeout = -1;
   }
 

@@ -27,14 +27,16 @@ export const getEl = (id: string, isExpectedMissing = false): HTMLElement | null
 };
 
 export const setInnerHtml = (id: string, html: string) => {
-  const el = getEl(id);
+  requestIdleCallback(() => {
+    const el = getEl(id);
 
-  if (!el) {
-    errorManagerInstance.debug(`Element with id ${id} not found!`);
+    if (!el) {
+      errorManagerInstance.debug(`Element with id ${id} not found!`);
 
-    return;
-  }
-  el.innerHTML = html;
+      return;
+    }
+    el.innerHTML = html;
+  });
 };
 
 /**

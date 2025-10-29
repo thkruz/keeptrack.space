@@ -57,6 +57,8 @@ export class NewLaunch extends KeepTrackPlugin {
       return;
     }
 
+    this.preValidate_(sat);
+
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
     (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4).padStart(8, '0');
   };
@@ -325,19 +327,6 @@ export class NewLaunch extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    EventBus.getInstance().on(
-      EventBusEvent.uiManagerFinal,
-      () => {
-        getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', () => {
-          const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
-
-          if (!sat.isSatellite()) {
-            return;
-          }
-          this.preValidate_(sat);
-        });
-      },
-    );
 
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
@@ -347,7 +336,6 @@ export class NewLaunch extends KeepTrackPlugin {
 
           (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
           this.setBottomIconToEnabled();
-          this.preValidate_(sat);
         } else if (obj?.type === SpaceObjectType.LAUNCH_SITE) {
           this.selectLaunchSite(obj as LandObject);
         } else {

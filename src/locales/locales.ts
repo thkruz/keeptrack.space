@@ -5,6 +5,7 @@ import en from './en.json';
 import es from './es.json';
 import fr from './fr.json';
 import ja from './ja.json';
+import { Keys, t7e } from './keys';
 import ko from './ko.json';
 import ru from './ru.json';
 import uk from './uk.json';
@@ -56,6 +57,15 @@ export class Localization implements LocaleInformation {
 
   constructor() {
     this.plugins = this.loadPlugins();
+
+    requestIdleCallback(this.preCacheTranslations.bind(this));
+  }
+
+  private preCacheTranslations() {
+    // Pre-cache translations for the current language
+    Keys.forEach((key) => {
+      t7e(Keys[key]);
+    });
   }
 
   private loadPlugins(): LocaleInformation['plugins'] {

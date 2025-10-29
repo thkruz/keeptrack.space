@@ -187,7 +187,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin {
       sat.vmag = this.calculateStdMag_(sat);
     }
     getEl(EL.CONFIGURATION)!.innerHTML = sat.configuration !== '' ? sat.configuration : t7e('SatInfoBoxObject.unknown');
-    this.updateRcsData_(sat);
+    requestIdleCallback(this.updateRcsData_.bind(this, sat));
   }
 
   private updateLaunchVehicleCorrelationTable_(obj: BaseObject) {

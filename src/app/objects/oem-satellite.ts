@@ -5,7 +5,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LagrangeInterpolator } from '@app/engine/ootk/src/interpolator/LagrangeInterpolator';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
 import { OrbitPathLine } from '@app/engine/rendering/line-manager/orbit-path';
-import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, J2000, Kilometers, Seconds, SpaceObjectType, TEME } from '@ootk/src/main';
 import { SatelliteModels } from '../rendering/mesh/model-resolver';
 
 export interface OemHeader {
@@ -70,6 +70,9 @@ export class OemSatellite extends BaseObject {
   orbitHistoryLine: OrbitPathLine | null = null;
   isDrawOrbitHistory = true;
   lagrangeInterpolator: LagrangeInterpolator | null = null;
+  pointsTeme: [number, number, number, number][] = [];
+  pointsJ2000: [number, number, number, number][] = [];
+  moonPositionCache_: { [key: number]: { position: { x: number; y: number; z: number } } } = {};
 
   eci(date: Date): { position: { x: number; y: number; z: number }; velocity: { x: number; y: number; z: number } } | null {
     const posAndVel = this.updatePosAndVel(date.getTime() / 1000 as Seconds);
@@ -215,7 +218,7 @@ export class OemSatellite extends BaseObject {
 
     dt = (simTime - this.OemDataBlocks[this.dataBlockIdx].ephemeris[this.stateVectorIdx].epoch.posix) as Seconds;
 
-    const currentSv = this.OemDataBlocks[this.dataBlockIdx].ephemeris[this.stateVectorIdx];
+    const currentSv: TEME = this.OemDataBlocks[this.dataBlockIdx].ephemeris[this.stateVectorIdx].toTEME();
 
     let offsetOrigin = { position: { x: 0, y: 0, z: 0 } };
 
@@ -233,9 +236,9 @@ export class OemSatellite extends BaseObject {
       };
     }
 
-    const nextSv =
-      this.OemDataBlocks[this.dataBlockIdx].ephemeris[this.stateVectorIdx + 1] ??
-      this.OemDataBlocks[this.dataBlockIdx + 1]?.ephemeris[0] ??
+    const nextSv: TEME =
+      this.OemDataBlocks[this.dataBlockIdx].ephemeris[this.stateVectorIdx + 1]?.toTEME() ??
+      this.OemDataBlocks[this.dataBlockIdx + 1]?.ephemeris[0]?.toTEME() ??
       currentSv;
 
     // interpolate position linearly between current and next state vector
@@ -377,24 +380,17 @@ export class OemSatellite extends BaseObject {
   }
 
   private generateOrbitPath_(): Float32Array {
-    const points: [number, number, number, number][] = [];
-
     for (const block of this.OemDataBlocks) {
       for (const stateVector of block.ephemeris) {
+        const j2000 = stateVector;
         const teme = stateVector.toTEME();
 
-        points.push([teme.epoch.posix * 1000, teme.position.x, teme.position.y, teme.position.z]);
+        this.pointsTeme.push([teme.position.x, teme.position.y, teme.position.z, teme.epoch.posix * 1000]);
+        this.pointsJ2000.push([j2000.position.x, j2000.position.y, j2000.position.z, j2000.epoch.posix * 1000]);
       }
     }
 
-    const pointsOut = new Float32Array(points.length * 4);
-
-    for (let i = 0; i < points.length; i++) {
-      pointsOut[i * 4] = points[i][1]; // x
-      pointsOut[i * 4 + 1] = points[i][2]; // y
-      pointsOut[i * 4 + 2] = points[i][3]; // z
-      pointsOut[i * 4 + 3] = points[i][0]; // Store epoch time in milliseconds
-    }
+    const pointsOut = new Float32Array(this.pointsTeme.flat());
 
     this.orbitPathCache_ = pointsOut;
     this.orbitFullPathCache_ = pointsOut;
@@ -454,7 +450,11 @@ export class OemSatellite extends BaseObject {
           let deltaOffsetPos = { x: 0, y: 0, z: 0 };
 
           if (this.isInertialMoonFrame) {
-            const newOffsetPos = ServiceLocator.getScene().moons.Moon.getTeme(new Date(this.orbitFullPathCache_[idx * 4 + 3]));
+            if (!this.moonPositionCache_[idx]) {
+              this.moonPositionCache_[idx] = ServiceLocator.getScene().moons.Moon.getTeme(new Date(this.orbitFullPathCache_[idx * 4 + 3]));
+            }
+
+            const newOffsetPos = this.moonPositionCache_[idx];
 
             deltaOffsetPos = {
               x: newOffsetPos.position.x - offsetOrigin.position.x,

@@ -327,13 +327,7 @@ export class Earth {
       throw new Error('settingsManager.installDirectory is undefined');
     }
 
-    let src = `${settingsManager.installDirectory}textures/${base}${resolution ?? this.DEFAULT_RESOLUTION}.${extension}`;
-
-    if (settingsManager.smallImages || settingsManager.isMobileModeEnabled) {
-      src = `${settingsManager.installDirectory}textures/${base}512.${extension}`;
-    }
-
-    return src;
+    return `${settingsManager.installDirectory}textures/${base}${resolution ?? this.DEFAULT_RESOLUTION}.${extension}`;
   }
 
   getJ2000(simTime: Date, centerBody = SolarBody.Earth): J2000 {
@@ -512,7 +506,7 @@ export class Earth {
     gl.uniform1f(this.surfaceMesh.material.uniforms.uGlow, this.glowNumber_);
     const isEarthCenterBody = settingsManager.centerBody === SolarBody.Earth;
 
-    gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? (keepTrackApi.getMainCamera().zoomLevel() ?? 1.0) ** (1 / 3) : 1.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? (keepTrackApi.getMainCamera().zoomLevel() / 2) ** (1 / 2) : 1.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);

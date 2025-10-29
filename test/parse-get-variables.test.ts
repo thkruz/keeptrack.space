@@ -160,11 +160,6 @@ describe('parseGetVariables', () => {
     godraysMock.mockRestore();
   });
 
-  it('should enable smallImages', () => {
-    parseGetVariables(['smallImages='], settingsManager);
-    expect(settingsManager.smallImages).toBe(true);
-  });
-
   it('should set lowperf options', () => {
     parseGetVariables(['lowperf='], settingsManager);
     expect(settingsManager.isShowSplashScreen).toBe(false);
@@ -173,7 +168,6 @@ describe('parseGetVariables', () => {
     expect(settingsManager.zFar).toBe(250000.0);
     expect(settingsManager.noMeshManager).toBe(true);
     expect(settingsManager.maxFieldOfViewMarkers).toBe(1);
-    expect(settingsManager.smallImages).toBe(true);
   });
 
   it('should set hires options', () => {
@@ -200,7 +194,6 @@ describe('parseGetVariables', () => {
     parseGetVariables(['draw-more='], settingsManager);
     expect(settingsManager.isDrawLess).toBe(false);
     expect(settingsManager.noMeshManager).toBe(false);
-    expect(settingsManager.smallImages).toBe(false);
     expect(settingsManager.isDrawMilkyWay).toBe(true);
   });
 

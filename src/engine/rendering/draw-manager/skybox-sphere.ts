@@ -83,13 +83,7 @@ export class SkyBoxSphere {
       throw new Error('settingsManager.installDirectory is undefined');
     }
 
-    let src = `${settingsManager.installDirectory}textures/${base}${resolution ?? this.DEFAULT_RESOLUTION}.${extension}`;
-
-    if (settingsManager.smallImages || settingsManager.isMobileModeEnabled) {
-      src = `${settingsManager.installDirectory}textures/${base}4k.${extension}`;
-    }
-
-    return src;
+    return `${settingsManager.installDirectory}textures/${base}${resolution ?? this.DEFAULT_RESOLUTION}.${extension}`;
   }
 
   render(tgtBuffer = null as WebGLFramebuffer | null): void {

@@ -21,12 +21,12 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { openColorbox } from '@app/lib/colorbox';
-import { getEl } from '@app/lib/get-el';
+import { openColorbox } from '@app/engine/utils/colorbox';
+import { getEl } from '@app/engine/utils/get-el';
 
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
-import { MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
 import calendarPng from '@public/img/icons/calendar.png';
 
 export class LaunchCalendar extends KeepTrackPlugin {

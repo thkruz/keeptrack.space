@@ -1,7 +1,7 @@
+import { DopList, DopMath } from '@app/engine/math/dop-math';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { DopList, DopMath } from '@app/static/dop-math';
-import { AzEl, Degrees, Kilometers } from 'ootk';
+import { AzEl, Degrees, Kilometers } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors } from './environment/standard-env';
 

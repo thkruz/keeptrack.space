@@ -1,11 +1,12 @@
 /* eslint-disable dot-notation */
+import { GroupsManager } from '@app/app/data/groups-manager';
+import { GroupType, ObjectGroup } from '@app/app/data/object-group';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { GroupsManager } from '@app/singletons/groups-manager';
-import { ObjectGroup } from '@app/singletons/object-group';
-import { keepTrackContainer } from '../src/container';
-import { Singletons } from '../src/interfaces';
+import { Container } from '../src/engine/core/container';
+import { Singletons } from '../src/engine/core/interfaces';
 import { CountriesMenu } from './../src/plugins/countries/countries';
 import { defaultSat } from './environment/apiMocks';
 import { mockUiManager, setupDefaultHtml } from './environment/standard-env';
@@ -14,6 +15,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-te
 describe('CountriesMenu_class', () => {
   beforeEach(() => {
     setupDefaultHtml();
+
     const mockGroupsManager = new GroupsManager();
     const topMenu = new TopMenu();
 
@@ -24,8 +26,8 @@ describe('CountriesMenu_class', () => {
       ids: [],
       updateIsInGroup: jest.fn(),
       updateOrbits: jest.fn(),
-    } as unknown as ObjectGroup;
-    keepTrackContainer.registerSingleton(Singletons.GroupsManager, mockGroupsManager);
+    } as unknown as ObjectGroup<GroupType.ALL>;
+    Container.getInstance().registerSingleton(Singletons.GroupsManager, mockGroupsManager);
   });
 
   standardPluginSuite(CountriesMenu, 'CountriesMenu');
@@ -45,7 +47,7 @@ describe('CountriesMenu_class', () => {
 
     uiManagerInstance.searchManager.fillResultBox = jest.fn();
     groupManagerInstance.selectGroup = jest.fn();
-    keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.GroupsManager, groupManagerInstance);
 
     CountriesMenu['groupSelected_']('F');
     expect(groupManagerInstance.selectGroup).toHaveBeenCalled();
@@ -61,6 +63,7 @@ describe('CountriesMenu_class', () => {
      * uiManagerInstance.searchManager.fillResultBox = jest.fn();
      */
 
+    PluginRegistry.addPlugin(new SelectSatManager());
     keepTrackApi.getPlugin(SelectSatManager).selectSat = jest.fn();
     groupManagerInstance.groupList.Argentina = {
       ids: [0, 1],
@@ -69,7 +72,7 @@ describe('CountriesMenu_class', () => {
       clear: jest.fn(),
       hasObject: jest.fn(),
       createGroupByCountry_: jest.fn(),
-    } as unknown as ObjectGroup;
+    } as unknown as ObjectGroup<GroupType.COUNTRY>;
     keepTrackApi.getCatalogManager().getObject = () => defaultSat;
     CountriesMenu['groupSelected_']('F');
     // expect(uiManagerInstance.searchManager.fillResultBox).toHaveBeenCalled();
@@ -82,8 +85,8 @@ describe('CountriesMenu_class', () => {
 
     groupManagerInstance.selectGroup = jest.fn();
     groupManagerInstance.createGroup = jest.fn();
-    groupManagerInstance.groupList = [] as unknown as Record<string, ObjectGroup>;
-    keepTrackContainer.registerSingleton(Singletons.GroupsManager, groupManagerInstance);
+    groupManagerInstance.groupList = [] as unknown as Record<string, ObjectGroup<GroupType.ALL>>;
+    Container.getInstance().registerSingleton(Singletons.GroupsManager, groupManagerInstance);
 
     CountriesMenu['countryMenuClick_']('F');
     expect(groupManagerInstance.createGroup).toHaveBeenCalled();

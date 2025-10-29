@@ -33,6 +33,7 @@
     "tsconfig.json",
     "src/tools/**/*",
     "test/**/*",
+    "src/engine/ootk/examples/**/*"
   ],
   "filesGlob": [
     "src/**/*.ts",

@@ -1,0 +1,83 @@
+{
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "Menú de filtros",
+      "bottomIconLabel": "Menú de filtros",
+      "helpBody": "Este menú permite filtrar los objetos mostrados en el globo según su tipo, régimen orbital y fuente de datos."
+    }
+  },
+  "filterMenu": {
+    "payloads": {
+      "name": "Cargas útiles",
+      "category": "Tipos de objetos",
+      "tooltip": "Objetos que se utilizan principalmente para transportar una carga útil, como satélites de comunicación o meteorológicos. Esto incluye satélites operativos y fuera de servicio."
+    },
+    "rocketBodies": {
+      "name": "Cuerpos de cohetes",
+      "category": "Tipos de objetos",
+      "tooltip": "Las etapas superiores de cohetes que han entregado cargas útiles en órbita y ahora son grandes piezas de desechos espaciales."
+    },
+    "debris": {
+      "name": "Desechos",
+      "category": "Tipos de objetos",
+      "tooltip": "Fragmentos de naves espaciales y cohetes, incluidos satélites rotos, que ya no son una sola pieza."
+    },
+    "unknownType": {
+      "name": "Tipo desconocido",
+      "category": "Tipos de objetos",
+      "tooltip": "Objetos en órbita cuyo propósito o tipo aún no está claramente identificado."
+    },
+    "notionalSatellites": {
+      "name": "Satélites nocionales",
+      "category": "Tipos de objetos",
+      "tooltip": "Satélites que están planeados o propuestos pero aún no han sido lanzados."
+    },
+    "agencies": {
+      "name": "Agencias",
+      "category": "Tipos de objetos",
+      "tooltip": "Función planificada - Esto mostrará agencias en el globo.",
+      "checked": false,
+      "disabled": true
+    },
+    "vleoSatellites": {
+      "name": "Satélites vLEO",
+      "category": "Regímenes orbitales",
+      "tooltip": "Satélites en órbita terrestre muy baja con un apogeo inferior a 400 km."
+    },
+    "leoSatellites": {
+      "name": "Satélites LEO",
+      "category": "Regímenes orbitales",
+      "tooltip": "Satélites en órbita terrestre baja con un apogeo entre 400 km y 6000 km."
+    },
+    "heoSatellites": {
+      "name": "Satélites HEO",
+      "category": "Regímenes orbitales",
+      "tooltip": "Satélites en órbita altamente elíptica con una excentricidad de 0.1 o mayor y un apogeo inferior a 39786 km."
+    },
+    "meoSatellites": {
+      "name": "Satélites MEO",
+      "category": "Regímenes orbitales",
+      "tooltip": "Satélites en órbita terrestre media con un apogeo entre 6000 km y 34786 km."
+    },
+    "geoSatellites": {
+      "name": "Satélites GEO",
+      "category": "Regímenes orbitales",
+      "tooltip": "Satélites en órbita geoestacionaria con una excentricidad inferior a 0.1 y un apogeo entre 34786 km y 36786 km."
+    },
+    "xgeoSatellites": {
+      "name": "Satélites xGEO",
+      "category": "Regímenes orbitales",
+      "tooltip": "Satélites en órbita ex-geosincrónica con una excentricidad inferior a 0.1 y un apogeo superior a 36786 km, o una excentricidad de 0.1 o mayor y un apogeo superior a 39786 km."
+    },
+    "vimpelSatellites": {
+      "name": "Satélites Vimpel",
+      "category": "Fuente",
+      "tooltip": "El catálogo de satélites Vimpel es mantenido por la empresa rusa JSC Vimpel, en cooperación con el Instituto Keldysh de Matemáticas Aplicadas."
+    },
+    "celestrakSatellites": {
+      "name": "Satélites Celestrak",
+      "category": "Fuente",
+      "tooltip": "Celestrak es una fuente popular de datos orbitales de satélites, proporcionando TLEs para una amplia gama de satélites y desechos."
+    }
+  }
+}

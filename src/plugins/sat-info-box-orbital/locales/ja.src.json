@@ -1,0 +1,80 @@
+{
+  "SatInfoBoxOrbital": {
+    "title": "軌道データ",
+    "Apogee": {
+      "label": "遠地点",
+      "tooltip": "軌道上で最も高い点"
+    },
+    "Perigee": {
+      "label": "近地点",
+      "tooltip": "軌道上で最も低い点"
+    },
+    "Inclination": {
+      "label": "傾斜角",
+      "tooltip": "昇交点で赤道から測定される角度"
+    },
+    "Eccentricity": {
+      "label": "離心率",
+      "tooltip": "軌道の円形度（0は円）"
+    },
+    "RightAsc": {
+      "label": "赤経",
+      "tooltip": "赤道上で昇る位置"
+    },
+    "ArgOfPerigee": {
+      "label": "近地点引数",
+      "tooltip": "軌道上で最も低い部分の位置"
+    },
+    "Latitude": {
+      "label": "緯度",
+      "tooltip": "地球上の現在の緯度",
+      "north": "北",
+      "south": "南"
+    },
+    "Longitude": {
+      "label": "経度",
+      "tooltip": "地球上の現在の経度",
+      "east": "東",
+      "west": "西"
+    },
+    "Altitude": {
+      "label": "高度",
+      "tooltip": "海抜からの現在の高度"
+    },
+    "Period": {
+      "label": "周期",
+      "tooltip": "地球を一周するのにかかる時間",
+      "meanMotion": "平均運動",
+      "revPerDay": "周/日",
+      "min": "分"
+    },
+    "Velocity": {
+      "label": "速度",
+      "tooltip": "衛星の現在の速度（地球に近いほど速い）"
+    },
+    "AgeOfGP": {
+      "label": "GPの経過時間",
+      "tooltip": "公式軌道計算からの経過時間（古いGPデータは通常精度が低い）",
+      "days": "日",
+      "hours": "時間",
+      "epochYear": "エポック年",
+      "epochDay": "エポック日"
+    },
+    "RadialSigma": {
+      "label": "半径方向シグマ",
+      "tooltip": "半径方向の不確かさ（メートル）"
+    },
+    "InTrackSigma": {
+      "label": "軌道方向シグマ",
+      "tooltip": "軌道方向の不確かさ（メートル）"
+    },
+    "CrossTrackSigma": {
+      "label": "横方向シグマ",
+      "tooltip": "横方向の不確かさ（メートル）"
+    },
+    "meter": "m",
+    "kilometer": "km",
+    "second": "秒",
+    "unknown": "不明"
+  }
+}

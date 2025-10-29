@@ -1,5 +1,5 @@
 /* eslint-disable dot-notation */
-import { getEl } from '@app/lib/get-el';
+import { getEl } from '@app/engine/utils/get-el';
 import { CollisionEvent, Collisions } from '@app/plugins/collisions/collisions';
 import { readFileSync } from 'fs';
 import { setupDefaultHtml } from './environment/standard-env';

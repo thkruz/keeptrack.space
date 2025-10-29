@@ -1,11 +1,15 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { PersistenceManager, StorageKey } from '@app/singletons/persistence-manager';
+import { t7e } from '@app/locales/keys';
 import filterPng from '@public/img/icons/filter.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
+import { EventBus } from '@app/engine/events/event-bus';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -28,7 +32,7 @@ import { TopMenu } from '../top-menu/top-menu';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-declare module '@app/interfaces' {
+declare module '@app/engine/core/interfaces' {
   interface UserSettings {
     isBlackEarth: boolean;
     isDrawMilkyWay: boolean;
@@ -36,6 +40,8 @@ declare module '@app/interfaces' {
 }
 
 export interface FilterPluginSettings {
+  xGEOSatellites?: boolean;
+  vLEOSatellites?: boolean;
   payloads?: boolean;
   rocketBodies?: boolean;
   debris?: boolean;
@@ -81,87 +87,121 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
 
   static filters: Filters[] = [
     {
-      name: 'Payloads',
-      category: 'Object Types',
+      name: t7e('filterMenu.payloads.name'),
+      category: t7e('filterMenu.payloads.category'),
+      tooltip: t7e('filterMenu.payloads.tooltip'),
     },
     {
-      name: 'Rocket Bodies',
-      category: 'Object Types',
+      name: t7e('filterMenu.rocketBodies.name'),
+      category: t7e('filterMenu.rocketBodies.category'),
+      tooltip: t7e('filterMenu.rocketBodies.tooltip'),
     },
     {
-      name: 'Debris',
-      category: 'Object Types',
+      name: t7e('filterMenu.debris.name'),
+      category: t7e('filterMenu.debris.category'),
+      tooltip: t7e('filterMenu.debris.tooltip'),
     },
     {
-      name: 'Unknown Type',
-      category: 'Object Types',
+      name: t7e('filterMenu.unknownType.name'),
+      category: t7e('filterMenu.unknownType.category'),
+      tooltip: t7e('filterMenu.unknownType.tooltip'),
     },
     {
-      name: 'Notional Satellites',
-      category: 'Object Types',
+      name: t7e('filterMenu.unknownType.name'),
+      category: t7e('filterMenu.unknownType.category'),
+      tooltip: t7e('filterMenu.unknownType.tooltip'),
     },
     {
-      name: 'Agencies',
-      category: 'Object Types',
-      tooltip: 'Planned feature - This will show agencies on the globe.',
+      name: t7e('filterMenu.notionalSatellites.name'),
+      category: t7e('filterMenu.notionalSatellites.category'),
+      tooltip: t7e('filterMenu.notionalSatellites.tooltip'),
+    },
+    {
+      name: t7e('filterMenu.agencies.name'),
+      category: t7e('filterMenu.agencies.category'),
+      tooltip: t7e('filterMenu.agencies.tooltip'),
       checked: false,
       disabled: true,
     },
     {
-      name: 'LEO Satellites',
-      category: 'Orbital Regimes',
+      name: t7e('filterMenu.vleoSatellites.name'),
+      category: t7e('filterMenu.vleoSatellites.category'),
+      tooltip: t7e('filterMenu.vleoSatellites.tooltip'),
     },
     {
-      name: 'HEO Satellites',
-      category: 'Orbital Regimes',
+      name: t7e('filterMenu.leoSatellites.name'),
+      category: t7e('filterMenu.leoSatellites.category'),
+      tooltip: t7e('filterMenu.leoSatellites.tooltip'),
     },
     {
-      name: 'MEO Satellites',
-      category: 'Orbital Regimes',
+      name: t7e('filterMenu.heoSatellites.name'),
+      category: t7e('filterMenu.heoSatellites.category'),
+      tooltip: t7e('filterMenu.heoSatellites.tooltip'),
     },
     {
-      name: 'GEO Satellites',
-      category: 'Orbital Regimes',
+      name: t7e('filterMenu.meoSatellites.name'),
+      category: t7e('filterMenu.meoSatellites.category'),
+      tooltip: t7e('filterMenu.meoSatellites.tooltip'),
     },
     {
-      name: 'Vimpel Satellites',
+      name: t7e('filterMenu.geoSatellites.name'),
+      category: t7e('filterMenu.geoSatellites.category'),
+      tooltip: t7e('filterMenu.geoSatellites.tooltip'),
+    },
+    {
+      name: t7e('filterMenu.xgeoSatellites.name'),
+      category: t7e('filterMenu.xgeoSatellites.category'),
+      tooltip: t7e('filterMenu.xgeoSatellites.tooltip'),
+    },
+    {
+      name: t7e('filterMenu.vimpelSatellites.name'),
       category: 'Source',
+      tooltip: t7e('filterMenu.vimpelSatellites.tooltip'),
     },
     {
-      name: 'Celestrak Satellites',
+      name: t7e('filterMenu.celestrakSatellites.name'),
       category: 'Source',
+      tooltip: t7e('filterMenu.celestrakSatellites.tooltip'),
     },
     {
       name: 'United States',
       category: 'Countries',
+      tooltip: 'Includes satellites from the United States of America.',
     },
     {
       name: 'United Kingdom',
       category: 'Countries',
+      tooltip: 'Includes satellites from the United Kingdom.',
     },
     {
       name: 'France',
       category: 'Countries',
+      tooltip: 'Includes satellites from France.',
     },
     {
       name: 'Germany',
       category: 'Countries',
+      tooltip: 'Includes satellites from Germany.',
     },
     {
       name: 'Japan',
       category: 'Countries',
+      tooltip: 'Includes satellites from Japan.',
     },
     {
       name: 'China',
       category: 'Countries',
+      tooltip: 'Includes satellites from China.',
     },
     {
       name: 'India',
       category: 'Countries',
+      tooltip: 'Includes satellites from India.',
     },
     {
       name: 'Russia',
       category: 'Countries',
+      tooltip: 'Includes satellites from Russia.',
     },
     {
       name: 'USSR',
@@ -171,10 +211,12 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     {
       name: 'South Korea',
       category: 'Countries',
+      tooltip: 'Includes satellites from South Korea.',
     },
     {
       name: 'Australia',
       category: 'Countries',
+      tooltip: 'Includes satellites from Australia.',
     },
     {
       name: 'Other Countries',
@@ -184,6 +226,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     {
       name: 'Starlink Satellites',
       category: 'Miscellaneous',
+      tooltip: 'Satellites that are part of SpaceX\'s Starlink constellation, which aims to provide global broadband internet coverage.',
     },
   ];
 
@@ -191,7 +234,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   bottomIconImg = filterPng;
   bottomIconLabel: string = 'Filter Menu';
   sideMenuElementName: string = 'filter-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="filter-menu" class="side-menu-parent start-hidden text-select">
     <div id="filter-content" class="side-menu">
       <div class="row">
@@ -238,9 +281,9 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
                 keepTrackApi.getSoundManager()?.play(checkbox.checked ? SoundNames.TOGGLE_ON : SoundNames.TOGGLE_OFF);
               };
 
-              return keepTrackApi.html`
+              return html`
             <div class="switch row">
-              <label data-position="top" data-delay="50" data-tooltip="${filter.tooltip || ''}">
+              <label data-position="top" data-delay="50" kt-tooltip="${filter.tooltip || ''}">
                 <input id="filter-${filter.id}" type="checkbox" ${filter.checked ? 'checked' : ''} ${!filter.disabled ? '' : 'disabled'}/>
                 <span class="lever"></span>
                 ${filter.name}
@@ -260,20 +303,20 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('filter-form')?.addEventListener('change', this.onFormChange_.bind(this));
         getEl('filter-reset')?.addEventListener('click', this.resetToDefaults.bind(this));
       },
     );
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerInit,
       () => {
-        getEl('nav-mobile2')?.insertAdjacentHTML(
+        getEl(TopMenu.TOP_RIGHT_ID)?.insertAdjacentHTML(
           'afterbegin',
-          keepTrackApi.html`
+          html`
             <li id="top-menu-filter-li">
               <a id="top-menu-filter-btn" class="top-menu-icons">
                 <div class="top-menu-icons bmenu-item-selected">
@@ -287,11 +330,11 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('top-menu-filter-btn')?.addEventListener('click', () => {
-          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          this.bottomMenuClicked();
         });
       },
     );
@@ -299,15 +342,15 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         this.syncOnLoad_();
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.saveSettings, this.saveSettings_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.loadSettings, this.loadSettings_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.saveSettings, this.saveSettings_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.loadSettings, this.loadSettings_.bind(this));
   }
   private saveSettings_() {
     const persistenceManagerInstance = PersistenceManager.getInstance();
@@ -317,10 +360,12 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_DEBRIS, (settingsManager.filter.debris as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_UNKNOWN_TYPE, (settingsManager.filter.unknownType as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_AGENCIES, (settingsManager.filter.agencies as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_VLEO, (settingsManager.filter.vLEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_LEO, (settingsManager.filter.lEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_HEO, (settingsManager.filter.hEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_MEO, (settingsManager.filter.mEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_GEO, (settingsManager.filter.gEOSatellites as boolean)?.toString() ?? 'true');
+    persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_X_GEO, (settingsManager.filter.xGEOSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_VIMPEL, (settingsManager.filter.vimpelSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_CELESTRAK, (settingsManager.filter.celestrakSatellites as boolean)?.toString() ?? 'true');
     persistenceManagerInstance.saveItem(StorageKey.FILTER_SETTINGS_NOTIONAL, (settingsManager.filter.notionalSatellites as boolean)?.toString() ?? 'true');
@@ -347,10 +392,12 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     settingsManager.filter.debris = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_DEBRIS, settingsManager.filter.debris);
     settingsManager.filter.unknownType = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_UNKNOWN_TYPE, settingsManager.filter.unknownType);
     settingsManager.filter.agencies = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_AGENCIES, settingsManager.filter.agencies);
+    settingsManager.filter.vLEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_VLEO, settingsManager.filter.vLEOSatellites);
     settingsManager.filter.lEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_LEO, settingsManager.filter.lEOSatellites);
     settingsManager.filter.hEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_HEO, settingsManager.filter.hEOSatellites);
     settingsManager.filter.mEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_MEO, settingsManager.filter.mEOSatellites);
     settingsManager.filter.gEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_GEO, settingsManager.filter.gEOSatellites);
+    settingsManager.filter.xGEOSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_X_GEO, settingsManager.filter.xGEOSatellites);
     settingsManager.filter.vimpelSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_VIMPEL, settingsManager.filter.vimpelSatellites);
     settingsManager.filter.celestrakSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_CELESTRAK, settingsManager.filter.celestrakSatellites);
     settingsManager.filter.notionalSatellites = persistenceManagerInstance.checkIfEnabled(StorageKey.FILTER_SETTINGS_NOTIONAL, settingsManager.filter.notionalSatellites);
@@ -375,8 +422,8 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       const checkbox = <HTMLInputElement>getEl(`filter-${id}`);
 
       if (checkbox) {
-        checkbox.checked = typeof settingsManager.filter[id as string] !== 'undefined' ? settingsManager.filter[id as string] : checked ?? !disabled;
-        settingsManager.filter[id as string] = checkbox.checked;
+        checkbox.checked = typeof settingsManager.filter[id] !== 'undefined' ? settingsManager.filter[id] : checked ?? !disabled;
+        settingsManager.filter[id] = checkbox.checked;
       }
     });
 

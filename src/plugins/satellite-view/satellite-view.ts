@@ -19,15 +19,17 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { CameraType } from '@app/engine/camera/camera';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
+import { shake } from '@app/engine/utils/shake';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { shake } from '@app/lib/shake';
 import { t7e } from '@app/locales/keys';
-import { CameraType } from '@app/singletons/camera';
+import { DetailedSatellite } from '@ootk/src/main';
 import viewInAirPng from '@public/img/icons/view-in-air.png';
-import { DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
@@ -49,8 +51,8 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+    EventBus.getInstance().on(
+      EventBusEvent.selectSatData,
       (obj) => {
         if (obj instanceof DetailedSatellite) {
           this.setBottomIconToEnabled();

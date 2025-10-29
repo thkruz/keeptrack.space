@@ -1,8 +1,8 @@
-import { MenuMode, ToastMsgType } from '@app/interfaces';
+import { GroupType } from '@app/app/data/object-group';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { GroupType } from '@app/singletons/object-group';
 import historyPng from '@public/img/icons/history.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 export class TimeMachine extends KeepTrackPlugin {
   readonly id = 'TimeMachine';

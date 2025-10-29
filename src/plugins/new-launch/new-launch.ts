@@ -1,23 +1,29 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { getEl } from '@app/engine/utils/get-el';
+import { hideLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
+import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { hideLoading, showLoadingSticky } from '@app/lib/showLoading';
-import { waitForCruncher } from '@app/lib/waitForCruncher';
 import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 
-import { SatMath } from '@app/static/sat-math';
+import { SatMath } from '@app/app/analysis/sat-math';
 
-import { launchSites } from '@app/catalogs/launch-sites';
+import { OrbitFinder } from '@app/app/analysis/orbit-finder';
+import { CatalogManager } from '@app/app/data/catalog-manager';
+import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
+import { launchSites } from '@app/app/data/catalogs/launch-sites';
+import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
-import { CatalogManager } from '@app/singletons/catalog-manager';
-import { LaunchSite } from '@app/singletons/catalog-manager/LaunchFacility';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { OrbitFinder } from '@app/singletons/orbit-finder';
-import { TimeManager } from '@app/singletons/time-manager';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond, SatelliteRecord, Sgp4, TleLine1, TleLine2 } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import {
+  BaseObject, Degrees, DetailedSatellite, DetailedSatelliteParams, EciVec3, FormatTle, KilometersPerSecond,
+  LandObject, SatelliteRecord, Sgp4, SpaceObjectType, TleLine1, TleLine2,
+} from '@ootk/src/main';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 
@@ -50,6 +56,8 @@ export class NewLaunch extends KeepTrackPlugin {
     if (!(sat instanceof DetailedSatellite) || !sat.sccNum || !sat.inclination || isNaN(sat.inclination)) {
       return;
     }
+
+    this.preValidate_(sat);
 
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
     (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4).padStart(8, '0');
@@ -97,7 +105,7 @@ export class NewLaunch extends KeepTrackPlugin {
       </optgroup>`,
     ).join('\n');
 
-    return keepTrackApi.html`
+    return html`
       <div id="newLaunch-menu" class="side-menu-parent start-hidden text-select">
         <div id="newLaunch-content" class="side-menu">
           <div class="row">
@@ -232,7 +240,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     colorSchemeManagerInstance.calculateColorBuffers(true);
 
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
+    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     const simulationTimeObj = timeManagerInstance.simulationTimeObj;
 
@@ -319,29 +327,17 @@ export class NewLaunch extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
-      () => {
-        getEl(`${this.sideMenuElementName}-form`)?.addEventListener('change', () => {
-          const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
-          if (!sat.isSatellite()) {
-            return;
-          }
-          this.preValidate_(sat);
-        });
-      },
-    );
-
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+    EventBus.getInstance().on(
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (obj?.isSatellite()) {
           const sat = obj as DetailedSatellite;
 
           (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
           this.setBottomIconToEnabled();
-          this.preValidate_(sat);
+        } else if (obj?.type === SpaceObjectType.LAUNCH_SITE) {
+          this.selectLaunchSite(obj as LandObject);
         } else {
           this.setBottomIconToDisabled();
         }

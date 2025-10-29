@@ -1,12 +1,15 @@
-import { KeepTrackPluginsConfiguration } from '@app/plugins/keeptrack-plugins-configuration';
+// Ensure imports are type only to avoid circular dependencies
+import type { KeepTrackPluginsConfiguration } from '@app/plugins/keeptrack-plugins-configuration';
+// These imports can be direct only because they have no dependencies
+import { satInfoBoxOrbitalConfigurationDefaults } from '@app/plugins/sat-info-box-orbital/sat-info-box-orbital-settings';
 
 export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   DebugMenuPlugin: {
     enabled: true,
     order: 0,
   },
-  TooltipsPlugin: {
-    enabled: false,
+  ScenarioManagementPlugin: {
+    enabled: true,
     order: 1,
   },
   UserAccountPlugin: {
@@ -77,6 +80,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 71,
   },
+  OemReaderPlugin: {
+    enabled: true,
+    order: 71.5,
+  },
   NewLaunch: {
     enabled: true,
     order: 72,
@@ -105,9 +112,13 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 90,
   },
+  OrbitGuardMenuPlugin: {
+    enabled: false,
+    order: 91,
+  },
   TrackingImpactPredict: {
     enabled: true,
-    order: 91,
+    order: 92,
   },
   StereoMap: {
     enabled: true,
@@ -136,6 +147,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   ColorMenu: {
     enabled: true,
     order: 232,
+  },
+  PlanetsMenuPlugin: {
+    enabled: true,
+    order: 233,
   },
   SatellitePhotos: {
     enabled: true,
@@ -244,7 +259,18 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: false,
     order: 601,
   },
+  VcrPlugin: {
+    enabled: true, // Disabled by default
+    order: 1000,
+  },
+  TimeSlider: {
+    enabled: true,
+    order: 1001,
+  },
   // Non-Menu plugins
+  TooltipsPlugin: {
+    enabled: true,
+  },
   SatInfoBoxCore: {
     enabled: true,
   },
@@ -260,17 +286,21 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
   SatInfoBoxMission: {
     enabled: true,
   },
-  SatInfoBoxOrbital: {
-    enabled: true,
+  SatInfoBoxManeuver: {
+    enabled: false,
   },
+  SatInfoBoxOrbital: satInfoBoxOrbitalConfigurationDefaults,
   SatInfoBoxSensor: {
     enabled: true,
   },
   TopMenu: {
     enabled: true,
   },
-  SocialMedia: {
+  GithubLinkPlugin: {
     enabled: true,
+  },
+  LinkedInLinkPlugin: {
+    enabled: false,
   },
   DateTimeManager: {
     enabled: true,

@@ -1,15 +1,18 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode, SatPassTimes, ToastMsgType } from '@app/interfaces';
+import { SensorMath } from '@app/app/sensors/sensor-math';
+import { GetSatType, MenuMode, SatPassTimes, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { lineManagerInstance } from '@app/engine/rendering/line-manager';
+import { LineColors } from '@app/engine/rendering/line-manager/line';
+import { dateFormat } from '@app/engine/utils/dateFormat';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
+import { shake } from '@app/engine/utils/shake';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { dateFormat } from '@app/lib/dateFormat';
-import { getEl } from '@app/lib/get-el';
-import { shake } from '@app/lib/shake';
-import { showLoading } from '@app/lib/showLoading';
-import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
-import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
-import { SensorMath } from '@app/static/sensor-math';
+import { DetailedSatellite, MILLISECONDS_PER_DAY } from '@ootk/src/main';
 import pictureInPicturePng from '@public/img/icons/picture-in-picture.png';
-import { DetailedSatellite, MILLISECONDS_PER_DAY } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from './watchlist';
 
@@ -62,7 +65,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   bottomIconImg = pictureInPicturePng;
 
   lastOverlayUpdateTime = 0;
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="info-overlay-menu" class="side-menu-parent start-hidden text-select">
       <div id="info-overlay-content"></div>
     </div>`;
@@ -86,9 +89,9 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.updateLoop.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, WatchlistOverlay.uiManagerFinal.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateLoop, this.updateLoop.bind(this));
+    EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, WatchlistOverlay.uiManagerFinal.bind(this));
   }
 
   updateLoop() {
@@ -246,14 +249,14 @@ export class WatchlistOverlay extends KeepTrackPlugin {
      */
     const mainCameraInstance = keepTrackApi.getMainCamera();
 
-    if ((Date.now() > this.lastOverlayUpdateTime * 1 + 10000 && !mainCameraInstance.isDragging) || isForceUpdate) {
+    if ((Date.now() > this.lastOverlayUpdateTime * 1 + 10000 && !mainCameraInstance.state.isDragging) || isForceUpdate) {
       this.infoOverlayDOMHtmlStrArr = [];
       this.infoOverlayDOMHtmlStrArr.push('<div>');
       for (let s = 0; s < this.nextPassArray.length; s++) {
         this.pushOverlayElement_(s, timeManagerInstance.simulationTimeObj.getTime(), this.infoOverlayDOMHtmlStrArr);
       }
       this.infoOverlayDOMHtmlStrArr.push('</div>');
-      getEl('info-overlay-content')!.innerHTML = this.infoOverlayDOMHtmlStrArr.join('');
+      setInnerHtml('info-overlay-content', this.infoOverlayDOMHtmlStrArr.join(''));
       this.lastOverlayUpdateTime = timeManagerInstance.realTime;
     }
   }

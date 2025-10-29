@@ -1,5 +1,5 @@
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 
 export interface MediaRecorderOptions {
   audio: boolean;
@@ -163,7 +163,7 @@ export class StreamManager {
         this.recordedBlobs = [];
         try {
           this.mediaRecorder_ = new window.MediaRecorder(this.stream_, options);
-        } catch (e) {
+        } catch {
           this.onMinorError_();
           this.isVideoRecording = false;
 

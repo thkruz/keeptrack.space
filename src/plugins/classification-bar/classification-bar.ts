@@ -1,9 +1,11 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { Classification, ClassificationString } from '@app/app/ui/classification';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { Classification, ClassificationString } from '@app/static/classification';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class ClassificationBar extends KeepTrackPlugin {
   readonly id = 'ClassificationBar';
@@ -56,13 +58,13 @@ export class ClassificationBar extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, this.uiManagerInit_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, this.uiManagerInit_.bind(this));
   }
 
   private createContainer_(): void {
     const node = document.createElement('div');
 
-    node.innerHTML = keepTrackApi.html`<span id="${this.textStringDomId}"></span>`;
+    node.innerHTML = html`<span id="${this.textStringDomId}"></span>`;
     node.id = this.containerDomId;
     node.style.cssText = `
       height: ${this.containerHeight}px;

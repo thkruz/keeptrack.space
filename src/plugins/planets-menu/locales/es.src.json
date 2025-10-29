@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "PlanetsMenuPlugin": {
+      "bottomIconLabel": "Planetas",
+      "title": "Menú de Lista de Planetas",
+      "helpBody": "Este menú te permite seleccionar y ver diferentes planetas en la simulación."
+    }
+  }
+}

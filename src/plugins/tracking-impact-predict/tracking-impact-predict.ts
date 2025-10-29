@@ -1,31 +1,34 @@
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import sputnickPng from '@public/img/icons/sputnick.png';
 import './tracking-impact-predict.css';
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
-import { SatMath } from '@app/static/sat-math';
-import { RAD2DEG } from 'ootk';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
+import { RAD2DEG } from '@ootk/src/main';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export interface TipMsg {
-  'NORAD_CAT_ID': string,
-  'MSG_EPOCH': string,
-  'INSERT_EPOCH': string,
-  'DECAY_EPOCH': string,
-  'WINDOW': string,
-  'REV': string,
-  'DIRECTION': string,
-  'LAT': string,
-  'LON': string,
-  'INCL': string,
-  'NEXT_REPORT': string,
-  'ID': string,
-  'HIGH_INTEREST': string,
-  'OBJECT_NUMBER': string,
+  NORAD_CAT_ID: string;
+  MSG_EPOCH: string;
+  INSERT_EPOCH: string;
+  DECAY_EPOCH: string;
+  WINDOW: string;
+  REV: string;
+  DIRECTION: string;
+  LAT: string;
+  LON: string;
+  INCL: string;
+  NEXT_REPORT: string;
+  ID: string;
+  HIGH_INTEREST: string;
+  OBJECT_NUMBER: string;
 }
 
 export class TrackingImpactPredict extends KeepTrackPlugin {
@@ -37,7 +40,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
   bottomIconImg = sputnickPng;
   sideMenuElementName: string = 'tip-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
   <div id="tip-menu" class="side-menu-parent start-hidden text-select">
     <div id="tip-content" class="side-menu">
       <div class="row">
@@ -65,13 +68,13 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       this.uiManagerFinal_.bind(this),
     );
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.onCruncherMessage,
+    EventBus.getInstance().on(
+      EventBusEvent.onCruncherMessage,
       () => {
         if (this.selectSatIdOnCruncher_ !== null) {
           // If selectedSatManager is loaded, set the selected sat to the one that was just added
@@ -139,20 +142,20 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
       return;
     }
 
-
     const now = new Date();
-    const decayEpoch = new Date(Date.UTC(
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(0, 4)), // year
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(5, 7)) - 1, // month (0-based)
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(8, 10)), // day
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(11, 13)), // hour
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(14, 16)), // minute
-      parseInt(this.tipList_[row].DECAY_EPOCH.substring(17, 19)), // second
-    ));
+    const decayEpoch = new Date(
+      Date.UTC(
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(0, 4)), // year
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(5, 7)) - 1, // month (0-based)
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(8, 10)), // day
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(11, 13)), // hour
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(14, 16)), // minute
+        parseInt(this.tipList_[row].DECAY_EPOCH.substring(17, 19)), // second
+      ),
+    );
 
     keepTrackApi.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
-
+    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     keepTrackApi.getUiManager().doSearch(`${sat.sccNum5}`);
 
@@ -169,7 +172,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
       TrackingImpactPredict.createHeaders_(tbl);
 
       this.createBody_(tbl);
-    } catch (e) {
+    } catch {
       errorManagerInstance.warn('Error processing reentry data!');
     }
   }
@@ -183,9 +186,17 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
   private static createHeaders_(tbl: HTMLTableElement) {
     const tr = tbl.insertRow();
     const names = [
-      'NORAD', 'Decay Date', 'Latitude', 'Longitude', 'Window (min)',
-      'Next Report (hrs)', 'Reentry Angle (deg)', 'RCS (m^2)', 'GP Age (hrs)',
-      'Dry Mass (kg)', 'Volume (m^3)',
+      'NORAD',
+      'Decay Date',
+      'Latitude',
+      'Longitude',
+      'Window (min)',
+      'Next Report (hrs)',
+      'Reentry Angle (deg)',
+      'RCS (m^2)',
+      'GP Age (hrs)',
+      'Dry Mass (kg)',
+      'Volume (m^3)',
     ];
 
     for (const name of names) {

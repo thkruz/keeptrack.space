@@ -1,12 +1,13 @@
-import { EChartsData, GetSatType } from '@app/interfaces';
+import { EChartsData, GetSatType } from '@app/engine/core/interfaces';
+import { SatMathApi } from '@app/engine/math/sat-math-api';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { SatMathApi } from '@app/singletons/sat-math-api';
+import { Degrees, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
 import scatterPlot4Png from '@public/img/icons/scatter-plot4.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { Degrees, DetailedSatellite, SpaceObjectType } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Lat2LonPlots extends KeepTrackPlugin {
@@ -36,7 +37,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
   chart: echarts.ECharts;
 
   sideMenuElementName = 'lat2lon-plots-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="lat2lon-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal plot-analysis-menu-maximized">
     <div id="plot-analysis-content" class="side-menu" style="height: 80%">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
@@ -241,5 +242,3 @@ export class Lat2LonPlots extends KeepTrackPlugin {
     return data;
   }
 }
-
-export const Lat2LonPlotsPlugin = new Lat2LonPlots();

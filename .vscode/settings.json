@@ -33,6 +33,9 @@
     "src/lib/**": true,
     "tsconfig.json": true
   },
+  "files.trimTrailingWhitespace": true,
+  "editor.renderWhitespace": "trailing",
+  "editor.trimAutoWhitespace": true,
   "[yaml]": {
     "editor.autoIndent": "advanced",
     "editor.defaultFormatter": "esbenp.prettier-vscode"

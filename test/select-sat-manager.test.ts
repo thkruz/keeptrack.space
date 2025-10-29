@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { DetailedSatellite, DetailedSensor, Kilometers, SpaceObjectType } from 'ootk';
+import { DetailedSatellite, DetailedSensor, Kilometers, SpaceObjectType } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('SelectSatManager_dots', () => {
+  let selectSatManager: SelectSatManager;
+
   beforeEach(() => {
     setupStandardEnvironment([TopMenu]);
+    selectSatManager = new SelectSatManager();
   });
 
   standardPluginSuite(SelectSatManager, 'SelectSatManager');
@@ -29,7 +32,6 @@ describe('SelectSatManager_dots', () => {
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-    const selectSatManager = new SelectSatManager();
 
     selectSatManager.selectSat(0);
     expect(selectSatManager.selectedSat).toBe(0);
@@ -38,7 +40,7 @@ describe('SelectSatManager_dots', () => {
   });
 
   it('should be able to select a sensor dot', () => {
-    const selectSatManager = new SelectSatManager();
+    selectSatManager.init();
 
     websiteInit(new SatInfoBox());
     keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;

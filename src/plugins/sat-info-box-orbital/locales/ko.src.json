@@ -1,0 +1,80 @@
+{
+  "SatInfoBoxOrbital": {
+    "title": "궤도 데이터",
+    "Apogee": {
+      "label": "원지점",
+      "tooltip": "궤도에서 가장 높은 지점"
+    },
+    "Perigee": {
+      "label": "근지점",
+      "tooltip": "궤도에서 가장 낮은 지점"
+    },
+    "Inclination": {
+      "label": "경사각",
+      "tooltip": "상승 교점에서 적도와 이루는 각도"
+    },
+    "Eccentricity": {
+      "label": "이심률",
+      "tooltip": "궤도의 원형 정도 (0은 원형)"
+    },
+    "RightAsc": {
+      "label": "적경",
+      "tooltip": "적도 위로 상승하는 위치"
+    },
+    "ArgOfPerigee": {
+      "label": "근지점 이각",
+      "tooltip": "궤도에서 가장 낮은 지점의 위치"
+    },
+    "Latitude": {
+      "label": "위도",
+      "tooltip": "지구 위의 현재 위도",
+      "north": "북",
+      "south": "남"
+    },
+    "Longitude": {
+      "label": "경도",
+      "tooltip": "지구 위의 현재 경도",
+      "east": "동",
+      "west": "서"
+    },
+    "Altitude": {
+      "label": "고도",
+      "tooltip": "해수면 위의 현재 고도"
+    },
+    "Period": {
+      "label": "주기",
+      "tooltip": "지구를 한 바퀴 도는 데 걸리는 시간",
+      "meanMotion": "평균 운동",
+      "revPerDay": "회/일",
+      "min": "분"
+    },
+    "Velocity": {
+      "label": "속도",
+      "tooltip": "위성의 현재 속도 (지구에 가까울수록 더 빠름)"
+    },
+    "AgeOfGP": {
+      "label": "GP 데이터 연령",
+      "tooltip": "공식 궤도 계산 이후 경과 시간 (오래된 GP 데이터는 보통 정확도가 낮음)",
+      "days": "일",
+      "hours": "시간",
+      "epochYear": "에포크 연도",
+      "epochDay": "에포크 일"
+    },
+    "RadialSigma": {
+      "label": "반경 시그마",
+      "tooltip": "반경 불확실성 (미터)"
+    },
+    "InTrackSigma": {
+      "label": "궤도 내 시그마",
+      "tooltip": "궤도 내 불확실성 (미터)"
+    },
+    "CrossTrackSigma": {
+      "label": "횡단 시그마",
+      "tooltip": "횡단 불확실성 (미터)"
+    },
+    "meter": "m",
+    "kilometer": "km",
+    "second": "초",
+    "unknown": "알 수 없음"
+  }
+}

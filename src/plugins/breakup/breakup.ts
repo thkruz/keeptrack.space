@@ -1,18 +1,20 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { OrbitFinder } from '@app/app/analysis/orbit-finder';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { CatalogManager } from '@app/app/data/catalog-manager';
+import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
+import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
-import { CatalogManager } from '@app/singletons/catalog-manager';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import streamPng from '@public/img/icons/stream.png';
-
 import { t7e } from '@app/locales/keys';
-import { OrbitFinder } from '@app/singletons/orbit-finder';
-import { TimeManager } from '@app/singletons/time-manager';
-import { SatMath } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from '@ootk/src/main';
+import streamPng from '@public/img/icons/stream.png';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Breakup extends KeepTrackPlugin {
@@ -58,7 +60,7 @@ export class Breakup extends KeepTrackPlugin {
   };
 
   sideMenuElementName: string = 'breakup-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="breakup-menu" class="side-menu-parent start-hidden text-select">
     <div id="breakup-content" class="side-menu">
       <div class="row">
@@ -154,8 +156,8 @@ export class Breakup extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('breakup')!.addEventListener('submit', (e: Event) => {
           e.preventDefault();
@@ -164,8 +166,8 @@ export class Breakup extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+    EventBus.getInstance().on(
+      EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (!sat?.isSatellite()) {
           if (this.isMenuButtonActive) {
@@ -234,7 +236,7 @@ export class Breakup extends KeepTrackPlugin {
 
     mainsat.tle1 = (mainsat.tle1.substring(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.tle1.substring(32)) as TleLine1;
 
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
+    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
       errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));

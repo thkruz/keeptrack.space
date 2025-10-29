@@ -1,14 +1,14 @@
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
+import { getEl } from '@app/engine/utils/get-el';
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { GroupType } from '@app/app/data/object-group';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { SatConstellationString } from '@app/singletons/catalog-manager/satLinkManager';
-import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
-import { GroupType } from '@app/singletons/object-group';
 import categoryPng from '@public/img/icons/category.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
@@ -26,7 +26,7 @@ export class SatConstellations extends KeepTrackPlugin {
   bottomIconImg = categoryPng;
   bottomIconElementName: string = 'menu-constellations';
   sideMenuElementName: string = 'constellations-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="constellations-menu" class="side-menu-parent start-hidden text-select">
     <div id="constellation-menu" class="side-menu">
       <ul>
@@ -56,8 +56,8 @@ export class SatConstellations extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         // Add additional constellations
         getEl('constellations-menu')!.querySelector('ul')!.insertAdjacentHTML(
@@ -85,7 +85,7 @@ export class SatConstellations extends KeepTrackPlugin {
   }
 
   private constellationMenuClick_(groupName: string) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    // const timeManagerInstance = keepTrackApi.getTimeManager();
     const catalogManagerInstance = keepTrackApi.getCatalogManager();
     const groupManagerInstance = keepTrackApi.getGroupsManager();
 
@@ -157,10 +157,9 @@ export class SatConstellations extends KeepTrackPlugin {
         if (!groupManagerInstance.groupList[groupName]) {
           groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(catalogManagerInstance.satLinkManager.aehf), groupName);
         }
-        showLoading(() => {
-          lineManagerInstance.clear();
-          catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Aehf, timeManagerInstance);
-        });
+        // showLoading(() => {
+        //   catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Aehf, timeManagerInstance);
+        // });
         break;
       case 'wgs':
         if (!groupManagerInstance.groupList[groupName]) {
@@ -169,10 +168,9 @@ export class SatConstellations extends KeepTrackPlugin {
 
           groupManagerInstance.createGroup(GroupType.SCC_NUM, catalogManagerInstance.id2satnum(wgs), groupName);
         }
-        showLoading(() => {
-          lineManagerInstance.clear();
-          catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Wgs, timeManagerInstance);
-        });
+        // showLoading(() => {
+        //   catalogManagerInstance.satLinkManager.showLinks(lineManagerInstance, SatConstellationString.Wgs, timeManagerInstance);
+        // });
         break;
       case 'starlink':
         if (!groupManagerInstance.groupList[groupName]) {

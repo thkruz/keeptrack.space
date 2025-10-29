@@ -1,9 +1,9 @@
+import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EarthTextureStyle } from '@app/singletons/draw-manager/earth';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
+import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
+import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
+import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
 import { keepTrackApi } from '../../keepTrackApi';
-import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
-import { lat2pitch, lon2yaw } from '../../lib/transforms';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
 
@@ -139,11 +139,11 @@ export const starTalk = (settingsManager: SettingsManager) => {
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
       setTimeout(() => {
         (keepTrackApi.getPlugin(TimeMachine)!).historyOfSatellitesPlay(); // Start Time Machine
-        keepTrackApi.getMainCamera().zoomTarget = 1; // Reset Zoom to Default
+        keepTrackApi.getMainCamera().state.zoomTarget = 1; // Reset Zoom to Default
         keepTrackApi.getMainCamera().camSnap(lat2pitch(DEFAULT_LATITUDE), lon2yaw(DEFAULT_LONGITUDE, new Date())); // Reset Camera to Default
       }, 100);
       setTimeout(() => {
-        keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
+        keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
         keepTrackApi.getMainCamera().autoRotate(true); // Start Rotating Camera
       }, DELAY_BEFORE_ROTATING);
     };

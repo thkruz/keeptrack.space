@@ -22,16 +22,15 @@
 
 import { KeepTrack } from './keeptrack';
 
+const keepTrackInstance = KeepTrack.getInstance();
 
 // Load the main website class
-const keepTrack = new KeepTrack(window.settingsOverride);
-
-keepTrack.init();
+keepTrackInstance.init(window.settingsOverride);
 
 // Expose to window for debugging
-window.keepTrack = keepTrack;
+window.keepTrack = keepTrackInstance;
 
 // Initialize the website
 KeepTrack.initCss().then(() => {
-  keepTrack.run();
+  keepTrackInstance.run();
 });

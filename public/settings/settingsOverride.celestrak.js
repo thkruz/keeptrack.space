@@ -27,140 +27,109 @@ const settingsOverride = {
   plugins: {
     DebugMenuPlugin: {
       enabled: false,
-      order: 0,
-    },
-    TooltipsPlugin: {
-      enabled: false,
-      order: 1,
     },
     UserAccountPlugin: {
-      enabled: true,
-      order: 2,
+      enabled: false,
     },
     SensorListPlugin: {
-      enabled: true,
-      order: 10,
+      enabled: false,
     },
     SensorInfoPlugin: {
-      enabled: true,
-      order: 11,
+      enabled: false,
     },
     CustomSensorPlugin: {
       enabled: false,
-      order: 12,
     },
     SensorFov: {
-      enabled: true,
-      order: 13,
+      enabled: false,
     },
     SensorSurvFence: {
       enabled: false,
-      order: 14,
     },
     ShortTermFences: {
       enabled: false,
-      order: 15,
     },
     LookAnglesPlugin: {
-      enabled: true,
-      order: 20,
+      enabled: false,
     },
     MultiSiteLookAnglesPlugin: {
       enabled: false,
-      order: 21,
     },
     SensorTimeline: {
       enabled: false,
-      order: 30,
     },
     SatelliteTimeline: {
       enabled: false,
-      order: 31,
     },
     WatchlistPlugin: {
-      enabled: true,
-      order: 40,
+      enabled: false,
     },
     WatchlistOverlay: {
-      enabled: true,
-      order: 41,
+      enabled: false,
     },
     ReportsPlugin: {
       enabled: true,
       menuMode: [1],
-      order: 50,
     },
     PolarPlotPlugin: {
-      enabled: true,
-      order: 60,
+      enabled: false,
     },
     CreateSat: {
       enabled: false,
-      order: 70,
     },
     EditSat: {
       enabled: false,
-      order: 71,
+    },
+    OemReaderPlugin: {
+      enabled: false,
     },
     NewLaunch: {
       enabled: false,
-      order: 72,
     },
     Breakup: {
       enabled: false,
-      order: 73,
     },
     MissilePlugin: {
       enabled: false,
-      order: 74,
     },
     SatelliteFov: {
       enabled: false,
-      order: 75,
     },
     FindSatPlugin: {
       enabled: true,
-      order: 80,
     },
     ProximityOps: {
       enabled: false,
-      order: 81,
     },
     Collisions: {
       enabled: true,
-      order: 90,
     },
     TrackingImpactPredict: {
       enabled: true,
-      order: 91,
     },
     StereoMap: {
       enabled: true,
-      order: 150,
     },
     SatelliteViewPlugin: {
       enabled: false,
-      order: 151,
     },
     Planetarium: {
       enabled: true,
-      order: 155,
     },
     Astronomy: {
       enabled: false,
-      order: 156,
     },
     SatConstellations: {
       enabled: true,
-      order: 230,
     },
     CountriesMenu: {
       enabled: true,
-      order: 231,
     },
     ColorMenu: {
       enabled: true,
-      order: 232,
+    },
+    PlanetsMenuPlugin: {
+      enabled: false,
     },
     SatellitePhotos: {
       enabled: true,
@@ -168,118 +137,119 @@ const settingsOverride = {
     },
     TimeMachine: {
       enabled: false,
-      order: 250,
     },
     EciPlot: {
       enabled: false,
-      order: 260,
     },
     EcfPlot: {
       enabled: false,
-      order: 261,
     },
     RicPlot: {
       enabled: false,
-      order: 262,
     },
     Time2LonPlots: {
       enabled: false,
-      order: 263,
     },
     Lat2LonPlots: {
       enabled: false,
-      order: 264,
     },
     Inc2AltPlots: {
       enabled: false,
-      order: 265,
     },
     Inc2LonPlots: {
       enabled: false,
-      order: 266,
     },
     NightToggle: {
       enabled: true,
-      order: 310,
     },
     DebrisScreening: {
       enabled: false,
-      order: 280,
     },
     transponderChannelData: {
       enabled: false,
     },
     NextLaunchesPlugin: {
-      enabled: false,
-      order: 350,
+      enabled: true,
     },
     LaunchCalendar: {
       enabled: false,
-      order: 351,
     },
     Calculator: {
       enabled: false,
-      order: 400,
+    },
+    ManeuverPlugin: {
+      enabled: false,
     },
     InitialOrbitDeterminationPlugin: {
       enabled: false,
-      order: 410,
     },
     AnalysisMenu: {
       enabled: false,
-      order: 420,
     },
     Screenshot: {
       enabled: true,
-      order: 450,
     },
     ScreenRecorder: {
       enabled: false,
-      order: 451,
     },
     DopsPlugin: {
       enabled: false,
-      order: 500,
     },
     SatChangesPlugin: {
-      enabled: false, // Backend no longer supports this
-      order: 501, // TODO: Update when backend is ready
+      enabled: false,
     },
     VideoDirectorPlugin: {
       enabled: false,
-      order: 510,
     },
     SettingsMenuPlugin: {
       enabled: true,
-      order: 590,
     },
     GraphicsMenuPlugin: {
       enabled: true,
-      order: 591,
     },
     FilterMenuPlugin: {
       enabled: true,
-      order: 592,
     },
     AboutMenuPlugin: {
       enabled: false,
-      order: 601,
+    },
+    VcrPlugin: {
+      enabled: true,
     },
     // Non-Menu plugins
-    SatInfoBox: {
+    SatInfoBoxCore: {
       enabled: true,
+    },
+    SatInfoBoxActions: {
+      enabled: true,
+    },
+    SatInfoBoxLinks: {
+      enabled: true,
+    },
+    SatInfoBoxObject: {
+      enabled: true,
+    },
+    SatInfoBoxMission: {
+      enabled: false,
+    },
+    SatInfoBoxOrbital: {
+      enabled: true,
+      isShowCovariance: false,
+    },
+    SatInfoBoxSensor: {
+      enabled: false,
     },
     TopMenu: {
       enabled: true,
     },
-    SocialMedia: {
+    GithubLinkPlugin: {
       enabled: true,
     },
     DateTimeManager: {
       enabled: true,
     },
     ClassificationBar: {
-      enabled: true,
+      enabled: false,
     },
     OrbitReferences: {
       enabled: false,
@@ -299,7 +269,7 @@ const settingsOverride = {
     },
     ViewInfoRmbPlugin: {
       enabled: true,
-    },
+    }
   },
   dataSources: {
     tle: 'https://api.keeptrack.space/v2/sats/celestrak',
@@ -378,6 +348,27 @@ const settingsOverride = {
     maxSize: 70.0,
   },
   isEnableJscCatalog: false,
+  isAutoStart: true,
+  isDisableSensors: true,
+  isDisablePlanets: true,
+
+  colorSchemeInstances: {
+    MissionColorScheme: {
+      enabled: false,
+    },
+    ConfidenceColorScheme: {
+      enabled: false,
+    },
+    OrbitalPlaneDensityColorScheme: {
+      enabled: false,
+    },
+    SpatialDensityColorScheme: {
+      enabled: false,
+    },
+    SourceColorScheme: {
+      enabled: false,
+    },
+  },
 };
 
 // Expose these to the console

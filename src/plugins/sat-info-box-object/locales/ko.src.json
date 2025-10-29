@@ -1,0 +1,51 @@
+{
+  "SatInfoBoxObject": {
+    "title": "객체 데이터",
+    "Type": {
+      "label": "유형",
+      "tooltip": "객체의 유형",
+      "unknown": "추후 공지",
+      "payload": "페이로드",
+      "rocketBody": "로켓 본체",
+      "debris": "파편",
+      "special": "특수",
+      "missile": "탄도 미사일"
+    },
+    "Status": {
+      "label": "상태",
+      "tooltip": "객체의 운용 상태",
+      "operational": "운용 중",
+      "nonOperational": "운용 중지",
+      "partiallyOperational": "부분 운용",
+      "extendedMission": "임무 연장",
+      "backupStandby": "백업/대기",
+      "spare": "예비",
+      "unknown": "알 수 없음"
+    },
+    "Country": {
+      "label": "국가",
+      "tooltip": "출신 국가"
+    },
+    "LaunchSite": {
+      "label": "발사장",
+      "tooltip": "객체가 발사된 위치"
+    },
+    "LaunchVehicle": {
+      "label": "발사체",
+      "tooltip": "객체를 발사한 로켓 또는 차량"
+    },
+    "Configuration": {
+      "label": "구성",
+      "tooltip": "로켓 또는 발사체의 구성"
+    },
+    "RCS": {
+      "label": "RCS",
+      "tooltip": "레이더 반사 단면적 - 레이더 신호에 대한 객체의 반사 정도 (m² 단위)"
+    },
+    "StdMag": {
+      "label": "표준 등급",
+      "tooltip": "표준 등급 - 숫자가 작을수록 더 밝음"
+    },
+    "unknown": "알 수 없음"
+  }
+}

@@ -1,13 +1,13 @@
+import { CatalogManager } from '@app/app/data/catalog-manager';
+import { Container } from '@app/engine/core/container';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManagerOverride } from '@app/settings/settings';
-import { DetailedSatellite, Milliseconds, Satellite } from 'ootk';
-import { keepTrackContainer } from '../src/container';
-import { SatCruncherMessageData, Singletons } from '../src/interfaces';
-import { CatalogManager } from '../src/singletons/catalog-manager';
-import { OrbitManager } from '../src/singletons/orbitManager';
-import { UiManager } from '../src/singletons/uiManager';
-import { WebGLRenderer } from '../src/singletons/webgl-renderer';
-import { CatalogLoader } from '../src/static/catalog-loader';
+import { DetailedSatellite, Milliseconds, Satellite } from '@ootk/src/main';
+import { CatalogLoader } from '../src/app/data/catalog-loader';
+import { UiManager } from '../src/app/ui/uiManager';
+import { SatCruncherMessageData, Singletons } from '../src/engine/core/interfaces';
+import { OrbitManager } from '../src/engine/rendering/orbitManager';
+import { WebGLRenderer } from '../src/engine/rendering/webgl-renderer';
 import { KeepTrack } from './../src/keeptrack';
 import { defaultSat } from './environment/apiMocks';
 import { mockCameraManager, setupDefaultHtml } from './environment/standard-env';
@@ -80,11 +80,11 @@ const setupStandardEnvironment = () => {
   // Pretend we have a working canvas
   drawManagerInstance.domElement = { style: { cursor: 'default' } } as unknown as HTMLCanvasElement;
 
-  keepTrackContainer.registerSingleton(Singletons.WebGLRenderer, drawManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
-  keepTrackContainer.registerSingleton(Singletons.MainCamera, mockCameraManager);
+  Container.getInstance().registerSingleton(Singletons.WebGLRenderer, drawManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.CatalogManager, catalogManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.UiManager, uiManagerInstance);
+  Container.getInstance().registerSingleton(Singletons.MainCamera, mockCameraManager);
 };
 
 describe('code_snippet', () => {
@@ -94,6 +94,7 @@ describe('code_snippet', () => {
   } as unknown as SettingsManagerOverride;
 
   beforeEach(() => {
+    KeepTrack.reset();
     setupStandardEnvironment();
   });
 
@@ -106,8 +107,8 @@ describe('code_snippet', () => {
 
     let keepTrack: KeepTrack;
     const initializationTest = async () => {
-      keepTrack = new KeepTrack(settingsOverride);
-      keepTrack.init();
+      keepTrack = KeepTrack.getInstance();
+      keepTrack.init(settingsOverride);
       KeepTrack.initCss();
       await keepTrack.run();
 
@@ -125,8 +126,9 @@ describe('code_snippet', () => {
       throw new Error('Test error');
     };
 
-    const keepTrack = new KeepTrack(settingsOverride);
+    const keepTrack = KeepTrack.getInstance();
 
+    keepTrack.init(settingsOverride);
     keepTrack.run().then(() => {
       /*
        * const error = new Error('Test error');
@@ -136,19 +138,21 @@ describe('code_snippet', () => {
   });
 
   // Tests that the game loop updates and draws the application correctly.
-  it.skip('test_game_loop_updates_and_draws_application', () => {
-    const keepTrack = new KeepTrack(settingsOverride);
+  it('test_game_loop_updates_and_draws_application', () => {
+    const keepTrack = KeepTrack.getInstance();
+
+    keepTrack.init(settingsOverride);
     const drawManagerInstance = keepTrackApi.getRenderer();
 
     keepTrack.run().then(() => {
       drawManagerInstance.update = jest.fn();
       keepTrackApi.getMainCamera().draw = jest.fn();
       settingsManager.cruncherReady = true;
-      keepTrack.gameLoop();
+      // keepTrack.engine.run();
       // eslint-disable-next-line dot-notation
-      keepTrack['update_'](1 as Milliseconds);
+      keepTrack.engine['update_'](1 as Milliseconds);
       // eslint-disable-next-line dot-notation
-      keepTrack['draw_'](1 as Milliseconds);
+      keepTrack.engine['draw_'](1 as Milliseconds);
       expect(drawManagerInstance.update).toHaveBeenCalled();
       expect(keepTrackApi.getMainCamera().draw).toHaveBeenCalled();
     });
@@ -156,7 +160,9 @@ describe('code_snippet', () => {
 
   // Test if isPreventDefaultHtml disabled
   it('test_isPreventDefaultHtml_disabled', () => {
-    const keepTrack = new KeepTrack({ isPreventDefaultHtml: false });
+    const keepTrack = KeepTrack.getInstance();
+
+    keepTrack.init({ isPreventDefaultHtml: false } as unknown as SettingsManagerOverride);
     const initializationTest = () => {
       keepTrack.run();
     };

@@ -1,50 +1,130 @@
-import { keepTrackApi } from '@app/keepTrackApi';
-import { loadPlugins } from '@app/plugins/plugins';
+import { PluginManager } from '@app/plugins/plugins';
 
 describe('plugins', () => {
   it('should be able to initialize all plugins', () => {
-    loadPlugins(keepTrackApi, {
-      debug: false,
-      SatInfoBoxCore: true,
-      AboutMenuPlugin: true,
-      Collisions: true,
-      DopsPlugin: true,
-      FindSatPlugin: true,
-      LaunchCalendar: true,
-      NewLaunch: true,
-      NextLaunchesPlugin: true,
-      NightToggle: true,
-      SatellitePhotos: true,
-      ScreenRecorder: true,
-      SatChangesPlugin: false,
-      StereoMap: true,
-      TimeMachine: true,
-      InitialOrbitDeterminationPlugin: true,
-      MissilePlugin: true,
-      Breakup: true,
-      EditSat: true,
-      SatConstellations: true,
-      CountriesMenu: true,
-      ColorMenu: true,
-      ShortTermFences: true,
-      OrbitReferences: true,
-      AnalysisMenu: true,
-      plotAnalysis: true,
-      SensorFov: true,
-      SensorSurvFence: true,
-      SatelliteFov: true,
-      SatelliteViewPlugin: true,
-      Planetarium: true,
-      Astronomy: true,
-      Screenshot: true,
-      WatchlistPlugin: true,
-      SettingsMenuPlugin: true,
-      DateTimeManager: true,
-      SocialMedia: true,
-      TopMenu: true,
-      ClassificationBar: true,
-      SoundManager: true,
-      GamepadPlugin: true,
+    const pluginManager = new PluginManager();
+
+    pluginManager.loadPlugins({
+      DebugMenuPlugin: {
+        enabled: true,
+      },
+      SatInfoBoxCore: {
+        enabled: true,
+      },
+      AboutMenuPlugin: {
+        enabled: true,
+      },
+      Collisions: {
+        enabled: true,
+      },
+      DopsPlugin: {
+        enabled: true,
+      },
+      FindSatPlugin: {
+        enabled: true,
+      },
+      LaunchCalendar: {
+        enabled: true,
+      },
+      NewLaunch: {
+        enabled: true,
+      },
+      NextLaunchesPlugin: {
+        enabled: true,
+      },
+      NightToggle: {
+        enabled: true,
+      },
+      SatellitePhotos: {
+        enabled: true,
+      },
+      ScreenRecorder: {
+        enabled: true,
+      },
+      SatChangesPlugin: {
+        enabled: true,
+      },
+      StereoMap: {
+        enabled: true,
+      },
+      TimeMachine: {
+        enabled: true,
+      },
+      InitialOrbitDeterminationPlugin: {
+        enabled: true,
+      },
+      MissilePlugin: {
+        enabled: true,
+      },
+      Breakup: {
+        enabled: true,
+      },
+      EditSat: {
+        enabled: true,
+      },
+      SatConstellations: {
+        enabled: true,
+      },
+      CountriesMenu: {
+        enabled: true,
+      },
+      ColorMenu: {
+        enabled: true,
+      },
+      ShortTermFences: {
+        enabled: true,
+      },
+      OrbitReferences: {
+        enabled: true,
+      },
+      AnalysisMenu: {
+        enabled: true,
+      },
+      SensorFov: {
+        enabled: true,
+      },
+      SensorSurvFence: {
+        enabled: true,
+      },
+      SatelliteFov: {
+        enabled: true,
+      },
+      SatelliteViewPlugin: {
+        enabled: true,
+      },
+      Planetarium: {
+        enabled: true,
+      },
+      Astronomy: {
+        enabled: true,
+      },
+      Screenshot: {
+        enabled: true,
+      },
+      WatchlistPlugin: {
+        enabled: true,
+      },
+      SettingsMenuPlugin: {
+        enabled: true,
+      },
+      DateTimeManager: {
+        enabled: true,
+      },
+      GithubLinkPlugin: {
+        enabled: true,
+      },
+      TopMenu: {
+        enabled: true,
+      },
+      ClassificationBar: {
+        enabled: true,
+      },
+      SoundManager: {
+        enabled: true,
+      },
+      GamepadPlugin: {
+        enabled: true,
+      },
     });
   });
 });

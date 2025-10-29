@@ -1,11 +1,12 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
-import { lat2pitch, lon2yaw } from '@app/lib/transforms';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { Degrees, Kilometers, Milliseconds, Radians } from '@ootk/src/main';
 import i18next from 'i18next';
-import { Degrees, Kilometers, Milliseconds, Radians } from 'ootk';
+import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
 import { keepTrackApi } from '../../keepTrackApi';
-import { getEl, hideEl, setInnerHtml } from '../../lib/get-el';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
 
@@ -21,7 +22,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
   settingsManager.plugins.TimeMachine = { enabled: true };
   settingsManager.plugins.TopMenu = { enabled: false };
 
-  settingsManager.staticOffset = 1743483637000 - Date.now(); // Set to April 1, 2025
+  settingsManager.simulationTime = new Date('2025-04-01T00:00:00Z'); // Set to April 1, 2025
 
   settingsManager.isEnableJscCatalog = false;
 
@@ -39,7 +40,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
   settingsManager.splashScreenList = ['epfl-1', 'epfl-2']; // Set Splash Screens to EPFL
 
-  keepTrackApi.on(KeepTrackApiEvents.onKeepTrackReady, () => {
+  EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
     hideEl('logo-primary');
   });
   settingsManager.isDisableAsciiCatalog = true;
@@ -167,20 +168,20 @@ export const darkClouds = (settingsManager: SettingsManager) => {
       keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
       const mainCameraInstance = keepTrackApi.getMainCamera();
 
-      mainCameraInstance.camPitch = lat2pitch(DEFAULT_LATITUDE);
-      mainCameraInstance.camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
-      mainCameraInstance.dragStartPitch = 0.06321641675916885 as Radians;
-      mainCameraInstance.dragStartYaw = 2.244571612554059 as Radians;
-      mainCameraInstance.zoomLevel_ = 0.8;
-      mainCameraInstance.zoomTarget = 0.8;
+      mainCameraInstance.state.camPitch = lat2pitch(DEFAULT_LATITUDE);
+      mainCameraInstance.state.camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
+      mainCameraInstance.state.dragStartPitch = 0.06321641675916885 as Radians;
+      mainCameraInstance.state.dragStartYaw = 2.244571612554059 as Radians;
+      mainCameraInstance.state.zoomLevel = 0.8;
+      mainCameraInstance.state.zoomTarget = 0.8;
 
-      mainCameraInstance.screenDragPoint = [mainCameraInstance.mouseX, mainCameraInstance.mouseY];
+      mainCameraInstance.state.screenDragPoint = [mainCameraInstance.state.mouseX, mainCameraInstance.state.mouseY];
 
       setTimeout(() => {
         (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
       }, 100);
       setTimeout(() => {
-        mainCameraInstance.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
+        mainCameraInstance.state.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
         mainCameraInstance.autoRotate(true); // Start Rotating Camera
       }, DELAY_BEFORE_ROTATING);
     };

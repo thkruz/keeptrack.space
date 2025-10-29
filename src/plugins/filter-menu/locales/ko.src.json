@@ -1,0 +1,83 @@
+{
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "필터 메뉴",
+      "bottomIconLabel": "필터 메뉴",
+      "helpBody": "이 메뉴에서는 객체 유형, 궤도 영역 및 데이터 출처에 따라 지구본에 표시되는 객체를 필터링할 수 있습니다."
+    }
+  },
+  "filterMenu": {
+    "payloads": {
+      "name": "페이로드",
+      "category": "객체 유형",
+      "tooltip": "통신 또는 기상 위성 등 주로 페이로드를 운반하는 데 사용되는 객체입니다. 운영 중이거나 퇴역한 위성을 포함합니다."
+    },
+    "rocketBodies": {
+      "name": "로켓 본체",
+      "category": "객체 유형",
+      "tooltip": "페이로드를 궤도에 올린 후 남은 로켓의 상단부로, 현재는 큰 우주 쓰레기입니다."
+    },
+    "debris": {
+      "name": "파편",
+      "category": "객체 유형",
+      "tooltip": "더 이상 하나의 조각이 아닌, 우주선과 로켓의 파편 및 고장난 위성을 포함합니다."
+    },
+    "unknownType": {
+      "name": "알 수 없는 유형",
+      "category": "객체 유형",
+      "tooltip": "목적이나 유형이 아직 명확하게 확인되지 않은 궤도상의 객체입니다."
+    },
+    "notionalSatellites": {
+      "name": "가상 위성",
+      "category": "객체 유형",
+      "tooltip": "아직 발사되지 않은 계획 또는 제안된 위성입니다."
+    },
+    "agencies": {
+      "name": "기관",
+      "category": "객체 유형",
+      "tooltip": "계획된 기능 - 지구본에 기관을 표시합니다.",
+      "checked": false,
+      "disabled": true
+    },
+    "vleoSatellites": {
+      "name": "vLEO 위성",
+      "category": "궤도 영역",
+      "tooltip": "최고점이 400km 이하인 초저지구궤도 위성입니다."
+    },
+    "leoSatellites": {
+      "name": "LEO 위성",
+      "category": "궤도 영역",
+      "tooltip": "최고점이 400km에서 6000km 사이인 저지구궤도 위성입니다."
+    },
+    "heoSatellites": {
+      "name": "HEO 위성",
+      "category": "궤도 영역",
+      "tooltip": "이심률이 0.1 이상이고 최고점이 39786km 이하인 고타원궤도 위성입니다."
+    },
+    "meoSatellites": {
+      "name": "MEO 위성",
+      "category": "궤도 영역",
+      "tooltip": "최고점이 6000km에서 34786km 사이인 중지구궤도 위성입니다."
+    },
+    "geoSatellites": {
+      "name": "GEO 위성",
+      "category": "궤도 영역",
+      "tooltip": "이심률이 0.1 미만이고 최고점이 34786km에서 36786km 사이인 정지궤도 위성입니다."
+    },
+    "xgeoSatellites": {
+      "name": "xGEO 위성",
+      "category": "궤도 영역",
+      "tooltip": "이심률이 0.1 미만이고 최고점이 36786km 이상이거나, 이심률이 0.1 이상이고 최고점이 39786km 이상인 초정지궤도 위성입니다."
+    },
+    "vimpelSatellites": {
+      "name": "Vimpel 위성",
+      "category": "출처",
+      "tooltip": "Vimpel 위성 카탈로그는 러시아의 JSC Vimpel과 Keldysh 응용수학연구소가 공동으로 관리합니다."
+    },
+    "celestrakSatellites": {
+      "name": "Celestrak 위성",
+      "category": "출처",
+      "tooltip": "Celestrak은 다양한 위성과 파편의 궤도 데이터를 제공하는 인기 있는 소스입니다."
+    }
+  }
+}

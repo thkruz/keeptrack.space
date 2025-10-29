@@ -1,0 +1,83 @@
+{
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "フィルタメニュー",
+      "bottomIconLabel": "フィルタメニュー",
+      "helpBody": "このメニューでは、種類、軌道領域、データソースに基づいて地球儀に表示されるオブジェクトをフィルタリングできます。"
+    }
+  },
+  "filterMenu": {
+    "payloads": {
+      "name": "ペイロード",
+      "category": "オブジェクトタイプ",
+      "tooltip": "主にペイロードを運ぶために使用されるオブジェクト（通信衛星や気象衛星など）。運用中および廃止された衛星を含みます。"
+    },
+    "rocketBodies": {
+      "name": "ロケット本体",
+      "category": "オブジェクトタイプ",
+      "tooltip": "ペイロードを軌道に投入した後のロケットの上段で、現在は宇宙デブリとなっている大型部品です。"
+    },
+    "debris": {
+      "name": "デブリ",
+      "category": "オブジェクトタイプ",
+      "tooltip": "壊れた衛星など、もはや一つの部品ではない宇宙船やロケットの破片です。"
+    },
+    "unknownType": {
+      "name": "不明なタイプ",
+      "category": "オブジェクトタイプ",
+      "tooltip": "目的や種類がまだ明確に特定されていない軌道上のオブジェクトです。"
+    },
+    "notionalSatellites": {
+      "name": "仮想衛星",
+      "category": "オブジェクトタイプ",
+      "tooltip": "計画中または提案中で、まだ打ち上げられていない衛星です。"
+    },
+    "agencies": {
+      "name": "機関",
+      "category": "オブジェクトタイプ",
+      "tooltip": "予定されている機能 - 地球儀上に機関を表示します。",
+      "checked": false,
+      "disabled": true
+    },
+    "vleoSatellites": {
+      "name": "超低軌道衛星 (vLEO)",
+      "category": "軌道領域",
+      "tooltip": "遠地点が400km未満の超低地球軌道衛星です。"
+    },
+    "leoSatellites": {
+      "name": "低軌道衛星 (LEO)",
+      "category": "軌道領域",
+      "tooltip": "遠地点が400kmから6000kmの低地球軌道衛星です。"
+    },
+    "heoSatellites": {
+      "name": "高楕円軌道衛星 (HEO)",
+      "category": "軌道領域",
+      "tooltip": "離心率が0.1以上、遠地点が39786km未満の高楕円軌道衛星です。"
+    },
+    "meoSatellites": {
+      "name": "中軌道衛星 (MEO)",
+      "category": "軌道領域",
+      "tooltip": "遠地点が6000kmから34786kmの中地球軌道衛星です。"
+    },
+    "geoSatellites": {
+      "name": "静止軌道衛星 (GEO)",
+      "category": "軌道領域",
+      "tooltip": "離心率が0.1未満、遠地点が34786kmから36786kmの静止軌道衛星です。"
+    },
+    "xgeoSatellites": {
+      "name": "超静止軌道衛星 (xGEO)",
+      "category": "軌道領域",
+      "tooltip": "離心率が0.1未満で遠地点が36786km以上、または離心率が0.1以上で遠地点が39786km以上の超静止軌道衛星です。"
+    },
+    "vimpelSatellites": {
+      "name": "ヴィンペル衛星",
+      "category": "ソース",
+      "tooltip": "ヴィンペル衛星カタログは、ロシアの株式会社JSCヴィンペルがケルディシュ応用数学研究所と協力して管理しています。"
+    },
+    "celestrakSatellites": {
+      "name": "セレストラック衛星",
+      "category": "ソース",
+      "tooltip": "セレストラックは、幅広い衛星やデブリの軌道データ（TLE）を提供する人気のある情報源です。"
+    }
+  }
+}

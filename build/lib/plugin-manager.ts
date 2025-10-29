@@ -80,6 +80,18 @@ export class PluginManager {
       openSourcePath: '../plugins/graphics-menu/graphics-menu',
       proPath: '../plugins-pro/graphics-menu/graphics-menu',
     },
+    'oem-reader': {
+      openSourcePath: '../plugins/oem-reader/oem-reader',
+      proPath: '../plugins-pro/oem-reader/oem-reader',
+    },
+    'user-account': {
+      openSourcePath: '../plugins/user-account/user-account',
+      proPath: '../plugins-pro/user-account/user-account',
+    },
+    'telemetry': {
+      openSourcePath: '../plugins/telemetry/telemetry',
+      proPath: '../plugins-pro/telemetry/telemetry',
+    },
   };
 
   constructor(fileManager: FileSystemManager) {

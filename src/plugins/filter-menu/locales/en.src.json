@@ -1,0 +1,83 @@
+{
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "Filter Menu",
+      "bottomIconLabel": "Filter Menu",
+      "helpBody": "This menu allows you to filter the objects displayed on the globe based on their type, orbital regime, and data source."
+    }
+  },
+  "filterMenu": {
+    "payloads": {
+      "name": "Payloads",
+      "category": "Object Types",
+      "tooltip": "Objects that are primarily used to carry a payload, such as communication or weather satellites. This includes operational and defunct satellites."
+    },
+    "rocketBodies": {
+      "name": "Rocket Bodies",
+      "category": "Object Types",
+      "tooltip": "The upper stages of rockets that have delivered payloads to orbit and are now large pieces of space debris."
+    },
+    "debris": {
+      "name": "Debris",
+      "category": "Object Types",
+      "tooltip": "Fragments of spacecraft and rockets, including broken satellites, that are no longer one piece."
+    },
+    "unknownType": {
+      "name": "Unknown Type",
+      "category": "Object Types",
+      "tooltip": "Objects in orbit whose purpose or type is not clearly identified yet."
+    },
+    "notionalSatellites": {
+      "name": "Notional Satellites",
+      "category": "Object Types",
+      "tooltip": "Satellites that are planned or proposed but not yet launched."
+    },
+    "agencies": {
+      "name": "Agencies",
+      "category": "Object Types",
+      "tooltip": "Planned feature - This will show agencies on the globe.",
+      "checked": false,
+      "disabled": true
+    },
+    "vleoSatellites": {
+      "name": "vLEO Satellites",
+      "category": "Orbital Regimes",
+      "tooltip": "Very Low Earth Orbit satellites with an apogee below 400 km."
+    },
+    "leoSatellites": {
+      "name": "LEO Satellites",
+      "category": "Orbital Regimes",
+      "tooltip": "Low Earth Orbit satellites with an apogee between 400 km and 6000 km."
+    },
+    "heoSatellites": {
+      "name": "HEO Satellites",
+      "category": "Orbital Regimes",
+      "tooltip": "Highly Elliptical Orbit satellites with an eccentricity of 0.1 or greater and an apogee below 39786 km."
+    },
+    "meoSatellites": {
+      "name": "MEO Satellites",
+      "category": "Orbital Regimes",
+      "tooltip": "Medium Earth Orbit satellites with an apogee between 6000 km and 34786 km."
+    },
+    "geoSatellites": {
+      "name": "GEO Satellites",
+      "category": "Orbital Regimes",
+      "tooltip": "Geostationary Orbit satellites with an eccentricity below 0.1 and an apogee between 34786 km and 36786 km."
+    },
+    "xgeoSatellites": {
+      "name": "xGEO Satellites",
+      "category": "Orbital Regimes",
+      "tooltip": "Ex-Geosynchronous Orbit satellites with an eccentricity below 0.1 and an apogee above 36786 km, or an eccentricity of 0.1 or greater and an apogee above 39786 km."
+    },
+    "vimpelSatellites": {
+      "name": "Vimpel Satellites",
+      "category": "Source",
+      "tooltip": "Vimpel satellite catalog is maintained by the Russian joint-stock company JSC Vimpel, in cooperation with the Keldysh Institute of Applied Mathematics."
+    },
+    "celestrakSatellites": {
+      "name": "Celestrak Satellites",
+      "category": "Source",
+      "tooltip": "Celestrak is a popular source for satellite orbital data, providing TLEs for a wide range of satellites and debris."
+    }
+  }
+}

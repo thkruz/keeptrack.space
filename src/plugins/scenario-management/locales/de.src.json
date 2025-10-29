@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "ScenarioManagementPlugin": {
+      "title": "Szenarienverwaltung",
+      "bottomIconLabel": "Szenarienverwaltung",
+      "helpBody": "Das Szenarienverwaltungs-Plugin ermöglicht es Ihnen, Ihre Arbeit für verschiedene Projekte oder Kontexte zu organisieren.<br/>Aktuelle Funktionen sind:<br/><br/>  - Name und Beschreibung für jedes Szenario<br/>  - Analysezeitraum: Start- und Enddatum/Uhrzeit<br/>  - Szenarien speichern/laden<br/><br/>Das Ziel ist es, schließlich eine einzelne Datei bereitzustellen, die alle für die Szenarienverwaltung notwendigen Informationen enthält. Weitere Funktionen folgen in Kürze!"
+    }
+  }
+}

@@ -18,25 +18,28 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode, SensorGeolocation } from '@app/interfaces';
+import { MobileManager } from '@app/app/ui/mobileManager';
+import { MenuMode, SensorGeolocation, SolarBody } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { UrlManager } from '@app/engine/input/url-manager';
+import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
+import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
+import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { keepTrackApi } from '@app/keepTrackApi';
-import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
-import { ColorSchemeColorMap } from '@app/singletons/color-schemes/color-scheme';
-import { ObjectTypeColorSchemeColorMap } from '@app/singletons/color-schemes/object-type-color-scheme';
-import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/singletons/draw-manager/earth';
-import { SunTextureQuality } from '@app/singletons/draw-manager/sun';
-import { MobileManager } from '@app/singletons/mobileManager';
-import { UrlManager } from '@app/static/url-manager';
-import { Degrees, Kilometers, Milliseconds } from 'ootk';
-import { RADIUS_OF_EARTH } from '../lib/constants';
-import { PersistenceManager, StorageKey } from '../singletons/persistence-manager';
-import { ClassificationString } from '../static/classification';
-import { isThisNode } from '../static/isThisNode';
+import { Degrees, Kilometers, Milliseconds, Radians } from '@ootk/src/main';
+import { ClassificationString } from '../app/ui/classification';
+import { RADIUS_OF_EARTH } from '../engine/utils/constants';
+import { isThisNode } from '../engine/utils/isThisNode';
+import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import { defaultColorSettings } from './default-color-settings';
 import { defaultPlugins } from './default-plugins';
 import { parseGetVariables } from './parse-get-variables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
+
+import type { MilkyWayTextureQuality } from '@app/engine/rendering/draw-manager/skybox-sphere';
+import type { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
+import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
 
 export class SettingsManager {
   /**
@@ -46,8 +49,8 @@ export class SettingsManager {
   activeMenuMode: MenuMode = MenuMode.BASIC;
   // This controls which of the built-in plugins are loaded
   plugins = defaultPlugins;
-  changeTimeWithKeyboardAmountBig = 1000 * 60 * 60 as Milliseconds; // 1 hour
-  changeTimeWithKeyboardAmountSmall = 1000 * 60 as Milliseconds; // 1 minute
+  changeTimeWithKeyboardAmountBig = (1000 * 60 * 60) as Milliseconds; // 1 hour
+  changeTimeWithKeyboardAmountSmall = (1000 * 60) as Milliseconds; // 1 minute
   earthDayTextureQuality;
   earthNightTextureQuality;
   earthSpecTextureQuality;
@@ -93,14 +96,19 @@ export class SettingsManager {
    * plugins that use the bottom menu.
    */
   isDisableBottomMenu = false;
-  /** The initial time offset */
-  staticOffset: number = 0; // in seconds
+  /** The initial time */
+  simulationTime: Date | null = null;
+  propRate = 1.0;
   isDrawNightAsDay = false;
   isEmbedMode = false;
   splashScreenList: string[] | null = null;
   preset: string | null = null; // Used to force a preset to be loaded without GET variable
   isDisableCanvas = false; // Used to disable the canvas for debugging purposes
-
+  maxOemSatellites: number = 10; // Maximum number of OEM satellites to load
+  /** Default resolution for Milky Way texture */
+  milkyWayTextureQuality: MilkyWayTextureQuality;
+  /** Number of segments to use when drawing OEM orbits */
+  oemOrbitSegments = 64;
 
   static preserveSettings() {
     if (settingsManager.offlineMode) {
@@ -138,7 +146,7 @@ export class SettingsManager {
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality?.toString());
     }
 
-    keepTrackApi.emit(KeepTrackApiEvents.saveSettings);
+    keepTrackApi.emit(EventBusEvent.saveSettings);
   }
 
   colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
@@ -148,6 +156,54 @@ export class SettingsManager {
    * Ex. DefaultColorScheme, CelestrakColorScheme, etc.
    */
   defaultColorScheme = 'CelestrakColorScheme';
+
+  colorSchemeInstances = {
+    CelestrakColorScheme: {
+      enabled: true,
+    },
+    ObjectTypeColorScheme: {
+      enabled: true,
+    },
+    CountryColorScheme: {
+      enabled: true,
+    },
+    RcsColorScheme: {
+      enabled: true,
+    },
+    ReentryRiskColorScheme: {
+      enabled: true,
+    },
+    MissionColorScheme: {
+      enabled: true,
+    },
+    ConfidenceColorScheme: {
+      enabled: true,
+    },
+    OrbitalPlaneDensityColorScheme: {
+      enabled: true,
+    },
+    SpatialDensityColorScheme: {
+      enabled: true,
+    },
+    SunlightColorScheme: {
+      enabled: true,
+    },
+    GpAgeColorScheme: {
+      enabled: true,
+    },
+    SourceColorScheme: {
+      enabled: true,
+    },
+    VelocityColorScheme: {
+      enabled: true,
+    },
+    StarlinkColorScheme: {
+      enabled: true,
+    },
+    SmallSatColorScheme: {
+      enabled: true,
+    },
+  };
 
   /** Ensures no html is injected into the page */
   isPreventDefaultHtml = false;
@@ -189,7 +245,7 @@ export class SettingsManager {
   /**
    * The initial field of view settings for FPS, Planetarium, Astronomy, and Satellite View
    */
-  fieldOfView = 0.6;
+  fieldOfView = 0.6 as Radians;
   db = null;
   /**
    * Catch Errors and report them via github
@@ -449,6 +505,8 @@ export class SettingsManager {
     maxrange: null,
   };
 
+  centerBody: SolarBody = SolarBody.Earth;
+
   altMsgNum = null;
   altLoadMsgs = false;
   /**
@@ -501,7 +559,7 @@ export class SettingsManager {
   /**
    * The current legend to display.
    */
-  currentLegend = 'default';
+  currentLayer = 'CelestrakColorScheme';
   /**
    * The number of days before a TLE is considered lost.
    */
@@ -578,7 +636,7 @@ export class SettingsManager {
    *
    * TODO: Implement this for FPS, Planetarium, Astronomy, and Satellite View
    */
-  fieldOfViewMax = 1.2;
+  fieldOfViewMax = 1.2 as Radians;
   /**
    * @deprecated
    * The minimum value for the field of view setting.
@@ -815,7 +873,7 @@ export class SettingsManager {
    *
    * Used for zooming in and out in default and offset camera modes.
    */
-  maxZoomDistance = <Kilometers>120000;
+  maxZoomDistance = <Kilometers>1.2e6; // 1.2 million km
   /**
    * Which mesh to use if meshOverride is set
    */
@@ -937,6 +995,10 @@ export class SettingsManager {
      */
     minSize: 5.5,
     /**
+     * The maximum size of objects in the shader.
+     */
+    maxSize: 70.0,
+    /**
      * The minimum size of objects in the shader when in planetarium mode.
      */
     minSizePlanetarium: 20.0,
@@ -983,10 +1045,6 @@ export class SettingsManager {
      * The blur alpha factor used for stars.
      */
     blurFactor4: '0.25',
-    /**
-     * The maximum size of objects in the shader.
-     */
-    maxSize: 70.0,
   };
 
   /**
@@ -1040,7 +1098,7 @@ export class SettingsManager {
    * Increasing this causes z-fighting
    * Decreasing this causes clipping of stars and satellites
    */
-  zFar = 450000.0;
+  zFar = 149600000;
   /**
    * The minimum z-depth for the WebGL renderer.
    */
@@ -1048,7 +1106,7 @@ export class SettingsManager {
   /**
    * The speed at which the zoom level changes when the user zooms in or out.
    */
-  zoomSpeed = 0.0025;
+  zoomSpeed = 0.005;
   /**
    * Draw Trailing Orbits
    */
@@ -1088,7 +1146,7 @@ export class SettingsManager {
    * Minimum distance from satellite when we switch to close camera mode
    * The camera will not be able to get closer than this distance
    */
-  minDistanceFromSatellite = 1.25 as Kilometers;
+  minDistanceFromSatellite = 0.75 as Kilometers;
 
   /**
    * Disable toast messages
@@ -1108,7 +1166,7 @@ export class SettingsManager {
    */
   isDisableGodrays = false;
   isDisableSkybox = false;
-  isDisableMoon = false;
+  isDisablePlanets = false;
   isDisableSearchBox = false;
   isDisableAsyncReadPixels = false;
   /**
@@ -1233,7 +1291,6 @@ export class SettingsManager {
        * URL Params > Local Storage > Default
        */
       this.loadPersistedSettings();
-
     }
 
     // If No UI Reduce Overhead
@@ -1390,16 +1447,50 @@ export class SettingsManager {
     a.click();
   }
 
+  private deepMerge(target: object, source: object): object {
+    for (const key of Object.keys(source)) {
+      const sourceValue = source[key];
+      const targetValue = target[key];
+
+      if (
+        typeof sourceValue === 'object' &&
+        sourceValue !== null &&
+        !Array.isArray(sourceValue) &&
+        typeof targetValue === 'object' &&
+        targetValue !== null &&
+        !Array.isArray(targetValue)
+      ) {
+        // Recursively merge objects
+        target[key] = this.deepMerge({ ...targetValue }, sourceValue);
+      } else {
+        target[key] = sourceValue;
+      }
+    }
+
+    return target;
+  }
+
   private loadOverrides_(settingsOverride: SettingsManagerOverride) {
     // combine settingsOverride with window.settingsOverride
     const overrides = { ...settingsOverride, ...window.settingsOverride };
     // override values in this with overrides
 
+
     for (const key of Object.keys(overrides)) {
-      if (typeof overrides[key] === 'object' && overrides[key] !== null) {
-        this[key] = { ...this[key], ...overrides[key] };
+      const overrideValue = overrides[key];
+      const currentValue = this[key];
+
+      if (
+        typeof overrideValue === 'object' &&
+        overrideValue !== null &&
+        !Array.isArray(overrideValue) &&
+        typeof currentValue === 'object' &&
+        currentValue !== null &&
+        !Array.isArray(currentValue)
+      ) {
+        this[key] = this.deepMerge({ ...currentValue }, overrideValue);
       } else {
-        this[key] = overrides[key];
+        this[key] = overrideValue;
       }
     }
   }
@@ -1452,9 +1543,21 @@ export class SettingsManager {
 }
 
 // Create a type based on the parameters of SettingsManager (ignore methods)
-export type SettingsManagerOverride = Partial<Omit<SettingsManager,
-  'exportSettingsToJSON' | 'loadOverridesFromUrl_' | 'loadLastMapTexture_' | 'setEmbedOverrides_' | 'setMobileSettings_' | 'setInstallDirectory_' | 'setColorSettings_' |
-  'checkIfIframe_' | 'initParseFromGETVariables_' | 'loadOverrides_' | 'setMobileSettings_' | 'setEmbedOverrides_' | 'loadLastMapTexture_' | 'setColorSettings_'>>;
+export type SettingsManagerOverride = Partial<
+  Omit<
+    SettingsManager,
+    | 'exportSettingsToJSON'
+    | 'loadOverridesFromUrl_'
+    | 'loadLastMapTexture_'
+    | 'setEmbedOverrides_'
+    | 'setMobileSettings_'
+    | 'setInstallDirectory_'
+    | 'setColorSettings_'
+    | 'checkIfIframe_'
+    | 'initParseFromGETVariables_'
+    | 'loadOverrides_'
+  >
+>;
 
 // Export the settings manager instance
 

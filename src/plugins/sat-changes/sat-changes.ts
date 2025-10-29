@@ -1,14 +1,14 @@
 /* eslint-disable no-use-before-define */
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl } from '@app/engine/utils/get-el';
+import { isThisNode } from '@app/engine/utils/isThisNode';
+import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
+import { dateFromJday } from '@app/engine/utils/transforms';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl } from '@app/lib/get-el';
-import { slideInRight, slideOutLeft } from '@app/lib/slide';
-import { isThisNode } from '@app/static/isThisNode';
 import satChngPng from '@public/img/icons/sats.png';
-
-import { dateFromJday } from '@app/lib/transforms';
-
 import './components/sat-changes.css';
 
 /**
@@ -31,9 +31,9 @@ let issatChngMenuOpen = false;
 
 export const uiManagerInit = () => {
   // Side Menu
-  getEl('left-menus').insertAdjacentHTML(
+  getEl('left-menus')?.insertAdjacentHTML(
     'beforeend',
-    keepTrackApi.html`
+    html`
         <div id="satChng-menu" class="side-menu-parent start-hidden text-select">
           <div id="satChng-content" class="side-menu">
             <div class="row">
@@ -48,7 +48,7 @@ export const uiManagerInit = () => {
   // Bottom Icon
   getEl('bottom-icons')?.insertAdjacentHTML(
     'beforeend',
-    keepTrackApi.html`
+    html`
         <div id="menu-satChng" class="bmenu-item">
           <div class="bmenu-item-inner">
             <img alt="satchng" src="" delayedsrc="${satChngPng}" />
@@ -61,12 +61,12 @@ export const uiManagerInit = () => {
 
 export const init = (): void => {
   // Add HTML
-  keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, uiManagerInit);
-  keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, uiManagerFinal);
+  EventBus.getInstance().on(EventBusEvent.uiManagerInit, uiManagerInit);
+  EventBus.getInstance().on(EventBusEvent.uiManagerFinal, uiManagerFinal);
 
   // Add JavaScript
-  keepTrackApi.on(KeepTrackApiEvents.bottomMenuClick, bottomMenuClick);
-  keepTrackApi.on(KeepTrackApiEvents.hideSideMenus, hideSideMenus);
+  EventBus.getInstance().on(EventBusEvent.bottomMenuClick, bottomMenuClick);
+  EventBus.getInstance().on(EventBusEvent.hideSideMenus, hideSideMenus);
 };
 
 const uiManagerFinal = () => {
@@ -126,7 +126,7 @@ export const satChng = (row: number, testOverride?: undefined): void => {
 
 export const hideSideMenus = (): void => {
   slideOutLeft(getEl('satChng-menu'), 1000);
-  getEl('menu-satChng').classList.remove('bmenu-item-selected');
+  getEl('menu-satChng')?.classList.remove('bmenu-item-selected');
   issatChngMenuOpen = false;
 };
 
@@ -146,7 +146,7 @@ export const bottomMenuClick = (iconName: string): void => {
       slideInRight(getEl('satChng-menu'), 1000);
       issatChngMenuOpen = true;
       satChng(-1);
-      getEl('menu-satChng').classList.add('bmenu-item-selected');
+      getEl('menu-satChng')?.classList.add('bmenu-item-selected');
 
     }
   }

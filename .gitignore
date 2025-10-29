@@ -54,6 +54,7 @@ jspm_packages
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+.idea/
 
 # Prettier
 .prettierignore
@@ -127,3 +128,7 @@ stats.json
 # Cypress Testing Files
 cypress
 cypress.config.ts
+
+# Generated Locale Files
+src/locales/keys.ts
+src/locales/*.json

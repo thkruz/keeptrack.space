@@ -1,16 +1,19 @@
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
 import gpsPng from '@public/img/icons/gps.png';
 
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
-import type { CatalogManager } from '@app/singletons/catalog-manager';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import type { GroupsManager } from '@app/singletons/groups-manager';
-import { GroupType } from '@app/singletons/object-group';
-import { DopMath } from '@app/static/dop-math';
-import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { CatalogManager } from '@app/app/data/catalog-manager';
+import type { GroupsManager } from '@app/app/data/groups-manager';
+import { GroupType } from '@app/app/data/object-group';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { DopMath } from '@app/engine/math/dop-math';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from '@ootk/src/main';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';
@@ -32,7 +35,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   };
 
   helpTitle = 'Dilution of Precision (DOP) Menu';
-  helpBody = keepTrackApi.html`The Dilution of Precision (DOP) Menu is used to calculate the Dilution of Precision (DOP) for a given location and elevation mask.
+  helpBody = html`The Dilution of Precision (DOP) Menu is used to calculate the Dilution of Precision (DOP) for a given location and elevation mask.
     <br><br>
     HDOP is the Horizontal Dilution of Precision. It is a measure of the accuracy of the horizontal position.
     <br><br>
@@ -42,7 +45,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   `;
 
   sideMenuElementName = 'dops-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
   <div id="${this.sideMenuElementName}" class="side-menu-parent start-hidden text-select">
     <div id="dops-content" class="side-menu">
       <form id="dops-form">
@@ -77,7 +80,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   </div>`;
 
   rmbL1ElementName = 'dops-rmb';
-  rmbL1Html = keepTrackApi.html`
+  rmbL1Html = html`
   <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">DOPs &#x27A4;</a></li>
 `;
 
@@ -86,7 +89,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   isRmbOnSat = false;
 
   rmbL2ElementName = 'dops-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
   <ul class='dropdown-contents'>
     <li id="dops-curdops-rmb"><a href="#">Current GPS DOPs</a></li>
     <li id="dops-24dops-rmb"><a href="#">24 Hour GPS DOPs</a></li>
@@ -125,12 +128,18 @@ export class DopsPlugin extends KeepTrackPlugin {
       case 'dops-24dops-rmb': {
         const latLon = keepTrackApi.getInputManager().mouse.latLon;
 
+        if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
+          errorManagerInstance.warn('Please select a valid location on Earth for 24 Hour DOPs!');
+
+          return;
+        }
+
         if (!this.isMenuButtonActive) {
           (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
           (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
           (<HTMLInputElement>getEl('dops-alt')).value = '0';
           (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
-          keepTrackApi.emit(KeepTrackApiEvents.bottomMenuClick, this.bottomIconElementName);
+          this.bottomMenuClicked();
         } else {
           showLoading(DopsPlugin.updateSideMenu);
           this.setBottomIconToEnabled();
@@ -146,8 +155,8 @@ export class DopsPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('dops-form')!.addEventListener('submit', (e: Event) => {
           e.preventDefault();

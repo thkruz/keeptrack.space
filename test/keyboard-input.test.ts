@@ -1,7 +1,9 @@
-import { InputEventType, keepTrackApi } from '@app/keepTrackApi';
-import { KeyboardInput } from '@app/singletons/input-manager/keyboard-input';
-import { keepTrackContainer } from '../src/container';
-import { Singletons } from '../src/interfaces';
+import { Container } from '@app/engine/core/container';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeyboardInput } from '@app/engine/input/input-manager/keyboard-input';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { Singletons } from '../src/engine/core/interfaces';
 
 describe('KeyboardInput_class', () => {
   // Tests that keyHandler does not execute if uiManagerInstance.isCurrentlyTyping is true
@@ -12,16 +14,16 @@ describe('KeyboardInput_class', () => {
     keyboardInput.init();
     const uiManagerInstance = { isCurrentlyTyping: true };
 
-    keepTrackContainer.registerSingleton(Singletons.UiManager, uiManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.UiManager, uiManagerInstance);
 
-    keepTrackApi.on(InputEventType.KeyDown, (key: string) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string) => {
       if (key === 'R') {
         test = true;
       }
     });
 
     // Simulate key event while typing
-    keepTrackApi.emit(InputEventType.KeyDown, 'R', 'KeyR', false, false, false);
+    keepTrackApi.emit(EventBusEvent.KeyDown, 'R', 'KeyR', false, false, false);
 
     expect(test).toBe(true);
   });
@@ -32,12 +34,12 @@ describe('KeyboardInput_class', () => {
     let test = false;
 
     keyboardInput.init();
-    keepTrackApi.on(InputEventType.KeyDown, (key: string) => {
+    EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string) => {
       if (key === 'R') {
         test = true;
       }
     });
-    keepTrackApi.emit(InputEventType.KeyDown, 'R', 'KeyR', false, false, false);
+    keepTrackApi.emit(EventBusEvent.KeyDown, 'R', 'KeyR', false, false, false);
 
     expect(test).toBe(true);
   });

@@ -1,16 +1,19 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 
-import { hideLoading, showLoading } from '@app/lib/showLoading';
+import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
+import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { CoordinateTransforms } from '@app/static/coordinate-transforms';
-import { SatMath, StringifiedNumber } from '@app/static/sat-math';
+import { BaseObject, CatalogSource, Degrees, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Seconds, Sgp4, StateVectorSgp4 } from '@ootk/src/main';
 import rpo from '@public/img/icons/rpo.png';
 import { vec3 } from 'gl-matrix';
-import { BaseObject, CatalogSource, Degrees, DetailedSatellite, EciVec3, Kilometers, KilometersPerSecond, Seconds, Sgp4, StateVectorSgp4 } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 
@@ -67,7 +70,7 @@ export class ProximityOps extends KeepTrackPlugin {
   secondaryMenuIcon = 'view_list';
 
   sideMenuElementName = 'proximityOps-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <form id="proximityOps">
     <div class="input-field col s12">
         <input value="0" id="proximity-ops-norad" type="text" maxlength="5" />
@@ -133,7 +136,7 @@ export class ProximityOps extends KeepTrackPlugin {
     </form>
     `;
 
-  sideMenuSecondaryHtml: string = keepTrackApi.html`
+  sideMenuSecondaryHtml: string = html`
     <div class="row" style="margin: 0 10px;">
       <h5 class="center-align">${t7e('plugins.ProximityOps.titleSecondary')}</h5>
       <table id="proximity-ops-table" class="center-align striped-light centered"></table>
@@ -146,8 +149,8 @@ export class ProximityOps extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
 
         getEl('submit')!.addEventListener('click', (e) => {
@@ -188,8 +191,8 @@ export class ProximityOps extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+    EventBus.getInstance().on(
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (this.isMenuButtonActive && obj?.isSatellite() && (obj as DetailedSatellite).sccNum !== (<HTMLInputElement>getEl('proximity-ops-norad')).value) {
           this.updateNoradId_();

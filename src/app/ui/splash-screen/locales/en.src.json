@@ -1,0 +1,49 @@
+{
+  "splashScreens": {
+    "1": "Satellite models appear bigger than they really are. Everything else is to scale.",
+    "2": "Press the 'L' key to toggle satellite orbits on/off.",
+    "3": "Press the 'P' key to open a polar plot of the current satellite (You need to pick a sensor first!).",
+    "4": "Reset the simulation time by pressing the 'T' key.",
+    "5": "Advance the simulation time by pressing the '>' or '=' key.",
+    "6": "Move back the simulation time by pressing the '<' or ')' key.",
+    "7": "Pressing the '/' key will toggle the simulation speed between 1x and 0x.",
+    "8": "Press the 'V' key to change the view mode.",
+    "9": "Press Shift+F1 to open the help menu at any time.",
+    "10": "Press the 'R' key to enable auto-rotation.",
+    "11": "Pressing Shift + C when a satellite is selected will toggle its visibility cone on/off.",
+    "12": "The 'Home' key will rotate the camera to the current sensor.",
+    "13": "The '`' (tilda) key will reset the camera to the default view.",
+    "14": "The 'M' key will show the 2D map view of the current satellite.",
+    "15": "The settings menu located in the bottom toolbar contains many options to customize your experience.",
+    "16": "Many of the menus have additional settings that can be accessed by clicking the gear icon.",
+    "17": "Add satellites to the watchlist to get notifications when they are overhead of the current sensor.",
+    "18": "Right click on the globe to open the context menu with more options.",
+    "19": "Press '+' or '-' keys to zoom in and out.",
+    "20": "Press 'F11' to toggle on/off the fullscreen mode.",
+    "21": "You can search for satellites by name or NORAD ID in the search bar at the top right.",
+    "22": "A new launch nominal can be created by selecting a satellite and clicking the 'New Launch' button in the bottom menu.",
+    "23": "Press the 'N' key to toggle night.",
+    "24": "Press the 'I' key to hide/display contextual information about a satellite.",
+    "25": "Press the 'B' key to hide/display the menu.",
+    "26": "Speed up the simulation by pressing the Shift + ';' key.",
+    "27": "Slow down the simulation by pressing the ',' key.",
+    "28": "Set an object as Secondary to see its relative distance with primary object.",
+    "29": "Switch an object between Primary/Secondary with the '[' key."
+  },
+  "loadingScreenMsgs": {
+    "math": "Attempting to Math...",
+    "science": "Locating Science...",
+    "science2": "Found Science...",
+    "dots": "Drawing Dots in Space...",
+    "satIntel": "Integrating Satellite Intel...",
+    "painting": "Painting the Earth...",
+    "coloring": "Coloring Inside the Lines..",
+    "elsets": "Locating GP Data...",
+    "models": "Building 3D Models...",
+    "cunningPlan": "Crafting a Cunning Plan..."
+  },
+  "copyright": {
+    "notice": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible.<br>No commercial license has been granted, and no compensation has been provided to the rights holder.<br>Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms.",
+    "noticeMobile": "KeepTrack™ and KeepTrack.Space™ are trademarks of Kruczek Labs LLC.<br>This instance is licensed under the GNU AGPL v3.0. Attribution, source access, and this notice must remain visible. No commercial license has been granted. No compensation has been provided to the rights holder. Unauthorized use, rebranding, or removal of attribution may violate trademark and open source license terms.<br>© 2025 Kruczek Labs LLC. All rights reserved. See LICENSE for full terms."
+  }
+}

@@ -1,9 +1,10 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import videocamPng from '@public/img/icons/videocam.png';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { StreamManager } from './stream-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class ScreenRecorder extends KeepTrackPlugin {
   readonly id = 'ScreenRecorder';
@@ -44,8 +45,8 @@ export class ScreenRecorder extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerOnReady,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerOnReady,
       () => {
         try {
           this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));

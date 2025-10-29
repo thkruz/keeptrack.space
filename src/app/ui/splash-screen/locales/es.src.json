@@ -1,0 +1,51 @@
+{
+  "splashScreens": {
+    "1": "Los modelos de satélites aparecen más grandes de lo que son en realidad. Todo lo demás está a escala.",
+    "2": "Presiona la tecla 'L' para activar/desactivar las órbitas de los satélites.",
+    "3": "Presiona la tecla 'P' para abrir un gráfico polar del satélite actual (¡Primero debes seleccionar un sensor!).",
+    "4": "Reinicia el tiempo de simulación presionando la tecla 'T'.",
+    "5": "Acelera la simulación presionando la tecla '>'.",
+    "6": "Ralentiza la simulación presionando la tecla '<'.",
+    "7": "Presionar la tecla '/' alternará la velocidad de simulación entre 1x y 0x.",
+    "8": "Presiona la tecla 'V' para cambiar el modo de vista.",
+    "9": "Presiona Shift+F1 para abrir el menú de ayuda en cualquier momento.",
+    "10": "Presiona la tecla 'R' para activar la rotación automática.",
+    "11": "Presionar Shift + C cuando un satélite está seleccionado activará/desactivará su cono de visibilidad.",
+    "12": "La tecla 'Inicio' rotará la cámara hacia el sensor actual.",
+    "13": "La tecla '`' (tilde) reiniciará la cámara a la vista predeterminada.",
+    "14": "La tecla 'M' mostrará la vista del mapa 2D del satélite actual.",
+    "15": "El menú de configuración ubicado en la barra de herramientas inferior contiene muchas opciones para personalizar tu experiencia.",
+    "16": "Muchos de los menús tienen configuraciones adicionales a las que se puede acceder haciendo clic en el icono de engranaje.",
+    "17": "Agrega satélites a la lista de seguimiento para recibir notificaciones cuando estén sobre el sensor actual.",
+    "18": "Haz clic derecho en el globo para abrir el menú contextual con más opciones.",
+    "19": "Presiona las teclas '+' o '-' para acercar y alejar.",
+    "20": "Presiona 'F11' para activar/desactivar el modo de pantalla completa.",
+    "21": "Puedes buscar satélites por nombre o ID de NORAD en la barra de búsqueda en la parte superior derecha.",
+    "22": "Se puede crear un lanzamiento nominal nuevo seleccionando un satélite y haciendo clic en el botón 'Nuevo Lanzamiento' en el menú inferior.",
+    "23": "Presiona la tecla 'N' para activar/desactivar el modo nocturno.",
+    "24": "Presiona la tecla 'I' para ocultar/mostrar información contextual sobre un satélite.",
+    "25": "Presiona la tecla 'B' para ocultar/mostrar el menú.",
+    "26": "Acelera la simulación presionando la tecla Shift + ';'.",
+    "27": "Ralentiza la simulación presionando la tecla ','.",
+    "28": "Establece un objeto como Secundario para ver su distancia relativa con el objeto primario.",
+    "29": "Cambia un objeto entre Primario/Secundario con la tecla '['."
+  },
+  "loadingScreenMsgs": {
+    "math": "Intentando hacer matemáticas...",
+    "science": "Localizando ciencia...",
+    "science2": "Ciencia encontrada...",
+    "dots": "Dibujando puntos en el espacio...",
+    "satIntel": "Integrando inteligencia satelital...",
+    "painting": "Pintando la Tierra...",
+    "coloring": "Coloreando dentro de las líneas...",
+    "elsets": "Localizando Datos de GP...",
+    "models": "Construyendo modelos 3D...",
+    "cunningPlan": "Desarrollando un plan astuto...",
+    "copyrightNotice": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles.<br>No se ha concedido una licencia comercial, y no se ha proporcionado compensación al titular de los derechos.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para los términos completos.",
+    "copyrightNoticeMobile": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles. No se ha concedido una licencia comercial. No se ha proporcionado compensación al titular de los derechos. El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulte LICENSE para los términos completos."
+  },
+  "copyright": {
+    "notice": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles.<br>No se ha otorgado ninguna licencia comercial, y no se ha proporcionado compensación al titular de los derechos.<br>El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulta el archivo LICENSE para ver los términos completos.",
+    "noticeMobile": "KeepTrack™ y KeepTrack.Space™ son marcas registradas de Kruczek Labs LLC.<br>Esta instancia está licenciada bajo la GNU AGPL v3.0. La atribución, el acceso al código fuente y este aviso deben permanecer visibles. No se ha otorgado ninguna licencia comercial. No se ha proporcionado compensación al titular de los derechos. El uso no autorizado, el cambio de marca o la eliminación de la atribución pueden violar los términos de la marca registrada y de la licencia de código abierto.<br>© 2025 Kruczek Labs LLC. Todos los derechos reservados. Consulta el archivo LICENSE para ver los términos completos."
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "satInfoBox": {
+    "title": "Identifiers",
+    "Cospar": {
+      "label": "COSPAR",
+      "tooltip": "International Designator"
+    },
+    "Norad": {
+      "label": "NORAD",
+      "tooltip": "North American Aerospace Defense Command Catalog Number"
+    },
+    "AltName": {
+      "label": "Alt. Name",
+      "tooltip": "Alternate Satellite Name"
+    },
+    "AltId": {
+      "label": "Alt. ID",
+      "tooltip": "Alternate Satellite ID"
+    },
+    "Source": {
+      "label": "Source",
+      "tooltip": "Data Source for the Satellite Information"
+    },
+    "Confidence": {
+      "label": "Confidence",
+      "tooltip": "Confidence Level of the Data (Higher Is Better) on a 1-10. Based on the source and age of the data"
+    }
+  }
+}

@@ -1,9 +1,9 @@
-import { GeolocationPosition } from '@app/interfaces';
+import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
+import { UiManager } from '@app/app/ui/uiManager';
+import { GeolocationPosition } from '@app/engine/core/interfaces';
+import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
-import { UiManager } from '@app/singletons/uiManager';
-import { UiGeolocation } from '@app/static/ui-manager-geolocation';
 import { defaultSensor } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors, setupMinimumHtml, setupStandardEnvironment } from './environment/standard-env';
 
@@ -128,9 +128,10 @@ describe('uiManager', () => {
   it('process_initMenuController', () => {
     setupStandardEnvironment();
     (keepTrackApi.containerRoot as HTMLDivElement).innerHTML += `
-    <div id="legend-menu"></div>
-    <div id="legend-hover-menu"></div>
-    <div id="legend-icon"></div>
+    <div id="fullscreen-icon"></div>
+    <div id="layers-menu-btn"></div>
+    <div id="layers-hover-menu"></div>
+    <div id="layers-icon"></div>
     <div id="settings-menu"></div>
     <div id="about-menu"></div>
     `;

@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "ScenarioManagementPlugin": {
+      "title": "Scenario Management",
+      "bottomIconLabel": "Scenario Management",
+      "helpBody": "The scenario management plugin allows you to organize your work for different projects or contexts.<br/>Current features are:<br/><br/>  - Name and description for each scenario<br/>  - Analysis period start and end date/time<br/>  - Save/Load scenarios<br/><br/>The goal is to eventually provide a single file that contains all information necessary for scenario management. More features coming soon!"
+    }
+  }
+}

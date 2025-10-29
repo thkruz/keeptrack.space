@@ -1,0 +1,83 @@
+{
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "Filtermenü",
+      "bottomIconLabel": "Filtermenü",
+      "helpBody": "Dieses Menü ermöglicht es Ihnen, die auf dem Globus angezeigten Objekte nach Typ, orbitalen Bereichen und Datenquellen zu filtern."
+    }
+  },
+  "filterMenu": {
+    "payloads": {
+      "name": "Nutzlasten",
+      "category": "Objekttypen",
+      "tooltip": "Objekte, die hauptsächlich zum Transport einer Nutzlast verwendet werden, wie Kommunikations- oder Wettersatelliten. Dies umfasst sowohl betriebsfähige als auch außer Betrieb gesetzte Satelliten."
+    },
+    "rocketBodies": {
+      "name": "Raketenstufen",
+      "category": "Objekttypen",
+      "tooltip": "Die oberen Stufen von Raketen, die Nutzlasten in den Orbit gebracht haben und nun große Teile von Weltraummüll sind."
+    },
+    "debris": {
+      "name": "Trümmer",
+      "category": "Objekttypen",
+      "tooltip": "Fragmente von Raumfahrzeugen und Raketen, einschließlich zerbrochener Satelliten, die nicht mehr als ein Stück existieren."
+    },
+    "unknownType": {
+      "name": "Unbekannter Typ",
+      "category": "Objekttypen",
+      "tooltip": "Objekte im Orbit, deren Zweck oder Typ noch nicht eindeutig identifiziert ist."
+    },
+    "notionalSatellites": {
+      "name": "Konzeptionelle Satelliten",
+      "category": "Objekttypen",
+      "tooltip": "Satelliten, die geplant oder vorgeschlagen sind, aber noch nicht gestartet wurden."
+    },
+    "agencies": {
+      "name": "Agenturen",
+      "category": "Objekttypen",
+      "tooltip": "Geplante Funktion – Dies wird Agenturen auf dem Globus anzeigen.",
+      "checked": false,
+      "disabled": true
+    },
+    "vleoSatellites": {
+      "name": "vLEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im sehr niedrigen Erdorbit mit einem Apogäum unter 400 km."
+    },
+    "leoSatellites": {
+      "name": "LEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im niedrigen Erdorbit mit einem Apogäum zwischen 400 km und 6000 km."
+    },
+    "heoSatellites": {
+      "name": "HEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im stark elliptischen Orbit mit einer Exzentrizität von 0,1 oder mehr und einem Apogäum unter 39786 km."
+    },
+    "meoSatellites": {
+      "name": "MEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im mittleren Erdorbit mit einem Apogäum zwischen 6000 km und 34786 km."
+    },
+    "geoSatellites": {
+      "name": "GEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im geostationären Orbit mit einer Exzentrizität unter 0,1 und einem Apogäum zwischen 34786 km und 36786 km."
+    },
+    "xgeoSatellites": {
+      "name": "xGEO-Satelliten",
+      "category": "Orbitale Bereiche",
+      "tooltip": "Satelliten im Ex-Geosynchronen Orbit mit einer Exzentrizität unter 0,1 und einem Apogäum über 36786 km oder einer Exzentrizität von 0,1 oder mehr und einem Apogäum über 39786 km."
+    },
+    "vimpelSatellites": {
+      "name": "Vimpel-Satelliten",
+      "category": "Quelle",
+      "tooltip": "Der Vimpel-Satellitenkatalog wird von der russischen Aktiengesellschaft JSC Vimpel in Zusammenarbeit mit dem Keldysh-Institut für Angewandte Mathematik gepflegt."
+    },
+    "celestrakSatellites": {
+      "name": "Celestrak-Satelliten",
+      "category": "Quelle",
+      "tooltip": "Celestrak ist eine beliebte Quelle für Satellitenbahndaten und bietet TLEs für eine Vielzahl von Satelliten und Trümmern."
+    }
+  }
+}

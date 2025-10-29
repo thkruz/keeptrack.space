@@ -1,3 +1,5 @@
+// Ensure imports are type only to avoid circular dependencies
+import type { SatInfoBoxOrbitalConfiguration } from './sat-info-box-orbital/sat-info-box-orbital-settings';
 
 export type PluginConfiguration = {
   enabled: boolean;
@@ -6,9 +8,12 @@ export type PluginConfiguration = {
 };
 
 export type KeepTrackPluginsConfiguration = {
+  ScenarioManagementPlugin?: PluginConfiguration;
   EarthAtmosphere?: PluginConfiguration;
   TooltipsPlugin?: PluginConfiguration;
   UserAccountPlugin?: PluginConfiguration;
+  OrbitGuardMenuPlugin?: PluginConfiguration;
+  SatInfoBoxManeuver?: PluginConfiguration;
   ManeuverPlugin?: PluginConfiguration;
   DebugMenuPlugin?: PluginConfiguration;
   SensorListPlugin?: PluginConfiguration;
@@ -23,7 +28,7 @@ export type KeepTrackPluginsConfiguration = {
   SatInfoBoxCore?: PluginConfiguration;
   SatInfoBoxActions?: PluginConfiguration;
   SatInfoBoxLinks?: PluginConfiguration;
-  SatInfoBoxOrbital?: PluginConfiguration;
+  SatInfoBoxOrbital?: SatInfoBoxOrbitalConfiguration;
   SatInfoBoxObject?: PluginConfiguration;
   SatInfoBoxMission?: PluginConfiguration;
   SatInfoBoxSensor?: PluginConfiguration;
@@ -43,6 +48,7 @@ export type KeepTrackPluginsConfiguration = {
   Collisions?: PluginConfiguration;
   TrackingImpactPredict?: PluginConfiguration;
   ColorMenu?: PluginConfiguration;
+  PlanetsMenuPlugin?: PluginConfiguration;
   SatConstellations?: PluginConfiguration;
   countriesMenu?: PluginConfiguration;
   DateTimeManager?: PluginConfiguration;
@@ -70,7 +76,8 @@ export type KeepTrackPluginsConfiguration = {
   SensorFov?: PluginConfiguration;
   SensorSurvFence?: PluginConfiguration;
   ShortTermFences?: PluginConfiguration;
-  SocialMedia?: PluginConfiguration;
+  GithubLinkPlugin?: PluginConfiguration;
+  LinkedInLinkPlugin?: PluginConfiguration;
   sounds?: PluginConfiguration;
   StereoMap?: PluginConfiguration;
   TimeMachine?: PluginConfiguration;
@@ -89,4 +96,7 @@ export type KeepTrackPluginsConfiguration = {
   EarthPresetsPlugin?: PluginConfiguration;
   DrawLinesPlugin?: PluginConfiguration;
   ViewInfoRmbPlugin?: PluginConfiguration;
+  VcrPlugin?: PluginConfiguration;
+  TimeSlider?: PluginConfiguration;
+  OemReaderPlugin?: PluginConfiguration;
 };

@@ -2,7 +2,7 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
-import { DetailedSensor } from 'ootk';
+import { DetailedSensor } from '@ootk/src/main';
 
 describe('SensorListPlugin', () => {
   let plugin: SensorListPlugin;

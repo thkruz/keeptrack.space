@@ -27,7 +27,7 @@ const settingsOverride = {
       enabled: false,
       order: 0,
     },
-    TooltipsPlugin: {
+    ScenarioManagementPlugin: {
       enabled: false,
       order: 1,
     },
@@ -99,6 +99,10 @@ const settingsOverride = {
       enabled: false,
       order: 71,
     },
+    OemReaderPlugin: {
+      enabled: false,
+      order: 71.5,
+    },
     NewLaunch: {
       enabled: false,
       order: 72,
@@ -127,9 +131,13 @@ const settingsOverride = {
       enabled: false,
       order: 90,
     },
-    TrackingImpactPredict: {
+    OrbitGuardMenuPlugin: {
       enabled: false,
       order: 91,
+    },
+    TrackingImpactPredict: {
+      enabled: false,
+      order: 92,
     },
     StereoMap: {
       enabled: false,
@@ -158,6 +166,10 @@ const settingsOverride = {
     ColorMenu: {
       enabled: false,
       order: 232,
+    },
+    PlanetsMenuPlugin: {
+      enabled: false,
+      order: 233,
     },
     SatellitePhotos: {
       enabled: false,
@@ -255,7 +267,7 @@ const settingsOverride = {
       order: 590,
     },
     GraphicsMenuPlugin: {
-      enabled: true,
+      enabled: false,
       order: 591,
     },
     FilterMenuPlugin: {
@@ -266,14 +278,49 @@ const settingsOverride = {
       enabled: false,
       order: 601,
     },
+    VcrPlugin: {
+      enabled: false, // Disabled by default
+      order: 1000,
+    },
+    TimeSlider: {
+      enabled: false,
+      order: 1001,
+    },
     // Non-Menu plugins
-    SatInfoBox: {
+    TooltipsPlugin: {
+      enabled: false,
+    },
+    SatInfoBoxCore: {
+      enabled: false,
+    },
+    SatInfoBoxActions: {
+      enabled: false,
+    },
+    SatInfoBoxLinks: {
+      enabled: false,
+    },
+    SatInfoBoxObject: {
+      enabled: false,
+    },
+    SatInfoBoxMission: {
+      enabled: false,
+    },
+    SatInfoBoxManeuver: {
+      enabled: false,
+    },
+    SatInfoBoxOrbital: {
+      enabled: false,
+    },
+    SatInfoBoxSensor: {
       enabled: false,
     },
     TopMenu: {
       enabled: false,
     },
-    SocialMedia: {
+    GithubLinkPlugin: {
+      enabled: false,
+    },
+    LinkedInLinkPlugin: {
       enabled: false,
     },
     DateTimeManager: {
@@ -289,6 +336,10 @@ const settingsOverride = {
       enabled: false,
     },
     GamepadPlugin: {
+      enabled: false,
+    },
+    // Scene plugins
+    EarthAtmosphere: {
       enabled: false,
     },
     // RMB plugins
@@ -341,6 +392,12 @@ const settingsOverride = {
   earthTextureStyle: 'earthmap', // 'earthmap' or 'flat'
   isEmbedMode: true,
   isDisableToasts: true,
+  isAutoStart: true,
+
+  isDisableSkybox: true,
+  isDisablePlanets: true,
+
+  maxZoomDistance: 170_000,
 };
 
 // Expose these to the console

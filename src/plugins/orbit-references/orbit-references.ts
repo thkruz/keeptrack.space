@@ -1,11 +1,12 @@
-import { KeepTrackApiEvents } from '@app/interfaces';
+import { StringifiedNumber } from '@app/app/analysis/sat-math';
+import { CatalogManager } from '@app/app/data/catalog-manager';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-
-import { CatalogManager } from '@app/singletons/catalog-manager';
-import { StringifiedNumber } from '@app/static/sat-math';
-import { BaseObject, FormatTle, Tle } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { BaseObject, FormatTle, Tle } from '@ootk/src/main';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -25,8 +26,8 @@ export class OrbitReferences extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+    EventBus.getInstance().on(
+      EventBusEvent.selectSatData,
       (obj?: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
@@ -45,7 +46,7 @@ export class OrbitReferences extends KeepTrackPlugin {
 
           actionsSectionElement.insertAdjacentHTML(
             'beforeend',
-            keepTrackApi.html`
+            html`
                 <div id="orbit-references-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                       data-tooltip="Create Analyst Satellites in Orbit">Generate Orbit Reference Satellites...</div>
               `,

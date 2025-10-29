@@ -1,11 +1,14 @@
-import { KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl } from '@app/engine/utils/get-el';
+import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { clickAndDragWidth } from '@app/lib/click-and-drag';
-import { getEl } from '@app/lib/get-el';
-import { hideLoading, showLoading } from '@app/lib/showLoading';
 import rocketPng from '@public/img/icons/rocket.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from './missile-manager';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class MissilePlugin extends KeepTrackPlugin {
   readonly id = 'MissilePlugin';
@@ -15,7 +18,7 @@ export class MissilePlugin extends KeepTrackPlugin {
 
   bottomIconImg = rocketPng;
   sideMenuElementName: string = `${this.id}-menu`;
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="${this.id}-menu" class="side-menu-parent start-hidden text-select">
     <div id="${this.id}-content" class="side-menu">
       <div class="row">
@@ -180,14 +183,14 @@ export class MissilePlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
   addJs(): void {
     super.addJs();
 
     // Missile orbits have to be updated every draw or they quickly become inaccurate
-    keepTrackApi.on(KeepTrackApiEvents.updateLoop, this.updateLoop_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateLoop, this.updateLoop_.bind(this));
   }
 
   private searchForRvs_() {

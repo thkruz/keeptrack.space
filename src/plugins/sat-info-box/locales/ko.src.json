@@ -1,0 +1,29 @@
+{
+  "satInfoBox": {
+    "title": "식별자",
+    "Cospar": {
+      "label": "COSPAR",
+      "tooltip": "국제 식별자"
+    },
+    "Norad": {
+      "label": "NORAD",
+      "tooltip": "북미 항공우주 방위 사령부 카탈로그 번호"
+    },
+    "AltName": {
+      "label": "대체 이름",
+      "tooltip": "위성의 대체 이름"
+    },
+    "AltId": {
+      "label": "대체 ID",
+      "tooltip": "위성의 대체 ID"
+    },
+    "Source": {
+      "label": "출처",
+      "tooltip": "위성 정보의 데이터 출처"
+    },
+    "Confidence": {
+      "label": "신뢰도",
+      "tooltip": "데이터의 신뢰도 수준(높을수록 좋음), 1-10. 출처와 데이터의 최신성에 기반함"
+    }
+  }
+}

@@ -51,8 +51,8 @@ import {
   eci2lla,
   lla2eci,
   rae2eci,
-} from 'ootk';
-import { GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH, STAR_DISTANCE } from '../lib/constants';
+} from '@ootk/src/main';
+import { GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH, STAR_DISTANCE } from '../engine/utils/constants';
 import { PosCruncherCachedObject, PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from './constants';
 import { setupTimeVariables } from './positionCruncher/calculations';
 import { resetPosition, resetVelocity } from './positionCruncher/satCache';
@@ -656,7 +656,7 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
         throw new Error('Impossible orbit');
       }
     }
-  } catch (e) {
+  } catch {
     // This is probably a reentry and should be skipped from now on.
     objCache[i].active = false;
 
@@ -702,7 +702,7 @@ export const updateSatellite = (now: Date, i: number, gmst: GreenwichMeanSiderea
           try {
             positionEcf = eci2ecf(pv.position, gmst); // pv.position is called positionEci originally
             rae = ecfRad2rae(sensor.llaRad(), positionEcf);
-          } catch (e) {
+          } catch {
             continue;
           }
           satInView[i] = sensor.isRaeInFov(rae) ? 1 : 0;

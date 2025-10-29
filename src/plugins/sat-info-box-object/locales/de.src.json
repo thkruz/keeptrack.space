@@ -1,0 +1,51 @@
+{
+  "SatInfoBoxObject": {
+    "title": "Objektdaten",
+    "Type": {
+      "label": "Typ",
+      "tooltip": "Objekttyp",
+      "unknown": "Wird bekannt gegeben",
+      "payload": "Nutzlast",
+      "rocketBody": "Raketenstufe",
+      "debris": "Trümmer",
+      "special": "Spezial",
+      "missile": "Ballistische Rakete"
+    },
+    "Status": {
+      "label": "Status",
+      "tooltip": "Betriebsstatus des Objekts",
+      "operational": "Betriebsbereit",
+      "nonOperational": "Nicht betriebsbereit",
+      "partiallyOperational": "Teilweise betriebsbereit",
+      "extendedMission": "Erweiterte Mission",
+      "backupStandby": "Reserve/Bereitschaft",
+      "spare": "Ersatz",
+      "unknown": "Unbekannt"
+    },
+    "Country": {
+      "label": "Land",
+      "tooltip": "Ursprungsland"
+    },
+    "LaunchSite": {
+      "label": "Startplatz",
+      "tooltip": "Ort, von dem das Objekt gestartet wurde"
+    },
+    "LaunchVehicle": {
+      "label": "Trägerrakete",
+      "tooltip": "Rakete oder Fahrzeug, das zum Start verwendet wurde"
+    },
+    "Configuration": {
+      "label": "Konfiguration",
+      "tooltip": "Konfiguration der Rakete oder des Trägers"
+    },
+    "RCS": {
+      "label": "RCS",
+      "tooltip": "Radarquerschnitt - Wie stark das Objekt Radarstrahlen reflektiert (in m²)"
+    },
+    "StdMag": {
+      "label": "Standard-Mag",
+      "tooltip": "Standardhelligkeit - Kleinere Zahlen sind heller"
+    },
+    "unknown": "Unbekannt"
+  }
+}

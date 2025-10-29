@@ -102,6 +102,8 @@ export class WebpackManager {
         extensions: ['.ts', '.js'],
         alias: {
           '@app': `${dirName}/../src`,
+          '@engine': `${dirName}/../src/engine`,
+          '@ootk': `${dirName}/../src/engine/ootk`,
           '@public': `${dirName}/../public`,
           '@css/style.css': `${dirName}/../${this.config.styleCssPath}`,
           '@css/loading-screen.css': `${dirName}/../${this.config.loadingScreenCssPath}`,

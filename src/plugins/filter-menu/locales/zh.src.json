@@ -1,0 +1,83 @@
+{
+  "plugins": {
+    "FilterMenuPlugin": {
+      "title": "过滤菜单",
+      "bottomIconLabel": "过滤菜单",
+      "helpBody": "此菜单允许您根据对象的类型、轨道类型和数据来源筛选地球仪上显示的对象。"
+    }
+  },
+  "filterMenu": {
+    "payloads": {
+      "name": "载荷",
+      "category": "对象类型",
+      "tooltip": "主要用于携带载荷的物体，如通信或气象卫星，包括在轨运行和失效的卫星。"
+    },
+    "rocketBodies": {
+      "name": "火箭体",
+      "category": "对象类型",
+      "tooltip": "已将载荷送入轨道的火箭上级，现在成为大型空间碎片。"
+    },
+    "debris": {
+      "name": "碎片",
+      "category": "对象类型",
+      "tooltip": "航天器和火箭的碎片，包括已损坏的卫星，不再是完整的个体。"
+    },
+    "unknownType": {
+      "name": "未知类型",
+      "category": "对象类型",
+      "tooltip": "轨道上用途或类型尚未明确识别的物体。"
+    },
+    "notionalSatellites": {
+      "name": "概念卫星",
+      "category": "对象类型",
+      "tooltip": "计划或提议但尚未发射的卫星。"
+    },
+    "agencies": {
+      "name": "机构",
+      "category": "对象类型",
+      "tooltip": "计划功能 - 这将在地球仪上显示机构。",
+      "checked": false,
+      "disabled": true
+    },
+    "vleoSatellites": {
+      "name": "超低轨卫星",
+      "category": "轨道类型",
+      "tooltip": "远地点低于400公里的超低地球轨道卫星。"
+    },
+    "leoSatellites": {
+      "name": "低轨卫星",
+      "category": "轨道类型",
+      "tooltip": "远地点在400公里到6000公里之间的低地球轨道卫星。"
+    },
+    "heoSatellites": {
+      "name": "高椭圆轨道卫星",
+      "category": "轨道类型",
+      "tooltip": "偏心率大于等于0.1且远地点低于39786公里的高椭圆轨道卫星。"
+    },
+    "meoSatellites": {
+      "name": "中轨卫星",
+      "category": "轨道类型",
+      "tooltip": "远地点在6000公里到34786公里之间的中地球轨道卫星。"
+    },
+    "geoSatellites": {
+      "name": "地球同步轨道卫星",
+      "category": "轨道类型",
+      "tooltip": "偏心率低于0.1且远地点在34786公里到36786公里之间的地球同步轨道卫星。"
+    },
+    "xgeoSatellites": {
+      "name": "超同步轨道卫星",
+      "category": "轨道类型",
+      "tooltip": "偏心率低于0.1且远地点高于36786公里，或偏心率大于等于0.1且远地点高于39786公里的超同步轨道卫星。"
+    },
+    "vimpelSatellites": {
+      "name": "Vimpel 卫星",
+      "category": "来源",
+      "tooltip": "Vimpel 卫星目录由俄罗斯股份公司 JSC Vimpel 与 Keldysh 应用数学研究所合作维护。"
+    },
+    "celestrakSatellites": {
+      "name": "Celestrak 卫星",
+      "category": "来源",
+      "tooltip": "Celestrak 是卫星轨道数据的热门来源，提供各种卫星和碎片的 TLE 数据。"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+:root {
+  /** The height of the time slider bar */
+  --time-slider-height: 25px !important;
+}
+
+.time-slider-container {
+  height: var(--time-slider-height);
+  width: 100%;
+  margin: 0 auto;
+  padding: 0px 10px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  background: var(--color-dark-border);
+  padding-top: 0.5em;
+}
+
+#time-slider-container-slider {
+  width: 100%;
+}

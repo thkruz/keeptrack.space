@@ -23,16 +23,19 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import analysisPng from '@public/img/icons/reports.png';
 
 
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 interface ReportData {
@@ -61,7 +64,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   sideMenuElementName: string = 'reports-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="reports-menu" class="side-menu-parent start-hidden text-select">
     <div id="reports-content" class="side-menu">
       <div class="row">
@@ -92,8 +95,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('aer-report-btn')!.addEventListener('click', () => this.generateAzElRng_());
         getEl('coes-report-btn')!.addEventListener('click', () => this.generateClasicalOrbElJ2000_());
@@ -102,8 +105,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+    EventBus.getInstance().on(
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (obj?.isSatellite()) {
           getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-disabled');

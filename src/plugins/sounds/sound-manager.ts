@@ -1,9 +1,14 @@
-import { keepTrackContainer } from '@app/container';
-import { KeepTrackApiEvents, Singletons } from '@app/interfaces';
+import { Container } from '@app/engine/core/container';
+import { Singletons } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import soundOffPng from '@public/img/icons/sound-off.png';
+import soundOnPng from '@public/img/icons/sound-on.png';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { TopMenu } from '../top-menu/top-menu';
 import { SoundNames, sounds } from './sounds';
 
 interface PlayingSound {
@@ -40,9 +45,6 @@ export class SoundManager extends KeepTrackPlugin {
   constructor() {
     super();
 
-    // Initialize audio context and preload
-    this.initializeAudio();
-
     // Find the maxClickClip_
     Object.keys(sounds).forEach((key) => {
       if (key.startsWith('click')) {
@@ -55,22 +57,66 @@ export class SoundManager extends KeepTrackPlugin {
     });
   }
 
-  private async initializeAudio() {
+  init() {
+    if (this.isAudioReady) {
+      throw new Error('SoundManager is already initialized.');
+    }
+
     try {
+      super.init();
+      this.setupTopMenu();
       // Initialize Web Audio Context
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
       // Preload all audio
-      this.audioLoadingPromise = this.preloadAllAudio();
-      await this.audioLoadingPromise;
-
-      this.isAudioReady = true;
+      this.audioLoadingPromise = this.preloadAllAudio().then(() => {
+        this.isAudioReady = true;
+      });
     } catch (error) {
       errorManagerInstance.log(`Web Audio API initialization failed, using HTML5 Audio fallback: ${error}`);
       this.audioContext = null;
       this.preloadHtmlAudio();
       this.isAudioReady = true;
     }
+  }
+
+  private setupTopMenu() {
+    const eventBus = EventBus.getInstance();
+
+    // This needs to happen immediately so the sound button is in the menu
+    keepTrackApi.getPlugin(TopMenu)?.navItems.push({
+      id: 'sound-btn',
+      order: 1,
+      classInner: 'bmenu-item-selected',
+      icon: soundOnPng,
+      tooltip: 'Toggle Sound On/Off',
+    });
+
+    eventBus.on(EventBusEvent.uiManagerFinal, () => {
+      getEl('sound-btn')!.onclick = () => {
+        const soundIcon = <HTMLImageElement>getEl('sound-icon');
+        const soundManager = keepTrackApi.getSoundManager();
+
+        if (!soundManager) {
+          errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');
+
+          return;
+        }
+
+        if (!soundManager.isMute) {
+          soundManager.isMute = true;
+          soundIcon.src = soundOffPng;
+          soundIcon.parentElement!.classList.remove('bmenu-item-selected');
+          soundIcon.parentElement!.classList.add('bmenu-item-error');
+        } else {
+          soundManager.isMute = false;
+          soundIcon.src = soundOnPng;
+          soundIcon.parentElement!.classList.add('bmenu-item-selected');
+          soundIcon.parentElement!.classList.remove('bmenu-item-error');
+        }
+      };
+    },
+    );
   }
 
   private async preloadAllAudio(): Promise<void> {
@@ -122,15 +168,19 @@ export class SoundManager extends KeepTrackPlugin {
 
   private getVolumeForSound(soundKey: string): number {
     if (soundKey.startsWith('click')) {
-      return 0.25;
+      return 0.15;
     } else if (soundKey.startsWith('chatter')) {
       return 0.15;
-    } else if (soundKey === 'loading') {
+    } else if (soundKey === SoundNames.LOADING) {
       return 0.25;
-    } else if (soundKey === 'export') {
+    } else if (soundKey === SoundNames.EXPORT) {
       return 0.3;
     } else if (soundKey === 'error2') {
       return 0.5;
+    } else if (soundKey.startsWith('beep') || soundKey.startsWith('genericBeep')) {
+      return 0.3;
+    } else if (soundKey === SoundNames.MENU_BUTTON) {
+      return 0.25;
     }
 
     return 1.0;
@@ -199,15 +249,10 @@ export class SoundManager extends KeepTrackPlugin {
   addJs = (): void => {
     super.addJs();
 
-    keepTrackContainer.registerSingleton<SoundManager>(Singletons.SoundManager, this);
+    Container.getInstance().registerSingleton<SoundManager>(Singletons.SoundManager, this);
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerInit, () => {
+    EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
       this.voices = speechSynthesis.getVoices();
-
-      // Resume audio context if suspended (required by browser autoplay policies)
-      if (this.audioContext?.state === 'suspended') {
-        this.audioContext.resume();
-      }
     });
   };
 
@@ -231,7 +276,7 @@ export class SoundManager extends KeepTrackPlugin {
    * Create a new utterance for the specified text and add it to the queue.
    */
   speak(text: string) {
-    if (this.isMute) {
+    if (this.isMute || !speechSynthesis.getVoices) {
       return;
     }
 
@@ -241,6 +286,11 @@ export class SoundManager extends KeepTrackPlugin {
     msg.volume = 0.5;
     msg.rate = 1;
     msg.pitch = 1;
+
+    if (this.voices.length === 0) {
+      this.voices = speechSynthesis.getVoices();
+    }
+
     msg.voice = this.voices.filter((voice) => voice.name === 'Google UK English Female')[0];
 
     window.speechSynthesis.speak(msg);

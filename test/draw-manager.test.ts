@@ -1,8 +1,8 @@
 /* eslint-disable dot-notation */
+import { CameraType } from '@app/engine/camera/camera';
+import { Moon } from '@app/engine/rendering/draw-manager/celestial-bodies/moon';
+import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CameraType } from '@app/singletons/camera';
-import { Moon } from '@app/singletons/draw-manager/moon';
-import { WebGLRenderer } from '@app/singletons/webgl-renderer';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 
@@ -34,7 +34,7 @@ describe('drawManager', () => {
   it('should calculate the moon\'s position', () => {
     const moon = new Moon();
     const date = new Date(2023, 1, 1);
-    const updateResults = () => moon['updateEciPosition_'](date);
+    const updateResults = () => moon.updatePosition(date);
 
     expect(() => updateResults()).not.toThrow();
     expect(moon.position).toMatchSnapshot();

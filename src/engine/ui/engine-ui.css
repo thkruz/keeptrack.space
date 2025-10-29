@@ -1,0 +1,237 @@
+/* ==========================================================================
+   USER ACCOUNT COMPONENT STYLES
+   ========================================================================== */
+
+/* CSS Custom Properties */
+:root {
+  --user-account-transition: 0.2s ease;
+  --user-account-border-radius: 4px;
+  --user-account-border-radius-full: 50%;
+  --user-account-avatar-size: 20px;
+  --user-account-spacing-xs: 0.25rem;
+  --user-account-spacing-sm: 0.5rem;
+  --user-account-spacing-md: 0.75rem;
+  --user-account-spacing-lg: 1rem;
+  --user-account-spacing-xl: 1.5rem;
+}
+
+/* ==========================================================================
+   DRAGGABLE MODAL BASE STYLES
+   ========================================================================== */
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.7);
+  max-height: 100vh;
+}
+
+.draggable-box {
+  background-color: var(--color-dark-background);
+  width: 300px;
+  max-width: 90vw;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+  position: relative;
+  border-radius: var(--user-account-border-radius);
+}
+
+.draggable-box__title-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-dark-border);
+  margin: 0;
+  height: 25px;
+  width: 100%;
+  border-radius: var(--user-account-border-radius) var(--user-account-border-radius) 0 0;
+}
+
+.draggable-box__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.draggable-box__title h3 {
+  margin: 0;
+  user-select: none;
+}
+
+.draggable-box__content {
+  border: 5px solid var(--color-dark-border);
+  border-top: 0;
+  border-radius: 0 0 var(--user-account-border-radius) var(--user-account-border-radius);
+}
+
+.draggable-box__btn {
+  position: absolute;
+  width: 0.9em;
+  height: 0.9em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: var(--color-dark-border);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  transition: all var(--user-account-transition);
+  border: none;
+}
+
+.draggable-box__dock-btn {
+  right: 3em;
+  background: var(--colorCautionDarken1);
+}
+
+.draggable-box__dock-btn:hover {
+  background: var(--colorCautionDarken2);
+}
+
+.draggable-box__close-btn {
+  right: 1em;
+  background: var(--color-dark-text-accent);
+}
+
+.draggable-box__close-btn:hover {
+  background: var(--color-primary);
+}
+
+/* ==========================================================================
+   CONFIRM MODAL
+   ========================================================================== */
+
+.confirm-modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--user-account-spacing-xl);
+  padding: var(--user-account-spacing-xl);
+  min-width: 320px;
+}
+
+.confirm-modal__content {
+  text-align: center;
+}
+
+.confirm-modal__message {
+  margin: 0;
+  color: var(--color-dark-text-accent);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.confirm-modal__actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--user-account-spacing-lg);
+  flex-wrap: wrap;
+}
+
+.confirm-modal__btn {
+  min-width: 100px;
+  padding: var(--user-account-spacing-md) var(--user-account-spacing-xl);
+  border: none;
+  border-radius: var(--user-account-border-radius);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--user-account-transition);
+  text-align: center;
+}
+
+.confirm-modal__btn:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.confirm-modal__btn--primary {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.confirm-modal__btn--primary:hover {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.confirm-modal__btn--destructive {
+  background-color: var(--color-primary);
+  color: #ffffff;
+}
+
+.confirm-modal__btn--destructive:hover {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.confirm-modal__btn--secondary {
+  background-color: transparent;
+  color: var(--color-primary-dark);
+  border: 1px solid var(--color-dark-border);
+}
+
+.confirm-modal__btn--secondary:hover {
+  background-color: var(--color-dark-border);
+  color: var(--color-dark-text);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .draggable-box {
+    width: 95vw;
+    max-width: 95vw;
+  }
+}
+
+/* ==========================================================================
+   LEGACY SUPPORT & ID-BASED SELECTORS
+   ========================================================================== */
+
+/* Support both original IDs and new BEM classes for smooth migration */
+#top-menu-user-account-li,
+.user-account__menu-item {
+  display: flex;
+  align-items: center;
+}
+
+#top-menu-user-account-btn,
+#top-menu-user-account-icon,
+.user-account__login-btn,
+.user-account__profile-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--user-account-avatar-size);
+  height: var(--user-account-avatar-size);
+  border-radius: var(--user-account-border-radius-full);
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: var(--color-dark-background);
+  transition: filter var(--user-account-transition);
+}
+
+#top-menu-user-account-icon.user-account__profile-btn--hidden,
+.user-account__profile-btn--hidden {
+  display: none;
+}
+
+#top-menu-user-account-btn:hover,
+#top-menu-user-account-icon:hover,
+.user-account__btn--hover:hover {
+  filter: brightness(1.2);
+}

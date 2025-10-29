@@ -1,10 +1,13 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
 
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
+import { EventBus } from '@app/engine/events/event-bus';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -27,7 +30,7 @@ import { SoundNames } from '../sounds/sounds';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-declare module '@app/interfaces' {
+declare module '@app/engine/core/interfaces' {
   interface UserSettings {
     isBlackEarth: boolean;
     isDrawMilkyWay: boolean;
@@ -47,7 +50,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
   bottomIconElementName: string = 'video-director-icon';
   bottomIconImg = videoSettingsPng;
   sideMenuElementName: string = 'video-director-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="video-director-menu" class="side-menu-parent start-hidden text-select">
     <div id="video-director-content" class="side-menu">
       <div class="row">
@@ -160,8 +163,8 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);
         getEl('video-director-form')!.addEventListener('submit', VideoDirectorPlugin.onSubmit);

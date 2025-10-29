@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "ScenarioManagementPlugin": {
+      "title": "Gestion des scénarios",
+      "bottomIconLabel": "Gestion des scénarios",
+      "helpBody": "Le plugin de gestion des scénarios vous permet d'organiser votre travail pour différents projets ou contextes.<br/>Fonctionnalités actuelles :<br/><br/>  - Nom et description pour chaque scénario<br/>  - Date/heure de début et de fin de la période d'analyse<br/>  - Enregistrer/Charger des scénarios<br/><br/>L'objectif est de fournir éventuellement un fichier unique contenant toutes les informations nécessaires à la gestion des scénarios. Plus de fonctionnalités à venir !"
+    }
+  }
+}

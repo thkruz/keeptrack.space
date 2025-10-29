@@ -1,9 +1,9 @@
-import { keepTrackContainer } from '@app/container';
-import { Singletons } from '@app/interfaces';
+import { Container } from '@app/engine/core/container';
+import { Singletons } from '@app/engine/core/interfaces';
+import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
-import { ColorSchemeManager } from '@app/singletons/color-scheme-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
@@ -43,7 +43,7 @@ describe('SettingsMenuPlugin_class', () => {
 
     colorSchemeManagerInstance.setColorScheme = jest.fn();
     colorSchemeManagerInstance.reloadColors = jest.fn();
-    keepTrackContainer.registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
+    Container.getInstance().registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
     expect(() => getEl('settings-submit')?.click()).not.toThrow();
   });
 });

@@ -1,18 +1,22 @@
 /* eslint-disable max-lines */
-import { KeepTrackApiEvents, ToastMsgType } from '@app/interfaces';
+import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
+import { ToastMsgType } from '@app/engine/core/interfaces';
+import type { TimeManager } from '@app/engine/core/time-manager';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import type { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import type { TimeManager } from '@app/singletons/time-manager';
-import { SatMath, SunStatus } from '@app/static/sat-math';
-import { SensorMath, TearrData } from '@app/static/sensor-math';
-import { BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, RfSensor, SpaceObjectType, Sun, SunTime } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { BaseObject, cKmPerMs, DEG2RAD, DetailedSatellite, eci2lla, eci2rae, RfSensor, SpaceObjectType, Sun, SunTime } from '@ootk/src/main';
+import type { SensorManager } from '../../app/sensors/sensorManager';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import type { SensorManager } from '../sensor/sensorManager';
 import { StereoMap } from '../stereo-map/stereo-map';
 
 const SECTIONS = {
@@ -40,7 +44,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxInit, () => {
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
       keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createSensorSection_(), order: 5 });
     });
   }
@@ -48,9 +52,9 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.selectSatData, this.updateSensorInfo_.bind(this));
-    keepTrackApi.on(KeepTrackApiEvents.updateSelectBox, this.updateSelectBox_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateSensorInfo_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateSelectBox, this.updateSelectBox_.bind(this));
   }
 
   private satInfoBoxAddListeners_() {
@@ -72,18 +76,18 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       { key: 'Next Pass', id: EL.NEXT_PASS, tooltip: 'Next Time in Coverage', value: '00:00:00z' },
     ];
 
-    return keepTrackApi.html`
+    return html`
       <div id="${SECTIONS.SENSOR}">
       <div class="sat-info-section-header">
         Sensor Data
         <span id="${SECTIONS.SENSOR}-collapse" class="section-collapse material-icons">expand_less</span>
       </div>
-      ${rows.map((row) => keepTrackApi.html`
+      ${rows.map((row) => html`
         <div
           class="sat-info-row${row.id === EL.SUN || row.id === EL.VMAG || row.id === EL.NEXT_PASS ? ' sat-only-info' : ''}"
         >
         <div class="sat-info-key" data-position="top" data-delay="50"
-          data-tooltip="${row.tooltip}"
+          kt-tooltip="${row.tooltip}"
         >
           ${row.key}
         </div>
@@ -210,17 +214,15 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       const timeManagerInstance = keepTrackApi.getTimeManager();
       const sensorManagerInstance = keepTrackApi.getSensorManager();
 
-      if (obj.isSatellite()) {
-        const sat = obj as DetailedSatellite;
-
-        if (!sat.position?.x || !sat.position?.y || !sat.position?.z || isNaN(sat.position?.x) || isNaN(sat.position?.y) || isNaN(sat.position?.z)) {
-          const newPosition = SatMath.getEci(sat, timeManagerInstance.simulationTimeObj).position as { x: number; y: number; z: number };
+      if (obj instanceof DetailedSatellite) {
+        if (!obj.position?.x || !obj.position?.y || !obj.position?.z || isNaN(obj.position?.x) || isNaN(obj.position?.y) || isNaN(obj.position?.z)) {
+          const newPosition = SatMath.getEci(obj, timeManagerInstance.simulationTimeObj).position as { x: number; y: number; z: number };
 
           if (!newPosition || (newPosition?.x === 0 && newPosition?.y === 0 && newPosition?.z === 0)) {
             keepTrackApi
               .getUiManager()
               .toast(
-                `Satellite ${sat.sccNum} is not in orbit!<br>Sim time is ${timeManagerInstance.simulationTimeObj.toUTCString()}.<br>Be sure to check you have the right TLE.`,
+                `Satellite ${obj.sccNum} is not in orbit!<br>Sim time is ${timeManagerInstance.simulationTimeObj.toUTCString()}.<br>Be sure to check you have the right TLE.`,
                 ToastMsgType.error,
                 true,
               );
@@ -235,7 +237,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         if (keepTrackApi.getSensorManager().isSensorSelected()) {
           const sensor = keepTrackApi.getSensorManager().currentSensors[0];
 
-          rae = sensor.rae(sat, timeManagerInstance.simulationTimeObj);
+          rae = sensor.rae(obj, timeManagerInstance.simulationTimeObj);
           isInView = sensor.isRaeInFov(rae);
         } else {
           rae = {
@@ -246,13 +248,44 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           isInView = false;
         }
 
-        const lla = eci2lla(sat.position, keepTrackApi.getTimeManager().gmst);
+        const lla = eci2lla(obj.position, keepTrackApi.getTimeManager().gmst);
         const currentTearr: TearrData = {
           time: timeManagerInstance.simulationTimeObj.toISOString(),
           az: rae.az,
           el: rae.el,
           rng: rae.rng,
-          objName: sat.name,
+          objName: obj.name,
+          lat: lla.lat,
+          lon: lla.lon,
+          alt: lla.alt,
+          inView: isInView,
+        };
+
+        keepTrackApi.getSensorManager().currentTEARR = currentTearr;
+      } else if (obj instanceof OemSatellite) {
+        let isInView, rae;
+
+        if (keepTrackApi.getSensorManager().isSensorSelected()) {
+          const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+
+          rae = eci2rae(timeManagerInstance.simulationTimeObj, obj.position, sensor);
+          isInView = sensor.isRaeInFov(rae);
+        } else {
+          rae = {
+            az: 0,
+            el: 0,
+            rng: 0,
+          };
+          isInView = false;
+        }
+
+        const lla = eci2lla(obj.position, keepTrackApi.getTimeManager().gmst);
+        const currentTearr: TearrData = {
+          time: timeManagerInstance.simulationTimeObj.toISOString(),
+          az: rae.az,
+          el: rae.el,
+          rng: rae.rng,
+          objName: obj.name,
           lat: lla.lat,
           lon: lla.lon,
           alt: lla.alt,
@@ -311,7 +344,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       } else if (nextPassElement) {
         nextPassElement.innerHTML = 'Unavailable';
       }
-    } catch (e) {
+    } catch {
       errorManagerInstance.debug('Error updating satellite info!');
     }
   }

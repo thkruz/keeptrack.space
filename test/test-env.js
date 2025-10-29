@@ -46,6 +46,15 @@ global.speechSynthesis = {
   getVoices: jest.fn(),
 };
 
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    json: () => Promise.resolve({}),
+    blob: () => Promise.resolve(new Blob()),
+    text: () => Promise.resolve(''),
+    ok: true,
+  }),
+);
+
 /*
  * global.document.canvas = new HTMLCanvasElement(1920, 1080);
  * global.document.canvas.style = {};
@@ -90,6 +99,18 @@ global.console = {
   // Ignore console.log() type statements during test
   info: jest.fn(),
   debug: jest.fn(),
+};
+
+// TODO: Make a PR to fix this warning in the echarts-gl codebase
+
+// If console.warn tries to warn "geo3D exists." ignore it.
+const consoleWarn = global.console.warn;
+
+global.console.warn = (message, ...optionalParams) => {
+  if (typeof message === 'string' && message.includes('geo3D exists.')) {
+    return;
+  }
+  consoleWarn(message, ...optionalParams);
 };
 
 window.HTMLMediaElement.prototype.load = () => {

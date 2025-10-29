@@ -7,12 +7,13 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { ConsoleStyles, logWithStyle } from '../lib/build-error';
 
 // Function to generate TypeScript code for the Keys object
-function generateKeysFromJSON(jsonObj: unknown, prefix: string = ''): string {
+function generateKeysFromJSON(jsonObj: Record<string, string>, prefix: string = ''): string {
   const keys: string[] = [];
 
-  function traverse(obj: unknown, currentPrefix: string): void {
+  function traverse(obj: Record<string, string>, currentPrefix: string): void {
     if (typeof obj !== 'object' || obj === null) {
       return;
     }
@@ -24,21 +25,65 @@ function generateKeysFromJSON(jsonObj: unknown, prefix: string = ''): string {
       if (typeof value === 'object' && value !== null) {
         traverse(value, newPrefix);
       } else {
-        keys.push(JSON.stringify(newPrefix));
+        keys.push(JSON.stringify(newPrefix).replace(/"/gu, '\''));
       }
     });
   }
 
   traverse(jsonObj, prefix);
 
-  return `[\n  ${keys.join(',\n  ')}\n] as const`;
+  return `[\n  ${keys.join(',\n  ')},\n] as const`;
+}
+
+function findLocalesDirs(dir: string, enJsonPaths: string[] = []): string[] {
+  for (const dirent of fs.readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = path.join(dir, dirent.name);
+
+    // skip ootk and its children
+    if (fullPath.includes('ootk')) {
+      continue;
+    }
+
+    if (dirent.isDirectory()) {
+      if (dirent.name === 'locales') {
+        const enJsonPath = path.join(fullPath, 'en.json');
+
+        if (fs.existsSync(enJsonPath)) {
+          enJsonPaths.push(enJsonPath);
+        }
+      } else {
+        enJsonPaths = [...enJsonPaths, ...findLocalesDirs(fullPath)];
+      }
+    }
+  }
+
+  return enJsonPaths;
 }
 
 // Main function to generate the entire Keys file
-function generateKeysFile(inputJsonPath: string, outputTsPath: string): void {
+export function generateKeysFile(inputJsonPath: string, outputTsPath: string): void {
   try {
-    // Read the JSON file
-    const jsonData = JSON.parse(fs.readFileSync(inputJsonPath, 'utf8'));
+    logWithStyle(`Input JSON Path: ${inputJsonPath}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Output TS Path: ${outputTsPath}`, ConsoleStyles.DEBUG);
+    /*
+     * Search all of ../../src for any folders named locales with an en.json
+     * file inside of them and compile a list of their paths
+     */
+
+    // Recursively search for 'locales' directories containing 'en.json'
+    const enJsonPaths: string[] = findLocalesDirs(path.dirname(inputJsonPath));
+
+    console.log('Translation files found:', enJsonPaths);
+
+    // Read all the json files and merge them into one object
+    const jsonData: Record<string, string> = {};
+
+    for (const enJsonPath of enJsonPaths) {
+      logWithStyle(`Processing translation file: ${enJsonPath}`, ConsoleStyles.DEBUG);
+      const fileData = JSON.parse(fs.readFileSync(enJsonPath, 'utf8'));
+
+      Object.assign(jsonData, fileData);
+    }
 
     // Generate Keys object
     const keysObject = generateKeysFromJSON(jsonData);
@@ -46,11 +91,14 @@ function generateKeysFile(inputJsonPath: string, outputTsPath: string): void {
     // Create the complete TypeScript file content
     const tsContent = `// This file is auto-generated from the translation JSON file
 // Do not edit manually
+// Use npm run generate-t7e instead!
 /* eslint-disable guard-for-in */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import i18next from 'i18next';
 
 export const Keys = ${keysObject};
+
+const translationCache: Map<TranslationKey, string> = new Map();
 
 // Type for all valid translation keys
 export type TranslationKey = typeof Keys[number];
@@ -68,7 +116,18 @@ export type TranslationKey = typeof Keys[number];
  * or another localization library implementation.
  */
 export function t7e(key: TranslationKey, options?: Record<string, any>): string {
-  return i18next.t(key, options);
+  // Check if the translation is already cached
+  if (translationCache.has(key)) {
+    return translationCache.get(key)!;
+  }
+
+  // Perform the translation using i18next
+  const translatedString = i18next.t(key, options) as string;
+
+  // Cache the translation
+  translationCache.set(key, translatedString);
+
+  return translatedString;
 }
 `;
 
@@ -80,17 +139,3 @@ export function t7e(key: TranslationKey, options?: Record<string, any>): string 
     console.error('Error generating Keys file:', error);
   }
 }
-
-/*
- * Usage
- * Assuming your JSON is in "../locales/en/translation.json"
- * and you want to output to "./src/i18n/keys.ts"
- */
-const __dirname = path.dirname(new URL(import.meta.url).pathname).replace(/^\/+/u, '');
-
-console.log(__dirname);
-
-generateKeysFile(
-  `${__dirname}/../src/locales/en.json`,
-  `${__dirname}/../src/locales/keys.ts`,
-);

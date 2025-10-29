@@ -1,0 +1,80 @@
+{
+  "SatInfoBoxOrbital": {
+    "title": "Orbital Data",
+    "Apogee": {
+      "label": "Apogee",
+      "tooltip": "Highest Point in the Orbit"
+    },
+    "Perigee": {
+      "label": "Perigee",
+      "tooltip": "Lowest Point in the Orbit"
+    },
+    "Inclination": {
+      "label": "Inclination",
+      "tooltip": "Angle Measured from Equator on the Ascending Node"
+    },
+    "Eccentricity": {
+      "label": "Eccentricity",
+      "tooltip": "How Circular the Orbit Is (0 is a Circle)"
+    },
+    "RightAsc": {
+      "label": "Right Asc.",
+      "tooltip": "Where it Rises Above the Equator"
+    },
+    "ArgOfPerigee": {
+      "label": "Arg of Perigee",
+      "tooltip": "Where the Lowest Part of the Orbit Is"
+    },
+    "Latitude": {
+      "label": "Latitude",
+      "tooltip": "Current Latitude Over Earth",
+      "north": "N",
+      "south": "S"
+    },
+    "Longitude": {
+      "label": "Longitude",
+      "tooltip": "Current Longitude Over Earth",
+      "east": "E",
+      "west": "W"
+    },
+    "Altitude": {
+      "label": "Altitude",
+      "tooltip": "Current Altitude Above Sea Level"
+    },
+    "Period": {
+      "label": "Period",
+      "tooltip": "Time for One Complete Revolution Around Earth",
+      "meanMotion": "Mean Motion",
+      "revPerDay": "rev/day",
+      "min": "min"
+    },
+    "Velocity": {
+      "label": "Velocity",
+      "tooltip": "Current Velocity of the Satellite (Higher the Closer to Earth it Is)"
+    },
+    "AgeOfGP": {
+      "label": "Age of GP",
+      "tooltip": "Time Since Official Orbit Calculated (Older GP Data is Less Accurate Usually)",
+      "days": "Days",
+      "hours": "Hours",
+      "epochYear": "Epoch Year",
+      "epochDay": "Epoch Day"
+    },
+    "RadialSigma": {
+      "label": "Radial Sigma",
+      "tooltip": "Radial Uncertainty (meters)"
+    },
+    "InTrackSigma": {
+      "label": "In Track Sigma",
+      "tooltip": "In Track Uncertainty (meters)"
+    },
+    "CrossTrackSigma": {
+      "label": "Cross Track Sigma",
+      "tooltip": "Cross Track Uncertainty (meters)"
+    },
+    "meter": "m",
+    "kilometer": "km",
+    "second": "s",
+    "unknown": "Unknown"
+  }
+}

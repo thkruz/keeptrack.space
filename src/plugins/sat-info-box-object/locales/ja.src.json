@@ -1,0 +1,51 @@
+{
+  "SatInfoBoxObject": {
+    "title": "オブジェクトデータ",
+    "Type": {
+      "label": "タイプ",
+      "tooltip": "オブジェクトの種類",
+      "unknown": "未定",
+      "payload": "ペイロード",
+      "rocketBody": "ロケット本体",
+      "debris": "デブリ",
+      "special": "特殊",
+      "missile": "弾道ミサイル"
+    },
+    "Status": {
+      "label": "状態",
+      "tooltip": "オブジェクトの運用状況",
+      "operational": "運用中",
+      "nonOperational": "非運用",
+      "partiallyOperational": "部分的に運用中",
+      "extendedMission": "拡張ミッション",
+      "backupStandby": "予備/待機",
+      "spare": "スペア",
+      "unknown": "不明"
+    },
+    "Country": {
+      "label": "国",
+      "tooltip": "原産国"
+    },
+    "LaunchSite": {
+      "label": "打上げ場所",
+      "tooltip": "オブジェクトが打ち上げられた場所"
+    },
+    "LaunchVehicle": {
+      "label": "打上げ機",
+      "tooltip": "オブジェクトを打ち上げるために使用されたロケットや機体"
+    },
+    "Configuration": {
+      "label": "構成",
+      "tooltip": "ロケットや打上げ機の構成"
+    },
+    "RCS": {
+      "label": "RCS",
+      "tooltip": "レーダー断面積 - レーダー信号に対する反射性（m²）"
+    },
+    "StdMag": {
+      "label": "標準等級",
+      "tooltip": "標準等級 - 数値が小さいほど明るい"
+    },
+    "unknown": "不明"
+  }
+}

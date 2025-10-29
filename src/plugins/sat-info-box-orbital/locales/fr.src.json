@@ -1,0 +1,80 @@
+{
+  "SatInfoBoxOrbital": {
+    "title": "Données Orbitales",
+    "Apogee": {
+      "label": "Apogée",
+      "tooltip": "Point le plus haut de l'orbite"
+    },
+    "Perigee": {
+      "label": "Périgée",
+      "tooltip": "Point le plus bas de l'orbite"
+    },
+    "Inclination": {
+      "label": "Inclinaison",
+      "tooltip": "Angle mesuré depuis l'équateur au nœud ascendant"
+    },
+    "Eccentricity": {
+      "label": "Excentricité",
+      "tooltip": "À quel point l'orbite est circulaire (0 est un cercle)"
+    },
+    "RightAsc": {
+      "label": "Asc. Droite",
+      "tooltip": "Où elle passe au-dessus de l'équateur"
+    },
+    "ArgOfPerigee": {
+      "label": "Arg du Périgée",
+      "tooltip": "Où se trouve la partie la plus basse de l'orbite"
+    },
+    "Latitude": {
+      "label": "Latitude",
+      "tooltip": "Latitude actuelle au-dessus de la Terre",
+      "north": "N",
+      "south": "S"
+    },
+    "Longitude": {
+      "label": "Longitude",
+      "tooltip": "Longitude actuelle au-dessus de la Terre",
+      "east": "E",
+      "west": "O"
+    },
+    "Altitude": {
+      "label": "Altitude",
+      "tooltip": "Altitude actuelle au-dessus du niveau de la mer"
+    },
+    "Period": {
+      "label": "Période",
+      "tooltip": "Temps pour une révolution complète autour de la Terre",
+      "meanMotion": "Mouvement moyen",
+      "revPerDay": "rév/jour",
+      "min": "min"
+    },
+    "Velocity": {
+      "label": "Vitesse",
+      "tooltip": "Vitesse actuelle du satellite (plus élevée lorsqu'il est plus proche de la Terre)"
+    },
+    "AgeOfGP": {
+      "label": "Âge du GP",
+      "tooltip": "Temps depuis le calcul officiel de l'orbite (les données GP plus anciennes sont généralement moins précises)",
+      "days": "Jours",
+      "hours": "Heures",
+      "epochYear": "Année d'époque",
+      "epochDay": "Jour d'époque"
+    },
+    "RadialSigma": {
+      "label": "Sigma Radial",
+      "tooltip": "Incertitude radiale (mètres)"
+    },
+    "InTrackSigma": {
+      "label": "Sigma Sur Piste",
+      "tooltip": "Incertitude sur piste (mètres)"
+    },
+    "CrossTrackSigma": {
+      "label": "Sigma Hors Piste",
+      "tooltip": "Incertitude hors piste (mètres)"
+    },
+    "meter": "m",
+    "kilometer": "km",
+    "second": "s",
+    "unknown": "Inconnu"
+  }
+}

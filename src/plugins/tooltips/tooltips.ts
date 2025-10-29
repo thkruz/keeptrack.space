@@ -1,7 +1,9 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -31,36 +33,37 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   menuMode: MenuMode[] = [];
 
   isVisible_ = false;
+  tooltipTag = 'kt-tooltip';
 
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerInit,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerInit,
       () => {
         const tooltipDiv = document.createElement('div');
 
         tooltipDiv.id = 'tooltip';
         tooltipDiv.style.display = 'none';
         tooltipDiv.style.position = 'absolute';
-        tooltipDiv.style.zIndex = '9999';
-        tooltipDiv.style.width = '120px';
-        tooltipDiv.style.marginLeft = '-60px';
+        tooltipDiv.style.zIndex = '999999';
+        tooltipDiv.style.maxWidth = '200px';
         tooltipDiv.style.overflow = 'visible';
-        tooltipDiv.style.backgroundColor = 'var(--color-dark-background)';
+        tooltipDiv.style.backgroundColor = 'var(--color-primary-dark)';
         tooltipDiv.style.textAlign = 'center';
         tooltipDiv.style.padding = '5px';
         tooltipDiv.style.borderWidth = '5px';
-        tooltipDiv.style.borderColor = 'var(--color-dark-border)';
+        tooltipDiv.style.borderColor = 'var(--color-primary)';
         tooltipDiv.style.borderStyle = 'solid';
         tooltipDiv.style.color = '#ffffff';
+        tooltipDiv.style.fontSize = 'smaller';
         tooltipDiv.textContent = tooltipDiv.getAttribute('data-tooltip') ?? '';
         document.body.appendChild(tooltipDiv);
       },
     );
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.onKeepTrackReady,
       () => {
         this.initTooltips();
       },
@@ -68,23 +71,27 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   }
 
   initTooltips(): void {
-    // Search the entire dom tree for data-tooltip attributes
-    const elements = document.querySelectorAll('[data-tooltip]');
+    // Search the entire dom tree for kt-tooltip attributes
+    const elements = document.querySelectorAll(`[${this.tooltipTag}]`);
 
     elements.forEach((el) => {
-      const text = el.getAttribute('data-tooltip');
+      const text = el.getAttribute(this.tooltipTag);
 
       if (!text) {
-        errorManagerInstance.warn('Failed to create tooltip: Element has no data-tooltip attribute.');
+        errorManagerInstance.warn('Failed to create tooltip: Element has no kt-tooltip attribute.');
 
         return;
       }
 
-      this.createTooltip(el as HTMLElement, text);
+      this.createTooltip(el as HTMLElement);
     });
   }
 
-  createTooltip(el: HTMLElement, text: string): void {
+  createTooltip(el: HTMLElement | string): void {
+    if (typeof el === 'string') {
+      el = getEl(el) as HTMLElement;
+    }
+
     if (!el) {
       errorManagerInstance.warn('Failed to create tooltip: Element is null or undefined.');
 
@@ -96,7 +103,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       if (this.isVisible_) {
         return;
       }
-      this.showTooltip(event, text);
+      this.showTooltip(event, (event.target as HTMLElement).getAttribute(this.tooltipTag) ?? '');
       this.isVisible_ = true;
     });
 
@@ -104,6 +111,8 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       this.hideTooltip();
       this.isVisible_ = false;
     });
+
+    el.style.cursor = 'pointer';
   }
 
   hideTooltip() {
@@ -132,8 +141,8 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
     tooltipDiv.style.visibility = 'visible';
 
-    // Set tooltip text
-    tooltipDiv.textContent = text;
+    // Set tooltip HTML (allow <br />)
+    tooltipDiv.innerHTML = text;
 
     // Calculate available space in each direction
     const spaceAbove = event.clientY / viewportHeight;
@@ -147,43 +156,50 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
     type TooltipDirection = 'top' | 'bottom' | 'left' | 'right';
 
-    const spaces = [
+    const upDown = [
       { dir: 'top', value: spaceAbove },
       { dir: 'bottom', value: spaceBelow },
+    ];
+    const leftRight = [
       { dir: 'left', value: spaceLeft },
       { dir: 'right', value: spaceRight },
     ];
 
-    spaces.sort((a, b) => b.value - a.value);
-    const direction = spaces[0].dir as TooltipDirection;
+    upDown.sort((a, b) => b.value - a.value);
+    leftRight.sort((a, b) => b.value - a.value);
+    const upOrDown = upDown[0].dir as TooltipDirection;
+    const leftOrRight = leftRight[0].dir as TooltipDirection;
 
     // Position tooltip based on direction
-    switch (direction) {
+    switch (upOrDown) {
       case 'top':
         top = event.pageY - tooltipRect.height - 10;
-        left = event.pageX;
         break;
       case 'bottom':
-        top = event.pageY + 20;
-        left = event.pageX;
+        top = event.pageY + 10;
         break;
+      default:
+        errorManagerInstance.warn(`Unknown tooltip direction: ${upOrDown}`);
+
+        return;
+    }
+
+    switch (leftOrRight) {
       case 'left':
-        top = event.pageY;
-        left = event.pageX - tooltipRect.width - 10;
+        left = event.pageX - tooltipRect.width / 2;
         break;
       case 'right':
-        top = event.pageY;
         left = event.pageX + 10;
         break;
       default:
-        errorManagerInstance.warn(`Unknown tooltip direction: ${direction}`);
+        errorManagerInstance.warn(`Unknown tooltip direction: ${upOrDown}`);
 
         return;
     }
 
     // Clamp position to viewport
     top = Math.max(0, Math.min(top, viewportHeight - tooltipRect.height));
-    left = Math.max(0, Math.min(left, viewportWidth - tooltipRect.width));
+    left = Math.max(0, Math.min(left, viewportWidth - (tooltipRect.width / 2)));
 
     tooltipDiv.style.left = `${left}px`;
     tooltipDiv.style.top = `${top}px`;

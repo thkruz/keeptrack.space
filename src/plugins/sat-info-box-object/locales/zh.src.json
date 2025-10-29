@@ -1,0 +1,51 @@
+{
+  "SatInfoBoxObject": {
+    "title": "对象数据",
+    "Type": {
+      "label": "类型",
+      "tooltip": "对象类型",
+      "unknown": "待公布",
+      "payload": "有效载荷",
+      "rocketBody": "火箭体",
+      "debris": "碎片",
+      "special": "特殊",
+      "missile": "弹道导弹"
+    },
+    "Status": {
+      "label": "状态",
+      "tooltip": "对象的运行状态",
+      "operational": "运行中",
+      "nonOperational": "未运行",
+      "partiallyOperational": "部分运行",
+      "extendedMission": "扩展任务",
+      "backupStandby": "备份/待命",
+      "spare": "备用",
+      "unknown": "未知"
+    },
+    "Country": {
+      "label": "国家",
+      "tooltip": "原产国"
+    },
+    "LaunchSite": {
+      "label": "发射场",
+      "tooltip": "对象发射地点"
+    },
+    "LaunchVehicle": {
+      "label": "运载工具",
+      "tooltip": "用于发射对象的火箭或运载工具"
+    },
+    "Configuration": {
+      "label": "配置",
+      "tooltip": "火箭或运载工具的配置"
+    },
+    "RCS": {
+      "label": "雷达截面",
+      "tooltip": "雷达截面 - 物体对雷达信号的反射能力（单位：平方米）"
+    },
+    "StdMag": {
+      "label": "标准星等",
+      "tooltip": "标准星等 - 数值越小越亮"
+    },
+    "unknown": "未知"
+  }
+}

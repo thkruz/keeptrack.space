@@ -1,8 +1,9 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { BottomMenu } from '@app/static/bottom-menu';
+import { BottomMenu } from '@app/app/ui/bottom-menu';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { getEl } from '@app/engine/utils/get-el';
 import { SettingsManager } from '../settings';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.isBlockPersistence = true;
@@ -26,7 +27,7 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.isShowSplashScreen = true;
 
 
-  settingsManager.staticOffset = 1743483637000 - Date.now(); // Set to April 1, 2025
+  settingsManager.simulationTime = new Date('2025-04-01T00:00:00Z'); // Set to April 1, 2025
 
   settingsManager.isEnableJscCatalog = false;
 
@@ -58,7 +59,7 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
 
   settingsManager.isDisableExtraCatalog = false;
 
-  keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, () => {
+  EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
     BottomMenu.changeMenuMode(MenuMode.ALL);
 
     getEl('bottom-icons-filter')!.style.display = 'none';

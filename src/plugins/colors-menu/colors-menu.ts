@@ -1,10 +1,13 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { ColorScheme } from '@app/singletons/color-schemes/color-scheme';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import palettePng from '@public/img/icons/palette.png';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class ColorMenu extends KeepTrackPlugin {
@@ -16,7 +19,7 @@ export class ColorMenu extends KeepTrackPlugin {
 
   bottomIconElementName: string = 'menu-color-scheme';
   sideMenuElementName: string = 'color-scheme-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="color-scheme-menu" class="side-menu-parent start-hidden text-select">
     <div id="colors-menu" class="side-menu">
       <ul>
@@ -28,14 +31,14 @@ export class ColorMenu extends KeepTrackPlugin {
   </div>`;
 
   rmbL1ElementName = 'colors-rmb';
-  rmbL1Html = keepTrackApi.html`<li class="rmb-menu-item" id="${this.rmbL1ElementName}"><a href="#">Color Scheme &#x27A4;</a></li>`;
+  rmbL1Html = html`<li class="rmb-menu-item" id="${this.rmbL1ElementName}"><a href="#">Color Scheme &#x27A4;</a></li>`;
 
   isRmbOnEarth = true;
   isRmbOffEarth = true;
   rmbMenuOrder = 50;
 
   rmbL2ElementName = 'colors-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
   <ul class='dropdown-contents'>
     ${this.getRmbL2HtmlExtras()}
   </ul>`;
@@ -46,7 +49,7 @@ export class ColorMenu extends KeepTrackPlugin {
     let html = '';
 
     for (const colorScheme in colorSchemes) {
-      if (!colorSchemes[colorScheme].isOptionInColorMenu) {
+      if (!colorSchemes[colorScheme].isOptionInColorMenu || !settingsManager.colorSchemeInstances[colorScheme]?.enabled) {
         continue;
       }
 
@@ -62,7 +65,7 @@ export class ColorMenu extends KeepTrackPlugin {
     let html = '';
 
     for (const colorScheme in colorSchemes) {
-      if (!colorSchemes[colorScheme].isOptionInRmbMenu) {
+      if (!colorSchemes[colorScheme].isOptionInRmbMenu || !settingsManager.colorSchemeInstances[colorScheme]?.enabled) {
         continue;
       }
 
@@ -93,8 +96,8 @@ export class ColorMenu extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('colors-menu')
           ?.querySelectorAll('li')

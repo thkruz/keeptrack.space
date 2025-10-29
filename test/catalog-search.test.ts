@@ -1,5 +1,5 @@
-import { CatalogSearch } from '@app/static/catalog-search';
-import { SpaceObjectType, TleLine1 } from 'ootk';
+import { CatalogSearch } from '@app/app/data/catalog-search';
+import { SpaceObjectType, TleLine1 } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 
 describe('CatalogSearch_class', () => {

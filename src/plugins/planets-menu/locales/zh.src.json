@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "PlanetsMenuPlugin": {
+      "bottomIconLabel": "行星",
+      "title": "行星列表菜单",
+      "helpBody": "此菜单允许您选择并查看模拟中的不同行星。"
+    }
+  }
+}

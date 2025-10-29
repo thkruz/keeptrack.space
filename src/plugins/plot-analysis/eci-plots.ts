@@ -1,12 +1,13 @@
-import { EChartsData, MenuMode } from '@app/interfaces';
+import { EChartsData, MenuMode } from '@app/engine/core/interfaces';
+import { SatMathApi } from '@app/engine/math/sat-math-api';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { SatMathApi } from '@app/singletons/sat-math-api';
+import { DetailedSatellite } from '@ootk/src/main';
 import scatterPlot2Png from '@public/img/icons/scatter-plot2.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
-import { DetailedSatellite } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 type EChartsOption = echarts.EChartsOption;
@@ -38,7 +39,7 @@ export class EciPlot extends KeepTrackPlugin {
   chart: echarts.ECharts;
 
   sideMenuElementName = 'eci-plots-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="eci-plots-menu" class="side-menu-parent start-hidden text-select plot-analysis-menu-normal">
     <div id="plot-analysis-content" class="side-menu">
       <div id="${this.plotCanvasId}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>

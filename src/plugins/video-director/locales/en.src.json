@@ -1,0 +1,9 @@
+{
+  "plugins": {
+    "VideoDirectorPlugin": {
+      "title": "Video Director",
+      "bottomIconLabel": "Video Director",
+      "helpBody": "This menu allows you to add camera effects and control camera movements for creating cinematic videos within the simulation."
+    }
+  }
+}

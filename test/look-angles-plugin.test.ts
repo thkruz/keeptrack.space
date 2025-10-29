@@ -1,10 +1,11 @@
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { LookAnglesPlugin } from '@app/plugins/sensor/look-angles-plugin';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
 
 describe('LookAnglesPlugin_class', () => {
   beforeEach(() => {
-    setupStandardEnvironment([]);
+    setupStandardEnvironment([SelectSatManager]);
   });
 
   afterEach(() => {

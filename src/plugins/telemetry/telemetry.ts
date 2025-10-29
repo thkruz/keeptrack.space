@@ -1,7 +1,8 @@
-export class Telemetry {
+import { t7e } from '@app/locales/keys';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+
+export class Telemetry extends KeepTrackPlugin {
   init() {
-    console.error(
-      'Telemetry plugin is a pro plugin. Your .env file is improperly configured or you do not have the pro files!',
-    );
+    console.error(t7e('plugins.proOnlyMsg'));
   }
 }

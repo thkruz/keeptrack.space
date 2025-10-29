@@ -1,12 +1,15 @@
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl, hideEl, showEl } from '@app/lib/get-el';
-import { slideInRight, slideOutLeft } from '@app/lib/slide';
 import wifiFindPng from '@public/img/icons/wifi-find.png';
 
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { BaseObject, DEG2RAD, Degrees, DetailedSensor, EpochUTC, Kilometers, RAE, Radians, SpaceObjectType, ZoomValue, eci2rae } from '@ootk/src/main';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
@@ -34,7 +37,7 @@ export class ShortTermFences extends KeepTrackPlugin {
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
 
   sideMenuElementName = 'stf-menu';
-  sideMenuElementHtml: string = keepTrackApi.html`
+  sideMenuElementHtml: string = html`
   <div id="stf-menu" class="side-menu-parent start-hidden text-select">
     <div id="stf-content" class="side-menu">
       <div class="row">
@@ -93,8 +96,8 @@ export class ShortTermFences extends KeepTrackPlugin {
   addHtml(): void {
     super.addHtml();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+    EventBus.getInstance().on(
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         // Skip this if there is no satellite object because the menu isn't open
         if (!obj?.isSatellite()) {
@@ -107,7 +110,7 @@ export class ShortTermFences extends KeepTrackPlugin {
         if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
           getEl('actions-section')?.insertAdjacentHTML(
             'beforeend',
-            keepTrackApi.html`
+            html`
             <div id="stf-on-object-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
                   data-tooltip="Visualize Sensor Search Capability">Build Short Term Fence on this object...</div>
             `,
@@ -122,8 +125,8 @@ export class ShortTermFences extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('stfForm')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
@@ -196,10 +199,10 @@ export class ShortTermFences extends KeepTrackPlugin {
       },
     );
 
-    keepTrackApi.on(KeepTrackApiEvents.resetSensor, this.closeAndDisable_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.resetSensor, this.closeAndDisable_.bind(this));
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.setSensor,
+    EventBus.getInstance().on(
+      EventBusEvent.setSensor,
       (sensor, id): void => {
         if (sensor === null && id === null) {
           this.closeAndDisable_();

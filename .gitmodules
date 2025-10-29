@@ -1,3 +1,6 @@
 [submodule "src/plugins-pro"]
 	path = src/plugins-pro
 	url = git@github.com:thkruz/keeptrack-space-pro.git
+[submodule "src/engine/ootk"]
+	path = src/engine/ootk
+	url = https://github.com/thkruz/ootk.git

@@ -1,13 +1,18 @@
 import { keepTrackApi } from '@app/keepTrackApi';
 
-import { KeepTrackApiEvents } from '@app/interfaces';
-import { hideEl } from '@app/lib/get-el';
-import { MissileObject } from '@app/singletons/catalog-manager/MissileObject';
-import { lineManagerInstance } from '@app/singletons/draw-manager/line-manager';
-import { LineColors } from '@app/singletons/draw-manager/line-manager/line';
-import { errorManagerInstance } from '@app/singletons/errorManager';
-import { DetailedSatellite } from 'ootk';
-import { KeepTrackPlugin } from '../KeepTrackPlugin';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { SolarBody } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { ReferenceFrame } from '@app/engine/math/reference-frames';
+import { lineManagerInstance } from '@app/engine/rendering/line-manager';
+import { LineColors } from '@app/engine/rendering/line-manager/line';
+import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { hideEl } from '@app/engine/utils/get-el';
+import { DetailedSatellite, Kilometers } from '@ootk/src/main';
+import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class DrawLinesPlugin extends KeepTrackPlugin {
@@ -15,18 +20,22 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   dependencies_ = [];
 
   rmbL1ElementName = 'draw-rmb';
-  rmbL1Html = keepTrackApi.html`<li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>`;
+  rmbL1Html = html`<li class="rmb-menu-item" id="draw-rmb"><a href="#">Draw &#x27A4;</a></li>`;
   rmbL2ElementName = 'draw-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
   <ul class='dropdown-contents'>
     <li id="line-eci-axis-rmb"><a href="#">ECI Axes</a></li>
     <li id="line-eci-xgrid-rmb"><a href="#">X Axes Grid</a></li>
     <li id="line-eci-ygrid-rmb"><a href="#">Y Axes Grid</a></li>
     <li id="line-eci-zgrid-rmb"><a href="#">Z Axes Grid</a></li>
+    <li id="line-eci-radial-xgrid-rmb"><a href="#">X Axes Radial Grid</a></li>
+    <li id="line-eci-radial-ygrid-rmb"><a href="#">Y Axes Radial Grid</a></li>
+    <li id="line-eci-radial-zgrid-rmb"><a href="#">Z Axes Radial Grid</a></li>
     <li id="line-earth-sat-rmb"><a href="#">Earth to Satellite</a></li>
     <li id="line-sensor-sat-rmb"><a href="#">Sensor to Satellite</a></li>
     <li id="line-sat-sat-rmb"><a href="#">Satellite to Satellite</a></li>
     <li id="line-sat-sun-rmb"><a href="#">Satellite to Sun</a></li>
+    <li id="line-sat-moon-rmb"><a href="#">Satellite to Moon</a></li>
   </ul>
   `;
   rmbMenuOrder = 5;
@@ -35,10 +44,10 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   isRmbOnSat = true;
 
   rmbCallback = (targetId: string, clickedSat?: number): void => {
-    let clickSatObj: DetailedSatellite | MissileObject | null = null;
+    let clickSatObj: DetailedSatellite | MissileObject | OemSatellite | null = null;
     const obj = keepTrackApi.getCatalogManager().getObject(clickedSat);
 
-    if ((obj instanceof DetailedSatellite) || (obj instanceof MissileObject)) {
+    if ((obj instanceof DetailedSatellite) || (obj instanceof OemSatellite) || (obj instanceof MissileObject)) {
       clickSatObj = obj;
     }
 
@@ -49,13 +58,40 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
         lineManagerInstance.createRef2Ref([0, 0, 0], [0, 0, 25000], LineColors.BLUE);
         break;
       case 'line-eci-xgrid-rmb':
-        lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 1], 1);
+        lineManagerInstance.createGrid('x', [0.6, 0.2, 0.2, 0.3]);
         break;
       case 'line-eci-ygrid-rmb':
-        lineManagerInstance.createGrid('y', [0.2, 0.6, 0.2, 1], 1);
+        lineManagerInstance.createGrid('y', [0.2, 0.6, 0.2, 0.3]);
         break;
       case 'line-eci-zgrid-rmb':
-        lineManagerInstance.createGrid('z', [0.2, 0.2, 0.6, 1], 1);
+        lineManagerInstance.createGrid('z', [0.2, 0.2, 0.6, 0.3]);
+        break;
+      case 'line-eci-radial-xgrid-rmb':
+        lineManagerInstance.createGridRadial({
+          axis: 'x',
+          color: LineColors.RED,
+          opacity: 0.3,
+          circleInterval: 50000 as Kilometers,
+          referenceFrame: ReferenceFrame.J2000,
+        });
+        break;
+      case 'line-eci-radial-ygrid-rmb':
+        lineManagerInstance.createGridRadial({
+          axis: 'y',
+          color: LineColors.GREEN,
+          opacity: 0.3,
+          circleInterval: 50000 as Kilometers,
+          referenceFrame: ReferenceFrame.J2000,
+        });
+        break;
+      case 'line-eci-radial-zgrid-rmb':
+        lineManagerInstance.createGridRadial({
+          axis: 'z',
+          color: LineColors.BLUE,
+          opacity: 0.3,
+          circleInterval: 50000 as Kilometers,
+          referenceFrame: ReferenceFrame.J2000,
+        });
         break;
       case 'line-earth-sat-rmb':
         lineManagerInstance.createSatToRef(clickSatObj, [0, 0, 0], LineColors.PURPLE);
@@ -78,6 +114,9 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
       case 'line-sat-sun-rmb':
         lineManagerInstance.createSat2Sun(clickSatObj);
         break;
+      case 'line-sat-moon-rmb':
+        lineManagerInstance.createSat2CelestialBody(clickSatObj, SolarBody.Moon);
+        break;
       default:
         break;
     }
@@ -86,7 +125,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
   addJs() {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.rightBtnMenuOpen, (isEarth, clickedSatId) => {
+    EventBus.getInstance().on(EventBusEvent.rightBtnMenuOpen, (isEarth, clickedSatId) => {
       if (!isEarth) {
         hideEl('line-eci-axis-rmb');
       }

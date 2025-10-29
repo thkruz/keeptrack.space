@@ -1,19 +1,22 @@
-import { GetSatType, KeepTrackApiEvents, MenuMode, ToastMsgType } from '@app/interfaces';
+import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
+import { StringPad } from '@app/engine/utils/stringPad';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
-import { StringPad } from '@app/lib/stringPad';
-import { errorManagerInstance } from '@app/singletons/errorManager';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 
+import { OrbitFinder } from '@app/app/analysis/orbit-finder';
+import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
+import { TimeManager } from '@app/engine/core/time-manager';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
-import { OrbitFinder } from '@app/singletons/orbit-finder';
-import { TimeManager } from '@app/singletons/time-manager';
-import { SatMath, StringifiedNumber } from '@app/static/sat-math';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from 'ootk';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
+import { BaseObject, DetailedSatellite, FormatTle, SatelliteRecord, Sgp4, TleLine1, ZoomValue, eci2lla } from '@ootk/src/main';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 
@@ -36,7 +39,7 @@ export class EditSat extends KeepTrackPlugin {
   static readonly elementPrefix = 'es';
 
   sideMenuElementName = 'editSat-menu';
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
     <div id="editSat-menu" class="side-menu-parent start-hidden text-select">
       <div id="editSat-content" class="side-menu">
         <div class="row">
@@ -123,8 +126,8 @@ export class EditSat extends KeepTrackPlugin {
 
   addHtml(): void {
     super.addHtml();
-    keepTrackApi.on(
-      KeepTrackApiEvents.uiManagerFinal,
+    EventBus.getInstance().on(
+      EventBusEvent.uiManagerFinal,
       () => {
         getEl('editSat-newTLE')!.addEventListener('click', this.editSatNewTleClick_.bind(this));
 
@@ -180,8 +183,8 @@ export class EditSat extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(
-      KeepTrackApiEvents.selectSatData,
+    EventBus.getInstance().on(
+      EventBusEvent.selectSatData,
       (obj: BaseObject) => {
         if (!obj) {
           if (this.isMenuButtonActive) {
@@ -198,7 +201,7 @@ export class EditSat extends KeepTrackPlugin {
   isRmbOnSat = true;
   rmbMenuOrder = 2;
   rmbL1ElementName = 'edit-rmb';
-  rmbL1Html = keepTrackApi.html`
+  rmbL1Html = html`
   <li class="rmb-menu-item" id=${this.rmbL1ElementName}><a href="#">Edit Sat &#x27A4;</a></li>`;
 
   rmbCallback = (targetId: string, clickedSat?: number): void => {
@@ -225,7 +228,7 @@ export class EditSat extends KeepTrackPlugin {
   };
 
   rmbL2ElementName = 'edit-rmb-menu';
-  rmbL2Html = keepTrackApi.html`
+  rmbL2Html = html`
     <ul class='dropdown-contents'>
       <li id="set-pri-sat-rmb"><a href="#">Set as Primary Sat</a></li>
       <li id="set-sec-sat-rmb"><a href="#">Set as Secondary Sat</a></li>
@@ -363,7 +366,7 @@ export class EditSat extends KeepTrackPlugin {
 
       mainsat.tle1 = (mainsat.tle1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.tle1.substr(32)) as TleLine1;
 
-      keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
+      keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
 
       let TLEs;
       // Ignore argument of perigee for round orbits OPTIMIZE
@@ -488,7 +491,7 @@ export class EditSat extends KeepTrackPlugin {
       sat.active = true;
       sat.editTle(tle1, tle2);
       sat.country = country;
-      keepTrackApi.getMainCamera().zoomTarget = ZoomValue.GEO;
+      keepTrackApi.getMainCamera().state.zoomTarget = ZoomValue.GEO;
     } else {
       keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.',
         ToastMsgType.caution, true);
@@ -514,7 +517,7 @@ export class EditSat extends KeepTrackPlugin {
       });
 
       saveAs(blob, `${scc}.tle`);
-    } catch (error) {
+    } catch {
       // intentionally left blank
     }
     e.preventDefault();

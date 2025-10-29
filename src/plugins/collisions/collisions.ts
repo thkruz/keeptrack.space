@@ -1,13 +1,16 @@
-import { errorManagerInstance } from '@app/singletons/errorManager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import CollisionsPng from '@public/img/icons/collisions.png';
 import './collisions.css';
 
-import { KeepTrackApiEvents, MenuMode } from '@app/interfaces';
-import { getEl } from '@app/lib/get-el';
-import { showLoading } from '@app/lib/showLoading';
+import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { html } from '@app/engine/utils/development/formatter';
+import { getEl } from '@app/engine/utils/get-el';
+import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
+import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from '../../keepTrackApi';
-import { ClickDragOptions, KeepTrackPlugin } from '../KeepTrackPlugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 //  Updated to match KeepTrack API v2
@@ -38,7 +41,7 @@ export class Collisions extends KeepTrackPlugin {
   bottomIconElementName: string = 'menu-satellite-collision';
   bottomIconImg = CollisionsPng;
   sideMenuElementName: string = `${this.id}-menu`;
-  sideMenuElementHtml = keepTrackApi.html`
+  sideMenuElementHtml = html`
   <div id="${this.id}-menu" class="side-menu-parent start-hidden text-select">
     <div id="${this.id}-content" class="side-menu">
       <div class="row">
@@ -51,8 +54,8 @@ export class Collisions extends KeepTrackPlugin {
 
   dragOptions: ClickDragOptions = {
     isDraggable: true,
-    minWidth: 540,
-    maxWidth: 650,
+    minWidth: 575,
+    maxWidth: 700,
   };
 
   menuMode: MenuMode[] = [MenuMode.BASIC, MenuMode.ADVANCED, MenuMode.ALL];
@@ -66,9 +69,9 @@ export class Collisions extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(KeepTrackApiEvents.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    keepTrackApi.on(KeepTrackApiEvents.onCruncherMessage, () => {
+    EventBus.getInstance().on(EventBusEvent.onCruncherMessage, () => {
       if (this.selectSatIdOnCruncher_ !== null) {
         // If selectedSatManager is loaded, set the selected sat to the one that was just added
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
@@ -80,19 +83,19 @@ export class Collisions extends KeepTrackPlugin {
 
   private uiManagerFinal_() {
     getEl(this.sideMenuElementName)!.addEventListener('click', (evt: MouseEvent) => {
-      showLoading(() => {
-        const el = (<HTMLElement>evt.target).parentElement;
+      const el = (<HTMLElement>evt.target).parentElement;
 
-        if (!el!.classList.contains(`${this.id}-object`)) {
-          return;
-        }
-        // Might be better code for this.
-        const hiddenRow = el!.dataset?.row;
+      if (!el!.classList.contains(`${this.id}-object`)) {
+        return;
+      }
+      // Might be better code for this.
+      const hiddenRow = el!.dataset?.row;
 
-        if (hiddenRow !== null) {
+      if (hiddenRow !== null) {
+        showLoading(() => {
           this.eventClicked_(parseInt(hiddenRow!));
-        }
-      });
+        });
+      }
     });
   }
 
@@ -116,7 +119,7 @@ export class Collisions extends KeepTrackPlugin {
     const now = new Date();
 
     keepTrackApi.getTimeManager().changeStaticOffset(new Date(this.collisionList_[row].TOCA).getTime() - now.getTime() - 1000 * 30);
-    keepTrackApi.getMainCamera().isAutoPitchYawToTarget = false;
+    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     const sat1 = this.collisionList_[row].SAT1.toString().padStart(5, '0');
     const sat2 = this.collisionList_[row].SAT2.toString().padStart(5, '0');
@@ -136,7 +139,7 @@ export class Collisions extends KeepTrackPlugin {
       Collisions.createHeaders_(tbl);
 
       this.createBody_(tbl);
-    } catch (e) {
+    } catch {
       errorManagerInstance.warn(t7e('errorMsgs.Collisions.errorProcessingCollisions'));
     }
   }

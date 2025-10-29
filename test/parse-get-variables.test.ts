@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable global-require */
 
-import { ToastMsgType } from '@app/interfaces';
+import { ToastMsgType } from '@app/engine/core/interfaces';
+import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { GetVariables } from '@app/settings/getVariables';
 import { parseGetVariables } from '@app/settings/parse-get-variables';
 import { SettingsManager } from '@app/settings/settings';
-import { EarthTextureStyle } from '@app/singletons/draw-manager/earth';
 
 describe('parseGetVariables', () => {
   let settingsManager: SettingsManager;
@@ -160,11 +160,6 @@ describe('parseGetVariables', () => {
     godraysMock.mockRestore();
   });
 
-  it('should enable smallImages', () => {
-    parseGetVariables(['smallImages='], settingsManager);
-    expect(settingsManager.smallImages).toBe(true);
-  });
-
   it('should set lowperf options', () => {
     parseGetVariables(['lowperf='], settingsManager);
     expect(settingsManager.isShowSplashScreen).toBe(false);
@@ -173,7 +168,6 @@ describe('parseGetVariables', () => {
     expect(settingsManager.zFar).toBe(250000.0);
     expect(settingsManager.noMeshManager).toBe(true);
     expect(settingsManager.maxFieldOfViewMarkers).toBe(1);
-    expect(settingsManager.smallImages).toBe(true);
   });
 
   it('should set hires options', () => {
@@ -200,7 +194,6 @@ describe('parseGetVariables', () => {
     parseGetVariables(['draw-more='], settingsManager);
     expect(settingsManager.isDrawLess).toBe(false);
     expect(settingsManager.noMeshManager).toBe(false);
-    expect(settingsManager.smallImages).toBe(false);
     expect(settingsManager.isDrawMilkyWay).toBe(true);
   });
 

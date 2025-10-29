@@ -297,7 +297,7 @@ export class Camera {
       } else {
         const satAlt = SatMath.getAlt(SatMath.getPositionFromCenterBody(target.position), gmst);
 
-        if (this.getCameraDistanceFromEarth() < satAlt + RADIUS_OF_EARTH + settingsManager.minDistanceFromSatellite) {
+        if (this.calcDistanceBasedOnZoom() < satAlt + RADIUS_OF_EARTH + settingsManager.minDistanceFromSatellite) {
           this.state.zoomTarget = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
           // errorManagerInstance.debug('Zooming in to ' + this.zoomTarget_ + ' to because we are too close to the satellite');
           this.state.zoomLevel = this.state.zoomTarget;
@@ -365,7 +365,7 @@ export class Camera {
       return;
     }
 
-    const cameraDistance = this.getCameraDistanceFromEarth();
+    const cameraDistance = this.getDistFromEarth();
 
     this.state.ftsRotateReset = true;
 
@@ -401,9 +401,8 @@ export class Camera {
    *
    * Zoom level is ALWAYS raised to the power of ZOOM_EXP to ensure that zooming out is faster than zooming in
    * TODO: This should be handled before getting the zoomLevel_ value
-   * @deprecated This is old logic that assumes earth is the origin of the scene
    */
-  getCameraDistanceFromEarth(): Kilometers {
+  calcDistanceBasedOnZoom(): Kilometers {
     return <Kilometers>(this.state.zoomLevel ** ZOOM_EXP * (settingsManager.maxZoomDistance - settingsManager.minZoomDistance) + settingsManager.minZoomDistance);
   }
 
@@ -465,15 +464,6 @@ export class Camera {
     return vec3.fromValues(0, 0, 0);
   }
 
-  getCameraPosition(target?: EciVec3, orientation: vec3 = this.getCameraOrientation()) {
-    const centerOfEarth = vec3.fromValues(0, 0, 0);
-
-    const radius = this.getCameraRadius(target, keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!);
-
-
-    return vec3.fromValues(centerOfEarth[0] - orientation[0] * radius, centerOfEarth[1] - orientation[1] * radius, centerOfEarth[2] - orientation[2] * radius);
-  }
-
   getCameraRadius(target: EciVec3, centerBody: CelestialBody | Earth) {
     let targetDistanceFromEarth = 0;
 
@@ -483,7 +473,7 @@ export class Camera {
       this.state.camSnapToSat.altitude = SatMath.getAlt(target, gmst, centerBody.RADIUS as Kilometers);
       targetDistanceFromEarth = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH;
     }
-    const radius = this.getCameraDistanceFromEarth() - targetDistanceFromEarth;
+    const radius = this.calcDistanceBasedOnZoom() - targetDistanceFromEarth;
 
 
     return radius;
@@ -521,7 +511,7 @@ export class Camera {
     }
 
     if (zoom) {
-    this.changeZoom(zoom);
+      this.changeZoom(zoom);
     }
     this.camSnap(lat2pitch(lat), lon2yaw(lon, date));
   }
@@ -796,7 +786,7 @@ export class Camera {
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
 
     // 2. Back away from the earth in the Y direction (depth)
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [0, this.getCameraDistanceFromEarth(), 0]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [0, this.calcDistanceBasedOnZoom(), 0]);
     // 1. Rotate around the earth (0,0,0)
     mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.earthCenteredPitch);
     mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.earthCenteredYaw);
@@ -826,9 +816,13 @@ export class Camera {
 
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
 
+    // Calculate target position distance from Earth
+    const targetPosition = vec3.fromValues(target.position.x, target.position.y, target.position.z);
+    const targetDistance = vec3.length(targetPosition);
+
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [
       0,
-      this.getCameraRadius(SatMath.getPositionFromCenterBody(target.position), keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!),
+      this.calcDistanceBasedOnZoom() - targetDistance,
       0,
     ]);
 
@@ -846,7 +840,7 @@ export class Camera {
     // Adjust for panning
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
     // Back away from the earth
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [settingsManager.offsetCameraModeX, this.getCameraDistanceFromEarth(), settingsManager.offsetCameraModeZ]);
+    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [settingsManager.offsetCameraModeX, this.calcDistanceBasedOnZoom(), settingsManager.offsetCameraModeZ]);
     // Adjust for FPS style rotation
     mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.earthCenteredPitch);
     mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.earthCenteredYaw);
@@ -929,10 +923,14 @@ export class Camera {
 
   private updateCameraSnapMode(dt: Milliseconds) {
     if (this.state.isAutoPitchYawToTarget) {
-      this.state.camPitch = <Radians>(this.state.camPitch + (this.state.camPitchTarget - this.state.camPitch) * this.chaseSpeed_ * dt);
+      this.state.camPitch = this.chaseSpeed_ === 1.0
+        ? this.state.camPitchTarget
+        : <Radians>(this.state.camPitch + (this.state.camPitchTarget - this.state.camPitch) * this.chaseSpeed_ * dt);
 
       this.yawErr_ = normalizeAngle(<Radians>(this.state.camYawTarget - this.state.camYaw));
-      this.state.camYaw = <Radians>(this.state.camYaw + this.yawErr_ * this.chaseSpeed_ * dt);
+      this.state.camYaw = this.chaseSpeed_ === 1.0
+        ? (this.state.camYaw + this.yawErr_) as Radians
+        : <Radians>(this.state.camYaw + this.yawErr_ * this.chaseSpeed_ * dt);
     }
   }
 
@@ -1324,7 +1322,7 @@ export class Camera {
       this.updateSatShaderSizes();
     }
 
-    const cameraDistance = this.getCameraDistanceFromEarth();
+    const cameraDistance = this.getDistFromEarth();
 
     if (settingsManager.maxZoomDistance < 2e6) {
       // Scale minSize smoothly from 5.5 down to 3 as cameraDistance increases

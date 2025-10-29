@@ -929,7 +929,7 @@ export class Camera {
 
       this.yawErr_ = normalizeAngle(<Radians>(this.state.camYawTarget - this.state.camYaw));
       this.state.camYaw = this.chaseSpeed_ === 1.0
-        ? (this.state.camYaw + this.yawErr_) as Radians
+        ? this.state.camYawTarget
         : <Radians>(this.state.camYaw + this.yawErr_ * this.chaseSpeed_ * dt);
     }
   }

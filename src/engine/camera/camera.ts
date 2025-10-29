@@ -51,7 +51,7 @@ import { CameraState } from './state/camera-state';
  */
 export enum CameraType {
   CURRENT = 0,
-  DEFAULT = 1,
+  FIXED_TO_EARTH = 1,
   FIXED_TO_SAT = 2,
   FPS = 3,
   PLANETARIUM = 4,
@@ -85,7 +85,7 @@ export class Camera {
     return mat4.invert(mat4.create(), this.matrixWorldInverse)!;
   }
   matrixWorldInverse = mat4.create();
-  cameraType: CameraType = CameraType.DEFAULT;
+  cameraType: CameraType = CameraType.FIXED_TO_EARTH;
 
   resetRotation() {
     if (this.cameraType !== CameraType.FPS) {
@@ -152,7 +152,7 @@ export class Camera {
     }
 
     switch (this.cameraType) {
-      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_EARTH:
         this.cameraType = CameraType.FIXED_TO_SAT;
         break;
       case CameraType.FIXED_TO_SAT:
@@ -162,7 +162,7 @@ export class Camera {
         this.cameraType = CameraType.SATELLITE;
         break;
       case CameraType.SATELLITE:
-        this.cameraType = CameraType.DEFAULT;
+        this.cameraType = CameraType.FIXED_TO_EARTH;
         break;
       default:
         this.cameraType = CameraType.MAX_CAMERA_TYPES;
@@ -197,7 +197,7 @@ export class Camera {
         this.state.camZoomSnappedOnSat = true;
         this.cameraType = CameraType.FIXED_TO_SAT;
       } else {
-        this.cameraType = CameraType.DEFAULT;
+        this.cameraType = CameraType.FIXED_TO_EARTH;
       }
     }
   }
@@ -293,7 +293,7 @@ export class Camera {
     // Ensure we don't zoom in past our satellite
     if (this.cameraType === CameraType.FIXED_TO_SAT) {
       if (target.id === -1 || target.type === SpaceObjectType.STAR) {
-        this.cameraType = CameraType.DEFAULT;
+        this.cameraType = CameraType.FIXED_TO_EARTH;
       } else {
         const satAlt = SatMath.getAlt(SatMath.getPositionFromCenterBody(target.position), gmst);
 
@@ -307,7 +307,7 @@ export class Camera {
 
     if (this.cameraType === CameraType.SATELLITE) {
       if (target.id === -1 || target.type === SpaceObjectType.STAR) {
-        this.cameraType = CameraType.DEFAULT;
+        this.cameraType = CameraType.FIXED_TO_EARTH;
       }
     }
 
@@ -317,7 +317,7 @@ export class Camera {
      */
 
     switch (this.cameraType) {
-      case CameraType.DEFAULT: // pivot around the earth with earth in the center
+      case CameraType.FIXED_TO_EARTH: // pivot around the earth with earth in the center
         this.drawFixedToEarth_();
         break;
       case CameraType.OFFSET: // pivot around the earth with earth offset to the bottom right
@@ -371,7 +371,7 @@ export class Camera {
 
     // If within 9000km then we want to move further back to feel less jarring
     if (cameraDistance > 9000) {
-      this.cameraType = CameraType.DEFAULT;
+      this.cameraType = CameraType.FIXED_TO_EARTH;
 
       this.state.zoomTarget = this.getZoomFromDistance(cameraDistance) + 0.005;
       this.state.camPitch = this.state.earthCenteredPitch;
@@ -453,7 +453,7 @@ export class Camera {
 
       return vec3.fromValues(xRot, yRot, zRot);
     }
-    if (this.cameraType === CameraType.DEFAULT) {
+    if (this.cameraType === CameraType.FIXED_TO_EARTH) {
       const xRot = Math.sin(-this.state.camYaw) * Math.cos(this.state.camPitch);
       const yRot = Math.cos(this.state.camYaw) * Math.cos(this.state.camPitch);
       const zRot = Math.sin(-this.state.camPitch);
@@ -515,8 +515,14 @@ export class Camera {
   /**
    * Sets the camera to look at a specific latitude and longitude with a given zoom level.
    */
-  lookAtLatLon(lat: Degrees, lon: Degrees, zoom: ZoomValue | number, date = keepTrackApi.getTimeManager().simulationTimeObj): void {
+  lookAtLatLon(lat: Degrees, lon: Degrees, zoom?: ZoomValue | number, date = keepTrackApi.getTimeManager().simulationTimeObj): void {
+    if (this.cameraType !== CameraType.FIXED_TO_EARTH) {
+      this.cameraType = CameraType.FIXED_TO_EARTH;
+    }
+
+    if (zoom) {
     this.changeZoom(zoom);
+    }
     this.camSnap(lat2pitch(lat), lon2yaw(lon, date));
   }
 
@@ -544,7 +550,7 @@ export class Camera {
     }
 
     lineManagerInstance.clear();
-    this.cameraType = CameraType.DEFAULT; // Earth will block the view of the star
+    this.cameraType = CameraType.FIXED_TO_EARTH; // Earth will block the view of the star
     this.lookAtPosition(sat.position, false, timeManagerInstance.selectedDate);
   }
 
@@ -742,7 +748,7 @@ export class Camera {
       this.state.camYaw = <Radians>(this.state.camYaw + TAU);
     }
 
-    if (this.cameraType === CameraType.DEFAULT || this.cameraType === CameraType.OFFSET) {
+    if (this.cameraType === CameraType.FIXED_TO_EARTH || this.cameraType === CameraType.OFFSET) {
       this.state.earthCenteredPitch = this.state.camPitch;
       this.state.earthCenteredYaw = this.state.camYaw;
       if (this.state.earthCenteredYaw < 0) {
@@ -883,7 +889,7 @@ export class Camera {
     }
 
     if (!sensorPos && (this.cameraType === CameraType.PLANETARIUM || this.cameraType === CameraType.ASTRONOMY)) {
-      this.cameraType = CameraType.DEFAULT;
+      this.cameraType = CameraType.FIXED_TO_EARTH;
       errorManagerInstance.debug('A sensor should be selected first if this mode is allowed to be planetarium or astronmy.');
     }
   }
@@ -1365,7 +1371,7 @@ export class Camera {
     this.state.zoomLevel = this.state.zoomLevel < 0 ? 0.0001 : this.state.zoomLevel;
 
     // Try to stay out of the earth
-    if (this.cameraType === CameraType.DEFAULT || this.cameraType === CameraType.OFFSET || this.cameraType === CameraType.FIXED_TO_SAT) {
+    if (this.cameraType === CameraType.FIXED_TO_EARTH || this.cameraType === CameraType.OFFSET || this.cameraType === CameraType.FIXED_TO_SAT) {
       if (this.getDistFromEarth() < RADIUS_OF_EARTH + 30) {
         this.state.zoomTarget = this.state.zoomLevel + 0.001;
       }

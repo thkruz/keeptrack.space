@@ -5,7 +5,7 @@ import { DEG2RAD, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Mill
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 
 const testFuncWithAllCameraTypes = (testFunc: () => void, cameraInstance: Camera) => {
-  cameraInstance.cameraType = CameraType.DEFAULT;
+  cameraInstance.cameraType = CameraType.FIXED_TO_EARTH;
   expect(testFunc).not.toThrow();
   cameraInstance.cameraType = CameraType.OFFSET;
   expect(testFunc).not.toThrow();

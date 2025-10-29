@@ -292,7 +292,7 @@ export class GamepadPlugin {
     let zoomTarget = keepTrackApi.getMainCamera().zoomLevel();
 
     switch (keepTrackApi.getMainCamera().cameraType) {
-      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_EARTH:
       case CameraType.FIXED_TO_SAT:
         zoomTarget += (zoomOut / 500) * renderer.dt;
         zoomTarget -= (zoomIn / 500) * renderer.dt;
@@ -338,7 +338,7 @@ export class GamepadPlugin {
       settingsManager.lastGamepadMovement = Date.now();
 
       switch (keepTrackApi.getMainCamera().cameraType) {
-        case CameraType.DEFAULT:
+        case CameraType.FIXED_TO_EARTH:
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().state.camAngleSnappedOnSat = false;
           keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
@@ -376,7 +376,7 @@ export class GamepadPlugin {
     if (y > this.deadzone || y < -this.deadzone || x > this.deadzone || x < -this.deadzone) {
       keepTrackApi.getMainCamera().autoRotate(false);
       switch (keepTrackApi.getMainCamera().cameraType) {
-        case CameraType.DEFAULT:
+        case CameraType.FIXED_TO_EARTH:
         case CameraType.FIXED_TO_SAT:
           keepTrackApi.getMainCamera().state.isLocalRotateOverride = true;
           keepTrackApi.getMainCamera().state.localRotateDif.pitch = <Radians>(-y * 200);

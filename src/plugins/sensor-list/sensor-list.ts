@@ -210,7 +210,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       if (key === 'Home' && !isShift && !isRepeat) {
         // If a sensor is selected rotate the camera to it
         if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&
-          (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT)) {
+          (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH)) {
           const sensor = keepTrackApi.getSensorManager().currentSensors[0];
 
           keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, keepTrackApi.getTimeManager().selectedDate);

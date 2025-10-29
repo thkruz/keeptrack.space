@@ -206,7 +206,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
       keepTrackApi.getMainCamera().state.earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
       keepTrackApi.emit(EventBusEvent.sensorDotSelected, sensor);
     }
@@ -307,7 +307,7 @@ export class SelectSatManager extends KeepTrackPlugin {
       return;
     }
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.DEFAULT) {
+    if (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
       keepTrackApi.getMainCamera().state.earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
       keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
     }

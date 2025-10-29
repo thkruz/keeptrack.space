@@ -170,7 +170,7 @@ export class CameraInputHandler {
     this.camera.changeCameraType(orbitManagerInstance);
 
     switch (this.camera.cameraType) {
-      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_EARTH:
         uiManagerInstance.toast('Earth Centered Camera Mode', ToastMsgType.standby);
         this.camera.state.zoomTarget = 0.5;
         break;
@@ -224,7 +224,7 @@ export class CameraInputHandler {
 
   keyDownNumpad8_() {
     switch (this.camera.cameraType) {
-      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_EARTH:
       case CameraType.FIXED_TO_SAT:
         settingsManager.isAutoRotateU = true;
         this.state.isAutoRotate = true;
@@ -243,7 +243,7 @@ export class CameraInputHandler {
 
   keyDownNumpad2_() {
     switch (this.camera.cameraType) {
-      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_EARTH:
       case CameraType.FIXED_TO_SAT:
         settingsManager.isAutoRotateD = true;
         this.isHoldingDownAKey = 5;
@@ -262,7 +262,7 @@ export class CameraInputHandler {
 
   keyDownNumpad4_() {
     switch (this.camera.cameraType) {
-      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_EARTH:
       case CameraType.FIXED_TO_SAT:
         settingsManager.isAutoRotateL = true;
         this.isHoldingDownAKey = 5;
@@ -283,7 +283,7 @@ export class CameraInputHandler {
 
   keyDownNumpad6_() {
     switch (this.camera.cameraType) {
-      case CameraType.DEFAULT:
+      case CameraType.FIXED_TO_EARTH:
       case CameraType.FIXED_TO_SAT:
         settingsManager.isAutoRotateR = true;
         this.isHoldingDownAKey = 5;

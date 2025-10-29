@@ -87,7 +87,7 @@ jobs:
         if: matrix.task == 'eslint'
         run: |
           echo "Running ESLint..."
-          npx eslint ./src --ignore-path .gitignore --ext js,ts,tsx
+          npm run lint
           echo '### ESLint Passed' >> $GITHUB_STEP_SUMMARY
 
       - name: Run Unit Tests

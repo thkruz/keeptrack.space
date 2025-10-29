@@ -100,10 +100,10 @@ export class InputManager {
   /* istanbul ignore next */
   public static async getBufferSubDataAsync(
     gl: WebGL2RenderingContext,
-    target: number,
+    target: WebGL2RenderingContextBase['PIXEL_PACK_BUFFER'] | WebGLRenderingContextBase['ARRAY_BUFFER'],
     buffer: WebGLBuffer,
     srcByteOffset: number,
-    dstBuffer: Uint8Array,
+    outputArray: Uint8Array | Int8Array | Uint16Array | Int16Array | Uint32Array | Int32Array | Float32Array | Float64Array,
     dstOffset?: number,
     length?: number,
   ) {
@@ -123,16 +123,16 @@ export class InputManager {
     gl.bindBuffer(target, buffer);
 
     if (dstOffset && length) {
-      gl.getBufferSubData(target, srcByteOffset, dstBuffer, dstOffset, length);
+      gl.getBufferSubData(target, srcByteOffset, outputArray, dstOffset, length);
     } else if (dstOffset) {
-      gl.getBufferSubData(target, srcByteOffset, dstBuffer, dstOffset);
+      gl.getBufferSubData(target, srcByteOffset, outputArray, dstOffset);
     } else {
-      gl.getBufferSubData(target, srcByteOffset, dstBuffer);
+      gl.getBufferSubData(target, srcByteOffset, outputArray);
     }
 
     gl.bindBuffer(target, null);
 
-    return dstBuffer;
+    return outputArray;
   }
 
   public static getEarthScreenPoint(x: number, y: number): Kilometers[] {

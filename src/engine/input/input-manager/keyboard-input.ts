@@ -22,7 +22,11 @@ export class KeyboardInput {
             return;
           }
 
-          // Optionally, check event.origin here for security
+          // Verify the origin of the received message
+          if (event.origin !== window.origin) {
+            return;
+          }
+
           if (!event.data || typeof event.data !== 'object') {
             return;
           }

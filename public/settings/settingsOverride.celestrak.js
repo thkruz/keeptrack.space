@@ -347,6 +347,7 @@ const settingsOverride = {
   isEnableJscCatalog: false,
   isAutoStart: true,
   isDisableSensors: true,
+  isDisablePlanets: true,
 
   colorSchemeInstances: {
     MissionColorScheme: {

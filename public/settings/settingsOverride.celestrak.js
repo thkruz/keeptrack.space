@@ -80,6 +80,9 @@ const settingsOverride = {
     EditSat: {
       enabled: false,
     },
+    OemReaderPlugin: {
+      enabled: false,
+    },
     NewLaunch: {
       enabled: false,
     },

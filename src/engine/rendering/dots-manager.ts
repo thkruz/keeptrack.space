@@ -369,7 +369,7 @@ export class DotsManager {
 
     this.initProgramPicking();
 
-    EventBus.getInstance().on(EventBusEvent.update, this.updatePositionBuffer.bind(this));
+    EventBus.getInstance().on(EventBusEvent.update, this.update.bind(this));
     EventBus.getInstance().on(EventBusEvent.staticOffsetChange, this.interpolatePositionsOfOemSatellites.bind(this));
   }
 
@@ -604,7 +604,7 @@ export class DotsManager {
    * Updates the position buffer for the dots manager. This method interpolates the position of the satellites
    * based on their velocity and updates the position buffer accordingly. It also updates the position of active missiles.
    */
-  updatePositionBuffer(): void {
+  update(): void {
     // Don't update positions until positionCruncher finishes its first loop and creates data in position and velocity data arrays
     if (!this.positionData || !this.velocityData) {
       return;

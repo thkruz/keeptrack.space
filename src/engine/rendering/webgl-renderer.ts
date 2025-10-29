@@ -544,7 +544,7 @@ export class WebGLRenderer {
          */
         const isKeyboardOut = Math.abs((vw - oldWidth) / oldWidth) < 0.35 && Math.abs((vh - oldHeight) / oldHeight) > 0.35;
 
-        if (!settingsManager.isMobileModeEnabled || isKeyboardOut || this.isRotationEvent_ || !keepTrackApi.getMainCamera().projectionMatrix) {
+        if (!settingsManager.isMobileModeEnabled || !isKeyboardOut || this.isRotationEvent_ || !keepTrackApi.getMainCamera().projectionMatrix) {
           this.setCanvasSize(vh, vw);
           this.isRotationEvent_ = false;
         } else {

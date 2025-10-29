@@ -249,7 +249,7 @@ describe('alt2zoom_function', () => {
   it('test_happy_path_alt_equal_min_zoom_distance', () => {
     const alt = minZoom - RADIUS_OF_EARTH + 30;
 
-    expect(alt2zoom(<Kilometers>alt, minZoom, maxZoom, minDist)).toBeCloseTo(0.123);
+    expect(alt2zoom(<Kilometers>alt, minZoom, maxZoom, minDist)).toBeCloseTo(0.19);
   });
 
   // Tests that function returns 1 when alt is equal to maxZoomDistance

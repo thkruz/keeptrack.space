@@ -28,7 +28,7 @@ describe('Camera Key Input', () => {
     cameraInstance = new Camera();
   });
   it('should handle V', () => {
-    const testFunc = () => cameraInstance.inputHandler.keyDownV_();
+    const testFunc = () => cameraInstance.inputHandler.keyDownv_();
 
     for (let i = 0; i < 25; i++) {
       expect(testFunc).not.toThrow();
@@ -124,7 +124,7 @@ describe('Camera Key Input', () => {
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
   it('should handle R', () => {
-    const testFunc = () => cameraInstance.inputHandler.keyDownR_();
+    const testFunc = () => cameraInstance.inputHandler.keyDownr_();
 
     testFuncWithAllCameraTypes(testFunc, cameraInstance);
   });
@@ -404,7 +404,7 @@ const testVariousKeyDownInputs = (testFunc: () => void, cameraInstance: Camera) 
   cameraInstance.inputHandler.keyDownS_();
   testFunc();
 
-  cameraInstance.inputHandler.keyDownR_();
+  cameraInstance.inputHandler.keyDownr_();
   testFunc();
 
   cameraInstance.inputHandler.keyDownShift_();

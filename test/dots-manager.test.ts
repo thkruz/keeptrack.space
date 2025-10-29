@@ -4,8 +4,8 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '@app/settings/settings';
-import { mat4 } from 'gl-matrix';
 import { Milliseconds } from '@ootk/src/main';
+import { mat4 } from 'gl-matrix';
 import { setupStandardEnvironment } from './environment/standard-env';
 
 describe('drawManager', () => {
@@ -42,8 +42,8 @@ describe('drawManager', () => {
     const drawManagerInstance = keepTrackApi.getRenderer();
 
     drawManagerInstance.dtAdjusted = <Milliseconds>1000000000;
-    expect(() => dotsManagerInstance.updatePositionBuffer()).not.toThrow();
+    expect(() => dotsManagerInstance.update()).not.toThrow();
     drawManagerInstance.dtAdjusted = <Milliseconds>1000000000;
-    expect(() => dotsManagerInstance.updatePositionBuffer()).not.toThrow();
+    expect(() => dotsManagerInstance.update()).not.toThrow();
   });
 });

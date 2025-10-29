@@ -7,8 +7,8 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';
 import { OrbitCruncherType, OrbitDrawTypes } from '@app/webworker/orbitCruncher';
-import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers } from '@ootk/src/main';
+import { mat4 } from 'gl-matrix';
 import { HoverManager } from '../../app/ui/hover-manager';
 import { Camera, CameraType } from '../camera/camera';
 import { GetSatType } from '../core/interfaces';
@@ -48,6 +48,7 @@ export class OrbitManager {
   private secondarySelectId_ = -1;
   private selectOrbitBuf_: WebGLBuffer;
   private updateAllThrottle_ = 0;
+  private orbitCache_ = new Map<number, Float32Array>();
 
   orbitWorker: Worker;
   playNextSatellite = null;
@@ -564,6 +565,8 @@ export class OrbitManager {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
     gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
     this.inProgress_[satId] = false;
+
+    this.orbitCache_.set(satId, pointsOut);
   }
 
   private setOemSatelliteOrbitBuffer_(satId: number, pointsOut: Float32Array): void {
@@ -587,10 +590,20 @@ export class OrbitManager {
 
   /**
    * Updates the orbit data for a satellite by shifting its position relative
-   * to the new first point.
+   * to the new first point. This compensates for floating point precision issues
+   * when dealing with large coordinate values.
    */
-  updateOrbitData(satId: number, firstPosition: number[], isShiftFirstOnly = false): void {
-    const satOrbitData = this.getBufferData(satId);
+  alignOrbitSelectedObject(satId: number, firstPosition: number[], isShiftFirstOnly = false): void {
+    let satOrbitData: Float32Array | null;
+
+    if (this.orbitCache_.has(satId)) {
+      satOrbitData = this.orbitCache_.get(satId) ?? null;
+    } else {
+      satOrbitData = this.getBufferData(satId);
+      if (satOrbitData) {
+        this.orbitCache_.set(satId, satOrbitData);
+      }
+    }
 
     if (!satOrbitData) {
       return;
@@ -614,20 +627,23 @@ export class OrbitManager {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
 
     // get current buffer size
-    const currentBufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
+    // DEBUG: Disabled reallocation check for now to see if it helps with performance
+    // const currentBufferSize = gl.getBufferParameter(gl.ARRAY_BUFFER, gl.BUFFER_SIZE);
 
-    if (currentBufferSize !== satOrbitData.byteLength) {
-      // Delete the buffer first
-      gl.deleteBuffer(this.glBuffers_[satId]);
-      // Create a new buffer
-      this.glBuffers_[satId] = this.allocateBuffer(settingsManager.oemOrbitSegments * 4);
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
-      // reallocate buffer if size has changed
-      gl.bufferData(gl.ARRAY_BUFFER, satOrbitData, gl.DYNAMIC_DRAW);
-    } else {
-      // update buffer data
-      gl.bufferSubData(gl.ARRAY_BUFFER, 0, satOrbitData);
-    }
+    // if (currentBufferSize !== satOrbitData.byteLength) {
+    //   // Delete the buffer first
+    //   gl.deleteBuffer(this.glBuffers_[satId]);
+    //   // Create a new buffer
+    //   this.glBuffers_[satId] = this.allocateBuffer(settingsManager.oemOrbitSegments * 4);
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
+    //   // reallocate buffer if size has changed
+    //   gl.bufferData(gl.ARRAY_BUFFER, satOrbitData, gl.DYNAMIC_DRAW);
+    // } else {
+    //   // update buffer data
+    //   gl.bufferSubData(gl.ARRAY_BUFFER, 0, satOrbitData);
+    // }
+
+    gl.bufferSubData(gl.ARRAY_BUFFER, 0, satOrbitData);
   }
 
   /** Returns the current data from the buffer for the given satId. */

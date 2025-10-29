@@ -638,9 +638,9 @@ export class WebGLRenderer {
          * Force an update so that the orbit is always using recent data - this
          * will not fix this draw call
          */
-        keepTrackApi.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
+        // keepTrackApi.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
 
-        // Now we can fix thhis draw call
+        // Now we can fix this draw call
         const firstPointOut = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id);
         const firstRelativePointOut = SatMath.getPositionFromCenterBody({
           x: firstPointOut[0] as Kilometers,
@@ -649,15 +649,17 @@ export class WebGLRenderer {
         });
 
         if (primarySat instanceof DetailedSatellite) {
-          keepTrackApi.getOrbitManager().updateOrbitData(this.selectSatManager_.primarySatObj.id, [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z]);
+          keepTrackApi.getOrbitManager().alignOrbitSelectedObject(
+            this.selectSatManager_.primarySatObj.id, [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
+          );
         } else if (primarySat instanceof OemSatellite) {
-          keepTrackApi.getOrbitManager().updateOrbitData(
+          keepTrackApi.getOrbitManager().alignOrbitSelectedObject(
             this.selectSatManager_.primarySatObj.id,
             [firstPointOut[0], firstPointOut[1], firstPointOut[2]],
             false,
           );
         } else {
-          keepTrackApi.getOrbitManager().updateOrbitData(
+          keepTrackApi.getOrbitManager().alignOrbitSelectedObject(
             this.selectSatManager_.primarySatObj.id,
             [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
             true,

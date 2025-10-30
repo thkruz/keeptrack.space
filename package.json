@@ -106,7 +106,7 @@
     "@types/opener": "^1.4.3",
     "@types/papaparse": "^5.3.14",
     "@types/webgl2": "^0.0.11",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^6.21.0",
     "@typescript-eslint/typescript-estree": "^8.46.0",
     "auto-changelog-thkruz": "^1.0.0",

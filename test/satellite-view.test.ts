@@ -3,6 +3,7 @@ import { Camera, CameraType } from '@app/engine/camera/camera';
 import { Container } from '@app/engine/core/container';
 import { Singletons, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -59,14 +60,13 @@ describe('SatelliteViewPlugin_class', () => {
   standardPluginSuite(SatelliteViewPlugin, 'SatelliteViewPlugin');
 
   // Tests that the addHtml method adds the correct HTML element to the DOM
-  it.skip('test_addHtml_method', () => {
+  it('test_addHtml_method', () => {
     const plugin = new SatelliteViewPlugin();
-    // TODO: Replace keepTrackApi.on with EventBus subscription
-    const registerSpy = jest.spyOn(keepTrackApi, 'on');
+    const registerSpy = jest.spyOn(EventBus.getInstance(), 'on');
 
     plugin.addHtml();
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
     expect(registerSpy).toHaveBeenCalled();
     expect(getEl('bottom-icons')?.innerHTML).toContain('satellite-view-bottom-icon');
   });

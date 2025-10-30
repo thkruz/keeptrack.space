@@ -340,7 +340,7 @@ export class MyAwesomePlugin extends KeepTrackPlugin {
 }
 ```
 
-Place your plugin in `src/plugins/my-awesome-plugin/` and register it in [the plugin loader](src\plugins\plugins.ts).
+Place your plugin in `src/plugins/my-awesome-plugin/` and register it in [the plugin loader](src/plugins/plugins.ts).
 
 <!-- For a detailed guide, see [Plugin Development Guide](./docs/PLUGIN-DEV.md). -->
 

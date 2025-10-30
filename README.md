@@ -340,7 +340,7 @@ export class MyAwesomePlugin extends KeepTrackPlugin {
 }
 ```
 
-Place your plugin in `src/plugins/my-awesome-plugin/` and register it in [the plugin loader](src\plugins\plugins.ts).
+Place your plugin in `src/plugins/my-awesome-plugin/` and register it in [the plugin loader](src/plugins/plugins.ts).
 
 <!-- For a detailed guide, see [Plugin Development Guide](./docs/PLUGIN-DEV.md). -->
 
@@ -589,7 +589,7 @@ For more details, see the [Full License](https://github.com/thkruz/keeptrack.spa
 
 The AGPL ensures that improvements to KeepTrack remain open source, even when used as a web service. If you run a modified version, you must make your source code available to users.
 
-**Need a different license?** [Contact Kruczek Labs](admin@keeptrack.space) about commercial licensing options.
+**Need a different license?** [Contact Kruczek Labs](mailto:admin@keeptrack.space) about commercial licensing options.
 
 ---
 

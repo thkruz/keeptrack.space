@@ -115,7 +115,7 @@
       "windows": {
         "command": "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe",
         "args": [
-          "http://localhost:8080"
+          "http://localhost:5544"
         ]
       },
       "icon": {

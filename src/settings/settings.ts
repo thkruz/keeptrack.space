@@ -1505,7 +1505,7 @@ export class SettingsManager {
       case '127.0.0.1':
         // Is node running? This must be some kind of test
         if (isThisNode()) {
-          this.installDirectory = 'http://127.0.0.1:8080/';
+          this.installDirectory = 'http://127.0.0.1:5544/';
         } else {
           /*
            * Comment Out the Next Two Lines if you are testing on a local server

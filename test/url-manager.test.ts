@@ -6,6 +6,8 @@ import { UrlManager } from '@app/engine/input/url-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { BaseObject } from '@ootk/src/main';
 import { setupStandardEnvironment } from './environment/standard-env';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 
 describe('UrlManager_class', () => {
   beforeEach(() => {
@@ -15,7 +17,7 @@ describe('UrlManager_class', () => {
 
   // Tests that URL parameters with valid satellite and search values are parsed correctly
   it('should_parse_valid_satellite_and_search_params', () => {
-    const url = 'http://localhost:8080/?sat=25544&search=ISS&rate=1.0&date=1630512000000';
+    const url = 'http://localhost:5544/?sat=25544&search=ISS&rate=1.0&date=1630512000000';
 
     Object.defineProperty(window, 'location', {
       value: new URL(url),
@@ -62,7 +64,7 @@ describe('UrlManager_class', () => {
 
   // Tests that intldes parameter with valid value is parsed correctly
   it('test_parse_valid_params', () => {
-    const url = 'http://localhost:8080/?intldes=1988-064A';
+    const url = 'http://localhost:5544/?intldes=1988-064A';
 
     Object.defineProperty(window, 'location', {
       value: new URL(url),
@@ -98,7 +100,7 @@ describe('UrlManager_class', () => {
 
   // Tests that URL parameters valid but satellite not found
   it('test_parse_valid_params_sat_not_found', () => {
-    const url = 'http://localhost:8080/?intldes=1988-064A';
+    const url = 'http://localhost:5544/?intldes=1988-064A';
 
     Object.defineProperty(window, 'location', {
       value: new URL(url),
@@ -133,7 +135,7 @@ describe('UrlManager_class', () => {
 
   // Tests that URL parameters valid but satellite not found2
   it('test_parse_valid_params_sat_not_found2', () => {
-    const url = 'http://localhost:8080/?sat=99999';
+    const url = 'http://localhost:5544/?sat=99999';
 
     Object.defineProperty(window, 'location', {
       value: new URL(url),
@@ -168,7 +170,7 @@ describe('UrlManager_class', () => {
 
   // Tests that URL parameters with empty parameters are parsed correctly
   it('test_parse_empty_params', () => {
-    const url = 'http://localhost:8080/';
+    const url = 'http://localhost:5544/';
 
     Object.defineProperty(window, 'location', {
       value: new URL(url),
@@ -209,7 +211,7 @@ describe('UrlManager_class', () => {
 
   // Tests that URL parameters with invalid parameters are not parsed
   it('test_parse_invalid_params', () => {
-    const url = 'http://localhost:8080/?sat=invalid&search=ISS&rate=invalid&date=invalid';
+    const url = 'http://localhost:5544/?sat=invalid&search=ISS&rate=invalid&date=invalid';
 
     Object.defineProperty(window, 'location', {
       value: new URL(url),

@@ -9,7 +9,12 @@
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/jest",
-      "args": ["${fileBasenameNoExtension}", "--runInBand", "--coverage=false", "--no-cache"],
+      "args": [
+        "${fileBasenameNoExtension}",
+        "--runInBand",
+        "--coverage=false",
+        "--no-cache"
+      ],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
@@ -22,7 +27,7 @@
       "name": "Chrome",
       "type": "chrome",
       "request": "launch",
-      "url": "http://localhost:8080",
+      "url": "http://localhost:5544",
       "webRoot": "${workspaceFolder}",
       "sourceMapPathOverrides": {
         "webpack:///src/*": "${workspaceFolder}/src/*"

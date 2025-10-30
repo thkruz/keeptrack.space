@@ -119,7 +119,7 @@
     "css-loader": "^6.8.1",
     "cypress": "^15.4.0",
     "dotenv-webpack": "^8.1.1",
-    "eslint": "^8.57.0",
+    "eslint": "^9.38.0",
     "eslint-plugin-jest": "^27.4.0",
     "http-server": "^14.1.1",
     "husky": "^8.0.1",

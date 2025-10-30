@@ -26,9 +26,9 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { mat4 } from 'gl-matrix';
+import { OrbitManager } from '../../src/app/rendering/orbit-manager';
 import { Container } from '../../src/engine/core/container';
 import { Constructor, Singletons } from '../../src/engine/core/interfaces';
-import { OrbitManager } from '../../src/engine/rendering/orbitManager';
 import { WebGLRenderer } from '../../src/engine/rendering/webgl-renderer';
 import { defaultSat, defaultSensor } from './apiMocks';
 

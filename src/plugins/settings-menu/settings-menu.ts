@@ -1,5 +1,7 @@
 import { LayersManager } from '@app/app/ui/layers-manager';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorPick } from '@app/engine/utils/color-pick';
@@ -9,13 +11,11 @@ import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-ma
 import { parseRgba } from '@app/engine/utils/rgba';
 import { rgbCss } from '@app/engine/utils/rgbCss';
 import { SettingsManager } from '@app/settings/settings';
-import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
+import { OrbitCruncherMsgType } from '@app/webworker/orbit-cruncher-interfaces';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -547,8 +547,8 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     const numberOfEcfOrbitsToDraw = parseInt((<HTMLInputElement>getEl('settings-numberOfEcfOrbitsToDraw')).value);
 
     if (numberOfEcfOrbitsToDraw !== settingsManager.numberOfEcfOrbitsToDraw) {
-      ServiceLocator.getOrbitManager().orbitWorker.postMessage({
-        typ: OrbitCruncherType.SETTINGS_UPDATE,
+      ServiceLocator.getOrbitManager().orbitThreadMgr.postMessage({
+        type: OrbitCruncherMsgType.SETTINGS_UPDATE,
         numberOfOrbitsToDraw: numberOfEcfOrbitsToDraw,
       });
     }

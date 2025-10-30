@@ -7,6 +7,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
@@ -80,7 +81,7 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
 
 export const websiteInit = (plugin: KeepTrackPlugin) => {
   const settingsManager = new SettingsManager();
-  const engine = new Engine();
+  const engine = new Engine(KeepTrack.getInstance());
 
   settingsManager.init();
   engine.init();
@@ -88,7 +89,7 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
   engine.scene.init({
     gl: engine.renderer.gl,
   });
-  engine.camera.init(settingsManager);
+  engine.camera.init();
   engine.timeManager.init();
   ServiceLocator.getColorSchemeManager().init(engine.renderer);
   window.settingsManager = settingsManager;

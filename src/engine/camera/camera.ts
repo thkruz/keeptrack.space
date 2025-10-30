@@ -31,7 +31,7 @@ import {
 } from '@ootk/src/main';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { SatMath } from '../../app/analysis/sat-math';
-import { SettingsManager } from '../../settings/settings';
+import type { OrbitManager } from '../../app/rendering/orbit-manager';
 import { PluginRegistry } from '../core/plugin-registry';
 import { Scene } from '../core/scene';
 import { ServiceLocator } from '../core/service-locator';
@@ -40,7 +40,6 @@ import { EventBusEvent } from '../events/event-bus-events';
 import { DepthManager } from '../rendering/depth-manager';
 import { CelestialBody } from '../rendering/draw-manager/celestial-bodies/celestial-body';
 import { Earth } from '../rendering/draw-manager/earth';
-import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
 import { CameraInputHandler } from './camera-input-handler';
@@ -491,9 +490,7 @@ export class Camera {
     return forward;
   }
 
-  init(settings: SettingsManager) {
-    settingsManager = settings;
-
+  init() {
     this.state.zoomLevel = settingsManager.initZoomLevel ?? 0.6925;
     this.state.zoomTarget = settingsManager.initZoomLevel ?? 0.6925;
 

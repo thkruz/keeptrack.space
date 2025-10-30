@@ -1,6 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
+import { CruncherInMsgTimeSync } from '@app/webworker/orbit-cruncher-interfaces';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from '@ootk/src/main';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
@@ -414,20 +415,14 @@ export class TimeManager {
 
     const message = {
       typ: CruncerMessageTypes.OFFSET,
+      type: CruncerMessageTypes.OFFSET,
       staticOffset: this.staticOffset,
       dynamicOffsetEpoch: this.dynamicOffsetEpoch,
       propRate: this.propRate,
-    };
+    } as CruncherInMsgTimeSync;
 
     catalogManagerInstance.satCruncher.postMessage(message);
-
-    /*
-     * OrbitWorker starts later than the satCruncher so it might not be
-     * ready yet.
-     */
-    if (orbitManagerInstance.orbitWorker) {
-      orbitManagerInstance.orbitWorker.postMessage(message);
-    }
+    orbitManagerInstance.orbitThreadMgr.postMessage(message);
   }
 
   private isLeapYear(date: Date): boolean {

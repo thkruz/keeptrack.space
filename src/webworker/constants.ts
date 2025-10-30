@@ -31,18 +31,6 @@ export interface PosCruncherCachedObject {
   isMarker?: boolean;
 }
 
-export interface OrbitCruncherCachedObject {
-  // Other - We need placeholders to match the ids
-  ignore?: boolean;
-  // Satellite
-  satrec?: SatelliteRecord;
-  // Missiles
-  missile?: boolean;
-  latList?: Degrees[];
-  lonList?: Degrees[];
-  altList?: Kilometers[];
-}
-
 export type PositionCruncherOutgoingMsg = {
   satInView?: Int8Array;
   satInSun?: Int8Array;

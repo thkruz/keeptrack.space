@@ -32,6 +32,7 @@ import { Localization } from './locales/locales'; // Ensure localization is impo
 import { CatalogLoader } from './app/data/catalog-loader';
 import { CatalogManager } from './app/data/catalog-manager';
 import { GroupsManager } from './app/data/groups-manager';
+import { OrbitManager } from './app/rendering/orbit-manager';
 import { SensorMath } from './app/sensors/sensor-math';
 import { SensorManager } from './app/sensors/sensorManager';
 import { BottomMenu } from './app/ui/bottom-menu';
@@ -47,7 +48,7 @@ import { EventBusEvent } from './engine/events/event-bus-events';
 import { ColorSchemeManager } from './engine/rendering/color-scheme-manager';
 import { DotsManager } from './engine/rendering/dots-manager';
 import { lineManagerInstance } from './engine/rendering/line-manager';
-import { OrbitManager } from './engine/rendering/orbitManager';
+import { WebWorkerThreadManager } from './engine/threads/web-worker-thread';
 import { DemoManager } from './engine/utils/demo-mode';
 import { html } from './engine/utils/development/formatter';
 import { getEl } from './engine/utils/get-el';
@@ -64,6 +65,8 @@ export class KeepTrack {
   engine: Engine;
   api = keepTrackApi;
   containerRoot: HTMLDivElement;
+  isReady: boolean = false;
+  threads: WebWorkerThreadManager[] = [];
 
   private constructor() {
     // Singleton
@@ -93,7 +96,7 @@ export class KeepTrack {
     settingsManager.versionNumber = VERSION;
     this.settingsOverride_ = settingsOverride;
     Localization.getInstance(); // Initialize localization early
-    this.engine = new Engine();
+    this.engine = new Engine(this);
 
     settingsManager.init(this.settingsOverride_);
 
@@ -390,7 +393,7 @@ theodore.kruczek at gmail dot com.
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     UiManager.postStart();
 
-    if (settingsManager.cruncherReady) {
+    if (this.threads.every((t) => t.isReady)) {
       if (settingsManager.isDisableCanvas) {
         const canvasHolderDom = getEl('keeptrack-canvas');
 
@@ -425,6 +428,7 @@ theodore.kruczek at gmail dot com.
         settingsManager.onLoadCb();
       }
 
+      this.isReady = true;
       SplashScreen.hideSplashScreen();
     } else {
       setTimeout(() => {

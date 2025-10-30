@@ -10,6 +10,7 @@ import { saveCsv, saveVariable } from './engine/utils/saveVariable';
 
 import type { CatalogManager } from './app/data/catalog-manager';
 import type { GroupsManager } from './app/data/groups-manager';
+import type { OrbitManager } from './app/rendering/orbit-manager';
 import type { SensorMath } from './app/sensors/sensor-math';
 import type { SensorManager } from './app/sensors/sensorManager';
 import type { HoverManager } from './app/ui/hover-manager';
@@ -24,7 +25,6 @@ import type { ColorSchemeManager } from './engine/rendering/color-scheme-manager
 import type { DotsManager } from './engine/rendering/dots-manager';
 import type { LineManager } from './engine/rendering/line-manager';
 import type { MeshManager } from './engine/rendering/mesh-manager';
-import type { OrbitManager } from './engine/rendering/orbitManager';
 import type { WebGLRenderer } from './engine/rendering/webgl-renderer';
 import type { SoundManager } from './plugins/sounds/sound-manager';
 

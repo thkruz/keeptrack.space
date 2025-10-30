@@ -2,6 +2,7 @@ import orbitguardPng from '@public/img/icons/orbitguard.png';
 import './orbit-guard-menu.css';
 
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ClickDragOptions, KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { html } from '@app/engine/utils/development/formatter';
@@ -71,9 +72,9 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    keepTrackApi.on(EventBusEvent.onCruncherMessage, () => {
+    EventBus.getInstance().on(EventBusEvent.onCruncherMessage, () => {
       if (this.selectSatIdOnCruncher_ !== null) {
         keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
         this.selectSatIdOnCruncher_ = null;

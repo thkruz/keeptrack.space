@@ -6,7 +6,6 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { keepTrackApi } from '@app/keepTrackApi';
 import landscape3Png from '@public/img/icons/landscape3.png';
 import { saveAs } from 'file-saver';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -147,13 +146,13 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
       if (this.scenario.startTime && simulationTimeObj.getTime() < this.scenario.startTime.getTime()) {
         simulationTimeObj.setTime(this.scenario.startTime.getTime());
-        keepTrackApi.toast('Simulation time is before the scenario start time. Pausing at start time.', ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast('Simulation time is before the scenario start time. Pausing at start time.', ToastMsgType.caution, true);
         isOutsideBoundaries = true;
       }
 
       if (this.scenario.endTime && simulationTimeObj.getTime() > this.scenario.endTime.getTime()) {
         simulationTimeObj.setTime(this.scenario.endTime.getTime());
-        keepTrackApi.toast('Simulation time is after the scenario stop time. Pausing at stop time.', ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast('Simulation time is after the scenario stop time. Pausing at stop time.', ToastMsgType.caution, true);
         isOutsideBoundaries = true;
       }
 
@@ -257,7 +256,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
     // Only show toast if button was clicked
     if (e && isUpdateSuccess) {
-      keepTrackApi.toast('Scenario settings updated successfully!', ToastMsgType.normal);
+      ServiceLocator.getUiManager().toast('Scenario settings updated successfully!', ToastMsgType.normal);
     }
   }
 
@@ -365,7 +364,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
               };
 
               if (this.updateScenario(scenarioData)) {
-                keepTrackApi.toast('Scenario loaded successfully!', ToastMsgType.normal);
+                ServiceLocator.getUiManager().toast('Scenario loaded successfully!', ToastMsgType.normal);
               }
             } catch (error) {
               errorManagerInstance.error(error, 'scenario-management.ts', 'Error loading scenario file!');

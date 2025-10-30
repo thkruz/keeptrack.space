@@ -1,5 +1,4 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Milliseconds } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
@@ -22,7 +21,7 @@ describe('TimeMachine_class', () => {
     websiteInit(timeMachinePlugin);
     ServiceLocator.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
     ServiceLocator.getCatalogManager().objectCache = Array(50).fill(defaultSat);
-    keepTrackApi.containerRoot.innerHTML += '<div id="search-results"></div>';
+    KeepTrack.getInstance().containerRoot.innerHTML += '<div id="search-results"></div>';
 
     settingsManager.timeMachineDelay = <Milliseconds>0;
     EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, timeMachinePlugin.bottomIconElementName);

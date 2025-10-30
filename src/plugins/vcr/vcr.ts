@@ -5,7 +5,6 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import fastForwardPng from '@public/img/icons/fast-forward.png';
 import pausePng from '@public/img/icons/pause.png';
@@ -101,7 +100,7 @@ export class VcrPlugin extends KeepTrackPlugin {
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
     if (ServiceLocator.getTimeManager().simulationTimeObj.getTime() === this.scenario!.endTime?.getTime()) {
-      keepTrackApi.toast('Cannot Play: Simulation time is at the end of the scenario.', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Cannot Play: Simulation time is at the end of the scenario.', ToastMsgType.caution, true);
 
       return;
     }

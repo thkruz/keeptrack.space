@@ -1,7 +1,6 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { NewLaunch } from '@app/plugins/new-launch/new-launch';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees } from '@ootk/src/main';
@@ -11,7 +10,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from 
 
 describe('NewLaunch_class', () => {
   beforeEach(() => {
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment([SelectSatManager]);
   });
 
@@ -23,7 +22,7 @@ describe('NewLaunch_form', () => {
   let newLaunchPlugin: NewLaunch;
 
   beforeEach(() => {
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     PluginRegistry.unregisterAllPlugins();
     setupStandardEnvironment([SelectSatManager]);
     newLaunchPlugin = new NewLaunch();

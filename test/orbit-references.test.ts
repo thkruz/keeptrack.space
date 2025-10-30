@@ -1,6 +1,5 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { OrbitReferences } from '@app/plugins/orbit-references/orbit-references';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -11,7 +10,7 @@ import { standardPluginSuite } from './generic-tests';
 // Create a short test for the OrbitReferences plugin
 describe('OrbitReferences', () => {
   beforeEach(() => {
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
   });
   standardPluginSuite(OrbitReferences, 'OrbitReferences');

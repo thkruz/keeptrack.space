@@ -60,9 +60,10 @@ export class KeepTrack {
   private static instance: KeepTrack;
   private settingsOverride_: SettingsManagerOverride;
 
-  isReady = false;
+  isInitialized = false;
   engine: Engine;
   api = keepTrackApi;
+  containerRoot: HTMLDivElement;
 
   private constructor() {
     // Singleton
@@ -84,7 +85,7 @@ export class KeepTrack {
     isPreventDefaultHtml: false,
     isShowSplashScreen: true,
   }) {
-    if (this.isReady) {
+    if (this.isInitialized) {
       throw new Error('KeepTrack is already started');
     }
 
@@ -133,14 +134,14 @@ export class KeepTrack {
   }
 
   static getDefaultBodyHtml(): void {
-    if (!keepTrackApi.containerRoot) {
+    if (!KeepTrack.getInstance().containerRoot) {
       throw new Error('Container root is not set');
     }
 
-    SplashScreen.initLoadingScreen(keepTrackApi.containerRoot);
+    SplashScreen.initLoadingScreen(KeepTrack.getInstance().containerRoot);
 
-    keepTrackApi.containerRoot.id = 'keeptrack-root';
-    keepTrackApi.containerRoot.innerHTML += html`
+    KeepTrack.getInstance().containerRoot.id = 'keeptrack-root';
+    KeepTrack.getInstance().containerRoot.innerHTML += html`
       <header>
         <div id="keeptrack-header" class="start-hidden"></div>
       </header>
@@ -199,8 +200,8 @@ export class KeepTrack {
     }
 
     // If no current shadow DOM, create one - this is mainly for testing
-    if (!keepTrackApi.containerRoot) {
-      keepTrackApi.containerRoot = containerDom;
+    if (!KeepTrack.getInstance().containerRoot) {
+      KeepTrack.getInstance().containerRoot = containerDom;
     }
   }
 
@@ -380,7 +381,6 @@ theodore.kruczek at gmail dot com.
       this.engine.run();
 
       this.postStart_();
-      this.isReady = true;
     } catch (error) {
       KeepTrack.showErrorCode(<Error & { lineNumber: number }>error);
     }
@@ -418,7 +418,8 @@ theodore.kruczek at gmail dot com.
       });
       EventBus.getInstance().emit(EventBusEvent.resize);
 
-      keepTrackApi.isInitialized = true;
+      this.isInitialized = true;
+
       EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
       if (settingsManager.onLoadCb) {
         settingsManager.onLoadCb();

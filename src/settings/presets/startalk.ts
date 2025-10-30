@@ -1,13 +1,13 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
-import { keepTrackApi } from '../../keepTrackApi';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
+import { KeepTrack } from '@app/keeptrack';
 
 export const starTalk = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>5; // NOTE: 0 will make the geosynchronous satellites more apparent
@@ -97,7 +97,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
     const textOverlay = document.createElement('div');
 
     textOverlay.id = 'textOverlay';
-    keepTrackApi.containerRoot.appendChild(textOverlay);
+    KeepTrack.getInstance().containerRoot.appendChild(textOverlay);
 
     // Update CSS
     const toastCss = `

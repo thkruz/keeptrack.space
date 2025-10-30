@@ -1,7 +1,8 @@
-import { keepTrackApi } from '@app/keepTrackApi';
 
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { openColorbox } from '@app/engine/utils/colorbox';
@@ -12,8 +13,6 @@ import { DetailedSatellite, DetailedSensor, eci2lla } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SensorInfoPlugin } from '../sensor/sensor-info-plugin';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class ViewInfoRmbPlugin extends KeepTrackPlugin {
   readonly id = 'ViewInfoRmbPlugin';
@@ -49,7 +48,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
 
             latLon = eci2lla({ x: dragPosition[0], y: dragPosition[1], z: dragPosition[2] }, gmst);
           }
-          keepTrackApi.toast(`Lat: ${latLon.lat.toFixed(3)}<br>Lon: ${latLon.lon.toFixed(3)}`, ToastMsgType.normal, true);
+          ServiceLocator.getUiManager().toast(`Lat: ${latLon.lat.toFixed(3)}<br>Lon: ${latLon.lon.toFixed(3)}`, ToastMsgType.normal, true);
         }
         break;
       case 'view-sat-info-rmb':
@@ -78,7 +77,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
           const intldes = ServiceLocator.getCatalogManager().getSat(clickedSat ?? -1, GetSatType.EXTRA_ONLY)?.intlDes;
 
           if (!intldes) {
-            keepTrackApi.toast('Time 1 is Invalid!', ToastMsgType.serious);
+            ServiceLocator.getUiManager().toast('Time 1 is Invalid!', ToastMsgType.serious);
           }
           const searchStr = intldes?.slice(0, 8) ?? '';
 

@@ -1,3 +1,5 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
@@ -6,11 +8,9 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { Degrees, Kilometers, Milliseconds, Radians } from '@ootk/src/main';
 import i18next from 'i18next';
 import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
-import { keepTrackApi } from '../../keepTrackApi';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
+import { KeepTrack } from '@app/keeptrack';
 
 export const darkClouds = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>0; // NOTE: 0 will make the geosynchronous satellites more apparent
@@ -126,7 +126,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
     const textOverlay = document.createElement('div');
 
     textOverlay.id = 'textOverlay';
-    keepTrackApi.containerRoot.appendChild(textOverlay);
+    KeepTrack.getInstance().containerRoot.appendChild(textOverlay);
 
     // Update CSS
     const toastCss = `

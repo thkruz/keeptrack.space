@@ -45,7 +45,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   Image = jest.fn().mockImplementation(() => ({
     decode: () => Promise.resolve(new Uint8ClampedArray([0, 0, 0, 0])),
   }));
-  keepTrackApi.containerRoot = null as unknown as HTMLDivElement;
+  KeepTrack.getInstance().containerRoot = null as unknown as HTMLDivElement;
   keepTrackApi.analytics = {
     track: jest.fn(),
     identify: jest.fn(),
@@ -178,7 +178,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   sat2.sccNum = '11';
   ServiceLocator.getCatalogManager().objectCache = [defaultSat, sat2];
 
-  keepTrackApi.containerRoot.innerHTML += `
+  KeepTrack.getInstance().containerRoot.innerHTML += `
     <div id="save-rmb"></div>
     <div id="save-rmb-menu"></div>
     <div id="view-rmb"></div>
@@ -261,7 +261,7 @@ export const standardSelectSat = () => {
   PluginRegistry.getPlugin(SelectSatManager)?.selectSat(0);
 };
 export const setupMinimumHtml = () => {
-  keepTrackApi.containerRoot.innerHTML = `
+  KeepTrack.getInstance().containerRoot.innerHTML = `
   <div id="keeptrack-root">
     <div id="keeptrack-header"></div>
     <div id="${KeepTrackPlugin.bottomIconsContainerId}"></div>
@@ -392,7 +392,7 @@ export const setupDefaultHtml = () => {
   Container.getInstance().registerSingleton(Singletons.MainCamera, mockCameraManager);
   KeepTrack.getDefaultBodyHtml();
   BottomMenu.init();
-  keepTrackApi.containerRoot.innerHTML += `
+  KeepTrack.getInstance().containerRoot.innerHTML += `
     <input id="search"></input>
     <div id="search-holder"></div>
     <div id="search-btn"></div>

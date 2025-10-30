@@ -24,14 +24,14 @@
 
 import { Classification } from '@app/app/ui/classification';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { ServiceLocator } from '@app/engine/core/service-locator';
+import { KeepTrack } from '@app/keeptrack';
 
 export class Screenshot extends KeepTrackPlugin {
   readonly id = 'Screenshot';
@@ -211,7 +211,7 @@ export class Screenshot extends KeepTrackPlugin {
       tempCtx.fillText(classificationstr, cw / 2 - textWidth, 34);
     }
 
-    keepTrackApi.containerRoot.appendChild(tempCanvas);
+    KeepTrack.getInstance().containerRoot.appendChild(tempCanvas);
     const image = tempCanvas.toDataURL();
 
     tempCanvas.parentNode!.removeChild(tempCanvas);

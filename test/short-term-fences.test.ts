@@ -3,7 +3,6 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { ShortTermFences } from '@app/plugins/short-term-fences/short-term-fences';
@@ -13,7 +12,7 @@ import { standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('ShortTermFences_class', () => {
   beforeEach(() => {
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
   });
 

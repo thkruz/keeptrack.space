@@ -1,16 +1,15 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager, settingsManager } from '@app/settings/settings';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { DEG2RAD, Degrees, DetailedSatellite, RAD2DEG, Radians } from '@ootk/src/main';
+import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { AtmosphereSettings, EarthTextureStyle } from '../rendering/draw-manager/earth-quality-enums';
 import { getEl } from '../utils/get-el';
-import { PluginRegistry } from '../core/plugin-registry';
 
 export abstract class UrlManager {
   private static selectedSat_: DetailedSatellite | null = null;
@@ -225,7 +224,7 @@ export abstract class UrlManager {
 
               uiManagerInstance.doSearch(kv.search);
               if (settingsManager.lastSearchResults.length === 0) {
-                keepTrackApi.toast(`Search for "${kv.search}" found nothing!`, ToastMsgType.caution, true);
+                uiManagerInstance.toast(`Search for "${kv.search}" found nothing!`, ToastMsgType.caution, true);
                 uiManagerInstance.searchManager.hideResults();
               }
             }
@@ -388,7 +387,7 @@ export abstract class UrlManager {
     if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId)?.active) {
       PluginRegistry.getPlugin(SelectSatManager)?.selectSat(urlSatId);
     } else {
-      keepTrackApi.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
     }
   }
 
@@ -399,7 +398,7 @@ export abstract class UrlManager {
     if (urlSatId !== null) {
       PluginRegistry.getPlugin(SelectSatManager)?.selectSat(urlSatId);
     } else {
-      keepTrackApi.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
     }
   }
 
@@ -411,7 +410,7 @@ export abstract class UrlManager {
     (<HTMLSelectElement>getEl('ms-target')).value = subVal[2].toString();
     (<HTMLButtonElement>getEl('missile')).click();
 
-    keepTrackApi.toast('Missile launched!', ToastMsgType.normal, false);
+    ServiceLocator.getUiManager().toast('Missile launched!', ToastMsgType.normal, false);
   }
 
   private static handleDateParam_(val: string) {
@@ -422,7 +421,7 @@ export abstract class UrlManager {
       const date = new Date(val);
 
       if (isNaN(date.getTime())) {
-        keepTrackApi.toast(`Date value of "${val}" is not a proper ISO 8601 date string!`, ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast(`Date value of "${val}" is not a proper ISO 8601 date string!`, ToastMsgType.caution, true);
 
         return;
       }
@@ -430,12 +429,12 @@ export abstract class UrlManager {
       settingsManager.simulationTime = date;
     } else {
       if (val.length !== 13) {
-        keepTrackApi.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
 
         return;
       }
       if (isNaN(parseInt(val))) {
-        keepTrackApi.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
 
         return;
       }
@@ -449,7 +448,7 @@ export abstract class UrlManager {
     let rate = parseFloat(val);
 
     if (isNaN(rate)) {
-      keepTrackApi.toast(`Propagation rate of "${rate}" is not a valid float!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Propagation rate of "${rate}" is not a valid float!`, ToastMsgType.caution, true);
 
       return;
     }
@@ -468,13 +467,13 @@ export abstract class UrlManager {
     const camDistBufferValue = parseFloat(camDistBuffer);
 
     if (isNaN(zoom)) {
-      keepTrackApi.toast(`Zoom value of "${val}" is not a valid float!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Zoom value of "${val}" is not a valid float!`, ToastMsgType.caution, true);
 
       return;
     }
 
     if (zoom < 0.06 || zoom > 1) {
-      keepTrackApi.toast(`Zoom value of "${val}" is out of bounds!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Zoom value of "${val}" is out of bounds!`, ToastMsgType.caution, true);
 
       return;
     }
@@ -492,17 +491,17 @@ export abstract class UrlManager {
     const yawNum = parseFloat(kv.yaw);
 
     if (isNaN(pitchNum) || isNaN(yawNum)) {
-      keepTrackApi.toast('Pitch or Yaw value is not a valid float!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Pitch or Yaw value is not a valid float!', ToastMsgType.caution, true);
 
       return;
     }
     if (pitchNum < -90 || pitchNum > 90) {
-      keepTrackApi.toast('Pitch value is out of bounds!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Pitch value is out of bounds!', ToastMsgType.caution, true);
 
       return;
     }
     if (yawNum < -360 || yawNum > 360) {
-      keepTrackApi.toast('Yaw value is out of bounds!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Yaw value is out of bounds!', ToastMsgType.caution, true);
 
       return;
     }
@@ -525,19 +524,19 @@ export abstract class UrlManager {
 
 
     if (isNaN(zoomNum)) {
-      keepTrackApi.toast(`Zoom value of "${zoom}" is not a valid float!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Zoom value of "${zoom}" is not a valid float!`, ToastMsgType.caution, true);
 
       return;
     }
 
     if (isNaN(latNum) || isNaN(lonNum)) {
-      keepTrackApi.toast('Latitude or Longitude value is not a valid float!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Latitude or Longitude value is not a valid float!', ToastMsgType.caution, true);
 
       return;
     }
 
     if (latNum < -90 || latNum > 90 || lonNum < -360 || lonNum > 360) {
-      keepTrackApi.toast('Latitude or Longitude value is out of bounds!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Latitude or Longitude value is out of bounds!', ToastMsgType.caution, true);
 
       return;
     }

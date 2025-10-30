@@ -1183,7 +1183,7 @@ export class SettingsManager {
   isShowConfidenceLevels: boolean = false;
   /**
    * The container root element for the application
-   * NOTE: This is for initializing it, but keepTrackApi.containerRoot will be used throughout
+   * NOTE: This is for initializing it, but KeepTrack.getInstance().containerRoot will be used throughout
    * the application when looking for the container root element
    */
   containerRoot: HTMLDivElement;

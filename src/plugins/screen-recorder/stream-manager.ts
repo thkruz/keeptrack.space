@@ -1,5 +1,5 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrack } from '@app/keeptrack';
 
 export interface MediaRecorderOptions {
   audio: boolean;
@@ -122,10 +122,10 @@ export class StreamManager {
     a.style.display = 'none';
     a.href = url;
     a.download = name;
-    keepTrackApi.containerRoot.appendChild(a);
+    KeepTrack.getInstance().containerRoot.appendChild(a);
     a.click();
     setTimeout(() => {
-      keepTrackApi.containerRoot.removeChild(a);
+      KeepTrack.getInstance().containerRoot.removeChild(a);
       window.URL.revokeObjectURL(url);
     }, 100);
   }

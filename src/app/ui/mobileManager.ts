@@ -1,19 +1,19 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { KeepTrack } from '@app/keeptrack';
 import { Kilometers, Radians } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
-import { keepTrackApi } from '../../keepTrackApi';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class MobileManager {
   // eslint-disable-next-line require-await
   static async checkMobileMode() {
     try {
       // Don't become mobile after initialization
-      if (!keepTrackApi.isInitialized) {
+      if (!KeepTrack.getInstance().isInitialized) {
         if (MobileManager.checkIfMobileDevice()) {
           settingsManager.isMobileModeEnabled = true;
           settingsManager.disableWindowTouchMove = false;

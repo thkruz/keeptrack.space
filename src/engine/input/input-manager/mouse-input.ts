@@ -6,7 +6,6 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
@@ -16,6 +15,7 @@ import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
 import { InputManager, LatLon } from '../input-manager';
 import { KeyboardInput } from './keyboard-input';
+import { KeepTrack } from '@app/keeptrack';
 
 export class MouseInput {
   private dragHasMoved = false;
@@ -37,8 +37,8 @@ export class MouseInput {
         }
       };
 
-      keepTrackApi.containerRoot.addEventListener('mousewheel', stopWheelZoom, { passive: false });
-      keepTrackApi.containerRoot.addEventListener('DOMMouseScroll', stopWheelZoom, { passive: false });
+      KeepTrack.getInstance().containerRoot.addEventListener('mousewheel', stopWheelZoom, { passive: false });
+      KeepTrack.getInstance().containerRoot.addEventListener('DOMMouseScroll', stopWheelZoom, { passive: false });
     }
 
     if (settingsManager.disableWindowScroll || settingsManager.disableNormalEvents) {
@@ -206,7 +206,7 @@ export class MouseInput {
 
   private canvasMouseMoveFire_(mainCameraInstance: Camera, evt: MouseEvent) {
     // Cache DOM lookups
-    const container = keepTrackApi.containerRoot;
+    const container = KeepTrack.getInstance().containerRoot;
     const offsetX = container.scrollLeft - window.scrollX + container.offsetLeft;
     const offsetY = container.scrollTop - window.scrollY + container.offsetTop;
 

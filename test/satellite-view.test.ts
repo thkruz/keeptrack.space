@@ -7,7 +7,6 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SatelliteViewPlugin } from '@app/plugins/satellite-view/satellite-view';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -35,11 +34,6 @@ describe('SatelliteViewPlugin_class', () => {
   let selectSatManagerInstance: SelectSatManager;
 
   beforeEach(() => {
-    // eslint-disable-next-line guard-for-in
-    for (const callback in keepTrackApi.events) {
-      keepTrackApi.events[callback] = [];
-    }
-
     PluginRegistry.unregisterAllPlugins();
 
     mockUiManager.toast = jest.fn();

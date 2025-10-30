@@ -4,14 +4,9 @@ import { html } from '@app/engine/utils/development/formatter';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from '@ootk/src/main';
-import { keepTrackApi } from '../src/keepTrackApi';
 import { defaultSat } from './environment/apiMocks';
 
 test('keepTrackApi Unit Testing', () => {
-  expect(() => {
-    keepTrackApi.unregister({ event: EventBusEvent.touchStart, cbName: 'test' });
-  }).toThrow(Error);
-
   EventBus.getInstance().on(EventBusEvent.updateSelectBox, () => {
     // Do nothing
   });
@@ -84,10 +79,6 @@ test('keepTrackApi Unit Testing', () => {
   EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'test');
   EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
 
-  /*
-   * let emptyTexture: WebGLTexture;
-   * keepTrackApi.runEvent(KeepTrackApiEvents.nightToggle(keepTrackApi.programs.drawManager.gl, emptyTexture, emptyTexture));
-   */
   EventBus.getInstance().emit(EventBusEvent.orbitManagerInit);
   EventBus.getInstance().emit(EventBusEvent.drawManagerLoadScene);
   EventBus.getInstance().emit(EventBusEvent.drawOptionalScenery);

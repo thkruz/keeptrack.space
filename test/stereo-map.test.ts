@@ -1,5 +1,4 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { StereoMap } from '@app/plugins/stereo-map/stereo-map';
 import { defaultSat } from './environment/apiMocks';
@@ -8,7 +7,7 @@ import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-te
 
 describe('StereoMapPlugin_class', () => {
   beforeEach(() => {
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     PluginRegistry.unregisterAllPlugins();
     setupStandardEnvironment([SelectSatManager]);
     ServiceLocator.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));

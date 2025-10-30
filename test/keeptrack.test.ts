@@ -111,7 +111,7 @@ describe('code_snippet', () => {
       KeepTrack.initCss();
       await keepTrack.run();
 
-      expect(keepTrack.isReady).toBe(true);
+      expect(keepTrack.isInitialized).toBe(true);
     };
 
     expect(initializationTest).not.toThrow();

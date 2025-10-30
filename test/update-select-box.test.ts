@@ -1,6 +1,8 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrack } from '@app/keeptrack';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -32,10 +34,10 @@ describe('SatInfoBoxCore_class2', () => {
 
   it('should be able to select a satellite', () => {
     ServiceLocator.getCatalogManager().objectCache = [defaultSat];
-    ServiceLocator.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
+    ServiceLocator.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array as Float32Array<ArrayBuffer>;
     ServiceLocator.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
     ServiceLocator.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-    keepTrackApi.isInitialized = true;
+    KeepTrack.getInstance().isInitialized = true;
     const selectSatManager = new SelectSatManager();
 
     EventBus.getInstance().emit(EventBusEvent.uiManagerInit);

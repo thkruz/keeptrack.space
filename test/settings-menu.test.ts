@@ -2,14 +2,13 @@ import { Container } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
 
 describe('SettingsMenuPlugin_class', () => {
   beforeEach(() => {
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment();
   });
 

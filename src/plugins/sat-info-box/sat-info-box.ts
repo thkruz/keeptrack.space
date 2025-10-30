@@ -10,7 +10,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrack } from '@app/keeptrack';
 import { BaseObject, CatalogSource, DetailedSatellite } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -20,7 +20,7 @@ import './sat-info-box.css';
 
 /**
  * This class controls all the functionality of the satellite info box.
- * There are select events and update events that are registered to the keepTrackApi.
+ * There are select events and update events that are registered to the Event Bus.
  */
 export class SatInfoBox extends KeepTrackPlugin {
   readonly id = 'SatInfoBox';
@@ -138,7 +138,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   private initDraggabilly() {
     if (!settingsManager.isMobileModeEnabled) {
       const draggie = new Draggabilly(getEl(SatInfoBox.containerId_)!, {
-        containment: keepTrackApi.containerRoot,
+        containment: KeepTrack.getInstance().containerRoot,
       });
 
       draggie.on('dragStart', () => {
@@ -273,7 +273,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     setInnerHtml(EL.NAME, obj.name);
 
     if (obj instanceof DetailedSatellite) {
-      keepTrackApi.containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
+      KeepTrack.getInstance().containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
         (<HTMLElement>el).style.display = 'flex';
       });
     }

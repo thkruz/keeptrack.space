@@ -2,7 +2,6 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds } from '@ootk/src/main';
@@ -22,6 +21,7 @@ import { DepthManager } from './depth-manager';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
 import { MeshManager } from './mesh-manager';
+import { KeepTrack } from '@app/keeptrack';
 
 export class WebGLRenderer {
   private hoverBoxOnSatMiniElements_: HTMLElement | null = null;
@@ -65,10 +65,10 @@ export class WebGLRenderer {
 
   static getCanvasInfo(): { vw: number; vh: number } {
     // Using minimum allows the canvas to be full screen without fighting with scrollbars
-    const cw = keepTrackApi.containerRoot?.clientWidth ?? document.documentElement.clientWidth ?? 0;
+    const cw = KeepTrack.getInstance().containerRoot?.clientWidth ?? document.documentElement.clientWidth ?? 0;
     const iw = window.innerWidth || 0;
     const vw = Math.min.apply(null, [cw, iw].filter(Boolean));
-    const vh = Math.min(keepTrackApi.containerRoot?.clientHeight ?? document.documentElement.clientHeight ?? 0, window.innerHeight ?? 0);
+    const vh = Math.min(KeepTrack.getInstance().containerRoot?.clientHeight ?? document.documentElement.clientHeight ?? 0, window.innerHeight ?? 0);
 
     return { vw, vh };
   }

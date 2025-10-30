@@ -19,6 +19,7 @@ import type { Scene } from './engine/core/scene';
 import type { TimeManager } from './engine/core/time-manager';
 import type { InputManager } from './engine/input/input-manager';
 import HorizonsAPI from './engine/ootk/src/fetch/horizons';
+import { KeepTrackPlugin } from './engine/plugins/base-plugin';
 import type { ColorSchemeManager } from './engine/rendering/color-scheme-manager';
 import type { DotsManager } from './engine/rendering/dots-manager';
 import type { LineManager } from './engine/rendering/line-manager';
@@ -92,9 +93,6 @@ export class KeepTrackApi {
     }),
   } as unknown as AnalyticsInstance;
 
-  containerRoot = null as unknown as HTMLDivElement;
-  isInitialized = false;
-
   // UI related methods
   toast(toastText: string, type: ToastMsgType, isLong = false) {
     const uiManagerInstance = ServiceLocator.getUiManager();
@@ -117,7 +115,8 @@ export class KeepTrackApi {
   methods = EventBus.getInstance().methods;
 
   // Plugin registry methods
-  getPlugin = PluginRegistry.getPlugin.bind(PluginRegistry);
+  getPlugin: <T extends KeepTrackPlugin>(pluginClass: new (...args: unknown[]) => T) => T | null =
+    <T extends KeepTrackPlugin>(pluginClass: new (...args: unknown[]) => T) => PluginRegistry.getPlugin(pluginClass);
   checkIfLoaded = PluginRegistry.checkIfLoaded.bind(PluginRegistry);
   getPluginByName = PluginRegistry.getPluginByName.bind(PluginRegistry);
   unregisterAllPlugins = PluginRegistry.unregisterAllPlugins.bind(PluginRegistry);

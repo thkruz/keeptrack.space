@@ -1,4 +1,3 @@
-import { keepTrackApi } from '@app/keepTrackApi';
 import { ColorMenu } from '@app/plugins/colors-menu/colors-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSuite, websiteInit } from './generic-tests';
@@ -25,7 +24,7 @@ describe('ColorMenu_class', () => {
 
     websiteInit(menu);
     // Create a list of elements based on the li elements with data-color attributes
-    const elements = Array.from(keepTrackApi.containerRoot.querySelectorAll<HTMLElement>('li[data-color]'));
+    const elements = Array.from(KeepTrack.getInstance().containerRoot.querySelectorAll<HTMLElement>('li[data-color]'));
     // Click each element and make sure the menu is closed
 
     elements.forEach((element) => {

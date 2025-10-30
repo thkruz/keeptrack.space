@@ -84,7 +84,9 @@ export class WebGlProgramHelper {
     const vertShader = gl.createShader(gl.VERTEX_SHADER);
 
     if (!vertShader) {
-      throw new Error('Failed to create vertex shader');
+      const error = gl.getError();
+
+      throw new Error(`Failed to create vertex shader, WebGL error code: ${error}`);
     }
 
     gl.shaderSource(vertShader, source);
@@ -103,7 +105,9 @@ export class WebGlProgramHelper {
     const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
 
     if (!fragShader) {
-      throw new Error('Failed to create fragment shader');
+      const error = gl.getError();
+
+      throw new Error(`Failed to create fragment shader, WebGL error code: ${error}`);
     }
 
     gl.shaderSource(fragShader, source);

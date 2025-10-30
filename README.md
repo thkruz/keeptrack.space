@@ -76,7 +76,8 @@ The feature set rivals those of expensive toolkits, such as AGI's STK, and inclu
 
 # Installation
 
-KeepTrack is automatically deployed with the most-current version of the main branch to <https://keeptrack.space> via Cloudflare.
+KeepTrack is automatically deployed with the most-current version of the main
+branch to <https://keeptrack.space> and the most current development branch to <https://dev.keeptrack.space> via Cloudflare.
 
 ## Prerequisites
 
@@ -106,6 +107,7 @@ There are Typescript files for generating TLE.json that are not included, but <h
 
 # Release Notes
 
+- Version 11.0 - [Copernicus](./docs/v11.md)
 - Version 10.0 - [Euclid](./docs/v10.md)
 - Version 9.1 - [Kepler](./docs/v9.1.md)
 - Version 9.0 - [Kepler](./docs/v9.md)

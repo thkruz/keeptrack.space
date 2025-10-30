@@ -44,16 +44,16 @@ The primary objective of regression testing is to ensure that recent changes hav
   - Ensure that all UI elements are consistent across different pages.
   - Test responsiveness and layout adjustments on different browser sizes.
 - **Presets**:
-  - Check that <http://localhost:8080?preset=debris> works.
-  - Check that <http://localhost:8080?preset=starlink> works.
-  - Check that <http://localhost:8080?preset=ops-center> works.
-  - Check that <http://localhost:8080?preset=education> works.
-  - Check that <http://localhost:8080?preset=epfl> works.
-  - Check that <http://localhost:8080?preset=outreach> works.
-  - Check that <http://localhost:8080?preset=million-year> works.
-  - Check that <http://localhost:8080?preset=million-year2> works.
-  - Check that <http://localhost:8080?preset=altitudes> works.
-  - Check that <http://localhost:8080?preset=facsat2> works.
+  - Check that <http://localhost:5544?preset=debris> works.
+  - Check that <http://localhost:5544?preset=starlink> works.
+  - Check that <http://localhost:5544?preset=ops-center> works.
+  - Check that <http://localhost:5544?preset=education> works.
+  - Check that <http://localhost:5544?preset=epfl> works.
+  - Check that <http://localhost:5544?preset=outreach> works.
+  - Check that <http://localhost:5544?preset=million-year> works.
+  - Check that <http://localhost:5544?preset=million-year2> works.
+  - Check that <http://localhost:5544?preset=altitudes> works.
+  - Check that <http://localhost:5544?preset=facsat2> works.
 
 ### Performance Tests
 

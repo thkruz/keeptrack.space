@@ -2,6 +2,316 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v11.0.0
+
+>  
+
+- Maneuver detection
+- chore(deps-dev): bump @babel/core from 7.26.10 to 7.28.4
+- fix: applied null safe checks
+- fix: :bug: fix missing dependencies for normal build
+- Develop
+- fix: :bug: add warning message for satellite orbit optimization and i…
+- 10.8.4
+- v10.8.3
+- v10.8.2
+- chore: :bookmark: update subproject commit reference in plugins-pro
+- chore: :bookmark: update subproject commit reference in plugins-pro
+- Develop
+- Develop
+- 10.8.0
+- Develop
+- Develop
+- Develop
+- Develop
+- Develop
+- Develop
+- fix: :bug: update logo image path and format URLs in installation ins…
+- Develop
+- Develop
+- Develop
+- Develop
+- fix: :bug: standardize texture quality values to lowercase in MobileM…
+- Develop
+- fix: :bug: Improve Safari detection logic for better browser compatib…
+- fix: :bug: add warning message for satellite orbit optimization and improve error handling for input validation
+- feat: :sparkles: Add dwarf planet rendering class and texture support
+- feat: :sparkles: Add Pluto dwarf-planet renderer and make orbit paths accept vec4 points; enable Pluto in planets menu
+- refactor: :globe_with_meridians: Add localization support for splash screen and filter menu in multiple languages
+- build: :fire: remove pnpm-lock
+- refactor: :fire: remove auto generated locale files
+- feat: :sparkles: enhance mesh loading and rendering capabilities
+- feat: add Planets Menu Plugin with localization and UI integration
+- test: :white_check_mark: update tests to match v11 architecture
+- feat: :sparkles: add more of the solar system
+- refactor: :recycle: Refactor HTML rendering in plugins to use new html utility
+- refactor: :recycle: Refactor input manager and mouse input to use ServiceLocator for improved dependency management
+- feat: :sparkles: add VCR plugin with playback controls and integrate into top menu
+- feat: :sparkles: add alphaMap and alphaImage support in ShaderMaterial
+- feat: :sparkles: add Uranus rings rendering and integrate with Uranus class
+- refactor: :recycle: Replace keepTrackContainer with Container instance for improved dependency management
+- feat: :sparkles: implement Saturn rings rendering and integrate with Saturn class
+- refactor: :zap: enhance Godrays shader performance and add randomness to sun rendering
+- feat: :sparkles: add draco encoder/decoder for future support
+- refactor: :recycle: Replace keepTrackApi.glsl with glsl function for shader code formatting consistency
+- feat: :sparkles: add translation generation tasks and update mergeLocales method for improved locale management
+- refactor: :zap: optimize Godrays shader and improve performance
+- refactor: :recycle: disable unnecessary plugins and clean up settings for improved readability
+- feat: :sparkles: enhance color scheme management with enable/disable setting
+- feat: :sparkles: enhance calendar input handling with text input option
+- test: :white_check_mark: fix tests that were broken due to new engine updates
+- test: :white_check_mark: add mobile and desktop tests for LegendManager class functionality
+- refactor: :alien: update celestrak version
+- feat: :sparkles: update occlusion drawing logic to handle different center bodies
+- refactor: :zap: simplify shader calculations in DotsManager
+- build: :recycle: replace opener with custom openFile function for cross-platform compatibility
+- refactor: :recycle: Update plugin imports to use 'plugins-pro'
+- fix: :bug: revert star changes and rename shader attribute from a_star to a_size for clarity
+- feat: :sparkles: add low priority scene loading and event listener for KeepTrack readiness
+- fix: :bug: fix setCurrentModel method to reset rotation only when model name changes
+- feat: :sparkles: update celestial bodies list and enhance zoom distance settings for Sun and Earth
+- fix: :bug: simplify camera distance checks and enforce minimum distance in CameraState
+- fix: :bug: enable more camera distance checks for satellite shader minimum size
+- fix: :bug: update layers menu icon classes for consistent styling
+- fix: :bug: remove unnecessary type assertions for position and rotation arrays
+- fix: :bug: add localization import and initialize early in KeepTrack class
+- refactor: :recycle: clean up imports and improve jday existence check in DateTimeManager
+- fix: :bug: add missing styles for colorbox title to fix layout
+- fix: :bug: validate planet selection in changePlanet method to prevent invalid inputs
+- fix: :bug: validate selected planet before setting zoom distances in PlanetsMenuPlugin
+- chore: :recycle: move maxSize property in shader settings for improved object sizing
+- test: :white_check_mark: update Jest snapshot for moon position calculation in drawManager
+- fix: :bug: adjust depth test handling for Earth based on camera zoom level
+- refactor: :recycle: Update Earth class to use glsl import and conditionally disable depth test
+- refactor: :recycle: improve cloud densitiy
+- fix: :bug: remove unnecessary whitespace in top menu item HTML structure
+- chore: :heavy_minus_sign: remove unused dependencies from package.json
+- build: :arrow_up: bump @types/node
+- fix: :bug: update lint script to target the src directory for improved code quality checks
+- feat: :sparkles: add Mars wallpaper and update splash screen image list
+- chore: :heavy_minus_sign: remove path-to-regexp dependency from package.json
+- feat: :sparkles: add world shift calculation for Sun in WebGLRenderer
+- fix: :bug: disable VCR plugin by default for improved user experience
+- fix: :bug: update draggable box background color to use CSS variable for consistency
+- Merge branches 'develop' and 'develop' of https://github.com/thkruz/keeptrack.space into develop
+- refactor: :truck: restructure src into app and engine folders
+- refactor: :truck: restructure src into app and engine folders
+- refactor: :truck: Refactor camera state management and input handling
+- feat: :sparkles: improve automated building of localization files and update filter menu translations
+- feat: :globe_with_meridians: Add common translations in multiple languages
+- Pre main branch merge
+- test: :white_check_mark: Add unit tests for various color schemes in rendering engine
+- refactor: :recycle: isolate the engine from the application
+- feat: :sparkles: implement draggable boxes and convert legends to layers
+- chore: :globe_with_meridians: update generated localization for multiple languages
+- feat: :globe_with_meridians: Add localization support for satellite orbital data in multiple languages
+- refactor: :recycle: migrate from npm "ootk" to local ootk submodule and wire tooling
+- refactor: :recycle: update .gitignore to exclude keys.ts and remove generated keys.ts file
+- refactor: :recycle: Refactor camera state management
+- refactor: :recycle: use EventBus.getInstance() instead of keepTrackApi across app
+- feat: :globe_with_meridians: Add multilingual localization support for satellite info box in German, English, Spanish, French, Japanese, Korean, Russian, Ukrainian, and Chinese
+- refactor: replace EventBusEvent with EventBusEvents for consistency and clarity
+- test: :white_check_mark: fix all failing tests due to v11
+- feat: :sparkles: add OemSatellite class and integrate OEM satellite support
+- feat: :sparkles: Add OemReader plugin, register pro path, and add default OEM settings
+- feat: :sparkles: implement a worldShift to allow centering on non-earth objects
+- feat: :sparkles: Add ScenarioManagement plugin with UI, save/load and time-bound enforcement
+- feat: :sparkles: Support J2000/TEME line rendering, segmented radial grids, and TEME↔J2000 transforms
+- refactor: :recycle: Clean up CSS styles, enhance tooltip positioning, and improve top menu integration
+- feat: :planet: add planetary metadata, orbit-path rendering, and hover info
+- refactor: :recycle: separate projection vs world matrices and use matrixWorldInverse across renderer
+- feat: :globe_with_meridians: add multilingual support for satellite info box and improve layout structure
+- feat: :sparkles: implement DepthManager to enable logarithmic depth buffer
+- feat: :sparkles: add planet objects, planet dots and orbit-drawing UI
+- feat: :sparkles: Add Maneuver Detection plugin with UI and data integration
+- refactor: :fire: remove unused plugin translations and streamline localization handling
+- refactor: :globe_with_meridians: Move loading screen messages
+- refactor: :recycle: Replace SocialMedia plugin with generic TopMenuPlugin and update related configurations
+- refactor: :recycle: Enhance LayersManager and LayersPopupBox integration, update event handling and menu interactions
+- feat: :sparkles: add engine-ui.css for draggable box styles and import in draggable-box.ts
+- feat: :sparkles: Add TimeSlider plugin
+- feat: :zap: async loading of textures to unblock main thread
+- OrbitGuard menu with static data
+- feat: :globe_with_meridians: Update localization for satellite info box in Japanese, Korean, and Ukrainian
+- refactor: :truck: move datetime UI logic out of TimeManager into DateTimeManager
+- refactor: :recycle: Consolidate Earth texture quality enums into a single module and update imports across the codebase
+- refactor(camera/rendering): switch to earth-centered camera positions & dynamic sun sizing
+- refactor: :recycle: introduce CameraZoomState class to manage zoom state in Camera
+- feat: :sparkles: add size determination logic for dots based on search results and selection
+- chore: :globe_with_meridians: add filter-menu translations and scenario-management locale files; bump plugins-pro submodule
+- refactor(rendering): cache J2000, prevent duplicate orbit paths, and optimize orbit path updates
+- feat: :sparkles: add Reentry Risk color scheme and integrate into color scheme manager
+- refactor: :sparkles: Update celestial body classes to use Body type for getName and adjust RADIUS visibility
+- refactor: :recycle: update time management and URL handling for improved simulation time and rate management
+- feat(telemetry/build): add open-source telemetry stub, register plugin, and ensure submodules in prebuild
+- feat: :sparkles: implement legend popup menu with responsive behavior and z-index adjustments
+- feat: add loading screen start button translations and settings for ads and auto start
+- fix: :bug: use AEHF as default OEM satellite model; refresh time-slider on staticOffsetChange and expose updateSliderPosition; add 'planets' URL param to toggle planets; bump plugins-pro submodule
+- perf: :zap: performance tweaks to reduce dom interaction and utilize idlecallback
+- refactor: :recycle: Update tooltip attributes and styles across multiple plugins for consistency and improved usability
+- refactor: :sparkles: Introduce Milky Way texture quality settings and streamline skybox initialization
+- refactor(ui): replace ISS wallpaper, normalize keyboard handling, and tidy CSS
+- refactor: :recycle: split LayersPopupBox class into own file
+- test: :white_check_mark: fix all failing tests
+- refactor: :children_crossing: Enhance VCR plugin with improved tooltip handling and event management for play, pause, rewind, and fast forward actions
+- fix: :bug: correct OEM satellite orbit segment & history positioning; always update OEM orbit data
+- refactor: :recycle: cache orbit buffers, rename updateOrbitData -&gt; alignOrbitSelectedObject, and simplify GPU updates
+- refactor: streamline texture loading and splash behavior
+- refactor: :children_crossing: update embed settings to reflect new plugins and options
+- feat: :sparkles: Add filters for vLEO and xGEO satellites, update ColorSchemeManager and WebGLRenderer integration
+- refactor: :recycle: rename CameraType.DEFAULT to FIXED_TO_EARTH and update usages
+- fix: :bug: Adjust maxRng values for sensors to improve range accuracy
+- refactor: :truck: move the camera class to new folder to enable refactoring
+- refactor: :fire: remove unused isShowDistance property
+- refactor: update StarlinkColorScheme to differentiate operational and other statuses
+- refactor: :label: add type definitions for various managers and update service locator methods for improved type safety
+- refactor: :recycle: switch to declarative kt-tooltip and remove TooltipsPlugin usage
+- refactor(oem-satellite): rename stateVectors → ephemeris, wire LagrangeInterpolator, clean imports; bump plugins-pro submodule
+- feat: :sparkles: Add maneuver data handling to satellite info box
+- refactor: :recycle: replace getCameraDistanceFromEarth/getCameraPosition with calcDistanceBasedOnZoom/getDistFromEarth, compute target distance directly, and make snap instantaneous when chaseSpeed_ == 1.0
+- feat: :sparkles: implement deepMerge method for recursive object merging in settings management
+- feat: :sparkles: Add locale file compilation method to FileSystemManager
+- fix: :bug: simplify godrays occlusion drawing using planets map; keep Earth/Moon special-cases
+- fix: :bug: color-schemes: handle OEM-import sats, preserve planet color, adjust zoom behavior; bump plugins-pro submodule
+- refactor: :recycle: remove unused showLoading calls and improve link type assignment in SatLinkManager
+- fix: update loading screen button styles and add pulsate animation for better visibility
+- ci: :green_heart: make mergeLocales accept optional proDir and use for non-pro builds
+- feat: :sparkles: Add LinkedInLinkPlugin to top menu and update configuration
+- fix: :bug: fix J2000 vs TEME
+- fix: :bug: smooth satShader.minSize scaling based on camera distance
+- refactor: :children_crossing: Improve tooltip sizing and positioning logic — use maxWidth, separate vertical/horizontal direction selection, and fix placement math
+- feat: :sparkles: Update satellite info box sections to be collapsed by default with a new order
+- fix: :bug: use texture resolution settings independent of mobile settings
+- fix: :bug: Refactor container usage in setupStandardEnvironment to use Container.getInstance for consistency
+- refactor: :sparkles: Enhance celestial bodies menu with additional dwarf planets and improved tooltip handling
+- feat: :sparkles: add optional radius to getAlt and new getPositionFromCenterBody helper
+- fix: :bug: implement Moon.update to apply world shift and respect center/selection
+- feat: :sparkles: add SatInfoBoxOrbital configuration and update default plugins for improved settings management
+- feat: :sparkles: add data cleaning method to remove duplicate channel entries
+- fix: :bug: refactor showLoading call to only fire if a time change happens
+- feat: :sparkles: compute relativeSatPos and pass worldOffset to celestial-body shaders
+- docs: :memo: minor documentation changes
+- refactor: :recycle: init planets in loadScene and remove low-priority loader
+- fix: :bug: Improve Safari detection logic for better browser compatibility
+- fix: :bug: compute altitude for non-Earth-centered objects by resolving centerBody
+- refactor: :recycle: streamline localization handling by replacing Localization instance with t7e function calls
+- feat: :sparkles: add alternate nasa satellite image map originally seen on https://nadir.space
+- fix: :bug: VCR plugin - use ScenarioManagementPlugin.scenario for end-time checks and handle staticOffsetChange to refresh play/pause UI
+- refactor: :recycle: remove TooltipsPlugin dependency & tooltip creation; avoid auto-resuming audio context; lazily load speech voices in speak
+- chore(debug): convert buffer-size validation to commented debugging block in LineManager
+- refactor: :alembic: comment out Moon planet creation and assignments for now
+- refactor: :recycle: remove mat4 dependency and use mainCamera.matrixWorldInverse in unProject; fix indentation for clear-lines submenu
+- feat: :sparkles: Add "Draw Moon Orbit Path" button to Planets menu and wire click handler to invoke moon.drawOrbitPath()
+- refactor: :recycle: update the variable names for getBufferSubDataAsync to be easier to understand
+- refactor(planets-menu): normalize Home key handling; support Shift+Home vs Home
+- chore: :package: add ootk engine submodule (src/engine/ootk)
+- chore: :wrench: update default plugins - enable VcrPlugin, add TimeSlider, relocate TooltipsPlugin to non-menu
+- refactor: :sparkles: Update tooltip handling to use dynamic tooltipTag for attribute selection
+- fix: :bug: tune sound defaults — lower click volume, use SoundNames for loading/export, add volumes for beeps and menu button
+- build: :green_heart: normalize __dirname for Windows/POSIX and allow reassignment
+- feat: :sparkles: add Home key handler to center camera on Earth
+- feat: :sparkles: enhance tooltip dimensions and support HTML content
+- chore: :bookmark: update CHANGELOG for v10.8.4 with new features and fixes
+- refactor(rendering/skybox): use camera position directly for worldOffset; remove unused imports and dead code
+- fix: :bug: fix incorrect matrix being used for unprojection
+- feat: :globe_with_meridians: Add English locale for Video Director plugin
+- fix: :bug: include WebGL error code in vertex/fragment shader creation errors
+- test: :white_check_mark: fix broken tests
+- refactor(build/webpack-manager): only generate and push auth webpack config when isPro
+- refactor: :recycle: simplify alt2zoom — remove MIN_ZOOM_LEVEL/MAX_ZOOM_LEVEL and normalize output to [0,1] with 0.5 fallback
+- fix: :bug: scale sun size when zoomed out very far
+- ci: :green_heart: generate translation files before build and unit tests
+- feat: :sparkles: accept worldOffset in occlusion uniformSetup and use it
+- feat: :sparkles: add onLinesCleared, selectedDateChange and calculateSimulationTime events to EventBus and update EngineEventMap types
+- refactor: :recycle: replace Localization instance with t7e function for country label localization
+- feat: :sparkles: Integrate DepthManager into ConeMesh for log depth buffer support
+- fix: remove unnecessary cases from setInstallDirectory_ method for cleaner code
+- chore: :construction_worker: hide unused files
+- fix: :bug: eagerly initialize LayersPopupBox, simplify popup selection and move currentLayer assignment
+- fix: :bug: remove keeptrack.space hostname guard so UserAccountPlugin can load on local/other hosts
+- fix: :bug: clamp gl_Position.w in log-depth vertex shader to avoid NaNs/Infs for extreme coordinates
+- feat: :sparkles: add FilterMenuPlugin English locale entries to filter-menu en.src.json
+- fix: :bug: throttle updateURL to avoid browser hangs by debouncing history updates (skip calls within 250ms) and add lastUpdateTime_
+- fix: :bug: Enable depth testing in SensorFovMesh to improve rendering accuracy
+- fix: :lock: close benign security issue with cross origin of keyboard event
+- refactor: :recycle: rename updatePositionBuffer -&gt; update and rebind EventBus handler
+- fix: :bug: avoid forcing Earth center for OEM satellites
+- refactor: :recycle: Replace SatMath.j200ToTemeMatrix with getTemeToJ2000Matrix and tidy imports
+- fix: :bug: Update fieldOfView and fieldOfViewMax to use Radians for improved clarity
+- fix: :bug: update icon paths in web manifest for consistency
+- chore: update version to 11.0.0.0 in README, package.json, and version.js
+- fix: :art: fix unnecessary br
+- chore(build): add TypeScript declaration for clean-terminal-webpack-plugin
+- fix: :bug: stop overwriting Sun.position with ECI (account for worldShift)
+- fix: :bug: only load user-account pro plugin on keeptrack.space subdomains
+- fix: :bug: avoid recalculating simulation time
+- fix: :bug: remove unnecessary exports creating circular reference
+- fix: :bug: update logic on how screen size changes are handled
+- fix: :zap: dont load the sun texture if it will never get used
+- chore: :arrow_up: update src/engine/ootk and src/plugins-pro submodule pointers
+- build: :construction_worker: add user-account plugin mapping to plugin manager
+- fix: :bug: fix incorrect onKeyDown handler
+- fix: :bug: move SplashScreen.hideSplashScreen() to postStart_
+- fix: :bug: scale screenshot watermark logo height with hiResWidth and reorder imports
+- fix: :bug: add no-op calculateRelativeSatPos override to Moon class
+- feat: :sparkles: include vimpel=false in generated URL when JSC catalog is disabled
+- fix: :bug: initialize ScenarioManagementPlugin earlier (before TopMenu/TimeSlider) and hoist VcrPlugin import
+- chore: :arrow_up: update @typescript-eslint/typescript-estree and cypress dependencies to latest versions
+- refactor: :recycle: Update drag options dimensions for improved usability
+- build: :hammer: update lcov script to use tsx for consistency
+- fix: adjust loading screen positioning for better visibility and layout
+- chore: :bookmark: update version to 10.8.4 in README and version.js
+- chore: :wrench: explicitly disable OemReaderPlugin in celestrak settings
+- chore: :wrench: add Volta node toolchain config (node 25.0.0) to package.json
+- feat: :crescent_moon: add Moon entry to planets RMB submenu after Earth
+- chore: :sparkles: add generated locale files to .gitignore
+- fix: :bug: Update fragment shader code for log depth calculation to recover original gl_Position.w
+- fix: :bug: Adjust z-index for sidenav-trigger to prevent popups from blocking view
+- build: :label: add @types/opener dependency for TypeScript support
+- feat: add adsense placeholder to loading screen for improved ad integration
+- Update src/static/splash-screen.ts
+- ci: :construction_worker: switch ESLint step to use `npm run lint` in build pipeline
+- fix: snap camYaw instantly when chaseSpeed_ == 1.0
+- refactor(scenario-management): remove BASIC from menuMode; limit plugin to ADVANCED, SETTINGS, ALL
+- fix: :bug: resize renderer canvas in UiManager.postStart (add ServiceLocator import & call)
+- chore: :arrow_up: update plugins-pro submodule to 95675218
+- fix: :bug: use errorManager.log for external ASCII catalog processing instead of info
+- chore: :arrow_up: update plugins-pro submodule to aee63320
+- fix: :bug: increase drawPosition normalization divisor to 1e11 to avoid zero coords breaking mat4.targetTo
+- refactor: :recycle: add radius and position to earth
+- fix: :bug: refresh ScenarioManagementPlugin.scenario before time slider calculations
+- feat: :sparkles: Add new icon assets (event-note, input, landscape*) and update plugins-pro submodule
+- fix: :bug: adjust zoom value bounds for validation in UrlManager
+- fix: :bug: disable multiline-comment-style rule in ESLint configuration
+- chore: :package: update subproject commit reference in plugins-pro
+- fix: :bug: correct reference to Moon position in updateVertBuf method
+- ci: :green_heart: update ESLint command to target the src directory
+- build: :arrow_up: update gl-matrix dependency to version 3.4.4
+- chore: :arrow_up: update Node.js version in .nvmrc to 24
+- chore: :arrow_up: update typescript dependency to version 5.9.3
+- build: :arrow_up: update prettier-plugin-organize-imports to version 4.3.0
+- chore: :arrow_up: update subproject commit reference in plugins-pro
+- chore: :package: Update subproject commit reference in plugins-pro
+- fix: :bug: Remove dead satellite IDs from DSCS constellation array
+- fix: :bug: Add missing satellite ID to AEHF constellation array
+- chore: :package: update subproject commit reference in plugins-pro
+- fix: :bug: update close button markup for consistency in draggable modal
+- chore: :package: update subproject commit reference
+- chore: update subproject commit reference in plugins-pro
+- Update src/static/splash-screen.ts
+- fix: :zap: disable planets on celestrak version
+- fix: :bug: enable isAutoStart in embedded settingsOverride
+- chore: :heavy_minus_sign: remove ts-node dependency from package.json
+- chore: :heavy_minus_sign: remove download-file dependency from package.json
+- build: :fire: remove child_process
+- chore: :heavy_minus_sign: remove retire dependency from package.json
+- fix: :bug: add .vscode to .eslintignore to prevent linting of VS Code settings
+- fix: :bug: add padding to nav for improved layout
+- feat: add adsbygoogle interface to global declaration for improved type support
+- chore: :art: Update Saturn & Uranus ring textures to multiple of 2
+- chore: :arrow_up: update package-lock.json to reflect dependency changes
+- feat: :sparkles: add high-resolution textures for celestial bodies
+
 #### v10.8.4
 
 >  

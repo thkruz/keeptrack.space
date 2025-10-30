@@ -18,3 +18,4 @@ jobs:
           output_file: 'diagram.svg'
           artifact_name: "my-diagram"
           excluded_paths: 'dist,node_modules'
+          branch: 'diagram'

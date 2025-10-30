@@ -6,12 +6,12 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite } from '@ootk/src/main';
 import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 interface ChannelInfo {
   satellite: string;
@@ -31,7 +31,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
   // eslint-disable-next-line max-len
   private readonly satsWithChannels_: string[] = ['39508', '41588', '40424', '25924', '37393', '43039', '35942', '39078', '42934', '44479', '32794', '39237', '28868', '31102', '39127', '43450', '38107', '40982', '36745', '37810', '44186', '40272', '40941', '35696', '37933', '42942', '29055', '31306', '33436', '37775', '39285', '38778', '40364', '36581', '32299', '39079', '43632', '36592', '41029', '56757', '43463', '41238', '32019', '28943', '37677', '39157', '39017', '44067', '52255', '33051', '49125', '42907', '28935', '42967', '33207', '36499', '39008', '39233', '43700', '54259', '40425', '41589', '42741', '38992', '39773', '41382', '39020', '44334', '40875', '41310', '45985', '45986', '41191', '39612', '39613', '29236', '32951', '33376', '46114', '54243', '54244', '54026', '54741', '54742', '27445', '42814', '37264', '43228', '43633', '54048', '54225', '28358', '36097', '37238', '37834', '38356', '38740', '38749', '38098', '38867', '40271', '41581', '41748', '40874', '42818', '41747', '42950', '44476', '26824', '41903', '41471', '29272', '38331', '37749', '39728', '29349', '42984', '37265', '42691', '41034', '35362', '40147', '52904', '38014', '36830', '52817', '33373', '35873', '38342', '28526', '36032', '33749', '44048', '40146', '32252', '35756', '37779', '37826', '36831', '36516', '42432', '43488', '43175', '42709', '55970', '55971', '37809', '53961', '52933', '37748', '38087', '38652', '39172', '34941', '39460', '41380', '28945', '37606', '32768', '38991', '40733', '41904', '49055', '33274', '14787', '41944', '34111', '41036', '37602', '43611', '28786', '39500', '41552', '32487', '36033', '40613', '39481', '33056', '39522', '47306', '50212', '32767', '38332', '40345', '39022', '44307'];
   bottomIconCallback: () => void = () => {
-    const selectedSat = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+    const selectedSat = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
 
     // Show error if satellite is not a Payload in GEO
     if (
@@ -68,7 +68,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerInit,
       () => {
-        keepTrackApi.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_.map((sccNum) => parseInt(sccNum)));
+        PluginRegistry.getPlugin(SatConstellations)?.addConstellation('TV Satellites', GroupType.SCC_NUM, this.satsWithChannels_.map((sccNum) => parseInt(sccNum)));
       },
     );
 
@@ -142,7 +142,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
   </div>`;
 
   showTable() {
-    const selectedObj = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+    const selectedObj = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
     let selectedSat: DetailedSatellite;
 
     if (selectedObj?.isSatellite()) {

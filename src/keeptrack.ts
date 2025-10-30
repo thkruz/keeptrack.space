@@ -1,3 +1,4 @@
+import { ServiceLocator } from './engine/core/service-locator';
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -37,10 +38,11 @@ import { BottomMenu } from './app/ui/bottom-menu';
 import { CameraControlWidget } from './app/ui/camera-control-widget';
 import { HoverManager } from './app/ui/hover-manager';
 import { SplashScreen } from './app/ui/splash-screen';
-import { UiManager } from './app/ui/uiManager';
+import { UiManager } from './app/ui/ui-manager';
 import { Container } from './engine/core/container';
 import { Singletons } from './engine/core/interfaces';
 import { Engine } from './engine/engine';
+import { EventBus } from './engine/events/event-bus';
 import { EventBusEvent } from './engine/events/event-bus-events';
 import { ColorSchemeManager } from './engine/rendering/color-scheme-manager';
 import { DotsManager } from './engine/rendering/dots-manager';
@@ -317,18 +319,18 @@ theodore.kruczek at gmail dot com.
 
   async run(): Promise<void> {
     try {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      const renderer = keepTrackApi.getRenderer();
-      const sceneInstance = keepTrackApi.getScene();
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
-      const uiManagerInstance = keepTrackApi.getUiManager();
-      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-      const inputManagerInstance = keepTrackApi.getInputManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
+      const orbitManagerInstance = ServiceLocator.getOrbitManager();
+      const renderer = ServiceLocator.getRenderer();
+      const sceneInstance = ServiceLocator.getScene();
+      const dotsManagerInstance = ServiceLocator.getDotsManager();
+      const uiManagerInstance = ServiceLocator.getUiManager();
+      const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
+      const inputManagerInstance = ServiceLocator.getInputManager();
 
       this.engine.init();
 
-      // keepTrackApi.getMainCamera().init(settingsManager);
+      // ServiceLocator.getMainCamera().init(settingsManager);
 
       SplashScreen.loadStr(SplashScreen.msg.science);
 
@@ -398,9 +400,9 @@ theodore.kruczek at gmail dot com.
       }
 
       // Update any CSS now that we know what is loaded
-      keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+      EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      keepTrackApi.getUiManager().initMenuController();
+      ServiceLocator.getUiManager().initMenuController();
 
       // Update MaterialUI with new menu options
       try {
@@ -412,12 +414,12 @@ theodore.kruczek at gmail dot com.
       }
 
       window.addEventListener('resize', () => {
-        keepTrackApi.emit(EventBusEvent.resize);
+        EventBus.getInstance().emit(EventBusEvent.resize);
       });
-      keepTrackApi.emit(EventBusEvent.resize);
+      EventBus.getInstance().emit(EventBusEvent.resize);
 
       keepTrackApi.isInitialized = true;
-      keepTrackApi.emit(EventBusEvent.onKeepTrackReady);
+      EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
       if (settingsManager.onLoadCb) {
         settingsManager.onLoadCb();
       }

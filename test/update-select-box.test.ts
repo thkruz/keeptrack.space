@@ -31,22 +31,22 @@ describe('SatInfoBoxCore_class2', () => {
   });
 
   it('should be able to select a satellite', () => {
-    keepTrackApi.getCatalogManager().objectCache = [defaultSat];
-    keepTrackApi.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
-    keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
-    keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
+    ServiceLocator.getCatalogManager().objectCache = [defaultSat];
+    ServiceLocator.getColorSchemeManager().colorData = Array(100).fill(0) as unknown as Float32Array;
+    ServiceLocator.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
+    ServiceLocator.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
     keepTrackApi.isInitialized = true;
     const selectSatManager = new SelectSatManager();
 
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
-    keepTrackApi.emit(EventBusEvent.uiManagerOnReady);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerOnReady);
     selectSatManager.selectSat(0);
-    expect(() => keepTrackApi.emit(EventBusEvent.updateSelectBox, defaultSat)).not.toThrow();
+    expect(() => EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat)).not.toThrow();
 
-    keepTrackApi.emit(EventBusEvent.setSensor, defaultSensor, 2);
-    keepTrackApi.getCatalogManager().isSensorManagerLoaded = true;
+    EventBus.getInstance().emit(EventBusEvent.setSensor, defaultSensor, 2);
+    ServiceLocator.getCatalogManager().isSensorManagerLoaded = true;
     selectSatManager.selectSat(0);
-    expect(() => keepTrackApi.emit(EventBusEvent.updateSelectBox, defaultSat)).not.toThrow();
+    expect(() => EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat)).not.toThrow();
   });
 });

@@ -3,7 +3,6 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { BaseObject } from '@ootk/src/main';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -27,13 +26,13 @@ describe('UrlManager_class', () => {
     const expectedCurrentSearch = 'ISS';
     const expectedPropRate = 1;
     // const expectedStaticOffset = 1630512000000 - Date.now();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
-    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+    const selectedSatelliteManager = PluginRegistry.getPlugin(SelectSatManager);
 
     expect(selectedSatelliteManager).toBeDefined();
     expect(selectedSatelliteManager).not.toBeNull();
@@ -47,11 +46,11 @@ describe('UrlManager_class', () => {
     uiManagerInstance.doSearch = jest.fn();
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
     UrlManager.parseGetVariables(settingsManager);
-    keepTrackApi.emit(EventBusEvent.onKeepTrackReady);
+    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);
@@ -71,12 +70,12 @@ describe('UrlManager_class', () => {
     });
 
     const expectedSelectedSat = 10;
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
-    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+    const selectedSatelliteManager = PluginRegistry.getPlugin(SelectSatManager);
 
     expect(selectedSatelliteManager).toBeDefined();
     expect(selectedSatelliteManager).not.toBeNull();
@@ -92,7 +91,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables(settingsManager);
-    keepTrackApi.emit(EventBusEvent.onKeepTrackReady);
+    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).toHaveBeenCalledWith(expectedSelectedSat);
   });
@@ -106,13 +105,13 @@ describe('UrlManager_class', () => {
       writable: true,
     });
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
     uiManagerInstance.toast = jest.fn();
-    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+    const selectedSatelliteManager = PluginRegistry.getPlugin(SelectSatManager);
 
     expect(selectedSatelliteManager).toBeDefined();
     expect(selectedSatelliteManager).not.toBeNull();
@@ -127,7 +126,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables(settingsManager);
-    keepTrackApi.emit(EventBusEvent.onKeepTrackReady);
+    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
 
     expect(uiManagerInstance.toast).toHaveBeenCalled();
   });
@@ -141,13 +140,13 @@ describe('UrlManager_class', () => {
       writable: true,
     });
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
     uiManagerInstance.toast = jest.fn();
-    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+    const selectedSatelliteManager = PluginRegistry.getPlugin(SelectSatManager);
 
     expect(selectedSatelliteManager).toBeDefined();
     expect(selectedSatelliteManager).not.toBeNull();
@@ -162,7 +161,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables(settingsManager);
-    keepTrackApi.emit(EventBusEvent.onKeepTrackReady);
+    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
 
     expect(uiManagerInstance.toast).toHaveBeenCalled();
   });
@@ -180,13 +179,13 @@ describe('UrlManager_class', () => {
     const expectedCurrentSearch = 'ISS';
     const expectedPropRate = 1;
     const expectedStaticOffset = 1630512000000 - Date.now();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
-    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+    const selectedSatelliteManager = PluginRegistry.getPlugin(SelectSatManager);
 
     expect(selectedSatelliteManager).toBeDefined();
     expect(selectedSatelliteManager).not.toBeNull();
@@ -200,7 +199,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables(settingsManager);
-    keepTrackApi.emit(EventBusEvent.onKeepTrackReady);
+    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).not.toHaveBeenCalledWith(expectedCurrentSearch);
@@ -221,9 +220,9 @@ describe('UrlManager_class', () => {
     const expectedCurrentSearch = 'ISS';
     const expectedPropRate = 1;
     const expectedStaticOffset = 1630512000000 - Date.now();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     // eslint-disable-next-line no-empty-function
     jest.spyOn(window.history, 'replaceState').mockImplementation(() => { });
@@ -241,7 +240,7 @@ describe('UrlManager_class', () => {
     uiManagerInstance.searchManager.hideResults = jest.fn();
 
     UrlManager.parseGetVariables(settingsManager);
-    keepTrackApi.emit(EventBusEvent.onKeepTrackReady);
+    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
 
     expect(selectedSatelliteManager.selectSat).not.toHaveBeenCalledWith(expectedSelectedSat);
     expect(uiManagerInstance.doSearch).toHaveBeenCalledWith(expectedCurrentSearch);

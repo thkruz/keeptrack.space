@@ -1,4 +1,7 @@
 /* eslint-disable dot-notation */
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
@@ -28,8 +31,8 @@ describe('ShortTermFences_class', () => {
     const stf = new ShortTermFences();
 
     websiteInit(stf);
-    expect(() => keepTrackApi.emit(EventBusEvent.setSensor, null, null)).not.toThrow();
-    expect(() => keepTrackApi.emit(EventBusEvent.setSensor, defaultSensor, 1)).not.toThrow();
+    expect(() => EventBus.getInstance().emit(EventBusEvent.setSensor, null, null)).not.toThrow();
+    expect(() => EventBus.getInstance().emit(EventBusEvent.setSensor, defaultSensor, 1)).not.toThrow();
   });
 
   // test stfFormOnSubmit static method
@@ -40,7 +43,7 @@ describe('ShortTermFences_class', () => {
       websiteInit(stf);
       expect(() => stf['onSubmit_']()).not.toThrow();
 
-      keepTrackApi.getSensorManager().setCurrentSensor(null);
+      ServiceLocator.getSensorManager().setCurrentSensor(null);
       expect(() => stf['onSubmit_']()).not.toThrow();
     });
   });
@@ -53,11 +56,11 @@ describe('ShortTermFences_class', () => {
       websiteInit(stf);
       expect(() => stf['stfOnObjectLinkClick_']()).not.toThrow();
 
-      keepTrackApi.getSensorManager().setCurrentSensor(null);
+      ServiceLocator.getSensorManager().setCurrentSensor(null);
       expect(() => stf['stfOnObjectLinkClick_']()).not.toThrow();
 
-      keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
-      keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
+      ServiceLocator.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
+      PluginRegistry.getPlugin(SelectSatManager).selectSat(0);
       expect(() => stf['stfOnObjectLinkClick_']()).not.toThrow();
     });
   });

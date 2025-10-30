@@ -33,8 +33,8 @@ describe('EditSatPlugin_class', () => {
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
 
     toggleButton.click();
-    keepTrackApi.getCatalogManager().sccNum2Id = () => 0;
-    keepTrackApi.getCatalogManager().getObject = () => defaultSat;
+    ServiceLocator.getCatalogManager().sccNum2Id = () => 0;
+    ServiceLocator.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-newTLE');
 
     button.click();
@@ -49,8 +49,8 @@ describe('EditSatPlugin_class', () => {
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
 
     toggleButton.click();
-    keepTrackApi.getCatalogManager().sccNum2Id = () => 0;
-    keepTrackApi.getCatalogManager().getObject = () => defaultSat;
+    ServiceLocator.getCatalogManager().sccNum2Id = () => 0;
+    ServiceLocator.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-save');
 
     button.click();

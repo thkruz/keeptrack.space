@@ -1,4 +1,5 @@
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -158,13 +159,13 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
       if (isOutsideBoundaries) {
         const today = new Date();
-        const timeManagerInstance = keepTrackApi.getTimeManager();
+        const timeManagerInstance = ServiceLocator.getTimeManager();
 
         timeManagerInstance.dynamicOffsetEpoch = Date.now();
         timeManagerInstance.staticOffset = timeManagerInstance.simulationTimeObj.getTime() - today.getTime();
         timeManagerInstance.changePropRate(0, false); // Pause without toast
         timeManagerInstance.synchronize();
-        keepTrackApi.emit(EventBusEvent.staticOffsetChange, timeManagerInstance.staticOffset);
+        EventBus.getInstance().emit(EventBusEvent.staticOffsetChange, timeManagerInstance.staticOffset);
       }
     });
   }
@@ -323,7 +324,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
   private onSave_(evt: Event): void {
     this.onSubmit_();
-    keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+    ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
     const blob = new Blob([JSON.stringify(this.scenario, null, 2)], {
       type: 'text/plain;charset=utf-8',
     });
@@ -339,7 +340,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
   }
 
   private onLoad_(): void {
-    keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+    ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
     const input = document.createElement('input');
 
     input.type = 'file';

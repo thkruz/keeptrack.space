@@ -1,11 +1,12 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { Kilometers, Radians } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
 import { keepTrackApi } from '../../keepTrackApi';
-import { EventBus } from '@app/engine/events/event-bus';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class MobileManager {
   // eslint-disable-next-line require-await
@@ -53,7 +54,7 @@ export class MobileManager {
             settingsManager.isShowPrimaryLogo = false;
             settingsManager.isShowSecondaryLogo = false;
           } else if (!settingsManager.isMobileModeEnabled) {
-            keepTrackApi.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
+            ServiceLocator.getUiManager().toast('Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
               ToastMsgType.normal);
           }
 
@@ -104,7 +105,7 @@ export class MobileManager {
           EventBus.getInstance().on(
             EventBusEvent.selectSatData,
             () => {
-              keepTrackApi.getUiManager().searchManager.closeSearch();
+              ServiceLocator.getUiManager().searchManager.closeSearch();
               hideEl('actions-section');
             },
           );

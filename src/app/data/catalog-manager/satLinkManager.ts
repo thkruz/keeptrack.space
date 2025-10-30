@@ -1,11 +1,11 @@
 /* eslint-disable max-depth */
 import { SensorMath } from '@app/app/sensors/sensor-math';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { LineManager } from '@app/engine/rendering/line-manager';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DetailedSatellite, DetailedSensor, RAD2DEG } from '@ootk/src/main';
 import numeric from 'numeric';
 import type { ControlSite } from './ControlSite';
@@ -69,7 +69,7 @@ export class SatLinkManager {
   ];
 
   private idToSatnum_(): void {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     this.aehf = catalogManagerInstance.satnums2ids(this.aehf);
     this.dscs = catalogManagerInstance.satnums2ids(this.dscs);
@@ -117,7 +117,7 @@ export class SatLinkManager {
       errorManagerInstance.info('controlSiteManager unable to load!');
     }
 
-    const staticSet = keepTrackApi.getCatalogManager().staticSet;
+    const staticSet = ServiceLocator.getCatalogManager().staticSet;
 
     for (const sensor in staticSet) {
       if (!Object.prototype.hasOwnProperty.call(staticSet, sensor)) {
@@ -212,7 +212,7 @@ export class SatLinkManager {
         for (let i = 0; i < satlist.length; i++) {
           for (let j = 0; j < satlist.length; j++) {
             if (i !== j) {
-              const catalogManagerInstance = keepTrackApi.getCatalogManager();
+              const catalogManagerInstance = ServiceLocator.getCatalogManager();
               const sat1 = catalogManagerInstance.getSat(satlist[i]);
               const sat2 = catalogManagerInstance.getSat(satlist[j]);
 
@@ -246,7 +246,7 @@ export class SatLinkManager {
             }
           }
         }
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
         for (const sensorName of userlist) {
           const id = catalogManagerInstance.getSensorFromSensorName(sensorName.toString());
@@ -266,7 +266,7 @@ export class SatLinkManager {
             }
           }
           if (bestSat) {
-            lineManager.createSensorToSat(keepTrackApi.getSensorManager().getSensor(), bestSat, [0, 1.0, 0.6, 1.0]);
+            lineManager.createSensorToSat(ServiceLocator.getSensorManager().getSensor(), bestSat, [0, 1.0, 0.6, 1.0]);
           }
         }
       } catch {
@@ -277,7 +277,7 @@ export class SatLinkManager {
     if (linkType === LinkType.Users) {
       try {
         // Loop through all the users
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
         for (const sensorName of userlist) {
           // Select the current user
@@ -320,7 +320,7 @@ export class SatLinkManager {
             }
           }
           // Draw a line from the user to the satellite
-          lineManager.createSensorToSat(keepTrackApi.getSensorManager().getSensor(), bestSat, [0, 1.0, 0.6, 1.0]);
+          lineManager.createSensorToSat(ServiceLocator.getSensorManager().getSensor(), bestSat, [0, 1.0, 0.6, 1.0]);
         }
       } catch (e) {
         errorManagerInstance.info(e);

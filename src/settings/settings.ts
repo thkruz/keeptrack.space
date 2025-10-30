@@ -25,7 +25,6 @@ import { UrlManager } from '@app/engine/input/url-manager';
 import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Degrees, Kilometers, Milliseconds, Radians } from '@ootk/src/main';
 import { ClassificationString } from '../app/ui/classification';
 import { RADIUS_OF_EARTH } from '../engine/utils/constants';
@@ -37,6 +36,7 @@ import { parseGetVariables } from './parse-get-variables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 
+import { EventBus } from '@app/engine/events/event-bus';
 import type { MilkyWayTextureQuality } from '@app/engine/rendering/draw-manager/skybox-sphere';
 import type { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
@@ -146,7 +146,7 @@ export class SettingsManager {
       PersistenceManager.getInstance().saveItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION, settingsManager.earthNightTextureQuality?.toString());
     }
 
-    keepTrackApi.emit(EventBusEvent.saveSettings);
+    EventBus.getInstance().emit(EventBusEvent.saveSettings);
   }
 
   colors: ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;

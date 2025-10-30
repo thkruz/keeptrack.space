@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
 import { Scene } from '@app/engine/core/scene';
-import { mat4, quat, vec3 } from 'gl-matrix';
+import { glsl } from '@app/engine/utils/development/formatter';
 import { BaseObject, Degrees, Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
-import { keepTrackApi } from '../../../keepTrackApi';
+import { mat4, quat, vec3 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
 import { CustomMesh } from './custom-mesh';
-import { glsl } from '@app/engine/utils/development/formatter';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export interface ConeSettings {
   /** The field of view of the cone in degrees, default is 3 */
@@ -61,7 +61,7 @@ export class ConeMesh extends CustomMesh {
   }
 
   private updatePosition_() {
-    const positionData = keepTrackApi.getDotsManager()?.positionData;
+    const positionData = ServiceLocator.getDotsManager()?.positionData;
     const id = this.obj.id;
 
     this.pos = vec3.fromValues(positionData[id * 3], positionData[id * 3 + 1], positionData[id * 3 + 2]);
@@ -99,7 +99,7 @@ export class ConeMesh extends CustomMesh {
       return;
     }
 
-    const { gl } = keepTrackApi.getRenderer();
+    const { gl } = ServiceLocator.getRenderer();
 
     gl.useProgram(this.program_);
     if (tgtBuffer) {

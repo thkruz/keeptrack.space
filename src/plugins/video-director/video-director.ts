@@ -1,13 +1,13 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
 
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
-import { EventBus } from '@app/engine/events/event-bus';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -169,8 +169,8 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
         getEl('video-director-form')!.addEventListener('change', VideoDirectorPlugin.onFormChange);
         getEl('video-director-form')!.addEventListener('submit', VideoDirectorPlugin.onSubmit);
         getEl('video-director-rotate')!.addEventListener('click', () => {
-          keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
-          keepTrackApi.getMainCamera().autoRotate(true);
+          ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
+          ServiceLocator.getMainCamera().autoRotate(true);
         });
       },
     );
@@ -196,10 +196,10 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
       case 'video-director-zoomOut':
         if ((<HTMLInputElement>getEl(elementId))?.checked) {
           // Play sound for enabling option
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           // Play sound for disabling option
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
         break;
       default:
@@ -275,7 +275,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     }
     e.preventDefault();
 
-    keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
+    ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
     settingsManager.isAutoRotateR = (<HTMLInputElement>getEl('video-director-rotateR')).checked;
     settingsManager.isAutoRotateL = (<HTMLInputElement>getEl('video-director-rotateL')).checked;

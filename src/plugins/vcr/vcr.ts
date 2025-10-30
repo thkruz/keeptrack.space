@@ -100,7 +100,7 @@ export class VcrPlugin extends KeepTrackPlugin {
     }
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
-    if (keepTrackApi.getTimeManager().simulationTimeObj.getTime() === this.scenario!.endTime?.getTime()) {
+    if (ServiceLocator.getTimeManager().simulationTimeObj.getTime() === this.scenario!.endTime?.getTime()) {
       keepTrackApi.toast('Cannot Play: Simulation time is at the end of the scenario.', ToastMsgType.caution, true);
 
       return;
@@ -204,7 +204,7 @@ export class VcrPlugin extends KeepTrackPlugin {
   }
 
   private onStaticOffsetChanged_(): void {
-    if ((this.scenario?.endTime?.getTime() ?? -Infinity) >= keepTrackApi.getTimeManager().simulationTimeObj.getTime()) {
+    if ((this.scenario?.endTime?.getTime() ?? -Infinity) >= ServiceLocator.getTimeManager().simulationTimeObj.getTime()) {
       this.updatePausePlayBtn();
     }
   }

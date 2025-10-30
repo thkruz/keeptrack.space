@@ -1,8 +1,8 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { vec4 } from 'gl-matrix';
 import { Degrees, DetailedSatellite, ecf2rae, eci2ecf, Kilometers, lla2ecf } from '@ootk/src/main';
+import { vec4 } from 'gl-matrix';
 import { Line, LineColors } from './line';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatScanEarthLine extends Line {
   private sat: DetailedSatellite;
@@ -18,7 +18,7 @@ export class SatScanEarthLine extends Line {
   }
 
   update(): void {
-    const eci = this.sat.eci(keepTrackApi.getTimeManager().simulationTimeObj);
+    const eci = this.sat.eci(ServiceLocator.getTimeManager().simulationTimeObj);
     const eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
 
     let t = 0;

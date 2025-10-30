@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
-import { keepTrackApi } from '@app/keepTrackApi';
 import { vec3, vec4 } from 'gl-matrix';
 import { GlUtils } from '../gl-utils';
 import { LineManager } from '../line-manager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export type LineColor = typeof LineColors[keyof typeof LineColors] | vec4;
 
@@ -33,7 +33,7 @@ export abstract class Line {
   isGarbage = false;
 
   constructor(dataPoints = 2) {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     this.vertBuf_ = gl.createBuffer();
     GlUtils.bindBufferDynamicDraw(gl, this.vertBuf_, new Float32Array(dataPoints * 4));
@@ -58,7 +58,7 @@ export abstract class Line {
   abstract update(): void;
 
   updateVertBuf(points: vec3[]): void {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     GlUtils.bindBufferDynamicDraw(gl, this.vertBuf_, new Float32Array([points[0][0], points[0][1], points[0][2], 1.0, points[1][0], points[1][1], points[1][2], 1.0]));
   }

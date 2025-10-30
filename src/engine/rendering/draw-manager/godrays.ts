@@ -6,7 +6,6 @@ import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { RADIUS_OF_SUN } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4, vec2, vec4 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
 import { Sun } from './sun';
@@ -161,8 +160,8 @@ export class Godrays {
   private initFrameBuffer_(): void {
     const gl = this.gl_;
 
-    keepTrackApi.getScene().frameBuffers.godrays = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.godrays);
+    ServiceLocator.getScene().frameBuffers.godrays = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.godrays);
 
     this.renderBuffer = gl.createRenderbuffer(); // create RB to store the depth buffer
     gl.bindRenderbuffer(gl.RENDERBUFFER, this.renderBuffer);

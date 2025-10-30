@@ -11,6 +11,7 @@ import { RfSensor, SpaceObjectType } from '@ootk/src/main';
 import sensorInfoPng from '@public/img/icons/sensor-info.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SensorInfoPlugin extends KeepTrackPlugin {
   readonly id = 'SensorInfoPlugin';
@@ -19,7 +20,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
   bottomIconCallback: () => void = () => {
     this.getSensorInfo();
-    this.checkIfLinesVisible_(keepTrackApi.getLineManager());
+    this.checkIfLinesVisible_(ServiceLocator.getLineManager());
   };
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
@@ -168,7 +169,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       }
 
       if (this.isMonnLineVisible_) {
-        const lineManager = keepTrackApi.getLineManager();
+        const lineManager = ServiceLocator.getLineManager();
 
         for (const line of lineManager.lines) {
           if (line instanceof SensorToMoonLine) {
@@ -176,7 +177,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
 
             sensorMoonBtnElement.textContent = 'Add Line to Moon  \u25B6';
             this.isMonnLineVisible_ = false;
-            keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+            ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
 
 
             return;
@@ -184,20 +185,20 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
         }
       } else {
         // Prevent Multiple Sensors
-        const sensors = keepTrackApi.getSensorManager().currentSensors;
+        const sensors = ServiceLocator.getSensorManager().currentSensors;
 
         if (sensors.length !== 1) {
-          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
         }
 
         keepTrackApi
           .getLineManager()
-          .createSensorToMoon(keepTrackApi.getSensorManager().currentSensors[0]);
+          .createSensorToMoon(ServiceLocator.getSensorManager().currentSensors[0]);
 
         // Change Button Text
         sensorMoonBtnElement.textContent = 'Remove Line to Moon  \u25B6';
         this.isMonnLineVisible_ = true;
-        keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+        ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       }
     });
   }
@@ -211,34 +212,34 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       }
 
       if (this.isSunLineVisible_) {
-        const lineManager = keepTrackApi.getLineManager();
+        const lineManager = ServiceLocator.getLineManager();
 
         for (const line of lineManager.lines) {
           if (line instanceof SensorToSunLine) {
             line.isGarbage = true;
             sensorSunBtnElement.textContent = 'Add Line to Sun  \u25B6';
             this.isSunLineVisible_ = false;
-            keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+            ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
 
             return;
           }
         }
       } else {
         // Prevent Multiple Sensors
-        const sensors = keepTrackApi.getSensorManager().currentSensors;
+        const sensors = ServiceLocator.getSensorManager().currentSensors;
 
         if (sensors.length !== 1) {
-          keepTrackApi.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast('Please Select Only One Sensor', ToastMsgType.caution);
         }
 
         keepTrackApi
           .getLineManager()
-          .createSensorToSun(keepTrackApi.getSensorManager().currentSensors[0]);
+          .createSensorToSun(ServiceLocator.getSensorManager().currentSensors[0]);
 
         // Change Button Text
         sensorSunBtnElement.textContent = 'Remove Line to Sun  \u25B6';
         this.isSunLineVisible_ = true;
-        keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+        ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       }
     });
   }
@@ -248,7 +249,7 @@ export class SensorInfoPlugin extends KeepTrackPlugin {
       return;
     }
 
-    const firstSensor = keepTrackApi.getSensorManager().currentSensors[0];
+    const firstSensor = ServiceLocator.getSensorManager().currentSensors[0];
 
     const sensorLatitudeElement = getEl('sensor-latitude');
     const sensorLongitudeElement = getEl('sensor-longitude');

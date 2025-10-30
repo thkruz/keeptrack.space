@@ -20,13 +20,13 @@ describe('OrbitReferences', () => {
     const orbitReferences = new OrbitReferences();
 
     expect(() => orbitReferences.init()).not.toThrow();
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
-    expect(() => keepTrackApi.emit(EventBusEvent.selectSatData, defaultSat, 0)).not.toThrow();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    expect(() => EventBus.getInstance().emit(EventBusEvent.selectSatData, defaultSat, 0)).not.toThrow();
 
-    keepTrackApi.getCatalogManager().analSatSet = [defaultSat];
-    keepTrackApi.getPlugin(SelectSatManager).selectSat(0);
-    keepTrackApi.getCatalogManager().addAnalystSat = () => defaultSat;
+    ServiceLocator.getCatalogManager().analSatSet = [defaultSat];
+    PluginRegistry.getPlugin(SelectSatManager).selectSat(0);
+    ServiceLocator.getCatalogManager().addAnalystSat = () => defaultSat;
     getEl('orbit-references-link').click();
   });
 });

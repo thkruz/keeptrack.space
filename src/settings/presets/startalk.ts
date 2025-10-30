@@ -6,6 +6,8 @@ import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
 import { keepTrackApi } from '../../keepTrackApi';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export const starTalk = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>5; // NOTE: 0 will make the geosynchronous satellites more apparent
@@ -71,7 +73,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
    * yearStr is the last two digits of the year in string format
    */
   settingsManager.timeMachineString = (yearStr) => {
-    keepTrackApi.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
+    ServiceLocator.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
     const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
     const english = `In ${yearPrefix}${yearStr}`;
     /*
@@ -87,7 +89,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
   };
 
   settingsManager.onLoadCb = () => {
-    keepTrackApi.getTimeManager().setSelectedDate(new Date(2025, 3, 9, 17, 0)); // Set Date to 2022
+    ServiceLocator.getTimeManager().setSelectedDate(new Date(2025, 3, 9, 17, 0)); // Set Date to 2022
 
     hideEl('nav-footer');
 
@@ -136,26 +138,26 @@ export const starTalk = (settingsManager: SettingsManager) => {
     settingsManager.loopTimeMachine = true; // Loop through the years
 
     const startTimeMachine = () => {
-      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
       setTimeout(() => {
-        (keepTrackApi.getPlugin(TimeMachine)!).historyOfSatellitesPlay(); // Start Time Machine
-        keepTrackApi.getMainCamera().state.zoomTarget = 1; // Reset Zoom to Default
-        keepTrackApi.getMainCamera().camSnap(lat2pitch(DEFAULT_LATITUDE), lon2yaw(DEFAULT_LONGITUDE, new Date())); // Reset Camera to Default
+        (PluginRegistry.getPlugin(TimeMachine)!).historyOfSatellitesPlay(); // Start Time Machine
+        ServiceLocator.getMainCamera().state.zoomTarget = 1; // Reset Zoom to Default
+        ServiceLocator.getMainCamera().camSnap(lat2pitch(DEFAULT_LATITUDE), lon2yaw(DEFAULT_LONGITUDE, new Date())); // Reset Camera to Default
       }, 100);
       setTimeout(() => {
-        keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
-        keepTrackApi.getMainCamera().autoRotate(true); // Start Rotating Camera
+        ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
+        ServiceLocator.getMainCamera().autoRotate(true); // Start Rotating Camera
       }, DELAY_BEFORE_ROTATING);
     };
 
     // Initialize
     settingsManager.lastInteractionTime = Date.now() - RESTART_ROTATE_TIME * 1000 + 1000;
-    const allSatsGroup = keepTrackApi.getGroupsManager().createGroup(0, null); // All Satellites
+    const allSatsGroup = ServiceLocator.getGroupsManager().createGroup(0, null); // All Satellites
 
     setInnerHtml('textOverlay', 'Building Buffers');
 
     // Show All Orbits first to build buffers
-    keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
+    ServiceLocator.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
     setTimeout(() => {
       // Start Time Machine after 5 seconds to allow for buffers to be built
       startTimeMachine();
@@ -163,24 +165,24 @@ export const starTalk = (settingsManager: SettingsManager) => {
       setInterval(() => {
         if (Date.now() - settingsManager.lastInteractionTime > RESTART_ROTATE_TIME * 1000) {
           // If Time Machine is Off
-          if (!(keepTrackApi.getPlugin(TimeMachine)!).isTimeMachineRunning) {
+          if (!(PluginRegistry.getPlugin(TimeMachine)!).isTimeMachineRunning) {
             startTimeMachine();
-          } else if ((keepTrackApi.getPlugin(TimeMachine)!).historyOfSatellitesRunCount >= 67) {
+          } else if ((PluginRegistry.getPlugin(TimeMachine)!).historyOfSatellitesRunCount >= 67) {
             setTimeout(() => {
               startTimeMachine();
             }, settingsManager.timeMachineDelay);
           }
           // If Time Machine is Running
-        } else if ((keepTrackApi.getPlugin(TimeMachine)!).isTimeMachineRunning) {
-          (keepTrackApi.getPlugin(TimeMachine)!).isTimeMachineRunning = false; // Stop Time Machine
+        } else if ((PluginRegistry.getPlugin(TimeMachine)!).isTimeMachineRunning) {
+          (PluginRegistry.getPlugin(TimeMachine)!).isTimeMachineRunning = false; // Stop Time Machine
 
-          settingsManager.colors.transparent = keepTrackApi.getOrbitManager().tempTransColor;
+          settingsManager.colors.transparent = ServiceLocator.getOrbitManager().tempTransColor;
 
-          keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
+          ServiceLocator.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
 
           // groupsManager.selectGroup(null); // Deselect all orbits
-          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true); // Reset All Colors
-          keepTrackApi.getUiManager().dismissAllToasts();
+          ServiceLocator.getColorSchemeManager().calculateColorBuffers(true); // Reset All Colors
+          ServiceLocator.getUiManager().dismissAllToasts();
 
           /*
            * Add these four lines if you want to hide the orbits when interacting with the mouse

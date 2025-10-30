@@ -18,6 +18,8 @@ import { missileManager } from '../missile/missile-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { StereoMap } from '../stereo-map/stereo-map';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 const SECTIONS = {
   SENSOR: 'sensor-sat-info',
@@ -45,7 +47,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
-      keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createSensorSection_(), order: 5 });
+      PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createSensorSection_(), order: 5 });
     });
   }
 
@@ -58,7 +60,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   }
 
   private satInfoBoxAddListeners_() {
-    const satInfoBoxPlugin = keepTrackApi.getPlugin(SatInfoBox)!;
+    const satInfoBoxPlugin = PluginRegistry.getPlugin(SatInfoBox)!;
 
     satInfoBoxPlugin.addListenerToCollapseElement(getEl(`${SECTIONS.SENSOR}`), { value: this.isSensorSectionCollapsed_ });
   }
@@ -102,7 +104,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     if (obj === null || typeof obj === 'undefined' || settingsManager.isDisableSensors) {
       return;
     }
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     /*
      * If we are using the sensor manager plugin then we should hide the sensor to satellite
@@ -130,13 +132,13 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   private calculateSunStatus_(obj: BaseObject) {
     let satInSun: SunStatus;
     let sunTime: SunTime;
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
     let now = new Date(timeManagerInstance.simulationTimeObj.getTime());
 
     try {
       sunTime = Sun.getTimes(now, sensorManagerInstance.currentSensors[0].lat, sensorManagerInstance.currentSensors[0].lon);
-      satInSun = SatMath.calculateIsInSun(obj, keepTrackApi.getScene().sun.eci);
+      satInSun = SatMath.calculateIsInSun(obj, ServiceLocator.getScene().sun.eci);
     } catch {
       sunTime = {
         sunriseStart: new Date(2050),
@@ -211,8 +213,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
 
     try {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
-      const sensorManagerInstance = keepTrackApi.getSensorManager();
+      const timeManagerInstance = ServiceLocator.getTimeManager();
+      const sensorManagerInstance = ServiceLocator.getSensorManager();
 
       if (obj instanceof DetailedSatellite) {
         if (!obj.position?.x || !obj.position?.y || !obj.position?.z || isNaN(obj.position?.x) || isNaN(obj.position?.y) || isNaN(obj.position?.z)) {
@@ -226,7 +228,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
                 ToastMsgType.error,
                 true,
               );
-            keepTrackApi.getPlugin(SelectSatManager)!.selectSat(-1);
+            PluginRegistry.getPlugin(SelectSatManager)!.selectSat(-1);
 
             return;
           }
@@ -234,8 +236,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
         let isInView, rae;
 
-        if (keepTrackApi.getSensorManager().isSensorSelected()) {
-          const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+        if (ServiceLocator.getSensorManager().isSensorSelected()) {
+          const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
           rae = sensor.rae(obj, timeManagerInstance.simulationTimeObj);
           isInView = sensor.isRaeInFov(rae);
@@ -248,7 +250,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           isInView = false;
         }
 
-        const lla = eci2lla(obj.position, keepTrackApi.getTimeManager().gmst);
+        const lla = eci2lla(obj.position, ServiceLocator.getTimeManager().gmst);
         const currentTearr: TearrData = {
           time: timeManagerInstance.simulationTimeObj.toISOString(),
           az: rae.az,
@@ -261,12 +263,12 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           inView: isInView,
         };
 
-        keepTrackApi.getSensorManager().currentTEARR = currentTearr;
+        ServiceLocator.getSensorManager().currentTEARR = currentTearr;
       } else if (obj instanceof OemSatellite) {
         let isInView, rae;
 
-        if (keepTrackApi.getSensorManager().isSensorSelected()) {
-          const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+        if (ServiceLocator.getSensorManager().isSensorSelected()) {
+          const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
           rae = eci2rae(timeManagerInstance.simulationTimeObj, obj.position, sensor);
           isInView = sensor.isRaeInFov(rae);
@@ -279,7 +281,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           isInView = false;
         }
 
-        const lla = eci2lla(obj.position, keepTrackApi.getTimeManager().gmst);
+        const lla = eci2lla(obj.position, ServiceLocator.getTimeManager().gmst);
         const currentTearr: TearrData = {
           time: timeManagerInstance.simulationTimeObj.toISOString(),
           az: rae.az,
@@ -292,18 +294,18 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           inView: isInView,
         };
 
-        keepTrackApi.getSensorManager().currentTEARR = currentTearr;
+        ServiceLocator.getSensorManager().currentTEARR = currentTearr;
       } else {
         // Is Missile
-        keepTrackApi.getSensorManager().currentTEARR = missileManager.getMissileTEARR(obj as MissileObject);
+        ServiceLocator.getSensorManager().currentTEARR = missileManager.getMissileTEARR(obj as MissileObject);
       }
 
       if (
         settingsManager.plugins?.StereoMap &&
-        keepTrackApi.getPlugin(StereoMap)?.isMenuButtonActive &&
+        PluginRegistry.getPlugin(StereoMap)?.isMenuButtonActive &&
         timeManagerInstance.realTime > settingsManager.lastMapUpdateTime + 30000
       ) {
-        keepTrackApi.getPlugin(StereoMap)?.updateMap();
+        PluginRegistry.getPlugin(StereoMap)?.updateMap();
         settingsManager.lastMapUpdateTime = timeManagerInstance.realTime;
       }
 
@@ -312,14 +314,14 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       const nextPassElement = getEl('sat-nextpass');
 
       if (sensorManagerInstance.isSensorSelected()) {
-        const uiManagerInstance = keepTrackApi.getUiManager();
+        const uiManagerInstance = ServiceLocator.getUiManager();
 
         /*
          * If we didn't just calculate next pass time for this satellite and sensor combination do it
          * TODO: Make new logic for this to allow it to be updated while selected
          */
         if (
-          (keepTrackApi.getPlugin(SelectSatManager)!.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
+          (PluginRegistry.getPlugin(SelectSatManager)!.selectedSat !== uiManagerInstance.lastNextPassCalcSatId ||
             sensorManagerInstance.currentSensors[0].objName !== uiManagerInstance.lastNextPassCalcSensorShortName) &&
           !obj.isMissile()
         ) {
@@ -339,7 +341,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
            * lineManager.create('ref',[sun.sunvar.position.x,sun.sunvar.position.y,sun.sunvar.position.z]);
            */
         }
-        uiManagerInstance.lastNextPassCalcSatId = keepTrackApi.getPlugin(SelectSatManager)!.selectedSat;
+        uiManagerInstance.lastNextPassCalcSatId = PluginRegistry.getPlugin(SelectSatManager)!.selectedSat;
         uiManagerInstance.lastNextPassCalcSensorShortName = sensorManagerInstance.currentSensors[0]?.objName ?? '';
       } else if (nextPassElement) {
         nextPassElement.innerHTML = 'Unavailable';
@@ -359,7 +361,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       maxTmx: getEl('sat-maxTmx'),
     };
 
-    if (keepTrackApi.getSensorManager().currentTEARR.inView) {
+    if (ServiceLocator.getSensorManager().currentTEARR.inView) {
       this.updateSatTearrInFov_(elements, obj, sensorManagerInstance, timeManagerInstance);
     } else {
       this.updateSatTearrOutFov_(elements, sensorManagerInstance);
@@ -375,7 +377,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
     if (elements.az) {
       elements.az.innerHTML = 'Out of FOV';
-      const az = keepTrackApi.getSensorManager().currentTEARR.az;
+      const az = ServiceLocator.getSensorManager().currentTEARR.az;
 
       if (az) {
         elements.az.title = `Azimuth: ${az.toFixed(0)}°`;
@@ -386,7 +388,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
     if (elements.el) {
       elements.el.innerHTML = 'Out of FOV';
-      const el = keepTrackApi.getSensorManager().currentTEARR.el;
+      const el = ServiceLocator.getSensorManager().currentTEARR.el;
 
       if (el) {
         elements.el.title = `Elevation: ${el.toFixed(1)}°`;
@@ -397,7 +399,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
     if (elements.rng) {
       elements.rng.innerHTML = 'Out of FOV';
-      const rng = keepTrackApi.getSensorManager().currentTEARR.rng;
+      const rng = ServiceLocator.getSensorManager().currentTEARR.rng;
 
       if (rng) {
         elements.rng.title = `Range: ${rng.toFixed(2)} km`;
@@ -427,7 +429,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     maxTmx: HTMLElement | null;
   }, obj: BaseObject, sensorManagerInstance: SensorManager, timeManagerInstance: TimeManager) {
     if (elements.az) {
-      const az = keepTrackApi.getSensorManager().currentTEARR.az;
+      const az = ServiceLocator.getSensorManager().currentTEARR.az;
 
       if (az) {
         elements.az.innerHTML = `${az.toFixed(0)}°`;
@@ -436,7 +438,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       }
     } // Convert to Degrees
     if (elements.el) {
-      const el = keepTrackApi.getSensorManager().currentTEARR.el;
+      const el = ServiceLocator.getSensorManager().currentTEARR.el;
 
       if (el) {
         elements.el.innerHTML = `${el.toFixed(1)}°`;
@@ -445,14 +447,14 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       }
     }
     if (elements.rng) {
-      const rng = keepTrackApi.getSensorManager().currentTEARR.rng;
+      const rng = ServiceLocator.getSensorManager().currentTEARR.rng;
 
       if (rng) {
         elements.rng.innerHTML = `${rng.toFixed(2)} km`;
       } else {
         elements.rng.innerHTML = 'Unknown';
       }
-      const sun = keepTrackApi.getScene().sun;
+      const sun = ServiceLocator.getScene().sun;
 
       if (elements.vmag) {
         if (obj.isMissile()) {
@@ -466,7 +468,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       let beamwidthString = 'Unknown';
 
       if (sensorManagerInstance.currentSensors[0] instanceof RfSensor) {
-        const currentRange = keepTrackApi.getSensorManager().currentTEARR.rng;
+        const currentRange = ServiceLocator.getSensorManager().currentTEARR.rng;
 
         beamwidthString = sensorManagerInstance.currentSensors[0].beamwidth && currentRange
           ? `${(currentRange * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2)} km`
@@ -476,7 +478,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         elements.beamwidth.innerHTML = beamwidthString;
       }
       if (elements.maxTmx) {
-        const currentRange = keepTrackApi.getSensorManager().currentTEARR.rng;
+        const currentRange = ServiceLocator.getSensorManager().currentTEARR.rng;
         // Time for RF to hit target and bounce back
 
         elements.maxTmx.innerHTML = currentRange ? `${((currentRange / cKmPerMs) * 2).toFixed(2)} ms` : 'Unknown';

@@ -1,10 +1,9 @@
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { Container } from '@app/engine/core/container';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManagerOverride } from '@app/settings/settings';
 import { DetailedSatellite, Milliseconds, Satellite } from '@ootk/src/main';
 import { CatalogLoader } from '../src/app/data/catalog-loader';
-import { UiManager } from '../src/app/ui/uiManager';
+import { UiManager } from '../src/app/ui/ui-manager';
 import { SatCruncherMessageData, Singletons } from '../src/engine/core/interfaces';
 import { OrbitManager } from '../src/engine/rendering/orbitManager';
 import { WebGLRenderer } from '../src/engine/rendering/webgl-renderer';
@@ -61,7 +60,7 @@ const setupStandardEnvironment = () => {
   // eslint-disable-next-line require-await
   jest.spyOn(CatalogLoader, 'load').mockImplementation(async () => {
     // Setup a mock catalog
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     catalogManagerInstance.objectCache = [
       new DetailedSatellite({ ...defaultSat, ...{ id: 0, type: 1 } }),
@@ -100,10 +99,10 @@ describe('code_snippet', () => {
 
   // Tests that the constructor initializes all necessary objects and settings correctly.
   it('test_constructor_initializes_objects_without_showErrorCode', () => {
-    const drawManagerInstance = keepTrackApi.getRenderer();
+    const drawManagerInstance = ServiceLocator.getRenderer();
 
     drawManagerInstance.update = jest.fn();
-    keepTrackApi.getMainCamera().draw = jest.fn();
+    ServiceLocator.getMainCamera().draw = jest.fn();
 
     let keepTrack: KeepTrack;
     const initializationTest = async () => {
@@ -120,7 +119,7 @@ describe('code_snippet', () => {
 
   // Test that error messages are displayed on the loading screen in case of errors.
   it.skip('test_error_messages_displayed_on_loading_screen', () => {
-    const scene = keepTrackApi.getScene();
+    const scene = ServiceLocator.getScene();
 
     scene.loadScene = () => {
       throw new Error('Test error');
@@ -142,11 +141,11 @@ describe('code_snippet', () => {
     const keepTrack = KeepTrack.getInstance();
 
     keepTrack.init(settingsOverride);
-    const drawManagerInstance = keepTrackApi.getRenderer();
+    const drawManagerInstance = ServiceLocator.getRenderer();
 
     keepTrack.run().then(() => {
       drawManagerInstance.update = jest.fn();
-      keepTrackApi.getMainCamera().draw = jest.fn();
+      ServiceLocator.getMainCamera().draw = jest.fn();
       settingsManager.cruncherReady = true;
       // keepTrack.engine.run();
       // eslint-disable-next-line dot-notation
@@ -154,7 +153,7 @@ describe('code_snippet', () => {
       // eslint-disable-next-line dot-notation
       keepTrack.engine['draw_'](1 as Milliseconds);
       expect(drawManagerInstance.update).toHaveBeenCalled();
-      expect(keepTrackApi.getMainCamera().draw).toHaveBeenCalled();
+      expect(ServiceLocator.getMainCamera().draw).toHaveBeenCalled();
     });
   });
 

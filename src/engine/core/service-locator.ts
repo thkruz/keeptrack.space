@@ -3,7 +3,7 @@ import type { GroupsManager } from '@app/app/data/groups-manager';
 import type { SensorMath } from '@app/app/sensors/sensor-math';
 import type { SensorManager } from '@app/app/sensors/sensorManager';
 import type { HoverManager } from '@app/app/ui/hover-manager';
-import type { UiManager } from '@app/app/ui/uiManager';
+import type { UiManager } from '@app/app/ui/ui-manager';
 import { Container } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import type { SoundManager } from '@app/plugins/sounds/sound-manager';

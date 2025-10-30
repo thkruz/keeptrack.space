@@ -5,10 +5,12 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SettingsManager, settingsManager } from '@app/settings/settings';
 import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { DEG2RAD, Degrees, DetailedSatellite, RAD2DEG, Radians } from '@ootk/src/main';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { AtmosphereSettings, EarthTextureStyle } from '../rendering/draw-manager/earth-quality-enums';
 import { getEl } from '../utils/get-el';
+import { PluginRegistry } from '../core/plugin-registry';
 
 export abstract class UrlManager {
   private static selectedSat_: DetailedSatellite | null = null;
@@ -195,7 +197,7 @@ export abstract class UrlManager {
               settingsManager.numberOfEcfOrbitsToDraw = ecfValue;
 
               EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
-                keepTrackApi.getOrbitManager().orbitWorker.postMessage({
+                ServiceLocator.getOrbitManager().orbitWorker.postMessage({
                   typ: OrbitCruncherType.SETTINGS_UPDATE,
                   numberOfOrbitsToDraw: settingsManager.numberOfEcfOrbitsToDraw,
                 });
@@ -219,7 +221,7 @@ export abstract class UrlManager {
         switch (key) {
           case 'search':
             if (!settingsManager.disableUI) {
-              const uiManagerInstance = keepTrackApi.getUiManager();
+              const uiManagerInstance = ServiceLocator.getUiManager();
 
               uiManagerInstance.doSearch(kv.search);
               if (settingsManager.lastSearchResults.length === 0) {
@@ -275,9 +277,9 @@ export abstract class UrlManager {
     }
     this.lastUpdateTime_ = Date.now();
 
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const mainCamera = keepTrackApi.getMainCamera();
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const mainCamera = ServiceLocator.getMainCamera();
 
     if (!uiManagerInstance?.searchManager) {
       return;
@@ -336,9 +338,9 @@ export abstract class UrlManager {
       paramSlices.push(`camDistBuffer=${mainCamera.state.camDistBuffer}`);
     }
 
-    if (keepTrackApi.getColorSchemeManager().currentColorScheme.id !== 'CelestrakColorScheme') {
+    if (ServiceLocator.getColorSchemeManager().currentColorScheme.id !== 'CelestrakColorScheme') {
       const shorthandFromDefinition = Object.keys(UrlManager.colorSchemeDefinitions_).find(
-        (key) => UrlManager.colorSchemeDefinitions_[key] === keepTrackApi.getColorSchemeManager().currentColorScheme.id,
+        (key) => UrlManager.colorSchemeDefinitions_[key] === ServiceLocator.getColorSchemeManager().currentColorScheme.id,
       );
 
       paramSlices.push(`color=${shorthandFromDefinition}`);
@@ -380,22 +382,22 @@ export abstract class UrlManager {
   }
 
   private static handleIntldesParam_(val: string) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const urlSatId = catalogManagerInstance.intlDes2id(val.toUpperCase());
 
     if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId)?.active) {
-      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(urlSatId);
     } else {
       keepTrackApi.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
     }
   }
 
   private static handleSatParam_(val: string) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
 
     if (urlSatId !== null) {
-      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(urlSatId);
     } else {
       keepTrackApi.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
     }
@@ -443,7 +445,7 @@ export abstract class UrlManager {
   }
 
   private static handleRateParam_(val: string) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
     let rate = parseFloat(val);
 
     if (isNaN(rate)) {
@@ -477,7 +479,7 @@ export abstract class UrlManager {
       return;
     }
 
-    keepTrackApi.getMainCamera().state.zoomTarget = zoom;
+    ServiceLocator.getMainCamera().state.zoomTarget = zoom;
 
     if (camDistBufferValue >= settingsManager.nearZoomLevel) {
       // Outside camDistBuffer
@@ -504,7 +506,7 @@ export abstract class UrlManager {
 
       return;
     }
-    const mainCameraInstance = keepTrackApi.getMainCamera();
+    const mainCameraInstance = ServiceLocator.getMainCamera();
 
     mainCameraInstance.autoRotate(false);
     mainCameraInstance.camSnap(pitchNum * DEG2RAD as Radians, yawNum * DEG2RAD as Radians);
@@ -540,14 +542,14 @@ export abstract class UrlManager {
       return;
     }
 
-    keepTrackApi.getMainCamera().autoRotate(false);
+    ServiceLocator.getMainCamera().autoRotate(false);
 
     if (date !== null && !isNaN(parseInt(date))) {
       setTimeout(() => {
-        keepTrackApi.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
+        ServiceLocator.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
       }, 10500);
     } else {
-      keepTrackApi.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
+      ServiceLocator.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
     }
   }
 
@@ -575,7 +577,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = false;
         EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
-          keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+          PluginRegistry.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
       case 'opscenter':
@@ -589,7 +591,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
         EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
-          keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+          PluginRegistry.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
       case '90s':
@@ -603,7 +605,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
         EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
-          keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+          PluginRegistry.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
       default:

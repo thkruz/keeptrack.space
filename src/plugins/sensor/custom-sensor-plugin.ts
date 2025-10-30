@@ -8,7 +8,6 @@ import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { slideInRight } from '@app/engine/utils/slide';
 import { triggerSubmit } from '@app/engine/utils/trigger-submit';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { Degrees, DetailedSensor, Kilometers, SpaceObjectType, ZoomValue } from '@ootk/src/main';
@@ -19,13 +18,15 @@ import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
 import { SoundNames } from '../sounds/sounds';
 import { SensorInfoPlugin } from './sensor-info-plugin';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
   readonly id = 'CustomSensorPlugin';
   dependencies_ = [];
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
-      const sensorManagerInstance = keepTrackApi.getSensorManager();
+      const sensorManagerInstance = ServiceLocator.getSensorManager();
 
       if (sensorManagerInstance.isSensorSelected()) {
         (<HTMLInputElement>getEl('cs-replace')).style.display = '';
@@ -145,10 +146,10 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   </ul>`;
 
   rmbCallback: (targetId: string, clickedSat?: number) => void = (targetId: string) => {
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const mouseInputInstance = keepTrackApi.getInputManager().mouse;
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const mouseInputInstance = ServiceLocator.getInputManager().mouse;
 
     switch (targetId) {
       case 'create-observer-rmb':
@@ -258,13 +259,13 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
   private static addUseGeolocationListener_() {
     getEl('cs-geolocation')!.addEventListener('click', UiGeolocation.useCurrentGeolocationAsSensor);
-    keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
   }
 
   private static addClearCustomSensorListener_() {
     getEl('cs-clear')!.addEventListener('click', () => {
-      keepTrackApi.getSensorManager().clearSecondarySensors();
-      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+      ServiceLocator.getSensorManager().clearSecondarySensors();
+      ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
       CustomSensorPlugin.updateCustomSensorListDom();
     });
   }
@@ -272,20 +273,20 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   private static addCustomSensorBtnCLickListener_() {
     getEl('cs-submit')!.addEventListener('click', () => {
       CustomSensorPlugin.processCustomSensorSubmit_();
-      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+      ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
     });
     getEl('cs-replace')!.addEventListener('click', () => {
       CustomSensorPlugin.processCustomSensorSubmit_(true);
-      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+      ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
     });
   }
 
   private static processCustomSensorSubmit_(isReplaceSensor = false) {
-    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
-    keepTrackApi.getPluginByName('Planetarium')?.setBottomIconToUnselected();
-    keepTrackApi.getPluginByName('Astronomy')?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+    PluginRegistry.getPluginByName('Planetarium')?.setBottomIconToUnselected();
+    PluginRegistry.getPluginByName('Astronomy')?.setBottomIconToUnselected();
 
     (<HTMLInputElement>getEl('sensor-type')).value = (<HTMLInputElement>getEl('cs-type')).value.replace(/</gu, '&lt;').replace(/>/gu, '&gt;');
     getEl('sensor-info-title')!.innerHTML = 'Custom Sensor';
@@ -379,7 +380,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     const randomUUID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
-    keepTrackApi.getSensorManager().addSecondarySensor(
+    ServiceLocator.getSensorManager().addSecondarySensor(
       new DetailedSensor({
         lat,
         lon,
@@ -407,10 +408,10 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   }
 
   private static updateCustomSensorListDom() {
-    const primarySensor = keepTrackApi.getSensorManager().currentSensors[0]?.objName?.startsWith('Custom Sensor')
-      ? [keepTrackApi.getSensorManager().currentSensors[0]]
+    const primarySensor = ServiceLocator.getSensorManager().currentSensors[0]?.objName?.startsWith('Custom Sensor')
+      ? [ServiceLocator.getSensorManager().currentSensors[0]]
       : [] as DetailedSensor[];
-    const sensors = primarySensor.concat(keepTrackApi.getSensorManager().secondarySensors);
+    const sensors = primarySensor.concat(ServiceLocator.getSensorManager().secondarySensors);
 
     getEl('custom-sensors-sensor-list')!.innerHTML = sensors.map((sensor) => `
       <div class="row" style="height: 100%; display: flex; align-items: center; margin: 20px 0px;">
@@ -433,11 +434,11 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     document.querySelectorAll('.remove-sensor').forEach((el) => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
-        keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+        ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
         const objName = (<HTMLElement>e.target).dataset.id;
-        const sensor = keepTrackApi.getSensorManager().getSensorByObjName(objName);
+        const sensor = ServiceLocator.getSensorManager().getSensorByObjName(objName);
 
-        keepTrackApi.getSensorManager().removeSensor(sensor);
+        ServiceLocator.getSensorManager().removeSensor(sensor);
         CustomSensorPlugin.updateCustomSensorListDom();
       });
     });
@@ -467,7 +468,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         getEl('cs-minrange-div')!.style.display = 'block';
         getEl('cs-maxrange-div')!.style.display = 'block';
 
-        const sensorManagerInstance = keepTrackApi.getSensorManager();
+        const sensorManagerInstance = ServiceLocator.getSensorManager();
 
         if (sensorManagerInstance.isSensorSelected()) {
           (<HTMLInputElement>getEl('cs-minaz')).value = sensorManagerInstance.currentSensors[0].minAz.toString();

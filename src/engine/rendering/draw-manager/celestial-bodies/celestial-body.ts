@@ -19,7 +19,6 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { DEG2RAD, EciVec3, EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, SpaceObjectType, TEME, Vector3D } from '@ootk/src/main';
 import { Body, KM_PER_AU, BackdatePosition as backdatePosition, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
-import { keepTrackApi } from '../../../../keepTrackApi';
 import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';
 import { OrbitPathLine } from '../../line-manager/orbit-path';
@@ -244,12 +243,12 @@ export abstract class CelestialBody {
   protected setUniforms_(gl: WebGL2RenderingContext, sunPosition: vec3) {
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, ServiceLocator.getRenderer().projectionCameraMatrix);
     gl.uniform3fv(this.mesh.material.uniforms.sunPos, vec3.fromValues(sunPosition[0] * 100, sunPosition[1] * 100, sunPosition[2] * 100));
     gl.uniform3fv(this.mesh.material.uniforms.worldOffset, [-this.relativeSatPos.x, -this.relativeSatPos.y, -this.relativeSatPos.z]);
     gl.uniform1f(this.mesh.material.uniforms.drawPosition, Math.sqrt(this.position[0] ** 2 + this.position[1] ** 2 + this.position[2] ** 2));
     gl.uniform1i(this.mesh.material.uniforms.sampler, 0);
-    gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+    gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, ServiceLocator.getMainCamera().getForwardVector());
     gl.uniform1f(this.mesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
   }
 

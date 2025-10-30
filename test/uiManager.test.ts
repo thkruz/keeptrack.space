@@ -1,5 +1,5 @@
+import { UiManager } from '@app/app/ui/ui-manager';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
-import { UiManager } from '@app/app/ui/uiManager';
 import { GeolocationPosition } from '@app/engine/core/interfaces';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -26,7 +26,7 @@ describe('uiManager', () => {
     <div id="sensor-minrange"></div>
     <div id="sensor-maxrange"></div>
     `;
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     sensorManagerInstance.currentSensors = [defaultSensor];
   });

@@ -1,5 +1,7 @@
 import { SensorMath, TearrData, TearrType } from '@app/app/sensors/sensor-math';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -9,7 +11,6 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, DetailedSensor, SpaceObjectType } from '@ootk/src/main';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -24,7 +25,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
@@ -96,7 +97,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       </div>
     </div>`;
   downloadIconCb = () => {
-    const sensor = keepTrackApi.getSensorManager().getSensor();
+    const sensor = ServiceLocator.getSensorManager().getSensor();
 
     if (!this.lastlooksArray_) {
       this.refreshSideMenuData_();
@@ -177,7 +178,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   }
 
   private checkIfCanBeEnabled_(obj: BaseObject | null) {
-    if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
+    if (obj?.isSatellite() && ServiceLocator.getSensorManager().isSensorSelected()) {
       this.setBottomIconToEnabled();
       if (this.isMenuButtonActive && obj) {
         this.getlookangles_(obj as DetailedSatellite);
@@ -204,10 +205,10 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   }
 
   private getlookangles_(sat: DetailedSatellite, sensors?: DetailedSensor[]): TearrData[] {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     if (!sensors) {
-      const sensorManagerInstance = keepTrackApi.getSensorManager();
+      const sensorManagerInstance = ServiceLocator.getSensorManager();
 
       // Error Checking
       if (!sensorManagerInstance.isSensorSelected()) {

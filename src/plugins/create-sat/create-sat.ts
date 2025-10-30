@@ -10,7 +10,6 @@ import {
 } from '@ootk/src/main';
 import addSatellitePnng from '@public/img/icons/add-satellite.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 import { SatMath } from '@app/app/analysis/sat-math';
@@ -24,6 +23,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { saveAs } from 'file-saver';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 /**
  * Interface for TLE input parameters
@@ -268,9 +268,9 @@ export class CreateSat extends KeepTrackPlugin {
     (getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement).value = inc;
 
     // Set date-related values
-    const date = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
+    const date = new Date(ServiceLocator.getTimeManager().simulationTimeObj);
     const year = date.getFullYear().toString().slice(2, 4);
-    const currentJday = keepTrackApi.getTimeManager().getUTCDayOfYear(date);
+    const currentJday = ServiceLocator.getTimeManager().getUTCDayOfYear(date);
     const currentTime = (date.getUTCHours() * 3600 + date.getUTCMinutes() * 60 + date.getUTCSeconds()) / 86400;
     const day = (currentJday + currentTime).toFixed(8).padStart(12, '0');
 
@@ -504,8 +504,8 @@ export class CreateSat extends KeepTrackPlugin {
    * Create and submit a new satellite
    */
   private static createSatSubmit_(): void {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
     // Attempt to fix formatting issues
     CreateSat.fixInputFormatting_();
@@ -517,7 +517,7 @@ export class CreateSat extends KeepTrackPlugin {
     const invalidMsg = CreateSat.validateInputs_(inputParams);
 
     if (invalidMsg) {
-      keepTrackApi.getUiManager().toast(`Invalid input parameters: ${invalidMsg}`, ToastMsgType.error, true);
+      ServiceLocator.getUiManager().toast(`Invalid input parameters: ${invalidMsg}`, ToastMsgType.error, true);
 
       return;
     }
@@ -528,7 +528,7 @@ export class CreateSat extends KeepTrackPlugin {
       const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
 
       if (!obj?.isSatellite()) {
-        keepTrackApi.getUiManager().toast(
+        ServiceLocator.getUiManager().toast(
           'Invalid satellite object',
           ToastMsgType.error,
           true,
@@ -578,8 +578,8 @@ export class CreateSat extends KeepTrackPlugin {
       }
 
       // Validate altitude is reasonable
-      if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) <= 1) {
-        keepTrackApi.getUiManager().toast(
+      if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) <= 1) {
+        ServiceLocator.getUiManager().toast(
           'Failed to propagate satellite. Try different parameters or report this issue if parameters are correct.',
           ToastMsgType.caution,
           true,
@@ -636,10 +636,10 @@ export class CreateSat extends KeepTrackPlugin {
       }
 
       // Search for the new satellite
-      keepTrackApi.getUiManager().doSearch(inputParams.scc);
+      ServiceLocator.getUiManager().doSearch(inputParams.scc);
 
       // Show success message
-      keepTrackApi.getUiManager().toast(
+      ServiceLocator.getUiManager().toast(
         `Satellite ${inputParams.name} (${inputParams.scc}) created successfully`,
         ToastMsgType.normal,
         true,
@@ -656,7 +656,7 @@ export class CreateSat extends KeepTrackPlugin {
   private static exportTLE_(e: Event): void {
     e.preventDefault();
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     try {
       const scc = (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value;
@@ -664,7 +664,7 @@ export class CreateSat extends KeepTrackPlugin {
       const sat = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
       if (!sat || !sat.tle1 || !sat.tle2) {
-        keepTrackApi.getUiManager().toast('No valid TLE to export', ToastMsgType.error, true);
+        ServiceLocator.getUiManager().toast('No valid TLE to export', ToastMsgType.error, true);
 
         return;
       }
@@ -676,10 +676,10 @@ export class CreateSat extends KeepTrackPlugin {
       });
 
       saveAs(blob, `${scc}.tle`);
-      keepTrackApi.getUiManager().toast('TLE exported successfully', ToastMsgType.normal, true);
+      ServiceLocator.getUiManager().toast('TLE exported successfully', ToastMsgType.normal, true);
     } catch (error) {
       errorManagerInstance.error(error as Error, 'create-sat.ts', 'Failed to export TLE');
-      keepTrackApi.getUiManager().toast('Failed to export TLE', ToastMsgType.error, true);
+      ServiceLocator.getUiManager().toast('Failed to export TLE', ToastMsgType.error, true);
     }
   }
 }

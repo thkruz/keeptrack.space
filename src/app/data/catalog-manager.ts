@@ -30,10 +30,11 @@ import { launchSiteObjects, launchSites } from '@app/app/data/catalogs/launch-si
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { stars } from '@app/app/data/catalogs/stars';
 import { GetSatType, MissileParams, SatCruncherMessageData } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import {
   BaseObject, Degrees, DetailedSatellite, EciVec3, KilometersPerSecond, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2,
@@ -118,7 +119,7 @@ export class CatalogManager {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   staticSet = [] as any[];
   updateCruncherBuffers = (mData: SatCruncherMessageData): void => {
-    keepTrackApi.getDotsManager().updateCruncherBuffers(mData);
+    ServiceLocator.getDotsManager().updateCruncherBuffers(mData);
 
     if (typeof mData?.sensorMarkerArray !== 'undefined' && mData?.sensorMarkerArray?.length !== 0) {
       this.sensorMarkerArray = mData.sensorMarkerArray;
@@ -272,13 +273,13 @@ export class CatalogManager {
     }
 
     if (type === GetSatType.POSITION_ONLY) {
-      this.objectCache[i].position = keepTrackApi.getDotsManager().getCurrentPosition(i);
+      this.objectCache[i].position = ServiceLocator.getDotsManager().getCurrentPosition(i);
 
       return this.objectCache[i];
     }
 
     if (type !== GetSatType.SKIP_POS_VEL) {
-      keepTrackApi.getDotsManager().updatePosVel(this.objectCache[i], i);
+      ServiceLocator.getDotsManager().updatePosVel(this.objectCache[i], i);
     }
 
     return this.objectCache[i];
@@ -503,7 +504,7 @@ export class CatalogManager {
       return null;
     }
 
-    if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) > 1) {
+    if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) > 1) {
       this.objectCache[id] = new DetailedSatellite({
         active: true,
         name: `Analyst Sat ${id}`,
@@ -527,7 +528,7 @@ export class CatalogManager {
       };
 
       this.satCruncher.postMessage(m);
-      keepTrackApi.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
+      ServiceLocator.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
       const sat = this.objectCache[id] as DetailedSatellite;
 
       if (!sat.isSatellite()) {
@@ -579,10 +580,10 @@ export class CatalogManager {
     this.updateCruncherBuffers(mData);
 
     // Run any callbacks for a normal position cruncher message
-    keepTrackApi.emit(EventBusEvent.onCruncherMessage);
+    EventBus.getInstance().emit(EventBusEvent.onCruncherMessage);
 
     // Only do this once after satData, positionData, and velocityData are all received/processed from the cruncher
-    if (!settingsManager.cruncherReady && this.objectCache && keepTrackApi.getDotsManager().positionData && keepTrackApi.getDotsManager().velocityData) {
+    if (!settingsManager.cruncherReady && this.objectCache && ServiceLocator.getDotsManager().positionData && ServiceLocator.getDotsManager().velocityData) {
       this.onCruncherReady_();
     }
   }
@@ -593,16 +594,16 @@ export class CatalogManager {
     if (stars.length > 0) {
       stars.sort((a, b) => a.id - b.id);
       // this is the smallest id
-      keepTrackApi.getDotsManager().starIndex1 = stars[0].id;
+      ServiceLocator.getDotsManager().starIndex1 = stars[0].id;
       // this is the largest id
-      keepTrackApi.getDotsManager().starIndex2 = stars[stars.length - 1].id;
-      keepTrackApi.getDotsManager().updateSizeBuffer();
+      ServiceLocator.getDotsManager().starIndex2 = stars[stars.length - 1].id;
+      ServiceLocator.getDotsManager().updateSizeBuffer();
     }
 
     this.buildOrbitDensityMatrix_();
 
     // Run any functions registered with the API
-    keepTrackApi.emit(EventBusEvent.onCruncherReady);
+    EventBus.getInstance().emit(EventBusEvent.onCruncherReady);
 
     settingsManager.cruncherReady = true;
   }

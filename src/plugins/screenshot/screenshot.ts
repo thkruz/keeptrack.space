@@ -24,13 +24,14 @@
 
 import { Classification } from '@app/app/ui/classification';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { keepTrackApi } from '@app/keepTrackApi';
 import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { EventBus } from '@app/engine/events/event-bus';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class Screenshot extends KeepTrackPlugin {
   readonly id = 'Screenshot';
@@ -159,7 +160,7 @@ export class Screenshot extends KeepTrackPlugin {
   }
 
   private watermarkedDataUrl_() {
-    const canvas = keepTrackApi.getRenderer().domElement;
+    const canvas = ServiceLocator.getRenderer().domElement;
 
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');

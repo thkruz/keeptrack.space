@@ -1,12 +1,13 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { Scene } from '@app/engine/core/scene';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { DetailedSensor, SpaceObjectType } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { CustomMeshFactory } from './custom-mesh-factory';
 import { SensorFovMesh } from './sensor-fov-mesh';
-import { Scene } from '@app/engine/core/scene';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 // TODO: Sensors should be indpeneent of the object they are attached to. This will remove minAz2 and maxAz2 type of properties
 
@@ -16,7 +17,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     let didWeDrawSomething = false;
     let lastSensorObjName = '';
 
-    const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
+    const activeSensors = ServiceLocator.getSensorManager().getAllActiveSensors();
 
     this.meshes.forEach((mesh) => {
       const isNeeded = this.checkIfNeeded_(activeSensors, mesh);
@@ -29,7 +30,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
 
       if (sensors.length > 0) {
         didWeDrawSomething = true;
-        mesh.draw(pMatrix, camMatrix, keepTrackApi.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
+        mesh.draw(pMatrix, camMatrix, ServiceLocator.getColorSchemeManager().colorTheme.marker[i], tgtBuffer);
         if (mesh.sensor.objName !== lastSensorObjName) {
           i++;
           lastSensorObjName = mesh.sensor.objName as string; // It is NOT optional in KeepTrack even though ootk allows it to be
@@ -44,10 +45,10 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
      * and nothing happens.
      */
     if (!didWeDrawSomething) {
-      const sensorFovPlugin = keepTrackApi.getPlugin(SensorFov);
+      const sensorFovPlugin = PluginRegistry.getPlugin(SensorFov);
 
       if (sensorFovPlugin && sensorFovPlugin.isMenuButtonActive) {
-        keepTrackApi.getUiManager().toast('No valid FOV to draw! We can\'t draw multiple Deep Space sensors at once.', ToastMsgType.caution);
+        ServiceLocator.getUiManager().toast('No valid FOV to draw! We can\'t draw multiple Deep Space sensors at once.', ToastMsgType.caution);
         sensorFovPlugin.disableFovView();
       }
     }
@@ -69,7 +70,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
   private checkIfNeeded_(activeSensors: DetailedSensor[], mesh: SensorFovMesh): boolean {
     // There needs to be a reason to draw the radar dome.
     if (mesh.sensor.type === SpaceObjectType.SHORT_TERM_FENCE &&
-      keepTrackApi.getSensorManager().stfSensors.length === 0
+      ServiceLocator.getSensorManager().stfSensors.length === 0
     ) {
       // STFs are not reused, so remove them when they are not needed.
       this.remove(mesh.id);
@@ -77,8 +78,8 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
       return false;
     }
 
-    if (mesh.sensor.type !== SpaceObjectType.SHORT_TERM_FENCE && (!keepTrackApi.getPlugin(SensorFov)?.isMenuButtonActive &&
-      !keepTrackApi.getPlugin(SensorSurvFence)?.isMenuButtonActive)) {
+    if (mesh.sensor.type !== SpaceObjectType.SHORT_TERM_FENCE && (!PluginRegistry.getPlugin(SensorFov)?.isMenuButtonActive &&
+      !PluginRegistry.getPlugin(SensorSurvFence)?.isMenuButtonActive)) {
       return false;
     }
 
@@ -92,8 +93,8 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
   }
 
   updateAll() {
-    const gmst = keepTrackApi.getTimeManager().gmst;
-    const activeSensors = keepTrackApi.getSensorManager().getAllActiveSensors();
+    const gmst = ServiceLocator.getTimeManager().gmst;
+    const activeSensors = ServiceLocator.getSensorManager().getAllActiveSensors();
 
     this.meshes.forEach((mesh) => {
       const isNeeded = this.checkIfNeeded_(activeSensors, mesh);
@@ -151,6 +152,6 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
 
     this.add(sensorFovMesh);
 
-    sensorFovMesh.sortFacesByDistance(keepTrackApi.getMainCamera().getCamPos(Scene.getInstance().worldShift));
+    sensorFovMesh.sortFacesByDistance(ServiceLocator.getMainCamera().getCamPos(Scene.getInstance().worldShift));
   }
 }

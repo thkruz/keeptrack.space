@@ -1,11 +1,10 @@
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
+import { CatalogManager } from '@app/app/data/catalog-manager';
 import { CatalogSearch } from '@app/app/data/catalog-search';
 import { GetSatType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, SpaceObjectType } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
-import { CatalogManager } from '@app/app/data/catalog-manager';
 
 // Test calcSatrec function
 describe('calcSatrec', () => {
@@ -150,7 +149,7 @@ describe('calcSatrec', () => {
   // should process getSatPosOnly
   it('process_get_sat_pos_only', () => {
     catalogManagerInstance.objectCache = [defaultSat];
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     dotsManagerInstance.positionData = new Float32Array(3);
     const result = catalogManagerInstance.getSat(0, GetSatType.POSITION_ONLY);
@@ -161,14 +160,14 @@ describe('calcSatrec', () => {
   // Should allow set secondary
   it('process_set_secondary', () => {
     catalogManagerInstance.objectCache = [defaultSat];
-    expect(() => keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(0)).not.toThrow();
+    expect(() => PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(0)).not.toThrow();
   });
 
   // Should allow switch primary
   it('process_switch_primary', () => {
     catalogManagerInstance.objectCache = [defaultSat];
-    expect(() => keepTrackApi.getPlugin(SelectSatManager)?.switchPrimarySecondary()).not.toThrow();
-    expect(() => keepTrackApi.getPlugin(SelectSatManager)?.switchPrimarySecondary()).not.toThrow();
+    expect(() => PluginRegistry.getPlugin(SelectSatManager)?.switchPrimarySecondary()).not.toThrow();
+    expect(() => PluginRegistry.getPlugin(SelectSatManager)?.switchPrimarySecondary()).not.toThrow();
   });
 
   // Should addAnalystSat

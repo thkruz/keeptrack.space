@@ -1,10 +1,10 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { errorManagerInstance } from '../utils/errorManager';
 import { Camera, CameraType } from './camera';
 import { CameraState } from './state/camera-state';
+import { ServiceLocator } from '../core/service-locator';
 
 export class CameraInputHandler {
   private readonly camera: Camera;
@@ -164,8 +164,8 @@ export class CameraInputHandler {
   }
 
   keyDownv_() {
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
     this.camera.changeCameraType(orbitManagerInstance);
 

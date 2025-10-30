@@ -2,10 +2,10 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, Star } from '@ootk/src/main';
 import { CameraType } from '../../camera/camera';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -40,7 +40,7 @@ export class SourceColorScheme extends ColorScheme {
   }
 
   update(obj: BaseObject): ColorInformation {
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+    if (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,

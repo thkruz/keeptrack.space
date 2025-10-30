@@ -1,9 +1,8 @@
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ModelResolver } from '@app/app/rendering/mesh/model-resolver';
 import { EciArr3, GetSatType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { mat3, mat4, vec3 } from 'gl-matrix';
 import { BaseObject, DEG2RAD, Degrees, DetailedSatellite, EciVec3, EpochUTC, Kilometers, PayloadStatus, Radians, SpaceObjectType, Sun, Vec3, Vector3D } from '@ootk/src/main';
+import { mat3, mat4, vec3 } from 'gl-matrix';
 import { Layout, Mesh } from 'webgl-obj-loader';
 import { MissileObject } from '../../app/data/catalog-manager/MissileObject';
 import { SplashScreen } from '../../app/ui/splash-screen';
@@ -155,7 +154,7 @@ export class MeshManager {
       this.meshRegistry_.load(meshName, `${settingsManager.installDirectory}meshes/${meshName}.obj`, this.gl_);
     }
 
-    const posData = keepTrackApi.getDotsManager().positionData;
+    const posData = ServiceLocator.getDotsManager().positionData;
     const position = {
       x: posData[sat.id * 3],
       y: posData[sat.id * 3 + 1],
@@ -206,7 +205,7 @@ export class MeshManager {
   }
 
   private updateRotationToNadir_(drawPosition: EciArr3) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const sat = catalogManagerInstance.getObject(this.currentMeshObject.id, GetSatType.POSITION_ONLY);
 
     if (sat === null) {

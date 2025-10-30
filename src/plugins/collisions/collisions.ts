@@ -10,8 +10,9 @@ import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 //  Updated to match KeepTrack API v2
 export interface CollisionEvent {
@@ -74,7 +75,7 @@ export class Collisions extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.onCruncherMessage, () => {
       if (this.selectSatIdOnCruncher_ !== null) {
         // If selectedSatManager is loaded, set the selected sat to the one that was just added
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
 
         this.selectSatIdOnCruncher_ = null;
       }
@@ -118,14 +119,14 @@ export class Collisions extends KeepTrackPlugin {
   private eventClicked_(row: number) {
     const now = new Date();
 
-    keepTrackApi.getTimeManager().changeStaticOffset(new Date(this.collisionList_[row].TOCA).getTime() - now.getTime() - 1000 * 30);
-    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
+    ServiceLocator.getTimeManager().changeStaticOffset(new Date(this.collisionList_[row].TOCA).getTime() - now.getTime() - 1000 * 30);
+    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     const sat1 = this.collisionList_[row].SAT1.toString().padStart(5, '0');
     const sat2 = this.collisionList_[row].SAT2.toString().padStart(5, '0');
 
-    keepTrackApi.getUiManager().doSearch(`${sat1},${sat2}`);
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    ServiceLocator.getUiManager().doSearch(`${sat1},${sat2}`);
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     this.selectSatIdOnCruncher_ = catalogManagerInstance.sccNum2Id(parseInt(sat1));
   }

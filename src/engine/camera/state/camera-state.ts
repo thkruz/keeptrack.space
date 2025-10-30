@@ -1,8 +1,8 @@
 // app/keeptrack/camera/camera-state.ts
 import { SatMath } from '@app/app/analysis/sat-math';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { alt2zoom } from '@app/engine/utils/transforms';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Radians } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
@@ -224,13 +224,13 @@ export class CameraState {
   // ============ Methods ============
 
   zoomTargetChange(): void {
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
     const maxCovarianceDistance = Math.min((selectSatManagerInstance?.primarySatCovMatrix?.[2] ?? 0) * 10, 10000);
 
     if ((settingsManager.isZoomStopsSnappedOnSat || (selectSatManagerInstance?.selectedSat ?? -1) === -1) || (this.camDistBuffer >= settingsManager.nearZoomLevel)) {
 
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
-      keepTrackApi.getRenderer().setFarRenderer();
+      ServiceLocator.getRenderer().setFarRenderer();
       this.earthCenteredLastZoom = this.zoomTarget;
       this.camZoomSnappedOnSat = false;
 
@@ -254,7 +254,7 @@ export class CameraState {
       }
 
     } else {
-      keepTrackApi.getRenderer().setNearRenderer();
+      ServiceLocator.getRenderer().setNearRenderer();
 
       // Clamping camDistBuffer to be between minDistanceFromSatellite and maxZoomDistance
       this.camDistBuffer = <Kilometers>Math.min(

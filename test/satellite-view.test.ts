@@ -1,8 +1,9 @@
-import { UiManager } from '@app/app/ui/uiManager';
+import { UiManager } from '@app/app/ui/ui-manager';
 import { Camera, CameraType } from '@app/engine/camera/camera';
 import { Container } from '@app/engine/core/container';
 import { Singletons, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
@@ -47,7 +48,7 @@ describe('SatelliteViewPlugin_class', () => {
 
     selectSatManager.init();
 
-    selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager) as SelectSatManager;
+    selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager) as SelectSatManager;
 
     expect(selectSatManagerInstance).toBeDefined();
     expect(selectSatManagerInstance).not.toBeNull();
@@ -74,44 +75,44 @@ describe('SatelliteViewPlugin_class', () => {
   // Tests that a toast message is displayed when no satellite is selected and trying to activate Satellite Camera Mode
   it('test_bottomMenuClick_callback_no_satellite_selected', () => {
     const plugin = new SatelliteViewPlugin();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     selectSatManagerInstance.selectedSat = -1;
     plugin.init();
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
     Container.getInstance().registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).toHaveBeenCalledWith(t7e('errorMsgs.SelectSatelliteFirst'), ToastMsgType.serious, true);
   });
 
   // Tests that a toast message is not displayed when a satellite is selected and trying to activate Satellite Camera Mode
   it('test_bottomMenuClick_callback_satellite_selected', () => {
     const plugin = new SatelliteViewPlugin();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     selectSatManagerInstance.selectedSat = 1;
     plugin.init();
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
     Container.getInstance().registerSingleton<Camera>(Singletons.MainCamera, mockCameraManager);
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
 
   // Tests that clicking the Satellite Camera Mode icon switches the camera to Satellite mode
   it('should_switch_to_satellite_camera_mode_when_icon_clicked', () => {
     const plugin = new SatelliteViewPlugin();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     selectSatManagerInstance.selectedSat = 1;
     plugin.init();
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
     const tempMockCamera = { ...mockCameraManager, cameraType: CameraType.SATELLITE } as Camera;
 
     Container.getInstance().registerSingleton<Camera>(Singletons.MainCamera, tempMockCamera);
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
     expect(uiManagerInstance.toast).not.toHaveBeenCalled();
   });
 });

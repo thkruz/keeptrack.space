@@ -38,7 +38,7 @@ describe('SettingsMenuPlugin_class', () => {
     const settingsMenuPlugin = new SettingsMenuPlugin();
 
     websiteInit(settingsMenuPlugin);
-    keepTrackApi.getGroupsManager().clearSelect = jest.fn();
+    ServiceLocator.getGroupsManager().clearSelect = jest.fn();
     const colorSchemeManagerInstance = new ColorSchemeManager();
 
     colorSchemeManagerInstance.setColorScheme = jest.fn();

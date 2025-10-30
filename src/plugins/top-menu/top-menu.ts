@@ -1,12 +1,12 @@
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import fullscreenPng from '@public/img/icons/fullscreen.png';
 import helpPng from '@public/img/icons/help.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { EventBus } from '@app/engine/events/event-bus';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class TopMenu extends KeepTrackPlugin {
   readonly id = 'TopMenu';
@@ -93,7 +93,7 @@ export class TopMenu extends KeepTrackPlugin {
     const sensorSelectedDom = getEl('sensor-selected', true);
 
     if (sensorSelectedDom) {
-      const sensorTitle = keepTrackApi.getSensorManager()?.sensorTitle;
+      const sensorTitle = ServiceLocator.getSensorManager()?.sensorTitle;
 
       // If this.sensorTitle is empty hide the div
       if (!sensorTitle || sensorTitle === '') {

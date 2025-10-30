@@ -36,11 +36,11 @@ describe('NewLaunch_form', () => {
 
   it('should have working buttons', () => {
     websiteInit(newLaunchPlugin);
-    keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true, isSatellite: () => true });
-    keepTrackApi.getPlugin(SelectSatManager).selectedSat = defaultSat.id;
-    keepTrackApi.getCatalogManager().objectCache = Array(50).fill({ ...defaultSat, isInGroup: true, isSatellite: () => true });
-    keepTrackApi.getCatalogManager().isLaunchSiteManagerLoaded = true;
-    keepTrackApi.getCatalogManager().launchSites = {
+    ServiceLocator.getCatalogManager().getObject = jest.fn().mockReturnValue({ ...defaultSat, isInGroup: true, isSatellite: () => true });
+    PluginRegistry.getPlugin(SelectSatManager).selectedSat = defaultSat.id;
+    ServiceLocator.getCatalogManager().objectCache = Array(50).fill({ ...defaultSat, isInGroup: true, isSatellite: () => true });
+    ServiceLocator.getCatalogManager().isLaunchSiteManagerLoaded = true;
+    ServiceLocator.getCatalogManager().launchSites = {
       CAS: {
         name: 'CAS',
         lat: 0 as Degrees,
@@ -48,8 +48,8 @@ describe('NewLaunch_form', () => {
       },
     };
 
-    keepTrackApi.emit(EventBusEvent.selectSatData, defaultSat, defaultSat.id);
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, defaultSat, defaultSat.id);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, newLaunchPlugin.bottomIconElementName);
 
     expect(() => getEl(`${newLaunchPlugin.sideMenuElementName}-submit`)!.click()).not.toThrow();
     jest.advanceTimersByTime(1000);

@@ -1,5 +1,4 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SoundNames, sounds } from '@app/plugins/sounds/sounds';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -41,7 +40,7 @@ describe('Sound Manager', () => {
   });
 
   it('should_be_able_to_speak', () => {
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
     // Mock SpeechSynthesisUtterance
     const mockSpeechUtterance = jest.fn(() => ({
       lang: 'en-US',

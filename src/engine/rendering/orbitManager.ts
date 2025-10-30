@@ -2,7 +2,6 @@
 
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { SettingsManager } from '@app/settings/settings';
@@ -12,6 +11,7 @@ import { mat4 } from 'gl-matrix';
 import { HoverManager } from '../../app/ui/hover-manager';
 import { Camera, CameraType } from '../camera/camera';
 import { GetSatType } from '../core/interfaces';
+import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
@@ -69,7 +69,7 @@ export class OrbitManager {
       return;
     }
 
-    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+    const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.hoverOrbitBuf_);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array((settingsManager.orbitSegments + 1) * 4), gl.DYNAMIC_DRAW);
@@ -83,7 +83,7 @@ export class OrbitManager {
   }
 
   clearSelectOrbit(isSecondary = false): void {
-    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+    const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
 
     if (isSecondary) {
       this.secondarySelectId_ = -1;
@@ -112,8 +112,8 @@ export class OrbitManager {
     if (!this.isInitialized_) {
       return;
     }
-    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
+    const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.lineManagerInstance_.program);
@@ -159,7 +159,7 @@ export class OrbitManager {
   drawOrbitsSettingChanged(): void {
     // We may have skipped initialization on boot and now need to do it
     if (!this.isInitialized_) {
-      this.init(keepTrackApi.getLineManager(), keepTrackApi.getRenderer().gl);
+      this.init(ServiceLocator.getLineManager(), ServiceLocator.getRenderer().gl);
     }
   }
 
@@ -178,7 +178,7 @@ export class OrbitManager {
     this.gl_ = gl;
 
     this.tempTransColor = settingsManager.colors.transparent;
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     // See if we are running jest right now for testing
     this.startCruncher_(orbitWorker);
@@ -202,7 +202,7 @@ export class OrbitManager {
       this.glBuffers_.push(this.allocateBuffer());
     }
 
-    const objDataString = OrbitManager.getObjDataString(keepTrackApi.getCatalogManager().objectCache);
+    const objDataString = OrbitManager.getObjDataString(ServiceLocator.getCatalogManager().objectCache);
 
     if (!this.orbitWorker) {
       return;
@@ -238,24 +238,24 @@ export class OrbitManager {
       this.updateAllVisibleOrbits();
     });
 
-    keepTrackApi.emit(EventBusEvent.orbitManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.orbitManagerInit);
   }
 
   private toggleOrbitLines_() {
     settingsManager.isDrawOrbits = !settingsManager.isDrawOrbits;
     if (settingsManager.isDrawOrbits) {
-      keepTrackApi.getUiManager().toast('Orbits On', ToastMsgType.normal);
+      ServiceLocator.getUiManager().toast('Orbits On', ToastMsgType.normal);
     } else {
-      keepTrackApi.getUiManager().toast('Orbits Off', ToastMsgType.standby);
+      ServiceLocator.getUiManager().toast('Orbits Off', ToastMsgType.standby);
     }
   }
 
   private toggleEciToEcf_() {
     settingsManager.isOrbitCruncherInEcf = !settingsManager.isOrbitCruncherInEcf;
     if (settingsManager.isOrbitCruncherInEcf) {
-      keepTrackApi.getUiManager().toast('GEO Orbits displayed in ECF', ToastMsgType.normal);
+      ServiceLocator.getUiManager().toast('GEO Orbits displayed in ECF', ToastMsgType.normal);
     } else {
-      keepTrackApi.getUiManager().toast('GEO Orbits displayed in ECI', ToastMsgType.standby);
+      ServiceLocator.getUiManager().toast('GEO Orbits displayed in ECI', ToastMsgType.standby);
     }
   }
 
@@ -320,7 +320,7 @@ export class OrbitManager {
   }
 
   updateAllVisibleOrbits(): void {
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (uiManagerInstance.searchManager?.isResultsOpen && !settingsManager.disableUI && !settingsManager.lowPerf) {
       const currentSearchSats = uiManagerInstance.searchManager.getLastResultGroup()?.ids;
@@ -337,7 +337,7 @@ export class OrbitManager {
   }
 
   changeOrbitBufferData(id: number, tle1: string, tle2: string): void {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     if (!this.orbitWorker) {
       return;
@@ -362,8 +362,8 @@ export class OrbitManager {
       altList: Kilometers[];
     },
   ) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     const obj = catalogManagerInstance.getObject(id, GetSatType.EXTRA_ONLY);
 
@@ -430,7 +430,7 @@ export class OrbitManager {
   }
 
   private allocateBuffer(bufferLength = (settingsManager.orbitSegments + 1) * 4): WebGLBuffer {
-    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+    const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
     const buf = gl.createBuffer();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
@@ -442,7 +442,7 @@ export class OrbitManager {
   // private isCalculateColorLocked = false;
 
   private drawGroupObjectOrbit(hoverManagerInstance: HoverManager, colorSchemeManagerInstance: ColorSchemeManager): void {
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
     const colorData = colorSchemeManagerInstance.colorData;
 
     if (groupManagerInstance.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
@@ -450,7 +450,7 @@ export class OrbitManager {
         if (id === hoverManagerInstance.getHoverId() || id === this.currentSelectId_) {
           return;
         } // Skip hover and select objects
-        if (!keepTrackApi.getCatalogManager().getObject(id)?.active) {
+        if (!ServiceLocator.getCatalogManager().getObject(id)?.active) {
           return;
         } // Skip inactive objects
 
@@ -507,7 +507,7 @@ export class OrbitManager {
 
     const hoverId = hoverManagerInstance.getHoverId();
 
-    if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !keepTrackApi.getCatalogManager().getObject(hoverId, GetSatType.EXTRA_ONLY)?.isStatic()) {
+    if (hoverId !== -1 && hoverId !== this.currentSelectId_ && !ServiceLocator.getCatalogManager().getObject(hoverId, GetSatType.EXTRA_ONLY)?.isStatic()) {
       OrbitManager.checkColorBuffersValidity_(hoverId, colorSchemeManagerInstance.colorData);
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitHoverColor);
       this.writePathToGpu_(hoverId);
@@ -544,14 +544,14 @@ export class OrbitManager {
   }
 
   private drawPrimaryObjectOrbit_() {
-    if (this.currentSelectId_ !== -1 && !keepTrackApi.getCatalogManager().getObject(this.currentSelectId_, GetSatType.EXTRA_ONLY)?.isStatic()) {
+    if (this.currentSelectId_ !== -1 && !ServiceLocator.getCatalogManager().getObject(this.currentSelectId_, GetSatType.EXTRA_ONLY)?.isStatic()) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor);
       this.writePathToGpu_(this.currentSelectId_);
     }
   }
 
   private drawSecondaryObjectOrbit_(): void {
-    if (this.secondarySelectId_ !== -1 && !keepTrackApi.getCatalogManager().getObject(this.secondarySelectId_, GetSatType.EXTRA_ONLY)?.isStatic()) {
+    if (this.secondarySelectId_ !== -1 && !ServiceLocator.getCatalogManager().getObject(this.secondarySelectId_, GetSatType.EXTRA_ONLY)?.isStatic()) {
       this.lineManagerInstance_.setColorUniforms(settingsManager.orbitSelectColor2);
       this.writePathToGpu_(this.secondarySelectId_);
     }
@@ -560,7 +560,7 @@ export class OrbitManager {
   private workerOnMessage_(m: OrbitCruncherMessageMain): void {
     const satId = m.data.satId;
     const pointsOut = new Float32Array(m.data.pointsOut);
-    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+    const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
     gl.bufferData(gl.ARRAY_BUFFER, pointsOut, gl.DYNAMIC_DRAW);
@@ -570,7 +570,7 @@ export class OrbitManager {
   }
 
   private setOemSatelliteOrbitBuffer_(satId: number, pointsOut: Float32Array): void {
-    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+    const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
 
@@ -622,7 +622,7 @@ export class OrbitManager {
       // Ignore oppacity
     }
 
-    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+    const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.glBuffers_[satId]);
 
@@ -648,7 +648,7 @@ export class OrbitManager {
 
   /** Returns the current data from the buffer for the given satId. */
   getBufferData(satId: number): Float32Array | null {
-    const gl = this.gl_ ?? keepTrackApi.getRenderer().gl;
+    const gl = this.gl_ ?? ServiceLocator.getRenderer().gl;
     const buffer = this.glBuffers_[satId];
 
     if (!buffer) {
@@ -693,12 +693,12 @@ export class OrbitManager {
     }
 
     if (settingsManager.isDrawTrailingOrbits) {
-      keepTrackApi.getOrbitManager().orbitWorker.postMessage({
+      ServiceLocator.getOrbitManager().orbitWorker.postMessage({
         typ: OrbitCruncherType.CHANGE_ORBIT_TYPE,
         orbitType: OrbitDrawTypes.TRAIL,
       });
     } else {
-      keepTrackApi.getOrbitManager().orbitWorker.postMessage({
+      ServiceLocator.getOrbitManager().orbitWorker.postMessage({
         typ: OrbitCruncherType.CHANGE_ORBIT_TYPE,
         orbitType: OrbitDrawTypes.ORBIT,
       });

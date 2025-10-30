@@ -3,12 +3,12 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Planet } from '@app/app/objects/planet';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType, Star } from '@app/engine/ootk/src/main';
 import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { CameraType } from '../../camera/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
@@ -126,7 +126,7 @@ export class CelestrakColorScheme extends ColorScheme {
     }
 
     // If we are in astronomy mode, hide everything that isn't a star (above)
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY) {
+    if (ServiceLocator.getMainCamera().cameraType === CameraType.ASTRONOMY) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -143,7 +143,7 @@ export class CelestrakColorScheme extends ColorScheme {
       return this.getMarkerColor_();
     }
 
-    if (obj.isSensor() && (this.objectTypeFlags.celestrakDefaultSensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
+    if (obj.isSensor() && (this.objectTypeFlags.celestrakDefaultSensor === false || ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -183,9 +183,9 @@ export class CelestrakColorScheme extends ColorScheme {
       }
     }
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
     const sat = obj as DetailedSatellite;
 
     if (
@@ -193,7 +193,7 @@ export class CelestrakColorScheme extends ColorScheme {
         sat.type === SpaceObjectType.PAYLOAD &&
         sat.status !== PayloadStatus.NONOPERATIONAL && sat.status !== PayloadStatus.UNKNOWN &&
         this.objectTypeFlags.celestrakDefaultActivePayload === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
+      (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM &&
         sat.type === SpaceObjectType.PAYLOAD &&
         sat.status !== PayloadStatus.NONOPERATIONAL && sat.status !== PayloadStatus.UNKNOWN &&
         this.objectTypeFlags.celestrakDefaultActivePayload === false) ||
@@ -214,7 +214,7 @@ export class CelestrakColorScheme extends ColorScheme {
         sat.type === SpaceObjectType.PAYLOAD &&
         (sat.status === PayloadStatus.NONOPERATIONAL || sat.status === PayloadStatus.UNKNOWN) &&
         this.objectTypeFlags.celestrakDefaultInactivePayload === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
+      (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM &&
         sat.type === SpaceObjectType.PAYLOAD &&
         (sat.status === PayloadStatus.NONOPERATIONAL || sat.status === PayloadStatus.UNKNOWN) &&
         this.objectTypeFlags.celestrakDefaultInactivePayload === false) ||
@@ -234,7 +234,7 @@ export class CelestrakColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.UNKNOWN &&
         this.objectTypeFlags.celestrakDefaultUnknown === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
+      (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM &&
         sat.type === SpaceObjectType.UNKNOWN &&
         this.objectTypeFlags.celestrakDefaultUnknown === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
@@ -252,7 +252,7 @@ export class CelestrakColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.ROCKET_BODY &&
         this.objectTypeFlags.celestrakDefaultRocketBody === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY &&
+      (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY &&
         this.objectTypeFlags.celestrakDefaultRocketBody === false) || (catalogManagerInstance.isSensorManagerLoaded &&
           sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
           typeof sat.vmag === 'undefined' &&
@@ -268,7 +268,7 @@ export class CelestrakColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.DEBRIS &&
         this.objectTypeFlags.celestrakDefaultDebris === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.celestrakDefaultDebris === false) ||
+      (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.celestrakDefaultDebris === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
@@ -282,14 +282,14 @@ export class CelestrakColorScheme extends ColorScheme {
     }
 
     if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.celestrakDefaultFov === false &&
-      keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+      ServiceLocator.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && ServiceLocator.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
       if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
         // Intentional
       } else {

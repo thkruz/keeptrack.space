@@ -6,7 +6,7 @@ import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSu
 describe('ColorMenu_class', () => {
   beforeEach(() => {
     setupStandardEnvironment();
-    keepTrackApi.getCatalogManager().satCruncher = {
+    ServiceLocator.getCatalogManager().satCruncher = {
       addEventListener: () => {
         // Mock the addEventListener function
       },

@@ -13,7 +13,7 @@ import type { GroupsManager } from './app/data/groups-manager';
 import type { SensorMath } from './app/sensors/sensor-math';
 import type { SensorManager } from './app/sensors/sensorManager';
 import type { HoverManager } from './app/ui/hover-manager';
-import type { UiManager } from './app/ui/uiManager';
+import type { UiManager } from './app/ui/ui-manager';
 import type { Camera } from './engine/camera/camera';
 import type { Scene } from './engine/core/scene';
 import type { TimeManager } from './engine/core/time-manager';

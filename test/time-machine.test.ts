@@ -20,12 +20,12 @@ describe('TimeMachine_class', () => {
   // test the full animation
   it('should animate the time machine', () => {
     websiteInit(timeMachinePlugin);
-    keepTrackApi.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
-    keepTrackApi.getCatalogManager().objectCache = Array(50).fill(defaultSat);
+    ServiceLocator.getCatalogManager().getObject = jest.fn().mockReturnValue(defaultSat);
+    ServiceLocator.getCatalogManager().objectCache = Array(50).fill(defaultSat);
     keepTrackApi.containerRoot.innerHTML += '<div id="search-results"></div>';
 
     settingsManager.timeMachineDelay = <Milliseconds>0;
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, timeMachinePlugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, timeMachinePlugin.bottomIconElementName);
     jest.advanceTimersByTime(1000);
     expect(timeMachinePlugin.isMenuButtonActive).toBe(true);
     jest.advanceTimersByTime(10000);

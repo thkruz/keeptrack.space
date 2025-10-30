@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### v11.0.1
+
+>  
+
+- docs: :memo: add v11 "Copernicus" release notes and update CHANGELOG.md
+- build: :coffin: remove old toml files
+- ci: :construction_worker: set branch to 'diagram' for repo-visualizer workflow
+- ci: :construction_worker: add artifact_name to repo-visualizer workflow
+
 #### v11.0.0
 
 >  

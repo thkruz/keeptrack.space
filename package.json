@@ -167,7 +167,7 @@
     "openmeteo": "^1.2.0",
     "requestidlecallback-polyfill": "^1.0.2",
     "resizable": "^1.2.1",
-    "uuid": "^11.1.0",
+    "uuid": "^13.0.0",
     "webgl-obj-loader": "^2.0.8"
   },
   "volta": {

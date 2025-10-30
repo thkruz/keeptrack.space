@@ -19,11 +19,11 @@
  */
 
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '../../keepTrackApi';
+import { EventBus } from '../events/event-bus';
 import { html } from './development/formatter';
 import { getEl, hideEl } from './get-el';
 import { PersistenceManager, StorageKey } from './persistence-manager';
-import { EventBus } from '../events/event-bus';
+import { KeepTrack } from '@app/keeptrack';
 
 export class AdviceManager {
   private helpHeaderDOM: HTMLElement;
@@ -51,7 +51,7 @@ export class AdviceManager {
       return;
     }
 
-    keepTrackApi.containerRoot?.insertAdjacentHTML(
+    KeepTrack.getInstance().containerRoot?.insertAdjacentHTML(
       'beforeend',
       html`
         <div id="help-outer-container" class="valign">
@@ -73,7 +73,7 @@ export class AdviceManager {
     this.tutIconDOM = getEl('tutorial-icon')!;
 
     this.tutIconDOM.addEventListener('click', () => {
-      keepTrackApi.emit(EventBusEvent.onHelpMenuClick);
+      EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
     });
 
     // TODO: This should be registered with the keyboard class
@@ -84,7 +84,7 @@ export class AdviceManager {
           this.isAdviceOpen = false;
           this.helpOuterDOM.style.display = 'none';
         } else {
-          keepTrackApi.emit(EventBusEvent.onHelpMenuClick);
+          EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
         }
       }
     };

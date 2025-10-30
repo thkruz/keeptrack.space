@@ -1,10 +1,11 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { settingsManager } from '@app/settings/settings';
 import { Milliseconds } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
@@ -33,7 +34,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, this.uiManagerInit.bind(this));
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal.bind(this));
     EventBus.getInstance().on(EventBusEvent.updateDateTime, this.updateDateTime.bind(this));
-    EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => this.updateDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+    EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => this.updateDateTime(ServiceLocator.getTimeManager().simulationTimeObj));
     EventBus.getInstance().on(EventBusEvent.selectedDateChange, (date: Date) => this.updateDateTime(date));
   }
 
@@ -50,14 +51,14 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
 
     if (settingsManager.isUseJdayOnTopMenu) {
-      const jday = keepTrackApi.getTimeManager().getUTCDayOfYear(keepTrackApi.getTimeManager().simulationTimeObj);
+      const jday = ServiceLocator.getTimeManager().getUTCDayOfYear(ServiceLocator.getTimeManager().simulationTimeObj);
 
       getEl('jday')!.innerHTML = jday.toString();
     } else {
-      getEl('jday')!.innerHTML = keepTrackApi.getTimeManager().simulationTimeObj.toLocaleDateString();
+      getEl('jday')!.innerHTML = ServiceLocator.getTimeManager().simulationTimeObj.toLocaleDateString();
     }
 
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     if (!this.simulationTimeSerialized_ || Math.abs(this.lastTime - timeManagerInstance.simulationTimeObj.getTime()) > (1000 as Milliseconds)) {
       this.simulationTimeSerialized_ = timeManagerInstance.simulationTimeObj.toJSON();
@@ -107,8 +108,8 @@ export class DateTimeManager extends KeepTrackPlugin {
   }
 
   datetimeTextClick(): void {
-    const simulationDateObj = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const simulationDateObj = new Date(ServiceLocator.getTimeManager().simulationTimeObj);
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     timeManagerInstance.synchronize();
 
@@ -183,7 +184,7 @@ export class DateTimeManager extends KeepTrackPlugin {
           }, 500);
 
           try {
-            const uiManagerInstance = keepTrackApi.getUiManager();
+            const uiManagerInstance = ServiceLocator.getUiManager();
 
             uiManagerInstance.updateNextPassOverlay(true);
           } catch {

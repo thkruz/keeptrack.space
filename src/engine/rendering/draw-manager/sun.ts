@@ -30,7 +30,6 @@ import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DEG2RAD, EciVec3, Kilometers } from '@ootk/src/main';
 import { Body, RotationAxis as rotationAxis } from 'astronomy-engine';
 import { mat3, mat4, vec2, vec3 } from 'gl-matrix';
@@ -177,7 +176,7 @@ export class Sun {
      */
     if (settingsManager.centerBody === SolarBody.Earth || settingsManager.centerBody === SolarBody.Moon) {
 
-      const ros = rotationAxis(Body.Earth, keepTrackApi.getTimeManager().simulationTimeObj);
+      const ros = rotationAxis(Body.Earth, ServiceLocator.getTimeManager().simulationTimeObj);
 
       mat4.rotateY(this.modelViewMatrix_, this.modelViewMatrix_, (ros.dec - 90) * DEG2RAD);
     }
@@ -207,7 +206,7 @@ export class Sun {
   }
 
   getEci(simulationTimeObj: Date): EciArr3 {
-    if (keepTrackApi.getTimeManager().simulationTimeObj.getTime() === simulationTimeObj.getTime()) {
+    if (ServiceLocator.getTimeManager().simulationTimeObj.getTime() === simulationTimeObj.getTime()) {
       return [this.eci.x, this.eci.y, this.eci.z];
     }
 
@@ -219,7 +218,7 @@ export class Sun {
   }
 
   updateEci() {
-    const simulationTimeObj = keepTrackApi.getTimeManager().simulationTimeObj;
+    const simulationTimeObj = ServiceLocator.getTimeManager().simulationTimeObj;
 
     if (simulationTimeObj.getTime() === this.lastUpdateTime) {
       return;
@@ -240,7 +239,7 @@ export class Sun {
 
     gl.uniformMatrix3fv(this.mesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
     gl.uniformMatrix4fv(this.mesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
-    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.mesh.material.uniforms.projectionMatrix, false, ServiceLocator.getRenderer().projectionCameraMatrix);
 
     // Animate the fireball effect by passing time to the shader
     const time = performance.now() * 0.0001;

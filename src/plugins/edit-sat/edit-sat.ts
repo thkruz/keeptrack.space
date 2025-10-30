@@ -3,12 +3,13 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { StringPad } from '@app/engine/utils/stringPad';
-import { keepTrackApi } from '@app/keepTrackApi';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
 import { saveAs } from 'file-saver';
 
 import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -27,7 +28,7 @@ export class EditSat extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
@@ -161,7 +162,7 @@ export class EditSat extends KeepTrackPlugin {
         getEl('editSat-save')!.addEventListener('click', EditSat.editSatSaveClick);
 
         getEl('editSat-open')!.addEventListener('click', () => {
-          keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
           getEl('editSat-file')!.click();
         });
 
@@ -219,7 +220,7 @@ export class EditSat extends KeepTrackPlugin {
       case 'edit-sat-rmb':
         this.selectSatManager_.selectSat(clickedSat);
         if (!this.isMenuButtonActive) {
-          keepTrackApi.getUiManager().bottomIconPress(<HTMLElement>{ id: this.bottomIconElementName });
+          ServiceLocator.getUiManager().bottomIconPress(<HTMLElement>{ id: this.bottomIconElementName });
         }
         break;
       default:
@@ -260,13 +261,13 @@ export class EditSat extends KeepTrackPlugin {
       return;
     }
 
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     const object = JSON.parse(<string>eventTarget.result);
     const sccNum = parseInt(StringPad.pad0(object.tle1.substr(2, 5).trim(), 5));
-    const sat = keepTrackApi.getCatalogManager().sccNum2Sat(sccNum);
+    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(sccNum);
 
     if (!sat) {
       errorManagerInstance.warn(t7e('errorMsgs.EditSat.satelliteNotFound', { sccNum }));
@@ -284,7 +285,7 @@ export class EditSat extends KeepTrackPlugin {
       return;
     }
     if (SatMath.altitudeCheck(satrec, timeManagerInstance.simulationTimeObj) > 1) {
-      keepTrackApi.getCatalogManager().satCruncher.postMessage({
+      ServiceLocator.getCatalogManager().satCruncher.postMessage({
         typ: CruncerMessageTypes.SAT_EDIT,
         id: sat.id,
         active: true,
@@ -334,13 +335,13 @@ export class EditSat extends KeepTrackPlugin {
   }
 
   private editSatNewTleClickFadeIn_() {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     try {
       // Update Satellite TLE so that Epoch is Now but ECI position is very very close
-      const id = keepTrackApi.getCatalogManager().sccNum2Id(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
-      const obj = keepTrackApi.getCatalogManager().getObject(id);
+      const id = ServiceLocator.getCatalogManager().sccNum2Id(parseInt((<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value));
+      const obj = ServiceLocator.getCatalogManager().getObject(id);
 
       if (!obj?.isSatellite()) {
         return;
@@ -348,7 +349,7 @@ export class EditSat extends KeepTrackPlugin {
 
       const mainsat = obj as DetailedSatellite;
       // Launch Points are the Satellites Current Location
-      const gmst = keepTrackApi.getTimeManager().gmst;
+      const gmst = ServiceLocator.getTimeManager().gmst;
       const lla = eci2lla(mainsat.position, gmst);
       const launchLon = lla.lon;
       const launchLat = lla.lat;
@@ -366,7 +367,7 @@ export class EditSat extends KeepTrackPlugin {
 
       mainsat.tle1 = (mainsat.tle1.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.tle1.substr(32)) as TleLine1;
 
-      keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
+      ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
       let TLEs;
       // Ignore argument of perigee for round orbits OPTIMIZE
@@ -386,13 +387,13 @@ export class EditSat extends KeepTrackPlugin {
         return;
       }
 
-      keepTrackApi.getCatalogManager().satCruncher.postMessage({
+      ServiceLocator.getCatalogManager().satCruncher.postMessage({
         typ: CruncerMessageTypes.SAT_EDIT,
         id,
         tle1,
         tle2,
       });
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+      const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
       orbitManagerInstance.changeOrbitBufferData(id!, tle1, tle2);
       /*
@@ -434,9 +435,9 @@ export class EditSat extends KeepTrackPlugin {
   }
 
   private static editSatSubmit() {
-    keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+    ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     getEl(`${EditSat.elementPrefix}-error`)!.style.display = 'none';
     const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;
@@ -477,7 +478,7 @@ export class EditSat extends KeepTrackPlugin {
       return;
     }
 
-    if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) > 1) {
+    if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) > 1) {
       catalogManagerInstance.satCruncher.postMessage({
         typ: CruncerMessageTypes.SAT_EDIT,
         id: satId,
@@ -485,23 +486,23 @@ export class EditSat extends KeepTrackPlugin {
         tle1,
         tle2,
       });
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+      const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
       orbitManagerInstance.changeOrbitBufferData(satId!, tle1, tle2);
       sat.active = true;
       sat.editTle(tle1, tle2);
       sat.country = country;
-      keepTrackApi.getMainCamera().state.zoomTarget = ZoomValue.GEO;
+      ServiceLocator.getMainCamera().state.zoomTarget = ZoomValue.GEO;
     } else {
-      keepTrackApi.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.',
+      ServiceLocator.getUiManager().toast('Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.',
         ToastMsgType.caution, true);
     }
   }
 
   private static editSatSaveClick(e: Event) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
-    keepTrackApi.getSoundManager()?.play(SoundNames.EXPORT);
+    ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
 
     try {
       const scc = (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value;

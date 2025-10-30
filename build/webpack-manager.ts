@@ -30,7 +30,8 @@ export class WebpackManager {
       baseConfig.watchOptions = {
         aggregateTimeout: 300,
         poll: 1000,
-        ignored: /node_modules/u,
+        // ignore node_modules and test
+        ignored: /node_modules|test/u,
       };
     }
 
@@ -153,7 +154,7 @@ export class WebpackManager {
           {
             test: /\.tsx?$/u,
             loader: 'ts-loader',
-            exclude: [/node_modules/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u, /\src\/admin/u],
+            exclude: [/node_modules/u, /\test/u, /\dist/u, /\coverage/u, /\.test\.tsx?$/u, /\src\/admin/u],
             options: {
               transpileOnly: false,
               configFile: 'tsconfig.build.json',

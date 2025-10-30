@@ -2,7 +2,6 @@
 import { CameraType } from '@app/engine/camera/camera';
 import { Moon } from '@app/engine/rendering/draw-manager/celestial-bodies/moon';
 import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
 
@@ -22,8 +21,8 @@ describe('drawManager', () => {
     setupDefaultHtml();
     drawManagerInstance.isDrawOrbitsAbove = false;
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
-    keepTrackApi.getMainCamera().cameraType = CameraType.PLANETARIUM;
-    keepTrackApi.getSensorManager().currentSensors = [defaultSensor];
+    ServiceLocator.getMainCamera().cameraType = CameraType.PLANETARIUM;
+    ServiceLocator.getSensorManager().currentSensors = [defaultSensor];
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();
     drawManagerInstance.isDrawOrbitsAbove = true;
     expect(() => drawManagerInstance.orbitsAbove()).not.toThrow();

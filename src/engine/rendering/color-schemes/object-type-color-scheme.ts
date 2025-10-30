@@ -7,11 +7,11 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from '@ootk/src/main';
 import { CameraType } from '../../camera/camera';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
   payload: rgbaArray;
@@ -129,7 +129,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
     }
 
     // If we are in astronomy mode, hide everything that isn't a star (above)
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY) {
+    if (ServiceLocator.getMainCamera().cameraType === CameraType.ASTRONOMY) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -146,7 +146,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       return this.getMarkerColor_();
     }
 
-    if (obj.isSensor() && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
+    if (obj.isSensor() && (this.objectTypeFlags.sensor === false || ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -186,16 +186,16 @@ export class ObjectTypeColorScheme extends ColorScheme {
       }
     }
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
     const sat = obj as DetailedSatellite;
 
     if (
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.PAYLOAD &&
         this.objectTypeFlags.payload === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
+      (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
@@ -211,7 +211,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.ROCKET_BODY &&
         this.objectTypeFlags.rocketBody === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
+      (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
@@ -227,7 +227,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.DEBRIS &&
         this.objectTypeFlags.debris === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
+      (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
@@ -245,7 +245,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
+      (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM &&
         (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
         this.objectTypeFlags.pink === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
@@ -260,14 +260,14 @@ export class ObjectTypeColorScheme extends ColorScheme {
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.inFOV === false && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.inFOV === false && ServiceLocator.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && ServiceLocator.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
       if (catalogManagerInstance.isSensorManagerLoaded && sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER && typeof sat.vmag === 'undefined') {
         // Intentional
       } else {
@@ -317,7 +317,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
 
   updateGroup(obj: BaseObject): ColorInformation {
     // Show Things in the Group
-    if (keepTrackApi.getGroupsManager().selectedGroup?.hasObject(obj.id)) {
+    if (ServiceLocator.getGroupsManager().selectedGroup?.hasObject(obj.id)) {
       if (obj.isMissile()) {
         return this.missileColor_(obj as MissileObject);
       }
@@ -345,7 +345,7 @@ export class ObjectTypeColorScheme extends ColorScheme {
           break;
       }
 
-      if (keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1) {
+      if (ServiceLocator.getDotsManager().inViewData?.[obj.id] === 1) {
         color = this.colorTheme.inFOV;
       }
 

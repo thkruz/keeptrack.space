@@ -2,9 +2,9 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import Draggabilly from 'draggabilly';
+import { html } from '../utils/development/formatter';
 import { showEl } from '../utils/get-el';
 import { DraggableBox } from './draggable-box';
-import { html } from '../utils/development/formatter';
 
 
 export abstract class DraggableModal extends DraggableBox {
@@ -25,7 +25,7 @@ export abstract class DraggableModal extends DraggableBox {
 
   override open(cb?: () => void) {
     if (!this.boxEl) {
-      // Should it be keepTrackApi.containerRoot instead of document.body?
+      // Should it be KeepTrack.getInstance().containerRoot instead of document.body?
       document.body.insertAdjacentHTML('beforeend', html`
         <div id="${this.boxId}-container" class="modal" style="display:none;">
           <div id="${this.boxId}" class="draggable-box" style="pointer-events:auto;">

@@ -1,9 +1,9 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { html } from '@app/engine/utils/development/formatter';
 import { BaseObject, Star } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
-import { html } from '@app/engine/utils/development/formatter';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class VelocityColorScheme extends ColorScheme {
   readonly label = 'Velocity';
@@ -53,7 +53,7 @@ export class VelocityColorScheme extends ColorScheme {
       };
     }
 
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     if (dotsManagerInstance.inViewData?.[obj.id] === 1) {
       if (this.objectTypeFlags.inViewAlt === false) {

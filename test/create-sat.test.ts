@@ -2,7 +2,6 @@
 
 import { SatMath } from '@app/app/analysis/sat-math';
 import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { CreateSat } from '@app/plugins/create-sat/create-sat';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { FormatTle, Sgp4 } from '@ootk/src/main';
@@ -63,10 +62,10 @@ describe('CreateSat', () => {
     });
 
     // Mock keepTrackApi
-    keepTrackApi.getCatalogManager = jest.fn().mockReturnValue(mockCatalogManager);
-    keepTrackApi.getOrbitManager = jest.fn().mockReturnValue(mockOrbitManager);
-    keepTrackApi.getUiManager = jest.fn().mockReturnValue(mockUiManager);
-    keepTrackApi.getTimeManager = jest.fn().mockReturnValue(mockTimeManager);
+    ServiceLocator.getCatalogManager = jest.fn().mockReturnValue(mockCatalogManager);
+    ServiceLocator.getOrbitManager = jest.fn().mockReturnValue(mockOrbitManager);
+    ServiceLocator.getUiManager = jest.fn().mockReturnValue(mockUiManager);
+    ServiceLocator.getTimeManager = jest.fn().mockReturnValue(mockTimeManager);
 
     // Mock the validation CreateSat[validateInputs_] method to always return false
     // eslint-disable-next-line dot-notation
@@ -154,10 +153,10 @@ describe('CreateSat', () => {
     });
 
     // Mock keepTrackApi
-    keepTrackApi.getCatalogManager = jest.fn().mockReturnValue(mockCatalogManager);
-    keepTrackApi.getOrbitManager = jest.fn().mockReturnValue(mockOrbitManager);
-    keepTrackApi.getUiManager = jest.fn().mockReturnValue(mockUiManager);
-    keepTrackApi.getTimeManager = jest.fn().mockReturnValue(mockTimeManager);
+    ServiceLocator.getCatalogManager = jest.fn().mockReturnValue(mockCatalogManager);
+    ServiceLocator.getOrbitManager = jest.fn().mockReturnValue(mockOrbitManager);
+    ServiceLocator.getUiManager = jest.fn().mockReturnValue(mockUiManager);
+    ServiceLocator.getTimeManager = jest.fn().mockReturnValue(mockTimeManager);
 
     // Call the method under test
     // eslint-disable-next-line dot-notation

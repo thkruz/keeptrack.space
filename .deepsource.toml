@@ -1,0 +1,16 @@
+version = 1
+
+test_patterns = ["*.test.js"]
+
+exclude_patterns = [
+  "src/lib/external/*",
+  "src/engine/ootk/*",
+  "*mSat.js*",
+  "*/offline/*",
+  ]
+
+[[analyzers]]
+name = "javascript"
+enabled = true
+
+  [analyzers.meta]

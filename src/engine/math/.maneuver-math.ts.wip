@@ -13,10 +13,10 @@ import { SensorMath } from './sensor-math';
  */
 export abstract class ManueverMath {
   public static createManeuverAnalyst = (satId: number, incVariation: number, meanmoVariation: number, rascVariation: number) => {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (sensorManagerInstance.currentSensors?.length === 0) throw new Error('No sensors selected');
 
@@ -112,7 +112,7 @@ export abstract class ManueverMath {
   };
 
   public static findChangeOrbitToDock = (sat: SatObject, sat2: SatObject, propLength: number) => {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     let closestInc = 0;
     let closestRaan = 0;
     let closestMeanMo = 1;

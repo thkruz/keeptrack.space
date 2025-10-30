@@ -7,9 +7,9 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Kilometers, Meters, SpaceObjectType } from '@ootk/src/main';
 import { missileManager } from './missile-manager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class Missile {
   static EarthMass = 5.9726 * 10 ** 24; // (kg)
@@ -920,7 +920,7 @@ export class Missile {
     country: any;
     minAltitude: number;
   }) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const missileObj: MissileObject = catalogManagerInstance.getMissile(MissileObjectNum);
 
     // Dimensions of the rocket

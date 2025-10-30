@@ -1,8 +1,8 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { mat4, vec3 } from 'gl-matrix';
 import { Radians } from '@ootk/src/main';
+import { mat4, vec3 } from 'gl-matrix';
 
 export class CameraControlWidget {
   private static instance: CameraControlWidget;
@@ -108,16 +108,16 @@ export class CameraControlWidget {
     const clickedAxis = this.checkIfNeedsFlipped(this.getClickedAxis(x, y));
 
     if (clickedAxis) {
-      keepTrackApi.getMainCamera().autoRotate(false);
-      keepTrackApi.getMainCamera().state.camAngleSnappedOnSat = false;
-      keepTrackApi.getMainCamera().state.camZoomSnappedOnSat = false;
+      ServiceLocator.getMainCamera().autoRotate(false);
+      ServiceLocator.getMainCamera().state.camAngleSnappedOnSat = false;
+      ServiceLocator.getMainCamera().state.camZoomSnappedOnSat = false;
       this.alignCameraToAxis(clickedAxis);
     }
   }
 
   private checkIfNeedsFlipped(axis: string | null): string | null {
     if (axis) {
-      const camera = keepTrackApi.getMainCamera();
+      const camera = ServiceLocator.getMainCamera();
 
       if (axis === 'X' && camera.state.camYawTarget === Math.PI / 2 as Radians) {
         return '-X';
@@ -145,7 +145,7 @@ export class CameraControlWidget {
   }
 
   private updateCameraRotation(dx: number, dy: number) {
-    const camera = keepTrackApi.getMainCamera();
+    const camera = ServiceLocator.getMainCamera();
     const rotationSpeed = 0.01;
 
     camera.state.camYaw = camera.state.camYaw + dx * rotationSpeed as Radians;
@@ -153,7 +153,7 @@ export class CameraControlWidget {
   }
 
   private getClickedAxis(x: number, y: number): string | null {
-    const camera = keepTrackApi.getMainCamera();
+    const camera = ServiceLocator.getMainCamera();
     const rotationMatrix = mat4.create();
 
     mat4.rotateX(rotationMatrix, rotationMatrix, camera.state.camPitch);
@@ -173,7 +173,7 @@ export class CameraControlWidget {
   }
 
   private alignCameraToAxis(axisName: string) {
-    const camera = keepTrackApi.getMainCamera();
+    const camera = ServiceLocator.getMainCamera();
 
     camera.state.isAutoPitchYawToTarget = true;
     switch (axisName) {
@@ -209,7 +209,7 @@ export class CameraControlWidget {
     }
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    const camera = keepTrackApi.getMainCamera();
+    const camera = ServiceLocator.getMainCamera();
     const rotationMatrix = mat4.create();
 
     // Apply pitch rotation first

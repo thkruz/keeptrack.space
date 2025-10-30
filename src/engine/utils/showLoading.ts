@@ -1,9 +1,9 @@
 import { SplashScreen } from '@app/app/ui/splash-screen';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e, TranslationKey } from '@app/locales/keys';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import { fadeIn, fadeOut } from './fade';
 import { getEl } from './get-el';
+import { ServiceLocator } from '../core/service-locator';
 
 const messages = ['cunningPlan', 'satIntel', 'science', 'math'];
 
@@ -31,7 +31,7 @@ export const showLoading = (callback?: () => void, delay?: number): void => {
   }
   SplashScreen.loadStr(getRandomMessage());
 
-  keepTrackApi.getSoundManager()?.play(SoundNames.LOADING);
+  ServiceLocator.getSoundManager()?.play(SoundNames.LOADING);
 
   fadeIn(loading, 'flex', 500);
 
@@ -66,5 +66,5 @@ export const hideLoading = () => {
   }
 
   fadeOut(loading, 1000);
-  keepTrackApi.getSoundManager()?.stop(SoundNames.LOADING);
+  ServiceLocator.getSoundManager()?.stop(SoundNames.LOADING);
 };

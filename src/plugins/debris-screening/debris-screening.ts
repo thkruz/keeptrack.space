@@ -11,6 +11,8 @@ import { DetailedSatellite, Hours, Kilometers, Milliseconds, Minutes, PosVel, Se
 import frameInspectPng from '@public/img/icons/frame-inspect.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class DebrisScreening extends KeepTrackPlugin {
   readonly id = 'DebrisScreening';
@@ -19,7 +21,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   bottomIconCallback = () => {
@@ -28,7 +30,7 @@ export class DebrisScreening extends KeepTrackPlugin {
     }
 
     if (this.isMenuButtonActive) {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
       const sat = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
@@ -150,21 +152,21 @@ export class DebrisScreening extends KeepTrackPlugin {
     const vVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-v`)).value);
     const wVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-w`)).value);
 
-    keepTrackApi.getScene().searchBox.setCubeSize(<Kilometers>uVal, <Kilometers>vVal, <Kilometers>wVal);
+    ServiceLocator.getScene().searchBox.setCubeSize(<Kilometers>uVal, <Kilometers>vVal, <Kilometers>wVal);
   }
 
   static onClearVisClick(): void {
-    keepTrackApi.getScene().searchBox.setCubeSize(<Kilometers>0, <Kilometers>0, <Kilometers>0);
+    ServiceLocator.getScene().searchBox.setCubeSize(<Kilometers>0, <Kilometers>0, <Kilometers>0);
   }
 
   onFormSubmit(): void {
-    const satId = keepTrackApi.getCatalogManager().sccNum2Id(parseInt((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value));
+    const satId = ServiceLocator.getCatalogManager().sccNum2Id(parseInt((<HTMLInputElement>getEl(`${this.formPrefix_}-scc`)).value));
 
     const uVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-u`)).value);
     const vVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-v`)).value);
     const wVal = parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-w`)).value);
     const timeVal = <Hours>parseFloat((<HTMLInputElement>getEl(`${this.formPrefix_}-time`)).value);
-    const sat = keepTrackApi.getCatalogManager().getObject(satId, GetSatType.SKIP_POS_VEL) as DetailedSatellite;
+    const sat = ServiceLocator.getCatalogManager().getObject(satId, GetSatType.SKIP_POS_VEL) as DetailedSatellite;
 
     const possibleSats = keepTrackApi
       .getCatalogManager()
@@ -190,7 +192,7 @@ export class DebrisScreening extends KeepTrackPlugin {
 
     for (let t = <Minutes>0; t < <Seconds>(timeVal * 60); t++) {
       offset = <Milliseconds>(t * 1000 * 60);
-      const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+      const now = ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
       const { m } = SatMath.calculateTimeVariables(now, sat.satrec) as { m: number };
       const satSv = Sgp4.propagate(sat.satrec, m);
 
@@ -200,7 +202,7 @@ export class DebrisScreening extends KeepTrackPlugin {
       }
 
       for (let idx = 0; idx < possibleSats.length; idx++) {
-        const obj2 = keepTrackApi.getCatalogManager().getObject(possibleSats[idx], GetSatType.SKIP_POS_VEL);
+        const obj2 = ServiceLocator.getCatalogManager().getObject(possibleSats[idx], GetSatType.SKIP_POS_VEL);
 
         if (!obj2?.isSatellite()) {
           continue;
@@ -234,6 +236,6 @@ export class DebrisScreening extends KeepTrackPlugin {
     // Remove trailing comma
 
     searchStr = searchStr.replace(/,\s*$/u, '');
-    keepTrackApi.getUiManager().doSearch(searchStr);
+    ServiceLocator.getUiManager().doSearch(searchStr);
   }
 }

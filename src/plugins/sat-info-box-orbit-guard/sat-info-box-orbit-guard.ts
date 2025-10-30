@@ -7,13 +7,13 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, DetailedSatellite, RADIUS_OF_EARTH } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { EL, SECTIONS } from './sat-info-box-orbit-guard-html';
 
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import './sat-info-box-orbit-guard.css';
 
 export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
@@ -42,7 +42,7 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
-      keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createManeuverSection_(), order: 7 });
+      PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createManeuverSection_(), order: 7 });
     });
   }
 

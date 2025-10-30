@@ -10,20 +10,21 @@ import { saveCsv, saveVariable } from './engine/utils/saveVariable';
 
 import type { CatalogManager } from './app/data/catalog-manager';
 import type { GroupsManager } from './app/data/groups-manager';
+import type { OrbitManager } from './app/rendering/orbit-manager';
 import type { SensorMath } from './app/sensors/sensor-math';
 import type { SensorManager } from './app/sensors/sensorManager';
 import type { HoverManager } from './app/ui/hover-manager';
-import type { UiManager } from './app/ui/uiManager';
+import type { UiManager } from './app/ui/ui-manager';
 import type { Camera } from './engine/camera/camera';
 import type { Scene } from './engine/core/scene';
 import type { TimeManager } from './engine/core/time-manager';
 import type { InputManager } from './engine/input/input-manager';
 import HorizonsAPI from './engine/ootk/src/fetch/horizons';
+import { KeepTrackPlugin } from './engine/plugins/base-plugin';
 import type { ColorSchemeManager } from './engine/rendering/color-scheme-manager';
 import type { DotsManager } from './engine/rendering/dots-manager';
 import type { LineManager } from './engine/rendering/line-manager';
 import type { MeshManager } from './engine/rendering/mesh-manager';
-import type { OrbitManager } from './engine/rendering/orbitManager';
 import type { WebGLRenderer } from './engine/rendering/webgl-renderer';
 import type { SoundManager } from './plugins/sounds/sound-manager';
 
@@ -92,9 +93,6 @@ export class KeepTrackApi {
     }),
   } as unknown as AnalyticsInstance;
 
-  containerRoot = null as unknown as HTMLDivElement;
-  isInitialized = false;
-
   // UI related methods
   toast(toastText: string, type: ToastMsgType, isLong = false) {
     const uiManagerInstance = ServiceLocator.getUiManager();
@@ -117,7 +115,8 @@ export class KeepTrackApi {
   methods = EventBus.getInstance().methods;
 
   // Plugin registry methods
-  getPlugin = PluginRegistry.getPlugin.bind(PluginRegistry);
+  getPlugin: <T extends KeepTrackPlugin>(pluginClass: new (...args: unknown[]) => T) => T | null =
+    <T extends KeepTrackPlugin>(pluginClass: new (...args: unknown[]) => T) => PluginRegistry.getPlugin(pluginClass);
   checkIfLoaded = PluginRegistry.checkIfLoaded.bind(PluginRegistry);
   getPluginByName = PluginRegistry.getPluginByName.bind(PluginRegistry);
   unregisterAllPlugins = PluginRegistry.unregisterAllPlugins.bind(PluginRegistry);

@@ -1,5 +1,6 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { KeyEvent } from '../input-manager';
 
 export class KeyboardInput {
@@ -30,7 +31,7 @@ export class KeyboardInput {
           if (!event.data || typeof event.data !== 'object') {
             return;
           }
-          if (keepTrackApi.getUiManager().isCurrentlyTyping) {
+          if (ServiceLocator.getUiManager().isCurrentlyTyping) {
             return;
           }
 
@@ -73,7 +74,7 @@ export class KeyboardInput {
         if (e.target instanceof Element && e.target.classList.contains('keyboard-priority')) {
           return;
         }
-        if (keepTrackApi.getUiManager().isCurrentlyTyping) {
+        if (ServiceLocator.getUiManager().isCurrentlyTyping) {
           return;
         }
         this.keyDownHandler_(<KeyboardEvent>e);
@@ -83,7 +84,7 @@ export class KeyboardInput {
         if (e.target instanceof Element && e.target.classList.contains('keyboard-priority')) {
           return;
         }
-        if (keepTrackApi.getUiManager().isCurrentlyTyping) {
+        if (ServiceLocator.getUiManager().isCurrentlyTyping) {
           return;
         }
         this.keyUpHandler_(<KeyboardEvent>e);
@@ -120,7 +121,7 @@ export class KeyboardInput {
       evt.preventDefault();
     }
 
-    keepTrackApi.emit(EventBusEvent.KeyUp, key, code, false, isShiftPressed, isCtrlPressed);
+    EventBus.getInstance().emit(EventBusEvent.KeyUp, key, code, false, isShiftPressed, isCtrlPressed);
 
     if (key === 'Shift') {
       // Loop through all uppercase letters and change them to lowercase when the shift key is released
@@ -131,8 +132,8 @@ export class KeyboardInput {
         if (this.keyStates.get(upper)) {
           this.keyStates.set(upper, false);
           this.keyStates.set(lower, true);
-          keepTrackApi.emit(EventBusEvent.KeyUp, upper, code, false, isShiftPressed, isCtrlPressed);
-          keepTrackApi.emit(EventBusEvent.KeyDown, lower, code, false, isShiftPressed, isCtrlPressed);
+          EventBus.getInstance().emit(EventBusEvent.KeyUp, upper, code, false, isShiftPressed, isCtrlPressed);
+          EventBus.getInstance().emit(EventBusEvent.KeyDown, lower, code, false, isShiftPressed, isCtrlPressed);
         }
       }
     }
@@ -160,7 +161,7 @@ export class KeyboardInput {
       evt.preventDefault();
     }
 
-    keepTrackApi.emit(EventBusEvent.KeyDown, key, code, isRepeat, isShiftPressed, isCtrlPressed);
+    EventBus.getInstance().emit(EventBusEvent.KeyDown, key, code, isRepeat, isShiftPressed, isCtrlPressed);
 
     if (key === 'Shift') {
       // Loop through all uppercase letters and change them to lowercase when the shift key is released
@@ -171,8 +172,8 @@ export class KeyboardInput {
         if (this.keyStates.get(lower)) {
           this.keyStates.set(lower, false);
           this.keyStates.set(upper, true);
-          keepTrackApi.emit(EventBusEvent.KeyUp, lower, code, isRepeat, isShiftPressed, isCtrlPressed);
-          keepTrackApi.emit(EventBusEvent.KeyDown, upper, code, isRepeat, isShiftPressed, isCtrlPressed);
+          EventBus.getInstance().emit(EventBusEvent.KeyUp, lower, code, isRepeat, isShiftPressed, isCtrlPressed);
+          EventBus.getInstance().emit(EventBusEvent.KeyDown, upper, code, isRepeat, isShiftPressed, isCtrlPressed);
         }
       }
     }

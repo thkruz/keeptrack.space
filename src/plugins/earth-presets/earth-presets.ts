@@ -1,9 +1,10 @@
-import { keepTrackApi } from '@app/keepTrackApi';
 
 import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { html } from '@app/engine/utils/development/formatter';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { NightToggle } from '../night-toggle/night-toggle';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class EarthPresetsPlugin extends KeepTrackPlugin {
   readonly id = 'EarthPresetsPlugin';
@@ -29,7 +30,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
   rmbCallback = (targetId: string): void => {
     switch (targetId) {
       case 'earth-satellite-rmb':
-        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.BLUE_MARBLE);
+        ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.BLUE_MARBLE);
         settingsManager.isDrawCloudsMap = true;
         settingsManager.isDrawBumpMap = true;
         settingsManager.isDrawSpecMap = true;
@@ -37,11 +38,11 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = true;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = true;
-        keepTrackApi.getPlugin(NightToggle)?.setBottomIconToUnselected();
-        keepTrackApi.getPlugin(NightToggle)?.off();
+        PluginRegistry.getPlugin(NightToggle)?.setBottomIconToUnselected();
+        PluginRegistry.getPlugin(NightToggle)?.off();
         break;
       case 'earth-nadir-rmb':
-        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.NADIR);
+        ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.NADIR);
         settingsManager.isDrawCloudsMap = false;
         settingsManager.isDrawBumpMap = false;
         settingsManager.isDrawSpecMap = false;
@@ -49,11 +50,11 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = true;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = true;
-        keepTrackApi.getPlugin(NightToggle)?.setBottomIconToUnselected();
-        keepTrackApi.getPlugin(NightToggle)?.off();
+        PluginRegistry.getPlugin(NightToggle)?.setBottomIconToUnselected();
+        PluginRegistry.getPlugin(NightToggle)?.off();
         break;
       case 'earth-engineer-rmb':
-        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.BLUE_MARBLE);
+        ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.BLUE_MARBLE);
         settingsManager.isDrawCloudsMap = false;
         settingsManager.isDrawBumpMap = false;
         settingsManager.isDrawSpecMap = false;
@@ -61,10 +62,10 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.getPlugin(NightToggle)?.on();
+        PluginRegistry.getPlugin(NightToggle)?.on();
         break;
       case 'earth-opscenter-rmb':
-        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
+        ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
         settingsManager.isDrawCloudsMap = false;
         settingsManager.isDrawBumpMap = false;
         settingsManager.isDrawSpecMap = false;
@@ -72,10 +73,10 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = true;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.getPlugin(NightToggle)?.on();
+        PluginRegistry.getPlugin(NightToggle)?.on();
         break;
       case 'earth-90sGraphics-rmb':
-        keepTrackApi.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
+        ServiceLocator.getScene().earth.changeEarthTextureStyle(EarthTextureStyle.FLAT);
         settingsManager.isDrawCloudsMap = false;
         settingsManager.isDrawBumpMap = false;
         settingsManager.isDrawSpecMap = false;
@@ -83,7 +84,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = false;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
-        keepTrackApi.getPlugin(NightToggle)?.on();
+        PluginRegistry.getPlugin(NightToggle)?.on();
         break;
       default:
         break;

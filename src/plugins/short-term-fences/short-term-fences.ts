@@ -1,7 +1,6 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
-import { keepTrackApi } from '@app/keepTrackApi';
 import wifiFindPng from '@public/img/icons/wifi-find.png';
 
 import { EventBus } from '@app/engine/events/event-bus';
@@ -13,6 +12,8 @@ import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plu
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class ShortTermFences extends KeepTrackPlugin {
   readonly id = 'ShortTermFences';
@@ -21,7 +22,7 @@ export class ShortTermFences extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   bottomIconImg = wifiFindPng;
@@ -107,7 +108,7 @@ export class ShortTermFences extends KeepTrackPlugin {
         }
         showEl('stf-on-object-link');
 
-        if (keepTrackApi.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
+        if (PluginRegistry.getPlugin(SatInfoBox) && !this.isAddStfLinksOnce) {
           getEl('actions-section')?.insertAdjacentHTML(
             'beforeend',
             html`
@@ -130,16 +131,16 @@ export class ShortTermFences extends KeepTrackPlugin {
       () => {
         getEl('stfForm')?.addEventListener('submit', (e: Event) => {
           e.preventDefault();
-          keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
           this.onSubmit_.bind(this)();
         });
         getEl('stf-remove-last')?.addEventListener('click', () => {
-          keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-          keepTrackApi.getSensorManager().removeStf();
+          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+          ServiceLocator.getSensorManager().removeStf();
         });
         getEl('stf-clear-all')?.addEventListener('click', () => {
-          keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-          keepTrackApi.getSensorManager().clearStf();
+          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+          ServiceLocator.getSensorManager().clearStf();
         });
 
         getEl('stf-azExt')?.addEventListener('blur', () => {
@@ -154,11 +155,11 @@ export class ShortTermFences extends KeepTrackPlugin {
             (<HTMLInputElement>getEl('stf-azExt')).value = azExtDeg.toFixed(1);
           }
 
-          const epoch = EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj);
-          const siteJ2000 = keepTrackApi.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
+          const epoch = EpochUTC.fromDateTime(ServiceLocator.getTimeManager().simulationTimeObj);
+          const siteJ2000 = ServiceLocator.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
           const pt1 = new RAE(epoch, rng as Kilometers, ((centerAz - azExtDeg / 2) * DEG2RAD) as Radians, (centerEl * DEG2RAD) as Radians).position(siteJ2000);
           const pt2 = new RAE(
-            EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
+            EpochUTC.fromDateTime(ServiceLocator.getTimeManager().simulationTimeObj),
             rng as Kilometers,
             ((centerAz + azExtDeg / 2) * DEG2RAD) as Radians,
             (centerEl * DEG2RAD) as Radians,
@@ -181,11 +182,11 @@ export class ShortTermFences extends KeepTrackPlugin {
             (<HTMLInputElement>getEl('stf-elExt')).value = elExtDeg.toFixed(1);
           }
 
-          const epoch = EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj);
-          const siteJ2000 = keepTrackApi.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
+          const epoch = EpochUTC.fromDateTime(ServiceLocator.getTimeManager().simulationTimeObj);
+          const siteJ2000 = ServiceLocator.getSensorManager().currentSensors[0].toGeodetic().toITRF(epoch).toJ2000();
           const pt1 = new RAE(epoch, rng as Kilometers, (centerAz * DEG2RAD) as Radians, ((centerEl - elExtDeg / 2) * DEG2RAD) as Radians).position(siteJ2000);
           const pt2 = new RAE(
-            EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj),
+            EpochUTC.fromDateTime(ServiceLocator.getTimeManager().simulationTimeObj),
             rng as Kilometers,
             (centerAz * DEG2RAD) as Radians,
             ((centerEl + elExtDeg / 2) * DEG2RAD) as Radians,
@@ -218,7 +219,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     this.isMenuButtonActive = false;
     this.setBottomIconToUnselected();
     this.setBottomIconToDisabled();
-    keepTrackApi.getUiManager().hideSideMenus();
+    ServiceLocator.getUiManager().hideSideMenus();
   }
 
   private onSubmit_() {
@@ -241,7 +242,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     const minrange = (rng - rngExt / 2) as Kilometers;
     const maxrange = (rng + rngExt / 2) as Kilometers;
 
-    const curSensor = keepTrackApi.getSensorManager().currentSensors[0];
+    const curSensor = ServiceLocator.getSensorManager().currentSensors[0];
     const randomUUID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const stfSensor = new DetailedSensor({
       objName: `STF-${randomUUID}`,
@@ -278,11 +279,11 @@ export class ShortTermFences extends KeepTrackPlugin {
       return;
     }
 
-    keepTrackApi.getSensorManager().addStf(stfSensor);
+    ServiceLocator.getSensorManager().addStf(stfSensor);
   }
 
   private stfOnObjectLinkClick_() {
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     if (!this.verifySensorSelected()) {
       return;
@@ -291,7 +292,7 @@ export class ShortTermFences extends KeepTrackPlugin {
       return;
     }
 
-    const now = keepTrackApi.getTimeManager().simulationTimeObj;
+    const now = ServiceLocator.getTimeManager().simulationTimeObj;
 
     if (!this.selectSatManager_) {
       errorManagerInstance.warn('No selectSatManager instance found');
@@ -305,7 +306,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     (<HTMLInputElement>getEl('stf-el')).value = rae.el.toFixed(1);
     (<HTMLInputElement>getEl('stf-rng')).value = rae.rng.toFixed(1);
 
-    keepTrackApi.getUiManager().hideSideMenus();
+    ServiceLocator.getUiManager().hideSideMenus();
     slideInRight(getEl('stf-menu'), 1000);
     this.isMenuButtonActive = true;
     this.setBottomIconToSelected();

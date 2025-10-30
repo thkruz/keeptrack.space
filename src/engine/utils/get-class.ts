@@ -1,4 +1,4 @@
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrack } from '@app/keeptrack';
 
 /**
  * Retrieves an array of HTMLElements with the specified class name.
@@ -7,7 +7,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
  *
  */
 export const getClass = (id: string): HTMLElement[] => {
-  const els = Array.from(keepTrackApi.containerRoot.querySelectorAll(`.${id}`));
+  const els = Array.from(KeepTrack.getInstance().containerRoot.querySelectorAll(`.${id}`));
 
   if (els.length) {
     return els as HTMLElement[];
@@ -19,7 +19,7 @@ export const getClass = (id: string): HTMLElement[] => {
    *   // TODO - This is a hack. Tests should provide the right environment.
    *   const el = document.createElement('div');
    *   el.id = id;
-   *   keepTrackApi.containerRoot.appendChild(el);
+   *   KeepTrack.getInstance().containerRoot.appendChild(el);
    *   return [<HTMLElement>(<unknown>el)];
    * }
    */

@@ -1,9 +1,9 @@
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { mat4 } from 'gl-matrix';
 import { BaseObject, Degrees } from '@ootk/src/main';
+import { mat4 } from 'gl-matrix';
 import { ConeMesh, ConeSettings } from './cone-mesh';
 import { CustomMeshFactory } from './custom-mesh-factory';
+import { EventBus } from '@app/engine/events/event-bus';
 
 export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
   private defaultConeSettings_: ConeSettings = {
@@ -45,12 +45,12 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
     const sensorFovMesh = new ConeMesh(coneAttachPoint, settings);
 
     this.add(sensorFovMesh);
-    keepTrackApi.emit(EventBusEvent.ConeMeshUpdate);
+    EventBus.getInstance().emit(EventBusEvent.ConeMeshUpdate);
   }
 
   remove(id: number) {
     this.meshes.splice(id, 1);
-    keepTrackApi.emit(EventBusEvent.ConeMeshUpdate);
+    EventBus.getInstance().emit(EventBusEvent.ConeMeshUpdate);
   }
 
   removeByObjectId(id: number) {
@@ -60,6 +60,6 @@ export class ConeMeshFactory extends CustomMeshFactory<ConeMesh> {
       this.remove(index);
     }
 
-    keepTrackApi.emit(EventBusEvent.ConeMeshUpdate);
+    EventBus.getInstance().emit(EventBusEvent.ConeMeshUpdate);
   }
 }

@@ -1,13 +1,14 @@
 import { EChartsData, GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
 import waterfall2Png from '@public/img/icons/waterfall2.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class Inc2AltPlots extends KeepTrackPlugin {
   readonly id = 'Inc2AltPlots';
@@ -16,7 +17,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   bottomIconImg = waterfall2Png;
@@ -203,7 +204,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
     const russia = [] as unknown as [number, number, number, string, number][];
     const other = [] as unknown as [number, number, number, string, number][];
 
-    keepTrackApi.getCatalogManager().objectCache.forEach((obj) => {
+    ServiceLocator.getCatalogManager().objectCache.forEach((obj) => {
       if (obj.type !== SpaceObjectType.PAYLOAD) {
         return;
       }
@@ -214,8 +215,8 @@ export class Inc2AltPlots extends KeepTrackPlugin {
         return;
       }
 
-      sat = keepTrackApi.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY)!;
-      const now = keepTrackApi.getTimeManager().simulationTimeObj;
+      sat = ServiceLocator.getCatalogManager().getSat(sat.id, GetSatType.POSITION_ONLY)!;
+      const now = ServiceLocator.getTimeManager().simulationTimeObj;
 
       const alt = sat.lla(now)?.alt ?? 0;
 

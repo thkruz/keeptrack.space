@@ -1,11 +1,11 @@
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { keepTrackApi } from '@app/keepTrackApi';
 import landscape3Png from '@public/img/icons/landscape3.png';
 import { saveAs } from 'file-saver';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -146,25 +146,25 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
       if (this.scenario.startTime && simulationTimeObj.getTime() < this.scenario.startTime.getTime()) {
         simulationTimeObj.setTime(this.scenario.startTime.getTime());
-        keepTrackApi.toast('Simulation time is before the scenario start time. Pausing at start time.', ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast('Simulation time is before the scenario start time. Pausing at start time.', ToastMsgType.caution, true);
         isOutsideBoundaries = true;
       }
 
       if (this.scenario.endTime && simulationTimeObj.getTime() > this.scenario.endTime.getTime()) {
         simulationTimeObj.setTime(this.scenario.endTime.getTime());
-        keepTrackApi.toast('Simulation time is after the scenario stop time. Pausing at stop time.', ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast('Simulation time is after the scenario stop time. Pausing at stop time.', ToastMsgType.caution, true);
         isOutsideBoundaries = true;
       }
 
       if (isOutsideBoundaries) {
         const today = new Date();
-        const timeManagerInstance = keepTrackApi.getTimeManager();
+        const timeManagerInstance = ServiceLocator.getTimeManager();
 
         timeManagerInstance.dynamicOffsetEpoch = Date.now();
         timeManagerInstance.staticOffset = timeManagerInstance.simulationTimeObj.getTime() - today.getTime();
         timeManagerInstance.changePropRate(0, false); // Pause without toast
         timeManagerInstance.synchronize();
-        keepTrackApi.emit(EventBusEvent.staticOffsetChange, timeManagerInstance.staticOffset);
+        EventBus.getInstance().emit(EventBusEvent.staticOffsetChange, timeManagerInstance.staticOffset);
       }
     });
   }
@@ -256,7 +256,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
     // Only show toast if button was clicked
     if (e && isUpdateSuccess) {
-      keepTrackApi.toast('Scenario settings updated successfully!', ToastMsgType.normal);
+      ServiceLocator.getUiManager().toast('Scenario settings updated successfully!', ToastMsgType.normal);
     }
   }
 
@@ -323,7 +323,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
   private onSave_(evt: Event): void {
     this.onSubmit_();
-    keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+    ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
     const blob = new Blob([JSON.stringify(this.scenario, null, 2)], {
       type: 'text/plain;charset=utf-8',
     });
@@ -339,7 +339,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
   }
 
   private onLoad_(): void {
-    keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+    ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
     const input = document.createElement('input');
 
     input.type = 'file';
@@ -364,7 +364,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
               };
 
               if (this.updateScenario(scenarioData)) {
-                keepTrackApi.toast('Scenario loaded successfully!', ToastMsgType.normal);
+                ServiceLocator.getUiManager().toast('Scenario loaded successfully!', ToastMsgType.normal);
               }
             } catch (error) {
               errorManagerInstance.error(error, 'scenario-management.ts', 'Error loading scenario file!');

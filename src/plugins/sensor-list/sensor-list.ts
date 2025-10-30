@@ -1,6 +1,7 @@
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { CameraType } from '@app/engine/camera/camera';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -17,6 +18,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { keepTrackApi } from './../../keepTrackApi';
 import './sensor-list.css';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 // TODO: Add a search bar and filter for sensors
 
@@ -27,7 +29,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
   bottomIconCallback: () => void = () => {
     if (this.isMenuButtonActive) {
-      if (keepTrackApi.getPluginByName('Planetarium')?.isMenuButtonActive) {
+      if (PluginRegistry.getPluginByName('Planetarium')?.isMenuButtonActive) {
         getClass('sensor-top-link').forEach((el) => {
           el.style.display = 'none';
         });
@@ -105,13 +107,13 @@ export class SensorListPlugin extends KeepTrackPlugin {
           }
 
           if (realTarget.id === 'reset-sensor-button') {
-            keepTrackApi.getSensorManager().resetSensorSelected();
-            keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+            ServiceLocator.getSensorManager().resetSensorSelected();
+            ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
 
             return;
           }
 
-          keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+          ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
           const sensorClick = realTarget.dataset.sensor;
 
           this.sensorListContentClick(sensorClick ?? '');
@@ -131,7 +133,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
 
         showEl('sensors-in-fov-link');
 
-        if (keepTrackApi.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
+        if (PluginRegistry.getPlugin(SatInfoBox) !== null && !this.isSensorLinksAdded) {
           getEl('actions-section')?.insertAdjacentHTML(
             'beforeend',
             html`
@@ -140,9 +142,9 @@ export class SensorListPlugin extends KeepTrackPlugin {
                 `,
           );
           getEl('sensors-in-fov-link')?.addEventListener('click', () => {
-            keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+            ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
 
-            const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+            const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
             if (!selectSatManagerInstance) {
               return;
@@ -154,7 +156,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
               return;
             }
 
-            keepTrackApi.getLineManager().createSensorsToSatFovOnly(sat as DetailedSatellite);
+            ServiceLocator.getLineManager().createSensorsToSatFovOnly(sat as DetailedSatellite);
           });
           this.isSensorLinksAdded = true;
         }
@@ -176,7 +178,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
         }
         const sensor = obj as DetailedSensor;
 
-        const sensorManagerInstance = keepTrackApi.getSensorManager();
+        const sensorManagerInstance = ServiceLocator.getSensorManager();
         // No sensor manager on mobile
 
         sensorManagerInstance.setSensor(null, sensor.sensorId);
@@ -184,7 +186,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
         if (sensorManagerInstance.currentSensors.length === 0) {
           throw new Error('No sensors found');
         }
-        const timeManagerInstance = keepTrackApi.getTimeManager();
+        const timeManagerInstance = ServiceLocator.getTimeManager();
 
         keepTrackApi
           .getMainCamera()
@@ -201,7 +203,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       EventBusEvent.onCruncherReady,
       () => {
         if (!settingsManager.disableUI && settingsManager.isLoadLastSensor && settingsManager.offlineMode) {
-          keepTrackApi.getSensorManager().loadSensorJson();
+          ServiceLocator.getSensorManager().loadSensorJson();
         }
       },
     );
@@ -209,12 +211,12 @@ export class SensorListPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean, isShift: boolean) => {
       if (key === 'Home' && !isShift && !isRepeat) {
         // If a sensor is selected rotate the camera to it
-        if ((keepTrackApi.getSensorManager().currentSensors.length > 0) &&
-          (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH)) {
-          const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+        if ((ServiceLocator.getSensorManager().currentSensors.length > 0) &&
+          (ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH)) {
+          const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
-          keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, keepTrackApi.getTimeManager().selectedDate);
-          keepTrackApi.getSoundManager()?.play(SoundNames.WHOOSH);
+          ServiceLocator.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, ServiceLocator.getTimeManager().selectedDate);
+          ServiceLocator.getSoundManager()?.play(SoundNames.WHOOSH);
         }
       }
     });
@@ -225,7 +227,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
       return;
     }
 
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     if (sensorClick === '') {
       errorManagerInstance.debug('The menu item was clicked but the menu was not defined.');
@@ -244,7 +246,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
     }
 
     // Deselect any satellites
-    if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
+    if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
       try {
         keepTrackApi
           .getMainCamera()
@@ -252,7 +254,7 @@ export class SensorListPlugin extends KeepTrackPlugin {
             sensorManagerInstance.currentSensors[0].lat,
             sensorManagerInstance.currentSensors[0].lon,
             sensorManagerInstance.currentSensors[0].zoom ?? ZoomValue.GEO,
-            keepTrackApi.getTimeManager().selectedDate,
+            ServiceLocator.getTimeManager().selectedDate,
           );
       } catch (e) {
         // TODO: More intentional conditional statement

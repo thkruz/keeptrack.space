@@ -4,12 +4,13 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import soundOffPng from '@public/img/icons/sound-off.png';
 import soundOnPng from '@public/img/icons/sound-on.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { SoundNames, sounds } from './sounds';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 interface PlayingSound {
   source: AudioBufferSourceNode;
@@ -84,7 +85,7 @@ export class SoundManager extends KeepTrackPlugin {
     const eventBus = EventBus.getInstance();
 
     // This needs to happen immediately so the sound button is in the menu
-    keepTrackApi.getPlugin(TopMenu)?.navItems.push({
+    PluginRegistry.getPlugin(TopMenu)?.navItems.push({
       id: 'sound-btn',
       order: 1,
       classInner: 'bmenu-item-selected',
@@ -95,7 +96,7 @@ export class SoundManager extends KeepTrackPlugin {
     eventBus.on(EventBusEvent.uiManagerFinal, () => {
       getEl('sound-btn')!.onclick = () => {
         const soundIcon = <HTMLImageElement>getEl('sound-icon');
-        const soundManager = keepTrackApi.getSoundManager();
+        const soundManager = ServiceLocator.getSoundManager();
 
         if (!soundManager) {
           errorManagerInstance.warn('SoundManager is not enabled. Check your settings!');

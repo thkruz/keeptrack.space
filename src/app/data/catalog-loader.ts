@@ -20,7 +20,6 @@ import {
   TleLine1,
   TleLine2,
 } from '@ootk/src/main';
-import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
 import { Planet } from '../objects/planet';
 import { CatalogManager } from './catalog-manager';
@@ -137,7 +136,7 @@ export interface KeepTrackTLEFile {
 export class CatalogLoader {
   static filterTLEDatabase(resp: KeepTrackTLEFile[], extraSats: ExtraSat[] | null, asciiCatalog: AsciiTleSat[] | null, jsCatalog: JsSat[] | null): void {
     let tempObjData: DetailedSatellite[] = [];
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     catalogManagerInstance.sccIndex = <{ [key: string]: number }>{};
     catalogManagerInstance.cosparIndex = <{ [key: string]: number }>{};
@@ -313,8 +312,8 @@ export class CatalogLoader {
       asciiCatalog = externalCatalog || asciiCatalog;
 
       // Make sure everyone agrees on what time it is
-      keepTrackApi.getTimeManager().init();
-      keepTrackApi.getTimeManager().synchronize();
+      ServiceLocator.getTimeManager().init();
+      ServiceLocator.getTimeManager().synchronize();
 
       /*
        * Filter TLEs
@@ -322,7 +321,7 @@ export class CatalogLoader {
        */
       CatalogLoader.filterTLEDatabase(resp, extraSats, asciiCatalog, jsCatalog);
 
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
       catalogManagerInstance.numObjects = catalogManagerInstance.objectCache.length;
 
@@ -345,7 +344,7 @@ export class CatalogLoader {
    */
   private static addNonSatelliteObjects_(catalogManagerInstance: CatalogManager, tempObjData: BaseObject[]) {
     catalogManagerInstance.orbitalSats = tempObjData.length + settingsManager.maxAnalystSats;
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     dotsManagerInstance.starIndex1 = catalogManagerInstance.starIndex1 + catalogManagerInstance.orbitalSats;
     dotsManagerInstance.starIndex2 = catalogManagerInstance.starIndex2 + catalogManagerInstance.orbitalSats;
@@ -418,7 +417,7 @@ export class CatalogLoader {
       });
 
       earthDot.color = (planetList[SolarBody.Earth]?.color ?? [0.0, 0.5, 1.0, 1.0]) as rgbaArray;
-      keepTrackApi.getScene().earth.planetObject = earthDot;
+      ServiceLocator.getScene().earth.planetObject = earthDot;
       tempObjData.push(earthDot);
 
       // const moonDot = new Planet({
@@ -427,7 +426,7 @@ export class CatalogLoader {
       // });
 
       // moonDot.color = (planetList[SolarBody.Moon]?.color ?? [1.0, 1.0, 1.0, 1.0]);
-      // keepTrackApi.getScene().planets.Moon.planetObject = moonDot;
+      // ServiceLocator.getScene().planets.Moon.planetObject = moonDot;
 
       // tempObjData.push(moonDot);
     }

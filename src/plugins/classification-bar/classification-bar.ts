@@ -1,11 +1,11 @@
 import { Classification, ClassificationString } from '@app/app/ui/classification';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrack } from '@app/keeptrack';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class ClassificationBar extends KeepTrackPlugin {
   readonly id = 'ClassificationBar';
@@ -73,7 +73,7 @@ export class ClassificationBar extends KeepTrackPlugin {
       justify-content: center;
       `;
 
-    keepTrackApi.containerRoot.insertBefore(node, keepTrackApi.containerRoot.firstChild);
+    KeepTrack.getInstance().containerRoot.insertBefore(node, KeepTrack.getInstance().containerRoot.firstChild);
 
     this.isClassificationContainerLoaded_ = true;
   }

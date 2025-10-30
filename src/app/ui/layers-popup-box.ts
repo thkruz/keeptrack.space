@@ -1,8 +1,8 @@
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, showEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { LayersManager } from './layers-manager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 
 export class LayersPopupBox extends DraggableBox {
@@ -28,7 +28,7 @@ export class LayersPopupBox extends DraggableBox {
       const hoverMenuItemClass = (e.target as HTMLElement)?.classList[1];
 
       if (hoverMenuItemClass) {
-        keepTrackApi.getUiManager().layersManager.layersHoverMenuClick(hoverMenuItemClass);
+        ServiceLocator.getUiManager().layersManager.layersHoverMenuClick(hoverMenuItemClass);
       }
     });
   }
@@ -39,6 +39,6 @@ export class LayersPopupBox extends DraggableBox {
 
     layersMenuIconContainer.classList.remove('bmenu-item-selected');
     layersMenuIconContainer.classList.add('top-menu-icons__blue-img');
-    keepTrackApi.getUiManager().layersManager.isLayersMenuOpen = false;
+    ServiceLocator.getUiManager().layersManager.isLayersMenuOpen = false;
   }
 }

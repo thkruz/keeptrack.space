@@ -1,7 +1,6 @@
 import { CameraType } from '@app/engine/camera/camera';
 import { GetSatType, SolarBody, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
@@ -52,10 +51,10 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.endOfDraw, () => {
       if ((this.selectedSat ?? -1) > -1) {
-        const timeManagerInstance = keepTrackApi.getTimeManager();
+        const timeManagerInstance = ServiceLocator.getTimeManager();
 
         if (this.primarySatObj) {
-          keepTrackApi.getUiManager().
+          ServiceLocator.getUiManager().
             updateSelectBox(timeManagerInstance.realTime, timeManagerInstance.lastBoxUpdateTime, this.primarySatObj);
         }
       }
@@ -63,8 +62,8 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   checkIfSelectSatVisible() {
-    if (keepTrackApi.getPlugin(TopMenu)) {
-      const currentSearch = keepTrackApi.getUiManager().searchManager.getCurrentSearch();
+    if (PluginRegistry.getPlugin(TopMenu)) {
+      const currentSearch = ServiceLocator.getUiManager().searchManager.getCurrentSearch();
 
       // Base CSS Style based on if the search box is open or not
       let cssStyle = currentSearch.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';
@@ -87,7 +86,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     if (satId >= 0) {
       this.selectSat(satId);
     } else {
-      const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
+      const activeSats = ServiceLocator.getCatalogManager().getActiveSats();
       const lastSatId = activeSats[activeSats.length - 1].id;
 
       this.selectSat(lastSatId);
@@ -95,7 +94,7 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   selectNextSat() {
-    const activeSats = keepTrackApi.getCatalogManager().getActiveSats();
+    const activeSats = ServiceLocator.getCatalogManager().getActiveSats();
     const lastSatId = activeSats[activeSats.length - 1].id;
     const satId = this.selectedSat + 1;
 
@@ -111,14 +110,14 @@ export class SelectSatManager extends KeepTrackPlugin {
       return;
     }
 
-    const obj = keepTrackApi.getCatalogManager().getObject(satId);
+    const obj = ServiceLocator.getCatalogManager().getObject(satId);
 
     if (!obj || !obj.active) {
       this.selectSatReset_();
     } else {
 
       if (obj.position.x === 0 && obj.position.y === 0 && obj.position.z === 0 && obj.name !== SolarBody.Earth) {
-        keepTrackApi.getUiManager().toast('Object is inside the Earth, cannot select it', ToastMsgType.caution);
+        ServiceLocator.getUiManager().toast('Object is inside the Earth, cannot select it', ToastMsgType.caution);
 
         return;
       }
@@ -132,7 +131,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         case SpaceObjectType.BISTATIC_RADIO_TELESCOPE:
         case SpaceObjectType.GROUND_SENSOR_STATION:
           this.selectSensorObject_(obj as DetailedSensor);
-          keepTrackApi.getSoundManager()?.play(SoundNames.WHOOSH);
+          ServiceLocator.getSoundManager()?.play(SoundNames.WHOOSH);
 
           return;
         case SpaceObjectType.PAYLOAD:
@@ -184,7 +183,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     this.primarySatObj = spaceObj ?? this.noSatObj_;
 
     // Run any other callbacks
-    keepTrackApi.emit(EventBusEvent.selectSatData, spaceObj, spaceObj?.id);
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, spaceObj, spaceObj?.id);
 
     // Record the last selected sat
     this.lastSelectedSat(this.selectedSat);
@@ -199,16 +198,16 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
 
     // stop rotation if it is on
-    keepTrackApi.getMainCamera().autoRotate(false);
-    keepTrackApi.getMainCamera().state.panCurrent = {
+    ServiceLocator.getMainCamera().autoRotate(false);
+    ServiceLocator.getMainCamera().state.panCurrent = {
       x: 0,
       y: 0,
       z: 0,
     };
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
-      keepTrackApi.getMainCamera().state.earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.emit(EventBusEvent.sensorDotSelected, sensor);
+    if (ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
+      ServiceLocator.getMainCamera().state.earthCenteredLastZoom = ServiceLocator.getMainCamera().zoomLevel();
+      EventBus.getInstance().emit(EventBusEvent.sensorDotSelected, sensor);
     }
 
     this.setSelectedSat_(-1);
@@ -222,12 +221,12 @@ export class SelectSatManager extends KeepTrackPlugin {
   private selectSatChange_(obj = null as DetailedSatellite | MissileObject | null) {
     const id = obj?.id ?? -1;
 
-    keepTrackApi.getSoundManager()?.play(SoundNames.WHOOSH);
+    ServiceLocator.getSoundManager()?.play(SoundNames.WHOOSH);
 
     if ((obj as DetailedSatellite)?.sccNum === '25544') {
-      keepTrackApi.getSoundManager()?.play(SoundNames.CHATTER);
+      ServiceLocator.getSoundManager()?.play(SoundNames.CHATTER);
     } else {
-      keepTrackApi.getSoundManager()?.stop(SoundNames.CHATTER);
+      ServiceLocator.getSoundManager()?.stop(SoundNames.CHATTER);
     }
 
     SelectSatManager.updateCruncher_(id);
@@ -236,7 +235,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // If deselecting a satellite, clear the selected orbit
     if (id === -1 && this.lastSelectedSat_ > -1) {
-      keepTrackApi.getOrbitManager().clearSelectOrbit();
+      ServiceLocator.getOrbitManager().clearSelectOrbit();
     } else if (!(obj instanceof OemSatellite)) {
       // Currently DetailedSatellites and Missiles assume Earth center
       settingsManager.centerBody = SolarBody.Earth;
@@ -253,10 +252,10 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     // Run this ONCE when clicking empty space
     if (this.lastSelectedSat() !== -1) {
-      keepTrackApi.getMainCamera().exitFixedToSat();
+      ServiceLocator.getMainCamera().exitFixedToSat();
 
       document.documentElement.style.setProperty('--search-box-bottom', '0px');
-      keepTrackApi.getPlugin(SatInfoBox)?.hide();
+      PluginRegistry.getPlugin(SatInfoBox)?.hide();
     }
 
     this.setSelectedSat_(-1);
@@ -282,17 +281,17 @@ export class SelectSatManager extends KeepTrackPlugin {
 
         this.primarySatCovMatrix = radii;
 
-        const primaryCovBubble = keepTrackApi.getScene().primaryCovBubble;
+        const primaryCovBubble = ServiceLocator.getScene().primaryCovBubble;
 
         primaryCovBubble.setColor([1, 0, 0, 0.3]);
-        primaryCovBubble.setRadii(keepTrackApi.getRenderer().gl, radii);
+        primaryCovBubble.setRadii(ServiceLocator.getRenderer().gl, radii);
       }
     }
 
 
     // stop rotation if it is on
-    keepTrackApi.getMainCamera().autoRotate(false);
-    keepTrackApi.getMainCamera().state.panCurrent = {
+    ServiceLocator.getMainCamera().autoRotate(false);
+    ServiceLocator.getMainCamera().state.panCurrent = {
       x: 0,
       y: 0,
       z: 0,
@@ -307,19 +306,19 @@ export class SelectSatManager extends KeepTrackPlugin {
       return;
     }
 
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
-      keepTrackApi.getMainCamera().state.earthCenteredLastZoom = keepTrackApi.getMainCamera().zoomLevel();
-      keepTrackApi.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
+    if (ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_EARTH) {
+      ServiceLocator.getMainCamera().state.earthCenteredLastZoom = ServiceLocator.getMainCamera().zoomLevel();
+      ServiceLocator.getMainCamera().cameraType = CameraType.FIXED_TO_SAT;
     }
 
     // If we deselect an object but had previously selected one then disable/hide stuff
-    keepTrackApi.getMainCamera().state.camZoomSnappedOnSat = true;
-    keepTrackApi.getMainCamera().state.camDistBuffer = settingsManager.minDistanceFromSatellite;
-    keepTrackApi.getMainCamera().state.camAngleSnappedOnSat = true;
+    ServiceLocator.getMainCamera().state.camZoomSnappedOnSat = true;
+    ServiceLocator.getMainCamera().state.camDistBuffer = settingsManager.minDistanceFromSatellite;
+    ServiceLocator.getMainCamera().state.camAngleSnappedOnSat = true;
   }
 
   private static selectOwnerManufacturer_(obj: LandObject) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const searchStr = catalogManagerInstance.objectCache
       .filter((_sat) => {
         const isOwner = (_sat as DetailedSatellite).owner === obj.Code;
@@ -332,10 +331,10 @@ export class SelectSatManager extends KeepTrackPlugin {
       .join(',');
 
     if (searchStr.length === 0) {
-      keepTrackApi.getUiManager().toast('No satellites found for this owner/manufacturer', ToastMsgType.caution, false);
+      ServiceLocator.getUiManager().toast('No satellites found for this owner/manufacturer', ToastMsgType.caution, false);
     } else {
-      keepTrackApi.getUiManager().searchManager.doSearch(searchStr);
-      keepTrackApi.getMainCamera().changeZoom(0.9);
+      ServiceLocator.getUiManager().searchManager.doSearch(searchStr);
+      ServiceLocator.getMainCamera().changeZoom(0.9);
     }
   }
 
@@ -348,16 +347,16 @@ export class SelectSatManager extends KeepTrackPlugin {
   }
 
   private static updateCruncher_(i: number) {
-    keepTrackApi.getCatalogManager().satCruncher.postMessage({
+    ServiceLocator.getCatalogManager().satCruncher.postMessage({
       typ: CruncerMessageTypes.SATELLITE_SELECTED,
       satelliteSelected: [i],
     });
   }
 
   private updateDotSizeAndColor_(i: number) {
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
-    const { gl, isContextLost } = keepTrackApi.getRenderer();
+    const { gl, isContextLost } = ServiceLocator.getRenderer();
 
     if (isContextLost) {
       return;
@@ -372,7 +371,7 @@ export class SelectSatManager extends KeepTrackPlugin {
         colorSchemeManagerInstance.colorSchemeInstances[settingsManager.defaultColorScheme]?.update ??
         Object.values(colorSchemeManagerInstance.colorSchemeInstances)[0].update;
 
-      const lastSat = keepTrackApi.getCatalogManager().getObject(lastSelectedObject);
+      const lastSat = ServiceLocator.getCatalogManager().getObject(lastSelectedObject);
 
       if (lastSat && colorSchemeManagerInstance.colorData) {
         const newColor = colorSchemeManagerInstance.currentColorScheme.update(lastSat).color;
@@ -415,7 +414,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     }
     this.secondarySat = id;
     if (this.secondarySatObj?.id !== id) {
-      this.secondarySatObj = keepTrackApi.getCatalogManager().getObject(id) as DetailedSatellite;
+      this.secondarySatObj = ServiceLocator.getCatalogManager().getObject(id) as DetailedSatellite;
 
       if (!this.secondarySatObj) {
         this.secondarySatObj = null;
@@ -446,20 +445,20 @@ export class SelectSatManager extends KeepTrackPlugin {
 
         this.secondarySatCovMatrix = radii;
 
-        const secondaryCovBubble = keepTrackApi.getScene().secondaryCovBubble;
+        const secondaryCovBubble = ServiceLocator.getScene().secondaryCovBubble;
 
         secondaryCovBubble.setColor([0, 0, 1, 0.4]);
-        secondaryCovBubble.setRadii(keepTrackApi.getRenderer().gl, radii);
+        secondaryCovBubble.setRadii(ServiceLocator.getRenderer().gl, radii);
       }
     }
 
     if (this.secondarySat === this.selectedSat) {
       this.selectedSat = -1;
       this.setSelectedSat_(-1);
-      keepTrackApi.getOrbitManager().clearSelectOrbit(false);
+      ServiceLocator.getOrbitManager().clearSelectOrbit(false);
     }
 
-    keepTrackApi.emit(EventBusEvent.setSecondarySat, this.secondarySatObj, id);
+    EventBus.getInstance().emit(EventBusEvent.setSecondarySat, this.secondarySatObj, id);
   }
 
   private setSelectedSat_(id: number): void {
@@ -470,7 +469,7 @@ export class SelectSatManager extends KeepTrackPlugin {
 
     if (this.selectedSat === this.secondarySat && this.selectedSat !== -1) {
       this.setSecondarySat(-1);
-      keepTrackApi.getOrbitManager().clearSelectOrbit(true);
+      ServiceLocator.getOrbitManager().clearSelectOrbit(true);
     }
   }
 
@@ -479,7 +478,7 @@ export class SelectSatManager extends KeepTrackPlugin {
     const _secondary = this.secondarySat;
 
     this.setSecondarySat(_primary);
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
     if (_primary !== -1) {
       orbitManagerInstance.setSelectOrbit(_primary, true);

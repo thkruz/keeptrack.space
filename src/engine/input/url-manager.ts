@@ -1,14 +1,15 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager, settingsManager } from '@app/settings/settings';
-import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import { DEG2RAD, Degrees, DetailedSatellite, RAD2DEG, Radians } from '@ootk/src/main';
+import { PluginRegistry } from '../core/plugin-registry';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { AtmosphereSettings, EarthTextureStyle } from '../rendering/draw-manager/earth-quality-enums';
 import { getEl } from '../utils/get-el';
+import { OrbitCruncherMsgType } from '@app/webworker/orbit-cruncher-interfaces';
 
 export abstract class UrlManager {
   private static selectedSat_: DetailedSatellite | null = null;
@@ -195,8 +196,8 @@ export abstract class UrlManager {
               settingsManager.numberOfEcfOrbitsToDraw = ecfValue;
 
               EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
-                keepTrackApi.getOrbitManager().orbitWorker.postMessage({
-                  typ: OrbitCruncherType.SETTINGS_UPDATE,
+                ServiceLocator.getOrbitManager().orbitThreadMgr.postMessage({
+                  type: OrbitCruncherMsgType.SETTINGS_UPDATE,
                   numberOfOrbitsToDraw: settingsManager.numberOfEcfOrbitsToDraw,
                 });
               });
@@ -219,11 +220,11 @@ export abstract class UrlManager {
         switch (key) {
           case 'search':
             if (!settingsManager.disableUI) {
-              const uiManagerInstance = keepTrackApi.getUiManager();
+              const uiManagerInstance = ServiceLocator.getUiManager();
 
               uiManagerInstance.doSearch(kv.search);
               if (settingsManager.lastSearchResults.length === 0) {
-                keepTrackApi.toast(`Search for "${kv.search}" found nothing!`, ToastMsgType.caution, true);
+                uiManagerInstance.toast(`Search for "${kv.search}" found nothing!`, ToastMsgType.caution, true);
                 uiManagerInstance.searchManager.hideResults();
               }
             }
@@ -275,9 +276,9 @@ export abstract class UrlManager {
     }
     this.lastUpdateTime_ = Date.now();
 
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const mainCamera = keepTrackApi.getMainCamera();
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const mainCamera = ServiceLocator.getMainCamera();
 
     if (!uiManagerInstance?.searchManager) {
       return;
@@ -336,9 +337,9 @@ export abstract class UrlManager {
       paramSlices.push(`camDistBuffer=${mainCamera.state.camDistBuffer}`);
     }
 
-    if (keepTrackApi.getColorSchemeManager().currentColorScheme.id !== 'CelestrakColorScheme') {
+    if (ServiceLocator.getColorSchemeManager().currentColorScheme.id !== 'CelestrakColorScheme') {
       const shorthandFromDefinition = Object.keys(UrlManager.colorSchemeDefinitions_).find(
-        (key) => UrlManager.colorSchemeDefinitions_[key] === keepTrackApi.getColorSchemeManager().currentColorScheme.id,
+        (key) => UrlManager.colorSchemeDefinitions_[key] === ServiceLocator.getColorSchemeManager().currentColorScheme.id,
       );
 
       paramSlices.push(`color=${shorthandFromDefinition}`);
@@ -380,24 +381,24 @@ export abstract class UrlManager {
   }
 
   private static handleIntldesParam_(val: string) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const urlSatId = catalogManagerInstance.intlDes2id(val.toUpperCase());
 
     if (urlSatId !== null && catalogManagerInstance.getObject(urlSatId)?.active) {
-      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(urlSatId);
     } else {
-      keepTrackApi.toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`International Designator "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
     }
   }
 
   private static handleSatParam_(val: string) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const urlSatId = catalogManagerInstance.sccNum2Id(parseInt(val));
 
     if (urlSatId !== null) {
-      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(urlSatId);
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(urlSatId);
     } else {
-      keepTrackApi.toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Satellite "${val.toUpperCase()}" was not found!`, ToastMsgType.caution, true);
     }
   }
 
@@ -409,7 +410,7 @@ export abstract class UrlManager {
     (<HTMLSelectElement>getEl('ms-target')).value = subVal[2].toString();
     (<HTMLButtonElement>getEl('missile')).click();
 
-    keepTrackApi.toast('Missile launched!', ToastMsgType.normal, false);
+    ServiceLocator.getUiManager().toast('Missile launched!', ToastMsgType.normal, false);
   }
 
   private static handleDateParam_(val: string) {
@@ -420,7 +421,7 @@ export abstract class UrlManager {
       const date = new Date(val);
 
       if (isNaN(date.getTime())) {
-        keepTrackApi.toast(`Date value of "${val}" is not a proper ISO 8601 date string!`, ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast(`Date value of "${val}" is not a proper ISO 8601 date string!`, ToastMsgType.caution, true);
 
         return;
       }
@@ -428,12 +429,12 @@ export abstract class UrlManager {
       settingsManager.simulationTime = date;
     } else {
       if (val.length !== 13) {
-        keepTrackApi.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
 
         return;
       }
       if (isNaN(parseInt(val))) {
-        keepTrackApi.toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast(`Date value of "${val}" is not a proper unix timestamp!`, ToastMsgType.caution, true);
 
         return;
       }
@@ -443,11 +444,11 @@ export abstract class UrlManager {
   }
 
   private static handleRateParam_(val: string) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
     let rate = parseFloat(val);
 
     if (isNaN(rate)) {
-      keepTrackApi.toast(`Propagation rate of "${rate}" is not a valid float!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Propagation rate of "${rate}" is not a valid float!`, ToastMsgType.caution, true);
 
       return;
     }
@@ -466,18 +467,18 @@ export abstract class UrlManager {
     const camDistBufferValue = parseFloat(camDistBuffer);
 
     if (isNaN(zoom)) {
-      keepTrackApi.toast(`Zoom value of "${val}" is not a valid float!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Zoom value of "${val}" is not a valid float!`, ToastMsgType.caution, true);
 
       return;
     }
 
     if (zoom < 0.06 || zoom > 1) {
-      keepTrackApi.toast(`Zoom value of "${val}" is out of bounds!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Zoom value of "${val}" is out of bounds!`, ToastMsgType.caution, true);
 
       return;
     }
 
-    keepTrackApi.getMainCamera().state.zoomTarget = zoom;
+    ServiceLocator.getMainCamera().state.zoomTarget = zoom;
 
     if (camDistBufferValue >= settingsManager.nearZoomLevel) {
       // Outside camDistBuffer
@@ -490,21 +491,21 @@ export abstract class UrlManager {
     const yawNum = parseFloat(kv.yaw);
 
     if (isNaN(pitchNum) || isNaN(yawNum)) {
-      keepTrackApi.toast('Pitch or Yaw value is not a valid float!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Pitch or Yaw value is not a valid float!', ToastMsgType.caution, true);
 
       return;
     }
     if (pitchNum < -90 || pitchNum > 90) {
-      keepTrackApi.toast('Pitch value is out of bounds!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Pitch value is out of bounds!', ToastMsgType.caution, true);
 
       return;
     }
     if (yawNum < -360 || yawNum > 360) {
-      keepTrackApi.toast('Yaw value is out of bounds!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Yaw value is out of bounds!', ToastMsgType.caution, true);
 
       return;
     }
-    const mainCameraInstance = keepTrackApi.getMainCamera();
+    const mainCameraInstance = ServiceLocator.getMainCamera();
 
     mainCameraInstance.autoRotate(false);
     mainCameraInstance.camSnap(pitchNum * DEG2RAD as Radians, yawNum * DEG2RAD as Radians);
@@ -523,31 +524,31 @@ export abstract class UrlManager {
 
 
     if (isNaN(zoomNum)) {
-      keepTrackApi.toast(`Zoom value of "${zoom}" is not a valid float!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(`Zoom value of "${zoom}" is not a valid float!`, ToastMsgType.caution, true);
 
       return;
     }
 
     if (isNaN(latNum) || isNaN(lonNum)) {
-      keepTrackApi.toast('Latitude or Longitude value is not a valid float!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Latitude or Longitude value is not a valid float!', ToastMsgType.caution, true);
 
       return;
     }
 
     if (latNum < -90 || latNum > 90 || lonNum < -360 || lonNum > 360) {
-      keepTrackApi.toast('Latitude or Longitude value is out of bounds!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('Latitude or Longitude value is out of bounds!', ToastMsgType.caution, true);
 
       return;
     }
 
-    keepTrackApi.getMainCamera().autoRotate(false);
+    ServiceLocator.getMainCamera().autoRotate(false);
 
     if (date !== null && !isNaN(parseInt(date))) {
       setTimeout(() => {
-        keepTrackApi.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
+        ServiceLocator.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
       }, 10500);
     } else {
-      keepTrackApi.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
+      ServiceLocator.getMainCamera().lookAtLatLon(latNum, lonNum, zoomNum);
     }
   }
 
@@ -575,7 +576,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = false;
         EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
-          keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+          PluginRegistry.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
       case 'opscenter':
@@ -589,7 +590,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
         EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
-          keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+          PluginRegistry.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
       case '90s':
@@ -603,7 +604,7 @@ export abstract class UrlManager {
         settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
         settingsManager.isEarthAmbientLighting = false;
         EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
-          keepTrackApi.getPlugin(NightToggle)?.setBottomIconToSelected();
+          PluginRegistry.getPlugin(NightToggle)?.setBottomIconToSelected();
         });
         break;
       default:

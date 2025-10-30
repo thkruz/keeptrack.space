@@ -1,8 +1,8 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { getEl } from './get-el';
 import { hideLoading, showLoading } from './showLoading';
 import { slideInRight, slideOutLeft } from './slide';
+import { KeepTrack } from '@app/keeptrack';
 
 interface ColorboxOptions {
   title?: string;
@@ -104,13 +104,13 @@ export const createColorbox = () => {
 
   colorboxDiv.id = 'colorbox-div';
 
-  if (!keepTrackApi.containerRoot) {
+  if (!KeepTrack.getInstance().containerRoot) {
     errorManagerInstance.warn('Container root not found!');
 
     return;
   }
 
-  keepTrackApi.containerRoot.appendChild(colorboxDiv);
+  KeepTrack.getInstance().containerRoot.appendChild(colorboxDiv);
   const colorboxContainer = document.createElement('div');
 
   colorboxContainer.id = 'colorbox-container';

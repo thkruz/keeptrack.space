@@ -7,9 +7,9 @@ import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
 import { dateFromJday } from '@app/engine/utils/transforms';
-import { keepTrackApi } from '@app/keepTrackApi';
 import satChngPng from '@public/img/icons/sats.png';
 import './components/sat-changes.css';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 /**
  *  ////////////////////////////////////////////////////////////////////////////
@@ -117,7 +117,7 @@ export const satChng = (row: number, testOverride?: undefined): void => {
     if (!satChngTable[row].SCC) {
       return;
     }
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     uiManagerInstance.doSearch(satChngTable[row].SCC.toString()); // Actually perform the search of the two objects
     (<HTMLInputElement>getEl('anal-sat')).value = satChngTable[row].SCC.toString();
@@ -132,7 +132,7 @@ export const hideSideMenus = (): void => {
 
 export const bottomMenuClick = (iconName: string): void => {
   if (iconName === 'menu-satChng') {
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (issatChngMenuOpen) {
       issatChngMenuOpen = false;
@@ -153,7 +153,7 @@ export const bottomMenuClick = (iconName: string): void => {
 };
 
 export const getSatChngJson = (json) => {
-  const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
   // TODO: This is a temporary fix for the fact that the JSON is not being parsed correctly.
   if (!json && isThisNode()) {

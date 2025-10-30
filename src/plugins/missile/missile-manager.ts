@@ -9,11 +9,11 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { MissileParams, ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { jday } from '@app/engine/utils/transforms';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, Degrees, EciVec3, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sensor, Sgp4, SpaceObjectType, ecfRad2rae, eci2ecf, eci2lla } from '@ootk/src/main';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import { ChinaICBM, FraSLBM, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, globalBMTargets, ukSLBM } from './missile-data';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 let BurnRate: number, EarthMass: number, EarthRadius: number, FuelDensity: number, G: number, R: number, WarheadMass: number, h: number;
 const missileArray: MissileObject[] = [];
@@ -29,7 +29,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
   await fetch(simFile)
     .then((response) => response.json())
     .then((newMissileArray) => {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
       const satSetLen = catalogManagerInstance.missileSats;
 
       missileManager.missilesInUse = newMissileArray.length;
@@ -80,7 +80,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
             altList: missileObj.altList,
             startTime: missileObj.startTime,
           });
-          const orbitManagerInstance = keepTrackApi.getOrbitManager();
+          const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
           orbitManagerInstance.updateOrbitBuffer(missileObj.id, missileObj);
         }
@@ -88,16 +88,16 @@ export const MassRaidPre = async (time: number, simFile: string) => {
       missileManager.missileArray = newMissileArray;
     });
 
-  keepTrackApi.getUiManager().toast('Missile Mass Raid Loaded Successfully', ToastMsgType.normal);
+  ServiceLocator.getUiManager().toast('Missile Mass Raid Loaded Successfully', ToastMsgType.normal);
   settingsManager.searchLimit = settingsManager.searchLimit > 500 ? settingsManager.searchLimit : 500;
   SettingsMenuPlugin.syncOnLoad();
 
   isMassRaidLoaded = true;
-  keepTrackApi.getUiManager().doSearch('RV_');
+  ServiceLocator.getUiManager().doSearch('RV_');
 };
 export const clearMissiles = () => {
-  const uiManagerInstance = keepTrackApi.getUiManager();
-  const catalogManagerInstance = keepTrackApi.getCatalogManager();
+  const uiManagerInstance = ServiceLocator.getUiManager();
+  const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
   uiManagerInstance.doSearch('');
   const satSetLen = catalogManagerInstance.missileSats;
@@ -133,7 +133,7 @@ export const clearMissiles = () => {
     });
 
     if (missileObj.id) {
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+      const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
       orbitManagerInstance.updateOrbitBuffer(missileObj.id, missileObj);
     }
@@ -207,11 +207,11 @@ export const Missile = (
   country: string,
   minAltitude: number,
 ) => {
-  const missileObj: MissileObject = <MissileObject>keepTrackApi.getCatalogManager().getObject(MissileObjectNum);
+  const missileObj: MissileObject = <MissileObject>ServiceLocator.getCatalogManager().getObject(MissileObjectNum);
 
   if (isMassRaidLoaded) {
     clearMissiles();
-    const satSetLen = keepTrackApi.getCatalogManager().missileSats;
+    const satSetLen = ServiceLocator.getCatalogManager().missileSats;
 
     MissileObjectNum = satSetLen - 500;
   }
@@ -559,7 +559,7 @@ export const Missile = (
     }
 
     missileArray.push(missileObj);
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     catalogManagerInstance.satCruncher.postMessage({
       id: missileObj.id,
@@ -574,7 +574,7 @@ export const Missile = (
       altList: missileObj.altList,
       startTime: missileObj.startTime,
     });
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
     orbitManagerInstance.updateOrbitBuffer(MissileObjectNum, {
       latList: missileObj.latList,
@@ -622,7 +622,7 @@ export const smoothList_ = <T extends number>(list: T[], smoothingFactor: number
  * @returns An object containing the current TEARR data for the missile.
  */
 export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
-  const timeManagerInstance = keepTrackApi.getTimeManager();
+  const timeManagerInstance = ServiceLocator.getTimeManager();
 
   const currentTEARR = {
     objName: '',
@@ -650,7 +650,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
 
   // If no sensor passed to function then try to use the 'currentSensor'
   if (typeof sensors === 'undefined') {
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     if (typeof sensorManagerInstance.currentSensors === 'undefined') {
       throw new Error('getTEARR requires a sensor or for a sensor to be currently selected.');
@@ -738,7 +738,7 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: Sensor[]) => {
     currentTEARR.inView = false;
   }
 
-  const sensorManagerInstance = keepTrackApi.getSensorManager();
+  const sensorManagerInstance = ServiceLocator.getSensorManager();
 
   if (sensorManagerInstance) {
     sensorManagerInstance.currentTEARR = currentTEARR;

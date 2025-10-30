@@ -1,9 +1,9 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { html } from '@app/engine/utils/development/formatter';
 import { BaseObject, DetailedSatellite, Star } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
-import { html } from '@app/engine/utils/development/formatter';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -40,7 +40,7 @@ export class OrbitalPlaneDensityColorScheme extends ColorScheme {
   }
 
   calculateParams() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     return {
       orbitalPlaneDensity: catalogManagerInstance.orbitalPlaneDensity,
@@ -58,7 +58,7 @@ export class OrbitalPlaneDensityColorScheme extends ColorScheme {
      * TODO: Hover and select code should be refactored to pass params
      */
     if (!params) {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
       params = {
         orbitalPlaneDensity: catalogManagerInstance.orbitalPlaneDensity,

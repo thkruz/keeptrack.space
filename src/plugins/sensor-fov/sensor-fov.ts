@@ -20,14 +20,14 @@
  */
 
 import { MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import fovPng from '@public/img/icons/fov.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class SensorFov extends KeepTrackPlugin {
   readonly id = 'SensorFov';
@@ -82,12 +82,12 @@ export class SensorFov extends KeepTrackPlugin {
   }
 
   disableFovView() {
-    keepTrackApi.emit(EventBusEvent.changeSensorMarkers, this.id);
+    EventBus.getInstance().emit(EventBusEvent.changeSensorMarkers, this.id);
     this.setBottomIconToUnselected(false);
   }
 
   enableFovView() {
-    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
 
     this.setBottomIconToSelected();
   }

@@ -1,10 +1,10 @@
 import { MenuMode } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
 import developerModePng from '@public/img/icons/developer-mode.png';
@@ -111,16 +111,16 @@ export class BottomMenu {
   }
 
   private static onBottomMenuFilterClick_(menuButtonDom: HTMLElement, menuMode: MenuMode) {
-    keepTrackApi.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+    ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
     settingsManager.activeMenuMode = menuMode;
     this.deselectAllBottomMenuFilterButtons_();
     menuButtonDom.classList.add('bmenu-item-selected');
-    keepTrackApi.emit(EventBusEvent.bottomMenuModeChange);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuModeChange);
   }
 
   static changeMenuMode(menuMode: MenuMode) {
     settingsManager.activeMenuMode = menuMode;
-    keepTrackApi.emit(EventBusEvent.bottomMenuModeChange);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuModeChange);
   }
 
   static addBottomMenuFilterButtons() {
@@ -139,7 +139,7 @@ export class BottomMenu {
       menuSettingsDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuSettingsDom, MenuMode.SETTINGS));
       menuAllDom.addEventListener('click', () => BottomMenu.onBottomMenuFilterClick_(menuAllDom, MenuMode.ALL));
 
-      keepTrackApi.emit(EventBusEvent.bottomMenuModeChange);
+      EventBus.getInstance().emit(EventBusEvent.bottomMenuModeChange);
     } else {
       errorManagerInstance.warn('Failed to find all bottom menu filter buttons');
     }

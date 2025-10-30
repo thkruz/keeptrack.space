@@ -2,13 +2,14 @@ import { getEl } from '@app/engine/utils/get-el';
 
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
-import { keepTrackApi } from '@app/keepTrackApi';
 import categoryPng from '@public/img/icons/category.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { EventBus } from '@app/engine/events/event-bus';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatConstellations extends KeepTrackPlugin {
   readonly id = 'SatConstellations';
@@ -85,9 +86,9 @@ export class SatConstellations extends KeepTrackPlugin {
   }
 
   private constellationMenuClick_(groupName: string) {
-    // const timeManagerInstance = keepTrackApi.getTimeManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    // const timeManagerInstance = ServiceLocator.getTimeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
 
     if (typeof groupManagerInstance === 'undefined') {
       return;
@@ -204,8 +205,8 @@ export class SatConstellations extends KeepTrackPlugin {
     if (typeof groupName === 'undefined') {
       return;
     }
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
 
     if (typeof groupManagerInstance.groupList[groupName] === 'undefined') {
       throw new Error(`Unknown group name: ${groupName}`);
@@ -224,9 +225,9 @@ export class SatConstellations extends KeepTrackPlugin {
     searchDOM.innerHTML = groupManagerInstance.groupList[groupName].ids.reduce((acc: string, id: number) => `${acc}${catalogManagerInstance.getSat(id)?.sccNum},`, '').slice(0, -1);
 
     // If SelectSatManager is enabled, deselect the selected sat
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
 
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     uiManagerInstance.searchManager.doSearch(groupManagerInstance.groupList[groupName].ids.map((id: number) => catalogManagerInstance.getSat(id)?.sccNum).join(','));
 

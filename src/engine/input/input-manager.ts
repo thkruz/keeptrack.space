@@ -1,9 +1,9 @@
 /* eslint-disable max-classes-per-file */
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { mat4, vec3, vec4 } from 'gl-matrix';
+import { ServiceLocator } from '../core/service-locator';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
 import { lineManagerInstance } from '../rendering/line-manager';
@@ -144,7 +144,7 @@ export class InputManager {
     }
 
     // Where is the camera
-    const rayOrigin = keepTrackApi.getMainCamera().getForwardVector();
+    const rayOrigin = ServiceLocator.getMainCamera().getForwardVector();
     // What did we click on
     const ptThru = InputManager.unProject(x, y);
 
@@ -184,8 +184,8 @@ export class InputManager {
       z: eci[2],
     };
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
 
     return dotsManagerInstance.getIdFromEci(eciArray, catalogManagerInstance.orbitalSats);
@@ -223,7 +223,7 @@ export class InputManager {
   }
 
   public static unProject(x: number, y: number): [number, number, number] {
-    const renderer = keepTrackApi.getRenderer();
+    const renderer = ServiceLocator.getRenderer();
     const { gl } = renderer;
 
     const glScreenX = (x / gl.drawingBufferWidth) * 2 - 1.0;
@@ -232,7 +232,7 @@ export class InputManager {
     const comboPMat = mat4.create();
     const invMat = mat4.create();
 
-    mat4.mul(comboPMat, keepTrackApi.getMainCamera().projectionMatrix, keepTrackApi.getMainCamera().matrixWorldInverse);
+    mat4.mul(comboPMat, ServiceLocator.getMainCamera().projectionMatrix, ServiceLocator.getMainCamera().matrixWorldInverse);
     mat4.invert(invMat, comboPMat);
     const worldVec = <[number, number, number, number]>(<unknown>vec4.create());
 
@@ -248,12 +248,12 @@ export class InputManager {
    * @returns The ID of the satellite at the given screen coordinates.
    */
   public getSatIdFromCoord(x: number, y: number): number {
-    const renderer = keepTrackApi.getRenderer();
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const renderer = ServiceLocator.getRenderer();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
     const { gl } = renderer;
 
     // NOTE: gl.readPixels is a huge bottleneck but readPixelsAsync doesn't work properly on mobile
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
     if (!isThisNode() && this.isAsyncWorking && !settingsManager.isDisableAsyncReadPixels) {
       this.readPixelsAsync(x, gl.drawingBufferHeight - y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, dotsManagerInstance.pickReadPixelBuffer);
     }
@@ -278,7 +278,7 @@ export class InputManager {
       `,
       );
       // Append any other menus before putting the reset/clear options
-      keepTrackApi.emit(EventBusEvent.rightBtnMenuAdd);
+      EventBus.getInstance().emit(EventBusEvent.rightBtnMenuAdd);
 
       // Now add the reset/clear options
       const menuUl = getEl('right-btn-menu-ul', true);
@@ -411,7 +411,7 @@ export class InputManager {
     rightBtnMenuDOM!.style.display = 'block';
     satHoverBoxDOM!.style.display = 'none';
 
-    keepTrackApi.emit(EventBusEvent.rightBtnMenuOpen, isEarth, clickedSatId);
+    EventBus.getInstance().emit(EventBusEvent.rightBtnMenuOpen, isEarth, clickedSatId);
 
     // Loop through all the menu items and determine how many are visible
     let numMenuItems = 0;
@@ -428,7 +428,7 @@ export class InputManager {
      * Offset size is based on size in style.css
      * TODO: Make this dynamic
      */
-    const mainCameraInstance = keepTrackApi.getMainCamera();
+    const mainCameraInstance = ServiceLocator.getMainCamera();
     const offsetX = mainCameraInstance.state.mouseX < canvasDOM!.clientWidth / 2 ? 0 : -1 * 165;
     const offsetY = mainCameraInstance.state.mouseY < canvasDOM!.clientHeight / 2 ? 0 : numMenuItems * -25;
 
@@ -454,7 +454,7 @@ export class InputManager {
 
   /* istanbul ignore next */
   public async readPixelsAsync(x: number, y: number, w: number, h: number, format: number, type: number, dstBuffer: Uint8Array) {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     try {
       const buf = gl.createBuffer();
@@ -493,11 +493,11 @@ export class InputManager {
       this.updateHoverDelayLimit = settingsManager.updateHoverDelayLimitBig;
     }
 
-    if (keepTrackApi.getMainCamera().state.isDragging) {
+    if (ServiceLocator.getMainCamera().state.isDragging) {
       return;
     }
 
-    const mainCameraInstance = keepTrackApi.getMainCamera();
+    const mainCameraInstance = ServiceLocator.getMainCamera();
 
     if (settingsManager.isMobileModeEnabled) {
       // this.mouse.mouseSat = this.getSatIdFromCoord(mainCameraInstance.mouseX, mainCameraInstance.mouseY);
@@ -506,7 +506,7 @@ export class InputManager {
 
     if (++this.updateHoverDelay >= this.updateHoverDelayLimit) {
       this.updateHoverDelay = 0;
-      const uiManagerInstance = keepTrackApi.getUiManager();
+      const uiManagerInstance = ServiceLocator.getUiManager();
 
       // If we are hovering over a satellite on a menu we don't want to change the mouseSat
       if (uiManagerInstance.searchHoverSatId >= 0) {

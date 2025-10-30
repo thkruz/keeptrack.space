@@ -1,11 +1,11 @@
 /* eslint-disable camelcase */
 import { SolarBody } from '@app/engine/core/interfaces';
 import { Scene } from '@app/engine/core/scene';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { vec3, vec4 } from 'gl-matrix';
 import { GlUtils } from '../gl-utils';
 import { LineManager } from '../line-manager';
 import { Line } from './line';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 /**
  * A line with a start and end point.
@@ -59,7 +59,7 @@ export abstract class Path extends Line {
   abstract update(): void;
 
   updateVertBuf(points: vec3[] | vec4[]): void {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     this.pathLength_ = points.length;
 

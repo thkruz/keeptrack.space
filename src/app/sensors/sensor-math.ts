@@ -23,8 +23,8 @@ import {
   lla2eci,
 } from '@ootk/src/main';
 import { dateFormat } from '../../engine/utils/dateFormat';
-import { keepTrackApi } from '../../keepTrackApi';
 import { SatMath, SunStatus } from '../analysis/sat-math';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export enum TearrType {
   RISE,
@@ -152,11 +152,11 @@ export class SensorMath {
    * @deprecated - Use ootk instead
    */
   static getTearr(sat: DetailedSatellite, sensors: DetailedSensor[], propTime?: Date): TearrData {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     const tearr = <TearrData>{}; // Most current TEARR data that is set in satellite object and returned.
 
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     sensors = sensorManagerInstance.verifySensors(sensors);
     // TODO: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
@@ -215,7 +215,7 @@ export class SensorMath {
 
     /*
      * Get Objects
-     * const catalogManagerInstance = keepTrackApi.getCatalogManager();
+     * const catalogManagerInstance = ServiceLocator.getCatalogManager();
      * hoverSat = catalogManagerInstance.getObject(hoverSat.id);
      * selectedSat = catalogManagerInstance.getObject(selectedSat.id);
      */
@@ -235,10 +235,10 @@ export class SensorMath {
     let sameBeamStr = '';
 
     try {
-      const sensorManagerInstance = keepTrackApi.getSensorManager();
+      const sensorManagerInstance = ServiceLocator.getSensorManager();
 
       if (sensorManagerInstance.currentTEARR?.inView) {
-        const sensorManagerInstance = keepTrackApi.getSensorManager();
+        const sensorManagerInstance = ServiceLocator.getSensorManager();
 
         const firstSensor = sensorManagerInstance.currentSensors[0];
 
@@ -276,8 +276,8 @@ export class SensorMath {
   }
 
   static getSunTimes(sat: DetailedSatellite, sensors?: DetailedSensor[], searchLength = 2, interval = 30) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     if (!sat.satrec) {
       errorManagerInstance.debug('No satellite record');
@@ -337,8 +337,8 @@ export class SensorMath {
   }
 
   static nextNpasses(sat: DetailedSatellite, sensors: DetailedSensor[], searchLength: number, interval: number, numPasses: number): Date[] {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     sensors = sensorManagerInstance.verifySensors(sensors);
     // TODO: Instead of doing the first sensor this should return an array of TEARRs for all sensors.
@@ -380,8 +380,8 @@ export class SensorMath {
   }
 
   static nextpass(sat: DetailedSatellite, sensors?: DetailedSensor[], searchLength?: number, interval?: number) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     sensors = sensorManagerInstance.verifySensors(sensors);
     // Loop through sensors looking for in view times

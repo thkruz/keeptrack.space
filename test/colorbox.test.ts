@@ -1,5 +1,4 @@
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
 import { openColorbox } from '../src/engine/utils/colorbox';
 import * as getElAll from '../src/engine/utils/get-el';
@@ -39,7 +38,7 @@ import * as getElAll from '../src/engine/utils/get-el';
 describe('openColorbox_function', () => {
   beforeEach(() => {
     KeepTrack.getDefaultBodyHtml();
-    keepTrackApi.containerRoot.innerHTML = `
+    KeepTrack.getInstance().containerRoot.innerHTML = `
         <div id="colorbox-container" style="display:none;"></div>
         <div id="colorbox-header"></div>
         <div id="colorbox-div" style="display:block;"></div>

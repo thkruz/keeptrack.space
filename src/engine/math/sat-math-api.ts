@@ -24,7 +24,7 @@
 
 import { Degrees, DetailedSatellite, Kilometers } from '@ootk/src/main';
 import { SatMath } from '../../app/analysis/sat-math';
-import { keepTrackApi } from '../../keepTrackApi';
+import { ServiceLocator } from '../core/service-locator';
 
 /**
  * `SatMathApi` is a singleton class that provides a wrapper around the `SatMath` class.
@@ -35,14 +35,14 @@ import { keepTrackApi } from '../../keepTrackApi';
  */
 export class SatMathApi {
   static getEcfOfCurrentOrbit(sat: DetailedSatellite, points: number) {
-    const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+    const cb = (offset: number) => ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
 
 
     return SatMath.getEcfOfCurrentOrbit(sat, points, cb);
   }
 
   static getEciOfCurrentOrbit(sat: DetailedSatellite, points: number) {
-    const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+    const cb = (offset: number) => ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
 
 
     return SatMath.getEciOfCurrentOrbit(sat, points, cb);
@@ -56,14 +56,14 @@ export class SatMathApi {
    * @returns An array of LLA coordinates representing the current orbit in latitude, longitude, altitude, and time.
    */
   static getLlaOfCurrentOrbit(sat: DetailedSatellite, points: number) {
-    const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+    const cb = (offset: number) => ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
 
 
     return SatMath.getLlaOfCurrentOrbit(sat, points, cb) as { lat: Degrees; lon: Degrees; alt: Kilometers; time: number }[];
   }
 
   static getRicOfCurrentOrbit(sat: DetailedSatellite, sat2: DetailedSatellite, points: number, orbits = 1) {
-    const cb = (offset: number) => keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+    const cb = (offset: number) => ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
 
 
     return SatMath.getRicOfCurrentOrbit(sat, sat2, points, cb, orbits);

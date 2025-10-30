@@ -1,13 +1,15 @@
 import { GroupType } from '@app/app/data/object-group';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { AtmosphereSettings, EarthCloudTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Kilometers, Milliseconds } from '@ootk/src/main';
 import { SettingsManager } from '../settings';
+import { KeepTrack } from '@app/keeptrack';
 
 export class SettingsPresets {
   static loadPresetMillionYear(settings: SettingsManager) {
@@ -93,8 +95,8 @@ export class SettingsPresets {
                   }`;
 
       getEl('nav-footer')!.style.display = 'none';
-      keepTrackApi.getPlugin(TimeMachine)!.isMenuButtonActive = true;
-      keepTrackApi.getPlugin(TimeMachine)!.bottomIconCallback();
+      PluginRegistry.getPlugin(TimeMachine)!.isMenuButtonActive = true;
+      PluginRegistry.getPlugin(TimeMachine)!.bottomIconCallback();
     };
   }
 
@@ -129,7 +131,7 @@ export class SettingsPresets {
     settings.disableAllPlugins();
 
     settings.onLoadCb = () => {
-      keepTrackApi.getUiManager().searchManager.doSearch('starlink');
+      ServiceLocator.getUiManager().searchManager.doSearch('starlink');
     };
   }
 
@@ -192,7 +194,7 @@ export class SettingsPresets {
       const textOverlay = document.createElement('div');
 
       textOverlay.id = 'textOverlay';
-      keepTrackApi.containerRoot.appendChild(textOverlay);
+      KeepTrack.getInstance().containerRoot.appendChild(textOverlay);
 
       // Update CSS
       const toastCss = `
@@ -250,12 +252,12 @@ export class SettingsPresets {
     settings.maxOribtsDisplayed = 100000;
     settings.searchLimit = 100000;
     settings.onLoadCb = () => {
-      const groupManagerInstance = keepTrackApi.getGroupsManager();
+      const groupManagerInstance = ServiceLocator.getGroupsManager();
       const allSats = groupManagerInstance.createGroup(GroupType.ALL);
 
       groupManagerInstance.selectGroup(allSats);
       allSats.updateOrbits();
-      keepTrackApi.getColorSchemeManager().isUseGroupColorScheme = true;
+      ServiceLocator.getColorSchemeManager().isUseGroupColorScheme = true;
     };
   }
 
@@ -330,12 +332,12 @@ export class SettingsPresets {
     settings.isLoadLastSensor = false;
     settings.isEnableJscCatalog = false;
     settings.onLoadCb = () => {
-      const groupManagerInstance = keepTrackApi.getGroupsManager();
+      const groupManagerInstance = ServiceLocator.getGroupsManager();
       const sccNumGroup = groupManagerInstance.createGroup(GroupType.ID_LIST, [0]);
 
       groupManagerInstance.selectGroup(sccNumGroup);
       sccNumGroup.updateOrbits();
-      keepTrackApi.getColorSchemeManager().isUseGroupColorScheme = true;
+      ServiceLocator.getColorSchemeManager().isUseGroupColorScheme = true;
     };
   }
 
@@ -370,7 +372,7 @@ export class SettingsPresets {
       EventBusEvent.onCruncherReady,
       () => {
         setTimeout(() => {
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(43721) ?? -1);
+          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(ServiceLocator.getCatalogManager().sccNum2Id(43721) ?? -1);
           settings.isDisableSelectSat = true;
         }, 5000);
       },

@@ -1,8 +1,8 @@
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import historyPng from '@public/img/icons/history.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class TimeMachine extends KeepTrackPlugin {
   readonly id = 'TimeMachine';
@@ -10,12 +10,12 @@ export class TimeMachine extends KeepTrackPlugin {
   dependencies_ = [];
 
   bottomIconCallback = () => {
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
     if (this.isMenuButtonActive) {
-      keepTrackApi.getUiManager().searchManager.hideResults();
+      ServiceLocator.getUiManager().searchManager.hideResults();
       this.setBottomIconToSelected();
       this.historyOfSatellitesPlay();
     } else {
@@ -38,7 +38,7 @@ export class TimeMachine extends KeepTrackPlugin {
   historyOfSatellitesPlay() {
     this.isTimeMachineRunning = true;
     this.historyOfSatellitesRunCount++;
-    keepTrackApi.getOrbitManager().tempTransColor = settingsManager.colors.transparent;
+    ServiceLocator.getOrbitManager().tempTransColor = settingsManager.colors.transparent;
     settingsManager.colors.transparent = [0, 0, 0, 0];
     for (let yy = 0; yy <= 200; yy++) {
       let year = 57 + yy;
@@ -70,8 +70,8 @@ export class TimeMachine extends KeepTrackPlugin {
 
       return;
     }
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     // Kill all old async calls if run count updates
     if (runCount !== this.historyOfSatellitesRunCount) {
@@ -88,12 +88,12 @@ export class TimeMachine extends KeepTrackPlugin {
       if (year >= 57 && year < 100) {
         const timeMachineString = <string>(settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`);
 
-        keepTrackApi.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
+        ServiceLocator.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
       } else {
         const yearStr = year < 10 ? `0${year}` : `${year}`;
         const timeMachineString = <string>(settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`);
 
-        keepTrackApi.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
+        ServiceLocator.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
       }
     }
 
@@ -111,9 +111,9 @@ export class TimeMachine extends KeepTrackPlugin {
   }
 
   removeSatellite(runCount: number): void {
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     if (runCount !== this.historyOfSatellitesRunCount) {
       return;

@@ -2,13 +2,14 @@ import { EChartsData, MenuMode } from '@app/engine/core/interfaces';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DetailedSatellite } from '@ootk/src/main';
 import scatterPlot2Png from '@public/img/icons/scatter-plot2.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -19,7 +20,7 @@ export class EciPlot extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   isRequireSatelliteSelected = true;
@@ -223,10 +224,10 @@ export class EciPlot extends KeepTrackPlugin {
   getPlotData(): EChartsData {
     const NUMBER_OF_POINTS = 100;
     const data = [] as EChartsData;
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     // Time management
-    const now = keepTrackApi.getTimeManager().simulationTimeObj.getTime();
+    const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
     const curSatObj = catalogManagerInstance.getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
 
     const timeData: Date[] = [];

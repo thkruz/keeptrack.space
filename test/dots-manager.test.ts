@@ -2,7 +2,6 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '@app/settings/settings';
 import { Milliseconds } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
@@ -39,7 +38,7 @@ describe('drawManager', () => {
   it('process_update_position_buffer', () => {
     dotsManagerInstance.positionData = new Float32Array(1);
     dotsManagerInstance.velocityData = new Float32Array(1);
-    const drawManagerInstance = keepTrackApi.getRenderer();
+    const drawManagerInstance = ServiceLocator.getRenderer();
 
     drawManagerInstance.dtAdjusted = <Milliseconds>1000000000;
     expect(() => dotsManagerInstance.update()).not.toThrow();

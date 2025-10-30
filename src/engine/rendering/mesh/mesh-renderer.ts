@@ -1,11 +1,11 @@
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { mat4 } from 'gl-matrix';
 import { OBJ } from 'webgl-obj-loader';
 import { DepthManager } from '../depth-manager';
 import { OcclusionProgram } from '../draw-manager/post-processing';
 import type { MeshManager, MeshModel } from '../mesh-manager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class MeshRenderer {
   private readonly gl_: WebGL2RenderingContext;
@@ -57,7 +57,7 @@ export class MeshRenderer {
     }
 
     // Don't draw meshes if the camera is too far away
-    if (keepTrackApi.getMainCamera().state.camDistBuffer >= settingsManager.nearZoomLevel) {
+    if (ServiceLocator.getMainCamera().state.camDistBuffer >= settingsManager.nearZoomLevel) {
       return;
     }
     if (
@@ -78,7 +78,7 @@ export class MeshRenderer {
     gl.useProgram(this.program_);
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
 
-    gl.uniform3fv(this.uniforms_.uLightDirection, keepTrackApi.getScene().earth.lightDirection);
+    gl.uniform3fv(this.uniforms_.uLightDirection, ServiceLocator.getScene().earth.lightDirection);
     gl.uniformMatrix3fv(this.uniforms_.uNormalMatrix, false, this.meshManager_.nMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.uMvMatrix, false, this.meshManager_.mvMatrix_);
     gl.uniformMatrix4fv(this.uniforms_.uPMatrix, false, pMatrix);

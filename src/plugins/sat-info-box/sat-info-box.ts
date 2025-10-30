@@ -3,12 +3,14 @@ import Draggabilly from 'draggabilly';
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrack } from '@app/keeptrack';
 import { BaseObject, CatalogSource, DetailedSatellite } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -18,7 +20,7 @@ import './sat-info-box.css';
 
 /**
  * This class controls all the functionality of the satellite info box.
- * There are select events and update events that are registered to the keepTrackApi.
+ * There are select events and update events that are registered to the Event Bus.
  */
 export class SatInfoBox extends KeepTrackPlugin {
   readonly id = 'SatInfoBox';
@@ -48,7 +50,7 @@ export class SatInfoBox extends KeepTrackPlugin {
         let isOnList = false;
 
         watchlistList.forEach(({ id }) => {
-          if (id === keepTrackApi.getPlugin(SelectSatManager)!.selectedSat) {
+          if (id === PluginRegistry.getPlugin(SelectSatManager)!.selectedSat) {
             isOnList = true;
           }
         });
@@ -88,7 +90,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   withClickSound<T extends unknown[]>(handler: (...args: T) => unknown): (...args: T) => unknown {
     return (...args: T) => {
       // This code will run before the handler
-      keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+      ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
 
       return handler.apply(this, args);
     };
@@ -136,7 +138,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   private initDraggabilly() {
     if (!settingsManager.isMobileModeEnabled) {
       const draggie = new Draggabilly(getEl(SatInfoBox.containerId_)!, {
-        containment: keepTrackApi.containerRoot,
+        containment: KeepTrack.getInstance().containerRoot,
       });
 
       draggie.on('dragStart', () => {
@@ -175,16 +177,16 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     this.addListenerToCollapseElement(getEl(`${SECTIONS.IDENTIFIERS}`), { value: this.isIdentifiersSectionCollapsed_ });
 
-    keepTrackApi.emit(EventBusEvent.satInfoBoxAddListeners);
+    EventBus.getInstance().emit(EventBusEvent.satInfoBoxAddListeners);
   }
 
   private createContainer(): void {
-    const plugin = keepTrackApi.getPlugin(SatInfoBox)!;
+    const plugin = PluginRegistry.getPlugin(SatInfoBox)!;
 
     plugin.addElement({ html: this.createHeader(), order: 0 });
     plugin.addElement({ html: this.createIdentifiersSection(), order: 3 });
     // Make sure we have all the dynamic html elements before getting the order
-    keepTrackApi.emit(EventBusEvent.satInfoBoxInit);
+    EventBus.getInstance().emit(EventBusEvent.satInfoBoxInit);
 
     const elements = plugin.getElements();
 
@@ -200,7 +202,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       `,
     );
 
-    keepTrackApi.emit(EventBusEvent.satInfoBoxFinal);
+    EventBus.getInstance().emit(EventBusEvent.satInfoBoxFinal);
 
     // Create a Sat Info Box Initializing Script
     this.initDraggabilly();
@@ -271,7 +273,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     setInnerHtml(EL.NAME, obj.name);
 
     if (obj instanceof DetailedSatellite) {
-      keepTrackApi.containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
+      KeepTrack.getInstance().containerRoot.querySelectorAll('.sat-only-info')?.forEach((el) => {
         (<HTMLElement>el).style.display = 'flex';
       });
     }
@@ -389,7 +391,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     const satInfoBoxDom = getEl(SatInfoBox.containerId_);
     // Get the height of the DOM
-    const searchBoxHeight = keepTrackApi.getUiManager().searchManager.isResultsOpen ? satInfoBoxDom?.getBoundingClientRect().height : 0;
+    const searchBoxHeight = ServiceLocator.getUiManager().searchManager.isResultsOpen ? satInfoBoxDom?.getBoundingClientRect().height : 0;
     const bottomMenuTopVar = document.documentElement.style.getPropertyValue('--bottom-menu-top').split('px')[0];
     const curVal = document.documentElement.style.getPropertyValue('--search-box-bottom');
 
@@ -464,7 +466,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   show(): void {
-    if (keepTrackApi.getPlugin(SelectSatManager)!.primarySatObj.id === -1) {
+    if (PluginRegistry.getPlugin(SelectSatManager)!.primarySatObj.id === -1) {
       return;
     }
     showEl(SatInfoBox.containerId_);

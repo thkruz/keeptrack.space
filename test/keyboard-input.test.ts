@@ -2,7 +2,6 @@ import { Container } from '@app/engine/core/container';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardInput } from '@app/engine/input/input-manager/keyboard-input';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Singletons } from '../src/engine/core/interfaces';
 
 describe('KeyboardInput_class', () => {
@@ -23,7 +22,7 @@ describe('KeyboardInput_class', () => {
     });
 
     // Simulate key event while typing
-    keepTrackApi.emit(EventBusEvent.KeyDown, 'R', 'KeyR', false, false, false);
+    EventBus.getInstance().emit(EventBusEvent.KeyDown, 'R', 'KeyR', false, false, false);
 
     expect(test).toBe(true);
   });
@@ -39,7 +38,7 @@ describe('KeyboardInput_class', () => {
         test = true;
       }
     });
-    keepTrackApi.emit(EventBusEvent.KeyDown, 'R', 'KeyR', false, false, false);
+    EventBus.getInstance().emit(EventBusEvent.KeyDown, 'R', 'KeyR', false, false, false);
 
     expect(test).toBe(true);
   });

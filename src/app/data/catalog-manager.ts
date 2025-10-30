@@ -29,16 +29,17 @@ import { controlSites } from '@app/app/data/catalogs/control-sites';
 import { launchSiteObjects, launchSites } from '@app/app/data/catalogs/launch-sites';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { stars } from '@app/app/data/catalogs/stars';
-import { GetSatType, MissileParams, SatCruncherMessageData } from '@app/engine/core/interfaces';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { GetSatType, MissileParams } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrack } from '@app/keeptrack';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import {
   BaseObject, Degrees, DetailedSatellite, EciVec3, KilometersPerSecond, Radians, SatelliteRecord, Sgp4, SpaceObjectType, Star, Tle, TleLine1, TleLine2,
 } from '@ootk/src/main';
 import { SatMath } from '../analysis/sat-math';
+import { SatCruncherThreadManager } from '../threads/sat-cruncher-thread-manager';
 import { SplashScreen } from '../ui/splash-screen';
 import { StringExtractor } from '../ui/string-extractor';
 import { LaunchSite } from './catalog-manager/LaunchFacility';
@@ -117,17 +118,6 @@ export class CatalogManager {
   starIndex2 = 0;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   staticSet = [] as any[];
-  updateCruncherBuffers = (mData: SatCruncherMessageData): void => {
-    keepTrackApi.getDotsManager().updateCruncherBuffers(mData);
-
-    if (typeof mData?.sensorMarkerArray !== 'undefined' && mData?.sensorMarkerArray?.length !== 0) {
-      this.sensorMarkerArray = mData.sensorMarkerArray;
-    }
-
-    const highestMarkerNumber = this.sensorMarkerArray?.[this.sensorMarkerArray?.length - 1] || 0;
-
-    settingsManager.dotsOnScreen = Math.max(this.numObjects - settingsManager.maxFieldOfViewMarkers, highestMarkerNumber);
-  };
 
   /**
    * Calculates the Satellite Record (satrec) for a given satellite object.
@@ -272,13 +262,13 @@ export class CatalogManager {
     }
 
     if (type === GetSatType.POSITION_ONLY) {
-      this.objectCache[i].position = keepTrackApi.getDotsManager().getCurrentPosition(i);
+      this.objectCache[i].position = ServiceLocator.getDotsManager().getCurrentPosition(i);
 
       return this.objectCache[i];
     }
 
     if (type !== GetSatType.SKIP_POS_VEL) {
-      keepTrackApi.getDotsManager().updatePosVel(this.objectCache[i], i);
+      ServiceLocator.getDotsManager().updatePosVel(this.objectCache[i], i);
     }
 
     return this.objectCache[i];
@@ -318,45 +308,19 @@ export class CatalogManager {
   }
 
   init(satCruncherOveride?: Worker): void {
-    try {
-      SplashScreen.loadStr(SplashScreen.msg.elsets);
-      // See if we are running jest right now for testing
-      if (isThisNode()) {
-        if (satCruncherOveride) {
-          this.satCruncher = satCruncherOveride;
-        } else {
-          try {
-            const url = 'http://localhost:8080/js/positionCruncher.js';
+    if (!satCruncherOveride) {
+      const satCruncherThreadManager = new SatCruncherThreadManager(KeepTrack.getInstance().threads);
 
-            this.satCruncher = new Worker(url);
-          } catch (error) {
-            this.satCruncher = {} as Worker;
-            errorManagerInstance.debug(error);
-          }
-        }
-      } else {
-        if (typeof Worker === 'undefined') {
-          throw new Error('Your browser does not support web workers.');
-        }
-        /* istanbul ignore next */
-        try {
-          this.satCruncher = new Worker('./js/positionCruncher.js');
-        } catch (error) {
-          // If you are trying to run this off the desktop you might have forgotten --allow-file-access-from-files
-          if (window.location.href.startsWith('file://')) {
-            throw new Error(
-              'Critical Error: You need to allow access to files from your computer! Ensure "--allow-file-access-from-files" is added to your chrome shortcut and that no other' +
-              'copies of chrome are running when you start it.',
-            );
-          } else {
-            throw new Error(error);
-          }
-        }
+      SplashScreen.loadStr(SplashScreen.msg.elsets);
+      satCruncherThreadManager.init();
+
+      if (satCruncherThreadManager.worker === null) {
+        throw new Error('satCruncher worker is null');
       }
 
-      this.satCruncher.onmessage = this.satCruncherOnMessage.bind(this);
-    } catch (error) {
-      throw new Error(error);
+      this.satCruncher = satCruncherThreadManager.worker;
+    } else {
+      this.satCruncher = satCruncherOveride;
     }
   }
 
@@ -503,7 +467,7 @@ export class CatalogManager {
       return null;
     }
 
-    if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) > 1) {
+    if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) > 1) {
       this.objectCache[id] = new DetailedSatellite({
         active: true,
         name: `Analyst Sat ${id}`,
@@ -527,7 +491,7 @@ export class CatalogManager {
       };
 
       this.satCruncher.postMessage(m);
-      keepTrackApi.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
+      ServiceLocator.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
       const sat = this.objectCache[id] as DetailedSatellite;
 
       if (!sat.isSatellite()) {
@@ -544,70 +508,7 @@ export class CatalogManager {
     return null;
   }
 
-  satCruncherOnMessage({ data: mData }: { data: SatCruncherMessageData }) {
-    if (!mData) {
-      return;
-    }
-
-    if (mData.badObjectId) {
-      if (mData.badObjectId >= 0) {
-        // Mark the satellite as inactive
-        const id = mData.badObjectId;
-
-        if (id !== null) {
-          const sat = this.objectCache[id] as DetailedSatellite;
-
-          sat.active = false;
-          /*
-           * (<any>window).decayedSats = (<any>window).decayedSats || [];
-           * (<any>window).decayedSats.push(this.satData[id].sccNum);
-           */
-          errorManagerInstance.debug(`Object ${mData.badObjectId} is inactive due to bad TLE\nSatellite ${sat.sccNum}\n${sat.tle1}\n${sat.tle2}`);
-        }
-      } else {
-        /*
-         * console.debug(`Bad sat number: ${mData.badObjectId}`);
-         * How are we getting a negative number? There is a bug somewhere...
-         */
-      }
-    }
-
-    if (mData?.extraUpdate) {
-      return;
-    }
-
-    this.updateCruncherBuffers(mData);
-
-    // Run any callbacks for a normal position cruncher message
-    keepTrackApi.emit(EventBusEvent.onCruncherMessage);
-
-    // Only do this once after satData, positionData, and velocityData are all received/processed from the cruncher
-    if (!settingsManager.cruncherReady && this.objectCache && keepTrackApi.getDotsManager().positionData && keepTrackApi.getDotsManager().velocityData) {
-      this.onCruncherReady_();
-    }
-  }
-
-  private onCruncherReady_() {
-    const stars = this.objectCache.filter((sat) => sat?.type === SpaceObjectType.STAR);
-
-    if (stars.length > 0) {
-      stars.sort((a, b) => a.id - b.id);
-      // this is the smallest id
-      keepTrackApi.getDotsManager().starIndex1 = stars[0].id;
-      // this is the largest id
-      keepTrackApi.getDotsManager().starIndex2 = stars[stars.length - 1].id;
-      keepTrackApi.getDotsManager().updateSizeBuffer();
-    }
-
-    this.buildOrbitDensityMatrix_();
-
-    // Run any functions registered with the API
-    keepTrackApi.emit(EventBusEvent.onCruncherReady);
-
-    settingsManager.cruncherReady = true;
-  }
-
-  private buildOrbitDensityMatrix_() {
+  buildOrbitDensityMatrix_() {
     const activeSats = this.getSats().filter((sat) => sat.active);
 
     this.orbitDensity = this.calculateOrbitalDensity_(activeSats, 25);

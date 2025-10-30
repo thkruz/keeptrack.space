@@ -26,7 +26,6 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import analysisPng from '@public/img/icons/reports.png';
 
 
@@ -37,6 +36,8 @@ import { t7e } from '@app/locales/keys';
 import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 interface ReportData {
   filename: string;
@@ -53,7 +54,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   isRequireSatelliteSelected = true;
@@ -332,7 +333,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   private getStartTime_() {
-    const time = keepTrackApi.getTimeManager().getOffsetTimeObj(0);
+    const time = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
     time.setMilliseconds(0);
     time.setSeconds(0);
@@ -359,7 +360,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
   }
 
   private getSensor_(): DetailedSensor | null {
-    const sensorManager = keepTrackApi.getSensorManager();
+    const sensorManager = ServiceLocator.getSensorManager();
 
     if (!sensorManager.isSensorSelected()) {
       errorManagerInstance.warn(t7e('errorMsgs.SelectSensorFirst'));

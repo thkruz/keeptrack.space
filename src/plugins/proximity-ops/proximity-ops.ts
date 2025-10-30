@@ -1,6 +1,5 @@
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 
 import { CoordinateTransforms } from '@app/app/analysis/coordinate-transforms';
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
@@ -16,6 +15,8 @@ import { vec3 } from 'gl-matrix';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 enum RPOType {
   GEO = 'GEO',
@@ -48,9 +49,9 @@ export class ProximityOps extends KeepTrackPlugin {
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ANALYSIS, MenuMode.ALL];
 
-  private readonly timeManagerInstance = keepTrackApi.getTimeManager()!;
-  private readonly selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
-  private readonly catalogManagerInstance = keepTrackApi.getCatalogManager()!;
+  private readonly timeManagerInstance = ServiceLocator.getTimeManager()!;
+  private readonly selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager)!;
+  private readonly catalogManagerInstance = ServiceLocator.getCatalogManager()!;
 
 
   dragOptions: ClickDragOptions = {
@@ -208,7 +209,7 @@ export class ProximityOps extends KeepTrackPlugin {
   downloadIconCb = () => {
 
     if (this.RPOs.length === 0) {
-      keepTrackApi.getUiManager().toast('No RPOs to download!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('No RPOs to download!', ToastMsgType.caution, true);
 
       return;
     }
@@ -363,7 +364,7 @@ export class ProximityOps extends KeepTrackPlugin {
       const satelliteId = this.catalogManagerInstance.sccNum2Id(primarySatSccNum);
 
       if (!satelliteId) {
-        keepTrackApi.getUiManager().toast(`Satellite with NORAD ID ${primarySatSccNum} not found`, ToastMsgType.caution, true);
+        ServiceLocator.getUiManager().toast(`Satellite with NORAD ID ${primarySatSccNum} not found`, ToastMsgType.caution, true);
 
         return [];
       }
@@ -375,7 +376,7 @@ export class ProximityOps extends KeepTrackPlugin {
     }
 
     if (RPOs.length === 0) {
-      keepTrackApi.getUiManager().toast('No RPOs found!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast('No RPOs found!', ToastMsgType.caution, true);
     }
 
     return RPOs;
@@ -397,7 +398,7 @@ export class ProximityOps extends KeepTrackPlugin {
   private findRPOs_(sats: DetailedSatellite[], maxDis: number, maxVel: number, duration: Seconds, isAvaChecked: boolean, satPairs?: number[][]) {
 
     const RPOs: ProximityOpsEvent[] = [];
-    const nowDate = keepTrackApi.getTimeManager().getOffsetTimeObj(0);
+    const nowDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
     if (isAvaChecked && satPairs) {
 
@@ -456,7 +457,7 @@ export class ProximityOps extends KeepTrackPlugin {
    */
   private findSatsById_(primarySatID: string, type: string, duration: Seconds): DetailedSatellite[] {
     const allSats = this.getFilteredSatellites();
-    const primarySat = keepTrackApi.getCatalogManager().getSat(parseInt(primarySatID))!;
+    const primarySat = ServiceLocator.getCatalogManager().getSat(parseInt(primarySatID))!;
 
     let sats: DetailedSatellite[] = [];
 
@@ -487,7 +488,7 @@ export class ProximityOps extends KeepTrackPlugin {
             sat.id.toString() !== primarySatID;
         });
     } else if (type === RPOType.LEO) {
-      const nowDate = keepTrackApi.getTimeManager().getOffsetTimeObj(0);
+      const nowDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
       const raan1 = SatMath.normalizeRaan(primarySat, nowDate);
 
@@ -581,7 +582,7 @@ export class ProximityOps extends KeepTrackPlugin {
    * The filtering is performed efficiently in a single pass if either filter is active.
    */
   private getFilteredSatellites(): DetailedSatellite[] {
-    let allSats = keepTrackApi.getCatalogManager().getSats();
+    let allSats = ServiceLocator.getCatalogManager().getSats();
     const isPayloadOnlyChecked = (<HTMLInputElement>getEl('proximity-ops-payload-only')).checked;
     const isVimpelChecked = (<HTMLInputElement>getEl('proximity-ops-no-vimpel')).checked;
 
@@ -691,7 +692,7 @@ export class ProximityOps extends KeepTrackPlugin {
     this.selectSatManagerInstance.setSecondarySat(event.sat2Id);
     this.selectSatManagerInstance.selectSat(event.sat1Id);
 
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (!settingsManager.isOrbitCruncherInEcf && (this.selectSatManagerInstance.primarySatObj as DetailedSatellite).perigee > 6000) {
       uiManagerInstance.toast('GEO Orbits displayed in ECF', ToastMsgType.normal);
@@ -720,7 +721,7 @@ export class ProximityOps extends KeepTrackPlugin {
    * Assumes that the relevant DOM elements exist and that the selected satellite is of type `DetailedSatellite`.
    */
   private updateNoradId_() {
-    const satellite = keepTrackApi.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite;
+    const satellite = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite;
 
     if (!satellite?.isSatellite()) {
       return;

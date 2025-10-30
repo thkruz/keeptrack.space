@@ -3,7 +3,6 @@ import { getEl } from '@app/engine/utils/get-el';
 
 import { MobileManager } from '@app/app/ui/mobileManager';
 import { SplashScreen } from '@app/app/ui/splash-screen';
-import { keepTrackApi } from '@app/keepTrackApi';
 
 describe('SplashScreen_class', () => {
   beforeEach(() => {
@@ -34,7 +33,7 @@ describe('SplashScreen_class', () => {
 
   // Tests that loadStr() does nothing when the loader text element is not found
   it('test_load_str_element_not_found', () => {
-    keepTrackApi.containerRoot.innerHTML = '<div id="loader-text"></div>';
+    KeepTrack.getInstance().containerRoot.innerHTML = '<div id="loader-text"></div>';
     SplashScreen.loadStr('test');
     expect(getEl('loader-text')?.textContent).toBe('test');
   });

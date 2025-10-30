@@ -5,7 +5,6 @@ import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, DetailedSatellite } from '@ootk/src/main';
 import scatterPlot3Png from '@public/img/icons/scatter-plot3.png';
@@ -13,6 +12,8 @@ import * as echarts from 'echarts';
 import 'echarts-gl';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 type EChartsOption = echarts.EChartsOption;
 
@@ -23,7 +24,7 @@ export class RicPlot extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   isIconDisabled = true;
@@ -34,12 +35,12 @@ export class RicPlot extends KeepTrackPlugin {
   bottomIconImg = scatterPlot3Png;
   bottomIconCallback = () => {
     if (this.selectSatManager_.selectedSat === -1) {
-      keepTrackApi.getUiManager().toast(t7e('errorMsgs.SelectSatelliteFirst'), ToastMsgType.critical);
+      ServiceLocator.getUiManager().toast(t7e('errorMsgs.SelectSatelliteFirst'), ToastMsgType.critical);
 
       return;
     }
     if (!this.selectSatManager_.secondarySatObj) {
-      keepTrackApi.getUiManager().toast(t7e('errorMsgs.SelectSecondarySatellite'), ToastMsgType.critical);
+      ServiceLocator.getUiManager().toast(t7e('errorMsgs.SelectSecondarySatellite'), ToastMsgType.critical);
 
       return;
     }
@@ -254,7 +255,7 @@ export class RicPlot extends KeepTrackPlugin {
       return [];
     }
 
-    const satP = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
+    const satP = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.selectedSat) as DetailedSatellite;
     const satS = this.selectSatManager_.secondarySatObj;
 
     if (!satP || !satS) {
@@ -264,7 +265,7 @@ export class RicPlot extends KeepTrackPlugin {
     }
 
     // Time management
-    const now = keepTrackApi.getTimeManager().simulationTimeObj.getTime();
+    const now = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
     const timeData: Date[] = [];
 
     for (let i = 0; i < NUMBER_OF_POINTS * NUMBER_OF_ORBITS; i++) {

@@ -1,6 +1,5 @@
 import { DopList, DopMath } from '@app/engine/math/dop-math';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { AzEl, Degrees, Kilometers } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors } from './environment/standard-env';
@@ -71,7 +70,7 @@ describe('updateDopsTable_method', () => {
       { time: new Date(), dops: { pdop: '4', hdop: '5', gdop: '6' } },
     ] as DopList;
 
-    keepTrackApi.containerRoot.innerHTML += '<table id="dops"></table>';
+    KeepTrack.getInstance().containerRoot.innerHTML += '<table id="dops"></table>';
     DopMath.updateDopsTable(dopsResults);
     const table = getEl('dops') as HTMLTableElement;
 
@@ -92,13 +91,13 @@ describe('updateDopsTable_method', () => {
 
   // Tests that the method throws an error if the table element cannot be found
   it('test_missing_table', () => {
-    const temp = keepTrackApi.containerRoot.innerHTML;
+    const temp = KeepTrack.getInstance().containerRoot.innerHTML;
 
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     disableConsoleErrors();
     expect(() => DopMath.updateDopsTable({ fake: 'bad data' } as unknown as DopList)).toThrow();
     enableConsoleErrors();
-    keepTrackApi.containerRoot.innerHTML = temp;
+    KeepTrack.getInstance().containerRoot.innerHTML = temp;
   });
 
   // Tests that the method throws an error if no DOPs results are found

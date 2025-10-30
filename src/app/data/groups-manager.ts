@@ -1,4 +1,4 @@
-import { keepTrackApi } from '../../keepTrackApi';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { GroupData, GroupType, ObjectGroup } from './object-group';
 
 /**
@@ -36,7 +36,7 @@ export class GroupsManager {
   selectGroup(group: ObjectGroup<GroupType>): void {
     this.changeGroup_(group);
     group.updateOrbits();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     colorSchemeManagerInstance.setToGroupColorScheme();
 
@@ -46,7 +46,7 @@ export class GroupsManager {
   selectGroupNoOverlay(): void {
     settingsManager.isGroupOverlayDisabled = true;
 
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     colorSchemeManagerInstance.isUseGroupColorScheme = true;
     colorSchemeManagerInstance.calculateColorBuffers();

@@ -1,5 +1,4 @@
 import { MenuMode } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import calculatorPng from '@public/img/icons/calculator.png';
 
 import { EventBus } from '@app/engine/events/event-bus';
@@ -9,6 +8,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { Degrees, DetailedSensor, ecf2eci, eci2ecf, eci2rae, Kilometers, rae2eci, RaeVec3, Vector3D } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 enum CalculatorMode {
   ITRF = 'ITRF',
@@ -394,15 +394,15 @@ export class Calculator extends KeepTrackPlugin {
     }
 
     const ecf = new Vector3D<Kilometers>(Number(x.value) as Kilometers, Number(y.value) as Kilometers, Number(z.value) as Kilometers);
-    const date = keepTrackApi.getTimeManager().simulationTimeObj;
-    const gmst = keepTrackApi.getTimeManager().gmst;
+    const date = ServiceLocator.getTimeManager().simulationTimeObj;
+    const gmst = ServiceLocator.getTimeManager().gmst;
     const eci = ecf2eci(ecf, gmst);
 
     (getEl('calc-j2000-x-input') as HTMLInputElement).value = eci.x.toString();
     (getEl('calc-j2000-y-input') as HTMLInputElement).value = eci.y.toString();
     (getEl('calc-j2000-z-input') as HTMLInputElement).value = eci.z.toString();
 
-    const currentSensor = keepTrackApi.getSensorManager().currentSensors[0];
+    const currentSensor = ServiceLocator.getSensorManager().currentSensors[0];
 
     if (!currentSensor) {
       (getEl('calc-sensor-name') as HTMLInputElement).value = 'No sensor selected';
@@ -433,15 +433,15 @@ export class Calculator extends KeepTrackPlugin {
     }
 
     const eci = new Vector3D<Kilometers>(Number(x.value) as Kilometers, Number(y.value) as Kilometers, Number(z.value) as Kilometers);
-    const date = keepTrackApi.getTimeManager().simulationTimeObj;
-    const gmst = keepTrackApi.getTimeManager().gmst;
+    const date = ServiceLocator.getTimeManager().simulationTimeObj;
+    const gmst = ServiceLocator.getTimeManager().gmst;
     const ecf = eci2ecf(eci, gmst);
 
     (getEl('calc-itrf-x-input') as HTMLInputElement).value = ecf.x.toString();
     (getEl('calc-itrf-y-input') as HTMLInputElement).value = ecf.y.toString();
     (getEl('calc-itrf-z-input') as HTMLInputElement).value = ecf.z.toString();
 
-    const currentSensor = keepTrackApi.getSensorManager().currentSensors[0];
+    const currentSensor = ServiceLocator.getSensorManager().currentSensors[0];
 
     if (!currentSensor) {
       (getEl('calc-sensor-name') as HTMLInputElement).value = 'No sensor selected';
@@ -471,7 +471,7 @@ export class Calculator extends KeepTrackPlugin {
       return;
     }
 
-    const sensor = keepTrackApi.getSensorManager().currentSensors[0];
+    const sensor = ServiceLocator.getSensorManager().currentSensors[0];
 
     if (!sensor) {
       errorManagerInstance.warn('No sensor selected');
@@ -484,13 +484,13 @@ export class Calculator extends KeepTrackPlugin {
       az: Number(a.value) as Degrees,
       el: Number(e.value) as Degrees,
     } as RaeVec3<Kilometers>;
-    const eci = rae2eci(rae, sensor.lla(), keepTrackApi.getTimeManager().gmst);
+    const eci = rae2eci(rae, sensor.lla(), ServiceLocator.getTimeManager().gmst);
 
     (getEl('calc-j2000-x-input') as HTMLInputElement).value = eci.x.toString();
     (getEl('calc-j2000-y-input') as HTMLInputElement).value = eci.y.toString();
     (getEl('calc-j2000-z-input') as HTMLInputElement).value = eci.z.toString();
 
-    const ecf = eci2ecf(eci, keepTrackApi.getTimeManager().gmst);
+    const ecf = eci2ecf(eci, ServiceLocator.getTimeManager().gmst);
 
     (getEl('calc-itrf-x-input') as HTMLInputElement).value = ecf.x.toString();
     (getEl('calc-itrf-y-input') as HTMLInputElement).value = ecf.y.toString();
@@ -547,7 +547,7 @@ export class Calculator extends KeepTrackPlugin {
     const a = getEl('calc-rae-a-input') as HTMLInputElement;
     const e = getEl('calc-rae-e-input') as HTMLInputElement;
 
-    keepTrackApi.getLineManager().createSensorToRae(this.sensorUsedInCalculation,
+    ServiceLocator.getLineManager().createSensorToRae(this.sensorUsedInCalculation,
       { rng: Number(r.value) as Kilometers, az: Number(a.value) as Degrees, el: Number(e.value) as Degrees });
   }
 }

@@ -1,7 +1,8 @@
-import { keepTrackApi } from '@app/keepTrackApi';
 
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { openColorbox } from '@app/engine/utils/colorbox';
@@ -38,27 +39,27 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
     switch (targetId) {
       case 'view-info-rmb':
         {
-          let latLon = keepTrackApi.getInputManager().mouse.latLon;
-          const dragPosition = keepTrackApi.getInputManager().mouse.dragPosition;
+          let latLon = ServiceLocator.getInputManager().mouse.latLon;
+          const dragPosition = ServiceLocator.getInputManager().mouse.dragPosition;
 
           if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
             errorManagerInstance.debug('latLon undefined!');
-            const gmst = keepTrackApi.getTimeManager().gmst;
+            const gmst = ServiceLocator.getTimeManager().gmst;
 
             latLon = eci2lla({ x: dragPosition[0], y: dragPosition[1], z: dragPosition[2] }, gmst);
           }
-          keepTrackApi.toast(`Lat: ${latLon.lat.toFixed(3)}<br>Lon: ${latLon.lon.toFixed(3)}`, ToastMsgType.normal, true);
+          ServiceLocator.getUiManager().toast(`Lat: ${latLon.lat.toFixed(3)}<br>Lon: ${latLon.lon.toFixed(3)}`, ToastMsgType.normal, true);
         }
         break;
       case 'view-sat-info-rmb':
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(clickedSat ?? -1);
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(clickedSat ?? -1);
         break;
       case 'view-sensor-info-rmb':
         this.viewSensorInfoRmb(clickedSat);
         break;
       case 'view-launchsite-info-rmb':
         {
-          const launchSite = keepTrackApi.getCatalogManager().getObject(clickedSat) as LaunchSite;
+          const launchSite = ServiceLocator.getCatalogManager().getObject(clickedSat) as LaunchSite;
 
           if (typeof launchSite === 'undefined' || launchSite === null) {
             errorManagerInstance.warn('Launch site not found!');
@@ -73,14 +74,14 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
         break;
       case 'view-related-sats-rmb':
         {
-          const intldes = keepTrackApi.getCatalogManager().getSat(clickedSat ?? -1, GetSatType.EXTRA_ONLY)?.intlDes;
+          const intldes = ServiceLocator.getCatalogManager().getSat(clickedSat ?? -1, GetSatType.EXTRA_ONLY)?.intlDes;
 
           if (!intldes) {
-            keepTrackApi.toast('Time 1 is Invalid!', ToastMsgType.serious);
+            ServiceLocator.getUiManager().toast('Time 1 is Invalid!', ToastMsgType.serious);
           }
           const searchStr = intldes?.slice(0, 8) ?? '';
 
-          keepTrackApi.getUiManager().doSearch(searchStr);
+          ServiceLocator.getUiManager().doSearch(searchStr);
         }
         break;
       default:
@@ -95,7 +96,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
       if (typeof clickedSatId === 'undefined') {
         return;
       }
-      const sat = keepTrackApi.getCatalogManager().getObject(clickedSatId);
+      const sat = ServiceLocator.getCatalogManager().getObject(clickedSatId);
 
       if (sat instanceof DetailedSatellite === false) {
         hideEl('view-sat-info-rmb');
@@ -120,15 +121,15 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin {
   }
 
   viewSensorInfoRmb(clickedSat = -1): void {
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(clickedSat);
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(clickedSat);
 
-    const sensorInfoPluginInstance = keepTrackApi.getPlugin(SensorInfoPlugin);
+    const sensorInfoPluginInstance = PluginRegistry.getPlugin(SensorInfoPlugin);
 
     if (!sensorInfoPluginInstance || clickedSat < 0) {
       return;
     }
 
-    const firstSensor = keepTrackApi.getSensorManager().currentSensors[0];
+    const firstSensor = ServiceLocator.getSensorManager().currentSensors[0];
 
     if (!firstSensor) {
       errorManagerInstance.warn('Sensor not found! Select a sensor first.');

@@ -7,7 +7,6 @@ import { SmallSatColorScheme } from '@app/engine/rendering/color-schemes/smallsa
 import { StarlinkColorScheme } from '@app/engine/rendering/color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from '@app/engine/rendering/color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from '@app/engine/rendering/color-schemes/velocity-color-scheme';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Container } from '../src/engine/core/container';
 import { Singletons } from '../src/engine/core/interfaces';
 import { defaultSensor } from './environment/apiMocks';
@@ -45,7 +44,7 @@ describe('LegendManager_class_mobile', () => {
 
   beforeEach(() => {
     settingsManager.isMobileModeEnabled = true;
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     Container.getInstance().registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
   });
 
@@ -63,7 +62,7 @@ describe('LegendManager_class_mobile', () => {
       legendHoverDom.innerHTML = '';
 
       legendHoverDom.id = 'layers-hover-menu';
-      keepTrackApi.containerRoot?.appendChild(legendHoverDom);
+      KeepTrack.getInstance().containerRoot?.appendChild(legendHoverDom);
 
       // Act
       settingsManager.isMobileModeEnabled = true;
@@ -81,7 +80,7 @@ describe('LegendManager_class_mobile', () => {
     const legendHoverDom = document.createElement('div');
 
     legendHoverDom.id = 'layers-hover-menu';
-    keepTrackApi.containerRoot?.appendChild(legendHoverDom);
+    KeepTrack.getInstance().containerRoot?.appendChild(legendHoverDom);
 
     LayersManager.change('clear');
 
@@ -93,7 +92,7 @@ describe('LegendManager_class_mobile', () => {
     const legendHoverDom = document.createElement('div');
 
     legendHoverDom.id = 'layers-hover-menu';
-    keepTrackApi.containerRoot?.appendChild(legendHoverDom);
+    KeepTrack.getInstance().containerRoot?.appendChild(legendHoverDom);
 
     const catalogManagerInstance = {
       isSensorManagerLoaded: true,
@@ -136,7 +135,7 @@ describe('LegendManager_class_desktop', () => {
 
   beforeEach(() => {
     settingsManager.isMobileModeEnabled = false;
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     Container.getInstance().registerSingleton(Singletons.ColorSchemeManager, colorSchemeManagerInstance);
   });
 
@@ -154,7 +153,7 @@ describe('LegendManager_class_desktop', () => {
       legendHoverDom.innerHTML = '';
 
       legendHoverDom.id = 'layers-hover-menu-popup';
-      keepTrackApi.containerRoot?.appendChild(legendHoverDom);
+      KeepTrack.getInstance().containerRoot?.appendChild(legendHoverDom);
 
       // Act
       LayersManager.change(menu);
@@ -171,7 +170,7 @@ describe('LegendManager_class_desktop', () => {
     const legendHoverDom = document.createElement('div');
 
     legendHoverDom.id = 'layers-hover-menu-popup';
-    keepTrackApi.containerRoot?.appendChild(legendHoverDom);
+    KeepTrack.getInstance().containerRoot?.appendChild(legendHoverDom);
 
     LayersManager.change('clear');
 
@@ -183,7 +182,7 @@ describe('LegendManager_class_desktop', () => {
     const legendHoverDom = document.createElement('div');
 
     legendHoverDom.id = 'layers-hover-menu-popup';
-    keepTrackApi.containerRoot?.appendChild(legendHoverDom);
+    KeepTrack.getInstance().containerRoot?.appendChild(legendHoverDom);
 
     const catalogManagerInstance = {
       isSensorManagerLoaded: true,

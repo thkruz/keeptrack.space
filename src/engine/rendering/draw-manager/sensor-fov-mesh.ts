@@ -1,13 +1,14 @@
 /* eslint-disable camelcase */
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { glsl } from '@app/engine/utils/development/formatter';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
-import { mat4, vec3 } from 'gl-matrix';
 import { Degrees, DetailedSensor, GreenwichMeanSiderealTime, Kilometers, rae2eci } from '@ootk/src/main';
-import { keepTrackApi } from '../../../keepTrackApi';
+import { mat4, vec3 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
 import { CustomMesh } from './custom-mesh';
-import { glsl } from '@app/engine/utils/development/formatter';
 
 interface SurfaceMeshParams {
   azStart: Degrees;
@@ -64,9 +65,9 @@ export class SensorFovMesh extends CustomMesh {
       return;
     }
 
-    const isFovDrawn = keepTrackApi.getPlugin(SensorFov)?.isMenuButtonActive;
-    const isSurvFenceDrawn = keepTrackApi.getPlugin(SensorSurvFence)?.isMenuButtonActive;
-    const isStfCreated = keepTrackApi.getSensorManager().stfSensors.length > 0;
+    const isFovDrawn = PluginRegistry.getPlugin(SensorFov)?.isMenuButtonActive;
+    const isSurvFenceDrawn = PluginRegistry.getPlugin(SensorSurvFence)?.isMenuButtonActive;
+    const isStfCreated = ServiceLocator.getSensorManager().stfSensors.length > 0;
 
     if (!isFovDrawn && !isSurvFenceDrawn && !isStfCreated) {
       return;

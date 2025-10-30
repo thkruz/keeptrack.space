@@ -2,14 +2,16 @@ import orbitguardPng from '@public/img/icons/orbitguard.png';
 import './orbit-guard-menu.css';
 
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ClickDragOptions, KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 // Define the maneuver data interface based on orbitguard_output.json
 export interface OrbitGuardEvent {
@@ -71,11 +73,11 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    keepTrackApi.on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
-    keepTrackApi.on(EventBusEvent.onCruncherMessage, () => {
+    EventBus.getInstance().on(EventBusEvent.onCruncherMessage, () => {
       if (this.selectSatIdOnCruncher_ !== null) {
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
         this.selectSatIdOnCruncher_ = null;
       }
     });
@@ -104,10 +106,10 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
   }
 
   private eventClicked_(row: number) {
-    const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(this.orbitGuardEvents[row].satNo));
+    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(this.orbitGuardEvents[row].satNo));
 
     if (!sat) {
-      keepTrackApi.getUiManager().toast('Satellite appears to have decayed!', ToastMsgType.caution);
+      ServiceLocator.getUiManager().toast('Satellite appears to have decayed!', ToastMsgType.caution);
 
       return;
     }
@@ -115,10 +117,10 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
     const now = new Date();
     const eventTime = new Date(this.orbitGuardEvents[row].event_end_timestamp);
 
-    keepTrackApi.getTimeManager().changeStaticOffset(eventTime.getTime() - now.getTime());
-    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
+    ServiceLocator.getTimeManager().changeStaticOffset(eventTime.getTime() - now.getTime());
+    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
-    keepTrackApi.getUiManager().doSearch(`${sat.sccNum5}`);
+    ServiceLocator.getUiManager().doSearch(`${sat.sccNum5}`);
     this.selectSatIdOnCruncher_ = sat.id;
     this.closeSideMenu();
   }

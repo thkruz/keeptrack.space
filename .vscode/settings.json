@@ -81,6 +81,7 @@
   "editor.rulers": [
     180
   ],
+  "rewrap.wrappingColumn": 180,
   "sonarlint.connectedMode.project": {
     "connectionId": "http-localhost-9000",
     "projectKey": "keeptrack"

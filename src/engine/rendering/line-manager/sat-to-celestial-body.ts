@@ -1,9 +1,9 @@
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3, SolarBody } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DetailedSatellite } from '@ootk/src/main';
 import { CelestialBody } from '../draw-manager/celestial-bodies/celestial-body';
 import { Line, LineColors } from './line';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SatToCelestialBodyLine extends Line {
   private readonly sat: DetailedSatellite | OemSatellite;
@@ -17,7 +17,7 @@ export class SatToCelestialBodyLine extends Line {
   }
 
   update(): void {
-    const eci = this.sat.eci(keepTrackApi.getTimeManager().simulationTimeObj);
+    const eci = this.sat.eci(ServiceLocator.getTimeManager().simulationTimeObj);
 
     if (!eci) {
       this.isGarbage = true;
@@ -27,6 +27,6 @@ export class SatToCelestialBodyLine extends Line {
 
     const eciArr = [eci.position.x, eci.position.y, eci.position.z] as EciArr3;
 
-    this.updateVertBuf([eciArr, (keepTrackApi.getScene().getBodyById(this.body) as CelestialBody).position]);
+    this.updateVertBuf([eciArr, (ServiceLocator.getScene().getBodyById(this.body) as CelestialBody).position]);
   }
 }

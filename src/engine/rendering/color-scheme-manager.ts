@@ -23,7 +23,6 @@
  */
 
 import { ColorRuleSet } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '../../keepTrackApi';
 import { ColorInformation, Pickable, rgbaArray } from '../core/interfaces';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl, hideEl } from '../utils/get-el';
@@ -57,6 +56,8 @@ import { StarlinkColorScheme } from './color-schemes/starlink-color-scheme';
 import { SunlightColorScheme } from './color-schemes/sunlight-color-scheme';
 import { VelocityColorScheme } from './color-schemes/velocity-color-scheme';
 import { WebGLRenderer } from './webgl-renderer';
+import { PluginRegistry } from '../core/plugin-registry';
+import { ServiceLocator } from '../core/service-locator';
 
 export class ColorSchemeManager {
   // This is where you confiure addon color schemes
@@ -109,9 +110,9 @@ export class ColorSchemeManager {
 
   calcColorBufsNextCruncher(): void {
     waitForCruncher({
-      cruncher: keepTrackApi.getCatalogManager().satCruncher,
+      cruncher: ServiceLocator.getCatalogManager().satCruncher,
       cb: () => {
-        keepTrackApi.getColorSchemeManager().calculateColorBuffers();
+        ServiceLocator.getColorSchemeManager().calculateColorBuffers();
       },
       validationFunc: (m: PositionCruncherOutgoingMsg) => (!!((m.satInView?.length && m.satInView?.length > 0))),
       skipNumber: 2,
@@ -159,12 +160,12 @@ export class ColorSchemeManager {
 
       // Lets loop through all the satellites and color them in one by one
       const params = this.calculateParams_();
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
       // Velocity is a special case - we need to know the velocity of each satellite
       if (this.currentColorScheme?.id === VelocityColorScheme.id) {
         // We also need the velocity data if we are trying to colorizing that
-        const dotsManagerInstance = keepTrackApi.getDotsManager();
+        const dotsManagerInstance = ServiceLocator.getDotsManager();
         const satVel: Float32Array | null = this.currentColorScheme?.id === VelocityColorScheme.id ? dotsManagerInstance.getSatVel() : null;
 
         this.calculateBufferDataVelocity_(firstDotToColor, lastDotToColor, catalogManagerInstance.objectCache, satVel as Float32Array, params);
@@ -220,7 +221,7 @@ export class ColorSchemeManager {
     EventBus.getInstance().on(
       EventBusEvent.onCruncherReady,
       (): void => {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
         const cachedColorScheme = PersistenceManager.getInstance().getItem(StorageKey.COLOR_SCHEME);
         let possibleColorScheme: ColorScheme | null = null;
 
@@ -286,10 +287,10 @@ export class ColorSchemeManager {
   }
 
   isInView(obj: BaseObject) {
-    return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && this.currentColorScheme?.objectTypeFlags.inFOV;
+    return ServiceLocator.getDotsManager().inViewData?.[obj.id] === 1 && this.currentColorScheme?.objectTypeFlags.inFOV;
   }
   isInViewOff(obj: BaseObject) {
-    return keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1 && !this.currentColorScheme?.objectTypeFlags.inFOV;
+    return ServiceLocator.getDotsManager().inViewData?.[obj.id] === 1 && !this.currentColorScheme?.objectTypeFlags.inFOV;
   }
   isPayloadOff(obj: BaseObject) {
     return settingsManager.filter?.payloads === false && obj.type === SpaceObjectType.PAYLOAD;
@@ -393,8 +394,8 @@ export class ColorSchemeManager {
 
   setColorScheme(scheme: ColorScheme, isForceRecolor?: boolean) {
     try {
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
-      const uiManagerInstance = keepTrackApi.getUiManager();
+      const dotsManagerInstance = ServiceLocator.getDotsManager();
+      const uiManagerInstance = ServiceLocator.getUiManager();
 
       LayersManager.change(scheme.id);
       uiManagerInstance.colorSchemeChangeAlert(scheme);
@@ -699,10 +700,10 @@ export class ColorSchemeManager {
       const watchlistTransform = watchlistMenu?.style.transform ?? '';
 
       if (
-        keepTrackApi.getUiManager().searchManager.getCurrentSearch() === '' &&
+        ServiceLocator.getUiManager().searchManager.getCurrentSearch() === '' &&
         watchlistTransform !== 'translateX(0px)' &&
-        !keepTrackApi.getPlugin(TimeMachine)?.isMenuButtonActive &&
-        !(<TimeMachine>keepTrackApi.getPlugin(TimeMachine))?.isTimeMachineRunning
+        !PluginRegistry.getPlugin(TimeMachine)?.isMenuButtonActive &&
+        !(<TimeMachine>PluginRegistry.getPlugin(TimeMachine))?.isTimeMachineRunning
       ) {
         this.isUseGroupColorScheme = false;
       }
@@ -746,7 +747,7 @@ export class ColorSchemeManager {
   }
 
   private setSelectedAndHoverBuffer_() {
-    const selSat = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
+    const selSat = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat;
 
     if (typeof selSat !== 'undefined' && selSat > -1) {
       // Selected satellites are always one color so forget whatever we just did
@@ -756,7 +757,7 @@ export class ColorSchemeManager {
       this.colorData[selSat * 4 + 3] = settingsManager.selectedColor[3]; // A
     }
 
-    const hovSat = keepTrackApi.getHoverManager().hoveringSat;
+    const hovSat = ServiceLocator.getHoverManager().hoveringSat;
 
     if (hovSat === -1 || hovSat === selSat) {
       return;

@@ -1,13 +1,13 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { ScenarioData, ScenarioManagementPlugin } from '../scenario-management/scenario-management';
 import { TopMenu } from '../top-menu/top-menu';
 import './time-slider.css';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export class TimeSlider extends KeepTrackPlugin {
   readonly id = 'TimeSlider';
@@ -33,7 +33,7 @@ export class TimeSlider extends KeepTrackPlugin {
               >
                 <span
                   tabindex="0" class="ui-slider-handle ui-corner-all ui-state-default"
-                  style="left: ${(this.getSliderValue(keepTrackApi.getTimeManager().simulationTimeObj)).toString()}%;">
+                  style="left: ${(this.getSliderValue(ServiceLocator.getTimeManager().simulationTimeObj)).toString()}%;">
                 </span>
               </div>
             </div>
@@ -93,7 +93,7 @@ export class TimeSlider extends KeepTrackPlugin {
   }
 
   private sliderWithoutBounds(value: number) {
-    const timeManager = keepTrackApi.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
     const currentDate = timeManager.simulationTimeObj;
 
     // Calculate new hours and minutes based on slider value
@@ -111,11 +111,11 @@ export class TimeSlider extends KeepTrackPlugin {
     timeManager.changeStaticOffset(newDate.getTime() - today.getTime());
 
     // Notify other components of the time change
-    keepTrackApi.emit(EventBusEvent.updateDateTime, newDate);
+    EventBus.getInstance().emit(EventBusEvent.updateDateTime, newDate);
   }
 
   private sliderWithBounds(value: number) {
-    const timeManager = keepTrackApi.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
 
     const minPosition = this.scenario!.startTime as Date;
     const maxPosition = this.scenario!.endTime as Date;
@@ -127,7 +127,7 @@ export class TimeSlider extends KeepTrackPlugin {
     timeManager.changeStaticOffset(newDate.getTime() - Date.now());
 
     // Notify other components of the time change
-    keepTrackApi.emit(EventBusEvent.updateDateTime, newDate);
+    EventBus.getInstance().emit(EventBusEvent.updateDateTime, newDate);
   }
 
   updateSliderPosition() {
@@ -135,7 +135,7 @@ export class TimeSlider extends KeepTrackPlugin {
     const handle = slider?.querySelector('.ui-slider-handle') as HTMLElement | null;
 
     if (slider && handle) {
-      const sliderValue = this.getSliderValue(keepTrackApi.getTimeManager().simulationTimeObj);
+      const sliderValue = this.getSliderValue(ServiceLocator.getTimeManager().simulationTimeObj);
 
       handle.style.left = `${sliderValue}%`;
     }

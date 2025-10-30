@@ -21,7 +21,7 @@ describe('parseGetVariables', () => {
       colors: {} as any,
       satShader: {} as any,
     } as unknown as SettingsManager;
-    // Mock keepTrackApi.getUiManager().toast
+    // Mock ServiceLocator.getUiManager().toast
     jest.spyOn(require('@app/keepTrackApi').keepTrackApi, 'getUiManager').mockReturnValue({
       toast: toastMock,
     });

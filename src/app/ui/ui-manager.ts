@@ -25,11 +25,11 @@
  */
 
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import '@materializecss/materialize';
 import { BaseObject, DetailedSatellite, Milliseconds, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
@@ -42,7 +42,6 @@ import { LayersManager } from './layers-manager';
 import { MobileManager } from './mobileManager';
 import { SearchManager } from './search-manager';
 import { UiValidation } from './ui-validation';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class UiManager {
   private static readonly LONG_TIMER_DELAY = MILLISECONDS_PER_SECOND * 100;
@@ -83,7 +82,7 @@ export class UiManager {
     }
 
     setTimeout(() => {
-      keepTrackApi.getRenderer().resizeCanvas(true);
+      ServiceLocator.getRenderer().resizeCanvas(true);
     }, 100);
   }
 
@@ -166,28 +165,28 @@ export class UiManager {
     switch (type) {
       case ToastMsgType.standby:
         toastMsg.$el[0].style.background = 'var(--statusDarkStandby)';
-        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
+        ServiceLocator.getSoundManager()?.play(SoundNames.WARNING);
         break;
       case ToastMsgType.caution:
         toastMsg.$el[0].style.background = 'var(--statusDarkCaution)';
-        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
+        ServiceLocator.getSoundManager()?.play(SoundNames.WARNING);
         break;
       case ToastMsgType.serious:
         toastMsg.$el[0].style.background = 'var(--statusDarkSerious)';
-        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
+        ServiceLocator.getSoundManager()?.play(SoundNames.WARNING);
         break;
       case ToastMsgType.critical:
         toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
-        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
+        ServiceLocator.getSoundManager()?.play(SoundNames.WARNING);
         break;
       case ToastMsgType.error:
         toastMsg.$el[0].style.background = 'var(--statusDarkCritical)';
-        keepTrackApi.getSoundManager()?.play(SoundNames.ERROR);
+        ServiceLocator.getSoundManager()?.play(SoundNames.ERROR);
         break;
       case ToastMsgType.normal:
       default:
         toastMsg.$el[0].style.background = 'var(--statusDarkNormal)';
-        keepTrackApi.getSoundManager()?.play(SoundNames.WARNING);
+        ServiceLocator.getSoundManager()?.play(SoundNames.WARNING);
         break;
     }
 
@@ -199,7 +198,7 @@ export class UiManager {
      * Don't make an alert unless something has really changed
      * Check if the name of the lastColorScheme function is the same as the name of the new color scheme
      */
-    if (keepTrackApi.getColorSchemeManager().lastColorScheme?.id === newScheme.id) {
+    if (ServiceLocator.getColorSchemeManager().lastColorScheme?.id === newScheme.id) {
       return;
     }
 
@@ -263,7 +262,7 @@ export class UiManager {
       getEl('logo-secondary')?.classList.remove('start-hidden');
     }
 
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
 
     this.sortBottomIcons();
 
@@ -333,7 +332,7 @@ export class UiManager {
     const navFooterDom = getEl('nav-footer');
 
     if (navFooterDom && parseInt(window.getComputedStyle(navFooterDom).bottom.replace('px', '')) < 0) {
-      keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+      ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
       setTimeout(() => {
         const bottomHeight = getEl('bottom-icons-container')?.offsetHeight;
 
@@ -342,7 +341,7 @@ export class UiManager {
     } else {
       // If the footer is open, then it will be hidden shortly but we don't want to wait for it to be hidden
       document.documentElement.style.setProperty('--bottom-menu-top', '0px');
-      keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+      ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
     }
   }
 
@@ -369,14 +368,14 @@ export class UiManager {
     }
 
     // Run any plugins code
-    keepTrackApi.emit(EventBusEvent.uiManagerOnReady);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerOnReady);
 
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
         this.bottomIconPress = (el: HTMLElement) => {
-          keepTrackApi.getSoundManager()?.play(SoundNames.BEEP);
-          keepTrackApi.emit(EventBusEvent.bottomMenuClick, el.id);
+          ServiceLocator.getSoundManager()?.play(SoundNames.BEEP);
+          EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, el.id);
         };
         const BottomIcons = getEl('bottom-icons');
 
@@ -405,7 +404,7 @@ export class UiManager {
         });
         this.hideSideMenus = () => {
           closeColorbox();
-          keepTrackApi.emit(EventBusEvent.hideSideMenus);
+          EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
         };
       },
     );
@@ -454,8 +453,8 @@ export class UiManager {
     const sat = obj as DetailedSatellite;
 
     if (realTime * 1 > lastBoxUpdateTime * 1 + this.updateInterval) {
-      keepTrackApi.emit(EventBusEvent.updateSelectBox, sat);
-      keepTrackApi.getTimeManager().lastBoxUpdateTime = realTime;
+      EventBus.getInstance().emit(EventBusEvent.updateSelectBox, sat);
+      ServiceLocator.getTimeManager().lastBoxUpdateTime = realTime;
     }
   }
 

@@ -4,14 +4,9 @@ import { html } from '@app/engine/utils/development/formatter';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { expect } from '@jest/globals';
 import { DetailedSatellite } from '@ootk/src/main';
-import { keepTrackApi } from '../src/keepTrackApi';
 import { defaultSat } from './environment/apiMocks';
 
 test('keepTrackApi Unit Testing', () => {
-  expect(() => {
-    keepTrackApi.unregister({ event: EventBusEvent.touchStart, cbName: 'test' });
-  }).toThrow(Error);
-
   EventBus.getInstance().on(EventBusEvent.updateSelectBox, () => {
     // Do nothing
   });
@@ -76,27 +71,23 @@ test('keepTrackApi Unit Testing', () => {
     // Do nothing
   });
 
-  keepTrackApi.emit(EventBusEvent.updateSelectBox, 'test' as unknown as DetailedSatellite);
-  keepTrackApi.emit(EventBusEvent.onCruncherReady);
-  keepTrackApi.emit(EventBusEvent.onCruncherMessage);
-  keepTrackApi.emit(EventBusEvent.uiManagerInit);
-  keepTrackApi.emit(EventBusEvent.uiManagerOnReady);
-  keepTrackApi.emit(EventBusEvent.bottomMenuClick, 'test');
-  keepTrackApi.emit(EventBusEvent.hideSideMenus);
+  EventBus.getInstance().emit(EventBusEvent.updateSelectBox, 'test' as unknown as DetailedSatellite);
+  EventBus.getInstance().emit(EventBusEvent.onCruncherReady);
+  EventBus.getInstance().emit(EventBusEvent.onCruncherMessage);
+  EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+  EventBus.getInstance().emit(EventBusEvent.uiManagerOnReady);
+  EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'test');
+  EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
 
-  /*
-   * let emptyTexture: WebGLTexture;
-   * keepTrackApi.runEvent(KeepTrackApiEvents.nightToggle(keepTrackApi.programs.drawManager.gl, emptyTexture, emptyTexture));
-   */
-  keepTrackApi.emit(EventBusEvent.orbitManagerInit);
-  keepTrackApi.emit(EventBusEvent.drawManagerLoadScene);
-  keepTrackApi.emit(EventBusEvent.drawOptionalScenery);
-  keepTrackApi.emit(EventBusEvent.updateLoop);
-  keepTrackApi.emit(EventBusEvent.rmbMenuActions, 'test', -1);
-  keepTrackApi.emit(EventBusEvent.updateDateTime, new Date());
-  keepTrackApi.emit(EventBusEvent.uiManagerFinal);
-  keepTrackApi.emit(EventBusEvent.rightBtnMenuAdd);
-  keepTrackApi.emit(EventBusEvent.selectSatData, defaultSat, 0);
+  EventBus.getInstance().emit(EventBusEvent.orbitManagerInit);
+  EventBus.getInstance().emit(EventBusEvent.drawManagerLoadScene);
+  EventBus.getInstance().emit(EventBusEvent.drawOptionalScenery);
+  EventBus.getInstance().emit(EventBusEvent.updateLoop);
+  EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, 'test', -1);
+  EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date());
+  EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+  EventBus.getInstance().emit(EventBusEvent.rightBtnMenuAdd);
+  EventBus.getInstance().emit(EventBusEvent.selectSatData, defaultSat, 0);
 });
 
 describe('html', () => {

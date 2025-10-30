@@ -1,10 +1,11 @@
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import viewTimelinePng from '@public/img/icons/view_timeline2.png';
 
 import { SatMath } from '@app/app/analysis/sat-math';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -49,8 +50,8 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       return;
     }
 
-    if (keepTrackApi.getPlugin(WatchlistPlugin).watchlistList.length === 0 && keepTrackApi.getPlugin(SelectSatManager).selectedSat === -1) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist or Select a Satellite', ToastMsgType.caution);
+    if (PluginRegistry.getPlugin(WatchlistPlugin).watchlistList.length === 0 && PluginRegistry.getPlugin(SelectSatManager).selectedSat === -1) {
+      ServiceLocator.getUiManager().toast('Add Satellites to Watchlist or Select a Satellite', ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
 
       return;
@@ -113,7 +114,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     const link = document.createElement('a');
 
     link.href = image;
-    link.download = `sensor-${keepTrackApi.getSensorManager().getSensor().uiName}-timeline.png`;
+    link.download = `sensor-${ServiceLocator.getSensorManager().getSensor().uiName}-timeline.png`;
     link.click();
   };
 
@@ -161,7 +162,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (sat: BaseObject) => {
-        if (!sat && keepTrackApi.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
+        if (!sat && PluginRegistry.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
           this.setBottomIconToDisabled();
         } else if (this.verifySensorSelected(false)) {
           this.setBottomIconToEnabled();
@@ -181,7 +182,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   }
 
   private onWatchlistUpdated_(watchlistList: number[]) {
-    if (watchlistList.length === 0 && keepTrackApi.getPlugin(SelectSatManager)?.selectedSat === -1) {
+    if (watchlistList.length === 0 && PluginRegistry.getPlugin(SelectSatManager)?.selectedSat === -1) {
       this.setBottomIconToDisabled();
     } else if (this.verifySensorSelected(false)) {
       this.setBottomIconToEnabled();
@@ -190,7 +191,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
   updateTimeline(): void {
     try {
-      if (keepTrackApi.getSensorManager().isSensorSelected() === false) {
+      if (ServiceLocator.getSensorManager().isSensorSelected() === false) {
         return;
       }
       if (!this.isMenuButtonActive) {
@@ -207,11 +208,11 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
   private calculatePasses_(): SatellitePasses[] {
     const satellitePasses: SatellitePasses[] = [];
-    const sensor = keepTrackApi.getSensorManager().getSensor();
-    const satellites = keepTrackApi.getPlugin(WatchlistPlugin).getSatellites().concat(keepTrackApi.getPlugin(SelectSatManager).selectedSat).filter((sat) => sat !== -1);
+    const sensor = ServiceLocator.getSensorManager().getSensor();
+    const satellites = PluginRegistry.getPlugin(WatchlistPlugin).getSatellites().concat(PluginRegistry.getPlugin(SelectSatManager).selectedSat).filter((sat) => sat !== -1);
 
     for (const sat of satellites) {
-      const satellite = keepTrackApi.getCatalogManager().getSat(sat);
+      const satellite = ServiceLocator.getCatalogManager().getSat(sat);
       const sensorPass: SatellitePasses = {
         satellite,
         passes: [],
@@ -235,7 +236,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       for (let i = 0; i < durationInSeconds; i += this.angleCalculationInterval_) {
         // 5second Looks
         offset = i * 1000; // Offset in seconds (msec * 1000)
-        const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+        const now = ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
         const multiSitePass = SatelliteTimeline.propagateMultiSite(now, satellite.satrec, sensor);
 
         // Check if in FOV
@@ -308,7 +309,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     const topOffset = 0; // Canvas is already offset from the top
     const width = this.canvas_.width * 0.75;
     const height = this.canvas_.height * 0.85;
-    const timeManager = keepTrackApi.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
     const startTime = timeManager.simulationTimeObj.getTime();
     const endTime = startTime + this.lengthOfLookAngles_ * 60 * 60 * 1000; // 24 hours from now
 
@@ -427,11 +428,11 @@ export class SatelliteTimeline extends KeepTrackPlugin {
 
           // If the mouse is over a pass change the sensor
           if (drawEvent(mouseX, mouseY)) {
-            const timeManagerInstance = keepTrackApi.getTimeManager();
+            const timeManagerInstance = ServiceLocator.getTimeManager();
 
             timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
             timeManagerInstance.calculateSimulationTime();
-            keepTrackApi.getPlugin(SelectSatManager).selectSat(satellitePass.satellite.id);
+            PluginRegistry.getPlugin(SelectSatManager).selectSat(satellitePass.satellite.id);
           }
         });
       });

@@ -2,7 +2,6 @@ import { GroupsManager } from '@app/app/data/groups-manager';
 import { GroupType } from '@app/app/data/object-group';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SatConstellations } from '@app/plugins/sat-constellations/sat-constellations';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -52,7 +51,7 @@ describe('SatConstellations_test_all_links', () => {
 
     const groupList = {};
 
-    keepTrackApi.getGroupsManager = () =>
+    ServiceLocator.getGroupsManager = () =>
       ({
         createGroup: (_type: GroupType, _listOfSats: number[], name: string) => {
           groupList[name] = {

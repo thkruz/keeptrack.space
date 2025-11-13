@@ -237,7 +237,7 @@ export class WebpackManager {
           }),
           new DotEnv({
             systemvars: true,
-            path: '../.env',
+            path: '.env',
             allowEmptyValues: true,
           }),
           new WebpackBar({
@@ -276,7 +276,7 @@ export class WebpackManager {
           }),
           new DotEnv({
             systemvars: true,
-            path: '../.env',
+            path: '.env',
             allowEmptyValues: true,
           }),
           new WebpackBar({

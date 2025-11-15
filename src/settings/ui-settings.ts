@@ -111,7 +111,7 @@ export class UiSettings {
 
   // Hover and Overlay
   /**
-   * Shows the oribt of the object when highlighted
+   * Shows the orbit of the object when highlighted
    */
   enableHoverOrbits = true;
   /**

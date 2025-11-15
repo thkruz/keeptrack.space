@@ -2,7 +2,7 @@
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, Star } from '@ootk/src/main';
-import { ColorScheme } from './color-scheme';
+import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
 import { html } from '@app/engine/utils/development/formatter';
 
 export class VelocityColorScheme extends ColorScheme {

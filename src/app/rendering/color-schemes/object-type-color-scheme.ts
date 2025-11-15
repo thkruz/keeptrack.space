@@ -5,37 +5,46 @@ import { Planet } from '@app/app/objects/planet';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType, Star } from '@app/engine/ootk/src/main';
 import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
-import { CameraType } from '../../camera/camera';
-import { errorManagerInstance } from '../../utils/errorManager';
-import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { BaseObject, DetailedSatellite, SpaceObjectType, Star } from '@ootk/src/main';
+import { CameraType } from '@app/engine/camera/camera';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { ColorScheme, ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 
-export interface CelestrakColorSchemeColorMap extends ColorSchemeColorMap {
-  celestrakDefaultRocketBody: rgbaArray;
-  celestrakDefaultDebris: rgbaArray;
-  celestrakDefaultActivePayload: rgbaArray;
-  celestrakDefaultInactivePayload: rgbaArray;
-  celestrakDefaultUnknown: rgbaArray;
-  celestrakDefaultSensor: rgbaArray;
-  celestrakDefaultFov: rgbaArray;
+export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
+  payload: rgbaArray;
+  rocketBody: rgbaArray;
+  debris: rgbaArray;
+  notional: rgbaArray;
+  unknown: rgbaArray;
+  analyst: rgbaArray;
+  missile: rgbaArray;
+  missileInview: rgbaArray;
+  pink: rgbaArray;
+  inFOV: rgbaArray;
 }
 
-export class CelestrakColorScheme extends ColorScheme {
-  readonly label = 'Celestrak';
-  readonly id = 'CelestrakColorScheme';
-  static readonly id = 'CelestrakColorScheme';
+export class ObjectTypeColorScheme extends ColorScheme {
+  readonly label = 'Object Type';
+  readonly id = 'ObjectTypeColorScheme';
+  static readonly id = 'ObjectTypeColorScheme';
 
   static readonly uniqueObjectTypeFlags = {
-    celestrakDefaultActivePayload: true,
-    celestrakDefaultInactivePayload: true,
-    celestrakDefaultRocketBody: true,
-    celestrakDefaultDebris: true,
-    celestrakDefaultSensor: true,
-    celestrakDefaultFov: true,
-    celestrakDefaultUnknown: true,
+    payload: true,
+    rocketBody: true,
+    debris: true,
+    notional: true,
+    unknown: true,
+    analyst: true,
+    facility: true,
+    sensor: true,
+    missile: true,
+    missileInview: true,
+    pink: true,
+    inFOV: true,
+    marker: true,
   };
 
   static readonly uniqueColorTheme = {
@@ -49,33 +58,27 @@ export class CelestrakColorScheme extends ColorScheme {
   };
 
   constructor() {
-    super(CelestrakColorScheme.uniqueColorTheme);
+    super(ObjectTypeColorScheme.uniqueColorTheme);
     this.objectTypeFlags = {
-      ...this.objectTypeFlags, ...CelestrakColorScheme.uniqueObjectTypeFlags,
+      ...this.objectTypeFlags, ...ObjectTypeColorScheme.uniqueObjectTypeFlags,
     };
 
     EventBus.getInstance().on(EventBusEvent.layerUpdated, () => {
       if (settingsManager.isDisableSensors) {
-        this.objectTypeFlags.celestrakDefaultSensor = false;
-        this.objectTypeFlags.celestrakDefaultFov = false;
-        const sensorBox = document.querySelector('.layers-celestrakDefaultSensor-box')?.parentElement as HTMLElement;
-        const inFOVBox = document.querySelector('.layers-celestrakDefaultFov-box')?.parentElement as HTMLElement;
-
-        if (sensorBox) {
-          hideEl(sensorBox);
-        }
-
-        if (inFOVBox) {
-          hideEl(inFOVBox);
-        }
+        this.objectTypeFlags.sensor = false;
+        this.objectTypeFlags.inFOV = false;
       }
 
       if (settingsManager.isDisableLaunchSites) {
         this.objectTypeFlags.facility = false;
-        const launchSiteBox = document.querySelector('.layers-facility-box')?.parentElement as HTMLElement;
+      }
 
-        if (launchSiteBox) {
-          hideEl(launchSiteBox);
+      if (!settingsManager.plugins?.MissilePlugin?.enabled) {
+        this.objectTypeFlags.missile = false;
+        const missileBox = document.querySelector('.layers-missile-box')?.parentElement as HTMLElement;
+
+        if (missileBox) {
+          hideEl(missileBox);
         }
       }
     });
@@ -114,7 +117,7 @@ export class CelestrakColorScheme extends ColorScheme {
       };
     }
 
-    if (obj.type === SpaceObjectType.NOTIONAL) {
+    if (obj.isNotional()) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -143,7 +146,7 @@ export class CelestrakColorScheme extends ColorScheme {
       return this.getMarkerColor_();
     }
 
-    if (obj.isSensor() && (this.objectTypeFlags.celestrakDefaultSensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
+    if (obj.isSensor() && (this.objectTypeFlags.sensor === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM)) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -151,7 +154,7 @@ export class CelestrakColorScheme extends ColorScheme {
     }
     if (obj.isSensor()) {
       return {
-        color: this.colorTheme.celestrakDefaultSensor,
+        color: this.colorTheme.sensor,
         pickable: Pickable.Yes,
       };
     }
@@ -191,57 +194,13 @@ export class CelestrakColorScheme extends ColorScheme {
     if (
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.PAYLOAD &&
-        sat.status !== PayloadStatus.NONOPERATIONAL && sat.status !== PayloadStatus.UNKNOWN &&
-        this.objectTypeFlags.celestrakDefaultActivePayload === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
-        sat.type === SpaceObjectType.PAYLOAD &&
-        sat.status !== PayloadStatus.NONOPERATIONAL && sat.status !== PayloadStatus.UNKNOWN &&
-        this.objectTypeFlags.celestrakDefaultActivePayload === false) ||
+        this.objectTypeFlags.payload === false) ||
+      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.PAYLOAD && this.objectTypeFlags.payload === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
         sat.type === SpaceObjectType.PAYLOAD &&
-        sat.status !== PayloadStatus.NONOPERATIONAL && sat.status !== PayloadStatus.UNKNOWN &&
-        this.objectTypeFlags.celestrakDefaultActivePayload === false)
-    ) {
-      return {
-        color: this.colorTheme.deselected,
-        pickable: Pickable.No,
-      };
-    }
-    if (
-      ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
-        sat.type === SpaceObjectType.PAYLOAD &&
-        (sat.status === PayloadStatus.NONOPERATIONAL || sat.status === PayloadStatus.UNKNOWN) &&
-        this.objectTypeFlags.celestrakDefaultInactivePayload === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
-        sat.type === SpaceObjectType.PAYLOAD &&
-        (sat.status === PayloadStatus.NONOPERATIONAL || sat.status === PayloadStatus.UNKNOWN) &&
-        this.objectTypeFlags.celestrakDefaultInactivePayload === false) ||
-      (catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
-        typeof sat.vmag === 'undefined' &&
-        sat.type === SpaceObjectType.PAYLOAD &&
-        (sat.status === PayloadStatus.NONOPERATIONAL || sat.status === PayloadStatus.UNKNOWN) &&
-        this.objectTypeFlags.celestrakDefaultInactivePayload === false)
-    ) {
-      return {
-        color: this.colorTheme.deselected,
-        pickable: Pickable.No,
-      };
-    }
-    if (
-      ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
-        sat.type === SpaceObjectType.UNKNOWN &&
-        this.objectTypeFlags.celestrakDefaultUnknown === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
-        sat.type === SpaceObjectType.UNKNOWN &&
-        this.objectTypeFlags.celestrakDefaultUnknown === false) ||
-      (catalogManagerInstance.isSensorManagerLoaded &&
-        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
-        typeof sat.vmag === 'undefined' &&
-        sat.type === SpaceObjectType.UNKNOWN &&
-        this.objectTypeFlags.celestrakDefaultUnknown === false)
+        this.objectTypeFlags.payload === false)
     ) {
       return {
         color: this.colorTheme.deselected,
@@ -251,13 +210,13 @@ export class CelestrakColorScheme extends ColorScheme {
     if (
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.ROCKET_BODY &&
-        this.objectTypeFlags.celestrakDefaultRocketBody === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY &&
-        this.objectTypeFlags.celestrakDefaultRocketBody === false) || (catalogManagerInstance.isSensorManagerLoaded &&
-          sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
-          typeof sat.vmag === 'undefined' &&
-          sat.type === SpaceObjectType.ROCKET_BODY &&
-          this.objectTypeFlags.celestrakDefaultRocketBody === false)
+        this.objectTypeFlags.rocketBody === false) ||
+      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.ROCKET_BODY && this.objectTypeFlags.rocketBody === false) ||
+      (catalogManagerInstance.isSensorManagerLoaded &&
+        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
+        typeof sat.vmag === 'undefined' &&
+        sat.type === SpaceObjectType.ROCKET_BODY &&
+        this.objectTypeFlags.rocketBody === false)
     ) {
       return {
         color: this.colorTheme.deselected,
@@ -267,13 +226,13 @@ export class CelestrakColorScheme extends ColorScheme {
     if (
       ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
         sat.type === SpaceObjectType.DEBRIS &&
-        this.objectTypeFlags.celestrakDefaultDebris === false) ||
-      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.celestrakDefaultDebris === false) ||
+        this.objectTypeFlags.debris === false) ||
+      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && sat.type === SpaceObjectType.DEBRIS && this.objectTypeFlags.debris === false) ||
       (catalogManagerInstance.isSensorManagerLoaded &&
         sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
         typeof sat.vmag === 'undefined' &&
         sat.type === SpaceObjectType.DEBRIS &&
-        this.objectTypeFlags.celestrakDefaultDebris === false)
+        this.objectTypeFlags.debris === false)
     ) {
       return {
         color: this.colorTheme.deselected,
@@ -281,8 +240,27 @@ export class CelestrakColorScheme extends ColorScheme {
       };
     }
 
-    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.celestrakDefaultFov === false &&
-      keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
+    // NOTE: Treat TBA Satellites as SPECIAL if SCC NUM is less than 70000 (ie a real satellite)
+    if (
+      ((!dotsManagerInstance.inViewData || (dotsManagerInstance.inViewData && dotsManagerInstance.inViewData?.[sat.id] === 0)) &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
+        this.objectTypeFlags.pink === false) ||
+      (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
+        this.objectTypeFlags.pink === false) ||
+      (catalogManagerInstance.isSensorManagerLoaded &&
+        sensorManagerInstance.currentSensors[0].type === SpaceObjectType.OBSERVER &&
+        typeof sat.vmag === 'undefined' &&
+        (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN || sat.type === SpaceObjectType.NOTIONAL) &&
+        this.objectTypeFlags.pink === false)
+    ) {
+      return {
+        color: this.colorTheme.deselected,
+        pickable: Pickable.No,
+      };
+    }
+
+    if (dotsManagerInstance.inViewData?.[sat.id] === 1 && this.objectTypeFlags.inFOV === false && keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM) {
       return {
         color: this.colorTheme.deselected,
         pickable: Pickable.No,
@@ -294,40 +272,36 @@ export class CelestrakColorScheme extends ColorScheme {
         // Intentional
       } else {
         return {
-          color: this.colorTheme.inFOVAlt,
+          color: this.colorTheme.inFOV,
           pickable: Pickable.Yes,
         };
       }
     }
 
-    let color: rgbaArray;
-    /*
-     * Green:  OBJECT_TYPE = PAY, OPS_STATUS_CODE = +
-     * Orange: OBJECT_TYPE = PAY, OPS_STATUS_CODE = -
-     * Red: R/B
-     * Gray: DEB
-     * White: UNK
-     */
+    let color: [number, number, number, number];
 
-    if (sat.type === SpaceObjectType.PAYLOAD) {
+    if (sat.country === 'ANALSAT') {
+      color = this.colorTheme.analyst;
+    } else if (sat.type === SpaceObjectType.PAYLOAD) {
       // Payload
-      if (sat.status !== PayloadStatus.NONOPERATIONAL && sat.status !== PayloadStatus.UNKNOWN) {
-        color = this.colorTheme.celestrakDefaultActivePayload;
-      } else {
-        color = this.colorTheme.celestrakDefaultInactivePayload;
-      }
+      color = this.colorTheme.payload;
     } else if (sat.type === SpaceObjectType.ROCKET_BODY) {
       // Rocket Body
-      color = this.colorTheme.celestrakDefaultRocketBody;
+      color = this.colorTheme.rocketBody;
     } else if (sat.type === SpaceObjectType.DEBRIS) {
       // Debris
-      color = this.colorTheme.celestrakDefaultDebris;
+      color = this.colorTheme.debris;
+    } else if (sat.type === SpaceObjectType.SPECIAL || sat.type === SpaceObjectType.UNKNOWN) {
+      // Special Object
+      color = this.colorTheme.pink;
+    } else if (sat.type === SpaceObjectType.NOTIONAL) {
+      color = this.colorTheme.notional;
     } else {
-      color = this.colorTheme.celestrakDefaultUnknown;
+      color = this.colorTheme.unknown;
     }
 
     if (typeof color === 'undefined') {
-      errorManagerInstance.debug(`${sat.id.toString()} has no color!`);
+      errorManagerInstance.info(`${sat.id.toString()} has no color!`);
 
       return {
         color: settingsManager.colors.transparent ?? this.colorTheme.transparent,
@@ -341,34 +315,93 @@ export class CelestrakColorScheme extends ColorScheme {
     };
   }
 
+  updateGroup(obj: BaseObject): ColorInformation {
+    // Show Things in the Group
+    if (keepTrackApi.getGroupsManager().selectedGroup?.hasObject(obj.id)) {
+      if (obj.isMissile()) {
+        return this.missileColor_(obj as MissileObject);
+      }
+
+      let color: [number, number, number, number];
+
+      switch (obj.type) {
+        case SpaceObjectType.PAYLOAD:
+          color = this.colorTheme.payload;
+          break;
+        case SpaceObjectType.ROCKET_BODY:
+          color = this.colorTheme.rocketBody;
+          break;
+        case SpaceObjectType.DEBRIS:
+          color = this.colorTheme.debris;
+          break;
+        case SpaceObjectType.SPECIAL:
+          color = this.colorTheme.payload; // Assume Payload
+          break;
+        case SpaceObjectType.UNKNOWN:
+          color = this.colorTheme.debris; // Assume Debris
+          break;
+        default: // Assume Payload
+          color = this.colorTheme.payload;
+          break;
+      }
+
+      if (keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1) {
+        color = this.colorTheme.inFOV;
+      }
+
+      return {
+        color,
+        pickable: Pickable.Yes,
+      };
+    }
+
+    if (obj.isMarker()) {
+      return this.getMarkerColor_();
+    }
+
+    if (obj.isStar()) {
+      return this.starColor_(obj as Star);
+    }
+
+    // Hide Everything Else
+    return {
+      color: settingsManager.colors.transparent ?? this.colorTheme.transparent,
+      pickable: Pickable.No,
+    };
+  }
+
   static readonly layersHtml = html`
-  <ul id="layers-list-celestrakDefault-sensor">
-  <li>
-      <div class="Square-Box layers-celestrakDefaultActivePayload-box"></div>
-      Active Payload
+  <ul id="layers-list-default-sensor">
+    <li>
+      <div class="Square-Box layers-payload-box"></div>
+      Payload
     </li>
     <li>
-      <div class="Square-Box layers-celestrakDefaultInactivePayload-box"></div>
-      Inactive Payload
-    </li>
-    <li>
-      <div class="Square-Box layers-celestrakDefaultRocketBody-box"></div>
+      <div class="Square-Box layers-rocketBody-box"></div>
       Rocket Body
     </li>
     <li>
-      <div class="Square-Box layers-celestrakDefaultDebris-box"></div>
+      <div class="Square-Box layers-debris-box"></div>
       Debris
     </li>
     <li>
-      <div class="Square-Box layers-celestrakDefaultUnknown-box"></div>
-      Unknown
+      <div class="Square-Box layers-pink-box"></div>
+      Special Sats
     </li>
     <li>
-      <div class="Square-Box layers-celestrakDefaultFov-box"></div>
-      In Field of View
+      <div class="Square-Box layers-inFOV-box"></div>
+      Satellite In View
     </li>
     <li>
-      <div class="Square-Box layers-celestrakDefaultSensor-box"></div>
+      <div class="Square-Box layers-missile-box"></div>
+      Missile
+    </li>
+    <li>
+      <div class="Square-Box layers-missileInview-box"></div>
+      Missile In View
+    </li>
+    <li>
+      <div class="Square-Box layers-sensor-box"></div>
       Sensor
     </li>
     <li>

@@ -1,8 +1,8 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { BaseObject, Days, DetailedSatellite, getDayOfYear, Star } from '@ootk/src/main';
-import { errorManagerInstance } from '../../utils/errorManager';
-import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { ColorScheme, ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { html } from '@app/engine/utils/development/formatter';
 
 export interface GpAgeColorSchemeColorMap extends ColorSchemeColorMap {

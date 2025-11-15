@@ -2,7 +2,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { addonColorSchemes } from '@app/engine/rendering/color-scheme-addons';
 import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
-import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
+import { ObjectTypeColorScheme } from '@app/app/rendering/color-schemes/object-type-color-scheme';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';

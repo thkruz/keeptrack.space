@@ -9,7 +9,7 @@ import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Star } from '@ootk/src/main';
-import { ColorScheme } from './color-scheme';
+import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
 import { EventBus } from '@app/engine/events/event-bus';
 
 export class SunlightColorScheme extends ColorScheme {

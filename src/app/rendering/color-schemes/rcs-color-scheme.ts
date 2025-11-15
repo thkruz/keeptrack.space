@@ -1,7 +1,7 @@
 /* eslint-disable complexity */
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { BaseObject, DetailedSatellite } from '@ootk/src/main';
-import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { ColorScheme, ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { html } from '@app/engine/utils/development/formatter';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {

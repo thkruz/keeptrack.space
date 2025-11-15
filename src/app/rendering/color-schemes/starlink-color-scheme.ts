@@ -3,8 +3,8 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, DetailedSatellite, PayloadStatus, SpaceObjectType } from '@ootk/src/main';
-import { CameraType } from '../../camera/camera';
-import { ColorScheme } from './color-scheme';
+import { CameraType } from '@app/engine/camera/camera';
+import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
 import { html } from '@app/engine/utils/development/formatter';
 
 export class StarlinkColorScheme extends ColorScheme {

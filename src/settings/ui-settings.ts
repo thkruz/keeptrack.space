@@ -130,7 +130,7 @@ export class UiSettings {
   /**
    * Determines whether or not to show the next pass time when hovering over an object.
    *
-   * This is proccess intensive and should be disabled on low end devices
+   * This is process intensive and should be disabled on low end devices
    */
   isShowNextPass = false;
   /**

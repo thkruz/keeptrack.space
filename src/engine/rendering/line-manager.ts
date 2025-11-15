@@ -6,11 +6,11 @@ import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Singletons, SolarBody } from '@app/engine/core/interfaces';
 import { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { WebGlProgramHelper } from '@app/engine/rendering/webgl-program';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, RaeVec3 } from '@ootk/src/main';
 import { mat4, vec3, vec4 } from 'gl-matrix';
 import { Container } from '../core/container';
 import { Scene } from '../core/scene';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { getTemeToJ2000Matrix, ReferenceFrame } from '../math/reference-frames';
@@ -54,13 +54,13 @@ export class LineManager {
 
   clear(): void {
     this.lines = [];
-    keepTrackApi.emit(EventBusEvent.onLineAdded, this);
-    keepTrackApi.emit(EventBusEvent.onLinesCleared, this);
+    EventBus.getInstance().emit(EventBusEvent.onLineAdded, this);
+    EventBus.getInstance().emit(EventBusEvent.onLinesCleared, this);
   }
 
   add(line: Line): void {
     this.lines.push(line);
-    keepTrackApi.emit(EventBusEvent.onLineAdded, this);
+    EventBus.getInstance().emit(EventBusEvent.onLineAdded, this);
   }
 
   createSatRicFrame(sat: DetailedSatellite | MissileObject | OemSatellite | null): void {
@@ -158,7 +158,7 @@ export class LineManager {
     this.add(new SensorToSatLine(sensor, sat, color));
   }
 
-  createObjToObj(obj1: DetailedSatellite | OemSatellite | MissileObject | null, obj2: DetailedSatellite | MissileObject | null, color?: vec4): void {
+  createObjToObj(obj1: DetailedSatellite | OemSatellite | MissileObject | null, obj2: DetailedSatellite | MissileObject | OemSatellite | null, color?: vec4): void {
     if (!obj1 || !obj2) {
       return;
     }
@@ -189,7 +189,7 @@ export class LineManager {
   }
 
   createSensorsToSatFovOnly(sat: DetailedSatellite, color?: vec4): void {
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     for (const sensor of sensorManagerInstance.getAllSensors()) {
       const line = new SensorToSatLine(sensor, sat, color);
@@ -430,7 +430,7 @@ export class LineManager {
     }
 
     const modelViewMatrix = mat4.create();
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     // Default to 1 so no transformation
     mat4.identity(modelViewMatrix);
@@ -453,7 +453,7 @@ export class LineManager {
 
     // Apply ecliptic rotation to modelMatrix
     // TEME to J2000 transformation
-    const temeToJ2000Matrix = getTemeToJ2000Matrix(keepTrackApi.getTimeManager().simulationTimeObj);
+    const temeToJ2000Matrix = getTemeToJ2000Matrix(ServiceLocator.getTimeManager().simulationTimeObj);
 
     mat4.rotateX(temeToJ2000Matrix, temeToJ2000Matrix, EARTH_OBLIQUITY_RADIANS);
 
@@ -473,7 +473,7 @@ export class LineManager {
   }
 
   runBeforeDraw(modelViewMatrix: mat4, projectionCameraMatrix: mat4, tgtBuffer: WebGLFramebuffer | null) {
-    const { gl } = keepTrackApi.getRenderer();
+    const { gl } = ServiceLocator.getRenderer();
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, tgtBuffer);
     gl.useProgram(this.program);
@@ -486,14 +486,14 @@ export class LineManager {
   }
 
   runAfterDraw() {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     gl.enable(gl.DEPTH_TEST);
     gl.disableVertexAttribArray(this.attribs.a_position.location); // Disable
   }
 
   init() {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     this.program = new WebGlProgramHelper(gl, this.shaders_.vert, this.shaders_.frag, this.attribs, this.uniforms_).program;
 
@@ -501,7 +501,7 @@ export class LineManager {
       EventBusEvent.selectSatData,
       (sat: BaseObject) => {
         if (sat) {
-          const sensor = keepTrackApi.getSensorManager().getSensor();
+          const sensor = ServiceLocator.getSensorManager().getSensor();
 
           this.createSensorToSatFovAndSelectedOnly(sensor, sat as DetailedSatellite);
         }
@@ -510,7 +510,7 @@ export class LineManager {
   }
 
   setAttribsAndDrawLineStrip(buffer: WebGLBuffer, segments: number) {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.vertexAttribPointer(this.attribs.a_position.location, 4, gl.FLOAT, false, 0, 0);
@@ -530,13 +530,13 @@ export class LineManager {
   }
 
   setColorUniforms(color: vec4) {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     gl.uniform4fv(this.uniforms_.u_color, color);
   }
 
   setWorldUniforms(modelViewMatrix: mat4, projectionCameraMatrix: mat4) {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     gl.uniformMatrix4fv(this.uniforms_.u_pCamMatrix, false, projectionCameraMatrix);
     gl.uniformMatrix4fv(this.uniforms_.u_mVMatrix, false, modelViewMatrix);

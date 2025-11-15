@@ -7,6 +7,7 @@ import { SettingsPresets } from './presets/presets';
 import { starTalk } from './presets/startalk';
 import { stemEnvironment } from './presets/stem';
 import type { SettingsManager } from './settings';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 // eslint-disable-next-line complexity
 export const parseGetVariables = (params: string[], settingsManager: SettingsManager): void => {
@@ -73,7 +74,7 @@ export const parseGetVariables = (params: string[], settingsManager: SettingsMan
         if (parseInt(val) > 0) {
           settingsManager.searchLimit = parseInt(val);
         } else {
-          keepTrackApi.getUiManager().toast(`Invalid search limit: ${val}`, ToastMsgType.error);
+          ServiceLocator.getUiManager().toast(`Invalid search limit: ${val}`, ToastMsgType.error);
         }
         break;
       case 'console':

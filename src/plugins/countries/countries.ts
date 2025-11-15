@@ -5,10 +5,10 @@ import { t7e, TranslationKey } from '@app/locales/keys';
 import { GroupType } from '@app/app/data/object-group';
 import { StringExtractor } from '@app/app/ui/string-extractor';
 import { MenuMode } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
 import flagPng from '@public/img/icons/flag.png';
 
 import { SearchResult } from '@app/app/ui/search-manager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -16,6 +16,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 export class CountriesMenu extends KeepTrackPlugin {
   readonly id = 'CountriesMenu';
@@ -47,7 +48,7 @@ export class CountriesMenu extends KeepTrackPlugin {
           .querySelectorAll('li')
           .forEach((element) => {
             element.addEventListener('click', () => {
-              keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+              ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
               CountriesMenu.countryMenuClick_(element.getAttribute('data-group') ?? '');
             });
           });
@@ -64,7 +65,7 @@ export class CountriesMenu extends KeepTrackPlugin {
 
     const countryCodeList = [] as string[];
 
-    keepTrackApi.getCatalogManager().getSats().forEach((sat) => {
+    ServiceLocator.getCatalogManager().getSats().forEach((sat) => {
       if (sat.country && !countryCodeList.includes(sat.country) && sat.country !== 'ANALSAT') {
         countryCodeList.push(sat.country);
       }
@@ -101,7 +102,7 @@ export class CountriesMenu extends KeepTrackPlugin {
   }
 
   private static countryMenuClick_(countryCode: string): void {
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
 
     if (countryCode === '') {
       throw new Error('Unknown country code');
@@ -115,9 +116,9 @@ export class CountriesMenu extends KeepTrackPlugin {
   }
 
   private static groupSelected_(groupName: string): void {
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     const searchDOM = <HTMLInputElement>getEl('search');
 
@@ -136,7 +137,7 @@ export class CountriesMenu extends KeepTrackPlugin {
     );
 
     // If a selectSat plugin exists, deselect the selected satellite
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
 
     // Close Menus
     if (settingsManager.isMobileModeEnabled) {

@@ -26,7 +26,6 @@ import { lookanglesRow, MenuMode, ToastMsgType } from '@app/engine/core/interfac
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { keepTrackApi } from '@app/keepTrackApi';
 
 import { SatMath } from '@app/app/analysis/sat-math';
 
@@ -42,6 +41,8 @@ import { DetailedSatellite, DetailedSensor, eci2rae, EciVec3, Kilometers, MILLIS
 import folderCodePng from '@public/img/icons/folder-code.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { WatchlistPlugin } from '../watchlist/watchlist';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class AnalysisMenu extends KeepTrackPlugin {
   readonly id = 'AnalysisMenu';
@@ -233,7 +234,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
           showLoading(AnalysisMenu.findRaBtnClick_);
         });
 
-        const objData = keepTrackApi.getCatalogManager().objectCache;
+        const objData = ServiceLocator.getCatalogManager().objectCache;
 
         getEl('export-catalog-csv-btn')?.addEventListener('click', () => {
           CatalogExporter.exportTle2Csv(objData);
@@ -415,9 +416,9 @@ export class AnalysisMenu extends KeepTrackPlugin {
     const satList = <DetailedSatellite[]>[];
 
     // Loop through all the satellites
-    for (let i = 0; i < keepTrackApi.getCatalogManager().orbitalSats; i++) {
+    for (let i = 0; i < ServiceLocator.getCatalogManager().orbitalSats; i++) {
       // Get the satellite
-      const sat = keepTrackApi.getCatalogManager().getSat(i);
+      const sat = ServiceLocator.getCatalogManager().getSat(i);
       // Avoid unnecessary errors
 
       if (!sat) {
@@ -446,11 +447,11 @@ export class AnalysisMenu extends KeepTrackPlugin {
   }
 
   private static findBestPass_(sat: DetailedSatellite, sensors: DetailedSensor[]): lookanglesRow[] {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     // Check if there is a sensor
     if (sensors.length <= 0 || typeof sensors[0]?.minAz === 'undefined') {
-      keepTrackApi.getUiManager().toast('Sensor\'s format incorrect. Did you select a sensor first?', ToastMsgType.critical);
+      ServiceLocator.getUiManager().toast('Sensor\'s format incorrect. Did you select a sensor first?', ToastMsgType.critical);
 
       return [];
     }
@@ -460,7 +461,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
     let offset = 0;
 
-    const satrec = keepTrackApi.getCatalogManager().calcSatrec(sat);
+    const satrec = ServiceLocator.getCatalogManager().calcSatrec(sat);
     const lookanglesTable = [] as lookanglesRow[]; // Clear Look Angles Table
 
     const looksInterval = 5;
@@ -549,7 +550,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
 
             tic = (now.getTime() - sTime.getTime()) / 1000 || 0;
 
-            const scene = keepTrackApi.getScene();
+            const scene = ServiceLocator.getScene();
             const sunRae = eci2rae(now, {
               x: scene.sun.position[0] as Kilometers,
               y: scene.sun.position[1] as Kilometers,
@@ -652,7 +653,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
         if (typeof satId === 'undefined' || satId === null || satId === '' || satId === ' ') {
           continue;
         }
-        const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(satId));
+        const sat = ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(satId));
 
         if (!sat) {
           continue;
@@ -684,21 +685,21 @@ export class AnalysisMenu extends KeepTrackPlugin {
   private findCsoBtnClick_() {
     const searchStr = this.findCloseObjects_();
 
-    keepTrackApi.getUiManager().doSearch(searchStr);
+    ServiceLocator.getUiManager().doSearch(searchStr);
   }
 
   private static findRaBtnClick_() {
-    const searchStr = CatalogSearch.findReentry(<DetailedSatellite[]>keepTrackApi.getCatalogManager().objectCache).join(',');
+    const searchStr = CatalogSearch.findReentry(<DetailedSatellite[]>ServiceLocator.getCatalogManager().objectCache).join(',');
 
-    keepTrackApi.getUiManager().doSearch(searchStr);
+    ServiceLocator.getUiManager().doSearch(searchStr);
   }
 
   private static analysisBptSumbit_() {
     const sats = (<HTMLInputElement>getEl('analysis-bpt-sats')).value;
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     if (!sensorManagerInstance.isSensorSelected()) {
-      keepTrackApi.getUiManager().toast('You must select a sensor first!', ToastMsgType.critical);
+      ServiceLocator.getUiManager().toast('You must select a sensor first!', ToastMsgType.critical);
     } else {
       AnalysisMenu.findBestPasses_(sats, sensorManagerInstance.getSensor()!);
     }
@@ -711,7 +712,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     const latMargin = parseFloat((<HTMLInputElement>getEl('analysis-of-lat-marg')).value);
     const lonMargin = parseFloat((<HTMLInputElement>getEl('analysis-of-lon-marg')).value);
 
-    const watchlistPlugin = keepTrackApi.getPlugin(WatchlistPlugin);
+    const watchlistPlugin = PluginRegistry.getPlugin(WatchlistPlugin);
 
     if (!watchlistPlugin) {
       errorManagerInstance.warn('Watchlist plugin not found. Cannot find overflights.');
@@ -732,7 +733,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
     }[];
 
     for (const satId of idList) {
-      const sat = keepTrackApi.getCatalogManager().getSat(satId);
+      const sat = ServiceLocator.getCatalogManager().getSat(satId);
 
       if (!sat) {
         continue;
@@ -762,7 +763,7 @@ export class AnalysisMenu extends KeepTrackPlugin {
   }
 
   private static getStartTime_() {
-    const time = keepTrackApi.getTimeManager().getOffsetTimeObj(0);
+    const time = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
     time.setMilliseconds(0);
     time.setSeconds(0);

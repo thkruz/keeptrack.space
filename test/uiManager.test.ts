@@ -1,9 +1,8 @@
+import { UiManager } from '@app/app/ui/ui-manager';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
-import { UiManager } from '@app/app/ui/uiManager';
 import { GeolocationPosition } from '@app/engine/core/interfaces';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { defaultSensor } from './environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors, setupMinimumHtml, setupStandardEnvironment } from './environment/standard-env';
 
@@ -16,7 +15,7 @@ describe('uiManager', () => {
 
   // Should process getsensorinfo
   it('process_getsensorinfo', () => {
-    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML = `
+    (KeepTrack.getInstance().containerRoot as HTMLDivElement).innerHTML = `
     <div id="sensor-latitude"></div>
     <div id="sensor-longitude"></div>
     <div id="sensor-minazimuth"></div>
@@ -26,7 +25,7 @@ describe('uiManager', () => {
     <div id="sensor-minrange"></div>
     <div id="sensor-maxrange"></div>
     `;
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     sensorManagerInstance.currentSensors = [defaultSensor];
   });
@@ -38,7 +37,7 @@ describe('uiManager', () => {
 
   // Should process updateSensorPosition
   it('process_updateSensorPosition', () => {
-    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML = `
+    (KeepTrack.getInstance().containerRoot as HTMLDivElement).innerHTML = `
       <input id="cs-lat" />
       <input id="cs-lon" />
       <input id="cs-hei" />
@@ -74,7 +73,7 @@ describe('uiManager', () => {
     expect((<HTMLInputElement>getEl('cs-lon')).value).toBe('22');
     expect((<HTMLInputElement>getEl('cs-hei')).value).toBe('0.022');
 
-    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML = '<div id="search"></div>';
+    (KeepTrack.getInstance().containerRoot as HTMLDivElement).innerHTML = '<div id="search"></div>';
     disableConsoleErrors();
     expect(() =>
       UiGeolocation.updateSensorPosition({
@@ -110,7 +109,7 @@ describe('uiManager', () => {
   // Should process footerToggle and hideUi
   it('process_footerToggle_hideUi', () => {
     setupMinimumHtml();
-    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML += `
+    (KeepTrack.getInstance().containerRoot as HTMLDivElement).innerHTML += `
     <div id="sat-infobox"></div>
     <div id="nav-footer"></div>
     <div id="nav-footer-toggle"></div>
@@ -127,7 +126,7 @@ describe('uiManager', () => {
   // Should process initMenuController
   it('process_initMenuController', () => {
     setupStandardEnvironment();
-    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML += `
+    (KeepTrack.getInstance().containerRoot as HTMLDivElement).innerHTML += `
     <div id="fullscreen-icon"></div>
     <div id="layers-menu-btn"></div>
     <div id="layers-hover-menu"></div>
@@ -159,7 +158,7 @@ describe('uiManager', () => {
   // Should process postStart
   it('process_postStart', () => {
     setupStandardEnvironment();
-    (keepTrackApi.containerRoot as HTMLDivElement).innerHTML += `
+    (KeepTrack.getInstance().containerRoot as HTMLDivElement).innerHTML += `
     <div id="editSat"></div>
     <div id="cs-geolocation"></div>
     <div id="es-ecen"></div>

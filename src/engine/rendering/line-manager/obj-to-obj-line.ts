@@ -2,9 +2,9 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DetailedSatellite } from '@ootk/src/main';
 import { Line, LineColors } from './line';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class ObjToObjLine extends Line {
   obj: DetailedSatellite | MissileObject | OemSatellite;
@@ -24,7 +24,7 @@ export class ObjToObjLine extends Line {
     if (this.obj instanceof MissileObject || this.obj instanceof OemSatellite) {
       eciArr = [this.obj.position.x, this.obj.position.y, this.obj.position.z] as EciArr3;
     } else if (this.obj instanceof DetailedSatellite) {
-      const eci = this.obj.eci(keepTrackApi.getTimeManager().simulationTimeObj);
+      const eci = this.obj.eci(ServiceLocator.getTimeManager().simulationTimeObj);
 
       if (!eci) {
         errorManagerInstance.debug(`ObjToObjLine: DetailedSatellite ${this.obj.sccNum} is not in orbit.`);
@@ -44,7 +44,7 @@ export class ObjToObjLine extends Line {
     if (this.obj2 instanceof MissileObject) {
       eciArr2 = [this.obj2.position.x, this.obj2.position.y, this.obj2.position.z] as EciArr3;
     } else if (this.obj2 instanceof DetailedSatellite) {
-      const eci = this.obj2.eci(keepTrackApi.getTimeManager().simulationTimeObj);
+      const eci = this.obj2.eci(ServiceLocator.getTimeManager().simulationTimeObj);
 
       if (!eci) {
         errorManagerInstance.debug(`ObjToObjLine: DetailedSatellite ${this.obj2.sccNum} is not in orbit.`);

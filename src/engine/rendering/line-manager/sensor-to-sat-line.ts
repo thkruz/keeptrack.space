@@ -1,9 +1,10 @@
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EciArr3 } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { vec4 } from 'gl-matrix';
 import { DetailedSatellite, DetailedSensor, eci2rae } from '@ootk/src/main';
+import { vec4 } from 'gl-matrix';
 import { Line, LineColors } from './line';
 
 export class SensorToSatLine extends Line {
@@ -28,11 +29,11 @@ export class SensorToSatLine extends Line {
   }
 
   update(): void {
-    const posData = keepTrackApi.getDotsManager().positionData;
+    const posData = ServiceLocator.getDotsManager().positionData;
     const id = this.sat.id;
     const eciArr = [posData[id * 3], posData[id * 3 + 1], posData[id * 3 + 2]] as EciArr3;
 
-    const sensorEci = this.sensor.eci(keepTrackApi.getTimeManager().simulationTimeObj);
+    const sensorEci = this.sensor.eci(ServiceLocator.getTimeManager().simulationTimeObj);
     const sensorEciArr = [sensorEci.x, sensorEci.y, sensorEci.z] as EciArr3;
 
     this.isDraw_ = true;
@@ -41,11 +42,11 @@ export class SensorToSatLine extends Line {
       let isInFov = false;
 
       if (this.sat instanceof OemSatellite) {
-        const rae = eci2rae(keepTrackApi.getTimeManager().simulationTimeObj, this.sat.position, this.sensor);
+        const rae = eci2rae(ServiceLocator.getTimeManager().simulationTimeObj, this.sat.position, this.sensor);
 
         isInFov = this.sensor.isRaeInFov(rae);
       } else if (this.sat instanceof DetailedSatellite) {
-        isInFov = this.sensor.isSatInFov(this.sat, keepTrackApi.getTimeManager().simulationTimeObj);
+        isInFov = this.sensor.isSatInFov(this.sat, ServiceLocator.getTimeManager().simulationTimeObj);
       }
 
       if (!isInFov) {
@@ -55,7 +56,7 @@ export class SensorToSatLine extends Line {
     }
 
     if (this.isDrawSelectedOnly_) {
-      if (this.sat.id !== keepTrackApi.getPlugin(SelectSatManager).selectedSat) {
+      if (this.sat.id !== PluginRegistry.getPlugin(SelectSatManager).selectedSat) {
         this.isDraw_ = false;
         this.isGarbage = true;
       }

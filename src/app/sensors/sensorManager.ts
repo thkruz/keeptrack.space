@@ -26,6 +26,9 @@
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import type { TearrData } from '@app/app/sensors/sensor-math';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { openColorbox } from '@app/engine/utils/colorbox';
@@ -39,7 +42,6 @@ import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { DEG2RAD, DetailedSensor, EpochUTC, GreenwichMeanSiderealTime, Radians, SpaceObjectType, Sun, ZoomValue, calcGmst, lla2eci, spaceObjType2Str } from '@ootk/src/main';
-import { keepTrackApi } from '../../keepTrackApi';
 import { SensorFov } from '../../plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '../../plugins/sensor-surv/sensor-surv-fence';
 import { LookAnglesPlugin } from '../../plugins/sensor/look-angles-plugin';
@@ -118,7 +120,7 @@ export class SensorManager {
     this.updatePositionCruncher_();
     this.cameraToCurrentSensor_();
     // Force a recalculation of the color buffers on next cruncher
-    keepTrackApi.getColorSchemeManager().calcColorBufsNextCruncher();
+    ServiceLocator.getColorSchemeManager().calcColorBufsNextCruncher();
   }
 
   /** Sensors that are currently selected/active */
@@ -147,7 +149,7 @@ export class SensorManager {
   }
 
   static drawFov(sensor: DetailedSensor) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const sensorId = catalogManagerInstance.getSensorFromSensorName(sensor.name);
 
     if (!sensorId) {
@@ -161,16 +163,16 @@ export class SensorManager {
       case 'BLEAFB':
       case 'CLRSFS':
       case 'THLSFB':
-        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 2);
-        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 2, 2);
+        lineManagerInstance.createSensorScanHorizon(ServiceLocator.getSensorManager().getSensorById(sensorId), 1, 2);
+        lineManagerInstance.createSensorScanHorizon(ServiceLocator.getSensorManager().getSensorById(sensorId), 2, 2);
         break;
       case 'RAFFYL':
-        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 3);
-        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 2, 3);
-        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 3, 3);
+        lineManagerInstance.createSensorScanHorizon(ServiceLocator.getSensorManager().getSensorById(sensorId), 1, 3);
+        lineManagerInstance.createSensorScanHorizon(ServiceLocator.getSensorManager().getSensorById(sensorId), 2, 3);
+        lineManagerInstance.createSensorScanHorizon(ServiceLocator.getSensorManager().getSensorById(sensorId), 3, 3);
         break;
       case 'COBRADANE':
-        lineManagerInstance.createSensorScanHorizon(keepTrackApi.getSensorManager().getSensorById(sensorId), 1, 1);
+        lineManagerInstance.createSensorScanHorizon(ServiceLocator.getSensorManager().getSensorById(sensorId), 1, 1);
         break;
       default:
         errorManagerInstance.warn(t7e('errorMsgs.SensorNotFound'));
@@ -265,7 +267,7 @@ export class SensorManager {
   }
 
   resetSensorSelected() {
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     // Remove satellite minibox hover
     const satMinibox = getEl('sat-minibox');
@@ -277,41 +279,41 @@ export class SensorManager {
     // Return to default settings with nothing 'inview'
     SensorManager.updateSensorUiStyling(null);
     this.setSensor(null); // Pass sensorId to identify which sensor the user clicked
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     catalogManagerInstance.satCruncher.postMessage({
       typ: CruncerMessageTypes.SENSOR,
       sensor: [],
     });
 
-    keepTrackApi.getPlugin(SensorFov)?.disableFovView();
-    keepTrackApi.getPlugin(SensorSurvFence)?.disableSurvView();
+    PluginRegistry.getPlugin(SensorFov)?.disableFovView();
+    PluginRegistry.getPlugin(SensorSurvFence)?.disableSurvView();
 
-    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToDisabled();
-    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToDisabled();
-    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToDisabled();
-    keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
-    keepTrackApi.getPlugin(LookAnglesPlugin)?.setBottomIconToDisabled();
-    keepTrackApi.getPluginByName('Planetarium')?.setBottomIconToUnselected();
-    keepTrackApi.getPluginByName('Planetarium')?.setBottomIconToDisabled();
-    keepTrackApi.getPluginByName('Astronomy')?.setBottomIconToUnselected();
-    keepTrackApi.getPluginByName('Astronomy')?.setBottomIconToDisabled();
+    PluginRegistry.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorInfoPlugin)?.setBottomIconToDisabled();
+    PluginRegistry.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorFov)?.setBottomIconToDisabled();
+    PluginRegistry.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorSurvFence)?.setBottomIconToDisabled();
+    PluginRegistry.getPlugin(LookAnglesPlugin)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(LookAnglesPlugin)?.setBottomIconToDisabled();
+    PluginRegistry.getPluginByName('Planetarium')?.setBottomIconToUnselected();
+    PluginRegistry.getPluginByName('Planetarium')?.setBottomIconToDisabled();
+    PluginRegistry.getPluginByName('Astronomy')?.setBottomIconToUnselected();
+    PluginRegistry.getPluginByName('Astronomy')?.setBottomIconToDisabled();
 
     setTimeout(() => {
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
+      const dotsManagerInstance = ServiceLocator.getDotsManager();
 
       dotsManagerInstance.resetSatInView();
       colorSchemeManagerInstance.calculateColorBuffers(true);
     }, 2000);
 
-    keepTrackApi.emit(EventBusEvent.resetSensor);
+    EventBus.getInstance().emit(EventBusEvent.resetSensor);
   }
 
   setCurrentSensor(sensor: DetailedSensor[] | null): void {
@@ -440,10 +442,10 @@ export class SensorManager {
     if (settingsManager.offlineMode) {
       PersistenceManager.getInstance().saveItem(StorageKey.CURRENT_SENSOR, JSON.stringify([selectedSensor, sensorId]));
     }
-    keepTrackApi.emit(EventBusEvent.setSensor, selectedSensor, sensorId ?? null);
+    EventBus.getInstance().emit(EventBusEvent.setSensor, selectedSensor, sensorId ?? null);
 
     for (const sensor of this.currentSensors) {
-      keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);
+      ServiceLocator.getScene().sensorFovFactory.generateSensorFovMesh(sensor);
     }
 
     // Update Satellite Math with new sensor - TODO: SatMath should reference the sensorManagerInstance
@@ -452,9 +454,9 @@ export class SensorManager {
     this.updatePositionCruncher_();
 
     waitForCruncher({
-      cruncher: keepTrackApi.getCatalogManager().satCruncher,
+      cruncher: ServiceLocator.getCatalogManager().satCruncher,
       cb: () => {
-        keepTrackApi.getColorSchemeManager().calculateColorBuffers(true);
+        ServiceLocator.getColorSchemeManager().calculateColorBuffers(true);
       },
       validationFunc: (m: PositionCruncherOutgoingMsg) => {
         if (selectedSensor && (m.sensorMarkerArray?.length ?? -1) > 0) {
@@ -476,11 +478,11 @@ export class SensorManager {
   static updateSensorUiStyling(sensors: DetailedSensor[] | null) {
     try {
       if (sensors?.[0]?.objName) {
-        keepTrackApi.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
-        keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
-        keepTrackApi.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
-        keepTrackApi.getPluginByName('Planetarium')?.setBottomIconToUnselected();
-        keepTrackApi.getPluginByName('Astronomy')?.setBottomIconToUnselected();
+        PluginRegistry.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
+        PluginRegistry.getPlugin(SensorFov)?.setBottomIconToUnselected();
+        PluginRegistry.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+        PluginRegistry.getPluginByName('Planetarium')?.setBottomIconToUnselected();
+        PluginRegistry.getPluginByName('Astronomy')?.setBottomIconToUnselected();
 
         if (getEl('reset-sensor-button', true)) {
           (getEl('reset-sensor-button') as HTMLButtonElement).disabled = false;
@@ -610,24 +612,24 @@ export class SensorManager {
   }
 
   private cameraToCurrentSensor_() {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
     const primarySensor = this.currentSensors[0];
 
     if (primarySensor.maxRng > 6000) {
-      keepTrackApi.getMainCamera().changeZoom(ZoomValue.GEO);
+      ServiceLocator.getMainCamera().changeZoom(ZoomValue.GEO);
     } else {
-      keepTrackApi.getMainCamera().changeZoom(ZoomValue.LEO);
+      ServiceLocator.getMainCamera().changeZoom(ZoomValue.LEO);
     }
-    keepTrackApi.getMainCamera().camSnap(lat2pitch(primarySensor.lat), lon2yaw(primarySensor.lon, timeManagerInstance.selectedDate));
+    ServiceLocator.getMainCamera().camSnap(lat2pitch(primarySensor.lat), lon2yaw(primarySensor.lon, timeManagerInstance.selectedDate));
   }
 
   private updatePositionCruncher_(): void {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     const combinedSensors = this.currentSensors.concat(this.secondarySensors).concat(this.stfSensors);
 
     for (const sensor of combinedSensors) {
-      keepTrackApi.getScene().sensorFovFactory.generateSensorFovMesh(sensor);
+      ServiceLocator.getScene().sensorFovFactory.generateSensorFovMesh(sensor);
     }
 
     catalogManagerInstance.satCruncher.postMessage({

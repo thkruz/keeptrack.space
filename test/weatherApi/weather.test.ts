@@ -1,6 +1,5 @@
 /* eslint-disable dot-notation */
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SensorTimeline } from '@app/plugins/timeline-sensor/sensor-timeline';
 import { DetailedSatellite, DetailedSensor, Hours } from '@ootk/src/main';
@@ -27,13 +26,13 @@ describe('SensorTimeline Weather Integration', () => {
       sensorTimelinePlugin['enabledSensors_'].push(new DetailedSensor({ ...enabledSensors[i] } as unknown as DetailedSensor));
     }
 
-    keepTrackApi.getCatalogManager().objectCache[0] = new DetailedSatellite({
+    ServiceLocator.getCatalogManager().objectCache[0] = new DetailedSatellite({
       ...selectedSat,
     } as unknown as DetailedSatellite);
 
     sensorTimelinePlugin['getWeather_'] = jest.fn().mockResolvedValue(weatherDataOutput);
-    keepTrackApi.getTimeManager().getOffsetTimeObj = jest.fn().mockReturnValue(new Date(1745200420463));
-    keepTrackApi.getPlugin(SelectSatManager)!.selectedSat = 0;
+    ServiceLocator.getTimeManager().getOffsetTimeObj = jest.fn().mockReturnValue(new Date(1745200420463));
+    PluginRegistry.getPlugin(SelectSatManager)!.selectedSat = 0;
     sensorTimelinePlugin.isMenuButtonActive = true;
     sensorTimelinePlugin['lengthOfLookAngles_'] = 24 as Hours;
     sensorTimelinePlugin['detailedPlot'] = true;

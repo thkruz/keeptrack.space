@@ -22,6 +22,7 @@
  */
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -30,15 +31,15 @@ import {
 } from '@ootk/src/main';
 import { mat4, quat, vec3 } from 'gl-matrix';
 import { SatMath } from '../../app/analysis/sat-math';
-import { keepTrackApi } from '../../keepTrackApi';
-import { SettingsManager } from '../../settings/settings';
+import type { OrbitManager } from '../../app/rendering/orbit-manager';
+import { PluginRegistry } from '../core/plugin-registry';
 import { Scene } from '../core/scene';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { DepthManager } from '../rendering/depth-manager';
 import { CelestialBody } from '../rendering/draw-manager/celestial-bodies/celestial-body';
 import { Earth } from '../rendering/draw-manager/earth';
-import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
 import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
 import { CameraInputHandler } from './camera-input-handler';
@@ -144,8 +145,8 @@ export class Camera {
   }
 
   changeCameraType(orbitManager: OrbitManager) {
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
     if (this.cameraType === CameraType.PLANETARIUM) {
       orbitManager.clearInViewOrbit(); // Clear Orbits if Switching from Planetarium View
@@ -188,7 +189,7 @@ export class Camera {
     }
 
     if (this.cameraType >= CameraType.MAX_CAMERA_TYPES) {
-      const renderer = keepTrackApi.getRenderer();
+      const renderer = ServiceLocator.getRenderer();
 
       this.state.isLocalRotateReset = true;
       settingsManager.fieldOfView = 0.6 as Radians;
@@ -209,7 +210,7 @@ export class Camera {
       this.autoRotate(false);
     }
 
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
     // Updated zoom logic for satellite/covariance bubble proximity
     const isCameraCloseToSatellite = this.state.camDistBuffer < settingsManager.nearZoomLevel;
@@ -248,7 +249,7 @@ export class Camera {
       if (settingsManager.fieldOfView < settingsManager.fieldOfViewMin) {
         settingsManager.fieldOfView = settingsManager.fieldOfViewMin as Radians;
       }
-      keepTrackApi.getRenderer().glInit();
+      ServiceLocator.getRenderer().glInit();
     }
   }
 
@@ -267,7 +268,7 @@ export class Camera {
    * Splitting it into subfunctions would not be optimal
    */
   draw(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
-    let target = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+    let target = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
 
     // TODO: This should be handled better
     target ??= <DetailedSatellite>(<unknown>{
@@ -280,7 +281,7 @@ export class Camera {
     let gmst: GreenwichMeanSiderealTime;
 
     if (!sensorPos?.gmst) {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
+      const timeManagerInstance = ServiceLocator.getTimeManager();
 
       gmst = sensorPos?.gmst ?? SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
     } else {
@@ -468,7 +469,7 @@ export class Camera {
     let targetDistanceFromEarth = 0;
 
     if (target) {
-      const gmst = keepTrackApi.getTimeManager().gmst;
+      const gmst = ServiceLocator.getTimeManager().gmst;
 
       this.state.camSnapToSat.altitude = SatMath.getAlt(target, gmst, centerBody.RADIUS as Kilometers);
       targetDistanceFromEarth = this.state.camSnapToSat.altitude + RADIUS_OF_EARTH;
@@ -489,9 +490,7 @@ export class Camera {
     return forward;
   }
 
-  init(settings: SettingsManager) {
-    settingsManager = settings;
-
+  init() {
     this.state.zoomLevel = settingsManager.initZoomLevel ?? 0.6925;
     this.state.zoomTarget = settingsManager.initZoomLevel ?? 0.6925;
 
@@ -505,7 +504,7 @@ export class Camera {
   /**
    * Sets the camera to look at a specific latitude and longitude with a given zoom level.
    */
-  lookAtLatLon(lat: Degrees, lon: Degrees, zoom?: ZoomValue | number, date = keepTrackApi.getTimeManager().simulationTimeObj): void {
+  lookAtLatLon(lat: Degrees, lon: Degrees, zoom?: ZoomValue | number, date = ServiceLocator.getTimeManager().simulationTimeObj): void {
     if (this.cameraType !== CameraType.FIXED_TO_EARTH) {
       this.cameraType = CameraType.FIXED_TO_EARTH;
     }
@@ -526,10 +525,10 @@ export class Camera {
   }
 
   lookAtStar(c: Star): void {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const lineManagerInstance = keepTrackApi.getLineManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const lineManagerInstance = ServiceLocator.getLineManager();
 
     // Try with the pname
     const satId = catalogManagerInstance.starName2Id(c.name, dotsManagerInstance.starIndex1, dotsManagerInstance.starIndex2);
@@ -576,8 +575,8 @@ export class Camera {
     }
 
     if (sat.position.x === 0 && sat.position.y === 0 && sat.position.z === 0) {
-      keepTrackApi.getUiManager().toast('Object is inside the earth!', ToastMsgType.critical);
-      const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+      ServiceLocator.getUiManager().toast('Object is inside the earth!', ToastMsgType.critical);
+      const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
       if (selectSatManagerInstance) {
         selectSatManagerInstance.selectSat(-1);
@@ -617,13 +616,13 @@ export class Camera {
         // if this is a satellite not a missile
         const { gmst } = SatMath.calculateTimeVariables(simulationTime);
 
-        const centerBodyPosition = keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!.position;
+        const centerBodyPosition = ServiceLocator.getScene().getBodyById(settingsManager.centerBody)!.position;
         const relativePosition = {
           x: sat.position.x - centerBodyPosition[0] as Kilometers,
           y: sat.position.y - centerBodyPosition[1] as Kilometers,
           z: sat.position.z - centerBodyPosition[2] as Kilometers,
         };
-        const centerBody = keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!;
+        const centerBody = ServiceLocator.getScene().getBodyById(settingsManager.centerBody)!;
 
         this.state.camSnapToSat.altitude = SatMath.getAlt(relativePosition, gmst, centerBody.RADIUS as Kilometers);
       }
@@ -800,7 +799,7 @@ export class Camera {
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.fpsPos[0], this.state.fpsPos[1], -this.state.fpsPos[2]]);
   }
 
-  private drawFixedToSatellite_(target: DetailedSatellite | MissileObject) {
+  private drawFixedToSatellite_(target: DetailedSatellite | MissileObject | OemSatellite) {
     /*
      * mat4 commands are run in reverse order
      * 1. Move to the satellite position
@@ -888,7 +887,7 @@ export class Camera {
     }
   }
 
-  private drawSatellite_(target: DetailedSatellite | MissileObject) {
+  private drawSatellite_(target: DetailedSatellite | MissileObject | OemSatellite) {
     const targetPositionTemp = vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
 
     mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, targetPositionTemp);
@@ -1163,7 +1162,7 @@ export class Camera {
         this.state.panDif.z = this.state.screenDragPoint[1] - this.state.mouseY;
 
         // Slow down the panning if a satellite is selected
-        if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
+        if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
           this.state.panDif.x /= 30;
           this.state.panDif.y /= 30;
           this.state.panDif.z /= 30;

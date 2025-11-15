@@ -5,13 +5,13 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SensorMath } from '@app/app/sensors/sensor-math';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, DetailedSatellite, eci2lla, Kilometers, MINUTES_PER_DAY } from '@ootk/src/main';
 import { Body } from 'astronomy-engine';
@@ -19,6 +19,7 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 export class SatInfoBoxOrbital extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxOrbital';
@@ -35,7 +36,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
-      keepTrackApi.getPlugin(SatInfoBox)!.addElement({ html: this.createOrbitalSection(), order: 4 });
+      PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createOrbitalSection(), order: 4 });
     });
   }
 
@@ -47,7 +48,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   }
 
   private satInfoBoxAddListeners_() {
-    const satInfoBoxPlugin = keepTrackApi.getPlugin(SatInfoBox)!;
+    const satInfoBoxPlugin = PluginRegistry.getPlugin(SatInfoBox)!;
 
     satInfoBoxPlugin.addListenerToCollapseElement(getEl(`${SECTIONS.ORBITAL}`), { value: this.isOrbitalSectionCollapsed_ });
   }
@@ -144,7 +145,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         );
       }
 
-      const gmst = keepTrackApi.getTimeManager().gmst;
+      const gmst = ServiceLocator.getTimeManager().gmst;
       const lla = eci2lla(obj.position, gmst);
 
       const satLonElement = getEl(EL.LONGITUDE);
@@ -170,10 +171,10 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     if (satAltitudeElement && satVelocityElement) {
 
       if (obj instanceof DetailedSatellite || obj instanceof OemSatellite) {
-        const gmst = keepTrackApi.getTimeManager().gmst;
+        const gmst = ServiceLocator.getTimeManager().gmst;
 
         if (((obj as OemSatellite).centerBody ?? Body.Earth) !== Body.Earth) {
-          const centerBody = keepTrackApi.getScene().getBodyById((obj as OemSatellite).centerBody) as CelestialBody | null;
+          const centerBody = ServiceLocator.getScene().getBodyById((obj as OemSatellite).centerBody) as CelestialBody | null;
 
           if (!centerBody) {
             errorManagerInstance.debug(`Error calculating altitude for non-Earth centered object ${obj.name}: center body not found.`);
@@ -196,7 +197,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       } else {
         const misl = obj as MissileObject;
 
-        satAltitudeElement.innerHTML = `${(keepTrackApi.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+        satAltitudeElement.innerHTML = `${(ServiceLocator.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
         if (misl.totalVelocity) {
           satVelocityElement.innerHTML = `${misl.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
         } else {
@@ -205,7 +206,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       }
     }
 
-    const covMatrix = keepTrackApi.getPlugin(SelectSatManager)!.primarySatCovMatrix;
+    const covMatrix = PluginRegistry.getPlugin(SelectSatManager)!.primarySatCovMatrix;
 
     if (covMatrix) {
       let covRadial = covMatrix[0];
@@ -235,7 +236,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       setInnerHtml(EL.UNCERTAINTY_INTRACK, t7e('SatInfoBoxOrbital.unknown'));
     }
 
-    const secondarySatObj = keepTrackApi.getPlugin(SelectSatManager)!.secondarySatObj;
+    const secondarySatObj = PluginRegistry.getPlugin(SelectSatManager)!.secondarySatObj;
 
     if (secondarySatObj && obj.isSatellite()) {
       const sat = obj as DetailedSatellite;

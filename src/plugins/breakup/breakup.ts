@@ -9,13 +9,14 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Kilometers, Tle, TleLine1, TleLine2, eci2lla } from '@ootk/src/main';
 import streamPng from '@public/img/icons/stream.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class Breakup extends KeepTrackPlugin {
   readonly id = 'Breakup';
@@ -24,7 +25,7 @@ export class Breakup extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   isRequireSatelliteSelected = true;
@@ -206,8 +207,8 @@ export class Breakup extends KeepTrackPlugin {
 
   // eslint-disable-next-line max-statements
   private onSubmit_(): void {
-    const { simulationTimeObj } = keepTrackApi.getTimeManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const { simulationTimeObj } = ServiceLocator.getTimeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     const { satId, breakupCount, rascVariation, incVariation, meanmoVariation, startNum } = Breakup.getFormData_(catalogManagerInstance);
     const mainsat = catalogManagerInstance.getSat(satId ?? -1);
@@ -221,7 +222,7 @@ export class Breakup extends KeepTrackPlugin {
     const origsat = mainsat;
 
     // Launch Points are the Satellites Current Location
-    const gmst = keepTrackApi.getTimeManager().gmst;
+    const gmst = ServiceLocator.getTimeManager().gmst;
     const lla = eci2lla(mainsat.position, gmst);
     const launchLat = lla.lat;
     const launchLon = lla.lon;
@@ -236,7 +237,7 @@ export class Breakup extends KeepTrackPlugin {
 
     mainsat.tle1 = (mainsat.tle1.substring(0, 18) + currentEpoch[0] + currentEpoch[1] + mainsat.tle1.substring(32)) as TleLine1;
 
-    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
+    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     if (mainsat.apogee - mainsat.perigee > this.maxDifApogeeVsPerigee_) {
       errorManagerInstance.warn(t7e('errorMsgs.Breakup.CannotCreateBreakupForNonCircularOrbits'));
@@ -273,7 +274,7 @@ export class Breakup extends KeepTrackPlugin {
       tle1,
       tle2,
     });
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
     orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
 
@@ -401,7 +402,7 @@ export class Breakup extends KeepTrackPlugin {
     if (breakupCount > settingsManager.searchLimit) {
       settingsManager.searchLimit = breakupCount;
     }
-    keepTrackApi.getUiManager().doSearch(`${mainsat.sccNum},Breakup Piece`);
+    ServiceLocator.getUiManager().doSearch(`${mainsat.sccNum},Breakup Piece`);
   }
 
   private static getFormData_(catalogManagerInstance: CatalogManager) {

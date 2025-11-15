@@ -1,8 +1,9 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { setInnerHtml } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 
@@ -20,7 +21,7 @@ export class Calendar {
   constructor(containerId: string) {
     this.containerId = containerId;
     this.calendarDate = new Date();
-    this.simulationDate = new Date(keepTrackApi.getTimeManager().simulationTimeObj);
+    this.simulationDate = new Date(ServiceLocator.getTimeManager().simulationTimeObj);
   }
 
   private render(date?: Date): void {
@@ -309,7 +310,7 @@ export class Calendar {
             .filter(Boolean)
             .join(' ');
 
-          const jday = keepTrackApi.getTimeManager().getUTCDayOfYear(new Date(this.calendarDate.getUTCFullYear(), this.calendarDate.getUTCMonth(), dayCount));
+          const jday = ServiceLocator.getTimeManager().getUTCDayOfYear(new Date(this.calendarDate.getUTCFullYear(), this.calendarDate.getUTCMonth(), dayCount));
 
           const dayCountPadded = dayCount.toString().padStart(2, '0');
           const jdayPadded = jday.toString().padStart(3, '0');
@@ -485,7 +486,7 @@ export class Calendar {
       return;
     }
 
-    const selectedDate = keepTrackApi.getTimeManager().getUTCDateFromDayOfYear(this.calendarDate.getUTCFullYear(), dayOfYear);
+    const selectedDate = ServiceLocator.getTimeManager().getUTCDateFromDayOfYear(this.calendarDate.getUTCFullYear(), dayOfYear);
 
     selectedDate.setUTCHours(this.simulationDate.getUTCHours());
     selectedDate.setUTCMinutes(this.simulationDate.getUTCMinutes());
@@ -520,8 +521,8 @@ export class Calendar {
   }
 
   toggleDatePicker(): void {
-    if (!keepTrackApi.getTimeManager().isTimeChangingEnabled) {
-      keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+    if (!ServiceLocator.getTimeManager().isTimeChangingEnabled) {
+      ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
       return;
     }
@@ -535,8 +536,8 @@ export class Calendar {
   }
 
   showDatePicker(): void {
-    if (!keepTrackApi.getTimeManager().isTimeChangingEnabled) {
-      keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+    if (!ServiceLocator.getTimeManager().isTimeChangingEnabled) {
+      ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
       return;
     }
@@ -559,7 +560,7 @@ export class Calendar {
   }
 
   updatePropRate(propRate: number): void {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     propRate = Math.max(this.propRateLimitMin, Math.min(propRate, this.propRateLimitMax));
     timeManagerInstance.calculateSimulationTime();
@@ -671,8 +672,8 @@ export class Calendar {
   }
 
   datetimeInputFormChange() {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     const today = new Date();
 
@@ -682,8 +683,8 @@ export class Calendar {
     colorSchemeManagerInstance.calculateColorBuffers(true);
 
     try {
-      const watchlistOverlay = keepTrackApi.getPlugin(WatchlistOverlay);
-      const uiManagerInstance = keepTrackApi.getUiManager();
+      const watchlistOverlay = PluginRegistry.getPlugin(WatchlistOverlay);
+      const uiManagerInstance = ServiceLocator.getUiManager();
 
       if (watchlistOverlay) {
         watchlistOverlay.lastOverlayUpdateTime = timeManagerInstance.realTime * 1 - 7000;

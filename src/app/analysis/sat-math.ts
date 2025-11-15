@@ -23,7 +23,6 @@
 
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { Earth } from '@app/engine/rendering/draw-manager/earth';
-import { keepTrackApi } from '@app/keepTrackApi';
 import {
   BaseObject,
   DEG2RAD,
@@ -60,6 +59,7 @@ import { DISTANCE_TO_SUN, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '../../engine/ut
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { jday, lon2yaw } from '../../engine/utils/transforms';
 import { CoordinateTransforms } from './coordinate-transforms';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 if (!global) {
   window._numeric = numeric; // numeric will break if it is not available globally
@@ -483,7 +483,7 @@ export abstract class SatMath {
   }
 
   static getPositionFromCenterBody(position: EciVec3, centerBody?: Earth | CelestialBody): EciVec3 {
-    centerBody ??= keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!;
+    centerBody ??= ServiceLocator.getScene().getBodyById(settingsManager.centerBody)!;
 
     const centerBodyPosition = centerBody.position;
 
@@ -496,7 +496,7 @@ export abstract class SatMath {
 
   static estimateRcsUsingHistoricalData(satInput: DetailedSatellite): number | null {
     const historicRcs: number[] = [];
-    const catalogManager = keepTrackApi.getCatalogManager();
+    const catalogManager = ServiceLocator.getCatalogManager();
     const objectCache = catalogManager.objectCache;
 
     for (const obj of objectCache) {
@@ -860,7 +860,7 @@ export abstract class SatMath {
     }
 
     // Get the sun from the scene to access the cache
-    const sun = keepTrackApi.getScene().sun;
+    const sun = ServiceLocator.getScene().sun;
 
     if (jd === sun?.sunDirectionCache.jd) {
       return sun.sunDirectionCache.sunDirection;
@@ -982,7 +982,7 @@ export abstract class SatMath {
     }
 
     // Calculate Sun Angle
-    const sunEci = keepTrackApi.getScene().sun.eci;
+    const sunEci = ServiceLocator.getScene().sun.eci;
     const angle = this.getAngleBetweenSatellitesAndSun(hoverSat as DetailedSatellite, secondaryObj as DetailedSatellite, sunEci);
 
     return angle * RAD2DEG as Degrees;

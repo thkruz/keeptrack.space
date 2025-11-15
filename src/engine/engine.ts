@@ -13,10 +13,16 @@ import { errorManagerInstance } from './utils/errorManager';
 import { isThisNode } from './utils/isThisNode';
 
 
-export class Engine {
-  private isRunning = false;
-  private isReady = false;
+export interface Application {
+  isReady: boolean;
+}
 
+export class Engine {
+  private isRunning_ = false;
+  private isReady_ = false;
+
+  private readonly application_: Application;
+  private isPaused: boolean = false;
   private isUpdateTimeThrottle_: boolean;
   private lastFrameTime_ = <Milliseconds>0;
 
@@ -29,8 +35,9 @@ export class Engine {
   readonly pluginManager: PluginManager;
   readonly timeManager: TimeManager;
 
-  constructor() {
+  constructor(application: Application) {
     // Initialize core engine systems
+    this.application_ = application;
     this.eventBus = EventBus.getInstance();
     this.renderer = new WebGLRenderer();
     this.scene = Scene.getInstance();
@@ -51,10 +58,10 @@ export class Engine {
     this.addErrorTrap_();
 
     this.eventBus.init();
-    this.camera.init(settingsManager);
+    this.camera.init();
     this.timeManager.init();
 
-    this.isReady = true;
+    this.isReady_ = true;
   }
 
   private addErrorTrap_() {
@@ -70,18 +77,18 @@ export class Engine {
   }
 
   run() {
-    if (!this.isReady) {
+    if (!this.isReady_) {
       throw new Error('KeepTrack is not ready');
     }
 
-    if (this.isRunning) {
+    if (this.isRunning_) {
       throw new Error('KeepTrack is already running');
     }
 
     this.gameLoop_();
 
     // Main game loop
-    this.isRunning = true;
+    this.isRunning_ = true;
   }
 
   private gameLoop_(timestamp = 0 as Milliseconds): void {
@@ -90,7 +97,7 @@ export class Engine {
 
     this.lastFrameTime_ = timestamp;
 
-    if (settingsManager.cruncherReady) {
+    if (!this.isPaused && this.application_.isReady) {
       this.update_(dt); // Do any per frame calculations
       this.draw_(dt);
     }
@@ -127,8 +134,16 @@ export class Engine {
     this.eventBus.emit(EventBusEvent.endOfDraw, dt);
   }
 
+  pause() {
+    this.isPaused = true;
+  }
+
+  resume() {
+    this.isPaused = false;
+  }
+
   stop() {
-    this.isRunning = false;
+    this.isRunning_ = false;
   }
 
   /** Check if the FPS is above a certain threshold */

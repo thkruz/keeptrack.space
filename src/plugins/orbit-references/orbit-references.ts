@@ -4,11 +4,12 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, FormatTle, Tle } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class OrbitReferences extends KeepTrackPlugin {
   readonly id = 'OrbitReferences';
@@ -17,7 +18,7 @@ export class OrbitReferences extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   doOnce = false;
@@ -59,7 +60,7 @@ export class OrbitReferences extends KeepTrackPlugin {
   }
 
   orbitReferencesLinkClick() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     // Determine which satellite is selected
     const sat = catalogManagerInstance.getSat(this.selectSatManager_.selectedSat);
@@ -112,7 +113,7 @@ export class OrbitReferences extends KeepTrackPlugin {
 
     // Remove the last comma
     searchStr = searchStr.slice(0, -1);
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     uiManagerInstance.doSearch(searchStr);
 

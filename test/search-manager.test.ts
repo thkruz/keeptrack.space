@@ -1,6 +1,6 @@
 import { GroupsManager } from '@app/app/data/groups-manager';
 import { SearchManager } from '@app/app/ui/search-manager';
-import { UiManager } from '@app/app/ui/uiManager';
+import { UiManager } from '@app/app/ui/ui-manager';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { keepTrackApi } from '@app/keepTrackApi';

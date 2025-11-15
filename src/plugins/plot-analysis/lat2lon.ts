@@ -2,13 +2,14 @@ import { EChartsData, GetSatType } from '@app/engine/core/interfaces';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Degrees, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
 import scatterPlot4Png from '@public/img/icons/scatter-plot4.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class Lat2LonPlots extends KeepTrackPlugin {
   readonly id = 'Lat2LonPlots';
@@ -22,7 +23,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
 
@@ -170,7 +171,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
   static getPlotData(): EChartsData {
     const data = [] as EChartsData;
 
-    keepTrackApi.getCatalogManager().objectCache.forEach((obj) => {
+    ServiceLocator.getCatalogManager().objectCache.forEach((obj) => {
       if (obj.type !== SpaceObjectType.PAYLOAD) {
         return;
       }
@@ -191,11 +192,11 @@ export class Lat2LonPlots extends KeepTrackPlugin {
       }
 
       // Compute LLA for each object
-      sat = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
+      sat = ServiceLocator.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
       const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 24);
       const plotData: [number, Degrees, Degrees][] = [];
 
-      const now = keepTrackApi.getTimeManager().simulationTimeObj;
+      const now = ServiceLocator.getTimeManager().simulationTimeObj;
 
       plotPoints.forEach((point) => {
         const pointTime = (point.time - now.getTime()) / 1000 / 60;

@@ -5,10 +5,11 @@ import { ColorScheme } from '@app/engine/rendering/color-schemes/color-scheme';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import palettePng from '@public/img/icons/palette.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class ColorMenu extends KeepTrackPlugin {
   readonly id = 'ColorMenu';
@@ -44,7 +45,7 @@ export class ColorMenu extends KeepTrackPlugin {
   </ul>`;
 
   getSideMenuElementHtmlExtras() {
-    const colorSchemes = keepTrackApi.getColorSchemeManager().colorSchemeInstances;
+    const colorSchemes = ServiceLocator.getColorSchemeManager().colorSchemeInstances;
 
     let html = '';
 
@@ -60,7 +61,7 @@ export class ColorMenu extends KeepTrackPlugin {
   }
 
   getRmbL2HtmlExtras() {
-    const colorSchemes = keepTrackApi.getColorSchemeManager().colorSchemeInstances;
+    const colorSchemes = ServiceLocator.getColorSchemeManager().colorSchemeInstances;
 
     let html = '';
 
@@ -76,7 +77,7 @@ export class ColorMenu extends KeepTrackPlugin {
   }
 
   rmbCallback: (targetId: string | null, clickedSat?: number) => void = (targetId: string | null) => {
-    for (const colorScheme in keepTrackApi.getColorSchemeManager().colorSchemeInstances) {
+    for (const colorScheme in ServiceLocator.getColorSchemeManager().colorSchemeInstances) {
       if (targetId === `colors-${colorScheme}-rmb`) {
         ColorMenu.colorsMenuClick(colorScheme);
 
@@ -113,10 +114,10 @@ export class ColorMenu extends KeepTrackPlugin {
   }
 
   static readonly colorsMenuClick = (colorName: string) => {
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     // If selecteSatManager is loaded, clear selected sat
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // clear selected sat
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1); // clear selected sat
 
     // Lets look through the addon color schemes
     for (const colorScheme in colorSchemeManagerInstance.colorSchemeInstances) {
@@ -128,13 +129,13 @@ export class ColorMenu extends KeepTrackPlugin {
 
       if (colorSchemeInstance.id === colorName) {
         colorSchemeInstance.onSelected();
-        if (keepTrackApi.getGroupsManager().selectedGroup !== null) {
+        if (ServiceLocator.getGroupsManager().selectedGroup !== null) {
           colorSchemeManagerInstance.isUseGroupColorScheme = true;
         } else {
           colorSchemeManagerInstance.isUseGroupColorScheme = false;
         }
         colorSchemeManagerInstance.setColorScheme(colorSchemeInstance, true);
-        keepTrackApi.getUiManager().hideSideMenus();
+        ServiceLocator.getUiManager().hideSideMenus();
 
         return;
       }

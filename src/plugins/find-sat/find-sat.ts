@@ -14,7 +14,6 @@ import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, eci2rae } from '@ootk/src/main';
 import findSatPng from '@public/img/icons/database-search.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { keepTrackApi } from '../../keepTrackApi';
 
 export interface SearchSatParams {
   argPe: Degrees;
@@ -315,7 +314,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     this.hasSearchBeenRun_ = true;
 
     return new Promise(() => {
-      const uiManagerInstance = keepTrackApi.getUiManager();
+      const uiManagerInstance = ServiceLocator.getUiManager();
 
       const az = parseFloat((<HTMLInputElement>getEl('fbl-azimuth')).value);
       const el = parseFloat((<HTMLInputElement>getEl('fbl-elevation')).value);
@@ -389,16 +388,16 @@ export class FindSatPlugin extends KeepTrackPlugin {
         return false;
       }
 
-      const currentSatellite = keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
+      const currentSatellite = ServiceLocator.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
 
       if (!currentSatellite) {
         return false;
       }
 
       const rae = eci2rae(
-        keepTrackApi.getTimeManager().simulationTimeObj,
+        ServiceLocator.getTimeManager().simulationTimeObj,
         currentSatellite.position,
-        keepTrackApi.getSensorManager().currentSensors[0],
+        ServiceLocator.getSensorManager().currentSensors[0],
       );
 
 
@@ -412,16 +411,16 @@ export class FindSatPlugin extends KeepTrackPlugin {
         return false;
       }
 
-      const currentSatellite = keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
+      const currentSatellite = ServiceLocator.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
 
       if (!currentSatellite) {
         return false;
       }
 
       const rae = eci2rae(
-        keepTrackApi.getTimeManager().simulationTimeObj,
+        ServiceLocator.getTimeManager().simulationTimeObj,
         currentSatellite.position,
-        keepTrackApi.getSensorManager().currentSensors[0],
+        ServiceLocator.getSensorManager().currentSensors[0],
       );
 
 
@@ -430,7 +429,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   private static checkInview_(posAll: DetailedSatellite[]) {
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
 
     return posAll.filter((pos) => dotsManagerInstance.inViewData[pos.id] === 1);
@@ -446,16 +445,16 @@ export class FindSatPlugin extends KeepTrackPlugin {
         return false;
       }
 
-      const currentSatellite = keepTrackApi.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
+      const currentSatellite = ServiceLocator.getCatalogManager().getSat(pos.id, GetSatType.POSITION_ONLY);
 
       if (!currentSatellite) {
         return false;
       }
 
       const rae = eci2rae(
-        keepTrackApi.getTimeManager().simulationTimeObj,
+        ServiceLocator.getTimeManager().simulationTimeObj,
         currentSatellite.position,
-        keepTrackApi.getSensorManager().currentSensors[0],
+        ServiceLocator.getSensorManager().currentSensors[0],
       );
 
 
@@ -464,7 +463,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   }
 
   private static limitPossibles_(possibles: DetailedSatellite[], limit: number): DetailedSatellite[] {
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (possibles.length >= limit) {
       uiManagerInstance.toast(`Too many results, limited to ${limit}`, ToastMsgType.serious);
@@ -546,7 +545,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       throw new Error('No Search Criteria Entered');
     }
 
-    let res = keepTrackApi.getCatalogManager().getSats();
+    let res = ServiceLocator.getCatalogManager().getSats();
 
     res = !isValidInc && !isValidPeriod && !isValidTleAge && (isValidAz || isValidEl || isValidRange) ? FindSatPlugin.checkInview_(res) : res;
 
@@ -615,7 +614,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     });
 
     (<HTMLInputElement>getEl('search')).value = result;
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     uiManagerInstance.doSearch((<HTMLInputElement>getEl('search')).value);
 

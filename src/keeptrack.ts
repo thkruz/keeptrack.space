@@ -1,3 +1,4 @@
+import { ServiceLocator } from './engine/core/service-locator';
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -31,21 +32,23 @@ import { Localization } from './locales/locales'; // Ensure localization is impo
 import { CatalogLoader } from './app/data/catalog-loader';
 import { CatalogManager } from './app/data/catalog-manager';
 import { GroupsManager } from './app/data/groups-manager';
+import { OrbitManager } from './app/rendering/orbit-manager';
 import { SensorMath } from './app/sensors/sensor-math';
 import { SensorManager } from './app/sensors/sensorManager';
 import { BottomMenu } from './app/ui/bottom-menu';
 import { CameraControlWidget } from './app/ui/camera-control-widget';
 import { HoverManager } from './app/ui/hover-manager';
 import { SplashScreen } from './app/ui/splash-screen';
-import { UiManager } from './app/ui/uiManager';
+import { UiManager } from './app/ui/ui-manager';
 import { Container } from './engine/core/container';
 import { Singletons } from './engine/core/interfaces';
 import { Engine } from './engine/engine';
+import { EventBus } from './engine/events/event-bus';
 import { EventBusEvent } from './engine/events/event-bus-events';
 import { ColorSchemeManager } from './engine/rendering/color-scheme-manager';
 import { DotsManager } from './engine/rendering/dots-manager';
 import { lineManagerInstance } from './engine/rendering/line-manager';
-import { OrbitManager } from './engine/rendering/orbitManager';
+import { WebWorkerThreadManager } from './engine/threads/web-worker-thread';
 import { DemoManager } from './engine/utils/demo-mode';
 import { html } from './engine/utils/development/formatter';
 import { getEl } from './engine/utils/get-el';
@@ -58,9 +61,12 @@ export class KeepTrack {
   private static instance: KeepTrack;
   private settingsOverride_: SettingsManagerOverride;
 
-  isReady = false;
+  isInitialized = false;
   engine: Engine;
   api = keepTrackApi;
+  containerRoot: HTMLDivElement;
+  isReady: boolean = false;
+  threads: WebWorkerThreadManager[] = [];
 
   private constructor() {
     // Singleton
@@ -82,7 +88,7 @@ export class KeepTrack {
     isPreventDefaultHtml: false,
     isShowSplashScreen: true,
   }) {
-    if (this.isReady) {
+    if (this.isInitialized) {
       throw new Error('KeepTrack is already started');
     }
 
@@ -90,7 +96,7 @@ export class KeepTrack {
     settingsManager.versionNumber = VERSION;
     this.settingsOverride_ = settingsOverride;
     Localization.getInstance(); // Initialize localization early
-    this.engine = new Engine();
+    this.engine = new Engine(this);
 
     settingsManager.init(this.settingsOverride_);
 
@@ -131,14 +137,14 @@ export class KeepTrack {
   }
 
   static getDefaultBodyHtml(): void {
-    if (!keepTrackApi.containerRoot) {
+    if (!KeepTrack.getInstance().containerRoot) {
       throw new Error('Container root is not set');
     }
 
-    SplashScreen.initLoadingScreen(keepTrackApi.containerRoot);
+    SplashScreen.initLoadingScreen(KeepTrack.getInstance().containerRoot);
 
-    keepTrackApi.containerRoot.id = 'keeptrack-root';
-    keepTrackApi.containerRoot.innerHTML += html`
+    KeepTrack.getInstance().containerRoot.id = 'keeptrack-root';
+    KeepTrack.getInstance().containerRoot.innerHTML += html`
       <header>
         <div id="keeptrack-header" class="start-hidden"></div>
       </header>
@@ -197,8 +203,8 @@ export class KeepTrack {
     }
 
     // If no current shadow DOM, create one - this is mainly for testing
-    if (!keepTrackApi.containerRoot) {
-      keepTrackApi.containerRoot = containerDom;
+    if (!KeepTrack.getInstance().containerRoot) {
+      KeepTrack.getInstance().containerRoot = containerDom;
     }
   }
 
@@ -317,18 +323,18 @@ theodore.kruczek at gmail dot com.
 
   async run(): Promise<void> {
     try {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
-      const renderer = keepTrackApi.getRenderer();
-      const sceneInstance = keepTrackApi.getScene();
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
-      const uiManagerInstance = keepTrackApi.getUiManager();
-      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-      const inputManagerInstance = keepTrackApi.getInputManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
+      const orbitManagerInstance = ServiceLocator.getOrbitManager();
+      const renderer = ServiceLocator.getRenderer();
+      const sceneInstance = ServiceLocator.getScene();
+      const dotsManagerInstance = ServiceLocator.getDotsManager();
+      const uiManagerInstance = ServiceLocator.getUiManager();
+      const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
+      const inputManagerInstance = ServiceLocator.getInputManager();
 
       this.engine.init();
 
-      // keepTrackApi.getMainCamera().init(settingsManager);
+      // ServiceLocator.getMainCamera().init(settingsManager);
 
       SplashScreen.loadStr(SplashScreen.msg.science);
 
@@ -378,7 +384,6 @@ theodore.kruczek at gmail dot com.
       this.engine.run();
 
       this.postStart_();
-      this.isReady = true;
     } catch (error) {
       KeepTrack.showErrorCode(<Error & { lineNumber: number }>error);
     }
@@ -388,7 +393,7 @@ theodore.kruczek at gmail dot com.
     // UI Changes after everything starts -- DO NOT RUN THIS EARLY IT HIDES THE CANVAS
     UiManager.postStart();
 
-    if (settingsManager.cruncherReady) {
+    if (this.threads.every((t) => t.isReady)) {
       if (settingsManager.isDisableCanvas) {
         const canvasHolderDom = getEl('keeptrack-canvas');
 
@@ -398,9 +403,9 @@ theodore.kruczek at gmail dot com.
       }
 
       // Update any CSS now that we know what is loaded
-      keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+      EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
-      keepTrackApi.getUiManager().initMenuController();
+      ServiceLocator.getUiManager().initMenuController();
 
       // Update MaterialUI with new menu options
       try {
@@ -412,16 +417,18 @@ theodore.kruczek at gmail dot com.
       }
 
       window.addEventListener('resize', () => {
-        keepTrackApi.emit(EventBusEvent.resize);
+        EventBus.getInstance().emit(EventBusEvent.resize);
       });
-      keepTrackApi.emit(EventBusEvent.resize);
+      EventBus.getInstance().emit(EventBusEvent.resize);
 
-      keepTrackApi.isInitialized = true;
-      keepTrackApi.emit(EventBusEvent.onKeepTrackReady);
+      this.isInitialized = true;
+
+      EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
       if (settingsManager.onLoadCb) {
         settingsManager.onLoadCb();
       }
 
+      this.isReady = true;
       SplashScreen.hideSplashScreen();
     } else {
       setTimeout(() => {

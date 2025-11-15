@@ -1,14 +1,14 @@
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
-import { keepTrackApi } from '@app/keepTrackApi';
 import rocketPng from '@public/img/icons/rocket.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from './missile-manager';
-import { EventBus } from '@app/engine/events/event-bus';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class MissilePlugin extends KeepTrackPlugin {
   readonly id = 'MissilePlugin';
@@ -194,7 +194,7 @@ export class MissilePlugin extends KeepTrackPlugin {
   }
 
   private searchForRvs_() {
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     uiManagerInstance.doSearch('RV_');
   }
@@ -202,8 +202,8 @@ export class MissilePlugin extends KeepTrackPlugin {
   private missileSubmit_(): void {
     // eslint-disable-next-line max-statements
     showLoading(() => {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
-      const uiManagerInstance = keepTrackApi.getUiManager();
+      const timeManagerInstance = ServiceLocator.getTimeManager();
+      const uiManagerInstance = ServiceLocator.getUiManager();
 
       getEl('ms-error')!.style.display = 'none';
       const type = parseFloat((<HTMLInputElement>getEl('ms-type')).value);
@@ -286,7 +286,7 @@ export class MissilePlugin extends KeepTrackPlugin {
 
         let a: number;
         let b: number;
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
         if (attacker < 200) {
           // USA
@@ -478,7 +478,7 @@ export class MissilePlugin extends KeepTrackPlugin {
 
   private updateLoop_(): void {
     if (typeof missileManager !== 'undefined' && missileManager.missileArray.length > 0) {
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+      const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
       for (this.i_ = 0; this.i_ < missileManager.missileArray.length; this.i_++) {
         orbitManagerInstance.updateOrbitBuffer(missileManager.missileArray[this.i_].id);

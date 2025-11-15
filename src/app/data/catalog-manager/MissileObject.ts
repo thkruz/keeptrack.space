@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { MissileParams } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { BaseObject, BaseObjectParams, DEG2RAD, Degrees, Kilometers, Radians, SpaceObjectType, Vector3D, calcGmst, eci2lla, lla2eci } from '@ootk/src/main';
 
 export class MissileObject extends BaseObject {
@@ -40,7 +40,7 @@ export class MissileObject extends BaseObject {
   }
 
   getAltitude(): Kilometers {
-    const { gmst } = calcGmst(keepTrackApi.getTimeManager().simulationTimeObj);
+    const { gmst } = calcGmst(ServiceLocator.getTimeManager().simulationTimeObj);
     const lla = eci2lla(this.position, gmst);
 
 
@@ -51,7 +51,7 @@ export class MissileObject extends BaseObject {
     this.lastTime ??= 0;
 
     for (let t = this.lastTime; t < this.altList.length; t++) {
-      if (this.startTime * 1 + t * 1000 >= keepTrackApi.getTimeManager().simulationTimeObj.getTime()) {
+      if (this.startTime * 1 + t * 1000 >= ServiceLocator.getTimeManager().simulationTimeObj.getTime()) {
         this.lastTime = t;
         break;
       }
@@ -61,7 +61,7 @@ export class MissileObject extends BaseObject {
   }
 
   eci(t = this.getTimeInTrajectory()): Vector3D {
-    const { gmst } = calcGmst(keepTrackApi.getTimeManager().simulationTimeObj);
+    const { gmst } = calcGmst(ServiceLocator.getTimeManager().simulationTimeObj);
     const lat = this.latList[t];
     const lon = this.lonList[t];
     const alt = this.altList[t];

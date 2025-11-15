@@ -11,8 +11,9 @@ import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { RAD2DEG } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { keepTrackApi } from '../../keepTrackApi';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export interface TipMsg {
   NORAD_CAT_ID: string;
@@ -78,7 +79,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
       () => {
         if (this.selectSatIdOnCruncher_ !== null) {
           // If selectedSatManager is loaded, set the selected sat to the one that was just added
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
+          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.selectSatIdOnCruncher_);
 
           this.selectSatIdOnCruncher_ = null;
         }
@@ -134,10 +135,10 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
 
   private eventClicked_(row: number) {
     // Check if the selected satellite is still in orbit
-    const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(this.tipList_[row].NORAD_CAT_ID));
+    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(this.tipList_[row].NORAD_CAT_ID));
 
     if (!sat) {
-      keepTrackApi.getUiManager().toast('Satellite appears to have decayed!', ToastMsgType.caution);
+      ServiceLocator.getUiManager().toast('Satellite appears to have decayed!', ToastMsgType.caution);
 
       return;
     }
@@ -154,10 +155,10 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
       ),
     );
 
-    keepTrackApi.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
-    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
+    ServiceLocator.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
+    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
-    keepTrackApi.getUiManager().doSearch(`${sat.sccNum5}`);
+    ServiceLocator.getUiManager().doSearch(`${sat.sccNum5}`);
 
     this.selectSatIdOnCruncher_ = sat.id;
   }
@@ -215,7 +216,7 @@ export class TrackingImpactPredict extends KeepTrackPlugin {
     tr.setAttribute('class', 'tip-object link');
     tr.setAttribute('data-row', i.toString());
 
-    const sat = keepTrackApi.getCatalogManager().sccNum2Sat(parseInt(this.tipList_[i].NORAD_CAT_ID));
+    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(parseInt(this.tipList_[i].NORAD_CAT_ID));
     let rcs = 'Reentered';
     let age = 'Reentered';
     let volume = 'Reentered';

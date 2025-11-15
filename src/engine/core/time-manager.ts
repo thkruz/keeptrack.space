@@ -1,13 +1,15 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { t7e } from '@app/locales/keys';
+import { CruncherInMsgTimeSync } from '@app/webworker/orbit-cruncher-interfaces';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { getDayOfYear, GreenwichMeanSiderealTime, Milliseconds } from '@ootk/src/main';
-import { keepTrackApi } from '../../keepTrackApi';
 import { DateTimeManager } from '../../plugins/date-time-manager/date-time-manager';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { getEl } from '../utils/get-el';
+import { PluginRegistry } from './plugin-registry';
+import { ServiceLocator } from './service-locator';
 
 export class TimeManager {
   datetimeInputDOM: HTMLInputElement | null = null;
@@ -82,7 +84,7 @@ export class TimeManager {
       this.simulationTimeObj.setTime(simulationTime);
     }
 
-    keepTrackApi.emit(EventBusEvent.calculateSimulationTime, this.simulationTimeObj);
+    EventBus.getInstance().emit(EventBusEvent.calculateSimulationTime, this.simulationTimeObj);
 
     return this.simulationTimeObj;
   }
@@ -93,7 +95,7 @@ export class TimeManager {
     } // no change
 
     this.propRate = propRate;
-    keepTrackApi.emit(EventBusEvent.propRateChanged, this.propRate);
+    EventBus.getInstance().emit(EventBusEvent.propRateChanged, this.propRate);
 
     if (!this.isInitialized) {
       return;
@@ -108,13 +110,13 @@ export class TimeManager {
 
     const toggleTimeDOM = getEl('toggle-time-rmb');
 
-    if (keepTrackApi.getTimeManager().propRate === 0) {
+    if (ServiceLocator.getTimeManager().propRate === 0) {
       toggleTimeDOM.childNodes[0].textContent = 'Start Clock';
     } else {
       toggleTimeDOM.childNodes[0].textContent = 'Pause Clock';
     }
 
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (!settingsManager.isAlwaysHidePropRate && isShowToast) {
       if (this.propRate > 1.01 || this.propRate < 0.99) {
@@ -148,7 +150,7 @@ export class TimeManager {
     this.staticOffset = staticOffset;
     this.calculateSimulationTime();
     this.synchronize();
-    keepTrackApi.emit(EventBusEvent.staticOffsetChange, this.staticOffset);
+    EventBus.getInstance().emit(EventBusEvent.staticOffsetChange, this.staticOffset);
   }
 
   getOffsetTimeObj(offset: number) {
@@ -206,11 +208,11 @@ export class TimeManager {
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 't' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
           return;
         }
-        keepTrackApi.getUiManager().toast('Time Set to Real Time', ToastMsgType.normal);
+        ServiceLocator.getUiManager().toast('Time Set to Real Time', ToastMsgType.normal);
         this.changeStaticOffset(0); // Reset to Current Time
       }
     });
@@ -218,7 +220,7 @@ export class TimeManager {
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === ',' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
           return;
         }
@@ -240,7 +242,7 @@ export class TimeManager {
           newPropRate = ((this.propRate * 2) / 3);
         }
 
-        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+        const calendarInstance = PluginRegistry.getPlugin(DateTimeManager)?.calendar;
 
         if (calendarInstance) {
           calendarInstance.updatePropRate(newPropRate);
@@ -253,7 +255,7 @@ export class TimeManager {
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '.' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
           return;
         }
@@ -275,7 +277,7 @@ export class TimeManager {
           newPropRate = ((this.propRate * 2) / 3);
         }
 
-        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+        const calendarInstance = PluginRegistry.getPlugin(DateTimeManager)?.calendar;
 
         if (calendarInstance) {
           calendarInstance.updatePropRate(newPropRate);
@@ -288,7 +290,7 @@ export class TimeManager {
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '<' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
           return;
         }
@@ -301,7 +303,7 @@ export class TimeManager {
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '>' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
           return;
         }
@@ -314,7 +316,7 @@ export class TimeManager {
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === '/' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
           return;
         }
@@ -327,7 +329,7 @@ export class TimeManager {
           newPropRate = 1;
         }
 
-        const calendarInstance = keepTrackApi.getPlugin(DateTimeManager)?.calendar;
+        const calendarInstance = PluginRegistry.getPlugin(DateTimeManager)?.calendar;
 
         if (calendarInstance) {
           calendarInstance.updatePropRate(newPropRate);
@@ -341,7 +343,7 @@ export class TimeManager {
     EventBus.getInstance().on(EventBusEvent.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
       if (code === 'Equal' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
           return;
         }
@@ -354,7 +356,7 @@ export class TimeManager {
     EventBus.getInstance().on(EventBusEvent.KeyDown, (_key: string, code: string, isRepeat: boolean) => {
       if (code === 'Minus' && !isRepeat) {
         if (!this.isTimeChangingEnabled) {
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
           return;
         }
@@ -382,7 +384,7 @@ export class TimeManager {
       this.changePropRate(0);
     }
 
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (this.propRate > 1.01 || this.propRate < 0.99) {
       if (this.propRate < 10) {
@@ -406,27 +408,21 @@ export class TimeManager {
   }
 
   synchronize() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
-    keepTrackApi.emit(EventBusEvent.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
+    EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date(this.dynamicOffsetEpoch + this.staticOffset));
 
     const message = {
       typ: CruncerMessageTypes.OFFSET,
+      type: CruncerMessageTypes.OFFSET,
       staticOffset: this.staticOffset,
       dynamicOffsetEpoch: this.dynamicOffsetEpoch,
       propRate: this.propRate,
-    };
+    } as CruncherInMsgTimeSync;
 
     catalogManagerInstance.satCruncher.postMessage(message);
-
-    /*
-     * OrbitWorker starts later than the satCruncher so it might not be
-     * ready yet.
-     */
-    if (orbitManagerInstance.orbitWorker) {
-      orbitManagerInstance.orbitWorker.postMessage(message);
-    }
+    orbitManagerInstance.orbitThreadMgr.postMessage(message);
   }
 
   private isLeapYear(date: Date): boolean {

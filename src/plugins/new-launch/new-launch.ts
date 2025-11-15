@@ -2,7 +2,6 @@ import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces'
 import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
-import { keepTrackApi } from '@app/keepTrackApi';
 import rocketLaunchPng from '@public/img/icons/rocket-launch.png';
 
 import { SatMath } from '@app/app/analysis/sat-math';
@@ -11,6 +10,7 @@ import { OrbitFinder } from '@app/app/analysis/orbit-finder';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { launchSites } from '@app/app/data/catalogs/launch-sites';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -26,6 +26,7 @@ import {
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';
@@ -34,7 +35,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
   constructor() {
     super();
-    const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager);
+    const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
     if (!selectSatManagerInstance) {
       throw new Error('SelectSatManager not found');
@@ -50,7 +51,7 @@ export class NewLaunch extends KeepTrackPlugin {
       return;
     }
 
-    const sat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
+    const sat = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY) as DetailedSatellite;
 
     // Validate satellite before changing DOM
     if (!(sat instanceof DetailedSatellite) || !sat.sccNum || !sat.inclination || isNaN(sat.inclination)) {
@@ -161,10 +162,10 @@ export class NewLaunch extends KeepTrackPlugin {
     }
     this.isDoingCalculations = true;
 
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     showLoadingSticky();
 
@@ -240,7 +241,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     colorSchemeManagerInstance.calculateColorBuffers(true);
 
-    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
+    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     const simulationTimeObj = timeManagerInstance.simulationTimeObj;
 
@@ -285,7 +286,7 @@ export class NewLaunch extends KeepTrackPlugin {
         tle2,
       });
 
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+      const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
       if (id) {
         orbitManagerInstance.changeOrbitBufferData(id, tle1, tle2);
@@ -301,13 +302,13 @@ export class NewLaunch extends KeepTrackPlugin {
         hideLoading();
 
         // Deseletect the satellite
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(sat.id);
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(sat.id);
 
         uiManagerInstance.toast('Launch Nominal Created!', ToastMsgType.standby);
         uiManagerInstance.searchManager.doSearch(sat.sccNum);
 
         uiManagerInstance.toast('Time is now relative to launch time.', ToastMsgType.standby);
-        keepTrackApi.getSoundManager()?.play(SoundNames.LIFT_OFF);
+        ServiceLocator.getSoundManager()?.play(SoundNames.LIFT_OFF);
       },
       validationFunc: (data: PositionCruncherOutgoingMsg) => typeof data.satPos !== 'undefined',
       error: () => {
@@ -401,17 +402,17 @@ export class NewLaunch extends KeepTrackPlugin {
     const eccFrac = inputParams.eccentricity.toString().split('.')[1] ?? '0';
 
     if (!(/^\d{7}$/u).test(eccFrac.padStart(7, '0'))) {
-      keepTrackApi.getUiManager().toast('Invalid eccentricity format!', ToastMsgType.critical, true);
+      ServiceLocator.getUiManager().toast('Invalid eccentricity format!', ToastMsgType.critical, true);
       errorManagerInstance.warn('There was an issue with this satellite\'s eccentricity format. Try a different satellite.');
     }
 
     if (!(/^\d{2}$/u).test(inputParams.epochYear.toString()?.padStart(2, '0'))) {
-      keepTrackApi.getUiManager().toast('Invalid epoch year format!', ToastMsgType.critical, true);
+      ServiceLocator.getUiManager().toast('Invalid epoch year format!', ToastMsgType.critical, true);
       errorManagerInstance.warn('There was an issue with this satellite\'s epoch year format. Try a different satellite.');
     }
 
     if (!(/^(?:\d{3}\.\d{8})$/u).test(inputParams.epochDay.toFixed(8).padStart(12, '0'))) {
-      keepTrackApi.getUiManager().toast('Invalid epoch day format! Must be 3 digits, a decimal, and 8 digits after the decimal.', ToastMsgType.critical, true);
+      ServiceLocator.getUiManager().toast('Invalid epoch day format! Must be 3 digits, a decimal, and 8 digits after the decimal.', ToastMsgType.critical, true);
       errorManagerInstance.warn('There was an issue with this satellite\'s epoch day format. Try a different satellite.');
     }
 
@@ -441,7 +442,7 @@ export class NewLaunch extends KeepTrackPlugin {
       return null;
     }
 
-    const currentEpoch = TimeManager.currentEpoch(keepTrackApi.getTimeManager().simulationTimeObj);
+    const currentEpoch = TimeManager.currentEpoch(ServiceLocator.getTimeManager().simulationTimeObj);
 
     const tle1 = (tle1_.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + tle1_.substr(32)) as TleLine1;
 
@@ -457,8 +458,8 @@ export class NewLaunch extends KeepTrackPlugin {
     }
 
     // Validate altitude is reasonable
-    if (SatMath.altitudeCheck(satrec, keepTrackApi.getTimeManager().simulationTimeObj) <= 1) {
-      keepTrackApi.getUiManager().toast(
+    if (SatMath.altitudeCheck(satrec, ServiceLocator.getTimeManager().simulationTimeObj) <= 1) {
+      ServiceLocator.getUiManager().toast(
         'Failed to propagate satellite. Try different parameters or report this issue if parameters are correct.',
         ToastMsgType.caution,
         true,
@@ -493,14 +494,14 @@ export class NewLaunch extends KeepTrackPlugin {
 
     newSat.active = true;
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     // Add to catalog
     catalogManagerInstance.objectCache[id] = newSat;
 
     // Update orbit buffer
     try {
-      keepTrackApi.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
+      ServiceLocator.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
     } catch (e) {
       errorManagerInstance.error(e as Error, 'create-sat.ts', 'Changing orbit buffer data failed');
 

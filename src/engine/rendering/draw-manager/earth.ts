@@ -34,7 +34,6 @@ import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
 import { BackdatePosition as backdatePosition, Body, KM_PER_AU } from 'astronomy-engine';
@@ -291,8 +290,8 @@ export class Earth {
    * This is run once per frame to update the earth.
    */
   update(): void {
-    const gmst = keepTrackApi.getTimeManager().gmst;
-    const sunPos = Sun.position(EpochUTC.fromDateTime(keepTrackApi.getTimeManager().simulationTimeObj));
+    const gmst = ServiceLocator.getTimeManager().gmst;
+    const sunPos = Sun.position(EpochUTC.fromDateTime(ServiceLocator.getTimeManager().simulationTimeObj));
 
     if (this.isDrawOrbitPath && (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon)) {
       this.drawFullOrbitPath();
@@ -318,7 +317,7 @@ export class Earth {
     this.glowDirection_ = this.glowNumber_ < 0 ? 1 : this.glowDirection_;
 
     // Update the cloud position
-    this.cloudPosition_ += 0.00000025 * keepTrackApi.getTimeManager().propRate; // Slowly drift the clouds, but enough to see the effect
+    this.cloudPosition_ += 0.00000025 * ServiceLocator.getTimeManager().propRate; // Slowly drift the clouds, but enough to see the effect
     this.cloudPosition_ = this.cloudPosition_ > 8192 ? 0 : this.cloudPosition_; // Reset the cloud position when it reaches 8192 - the width of the texture
   }
 
@@ -395,16 +394,16 @@ export class Earth {
    */
   private drawBlackGpuPickingEarth_() {
     const gl = this.gl_;
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     // Switch to GPU Picking Shader
     gl.useProgram(dotsManagerInstance.programs.picking.program);
     // Switch to the GPU Picking Frame Buffer
-    gl.bindFramebuffer(gl.FRAMEBUFFER, keepTrackApi.getScene().frameBuffers.gpuPicking);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, ServiceLocator.getScene().frameBuffers.gpuPicking);
 
     gl.bindVertexArray(this.vaoOcclusion_);
 
-    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(dotsManagerInstance.programs.picking.uniforms.u_pMvCamMatrix, false, ServiceLocator.getRenderer().projectionCameraMatrix);
 
     /*
      * no reason to render 100000s of pixels when
@@ -413,10 +412,10 @@ export class Earth {
     if (!settingsManager.isMobileModeEnabled) {
       gl.enable(gl.SCISSOR_TEST);
       gl.scissor(
-        keepTrackApi.getMainCamera().state.mouseX,
-        gl.drawingBufferHeight - keepTrackApi.getMainCamera().state.mouseY,
-        keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
-        keepTrackApi.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
+        ServiceLocator.getMainCamera().state.mouseX,
+        gl.drawingBufferHeight - ServiceLocator.getMainCamera().state.mouseY,
+        ServiceLocator.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
+        ServiceLocator.getDotsManager().PICKING_READ_PIXEL_BUFFER_SIZE,
       );
     }
 
@@ -479,7 +478,7 @@ export class Earth {
     gl.depthMask(false); // Disable depth writing
 
     gl.enable(gl.POLYGON_OFFSET_FILL);
-    gl.polygonOffset(0.0, -RADIUS_OF_EARTH * 50 * (1 - keepTrackApi.getMainCamera().zoomLevel()));
+    gl.polygonOffset(0.0, -RADIUS_OF_EARTH * 50 * (1 - ServiceLocator.getMainCamera().zoomLevel()));
 
     gl.bindVertexArray(this.atmosphereMesh.geometry.vao);
     gl.drawElements(gl.TRIANGLES, this.atmosphereMesh.geometry.indexLength, gl.UNSIGNED_SHORT, 0);
@@ -496,17 +495,17 @@ export class Earth {
    * This is run once per frame to set the uniforms for the earth.
    */
   private setSurfaceUniforms_(gl: WebGL2RenderingContext) {
-    gl.uniformMatrix4fv(this.surfaceMesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.surfaceMesh.material.uniforms.projectionMatrix, false, ServiceLocator.getRenderer().projectionCameraMatrix);
     gl.uniformMatrix4fv(this.surfaceMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix3fv(this.surfaceMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
-    gl.uniform3fv(this.surfaceMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+    gl.uniform3fv(this.surfaceMesh.material.uniforms.cameraPosition, ServiceLocator.getMainCamera().getForwardVector());
     gl.uniform1f(this.surfaceMesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uIsAmbientLighting, settingsManager.isEarthAmbientLighting ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uGlow, this.glowNumber_);
     const isEarthCenterBody = settingsManager.centerBody === SolarBody.Earth;
 
-    gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? (keepTrackApi.getMainCamera().zoomLevel() / 2) ** (1 / 2) : 1.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? (ServiceLocator.getMainCamera().zoomLevel() / 2) ** (1 / 2) : 1.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);
@@ -519,10 +518,10 @@ export class Earth {
       return;
     }
 
-    gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.projectionMatrix, false, keepTrackApi.getRenderer().projectionCameraMatrix);
+    gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.projectionMatrix, false, ServiceLocator.getRenderer().projectionCameraMatrix);
     gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
     gl.uniformMatrix3fv(this.atmosphereMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
-    gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, keepTrackApi.getMainCamera().getForwardVector());
+    gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, ServiceLocator.getMainCamera().getForwardVector());
     gl.uniform1f(this.atmosphereMesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
     gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
@@ -581,7 +580,7 @@ export class Earth {
    */
   private initVaoOcclusion_() {
     const gl = this.gl_;
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     this.vaoOcclusion_ = gl.createVertexArray();
     gl.bindVertexArray(this.vaoOcclusion_);

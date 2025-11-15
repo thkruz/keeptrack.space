@@ -1,5 +1,7 @@
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { GetSatType, MenuMode, SatPassTimes, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
@@ -9,7 +11,6 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { shake } from '@app/engine/utils/shake';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DetailedSatellite, MILLISECONDS_PER_DAY } from '@ootk/src/main';
 import pictureInPicturePng from '@public/img/icons/picture-in-picture.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -23,7 +24,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.watchlistPlugin_ = keepTrackApi.getPlugin(WatchlistPlugin)!;
+    this.watchlistPlugin_ = PluginRegistry.getPlugin(WatchlistPlugin)!;
   }
 
   menuMode: MenuMode[] = [MenuMode.ADVANCED, MenuMode.ALL];
@@ -39,8 +40,8 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       return;
     }
 
-    if (keepTrackApi.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', ToastMsgType.caution);
+    if (PluginRegistry.getPlugin(WatchlistPlugin)?.watchlistList.length === 0) {
+      ServiceLocator.getUiManager().toast('Add Satellites to Watchlist!', ToastMsgType.caution);
       shake(getEl('menu-info-overlay'));
 
       return;
@@ -51,7 +52,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     }
 
     if (this.watchlistPlugin_.watchlistList.length === 0 && !this.watchlistPlugin_.isWatchlistChanged) {
-      keepTrackApi.getUiManager().toast('Add Satellites to Watchlist!', ToastMsgType.caution);
+      ServiceLocator.getUiManager().toast('Add Satellites to Watchlist!', ToastMsgType.caution);
       shake(getEl('menu-info-overlay'));
       this.nextPassArray = [];
 
@@ -76,13 +77,13 @@ export class WatchlistOverlay extends KeepTrackPlugin {
 
   static uiManagerFinal() {
     getEl('info-overlay-content')!.addEventListener('click', (evt: Event) => {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
       const sccNum = parseInt((<HTMLElement>evt.target).textContent!.split(':')[0]);
       const id = catalogManagerInstance.sccNum2Id(sccNum);
 
       if (id !== null) {
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(id);
       }
     });
   }
@@ -97,7 +98,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   updateLoop() {
     this.updateNextPassOverlay_();
 
-    if (!keepTrackApi.getDotsManager().inViewData) {
+    if (!ServiceLocator.getDotsManager().inViewData) {
       return;
     }
 
@@ -110,15 +111,15 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   private updateFovLinesMulti_(sat: DetailedSatellite) {
     const idx = this.watchlistPlugin_.watchlistList.findIndex((el) => el.id === sat.id);
 
-    keepTrackApi.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
-    for (const sensor of keepTrackApi.getSensorManager().currentSensors) {
+    ServiceLocator.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
+    for (const sensor of ServiceLocator.getSensorManager().currentSensors) {
       lineManagerInstance.createSensorToSatFovOnly(sensor, sat, LineColors.GREEN);
     }
   }
 
   private updateFovLinesSingle_(sat: DetailedSatellite) {
-    const inView = keepTrackApi.getDotsManager().inViewData[sat.id];
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const inView = ServiceLocator.getDotsManager().inViewData[sat.id];
+    const uiManagerInstance = ServiceLocator.getUiManager();
     const idx = this.watchlistPlugin_.watchlistList.findIndex((el) => el.id === sat.id);
     const inViewListVal = this.watchlistPlugin_.watchlistList[idx].inView;
 
@@ -126,20 +127,20 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       // Is inview and wasn't previously
       this.watchlistPlugin_.watchlistList[idx].inView = true;
       uiManagerInstance.toast(`Satellite ${sat.sccNum} is In Field of View!`, ToastMsgType.normal);
-      lineManagerInstance.createSensorToSatFovOnly(keepTrackApi.getSensorManager().currentSensors[0], sat, LineColors.GREEN);
-      keepTrackApi.getOrbitManager().addInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
+      lineManagerInstance.createSensorToSatFovOnly(ServiceLocator.getSensorManager().currentSensors[0], sat, LineColors.GREEN);
+      ServiceLocator.getOrbitManager().addInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
     }
     if (inView === 0 && inViewListVal === true) {
       // Isn't inview and was previously
       this.watchlistPlugin_.watchlistList[idx].inView = false;
       uiManagerInstance.toast(`Satellite ${sat.sccNum} left Field of View!`, ToastMsgType.standby);
-      keepTrackApi.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
+      ServiceLocator.getOrbitManager().removeInViewOrbit(this.watchlistPlugin_.watchlistList[idx].id);
     }
   }
 
   private updateFovLines_() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     for (const obj of this.watchlistPlugin_.watchlistList) {
       const sat = catalogManagerInstance.getSat(obj.id);
@@ -165,8 +166,8 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   }
 
   private openOverlayMenu_() {
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const timeManager = keepTrackApi.getTimeManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const timeManager = ServiceLocator.getTimeManager();
 
     if (
       this.nextPassArray.length === 0 ||
@@ -176,7 +177,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
       this.lastSensorId !== sensorManagerInstance.currentSensors[0].id
     ) {
       showLoading(() => {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
         const satArray: DetailedSatellite[] = [];
 
@@ -205,7 +206,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   }
 
   private pushOverlayElement_(s: number, propTime: number, infoOverlayDOMHtmlStrArr: string[]) {
-    const isSatInView = keepTrackApi.getDotsManager().inViewData[this.nextPassArray[s].sat.id];
+    const isSatInView = ServiceLocator.getDotsManager().inViewData[this.nextPassArray[s].sat.id];
     // If old time and not in view, skip it
 
     if (this.nextPassArray[s].time.getTime() - propTime < -1000 * 60 * 5 && !isSatInView) {
@@ -238,7 +239,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
   }
 
   private updateNextPassOverlay_(isForceUpdate = false) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     if (this.nextPassArray.length <= 0 && !this.isMenuButtonActive) {
       return;
@@ -247,7 +248,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
      * TODO: This should auto update the overlay when the time changes outside the original search window
      * Update once every 10 seconds
      */
-    const mainCameraInstance = keepTrackApi.getMainCamera();
+    const mainCameraInstance = ServiceLocator.getMainCamera();
 
     if ((Date.now() > this.lastOverlayUpdateTime * 1 + 10000 && !mainCameraInstance.state.isDragging) || isForceUpdate) {
       this.infoOverlayDOMHtmlStrArr = [];

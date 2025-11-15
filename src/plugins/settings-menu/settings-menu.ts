@@ -1,5 +1,8 @@
 import { LayersManager } from '@app/app/ui/layers-manager';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorPick } from '@app/engine/utils/color-pick';
 import { html } from '@app/engine/utils/development/formatter';
@@ -7,14 +10,12 @@ import { getEl, hideEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { parseRgba } from '@app/engine/utils/rgba';
 import { rgbCss } from '@app/engine/utils/rgbCss';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsManager } from '@app/settings/settings';
-import { OrbitCruncherType } from '@app/webworker/orbitCruncher';
 import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
-import { EventBus } from '@app/engine/events/event-bus';
+import { OrbitCruncherMsgType } from '@app/webworker/orbit-cruncher-interfaces';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -448,7 +449,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     if (this.isNotColorPickerInitialSetup) {
       settingsManager.colors[colorStr] = parseRgba(context.color);
       LayersManager.layersColorsChange();
-      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+      const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
       colorSchemeManagerInstance.calculateColorBuffers(true);
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_MANAGER_COLORS, JSON.stringify(settingsManager.colors));
@@ -487,10 +488,10 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       case 'settings-snp':
         if ((<HTMLInputElement>getEl((<HTMLInputElement>e.target)?.id ?? ''))?.checked) {
           // Play sound for enabling option
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           // Play sound for disabling option
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
         break;
       default:
@@ -512,7 +513,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   }
 
   static resetToDefaults() {
-    keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
+    ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
     settingsManager.isDrawOrbits = true;
     settingsManager.drawCameraWidget = false;
     settingsManager.isDrawTrailingOrbits = false;
@@ -537,17 +538,17 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
     e.preventDefault();
 
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
-    keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
+    ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
     settingsManager.isOrbitCruncherInEcf = (<HTMLInputElement>getEl('settings-drawEcf')).checked;
     const numberOfEcfOrbitsToDraw = parseInt((<HTMLInputElement>getEl('settings-numberOfEcfOrbitsToDraw')).value);
 
     if (numberOfEcfOrbitsToDraw !== settingsManager.numberOfEcfOrbitsToDraw) {
-      keepTrackApi.getOrbitManager().orbitWorker.postMessage({
-        typ: OrbitCruncherType.SETTINGS_UPDATE,
+      ServiceLocator.getOrbitManager().orbitThreadMgr.postMessage({
+        type: OrbitCruncherMsgType.SETTINGS_UPDATE,
         numberOfOrbitsToDraw: numberOfEcfOrbitsToDraw,
       });
     }
@@ -571,11 +572,11 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     settingsManager.isDrawOrbits = (<HTMLInputElement>getEl('settings-drawOrbits')).checked;
     if (isDrawOrbitsChanged) {
-      keepTrackApi.getOrbitManager().drawOrbitsSettingChanged();
+      ServiceLocator.getOrbitManager().drawOrbitsSettingChanged();
     }
     settingsManager.isDrawTrailingOrbits = (<HTMLInputElement>getEl('settings-drawTrailingOrbits')).checked;
 
-    keepTrackApi.getOrbitManager().updateOrbitType();
+    ServiceLocator.getOrbitManager().updateOrbitType();
 
     // Must come after the above checks
     settingsManager.isEciOnHover = (<HTMLInputElement>getEl('settings-eciOnHover')).checked;
@@ -589,7 +590,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     settingsManager.isFreezePropRateOnDrag = (<HTMLInputElement>getEl('settings-freeze-drag')).checked;
 
     settingsManager.isDisableTimeMachineToasts = (<HTMLInputElement>getEl('settings-time-machine-toasts')).checked;
-    const timeMachinePlugin = keepTrackApi.getPlugin(TimeMachine);
+    const timeMachinePlugin = PluginRegistry.getPlugin(TimeMachine);
 
     /*
      * TODO: These settings buttons should be inside the plugins themselves
@@ -604,10 +605,10 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
      *   settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
      * }
      */
-    keepTrackApi.getGroupsManager().clearSelect();
+    ServiceLocator.getGroupsManager().clearSelect();
     colorSchemeManagerInstance.calculateColorBuffers(true); // force color recalc
 
-    keepTrackApi.getPlugin(TimeMachine)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(TimeMachine)?.setBottomIconToUnselected();
 
     colorSchemeManagerInstance.reloadColors();
 
@@ -625,7 +626,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       uiManagerInstance.toast('Invalid max search sats value!', ToastMsgType.critical);
     } else {
       settingsManager.searchLimit = maxSearchSats;
-      uiManagerInstance.searchManager.doSearch(keepTrackApi.getUiManager().searchManager.getCurrentSearch());
+      uiManagerInstance.searchManager.doSearch(ServiceLocator.getUiManager().searchManager.getCurrentSearch());
     }
 
     colorSchemeManagerInstance.calculateColorBuffers(true);

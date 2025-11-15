@@ -45,7 +45,6 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, showEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import mapPng from '@public/img/icons/map.png';
 import radar1 from '@public/img/radar-1.png';
 import redSquare from '@public/img/red-square.png';
@@ -60,6 +59,8 @@ import { BaseObject, Degrees, DetailedSatellite, DetailedSensor, Kilometers, Lla
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 interface GroundTracePoint {
   x: number;
@@ -74,7 +75,7 @@ export class StereoMap extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   /** The size of half of the dot used in the stereo map. (See CSS) */
@@ -159,7 +160,7 @@ export class StereoMap extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'm' && !isRepeat) {
-        if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
+        if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
           return;
         }
 
@@ -167,11 +168,11 @@ export class StereoMap extends KeepTrackPlugin {
           this.openSideMenu();
           this.setBottomIconToSelected();
           this.updateMap();
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           this.closeSideMenu();
           this.setBottomIconToUnselected();
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
       }
     });
@@ -234,8 +235,8 @@ export class StereoMap extends KeepTrackPlugin {
     const selectableInterval = Math.ceil(pointPerOrbit / 50);
     let selectableIdx = 1;
 
-    const sat = keepTrackApi.getCatalogManager().getSat(this.selectSatManager_?.selectedSat ?? -1);
-    const sensorList = keepTrackApi.getSensorManager().currentSensors;
+    const sat = ServiceLocator.getCatalogManager().getSat(this.selectSatManager_?.selectedSat ?? -1);
+    const sensorList = ServiceLocator.getSensorManager().currentSensors;
 
     if (!sat || !sensorList) {
       return;
@@ -243,7 +244,7 @@ export class StereoMap extends KeepTrackPlugin {
 
     // Start at 1 so that the first point is NOT the satellite
     for (let i = 1; i < pointPerOrbit; i++) {
-      const now = new Date(keepTrackApi.getTimeManager().simulationTimeObj.getTime() + ((i * sat.period * 1.15) / pointPerOrbit) * 60 * 1000);
+      const now = new Date(ServiceLocator.getTimeManager().simulationTimeObj.getTime() + ((i * sat.period * 1.15) / pointPerOrbit) * 60 * 1000);
       const mapPoints = StereoMap.getMapPoints_(now, sat, sensorList);
 
       groundTracePoints.push({
@@ -357,7 +358,7 @@ export class StereoMap extends KeepTrackPlugin {
   }
 
   private static updateSensorPosition_() {
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
     const sensorDom = <HTMLImageElement>getEl('map-sensor');
     let selectableIdx = 1;
 
@@ -390,7 +391,7 @@ export class StereoMap extends KeepTrackPlugin {
   }
 
   private updateSatPosition_() {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     const sat = catalogManagerInstance.getObject(this.selectSatManager_?.selectedSat ?? -1);
 
@@ -398,7 +399,7 @@ export class StereoMap extends KeepTrackPlugin {
       return;
     }
 
-    const gmst = keepTrackApi.getTimeManager().gmst;
+    const gmst = ServiceLocator.getTimeManager().gmst;
     const lla = eci2lla(sat.position, gmst);
     const map = {
       x: ((lla.lon + 180) / 360) * settingsManager.mapWidth,
@@ -483,7 +484,7 @@ export class StereoMap extends KeepTrackPlugin {
   }
 
   private mapMenuClick_(evt: Event) {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     this.isMapUpdateOverride_ = true;
     if (!(<HTMLElement>evt.target)?.dataset.time) {

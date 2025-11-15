@@ -1,8 +1,8 @@
 import { EciArr3 } from '@app/engine/core/interfaces';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { vec4 } from 'gl-matrix';
 import { Degrees, DetailedSensor, ecf2eci, rae2ecf } from '@ootk/src/main';
+import { vec4 } from 'gl-matrix';
 import { Line, LineColors } from './line';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SensorScanHorizonLine extends Line {
   private sensor: DetailedSensor;
@@ -27,7 +27,7 @@ export class SensorScanHorizonLine extends Line {
   }
 
   update(): void {
-    const eci = this.sensor.eci(keepTrackApi.getTimeManager().simulationTimeObj);
+    const eci = this.sensor.eci(ServiceLocator.getTimeManager().simulationTimeObj);
     const eciArr = [eci.x, eci.y, eci.z] as EciArr3;
 
     this.updateAzimuth_();
@@ -71,7 +71,7 @@ export class SensorScanHorizonLine extends Line {
           alt: lla.alt + 30,
         },
       ),
-      keepTrackApi.getTimeManager().gmst,
+      ServiceLocator.getTimeManager().gmst,
     );
 
     return [eci.x, eci.y, eci.z] as EciArr3;

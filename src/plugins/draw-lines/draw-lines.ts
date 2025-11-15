@@ -1,4 +1,3 @@
-import { keepTrackApi } from '@app/keepTrackApi';
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
@@ -14,6 +13,8 @@ import { hideEl } from '@app/engine/utils/get-el';
 import { DetailedSatellite, Kilometers } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class DrawLinesPlugin extends KeepTrackPlugin {
   readonly id = 'DrawLinesPlugin';
@@ -45,7 +46,7 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
 
   rmbCallback = (targetId: string, clickedSat?: number): void => {
     let clickSatObj: DetailedSatellite | MissileObject | OemSatellite | null = null;
-    const obj = keepTrackApi.getCatalogManager().getObject(clickedSat);
+    const obj = ServiceLocator.getCatalogManager().getObject(clickedSat);
 
     if ((obj instanceof DetailedSatellite) || (obj instanceof OemSatellite) || (obj instanceof MissileObject)) {
       clickSatObj = obj;
@@ -97,11 +98,11 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
         lineManagerInstance.createSatToRef(clickSatObj, [0, 0, 0], LineColors.PURPLE);
         break;
       case 'line-sensor-sat-rmb':
-        lineManagerInstance.createSensorToSat(keepTrackApi.getSensorManager().getSensor(), clickSatObj, LineColors.GREEN);
+        lineManagerInstance.createSensorToSat(ServiceLocator.getSensorManager().getSensor(), clickSatObj, LineColors.GREEN);
         break;
       case 'line-sat-sat-rmb':
         {
-          const primarySatObj = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
+          const primarySatObj = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
 
           if (!primarySatObj) {
             errorManagerInstance.warn('No primary satellite selected for Earth to Satellite line.');
@@ -130,11 +131,11 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
         hideEl('line-eci-axis-rmb');
       }
 
-      if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
+      if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
         hideEl('line-sat-sat-rmb');
       }
 
-      const sensorManager = keepTrackApi.getSensorManager();
+      const sensorManager = ServiceLocator.getSensorManager();
 
       if (!sensorManager.isSensorSelected() || sensorManager.whichRadar === 'CUSTOM') {
         hideEl('line-sensor-sat-rmb');

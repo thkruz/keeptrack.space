@@ -1,6 +1,8 @@
 import { Camera } from '@app/engine/camera/camera';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { MouseInput } from './mouse-input';
 
@@ -64,7 +66,7 @@ export class TouchInput {
         this.canvasTouchStart(e);
       });
       canvasDOM.addEventListener('touchend', (e) => {
-        this.canvasTouchEnd(e, keepTrackApi.getMainCamera());
+        this.canvasTouchEnd(e, ServiceLocator.getMainCamera());
       });
       canvasDOM.addEventListener('touchmove', (e) => {
         this.canvasTouchMove(e);
@@ -157,32 +159,32 @@ export class TouchInput {
 
     this.touchStartX = evt.x;
     this.touchStartY = evt.y;
-    keepTrackApi.getMainCamera().state.mouseX = this.touchStartX; // Move this
-    keepTrackApi.getMainCamera().state.mouseY = this.touchStartY; // Move this
+    ServiceLocator.getMainCamera().state.mouseX = this.touchStartX; // Move this
+    ServiceLocator.getMainCamera().state.mouseY = this.touchStartY; // Move this
 
     // If you hit the canvas hide any popups
-    keepTrackApi.getInputManager().hidePopUps();
+    ServiceLocator.getInputManager().hidePopUps();
 
-    keepTrackApi.emit(EventBusEvent.touchStart, evt);
+    EventBus.getInstance().emit(EventBusEvent.touchStart, evt);
   }
 
   tap(evt: TapTouchEvent) {
     this.lastEvent = evt;
 
     // Stop auto movement
-    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
-    keepTrackApi.getMainCamera().autoRotate(false);
+    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
+    ServiceLocator.getMainCamera().autoRotate(false);
 
     // Try to select satellite
-    const satId = keepTrackApi.getInputManager().getSatIdFromCoord(evt.x, evt.y);
+    const satId = ServiceLocator.getInputManager().getSatIdFromCoord(evt.x, evt.y);
 
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(satId);
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
   }
 
   pan(evt: PanTouchEvent) {
     this.lastEvent = evt;
 
-    const mainCameraInstance = keepTrackApi.getMainCamera();
+    const mainCameraInstance = ServiceLocator.getMainCamera();
 
     mainCameraInstance.state.mouseX = evt.x;
     mainCameraInstance.state.mouseY = evt.y;
@@ -198,10 +200,10 @@ export class TouchInput {
     this.lastEvent = evt;
 
     // Stop auto movement
-    keepTrackApi.getMainCamera().state.isAutoPitchYawToTarget = false;
-    keepTrackApi.getMainCamera().autoRotate(false);
+    ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
+    ServiceLocator.getMainCamera().autoRotate(false);
 
-    keepTrackApi.getInputManager().openRmbMenu();
+    ServiceLocator.getInputManager().openRmbMenu();
   }
 
   pinchStart(evt: PinchTouchEvent) {
@@ -211,7 +213,7 @@ export class TouchInput {
   pinchMove(evt: PinchTouchEvent) {
     this.lastEvent = evt;
 
-    const mainCameraInstance = keepTrackApi.getMainCamera();
+    const mainCameraInstance = ServiceLocator.getMainCamera();
 
     this.deltaPinchDistance = (this.startPinchDistance - evt.pinchDistance) / this.maxPinchSize;
     let zoomTarget = mainCameraInstance.state.zoomTarget;

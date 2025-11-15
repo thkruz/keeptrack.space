@@ -1,6 +1,5 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SatellitePhotos } from '@app/plugins/satellite-photos/satellite-photos';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -29,8 +28,8 @@ describe('SatellitePhotos_test_links', () => {
     setupStandardEnvironment([SelectSatManager]);
     satellitePhotosPlugin = new SatellitePhotos();
     websiteInit(satellitePhotosPlugin);
-    keepTrackApi.containerRoot.innerHTML += '<div id="colorbox-div"></div>';
-    keepTrackApi.getCatalogManager = jest.fn().mockReturnValue({
+    KeepTrack.getInstance().containerRoot.innerHTML += '<div id="colorbox-div"></div>';
+    ServiceLocator.getCatalogManager = jest.fn().mockReturnValue({
       selectSat: jest.fn(),
       getSatFromObjNum: jest.fn().mockReturnValue({
         id: 1,

@@ -6,7 +6,6 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
 import planetPng from '@public/img/icons/planet.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -144,14 +143,14 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     }
 
     if (planetName === SolarBody.Earth || planetName === SolarBody.Moon) {
-      keepTrackApi.getLineManager().clear();
+      ServiceLocator.getLineManager().clear();
     }
 
-    keepTrackApi.getDotsManager().updateSizeBuffer(keepTrackApi.getCatalogManager().objectCache.length);
+    ServiceLocator.getDotsManager().updateSizeBuffer(ServiceLocator.getCatalogManager().objectCache.length);
 
     PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect any selected satellite
     settingsManager.centerBody = planetName;
-    keepTrackApi.getUiManager().hideSideMenus();
+    ServiceLocator.getUiManager().hideSideMenus();
 
     if (planetName === SolarBody.Sun) {
       this.drawOrbits_(planetName);
@@ -220,7 +219,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
     settingsManager.centerBody = SolarBody.Sun; // Temporarily set to Sun to draw orbits relative to Sun
 
     const moon = ServiceLocator.getScene().getBodyById(SolarBody.Moon)!;
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
 
     moon.isDrawOrbitPath = true;
     moon.drawFullOrbitPath();
@@ -271,7 +270,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin {
   }
 
   setAllPlanetsDotSize(size = 1): void {
-    const gl = keepTrackApi.getRenderer().gl;
+    const gl = ServiceLocator.getRenderer().gl;
     const moon = ServiceLocator.getScene().getBodyById(SolarBody.Moon)!;
     const earth = ServiceLocator.getScene().getBodyById(SolarBody.Earth)!;
 

@@ -54,14 +54,14 @@ export class CameraSettings {
   /**
    * The speed at which the camera moves.
    *
-   * TODO: This needs to be made read-only and a sepearate internal camera variable should be used to handle
+   * TODO: This needs to be made read-only and a separate internal camera variable should be used to handle
    * the logic when shift is pressed
    */
   cameraMovementSpeed = 0.003;
   /**
    * The minimum speed at which the camera moves.
    *
-   * TODO: This needs to be made read-only and a sepearate internal camera variable should be used to handle
+   * TODO: This needs to be made read-only and a separate internal camera variable should be used to handle
    * the logic when shift is pressed
    */
   cameraMovementSpeedMin = 0.005;

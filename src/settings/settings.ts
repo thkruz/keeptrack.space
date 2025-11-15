@@ -338,6 +338,20 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   onLoadCb: 'core',
 };
 
+/**
+ * Interface that declares all flattened properties for TypeScript type checking.
+ * The actual values are delegated to category instances via getters/setters.
+ */
+export interface SettingsManager extends
+  GraphicsSettings,
+  UiSettings,
+  CameraSettings,
+  OrbitalSettings,
+  DataSettings,
+  PerformanceSettings,
+  ColorSettings,
+  CoreSettings {}
+
 export class SettingsManager {
   // Category instances - these hold the actual settings
   core: CoreSettings;

@@ -18,10 +18,10 @@
  */
 
 import type { SensorGeolocation, SolarBody } from '@app/engine/core/interfaces';
-import type { ClassificationString } from '../app/ui/classification';
-import type { Degrees, Milliseconds } from 'ootk';
+import { Degrees, Milliseconds } from '@app/engine/ootk/src/main';
 import type { FilterPluginSettings } from '@app/plugins/filter-menu/filter-menu';
 import type { KeepTrackPluginsConfiguration } from '@app/plugins/keeptrack-plugins-configuration';
+import type { ClassificationString } from '../app/ui/classification';
 import { defaultPlugins } from './default-plugins';
 
 /**
@@ -201,7 +201,7 @@ export class CoreSettings {
   nextNPassesCount = 5;
 
   // Center Body
-  centerBody: SolarBody = 0; // SolarBody.Earth
+  centerBody: SolarBody = 0 as unknown as SolarBody; // SolarBody.Earth
 
   // Special Settings
   altMsgNum: number | null = null;
@@ -291,7 +291,7 @@ export class CoreSettings {
    * Callback function that is called when the settings are loaded.
    */
   // eslint-disable-next-line no-empty-function
-  onLoadCb = () => {};
+  onLoadCb = () => { };
 }
 
 export const defaultCoreSettings = new CoreSettings();

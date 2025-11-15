@@ -18,7 +18,7 @@
  */
 
 import type { MenuMode } from '@app/engine/core/interfaces';
-import type { Milliseconds } from 'ootk';
+import { Milliseconds } from '@app/engine/ootk/src/main';
 
 /**
  * User Interface and display settings

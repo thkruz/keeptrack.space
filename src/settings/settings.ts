@@ -25,18 +25,18 @@ import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/dra
 import { keepTrackApi } from '@app/keepTrackApi';
 import { isThisNode } from '../engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
-import { defaultColorSettings as importedDefaultColorSettings } from './default-color-settings';
-import { parseGetVariables } from './parse-get-variables';
-import { darkClouds } from './presets/darkClouds';
-import { SettingsPresets } from './presets/presets';
-import { GraphicsSettings, defaultGraphicsSettings } from './graphics-settings';
-import { UiSettings, defaultUiSettings } from './ui-settings';
 import { CameraSettings, defaultCameraSettings } from './camera-settings';
-import { OrbitalSettings, defaultOrbitalSettings } from './orbital-settings';
-import { DataSettings, defaultDataSettings } from './data-settings';
-import { PerformanceSettings, defaultPerformanceSettings } from './performance-settings';
 import { ColorSettings, defaultColorSettings } from './color-settings';
 import { CoreSettings, defaultCoreSettings } from './core-settings';
+import { DataSettings, defaultDataSettings } from './data-settings';
+import { defaultColorSettings as importedDefaultColorSettings } from './default-color-settings';
+import { GraphicsSettings, defaultGraphicsSettings } from './graphics-settings';
+import { OrbitalSettings, defaultOrbitalSettings } from './orbital-settings';
+import { parseGetVariables } from './parse-get-variables';
+import { PerformanceSettings, defaultPerformanceSettings } from './performance-settings';
+import { darkClouds } from './presets/darkClouds';
+import { SettingsPresets } from './presets/presets';
+import { UiSettings, defaultUiSettings } from './ui-settings';
 
 /**
  * Mapping of property names to their category
@@ -340,25 +340,25 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
 
 export class SettingsManager {
   // Category instances - these hold the actual settings
+  core: CoreSettings;
+  data: DataSettings;
+  performance: PerformanceSettings;
   graphics: GraphicsSettings;
   ui: UiSettings;
   camera: CameraSettings;
   orbital: OrbitalSettings;
-  data: DataSettings;
-  performance: PerformanceSettings;
   color: ColorSettings;
-  core: CoreSettings;
 
   constructor() {
     // Initialize category instances with defaults
+    this.core = Object.assign(new CoreSettings(), defaultCoreSettings);
+    this.data = Object.assign(new DataSettings(), defaultDataSettings);
+    this.performance = Object.assign(new PerformanceSettings(), defaultPerformanceSettings);
     this.graphics = Object.assign(new GraphicsSettings(), defaultGraphicsSettings);
     this.ui = Object.assign(new UiSettings(), defaultUiSettings);
     this.camera = Object.assign(new CameraSettings(), defaultCameraSettings);
     this.orbital = Object.assign(new OrbitalSettings(), defaultOrbitalSettings);
-    this.data = Object.assign(new DataSettings(), defaultDataSettings);
-    this.performance = Object.assign(new PerformanceSettings(), defaultPerformanceSettings);
     this.color = Object.assign(new ColorSettings(), defaultColorSettings);
-    this.core = Object.assign(new CoreSettings(), defaultCoreSettings);
 
     // Create property accessors for backward compatibility
     this.createPropertyAccessors_();

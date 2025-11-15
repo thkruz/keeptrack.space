@@ -17,7 +17,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import type { Kilometers, Radians } from 'ootk';
+import { Radians, Kilometers } from '@app/engine/ootk/src/main';
 import { RADIUS_OF_EARTH } from '../engine/utils/constants';
 
 /**

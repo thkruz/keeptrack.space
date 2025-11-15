@@ -17,7 +17,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import type { Kilometers } from 'ootk';
+import { Kilometers } from '@app/engine/ootk/src/main';
 
 /**
  * Orbital mechanics and orbit rendering settings

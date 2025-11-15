@@ -201,7 +201,7 @@ export class CoreSettings {
   nextNPassesCount = 5;
 
   // Center Body
-  centerBody: SolarBody = 0 as unknown as SolarBody; // SolarBody.Earth
+  centerBody: SolarBody = 'Earth' as SolarBody; // SolarBody.Earth
 
   // Special Settings
   altMsgNum: number | null = null;

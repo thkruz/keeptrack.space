@@ -63,7 +63,7 @@ export class LineManager {
     keepTrackApi.emit(EventBusEvent.onLineAdded, this);
   }
 
-  createSatRicFrame(sat: DetailedSatellite | MissileObject | null): void {
+  createSatRicFrame(sat: DetailedSatellite | MissileObject | OemSatellite | null): void {
     if (!sat || !(sat instanceof DetailedSatellite)) {
       return;
     }

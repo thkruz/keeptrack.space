@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
@@ -21,7 +20,9 @@
 import { MobileManager } from '@app/app/ui/mobileManager';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
-import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
+import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
+import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { isThisNode } from '../engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
@@ -37,6 +38,9 @@ import { PerformanceSettings, defaultPerformanceSettings } from './performance-s
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 import { UiSettings, defaultUiSettings } from './ui-settings';
+
+/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
+/* eslint-disable max-lines */
 
 /**
  * Mapping of property names to their category
@@ -350,7 +354,7 @@ export interface SettingsManager extends
   DataSettings,
   PerformanceSettings,
   ColorSettings,
-  CoreSettings {}
+  CoreSettings { }
 
 export class SettingsManager {
   // Category instances - these hold the actual settings
@@ -468,13 +472,13 @@ export class SettingsManager {
     const earthDayTextureQaulityString = PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION);
 
     if (earthDayTextureQaulityString !== null) {
-      this.earthDayTextureQuality = earthDayTextureQaulityString as any;
+      this.earthDayTextureQuality = earthDayTextureQaulityString as EarthDayTextureQuality;
     }
 
     const earthNightTextureQaulityString = PersistenceManager.getInstance().getItem(StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION);
 
     if (earthNightTextureQaulityString !== null) {
-      this.earthNightTextureQuality = earthNightTextureQaulityString as any;
+      this.earthNightTextureQuality = earthNightTextureQaulityString as EarthNightTextureQuality;
     }
 
     const searchLimitString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_SEARCH_LIMIT);
@@ -571,7 +575,7 @@ export class SettingsManager {
   private setColorSettings_() {
     this.selectedColorFallback = this.selectedColor;
 
-    this.colors = {} as any;
+    this.colors = {} as ColorSchemeColorMap & ObjectTypeColorSchemeColorMap;
     try {
       const jsonString = PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DOT_COLORS);
 
@@ -583,7 +587,7 @@ export class SettingsManager {
       console.warn('Settings Manager: Unable to get color settings - localStorage issue!');
     }
     if (!this.colors || Object.keys(this.colors).length === 0 || this.colors.version !== importedDefaultColorSettings.version) {
-      this.colors = importedDefaultColorSettings as any;
+      this.colors = importedDefaultColorSettings;
 
       PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_DOT_COLORS, JSON.stringify(this.colors));
     }
@@ -718,7 +722,7 @@ export class SettingsManager {
     for (const category of categoryKeys) {
       if (overrides[category]) {
         // Deep merge category overrides
-        this[category] = this.deepMerge({ ...this[category] }, overrides[category]) as any;
+        this[category] = this.deepMerge({ ...this[category] }, overrides[category]);
       }
     }
 

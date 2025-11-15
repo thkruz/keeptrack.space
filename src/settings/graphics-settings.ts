@@ -17,7 +17,10 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import type { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import type {
+  AtmosphereSettings, EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality,
+  EarthPoliticalTextureQuality, EarthSpecTextureQuality, EarthTextureStyle,
+} from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import type { MilkyWayTextureQuality } from '@app/engine/rendering/draw-manager/skybox-sphere';
 import type { SunTextureQuality } from '@app/engine/rendering/draw-manager/sun';
 
@@ -28,10 +31,10 @@ export class GraphicsSettings {
   // Earth Texture Quality Settings
   earthDayTextureQuality: EarthDayTextureQuality;
   earthNightTextureQuality: EarthNightTextureQuality;
-  earthSpecTextureQuality: EarthDayTextureQuality;
-  earthBumpTextureQuality: EarthDayTextureQuality;
-  earthCloudTextureQuality: EarthDayTextureQuality;
-  earthPoliticalTextureQuality: EarthDayTextureQuality;
+  earthSpecTextureQuality: EarthSpecTextureQuality;
+  earthBumpTextureQuality: EarthBumpTextureQuality;
+  earthCloudTextureQuality: EarthCloudTextureQuality;
+  earthPoliticalTextureQuality: EarthPoliticalTextureQuality;
 
   // Earth Texture Style
   earthTextureStyle: EarthTextureStyle;

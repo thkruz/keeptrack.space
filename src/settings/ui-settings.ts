@@ -213,7 +213,7 @@ export class UiSettings {
   isShowAgencies = false;
   isDisableUrlBar: boolean | null = null;
   /**
-   * Determines whether or not to hide the propogation rate text on the GUI.
+   * Determines whether or not to hide the propagation rate text on the GUI.
    */
   isAlwaysHidePropRate = false;
   /**

@@ -28,7 +28,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import {
   DEG2RAD, Degrees, DetailedSatellite, EciVec3, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
 } from '@ootk/src/main';
-import { mat4, quat, vec3 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 import { SatMath } from '../../app/analysis/sat-math';
 import { keepTrackApi } from '../../keepTrackApi';
 import { SettingsManager } from '../../settings/settings';
@@ -40,14 +40,16 @@ import { CelestialBody } from '../rendering/draw-manager/celestial-bodies/celest
 import { Earth } from '../rendering/draw-manager/earth';
 import type { OrbitManager } from '../rendering/orbitManager';
 import { errorManagerInstance } from '../utils/errorManager';
-import { alt2zoom, lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
+import { lat2pitch, lon2yaw, normalizeAngle } from '../utils/transforms';
 import { CameraInputHandler } from './camera-input-handler';
 import { CameraState } from './state/camera-state';
+import type { ICameraBehavior } from './behaviors/ICameraBehavior';
+import { CameraBehaviorFactory } from './behaviors/CameraBehaviorFactory';
+import type { SensorPosition } from './behaviors/ICameraBehavior';
 
 /**
  * Represents the different types of cameras available.
- *
- * TODO: This should be replaced with different camera classes
+ * Each camera type has its own behavior class that implements the camera logic.
  */
 export enum CameraType {
   CURRENT = 0,
@@ -58,8 +60,6 @@ export enum CameraType {
   SATELLITE = 5,
   ASTRONOMY = 6,
   MAX_CAMERA_TYPES = 7,
-  /** @deprecated */
-  OFFSET = 8,
 }
 
 export class Camera {
@@ -67,25 +67,62 @@ export class Camera {
   inputHandler = new CameraInputHandler(this);
 
   private chaseSpeed_ = 0.0005;
-  private fpsLastTime_ = <Milliseconds>0;
   private isRayCastingEarth_ = false;
   private panMovementSpeed_ = 0.5;
   private localRotateMovementSpeed_ = 0.00005;
 
-  private normForward_ = vec3.create();
-  private normLeft_ = vec3.create();
-  private normUp_ = vec3.create();
-
   private yawErr_ = <Radians>0;
+  private cameraType_: CameraType = CameraType.FIXED_TO_EARTH;
+  private behavior_: ICameraBehavior;
+
   /**
-     * Main source of projection matrix for rest of the application
-     */
+   * Main source of projection matrix for rest of the application
+   */
   projectionMatrix: mat4 = mat4.create();
+
   get matrixWorld(): mat4 {
     return mat4.invert(mat4.create(), this.matrixWorldInverse)!;
   }
+
   matrixWorldInverse = mat4.create();
-  cameraType: CameraType = CameraType.FIXED_TO_EARTH;
+
+  /**
+   * Get the current camera type
+   */
+  get cameraType(): CameraType {
+    return this.cameraType_;
+  }
+
+  /**
+   * Set the camera type and switch to the appropriate behavior
+   */
+  set cameraType(type: CameraType) {
+    if (type === CameraType.CURRENT) {
+      return; // CURRENT means keep existing type
+    }
+
+    // Call onExit on old behavior if it exists
+    this.behavior_?.onExit?.();
+
+    // Update camera type
+    const oldType = this.cameraType_;
+
+    this.cameraType_ = type;
+
+    // Create and set new behavior
+    this.behavior_ = CameraBehaviorFactory.create(type, this);
+
+    // Call onEnter on new behavior
+    this.behavior_?.onEnter?.();
+
+    // Note: Could emit an event here if needed for camera type changes
+    // EventBus would need an instance and the event would need to be defined
+  }
+
+  constructor() {
+    // Initialize with default behavior
+    this.behavior_ = CameraBehaviorFactory.create(CameraType.FIXED_TO_EARTH, this);
+  }
 
   resetRotation() {
     if (this.cameraType !== CameraType.FPS) {
@@ -172,9 +209,7 @@ export class Camera {
     if ((this.cameraType === CameraType.FIXED_TO_SAT && !selectSatManagerInstance) || selectSatManagerInstance?.selectedSat === -1) {
       this.cameraType++;
     }
-    if (this.cameraType === CameraType.FPS) {
-      this.resetFpsPos_();
-    }
+    // FPS position reset is now handled by FpsBehavior.onEnter()
     if (this.cameraType === CameraType.PLANETARIUM && !sensorManagerInstance.isSensorSelected()) {
       this.cameraType++;
     }
@@ -262,9 +297,8 @@ export class Camera {
     this.state.zoomTarget = zoom;
   }
 
-  /*
-   * This is intentionally complex to reduce object creation and GC
-   * Splitting it into subfunctions would not be optimal
+  /**
+   * Set up the camera's view matrix for rendering
    */
   draw(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null): void {
     let target = keepTrackApi.getPlugin(SelectSatManager)?.primarySatObj;
@@ -277,87 +311,28 @@ export class Camera {
       static: false,
     });
 
-    let gmst: GreenwichMeanSiderealTime;
+    const sensorPosition: SensorPosition | null = sensorPos ? {
+      lat: sensorPos.lat,
+      lon: sensorPos.lon,
+      gmst: sensorPos.gmst,
+      x: sensorPos.x,
+      y: sensorPos.y,
+      z: sensorPos.z,
+    } : null;
 
-    if (!sensorPos?.gmst) {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
+    this.drawPreValidate_(sensorPosition);
 
-      gmst = sensorPos?.gmst ?? SatMath.calculateTimeVariables(timeManagerInstance.simulationTimeObj).gmst;
-    } else {
-      gmst = sensorPos.gmst;
+    // Validate camera behavior can be used
+    if (!this.behavior_.validate(sensorPosition, target)) {
+      // Fall back to fixed-to-earth if current behavior is invalid
+      this.cameraType = CameraType.FIXED_TO_EARTH;
     }
 
-    this.drawPreValidate_(sensorPos);
+    // Reset matrix
     mat4.identity(this.matrixWorldInverse);
 
-    // Ensure we don't zoom in past our satellite
-    if (this.cameraType === CameraType.FIXED_TO_SAT) {
-      if (target.id === -1 || target.type === SpaceObjectType.STAR) {
-        this.cameraType = CameraType.FIXED_TO_EARTH;
-      } else {
-        const satAlt = SatMath.getAlt(SatMath.getPositionFromCenterBody(target.position), gmst);
-
-        if (this.calcDistanceBasedOnZoom() < satAlt + RADIUS_OF_EARTH + settingsManager.minDistanceFromSatellite) {
-          this.state.zoomTarget = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
-          // errorManagerInstance.debug('Zooming in to ' + this.zoomTarget_ + ' to because we are too close to the satellite');
-          this.state.zoomLevel = this.state.zoomTarget;
-        }
-      }
-    }
-
-    if (this.cameraType === CameraType.SATELLITE) {
-      if (target.id === -1 || target.type === SpaceObjectType.STAR) {
-        this.cameraType = CameraType.FIXED_TO_EARTH;
-      }
-    }
-
-    /*
-     * For FPS style movement rotate the this and then translate it
-     * for traditional view, move the this and then rotate it
-     */
-
-    switch (this.cameraType) {
-      case CameraType.FIXED_TO_EARTH: // pivot around the earth with earth in the center
-        this.drawFixedToEarth_();
-        break;
-      case CameraType.OFFSET: // pivot around the earth with earth offset to the bottom right
-        this.drawOffsetOfEarth_();
-        break;
-      case CameraType.FIXED_TO_SAT: // Pivot around the satellite
-        this.drawFixedToSatellite_(target);
-        break;
-      case CameraType.FPS: // FPS style movement
-        this.drawFirstPersonView_();
-        break;
-      case CameraType.PLANETARIUM: {
-        /*
-         * Pitch is the opposite of the angle to the latitude
-         * Yaw is 90 degrees to the left of the angle to the longitude
-         */
-        if (!sensorPos) {
-          throw new Error('Sensor Position is undefined');
-        }
-        this.drawPlanetarium_(sensorPos);
-        break;
-      }
-      case CameraType.SATELLITE: {
-        this.drawSatellite_(target);
-        break;
-      }
-      case CameraType.ASTRONOMY: {
-        /*
-         * Pitch is the opposite of the angle to the latitude
-         * Yaw is 90 degrees to the left of the angle to the longitude
-         */
-        if (!sensorPos) {
-          throw new Error('Sensor Position is undefined');
-        }
-        this.drawAstronomy_(sensorPos);
-        break;
-      }
-      default:
-        break;
-    }
+    // Delegate drawing to the behavior
+    this.behavior_.draw(sensorPosition, target);
   }
 
   exitFixedToSat(): void {
@@ -553,7 +528,7 @@ export class Camera {
     }
 
     this.cameraType = val;
-    this.resetFpsPos_();
+    // FPS position reset is now handled by FpsBehavior.onEnter()
   }
 
   /**
@@ -682,6 +657,7 @@ export class Camera {
    * Calculate the camera's position and camera matrix
    */
   update(dt: Milliseconds) {
+    // Common updates for all camera types
     this.updatePan_(dt);
     this.updateLocalRotation_(dt);
     this.updatePitchYawSpeeds_(dt);
@@ -689,9 +665,8 @@ export class Camera {
 
     this.state.camRotateSpeed -= this.state.camRotateSpeed * dt * settingsManager.cameraMovementSpeed;
 
-    if (this.cameraType === CameraType.FPS || this.cameraType === CameraType.SATELLITE || this.cameraType === CameraType.ASTRONOMY) {
-      this.updateFpsMovement_(dt);
-    } else {
+    // Update pitch/yaw for non-FPS camera types
+    if (this.cameraType !== CameraType.FPS && this.cameraType !== CameraType.SATELLITE && this.cameraType !== CameraType.ASTRONOMY) {
       if (this.state.camPitchSpeed !== 0) {
         this.state.camPitch = <Radians>(this.state.camPitch + this.state.camPitchSpeed * dt);
       }
@@ -703,6 +678,7 @@ export class Camera {
       }
     }
 
+    // Auto-rotate if enabled
     if (this.state.isAutoRotate) {
       if (settingsManager.isAutoRotateL) {
         this.state.camYaw = <Radians>(this.state.camYaw - settingsManager.autoRotateSpeed * dt * (this.inputHandler.isHoldingDownAKey));
@@ -719,9 +695,9 @@ export class Camera {
     }
 
     this.updateZoom_(dt);
-
     this.updateCameraSnapMode(dt);
 
+    // Clamp pitch for non-Fixed-to-Sat cameras
     if (this.cameraType !== CameraType.FIXED_TO_SAT) {
       if (this.state.camPitch > TAU / 4) {
         this.state.camPitch = <Radians>(TAU / 4);
@@ -731,6 +707,7 @@ export class Camera {
       }
     }
 
+    // Normalize yaw angle
     if (this.state.camYaw > TAU) {
       this.state.camYaw = <Radians>(this.state.camYaw - TAU);
     }
@@ -738,123 +715,15 @@ export class Camera {
       this.state.camYaw = <Radians>(this.state.camYaw + TAU);
     }
 
-    if (this.cameraType === CameraType.FIXED_TO_EARTH || this.cameraType === CameraType.OFFSET) {
-      this.state.earthCenteredPitch = this.state.camPitch;
-      this.state.earthCenteredYaw = this.state.camYaw;
-      if (this.state.earthCenteredYaw < 0) {
-        this.state.earthCenteredYaw = <Radians>(this.state.earthCenteredYaw + TAU);
-      }
-    }
+    // Delegate camera-specific update logic to behavior
+    this.behavior_.update(dt);
   }
 
   zoomLevel(): number {
     return this.state.zoomLevel;
   }
 
-  private drawAstronomy_(sensorPos: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
-    this.state.fpsPitch = <Degrees>(-1 * sensorPos.lat * DEG2RAD);
-
-    const sensorPosU = vec3.fromValues(-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01);
-
-    this.state.fpsPos[0] = sensorPos.x;
-    this.state.fpsPos[1] = sensorPos.y;
-    this.state.fpsPos[2] = sensorPos.z;
-
-    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsPitch + -this.state.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.fpsRotate * DEG2RAD, [0, 1, 0]);
-    vec3.normalize(this.normUp_, sensorPosU);
-    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.fpsYaw * DEG2RAD, this.normUp_);
-
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [-sensorPos.x * 1.01, -sensorPos.y * 1.01, -sensorPos.z * 1.01]);
-
-    /*
-     * const q = quat.create();
-     * const newrot = mat4.create();
-     * quat.fromEuler(q, this.ftsPitch * RAD2DEG, 0, -this.ftsYaw_ * RAD2DEG);
-     * mat4.fromQuat(newrot, q);
-     * mat4.multiply(this.camMatrix, newrot, this.camMatrix);
-     */
-  }
-
-  private drawFixedToEarth_() {
-    // 4. Rotate the camera around the new local origin
-    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.pitch);
-    mat4.rotateY(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.roll);
-    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.yaw);
-
-    // 3. Adjust for panning
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
-
-    // 2. Back away from the earth in the Y direction (depth)
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [0, this.calcDistanceBasedOnZoom(), 0]);
-    // 1. Rotate around the earth (0,0,0)
-    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.earthCenteredPitch);
-    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.earthCenteredYaw);
-  }
-
-  private drawFirstPersonView_() {
-    // Rotate the camera
-    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.fpsPitch * DEG2RAD, [1, 0, 0]);
-    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsYaw * DEG2RAD, [0, 0, 1]);
-    // Move the camera to the FPS position
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.fpsPos[0], this.state.fpsPos[1], -this.state.fpsPos[2]]);
-  }
-
-  private drawFixedToSatellite_(target: DetailedSatellite | MissileObject) {
-    /*
-     * mat4 commands are run in reverse order
-     * 1. Move to the satellite position
-     * 2. Twist the camera around Z-axis
-     * 3. Pitch the camera around X-axis (this may have moved because of the Z-axis rotation)
-     * 4. Back away from the satellite
-     * 5. Adjust for panning
-     * 6. Rotate the camera FPS style
-     */
-    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.pitch);
-    mat4.rotateY(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.roll);
-    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.yaw);
-
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
-
-    // Calculate target position distance from Earth
-    const targetPosition = vec3.fromValues(target.position.x, target.position.y, target.position.z);
-    const targetDistance = vec3.length(targetPosition);
-
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [
-      0,
-      this.calcDistanceBasedOnZoom() - targetDistance,
-      0,
-    ]);
-
-    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.ftsPitch);
-    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.ftsYaw);
-
-    // mat4.translate(this.camMatrix, this.camMatrix, targetPosition);
-  }
-
-  private drawOffsetOfEarth_() {
-    // Rotate the camera
-    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.pitch);
-    mat4.rotateY(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.roll);
-    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.localRotateCurrent.yaw);
-    // Adjust for panning
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [this.state.panCurrent.x, this.state.panCurrent.y, this.state.panCurrent.z]);
-    // Back away from the earth
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [settingsManager.offsetCameraModeX, this.calcDistanceBasedOnZoom(), settingsManager.offsetCameraModeZ]);
-    // Adjust for FPS style rotation
-    mat4.rotateX(this.matrixWorldInverse, this.matrixWorldInverse, this.state.earthCenteredPitch);
-    mat4.rotateZ(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.earthCenteredYaw);
-  }
-
-  private drawPlanetarium_(sensorPos: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number }) {
-    this.state.fpsPitch = <Degrees>(-1 * sensorPos.lat * DEG2RAD);
-    this.state.fpsRotate = <Degrees>((90 - sensorPos.lon) * DEG2RAD - sensorPos.gmst);
-    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsPitch, [1, 0, 0]);
-    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsRotate, [0, 0, 1]);
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [-sensorPos.x, -sensorPos.y, -sensorPos.z]);
-  }
-
-  private drawPreValidate_(sensorPos?: { lat: number; lon: number; gmst: GreenwichMeanSiderealTime; x: number; y: number; z: number } | null) {
+  private drawPreValidate_(_sensorPos: SensorPosition | null) {
     if (
       Number.isNaN(this.state.camPitch) ||
       Number.isNaN(this.state.camYaw) ||
@@ -882,43 +751,7 @@ export class Camera {
       this.state.zoomTarget = 0.5;
     }
 
-    if (!sensorPos && (this.cameraType === CameraType.PLANETARIUM || this.cameraType === CameraType.ASTRONOMY)) {
-      this.cameraType = CameraType.FIXED_TO_EARTH;
-      errorManagerInstance.debug('A sensor should be selected first if this mode is allowed to be planetarium or astronmy.');
-    }
-  }
-
-  private drawSatellite_(target: DetailedSatellite | MissileObject) {
-    const targetPositionTemp = vec3.fromValues(-target.position.x, -target.position.y, -target.position.z);
-
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, targetPositionTemp);
-    vec3.normalize(this.normUp_, targetPositionTemp);
-    vec3.normalize(this.normForward_, [target.velocity.x, target.velocity.y, target.velocity.z]);
-    vec3.transformQuat(this.normLeft_, this.normUp_, quat.fromValues(this.normForward_[0], this.normForward_[1], this.normForward_[2], 90 * DEG2RAD));
-    const targetNextPosition = vec3.fromValues(target.position.x + target.velocity.x, target.position.y + target.velocity.y, target.position.z + target.velocity.z);
-
-    mat4.lookAt(this.matrixWorldInverse, targetNextPosition, targetPositionTemp, this.normUp_);
-
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, [target.position.x, target.position.y, target.position.z]);
-
-    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, this.state.fpsPitch * DEG2RAD, this.normLeft_);
-    mat4.rotate(this.matrixWorldInverse, this.matrixWorldInverse, -this.state.fpsYaw * DEG2RAD, this.normUp_);
-
-    mat4.translate(this.matrixWorldInverse, this.matrixWorldInverse, targetPositionTemp);
-  }
-
-  private resetFpsPos_(): void {
-    this.state.fpsPitch = <Degrees>0;
-    this.state.fpsYaw = <Degrees>0;
-    this.state.fpsPos[0] = 0;
-
-    // Move out from the center of the Earth in FPS Mode
-    if (this.cameraType === CameraType.FPS) {
-      this.state.fpsPos[1] = 25000;
-    } else {
-      this.state.fpsPos[1] = 0;
-    }
-    this.state.fpsPos[2] = 0;
+    // Sensor validation is now handled by behavior.validate()
   }
 
   private updateCameraSnapMode(dt: Milliseconds) {
@@ -938,95 +771,6 @@ export class Camera {
    * This is intentionally complex to reduce object creation and GC
    * Splitting it into subfunctions would not be optimal
    */
-  private updateFpsMovement_(dt: Milliseconds): void {
-    this.state.fpsPitch = <Degrees>(this.state.fpsPitch - 20 * this.state.camPitchSpeed * dt);
-    this.state.fpsYaw = <Degrees>(this.state.fpsYaw - 20 * this.state.camYawSpeed * dt);
-    this.state.fpsRotate = <Degrees>(this.state.fpsRotate - 20 * this.state.camRotateSpeed * dt);
-
-    // Prevent Over Rotation
-    if (this.state.fpsPitch > 90) {
-      this.state.fpsPitch = <Degrees>90;
-    }
-    if (this.state.fpsPitch < -90) {
-      this.state.fpsPitch = <Degrees>-90;
-    }
-    if (this.state.fpsRotate > 360) {
-      this.state.fpsRotate = <Degrees>(this.state.fpsRotate - 360);
-    }
-    if (this.state.fpsRotate < 0) {
-      this.state.fpsRotate = <Degrees>(this.state.fpsRotate + 360);
-    }
-    if (this.state.fpsYaw > 360) {
-      this.state.fpsYaw = <Degrees>(this.state.fpsYaw - 360);
-    }
-    if (this.state.fpsYaw < 0) {
-      this.state.fpsYaw = <Degrees>(this.state.fpsYaw + 360);
-    }
-
-    const fpsTimeNow = <Milliseconds>Date.now();
-
-    if (this.fpsLastTime_ !== 0) {
-      const fpsElapsed = <Milliseconds>(fpsTimeNow - this.fpsLastTime_);
-
-      if (this.state.isFPSForwardSpeedLock && this.state.fpsForwardSpeed < 0) {
-        this.state.fpsForwardSpeed = Math.max(this.state.fpsForwardSpeed + Math.min(this.state.fpsForwardSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsForwardSpeed);
-      } else if (this.state.isFPSForwardSpeedLock && this.state.fpsForwardSpeed > 0) {
-        this.state.fpsForwardSpeed = Math.min(this.state.fpsForwardSpeed + Math.max(this.state.fpsForwardSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsForwardSpeed);
-      }
-
-      if (this.state.isFPSSideSpeedLock && this.state.fpsSideSpeed < 0) {
-        this.state.fpsSideSpeed = Math.max(this.state.fpsSideSpeed + Math.min(this.state.fpsSideSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsSideSpeed);
-      } else if (this.state.isFPSSideSpeedLock && this.state.fpsSideSpeed > 0) {
-        this.state.fpsSideSpeed = Math.min(this.state.fpsSideSpeed + Math.max(this.state.fpsSideSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsSideSpeed);
-      }
-
-      if (this.state.isFPSVertSpeedLock && this.state.fpsVertSpeed < 0) {
-        this.state.fpsVertSpeed = Math.max(this.state.fpsVertSpeed + Math.min(this.state.fpsVertSpeed * -1.02 * fpsElapsed, -0.2), -settingsManager.fpsVertSpeed);
-      } else if (this.state.isFPSVertSpeedLock && this.state.fpsVertSpeed > 0) {
-        this.state.fpsVertSpeed = Math.min(this.state.fpsVertSpeed + Math.max(this.state.fpsVertSpeed * 1.02 * fpsElapsed, 0.2), settingsManager.fpsVertSpeed);
-      }
-
-      if (this.cameraType === CameraType.FPS) {
-        if (this.state.fpsForwardSpeed !== 0) {
-          this.state.fpsPos[0] -= Math.sin(this.state.fpsYaw * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
-          this.state.fpsPos[1] -= Math.cos(this.state.fpsYaw * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
-          this.state.fpsPos[2] += Math.sin(this.state.fpsPitch * DEG2RAD) * this.state.fpsForwardSpeed * this.state.fpsRun * fpsElapsed;
-        }
-        if (this.state.fpsVertSpeed !== 0) {
-          this.state.fpsPos[2] -= this.state.fpsVertSpeed * this.state.fpsRun * fpsElapsed;
-        }
-        if (this.state.fpsSideSpeed !== 0) {
-          this.state.fpsPos[0] -= Math.cos(-this.state.fpsYaw * DEG2RAD) * this.state.fpsSideSpeed * this.state.fpsRun * fpsElapsed;
-          this.state.fpsPos[1] -= Math.sin(-this.state.fpsYaw * DEG2RAD) * this.state.fpsSideSpeed * this.state.fpsRun * fpsElapsed;
-        }
-      }
-
-      if (!this.state.isFPSForwardSpeedLock) {
-        this.state.fpsForwardSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-      if (!this.state.isFPSSideSpeedLock) {
-        this.state.fpsSideSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-      if (!this.state.isFPSVertSpeedLock) {
-        this.state.fpsVertSpeed *= Math.min(0.98 * fpsElapsed, 0.98);
-      }
-
-      if (this.state.fpsForwardSpeed < 0.01 && this.state.fpsForwardSpeed > -0.01) {
-        this.state.fpsForwardSpeed = 0;
-      }
-      if (this.state.fpsSideSpeed < 0.01 && this.state.fpsSideSpeed > -0.01) {
-        this.state.fpsSideSpeed = 0;
-      }
-      if (this.state.fpsVertSpeed < 0.01 && this.state.fpsVertSpeed > -0.01) {
-        this.state.fpsVertSpeed = 0;
-      }
-
-      this.state.fpsPitch = <Degrees>(this.state.fpsPitch + this.state.fpsPitchRate * fpsElapsed);
-      this.state.fpsRotate = <Degrees>(this.state.fpsRotate + this.state.fpsRotateRate * fpsElapsed);
-      this.state.fpsYaw = <Degrees>(this.state.fpsYaw + this.state.fpsYawRate * fpsElapsed);
-    }
-    this.fpsLastTime_ = fpsTimeNow;
-  }
 
   private updateFtsRotation_(dt: number) {
     if (this.state.ftsRotateReset) {
@@ -1369,7 +1113,7 @@ export class Camera {
     this.state.zoomLevel = this.state.zoomLevel < 0 ? 0.0001 : this.state.zoomLevel;
 
     // Try to stay out of the earth
-    if (this.cameraType === CameraType.FIXED_TO_EARTH || this.cameraType === CameraType.OFFSET || this.cameraType === CameraType.FIXED_TO_SAT) {
+    if (this.cameraType === CameraType.FIXED_TO_EARTH || this.cameraType === CameraType.FIXED_TO_SAT) {
       if (this.getDistFromEarth() < RADIUS_OF_EARTH + 30) {
         this.state.zoomTarget = this.state.zoomLevel + 0.001;
       }

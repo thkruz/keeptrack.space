@@ -48,7 +48,7 @@ export class CameraSettings {
   /**
    * The speed at which the camera decays.
    *
-   * Reduce this give momentum to camera changes
+   * Reduce this to give momentum to camera changes
    */
   cameraDecayFactor = 5;
   /**

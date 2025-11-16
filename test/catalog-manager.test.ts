@@ -5,6 +5,8 @@ import { GetSatType } from '@app/engine/core/interfaces';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { BaseObject, Degrees, DetailedSatellite, Kilometers, Minutes, SpaceObjectType } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 // Test calcSatrec function
 describe('calcSatrec', () => {

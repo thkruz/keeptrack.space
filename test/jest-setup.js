@@ -85,6 +85,7 @@ window.matchMedia = jest.fn().mockImplementation((query) => ({
 
 window.M = {
   AutoInit: jest.fn(),
+  updateTextFields: jest.fn(),
 };
 
 global.requestAnimationFrame = function requestAnimationFrame(cb) {

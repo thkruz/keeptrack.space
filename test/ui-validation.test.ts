@@ -3,6 +3,7 @@
 
 import { UiValidation } from '@app/app/ui/ui-validation';
 import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('UiValidation_class', () => {
   // Tests that all event listeners are added successfully

@@ -4,6 +4,8 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('EditSatPlugin_class', () => {
   beforeEach(() => {

@@ -108,11 +108,6 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
 
   const orbitManagerInstance = new OrbitManager();
 
-  orbitManagerInstance.orbitWorker = {
-    postMessage: jest.fn(),
-    addEventListener: jest.fn(),
-  } as unknown as Worker;
-
   orbitManagerInstance.init(null as unknown as LineManager, global.mocks.glMock);
   Container.getInstance().registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
 
@@ -390,6 +385,7 @@ export const setupDefaultHtml = () => {
   PluginRegistry.unregisterAllPlugins();
   // ServiceLocator.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
   Container.getInstance().registerSingleton(Singletons.MainCamera, mockCameraManager);
+  KeepTrack.getInstance().containerRoot = document.body as HTMLDivElement;
   KeepTrack.getDefaultBodyHtml();
   BottomMenu.init();
   KeepTrack.getInstance().containerRoot.innerHTML += `

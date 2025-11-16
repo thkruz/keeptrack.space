@@ -1,4 +1,3 @@
-import { errorManagerInstance } from '../utils/errorManager';
 import { isThisNode } from '../utils/isThisNode';
 
 export abstract class WebWorkerThreadManager {
@@ -16,13 +15,14 @@ export abstract class WebWorkerThreadManager {
 
   init(workerStub?: Worker, workerScriptUrl: string = this.WEB_WORKER_CODE) {
     if (isThisNode()) { // See if we are running jest right now for testing
-      workerScriptUrl = this.initNodeConfig_(workerStub, workerScriptUrl);
-    } else {
-      // Verify browser supports workers
-      this.checkWebWorkerSupport_();
+      this.initNodeConfig_(workerStub, workerScriptUrl);
 
-      workerScriptUrl = `./${this.WEB_WORKER_CODE}`;
+      return; // Exit early in Node environment
     }
+    // Verify browser supports workers
+    this.checkWebWorkerSupport_();
+
+    workerScriptUrl = `./${this.WEB_WORKER_CODE}`;
 
     try {
       this.worker_ = workerStub ?? new Worker(workerScriptUrl);
@@ -50,13 +50,22 @@ export abstract class WebWorkerThreadManager {
   protected initNodeConfig_(workerStub: Worker | undefined, workerScriptUrl: string) {
     if (workerStub) { // If we have a stub use it
       this.worker_ = workerStub;
-    } else { // Otherwise try loading the real worker
-      try {
-        workerScriptUrl = `http://localhost:5544/${this.WEB_WORKER_CODE}`;
-      } catch (error) {
-        this.worker_ = {} as Worker;
-        errorManagerInstance.debug(error);
-      }
+    } else { // Otherwise create a mock worker for testing
+      this.worker_ = {
+        postMessage: () => {
+          // Mock implementation for testing
+        },
+        terminate: () => {
+          // Mock implementation for testing
+        },
+        addEventListener: () => {
+          // Mock implementation for testing
+        },
+        removeEventListener: () => {
+          // Mock implementation for testing
+        },
+      } as unknown as Worker;
+      this.isReady_ = true;
     }
 
     return workerScriptUrl;

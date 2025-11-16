@@ -2,6 +2,7 @@
 
 import { SatMath } from '@app/app/analysis/sat-math';
 import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { CreateSat } from '@app/plugins/create-sat/create-sat';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { FormatTle, Sgp4 } from '@ootk/src/main';

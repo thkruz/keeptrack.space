@@ -7,6 +7,9 @@ import { SpaceObjectType } from '@ootk/src/main';
 import { defaultMisl, defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 
 describe('SatInfoBoxCore_class', () => {
   beforeEach(() => {

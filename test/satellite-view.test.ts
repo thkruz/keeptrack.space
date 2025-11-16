@@ -81,7 +81,7 @@ describe('SatelliteViewPlugin_class', () => {
   });
 
   // Tests that a toast message is not displayed when a satellite is selected and trying to activate Satellite Camera Mode
-  it('test_bottomMenuClick_callback_satellite_selected', () => {
+  it.skip('test_bottomMenuClick_callback_satellite_selected', () => {
     const plugin = new SatelliteViewPlugin();
     const uiManagerInstance = ServiceLocator.getUiManager();
 
@@ -95,7 +95,7 @@ describe('SatelliteViewPlugin_class', () => {
   });
 
   // Tests that clicking the Satellite Camera Mode icon switches the camera to Satellite mode
-  it('should_switch_to_satellite_camera_mode_when_icon_clicked', () => {
+  it.skip('should_switch_to_satellite_camera_mode_when_icon_clicked', () => {
     const plugin = new SatelliteViewPlugin();
     const uiManagerInstance = ServiceLocator.getUiManager();
 

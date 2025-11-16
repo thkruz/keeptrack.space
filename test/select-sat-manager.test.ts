@@ -7,6 +7,7 @@ import { DetailedSatellite, DetailedSensor, Kilometers, SpaceObjectType } from '
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 describe('SelectSatManager_dots', () => {
   let selectSatManager: SelectSatManager;

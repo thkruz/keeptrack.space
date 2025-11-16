@@ -2,6 +2,7 @@ import { NextLaunchesPlugin } from '@app/plugins/next-launches/next-launches';
 import { readFileSync } from 'fs';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('NextLaunches_class', () => {
   beforeAll(() => {

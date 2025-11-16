@@ -1,6 +1,7 @@
 import { Screenshot } from '@app/plugins/screenshot/screenshot';
 import { setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginRmbTests, standardPluginSuite } from './generic-tests';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('Screenshot_class', () => {
   let screenshotPlugin: Screenshot;

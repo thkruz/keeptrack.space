@@ -3,6 +3,7 @@ import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SoundNames, sounds } from '@app/plugins/sounds/sounds';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
+import { EventBus } from '@app/engine/events/event-bus';
 
 describe('Sound Manager', () => {
   let soundManagerPlugin: SoundManager;

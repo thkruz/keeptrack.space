@@ -23,7 +23,6 @@ import { UrlManager } from '@app/engine/input/url-manager';
 import { ColorSchemeColorMap } from '@app/engine/rendering/color-schemes/color-scheme';
 import { ObjectTypeColorSchemeColorMap } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { isThisNode } from '../engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import { CameraSettings, defaultCameraSettings } from './camera-settings';
@@ -38,6 +37,7 @@ import { PerformanceSettings, defaultPerformanceSettings } from './performance-s
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 import { UiSettings, defaultUiSettings } from './ui-settings';
+import { EventBus } from '@app/engine/events/event-bus';
 
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 /* eslint-disable max-lines */

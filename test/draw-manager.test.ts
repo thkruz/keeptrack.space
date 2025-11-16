@@ -4,6 +4,7 @@ import { Moon } from '@app/engine/rendering/draw-manager/celestial-bodies/moon';
 import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupDefaultHtml } from './environment/standard-env';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 describe('drawManager', () => {
   let drawManagerInstance: WebGLRenderer;

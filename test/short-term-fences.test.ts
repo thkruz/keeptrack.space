@@ -9,6 +9,7 @@ import { ShortTermFences } from '@app/plugins/short-term-fences/short-term-fence
 import { defaultSat, defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite, websiteInit } from './generic-tests';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('ShortTermFences_class', () => {
   beforeEach(() => {

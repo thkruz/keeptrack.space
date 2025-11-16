@@ -6,6 +6,7 @@ import { SatConstellations } from '@app/plugins/sat-constellations/sat-constella
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 describe('SatConstellations_class', () => {
   beforeEach(() => {

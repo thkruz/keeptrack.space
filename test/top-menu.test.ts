@@ -8,6 +8,7 @@ import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
+import { EventBus } from '@app/engine/events/event-bus';
 
 describe('TopMenu_class', () => {
   let topMenu: TopMenu;

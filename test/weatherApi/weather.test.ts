@@ -5,6 +5,8 @@ import { SensorTimeline } from '@app/plugins/timeline-sensor/sensor-timeline';
 import { DetailedSatellite, DetailedSensor, Hours } from '@ootk/src/main';
 import { setupStandardEnvironment } from '../environment/standard-env';
 import { websiteInit } from '../generic-tests';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 describe('SensorTimeline Weather Integration', () => {
   beforeEach(() => {

@@ -1,5 +1,6 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
+import { KeepTrack } from '@app/keeptrack';
 import { SatellitePhotos } from '@app/plugins/satellite-photos/satellite-photos';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
@@ -29,12 +30,6 @@ describe('SatellitePhotos_test_links', () => {
     satellitePhotosPlugin = new SatellitePhotos();
     websiteInit(satellitePhotosPlugin);
     KeepTrack.getInstance().containerRoot.innerHTML += '<div id="colorbox-div"></div>';
-    ServiceLocator.getCatalogManager = jest.fn().mockReturnValue({
-      selectSat: jest.fn(),
-      getSatFromObjNum: jest.fn().mockReturnValue({
-        id: 1,
-      }),
-    });
   });
 
   links.forEach((link) => {

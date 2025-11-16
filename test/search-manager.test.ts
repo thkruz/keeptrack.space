@@ -1,23 +1,16 @@
+import { CatalogManager } from '@app/app/data/catalog-manager';
 import { GroupsManager } from '@app/app/data/groups-manager';
 import { SearchManager } from '@app/app/ui/search-manager';
-import { UiManager } from '@app/app/ui/ui-manager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
-import { keepTrackApi } from '@app/keepTrackApi';
-import { CatalogManager } from '@app/singletons/catalog-manager';
 import { DetailedSatellite } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 
 describe('SearchManager', () => {
   let searchManager: SearchManager;
-  let mockUiManager: UiManager;
 
   beforeEach(() => {
-    mockUiManager = {
-      hideSideMenus: jest.fn(),
-      searchHoverSatId: -1,
-    } as unknown as UiManager;
-
     document.body.innerHTML = `
       <div id="ui-wrapper">
         <div id="search-holder"></div>
@@ -27,7 +20,7 @@ describe('SearchManager', () => {
       </div>
     `;
 
-    searchManager = new SearchManager(mockUiManager);
+    searchManager = new SearchManager();
   });
 
   afterEach(() => {
@@ -80,10 +73,10 @@ describe('SearchManager', () => {
       calculateColorBuffers: jest.fn(),
     } as unknown as ColorSchemeManager;
 
-    jest.spyOn(keepTrackApi, 'getCatalogManager').mockReturnValue(mockCatalogManager);
-    jest.spyOn(keepTrackApi, 'getDotsManager').mockReturnValue(mockDotsManager);
-    jest.spyOn(keepTrackApi, 'getGroupsManager').mockReturnValue(mockGroupManager);
-    jest.spyOn(keepTrackApi, 'getColorSchemeManager').mockReturnValue(mockColorSchemeManager);
+    jest.spyOn(ServiceLocator, 'getCatalogManager').mockReturnValue(mockCatalogManager);
+    jest.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue(mockDotsManager);
+    jest.spyOn(ServiceLocator, 'getGroupsManager').mockReturnValue(mockGroupManager);
+    jest.spyOn(ServiceLocator, 'getColorSchemeManager').mockReturnValue(mockColorSchemeManager);
 
     searchManager.hideResults();
 
@@ -108,9 +101,9 @@ describe('SearchManager', () => {
       selectGroup: jest.fn(),
     } as unknown as GroupsManager;
 
-    jest.spyOn(keepTrackApi, 'getCatalogManager').mockReturnValue(mockCatalogManager);
-    jest.spyOn(keepTrackApi, 'getDotsManager').mockReturnValue(mockDotsManager);
-    jest.spyOn(keepTrackApi, 'getGroupsManager').mockReturnValue(mockGroupManager);
+    jest.spyOn(ServiceLocator, 'getCatalogManager').mockReturnValue(mockCatalogManager);
+    jest.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue(mockDotsManager);
+    jest.spyOn(ServiceLocator, 'getGroupsManager').mockReturnValue(mockGroupManager);
 
     searchManager.doSearch('Satellite');
 

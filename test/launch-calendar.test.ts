@@ -4,6 +4,7 @@ import { LaunchCalendar } from '@app/plugins/launch-calendar/launch-calendar';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
+import { EventBus } from '@app/engine/events/event-bus';
 
 describe('launch_calendar_plugin', () => {
   let launchCalendarPlugin: LaunchCalendar;

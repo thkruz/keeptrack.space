@@ -9,6 +9,7 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { defaultSensor } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { EventBus } from '@app/engine/events/event-bus';
 
 describe('SensorFov_class', () => {
   let SensorFovPlugin: SensorFov;

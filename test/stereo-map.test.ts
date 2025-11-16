@@ -4,6 +4,8 @@ import { StereoMap } from '@app/plugins/stereo-map/stereo-map';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('StereoMapPlugin_class', () => {
   beforeEach(() => {

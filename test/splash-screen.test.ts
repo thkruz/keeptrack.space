@@ -3,6 +3,7 @@ import { getEl } from '@app/engine/utils/get-el';
 
 import { MobileManager } from '@app/app/ui/mobileManager';
 import { SplashScreen } from '@app/app/ui/splash-screen';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('SplashScreen_class', () => {
   beforeEach(() => {

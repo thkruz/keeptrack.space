@@ -10,6 +10,7 @@ import { CountriesMenu } from './../src/plugins/countries/countries';
 import { defaultSat } from './environment/apiMocks';
 import { mockUiManager, setupDefaultHtml } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite } from './generic-tests';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 describe('CountriesMenu_class', () => {
   beforeEach(() => {

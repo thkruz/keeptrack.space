@@ -4,6 +4,7 @@ import { WebGLRenderer } from '@app/engine/rendering/webgl-renderer';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { OrbitManager } from '@app/app/rendering/orbit-manager';
 import { Container } from '@app/engine/core/container';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { HoverManager } from '../src/app/ui/hover-manager';
 import { Singletons } from '../src/engine/core/interfaces';

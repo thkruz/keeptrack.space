@@ -7,6 +7,9 @@ import { Degrees } from '@ootk/src/main';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('NewLaunch_class', () => {
   beforeEach(() => {

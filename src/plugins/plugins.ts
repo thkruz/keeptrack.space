@@ -14,6 +14,7 @@ import { getEl } from '../engine/utils/get-el';
 import { AnalysisMenu } from './analysis/analysis';
 import { Breakup } from './breakup/breakup';
 import { Calculator } from './calculator/calculator';
+import { SatelliteFragmentationPlugin } from './satellite-fragmentation/satellite-fragmentation-plugin';
 import { ClassificationBar } from './classification-bar/classification-bar';
 import { Collisions } from './collisions/collisions';
 import { ColorMenu } from './colors-menu/colors-menu';
@@ -190,6 +191,7 @@ export class PluginManager {
         { init: () => new OrbitGuardMenuPlugin().init(), config: plugins.OrbitGuardMenuPlugin },
         { init: () => new TrackingImpactPredict().init(), config: plugins.TrackingImpactPredict },
         { init: () => new Breakup().init(), config: plugins.Breakup },
+        { init: () => new SatelliteFragmentationPlugin().init(), config: plugins.SatelliteFragmentationPlugin },
         { init: () => new DebrisScreening().init(), config: plugins.DebrisScreening },
         { init: () => new TransponderChannelData().init(), config: plugins.transponderChannelData },
         { init: () => new CreateSat().init(), config: plugins.CreateSat },

@@ -43,6 +43,7 @@ export type KeepTrackPluginsConfiguration = {
   AnalysisMenu?: PluginConfiguration;
   Astronomy?: PluginConfiguration;
   Breakup?: PluginConfiguration;
+  SatelliteFragmentationPlugin?: PluginConfiguration;
   catalogLoader?: PluginConfiguration;
   ClassificationBar?: PluginConfiguration;
   Collisions?: PluginConfiguration;

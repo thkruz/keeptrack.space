@@ -33,7 +33,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND } from '@ootk/src/main';
+import { BaseObject, DetailedSatellite, DetailedSensor, MILLISECONDS_PER_SECOND, Degrees, EciVec3, Kilometers, LlaVec3 } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -47,14 +47,72 @@ interface ReportData {
   isHeaders?: boolean;
 }
 
+/**
+ * Interface for a report generator that can be registered with the ReportsPlugin
+ */
+export interface ReportGenerator {
+  /** Unique identifier for this report */
+  id: string;
+  /** Display name for the report button */
+  name: string;
+  /** Description of what the report contains */
+  description?: string;
+  /** Whether this report requires a sensor to be selected */
+  requiresSensor?: boolean;
+  /**
+   * Generate the report data
+   * @param sat The selected satellite
+   * @param sensor The selected sensor (if required)
+   * @param startTime The start time for the report
+   * @returns The report data to be written
+   */
+  generate(sat: DetailedSatellite, sensor: DetailedSensor | null, startTime: Date): ReportData;
+}
+
 export class ReportsPlugin extends KeepTrackPlugin {
   readonly id = 'ReportsPlugin';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
 
+  /**
+   * Static registry of all available report generators
+   * Other plugins can register their reports by calling ReportsPlugin.registerReport()
+   */
+  private static reportRegistry_: Map<string, ReportGenerator> = new Map();
+
+  /**
+   * Register a new report generator
+   * This can be called by any plugin to add custom reports
+   * @param report The report generator to register
+   */
+  static registerReport(report: ReportGenerator): void {
+    if (ReportsPlugin.reportRegistry_.has(report.id)) {
+      errorManagerInstance.warn(`Report with id "${report.id}" is already registered. Overwriting.`);
+    }
+    ReportsPlugin.reportRegistry_.set(report.id, report);
+  }
+
+  /**
+   * Unregister a report generator
+   * @param reportId The id of the report to unregister
+   */
+  static unregisterReport(reportId: string): void {
+    ReportsPlugin.reportRegistry_.delete(reportId);
+  }
+
+  /**
+   * Get all registered reports
+   */
+  static getRegisteredReports(): ReportGenerator[] {
+    return Array.from(ReportsPlugin.reportRegistry_.values());
+  }
+
   constructor() {
     super();
     this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+
+    // Register built-in reports
+    this.registerBuiltInReports_();
   }
 
   isRequireSatelliteSelected = true;
@@ -65,29 +123,38 @@ export class ReportsPlugin extends KeepTrackPlugin {
   isIconDisabledOnLoad = true;
   isIconDisabled = true;
   sideMenuElementName: string = 'reports-menu';
-  sideMenuElementHtml: string = html`
-  <div id="reports-menu" class="side-menu-parent start-hidden text-select">
-    <div id="reports-content" class="side-menu">
-      <div class="row">
-        <h5 class="center-align">Reports</h5>
-        <div class="divider"></div>
-        <div class="center-align" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; margin-left: 10px; margin-right: 10px;">
+
+  /**
+   * Dynamically generate the side menu HTML based on registered reports
+   */
+  get sideMenuElementHtml(): string {
+    const buttons = ReportsPlugin.getRegisteredReports()
+      .map((report) => `
           <button
-              id="aer-report-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Azimuth Elevation Range &#9658;
+              id="${report.id}-btn"
+              class="btn btn-ui waves-effect waves-light"
+              type="button"
+              name="action"
+              title="${report.description || report.name}">
+            ${report.name} &#9658;
           </button>
-          <button
-              id="lla-report-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Lattitude Longitude Altitude &#9658;
-          </button>
-          <button
-              id="eci-report-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Earth Centered Intertial &#9658;
-          <button
-              id="coes-report-btn" class="btn btn-ui waves-effect waves-light" type="button" name="action">Classical Orbital Elements &#9658;
-          </button>
+      `)
+      .join('');
+
+    return html`
+      <div id="reports-menu" class="side-menu-parent start-hidden text-select">
+        <div id="reports-content" class="side-menu">
+          <div class="row">
+            <h5 class="center-align">Reports</h5>
+            <div class="divider"></div>
+            <div class="center-align" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px; margin-left: 10px; margin-right: 10px;">
+              ${buttons}
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-  `;
+    `;
+  }
 
   dragOptions: ClickDragOptions = {
     isDraggable: false,
@@ -99,10 +166,14 @@ export class ReportsPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.uiManagerFinal,
       () => {
-        getEl('aer-report-btn')!.addEventListener('click', () => this.generateAzElRng_());
-        getEl('coes-report-btn')!.addEventListener('click', () => this.generateClasicalOrbElJ2000_());
-        getEl('eci-report-btn')!.addEventListener('click', () => this.generateEci_());
-        getEl('lla-report-btn')!.addEventListener('click', () => this.generateLla_());
+        // Dynamically attach event listeners for all registered reports
+        ReportsPlugin.getRegisteredReports().forEach((report) => {
+          const button = getEl(`${report.id}-btn`);
+
+          if (button) {
+            button.addEventListener('click', () => this.generateReport_(report));
+          }
+        });
       },
     );
 
@@ -120,42 +191,286 @@ export class ReportsPlugin extends KeepTrackPlugin {
     );
   }
 
-  private generateAzElRng_() {
+  /**
+   * Generic report generation method that works with any registered report
+   */
+  private generateReport_(report: ReportGenerator): void {
     const sat = this.getSat_();
-    const sensor = this.getSensor_();
 
-    if (!sat || !sensor) {
+    if (!sat) {
       return;
     }
 
-    const header = `Azimuth Elevation Range Report\n-------------------------------\n${this.createHeader_(sat, sensor)}`;
-    let body = 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n';
-    const durationInSeconds = 72 * 60 * 60;
-    let isInCoverage = false;
-    let time = this.getStartTime_();
+    let sensor: DetailedSensor | null = null;
 
-    for (let t = 0; t < durationInSeconds; t += 30) {
-      time = new Date(time.getTime() + MILLISECONDS_PER_SECOND * 30);
-      const rae = sensor.rae(sat, time);
-
-      if (rae.el > 0) {
-        isInCoverage = true;
-        body += `${this.formatTime_(time)},${rae.az.toFixed(3)},${rae.el.toFixed(3)},${rae.rng.toFixed(3)}\n`;
-      } else if (isInCoverage) {
-        // If we were in coverage but now we are not, add a blank line to separate the passes
-        body += '\n\n';
-        isInCoverage = false;
+    if (report.requiresSensor) {
+      sensor = this.getSensor_();
+      if (!sensor) {
+        return;
       }
     }
 
-    if (body === 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n') {
-      body += 'No passes found!';
-    }
+    const startTime = this.getStartTime_();
+    const reportData = report.generate(sat, sensor, startTime);
 
-    this.writeReport_({
-      filename: `aer-${sat.sccNum}`,
-      header,
-      body,
+    this.writeReport_(reportData);
+  }
+
+  /**
+   * Register all built-in reports
+   * This is called during construction
+   */
+  private registerBuiltInReports_(): void {
+    // Azimuth Elevation Range Report
+    ReportsPlugin.registerReport({
+      id: 'aer-report',
+      name: 'Azimuth Elevation Range',
+      description: 'Generate azimuth, elevation, and range data for satellite passes',
+      requiresSensor: true,
+      generate: (sat: DetailedSatellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
+        if (!sensor) {
+          throw new Error('Sensor is required for AER report');
+        }
+
+        const header = `Azimuth Elevation Range Report\n-------------------------------\n${this.createHeader_(sat, sensor)}`;
+        let body = 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n';
+        const durationInSeconds = 72 * 60 * 60;
+        let isInCoverage = false;
+        let time = new Date(startTime.getTime());
+
+        for (let t = 0; t < durationInSeconds; t += 30) {
+          time = new Date(time.getTime() + MILLISECONDS_PER_SECOND * 30);
+          const rae = sensor.rae(sat, time);
+
+          if (rae.el > 0) {
+            isInCoverage = true;
+            body += `${this.formatTime_(time)},${rae.az.toFixed(3)},${rae.el.toFixed(3)},${rae.rng.toFixed(3)}\n`;
+          } else if (isInCoverage) {
+            body += '\n\n';
+            isInCoverage = false;
+          }
+        }
+
+        if (body === 'Time (UTC),Azimuth(°),Elevation(°),Range(km)\n') {
+          body += 'No passes found!';
+        }
+
+        return {
+          filename: `aer-${sat.sccNum}`,
+          header,
+          body,
+        };
+      },
+    });
+
+    // Latitude Longitude Altitude Report
+    ReportsPlugin.registerReport({
+      id: 'lla-report',
+      name: 'Latitude Longitude Altitude',
+      description: 'Generate latitude, longitude, and altitude data over time',
+      requiresSensor: false,
+      generate: (sat: DetailedSatellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
+        const header = `Latitude Longitude Altitude Report\n-------------------------------\n${this.createHeader_(sat)}`;
+        let body = 'Time (UTC),Latitude(°),Longitude(°),Altitude(km)\n';
+        const durationInSeconds = 72 * 60 * 60;
+        let time = new Date(startTime.getTime());
+
+        for (let t = 0; t < durationInSeconds; t += 30) {
+          time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
+          const lla = sat.lla(time);
+
+          body += `${this.formatTime_(time)},${lla.lat.toFixed(3)},${lla.lon.toFixed(3)},${lla.alt.toFixed(3)}\n`;
+        }
+
+        return {
+          filename: `lla-${sat.sccNum}`,
+          header,
+          body,
+        };
+      },
+    });
+
+    // Earth Centered Inertial Report
+    ReportsPlugin.registerReport({
+      id: 'eci-report',
+      name: 'Earth Centered Inertial',
+      description: 'Generate ECI position and velocity vectors over time',
+      requiresSensor: false,
+      generate: (sat: DetailedSatellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
+        const header = `Earth Centered Intertial Report\n-------------------------------\n${this.createHeader_(sat)}`;
+        let body = 'Time (UTC),Position X(km),Position Y(km),Position Z(km),Velocity X(km/s),Velocity Y(km/s),Velocity Z(km/s)\n';
+        const durationInSeconds = 72 * 60 * 60;
+        let time = new Date(startTime.getTime());
+
+        for (let t = 0; t < durationInSeconds; t += 30) {
+          time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
+          const eci = sat.eci(time);
+
+          body += `${this.formatTime_(time)},${eci.position.x.toFixed(3)},${eci.position.y.toFixed(3)},${eci.position.z.toFixed(3)},` +
+            `${eci.velocity.x.toFixed(3)},${eci.velocity.y.toFixed(3)},${eci.velocity.z.toFixed(3)}\n`;
+        }
+
+        return {
+          filename: `eci-${sat.sccNum}`,
+          header,
+          body,
+          columns: 7,
+          isHeaders: true,
+        };
+      },
+    });
+
+    // Classical Orbital Elements Report
+    ReportsPlugin.registerReport({
+      id: 'coes-report',
+      name: 'Classical Orbital Elements',
+      description: 'Generate classical orbital elements at current epoch',
+      requiresSensor: false,
+      generate: (sat: DetailedSatellite, _sensor: DetailedSensor | null, _startTime: Date): ReportData => {
+        const header = `Classic Orbit Elements Report\n-------------------------------\n${this.createHeader_(sat)}`;
+        const classicalEls = sat.toJ2000().toClassicalElements();
+        const body = '' +
+          `Epoch, ${classicalEls.epoch}\n` +
+          `Apogee, ${classicalEls.apogee.toFixed(3)} km\n` +
+          `Perigee, ${classicalEls.perigee.toFixed(3)} km\n` +
+          `Inclination, ${classicalEls.inclination.toFixed(3)}°\n` +
+          `Right Ascension, ${classicalEls.rightAscensionDegrees.toFixed(3)}°\n` +
+          `Argument of Perigee, ${classicalEls.argPerigeeDegrees.toFixed(3)}°\n` +
+          `True Anomaly, ${classicalEls.trueAnomalyDegrees.toFixed(3)}°\n` +
+          `Eccentricity, ${classicalEls.eccentricity.toFixed(3)}\n` +
+          `Period, ${classicalEls.period.toFixed(3)} min\n` +
+          `Semi-Major Axis, ${classicalEls.semimajorAxis.toFixed(3)} km\n` +
+          `Mean Motion, ${classicalEls.meanMotion.toFixed(3)} rev/day`;
+
+        return {
+          filename: `coes-${sat.sccNum}`,
+          header,
+          body,
+          columns: 2,
+          isHeaders: false,
+        };
+      },
+    });
+
+    // NEW: Visibility Windows Report
+    ReportsPlugin.registerReport({
+      id: 'visibility-windows-report',
+      name: 'Visibility Windows',
+      description: 'Generate visibility windows with rise/set times and pass duration',
+      requiresSensor: true,
+      generate: (sat: DetailedSatellite, sensor: DetailedSensor | null, startTime: Date): ReportData => {
+        if (!sensor) {
+          throw new Error('Sensor is required for Visibility Windows report');
+        }
+
+        const header = `Visibility Windows Report\n-------------------------------\n${this.createHeader_(sat, sensor)}`;
+        let body = 'Pass #,Rise Time (UTC),Set Time (UTC),Duration (min),Max Elevation(°),Max Elevation Time (UTC)\n';
+        const durationInSeconds = 7 * 24 * 60 * 60; // 7 days
+        let time = new Date(startTime.getTime());
+        let passNumber = 0;
+        let inPass = false;
+        let riseTime: Date | null = null;
+        let maxEl = 0;
+        let maxElTime: Date | null = null;
+
+        for (let t = 0; t < durationInSeconds; t += 10) {
+          time = new Date(startTime.getTime() + t * MILLISECONDS_PER_SECOND);
+          const rae = sensor.rae(sat, time);
+
+          if (rae.el > 0 && !inPass) {
+            // Pass start
+            inPass = true;
+            riseTime = new Date(time.getTime());
+            maxEl = rae.el;
+            maxElTime = new Date(time.getTime());
+          } else if (rae.el > 0 && inPass) {
+            // During pass - track max elevation
+            if (rae.el > maxEl) {
+              maxEl = rae.el;
+              maxElTime = new Date(time.getTime());
+            }
+          } else if (rae.el <= 0 && inPass) {
+            // Pass end
+            inPass = false;
+            passNumber++;
+            const setTime = new Date(time.getTime());
+            const duration = riseTime ? (setTime.getTime() - riseTime.getTime()) / (MILLISECONDS_PER_SECOND * 60) : 0;
+
+            body += `${passNumber},${this.formatTime_(riseTime!)},${this.formatTime_(setTime)},${duration.toFixed(2)},` +
+              `${maxEl.toFixed(3)},${this.formatTime_(maxElTime!)}\n`;
+
+            maxEl = 0;
+            maxElTime = null;
+            riseTime = null;
+          }
+        }
+
+        if (passNumber === 0) {
+          body += 'No passes found in the next 7 days!';
+        }
+
+        return {
+          filename: `visibility-windows-${sat.sccNum}`,
+          header,
+          body,
+          columns: 6,
+          isHeaders: true,
+        };
+      },
+    });
+
+    // NEW: Sun/Eclipse Report
+    ReportsPlugin.registerReport({
+      id: 'sun-eclipse-report',
+      name: 'Sun/Eclipse Analysis',
+      description: 'Generate sun visibility and eclipse entry/exit times for power and thermal analysis',
+      requiresSensor: false,
+      generate: (sat: DetailedSatellite, _sensor: DetailedSensor | null, startTime: Date): ReportData => {
+        const header = `Sun/Eclipse Analysis Report\n-------------------------------\n${this.createHeader_(sat)}`;
+        let body = 'Time (UTC),Sun Illuminated,Eclipse Type,Sun Angle(°)\n';
+        const durationInSeconds = 3 * 24 * 60 * 60; // 3 days
+        let time = new Date(startTime.getTime());
+        let wasIlluminated = true;
+        let eclipseEntryTime: Date | null = null;
+        let sunlightEntryTime: Date | null = null;
+
+        for (let t = 0; t < durationInSeconds; t += 60) {
+          time = new Date(startTime.getTime() + t * MILLISECONDS_PER_SECOND);
+
+          // Calculate if satellite is illuminated by the sun
+          const satPos = sat.eci(time).position;
+          const sunPos = this.getSunPosition_(time);
+          const earthRadius = 6371; // km
+
+          // Calculate if satellite is in Earth's shadow
+          const isIlluminated = this.isSatelliteIlluminated_(satPos, sunPos, earthRadius);
+
+          // Calculate sun angle (angle between satellite and sun from Earth center)
+          const sunAngle = this.calculateSunAngle_(satPos, sunPos);
+
+          const illuminationStatus = isIlluminated ? 'Yes' : 'No';
+          const eclipseType = isIlluminated ? 'None' : this.getEclipseType_(satPos, sunPos, earthRadius);
+
+          body += `${this.formatTime_(time)},${illuminationStatus},${eclipseType},${sunAngle.toFixed(3)}\n`;
+
+          // Track transitions
+          if (!isIlluminated && wasIlluminated) {
+            eclipseEntryTime = time;
+          } else if (isIlluminated && !wasIlluminated) {
+            sunlightEntryTime = time;
+          }
+
+          wasIlluminated = isIlluminated;
+        }
+
+        return {
+          filename: `sun-eclipse-${sat.sccNum}`,
+          header,
+          body,
+          columns: 4,
+          isHeaders: true,
+        };
+      },
     });
   }
 
@@ -169,59 +484,98 @@ export class ReportsPlugin extends KeepTrackPlugin {
     return `${date} ${timeOut}`;
   }
 
-  private generateLla_() {
-    const sat = this.getSat_();
+  /**
+   * Get the sun's position in ECI coordinates at a given time
+   * Simplified solar position algorithm
+   */
+  private getSunPosition_(time: Date): EciVec3<Kilometers> {
+    const J2000 = new Date('2000-01-01T12:00:00Z').getTime();
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const days = (time.getTime() - J2000) / msPerDay;
 
-    if (!sat) {
-      return;
-    }
+    // Mean anomaly
+    const M = (357.5291 + 0.98560028 * days) % 360;
+    const Mrad = (M * Math.PI) / 180;
 
-    const header = `Latitude Longitude Altitude Report\n-------------------------------\n${this.createHeader_(sat)}`;
-    let body = 'Time (UTC),Latitude(°),Longitude(°),Altitude(km)\n';
-    const durationInSeconds = 72 * 60 * 60;
-    let time = this.getStartTime_();
+    // Ecliptic longitude
+    const C = 1.9148 * Math.sin(Mrad) + 0.02 * Math.sin(2 * Mrad) + 0.0003 * Math.sin(3 * Mrad);
+    const L = (280.4665 + 0.98564736 * days + C) % 360;
+    const Lrad = (L * Math.PI) / 180;
 
-    for (let t = 0; t < durationInSeconds; t += 30) {
-      time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
-      const lla = sat.lla(time);
+    // Distance to sun (AU to km)
+    const distance = 149597870.7; // 1 AU in km
 
-      body += `${this.formatTime_(time)},${lla.lat.toFixed(3)},${lla.lon.toFixed(3)},${lla.alt.toFixed(3)}\n`;
-    }
+    // Convert to ECI coordinates (simplified)
+    const x = distance * Math.cos(Lrad);
+    const y = distance * Math.sin(Lrad);
+    const z = 0; // Simplified - sun is in ecliptic plane
 
-    this.writeReport_({
-      filename: `lla-${sat.sccNum}`,
-      header,
-      body,
-    });
+    return { x, y, z } as EciVec3<Kilometers>;
   }
 
-  private generateEci_() {
-    const sat = this.getSat_();
+  /**
+   * Calculate if satellite is illuminated by the sun
+   * Uses simple cylindrical shadow model
+   */
+  private isSatelliteIlluminated_(satPos: EciVec3<Kilometers>, sunPos: EciVec3<Kilometers>, earthRadius: number): boolean {
+    // Vector from satellite to sun
+    const toSun = {
+      x: sunPos.x - satPos.x,
+      y: sunPos.y - satPos.y,
+      z: sunPos.z - satPos.z,
+    };
 
-    if (!sat) {
-      return;
+    // Check if satellite is on the dark side of Earth
+    const dotProduct = satPos.x * sunPos.x + satPos.y * sunPos.y + satPos.z * sunPos.z;
+
+    if (dotProduct > 0) {
+      // Satellite is on the sunlit side
+      return true;
     }
 
-    const header = `Earth Centered Intertial Report\n-------------------------------\n${this.createHeader_(sat)}`;
-    let body = 'Time (UTC),Position X(km),Position Y(km),Position Z(km),Velocity X(km/s),Velocity Y(km/s),Velocity Z(km/s)\n';
-    const durationInSeconds = 72 * 60 * 60;
-    let time = this.getStartTime_();
+    // Calculate distance from Earth center to satellite
+    const satDistance = Math.sqrt(satPos.x * satPos.x + satPos.y * satPos.y + satPos.z * satPos.z);
 
-    for (let t = 0; t < durationInSeconds; t += 30) {
-      time = new Date(time.getTime() + 30 * MILLISECONDS_PER_SECOND);
-      const eci = sat.eci(time);
-
-      body += `${this.formatTime_(time)},${eci.position.x.toFixed(3)},${eci.position.y.toFixed(3)},${eci.position.z.toFixed(3)},` +
-        `${eci.velocity.x.toFixed(3)},${eci.velocity.y.toFixed(3)},${eci.velocity.z.toFixed(3)}\n`;
+    // Simple cylindrical shadow check
+    // If satellite is below LEO altitude and on dark side, it's in shadow
+    if (satDistance < earthRadius + 1000) {
+      return dotProduct > 0;
     }
 
-    this.writeReport_({
-      filename: `eci-${sat.sccNum}`,
-      header,
-      body,
-      columns: 7,
-      isHeaders: true,
-    });
+    // For higher orbits, use more detailed check
+    const perpDist = Math.abs(satPos.x * sunPos.y - satPos.y * sunPos.x) / Math.sqrt(sunPos.x * sunPos.x + sunPos.y * sunPos.y);
+
+    return perpDist > earthRadius;
+  }
+
+  /**
+   * Calculate the angle between satellite and sun as seen from Earth center
+   */
+  private calculateSunAngle_(satPos: EciVec3<Kilometers>, sunPos: EciVec3<Kilometers>): number {
+    const satMag = Math.sqrt(satPos.x * satPos.x + satPos.y * satPos.y + satPos.z * satPos.z);
+    const sunMag = Math.sqrt(sunPos.x * sunPos.x + sunPos.y * sunPos.y + sunPos.z * sunPos.z);
+    const dotProduct = satPos.x * sunPos.x + satPos.y * sunPos.y + satPos.z * sunPos.z;
+
+    const cosAngle = dotProduct / (satMag * sunMag);
+    const angle = Math.acos(Math.max(-1, Math.min(1, cosAngle)));
+
+    return (angle * 180) / Math.PI;
+  }
+
+  /**
+   * Determine the type of eclipse (penumbral, umbral, etc.)
+   */
+  private getEclipseType_(satPos: EciVec3<Kilometers>, sunPos: EciVec3<Kilometers>, earthRadius: number): string {
+    const satDistance = Math.sqrt(satPos.x * satPos.x + satPos.y * satPos.y + satPos.z * satPos.z);
+
+    // Simplified eclipse type determination
+    if (satDistance < earthRadius + 200) {
+      return 'Umbral';
+    } else if (satDistance < earthRadius + 500) {
+      return 'Penumbral';
+    }
+
+    return 'Umbral';
   }
 
   private createHeader_(sat: DetailedSatellite, sensor?: DetailedSensor) {
@@ -246,38 +600,6 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
 
     return sensor ? `${satData}${sensorData}` : `${satData}`;
-  }
-
-  private generateClasicalOrbElJ2000_() {
-    const sat = this.getSat_();
-
-    if (!sat) {
-      return;
-    }
-
-    const header = `Classic Orbit Elements Report\n-------------------------------\n${this.createHeader_(sat)}`;
-    const classicalEls = sat.toJ2000().toClassicalElements();
-    const body = '' +
-      `Epoch, ${classicalEls.epoch}\n` +
-      `Apogee, ${classicalEls.apogee.toFixed(3)} km\n` +
-      `Perigee, ${classicalEls.perigee.toFixed(3)} km\n` +
-      `Inclination, ${classicalEls.inclination.toFixed(3)}°\n` +
-      `Right Ascension, ${classicalEls.rightAscensionDegrees.toFixed(3)}°\n` +
-      `Argument of Perigee, ${classicalEls.argPerigeeDegrees.toFixed(3)}°\n` +
-      `True Anomaly, ${classicalEls.trueAnomalyDegrees.toFixed(3)}°\n` +
-      `Eccentricity, ${classicalEls.eccentricity.toFixed(3)}\n` +
-      `Period, ${classicalEls.period.toFixed(3)} min\n` +
-      `Semi-Major Axis, ${classicalEls.semimajorAxis.toFixed(3)} km\n` +
-      `Mean Motion, ${classicalEls.meanMotion.toFixed(3)} rev/day`;
-
-
-    this.writeReport_({
-      filename: `coes-${sat.sccNum}`,
-      header,
-      body,
-      columns: 2,
-      isHeaders: false,
-    });
   }
 
   private writeReport_({ filename, header, body, columns = 4, isHeaders = true }: ReportData) {

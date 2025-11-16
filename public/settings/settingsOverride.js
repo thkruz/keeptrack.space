@@ -23,66 +23,85 @@ const settingsOverride = {
    * This is an example of available settings that can be overridden.
    * Uncomment any options you wish to change.
    *
-   * Classification can be "Unclassified", "Secret", "Top Secret", "Top Secret//SCI"
-   * classificationStr: '',
-   * This controls which of the built-in plugins are loaded
-   * plugins: {
-   *   debug: false,
-   *   satInfoboxCore: true,
-   *   aboutManager: false,
-   *   collisions: true,
-   *   trackingImpactPredict: true,
-   *   dops: false,
-   *   findSat: true,
-   *   launchCalendar: true,
-   *   newLaunch: true,
-   *   nextLaunch: true,
-   *   nightToggle: true,
-   *   photoManager: true,
-   *   screenRecorder: true,
-   *   satChanges: false,
-   *   stereoMap: true,
-   *   timeMachine: true,
-   *   initialOrbit: false,
-   *   missile: true,
-   *   breakup: true,
-   *   editSat: true,
-   *   constellations: true,
-   *   countries: true,
-   *   colorsMenu: true,
-   *   shortTermFences: true,
-   *   orbitReferences: true,
-   *   analysis: true,
-   *   plotAnalysis: false,
-   *   sensorFov: true,
-   *   sensorSurv: true,
-   *   satelliteFov: true,
-   *   satelliteView: true,
-   *   planetarium: true,
-   *   astronomy: false,
-   *   screenshot: true,
-   *   watchlist: true,
-   *   sensor: true,
-   *   settingsMenu: true,
-   *   datetime: true,
-   *   social: true,
-   *   topMenu: true,
-   *   classificationBar: false,
-   *   soundManager: true,
-   *   gamepad: true,
-   *   debrisScreening: true,
-   *   videoDirector: false,
-   *   reports: true,
-   *   polarPlot: true,
-   *   timeline: true,
-   *   timelineAlt: true,
-   *   transponderChannelData: true,
-   *   calculator: true,
-   * },
+   * =============================================================================
+   * FLAT SYNTAX (Backward Compatible):
+   * =============================================================================
+   * You can override settings directly using their property names:
    *
+   * classificationStr: '',
    * searchLimit: 150,
    * isDisableCss: false,
    * isShowSplashScreen: true,
+   * isDrawSun: true,
+   * fieldOfView: 0.8,
+   *
+   * =============================================================================
+   * NESTED SYNTAX (Recommended for better organization):
+   * =============================================================================
+   * You can organize overrides by category for better readability:
+   *
+   * graphics: {
+   *   isDrawSun: true,
+   *   isDrawMilkyWay: false,
+   *   isDrawAtmosphere: 1,
+   *   godraysSamples: 36,
+   * },
+   *
+   * ui: {
+   *   isShowSplashScreen: false,
+   *   isShowLoadingHints: false,
+   *   desktopMaxLabels: 1000,
+   * },
+   *
+   * camera: {
+   *   fieldOfView: 0.8,
+   *   zoomSpeed: 0.01,
+   * },
+   *
+   * orbital: {
+   *   isDrawOrbits: true,
+   *   orbitSegments: 128,
+   * },
+   *
+   * data: {
+   *   dataSources: {
+   *     tle: 'https://your-custom-tle-source.com/api/sats',
+   *   },
+   * },
+   *
+   * performance: {
+   *   lowPerf: false,
+   *   maxLabels: 5000,
+   * },
+   *
+   * color: {
+   *   defaultColorScheme: 'ObjectTypeColorScheme',
+   * },
+   *
+   * core: {
+   *   classificationStr: '',
+   *   searchLimit: 150,
+   *   plugins: {
+   *     DebugMenuPlugin: { enabled: false },
+   *     AboutMenuPlugin: { enabled: false },
+   *     Collisions: { enabled: true },
+   *     DopsPlugin: { enabled: false },
+   *   },
+   * },
+   *
+   * =============================================================================
+   * AVAILABLE CATEGORIES:
+   * =============================================================================
+   * - graphics: Rendering, textures, visual effects
+   * - ui: User interface, menus, display settings
+   * - camera: Camera movement, FOV, zoom settings
+   * - orbital: Orbit calculations, rendering, propagation
+   * - data: Data sources, catalogs, servers
+   * - performance: Performance limits, throttling
+   * - color: Color schemes and object colors
+   * - core: Core settings, plugins, filters, global flags
+   *
+   * You can mix flat and nested syntax - flat overrides take precedence.
    */
 };
 

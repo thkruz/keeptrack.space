@@ -1,14 +1,14 @@
 /* eslint-disable dot-notation */
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { FindSatPlugin } from '@app/plugins/find-sat/find-sat';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { KeepTrack } from '@app/keeptrack';
 
 // eslint-disable-next-line max-lines-per-function
 describe('FindSatPlugin_class', () => {
   beforeEach(() => {
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment();
     window.M.AutoInit = jest.fn();
   });

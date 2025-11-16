@@ -6,10 +6,11 @@ import { SensorMath } from '@app/app/sensors/sensor-math';
 import { SensorManager } from '@app/app/sensors/sensorManager';
 import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { SearchManager } from '@app/app/ui/search-manager';
-import { UiManager } from '@app/app/ui/uiManager';
+import { UiManager } from '@app/app/ui/ui-manager';
 import { Camera } from '@app/engine/camera/camera';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { InputManager } from '@app/engine/input/input-manager';
@@ -25,9 +26,9 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { mat4 } from 'gl-matrix';
+import { OrbitManager } from '../../src/app/rendering/orbit-manager';
 import { Container } from '../../src/engine/core/container';
 import { Constructor, Singletons } from '../../src/engine/core/interfaces';
-import { OrbitManager } from '../../src/engine/rendering/orbitManager';
 import { WebGLRenderer } from '../../src/engine/rendering/webgl-renderer';
 import { defaultSat, defaultSensor } from './apiMocks';
 
@@ -44,7 +45,7 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   Image = jest.fn().mockImplementation(() => ({
     decode: () => Promise.resolve(new Uint8ClampedArray([0, 0, 0, 0])),
   }));
-  keepTrackApi.containerRoot = null as unknown as HTMLDivElement;
+  KeepTrack.getInstance().containerRoot = null as unknown as HTMLDivElement;
   keepTrackApi.analytics = {
     track: jest.fn(),
     identify: jest.fn(),
@@ -107,11 +108,6 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
 
   const orbitManagerInstance = new OrbitManager();
 
-  orbitManagerInstance.orbitWorker = {
-    postMessage: jest.fn(),
-    addEventListener: jest.fn(),
-  } as unknown as Worker;
-
   orbitManagerInstance.init(null as unknown as LineManager, global.mocks.glMock);
   Container.getInstance().registerSingleton(Singletons.OrbitManager, orbitManagerInstance);
 
@@ -167,17 +163,17 @@ export const setupStandardEnvironment = (dependencies?: Constructor<KeepTrackPlu
   Container.getInstance().registerSingleton(Singletons.SensorMath, sensorMathInstance);
   Container.getInstance().registerSingleton(Singletons.SoundManager, soundManagerInstance);
 
-  keepTrackApi.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));
-  keepTrackApi.getDotsManager().sizeData = new Int8Array(Array(100).fill(0));
-  keepTrackApi.getDotsManager().positionData = new Float32Array(Array(100).fill(0));
+  ServiceLocator.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));
+  ServiceLocator.getDotsManager().sizeData = new Int8Array(Array(100).fill(0));
+  ServiceLocator.getDotsManager().positionData = new Float32Array(Array(100).fill(0));
   // Setup a mock catalog
   const sat2 = defaultSat.clone();
 
   sat2.id = 1;
   sat2.sccNum = '11';
-  keepTrackApi.getCatalogManager().objectCache = [defaultSat, sat2];
+  ServiceLocator.getCatalogManager().objectCache = [defaultSat, sat2];
 
-  keepTrackApi.containerRoot.innerHTML += `
+  KeepTrack.getInstance().containerRoot.innerHTML += `
     <div id="save-rmb"></div>
     <div id="save-rmb-menu"></div>
     <div id="view-rmb"></div>
@@ -252,15 +248,15 @@ export const enableConsoleErrors = () => {
 };
 
 export const standardSelectSat = () => {
-  keepTrackApi.getCatalogManager().objectCache = [defaultSat];
-  keepTrackApi.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));
-  keepTrackApi.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
-  keepTrackApi.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
-  keepTrackApi.getCatalogManager().getObject = () => defaultSat;
-  keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0);
+  ServiceLocator.getCatalogManager().objectCache = [defaultSat];
+  ServiceLocator.getColorSchemeManager().colorData = new Float32Array(Array(100).fill(0));
+  ServiceLocator.getDotsManager().sizeData = Array(100).fill(0) as unknown as Int8Array;
+  ServiceLocator.getDotsManager().positionData = Array(100).fill(0) as unknown as Float32Array;
+  ServiceLocator.getCatalogManager().getObject = () => defaultSat;
+  PluginRegistry.getPlugin(SelectSatManager)?.selectSat(0);
 };
 export const setupMinimumHtml = () => {
-  keepTrackApi.containerRoot.innerHTML = `
+  KeepTrack.getInstance().containerRoot.innerHTML = `
   <div id="keeptrack-root">
     <div id="keeptrack-header"></div>
     <div id="${KeepTrackPlugin.bottomIconsContainerId}"></div>
@@ -387,11 +383,12 @@ export const mockCameraManager = <Camera>(<unknown>{
 
 export const setupDefaultHtml = () => {
   PluginRegistry.unregisterAllPlugins();
-  // keepTrackApi.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
+  // ServiceLocator.getMainCamera = jest.fn().mockReturnValue(mockCameraManager);
   Container.getInstance().registerSingleton(Singletons.MainCamera, mockCameraManager);
+  KeepTrack.getInstance().containerRoot = document.body as HTMLDivElement;
   KeepTrack.getDefaultBodyHtml();
   BottomMenu.init();
-  keepTrackApi.containerRoot.innerHTML += `
+  KeepTrack.getInstance().containerRoot.innerHTML += `
     <input id="search"></input>
     <div id="search-holder"></div>
     <div id="search-btn"></div>

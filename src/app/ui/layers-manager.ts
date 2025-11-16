@@ -1,3 +1,5 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { addonColorSchemes } from '@app/engine/rendering/color-scheme-addons';
@@ -9,7 +11,6 @@ import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import layersPng from '@public/img/icons/layers.png';
 import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
 import { rgbCss } from '../../engine/utils/rgbCss';
-import { keepTrackApi } from '../../keepTrackApi';
 import {
   astronomyDiv,
   deepDiv,
@@ -102,7 +103,7 @@ export class LayersManager {
           showEl(layersHoverDom);
           layersMenuIconContainer.classList.remove('top-menu-icons__blue-img');
           layersMenuIconContainer.classList.add('bmenu-item-selected');
-          keepTrackApi.getUiManager().searchManager.hideResults();
+          ServiceLocator.getUiManager().searchManager.hideResults();
           this.isLayersMenuOpen = true;
         }
       });
@@ -113,7 +114,7 @@ export class LayersManager {
     const eventBus = EventBus.getInstance();
 
     // This needs to happen immediately so the sound button is in the menu
-    keepTrackApi.getPlugin(TopMenu)?.navItems.push({
+    PluginRegistry.getPlugin(TopMenu)?.navItems.push({
       id: 'layers-menu-btn',
       order: 2,
       classInner: 'top-menu-icons__blue-img',
@@ -134,7 +135,7 @@ export class LayersManager {
   }
 
   layersHoverMenuClick(layersType: string) {
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
     const colorSchemeInstance = colorSchemeManagerInstance.currentColorScheme;
     const slug = layersType.split('-')[1];
     let isFlagOn = true;
@@ -193,11 +194,11 @@ export class LayersManager {
 
     // Update Layers Colors
     LayersManager.layersColorsChange();
-    keepTrackApi.emit(EventBusEvent.layerUpdated, menu);
+    EventBus.getInstance().emit(EventBusEvent.layerUpdated, menu);
   }
 
   static layersColorsChange(): void {
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     colorSchemeManagerInstance.resetObjectTypeFlags();
 

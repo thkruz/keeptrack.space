@@ -3,7 +3,6 @@ import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { Milliseconds } from '@ootk/src/main';
-import { keepTrackApi } from '../../keepTrackApi';
 import { Camera } from '../camera/camera';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
@@ -152,7 +151,7 @@ export class Scene {
     }
     this.skybox.update();
 
-    keepTrackApi.getLineManager().update();
+    ServiceLocator.getLineManager().update();
 
     this.sensorFovFactory.updateAll();
     this.coneFactory.updateAll();
@@ -187,7 +186,7 @@ export class Scene {
     const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
 
     if (selectSatManager && selectSatManager.primarySatObj.id !== -1) {
-      const satelliteOffset = keepTrackApi.getDotsManager().getPositionArray(selectSatManager.primarySatObj.id).map((coord) => -coord);
+      const satelliteOffset = ServiceLocator.getDotsManager().getPositionArray(selectSatManager.primarySatObj.id).map((coord) => -coord);
 
       this.worldShift = satelliteOffset as [number, number, number];
     }
@@ -248,8 +247,8 @@ export class Scene {
         // Draw a black object mesh on top of the sun in the godrays frame buffer
         if (
           !settingsManager.modelsOnSatelliteViewOverride &&
-          (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
-          keepTrackApi.getMainCamera().state.camDistBuffer <= settingsManager.nearZoomLevel
+          (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1 &&
+          ServiceLocator.getMainCamera().state.camDistBuffer <= settingsManager.nearZoomLevel
         ) {
           renderer.meshManager.drawOcclusion(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.programs.occlusion, this.frameBuffers.godrays);
         }
@@ -272,7 +271,7 @@ export class Scene {
         }
       }
 
-      keepTrackApi.emit(EventBusEvent.drawOptionalScenery);
+      EventBus.getInstance().emit(EventBusEvent.drawOptionalScenery);
     }
 
     renderer.postProcessingManager.curBuffer = null;
@@ -293,32 +292,32 @@ export class Scene {
           settingsManager.isDisableGodrays = true;
           settingsManager.sizeOfSun = 1.65;
           settingsManager.isUseSunTexture = true;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingGodrays'), ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.Scene.disablingGodrays'), ToastMsgType.caution);
           break;
         }
         if (settingsManager.isDrawAurora) {
           settingsManager.isDrawAurora = false;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAurora'), ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.Scene.disablingAurora'), ToastMsgType.caution);
           break;
         }
         if (settingsManager.isDrawAtmosphere > 0) {
           settingsManager.isDrawAtmosphere = AtmosphereSettings.OFF;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingAtmosphere'), ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.Scene.disablingAtmosphere'), ToastMsgType.caution);
           break;
         }
         if (!settingsManager.isDisablePlanets) {
           settingsManager.isDisablePlanets = true;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingMoon'), ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.Scene.disablingMoon'), ToastMsgType.caution);
           break;
         }
         if (settingsManager.isDrawMilkyWay) {
           settingsManager.isDrawMilkyWay = false;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingMilkyWay'), ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.Scene.disablingMilkyWay'), ToastMsgType.caution);
           break;
         }
         if (settingsManager.isDrawSun) {
           settingsManager.isDrawSun = false;
-          keepTrackApi.getUiManager().toast(t7e('errorMsgs.Scene.disablingSun'), ToastMsgType.caution);
+          ServiceLocator.getUiManager().toast(t7e('errorMsgs.Scene.disablingSun'), ToastMsgType.caution);
           break;
         }
         isSettingsLeftToDisable = false;
@@ -336,10 +335,10 @@ export class Scene {
   }
 
   renderOpaque(renderer: WebGLRenderer, camera: Camera): void {
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
-    const hoverManagerInstance = keepTrackApi.getHoverManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
+    const hoverManagerInstance = ServiceLocator.getHoverManager();
 
     // Draw Earth
     this.earth.draw(renderer.postProcessingManager.curBuffer);
@@ -349,10 +348,10 @@ export class Scene {
 
     orbitManagerInstance.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer, hoverManagerInstance, colorSchemeManagerInstance, camera);
 
-    keepTrackApi.getLineManager().draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
+    ServiceLocator.getLineManager().draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);
 
     // Draw Satellite Model if a satellite is selected and meshManager is loaded
-    if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
+    if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) > -1) {
       if (!settingsManager.modelsOnSatelliteViewOverride && camera.state.camDistBuffer <= settingsManager.nearZoomLevel) {
         renderer.meshManager.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
       }
@@ -360,7 +359,7 @@ export class Scene {
   }
 
   renderTransparent(renderer: WebGLRenderer, camera: Camera): void {
-    const selectedSatelliteManager = keepTrackApi.getPlugin(SelectSatManager);
+    const selectedSatelliteManager = PluginRegistry.getPlugin(SelectSatManager);
 
     if (!selectedSatelliteManager) {
       return;
@@ -431,11 +430,11 @@ export class Scene {
   async loadScene(): Promise<void> {
     try {
       this.earth.init(this.gl_);
-      keepTrackApi.emit(EventBusEvent.drawManagerLoadScene);
+      EventBus.getInstance().emit(EventBusEvent.drawManagerLoadScene);
       await this.sun.init(this.gl_);
 
       if (!settingsManager.isDisableGodrays) {
-        keepTrackApi.getScene().godrays?.init(this.gl_, this.sun);
+        ServiceLocator.getScene().godrays?.init(this.gl_, this.sun);
       }
 
       if (!settingsManager.isDisablePlanets) {

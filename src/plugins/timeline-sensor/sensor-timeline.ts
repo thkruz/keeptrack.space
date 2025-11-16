@@ -5,7 +5,6 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import viewTimelinePng from '@public/img/icons/view_timeline.png';
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
@@ -19,6 +18,8 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
 
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -90,15 +91,15 @@ export class SensorTimeline extends KeepTrackPlugin {
   constructor() {
     super();
 
-    this.allSensorLists_ = keepTrackApi.getSensorManager().getSensorList('ssn').concat(
-      keepTrackApi.getSensorManager().getSensorList('mw'),
-      keepTrackApi.getSensorManager().getSensorList('md'),
-      keepTrackApi.getSensorManager().getSensorList('OWL-Net'),
-      keepTrackApi.getSensorManager().getSensorList('leolabs'),
-      keepTrackApi.getSensorManager().getSensorList('esoc'),
-      keepTrackApi.getSensorManager().getSensorList('rus'),
-      keepTrackApi.getSensorManager().getSensorList('prc'),
-      keepTrackApi.getSensorManager().getSensorList('other'),
+    this.allSensorLists_ = ServiceLocator.getSensorManager().getSensorList('ssn').concat(
+      ServiceLocator.getSensorManager().getSensorList('mw'),
+      ServiceLocator.getSensorManager().getSensorList('md'),
+      ServiceLocator.getSensorManager().getSensorList('OWL-Net'),
+      ServiceLocator.getSensorManager().getSensorList('leolabs'),
+      ServiceLocator.getSensorManager().getSensorList('esoc'),
+      ServiceLocator.getSensorManager().getSensorList('rus'),
+      ServiceLocator.getSensorManager().getSensorList('prc'),
+      ServiceLocator.getSensorManager().getSensorList('other'),
     );
 
     // remove duplicates in sensorList
@@ -107,7 +108,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     );
 
     this.enabledSensors_ = this.allSensorLists_.filter((s) =>
-      keepTrackApi.getSensorManager().getSensorList('mw').includes(s),
+      ServiceLocator.getSensorManager().getSensorList('mw').includes(s),
     );
   }
 
@@ -209,7 +210,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     link.href = URL.createObjectURL(blob);
 
     // Set the download attribute with a dynamically generated filename
-    link.download = `sat-${(keepTrackApi.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite).sccNum6}-timeline.csv`;
+    link.download = `sat-${(PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite).sccNum6}-timeline.csv`;
 
     // Simulate a click on the link to trigger the download
     link.click();
@@ -332,7 +333,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   async updateTimeline(): Promise<void> {
     try {
-      if (keepTrackApi.getPlugin(SelectSatManager)!.selectedSat === -1) {
+      if (PluginRegistry.getPlugin(SelectSatManager)!.selectedSat === -1) {
         return;
       }
       if (!this.isMenuButtonActive) {
@@ -390,11 +391,11 @@ export class SensorTimeline extends KeepTrackPlugin {
         if (sensorButton.classList.contains('btn-red')) {
           sensorButton.classList.remove('btn-red');
           this.enabledSensors_.push(sensor);
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           sensorButton.classList.add('btn-red');
           this.enabledSensors_.splice(this.enabledSensors_.indexOf(sensor), 1);
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
 
         this.ctxStatic_.reset();
@@ -415,8 +416,8 @@ export class SensorTimeline extends KeepTrackPlugin {
     const AllSatinSuns: Passes[] = [];
     const AllSensorNights: Passes[] = [];
     const AllClearSkies: Passes[] = [];
-    const satellite = keepTrackApi.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite;
-    const startDate = keepTrackApi.getTimeManager().getOffsetTimeObj(0);
+    const satellite = PluginRegistry.getPlugin(SelectSatManager)!.getSelectedSat() as DetailedSatellite;
+    const startDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
     startDate.setMinutes(0, 0, 0);
     /*
@@ -552,7 +553,7 @@ export class SensorTimeline extends KeepTrackPlugin {
         let weatherStatusThisIter = WeatherStatus.UNKOWN;
 
         offset = i * 1000 as Milliseconds;
-        // const now = keepTrackApi.getTimeManager().getOffsetTimeObj(offset);
+        // const now = ServiceLocator.getTimeManager().getOffsetTimeObj(offset);
         const now = new Date(startDate.getTime() + offset);
 
         // Calculate Observability conditions
@@ -803,7 +804,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   private drawTimeline_(Passes: Passes[], SatinFoVs: Passes[], SatinSuns: Passes[], StationInNights: Passes[], clearSkies: Passes[]): void {
 
-    const startDate = keepTrackApi.getTimeManager().getOffsetTimeObj(0);
+    const startDate = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
     startDate.setMinutes(0, 0, 0);
     const startTime = startDate.getTime() as Milliseconds;
@@ -1001,7 +1002,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     this.ctx_.lineTo(this.leftOffset + this.width, this.topOffset + this.height - 20);
     this.ctx_.stroke();
 
-    const timeManager = keepTrackApi.getTimeManager();
+    const timeManager = ServiceLocator.getTimeManager();
     const initialHour = timeManager.simulationTimeObj.getUTCHours();
 
     // Draw hour markers
@@ -1122,14 +1123,14 @@ export class SensorTimeline extends KeepTrackPlugin {
 
         // If the mouse is over a pass change the sensor
         if (drawEvent(mouseX, mouseY)) {
-          const timeManagerInstance = keepTrackApi.getTimeManager();
+          const timeManagerInstance = ServiceLocator.getTimeManager();
 
-          keepTrackApi.getSensorManager().setSensor(sensorPass.sensor);
+          ServiceLocator.getSensorManager().setSensor(sensorPass.sensor);
 
           timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
           timeManagerInstance.calculateSimulationTime();
 
-          const selectSatManagerInstance = keepTrackApi.getPlugin(SelectSatManager)!;
+          const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager)!;
           const currentSatId = selectSatManagerInstance.selectedSat;
 
           selectSatManagerInstance.selectSat(-1);

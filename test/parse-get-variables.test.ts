@@ -3,6 +3,7 @@
 /* eslint-disable global-require */
 
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { GetVariables } from '@app/settings/getVariables';
 import { parseGetVariables } from '@app/settings/parse-get-variables';
@@ -21,10 +22,8 @@ describe('parseGetVariables', () => {
       colors: {} as any,
       satShader: {} as any,
     } as unknown as SettingsManager;
-    // Mock keepTrackApi.getUiManager().toast
-    jest.spyOn(require('@app/keepTrackApi').keepTrackApi, 'getUiManager').mockReturnValue({
-      toast: toastMock,
-    });
+    // Mock ServiceLocator.getUiManager().toast
+    jest.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(toastMock);
   });
 
   it('should handle bad presets', () => {

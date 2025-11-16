@@ -2,7 +2,6 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds } from '@ootk/src/main';
@@ -11,7 +10,9 @@ import { GroupType } from '../../app/data/object-group';
 import { SettingsManager } from '../../settings/settings';
 import { Camera, CameraType } from '../camera/camera';
 import { GetSatType } from '../core/interfaces';
+import { PluginRegistry } from '../core/plugin-registry';
 import { Scene } from '../core/scene';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
@@ -20,6 +21,7 @@ import { DepthManager } from './depth-manager';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
 import { MeshManager } from './mesh-manager';
+import { KeepTrack } from '@app/keeptrack';
 
 export class WebGLRenderer {
   private hoverBoxOnSatMiniElements_: HTMLElement | null = null;
@@ -63,10 +65,10 @@ export class WebGLRenderer {
 
   static getCanvasInfo(): { vw: number; vh: number } {
     // Using minimum allows the canvas to be full screen without fighting with scrollbars
-    const cw = keepTrackApi.containerRoot?.clientWidth ?? document.documentElement.clientWidth ?? 0;
+    const cw = KeepTrack.getInstance().containerRoot?.clientWidth ?? document.documentElement.clientWidth ?? 0;
     const iw = window.innerWidth || 0;
     const vw = Math.min.apply(null, [cw, iw].filter(Boolean));
-    const vh = Math.min(keepTrackApi.containerRoot?.clientHeight ?? document.documentElement.clientHeight ?? 0, window.innerHeight ?? 0);
+    const vh = Math.min(KeepTrack.getInstance().containerRoot?.clientHeight ?? document.documentElement.clientHeight ?? 0, window.innerHeight ?? 0);
 
     return { vw, vh };
   }
@@ -76,7 +78,7 @@ export class WebGLRenderer {
       return;
     }
 
-    keepTrackApi.getMainCamera().projectionMatrix = Camera.calculatePMatrix(this.gl);
+    ServiceLocator.getMainCamera().projectionMatrix = Camera.calculatePMatrix(this.gl);
   }
 
   private isAltCanvasSize_ = false;
@@ -94,7 +96,7 @@ export class WebGLRenderer {
       this.isAltCanvasSize_ = false;
     }
 
-    const mainCamera = keepTrackApi.getMainCamera();
+    const mainCamera = ServiceLocator.getMainCamera();
 
     // Apply the camera matrix
     this.projectionCameraMatrix = mat4.mul(mat4.create(), mainCamera.projectionMatrix, mainCamera.matrixWorldInverse);
@@ -192,10 +194,10 @@ export class WebGLRenderer {
   // eslint-disable-next-line require-await
   async init(settings: SettingsManager): Promise<void> {
     this.settings_ = settings;
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
 
     this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
-    keepTrackApi.getHoverManager()?.init();
+    ServiceLocator.getHoverManager()?.init();
     this.startWithOrbits();
 
     // Reinitialize the canvas on mobile rotation
@@ -203,7 +205,7 @@ export class WebGLRenderer {
       this.isRotationEvent_ = true;
     });
 
-    keepTrackApi.getScene().earth.init();
+    ServiceLocator.getScene().earth.init();
   }
 
   /**
@@ -229,13 +231,13 @@ export class WebGLRenderer {
    */
   // eslint-disable-next-line max-statements
   orbitsAbove() {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
-    const watchlistPluginInstance = keepTrackApi.getPlugin(WatchlistPlugin);
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    const watchlistPluginInstance = PluginRegistry.getPlugin(WatchlistPlugin);
 
     if (
-      keepTrackApi.getMainCamera().cameraType === CameraType.ASTRONOMY ||
-      keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM ||
+      ServiceLocator.getMainCamera().cameraType === CameraType.ASTRONOMY ||
+      ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM ||
       watchlistPluginInstance?.hasAnyInView()
     ) {
       // Catch race condition where sensor has been reset but camera hasn't been updated
@@ -244,7 +246,7 @@ export class WebGLRenderer {
       } catch {
         errorManagerInstance.debug('Sensor not found, clearing orbits above!');
         this.sensorPos = null;
-        keepTrackApi.getOrbitManager().clearInViewOrbit();
+        ServiceLocator.getOrbitManager().clearInViewOrbit();
 
         return;
       }
@@ -258,7 +260,7 @@ export class WebGLRenderer {
         return;
       }
       // Previously called showOrbitsAbove();
-      if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
+      if (!settingsManager.isSatLabelModeOn || (ServiceLocator.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
         if (this.isSatMiniBoxInUse_) {
           this.hoverBoxOnSatMiniElements_ = getEl('sat-minibox');
 
@@ -278,7 +280,7 @@ export class WebGLRenderer {
         return;
       }
 
-      const orbitManagerInstance = keepTrackApi.getOrbitManager();
+      const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
       orbitManagerInstance.clearInViewOrbit();
 
@@ -293,8 +295,8 @@ export class WebGLRenderer {
        * @body Currently are writing and deleting the nodes every draw element. Reusuing them with a transition effect will make it smoother
        */
       this.hoverBoxOnSatMiniElements_.innerHTML = '';
-      if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      if (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
         for (let i = 0; i < catalogManagerInstance.orbitalSats && this.labelCount_ < settingsManager.maxLabels; i++) {
           obj = catalogManagerInstance.getObject(i, GetSatType.POSITION_ONLY);
@@ -303,7 +305,7 @@ export class WebGLRenderer {
             continue;
           }
           const sat = <DetailedSatellite>obj;
-          const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+          const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
           if (colorSchemeManagerInstance.isPayloadOff(sat)) {
             continue;
@@ -378,8 +380,8 @@ export class WebGLRenderer {
           this.labelCount_++;
         }
       } else {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const dotsManagerInstance = keepTrackApi.getDotsManager();
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
+        const dotsManagerInstance = ServiceLocator.getDotsManager();
 
         if (!dotsManagerInstance.inViewData) {
           return;
@@ -438,7 +440,7 @@ export class WebGLRenderer {
     }
 
     // Hide satMiniBoxes When Not in Use
-    if (!settingsManager.isSatLabelModeOn || (keepTrackApi.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
+    if (!settingsManager.isSatLabelModeOn || (ServiceLocator.getMainCamera().cameraType !== CameraType.PLANETARIUM && !watchlistPluginInstance?.hasAnyInView())) {
       if (this.isSatMiniBoxInUse_) {
         this.satMiniBox_ = <HTMLDivElement>(<unknown>getEl('sat-minibox'));
         this.satMiniBox_.innerHTML = '';
@@ -478,7 +480,7 @@ export class WebGLRenderer {
     z: number;
     error: boolean;
   } {
-    const mainCamera = keepTrackApi.getMainCamera();
+    const mainCamera = ServiceLocator.getMainCamera();
 
     const pMatrix = mainCamera.projectionMatrix;
     const camMatrix = mainCamera.matrixWorldInverse;
@@ -544,7 +546,7 @@ export class WebGLRenderer {
          */
         const isKeyboardOut = Math.abs((vw - oldWidth) / oldWidth) < 0.35 && Math.abs((vh - oldHeight) / oldHeight) > 0.35;
 
-        if (!settingsManager.isMobileModeEnabled || !isKeyboardOut || this.isRotationEvent_ || !keepTrackApi.getMainCamera().projectionMatrix) {
+        if (!settingsManager.isMobileModeEnabled || !isKeyboardOut || this.isRotationEvent_ || !ServiceLocator.getMainCamera().projectionMatrix) {
           this.setCanvasSize(vh, vw);
           this.isRotationEvent_ = false;
         } else {
@@ -565,14 +567,14 @@ export class WebGLRenderer {
     this.isPostProcessingResizeNeeded = true;
 
     // Fix the gpu picker texture size if it has already been created
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     if (dotsManagerInstance.isReady) {
       dotsManagerInstance.initProgramPicking();
     }
 
     // Fix flat geometry if it has already been created
-    keepTrackApi.getScene().godrays?.init(gl, keepTrackApi.getScene().sun);
+    ServiceLocator.getScene().godrays?.init(gl, ServiceLocator.getScene().sun);
   }
 
   /**
@@ -590,7 +592,7 @@ export class WebGLRenderer {
     }
 
     // Post Processing Texture Needs Scaled
-    keepTrackApi.getScene().godrays?.init(gl, sun);
+    ServiceLocator.getScene().godrays?.init(gl, sun);
     postProcessingManagerRef.init(gl);
 
     // Reset Flag now that textures are reinitialized
@@ -614,9 +616,9 @@ export class WebGLRenderer {
     const sceneInstance = Scene.getInstance();
 
     if (this.selectSatManager_?.primarySatObj.id !== -1) {
-      const timeManagerInstance = keepTrackApi.getTimeManager();
-      const primarySat = keepTrackApi.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
-      const satelliteOffset = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id).map((coord) => -coord);
+      const timeManagerInstance = ServiceLocator.getTimeManager();
+      const primarySat = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.primarySatObj.id, GetSatType.POSITION_ONLY) as DetailedSatellite | MissileObject;
+      const satelliteOffset = ServiceLocator.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id).map((coord) => -coord);
 
       sceneInstance.worldShift = satelliteOffset as [number, number, number];
       // sceneInstance.worldShift[0] = satelliteOffset[0] - sceneInstance.worldShift[0];
@@ -624,24 +626,24 @@ export class WebGLRenderer {
       // sceneInstance.worldShift[2] = satelliteOffset[2] - sceneInstance.worldShift[2];
 
       this.meshManager.update(timeManagerInstance.selectedDate, primarySat as DetailedSatellite);
-      keepTrackApi.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
+      ServiceLocator.getMainCamera().snapToSat(primarySat, timeManagerInstance.simulationTimeObj);
       if (primarySat.isMissile()) {
-        keepTrackApi.getOrbitManager().setSelectOrbit(primarySat.id);
+        ServiceLocator.getOrbitManager().setSelectOrbit(primarySat.id);
       }
 
       // If in satellite view the orbit buffer needs to be updated every time
       if (
         !primarySat.isMissile() &&
-        (keepTrackApi.getMainCamera().cameraType === CameraType.SATELLITE || keepTrackApi.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)
+        (ServiceLocator.getMainCamera().cameraType === CameraType.SATELLITE || ServiceLocator.getMainCamera().cameraType === CameraType.FIXED_TO_SAT)
       ) {
         /*
          * Force an update so that the orbit is always using recent data - this
          * will not fix this draw call
          */
-        // keepTrackApi.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
+        // ServiceLocator.getOrbitManager().updateOrbitBuffer(this.selectSatManager_.primarySatObj.id);
 
         // Now we can fix this draw call
-        const firstPointOut = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id);
+        const firstPointOut = ServiceLocator.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id);
         const firstRelativePointOut = SatMath.getPositionFromCenterBody({
           x: firstPointOut[0] as Kilometers,
           y: firstPointOut[1] as Kilometers,
@@ -649,17 +651,17 @@ export class WebGLRenderer {
         });
 
         if (primarySat instanceof DetailedSatellite) {
-          keepTrackApi.getOrbitManager().alignOrbitSelectedObject(
+          ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
             this.selectSatManager_.primarySatObj.id, [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
           );
         } else if (primarySat instanceof OemSatellite) {
-          keepTrackApi.getOrbitManager().alignOrbitSelectedObject(
+          ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
             this.selectSatManager_.primarySatObj.id,
             [firstPointOut[0], firstPointOut[1], firstPointOut[2]],
             false,
           );
         } else {
-          keepTrackApi.getOrbitManager().alignOrbitSelectedObject(
+          ServiceLocator.getOrbitManager().alignOrbitSelectedObject(
             this.selectSatManager_.primarySatObj.id,
             [firstRelativePointOut.x, firstRelativePointOut.y, firstRelativePointOut.z],
             true,
@@ -676,13 +678,13 @@ export class WebGLRenderer {
   }
 
   private updateSecondarySatellite_() {
-    const secondarySat = keepTrackApi.getPlugin(SelectSatManager)?.secondarySatObj;
+    const secondarySat = PluginRegistry.getPlugin(SelectSatManager)?.secondarySatObj;
 
     if (!secondarySat) {
       return;
     }
 
-    keepTrackApi.getScene().secondaryCovBubble.update(secondarySat);
+    ServiceLocator.getScene().secondaryCovBubble.update(secondarySat);
   }
 
   setCanvasSize(height: number, width: number) {
@@ -697,8 +699,8 @@ export class WebGLRenderer {
   // eslint-disable-next-line require-await
   async startWithOrbits(): Promise<void> {
     if (this.settings_.startWithOrbitsDisplayed) {
-      const groupsManagerInstance = keepTrackApi.getGroupsManager();
-      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+      const groupsManagerInstance = ServiceLocator.getGroupsManager();
+      const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
       // All Orbits
       groupsManagerInstance.groupList.debris = groupsManagerInstance.createGroup(GroupType.ALL, '', 'AllSats');
@@ -711,17 +713,17 @@ export class WebGLRenderer {
 
   update(): void {
     this.validateProjectionMatrix_();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     this.updatePrimarySatellite_();
     this.updateSecondarySatellite_();
-    keepTrackApi.getMainCamera().update(this.dt);
+    ServiceLocator.getMainCamera().update(this.dt);
 
-    keepTrackApi.getScene().update(timeManagerInstance.simulationTimeObj);
+    ServiceLocator.getScene().update(timeManagerInstance.simulationTimeObj);
 
     this.orbitsAbove(); // this.sensorPos is set here for the Camera Manager
 
-    keepTrackApi.emit(EventBusEvent.updateLoop);
+    EventBus.getInstance().emit(EventBusEvent.updateLoop);
   }
 
   getCurrentViewport(target = vec4.create()): vec4 {
@@ -758,7 +760,7 @@ export class WebGLRenderer {
   }
 
   private validateProjectionMatrix_() {
-    const projectionMatrix = keepTrackApi.getMainCamera().projectionMatrix;
+    const projectionMatrix = ServiceLocator.getMainCamera().projectionMatrix;
 
     if (!projectionMatrix) {
       errorManagerInstance.log('projectionMatrix is undefined - retrying');

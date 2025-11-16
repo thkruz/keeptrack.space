@@ -1,14 +1,15 @@
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { EditSat } from '@app/plugins/edit-sat/edit-sat';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from './environment/apiMocks';
 import { setupStandardEnvironment, standardSelectSat } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('EditSatPlugin_class', () => {
   beforeEach(() => {
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment([SelectSatManager]);
   });
 
@@ -20,7 +21,7 @@ describe('EditSatPlugin_class', () => {
 
     websiteInit(editSatPlugin);
     standardSelectSat();
-    const button = <HTMLButtonElement>keepTrackApi.containerRoot.querySelector('button[type="submit"]');
+    const button = <HTMLButtonElement>KeepTrack.getInstance().containerRoot.querySelector('button[type="submit"]');
 
     button.click();
   });
@@ -33,8 +34,8 @@ describe('EditSatPlugin_class', () => {
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
 
     toggleButton.click();
-    keepTrackApi.getCatalogManager().sccNum2Id = () => 0;
-    keepTrackApi.getCatalogManager().getObject = () => defaultSat;
+    ServiceLocator.getCatalogManager().sccNum2Id = () => 0;
+    ServiceLocator.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-newTLE');
 
     button.click();
@@ -49,8 +50,8 @@ describe('EditSatPlugin_class', () => {
     const toggleButton = getEl(editSatPlugin.bottomIconElementName);
 
     toggleButton.click();
-    keepTrackApi.getCatalogManager().sccNum2Id = () => 0;
-    keepTrackApi.getCatalogManager().getObject = () => defaultSat;
+    ServiceLocator.getCatalogManager().sccNum2Id = () => 0;
+    ServiceLocator.getCatalogManager().getObject = () => defaultSat;
     const button = getEl('editSat-save');
 
     button.click();

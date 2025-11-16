@@ -22,12 +22,12 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { DetailedSensor } from '@ootk/src/main';
 import fencePng from '@public/img/icons/fence.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SensorFov } from '../sensor-fov/sensor-fov';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 export class SensorSurvFence extends KeepTrackPlugin {
   readonly id = 'SensorSurvFence';
@@ -67,7 +67,7 @@ export class SensorSurvFence extends KeepTrackPlugin {
   }
 
   private enableSurvView_() {
-    keepTrackApi.getPlugin(SensorFov)?.setBottomIconToUnselected();
+    PluginRegistry.getPlugin(SensorFov)?.setBottomIconToUnselected();
     this.setBottomIconToSelected();
   }
 }

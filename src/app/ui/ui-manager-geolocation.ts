@@ -1,18 +1,19 @@
 import { GeolocationPosition, SensorGeolocation } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { Degrees, DetailedSensor, Kilometers, ZoomValue } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
-import { keepTrackApi } from '../../keepTrackApi';
 import { SensorManager } from '../sensors/sensorManager';
 
 export class UiGeolocation {
   static updateSensorPosition(position: GeolocationPosition): void {
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
     const { lon, lat, alt, minaz, maxaz, minel, maxel, minrange, maxrange } = UiGeolocation.updateSettingsManager(position);
 
     sensorManagerInstance.whichRadar = 'CUSTOM';
@@ -37,8 +38,8 @@ export class UiGeolocation {
 
     SensorManager.updateSensorUiStyling([sensorInfo]);
 
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
-    const mainCameraInstance = keepTrackApi.getMainCamera();
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+    const mainCameraInstance = ServiceLocator.getMainCamera();
 
     // Default to GEO view if maxrange > 6000 km, otherwise LEO view
     if ((maxrange ?? Infinity) > 6000) {

@@ -2,14 +2,15 @@ import { Container } from '@app/engine/core/container';
 import { Singletons } from '@app/engine/core/interfaces';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('SettingsMenuPlugin_class', () => {
   beforeEach(() => {
-    keepTrackApi.containerRoot.innerHTML = '';
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
     setupStandardEnvironment();
   });
 
@@ -38,7 +39,7 @@ describe('SettingsMenuPlugin_class', () => {
     const settingsMenuPlugin = new SettingsMenuPlugin();
 
     websiteInit(settingsMenuPlugin);
-    keepTrackApi.getGroupsManager().clearSelect = jest.fn();
+    ServiceLocator.getGroupsManager().clearSelect = jest.fn();
     const colorSchemeManagerInstance = new ColorSchemeManager();
 
     colorSchemeManagerInstance.setColorScheme = jest.fn();

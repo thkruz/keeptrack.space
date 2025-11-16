@@ -1,8 +1,8 @@
 import { DetailedSatellite, Milliseconds } from '@ootk/src/main';
 
-import { keepTrackApi } from '../../keepTrackApi';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
+import { ServiceLocator } from '../core/service-locator';
 
 export class DemoManager {
   private static instance: DemoManager;
@@ -28,12 +28,12 @@ export class DemoManager {
   }
 
   update(): void {
-    if (!settingsManager.isDemoModeOn || !keepTrackApi.getSensorManager()?.isSensorSelected()) {
+    if (!settingsManager.isDemoModeOn || !ServiceLocator.getSensorManager()?.isSensorSelected()) {
       return;
     }
 
-    const satData = keepTrackApi.getCatalogManager().objectCache;
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const satData = ServiceLocator.getCatalogManager().objectCache;
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     const realTime = <Milliseconds>Date.now();
 
@@ -42,7 +42,7 @@ export class DemoManager {
     }
 
     this.lastTime_ = realTime;
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const activeSats = catalogManagerInstance.objectCache.filter((sat) => sat.isSatellite() && sat.active) as DetailedSatellite[];
     const lastSatId = activeSats[activeSats.length - 1].id;
 
@@ -63,8 +63,8 @@ export class DemoManager {
         continue;
       }
 
-      keepTrackApi.getHoverManager().setHoverId(this.satellite);
-      keepTrackApi.getOrbitManager().setSelectOrbit(this.satellite);
+      ServiceLocator.getHoverManager().setHoverId(this.satellite);
+      ServiceLocator.getOrbitManager().setSelectOrbit(this.satellite);
       this.satellite++;
       break;
     }

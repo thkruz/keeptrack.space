@@ -2,13 +2,14 @@ import { EChartsData, GetSatType } from '@app/engine/core/interfaces';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Degrees, DetailedSatellite, SpaceObjectType } from '@ootk/src/main';
 import waterfallPng from '@public/img/icons/waterfall.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class Time2LonPlots extends KeepTrackPlugin {
   readonly id = 'Time2LonPlots';
@@ -17,7 +18,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   bottomIconImg = waterfallPng;
@@ -202,8 +203,8 @@ export class Time2LonPlots extends KeepTrackPlugin {
   }
 
   static getPlotData(): EChartsData {
-    const objData = keepTrackApi.getCatalogManager().objectCache;
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const objData = ServiceLocator.getCatalogManager().objectCache;
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     const now = timeManagerInstance.simulationTimeObj.getTime();
 
@@ -227,7 +228,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
         return;
       }
 
-      sat = keepTrackApi.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
+      sat = ServiceLocator.getCatalogManager().getObject(sat.id, GetSatType.POSITION_ONLY) as DetailedSatellite;
       const plotPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 24);
       const plotData: [number, Degrees][] = [];
 

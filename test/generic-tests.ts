@@ -1,10 +1,13 @@
 import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { Constructor } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Engine } from '@app/engine/engine';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SettingsManager } from '@app/settings/settings';
 import { defaultSat, defaultSensor } from './environment/apiMocks';
@@ -67,8 +70,8 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
 
   expect(plugin.init).toBeDefined();
   expect(() => plugin.init()).not.toThrow();
-  expect(() => keepTrackApi.emit(EventBusEvent.uiManagerInit)).not.toThrow();
-  expect(() => keepTrackApi.emit(EventBusEvent.uiManagerFinal)).not.toThrow();
+  expect(() => EventBus.getInstance().emit(EventBusEvent.uiManagerInit)).not.toThrow();
+  expect(() => EventBus.getInstance().emit(EventBusEvent.uiManagerFinal)).not.toThrow();
 
   if (plugin.bottomIconImg && !plugin.bottomIconElementName?.startsWith('plugins.')) {
     expect(getEl(plugin.bottomIconElementName)).toBeDefined();
@@ -78,7 +81,7 @@ export const standardPluginInit = (Plugin: Constructor<KeepTrackPlugin>) => {
 
 export const websiteInit = (plugin: KeepTrackPlugin) => {
   const settingsManager = new SettingsManager();
-  const engine = new Engine();
+  const engine = new Engine(KeepTrack.getInstance());
 
   settingsManager.init();
   engine.init();
@@ -86,17 +89,17 @@ export const websiteInit = (plugin: KeepTrackPlugin) => {
   engine.scene.init({
     gl: engine.renderer.gl,
   });
-  engine.camera.init(settingsManager);
+  engine.camera.init();
   engine.timeManager.init();
-  keepTrackApi.getColorSchemeManager().init(engine.renderer);
+  ServiceLocator.getColorSchemeManager().init(engine.renderer);
   window.settingsManager = settingsManager;
   (global as unknown as Global).settingsManager = settingsManager;
   BottomMenu.createBottomMenu();
   plugin.init();
-  keepTrackApi.emit(EventBusEvent.uiManagerInit);
-  keepTrackApi.emit(EventBusEvent.uiManagerFinal);
-  keepTrackApi.emit(EventBusEvent.uiManagerOnReady);
-  keepTrackApi.getCatalogManager().satCruncher = {
+  EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+  EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+  EventBus.getInstance().emit(EventBusEvent.uiManagerOnReady);
+  ServiceLocator.getCatalogManager().satCruncher = {
     addEventListener: jest.fn(),
     postMessage: jest.fn(),
   } as unknown as Worker;
@@ -122,7 +125,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, 'random-icon');
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, 'random-icon');
   });
 
   // Tests that clicking on the bottom icon toggles
@@ -135,13 +138,13 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled || plugin.isRequireSatelliteSelected || plugin.isRequireSensorSelected) {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+      EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
   });
@@ -151,7 +154,7 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
     const plugin = new Plugin();
 
     websiteInit(plugin);
-    keepTrackApi.getSensorManager().setSensor(defaultSensor, 0);
+    ServiceLocator.getSensorManager().setSensor(defaultSensor, 0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
 
@@ -162,18 +165,18 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
         expect(toggleButton!.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeTruthy();
       }
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-      keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+      EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconDisabledClassString)).toBeFalsy();
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-      keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+      EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+      EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
 
-    keepTrackApi.getSensorManager().setSensor(null);
+    ServiceLocator.getSensorManager().setSensor(null);
   });
 
   // Tests that clicking on the bottom icon toggles with satellite
@@ -181,25 +184,25 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
     const plugin = new Plugin();
 
     websiteInit(plugin);
-    keepTrackApi.getCatalogManager().objectCache = [defaultSat];
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0);
+    ServiceLocator.getCatalogManager().objectCache = [defaultSat];
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled || plugin.isRequireSensorSelected) {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+      EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
 
-    keepTrackApi.getCatalogManager().objectCache = [];
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
+    ServiceLocator.getCatalogManager().objectCache = [];
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
   });
 
   // Tests that clicking on the bottom icon toggles with satellite and sensor
@@ -207,21 +210,21 @@ export const standardPluginMenuButtonTests = (Plugin: Constructor<KeepTrackPlugi
     const plugin = new Plugin();
 
     websiteInit(plugin);
-    keepTrackApi.getSensorManager().setSensor(defaultSensor, 0);
-    keepTrackApi.getCatalogManager().objectCache = [defaultSat];
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(0);
+    ServiceLocator.getSensorManager().setSensor(defaultSensor, 0);
+    ServiceLocator.getCatalogManager().objectCache = [defaultSat];
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(0);
 
     const toggleButton = getEl(plugin.bottomIconElementName);
 
     expect(toggleButton).toBeDefined();
     expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
 
     if (plugin.isIconDisabled) {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     } else {
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeTruthy();
-      keepTrackApi.emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+      EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
       expect(toggleButton!.classList.contains(KeepTrackPlugin.iconSelectedClassString)).toBeFalsy();
     }
   });
@@ -263,9 +266,9 @@ export const standardPluginRmbTests = (Plugin: Constructor<KeepTrackPlugin>, plu
         const plugin = new Plugin();
 
         websiteInit(plugin);
-        expect(() => keepTrackApi.emit(EventBusEvent.rmbMenuActions, rmbOption, -1)).not.toThrow();
+        expect(() => EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, rmbOption, -1)).not.toThrow();
         jest.advanceTimersByTime(1000);
-        expect(() => keepTrackApi.emit(EventBusEvent.rmbMenuActions, rmbOption, -1)).not.toThrow();
+        expect(() => EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, rmbOption, -1)).not.toThrow();
         jest.advanceTimersByTime(1000);
       });
     });

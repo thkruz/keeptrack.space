@@ -22,6 +22,9 @@ describe('classification_bar_plugin', () => {
     expect(getEl('classification-string')).toBeDefined();
   });
 
+  /**
+   * TODO: Remove KeepTrackApi dependency
+   */
   it('process_init_with_settings_classification', () => {
     ['Unclassified', 'Secret', 'Top Secret', 'Top Secret//SCI'].forEach((testClassificationStr) => {
       PluginRegistry.unregisterAllPlugins();

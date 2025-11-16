@@ -20,17 +20,18 @@
  */
 
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { BaseObject, Degrees } from '@ootk/src/main';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import satelliteFovPng from '@public/img/icons/satellite-fov.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 export class SatelliteFov extends KeepTrackPlugin {
   readonly id = 'SatelliteFov';
@@ -176,8 +177,8 @@ export class SatelliteFov extends KeepTrackPlugin {
       EventBusEvent.uiManagerFinal,
       () => {
         getEl('reset-sat-fov-cones-button')!.addEventListener('click', () => {
-          keepTrackApi.getScene().coneFactory.clear();
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+          ServiceLocator.getScene().coneFactory.clear();
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
           getEl('reset-sat-fov-cones-button')!.setAttribute('disabled', 'true');
         });
       },
@@ -189,19 +190,19 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'C' && !isRepeat) {
-        const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
+        const currentSat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
 
         if (currentSat) {
-          const coneFactory = keepTrackApi.getScene().coneFactory;
+          const coneFactory = ServiceLocator.getScene().coneFactory;
 
           // See if it is already in the scene
           const cone = coneFactory.checkCacheForMesh_(currentSat);
 
           if (cone) {
-            keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+            ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
             coneFactory.remove(cone.id);
           } else {
-            keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+            ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
             coneFactory.generateMesh(currentSat);
           }
         }
@@ -238,8 +239,8 @@ export class SatelliteFov extends KeepTrackPlugin {
       ] as [number, number, number, number],
     };
 
-    const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
-    const coneFactory = keepTrackApi.getScene().coneFactory;
+    const currentSat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
+    const coneFactory = ServiceLocator.getScene().coneFactory;
 
     if (currentSat) {
       const cone = coneFactory.checkCacheForMesh_(currentSat);
@@ -256,7 +257,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const green = parseFloat((getEl('sat-fov-default-green') as HTMLInputElement).value);
     const blue = parseFloat((getEl('sat-fov-default-blue') as HTMLInputElement).value);
     const opacity = parseFloat((getEl('sat-fov-default-opacity') as HTMLInputElement).value);
-    const toast = keepTrackApi.getUiManager().toast.bind(keepTrackApi.getUiManager());
+    const toast = ServiceLocator.getUiManager().toast.bind(ServiceLocator.getUiManager());
 
     if (isNaN(fovAngle) || fovAngle <= 0 || fovAngle > 180) {
       toast('Field of View must be a number between 0 and 180 degrees.', ToastMsgType.critical);
@@ -298,11 +299,11 @@ export class SatelliteFov extends KeepTrackPlugin {
       color: [red, green, blue, opacity] as [number, number, number, number],
     };
 
-    keepTrackApi.getScene().coneFactory.editSettings(coneSettings);
+    ServiceLocator.getScene().coneFactory.editSettings(coneSettings);
   }
 
   private updateListOfFovMeshes_() {
-    const meshes = keepTrackApi.getScene().coneFactory.meshes;
+    const meshes = ServiceLocator.getScene().coneFactory.meshes;
 
     if (meshes.length === 0) {
       getEl('reset-sat-fov-cones-button')!.setAttribute('disabled', 'true');
@@ -313,7 +314,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     getEl('sat-fov-active-cones')!.innerHTML = meshes
       .sort((a, b) => a.obj.id - b.obj.id)
       .map((mesh) => {
-        const currentSat = keepTrackApi.getPlugin(SelectSatManager)?.getSelectedSat();
+        const currentSat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
         let nameSpan = '';
 
         if (currentSat && mesh.obj.id === currentSat.id) {
@@ -344,8 +345,8 @@ export class SatelliteFov extends KeepTrackPlugin {
       icon.addEventListener('click', (e) => {
         const id = parseInt((e.target as HTMLElement).dataset.id ?? '-1', 10);
 
-        keepTrackApi.getScene().coneFactory.removeByObjectId(id);
-        keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+        ServiceLocator.getScene().coneFactory.removeByObjectId(id);
+        ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
       });
     });
 
@@ -362,7 +363,7 @@ export class SatelliteFov extends KeepTrackPlugin {
           return;
         }
 
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(id);
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(id);
       });
     });
   }

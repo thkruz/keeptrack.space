@@ -14,6 +14,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { Degrees, DetailedSatellite, EciVec3, Kilometers, eci2lla } from '@ootk/src/main';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class DopsPlugin extends KeepTrackPlugin {
   readonly id = 'DopsPlugin';
@@ -100,12 +101,12 @@ export class DopsPlugin extends KeepTrackPlugin {
     switch (targetId) {
       case 'dops-curdops-rmb': {
         {
-          let latLon = keepTrackApi.getInputManager().mouse.latLon;
-          const dragPosition = keepTrackApi.getInputManager().mouse.dragPosition;
+          let latLon = ServiceLocator.getInputManager().mouse.latLon;
+          const dragPosition = ServiceLocator.getInputManager().mouse.dragPosition;
 
           if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
             errorManagerInstance.debug('latLon undefined!');
-            const gmst = keepTrackApi.getTimeManager().gmst;
+            const gmst = ServiceLocator.getTimeManager().gmst;
 
             latLon = eci2lla(
               {
@@ -116,8 +117,8 @@ export class DopsPlugin extends KeepTrackPlugin {
               gmst,
             );
           }
-          const gpsSatObjects = DopsPlugin.getGpsSats(keepTrackApi.getCatalogManager(), keepTrackApi.getGroupsManager());
-          const gpsDOP = DopMath.getDops(keepTrackApi.getTimeManager().simulationTimeObj, gpsSatObjects, latLon.lat, latLon.lon, <Kilometers>0, settingsManager.gpsElevationMask);
+          const gpsSatObjects = DopsPlugin.getGpsSats(ServiceLocator.getCatalogManager(), ServiceLocator.getGroupsManager());
+          const gpsDOP = DopMath.getDops(ServiceLocator.getTimeManager().simulationTimeObj, gpsSatObjects, latLon.lat, latLon.lon, <Kilometers>0, settingsManager.gpsElevationMask);
 
           keepTrackApi
             .getUiManager()
@@ -126,7 +127,7 @@ export class DopsPlugin extends KeepTrackPlugin {
         break;
       }
       case 'dops-24dops-rmb': {
-        const latLon = keepTrackApi.getInputManager().mouse.latLon;
+        const latLon = ServiceLocator.getInputManager().mouse.latLon;
 
         if (typeof latLon === 'undefined' || isNaN(latLon.lat) || isNaN(latLon.lon)) {
           errorManagerInstance.warn('Please select a valid location on Earth for 24 Hour DOPs!');
@@ -167,9 +168,9 @@ export class DopsPlugin extends KeepTrackPlugin {
   }
 
   static updateSideMenu(): void {
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const timeManagerInstance = keepTrackApi.getTimeManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
 
     const lat = <Degrees>parseFloat((<HTMLInputElement>getEl('dops-lat')).value);
     const lon = <Degrees>parseFloat((<HTMLInputElement>getEl('dops-lon')).value);

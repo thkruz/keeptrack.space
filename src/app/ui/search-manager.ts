@@ -1,19 +1,20 @@
 import { GroupType, ObjectGroup } from '@app/app/data/object-group';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import searchPng from '@public/img/icons/search.png';
 import { DetailedSatellite, SpaceObjectType, Star } from '@ootk/src/main';
+import searchPng from '@public/img/icons/search.png';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { slideInDown, slideOutUp } from '../../engine/utils/slide';
-import { keepTrackApi } from '../../keepTrackApi';
 import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
-import { EventBus } from '@app/engine/events/event-bus';
 
 export interface SearchResult {
   id: number; // Catalog Index
@@ -67,7 +68,7 @@ export class SearchManager {
 
   private setupTopMenu_() {
     // This needs to happen immediately so the sound button is in the menu
-    keepTrackApi.getPlugin(TopMenu)?.navItems.push({
+    PluginRegistry.getPlugin(TopMenu)?.navItems.push({
       id: 'search-btn',
       order: 5,
       class: 'top-menu-icons__blue-img',
@@ -84,13 +85,13 @@ export class SearchManager {
         return;
       }
 
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
       const obj = catalogManagerInstance.getObject(satId);
 
       if (obj?.type === SpaceObjectType.STAR) {
-        keepTrackApi.getMainCamera().lookAtStar(obj as Star);
+        ServiceLocator.getMainCamera().lookAtStar(obj as Star);
       } else {
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(satId);
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
       }
     });
     getEl('search-results')?.addEventListener('mouseover', (evt) => {
@@ -100,12 +101,12 @@ export class SearchManager {
         return;
       }
 
-      keepTrackApi.getHoverManager().setHoverId(satId);
-      keepTrackApi.getUiManager().searchHoverSatId = satId;
+      ServiceLocator.getHoverManager().setHoverId(satId);
+      ServiceLocator.getUiManager().searchHoverSatId = satId;
     });
     getEl('search-results')?.addEventListener('mouseout', () => {
-      keepTrackApi.getHoverManager().setHoverId(-1);
-      keepTrackApi.getUiManager().searchHoverSatId = -1;
+      ServiceLocator.getHoverManager().setHoverId(-1);
+      ServiceLocator.getUiManager().searchHoverSatId = -1;
     });
     getEl('search')?.addEventListener('input', () => {
       const searchStr = (<HTMLInputElement>getEl('search')).value;
@@ -170,10 +171,10 @@ export class SearchManager {
    */
   hideResults(): void {
     try {
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const dotsManagerInstance = keepTrackApi.getDotsManager();
-      const groupManagerInstance = keepTrackApi.getGroupsManager();
-      const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
+      const dotsManagerInstance = ServiceLocator.getDotsManager();
+      const groupManagerInstance = ServiceLocator.getGroupsManager();
+      const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
       slideOutUp(getEl('search-results')!, 1000);
       groupManagerInstance.clearSelect();
@@ -202,13 +203,13 @@ export class SearchManager {
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     if (searchString === '') {
       this.hideResults();
-      keepTrackApi.emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
+      EventBus.getInstance().emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
       return;
     }
 
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     if (catalogManagerInstance.objectCache.length === 0) {
       throw new Error('No sat data loaded! Check if TLEs are corrupted!');
@@ -220,7 +221,7 @@ export class SearchManager {
       dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
       (<HTMLInputElement>getEl('search')).value = '';
       this.hideResults();
-      keepTrackApi.emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
+      EventBus.getInstance().emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
       return;
     }
@@ -265,7 +266,7 @@ export class SearchManager {
       results = SearchManager.doRegularSearch_(searchString);
     }
 
-    keepTrackApi.emit(EventBusEvent.searchUpdated, searchString_, results.length, settingsManager.searchLimit);
+    EventBus.getInstance().emit(EventBusEvent.searchUpdated, searchString_, results.length, settingsManager.searchLimit);
 
     // Remove any results greater than the maximum allowed
     results = results.splice(0, settingsManager.searchLimit);
@@ -277,8 +278,8 @@ export class SearchManager {
 
     dotsManagerInstance.updateSizeBuffer(catalogManagerInstance.objectCache.length);
 
-    const groupManagerInstance = keepTrackApi.getGroupsManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
+    const groupManagerInstance = ServiceLocator.getGroupsManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
 
     const dispGroup = groupManagerInstance.createGroup(GroupType.ID_LIST, idList);
 
@@ -487,7 +488,7 @@ export class SearchManager {
   }
 
   private static getSearchableObjects_(isIncludeMissiles = true): (DetailedSatellite | MissileObject)[] | DetailedSatellite[] {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const searchableObjects = (
       catalogManagerInstance.objectCache.filter((obj) => {
         if (obj.isSensor() || obj.isMarker() || obj.isGroundObject() || obj.isStar()) {
@@ -524,7 +525,7 @@ export class SearchManager {
   }
 
   fillResultBox(results: SearchResult[], catalogManagerInstance: CatalogManager) {
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     const satData = catalogManagerInstance.objectCache;
 
@@ -654,7 +655,7 @@ export class SearchManager {
       resultsBox.innerHTML = htmlStr;
     }
     const satInfoboxDom = getEl('sat-infobox', true);
-    const satInfoBoxPlugin = keepTrackApi.getPlugin(SatInfoBox);
+    const satInfoBoxPlugin = PluginRegistry.getPlugin(SatInfoBox);
 
     if (satInfoBoxPlugin && satInfoboxDom) {
       satInfoBoxPlugin.initPosition(satInfoboxDom, false);
@@ -689,7 +690,7 @@ export class SearchManager {
     this.isSearchOpen = false;
     getEl('search-holder')?.classList.remove('search-slide-down');
     getEl('search-holder')?.classList.add('search-slide-up');
-    keepTrackApi.getUiManager().hideSideMenus();
+    ServiceLocator.getUiManager().hideSideMenus();
     this.hideResults();
   }
 

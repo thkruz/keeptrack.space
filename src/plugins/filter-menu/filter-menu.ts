@@ -1,15 +1,15 @@
 import { MenuMode } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import filterPng from '@public/img/icons/filter.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TopMenu } from '../top-menu/top-menu';
-import { EventBus } from '@app/engine/events/event-bus';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -278,7 +278,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
                 const checkbox = <HTMLInputElement>e.target;
 
                 settingsManager.filter[filter.id as string] = checkbox.checked;
-                keepTrackApi.getSoundManager()?.play(checkbox.checked ? SoundNames.TOGGLE_ON : SoundNames.TOGGLE_OFF);
+                ServiceLocator.getSoundManager()?.play(checkbox.checked ? SoundNames.TOGGLE_ON : SoundNames.TOGGLE_OFF);
               };
 
               return html`
@@ -481,7 +481,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
   }
 
   resetToDefaults() {
-    keepTrackApi.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
+    ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
     const filterForm = <HTMLFormElement>getEl('filter-form');
 
     const checkboxes = filterForm.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;

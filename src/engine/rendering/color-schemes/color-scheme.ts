@@ -2,10 +2,10 @@ import { DensityBin } from '@app/app/data/catalog-manager';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { BaseObject, Star } from '@app/engine/ootk/src/objects';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
-import { CameraType } from '../../camera/camera';
 import { SpaceObjectType } from '@ootk/src/main';
+import { CameraType } from '../../camera/camera';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export interface ColorSchemeColorMap {
   version: string;
@@ -118,7 +118,7 @@ export abstract class ColorScheme {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   updateGroup(obj: BaseObject, _params?): ColorInformation {
-    if (!keepTrackApi.getGroupsManager().selectedGroup.hasObject(obj.id)) {
+    if (!ServiceLocator.getGroupsManager().selectedGroup.hasObject(obj.id)) {
       // Hide Everything Else
       return {
         color: settingsManager.colors.transparent ?? this.colorTheme.transparent,
@@ -139,7 +139,7 @@ export abstract class ColorScheme {
 
   // This is called when the color scheme is selected
   onSelected(): void {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     catalogManagerInstance.satCruncher.postMessage({
       isSunlightView: false,
@@ -169,7 +169,7 @@ export abstract class ColorScheme {
       case SpaceObjectType.LAUNCH_AGENCY:
       case SpaceObjectType.CONTROL_FACILITY:
         // If the facility flag is off then we don't want to show this
-        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+        if (!settingsManager.isShowAgencies || this.objectTypeFlags.facility === false || ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM) {
           return {
             color: this.colorTheme.deselected,
             pickable: Pickable.No,
@@ -186,7 +186,7 @@ export abstract class ColorScheme {
       case SpaceObjectType.LAUNCH_POSITION:
       case SpaceObjectType.LAUNCH_FACILITY:
         // If the facility flag is off then we don't want to show this
-        if (settingsManager.isDisableLaunchSites || this.objectTypeFlags.facility === false || keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM) {
+        if (settingsManager.isDisableLaunchSites || this.objectTypeFlags.facility === false || ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM) {
           return {
             color: this.colorTheme.deselected,
             pickable: Pickable.No,
@@ -215,7 +215,7 @@ export abstract class ColorScheme {
   }
 
   missileColor_(missile: MissileObject): ColorInformation {
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     if (dotsManagerInstance.inViewData?.[missile.id] === 0) {
       if (this.objectTypeFlags.missile === false) {

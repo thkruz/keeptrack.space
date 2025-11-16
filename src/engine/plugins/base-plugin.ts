@@ -5,10 +5,10 @@ import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { t7e, TranslationKey } from '@app/locales/keys';
 import { BaseObject } from '@ootk/src/main';
 import Module from 'module';
-import { keepTrackApi } from '../../keepTrackApi';
 import type { SelectSatManager } from '../../plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '../../plugins/sounds/sounds';
 import { PluginRegistry } from '../core/plugin-registry';
+import { ServiceLocator } from '../core/service-locator';
 import { EventBus } from '../events/event-bus';
 import { EventBusEvent } from '../events/event-bus-events';
 import { clickAndDragWidth } from '../utils/click-and-drag';
@@ -366,7 +366,7 @@ export abstract class KeepTrackPlugin {
               return;
             }
 
-            keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+            ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
             if (this.isSideMenuSettingsOpen) {
               this.closeSecondaryMenu();
 
@@ -387,7 +387,7 @@ export abstract class KeepTrackPlugin {
 
           if (this.downloadIconCb) {
             getEl(`${this.sideMenuElementName}-download-btn`)?.addEventListener('click', () => {
-              keepTrackApi.getSoundManager()?.play(SoundNames.EXPORT);
+              ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
 
               if (this.downloadIconCb) {
                 this.downloadIconCb();
@@ -415,7 +415,7 @@ export abstract class KeepTrackPlugin {
     }
 
     if (this.rmbL1Html && this.rmbL1ElementName && this.rmbL2Html && this.rmbL2ElementName) {
-      keepTrackApi.getInputManager().rmbMenuItems.push({
+      ServiceLocator.getInputManager().rmbMenuItems.push({
         elementIdL1: this.rmbL1ElementName,
         elementIdL2: this.rmbL2ElementName,
         order: this.rmbMenuOrder,
@@ -700,7 +700,7 @@ export abstract class KeepTrackPlugin {
       this.onSetBottomIconToUnselected();
     }
     if (isHideSideMenus) {
-      keepTrackApi.emit(EventBusEvent.hideSideMenus);
+      EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
     }
     getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-selected');
   }
@@ -728,7 +728,7 @@ export abstract class KeepTrackPlugin {
   isRequireSensorSelected = false;
 
   verifySensorSelected(isMakeToast = true): boolean {
-    if (!keepTrackApi.getSensorManager().isSensorSelected()) {
+    if (!ServiceLocator.getSensorManager().isSensorSelected()) {
       if (isMakeToast) {
         errorManagerInstance.warn(t7e('errorMsgs.SelectSensorFirst'), true);
         shake(getEl(this.bottomIconElementName));
@@ -750,7 +750,7 @@ export abstract class KeepTrackPlugin {
      * const searchDom = getEl('search', true);
      * if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
      */
-    if (!(((keepTrackApi.getPluginByName('SelectSatManager') as SelectSatManager)?.selectedSat ?? -1) > -1)) {
+    if (!(((PluginRegistry.getPluginByName('SelectSatManager') as SelectSatManager)?.selectedSat ?? -1) > -1)) {
       errorManagerInstance.warn(t7e('errorMsgs.SelectSatelliteFirst'), true);
       shake(getEl(this.bottomIconElementName));
 
@@ -778,7 +778,7 @@ export abstract class KeepTrackPlugin {
       EventBus.getInstance().on(
         EventBusEvent.selectSatData,
         (obj: BaseObject): void => {
-          if (!obj?.isSatellite() || !keepTrackApi.getSensorManager().isSensorSelected()) {
+          if (!obj?.isSatellite() || !ServiceLocator.getSensorManager().isSensorSelected()) {
             this.setBottomIconToDisabled();
             this.setBottomIconToUnselected();
           } else {
@@ -863,8 +863,8 @@ export abstract class KeepTrackPlugin {
   }
 
   bottomMenuClicked() {
-    keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
-    keepTrackApi.emit(EventBusEvent.bottomMenuClick, this.bottomIconElementName);
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, this.bottomIconElementName);
   }
 
   protected static genH5Title_(title: string): string {
@@ -877,9 +877,9 @@ export abstract class KeepTrackPlugin {
 
   hideSideMenus(): void {
     if (settingsManager.isMobileModeEnabled) {
-      keepTrackApi.getUiManager().searchManager.closeSearch();
+      ServiceLocator.getUiManager().searchManager.closeSearch();
     }
-    keepTrackApi.getUiManager().hideSideMenus();
+    ServiceLocator.getUiManager().hideSideMenus();
     this.isMenuButtonActive = false;
   }
 

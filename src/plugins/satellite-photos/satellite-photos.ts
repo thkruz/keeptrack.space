@@ -3,11 +3,12 @@ import { getEl } from '@app/engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { Degrees } from '@ootk/src/main';
 import photoManagerPng from '@public/img/icons/photoManager.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -80,7 +81,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
            * The time is in UTC+3, so we need to convert the simulation time to UTC+3
            */
 
-          const simulationTime = keepTrackApi.getTimeManager().simulationTimeObj;
+          const simulationTime = ServiceLocator.getTimeManager().simulationTimeObj;
           const realTime = new Date().getTime();
 
           if (realTime - simulationTime.getTime() < 0) {
@@ -206,8 +207,11 @@ export class SatellitePhotos extends KeepTrackPlugin {
           getEl('sat-photo-menu-list')!.insertAdjacentHTML('beforeend', html);
           getEl(`discovr-link${i}`)!.addEventListener('click', () => {
             SatellitePhotos.loadPic_(-1, this.discvrPhotos_[i - 1].imageUrl);
-            keepTrackApi.getMainCamera().camSnap(lat2pitch(this.discvrPhotos_[i - 1].lat), lon2yaw(this.discvrPhotos_[i - 1].lon, keepTrackApi.getTimeManager().simulationTimeObj));
-            keepTrackApi.getMainCamera().changeZoom(0.7);
+            ServiceLocator.getMainCamera().camSnap(
+              lat2pitch(this.discvrPhotos_[i - 1].lat),
+              lon2yaw(this.discvrPhotos_[i - 1].lon, ServiceLocator.getTimeManager().simulationTimeObj),
+            );
+            ServiceLocator.getMainCamera().changeZoom(0.7);
           });
         }
       } else {
@@ -241,23 +245,23 @@ export class SatellitePhotos extends KeepTrackPlugin {
   }
 
   private static loadPic_(satId: number, url: string, title?: string): void {
-    keepTrackApi.getUiManager().searchManager.hideResults();
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(satId) ?? -1);
-    keepTrackApi.getMainCamera().changeZoom(0.7);
+    ServiceLocator.getUiManager().searchManager.hideResults();
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(ServiceLocator.getCatalogManager().sccNum2Id(satId) ?? -1);
+    ServiceLocator.getMainCamera().changeZoom(0.7);
     SatellitePhotos.colorbox_(url, title);
   }
 
   private static himawari8_(): void {
-    keepTrackApi.getPlugin(SelectSatManager)?.selectSat(keepTrackApi.getCatalogManager().sccNum2Id(40267) ?? -1);
-    keepTrackApi.getMainCamera().changeZoom(0.7);
+    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(ServiceLocator.getCatalogManager().sccNum2Id(40267) ?? -1);
+    ServiceLocator.getMainCamera().changeZoom(0.7);
 
     // Propagation time minus 30 minutes so that the pictures have time to become available
-    let propTime = keepTrackApi.getTimeManager().simulationTimeObj;
+    let propTime = ServiceLocator.getTimeManager().simulationTimeObj;
 
     if (propTime.getTime() < Date.now()) {
       propTime = new Date(propTime.getTime() - 1000 * 60 * 30);
     } else {
-      const uiManagerInstance = keepTrackApi.getUiManager();
+      const uiManagerInstance = ServiceLocator.getUiManager();
 
       uiManagerInstance.toast('Can\'t load pictures from the future. Loading most recent photos.', ToastMsgType.caution);
       propTime = new Date(Date.now() - 1000 * 60 * 30);

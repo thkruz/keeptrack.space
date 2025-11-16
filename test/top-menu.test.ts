@@ -4,11 +4,11 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SoundManager } from '@app/plugins/sounds/sound-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from './environment/standard-env';
 import { standardPluginSuite } from './generic-tests';
+import { EventBus } from '@app/engine/events/event-bus';
 
 describe('TopMenu_class', () => {
   let topMenu: TopMenu;
@@ -27,8 +27,8 @@ describe('TopMenu_class', () => {
   it('test_sound_button_toggle_without_sound_plugin', () => {
     topMenu.init();
     ServiceLocator.getSoundManager()?.init();
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
 
     errorManagerInstance.warn = jest.fn();
@@ -41,15 +41,15 @@ describe('TopMenu_class', () => {
   it('test_sound_button_toggle', () => {
     topMenu.init();
     ServiceLocator.getSoundManager()?.init();
-    keepTrackApi.emit(EventBusEvent.uiManagerInit);
-    keepTrackApi.emit(EventBusEvent.uiManagerFinal);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
 
     const soundBtn = getEl('sound-btn') as HTMLAnchorElement;
     const soundIcon = getEl('sound-icon') as HTMLImageElement;
     const soundManagerPlugin = new SoundManager();
 
     Container.getInstance().registerSingleton(Singletons.SoundManager, soundManagerPlugin);
-    const soundManager = keepTrackApi.getSoundManager();
+    const soundManager = ServiceLocator.getSoundManager();
 
     soundBtn.click();
     expect(soundManager!.isMute).toBe(true);

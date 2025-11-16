@@ -1,8 +1,8 @@
 import { saveCsv } from '@app/engine/utils/saveVariable';
-import { saveAs } from 'file-saver';
 import { BaseObject, DetailedSatellite } from '@ootk/src/main';
+import { saveAs } from 'file-saver';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
-import { keepTrackApi } from '../../keepTrackApi';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 interface CatalogExportCsvFields {
   [key: string]: unknown; // Add string index signature
@@ -88,7 +88,7 @@ export class CatalogExporter {
 
   static exportSatInFov2Csv(objData: BaseObject[]) {
     const data = objData
-      .filter((obj) => obj.isSatellite() && (obj as DetailedSatellite).tle1 && keepTrackApi.getDotsManager().inViewData?.[obj.id] === 1)
+      .filter((obj) => obj.isSatellite() && (obj as DetailedSatellite).tle1 && ServiceLocator.getDotsManager().inViewData?.[obj.id] === 1)
       .map((obj) => {
         const sat = obj as DetailedSatellite;
 

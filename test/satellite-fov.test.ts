@@ -1,5 +1,5 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { keepTrackApi } from '@app/keepTrackApi';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { defaultSat } from './environment/apiMocks';
@@ -10,8 +10,8 @@ describe('SatelliteFov_class', () => {
   beforeEach(() => {
     PluginRegistry.unregisterAllPlugins();
     setupStandardEnvironment([SelectSatManager]);
-    keepTrackApi.getCatalogManager().getObject = () => defaultSat;
-    keepTrackApi.getCatalogManager().satCruncher = {
+    ServiceLocator.getCatalogManager().getObject = () => defaultSat;
+    ServiceLocator.getCatalogManager().satCruncher = {
       postMessage: jest.fn(),
     } as unknown as Worker;
   });

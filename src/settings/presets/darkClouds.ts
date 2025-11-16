@@ -1,12 +1,21 @@
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import {
+  EarthBumpTextureQuality,
+  EarthCloudTextureQuality,
+  EarthDayTextureQuality, EarthNightTextureQuality,
+  EarthPoliticalTextureQuality,
+  EarthSpecTextureQuality,
+} from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
+import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds, Radians } from '@ootk/src/main';
 import i18next from 'i18next';
 import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
-import { keepTrackApi } from '../../keepTrackApi';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
 
@@ -26,12 +35,12 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
   settingsManager.isEnableJscCatalog = false;
 
-  settingsManager.earthDayTextureQuality = '16k';
-  settingsManager.earthNightTextureQuality = '16k';
-  settingsManager.earthSpecTextureQuality = '8k';
-  settingsManager.earthBumpTextureQuality = '8k';
-  settingsManager.earthPoliticalTextureQuality = 'off';
-  settingsManager.earthCloudTextureQuality = '8k';
+  settingsManager.earthDayTextureQuality = '16k' as EarthDayTextureQuality;
+  settingsManager.earthNightTextureQuality = '16k' as EarthNightTextureQuality;
+  settingsManager.earthSpecTextureQuality = '8k' as EarthSpecTextureQuality;
+  settingsManager.earthBumpTextureQuality = '8k' as EarthBumpTextureQuality;
+  settingsManager.earthPoliticalTextureQuality = 'off' as EarthPoliticalTextureQuality;
+  settingsManager.earthCloudTextureQuality = '8k' as EarthCloudTextureQuality;
 
   settingsManager.disableCameraControls = true;
 
@@ -100,7 +109,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
    * yearStr is the last two digits of the year in string format
    */
   settingsManager.timeMachineString = (yearStr) => {
-    keepTrackApi.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
+    ServiceLocator.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
     const satellitesSpan = `<span style="color: rgb(35, 255, 35);">${t7e('darkClouds.satellites')}</span>`;
     const debrisSpan = `<span style="color: rgb(255, 255, 35);">${t7e('darkClouds.debris')}</span>`;
     const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
@@ -124,7 +133,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
     const textOverlay = document.createElement('div');
 
     textOverlay.id = 'textOverlay';
-    keepTrackApi.containerRoot.appendChild(textOverlay);
+    KeepTrack.getInstance().containerRoot.appendChild(textOverlay);
 
     // Update CSS
     const toastCss = `
@@ -165,11 +174,11 @@ export const darkClouds = (settingsManager: SettingsManager) => {
     settingsManager.loopTimeMachine = true; // Loop through the years
 
     const startTimeMachine = () => {
-      keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
-      const mainCameraInstance = keepTrackApi.getMainCamera();
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1); // Deselect Any Satellites
+      const mainCameraInstance = ServiceLocator.getMainCamera();
 
       mainCameraInstance.state.camPitch = lat2pitch(DEFAULT_LATITUDE);
-      mainCameraInstance.state.camYaw = lon2yaw(DEFAULT_LONGITUDE, keepTrackApi.getTimeManager().simulationTimeObj);
+      mainCameraInstance.state.camYaw = lon2yaw(DEFAULT_LONGITUDE, ServiceLocator.getTimeManager().simulationTimeObj);
       mainCameraInstance.state.dragStartPitch = 0.06321641675916885 as Radians;
       mainCameraInstance.state.dragStartYaw = 2.244571612554059 as Radians;
       mainCameraInstance.state.zoomLevel = 0.8;
@@ -178,7 +187,7 @@ export const darkClouds = (settingsManager: SettingsManager) => {
       mainCameraInstance.state.screenDragPoint = [mainCameraInstance.state.mouseX, mainCameraInstance.state.mouseY];
 
       setTimeout(() => {
-        (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
+        (<TimeMachine>PluginRegistry.getPlugin(TimeMachine)).historyOfSatellitesPlay(); // Start Time Machine
       }, 100);
       setTimeout(() => {
         mainCameraInstance.state.isAutoPitchYawToTarget = false; // Disable Camera Snap Mode
@@ -188,12 +197,12 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
     // Initialize
     settingsManager.lastInteractionTime = Date.now() - RESTART_ROTATE_TIME * 1000 + 1000;
-    const allSatsGroup = keepTrackApi.getGroupsManager().createGroup(0, null); // All Satellites
+    const allSatsGroup = ServiceLocator.getGroupsManager().createGroup(0, null); // All Satellites
 
     setInnerHtml('textOverlay', t7e('darkClouds.buildingBuffers'));
 
     // Show All Orbits first to build buffers
-    keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
+    ServiceLocator.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
     setTimeout(() => {
       // Start Time Machine after 5 seconds to allow for buffers to be built
       startTimeMachine();
@@ -201,24 +210,24 @@ export const darkClouds = (settingsManager: SettingsManager) => {
       setInterval(() => {
         if (Date.now() - settingsManager.lastInteractionTime > RESTART_ROTATE_TIME * 1000) {
           // If Time Machine is Off
-          if (!(<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning) {
+          if (!(<TimeMachine>PluginRegistry.getPlugin(TimeMachine)).isTimeMachineRunning) {
             startTimeMachine();
-          } else if ((<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).historyOfSatellitesRunCount >= 67) {
+          } else if ((<TimeMachine>PluginRegistry.getPlugin(TimeMachine)).historyOfSatellitesRunCount >= 67) {
             setTimeout(() => {
               startTimeMachine();
             }, settingsManager.timeMachineDelay);
           }
           // If Time Machine is Running
-        } else if ((<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning) {
-          (<TimeMachine>keepTrackApi.getPlugin(TimeMachine)).isTimeMachineRunning = false; // Stop Time Machine
+        } else if ((<TimeMachine>PluginRegistry.getPlugin(TimeMachine)).isTimeMachineRunning) {
+          (<TimeMachine>PluginRegistry.getPlugin(TimeMachine)).isTimeMachineRunning = false; // Stop Time Machine
 
-          settingsManager.colors.transparent = keepTrackApi.getOrbitManager().tempTransColor;
+          settingsManager.colors.transparent = ServiceLocator.getOrbitManager().tempTransColor;
 
-          keepTrackApi.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
+          ServiceLocator.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits
 
           // groupsManager.selectGroup(null); // Deselect all orbits
-          keepTrackApi.getColorSchemeManager().calculateColorBuffers(true); // Reset All Colors
-          keepTrackApi.getUiManager().dismissAllToasts();
+          ServiceLocator.getColorSchemeManager().calculateColorBuffers(true); // Reset All Colors
+          ServiceLocator.getUiManager().dismissAllToasts();
 
           /*
            * Add these four lines if you want to hide the orbits when interacting with the mouse

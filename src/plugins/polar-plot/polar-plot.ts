@@ -1,6 +1,5 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import polarPlotPng from '@public/img/icons/polar-plot.png';
 
 
@@ -11,6 +10,8 @@ import { BaseObject, Degrees, DetailedSatellite, MILLISECONDS_PER_SECOND, second
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SoundNames } from '../sounds/sounds';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 type PolarPlotData = Array<[Degrees, Degrees]>
 
@@ -25,7 +26,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
   constructor() {
     super();
-    this.selectSatManager_ = keepTrackApi.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
+    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
   private ctx_: CanvasRenderingContext2D;
@@ -98,7 +99,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(
       EventBusEvent.selectSatData,
       (obj: BaseObject) => {
-        if (obj?.isSatellite() && keepTrackApi.getSensorManager().isSensorSelected()) {
+        if (obj?.isSatellite() && ServiceLocator.getSensorManager().isSensorSelected()) {
           getEl(this.bottomIconElementName)?.classList.remove('bmenu-item-disabled');
           this.isIconDisabled = false;
           // If it is open then refresh the plot
@@ -114,11 +115,11 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.KeyDown, (key: string, _code: string, isRepeat: boolean) => {
       if (key === 'P' && !isRepeat) {
-        if ((keepTrackApi.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
+        if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) === -1) {
           return;
         }
 
-        if (!keepTrackApi.getSensorManager().isSensorSelected()) {
+        if (!ServiceLocator.getSensorManager().isSensorSelected()) {
           return;
         }
 
@@ -126,11 +127,11 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
           this.openSideMenu();
           this.setBottomIconToSelected();
           this.updatePlot_();
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         } else {
           this.closeSideMenu();
           this.setBottomIconToUnselected();
-          keepTrackApi.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
+          ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
         }
       }
     });
@@ -155,7 +156,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.passStartTime_ = null;
     this.passStopTime_ = null;
 
-    const sensor = keepTrackApi.getSensorManager().getSensor();
+    const sensor = ServiceLocator.getSensorManager().getSensor();
     const sat = this.selectSatManager_.getSelectedSat() as DetailedSatellite;
 
     if (!sensor?.isSensor()) {
@@ -176,7 +177,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     let now: Date | null = null;
 
     for (let i = 0; i < this.plotDuration_ * secondsPerDay; i++) {
-      now = keepTrackApi.getTimeManager().getOffsetTimeObj(i * MILLISECONDS_PER_SECOND);
+      now = ServiceLocator.getTimeManager().getOffsetTimeObj(i * MILLISECONDS_PER_SECOND);
       const inView = sensor.isSatInFov(sat, now);
 
       if (inView) {
@@ -212,7 +213,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.ctx_.fillStyle = 'rgb(255, 255, 255)';
     this.ctx_.textAlign = 'left';
     this.ctx_.textBaseline = 'top';
-    const sensorName = keepTrackApi.getSensorManager().getSensor()?.name ?? 'Unknown Sensor';
+    const sensorName = ServiceLocator.getSensorManager().getSensor()?.name ?? 'Unknown Sensor';
     const satNum = (this.selectSatManager_.getSelectedSat() as DetailedSatellite).sccNum;
     const timeRange = `${this.passStartTime_?.toISOString().slice(11, 19) ?? 'Unknown Start Time'} - ${this.passStopTime_?.toISOString().slice(11, 19) ?? 'Unknown Stop Time'}`;
 

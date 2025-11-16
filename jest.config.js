@@ -14,7 +14,7 @@ export default {
   transformIgnorePatterns: ['node_modules/(?!(new-github-issue-url|ootk|ootk-core)/)'],
   testMatch: ['**/?(*.)+(spec|test).?(m)[jt]s?(x)'],
   moduleFileExtensions: ['js', 'mjs', 'ts'],
-  setupFiles: ['jest-canvas-mock', '<rootDir>/test/polyfills.js', '<rootDir>/test/test-env.js', '<rootDir>/test/test-env-mocks.js'],
+  setupFiles: ['jest-canvas-mock', '<rootDir>/test/polyfills.js', '<rootDir>/test/jest-setup.js'],
   coverageDirectory: '<rootDir>/coverage',
   moduleDirectories: ['node_modules', 'offline'],
   modulePathIgnorePatterns: ['<rootDir>/node_modules/', '<rootDir>/offline/', '<rootDir>/dist/', '<rootDir>/src/admin/', '<rootDir>/src/engine/ootk/'],

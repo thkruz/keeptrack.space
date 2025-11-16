@@ -132,3 +132,5 @@ cypress.config.ts
 # Generated Locale Files
 src/locales/keys.ts
 src/locales/*.json
+
+**/*.notes.md

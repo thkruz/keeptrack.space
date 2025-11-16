@@ -1,9 +1,9 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { getEl } from '@app/engine/utils/get-el';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { disableConsoleErrors, enableConsoleErrors, setupDefaultHtml } from './environment/standard-env';
 import { standardClickTests, standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from './generic-tests';
+import { KeepTrack } from '@app/keeptrack';
 
 describe('WatchlistPlugin_class', () => {
   beforeEach(() => {
@@ -58,7 +58,7 @@ describe('WatchlistPlugin_form', () => {
      * Step 3: Click remove button
      * get first img by class "watchlist-remove"
      */
-    const removeButton = <HTMLImageElement>keepTrackApi.containerRoot.querySelector('img.watchlist-remove');
+    const removeButton = <HTMLImageElement>KeepTrack.getInstance().containerRoot.querySelector('img.watchlist-remove');
 
     if (removeButton) {
       removeButton.click();

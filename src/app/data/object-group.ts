@@ -1,8 +1,8 @@
 import { BaseObject, DetailedSatellite } from '@ootk/src/main';
-import { keepTrackApi } from '../../keepTrackApi';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { CatalogSearch } from './catalog-search';
 import { getCountryMapList } from './catalogs/countries';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export enum GroupType {
   ALL = 0,
@@ -38,7 +38,7 @@ export class ObjectGroup<T extends GroupType> {
   ids: number[] = [];
 
   constructor(type: T, data: GroupData[T] | null = null) {
-    const objData = keepTrackApi.getCatalogManager().objectCache;
+    const objData = ServiceLocator.getCatalogManager().objectCache;
 
     switch (type) {
       case GroupType.ALL:
@@ -52,13 +52,13 @@ export class ObjectGroup<T extends GroupType> {
         });
         break;
       case GroupType.YEAR:
-        this.ids = CatalogSearch.year(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR])
+        this.ids = CatalogSearch.year(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .filter((sat: DetailedSatellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
           .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.YEAR_OR_LESS:
-        this.ids = CatalogSearch.yearOrLess(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR_OR_LESS])
+        this.ids = CatalogSearch.yearOrLess(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.YEAR_OR_LESS])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .filter((sat: DetailedSatellite) => typeof sat.id !== 'undefined' && !sat.isStatic())
           .map((sat: DetailedSatellite) => sat.id);
@@ -66,7 +66,7 @@ export class ObjectGroup<T extends GroupType> {
       case GroupType.INTLDES:
         this.ids = (data as GroupData[GroupType.INTLDES])
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((intlDes: string) => keepTrackApi.getCatalogManager().intlDes2id(intlDes))
+          .map((intlDes: string) => ServiceLocator.getCatalogManager().intlDes2id(intlDes))
           .filter((id: number | null) => id !== null);
         break;
       case GroupType.NAME_REGEX:
@@ -81,27 +81,27 @@ export class ObjectGroup<T extends GroupType> {
           .filter((id: number) => objData[id].isPayload());
         break;
       case GroupType.COUNTRY:
-        this.createGroupByCountry_(data as GroupData[GroupType.COUNTRY], keepTrackApi.getCatalogManager().getSats());
+        this.createGroupByCountry_(data as GroupData[GroupType.COUNTRY], ServiceLocator.getCatalogManager().getSats());
         break;
       case GroupType.COUNTRY_REGEX:
-        this.ids = CatalogSearch.country(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.COUNTRY_REGEX])
+        this.ids = CatalogSearch.country(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.COUNTRY_REGEX])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((obj: BaseObject) => obj.id);
         break;
       case GroupType.SHAPE_STRING:
-        this.ids = CatalogSearch.shape(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.SHAPE_STRING])
+        this.ids = CatalogSearch.shape(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.SHAPE_STRING])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.BUS_STRING:
-        this.ids = CatalogSearch.bus(keepTrackApi.getCatalogManager().getSats(), data as GroupData[GroupType.BUS_STRING])
+        this.ids = CatalogSearch.bus(ServiceLocator.getCatalogManager().getSats(), data as GroupData[GroupType.BUS_STRING])
           // .slice(0, settingsManager.maxOribtsDisplayed)
           .map((sat: DetailedSatellite) => sat.id);
         break;
       case GroupType.SCC_NUM:
         this.ids = (data as GroupData[GroupType.SCC_NUM])
           // .slice(0, settingsManager.maxOribtsDisplayed)
-          .map((sccNum: number) => keepTrackApi.getCatalogManager().sccNum2Id(sccNum))
+          .map((sccNum: number) => ServiceLocator.getCatalogManager().sccNum2Id(sccNum))
           .filter((id: number | null) => id !== null);
         break;
       case GroupType.ID_LIST:
@@ -116,10 +116,10 @@ export class ObjectGroup<T extends GroupType> {
 
   // What calls the orbit buffer when selected a group from the menu.
   updateOrbits = (): this => {
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
     this.ids.forEach((id) => {
-      const obj = keepTrackApi.getCatalogManager().objectCache[id];
+      const obj = ServiceLocator.getCatalogManager().objectCache[id];
 
       if (obj.isMissile()) {
         orbitManagerInstance.updateOrbitBuffer(obj.id, obj as MissileObject);

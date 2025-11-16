@@ -1,11 +1,11 @@
 import { Camera, CameraType } from '@app/engine/camera/camera';
 import { GetSatType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { SoundNames } from '@app/plugins/sounds/sounds';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
@@ -15,6 +15,7 @@ import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
 import { InputManager, LatLon } from '../input-manager';
 import { KeyboardInput } from './keyboard-input';
+import { KeepTrack } from '@app/keeptrack';
 
 export class MouseInput {
   private dragHasMoved = false;
@@ -36,8 +37,8 @@ export class MouseInput {
         }
       };
 
-      keepTrackApi.containerRoot.addEventListener('mousewheel', stopWheelZoom, { passive: false });
-      keepTrackApi.containerRoot.addEventListener('DOMMouseScroll', stopWheelZoom, { passive: false });
+      KeepTrack.getInstance().containerRoot.addEventListener('mousewheel', stopWheelZoom, { passive: false });
+      KeepTrack.getInstance().containerRoot.addEventListener('DOMMouseScroll', stopWheelZoom, { passive: false });
     }
 
     if (settingsManager.disableWindowScroll || settingsManager.disableNormalEvents) {
@@ -55,7 +56,7 @@ export class MouseInput {
 
     this.mouseMoveTimeout = -1;
     canvasDOM.addEventListener('mousemove', (e) => {
-      this.canvasMouseMove_(e, keepTrackApi.getMainCamera());
+      this.canvasMouseMove_(e, ServiceLocator.getMainCamera());
       settingsManager.lastInteractionTime = Date.now();
     });
 
@@ -205,7 +206,7 @@ export class MouseInput {
 
   private canvasMouseMoveFire_(mainCameraInstance: Camera, evt: MouseEvent) {
     // Cache DOM lookups
-    const container = keepTrackApi.containerRoot;
+    const container = KeepTrack.getInstance().containerRoot;
     const offsetX = container.scrollLeft - window.scrollX + container.offsetLeft;
     const offsetY = container.scrollTop - window.scrollY + container.offsetTop;
 
@@ -252,7 +253,7 @@ export class MouseInput {
     this.isStartedOnCanvas = true;
 
     if (evt.button === 2) {
-      this.dragPosition = InputManager.getEarthScreenPoint(ServiceLocator.getMainCamera().state.mouseX, keepTrackApi.getMainCamera().state.mouseY);
+      this.dragPosition = InputManager.getEarthScreenPoint(ServiceLocator.getMainCamera().state.mouseX, ServiceLocator.getMainCamera().state.mouseY);
 
       const gmst = ServiceLocator.getTimeManager().gmst;
 
@@ -298,10 +299,10 @@ export class MouseInput {
         // Left Mouse Button Clicked
         if (ServiceLocator.getMainCamera().cameraType === CameraType.SATELLITE) {
           if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY)?.isStatic()) {
-            keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
+            PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
           }
         } else {
-          keepTrackApi.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
+          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(this.clickedSat);
         }
 
       }
@@ -317,7 +318,7 @@ export class MouseInput {
 
     // Force the search bar to get repainted because it gets overwritten a lot
     this.dragHasMoved = false;
-    keepTrackApi.getMainCamera().state.isDragging = false;
+    ServiceLocator.getMainCamera().state.isDragging = false;
 
     if (settingsManager.isFreezePropRateOnDrag) {
       timeManagerInstance.calculateSimulationTime();
@@ -325,7 +326,7 @@ export class MouseInput {
     }
 
     if (!settingsManager.disableUI) {
-      keepTrackApi.getMainCamera().autoRotate(false);
+      ServiceLocator.getMainCamera().autoRotate(false);
     }
   }
 
@@ -349,7 +350,7 @@ export class MouseInput {
       delta *= 33.3333333;
     }
 
-    keepTrackApi.getMainCamera().zoomWheel(delta);
+    ServiceLocator.getMainCamera().zoomWheel(delta);
   }
 
   private rmbMenuActions_(e: MouseEvent) {
@@ -357,9 +358,9 @@ export class MouseInput {
     if (settingsManager.disableUI) {
       return;
     }
-    const timeManagerInstance = keepTrackApi.getTimeManager();
-    const uiManagerInstance = keepTrackApi.getUiManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const uiManagerInstance = ServiceLocator.getUiManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     const target = <HTMLElement>e.target;
     let targetId = target.id;
@@ -373,13 +374,13 @@ export class MouseInput {
 
     switch (targetId) {
       case 'set-sec-sat-rmb':
-        keepTrackApi.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
+        PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(this.clickedSat);
         break;
       case 'reset-camera-rmb':
-        if (keepTrackApi.getPlugin(SelectSatManager)?.selectedSat !== -1) {
-          keepTrackApi.getMainCamera().resetRotation();
+        if (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat !== -1) {
+          ServiceLocator.getMainCamera().resetRotation();
         } else {
-          keepTrackApi.getMainCamera().state.reset();
+          ServiceLocator.getMainCamera().state.reset();
         }
         break;
       case 'clear-lines-rmb':
@@ -389,8 +390,8 @@ export class MouseInput {
         timeManagerInstance.toggleTime();
         break;
       case 'clear-screen-rmb':
-        if (keepTrackApi.getPlugin(TimeMachine)) {
-          keepTrackApi.getPlugin(TimeMachine)!.isTimeMachineRunning = false;
+        if (PluginRegistry.getPlugin(TimeMachine)) {
+          PluginRegistry.getPlugin(TimeMachine)!.isTimeMachineRunning = false;
         }
         uiManagerInstance.doSearch('');
         uiManagerInstance.searchManager.closeSearch();
@@ -399,13 +400,13 @@ export class MouseInput {
         // Revert any group color scheme back to a non group scheme
         colorSchemeManagerInstance.isUseGroupColorScheme = false;
 
-        keepTrackApi.getPlugin(SelectSatManager)?.selectSat(-1);
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
         break;
       default:
-        keepTrackApi.emit(EventBusEvent.rmbMenuActions, targetId, this.clickedSat);
+        EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, targetId, this.clickedSat);
         break;
     }
-    keepTrackApi.getSoundManager()?.play(SoundNames.CLICK);
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
 
     const rightButtonMenuElement = getEl('right-btn-menu');
 

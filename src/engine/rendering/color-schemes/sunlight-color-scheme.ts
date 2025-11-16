@@ -2,15 +2,15 @@
 import { SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { CruncerMessageTypes } from '@app/webworker/positionCruncher';
 import { BaseObject, DetailedSatellite, Star } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
-import { EventBus } from '@app/engine/events/event-bus';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 
 export class SunlightColorScheme extends ColorScheme {
   readonly label = 'Sunlight Status';
@@ -42,8 +42,8 @@ export class SunlightColorScheme extends ColorScheme {
     EventBus.getInstance().on(
       EventBusEvent.onKeepTrackReady,
       (): void => {
-        const catalogManagerInstance = keepTrackApi.getCatalogManager();
-        const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+        const catalogManagerInstance = ServiceLocator.getCatalogManager();
+        const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
         if (colorSchemeManagerInstance.currentColorScheme === this) {
           catalogManagerInstance.satCruncher.postMessage({
@@ -67,8 +67,8 @@ export class SunlightColorScheme extends ColorScheme {
   }
 
   onSelected(): void {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
     catalogManagerInstance.satCruncher.postMessage({
       isSunlightView: true,
@@ -84,7 +84,7 @@ export class SunlightColorScheme extends ColorScheme {
   }
 
   update(obj: BaseObject): ColorInformation {
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     if ((dotsManagerInstance.inSunData?.length ?? -1) < obj.id) {
       return {

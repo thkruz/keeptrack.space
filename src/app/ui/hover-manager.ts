@@ -6,7 +6,6 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { html } from '@app/engine/utils/development/formatter';
-import { keepTrackApi } from '@app/keepTrackApi';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { CatalogSource, DetailedSatellite, DetailedSensor, KM_PER_AU, LandObject, SpaceObjectType, spaceObjType2Str, Star } from '@ootk/src/main';
@@ -18,6 +17,7 @@ import { MissileObject } from '../data/catalog-manager/MissileObject';
 import { Planet as PlanetDot } from '../objects/planet';
 import { SensorMath } from '../sensors/sensor-math';
 import { StringExtractor } from './string-extractor';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 
 export class HoverManager {
   /** The id of the object currently being hovered */
@@ -47,7 +47,7 @@ export class HoverManager {
     EventBus.getInstance().on(EventBusEvent.highPerformanceRender, () => {
       // Only update hover if we are not on mobile
       if (!settingsManager.isMobileModeEnabled) {
-        this.setHoverId(keepTrackApi.getInputManager().mouse.mouseSat, keepTrackApi.getMainCamera().state.mouseX, keepTrackApi.getMainCamera().state.mouseY);
+        this.setHoverId(ServiceLocator.getInputManager().mouse.mouseSat, ServiceLocator.getMainCamera().state.mouseX, ServiceLocator.getMainCamera().state.mouseY);
       }
     });
   }
@@ -57,7 +57,7 @@ export class HoverManager {
    */
   setHoverId(id: number, mouseX?: number, mouseY?: number) {
     // If this isn't a thing or the context menu is open then don't do anything
-    if (id === this.currentHoverId || keepTrackApi.getInputManager().isRmbMenuOpen) {
+    if (id === this.currentHoverId || ServiceLocator.getInputManager().isRmbMenuOpen) {
       return;
     }
 
@@ -76,11 +76,11 @@ export class HoverManager {
   }
 
   private controlFacility_(obj: LandObject) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     this.satHoverBoxNode1.textContent = obj.name;
     this.satHoverBoxNode2.innerHTML =
-      `${obj.country + SensorMath.distanceString(obj, catalogManagerInstance.getObject(keepTrackApi.getSensorManager().currentSensors[0]?.id) as DetailedSensor)}`;
+      `${obj.country + SensorMath.distanceString(obj, catalogManagerInstance.getObject(ServiceLocator.getSensorManager().currentSensors[0]?.id) as DetailedSensor)}`;
     this.satHoverBoxNode3.textContent = '';
     this.satHoverBoxNode3.style.display = 'none';
   }
@@ -111,7 +111,7 @@ export class HoverManager {
     if (this.satHoverBoxDOM.style.display === 'none' || !settingsManager.enableHoverOverlay) {
       return false;
     }
-    const renderer = keepTrackApi.getRenderer();
+    const renderer = ServiceLocator.getRenderer();
 
     this.satHoverBoxDOM.style.display = 'none';
     renderer.setCursor('default');
@@ -120,11 +120,11 @@ export class HoverManager {
   }
 
   private hoverOverSomething_(id: number, screenX?: number, screenY?: number) {
-    if (!keepTrackApi.getMainCamera().state.isDragging && settingsManager.enableHoverOverlay) {
+    if (!ServiceLocator.getMainCamera().state.isDragging && settingsManager.enableHoverOverlay) {
       // NOTE: The radar mesurement logic breaks if you call it a SatObject
 
-      const catalogManagerInstance = keepTrackApi.getCatalogManager();
-      const renderer = keepTrackApi.getRenderer();
+      const catalogManagerInstance = ServiceLocator.getCatalogManager();
+      const renderer = ServiceLocator.getRenderer();
 
       const obj = catalogManagerInstance.getObject(id);
 
@@ -185,14 +185,14 @@ export class HoverManager {
   }
 
   private launchFacility_(landObj: LandObject) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     const launchSite = StringExtractor.extractLaunchSite(landObj.name);
 
     this.satHoverBoxNode1.textContent = `${launchSite.site}, ${launchSite.country}`;
     this.satHoverBoxNode2.innerHTML =
       `${spaceObjType2Str(landObj.type) +
-      SensorMath.distanceString(landObj, catalogManagerInstance.getObject(keepTrackApi.getSensorManager().currentSensors[0]?.id) as DetailedSensor)
+      SensorMath.distanceString(landObj, catalogManagerInstance.getObject(ServiceLocator.getSensorManager().currentSensors[0]?.id) as DetailedSensor)
       }`;
     this.satHoverBoxNode3.textContent = '';
     this.satHoverBoxNode3.style.display = 'none';
@@ -207,10 +207,10 @@ export class HoverManager {
   }
 
   private planetariumView_(satId: number) {
-    if (keepTrackApi.getMainCamera().cameraType === CameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
+    if (ServiceLocator.getMainCamera().cameraType === CameraType.PLANETARIUM && !settingsManager.isDemoModeOn) {
       this.satHoverBoxDOM.style.display = 'none';
 
-      const renderer = keepTrackApi.getRenderer();
+      const renderer = ServiceLocator.getRenderer();
 
       if (satId !== -1) {
         renderer.setCursor('pointer');
@@ -228,7 +228,7 @@ export class HoverManager {
     if (!settingsManager.enableHoverOverlay) {
       return;
     }
-    const sensorManagerInstance = keepTrackApi.getSensorManager();
+    const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     // Use this as a default if no UI
     if (settingsManager.disableUI || settingsManager.isEPFL) {
@@ -402,8 +402,8 @@ export class HoverManager {
    * TODO: Rename this
    */
   private updateHover_(id: number) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const orbitManagerInstance = keepTrackApi.getOrbitManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
     this.currentHoverId = id;
     if (id !== -1 && catalogManagerInstance.objectCache[id]?.type !== SpaceObjectType.STAR) {
@@ -421,9 +421,9 @@ export class HoverManager {
       return;
     }
 
-    const colorSchemeManagerInstance = keepTrackApi.getColorSchemeManager();
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
-    const gl = keepTrackApi.getRenderer().gl;
+    const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
+    const gl = ServiceLocator.getRenderer().gl;
 
     this.hoveringSat = i;
     if (i === this.lasthoveringSat) {
@@ -435,7 +435,7 @@ export class HoverManager {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, colorSchemeManagerInstance.colorBuffer);
 
-    const primarySatId = keepTrackApi.getPlugin(SelectSatManager)?.selectedSat;
+    const primarySatId = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat;
     const isLastHoverNeedsUpdate = this.lasthoveringSat !== -1 && this.lasthoveringSat !== primarySatId;
     const isNewHHoverNeedsUpdate = this.hoveringSat !== -1 && this.hoveringSat !== primarySatId;
 
@@ -446,7 +446,7 @@ export class HoverManager {
   }
 
   private setHoverDotColor_(gl: WebGL2RenderingContext, isLastHoverNeedsUpdate: boolean, isNewHHoverNeedsUpdate: boolean, colorSchemeManagerInstance: ColorSchemeManager) {
-    const catalogManagerInstance = keepTrackApi.getCatalogManager();
+    const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     // If Old Select Sat Picked Color it Correct Color
     if (isLastHoverNeedsUpdate) {
@@ -473,7 +473,7 @@ export class HoverManager {
   }
 
   private setHoverDotSize_(gl: WebGL2RenderingContext, isLastHoverNeedsUpdate: boolean, isNewHHoverNeedsUpdate: boolean) {
-    const dotsManagerInstance = keepTrackApi.getDotsManager();
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
 
     if (isLastHoverNeedsUpdate) {
       dotsManagerInstance.sizeData[this.lasthoveringSat] = dotsManagerInstance.getSize(this.lasthoveringSat);

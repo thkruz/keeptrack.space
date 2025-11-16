@@ -55,6 +55,7 @@ import { SatInfoBoxSensor } from './sat-info-box-sensor/sat-info-box-sensor';
 import { SatInfoBox } from './sat-info-box/sat-info-box';
 import { SatelliteFov } from './satellite-fov/satellite-fov';
 import { SatellitePhotos } from './satellite-photos/satellite-photos';
+import { SatelliteSelection } from './satellite-selection/satellite-selection';
 import { ScenarioManagementPlugin } from './scenario-management/scenario-management';
 import { ScreenRecorder } from './screen-recorder/screen-recorder';
 import { Screenshot } from './screenshot/screenshot';
@@ -187,6 +188,7 @@ export class PluginManager {
         { init: () => new ProximityOps().init(), config: plugins.ProximityOps },
         { init: () => new OrbitReferences().init(), config: plugins.OrbitReferences },
         { init: () => new Collisions().init(), config: plugins.Collisions },
+        { init: () => new SatelliteSelection().init(), config: plugins.SatelliteSelection },
         { init: () => new OrbitGuardMenuPlugin().init(), config: plugins.OrbitGuardMenuPlugin },
         { init: () => new TrackingImpactPredict().init(), config: plugins.TrackingImpactPredict },
         { init: () => new Breakup().init(), config: plugins.Breakup },

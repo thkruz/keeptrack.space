@@ -62,6 +62,7 @@ export type KeepTrackPluginsConfiguration = {
   NextLaunchesPlugin?: PluginConfiguration;
   OrbitReferences?: PluginConfiguration;
   SatellitePhotos?: PluginConfiguration;
+  SatelliteSelection?: PluginConfiguration;
   Planetarium?: PluginConfiguration;
   EciPlot?: PluginConfiguration;
   EcfPlot?: PluginConfiguration;

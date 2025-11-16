@@ -2,4126 +2,3756 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### v11.0.1
-
->  
-
-- docs: :memo: add v11 "Copernicus" release notes and update CHANGELOG.md
-- build: :coffin: remove old toml files
-- ci: :construction_worker: set branch to 'diagram' for repo-visualizer workflow
-- ci: :construction_worker: add artifact_name to repo-visualizer workflow
-
-#### v11.0.0
-
->  
-
-- Maneuver detection
-- chore(deps-dev): bump @babel/core from 7.26.10 to 7.28.4
-- fix: applied null safe checks
-- fix: :bug: fix missing dependencies for normal build
-- Develop
-- fix: :bug: add warning message for satellite orbit optimization and i…
-- 10.8.4
-- v10.8.3
-- v10.8.2
-- chore: :bookmark: update subproject commit reference in plugins-pro
-- chore: :bookmark: update subproject commit reference in plugins-pro
-- Develop
-- Develop
-- 10.8.0
-- Develop
-- Develop
-- Develop
-- Develop
-- Develop
-- Develop
-- fix: :bug: update logo image path and format URLs in installation ins…
-- Develop
-- Develop
-- Develop
-- Develop
-- fix: :bug: standardize texture quality values to lowercase in MobileM…
-- Develop
-- fix: :bug: Improve Safari detection logic for better browser compatib…
-- fix: :bug: add warning message for satellite orbit optimization and improve error handling for input validation
-- feat: :sparkles: Add dwarf planet rendering class and texture support
-- feat: :sparkles: Add Pluto dwarf-planet renderer and make orbit paths accept vec4 points; enable Pluto in planets menu
-- refactor: :globe_with_meridians: Add localization support for splash screen and filter menu in multiple languages
-- build: :fire: remove pnpm-lock
-- refactor: :fire: remove auto generated locale files
-- feat: :sparkles: enhance mesh loading and rendering capabilities
-- feat: add Planets Menu Plugin with localization and UI integration
-- test: :white_check_mark: update tests to match v11 architecture
-- feat: :sparkles: add more of the solar system
-- refactor: :recycle: Refactor HTML rendering in plugins to use new html utility
-- refactor: :recycle: Refactor input manager and mouse input to use ServiceLocator for improved dependency management
-- feat: :sparkles: add VCR plugin with playback controls and integrate into top menu
-- feat: :sparkles: add alphaMap and alphaImage support in ShaderMaterial
-- feat: :sparkles: add Uranus rings rendering and integrate with Uranus class
-- refactor: :recycle: Replace keepTrackContainer with Container instance for improved dependency management
-- feat: :sparkles: implement Saturn rings rendering and integrate with Saturn class
-- refactor: :zap: enhance Godrays shader performance and add randomness to sun rendering
-- feat: :sparkles: add draco encoder/decoder for future support
-- refactor: :recycle: Replace keepTrackApi.glsl with glsl function for shader code formatting consistency
-- feat: :sparkles: add translation generation tasks and update mergeLocales method for improved locale management
-- refactor: :zap: optimize Godrays shader and improve performance
-- refactor: :recycle: disable unnecessary plugins and clean up settings for improved readability
-- feat: :sparkles: enhance color scheme management with enable/disable setting
-- feat: :sparkles: enhance calendar input handling with text input option
-- test: :white_check_mark: fix tests that were broken due to new engine updates
-- test: :white_check_mark: add mobile and desktop tests for LegendManager class functionality
-- refactor: :alien: update celestrak version
-- feat: :sparkles: update occlusion drawing logic to handle different center bodies
-- refactor: :zap: simplify shader calculations in DotsManager
-- build: :recycle: replace opener with custom openFile function for cross-platform compatibility
-- refactor: :recycle: Update plugin imports to use 'plugins-pro'
-- fix: :bug: revert star changes and rename shader attribute from a_star to a_size for clarity
-- feat: :sparkles: add low priority scene loading and event listener for KeepTrack readiness
-- fix: :bug: fix setCurrentModel method to reset rotation only when model name changes
-- feat: :sparkles: update celestial bodies list and enhance zoom distance settings for Sun and Earth
-- fix: :bug: simplify camera distance checks and enforce minimum distance in CameraState
-- fix: :bug: enable more camera distance checks for satellite shader minimum size
-- fix: :bug: update layers menu icon classes for consistent styling
-- fix: :bug: remove unnecessary type assertions for position and rotation arrays
-- fix: :bug: add localization import and initialize early in KeepTrack class
-- refactor: :recycle: clean up imports and improve jday existence check in DateTimeManager
-- fix: :bug: add missing styles for colorbox title to fix layout
-- fix: :bug: validate planet selection in changePlanet method to prevent invalid inputs
-- fix: :bug: validate selected planet before setting zoom distances in PlanetsMenuPlugin
-- chore: :recycle: move maxSize property in shader settings for improved object sizing
-- test: :white_check_mark: update Jest snapshot for moon position calculation in drawManager
-- fix: :bug: adjust depth test handling for Earth based on camera zoom level
-- refactor: :recycle: Update Earth class to use glsl import and conditionally disable depth test
-- refactor: :recycle: improve cloud densitiy
-- fix: :bug: remove unnecessary whitespace in top menu item HTML structure
-- chore: :heavy_minus_sign: remove unused dependencies from package.json
-- build: :arrow_up: bump @types/node
-- fix: :bug: update lint script to target the src directory for improved code quality checks
-- feat: :sparkles: add Mars wallpaper and update splash screen image list
-- chore: :heavy_minus_sign: remove path-to-regexp dependency from package.json
-- feat: :sparkles: add world shift calculation for Sun in WebGLRenderer
-- fix: :bug: disable VCR plugin by default for improved user experience
-- fix: :bug: update draggable box background color to use CSS variable for consistency
-- Merge branches 'develop' and 'develop' of https://github.com/thkruz/keeptrack.space into develop
-- refactor: :truck: restructure src into app and engine folders
-- refactor: :truck: restructure src into app and engine folders
-- refactor: :truck: Refactor camera state management and input handling
-- feat: :sparkles: improve automated building of localization files and update filter menu translations
-- feat: :globe_with_meridians: Add common translations in multiple languages
-- Pre main branch merge
-- test: :white_check_mark: Add unit tests for various color schemes in rendering engine
-- refactor: :recycle: isolate the engine from the application
-- feat: :sparkles: implement draggable boxes and convert legends to layers
-- chore: :globe_with_meridians: update generated localization for multiple languages
-- feat: :globe_with_meridians: Add localization support for satellite orbital data in multiple languages
-- refactor: :recycle: migrate from npm "ootk" to local ootk submodule and wire tooling
-- refactor: :recycle: update .gitignore to exclude keys.ts and remove generated keys.ts file
-- refactor: :recycle: Refactor camera state management
-- refactor: :recycle: use EventBus.getInstance() instead of keepTrackApi across app
-- feat: :globe_with_meridians: Add multilingual localization support for satellite info box in German, English, Spanish, French, Japanese, Korean, Russian, Ukrainian, and Chinese
-- refactor: replace EventBusEvent with EventBusEvents for consistency and clarity
-- test: :white_check_mark: fix all failing tests due to v11
-- feat: :sparkles: add OemSatellite class and integrate OEM satellite support
-- feat: :sparkles: Add OemReader plugin, register pro path, and add default OEM settings
-- feat: :sparkles: implement a worldShift to allow centering on non-earth objects
-- feat: :sparkles: Add ScenarioManagement plugin with UI, save/load and time-bound enforcement
-- feat: :sparkles: Support J2000/TEME line rendering, segmented radial grids, and TEME↔J2000 transforms
-- refactor: :recycle: Clean up CSS styles, enhance tooltip positioning, and improve top menu integration
-- feat: :planet: add planetary metadata, orbit-path rendering, and hover info
-- refactor: :recycle: separate projection vs world matrices and use matrixWorldInverse across renderer
-- feat: :globe_with_meridians: add multilingual support for satellite info box and improve layout structure
-- feat: :sparkles: implement DepthManager to enable logarithmic depth buffer
-- feat: :sparkles: add planet objects, planet dots and orbit-drawing UI
-- feat: :sparkles: Add Maneuver Detection plugin with UI and data integration
-- refactor: :fire: remove unused plugin translations and streamline localization handling
-- refactor: :globe_with_meridians: Move loading screen messages
-- refactor: :recycle: Replace SocialMedia plugin with generic TopMenuPlugin and update related configurations
-- refactor: :recycle: Enhance LayersManager and LayersPopupBox integration, update event handling and menu interactions
-- feat: :sparkles: add engine-ui.css for draggable box styles and import in draggable-box.ts
-- feat: :sparkles: Add TimeSlider plugin
-- feat: :zap: async loading of textures to unblock main thread
-- OrbitGuard menu with static data
-- feat: :globe_with_meridians: Update localization for satellite info box in Japanese, Korean, and Ukrainian
-- refactor: :truck: move datetime UI logic out of TimeManager into DateTimeManager
-- refactor: :recycle: Consolidate Earth texture quality enums into a single module and update imports across the codebase
-- refactor(camera/rendering): switch to earth-centered camera positions & dynamic sun sizing
-- refactor: :recycle: introduce CameraZoomState class to manage zoom state in Camera
-- feat: :sparkles: add size determination logic for dots based on search results and selection
-- chore: :globe_with_meridians: add filter-menu translations and scenario-management locale files; bump plugins-pro submodule
-- refactor(rendering): cache J2000, prevent duplicate orbit paths, and optimize orbit path updates
-- feat: :sparkles: add Reentry Risk color scheme and integrate into color scheme manager
-- refactor: :sparkles: Update celestial body classes to use Body type for getName and adjust RADIUS visibility
-- refactor: :recycle: update time management and URL handling for improved simulation time and rate management
-- feat(telemetry/build): add open-source telemetry stub, register plugin, and ensure submodules in prebuild
-- feat: :sparkles: implement legend popup menu with responsive behavior and z-index adjustments
-- feat: add loading screen start button translations and settings for ads and auto start
-- fix: :bug: use AEHF as default OEM satellite model; refresh time-slider on staticOffsetChange and expose updateSliderPosition; add 'planets' URL param to toggle planets; bump plugins-pro submodule
-- perf: :zap: performance tweaks to reduce dom interaction and utilize idlecallback
-- refactor: :recycle: Update tooltip attributes and styles across multiple plugins for consistency and improved usability
-- refactor: :sparkles: Introduce Milky Way texture quality settings and streamline skybox initialization
-- refactor(ui): replace ISS wallpaper, normalize keyboard handling, and tidy CSS
-- refactor: :recycle: split LayersPopupBox class into own file
-- test: :white_check_mark: fix all failing tests
-- refactor: :children_crossing: Enhance VCR plugin with improved tooltip handling and event management for play, pause, rewind, and fast forward actions
-- fix: :bug: correct OEM satellite orbit segment & history positioning; always update OEM orbit data
-- refactor: :recycle: cache orbit buffers, rename updateOrbitData -&gt; alignOrbitSelectedObject, and simplify GPU updates
-- refactor: streamline texture loading and splash behavior
-- refactor: :children_crossing: update embed settings to reflect new plugins and options
-- feat: :sparkles: Add filters for vLEO and xGEO satellites, update ColorSchemeManager and WebGLRenderer integration
-- refactor: :recycle: rename CameraType.DEFAULT to FIXED_TO_EARTH and update usages
-- fix: :bug: Adjust maxRng values for sensors to improve range accuracy
-- refactor: :truck: move the camera class to new folder to enable refactoring
-- refactor: :fire: remove unused isShowDistance property
-- refactor: update StarlinkColorScheme to differentiate operational and other statuses
-- refactor: :label: add type definitions for various managers and update service locator methods for improved type safety
-- refactor: :recycle: switch to declarative kt-tooltip and remove TooltipsPlugin usage
-- refactor(oem-satellite): rename stateVectors → ephemeris, wire LagrangeInterpolator, clean imports; bump plugins-pro submodule
-- feat: :sparkles: Add maneuver data handling to satellite info box
-- refactor: :recycle: replace getCameraDistanceFromEarth/getCameraPosition with calcDistanceBasedOnZoom/getDistFromEarth, compute target distance directly, and make snap instantaneous when chaseSpeed_ == 1.0
-- feat: :sparkles: implement deepMerge method for recursive object merging in settings management
-- feat: :sparkles: Add locale file compilation method to FileSystemManager
-- fix: :bug: simplify godrays occlusion drawing using planets map; keep Earth/Moon special-cases
-- fix: :bug: color-schemes: handle OEM-import sats, preserve planet color, adjust zoom behavior; bump plugins-pro submodule
-- refactor: :recycle: remove unused showLoading calls and improve link type assignment in SatLinkManager
-- fix: update loading screen button styles and add pulsate animation for better visibility
-- ci: :green_heart: make mergeLocales accept optional proDir and use for non-pro builds
-- feat: :sparkles: Add LinkedInLinkPlugin to top menu and update configuration
-- fix: :bug: fix J2000 vs TEME
-- fix: :bug: smooth satShader.minSize scaling based on camera distance
-- refactor: :children_crossing: Improve tooltip sizing and positioning logic — use maxWidth, separate vertical/horizontal direction selection, and fix placement math
-- feat: :sparkles: Update satellite info box sections to be collapsed by default with a new order
-- fix: :bug: use texture resolution settings independent of mobile settings
-- fix: :bug: Refactor container usage in setupStandardEnvironment to use Container.getInstance for consistency
-- refactor: :sparkles: Enhance celestial bodies menu with additional dwarf planets and improved tooltip handling
-- feat: :sparkles: add optional radius to getAlt and new getPositionFromCenterBody helper
-- fix: :bug: implement Moon.update to apply world shift and respect center/selection
-- feat: :sparkles: add SatInfoBoxOrbital configuration and update default plugins for improved settings management
-- feat: :sparkles: add data cleaning method to remove duplicate channel entries
-- fix: :bug: refactor showLoading call to only fire if a time change happens
-- feat: :sparkles: compute relativeSatPos and pass worldOffset to celestial-body shaders
-- docs: :memo: minor documentation changes
-- refactor: :recycle: init planets in loadScene and remove low-priority loader
-- fix: :bug: Improve Safari detection logic for better browser compatibility
-- fix: :bug: compute altitude for non-Earth-centered objects by resolving centerBody
-- refactor: :recycle: streamline localization handling by replacing Localization instance with t7e function calls
-- feat: :sparkles: add alternate nasa satellite image map originally seen on https://nadir.space
-- fix: :bug: VCR plugin - use ScenarioManagementPlugin.scenario for end-time checks and handle staticOffsetChange to refresh play/pause UI
-- refactor: :recycle: remove TooltipsPlugin dependency & tooltip creation; avoid auto-resuming audio context; lazily load speech voices in speak
-- chore(debug): convert buffer-size validation to commented debugging block in LineManager
-- refactor: :alembic: comment out Moon planet creation and assignments for now
-- refactor: :recycle: remove mat4 dependency and use mainCamera.matrixWorldInverse in unProject; fix indentation for clear-lines submenu
-- feat: :sparkles: Add "Draw Moon Orbit Path" button to Planets menu and wire click handler to invoke moon.drawOrbitPath()
-- refactor: :recycle: update the variable names for getBufferSubDataAsync to be easier to understand
-- refactor(planets-menu): normalize Home key handling; support Shift+Home vs Home
-- chore: :package: add ootk engine submodule (src/engine/ootk)
-- chore: :wrench: update default plugins - enable VcrPlugin, add TimeSlider, relocate TooltipsPlugin to non-menu
-- refactor: :sparkles: Update tooltip handling to use dynamic tooltipTag for attribute selection
-- fix: :bug: tune sound defaults — lower click volume, use SoundNames for loading/export, add volumes for beeps and menu button
-- build: :green_heart: normalize __dirname for Windows/POSIX and allow reassignment
-- feat: :sparkles: add Home key handler to center camera on Earth
-- feat: :sparkles: enhance tooltip dimensions and support HTML content
-- chore: :bookmark: update CHANGELOG for v10.8.4 with new features and fixes
-- refactor(rendering/skybox): use camera position directly for worldOffset; remove unused imports and dead code
-- fix: :bug: fix incorrect matrix being used for unprojection
-- feat: :globe_with_meridians: Add English locale for Video Director plugin
-- fix: :bug: include WebGL error code in vertex/fragment shader creation errors
-- test: :white_check_mark: fix broken tests
-- refactor(build/webpack-manager): only generate and push auth webpack config when isPro
-- refactor: :recycle: simplify alt2zoom — remove MIN_ZOOM_LEVEL/MAX_ZOOM_LEVEL and normalize output to [0,1] with 0.5 fallback
-- fix: :bug: scale sun size when zoomed out very far
-- ci: :green_heart: generate translation files before build and unit tests
-- feat: :sparkles: accept worldOffset in occlusion uniformSetup and use it
-- feat: :sparkles: add onLinesCleared, selectedDateChange and calculateSimulationTime events to EventBus and update EngineEventMap types
-- refactor: :recycle: replace Localization instance with t7e function for country label localization
-- feat: :sparkles: Integrate DepthManager into ConeMesh for log depth buffer support
-- fix: remove unnecessary cases from setInstallDirectory_ method for cleaner code
-- chore: :construction_worker: hide unused files
-- fix: :bug: eagerly initialize LayersPopupBox, simplify popup selection and move currentLayer assignment
-- fix: :bug: remove keeptrack.space hostname guard so UserAccountPlugin can load on local/other hosts
-- fix: :bug: clamp gl_Position.w in log-depth vertex shader to avoid NaNs/Infs for extreme coordinates
-- feat: :sparkles: add FilterMenuPlugin English locale entries to filter-menu en.src.json
-- fix: :bug: throttle updateURL to avoid browser hangs by debouncing history updates (skip calls within 250ms) and add lastUpdateTime_
-- fix: :bug: Enable depth testing in SensorFovMesh to improve rendering accuracy
-- fix: :lock: close benign security issue with cross origin of keyboard event
-- refactor: :recycle: rename updatePositionBuffer -&gt; update and rebind EventBus handler
-- fix: :bug: avoid forcing Earth center for OEM satellites
-- refactor: :recycle: Replace SatMath.j200ToTemeMatrix with getTemeToJ2000Matrix and tidy imports
-- fix: :bug: Update fieldOfView and fieldOfViewMax to use Radians for improved clarity
-- fix: :bug: update icon paths in web manifest for consistency
-- chore: update version to 11.0.0.0 in README, package.json, and version.js
-- fix: :art: fix unnecessary br
-- chore(build): add TypeScript declaration for clean-terminal-webpack-plugin
-- fix: :bug: stop overwriting Sun.position with ECI (account for worldShift)
-- fix: :bug: only load user-account pro plugin on keeptrack.space subdomains
-- fix: :bug: avoid recalculating simulation time
-- fix: :bug: remove unnecessary exports creating circular reference
-- fix: :bug: update logic on how screen size changes are handled
-- fix: :zap: dont load the sun texture if it will never get used
-- chore: :arrow_up: update src/engine/ootk and src/plugins-pro submodule pointers
-- build: :construction_worker: add user-account plugin mapping to plugin manager
-- fix: :bug: fix incorrect onKeyDown handler
-- fix: :bug: move SplashScreen.hideSplashScreen() to postStart_
-- fix: :bug: scale screenshot watermark logo height with hiResWidth and reorder imports
-- fix: :bug: add no-op calculateRelativeSatPos override to Moon class
-- feat: :sparkles: include vimpel=false in generated URL when JSC catalog is disabled
-- fix: :bug: initialize ScenarioManagementPlugin earlier (before TopMenu/TimeSlider) and hoist VcrPlugin import
-- chore: :arrow_up: update @typescript-eslint/typescript-estree and cypress dependencies to latest versions
-- refactor: :recycle: Update drag options dimensions for improved usability
-- build: :hammer: update lcov script to use tsx for consistency
-- fix: adjust loading screen positioning for better visibility and layout
-- chore: :bookmark: update version to 10.8.4 in README and version.js
-- chore: :wrench: explicitly disable OemReaderPlugin in celestrak settings
-- chore: :wrench: add Volta node toolchain config (node 25.0.0) to package.json
-- feat: :crescent_moon: add Moon entry to planets RMB submenu after Earth
-- chore: :sparkles: add generated locale files to .gitignore
-- fix: :bug: Update fragment shader code for log depth calculation to recover original gl_Position.w
-- fix: :bug: Adjust z-index for sidenav-trigger to prevent popups from blocking view
-- build: :label: add @types/opener dependency for TypeScript support
-- feat: add adsense placeholder to loading screen for improved ad integration
-- Update src/static/splash-screen.ts
-- ci: :construction_worker: switch ESLint step to use `npm run lint` in build pipeline
-- fix: snap camYaw instantly when chaseSpeed_ == 1.0
-- refactor(scenario-management): remove BASIC from menuMode; limit plugin to ADVANCED, SETTINGS, ALL
-- fix: :bug: resize renderer canvas in UiManager.postStart (add ServiceLocator import & call)
-- chore: :arrow_up: update plugins-pro submodule to 95675218
-- fix: :bug: use errorManager.log for external ASCII catalog processing instead of info
-- chore: :arrow_up: update plugins-pro submodule to aee63320
-- fix: :bug: increase drawPosition normalization divisor to 1e11 to avoid zero coords breaking mat4.targetTo
-- refactor: :recycle: add radius and position to earth
-- fix: :bug: refresh ScenarioManagementPlugin.scenario before time slider calculations
-- feat: :sparkles: Add new icon assets (event-note, input, landscape*) and update plugins-pro submodule
-- fix: :bug: adjust zoom value bounds for validation in UrlManager
-- fix: :bug: disable multiline-comment-style rule in ESLint configuration
-- chore: :package: update subproject commit reference in plugins-pro
-- fix: :bug: correct reference to Moon position in updateVertBuf method
-- ci: :green_heart: update ESLint command to target the src directory
-- build: :arrow_up: update gl-matrix dependency to version 3.4.4
-- chore: :arrow_up: update Node.js version in .nvmrc to 24
-- chore: :arrow_up: update typescript dependency to version 5.9.3
-- build: :arrow_up: update prettier-plugin-organize-imports to version 4.3.0
-- chore: :arrow_up: update subproject commit reference in plugins-pro
-- chore: :package: Update subproject commit reference in plugins-pro
-- fix: :bug: Remove dead satellite IDs from DSCS constellation array
-- fix: :bug: Add missing satellite ID to AEHF constellation array
-- chore: :package: update subproject commit reference in plugins-pro
-- fix: :bug: update close button markup for consistency in draggable modal
-- chore: :package: update subproject commit reference
-- chore: update subproject commit reference in plugins-pro
-- Update src/static/splash-screen.ts
-- fix: :zap: disable planets on celestrak version
-- fix: :bug: enable isAutoStart in embedded settingsOverride
-- chore: :heavy_minus_sign: remove ts-node dependency from package.json
-- chore: :heavy_minus_sign: remove download-file dependency from package.json
-- build: :fire: remove child_process
-- chore: :heavy_minus_sign: remove retire dependency from package.json
-- fix: :bug: add .vscode to .eslintignore to prevent linting of VS Code settings
-- fix: :bug: add padding to nav for improved layout
-- feat: add adsbygoogle interface to global declaration for improved type support
-- chore: :art: Update Saturn & Uranus ring textures to multiple of 2
-- chore: :arrow_up: update package-lock.json to reflect dependency changes
-- feat: :sparkles: add high-resolution textures for celestial bodies
-
-#### v10.8.4
-
->  
-
-- chore: :bookmark: update version to 10.8.3 in README, CHANGELOG, and version.js
-- feat: add new achievement and icon images; update subproject reference
-- Update src/plugins/new-launch/new-launch.ts
-- chore: :bookmark: update subproject commit reference in src/plugins-pro
-- fix: :rotating_light: fix linter error
-
-#### v10.8.3
-
->  
-
-- fix: :bug: add validation for eccentricity, epoch year, and epoch day formats in createNominalSat_
-- docs: :loud_sound: update CHANGELOG for v10.8.2 with new features and bug fixes
-- fix: :bug: ensure HTML is ready before updating header data in SatInfoBox
-- fix: :bug: add sensor existence check before accessing sensor info in viewSensorInfoRmb
-- refactor: :recycle: replace magic numbers with constants for long audio cooldown and chatter repeat delay
-- feat: :sparkles: add new achievement images for ISS and Vanguard
-- chore: :bookmark: update version to 10.8.2 in README and version.js
-- fix: :bug: add color scheme validation before updating last satellite color
-- chore: :bookmark: update subproject commit reference in plugins-pro
-- fix: :bug: adjust cloud color intensity calculation for improved visual quality
-
-#### v10.8.2
-
->  
-
-- feat: :zap: enhance audio playback using Web Audio API
-- fix: :bug: handle potential null values in look angles download and improve data display
-- fix: :bug: handle potential null values in filter settings saving to ensure defaults are applied
-- fix: :bug: handle potential null values for primary satellite covariance matrix in SelectSatManager
-- fix: :bug: handle potential null values in audio playback and error logging
-- fix: :bug: improve error handling in ScreenRecorder and StreamManager to prevent crashes when media recorder is not initialized
-- docs: :loud_sound: add v10.8.1 section to CHANGELOG with updates for new features and fixes
-- fix: :bug: add validation for satellite data before updating DOM elements
-- chore: :bookmark: update subproject commit reference in plugins-pro
-- chore: :bookmark: update subproject commit reference in plugins-pro
-
-#### v10.8.1
-
->  
-
-- docs: :loud_sound: update CHANGELOG with new features, fixes, and enhancements for v10.8.0
-- chore: :bookmark: update version to 10.8.0 and refine Create Satellite help description
-- chore: :bookmark: update subproject commit reference in plugins-pro
-
-#### v10.8.0
-
->  
-
-- feat: :sparkles: enhance error handling by adding error event to KeepTrackApi and removing telemetry implementation
-- test: :white_check_mark: add unit tests for GetVariables and parseGetVariables functions
-- feat: :sparkles: update environment configuration and remove SupabaseManager; adjust plugin settings for better control
-- feat: :sparkles: add Elektro-L 2 satellite image retrieval and display functionality
-- feat: :sparkles: update ESLint configuration to allow process.env usage and integrate dotenv-webpack for environment variable management
-- feat: :sparkles: add isWatchlistTopMenuNotification flag and update settings persistence for offline mode
-- feat: :sparkles: enhance SensorManager to support offline mode and load sensor JSON
-- feat: :sparkles: enhance WatchlistPlugin with top menu notifications and update StorageKey enum for better organization
-- feat: :sparkles: add stem environment preset and integrate into parseGetVariables
-- feat: :sparkles: add userAccountChange event and update searchUpdated event parameters
-- refactor: :recycle: refactor watchlist serialization and deserialization methods for improved clarity and error handling
-- feat: :sparkles: integrate SupabaseManager for environment variable handling and add Supabase dependencies
-- feat: :sparkles: refactor orbit type handling to use updateOrbitType method in OrbitManager
-- test: :white_check_mark: update WatchlistPlugin to conditionally enable top-menu elements
-- feat: :sparkles: add HOLDARC sensor details and update coordinates for existing sensors
-- refactor: :recycle: rename offline property to offlineMode
-- fix: :bug: wrap file copy operations in try-catch to handle errors gracefully
-- chore: :bookmark: update subproject commit reference in plugins-pro
-- fix: :bug: refactor visibility logic for secondary satellite info in SatInfoBoxObject
-- feat: :sparkles: enhance stem environment with BottomMenu integration and event handling
-- fix: :bug: ensure open button is defined before setting onclick handler in colorbox
-- fix: :bug: move auth-config.js writing logic to ensure proper file handling after directory creation
-- fix: :bug: handle invalid covariance matrix in selectSatObject_ method and set default radii
-- fix: :bug: use optional chaining for model mesh access to prevent runtime errors
-- fix: :bug: update Electro-L 2 timestamp format and adjust time buffer for closest satellite image retrieval
-- feat: :sparkles: add userLogin and userLogout events to KeepTrackApiEvents
-- chore: :fire: remove wrangler configuration file as part of cleanup
-- feat: :sparkles: add initial wrangler configuration for deployment setup
-- feat: :sparkles: add functionality to open image in new tab from colorbox
-- fix: :bug: clear styling from nav-wrapper in DateTimeManager initialization
-- fix: :bug: correct plugin assignment order and enable splash screen visibility
-- feat: :sparkles: add onWatchlistAdd and onWatchlistRemove events to KeepTrackApiEvents
-- fix: :bug: update environment variable keys for Supabase configuration to match naming conventions
-- fix: :bug: replace console warning with error logging for unregister callback not found
-- test: :white_check_mark: add TopMenu import and initialization in CountriesMenu tests
-- fix: :bug: use optional chaining for transparent color fallback in color schemes
-- fix: :bug: update version badge to 10.7.2 and update subproject commit reference
-- fix: :bug: ensure splash screen images are filtered only when splashScreenList is defined
-- fix: :bug: add TopMenu as a dependency for CountriesMenu plugin
-- feat: :sparkles: enhance helpBody description for Create Satellite menu with detailed usage instructions
-- feat: :sparkles: add account-circle icon to public assets
-- Update src/plugins/select-sat-manager/select-sat-manager.ts
-- chore: :heavy_plus_sign: update subproject commit reference in plugins-pro
-- fix: :bug: ensure mesh initialization only occurs if model name is defined
-- fix: :bug: update color settings version check to use defaultColorSettings.version
-- fix: :bug: ensure loading indicator is hidden on image and iframe load errors
-- Update src/static/splash-screen.ts
-- fix: :bug: update nav-wrapper style to use flexbox for better alignment
-- fix: :bug: correct splash screen identifiers to use hyphens for consistency
-- fix: :bug: adjust polygon offset calculation for atmosphere rendering based on camera zoom level
-- fix: :bug: remove redundant updateModel call in MeshManager
-- fix: :bug: remove splash screen visibility setting from loadPresetFacSat2
-- feat: :sparkles: add facebook-white icon to the public image assets
-
-#### v10.7.2
-
->  
-
-- feat: :children_crossing: Add new country codes and update localization files
-- chore: :bookmark: update version to 10.7.0 in README and version.js
-- feat: :sparkles: add satellite info boxes to mobile settings manager
-- fix: :bug: use optional chaining for sound manager calls to prevent errors
-- feat: :sparkles: add version management to PersistenceManager with validation and storage
-- fix: :bug: update getEl calls to include the 'true' parameter for titleSpan and optimize array initialization in tests
-- fix: :bug: update default values for godraysSamples and isDrawAtmosphere settings
-- fix: :bug: improve null checks for current mesh object to prevent errors during rendering
-- fix: :bug: add null check for unregistering callbacks in KeepTrackApi
-- chore: :bookmark: update version to 10.7.1 in README, package.json, and version.js
-- fix: :bug: update version display in splash screen to reflect current version number
-- fix: :bug: update settings to correctly show ECF drawing enabled by default
-- fix: :bug: replace toSorted with sort for consistent array ordering in SatInfoBox
-- feat: :sparkles: add new wallpaper
-- test: :white_check_mark: update expected output for valid country name test to include full name
-- fix: :bug: simplify null check for current mesh object in MeshManager
-
-#### v10.7.0
-
->  
-
-- fix: :bug: update hostname check for copyright notice in splash screen
-- Hotfixes
-- fix: :ambulance: fix outreach not loading due to new API schema
-- Hotfixes
-- fix: :ambulance: fix vimpel issues with R2 CORS
-- Bug Fixes. Bump to 10.5.1
-- fix: :ambulance: fix covariance ellipsoids breaking mobile
-- fix: :bug: fix lack of variety in loading screens
-- build(deps): bump uuid from 9.0.1 to 11.1.0
-- build(deps): bump flag-icons from 7.2.3 to 7.3.2
-- New Color Schemes and Filter Menu
-- fix: :bug: fix offline mode
-- Develop
-- build(deps-dev): bump @types/webgl2 from 0.0.10 to 0.0.11
-- Develop
-- Develop
-- fix: :bug: add fixes for bad colorscheme values and velocity scheme
-- Develop
-- fix: :ambulance: fix color schemes relying on class name that change …
-- fix: :ambulance: fix color schemes relying on class name that change …
-- Develop
-- fix: :beers: fix k vs K
-- Develop
-- fix: :bug: stop using LFS for cloudflare compatibility
-- fix: :ambulance: fix color scheme not loading
-- fix: :ambulance: fix issue with color scheme freezing
-- Develop
-- Develop
-- fix: :ambulance: fix missing parentheses
-- Develop
-- Develop
-- Aldoria Additions and Other Updates
-- Develop
-- Develop
-- Develop
-- Develop
-- refactor: :recycle: update tle path to use v2 of API
-- Develop
-- Develop
-- fix: :arrow_up: bump ootk
-- Develop
-- Develop
-- Develop
-- Develop
-- Develop
-- fix: :zap: improve orbit finder algorithm for breakups
-- Develop
-- Address Issues Found on Hacker News
-- Develop
-- Develop
-- Develop
-- Develop
-- Develop
-- fix: :ambulance: fix error when no satellite selected
-- fix: :bug: fix transponder menu being enabled incorrectly
-- feat: :sparkles: add geo satellite transponder info
-- Develop
-- Updates to TIP Plugin
-- fix: :bug: fix flickering on mobile
-- Develop
-- Develop
-- Develop
-- Develop
-- fix: :ambulance: emergency fix
-- fix: fix analytics on localhost
-- Develop
-- Develop
-- Develop
-- docs: :memo: fix readme links
-- ci: :construction_worker: allow npm audit to fail but open an issue
-- Develop
-- Develop
-- Develop
-- Develop
-- fix: :ambulance: fix one bad satellite breaking website
-- Develop
-- fix: :ambulance: fix new launch plugin
-- fix: :bug: multiple bug fixes related to color buffer updates
-- fix: :zap: fix performance bug and css issues
-- test: :white_check_mark: fix broken tests
-- Develop
-- Develop
-- Develop
-- Hotfix to deprecated plot plugins impacting app even when disabled.
-- KeepTrack v9.0.0
-- fix: :bug: prevent triggering an error when typing in invalid custom sensor values
-- fix: :bug: handle errors when processing known satellites in ASCII file
-- fix: :bug: handle undefined satellite object in right button menu
-- fix: :bug: handle errors when processing satellites in CatalogLoader
-- fix: :bug: prevent update execution if sun model is not loaded
-- refactor: :recycle: update event handling in CountriesMenu to use uiManagerFinal
-- feat: :children_crossing: enhance satellite creation with input validation and formatting improvements
-- fix: :bug: fix requestFullscreen failing on some browsers
-- fix: :bug: fix breakup throwing uncaught error
-- fix: :bug: Better handling of errors in obj-to-obj-line.ts
-- fix: :bug: add validation to avoid race conditions
-- fix: :bug: add validation to analytics tool before using
-- fix: :bug: validate datetimeTextElement before setting date/time
-- fix: :bug: add trap for race condition
-- feat: :technologist: new build system
-- test: :white_check_mark: add locales json build output for unit testing in github runner
-- test: :white_check_mark: add jest tests to ensure this continues working as intended
-- test: :white_check_mark: fix outdated snapshots
-- fix: :bug: fix all open issues with rpo-calculator (now proximity-ops)
-- feat: :sparkles: add additonal features to Remote Proximity Operations plugin
-- feat: :technologist: add strict i18n key validation and korean support
-- feat: :technologist: add strict i18n key validation and korean support
-- feat: 🔥 Plotting changes to make it cleaner and refactor code to make it more readable
-- feat: 🔥 Inital commit for find RPO plugin
-- feat: :sparkles: implement covariance ellipsoids
-- feat: 🔥Added option to take into account the weather forecast when finding observable transits for optical sensors
-- refactor: :recycle: reduce unnecessary API calls, utilize enums, fix linter errors, add optimizations
-- docs: :page_facing_up: transfer copyright to Kruczek Labs LLC
-- feat: :children_crossing: improve layout of sensor timeline
-- feat: :sparkles: new launches now use nominal satellites
-- feat: :speech_balloon: add translation support for proximity ops
-- build: :arrow_up: add compatibility with ootk 5
-- feat: :sparkles: add OWL-Net sensors
-- build: :construction_worker: remove auto version date due to merge conflicts and add version to readme
-- feat: 🔥 Add changes to enable RPO plugin & add temporary icon
-- fix: :pencil2: fix Collisions spelling
-- fix: :pencil2: fix Collisions spelling
-- perf: :stethoscope: add throttle for telemetry reporting
-- fix: :art: update logo and add version/copyright information to splash screen
-- fix: :ambulance: fix sensor name not resetting in top menu
-- feat: :sparkles: add ability to increase number of ECF orbits drawn
-- feat: :sparkles: add ability to reload last selected sensors
-- fix: :children_crossing: make it clear ECF orbits only work on GEO satellites
-- fix: :bug: fix satellite view not being enabled
-- fix: :bug: add error catching when drawing map and context lost to canvs
-- fix: :children_crossing: provide feedback when fov bubble enabled but not valid
-- refactor: :children_crossing: set godrays to off by default due to reports of performance issues
-- fix: :goal_net: add Safari browser support warning and redirect
-- fix: :bug: fix bug where alt is null in inc2alt plots
-- fix: :bug: avoid crashing production server even when there is a uniform issue in WebGl
-- refactor: :recycle: change bottom menu categories
-- test: :technologist: fix issue with vscode debug not working with jest
-- Update src/static/gl-utils.ts
-- docs: :bookmark: bump version
-- test: :white_check_mark: fix broken test
-- fix: :beers: used the wrong word for RPO
-- build: :arrow_up: bump ootk to v5
-- chore: :bookmark: bump patch version
-- fix: :bug: fix race condition with soundManager loading after being called
-- fix: :bug: fix issue with sound firing before initialization
-- build: :arrow_up: bump ootk
-- ci: :bug: fix lint-yml checking other files
-- fix: :label: fix incorrect type
-- fix: :bug: prevent errors when plugins are disabled
-- build: :bug: add missing .gitmodules file
-- fix: :ambulance: calendar incorrectly adding 1 to jday
-- fix: :twisted_rightwards_arrows: fix merge issue
-- fix: :twisted_rightwards_arrows: fix merge issue
-- fix: :poop: remove console.log
-- feat: 🔥Add openmeteo dependecy to package.json
-- fix: :bug: fix broken ui icons
-- Resloved conflicts between fixes and new feature branch
-- feat: :sparkles: add telemetry server integration for error troubleshooting
-- feat: :sparkles: add telemetry server integration for error troubleshooting
-- feat: :sparkles: add OWL-Net sensors
-- fix: resolve leftover conflict markers in version files
-- feat: 🔥 Add changes to enable RPO plugin & add temporary icon
-- refactor: :recycle: refactor to merge with celestrak changes
-- fix: :bug: remove unused normalMatrix that was causing errors on init
-- fix: :bug: remove unused normalMatrix that was causing errors on init
-- fix: :bug: fix linter errors with telemetry
-- fix: :bug: fix linter errors with telemetry
-- fix: :bug: fix filters being improperly applied on mobile
-- fix: :bug: fix filters being improperly applied on mobile
-- feat: :sparkles: add newtab utility for future work exporting information to a new tab
-- feat: :sparkles: add newtab utility for future work exporting information to a new tab
-- refactor: :recycle: rename defaultColorScheme and set Celestrak to default
-- refactor: :recycle: rename defaultColorScheme and set Celestrak to default
-- feat: :sparkles: disable unused filters in bottom menu
-- Bug: 🐛Fixed issue with plotted pass not corresponding to displayed time if the calculations were not done starting at a full hour
-- refactor: :recycle: use first color scheme instead of "default" color scheme
-- fix: :bug: ensure confidence levels are completely hidden if disabled
-- fix: :bug: ensure confidence levels are completely hidden if disabled
-- fix: :children_crossing: provide feedback when fov bubble enabled but not valid
-- fix: :bug: show help button disabled until side menu is open
-- fix: :bug: show help button disabled until side menu is open
-- refactor: :recycle: hide altName and altId independently
-- refactor: :recycle: hide altName and altId independently
-- fix: :bug: force set legend menu at init
-- fix: :bug: force set legend menu at init
-- fix: :bug: prevent errors when plugins are disabled
-- fix: :bug: ensure dots are updated on mobile
-- fix: :bug: ensure dots are updated on mobile
-- fix: :bug: explicitly allow tutorial button to be missing during testing
-- fix: :bug: explicitly allow tutorial button to be missing during testing
-- fix: :label: fix typo in filter
-- test: :white_check_mark: fix test to match new logic
-- fix: :label: fix typo in filter
-- test: :white_check_mark: fix test to match new logic
-- fix: :lipstick: fix mismatch in styling for full screen icon
-- fix: :lipstick: fix mismatch in styling for full screen icon
-- refactor: :recycle: hide altName and altId independently
-- refactor: :recycle: rename defaultColorScheme and set Celestrak to default
-- fix: :bug: default help button to disabled
-- fix: :bug: ensure confidence levels are completely hidden if disabled
-- fix: :bug: show help button disabled until side menu is open
-- refactor: :recycle: use first color scheme instead of "default" color scheme
-- fix: :bug: fix bug when surviellance plugin is disabled
-- fix: :iphone: fix size of sat-info-box title
-- feat: :sparkles: disable unused filters in bottom menu
-- refactor: :recycle: refactor to merge with celestrak changes
-- fix: :label: fix type
-- test: :white_check_mark: increase test coverage
-- refactor: :recycle: make colorschemes modular
-- feat: :sparkles: update environment configuration files to add embed settings
-- refactor: :recycle: refactor sat-info-box to be more modular and dynamic
-- refactor: :recycle: rewrite sat-info-box to be more modular
-- refactor: :recycle: improve typing and fix eslint errors/warnings
-- refactor: :recycle: improve typing and fix eslint errors/warnings
-- feat: :sparkles: update earth and sun rendering
-- refactor: :recycle: convert register and runEvent to on and emit syntax
-- feat: :sparkles: add new bottom menu categories
-- feat: :sparkles: add new languages to localization
-- chore: :sparkles: Add country translations to localization files for Korean, Russian, and Ukrainian
-- refactor: :recycle: move countries to locales json files
-- feat: :sparkles: add new filter menu
-- feat: :closed_lock_with_key: move non-agpl code out of public repo
-- refactor: :speech_balloon: Translate UI elements and help texts to other languages, add copyright notices, and update sensor-related plugin descriptions for improved clarity and localization.
-- feat: Enhance keyboard input handling and add debug keyboard overlay
-- feat: :sparkles: add new color schemes for orbital density
-- feat: 🔥 Inital commit for find RPO plugin
-- feat: :sparkles: add more translations
-- feat: :sparkles: add EarthPresetsPlugin, DrawLinesPlugin, and ViewInfoRmbPlugin with context menu integration
-- test: :white_check_mark: add more testing of color-scheme-manager
-- feat: :sparkles: step 1 of merging celestrak version with main version
-- refactor: :recycle: replace inline plugin configuration with defaultPlugins import for cleaner settings management
-- feat: :sparkles: add multiple launch sites with detailed information including coordinates and country
-- refactor: :goal_net: add better handling for null events
-- test: :white_check_mark: increase test coverage
-- test: :white_check_mark: increase test coverage
-- feat: :sparkles: add embed mode support and enhance input handling for keyboard and mouse interactions
-- refactor: :recycle: refactor sat-info-box to account for null better
-- feat: :sparkles: add launch site management with detailed site information and update UI for launch facility selection
-- refactor: :recycle: enhance settings persistence management and streamline URL parameter handling
-- refactor: :recycle: implement parseGetVariables function for enhanced settings management from URL parameters
-- feat: Refactor keyboard input handling to use unified event system and add new key bindings
-- refactor: :recycle: cleanup create-sat code for production
-- refactor: :recycle: fix linter errors
-- test: :rotating_light: fix linter errors in Jest test
-- feat: :sparkles: Add dark clouds and maneuver plugin translations for multiple languages
-- refactor: :recycle: move keyboard events to their class instead of keyboard manager
-- fix: :recycle: make color scheme changes more consistent
-- feat: :sparkles: update plugin menu modes and add block persistence setting
-- feat: :sparkles: add new mission color scheme
-- feat: :sparkles: add earth texture quality options to graphics menu
-- feat: :sparkles: add wikipedia urls to launch sites
-- test: :white_check_mark: fix all tests
-- feat: :sparkles: add EarthAtmosphere plugin and integrate into plugin manager
-- feat: :sparkles: add color scheme for data source
-- fix: :bug: remove more images from lfs
-- refactor: :recycle: streamline URL parameter handling and remove unused satellite selection logic
-- feat: :sparkles: reupload images
-- refactor: :technologist: standardize plugin naming to PascalCase and update related configurations for consistency
-- feat: :sparkles: enhance bottom menu functionality and settings management
-- fix: :bug: refactor build pipeline and add Node.js setup action for improved dependency management
-- feat: :sparkles: implement TooltipsPlugin with tooltip creation and positioning logic
-- refactor: :recycle: move common math functions to ootk
-- test: :white_check_mark: add testing foro create-sat.ts
-- refactor: :recycle: split default color settings for improved visual customization
-- feat: :sparkles: update bottom menu icons
-- feat: :zap: optimize sound management by loading on demand
-- fix: 🐛 Fixed bugs with input values and plot
-- refactor: :recycle: replace custom day of year calculations with TimeManager methods and streamline related logic
-- refactor: :recycle: standardize plugin naming conventions across the codebase
-- ci: :construction_worker: update issue templates for better clarity and usability
-- refactor: :technologist: standardize plugin names to PascalCase and update related configurations for consistency
-- refactor: :recycle: update event names and streamline URL management across components
-- fix: :bug: fix filtering in planetarium view
-- feat: :sparkles: implement sorting of sphere geometry faces for transparency rendering
-- refactor: :recycle: standardize plugin naming conventions and menu modes across multiple plugins
-- fix: :bug: update styles for ui-datepicker and copyright notice, adjust mobile settings handling in SplashScreen and SettingsManager
-- fix: :bug: update settings to enable JSC catalog, manage night mode display, and handle dots parameter in UrlManager
-- fix: :rotating_light: fix linter error on comment style
-- refactor: :rotating_light: remove linter errors
-- feat: :sparkles: add legendUpdated event and update legend handling in color schemes
-- fix: :bug: update build pipeline for improved YAML linting, NPM audit, and Node.js setup
-- refactor: :recycle: move splash screen images to SplashScreen class
-- feat: :sparkles: enable custom language files for pro users
-- ci: :fire: remove old ci/cd actions
-- refactor: :recycle: remove unused properties from various color scheme classes
-- refactor: :recycle: refactor to merge with celestrak changes
-- feat: :sparkles: add primary and secondary logo paths to configuration and update build process to handle new logos
-- feat: :sparkles: update icons and improve create satellite plugin
-- chore: :fire: remove Cypress configuration and test files
-- fix: :bug: force new persistence cache
-- refactor: :goal_net: add more defensive code to watchlist.ts
-- refactor: :recycle: standardize plugin naming conventions for consistency across configuration and initialization
-- refactor: :goal_net: add more defensive code to KeepTrackPlugin.ts
-- refactor: :recycle: replace SatMath calculations with keepTrackApi time manager for consistency across plugins
-- feat: :sparkles: enhance keyboard input handling for iframe communication and improve mouse input iframe detection
-- feat: :sparkles: enhance build process with optional directory copying and remove deprecated example HTML files
-- refactor: :recycle: sync dark-clouds preset with original version
-- fix: :bug: fix math for age of elset calculations
-- fix: :bug: cap covariance radii to prevent excessive bubble sizes, enable Jday usage in settings, and update bottom menu visibility handling
-- fix: :bug: sync keyboard commands with calendar plugin
-- feat: :sparkles: enhance Gaussian blur function with variable blur amount and optimize performance by early exits
-- refactor: :recycle: extract is visible to sensor logic
-- feat: :zap: optimize mesh management by loading on demand
-- fix: :bug: update build-manager to copy examples directory and adjust settings manager for static offset handling
-- refactor: :recycle: streamline watchlist creation and clear functionality in WatchlistPlugin
-- feat: :sparkles: Add launch site selection functionality to NewLaunch plugin
-- fix: :bug: fix time management with delayed enabling of time changes
-- refactor: :recycle: typecast SelectSatManager since KeepTrackPlugin constructor validates dependencies
-- feat: :sparkles: add SETTINGS mode to MenuMode enum and update related plugins for enhanced menu functionality
-- fix: :bug: correct night mode toggle logic in NightToggle plugin
-- fix: :bug: update cache action version and streamline SSH setup in build pipeline
-- fix: :bug: add !important to nav-bar-height and refactor settings override loading in SettingsManager
-- feat: :sparkles: streamline satellite selection handling and enhance settings for hover overlay and focus on satellite
-- test: :white_check_mark: fix all broken tests
-- refactor: :recycle: update WebpackManager to use BuildConfig and remove deprecated dotenv usage; clean up CSS filters
-- feat: :sparkles: add visible field to lookangles plugin
-- fix: :bug: fix issues with new color scheme system
-- fix: :bug: update class method references to use optional chaining for safer DOM manipulation
-- feat: :sparkles: disable unused filters in bottom menu
-- feat: :sparkles: Add locale file compilation method to FileSystemManager
-- fix: :bug: move SSH setup for deploy key to appropriate steps and ensure submodules are updated
-- refactor: :technologist: update to use DebugMenuPlugin and SensorListPlugin for sorting
-- fix: :bug: fix age of elset calculation
-- feat: :sparkles: add Long Range Discrimination Radar (LRDR) sensor and fix LEOLABS enum value
-- feat: :sparkles: Enhance darkClouds preset with improved camera settings and UI adjustments
-- feat: :sparkles: add epfl env
-- refactor: :technologist: add better control over sensor plugins
-- refactor: :recycle: use first color scheme instead of "default" color scheme
-- feat: :sparkles: Add ManeuverPlugin with configuration and localization support
-- refactor: :rotating_light: fix sonarqube findings
-- fix: :bug: remove IIFE for Safari support
-- refactor: :technologist: rename watchlist to WatchlistPlugin and update related configurations for consistency
-- fix: :ambulance: fix color schemes relying on class name that change during production build
-- refactor: :goal_net: add more defensive code to new-launbch.ts
-- refactor: :technologist: standardize plugin naming to PascalCase for consistency
-- fix: :bug: night mode toggle logic in NightToggle plugin
-- fix: :bug: update keyboard_ property to readonly and remove unused right-click menu elements
-- fix: :bug: adjust godrays exposure value and blur kernel size for improved rendering
-- fix: :bug: Remove Safari support check and redirect logic from main initialization
-- refactor: :rotating_light: remove linter errors
-- feat: :sparkles: add settings to enable/disable launch sites and sensors via URL parameters
-- feat: :sparkles: add jsc vimpel filter
-- refactor: :recycle: replace direct plugin imports with getPluginByName calls in SensorListPlugin, CustomSensorPlugin, and SensorManager
-- feat: :sparkles: update satellite record handling in orbit cruncher for better ecf handling
-- chore: :memo: update package number
-- refactor: :rotating_light: fix linter errors in get-el.ts
-- refactor: :recycle: change polar plot design
-- refactor: :rotating_light: fix sonarqube findings in sun.ts
-- fix: :bug: replace SSH setup script with webfactory/ssh-agent action for deploy key
-- fix: :bug: update waitForCruncher parameters to skip messages and count passes for improved synchronization
-- fix: :bug: fix resizing needed after start but before loading is finished
-- feat: :sparkles: add TooltipsPlugin and UserAccountPlugin configurations to KeepTrackPluginsConfiguration
-- refactor: :recycle: remove obsolete test files for Astronomy and Planetarium plugins
-- feat: :sparkles: add sorting functionality for bottom icons in UiManager
-- refactor: :recycle: refactor eruda toggle to standalone method
-- refactor: :recycle: standardize error handling in slide.ts
-- feat: :sparkles: add MAX_BOTTOM_ICON_ORDER constant for consistent bottom icon sorting
-- fix: :bug: Improve Safari detection logic for better browser compatibility
-- refactor: :rotating_light: fix sonarqube findings
-- fix: :bug: remove unnecessary resizeCanvas method
-- refactor: :recycle: enhance ECF settings handling and update URL parameter management
-- fix: :bug: adjust dropdown content max-height and style scrollbar for better usability
-- feat: :sparkles: update darkClouds preset with new longitude and settingsOverride structure
-- fix: :bug: update SelectSatManager import type and adjust parseGetVariables calls in tests to include settingsManager
-- fix: :bug: update sensor-selected-container display logic and reset sensor button state
-- fix: :bug: fix image loading in colorbox with callback for better display control
-- build: :construction_worker: Add setenv script to configure environment variables
-- fix: :bug: update copyright notice handling for official website
-- feat: :sparkles: add slow shrink/grow to sun geometry
-- refactor: :recycle: improve audio element validation in SoundManager
-- refactor: :recycle: remove unused .lftp_ignore file
-- refactor: :technologist: rename aboutManager to AboutMenuPlugin for consistency across plugins
-- refactor: :recycle: use getDayOfYear in ootk
-- refactor: :rotating_light: fix linter errors
-- refactor: :recycle: add typing and remove unnecessary checks in sunAngle
-- refactor: :recycle: chane isAudioElement to private since it's only used internally within SoundManager
-- feat: :art: Update texture quality settings and disable night mode in mobile manager
-- fix: :lipstick: add absolute positioning to nav for improved layout
-- fix: :bug: update context loss handling in WebGLRenderer and SelectSatManager for improved stability
-- refactor: :recycle: improve type handling and null checks in select-sat-manager
-- refactor: :recycle: improve type handling and null checks in select-sat-manager
-- fix: :ambulance: fix color schemes relying on class name that change during production build
-- feat: :sparkles: add keyboard event handling for elements with 'keyboard-priority' class
-- fix: :bug: enhance visibility of menu items based on satellite type in ViewInfoRmbPlugin
-- fix: :bug: handle null mesh cases in MeshModel and applyAttributePointers_
-- feat: :sparkles: add canvas visibility toggle in settings manager
-- fix: :bug: Correct texture quality string casing and standardize resolution handling
-- fix: :bug: standardize earth texture quality values to lowercase
-- fix: :bug: standardize texture quality values to lowercase in MobileManager
-- fix: :bug: update build pipeline to set up SSH for deploy key using webfactory/ssh-agent action
-- feat: :sparkles: refactor Astronomy and Planetarium plugins to extend KeepTrackPlugin and initialize dependencies
-- fix: :bug: update legend HTML to correct source order and display for data sources
-- fix: :bug: update event listener bindings in BottomMenu to use class method references
-- fix: :bug: reorder experimental menu item to maintain consistent menu structure
-- fix: :bug: remove git lfs
-- fix: :bug: remove git lfs
-- fix: :bug: update build pipeline to set up SSH for deploy key and remove submodule checkout
-- fix: :bug: update godraysSamples values to use numeric constants instead of GodraySamples enum
-- fix: :zap: prevent multiple resize events firing back to back
-- fix: :bug: fix proprate label not updating when slider moved
-- fix: :bug: disable eruda popping up on global error
-- chore: :bookmark: update version number to 10.6.2 in package.json
-- fix: :bug: Prevent Safari from bouncing by setting body overflow to hidden
-- refactor: :recycle: remove unused CopyRspackPlugin from webpack configuration
-- fix: :bug: add SSH setup for deploy key in build pipeline steps
-- fix: :bug: update build pipeline to initialize git submodules during checkout
-- fix: :bug: update loadOverridesFromUrl_ to handle query strings correctly when a hash is present
-- docs: :wastebasket: remove deprecated references to github page
-- fix: :white_check_mark: fix tests
-- refactor: :rewind: remove Aldoria specific code from main repo
-- fix: :zap: update TypeScript target version to ES2023 in tsconfig
-- feat: :sparkles: add UserAccountPlugin with initialization error handling
-- fix: :bug: update satellite record creation to prevent caching of old TLEs
-- fix: :bug: update picking dot size and adjust draw size calculations to reduce flickering
-- chore: :arrow_up: update version to 10.6.1 in package.json and splash-screen
-- feat: :art: adjust night color intensity and apply diffuse factor to political and clouds textures
-- feat: :sparkles: Add SpinLaunch launch site details to launchSites catalog
-- refactor: :truck: rename all locale files
-- fix: :bug: update texture quality settings to 'off' for better performance in embed mode
-- fix: :bug: correct typo in comment and prevent search results animation in embed mode
-- refactor: :recycle: remove unnecessary eslint-disable comments for class methods across multiple files
-- fix: :bug: Replace throw error with console.error in pro plugin initialization methods
-- fix: :bug: fix resizing not firing correctly
-- build: :truck: change default port to 5544 to match CORS exception
-- fix: :bug: prevent attempting to export a find result before running a find
-- fix: :bug: fix Safari only error related to rgba parsing
-- fix: :bug: add SSH setup and submodule update steps before installing dependencies in build pipeline
-- build: :lock: fix all open npm audit findings
-- feat: :sparkles: Optimize mouse satellite ID retrieval with update time check
-- fix: :bug: update logo image path and format URLs in installation instructions for consistency
-- fix: :bug: remove Vimpel satellites setting and replace with JSC catalog enable flag
-- fix: :bug: correct YAML lint file path and enhance build summary message
-- feat: :sparkles: add loading hints toggle to settings and update splash screen behavior
-- fix: :bug: adjust political map rendering order to ensure correct layering with clouds and atmosphere
-- fix: :bug: remove unused hideEl calls for earth-related context menus
-- feat: :sparkles: add toast method to KeepTrackApi for displaying notifications
-- refactor: :art: update color settings version and adjust facility color values
-- feat: :sparkles: add clear method to PersistenceManager for removing all stored items
-- refactor: :wastebasket: remove sensor plugin and replace with setting
-- refactor: :technologist: replace height with max-height for input focus to improve layout consistency
-- fix: :bug: Handle null or undefined values in saveItem method by removing the item
-- fix: :rotating_light: fix linter error
-- fix: :rotating_light: fix linter error
-- fix: :bug: update camera position any time mouse button released
-- fix: :bug: fix no sound playing on Safari
-- feat: :sparkles: Update loadPlugins to support asynchronous plugin initialization
-- feat: :sparkles: Add ManeuverPlugin menu and help text for satellite maneuvers
-- feat: :sparkles: Add ManeuverPlugin settings and disable toast notifications
-- build: :bug: update submodule configuration for src/plugins-pro
-- build: :bug: remove submodule from .gitignore
-- test: :white_check_mark: mock validation method to always return false in CreateSat tests
-- fix: :bug: update background and theme colors in manifest.webmanifest
-- chore: :arrow_up: update cypress dependency to version 13.17.0
-- chore: :sparkles: add Cypress testing files to .gitignore
-- fix: :truck: rename epfl wallpaper due to case-sensitive issue
-- fix: :bug: Add explicit error when WebGL context lost during program creation
-- docs: :memo: add README for locales JSON files
-- docs: :memo: update comment to clarify settings overrides for embedded version
-- fix: :bug: improve copyright notice handling for official website by using a trusted domains list
-- fix: :bug: update test and build steps to initialize git submodules before execution
-- fix: :bug: update UrlManager to set isSupplementExternal and disable isMissionDataEnabled for external TLEs
-- chore: :arrow_up: update version to 10.6.0 in README.md and version.js
-- fix: :bug: add 'start-hidden' class to keeptrack header and show it on loading screen
-- refactor: :recycle: Specify array types for combinedArray and index in SphereGeometry
-- fix: :bug: fix bug when surviellance plugin is disabled
-- fix: :bug: fix bug when surviellance plugin is disabled
-- feat: :sparkles: add ussr flag
-- refactor: :recycle: update color settings version number
-- fix: :bug: fix invalid locale string
-- fix: :bug: hide default eruda btn
-- fix: :bug: fix plugin settings menu not loading
-- fix: :arrow_up: adjust isimp to work with new ootk version
-- build: :arrow_up: bump ootk
-- fix: :bug: fix auto rotation up/down being backwards
-- fix: :bug: fix mismatch between D1 database and app
-- fix: :bug: fix bug when pitch and yaw is exactly 0
-- feat: :sparkles: add ops2 wallpaper to splash screen image list
-- refactor: :recycle: Use DEFAULT_RESOLUTION for texture source resolution fallback
-- refactor: :recycle: integrate localization for country extraction fallback
-- fix: :bug: add support for Vimpel satellites in settings manager
-- fix: :bug: add npm ci step for installing dependencies in build pipeline
-- feat: :sparkles: add settings preservation on orbit line and ECI/ECF toggles
-- fix: :ambulance: fix typo in typing breaking build
-- refactor: :recycle: remove extra line
-- fix: :bug: remove unnecessary sorting of atmosphere mesh faces to optimize rendering
-- fix: :bug: ensure GraphicsMenuPlugin is enabled before setting texture quality defaults
-- test: :white_check_mark: update snapshot to reflect changes in weather API test
-- feat: :sparkles: update eruda dependency from 2.5.0 to 3.4.3
-- feat: :sparkles: add USER_ACCOUNT key to StorageKey enum in PersistenceManager
-- chore: :arrow_up: update version to 10.6.1 in README.md
-- fix: :bug: add optional chaining to prevent errors when accessing touches length
-- fix: :recycle: move register uiManagerFinal event listener in SatInfoBox constructor
-- test: :white_check_mark: Skip error messages display test on loading screen
-- fix: :bug: Correctly reference the second parameter in getEl function for proximity ops type select
-- chore: :package: Update subproject commit reference in plugins-pro
-- chore: :package: Update subproject commit reference in plugins-pro
-- chore: :package: Mark subproject as dirty in plugins-pro
-- chore: :package: update subproject commit reference in plugins-pro
-- chore: :package: update subproject commit reference in plugins-pro
-- refactor: :recycle: change zoomLevel_ to public in Camera class
-- chore: :package: update subproject commit reference in plugins-pro
-- chore: :package: update subproject commit reference in plugins-pro
-- fix: :bug: fix broken og image
-- fix: :bug: add MODE environment variable for development mode
-- fix: :bug: ensure MODE is loaded from environment variables in config manager
-- fix: :bug: update WebpackManager configuration to use the full config object instead of mode
-- fix: :bug: update .env file header to reflect correct environment for embed.keeptrack.space
-- fix: :bug: update submodule URL to use SSH instead of HTTPS
-- chore: :arrow_up: bump version to 10.6.0 in package.json
-- fix: :bug: update regex for TLE data source to include optional Celestrak path
-- chore: :arrow_up: update subproject commit reference in plugins-pro
-- chore: :package: update subproject commit reference in plugins-pro
-- fix: :bug: correct textureLod parameter for political map rendering
-- chore: :technologist: update subproject commit reference in plugins-pro
-- fix: :bug: fix line addition logic in createRef2Ref method
-- chore: :package: update subproject commit reference in plugins-pro
-- fix: :bug: Hide copyright notice and version text on splash screen
-- build: :bug: update subproject commit for src/plugins-pro
-- fix: :bug: default help button to disabled
-- fix: :bug: update earth texture dropdown after hitting reset
-- fix: :bug: default help button to disabled
-- fix: :bug: update earth texture dropdown after hitting reset
-- fix: :label: fix type
-- fix: :label: fix type
-- test: :white_check_mark: update test to match new code
-- docs: :memo: update readme with build tutorial
-- chore: :memo: add note about issue #1018
-- refactor: :recycle: link to live api server
-- test: :white_check_mark: explicitly allow missing element
-- build: :arrow_up: bump ootk
-- build: :rotating_light: disable callback-return rule in eslint
-- fix: :bug: remove unnecessary flag setting for parsed variables in UrlManager
-- feat: :sparkles: add user account button image to top menu
-- fix: :bug: Ensure isContextLost method returns false in glMock for accurate context state
-- refactor: :art: remove empty line before the return statement for better code consistency
-- fix: :bug: ensure YAML lint step continues on error for better pipeline resilience
-- fix: :bug: add isUseJdayOnTopMenu setting to control Jday display in top menu
-- feat: :sparkles: add attribution for collision data source in the UI
-- fix: :bug: set max-width for input focus to ensure proper layout of bottom icons
-- fix: :iphone: fix size of sat-info-box title
-- fix: :iphone: fix size of sat-info-box title
-- fix: :bug: add missing import
-- fix: :bug: fix missing form element from change listener
-- refactor: :recycle: remove extra empty line
-- feat: :sparkles: update night and day Earth map textures for improved visuals
-- feat: :sparkles: add new icon images for globe, orbit, etc
-- fix: :zap: compress moonmap textures for improved performance
-- feat: :sparkles: add lock and login icons to the public image assets
-- feat: :sparkles: Add earthspec2k texture for enhanced visual fidelity
-- refactor: :truck: fix typo
-- fix: :bug: fix broken flag images
-- feat: :art: reupload images
-- build: :lock: fix npm security issues
-
-#### v10.3.0
-
->  
-
-- fix: :bug: fix failure when no internet connection
-- ✨ updating sensor-timeline to show visibility from optical sensors
-- 📈 Updated plot-analysis plugin. Added a lat2lon plot, and updated hover data
-- feat: :sparkles: add graphics menu and update shaders
-- feat: :sparkles: add caclulator plugin
-- refactor: :rotating_light: fix linting errors
-- 🛰️  New plugin to create a sat from its keplerian elements
-- refactor: :recycle: move graphics settings into graphics menu
-- fix: :bug: fixes to orbit-finder
-- feat: :sparkles: add startalk preset
-- 🏗️  Updating settings, interfaces, packages for code building
-- refactor: :recycle: refactor catalog-search to move new functions to satMath class
-- chore: :memo: update copyright dates
-- refactor: :recycle: change Old GP colorscheme
-- 🎯 Polar plot minor update
-- refactor: :truck: rename clickDragOptions
-- build: :building_construction: disable settings in settingsOverride by default
-- feat: :sparkles: add satellite overflight feature to analysis
-- refactor: :zap: eliminate loading extra satellites when using limitSat
-- feat: :sparkles: add satellite status
-- 🎚️  Propagation slider added to the calendar plugin
-- refactor: :alien: update collisions plugin to use new KeepTrack API V2
-- refactor: :recycle: move sync settings to settingsManager
-- refactor: :recycle: update launch site mapping
-- fix: :rotating_light: fix typescript errors
-- 👀 find-sat plugin updated to add more options: search by data source, or by TLE age
-- 🗺️  updating stereo-map to shwo all selected sensors
-- fix: :bug: fix typescript syntax errors
-- fix: :bug: fix countries menu for new cloudflare backend
-- refactor: :rotating_light: fix typescript lint errors
-- fix: :bug: fix issue with classification colors
-- fix: :bug: fix issues with nodal precession
-- fix: :bug: fix known satellites failing with ascii catalog
-- 🖼️  Aldoria version first commit. Updated public/ data and folder
-- fix: :bug: fix missing decimal place
-- 🚀 minor updates to watchlist plugin, and classification bar
-- refactor: :rotating_light: fix linting errors in moon.ts
-- refactor: :recycle: refactor findObjsByOrbit
-- fix: :bug: fix colors
-- ⌨️  New shortcut to switch from ECI to ECF: 'E'
-- fix: :pencil2: fix typo in import
-- refactor: :recycle: rename ELSET to GP
-- fix: :bug: add missing launch sites
-- fix: :bug: update routes
-- feat: :sparkles: add callback option to clickAndDragWidth
-- ci: :construction_worker: update sonar-project settings
-- fix: :bug: fix scrolling gamepad errors
-- build: :building_construction: update husky
-- refactor: :recycle: update tle path to use v2 of API
-- fix: :ambulance: fix single bad TLE breaking sccIndex and cosparIndex
-- fix: :poop: move mock date to test not live code
-- feat: :sparkles: add gp url param option
-- fix: :bug: add iss flag
-- build: :building_construction: update .gitattributes to stop uploading binaries
-- fix: :bug: fix bug where logo wasn't hidden with settingsManager
-- docs: :memo: update changelog
-- fix: :rotating_light: fix typescript linter errors
-- feat: :sparkles: add compatibility with ALDORIA CONFIDENTIAL setting
-- fix: :bug: use launch year data if available
-- fix: :bug: ignore flag for object with no country
-- ci: :construction_worker: update sonar connected-mode settings
-- fix: :bug: make debug toasts standby color
-- fix: :bug: fix missing cis flag
-- fix: :arrow_up: bump ootk
-- fix: :bug: fix bug where launch year missing 0
-- fix: :zap: disable the camera widget by default since it is for a small number of users
-- build: :see_no_evil: update gitignore
-- fix: :bug: fix camera widget ignoring settings
-- feat: :sparkles: add payload status
-- feat: :sparkles: add compatibility with ALDORIA CONFIDENTIAL setting
-- fix: :bug: filter out 270000 analyst satellites
-- fix: :zap: smooth loading of colors during later years of time machine
-- fix: :bug: fix incorrect date calculation in ootk-core dependency
-- refactor: :zap: eliminate loading extra satellites when using limitSats
-- test: :white_check_mark: fix test
-- fix: :bug: fix bug where CIS flag shown instead of RU
-- fix: :bug: fix confidence logic
-- chore: :memo: update version date
-- fix: :arrow_up: bump ootk to fix leap year errors
-- feat: :sparkles: allow spaces in watchlist entry
-- chore: :memo: add todo for creating a new setting
-- refactor: :memo: update comment for bottomIconElementName
-- fix: :lock: fix security issues in dependencies
-
-#### v10.2.2
-
->  
-
-- fix: :zap: improve orbit finder algorithm for breakups
-- fix: :bug: fix linter and tests
-- docs: :memo: update CHANGELOG
-
-#### v10.2.1
-
->  
-
-- fix: :bug: add error checking for non-xbox controllers
-- fix: :bug: add verification that elements are found before accessing
-- docs: :memo: update changelog
-- fix: :bug: fix black earth not loading
-- test: :white_check_mark: update test environment
-
-#### v10.2.0
-
->  
-
-- Sateliot
-- fix: :bug: fix debris screening menu being available without a satellite selected
-- feature: new sateliot satellite model
-- feat: :sparkles: add localization for spanish and german
-- feat: :sparkles: add collapsable sections in the sat-infobox
-- feature: created a new satellite model based on a s6u with solar pannels.
-- refactor: :fire: remove jquery!
-- fix: :bug: fix styling issues with sat-infobox and search drop down
-- feat: :sparkles: update new calendar component
-- refactor: :fire: remove unused fonts
-- feat: :lipstick: new ui
-- feat: :heavy_minus_sign: remove jquery-ui-bundle dependencies for calendar
-- refactor: :lipstick: update styling for new theme
-- refactor: :recycle: rename css variables to match home page
-- feat: :sparkles: add flags
-- feat: :sparkles: add new camera widget in eci coordinates
-- refactor: :bug: fix class name error caused by minification
-- build: :green_heart: fix build hanging
-- feat: :sparkles: expand features of tip plugin and fix bug with fetch source
-- test: :white_check_mark: update tests to match new plugin architecture
-- fix: :bug: fix type in .gitignore
-- build: :fire: remove old deployment pipeline
-- feat: :sparkles: add geo satellite transponder info
-- fix: :lipstick: fix ui issues caused by input-field not having margin
-- feat: :globe_with_meridians: add localization to calendar for es and de
-- feat: :sparkles: add sateliot preset
-- fix: :lipstick: fix stf menu ui
-- refactor: :wastebasket: remove deprecated style code
-- refactor: :recycle: migrate to storage.keeptrack.space
-- feat: :sparkles: add camera reset function
-- feat: :sparkles: add tv satellites to constellations plugin
-- feat: :sparkles: add colorbox header
-- feat: :sparkles: add links to satellite owner websites
-- build: :construction_worker: remove codecov from cicd
-- refactor: :recycle: remove deprecated settings and names
-- feat: :sparkles: add new logo always on
-- fix: :bug: fix export function of transponders plugin
-- refactor: :lipstick: more color updates
-- fix: :bug: fix flickering on mobile
-- feat: :sparkles: update screenshot to use new logo instead of text
-- feat: :sparkles: add clear message when no lookangles correctly displayed
-- feat: :sparkles: add different logic for rotation reset vs full camera reset
-- fix: :bug: fix bug caused by satellite that propagates into the earth
-- fix: :bug: fix bug where satellite timeline only visible if watchlist sats
-- refactor: :lipstick: more changes to ui color
-- fix: :bug: fix color of buttons in multi-site lookangles settings
-- fix: :bug: fix bug where some plugins reenable in mobile mode
-- fix: :bug: fix bug in processLimitedSats_ that caused duplicated ids
-- refactor: :recycle: refactor the satellite cone mesh distance from earth to settings
-- build: :construction_worker: remove unnecessary artifacts
-- fix: :lipstick: fix collapsing sat-infobox on mobile
-- fix: :lipstick: fix duplicate shadow effect
-- fix: :bug: fix bug with shift being tracked as down after window loses focus
-- fix: :bug: fix missing id parameters
-- build: :heavy_minus_sign: remove old dependencies
-- feat: :sparkles: add new splash screens
-- fix: :bug: fix new launch showing error even when it works
-- refactor: :lipstick: change color of polar plot to match new theme
-- feat: :lipstick: shrink sat-info-box when multiple menus are collapsed
-- fix: :bug: fix dark-clouds preset
-- refactor: :children_crossing: increase zoom speed
-- fix: :bug: fix bug where no references availalbe for historical RCS est
-- fix: :bug: fix transponder menu being enabled incorrectly
-- refactor: :heavy_minus_sign: remove unused dependencies
-- test: :white_check_mark: fix colorbox test
-- fix: :bug: fix sensor-list side menu size
-- refactor: :recycle: change default search size
-- feat: :lipstick: add iss flag
-- fix: :bug: fix bug where polar plot could be opened without a sensor selected
-- ci: :green_heart: switch trufflehog action
-- fix: :bug: fix create sensor from context menu not working
-- fix: :bug: fix search bar being clipped when sat-infobox moved
-- fix: :lock: fix security issue in dependencies
-- fix: :bug: fix unknown countries showing up as Grenada
-- refactor: :recycle: allow closer zoom on satellite models
-- fix: :ambulance: fix error when no satellite selected
-- fix: :bug: fix typo in locales.ts
-- feat: :sparkles: update logo image
-- fix: :lipstick: fix custom sensor plugin menu width
-- fix: :lipstick: fix missing nav-bar-height on mobile
-- feat: :sparkles: update logos
-- refactor: :lock: fix security issue with dependencies
-
-#### v10.2.0-0
-
-#### v10.1.0
-
->  
-
-- feat: :sparkles: add localization for spanish and german
-- refactor: :fire: remove jquery!
-- feat: :sparkles: update new calendar component
-- refactor: :fire: remove unused fonts
-- feat: :heavy_minus_sign: remove jquery-ui-bundle dependencies for calendar
-- feat: :sparkles: add flags
-- refactor: :bug: fix class name error caused by minification
-- feat: :sparkles: expand features of tip plugin and fix bug with fetch source
-- test: :white_check_mark: update tests to match new plugin architecture
-- fix: :bug: fix type in .gitignore
-- build: :fire: remove old deployment pipeline
-- feat: :globe_with_meridians: add localization to calendar for es and de
-- refactor: :recycle: migrate to storage.keeptrack.space
-- fix: :bug: fix flickering on mobile
-- fix: :bug: fix missing id parameters
-- refactor: :heavy_minus_sign: remove unused dependencies
-- fix: :bug: fix typo in locales.ts
-- refactor: :lock: fix security issue with dependencies
-
-#### v10.1.0-2
-
->  
-
-- build: :heavy_minus_sign: remove old dependencies
-
-#### v10.1.0-1
-
->  
-
-- fix: :bug: disable husky
-
-#### v10.1.0-0
-
->  
-
-- refactor: :recycle: abstract text from plugins
-- feat: :construction: first attempt at providing localization
-- refactor: :recycle: refactor data out of sensorList and multisiteLookangles
-- feat: :sparkles: add ability to push to npm again
-- docs: :memo: update changelog
-- fix: :bug: fix missing rmb items
-- fix: :goal_net: add try/catch for bad plugins
-- fix: :rotating_light: fix linter errors with package.json
-- fix: :bug: fix rmb events firing twice
-- fix: :bug: fix getSensorList logic
-
-#### v10.0.2
-
->  
-
-- chore: :card_file_box: update databases
-- fix: :bug: fix external TLEs not loading
-- docs: :memo: update changelog
-- fix: :ambulance: emergency fix
-- fix: fix analytics on localhost
-
-#### v10.0.1
-
->  
-
-- fix: :bug: add conistent hover color
-- ci: :green_heart: prevent overwriting production files when deploying
-- fix: :bug: fix sorting of the tracking and impact prediction plugin
-- feat: :sparkles: add new TIP message plugin
-- refactor: :recycle: refactor lineManager into separate classes
-- fix: :bug: fix dependency checking logic for plugins
-- docs: :memo: update readme and release notes
-- refactor: :recycle: refactor all toast types to an enum
-- chore: :card_file_box: update data
-- fix: :technologist: fix linter and formatter conflict
-- feat: :monocle_face: add basic telemtry to determine which features should be prioritized
-- fix: :bug: fix ui issues with missile objects
-- chore: :goal_net: catch and log invalid velocity
-- fix: :bug: convert legacy missile sims into new missileObject class
-- fix: :bug: fix missilesInUse count
-- fix: :bug: fix missiles causing search errors
-- fix: :bug: fix camera trying to go inside the earth
-- docs: :memo: add a citation file
-- fix: :zap: fix lag when selecting satellites
-- build: :arrow_up: bump dependencies
-- ci: :construction_worker: allow npm audit to fail but open an issue
-- docs: :memo: fix readme links
-- fix: :bug: fix bug with depth test when milkyway is disabled
-- fix: :bug: dont draw FOV lines to missiles
-- build: :arrow_up: upgrade materializecss
-- fix: :bug: fix bug where search results were shown even if no results
-- fix: :bug: fix duplicate listeners on search box
-
-#### v10.0.0
-
->  
-
-- feat: :sparkles: add satellite-timeline plugin
-- feat: :sparkles: add timeline feature
-- refactor: :recycle: abstract away common elements of sesnor-fov-mesh/factory
-- feat: :sparkles: update satellite fov menu
-- feat: :sparkles: add radar domes
-- feat: :sparkles: add settings and download buttons to look-angles and multi-site-looks
-- refactor: :fire: remove markers for sensor fov and surv
-- refactor: :recycle: split methods in SensorFovMesh class
-- feat: :sparkles: improve sensor management and menus to incorporate radarDomes
-- feat: :construction: add cone mesh and coneFactory
-- feat: :wastebasket: deprecate marker logic
-- fix: :bug: fix cone mesh only hitting surface of earth
-- chore: :art: update logos
-- feat: :sparkles: add settings menu to multi-site looks
-- chore: :card_file_box: update databases
-- feat: :sparkles: add settings sub-menu to plugins
-- refactor: :recycle: refactor sensor-fov-mesh-factory to remove duplication and deprecated methods
-- feat: :sparkles: update keyboard shortcuts to align with kerbal
-- fix: :zap: fix long loop through markers looking for satellites
-- feat: :sparkles: update camera keyboard controls to match kerbal
-- feat: :art: update icons and logos
-- feat: :sparkles: add scc num and time to polar plots
-- fix: :bug: fix cone's not lining up prefectly with a satellite
-- feat: :sparkles: update look angles logic and add type column
-- refactor: :truck: rename customMeshFactory to sensorFovMeshFactory
-- refactor: :recycle: consolidate selectsat manager logic
-- feat: :sparkles: improve radarDomes
-- fix: :bug: catch edge case where some plugins not loaded
-- feat: :art: replace all icons
-- feat: :sparkles: update keyboard shortcuts for sensor-list
-- feat: :sparkles: add math for new look angles logic
-- fix: :bug: fix resizing of timeline window
-- feat: :sparkles: add searching by alt name
-- refactor: :coffin: disable satelliteFov until I have a working mesh solution instead of markers
-- feat: :sparkles: update keyboard shortcuts for sat-info-box
-- feat: :sparkles: add createRadarDome calls
-- feat: :sparkles: add ctrl+b to toggle bottom menu open/close
-- chore: :card_file_box: update sensors paramaters
-- feat: :sparkles: add keyboard shortcut for satelltie FOV cones
-- feat: :sparkles: update keyboard shortcuts for stereo map
-- fix: :bug: fix polar plot overwriting canvas
-- feat: :sparkles: update keyboard shortcuts for polar plot
-- feat: :sparkles: update keyboard shortcuts for debug menu
-- feat: :sparkles: remove markers changed cb from sensor fov and surv
-- feat: :sparkles: update keyboard shortcuts for night toggle
-- test: :white_check_mark: fix testing environment
-- fix: :bug: fix side menu sub menu width override not working
-- fix: :bug: fix keyEvents not firing
-- fix: :bug: reenable satelliteFOV plugin
-- refactor: :recycle: refactor camera logic out of mouse input
-- feat: :sparkles: add uuid to custom and stf sensor objNames to differentiate them
-- refactor: :recycle: type settingsSideMenu in multi-site-look-angles
-- feat: :sparkles: update splash screens
-- refactor: :art: update css to make dividers thicker
-- fix: :bug: fix hide UI shortcut not working initially
-- feat: :sparkles: add resize event
-- fix: :bug: fix default isDraggable settings
-- refactor: :truck: rename SensorFovMeshFactory filename
-- fix: :bug: fix wathlist overlay being enabled incorrectly
-- fix: :art: fix logo being oversized
-
-#### v9.1.0
-
->  
-
-- fix: :bug: fix issue with godrays breaking after screen resize
-- fix: :bug: fix issue with godrays breaking after screen resize
-- refactor: :rotating_light: migrate to eslint for formatting
-- chore: :card_file_box: update database files
-- fix: :zap: fix performance bug and css issues
-- chore: :card_file_box: update data
-- feat: :sparkles: add polar plots
-- feat: :sparkles: add new quick reports
-- fix: :ambulance: fix one bad satellite breaking website
-- chore: :card_file_box: update databases
-- chore: :card_file_box: update database
-- fix: :bug: fix logic on waitForCruncher
-- feat: :sparkles: add aer report
-- feat: :sparkles: add sun angle to bestpass report
-- fix: :bug: multiple bug fixes related to color buffer updates
-- fix: :ambulance: fix new launch plugin
-- refactor: :recycle: update settings methods to identify private funcs
-- fix: :zap: reduce impact of godrays on performance
-- fix: :bug: fix conflict between custom sensors and normal sensors
-- test: :white_check_mark: fix broken tests
-- feat: :sparkles: add save button to polar plots
-- fix: :bug: fix reference orbits not updating correctly
-- fix: :bug: fix line to sun/moon in sensor info for custom sensors
-- fix: :bug: fix sun/moon line
-- build: :arrow_up: bump ootk
-- feat: :sparkles: add inFOV color to group color scheme
-- fix: :zap: remove unnecessary color buffer update
-- fix: :bug: fix how isSensorSelected works
-- fix: :lipstick: fix resize cursor icon on draggable menus
-
-#### v9.0.3
-
->  
-
-- fix: :bug: fix error when sensor reset and planetarium is open
-- feat: :sparkles: add responsive design
-- refactor: :technologist: add version number to error handler for easier debugging
-- docs: :memo: update changelog
-- fix: :bug: fix canvas resizing issue on mobile
-- fix: :bug: fix webgl issue with large images on small devices
-- refactor: :recycle: add additional catalog sources
-- build: :arrow_up: bump ootk
-
-#### v9.0.2
-
->  
-
-- fix: :ambulance: fix bug where lastPropRate not previously assigned
-
-#### v9.0.1
-
->  
-
-- fix: :ambulance: deprecate plot code that is loading out of order
-
-#### v9.0.0
-
->  
-
-- Develop
-- Develop
-- build(deps-dev): bump @types/webgl2 from 0.0.6 to 0.0.10
-- build(deps-dev): bump cypress from 12.17.4 to 13.6.1
-- build(deps-dev): bump @types/jquery from 3.5.14 to 3.5.29
-- Develop
-- Develop
-- Develop
-- Develop
-- Develop
-- fix: :bug: fix orbits broken when turned on after initialization
-- fix: :bug: fix moon position calculation
-- feat: :sparkles: improve scaling of mesh models
-- feat: :sparkles: add ses satellite mesh
-- chore: :fire: remove old tle files
-- chore: :fire: remove unused meshes
-- feat: :sparkles: ootk v4 integration
-- feat: :sparkles: add glonass meshes
-- chore: :card_file_box: update satellite databases
-- refactor: :heavy_minus_sign: reduce dependencies
-- chore: :card_file_box: update json databases
-- fix: :bug: streamline and fix mesh manager
-- refactor: :truck: reorganize source code
-- refactor: :recycle: refactor meshes
-- refactor: :truck: reorganize source code
-- refactor: :recycle: refactor drawing code
-- refactor: :poop: refactored to isolate plugins
-- refactor: :label: improve type support
-- build: :truck: update public folder
-- refactor: :label: improve type support for KeepTrackApi callbacks
-- refactor: :recycle: separate satellite selection from catalog management
-- refactor: :recycle: condense drawing code to align with three.js
-- feat: :sparkles: improved lineManager class
-- fix: :bug: fix countries plugin
-- feat: :sparkles: update loading screens
-- fix: :bug: fix and refactor meshes
-- chore: :card_file_box: update databases
-- test: :white_check_mark: fix all broken tests
-- test: :white_check_mark: update tests to work with ootk
-- fix: :bug: refactor and fix webgl issues
-- fix: :bug: fix stereo map
-- refactor: :beers: merge update-select-box with satinfoboxCore
-- refactor: :recycle: integrate with ootk v4
-- fix: :bug: fix satinfobox issues
-- refactor: :truck: refactor presets
-- feat: :sparkles: switch to css only tooltip for faster ui
-- refactor: :recycle: refactor sat-info-box
-- refactor: :wastebasket: deprecate socrates html file
-- chore: :card_file_box: update tle catalogs
-- fix: :bug: align mesh, orbits, and dots positions
-- refactor: :truck: reorganize source code
-- refactor: :recycle: refactor select sat manager functions out of webgl-renderer
-- refactor: :recycle: standardize plugins
-- fix: :bug: fix lookangles/multi-site lookangles not enabling/disabling correctly
-- build: :arrow_up: bump ootk
-- fix: :bug: fix edit satellite plugin
-- fix: :bug: fix css on mobile
-- refactor: :recycle: simplify zoomlevel functions
-- fix: :bug: update select sat manager
-- fix: :arrow_up: integrate latest ootk version
-- feat: :sparkles: add sun/moon toggle and export sats in fov
-- refactor: :recycle: refactor editsat
-- refactor: :recycle: remove unnecessary interfaces
-- fix: :bug: fix lookangles plugin
-- refactor: :recycle: remove code no handled in ootk
-- refactor: :fire: remove old interfaces
-- refactor: :recycle: refactor search manager functions out of ui manager
-- fix: :zap: add better number only searching
-- ci: :construction_worker: split cd pipeline into stage and deploy
-- chore: :coffin: remove old files
-- feat: :sparkles: add toggles for starlink and notional sats
-- fix: :bug: fix camera key not working
-- test: :bug: fix broken tests
-- fix: :bug: fix bugs caused by splitting velocity updates
-- fix: :bug: fix search bar toggle and slide in animations
-- feat: :sparkles: add starlink toggle
-- refactor: :boom: migrate to new selectsatmanager plugin
-- feat: :sparkles: update socrates to json input
-- refactor: :recycle: integrate with ootk v4
-- fix: :bug: fix touch controls
-- build: :technologist: update vscode tasks
-- feat: :zap: improve standard magnitude estimates
-- refactor: :truck: rename satInfoBoxCore to satInfoBox
-- refactor: :recycle: make sccNum vs Id more explicit
-- refactor: :recycle: cleanup collisions plugin
-- feat: :sparkles: million-year presets
-- refactor: :recycle: refactor enum to ootk
-- build: :wastebasket: deprecate build embed
-- build: :arrow_up: bump dependencies
-- fix: :bug: fix watchlist with vimpel objects
-- test: :white_check_mark: fix broken tests
-- fix: :children_crossing: improve missile mesh orientation
-- feat: :sparkles: add stf az el ext in kilometers
-- fix: :coffin: hide show agencies until it is fixed
-- fix: :bug: fix leo and geo color schemes
-- refactor: :recycle: refactor selectsat manager
-- docs: :page_facing_up: fix missing word public from license
-- docs: :memo: update changelog
-- fix: :bug: fix new launch plugin
-- fix: :bug: fix breakup icon color in bottom menu
-- fix: :bug: fix css issue on tablets
-- refactor: :recycle: organize breakup plugin
-- refactor: :recycle: add helpers for hide/show dom elements
-- fix: :bug: fix constellations
-- feat: :sparkles: add more sensor info
-- test: :white_check_mark: fix broken tests
-- build: :goal_net: update husky pre-commit to be more extensible
-- refactor: :rotating_light: Use // @ts-expect-error over // @ts-ignore
-- fix: :bug: fix missile crunching without sensor selected
-- fix: :bug: fix breakup not updating satellite
-- refactor: :wastebasket: deprecate stringPad class
-- refactor: :recycle: use KeepTrackApiEvents instead of strings
-- feat: :sparkles: add start-stop clock button to context menu
-- refactor: :recycle: refactor line manager code out of selectsat manager
-- fix: :bug: add callbacks for sensor dot selected
-- fix: :bug: fix search logic
-- feat: :sparkles: add more options to constellations plugin
-- fix: :bug: fix hover not showing launch year
-- fix: :bug: fix for #827
-- fix: :bug: fix select sat on plugins
-- test: :white_check_mark: fix broken tests
-- chore: :technologist: add task to open github page
-- fix: :bug: ensure consistency between constellations
-- chore: :label: add typing to crunchers
-- fix: :bug: fix issues with legend
-- test: :white_check_mark: add test to ensure moon is in right position
-- refactor: :bug: move conditional back to renderer
-- fix: :bug: fix sound playing before user interacts with page
-- fix: :bug: add fixes to presets
-- chore: :card_file_box: update sensor information
-- fix: :art: fix icon flickering when resizing bottom menu
-- fix: :bug: fix switch in custom sensor
-- chore: :technologist: minor tweaks to tasks.json
-- refactor: :recycle: move stereo map plugin code out of select sat manager
-- fix: :adhesive_bandage: add logic for when primary and secondary sat are the same
-- fix: :bug: fix hover color showing on selected sats
-- refactor: :rotating_light: remove use of banned type
-- fix: :bug: fix edit-sat
-- fix: :bug: fix short term fence and watchlist plugins
-- fix: :bug: better zoom out experience
-- chore: :wastebasket: cleanup vscode settings.json file
-- fix: :bug: fix ISS chatter not playing
-- feat: :sparkles: add setting for delay between time machine loops
-- refactor: :fire: remove duplicate code
-- fix: :bug: fix selected dot missing when zoomed out
-- fix: :bug: fix country color scheme
-- fix: :bug: fix debug menu throwing errors when disabled
-- fix: :bug: fix country color scheme and legend
-- fix: :bug: fix countries option in find sat plugin
-- fix: :adhesive_bandage: remove unnecessary console logging
-- refactor: :recycle: remove duplicate imports
-- fix: :bug: fix search dropdown css
-- fix: :adhesive_bandage: fix sec-angle-link showing when not usable
-- ci: :bug: fix build script
-- fix: :bug: fix selecting satellite dots
-- fix: :bug: fix collision plugin not searching for full satid
-- fix: :bug: reduce local storage saves
-- feat: :sparkles: expand showEl to allow passing a display value
-- build: :wastebasket: simplify build instructions
-- fix: :bug: fix for velocity being 0 instead of null or an object
-- fix: :bug: fix 16k skybox not loading
-- chore: :rotating_light: fix linter error in settings.json
-- fix: :bug: fix wrong decayed objects be deactivated
-- fix: :bug: fix excessive xmlserialize calls
-- fix: :bug: fix keyboard events not working
-- fix: :bug: better fix to resizeCanvas
-- fix: :bug: throttle multiple error requests to open github
-- fix: :bug: fix uv attribute bug in godrays
-- test: :white_check_mark: skip failing test for now
-- docs: :bookmark: update version to 9.0.0
-- refactor: :label: add readonly to plugin names
-- refactor: :children_crossing: slow auto zoom and chase speeds
-- perf: :zap: use RegExp#test for true/false tests
-- refactor: :recycle: create larger font for altitudes presentation
-- ci: :rotating_light: fix linter error
-- build: :label: add more type support
-- refactor: :heavy_plus_sign: add dependencies for refactored meshes
-- fix: :fire: remove tooltip that blocked clock
-- ci: :rotating_light: fix linter error
-- ci: :green_heart: add only build for staging after approval
-- fix: :bug: fix search finding land objects
-- build: :arrow_up: bump serve
-- fix: :bug: fix watchlist plugin
-- ci: :rotating_light: update sonar ignores
-- fix: :bug: fix resizeCanvas
-- fix: :bug: fix broken godrays
-- fix: :white_check_mark: fix broken test
-- docs: :memo: add description of searchBox scene object
-- build: :lock: fix security issue in dependencies
-
-#### v8.2.0
-
->  
-
-- Develop
-- fix: :bug: fix typo in time-machine logic
-- Develop
-- fix: :bug: fix #758
-- feat: :sparkles: add improvements for JSC Vimpel data
-- fix: :bug: fix time machine showing vimpel objects in 1958
-- feat: :sparkles: add confidence color scheme
-- refactor: :recycle: rewrite of sensors
-- refactor: :recycle: move all plot plugins to class based design
-- refactor: :recycle: reduce dependencies by using keepTrackApi more
-- refactor: :recycle: refactor analysis menu into class structure
-- refactor: :recycle: move ECI and ECF plots to stand-alone plugins
-- refactor: :recycle: cleanup satinfobox design
-- refactor: :recycle: consolidate right click menu
-- feat: :sparkles: add persistanceManager for localStorage management
-- feat: :sparkles: persist settings across sessions
-- fix: :rotating_light: fix sonarcloud findings
-- fix: :bug: add error checking to new launch plugin
-- test: :white_check_mark: fix broken tests
-- fix: :bug: add fixes for multi-site lookangles plugin
-- docs: :memo: update changelog
-- feat: :children_crossing: update to address #803
-- feat: :sparkles: add alternate names and notional TLEs
-- refactor: :wastebasket: remove old keepTrackApi.programs object
-- fix: :bug: add fixes to position cruncher for VIMPEL objects
-- fix: :adhesive_bandage: fix minor PWA errors
-- ci: :construction_worker: remove cypress for now
-- fix: :bug: fix bug in demo-mode logic
-- fix: :lipstick: fix incorrect icon color
-- fix: :bug: fix to #809
-- fix: :bug: fix bug where low resolution menu not visible
-- ci: :green_heart: move sonarcloud scan to a github app instead
-- ci: :construction_worker: update sonarcloud scan
-- ci: :bug: fix yaml format
-- fix: :bug: consolidate imports
-- test: :white_check_mark: fix broken test
-- ci: :construction_worker: fix sonarlint
-- docs: :memo: update main.ts docs
-- docs: :wastebasket: deprecate the about menu
-- fix: :bug: add defensive code for missing satellite or sensor
-- test: :white_check_mark: fix test environment
-- fix: :fire: consolidate imports
-- fix: :zap: only reinitialize impacted components for better performance
-- test: :white_check_mark: fix broken test
-- fix: :bug: fix for #759
-- docs: :memo: explain DISCOVR differences
-- fix: :bug: fix time machine showing VIMPEL
-- ci: :construction_worker: migrate to automatic sonarcloud analysis
-- build: :lock: fix security issue
-- ci: :construction_worker: update sonarcloud scan
-- Update README.md
-- Update README.md
-- fix: :bug: fix issue w/ 2nd gamepad but no 1st gamepad
-- chore: :card_file_box: update TLE2.json
-- fix: :adhesive_bandage: remove debugger
-- fix: :bug: fix bug where satinfobox disappears on rmb
-- fix: :lipstick: fix wrong icon color
-- ci: :pencil2: remove extra line from build yml
-
-#### v8.1.1
-
->  
-
-- 772 right click create sensor here
-- Develop
-- Develop
-- refactor: :fire: revert to google analytics
-- feat: :sparkles: new splash screens
-- feat: :sparkles: add searchLimit param to settings
-- Develop
-- feat: :sparkles: abstract camera and add dark-clouds preset
-- fix: :bug: fix issue in mobile logic
-- feat: :sparkles: update gamepad logic
-- Develop
-- fix: :bug: fixes for iframes
-- feat: :sparkles: update iframe example
-- Develop
-- feat: :sparkles: update readme
-- fix: :bug: fix illegal return
-- Develop
-- ci: :rotating_light: fix minor linter error
-- ci: :construction_worker: expand ignore list for deploy
-- ci: :construction_worker: fix ignore list for sftp
-- ci: :construction_worker: fix ignore list for sftp
-- ci: :construction_worker: fix sftp typo
-- ci: :construction_worker: fix sftp ignore list
-- ci: :construction_worker: fix sftp settings
-- ci: :construction_worker: use new sftp deployer
-- ci: :construction_worker: fix ci/cd increase timeout
-- Develop
-- ci: :pencil2: sftp to ftps
-- Develop
-- ci: :construction_worker: fix ci/cd sftp
-- ci: :construction_worker: update ci/cd pipeline
-- fix gh-pages deployment
-- fix ci/cd
-- ci: :construction_worker: update ci/cd pipeline
-- Minor updates
-- Keep Track Version 8
-- refactor: :art: put catalog loader in class for more clear loading
-- refactor: :recycle: refactor format-tle class for standardization
-- refactor: :label: add clear difference between catalog objects and sat objects
-- fix: :bug: fix custom sensor errors
-- docs: :memo: update changelog
-- fix: :bug: add checks for missing data in satInfoboxCore
-- fix: :bug: fix position cruncher not calculating star positions
-- feat: :sparkles: add hires skybox and have skybox follow camera
-- fix: :bug: update year or less logic to make large fragmentation events match date it occurred
-- fix: :bug: add defensive code to block infinite loops
-- feat: :sparkles: add new altitudes settings and disable stars by default
-- fix: :white_check_mark: fix failing catalog-loader testing
-- feat: :sparkles: scale dots during auto zoom out
-- refactor: :label: add better type support for catalog
-- refactor: :recycle: refactor to reduce code
-- fix: :bug: fix star index calculations
-- feat: :sparkles: make vimpel catalog available by default
-- fix: :bug: fix race condition found in #793
-- fix: :green_heart: fix build error
-- refactor: :wastebasket: remove debug code
-- refactor: :recycle: refactor for better type support
-- feat: :sparkles: allow disabling the moon
-- refactor: :coffin: remove old reference
-- fix: :bug: fix Right Click &gt; Create Sensor Here error #772
-- refactor: :recycle: update cruncher interfaces
-- fix: :bug: reduce unnecessary logging in default settings
-- docs: :memo: update version date
-- fix: :recycle: update texture url for hires earth
-- fix: :pencil2: fix typo in star indexs
-- fix: :bug: fix typo in time-machine logic
-- fix: :bug: fix satinfobox appearing on first static object clicked
-- fix: :white_check_mark: fix test issue caused by new settingsManager
-- build: :lock: fix security issues
-
-#### v8.1.0
-
->  
-
-- fix: :bug: fix controller disconnected crash
-- feat: :sparkles: add external catalog loader
-- feat: :sparkles: abstract camera and add dark-clouds preset
-- fix: :bug: fix mobile controls
-- feat: :sparkles: update gamepad logic
-- feat: :zap: improve performance on mobile
-- fix: :bug: fix satinfobox crashing with missiles
-- fix: :bug: fixes for iframes
-- feat: :children_crossing: add improved debug menu
-- feat: :children_crossing: improved camera controls
-- feat: :sparkles: add video director menu
-- fix: :bug: fix string extractor
-- docs: :memo: update changelog
-- feat: :sparkles: add support for external TLE files
-- feat: :sparkles: update to setting defaults
-- feat: :lipstick: update site manifest and favicons
-- feat: :zap: improve notional debris logic
-- feat: :sparkles: improve mobile experience
-- refactor: :recycle: add skip when mesh can't be seen anyway
-- refactor: :fire: revert to google analytics
-- feat: :sparkles: add auto rotate pan and zoom settings
-- feat: :sparkles: force presets for facsat2
-- fix: :bug: fix hovermanager not available in KeepTrackApi
-- feat: :sparkles: add presets for facsat2
-- refactor: :label: update settings type
-- test: :bug: move analytics to fix jest hanging
-- fix: :bug: fix analytics error
-- test: :bug: fix catalog test
-- feat: :sparkles: filter out objects that appear to have reentered
-- feat: :sparkles: new splash screens
-- fix: :bug: fix issue in mobile logic
-- test: :bug: fix failing tests
-- feat: :sparkles: add iframe example
-- fix: :bug: fixed notional satellites being found in search
-- fix: :bug: dont use orbit manager if it isn't available
-- fix: :bug: fix bug with legend menu showing empty
-- test: :bug: make getEl optional for select-sat-manager tests
-- fix: :zap: better camera zooming controls
-- feat: :sparkles: add searchLimit param to settings
-- feat: :sparkles: add iframe check
-- feat: :sparkles: update readme splash screen and meta data
-- fix: :bug: fix time machine not stopping correctly
-- fix: :bug: better handling of prop rate on load
-- feat: :sparkles: update notional debris coloring
-- feat: :sparkles: update iframe example
-- fix: :bug: fix search results
-- fix: :zap: remove debug code
-- fix: :adhesive_bandage: quick fix for TLEs without leading 0s
-- fix: :bug: fix coloring issue with video-director plugin
-- refactor: :recycle: use sputnik as extra satellite
-- refactor: :recycle: make use of keepTrackApi
-- fix: :bug: fix mesh shaders turning white
-- fix: :bug: fix crash caused by sat-sun being missing
-- chore: :card_file_box: update default catalog
-- refactor: :coffin: hide debug only code
-- refactor: :recycle: move event listener for keyboard to document level
-- fix: :bug: reduce scrolling errors
-- refactor: :card_file_box: update default settingsOverride
-- docs: :memo: update build date
-- fix: :bug: fix hover id error caused by id 0
-- build: :lock: fix audit issues
-
-#### v8.0.0
-
->  
-
-- feat: :sparkles: add preset functions to settings
-- ci: :construction_worker: add dev site to ci/cd pipeline
-- fix: :bug: fix errors when plugins disabled
-- build: :construction_worker: update dependencies
-- ci: :construction_worker: use new sftp deployer
-- feat: :sparkles: replace google analytics
-- fix: :bug: move analytics to html
-- feat: :sparkles: update readme
-- ci: :construction_worker: use new sftp deployer
-- ci: :pencil2: fix typo in ci/cd pipeline
-- ci: :construction_worker: update ci/cd pipeline
-- fix: :label: fix type issue
-- ci: :construction_worker: fix sftp ignore list
-- fix: :bug: fix limitsat functionality
-- fix: :bug: fix issue with sun colorscheme
-- ci: :construction_worker: fix ci/cd directory names
-- fix: :bug: fix illegal return
-- feat: :sparkles: update readme
-- ci: :rotating_light: fix formatting on ci/cd pipe
-- ci: :construction_worker: expand ignore list for deploy
-- feat: :fire: remove old license text
-- ci: :construction_worker: fix ignore list for sftp
-- ci: :construction_worker: fix ignore list for sftp
-- ci: :construction_worker: fix sftp typo
-- ci: :construction_worker: update dependabot
-- ci: :pencil2: sftp to ftps
-- ci: :rotating_light: fix minor linter error
-- feat: :sparkles: improve errorManager logic for easier offline testing
-- fix: :bug: catch setHover errors where index is null
-- test: :white_check_mark: improve tests
-- ci: :construction_worker: update ci/cd pipeline
-- test: :white_check_mark: fix dependency errors on tests
-- ci: :construction_worker: fix sftp settings
-- ci: :construction_worker: fix ci/cd sftp
-- fix: :bug: fix bug in settings for new url
-- ci: :construction_worker: update ci dependencies
-- feat: :sparkles: add getHoverManager to keepTrackApi
-- ci: :construction_worker: reduce unnecessary visaulizer runs
-- fix: :bug: fix splash screen not showing up
-- ci: :construction_worker: fix ci/cd increase timeout
-- fix: :bug: dont overwrite dist/settings/settingsOverride.js
-- ci: :pencil2: fix typo in ci/cd
-- fix: :adhesive_bandage: fix build script
-- ci: :construction_worker: rebuild on PR from dependabot
-- ci: :bug: fix gh-pages deployment
-- fix: :bug: fix colorscheme when limitedsats in effect
-- Delete .github/workflows/build.workflow
-- Create build.workflow
-
-#### v8.0.0-0
-
->  
-
-- Update
-- v7.2
-- Add .circleci/config.yml
-- New version
-- feat: :sparkles: give user option to hide toasts
-- fix: :bug: fixed error when sensor not selected
-- feat: :sparkles: add 2030 catalog tools and 3d cone draft
-- feat: :fire: Convert to class based system for code part 1
-- ci: :sparkles: add visualizer workflow
-- refactor: :recycle: split missileManager.ts and convert to classes
-- feat: :technologist: convert settingsManager to a class
-- refactor: :recycle: split watchlist plugin and convert to classes for better modularity
-- refactor: :recycle: convert dots to classes and implement vao
-- feat: :sparkles: add new gray political map and color scheme
-- style: :art: fix minor formatting and linter errors
-- test: :white_check_mark: improve test coverage
-- style: :art: format saveVariable.ts
-- chore: :technologist: update changelog
-- build: :green_heart: add missing tsconfig file
-- build: :construction_worker: update github pipeline to use modern node versions
-- feat: :sparkles: enable toggles for orbital regime independent of color scheme
-- feat: :lipstick: warn/prevent user trying non-circular orbits for breakups
-- ci: :arrow_up: update ci/cd pipeline dependencies
-- build: :construction_worker: clean up build pipeline
-- fix: :bug: trap bug when satInSun cant be calculated
-- Create SECURITY.md
-- feat: :sparkles: maintain sensor filter and rerun on satellite change for multisite lookangles
-- build: :lock: update all unsecure dependencies
-- feat: :sparkles: update lookangles on time change
-- refactor: :recycle: migrate setting to stereo-map plugin
-- style: :art: remove trailing spaces
-- style: :art: remove trailing spaces
-- fix: :bug: fix error calculating meanA in non-circular orbits
-- build: :art: fix yaml formatting
-- build: :wrench: update vscode settings
-- ci: :bug: update yml
-- ci: :construction_worker: update sonarcloud and CodeQL
-- ci: :green_heart: fix yaml formatting caused by github
-- fix: :bug: fix missing ground objects
-- feat: :sparkles: resize mesh models to support pizza box 3D model
-- feat: :sparkles: add close side menu to KeepTrackPlugin class
-- ci: :rotating_light: fix linter issue
-- feat: :sparkles: rerun search when opening search bar
-- ci: :green_heart: remove watch from npm test
-- Update SECURITY.md
-- ci: :bug: update yml
-- ci: :bug: update yml
-- build: :lock: fix npm security issues
-- fix: :pencil2: fix bug in test due to typo
-- chore: fixing tags
-- fix: :bug: fix search dropdown not showing when search icon clicked
-- build: :arrow_up: upgrade Orbital Object Toolkit (ootk)
-- ci: :adhesive_bandage: fix typo in yaml
-- Update visualizer.yml
-- ci: :green_heart: reduce unnecessary automatic PRs
-- Repo visualizer: update diagram
-- Repo visualizer: update diagram
-- Repo visualizer: update diagram
-- Repo visualizer: update diagram
-- Repo visualizer: update diagram
-- Repo visualizer: update diagram
-- Update SECURITY.md
-- Repo visualizer: update diagram
-- Repo visualizer: update diagram
-- Update visualizer.yml
-- Update visualizer.yml
-- feat: :sparkles: add staticOffsetChange keepTrackApi callback
-- Repo visualizer: update diagram
-
-#### v7.2.0
-
->  
-
-- Main
-- test: :adhesive_bandage: fix testing issue causing jest to fail on gi…
-- Update
-- Update
-- minor bug fixes
-- Version 7.1
-- Update to 7.0
-- Update
-- Update
-- Upgrade dependencies
-- Develop
-- Develop
-- Develop
-- refactor: :label: convert om-manager to typescript
-- Develop
-- Develop3
-- feat: :card_file_box: update catalog
-- fix: :green_heart: update docker.google instructions
-- Develop
-- feat: :zap: optimize milky way textures and rotate
-- Develop
-- Develop
-- Develop
-- Develop
-- fix: :ambulance: fix photomanager icon not loading
-- fix: :ambulance: fix image not found on linux ending in /
-- Develop
-- Develop
-- build: :arrow_up: upgrade dependencies
-- Develop
-- chore: :card_file_box: update database
-- fix: :zap: remove jquery and fix open bugs
-- feat: :sparkles: add eci ecf ric inc2lon and time2lon plots
-- refactor: :zap: remove jquery
-- feat: :sparkles: add satellite search on control site clicked
-- style: :art: replace all camelCase files with hyphens for better git detection
-- feat: :sparkles: add scenario-creator scaffold
-- docs: :page_facing_up: clear AGPL notice
-- feat: :sparkles: add 2nd sat selection + update selectbox
-- fix: :rotating_light: fix sonarcube findings
-- feat: :sparkles: add ECI plots
-- refactor: :zap: remove more jquery
-- fix: :zap: reduce complexity of legend color code
-- feat: :zap: optimize cruncher loops
-- build: :construction_worker: add google cloud support
-- fix: :bug: fix loading + legend + add more settings
-- refactor: :zap: remove jquery from adviceManager
-- test: :white_check_mark: fix all failing tests
-- fix: :zap: improve loading times
-- fix: :bug: safeguard functions against bad values
-- feat: :sparkles: add RIC frame 3D scatter plots
-- refactor: :zap: change base64 images to delayedsrc images
-- feat: :sparkles: add ecf analysis plot
-- fix: :bug: fix time not moving at correct speed
-- feat: :sparkles: add better breakup logic
-- fix: :rotating_light: fix minor sonarcube findings
-- fix: :rotating_light: fix minor sonarcube findings
-- refactor: :zap: remove jquery
-- refactor: :label: add more typing to colorSchemeManager
-- fix: :zap: fix minor issues with stf menu
-- docs: :memo: update changelog
-- docs: :memo: update changelog
-- fix: :beers: start fixing trend analysis menu
-- fix: :bug: fix lookangles menu
-- feat: :sparkles: add find reentries function
-- feat: :triangular_flag_on_post: modify breakup options to be more realistic
-- fix: :bug: fix ray casting on earth functionality
-- fix: :sparkles: add color scheme for notional debris
-- feat: :sparkles: new loading screen
-- fix: :bug: fix premature filtering in findsat
-- feat: :sparkles: add ability to use ECF for satellite orbits
-- chore: :bookmark: update to version 5.4
-- fix: :bug: fix socrates
-- fix: :lipstick: fix bug with sat-infobox being sluggish
-- fix: :bug: fix countries filters
-- fix: :label: better typing
-- test: :camera_flash: update snapshots
-- docs: :memo: add better notes on how dot interpolation works
-- fix: :bug: fix next pass time not updating
-- fix: :bug: include TBA sats as Special
-- fix deploy
-- chore: :bookmark: change to 6.0.1
-- fix: :sparkles: update SRP FOV
-- fix: :bug: fix missing top menu icons
-- fix: :bug: fix umbral not showing
-- Update deploy-pipeline.yml
-- fix: :pencil2: fix capitialization issue with constellations.ts
-- test: :bug: fix settingsmenu tests
-- chore: :lock: add gpg signing
-- build: :lock: update npm packages
-- fix: :lock: bump async
-
-#### v7.1.2
-
->  
-
-- feat: :sparkles: add func to show selected object as large red dot
-- fix: :bug: fixes #630
-- feat: :sparkles: add skeleton for new help menus
-- test: :white_check_mark: update tests
-- feat: :sparkles: fix issues on mobile devices
-- test: :adhesive_bandage: fix testing issue causing jest to fail on github
-- feat: :sparkles: add neighbors color scheme for orbit density
-- feat: :sparkles: add sensors help menu
-- feat: :sparkles: enable legend functions for orbit density scheme
-- feat: :sparkles: new splash screens
-- feat: :sparkles: add orbit density color scheme
-- test: :camera_flash: update snapshots for testing
-- feat: :sparkles: add help to plot menus
-- feat: :sparkles: add main help menu
-- feat: :sparkles: add help to edit sat menu
-- feat: :sparkles: add meanmo to period conversions on edit sat
-- feat: :sparkles: add help to constellations menu and fix constellation search code
-- feat: :sparkles: add sensors help
-- feat: :sparkles: add help for breakup menu
-- feat: :sparkles: add help menu to colors menu
-- fix: :bug: fix bug where lookangles enabled with no sensor
-- feat: :sparkles: add analysis help menu
-- fix: :bug: fix incorrect lookangles caused by caching satrec
-- feat: :sparkles: add help to new launch menu
-- feat: :sparkles: add help to missile menu
-- feat: :sparkles: add help to dop menu
-- feat: :sparkles: add watchlist help menu
-- feat: :sparkles: add help to initial orbit menu
-- feat: :sparkles: add help to find sat menu
-- feat: :sparkles: add help to debug menu
-- feat: :sparkles: add help to stf menu
-- feat: :sparkles: add help to satellite photo menu
-- feat: :sparkles: add help for collisions menu
-- fix: :bug: add error logging for possible bug #635
-- test: :clown_face: add missing mock data to tests
-- feat: :sparkles: add help to twitter menu
-- feat: :sparkles: add help to next launch menu
-- feat: :sparkles: add help to external source
-- feat: :sparkles: add help to countries menu
-- feat: :sparkles: add help to map menu
-- feat: :sparkles: add help to settings menu
-- fix: :bug: fix error on loading related to tle4.js
-- fix: :bug: fix bug in sat-fov menu when plugins disabled
-- fix: :bug: fix bug with color menu plugin being disabled
-- refactor: :recycle: simplify help menu code
-- fix: :bug: fix bug with sat url param not being found
-- fix: :bug: fix texture issue after undoing black earth
-- feat: :sparkles: add about page help menu
-- fix: :lock: fix security issue
-
-#### v7.1.1
-
->  
-
-- fix: :bug: fix error with TLE when editing satellite
-- fix: fix error setting value of null in analysis menu
-- fix: :bug: fix error in updateSatInfo
-- feat: :sparkles: add inc vs alt plots
-- test: :white_check_mark: add manual jest inline testing for debugging on github
-- build: :lock: fix security issue
-- fix: :bug: fix tests
-- fix: :bug: fix ecentricity formatting
-- test: :white_check_mark: update how jest is run
-
-#### v7.1.0
-
->  
-
-- feat: :card_file_box: update catalog
-- feat: :sparkles: add code for extended catalog
-- feat: :sparkles: add new optional settings
-- fix: :bug: fix contries and constellations menus
-- feat: :label: update types
-- feat: :wrench: update default settings
-- docs: :memo: update changelog
-- fix: :children_crossing: delay error sound to prevent constant repeats
-- fix: :bug: fix bug on mobile
-- feat: :sparkles: add faster searching
-
-#### v7.0.3
-
->  
-
-- fix: :bug: fix issue caused by clicking a non-satellite first
-- refactor: :label: update camera typing
-- fix: :bug: add error trapping for uniformMatrix4fv failure
-
-#### v7.0.2
-
->  
-
-- fix: :bug: fix sorting issue with null satellites
-- fix: :bug: fix issue with sun calculations
-- fix: :bug: remove old reference to uiManager.resize2DMap
-- fix: :bug: fix testing bugs
-- refactor: remove jquery get request
-- chore: :memo: update version number
-- fix: :lock: remove vulnerability
-
-#### v7.0.1
-
->  
-
-- fix: :bug: fix satellite fov not showing up
-- fix: :bug: fix lostobjects colorscheme hanging
-- fix: :bug: fix bug in getlookangles with null for satellite
-- refactor: :recycle: refactor to allow use as a react component
-- build: :see_no_evil: add npmignore for lib builds
-- fix: :bug: fix search issues
-- feat: :sparkles: add bulk add/remove to watchlist
-- docs: :memo: update changelog
-- test: :white_check_mark: fix broken watchlist tests
-- docs: :memo: update readme
-- feat: :sparkles: add prefetching of splash screens on initial run
-
-#### v7.0.0
-
->  
-
-- fix: :bug: fix country menu not working
-- fix: :bug: fix timeMachine showing other objects
-- refactor: :label: add better type checking
-- fix: :bug: complete country matching code
-- test: :white_check_mark: add testing for colorSchemeChangeAlerts
-- feat: :sparkles: add settings to hide agency dots
-- feat: :sparkles: add debug menu
-- feat: :sparkles: add filter settings for various orbits
-- docs: :memo: update changelog
-- feat: :sparkles: add labels to watchlist items in fov
-- feat: :sparkles: add new splash screen wallpapers
-- feat: :goal_net: add TLE validation when creating TLEs
-- fix: :bug: fix bug where search results dont respond
-- feat: :sparkles: add new logo and loading screen
-- refactor: :recycle: change default lookangles to 2 days from 7
-- fix: :bug: fix watchlist line to satellite
-- docs: :memo: update readme
-- fix: :bug: fix bug in error catching
-- fix: :bug: fix memory leak in line-factory
-- fix: :bug: fix screenshot resolution
-- build: :arrow_up: upgrade serve
-
-#### v6.2.0
-
->  
-
-- build(deps-dev): bump @babel/plugin-proposal-private-methods from 7.16.11 to 7.18.6
-- build(deps): bump echarts from 5.3.2 to 5.3.3
-- build(deps-dev): bump mini-css-extract-plugin from 2.6.0 to 2.6.1
-- build(deps-dev): bump husky from 7.0.4 to 8.0.1
-- build(deps-dev): bump @testing-library/jest-dom from 5.16.2 to 5.16.4
-- build(deps-dev): bump @typescript-eslint/parser from 5.12.1 to 5.30.7
-- build(deps-dev): bump ponicode from 0.61.3 to 0.70.11
-- chore: :card_file_box: update TLE databases
-- refactor: :heavy_minus_sign: replace suncalc with ootk
-- feat: :sparkles: add new sensors
-- fix: :bug: fix tle exporters
-- fix: :bug: fix bug when creating sensor or observer from rmb
-- fix: :bug: fix edit sat menu
-- feat: :sparkles: add error reporting feature
-- refactor: :recycle: simplify tle formatting
-- feat: :sparkles: add basic sounds
-- test: :white_check_mark: fix failing jest tests
-- docs: update changelog
-- feat: :sparkles: add additional tle export options
-- fix: :bug: fix initial orbits menu
-- fix: :bug: fix breakup creator
-- feat: :sparkles: add mute button
-- fix: :bug: fix bug new launch time mismatch
-- feat: :sparkles: add sound effects
-- feat: :sparkles: update sounds
-- fix: :bug: update apogee when edit sat in positionCruncher
-- feat: :sparkles: add sounds to settings menu
-- fix: :bug: update default colorscheme to catch unknown types
-- fix: :goal_net: add defensive code to satCalculate
-- build: :arrow_up: update all dependencies
-- fix: :bug: fix bottom menu ui not responding when edges clicked
-- fix: :bug: fix watchlist issues
-- feat: :sparkles: update about page
-- fix: :bug: fix bug caused by depricated fov text
-- build: :arrow_up: update ootk
-- fix: :bug: fix breakup menu
-- fix: :bug: fix new launch menu
-- fix: :bug: correct tle formatting in orbitReferencesLinkClick
-- fix: :bug: fix earth becoming background
-- fix: :bug: fix TLE formatting bug in getOrbitByLatLon
-- fix: :goal_net: add defensive code to setSelectedSat
-- fix: :goal_net: add defensive code to snapToSat
-- chore: :card_file_box: update SOCRATES example
-- fix: :bug: fix typo in stfOnObjectLinkClick
-- fix: :lock: update node-fetch
-- build(deps-dev): bump @babel/plugin-proposal-private-methods
-
-#### v6.1.0
-
->  
-
-- refactor: :recycle: split SatMath into pieces
-- refactor: :truck: split uiManager into smaller pieces
-- docs: :page_facing_up: clear AGPL notice
-- refactor: :recycle: split satMath
-- perf: :zap: improve color calculation speed
-- fix: :lock: remove security false postives
-- fix: :rotating_light: fix sonarcube findings
-- style: :art: add more granular prettier ignore directives
-- feat: :sparkles: add better embeded support
-- refactor: :label: convert om-manager to typescript
-- refactor: :heavy_minus_sign: migrate from satellite.js to ootk for all orbital math
-- feat: :sparkles: update color scheme menus
-- perf: :zap: add caching of satrec object
-- feat: :zap: optimize find close objects code
-- fix: :rotating_light: fix minor sonarcube findings
-- feat: :sparkles: add group countries color scheme
-- feat: :sparkles: update orbit manager
-- refactor: :recycle: update embeded example
-- refactor: :zap: optimize age of elset color scheme
-- feat: :sparkles: add vismag calculations to satbox
-- docs: :memo: update changelog
-- refactor: :recycle: update sat group class
-- feat: :heavy_minus_sign: migrate from satellite.js to ootk
-- refactor: :recycle: reduce unnecessary code in meshManager
-- feat: :sparkles: update time machine
-- feat: :sparkles: update group color scheme
-- fix: :arrow_up: upgarde critical dependencies to fix build issue
-- feat: :heavy_minus_sign: migrate from satellite.js to ootk
-- test: :camera_flash: update snapshots
-- build: :arrow_up: bump dependencies
-- feat: :sparkles: update hover manager
-- fix: :sparkles: update object manager
-- fix: :adhesive_bandage: remove debugger call
-- fix: :adhesive_bandage: remove unnecessary logging
-- test: :white_check_mark: fix api mocks
-
-#### v6.0.3
-
->  
-
-- fix: :zap: remove jquery and fix open bugs
-- feat: :sparkles: add eci ecf ric inc2lon and time2lon plots
-- refactor: :zap: remove jquery
-- feat: :sparkles: add satellite search on control site clicked
-- style: :art: replace all camelCase files with hyphens for better git detection
-- feat: :sparkles: add scenario-creator scaffold
-- feat: :sparkles: add 2nd sat selection + update selectbox
-- test: :zap: improve jest speed and reliability
-- feat: :sparkles: add ECI plots
-- refactor: :zap: remove more jquery
-- fix: :zap: reduce complexity of legend color code
-- build: :construction_worker: add google cloud support
-- fix: :bug: fix loading + legend + add more settings
-- refactor: :zap: remove jquery from adviceManager
-- feat: :card_file_box: update catalog
-- feat: :zap: optimize milky way textures and rotate
-- test: :white_check_mark: fix all failing tests
-- fix: :zap: improve loading times
-- feat: :sparkles: add RIC frame 3D scatter plots
-- refactor: :zap: change base64 images to delayedsrc images
-- feat: :sparkles: add ecf analysis plot
-- fix: :bug: fix time not moving at correct speed
-- feat: :sparkles: add better breakup logic
-- fix: :ambulance: fix image not found on linux ending in /
-- refactor: :zap: remove jquery
-- fix: :zap: fix minor issues with stf menu
-- fix: :beers: start fixing trend analysis menu
-- fix: :bug: fix lookangles menu
-- feat: :sparkles: add find reentries function
-- feat: :triangular_flag_on_post: modify breakup options to be more realistic
-- fix: :bug: fix ray casting on earth functionality
-- feat: :sparkles: new loading screen
-- fix: :bug: fix premature filtering in findsat
-- feat: :sparkles: add ability to use ECF for satellite orbits
-- chore: :bookmark: update to version 5.4
-- fix: :bug: fix socrates
-- fix: :bug: fix countries filters
-- test: :camera_flash: update snapshots
-- fix: :bug: fix next pass time not updating
-- fix: :bug: include TBA sats as Special
-- chore: :bookmark: change to 6.0.1
-- fix: :sparkles: update SRP FOV
-- fix: :bug: fix missing top menu icons
-- fix: :bug: fix umbral not showing
-- fix: :green_heart: update docker.google instructions
-- fix: :ambulance: fix photomanager icon not loading
-- fix: :pencil2: fix capitialization issue with constellations.ts
-- test: :bug: fix settingsmenu tests
-- chore: :lock: add gpg signing
-- fix: :lock: bump async
-
-#### v6.0.2
-
->  
-
-- feat: :zap: optimize milky way textures and rotate
-- chore: :bookmark: change to 6.0.1
-
-#### v6.0.1
-
->  
-
-- fix: :bug: fix loading + legend + add more settings
-- feat: :sparkles: new loading screen
-
-#### v6.0.0
-
->  
-
-- fix: :zap: remove jquery and fix open bugs
-- refactor: :zap: remove jquery
-- refactor: :zap: remove more jquery
-- refactor: :zap: remove jquery from adviceManager
-- test: :white_check_mark: fix all failing tests
-- refactor: :zap: remove jquery
-- chore: :bookmark: update to version 5.4
-
-#### v5.4.0
-
->  
-
-- feat: :sparkles: add satellite search on control site clicked
-- style: :art: replace all camelCase files with hyphens for better git detection
-- feat: :sparkles: add scenario-creator scaffold
-- fix: :zap: reduce complexity of legend color code
-- fix: :zap: improve loading times
-- fix: :bug: fix time not moving at correct speed
-- feat: :sparkles: add better breakup logic
-- fix: :zap: fix minor issues with stf menu
-- fix: :beers: start fixing trend analysis menu
-- feat: :triangular_flag_on_post: modify breakup options to be more realistic
-- fix: :bug: fix ray casting on earth functionality
-- fix: :bug: fix socrates
-- fix: :bug: fix countries filters
-- fix: :bug: fix next pass time not updating
-- fix: :bug: include TBA sats as Special
-- fix: :sparkles: update SRP FOV
-- fix: :bug: fix missing top menu icons
-- fix: :bug: fix umbral not showing
-- test: :bug: fix settingsmenu tests
-- fix: :lock: bump async
-
-#### v5.3.0
-
->  
-
-- ci: :construction_worker: add cypress to pipeline
-- Develop
-- refactor: :heavy_minus_sign: remove old dependencies
-- ci: :construction_worker: update codecov settings
-- Develop
-- ci: :construction_worker: add github actions back to main branch
-- Develop
-- Develop
-- fix: :ambulance: fixed post processing manager
-- fix: :rotating_light: fixed sonarqube errors
-- Develop
-- build: :rotating_light: ignore database file
-- build: :rotating_light: minor fixes for sonarlint warnings
-- Develop
-- fix: :bug: fix moon position errors
-- feat: :sparkles: add eci ecf ric inc2lon and time2lon plots
-- feat: :sparkles: add 2nd sat selection + update selectbox
-- test: :white_check_mark: increase test coverage of uiInput
-- feat: :sparkles: add ECI plots
-- ci: :fire: remove github actions from develop branch
-- feat: :sparkles: allow multiple STFs to be created
-- refactor: :recycle: split analysis into components
-- test: :white_check_mark: increase test coverage of uiInput
-- test: :white_check_mark: increase coverage of calculations.ts
-- feat: :sparkles: add RIC frame 3D scatter plots
-- refactor: :zap: change base64 images to delayedsrc images
-- feat: :sparkles: add ecf analysis plot
-- test: :white_check_mark: increase test coverage
-- fix: :ambulance: fix image not found on linux ending in /
-- ci: :rocket: add cypress testing
-- fix: :adhesive_bandage: fix sensors appearing selected when not selected
-- fix: :bug: fix multisite lookangles
-- refactor: :lock: use separate func for keyboardEvt
-- fix: :bug: fix lookangles menu
-- refactor: :art: use constant for key pressed
-- feat: :sparkles: add find reentries function
-- fix: :adhesive_bandage: fix find near orbit when raan 350+
-- refactor: :heavy_minus_sign: remove perfect-scrollbar
-- fix: :zap: add limits to all searches with findSat
-- fix: :bug: fix premature filtering in findsat
-- feat: :sparkles: add ability to use ECF for satellite orbits
-- docs: :memo: update changelog
-- refactor: :label: add typing of findBestPass
-- refactor: :rotating_light: address sonarqube findings
-- fix: :adhesive_bandage: fix searching by orbit near 359 raan
-- refactor: :rotating_light: address sonarqube findings
-- ci: :construction_worker: fix cypress pipeline
-- build: :arrow_up: upgrade dependencies
-- fix: :adhesive_bandage: align three buttons in custom sensor
-- ci: :construction_worker: add alternate http server for cypress testing
-- refactor: :rotating_light: address sonarqube finding
-- test: :rotating_light: fix trufflehog finding
-- ci: :truck: rename master to main
-- fix: :adhesive_bandage: fix alignment of rows in sensor lists
-- fix: :ambulance: fix photomanager icon not loading
-- fix: :pencil2: fix capitialization issue with constellations.ts
-- fix: :bug: fix searches in URL not working on load
-- ci: :pencil2: add "npm run" to build pipeline
-- fix: :adhesive_bandage: remove duplicate css
-- fix: :bug: fix right mouse click not working
-- chore: :lock: add gpg signing
-- ci: :package: add placeholder for e2e tests
-- build: :package: updated npm packages
-
-#### v5.2.1
-
->  
-
-- refactor: :heavy_minus_sign: remove materialize.js in favor of npm package
-- docs: :memo: new changelog for 5.2
-- test: :camera_flash: snapshots updated to UTC timezone
-- style: :art: fixed sonarqube findings
-- test: :white_check_mark: increase test coverage in satMath
-- test: :white_check_mark: expand testing of uiInput.ts
-- test: :white_check_mark: increase test coverage of positionCruncher
-- test: :white_check_mark: increase test coverage
-- test: :white_check_mark: add tests for cruncherInteractions.ts
-- test: :white_check_mark: set time using UTC to ensure standardized timezone settings
-- test: :white_check_mark: increase test coverage of orbitCruncher
-- test: :white_check_mark: increase test coverage of classification.ts
-- test: :white_check_mark: increase test coverage of findSat and positionCruncher
-- docs: :page_facing_up: update copyright dates
-- test: :white_check_mark: add more test coverage to satInfoboxCore
-- fix: :bug: replace getFullYear with getUTCFullYear
-- ci: :camera_flash: remove snapshot tripping trufflehog
-- test: :white_check_mark: standardize time in colorschememanager
-- test: :camera_flash: remove obsolute snapshots
-- ci: :heavy_plus_sign: add husky to package
-- ci: :white_check_mark: added run lint on commit
-- test: :camera_flash: remove obsolete snapshots
-
-#### v5.2.0
-
->  
-
-- fix: :bug: fix undefined error in positionCruncher
-- Develop
-- build(deps-dev): bump @babel/core from 7.16.5 to 7.16.7
-- build(deps-dev): bump jest from 27.4.5 to 27.4.7
-- build(deps-dev): bump @babel/preset-typescript from 7.16.5 to 7.16.7
-- build(deps-dev): bump @types/jquery from 3.5.12 to 3.5.13
-- build(deps-dev): bump webpack from 5.65.0 to 5.66.0
-- build(deps-dev): bump http-server from 14.0.0 to 14.1.0
-- build(deps-dev): bump ponicode from 0.60.0 to 0.61.3
-- build(deps-dev): bump @typescript-eslint/eslint-plugin from 5.9.0 to 5.9.1
-- build(deps-dev): bump @types/node from 17.0.7 to 17.0.8
-- build(deps-dev): bump source-map-loader from 3.0.0 to 3.0.1
-- build(deps-dev): bump @typescript-eslint/parser from 5.9.0 to 5.9.1
-- build(deps-dev): bump retire from 3.0.3 to 3.0.6
-- build(deps-dev): bump @babel/plugin-proposal-private-methods from 7.16.5 to 7.16.7
-- build(deps-dev): bump eslint-plugin-jest from 25.3.0 to 25.3.4
-- build(deps-dev): bump @types/jest from 27.0.3 to 27.4.0
-- build(deps-dev): bump @babel/preset-env from 7.16.5 to 7.16.8
-- build(deps-dev): bump @types/jquery from 3.5.10 to 3.5.12
-- Develop
-- feat: :sparkles: add RIC frame on hover
-- build: :arrow_up: bump all dependencies
-- Develop
-- fix: :bug: fix meshManager selecting correct mesh
-- refactor: :recycle: positionCruncher overhauled to be less complex
-- chore: :children_crossing: undo last commit
-- Develop
-- build: :construction_worker: codecov is info only
-- Develop
-- Develop
-- refactor: :rotating_light: fixed sonar findings
-- refactor: :rotating_light: fixed sonar finding on input complexity
-- Develop
-- build: :coffin: admin folder will now be handled by a separate repo
-- build: :green_heart: updated build scripts for gitlab pipeline
-- Develop
-- Develop
-- Develop
-- build(deps-dev): bump @types/node from 16.11.12 to 17.0.0
-- Develop
-- Develop
-- fix: :bug: fix moon position errors
-- refactor: :heavy_minus_sign: remove locally hosted dependencies
-- refactor: :recycle: refactor uiManager.ts to look cleaner
-- feat: :bento: add flock, lemur, oneweb, spacebee and search by bus
-- refactor: :recycle: refactor hoverbox code out of drawManager
-- docs: :memo: changelog bump
-- style: :rotating_light: code cleanup to fix sonarqube findings
-- refactor: :recycle: refactor legend change code
-- refactor: :recycle: refactor camera.ts
-- style: :rotating_light: reformat to reduce sonarqube code smells
-- feat: :sparkles: add more search filters and minor bug fixes
-- fix: :bug: add installDirectory settings for staging.dso.mil
-- build: :rotating_light: minor fixes for sonarlint warnings
-- fix: :rotating_light: fixed sonarqube errors
-- refactor: :recycle: refactor screenshot code
-- build: :lock: add explicit ignore for incorrect trufflehog warnings
-- test: :white_check_mark: replace all js tests with ts
-- refactor: :technologist: update catalog searches
-- style: :art: sonarqube findings fixed
-- style: :art: removed unused code
-- fix: :bug: fixed bug with ignoring trufflehog and added sonarqube fixes
-- docs: :rotating_light: explicitly identify intentionally high complexity functions
-- docs: :memo: updated readme and contributing guidelines
-- fix: :rotating_light: fixed minor css sonarqube findings
-- test: :white_check_mark: replaced js test with ts
-- refactor: :recycle: reduce complexity
-- style: :rotating_light: fixed sonarqube findings
-- style: :zap: reduce unnecessary missileManager actions
-- refactor: :truck: migrate more scripts to TypeScript
-- fix: :adhesive_bandage: fixed sonarqube issues
-- test: :white_check_mark: add better tests for tleformater
-- fix: :bug: fix show sensors with fov link not working
-- refactor: :fire: remove uiLimited code
-- style: :rotating_light: remove unnecessary comments
-- test: :white_check_mark: convert js tests to ts
-- refactor: :fire: remove duplicate code
-- build: :construction_worker: fix build env and update dependencies
-- feat: :sparkles: add search for star and panToStar functionality
-- Update issue templates
-- fix: :children_crossing: removed extra spacing when sat-infobox is dragged
-- chore: :children_crossing: feature request template
-- test: :white_check_mark: tests are now timezone agnostic
-- test: :white_check_mark: expand code coverage on positionCruncher
-- chore: :rotating_light: added explicit ignores for sonarqube
-- build: :art: cleaned up build files
-- feat: :zap: add more dynamic reference orbit satellites
-- fix: :ambulance: fixed post processing manager
-- fix: :lock: addressed sonarqube security findings
-- test: :camera_flash: update snapshots
-- test: :bug: add consistent time when testing in different timezones
-- feat: :children_crossing: provide feedback on getorbitbylatlon errors to user
-- Create bug.md
-- Delete feature-request.md
-- 403 error fix: changed htm files to html files to address 403 error. Updated fiveserver, package.json, and build.mjs
-- Update user-story.md
-- feat: :children_crossing: change collision time to slightly before event
-- fix: :ambulance: fix typo breaking drawManager
-- fix: :bug: fix race condition in findSat plugin
-- test: :camera_flash: update snapshots
-- ci: :construction_worker: update github pipeline
-- test: :camera_flash: update snapshots
-- feat: :children_crossing: provide user feedback on editsat failures
-- test: fixed failing tests
-- test: :alien: change code coverage directory for sonarcube
-- docs: :memo: update readme
-- build: :rotating_light: addressed yaml lint findings
-- ci: :green_heart: add new york timezone for deployment
-- build: :rotating_light: second try at addressing yaml lint issues
-- docs: :memo: added a link on cognitive complexity
-- ci: :green_heart: add github token
-- ci: :green_heart: use different method for changing timezone
-- build: :lock: added trufflehog regex
-- refactor: :rotating_light: reduce complexity in getters.ts
-- fixing deployment: updating dockerfile to more closely match frontend.
-- build: :green_heart: use New York timezone
-- fix: :bug: fix bug where object id 0 has no orbit
-- ci: :adhesive_bandage: reverted change to sonar key
-- build: :rotating_light: ignore database file
-- ci: :green_heart: use with vs env
-- ci: :pencil2: lowercase github token
-- chore: :children_crossing: update bat file for index.html
-- ci: :wrench: update babel config
-- fix: :bug: fix reference orbits having wrong rasc
-- test: :adhesive_bandage: fix moon tests
-- build: :heavy_minus_sign: remove five-server until security update is made
-- refactor: :rotating_light: fix sonar lint error
-- Update deploy-pipeline.yml
-- build: :arrow_up: remove vulnerability
-- build: :arrow_up: security fix
-- build: :lock: fix vulnerability
-- build(deps-dev): bump @typescript-eslint/eslint-plugin
-- build(deps-dev): bump @babel/plugin-proposal-private-methods
-
-#### v5.1.0
-
->  
-
-- build(deps-dev): bump @types/node from 16.11.12 to 17.0.0
-- Develop
-- build: :hammer: cleaned up all the build scripts to use node API
-- fix: :label: type error preventing build
-- build: :construction_worker: add code coverage settings for sonarcloud
-- build: :construction_worker: better github pipeline
-- Develop2
-- build: :green_heart: allow but dont require node 17
-- fix: :bug: fixed use of strings instead of SpaceObjectType enum
-- Develop
-- Develop
-- build(package): downgraded typescript and referenced local build in vscode
-- refactor(keeptrackapi): refactored api + removed all &lt;any&gt;keepTrackApi references
-- build(dockerfile): got docker to start the npm install but need to remove github dependencies
-- build(deps-dev): bump jsdom from 17.0.0 to 19.0.0
-- Develop
-- Develop
-- Develop
-- fix(catalogloader): fixed offline catalog loading with JSON parse
-- Develop
-- Add CodeSee architecture diagram workflow to repository
-- Develop
-- Develop
-- test(settingsmanager): fixed tests to work with non-module settingsMa…
-- fix: :rotating_light: fixed multiple sonarqube findings
-- feat: :children_crossing: better feedback on 404/500 errors
-- refactor: :fire: removed duplicate code
-- fix: :bug: fixed some sonarqube findings
-- fix: :bug: fixed bugs related to legacy end of world json sims
-- fix: :rotating_light: extra file breaking linter
-- test: :white_check_mark: added testing to positionCruncher
-- fix: :bug: new launch now displays error if no sat selected
-- test: :white_check_mark: increased satSet test coverage
-- test: :white_check_mark: increased test coverage on menuController
-- refactor: :rotating_light: fixed sonarqube findings
-- build: :construction_worker: sonarcloud fixes and deploy pipeline
-- refactor: :coffin: removed WIP radarDataManager
-- ci: :construction_worker: new deployment pipeline
-- ci: :construction_worker: add checkout of code to each job
-- build: :rotating_light: yaml linting
-- perf: :lock: addressed multiple sonarqube findings
-- build: :green_heart: changed build pipeline order
-- refactor: :rotating_light: fixed sonar finding on input complexity
-- ci: :pencil2: added missing "run" command
-- test: :coffin: removed obsolete jest snapshots
-- ci: :rotating_light: fixed linting errors in yml files
-- ci: :white_check_mark: generate code coverage for sonarcloud
-- build: :wastebasket: removed unnecessary build calls
-- refactor: :rotating_light: fixed sonar findings
-- test: :adhesive_bandage: make tests pass
-- build: :construction_worker: linting build-pipeline.yml
-- build: :construction_worker: run on push OR pull not both
-- fix: :art: minor changes to redundant css code
-- build: :lock: add sonarcube scans to master on push
-- test: :bug: fixed jest tests
-- build: :green_heart: updated build scripts for gitlab pipeline
-- build: :ambulance: watch command is locking up build in CI
-- ci: :construction_worker: no node restrictions for better interoperability
-- fix: :bug: fixed bug where 404 was always displayed
-- fix: :lipstick: fixed bug in materialize.css
-- fix: :lock: address sonarqube finding for client-side redirection
-- build: :bug: webpack ignores catalog admin files
-- fix: :pencil2: error page now redirects back to home page
-- test: :bug: fixed test running after jest teardown
-- ci: :construction_worker: changed npm-audit-action
-- build: :green_heart: yml issue
-- ci: :pencil2: removed extra -
-- build: :coffin: admin folder will now be handled by a separate repo
-- chore: :coffin: removed unused images
-- refactor: :label: type incorrect
-- ci: :pencil2: fixed port for ftp deployment
-- ci: :construction_worker: clarify pipeline order
-- build: :pencil2: yml not yaml
-- build: :green_heart: workspace directory "fixed" again
-- build: :coffin: removed duplicate test script
-- Merge branches 'master' and 'master' of https://code.il4.dso.mil/spacecamp/delta4/darts/keeptrack-space
-- feat(multiple): merging with the current github code base
-- fix(timemanager): improved time sync between satCruncher orbitCruncher and main thread
-- refactor: :fire: removed old php scripts that are no longer used
-- test: :white_check_mark: fixed test dependencies and use of SatObject
-- refactor: :truck: split satSet into multiple files
-- test(multiple): increased code coverage
-- test: :white_check_mark: improved coverage of default ruleSet
-- test(multiple): fixed tests
-- refactor(timemanager): consolidated all propRate propOffset and satCruncher time communication
-- build: :hammer: implemented five-server (live-server) and webpack --watch
-- test: :white_check_mark: increased code coverage
-- feat: :sparkles: convert SpaceObjectType enum to string
-- refactor: :rotating_light: fixed eslint warnings
-- test: :heavy_plus_sign: added missing imports
-- test: :white_check_mark: improved main.ts tests
-- chore(changelog): updated changelog
-- test: :white_check_mark: code coverage for group ruleset
-- refactor(timemanager/transforms.ts): refactored time conversion functions out of timeManager.ts
-- refactor: :label: created &lt;KeepTrackPrograms&gt; interface to reduce use of &lt;any&gt;
-- refactor: :heavy_minus_sign: removed some @app references
-- refactor: :fire: removed old cypress e2e tools
-- test(multiple): improved code coverage
-- test(multiple): increase code coverage
-- build: :coffin: removed old scripts that are no longer needed
-- test: :white_check_mark: 100% coverage in countries colorscheme
-- test: :white_check_mark: added code coverage to main.ts and embed.ts
-- Delete codesee-arch-diagram.yml
-- refactor: :recycle: cleaned up breakup code
-- test(multiple): fixed tests for no EST test servers
-- build: :lock: removed vulnerabilities in devdependencies
-- build: :arrow_up: upgraded multiple dependencies
-- fix(initialorbit): creating an analyst satellite automatically searches for it now
-- Delete .gitlab-ci.yml
-- Update .gitlab-ci.yml file
-- SH: added dockerfile, added npm install to build script (not functional yet)
-- build(dockerfile): reworked dependencies to get docker working
-- fix: :bug: analyst satellites were not defaulting with correct SpaceObjectType
-- fix(watchlist): load watchlist now calls the correct function
-- test: :lock: false positive for secret
-- fix(selectsatmanager): fixed bug where search box was displayed empty and updated political map
-- build: :arrow_up: requiring node 17 to mitigate bug in node 16
-- build(package.json): added test:unit
-- refactor(multiple): minor ts errors fixed or hidden
-- changelog
-- fix(sensor): sensor reset button now sets the sensor back to defaults
-- Update node-ci.yml
-- build: :bug: CI now relies on previous step
-- build: :green_heart: wrong yaml path
-- Update Dockerfile per MDO request (may need to double check npm i removal)
-- fix: :bug: enabled local testing without https
-- build: :construction_worker: wrong yml filename
-- ci: :green_heart: added package-lock.json back in for pipelines npm ci
-- SH: updated dockerfile to look at output dist instead of build
-
-#### v5.0.1
-
->  
-
-- build(deps-dev): bump cypress from 7.7.0 to 8.2.0
-- build(deps-dev): bump http-server from 0.12.3 to 13.0.0
-- build(deps-dev): bump jest from 26.6.3 to 27.0.6
-- Develop
-- feat(settingsmanager.js): settings.js now compiles separate from othe…
-- Develop
-- feat(sensor.ts): added link to show all sensors with fov on a satellite
-- thkruz/issue295
-- build(deps-dev): bump css-loader from 5.2.7 to 6.2.0
-- Version 5
-- feat(meshes): added new meshes
-- added new  catalog loader
-- test(multiple): a lot of ponicode created unit tests
-- fix(multiple): improved code to allow more unit tests and catch async errors
-- refactor(camera): migrated camera to typescript
-- feat(multiple): improved error detection and reporting for webgl issues
-- test(multiple): added many new Jest tests
-- fix(get_data.php): patched vulnerability
-- build(configs): updated configuration settings
-- refactor(satset): cleaned up satSet code
-- refactor(sun): implement vao and move to typescript
-- refactor(moon): add vao and move to typescript
-- feat(extra.json): better offline catalog management
-- fix(multiple): implemented Snyk and fixed multiple minor errors
-- refactor(camera): renamed cameraManager to setup future multi camera modes
-- build(embed): created an embedable version of KeepTrack
-- feat(settingsmanager.js): settings.js now compiles separate from other files for easy offline edits
-- feat(gamepad): initial gamepad support
-- test(multiple): fixed failing tests
-- feat(settingsmanager.js): add passing of URI with settings overrides
-- refactor(camera): refactor cameraTypes to be like enums
-- update settingsManager to not be a module
-- test(apimocks.ts): consolidated mocks for jest testing
-- fix(positioncruncher): fixed issue with full FOV not working with fence update
-- test(settingsmanager): improved settingsManager testing
-- test(multiple): added additional unit tests
-- test(ui-input.ts): improved ui-input testing and error catching
-- test(externalapi): added new stub file for tests
-- test(moon): added test for the moon
-- feat(line-factory.js): added lines for showing scanning by satellite or ground sensor
-- feat(ui-input.ts): added political maps and upgraded surveillance fence view
-- feat(settingsoverride): added an override so that settings stay consistent after updates
-- docs(changelog.md): version bump
-- fix(uimanager): shift f to find and shift h to hide UI
-- feat(main.js): added more visible error checking to the loading screen
-- fix(satset): getTEARR now works on missile objects
-- test(main.js): removed unnecessary console statements and improved testing
-- ascii catalog edits
-- fix(starmanager): fixed bug where webGl lags hard after highlighting certain stars
-- feat(settingsmanager): added new settings for overriding defaults to support making movies
-- fix(satset.js): added more descriptive error messages
-- feat(meshmanager.js): added new meshes, mesh rotation settings, sbirs options, and mesh overrides
-- feat(sensormanager.js): added drawFov function for animating radars surveillance fences
-- fix(color-scheme-factory.js): show stars when searching for objects
-- feat(camera.js): added autopan, zoom speed settings, and zooming on missiles
-- fix(shorttermfences.ts): fixed scoping issue with one time only flag
-- build(settings.js): enabled offline version
-- fix(satinfoboxcore): hide sunlight status if no sensor
-- changelog
-- build(package.json): improved npm scripts
-- fix(sensorlist.js): removed cobra danes secondary sensor
-- build(package): upgraded jsdom
-- fix(webgl-obj-loader.js): migrated fetch to $.get for offline support
-- fix(package.json): fixed http-server issue with new default ip address
-- feat(atmosphere.ts): allow mesh to be moved with a position override
-- fix(satinfoboxcore): fixed bug when selecting a missile
-- test(test-env): migrated from require to import
-- fix(satmath): fixed issue with ecf calculations breaking sun and moon
-- Update README.md
-- fix(catalogloader): fixed offline catalog loading with JSON parse
-- github actions
-- feat(moon.js): allow moon position to be modified with an override
-- test(settingsmanager): fixed tests to work with non-module settingsManager
-- no admin folder required
-- feat(ui-input.ts): added override to allow zooming while auto rotate is on
-- build(tsconfig.json): build to es3
-- test(camera.test.ts): unneeded import
-- settingsManager fixed
-- refactor(timemanager.ts): changed warning to debug to reduce unecessary messages in the console
-- build(.gitignore): added embed folder
-- fix(catalogloader.ts): give static dots an id property
-- fix(index.htm): removed modernizr since it provided no value
-- fix jest to use jsdom
-
-#### v4.1.0
-
->  
-
-- Main
-- Develop
-- Develop
-- build(typescript): started migration to typescript
-- fix(sensor.ts): fixes #295
-- fix(satinfoboxcore): only show sensor info if a sensor is selected
-- docs(changelog): version officially bumped to 4.0
-- chore(commitizen): added commitizen to package.json
-- updated dependencies
-
-#### v4.0.0
-
->  
-
-- feat(keeptrack): complete overhaul to TypeScript and implement KeepTrackApi
-- feat(astroux): implemented astroux css and soundManager
-- fix(nextlaunchmanager): upgraded to launch library 2 api
-- test(integration tests): updated integration tests to support keeptrackApi
-- feat(main): updated main.js to use keeptrackApi
-- feat(multiple): implemented keeptrackApi instead of passing variables to functions
-- fix(satinfoboxcore): provided a fix for when isInSun is unavailable (testing only so far)
-- fix(tle.js): fixed missing export call in offline TLEs
-- fix(ui-input.ts): fixed DOP calculation bug
-- fix(lookangles.js): fixed dop calculation bug
-- build(package.json): changed jest testing to stop on first failure
-- chore(launch.json): changed vscode config for debugging
-
-#### v3.5.0
-
->  
-
-- refactor(settingsmanager): converted settingsmanager from js to ts
-- refactor(uimanager): ui-input converted to ts and uiManager updated to be more dynamic
-- feat(satinfoboxcore): refactored satInfoBox as plugin
-- chore(contributing.md): removed contributing.md file
-- refactor(multiple): standardized use of lat, lon, alt vs lat, long, obshei
-- refactor(selectsatmanager): refactored selectSatManager as a plugin to keeptrackApi
-- feat(externalapi): implemented API for external plugins
-- chore(tsconfig.json): updated tsconfig rules
-- chore(tle): updated TLEs
-- chore(declaration.d.ts): enabled css for typescript
-- chore(.eslintrc): removed no-explicit-any rule
-
-#### v3.4.3
-
->  
-
-- feat(uimanager.js): added Short Term Fence menu
-- build(deps-dev): bump style-loader from 2.0.0 to 3.0.0
-- feat(satvmagmanager): expanded sunlight color scheme, fixed propagati…
-- fix(analysis-tools): fixed analysis tools to work with OOTK
-- fix(style.css): bottom menu was hiding some input selection options. …
-- fix(uimanager): fixed find objects in this orbit and orbit remaining …
-- docs(changelog): generated auto changelog
-- docs(readme.md): updated readme for version 3
-- feat(satvmagmanager): expanded sunlight color scheme, fixed propagation speed code and line to sat
-- fix(ui-input.ts): migrated ui-input to typescript. fixed on click and create sensor/observer bugs
-- build(typescript): started migration to typescript
-- refactor(helpers.ts): migrated helper module to typescript
-- refactor(nextlaunchmanager.ts): fixed typing errors during build
-- test(integration1): increased code coverage
-- build(typescript): updated types and lint rules
-- fix(uimanager): fixed find objects in this orbit and orbit remaining after watchlist item removed
-- fix(nextlaunchmanager.ts): fixed type error
-- test(integration1.test.js): increased lookangles code coverage
-- build(uimanager.js): fixed import to use new typescript file
-- Autofix issues in 2 files
-- chore(changelog): updated changelog
-- fix(style.css): bottom menu was hiding some input selection options. changed max-heigh of popups
-- build(package.json): updated version npm scripts to include git tag
-- fix(nextlaunchmanager): removed race condition involving launchList
-- build(helper.ts): fixed type error
-- chore(package.json): bumped version number
-- build(auto-changelog): added changelog dependency
-- ci(deepsource): fixed exclude to ignore external libraries
-
-#### v3.2.0
-
->  
-
-- feat(uimanager.js): improved alerts for watchlist items entering/exit…
-- build(release.yml): fixed github publishing reference
-- chore(package.json): version bump
-- fix(uimanager): fixes issues #223 and #237
-- ci(github workflows): updated to match package.json new script names
-- feat(photomanager.js): added on orbit imagery to close #14
-- test(integration tests): split integration testing into 3 files
-- feat(ui-input.js): added draw sat to sun line feature
-- test(integration1.test.js): added menu-sat-photo testing
-
-#### v3.1.3
-
->  
-
-- feat(uimanager.js): improved alerts for watchlist items entering/exiting fov
-- fix(satset.js): fixed color of overlay icon when loading saved watchlist
-
-#### v3.1.2
-
-- build(release.yml): fixed github publishing reference
-
-#### v3.1.1
-
-- chore(package.json): version bump
-
-#### v3.1.0
-
->  
-
-- fix(uimanager): fixes issues #223 and #237
-- ci(github workflows): updated to match package.json new script names
-- build(deps-dev): bump jest from 26.6.3 to 27.0.1
-- build(deps-dev): bump imports-loader from 2.0.0 to 3.0.0
-- Develop
-- Develop
-- develop
-- test(color-scheme.unit.test.js): increased code coverage
-- test(dots.unit.test.js): increased test coverage
-- Develop
-- perf(drawmanager.js): removed extra meshManager.draw calls and fixed …
-- perf(positioncruncher.js): longer time between propagation loops
-- Develop
-- test(integration.test.js): increased test coverage
-- Develop
-- test(search-box): add 90% code coverage
-- Develop
-- Develop
-- Bump imports-loader from 1.2.0 to 2.0.0
-- Ootk
-- feat(ootk): integrated ootk to replace satellite.js
-- Develop
-- Version bump
-- Twgl
-- Develop
-- Twgl
-- Added getSunPosition and Fixed getStarPosition
-- Color factory
-- Private variables in camera
-- Clear entry point
-- Clear entry point
-- Class extraction
-- Development
-- Update version number
-- Private Methods and Fields added
-- Create Camera Class
-- fix(uimanager): fixes issues #223 and #237
-- Fixed #217
-- README Update
-- test(cypress): added cypress E2E testing
-- chore(out.json): remove unneded output
-- fix(ui): various bugfixes to UI menus
-- Offline fixes for Firefox 52
-- test(integration.js): increased code coverage
-- refactor(uimanager.js): consolidated sensor selection code
-- feat(analysis): added analysis features and move ootk to a separate location
-- fix(orbitmanager.js): fixed orbit not updating on new launch generation
-- test(integration.js): raised to 80% code coverage
-- fix(graphics): reduced use of framebuffers and overall number of drawing calls
-- chore(package.json): version bump
-- Reorganize Files
-- test(integration.test.js): added integration testing to increase code coverage
-- fix(babel.config.js): cleaned up minor errors that had no impact on code
-- feat(webgl): upgrade to webgl2
-- refactor(multiple): increased code coverage and fixed fringe cases
-- test(integration.test.js): increased code coverage
-- Ocular Occlusion for Earth
-- feat(ui): resizeable menus added
-- Added ocular occlusion for mesh models
-- refactor(sidemenumanager.js): consolidated side menu code from uiManager
-- meshManager fixes
-- dlManager updated
-- library separated internal vs external
-- Renamed dlManager drawManager
-- refactor(helpers.js): extracted color parsing and conversion functions
-- Moved webworkers
-- Godrays
-- test(all): added working jest support for doms, webworkers, and canvas
-- Consolidated constants
-- Consolidated sceneManager and Removed jQuery
-- feat(post-processing): added FXAA support
-- Made mapManager part of uiManager
-- Fixes for offfline tles, atmosphere, camera, meshes
-- Post Processing Resize Fix
-- refactor(ui-validation): extracted validation jquery code from uiManager
-- fix(sidemenumanager): fixed references to depricated sMM functions
-- perf(drawloop): reduced GPU commands
-- perf(dots.js): reduced number of dots in buffer to speed up readpixel calls
-- build(package.json): automatic version and build date scripts added
-- Reduce readPixel calls
-- Remove unused libraries
-- Screenshots, timepicker, and sat-hoverbox bugfixes
-- build(npm scripts): cleaned up npm scripts naming
-- Fixed meshManager webgl error
-- fix(camera.js): fixed issue where reseting camera could get stuck spinning in a circle
-- build(cypress.yml): removed cypress github action
-- Depricated modules folder
-- test(cypress.yml): remove firefox testing
-- fix(dots.js): moved mat4 multiplication from vert shader to js
-- build(startup.js): simplified cypress testing
-- build(e2e.js): disable e2e for now
-- build(webworker): disable webworkers during testing
-- Libraries merged into lib folder
-- build(package.json): added start-server-and-test
-- build(package.json): added npm-run-all
-- build(package.json): downgraded jest
-- selectSatManager moved to drawManager
-- Improved desktop performance
-- build(webworkers): skip workers when in CI mode on github
-- search-box moved
-- Fixed hover and select colors
-- test(cypress.yml): fixed spacing issue
-- test(cypress.yml): fixed formatting
-- Enabled mipmaps
-- test(package.json): added http-server
-- test(cypress.yml): remove last firefox test
-- fix(materialize-local.css): fixed load order of colors
-- test(startup.js): simplified cypress test
-- fix(startup.js): removed redundant global variable references
-- fix(drawmanager.js): fixed resizing from small screen to big screen that caused gpupicking to break
-- test(startup.js): added error handling
-- test(cypress.yml): updated working-directory
-- build(github actions): typo in build command
-- perf(drawmanager.js): removed extra meshManager.draw calls and fixed earthBumpMap
-- test(missilemananger.unit.test.js): removed unnecessary test
-- Reduce DOM Lookups
-- fix(tle.js): added export for offline TLEs
-- build(gpr.js): reenabled linter
-- build(node-ci.yml): simplified node-ci
-- test(node-ci.yml): removed cypress from node-ci
-- orbitManager moved
-- build(package.json): use start-server-and-test for jest
-- chore(package.json): bumped version number
-- build(cypress.yml): made cypress run headless
-- build(node-ci.yml): node version bump
-- chore(package.json): update version number
-- sideMenuManager moved to uiManager
-- readpixels throttle
-- build(node-ci): added build:dev
-- build(node-ci.yml): fix gl issue
-- build(node-ci.yml): remove CI variable
-- test(meshmanager.js): removed testing of meshManager init
-- build(package.json): fixed issue with jest
-- chore(version.js): bump version number
-- test(startup.js): increase wait to 10s
-- chore(package.json): updated version number
-- docs(settingsmanager): updated version number
-- build(node-ci.yml): fixed typo
-- fix(babel.config.js): bugs found in deepsource removed
-- fix(sidemenumanager.js): fixed issue when less than 20 collision events
-- ci(package.json): removed outdated package
-- build(webworker): changed to array
-- build(node-ci.yml): convert node-ci to windows runner
-- build(node-ci.yml): fixed typo
-- test(startup.js): increased waiting to 30s
-- test(cypress.yml): fixed typo
-- fix(satset.js): fixed calculation on how many dots to draw
-- Update node-ci.yml
-- fix(drawmanager.js): typo removed
-- Update is-website-vulnerable.yml
-- fix(sidemenumanager.js): dOM text reinterpreted as HTML
-- Update README.md
-- build(node-ci.yml): added local server
-- test(package.json): added cypress
-- test(cypress.yml): fixed typo
-- build(package.json): created a script for starting a test server on localhost
-- merge conflicts
-- Revert "Revert "Fix DOMContentLoaded issue""
-- Revert "Fix DOMContentLoaded issue"
-- Fix DOMContentLoaded issue
-- Extracted starManager and Made LineFactory
-- Extracted SunCalc and More Explicit Start Order
-- Refactored main.js
-- No ColorScheme Globals and Fixed Sunlight Status
-- ColorSchemeFactory
-- Automatic ES6 Conversion
-- dots class created
-- keeptrack-head renammed settings
-- Established Clear Loading Order
-- Smarter dots buffer use
-- Decoupled parseCatalog
-- twgl for Moon
-- Moon and Atmosphere Switched to TWGL
-- Cleanup SatSet.init
-- Fixed pMatrix Not Updating
-- Class for Satellite gl Actions
-- Reduce Dependencies
-- Fixed bug with appending hoverbox
-- Separated Update Draw and Drawpicking
-- Fix Star Sizes
-- Private Fields Removed
-- Stable SunCalc
-- Removed jQuery from main.js
-- Separate Picking from Positions
-- Revert "Private variables in camera"
-- Clean main.js
-- Separate catalog loading
-- Separated gpu buffer setup
-- Reduce Dependencies
-- Fixed daysold calculations
-- Added gl.DYNAMIC_DRAW
-- Moved webworkers to own folder
-- Fixed raycasting bug when clicking earth
-- Revert "Lint fix for camera.js"
-- Lint fix for camera.js
-- satVmag moved
-- Archived unused js code
-
-#### v3.0.4
-
->  
-
-- Fix .gitattributes Issue
-- Include All Req Image
-- Remove unused files from deepsource
-- Development
-- Github Packages fix
-- Create codeql-analysis.yml
-- Create release.yml
-- Delete npm-publish.yml
-- Create deploy-ghpages.yml
-- Create .deepsource.toml
-- Fix codecov
-- Update release.yml
-- Fix coverage
-- Update .deepsource.toml
-- Add codecov
-- Update README.md
-- Update node-ci.yml
-- Delete npm.yml
-- Create npm.yml
-- Update node-ci.yml
-- Add coverage to package
-
-#### v3.0.3
-
->  
-
-- Development
-- Create CONTRIBUTING.md
-- Fixed Gitattributes
-- Update README.md
-- .gitignore Update
-- Update README.md
-- Example automatic todo
-- Fix Images
-- Update README.md
-- Update README.md
-- Update npm-publish.yml
-- Update npm-publish.yml
-- Update npm-publish.yml
-- Update npm-publish.yml
-- Bump to 3.0.3
-- Update npm-publish.yml
-- Update npm-publish.yml
-- Update npm-publish.yml
-- Update node-ci.yml
-- Update README.md
-- Update npm-publish.yml
-- Update README.md
-
-#### v3.0.2
-
->  
-
-- cameraManager testing added
-- Development
-- Refactor main.js
-- Fixed loading screen issues
-- Update and rename npm.yml to npm-publish.yml
-- Update and rename lint.yml to node-ci.yml
-- Fixed tests
-- Create npm.yml
-- Configured for CI
-- Update node-ci.yml
-- Update node-ci.yml
-- Update node-ci.yml
-- Update lint.yml
-- Update node-ci.yml
-- Update lint.yml
-- Ignore coverage
-- Update npm.yml
-- Update is-website-vulnerable.yml
-
-#### v3.0.1
-
->  
-
-- updateRadarData script
-- Remove highres images
-- Remove radar data
-- Remove radar data
-- Remove 8k images
-- Remove highres images
-- Remove 8k images
-
-#### v3.0.0
-
->  
-
-- Bump mkdirp from 0.5.5 to 1.0.4
-- Upgrade to ES6+
-- eslint rename
-- npm publishing
-- Create dependabot.yml
-- Update lint.yml
-- gitignore
-- Remove hires images
-- Rm package-lock.json
-
-#### v2.8.1
-
->  
-
-- satellite.js to 4.1.3
-- Implement npm
-- PropRate 0 bugfix.
-- Package update
-
-#### v2.8.0
-
->  
-
-- Missile bugfixes. Error toasts. New loading messages.
-
-#### v2.7.5
-
->  
-
-- Better orbit lines. Mobile scrolling bufix.
-
-#### v2.7.4
-
->  
-
-- Fixed to Satellite camera mode bugfixes
-
-#### v2.7.3
-
->  
-
-- Reduce memory leaks
-
-#### v2.7.2
-
->  
-
-- Selected dot color fix
-
-#### v2.7.1
-
->  
-
-- Initial Orbit Determination
-- Numerous bugfixes.
-- 16K images and satellite fixed camera
-- Astronomy and Planetarium fixes. Shader updates.
-- Time propagation bug fixes.
-- Version updated
-- Mobile webgl fixes
-
-#### v2.5.1
-
->  
-
-- RadarData toggle
-- Performance fixes
-- Mobile fixes.
-- frag depth extension fixes
-- radarData auto-import
-- Console Toggle
-
-#### v2.4.0
-
->  
-
-- Create LICENSE
-- Faster indexing and more radarData colors.
-- GNU GPL copyright update
-- Update README.md
-- Bugfixes
-- Update README.md
-- Update README.md
-- license folder rename
-
-#### v2.3.0
-
->  
-
-- Moon fixed. GS database added.
-- radarData module updates
-
-#### v2.2.0
-
->  
-
-- RadarData module updated
-
-#### v2.1.0
-
->  
-
-- Offline fixes and rmManager
-
-#### v2.0.0
-
->  
-
-- Feature locks and bugfixes
-- Fixed running without webserver
-- Right click menu color fix
-
-#### v1.20.12
-
->  
-
-- Relative velocity added
-
-#### v1.20.11
-
->  
-
-- Fix line to satellite from sensor
-
-#### v1.20.10
-
->  
-
-- External data fix
-- Fixed edit satellite menu
-
-#### v1.20.9
-
->  
-
-- External data fix
-
-#### v1.20.8
-
->  
-
-- Show sensor to satellite link. Fix external sensor requests.
-- Missing min files
-
-#### v1.20.7
-
->  
-
-- Zoom more friendly. Fixes #182
-- Multisite lookangles fix
-- Starlink control sites
-- Fixed timeRate handling, missile events, and colorbox issues
-- Galileo satLinkManager
-- External Sources menu
-- Sub 1 Second Loading
-- Lighthouse Report fixes
-- PWA update
-- Version Number Update
-- Service worker update.
-- Fix which assets preloaded
-- Fixed toasts for limitedUI without all the extras of materialize
-- Progressive Web App test
-- Improved PWA
-- Thinner orbit lines when the UI is disabled
-- Increased visibility when searching for satellites
-- Better search menu handling
-- PWA bugfix
-- Ensure a default earth texture loads
-- Manifest files
-- Fix duplicate suns #185
-- Service worker installed first
-- Prevent zoom NaN errors
-- Clear lines too when the screen is cleared
-- Search list dropdown fix
-- Breakup generator fixes
-- PWA update
-- Add license file template
-- Missile manager updated to use new timeManager
-- PWA fix
-- Multisite Lookangles fixed with new timeManager
-- https redirect
-- Alpha settings in webgl off
-- Provide a valid apple-touch-icon
-- webmanifest update
-- PWA update
-- PWA fix
-- PWA remove extra file
-- Unecessary CSS in limitedUI mode is overriding other websites CSS files
-- Multisite lookangles fix 2
-- Charset declaration earlier in page load
-- Fullscreen PWA
-- Bugfix on manifest
-- Favorite icon update
-- Add an Apple touch icon
-- Add a theme-color meta tag
-- Better Apple Touch icon
-
-#### v1.20.1
-
->  
-
-- Pr/179
-- Merge Le-Roi Changes
-- Constellations
-- Footer Nav Style Updates
-- format update
-- code formatting
-- format update
-- Repo Update
-- Fixed formatter issues.
-- Latest From Master
-- working on code format
-- Minimize loading times and add prettier
-- CSS issues and response.html
-- O3b and debris
-- AEHF and auto face Nadir
-- Minified js loading
-- Bugfixes
-- Galileo satellite added
-- Gps satellite model added
-- Add orbcomm and globalstar constellations
-- Added PNames to stars HR3 to HR1003
-- Javascript standard style.
-- Added additional constellations
-- Add sensors and fix sun
-- Embed testing and image preloading
-- Bugfixes
-- Enable draw-less setting
-- Refactor sensorManager attributes
-- Update checker-script.js
-- Updates
-- Reverted json loading
-- pre-multiplied alphas disabled for firefox compatibility
-- Better loading order
-- working on sensor manager
-- Fixed css and time
-- json updates
-- Fix bug from merge
-- Folder Cleanup
-- footer nav tweaks
-- Update checker-script.js
-- Improved atmosphere shader
-- Working on embeded.htnl
-- Skip minified version of satSet
-- Update sensorManager.js
-- typo
-- Typo
-- Missing semicolon
-- Missing missileManager icon
-- Fix conflicts. We need to fix your linter.
-- Update style.css
-
-#### v1.19.10
-
->  
-
-- Fixed mobile clock and unlinked datestring to close #169 and #170
-- More 3D models
-- More meshes and improved camera controls
-- Colored Meshes
-- Astro Space UXDS update
-- Fixed bug
-- Case sensitive Satellite.obj (rename later).
-- Bugfixes
-- Color fixes
-
-#### v1.19.7
-
->  
-
-- After loading updated with readystate function
-- 17-08-2020 keeptrack.space response and compatibility update.
-- Updated UI colors. Close #166
-- Added right click menu on mobile to close #132
-- Close #150
-- revert??
-- update
-- loading update
-- response and compatibility update
-- Update index.htm
-- response update
-- Improved camera controls
-- testing error scripts
-- Working on content loaded
-- Fixed rest of #132
-- response updates
-- Look for an essential file rather than the index.htm
-- Merged changes. Hides analytics and adds https requirement.
-- some tweaks
-- trail and error
-- Performance update for limitedUI mode.
-- Combined Ignores
-- My ignores
-- footer menu fix (SEE LINE COMMENT 2148 UI.JS )
-- Fixed github.io
-
-#### v1.19.3
-
->  
-
-- mesh cleanup
-- Merged sun.js and earth.js
-- meshManager implemented!
-- Updates for limitedUI
-- Mobile resizing and width calculation ignoring scroll bar fixed
-- Better mobile device detection and canvas resize locking #154
-- Remove debug comments
-- Update README.md
-- Updated preview image.
-- Fixed issue with satellite shaders too small until zoom changes
-- Fixed bug that kept reloading previous sensor even after clearing it
-- Update README.md
-- Update README.md
-- timeManager file rename
-
-#### v1.18.3
-
->  
-
-- Added constellations
-- meshManager added with 3d satellite
-- Panning controls implemented
-- Cleaned up settings manager
-- Shader improvements, bump maps, specular lighting
-- Update index.htm
-- response update
-- Limited UI Enhancements
-- response updates
-- Made analytics only turn on when on keeptrack.space #141
-- Local rotation implemented
-- Removed background forced coloring
-- Github Version
-- footer menu fix (SEE LINE COMMENT 2148 UI.JS )
-- Typos in constellations
-- Typos in constellations
-- Fixed bug with time drifting backwards.
-- Fixed typo
-- Removed comma
-
-#### v1.17.0
-
->  
-
-- Atmosphere, performance improvements, and embed support.
-- Atmosphere, Time Machine, and Optional Modules System
-- Added Sun, Moon, and install directory settings
-- Remove Sat Class. Add French SLBM. Fix TruSat Map.
-- Better shaders
-- Better shaders
-- Search and Socrates bug fixes.
-- Local to utc fixed in lookangles formatting
-- updateURL overhaul
-- Fixed install directory code
-- Hi-Res Screenshots
-- Submarine settings in MissileManager
-- satellite.satSensorFOV
-- get parameters updated to use date variable
-- sat-cruncher error catching
-- Notify of color scheme changes
-- github.io Compatibility
-- Dynamic missile apogee added.
-- MissileManager updates
-- Dynamic install location code.
-- Debris only and photo button
-- Match protocol for colorbox
-- TruSat Correction
-- Remove logging
-- Remove .min reference
-
-#### v1.11.2
-
->  
-
-- Bugfixes and persistent sensor. Fixes #138
-- CSO Search added. Group colorscheme fixed.
-- lookangles.js reorganized
-- Code cleanup
-- Best pass times calculator
-- Fix issue #137
-- Age of Elset colorscheme added
-- Fix screen recorder and rise/set lookangles
-- Search slider update
-- Delete todo-issues.yml
-- Create todo-issues.yml
-- Test todo bot
-- Delete to-do-to-issues.yml
-- Update todo-issues.yml
-
-#### v1.10.1
-
->  
-
-- jQuery update and removed depricated references
-- Next Launch Manager added to solve #97
-- Cleanup TODO comments
-- Decayed satellite checks
-- Create Linter
-- is-website-vulnerable
-- Create to-do-to-issues.yml
-- jQquery 3.5.1 update
-- Update README.md
-- Update README.md
-
-#### v1.9.3
-
->  
-
-- Red theme fixes #125
-- Dynamic object colors and color picker in settings
-- SatChng Menu and fixed multiple TODOs
-- Clean lookangles and multisitelooks. Add catalog exports.
-- Cleanup file organization
-- Cleanup file organization
-- Cleanup minor syntax errors
-- Add debugging mode
-- Dynamic mobile mode
-- Force Cache Refresh
-- Analyst Satellite Fixes
-- Update README.md
-- Sensor parameter fixes.
-- Merge
-- Update README.md
-- Update README.md
-- Update README.md
-- Update README.md
-
-#### v1.8.0
-
->  
-
-- fix JS math expression
-- Bug fixes.
-- Visual Magnitudes for satellites. Right Click Menu Changes.
-- Dynamic object colors and color picker in settings
-- Stars Updates, Earth Map Adds, and Breakup/New Launch Fixes
-- Additional Map options from the right click menu.
-- TruSat tie-in
-- TruSat Integration Update
-- Keep last map settings on reload.
-
-#### v1.5.1
-
->  
-
-- Updated video recording (now includes UI) and added sunlight view
-- Added Video Recorder
-- IE bug fixes
-- Reduced position calculations.
-
-#### v1.2.6
-
->  
-
-- Reorganized Files
-- Improved Responsive UI/CSS
-- Added Launch Sites
-- Updated social links.
-
-#### v1.2.4
-
->  
-
-- Added Constellations
-- drawLoop Fix
-- drawLoop Fix
-
-#### v1.2.2
-
->  
-
-- Improved Stars and Constellations
-- Stars and Constellations
-- Astronomy View Improvements
-
-#### v1.1.1
-
->  
-
-- Fixes for offline mode.
-- Support for Mike McCant's TLEs
-- Delete .gitignore
-- Delete .htaccess
-- Cross-browser support for satbox-info
-- Delete .gitattributes
-- Offline bugfix
-- License Typo
-- Remove some files.
-- Delete .jshintrc
-- License Typo
-
-#### v1.0.0
-
->  
-
-- License System Implemented
-- DOP Table Added
-- Small Bugfixes
-- Update README.md
-- Removed offline scripts.
-- Delete keeptrackPreview.jpg
-- Delete dayearth-10800.jpg
-- Delete dayearth-43200.jpg
-- Delete 6_night_16k.jpg
-- Delete 2_earth_16k.jpg
-
-#### v0.48.2
-
->  
-
-- PDOP function finished
-- Started PDOP Calculator
-
-#### v0.48.1
-
->  
-
-- Surveillance and FOV Bubble modes.
-- Right Click Menu Added
-- Enabled multisat satoverfly mode. Minor UI fixes.
-- Partial undo of IE11 Fix.
-
-#### v0.42.7
-
->  
-
-- Performance Updates
-- Bug Fixes
-- Updated Libraries.
-- Moved group creation to a web worker and drastically increased load time
-- More Performance Updates
-- Fixed group creation and coloring.
-- Fixed group-cruncher bugs + added performance scaling for sat-cruncher.
-- Performance Improvements
-- Performance Improvements
-- Planetarium view bug fixes.
-- Added satellite overfly options.
-- Added satellite overfly options.
-- Fixed infinite loop in mobile.hidesearch
-- Low Performance Mode
-- Reducing performance hit on recoloring
-- Fixed missile conflicts with new markers
-- Downgraded unneeded Float32Array to Int8Array
-- Fixed issue with single click on mobile.
-- Less DOM Creation
-- Fixed bug in satcruncher related to satellite overfly.
-- IE11 Bugfix.
-- Bugfix for mobile.
-- Update version number
-- SatCruncher ignore markers unless enabled.
-- Ignore markers unless enabled during satSet.draw
-- Canvas bugfix.
-- Update Version
-
-#### v0.36.1
-
->  
-
-- Reworked mobile controls and consolidated html files.
-- Reworked mobile controls and consolidated html files.
-- SOCRATES fixed. Border added to menus.
-- ESA sensors added. Mobile CSS improved.
-- Improved mobile UI
-- Sat Label and Demo Modes added. New HiRes images.
-- Moved colorscheme to a side menu.
-- Added Sensor FOV Bubbles
-- Countries color scheme added.
-- Consolidated legend menu changes.
-- Moved colors from color-scheme to settingsManager.
-- Consolidated files.
-- New loading screen, slimmer ui, and mobile controls.
-- Fullscreen mobile interface.
-- Fixes to date picker and mobile menus.
-- Fixed bugs in satinfobox menu.
-- Fixed minor UI issues with Multi Sensor menu.
-- Fixed bug with 2D map resizing on mobile.
-- UI Updates
-- Fixed bug with bottom menu.
-- Fixed mobile touch sensitivity.
-- Fixed desktop movement and legend color toggles.
-- Fixed bug with launch facilities not displaying full names.
-- Better caching prevention.
-- Fixed scroll on bottom icons when mobile.
-- Variable sized fragment shaders
-- Better hires images.
-- Fixed bug that crashes multitouch on mobile.
-
-#### v0.34.0
-
->  
-
-- Fixed #89 and #90
-- Fixed #89 and #90
-- Changes to Planetarium Camera Mode. Fixed #83.
-- Changes to Planetarium Camera Mode. Fixed #83.
-- Fixed #81. Map settings needed updated on load.
-- Downgraded satcruncher from satellite.js 2.0.2 to 1.3 for better speed
-- Vertex Shader can now be changed realtime.
-- Legend UI is now a toggle for satellite visibility.
-- Added geolocation options when using https.
-- Added license info from James Yoder/thingsinspace.
-- Add hires option from GET variable.
-- Adjusted cameraType.SATELLITE movement. Q and E for rotation.
-- Allow passing mw, retro, vec, etc via GET instead of different filenames
-- Update .igtignore
-- Harder to deselect selectedsat when in satellite camera view.
-- Fixed fieldOfView code.
-- Fixed fieldOfView code.
-- Fixed fieldOfView code.
-
-#### v0.33.0
-
->  
-
-- Added planetarium and satellite camera views
-
-#### v0.32.0
-
->  
-
-- Minor fixes.
-- Added an vector version of the offline version.
-- Added vector image.
-- Added vector image.
-- Fixed bug in view sats in FOV. Started multithreading SGP4.
-- Fixed timeManager.now errors and added Editor.htm
-- Changed offline satbox update interval. Added more optional information for offline versions.
-- Planetarium Camera View Added
-- Fixed error in offline only version due to load order.
-- Corrected date error in settings.
-
-#### v0.30.7
-
->  
-
-- Updated merging function for offline use.
-
-#### v0.30.6
-
->  
-
-- Separated UI from main.js
-- InView for all SSN sensors added.
-- Fixed performance issue with sat-cruncher and overlay.
-- Overlay updated to recalculate times when needed.
-- _updateOverlay causes jittering
-- Reduce garbage collection in sat-cruncher.js
-- Fixed theme problems
-- In default view only calculate colors if inview changes.
-- Fixed bug with legend reseting colorscheme
-
-#### v0.30.5
-
->  
-
-- Develop
-- Develop
-- Develop
-- Develop
-- Develop
-- Develop
-- Develop
-- Rise Set Lookangle Times
-- Organize
-- Upgraded to satellite.js 1.4.0
-- Separated main functions into separate files. Trying to reduce global variables and optimize each of the main functions.
-- Remove admin folder.
-- Replacing strings with single references in variable.js. Addresses issue #72
-- Fixed multisite propagation and added Cobra Dane
-- Missile Generator added.
-- Renamed internal functions.
-- Minor Changes
-- Fixed some red theme problems.
-- Added Offline Version
-- Added a retro version set to March 13, 2000. Fixed a few incorrect launch sites.
-- Added MW page to display only missiles.
-- No External Sources
-- Material Font, SSN Lookangles, and Custom Sensors
-- Updated ballistic missiles.
-- Added mini loading screen and touch controls for date/time picker.
-- Stereographic Map and Telescopes
-- Integrated lookangles.js with satellite.js.
-- Standardize variable names.
-- Created timeManager and reduced jQuery calls during drawLoop.
-- About Author Icon
-- Optimizations to reduce garbage collection. Ugly code.
-- timeManager organized and unnecessary public functions and variables hidden
-- Cleaned up extra satellite functions.
-- Updated editor to allow additional satellite information and a URL to be added.
-- New Interface Finished
-- Reduced need for garbage collection on loops.
-- Created custom objects with static variable to display launch sites
-- Added overlay for watchlist items and yellow highlighting for inview watchlist items.
-- Mobile Version
-- Added more launch sites for nominal creator and fixed some styling problems on side menus where bottom 50px were cutoff.
-- Fixed nominal creator functions. Main error was caused by converting string to a number - leftover from old version.
-- Optimized the search function. Remove a lot of unnecessary extra variables.
-- Add three camera modes (default, offset, FPS).
-- Reduced unnecessary variables in lookangles methods.
-- Few bugfixes where proprealtime was off by a few milliseconds.
-- Added limitSats GET variable to filter out extra satellites
-- Added ability to have additional satellites in a local file for offline mode.
-- Added mobile controls
-- Added legend to the top right to address issue "Legend for Colors".
-- Added legend to the top right to address issue #23 (Legend for Colors).
-- Organized braun.js and renammed mapper.
-- Custom Sensor Menu
-- Removed Changelog. Pulled drawLoop variables to global scope. Fixed altitude check for calculating zoom.
-- Custom Sensor Menu
-- Combined FOV-bubble.js and line.js into drawLoop-shapes.js
-- Fixed orbit search. Added watchlist red theme when inview.
-- TLE saving and loading added.
-- Progress on Breakup Simulator
-- Fixed map for IE 9 & 10.
-- Add watchlist menu.
-- Missile creation page updated to add premade list of targets.
-- Added show distance on hover feature and fixed jday calculation glitch in elset age.
-- Mobile controls tapandhold functionality added.
-- Code cleanup
-- North or South Option on Nominals
-- Error Checking on Satellite Edit
-- Added setting to increase sharpness of satellties
-- Optimized search time and groups.js code. Related to issue #10
-- Deconflict with Master Branch
-- Added different legends depending on the current colorscheme
-- Enabled bottom menus when sensor is selected from the map.
-- Added License Key for Offline Only users.
-- Updated About Info
-- Socrates optimization.
-- Removed Ligatures for IE Compatibility
-- Added watchlist save and load buttons.
-- Fixed glitch preventing launches to the north.
-- Added filter options to the settings menu for convienence.
-- Added JDAY to the top left.
-- Reorganized js libraries to a separate folder.
-- search-box.js reorganized.
-- Text Highlighting Fixed
-- Cleaned up settings menu.
-- Added alert text when camera mode changed.
-- Optimized syncing mechanism for multiple catalogues.
-- Formatted sun.js like other functions.
-- Updated version number.
-- Removed multiple declarations of the current time "now" that were causing incorrect values in the satbox when proprate was not 1.
-- SensorSelected Variable
-- Added current time check to nominal creator. Solves issue #67.
-- Removed admin folder from github.
-- Show Next Pass in Sat Box
-- More Launch Sites
-- Fixed sun exclusion times.
-- Cleanup main folder.
-- Removed unnecessary getSatIdFromCoord calls from drawloop.
-- Fixed edit satellite function.
-- Social Media Links
-- Updated about page.
-- Made show distance default
-- Reorganized settingsManager.
-- Moved simulations to cleanup main folder.
-- Less choppy mobile controls
-- Removing duplicate jday functions.
-- Fixed 2d map.
-- Fixed multisensorlookangles
-- Updated gitignore
-- Fixed bug where all dropdown menus had extra bottom padding
-- Fixed map update override.
-- Added check to hide SOCRATES menu if the limitSats filter is on.
-- Fixed error message in timeManager that was in the wrong spot.
-- RCS color display fixed to account for actual RCS values not size groups
-- Readd satData copy to searchBox.init
-- Fixed mobile sliders color and prevented default keyboard popup.
-- Right Mouse Click Fixed
-- Red theme removed if last object from watchlist is removed while inview.
-- Update version number.
-- Added public github link.
-- Adjusted RCS check in colorscheme so that Small Satellites now display correctly.
-- Updated index Date
-- Updated gitignore
-- Version Fixed
-- Fixed bug on index.htm where side menus were missing.
-- This should fix issue #70.
-- Updated version number.
-- Increment version number
-- Updated version number.
-- Shortened option description in settings menu.
-- Updated version number
-- Updated version number
-- Updated version number.
-- Version number updated.
-- Cleanup github
-- Fixed glitch caused by static objects in satcache.
-- Right Mouse Click Fixed
-
-#### v0.10.0
-
->  
-
-- Develop
-- Develop
-- UI Overhaul
-- TLE Minification
-- UI Overhaul
-- Only FOV Option
-- Optional Show Next Pass
-
-#### v0.9.2
-
->  
-
-- Develop
-- TLE Update
-- Satellite Editor
-- Fixed iframes
-- Alternate Launch Menu
-- Edit Satellites
-- ISS Stream, Launch Updater, and Socrates Improvements
-- MultiSite Lookangles
-- sat-cruncher Semi-Standard
-- Improved Multi Site Lookangles
-- Disable Bottom Icons Initially
-- Country Menu Improved
-- Variable Cleanup
-- Settings Menu
-- Settings Menu Update
-- Future Next Pass Feature and Removed Memory Leak
-- TAGs Updated
-- Version Number Menu
-- Socrates Menu Functionality
-- Default Messages Changed\nChanged the default messages to make them more obvious if there is a js error.
-- Prevent Shake Effect Failures
-- Fixed Tooltips
-- NORAD Number Search
-- Find Near Objects Fixed
-- Disable Look Angles Until Sensor Selected
-- Proprate Fixed
-- Links and Version Number Box
-- Disable Weather if No Weather Maps
-- Variables Optional
-- Version Number Updated
-- Updated Ignore
-- Updated Ignore File
-- Fixed Index.htm
-- Testing Git Commit
-- Version Box Fixed
-- Version Box Updated
-- Reduced Max Orbits
-- Default Messages Changed
-- Default Messages Changed" -m "Changed the default messages to make them more obvious if there is a js error.
-- FIxed ELSET Parser
-- Renamed Images
-
-#### v0.5.2
-
->  
-
-- Fixed Open Issues
-
-#### v0.5.1
-
->  
-
-- Admin Section Added
-- Updated README for v0.5.0
-
-#### v0.5.0
-
->  
-
-- Revert "Javascript Semi-Standard Compliant"
-- Revert "SOCRATES"
-- SOCRATES
-- SOCRATES
-- Remove Old Files
-
-#### v0.4.0
-
->  
-
-- Javascript Semi-Standard Compliant
-- Create README.md
-- Update README.md
+### [v11.0.2](https://github.com/thkruz/keeptrack.space/compare/v3.2.0...v11.0.2)
+
+>  
+
+- Refactor SettingsManager [`#1240`](https://github.com/thkruz/keeptrack.space/pull/1240)
+- v11.0.1 [`#1227`](https://github.com/thkruz/keeptrack.space/pull/1227)
+- v11 [`#1198`](https://github.com/thkruz/keeptrack.space/pull/1198)
+- Maneuver detection [`#1225`](https://github.com/thkruz/keeptrack.space/pull/1225)
+- chore(deps-dev): bump @babel/core from 7.26.10 to 7.28.4 [`#1220`](https://github.com/thkruz/keeptrack.space/pull/1220)
+- fix: applied null safe checks [`#1217`](https://github.com/thkruz/keeptrack.space/pull/1217)
+- fix: :bug: fix missing dependencies for normal build [`#1205`](https://github.com/thkruz/keeptrack.space/pull/1205)
+- Develop [`#1196`](https://github.com/thkruz/keeptrack.space/pull/1196)
+- fix: :bug: add warning message for satellite orbit optimization and i… [`#1194`](https://github.com/thkruz/keeptrack.space/pull/1194)
+- 10.8.4 [`#1192`](https://github.com/thkruz/keeptrack.space/pull/1192)
+- v10.8.3 [`#1184`](https://github.com/thkruz/keeptrack.space/pull/1184)
+- v10.8.2 [`#1179`](https://github.com/thkruz/keeptrack.space/pull/1179)
+- chore: :bookmark: update subproject commit reference in plugins-pro [`#1170`](https://github.com/thkruz/keeptrack.space/pull/1170)
+- chore: :bookmark: update subproject commit reference in plugins-pro [`#1169`](https://github.com/thkruz/keeptrack.space/pull/1169)
+- Develop [`#1168`](https://github.com/thkruz/keeptrack.space/pull/1168)
+- Develop [`#1167`](https://github.com/thkruz/keeptrack.space/pull/1167)
+- 10.8.0 [`#1163`](https://github.com/thkruz/keeptrack.space/pull/1163)
+- Develop [`#1159`](https://github.com/thkruz/keeptrack.space/pull/1159)
+- Develop [`#1156`](https://github.com/thkruz/keeptrack.space/pull/1156)
+- Develop [`#1149`](https://github.com/thkruz/keeptrack.space/pull/1149)
+- Develop [`#1147`](https://github.com/thkruz/keeptrack.space/pull/1147)
+- Develop [`#1141`](https://github.com/thkruz/keeptrack.space/pull/1141)
+- Develop [`#1127`](https://github.com/thkruz/keeptrack.space/pull/1127)
+- fix: :bug: update logo image path and format URLs in installation ins… [`#1108`](https://github.com/thkruz/keeptrack.space/pull/1108)
+- Develop [`#1107`](https://github.com/thkruz/keeptrack.space/pull/1107)
+- Develop [`#1106`](https://github.com/thkruz/keeptrack.space/pull/1106)
+- Develop [`#1103`](https://github.com/thkruz/keeptrack.space/pull/1103)
+- Develop [`#1102`](https://github.com/thkruz/keeptrack.space/pull/1102)
+- fix: :bug: standardize texture quality values to lowercase in MobileM… [`#1101`](https://github.com/thkruz/keeptrack.space/pull/1101)
+- Develop [`#1098`](https://github.com/thkruz/keeptrack.space/pull/1098)
+- fix: :bug: Improve Safari detection logic for better browser compatib… [`#1097`](https://github.com/thkruz/keeptrack.space/pull/1097)
+- fix: :bug: update hostname check for copyright notice in splash screen [`#1096`](https://github.com/thkruz/keeptrack.space/pull/1096)
+- Hotfixes [`#1095`](https://github.com/thkruz/keeptrack.space/pull/1095)
+- fix: :ambulance: fix outreach not loading due to new API schema [`#1087`](https://github.com/thkruz/keeptrack.space/pull/1087)
+- Hotfixes [`#1084`](https://github.com/thkruz/keeptrack.space/pull/1084)
+- fix: :ambulance: fix vimpel issues with R2 CORS [`#1083`](https://github.com/thkruz/keeptrack.space/pull/1083)
+- Bug Fixes. Bump to 10.5.1 [`#1077`](https://github.com/thkruz/keeptrack.space/pull/1077)
+- fix: :ambulance: fix covariance ellipsoids breaking mobile [`#1076`](https://github.com/thkruz/keeptrack.space/pull/1076)
+- fix: :bug: fix lack of variety in loading screens [`#1075`](https://github.com/thkruz/keeptrack.space/pull/1075)
+- build(deps): bump uuid from 9.0.1 to 11.1.0 [`#1035`](https://github.com/thkruz/keeptrack.space/pull/1035)
+- build(deps): bump flag-icons from 7.2.3 to 7.3.2 [`#1033`](https://github.com/thkruz/keeptrack.space/pull/1033)
+- New Color Schemes and Filter Menu [`#1044`](https://github.com/thkruz/keeptrack.space/pull/1044)
+- fix: :bug: fix offline mode [`#1043`](https://github.com/thkruz/keeptrack.space/pull/1043)
+- Develop [`#1040`](https://github.com/thkruz/keeptrack.space/pull/1040)
+- build(deps-dev): bump @types/webgl2 from 0.0.10 to 0.0.11 [`#925`](https://github.com/thkruz/keeptrack.space/pull/925)
+- Develop [`#1032`](https://github.com/thkruz/keeptrack.space/pull/1032)
+- Develop [`#1031`](https://github.com/thkruz/keeptrack.space/pull/1031)
+- fix: :bug: add fixes for bad colorscheme values and velocity scheme [`#1029`](https://github.com/thkruz/keeptrack.space/pull/1029)
+- Develop [`#1028`](https://github.com/thkruz/keeptrack.space/pull/1028)
+- fix: :ambulance: fix color schemes relying on class name that change … [`#1027`](https://github.com/thkruz/keeptrack.space/pull/1027)
+- fix: :ambulance: fix color schemes relying on class name that change … [`#1026`](https://github.com/thkruz/keeptrack.space/pull/1026)
+- Develop [`#1025`](https://github.com/thkruz/keeptrack.space/pull/1025)
+- fix: :beers: fix k vs K [`#1024`](https://github.com/thkruz/keeptrack.space/pull/1024)
+- Develop [`#1023`](https://github.com/thkruz/keeptrack.space/pull/1023)
+- fix: :bug: stop using LFS for cloudflare compatibility [`#1022`](https://github.com/thkruz/keeptrack.space/pull/1022)
+- fix: :ambulance: fix color scheme not loading [`#1021`](https://github.com/thkruz/keeptrack.space/pull/1021)
+- fix: :ambulance: fix issue with color scheme freezing [`#1020`](https://github.com/thkruz/keeptrack.space/pull/1020)
+- Develop [`#1019`](https://github.com/thkruz/keeptrack.space/pull/1019)
+- Develop [`#1017`](https://github.com/thkruz/keeptrack.space/pull/1017)
+- fix: :ambulance: fix missing parentheses [`#1016`](https://github.com/thkruz/keeptrack.space/pull/1016)
+- Develop [`#1015`](https://github.com/thkruz/keeptrack.space/pull/1015)
+- Develop [`#1013`](https://github.com/thkruz/keeptrack.space/pull/1013)
+- Aldoria Additions and Other Updates [`#1012`](https://github.com/thkruz/keeptrack.space/pull/1012)
+- Develop [`#1007`](https://github.com/thkruz/keeptrack.space/pull/1007)
+- Develop [`#1006`](https://github.com/thkruz/keeptrack.space/pull/1006)
+- Develop [`#1005`](https://github.com/thkruz/keeptrack.space/pull/1005)
+- Develop [`#1004`](https://github.com/thkruz/keeptrack.space/pull/1004)
+- refactor: :recycle: update tle path to use v2 of API [`#1003`](https://github.com/thkruz/keeptrack.space/pull/1003)
+- Develop [`#1002`](https://github.com/thkruz/keeptrack.space/pull/1002)
+- Develop [`#1001`](https://github.com/thkruz/keeptrack.space/pull/1001)
+- fix: :arrow_up: bump ootk [`#1000`](https://github.com/thkruz/keeptrack.space/pull/1000)
+- Develop [`#999`](https://github.com/thkruz/keeptrack.space/pull/999)
+- Develop [`#998`](https://github.com/thkruz/keeptrack.space/pull/998)
+- Develop [`#991`](https://github.com/thkruz/keeptrack.space/pull/991)
+- Develop [`#990`](https://github.com/thkruz/keeptrack.space/pull/990)
+- Develop [`#975`](https://github.com/thkruz/keeptrack.space/pull/975)
+- fix: :zap: improve orbit finder algorithm for breakups [`#970`](https://github.com/thkruz/keeptrack.space/pull/970)
+- Develop [`#965`](https://github.com/thkruz/keeptrack.space/pull/965)
+- Address Issues Found on Hacker News [`#957`](https://github.com/thkruz/keeptrack.space/pull/957)
+- Develop [`#955`](https://github.com/thkruz/keeptrack.space/pull/955)
+- Develop [`#954`](https://github.com/thkruz/keeptrack.space/pull/954)
+- Develop [`#953`](https://github.com/thkruz/keeptrack.space/pull/953)
+- Develop [`#952`](https://github.com/thkruz/keeptrack.space/pull/952)
+- Sateliot [`#951`](https://github.com/thkruz/keeptrack.space/pull/951)
+- Develop [`#948`](https://github.com/thkruz/keeptrack.space/pull/948)
+- fix: :ambulance: fix error when no satellite selected [`#947`](https://github.com/thkruz/keeptrack.space/pull/947)
+- fix: :bug: fix transponder menu being enabled incorrectly [`#946`](https://github.com/thkruz/keeptrack.space/pull/946)
+- feat: :sparkles: add geo satellite transponder info [`#945`](https://github.com/thkruz/keeptrack.space/pull/945)
+- Develop [`#943`](https://github.com/thkruz/keeptrack.space/pull/943)
+- Updates to TIP Plugin [`#942`](https://github.com/thkruz/keeptrack.space/pull/942)
+- fix: :bug: fix flickering on mobile [`#936`](https://github.com/thkruz/keeptrack.space/pull/936)
+- Develop [`#935`](https://github.com/thkruz/keeptrack.space/pull/935)
+- Develop [`#934`](https://github.com/thkruz/keeptrack.space/pull/934)
+- Develop [`#933`](https://github.com/thkruz/keeptrack.space/pull/933)
+- Develop [`#921`](https://github.com/thkruz/keeptrack.space/pull/921)
+- fix: :ambulance: emergency fix [`#920`](https://github.com/thkruz/keeptrack.space/pull/920)
+- fix: fix analytics on localhost [`#919`](https://github.com/thkruz/keeptrack.space/pull/919)
+- Develop [`#918`](https://github.com/thkruz/keeptrack.space/pull/918)
+- Develop [`#917`](https://github.com/thkruz/keeptrack.space/pull/917)
+- Develop [`#910`](https://github.com/thkruz/keeptrack.space/pull/910)
+- docs: :memo: fix readme links [`#909`](https://github.com/thkruz/keeptrack.space/pull/909)
+- ci: :construction_worker: allow npm audit to fail but open an issue [`#908`](https://github.com/thkruz/keeptrack.space/pull/908)
+- Develop [`#907`](https://github.com/thkruz/keeptrack.space/pull/907)
+- Develop [`#906`](https://github.com/thkruz/keeptrack.space/pull/906)
+- Develop [`#905`](https://github.com/thkruz/keeptrack.space/pull/905)
+- Develop [`#904`](https://github.com/thkruz/keeptrack.space/pull/904)
+- fix: :ambulance: fix one bad satellite breaking website [`#901`](https://github.com/thkruz/keeptrack.space/pull/901)
+- Develop [`#896`](https://github.com/thkruz/keeptrack.space/pull/896)
+- fix: :ambulance: fix new launch plugin [`#895`](https://github.com/thkruz/keeptrack.space/pull/895)
+- fix: :bug: multiple bug fixes related to color buffer updates [`#893`](https://github.com/thkruz/keeptrack.space/pull/893)
+- fix: :zap: fix performance bug and css issues [`#892`](https://github.com/thkruz/keeptrack.space/pull/892)
+- test: :white_check_mark: fix broken tests [`#891`](https://github.com/thkruz/keeptrack.space/pull/891)
+- Develop [`#890`](https://github.com/thkruz/keeptrack.space/pull/890)
+- Develop [`#887`](https://github.com/thkruz/keeptrack.space/pull/887)
+- Develop [`#874`](https://github.com/thkruz/keeptrack.space/pull/874)
+- Hotfix to deprecated plot plugins impacting app even when disabled. [`#873`](https://github.com/thkruz/keeptrack.space/pull/873)
+- KeepTrack v9.0.0 [`#836`](https://github.com/thkruz/keeptrack.space/pull/836)
+- Develop [`#829`](https://github.com/thkruz/keeptrack.space/pull/829)
+- Develop [`#820`](https://github.com/thkruz/keeptrack.space/pull/820)
+- build(deps-dev): bump @types/webgl2 from 0.0.6 to 0.0.10 [`#797`](https://github.com/thkruz/keeptrack.space/pull/797)
+- build(deps-dev): bump cypress from 12.17.4 to 13.6.1 [`#819`](https://github.com/thkruz/keeptrack.space/pull/819)
+- build(deps-dev): bump @types/jquery from 3.5.14 to 3.5.29 [`#814`](https://github.com/thkruz/keeptrack.space/pull/814)
+- Develop [`#818`](https://github.com/thkruz/keeptrack.space/pull/818)
+- Develop [`#816`](https://github.com/thkruz/keeptrack.space/pull/816)
+- Develop [`#805`](https://github.com/thkruz/keeptrack.space/pull/805)
+- Develop [`#802`](https://github.com/thkruz/keeptrack.space/pull/802)
+- Develop [`#800`](https://github.com/thkruz/keeptrack.space/pull/800)
+- Develop [`#788`](https://github.com/thkruz/keeptrack.space/pull/788)
+- fix: :bug: fix typo in time-machine logic [`#782`](https://github.com/thkruz/keeptrack.space/pull/782)
+- Develop [`#781`](https://github.com/thkruz/keeptrack.space/pull/781)
+- 772 right click create sensor here [`#780`](https://github.com/thkruz/keeptrack.space/pull/780)
+- Develop [`#771`](https://github.com/thkruz/keeptrack.space/pull/771)
+- Develop [`#769`](https://github.com/thkruz/keeptrack.space/pull/769)
+- refactor: :fire: revert to google analytics [`#768`](https://github.com/thkruz/keeptrack.space/pull/768)
+- feat: :sparkles: new splash screens [`#766`](https://github.com/thkruz/keeptrack.space/pull/766)
+- feat: :sparkles: add searchLimit param to settings [`#765`](https://github.com/thkruz/keeptrack.space/pull/765)
+- Develop [`#763`](https://github.com/thkruz/keeptrack.space/pull/763)
+- feat: :sparkles: abstract camera and add dark-clouds preset [`#761`](https://github.com/thkruz/keeptrack.space/pull/761)
+- fix: :bug: fix issue in mobile logic [`#757`](https://github.com/thkruz/keeptrack.space/pull/757)
+- feat: :sparkles: update gamepad logic [`#756`](https://github.com/thkruz/keeptrack.space/pull/756)
+- Develop [`#755`](https://github.com/thkruz/keeptrack.space/pull/755)
+- fix: :bug: fixes for iframes [`#745`](https://github.com/thkruz/keeptrack.space/pull/745)
+- feat: :sparkles: update iframe example [`#744`](https://github.com/thkruz/keeptrack.space/pull/744)
+- Develop [`#743`](https://github.com/thkruz/keeptrack.space/pull/743)
+- feat: :sparkles: update readme [`#742`](https://github.com/thkruz/keeptrack.space/pull/742)
+- fix: :bug: fix illegal return [`#741`](https://github.com/thkruz/keeptrack.space/pull/741)
+- Develop [`#740`](https://github.com/thkruz/keeptrack.space/pull/740)
+- ci: :rotating_light: fix minor linter error [`#733`](https://github.com/thkruz/keeptrack.space/pull/733)
+- ci: :construction_worker: expand ignore list for deploy [`#732`](https://github.com/thkruz/keeptrack.space/pull/732)
+- ci: :construction_worker: fix ignore list for sftp [`#731`](https://github.com/thkruz/keeptrack.space/pull/731)
+- ci: :construction_worker: fix ignore list for sftp [`#730`](https://github.com/thkruz/keeptrack.space/pull/730)
+- ci: :construction_worker: fix sftp typo [`#729`](https://github.com/thkruz/keeptrack.space/pull/729)
+- ci: :construction_worker: fix sftp ignore list [`#728`](https://github.com/thkruz/keeptrack.space/pull/728)
+- ci: :construction_worker: fix sftp settings [`#727`](https://github.com/thkruz/keeptrack.space/pull/727)
+- ci: :construction_worker: use new sftp deployer [`#726`](https://github.com/thkruz/keeptrack.space/pull/726)
+- ci: :construction_worker: fix ci/cd increase timeout [`#725`](https://github.com/thkruz/keeptrack.space/pull/725)
+- Develop [`#724`](https://github.com/thkruz/keeptrack.space/pull/724)
+- ci: :pencil2: sftp to ftps [`#723`](https://github.com/thkruz/keeptrack.space/pull/723)
+- Develop [`#722`](https://github.com/thkruz/keeptrack.space/pull/722)
+- ci: :construction_worker: fix ci/cd sftp [`#721`](https://github.com/thkruz/keeptrack.space/pull/721)
+- ci: :construction_worker: update ci/cd pipeline [`#715`](https://github.com/thkruz/keeptrack.space/pull/715)
+- fix gh-pages deployment [`#714`](https://github.com/thkruz/keeptrack.space/pull/714)
+- fix ci/cd [`#713`](https://github.com/thkruz/keeptrack.space/pull/713)
+- ci: :construction_worker: update ci/cd pipeline [`#712`](https://github.com/thkruz/keeptrack.space/pull/712)
+- Minor updates [`#711`](https://github.com/thkruz/keeptrack.space/pull/711)
+- Keep Track Version 8 [`#691`](https://github.com/thkruz/keeptrack.space/pull/691)
+- Update [`#668`](https://github.com/thkruz/keeptrack.space/pull/668)
+- v7.2 [`#662`](https://github.com/thkruz/keeptrack.space/pull/662)
+- Add .circleci/config.yml [`#663`](https://github.com/thkruz/keeptrack.space/pull/663)
+- New version [`#639`](https://github.com/thkruz/keeptrack.space/pull/639)
+- Main [`#640`](https://github.com/thkruz/keeptrack.space/pull/640)
+- test: :adhesive_bandage: fix testing issue causing jest to fail on gi… [`#609`](https://github.com/thkruz/keeptrack.space/pull/609)
+- Update [`#608`](https://github.com/thkruz/keeptrack.space/pull/608)
+- Update [`#591`](https://github.com/thkruz/keeptrack.space/pull/591)
+- minor bug fixes [`#588`](https://github.com/thkruz/keeptrack.space/pull/588)
+- Version 7.1 [`#577`](https://github.com/thkruz/keeptrack.space/pull/577)
+- Update to 7.0 [`#563`](https://github.com/thkruz/keeptrack.space/pull/563)
+- Update [`#550`](https://github.com/thkruz/keeptrack.space/pull/550)
+- Update [`#542`](https://github.com/thkruz/keeptrack.space/pull/542)
+- build(deps-dev): bump @babel/plugin-proposal-private-methods from 7.16.11 to 7.18.6 [`#531`](https://github.com/thkruz/keeptrack.space/pull/531)
+- build(deps): bump echarts from 5.3.2 to 5.3.3 [`#536`](https://github.com/thkruz/keeptrack.space/pull/536)
+- build(deps-dev): bump mini-css-extract-plugin from 2.6.0 to 2.6.1 [`#538`](https://github.com/thkruz/keeptrack.space/pull/538)
+- Upgrade dependencies [`#534`](https://github.com/thkruz/keeptrack.space/pull/534)
+- build(deps-dev): bump husky from 7.0.4 to 8.0.1 [`#530`](https://github.com/thkruz/keeptrack.space/pull/530)
+- build(deps-dev): bump @testing-library/jest-dom from 5.16.2 to 5.16.4 [`#529`](https://github.com/thkruz/keeptrack.space/pull/529)
+- build(deps-dev): bump @typescript-eslint/parser from 5.12.1 to 5.30.7 [`#532`](https://github.com/thkruz/keeptrack.space/pull/532)
+- build(deps-dev): bump ponicode from 0.61.3 to 0.70.11 [`#533`](https://github.com/thkruz/keeptrack.space/pull/533)
+- Develop [`#528`](https://github.com/thkruz/keeptrack.space/pull/528)
+- Develop [`#519`](https://github.com/thkruz/keeptrack.space/pull/519)
+- Develop [`#518`](https://github.com/thkruz/keeptrack.space/pull/518)
+- refactor: :label: convert om-manager to typescript [`#513`](https://github.com/thkruz/keeptrack.space/pull/513)
+- Develop [`#509`](https://github.com/thkruz/keeptrack.space/pull/509)
+- Develop3 [`#508`](https://github.com/thkruz/keeptrack.space/pull/508)
+- feat: :card_file_box: update catalog [`#498`](https://github.com/thkruz/keeptrack.space/pull/498)
+- fix: :green_heart: update docker.google instructions [`#496`](https://github.com/thkruz/keeptrack.space/pull/496)
+- Develop [`#495`](https://github.com/thkruz/keeptrack.space/pull/495)
+- feat: :zap: optimize milky way textures and rotate [`#491`](https://github.com/thkruz/keeptrack.space/pull/491)
+- Develop [`#490`](https://github.com/thkruz/keeptrack.space/pull/490)
+- Develop [`#488`](https://github.com/thkruz/keeptrack.space/pull/488)
+- Develop [`#482`](https://github.com/thkruz/keeptrack.space/pull/482)
+- Develop [`#481`](https://github.com/thkruz/keeptrack.space/pull/481)
+- fix: :ambulance: fix photomanager icon not loading [`#470`](https://github.com/thkruz/keeptrack.space/pull/470)
+- fix: :ambulance: fix image not found on linux ending in / [`#469`](https://github.com/thkruz/keeptrack.space/pull/469)
+- Develop [`#468`](https://github.com/thkruz/keeptrack.space/pull/468)
+- Develop [`#452`](https://github.com/thkruz/keeptrack.space/pull/452)
+- build: :arrow_up: upgrade dependencies [`#449`](https://github.com/thkruz/keeptrack.space/pull/449)
+- Develop [`#448`](https://github.com/thkruz/keeptrack.space/pull/448)
+- ci: :construction_worker: add cypress to pipeline [`#441`](https://github.com/thkruz/keeptrack.space/pull/441)
+- Develop [`#440`](https://github.com/thkruz/keeptrack.space/pull/440)
+- refactor: :heavy_minus_sign: remove old dependencies [`#439`](https://github.com/thkruz/keeptrack.space/pull/439)
+- ci: :construction_worker: update codecov settings [`#438`](https://github.com/thkruz/keeptrack.space/pull/438)
+- Develop [`#437`](https://github.com/thkruz/keeptrack.space/pull/437)
+- ci: :construction_worker: add github actions back to main branch [`#434`](https://github.com/thkruz/keeptrack.space/pull/434)
+- Develop [`#433`](https://github.com/thkruz/keeptrack.space/pull/433)
+- Develop [`#432`](https://github.com/thkruz/keeptrack.space/pull/432)
+- fix: :ambulance: fixed post processing manager [`#431`](https://github.com/thkruz/keeptrack.space/pull/431)
+- fix: :rotating_light: fixed sonarqube errors [`#430`](https://github.com/thkruz/keeptrack.space/pull/430)
+- Develop [`#428`](https://github.com/thkruz/keeptrack.space/pull/428)
+- build: :rotating_light: ignore database file [`#427`](https://github.com/thkruz/keeptrack.space/pull/427)
+- build: :rotating_light: minor fixes for sonarlint warnings [`#426`](https://github.com/thkruz/keeptrack.space/pull/426)
+- Develop [`#422`](https://github.com/thkruz/keeptrack.space/pull/422)
+- fix: :bug: fix moon position errors [`#408`](https://github.com/thkruz/keeptrack.space/pull/408)
+- fix: :bug: fix undefined error in positionCruncher [`#406`](https://github.com/thkruz/keeptrack.space/pull/406)
+- Develop [`#401`](https://github.com/thkruz/keeptrack.space/pull/401)
+- build(deps-dev): bump @babel/core from 7.16.5 to 7.16.7 [`#393`](https://github.com/thkruz/keeptrack.space/pull/393)
+- build(deps-dev): bump jest from 27.4.5 to 27.4.7 [`#392`](https://github.com/thkruz/keeptrack.space/pull/392)
+- build(deps-dev): bump @babel/preset-typescript from 7.16.5 to 7.16.7 [`#388`](https://github.com/thkruz/keeptrack.space/pull/388)
+- build(deps-dev): bump @types/jquery from 3.5.12 to 3.5.13 [`#390`](https://github.com/thkruz/keeptrack.space/pull/390)
+- build(deps-dev): bump webpack from 5.65.0 to 5.66.0 [`#391`](https://github.com/thkruz/keeptrack.space/pull/391)
+- build(deps-dev): bump http-server from 14.0.0 to 14.1.0 [`#389`](https://github.com/thkruz/keeptrack.space/pull/389)
+- build(deps-dev): bump ponicode from 0.60.0 to 0.61.3 [`#387`](https://github.com/thkruz/keeptrack.space/pull/387)
+- build(deps-dev): bump @typescript-eslint/eslint-plugin from 5.9.0 to 5.9.1 [`#379`](https://github.com/thkruz/keeptrack.space/pull/379)
+- build(deps-dev): bump @types/node from 17.0.7 to 17.0.8 [`#380`](https://github.com/thkruz/keeptrack.space/pull/380)
+- build(deps-dev): bump source-map-loader from 3.0.0 to 3.0.1 [`#381`](https://github.com/thkruz/keeptrack.space/pull/381)
+- build(deps-dev): bump @typescript-eslint/parser from 5.9.0 to 5.9.1 [`#382`](https://github.com/thkruz/keeptrack.space/pull/382)
+- build(deps-dev): bump retire from 3.0.3 to 3.0.6 [`#386`](https://github.com/thkruz/keeptrack.space/pull/386)
+- build(deps-dev): bump @babel/plugin-proposal-private-methods from 7.16.5 to 7.16.7 [`#370`](https://github.com/thkruz/keeptrack.space/pull/370)
+- build(deps-dev): bump eslint-plugin-jest from 25.3.0 to 25.3.4 [`#372`](https://github.com/thkruz/keeptrack.space/pull/372)
+- build(deps-dev): bump @types/jest from 27.0.3 to 27.4.0 [`#374`](https://github.com/thkruz/keeptrack.space/pull/374)
+- build(deps-dev): bump @babel/preset-env from 7.16.5 to 7.16.8 [`#376`](https://github.com/thkruz/keeptrack.space/pull/376)
+- build(deps-dev): bump @types/jquery from 3.5.10 to 3.5.12 [`#377`](https://github.com/thkruz/keeptrack.space/pull/377)
+- Develop [`#378`](https://github.com/thkruz/keeptrack.space/pull/378)
+- feat: :sparkles: add RIC frame on hover [`#375`](https://github.com/thkruz/keeptrack.space/pull/375)
+- build: :arrow_up: bump all dependencies [`#369`](https://github.com/thkruz/keeptrack.space/pull/369)
+- Develop [`#360`](https://github.com/thkruz/keeptrack.space/pull/360)
+- fix: :bug: fix meshManager selecting correct mesh [`#14`](https://github.com/thkruz/keeptrack.space/pull/14)
+- refactor: :recycle: positionCruncher overhauled to be less complex [`#357`](https://github.com/thkruz/keeptrack.space/pull/357)
+- chore: :children_crossing: undo last commit [`#356`](https://github.com/thkruz/keeptrack.space/pull/356)
+- Develop [`#355`](https://github.com/thkruz/keeptrack.space/pull/355)
+- build: :construction_worker: codecov is info only [`#354`](https://github.com/thkruz/keeptrack.space/pull/354)
+- Develop [`#353`](https://github.com/thkruz/keeptrack.space/pull/353)
+- Develop [`#13`](https://github.com/thkruz/keeptrack.space/pull/13)
+- refactor: :rotating_light: fixed sonar findings [`#352`](https://github.com/thkruz/keeptrack.space/pull/352)
+- refactor: :rotating_light: fixed sonar finding on input complexity [`#351`](https://github.com/thkruz/keeptrack.space/pull/351)
+- Develop [`#350`](https://github.com/thkruz/keeptrack.space/pull/350)
+- build: :coffin: admin folder will now be handled by a separate repo [`#349`](https://github.com/thkruz/keeptrack.space/pull/349)
+- build: :green_heart: updated build scripts for gitlab pipeline [`#12`](https://github.com/thkruz/keeptrack.space/pull/12)
+- Develop [`#11`](https://github.com/thkruz/keeptrack.space/pull/11)
+- Develop [`#348`](https://github.com/thkruz/keeptrack.space/pull/348)
+- Develop [`#347`](https://github.com/thkruz/keeptrack.space/pull/347)
+- build(deps-dev): bump @types/node from 16.11.12 to 17.0.0 [`#10`](https://github.com/thkruz/keeptrack.space/pull/10)
+- build(deps-dev): bump @types/node from 16.11.12 to 17.0.0 [`#342`](https://github.com/thkruz/keeptrack.space/pull/342)
+- Develop [`#346`](https://github.com/thkruz/keeptrack.space/pull/346)
+- build: :hammer: cleaned up all the build scripts to use node API [`#345`](https://github.com/thkruz/keeptrack.space/pull/345)
+- Develop [`#9`](https://github.com/thkruz/keeptrack.space/pull/9)
+- fix: :label: type error preventing build [`#344`](https://github.com/thkruz/keeptrack.space/pull/344)
+- build: :construction_worker: add code coverage settings for sonarcloud [`#343`](https://github.com/thkruz/keeptrack.space/pull/343)
+- Develop [`#8`](https://github.com/thkruz/keeptrack.space/pull/8)
+- build: :construction_worker: better github pipeline [`#341`](https://github.com/thkruz/keeptrack.space/pull/341)
+- Develop2 [`#339`](https://github.com/thkruz/keeptrack.space/pull/339)
+- build: :green_heart: allow but dont require node 17 [`#7`](https://github.com/thkruz/keeptrack.space/pull/7)
+- fix: :bug: fixed use of strings instead of SpaceObjectType enum [`#6`](https://github.com/thkruz/keeptrack.space/pull/6)
+- Develop [`#5`](https://github.com/thkruz/keeptrack.space/pull/5)
+- Develop [`#4`](https://github.com/thkruz/keeptrack.space/pull/4)
+- build(package): downgraded typescript and referenced local build in vscode [`#3`](https://github.com/thkruz/keeptrack.space/pull/3)
+- refactor(keeptrackapi): refactored api + removed all &lt;any&gt;keepTrackApi references [`#2`](https://github.com/thkruz/keeptrack.space/pull/2)
+- build(dockerfile): got docker to start the npm install but need to remove github dependencies [`#1`](https://github.com/thkruz/keeptrack.space/pull/1)
+- build(deps-dev): bump jsdom from 17.0.0 to 19.0.0 [`#334`](https://github.com/thkruz/keeptrack.space/pull/334)
+- Develop [`#332`](https://github.com/thkruz/keeptrack.space/pull/332)
+- Develop [`#331`](https://github.com/thkruz/keeptrack.space/pull/331)
+- Develop [`#328`](https://github.com/thkruz/keeptrack.space/pull/328)
+- fix(catalogloader): fixed offline catalog loading with JSON parse [`#326`](https://github.com/thkruz/keeptrack.space/pull/326)
+- Develop [`#321`](https://github.com/thkruz/keeptrack.space/pull/321)
+- Add CodeSee architecture diagram workflow to repository [`#309`](https://github.com/thkruz/keeptrack.space/pull/309)
+- Develop [`#306`](https://github.com/thkruz/keeptrack.space/pull/306)
+- Develop [`#305`](https://github.com/thkruz/keeptrack.space/pull/305)
+- test(settingsmanager): fixed tests to work with non-module settingsMa… [`#304`](https://github.com/thkruz/keeptrack.space/pull/304)
+- build(deps-dev): bump cypress from 7.7.0 to 8.2.0 [`#288`](https://github.com/thkruz/keeptrack.space/pull/288)
+- build(deps-dev): bump http-server from 0.12.3 to 13.0.0 [`#298`](https://github.com/thkruz/keeptrack.space/pull/298)
+- build(deps-dev): bump jest from 26.6.3 to 27.0.6 [`#274`](https://github.com/thkruz/keeptrack.space/pull/274)
+- Develop [`#302`](https://github.com/thkruz/keeptrack.space/pull/302)
+- feat(settingsmanager.js): settings.js now compiles separate from othe… [`#300`](https://github.com/thkruz/keeptrack.space/pull/300)
+- Develop [`#299`](https://github.com/thkruz/keeptrack.space/pull/299)
+- feat(sensor.ts): added link to show all sensors with fov on a satellite [`#297`](https://github.com/thkruz/keeptrack.space/pull/297)
+- thkruz/issue295 [`#296`](https://github.com/thkruz/keeptrack.space/pull/296)
+- build(deps-dev): bump css-loader from 5.2.7 to 6.2.0 [`#282`](https://github.com/thkruz/keeptrack.space/pull/282)
+- Main [`#294`](https://github.com/thkruz/keeptrack.space/pull/294)
+- Develop [`#285`](https://github.com/thkruz/keeptrack.space/pull/285)
+- Develop [`#278`](https://github.com/thkruz/keeptrack.space/pull/278)
+- build(typescript): started migration to typescript [`#276`](https://github.com/thkruz/keeptrack.space/pull/276)
+- feat(uimanager.js): added Short Term Fence menu [`#275`](https://github.com/thkruz/keeptrack.space/pull/275)
+- build(deps-dev): bump style-loader from 2.0.0 to 3.0.0 [`#272`](https://github.com/thkruz/keeptrack.space/pull/272)
+- feat(satvmagmanager): expanded sunlight color scheme, fixed propagati… [`#273`](https://github.com/thkruz/keeptrack.space/pull/273)
+- fix(analysis-tools): fixed analysis tools to work with OOTK [`#269`](https://github.com/thkruz/keeptrack.space/pull/269)
+- fix(style.css): bottom menu was hiding some input selection options. … [`#268`](https://github.com/thkruz/keeptrack.space/pull/268)
+- fix(uimanager): fixed find objects in this orbit and orbit remaining … [`#267`](https://github.com/thkruz/keeptrack.space/pull/267)
+- docs(changelog): generated auto changelog [`#259`](https://github.com/thkruz/keeptrack.space/pull/259)
+- docs(readme.md): updated readme for version 3 [`#258`](https://github.com/thkruz/keeptrack.space/pull/258)
+- fix: :bug: add warning message for satellite orbit optimization and improve error handling for input validation [`#1193`](https://github.com/thkruz/keeptrack.space/issues/1193)
+- fix: :bug: prevent triggering an error when typing in invalid custom sensor values [`#1146`](https://github.com/thkruz/keeptrack.space/issues/1146)
+- fix: :bug: handle errors when processing known satellites in ASCII file [`#1144`](https://github.com/thkruz/keeptrack.space/issues/1144)
+- fix: :bug: handle undefined satellite object in right button menu [`#1145`](https://github.com/thkruz/keeptrack.space/issues/1145)
+- fix: :bug: handle errors when processing satellites in CatalogLoader [`#1144`](https://github.com/thkruz/keeptrack.space/issues/1144)
+- fix: :bug: prevent update execution if sun model is not loaded [`#1143`](https://github.com/thkruz/keeptrack.space/issues/1143)
+- refactor: :recycle: update event handling in CountriesMenu to use uiManagerFinal [`#1136`](https://github.com/thkruz/keeptrack.space/issues/1136)
+- feat: :children_crossing: enhance satellite creation with input validation and formatting improvements [`#1132`](https://github.com/thkruz/keeptrack.space/issues/1132)
+- fix: :bug: fix requestFullscreen failing on some browsers [`#1064`](https://github.com/thkruz/keeptrack.space/issues/1064)
+- fix: :bug: fix breakup throwing uncaught error [`#1030`](https://github.com/thkruz/keeptrack.space/issues/1030)
+- fix: :bug: Better handling of errors in obj-to-obj-line.ts [`#1014`](https://github.com/thkruz/keeptrack.space/issues/1014)
+- fix: :bug: add validation to avoid race conditions [`#902`](https://github.com/thkruz/keeptrack.space/issues/902)
+- fix: :bug: add validation to analytics tool before using [`#980`](https://github.com/thkruz/keeptrack.space/issues/980)
+- fix: :bug: validate datetimeTextElement before setting date/time [`#985`](https://github.com/thkruz/keeptrack.space/issues/985)
+- fix: :bug: add trap for race condition [`#993`](https://github.com/thkruz/keeptrack.space/issues/993)
+- fix: :bug: add error checking for non-xbox controllers [`#964`](https://github.com/thkruz/keeptrack.space/issues/964)
+- fix: :bug: add verification that elements are found before accessing [`#960`](https://github.com/thkruz/keeptrack.space/issues/960)
+- fix: :bug: fix debris screening menu being available without a satellite selected [`#956`](https://github.com/thkruz/keeptrack.space/issues/956)
+- fix: :bug: add conistent hover color [`#812`](https://github.com/thkruz/keeptrack.space/issues/812)
+- fix: :bug: fix issue with godrays breaking after screen resize [`#842`](https://github.com/thkruz/keeptrack.space/issues/842)
+- fix: :bug: fix issue with godrays breaking after screen resize [`#482`](https://github.com/thkruz/keeptrack.space/issues/482)
+- fix: :bug: fix error when sensor reset and planetarium is open [`#885`](https://github.com/thkruz/keeptrack.space/issues/885)
+- fix: :bug: fix orbits broken when turned on after initialization [`#828`](https://github.com/thkruz/keeptrack.space/issues/828)
+- fix: :bug: fix moon position calculation [`#838`](https://github.com/thkruz/keeptrack.space/issues/838)
+- fix: :bug: fix #758 [`#758`](https://github.com/thkruz/keeptrack.space/issues/758)
+- fix: :bug: fix controller disconnected crash [`#746`](https://github.com/thkruz/keeptrack.space/issues/746)
+- feat: :sparkles: give user option to hide toasts [`#666`](https://github.com/thkruz/keeptrack.space/issues/666)
+- fix: :bug: fixed error when sensor not selected [`#657`](https://github.com/thkruz/keeptrack.space/issues/657)
+- feat: :sparkles: add func to show selected object as large red dot [`#602`](https://github.com/thkruz/keeptrack.space/issues/602)
+- fix: :bug: fixes #630 [`#630`](https://github.com/thkruz/keeptrack.space/issues/630)
+- fix: :bug: fix error with TLE when editing satellite [`#603`](https://github.com/thkruz/keeptrack.space/issues/603)
+- fix: fix error setting value of null in analysis menu [`#606`](https://github.com/thkruz/keeptrack.space/issues/606)
+- fix: :bug: fix error in updateSatInfo [`#607`](https://github.com/thkruz/keeptrack.space/issues/607)
+- fix: :bug: fix issue caused by clicking a non-satellite first [`#590`](https://github.com/thkruz/keeptrack.space/issues/590)
+- fix: :bug: fix sorting issue with null satellites [`#566`](https://github.com/thkruz/keeptrack.space/issues/566)
+- fix: :bug: fix issue with sun calculations [`#569`](https://github.com/thkruz/keeptrack.space/issues/569)
+- fix: :bug: remove old reference to uiManager.resize2DMap [`#581`](https://github.com/thkruz/keeptrack.space/issues/581)
+- fix: :bug: fix satellite fov not showing up [`#559`](https://github.com/thkruz/keeptrack.space/issues/559)
+- fix: :bug: fix lostobjects colorscheme hanging [`#557`](https://github.com/thkruz/keeptrack.space/issues/557)
+- fix: :bug: fix bug in getlookangles with null for satellite [`#564`](https://github.com/thkruz/keeptrack.space/issues/564)
+- fix: :bug: fix country menu not working [`#558`](https://github.com/thkruz/keeptrack.space/issues/558)
+- fix: :bug: fix timeMachine showing other objects [`#560`](https://github.com/thkruz/keeptrack.space/issues/560)
+- fix: :bug: fix moon position errors [`#407`](https://github.com/thkruz/keeptrack.space/issues/407) [`#407`](https://github.com/thkruz/keeptrack.space/issues/407)
+- fix(sensor.ts): fixes #295 [`#295`](https://github.com/thkruz/keeptrack.space/issues/295) [`#295`](https://github.com/thkruz/keeptrack.space/issues/295)
+- feat: :sparkles: Add dwarf planet rendering class and texture support [`ed79812`](https://github.com/thkruz/keeptrack.space/commit/ed7981249b94e5d4318d4e8f4c5e46961c84a648)
+- feat: :sparkles: Add Pluto dwarf-planet renderer and make orbit paths accept vec4 points; enable Pluto in planets menu [`5332217`](https://github.com/thkruz/keeptrack.space/commit/5332217118b43f3ba2561b2b14b323825db154c5)
+- refactor: :globe_with_meridians: Add localization support for splash screen and filter menu in multiple languages [`509cd9e`](https://github.com/thkruz/keeptrack.space/commit/509cd9e37e39b3de7abd30df760141414d668038)
+- build: :fire: remove pnpm-lock [`66f9ecf`](https://github.com/thkruz/keeptrack.space/commit/66f9ecfcf4a84fcbcd33baaa50676be1c51b5381)
+- refactor: :fire: remove auto generated locale files [`2cc0fd2`](https://github.com/thkruz/keeptrack.space/commit/2cc0fd26834b22384e1f58dcc26caed1817c9b04)
+- test: :white_check_mark: add locales json build output for unit testing in github runner [`9eefce8`](https://github.com/thkruz/keeptrack.space/commit/9eefce811d82e8e8dc2d41e8f0a807a570943172)
+- feat: :sparkles: update environment configuration files to add embed settings [`f024c31`](https://github.com/thkruz/keeptrack.space/commit/f024c310dd3f744ed27e750592c5379248474d0e)
+- refactor: :recycle: refactor sat-info-box to be more modular and dynamic [`0c498b0`](https://github.com/thkruz/keeptrack.space/commit/0c498b00878dc5f76461db30c4ff41f48642688a)
+- refactor: :recycle:  replace global keepTrackApi with ServiceLocator/PluginRegistry and EventBus; update tests; bump version [`94f0288`](https://github.com/thkruz/keeptrack.space/commit/94f028877d534f9753b9b70e3aeae3cc47be7f58)
+- refactor: :recycle: rewrite sat-info-box to be more modular [`31f028d`](https://github.com/thkruz/keeptrack.space/commit/31f028d158357e553d95a719fed43b307203245f)
+- refactor(settings): reorganize SettingsManager into category-based modules [`dcf72c9`](https://github.com/thkruz/keeptrack.space/commit/dcf72c9658814969436764b22d9374039c72cc11)
+- refactor: :truck: restructure src into app and engine folders [`90231d6`](https://github.com/thkruz/keeptrack.space/commit/90231d65c61a713efbe3db7571ffce8c7c802d9b)
+- refactor: :truck: restructure src into app and engine folders [`e64f7f6`](https://github.com/thkruz/keeptrack.space/commit/e64f7f664d665ffefe3c0ae90e578166c8254bb7)
+- refactor: :truck: Refactor camera state management and input handling [`9979289`](https://github.com/thkruz/keeptrack.space/commit/9979289735c9ec597acecd7b6aaf2d2f4bb2cb52)
+- feat: :sparkles: improve automated building of localization files and update filter menu translations [`76b5071`](https://github.com/thkruz/keeptrack.space/commit/76b507170e4b17be8a9bb9ebce85714e7aa9f8a1)
+- feat: :globe_with_meridians: Add common translations in multiple languages [`efe971f`](https://github.com/thkruz/keeptrack.space/commit/efe971f027a4649c17a719229295b6d997e65ce6)
+- feat: :sparkles: enhance mesh loading and rendering capabilities [`48c7134`](https://github.com/thkruz/keeptrack.space/commit/48c713478e359b4d865c93995e6c65ec28eb6112)
+- Pre main branch merge [`1817494`](https://github.com/thkruz/keeptrack.space/commit/181749486473eb5c08540f8e5e65c88c8d07f5fd)
+- chore: :sparkles: Add country translations to localization files for Korean, Russian, and Ukrainian [`3187442`](https://github.com/thkruz/keeptrack.space/commit/31874424e651407f19a2f2d852a193fc568afce9)
+- feat: add Planets Menu Plugin with localization and UI integration [`01a8cfb`](https://github.com/thkruz/keeptrack.space/commit/01a8cfb7ef20e88cede806613c1b5a9a892b425a)
+- feat: :children_crossing: Add new country codes and update localization files [`205db53`](https://github.com/thkruz/keeptrack.space/commit/205db53a417f8ccd7a1a9d9c580f586e9f0bf6f7)
+- test: :white_check_mark: Add unit tests for various color schemes in rendering engine [`ba5465a`](https://github.com/thkruz/keeptrack.space/commit/ba5465a027cd2fa563876f7d88741b0994b7e78a)
+- refactor: :recycle: move countries to locales json files [`2b3329e`](https://github.com/thkruz/keeptrack.space/commit/2b3329ef88c7bf1cf885242bb6a0efbab2d13b93)
+- refactor: :recycle: isolate the engine from the application [`0c37f8e`](https://github.com/thkruz/keeptrack.space/commit/0c37f8e954d9eb3c459168317ec0f46b0768c290)
+- feat: :sparkles: implement draggable boxes and convert legends to layers [`26c8e83`](https://github.com/thkruz/keeptrack.space/commit/26c8e835bd9698c376a24bb459a0f1fb660858ca)
+- feat: :sparkles: introduce WebWorkerThreadManager and migrate orbit/sat crunchers to thread managers [`aee7028`](https://github.com/thkruz/keeptrack.space/commit/aee7028851f41208c0093b40e71877536dd3f395)
+- chore: :globe_with_meridians: update generated localization for multiple languages [`c2a5dd2`](https://github.com/thkruz/keeptrack.space/commit/c2a5dd29cf74509acaef1686875f1ff6a4e978c6)
+- refactor: :speech_balloon: Translate UI elements and help texts to other languages, add copyright notices, and update sensor-related plugin descriptions for improved clarity and localization. [`a3184de`](https://github.com/thkruz/keeptrack.space/commit/a3184ded81cb7cced1232005c33503f384b108a0)
+- feat: :globe_with_meridians: Add localization support for satellite orbital data in multiple languages [`b7d2a76`](https://github.com/thkruz/keeptrack.space/commit/b7d2a760cdbdaeb3e5e6e69f07c139992b1e229b)
+- refactor: :recycle: migrate from npm "ootk" to local ootk submodule and wire tooling [`6f5fe6f`](https://github.com/thkruz/keeptrack.space/commit/6f5fe6fb33bcde628877b07ee70fd65fa898d259)
+- refactor: :recycle: update .gitignore to exclude keys.ts and remove generated keys.ts file [`6389982`](https://github.com/thkruz/keeptrack.space/commit/6389982529633b618eadbe69e26a248cdbc88bc3)
+- feat: :zap: enhance audio playback using Web Audio API [`28725ac`](https://github.com/thkruz/keeptrack.space/commit/28725ac095b9deb865ccaf0551102ca7fdf37aa0)
+- refactor: :recycle: Refactor camera state management [`f90881f`](https://github.com/thkruz/keeptrack.space/commit/f90881f288dc6665d9add8b2a3fa2438f1ebc3e2)
+- test: :white_check_mark: update tests to match v11 architecture [`cbc6927`](https://github.com/thkruz/keeptrack.space/commit/cbc6927ef6731981b3b18125e510075b9fc89852)
+- chore: :bookmark: update version to 10.7.0 in README and version.js [`babb7bf`](https://github.com/thkruz/keeptrack.space/commit/babb7bf59ecd80770dc58d55932ccc0b47816aec)
+- docs: :memo: overhaul README with expanded docs, restructure, and clarify license [`e97ddcb`](https://github.com/thkruz/keeptrack.space/commit/e97ddcbf275d63874c9ba8c1519b97c8aed9fc16)
+- refactor: :recycle: use EventBus.getInstance() instead of keepTrackApi across app [`ffa19c8`](https://github.com/thkruz/keeptrack.space/commit/ffa19c82adecd3f8aefce242e82c8aa09c03a080)
+- feat: :globe_with_meridians: Add multilingual localization support for satellite info box in German, English, Spanish, French, Japanese, Korean, Russian, Ukrainian, and Chinese [`7bb356a`](https://github.com/thkruz/keeptrack.space/commit/7bb356a8ab58cac42fe35cb5855de3d2dfd797fa)
+- refactor: replace EventBusEvent with EventBusEvents for consistency and clarity [`2b28729`](https://github.com/thkruz/keeptrack.space/commit/2b28729195a51fa0c56330b741a55a99df0786d6)
+- test: :white_check_mark: fix all failing tests due to v11 [`0aa9d2b`](https://github.com/thkruz/keeptrack.space/commit/0aa9d2b5c1f5be25ab81b8607291d6753a72c712)
+- docs: :memo: add v11 "Copernicus" release notes and update CHANGELOG.md [`9837f59`](https://github.com/thkruz/keeptrack.space/commit/9837f597b966e5a3c1b25753192d1091ae52edb1)
+- feat: :sparkles: add more of the solar system [`49e5ed8`](https://github.com/thkruz/keeptrack.space/commit/49e5ed86722973cf360059ac233840d2f98fee50)
+- feat: :sparkles: add OemSatellite class and integrate OEM satellite support [`b90b06d`](https://github.com/thkruz/keeptrack.space/commit/b90b06dd68e6bcdb9ff56e95e2b8d98007543442)
+- feat: :sparkles: enhance error handling by adding error event to KeepTrackApi and removing telemetry implementation [`a04861c`](https://github.com/thkruz/keeptrack.space/commit/a04861c77f98cf8bdb3e1ba9c02554be7315be44)
+- feat: :sparkles: add embed mode support and enhance input handling for keyboard and mouse interactions [`6d5bdce`](https://github.com/thkruz/keeptrack.space/commit/6d5bdceec507daee4761765a4d1ac3e845382200)
+- refactor: :recycle: Refactor HTML rendering in plugins to use new html utility [`bb9860c`](https://github.com/thkruz/keeptrack.space/commit/bb9860cbb4e494c152b17c9fc5db19b3055c7287)
+- feat: :sparkles: Add OemReader plugin, register pro path, and add default OEM settings [`2a92713`](https://github.com/thkruz/keeptrack.space/commit/2a92713d2f391990a7795adf67987632bcf05d24)
+- feat: :sparkles: implement a worldShift to allow centering on non-earth objects [`f298929`](https://github.com/thkruz/keeptrack.space/commit/f298929d12365444273f8687b93cb6b59b79514a)
+- feat: :sparkles: Add ScenarioManagement plugin with UI, save/load and time-bound enforcement [`e5ae5cd`](https://github.com/thkruz/keeptrack.space/commit/e5ae5cdb8fc7fc0531ae704334b3d7b131ae3b34)
+- feat: :sparkles: Support J2000/TEME line rendering, segmented radial grids, and TEME↔J2000 transforms [`1761468`](https://github.com/thkruz/keeptrack.space/commit/1761468bee4b6cf0cb11497beb70a94810d04407)
+- refactor: :recycle: Clean up CSS styles, enhance tooltip positioning, and improve top menu integration [`45c539a`](https://github.com/thkruz/keeptrack.space/commit/45c539ac1593df4eb77e6afe4111144354fecb76)
+- feat: :sparkles: Add dark clouds and maneuver plugin translations for multiple languages [`1ffdca9`](https://github.com/thkruz/keeptrack.space/commit/1ffdca9752b3decc79811a1c428234e08cdfe685)
+- feat: :planet: add planetary metadata, orbit-path rendering, and hover info [`4287367`](https://github.com/thkruz/keeptrack.space/commit/4287367aa042471704ecf264b5c17cbfc00b3de4)
+- feat: :sparkles: update plugin menu modes and add block persistence setting [`0f0f561`](https://github.com/thkruz/keeptrack.space/commit/0f0f561461ce15fdfc721f76406ea973a8018f3b)
+- refactor: :recycle: Refactor input manager and mouse input to use ServiceLocator for improved dependency management [`6448565`](https://github.com/thkruz/keeptrack.space/commit/644856563b3e0fac479e82580c1402233a373a13)
+- refactor: :recycle: separate projection vs world matrices and use matrixWorldInverse across renderer [`d719df5`](https://github.com/thkruz/keeptrack.space/commit/d719df5e983880297958323318e5d810ec27b046)
+- feat: :globe_with_meridians: add multilingual support for satellite info box and improve layout structure [`a41be1f`](https://github.com/thkruz/keeptrack.space/commit/a41be1f28e7748f07d5bb1c0728219b269428644)
+- feat: :sparkles: implement DepthManager to enable logarithmic depth buffer [`ff6914a`](https://github.com/thkruz/keeptrack.space/commit/ff6914ac9ac1e959e561395bf2398a50d939df27)
+- refactor: :recycle: migrate off global keepTrackApi — use KeepTrack singleton / ServiceLocator [`36caf62`](https://github.com/thkruz/keeptrack.space/commit/36caf62942e4879e5088d3fbc1dd718956910558)
+- test: :white_check_mark: add unit tests for GetVariables and parseGetVariables functions [`6a4a2a7`](https://github.com/thkruz/keeptrack.space/commit/6a4a2a7cd1ad3586be9ed01bbd5067d925ba6fe4)
+- feat: :sparkles: add planet objects, planet dots and orbit-drawing UI [`f315965`](https://github.com/thkruz/keeptrack.space/commit/f31596573826ee0f49bfa8f9e46849b88b9d3ad0)
+- feat: :sparkles: add VCR plugin with playback controls and integrate into top menu [`4b88868`](https://github.com/thkruz/keeptrack.space/commit/4b88868baf1fb10ebfd7562718cf85d7e9b1928c)
+- test: consolidate Jest environment and switch tests to EventBus [`82debf8`](https://github.com/thkruz/keeptrack.space/commit/82debf8b42e432f016f43bb11ba333f08751a762)
+- feat: :sparkles: Add Maneuver Detection plugin with UI and data integration [`6831181`](https://github.com/thkruz/keeptrack.space/commit/68311811e0cb528587608a15a0bc49a4cea1cca9)
+- feat: :sparkles: add alphaMap and alphaImage support in ShaderMaterial [`e0bdc10`](https://github.com/thkruz/keeptrack.space/commit/e0bdc107a7494e0fc54b08890d8c4b227520d381)
+- feat: :sparkles: add EarthAtmosphere plugin and integrate into plugin manager [`20cee90`](https://github.com/thkruz/keeptrack.space/commit/20cee90bb795677d73b34570524565462b3d956b)
+- feat: :sparkles: add Uranus rings rendering and integrate with Uranus class [`774972f`](https://github.com/thkruz/keeptrack.space/commit/774972f74763d88c5b907340b2da0799762a5dc3)
+- refactor: :fire: remove unused plugin translations and streamline localization handling [`770ea93`](https://github.com/thkruz/keeptrack.space/commit/770ea9359fea0e682531968d274549e54bac1a6f)
+- refactor: :recycle: Replace keepTrackContainer with Container instance for improved dependency management [`78cb5f8`](https://github.com/thkruz/keeptrack.space/commit/78cb5f87d8947222d990a9407bae119945061d86)
+- refactor: :globe_with_meridians: Move loading screen messages [`cba75be`](https://github.com/thkruz/keeptrack.space/commit/cba75be86c584fc737bf71bc230c20a4d2e2da96)
+- feat: :sparkles: implement Saturn rings rendering and integrate with Saturn class [`347e25f`](https://github.com/thkruz/keeptrack.space/commit/347e25f1e1ed0fa8bcd3f3e1093d23e0059e3716)
+- refactor: :recycle: Replace SocialMedia plugin with generic TopMenuPlugin and update related configurations [`6fad4b5`](https://github.com/thkruz/keeptrack.space/commit/6fad4b57752e63e54e87ce02349b6700786ff6d1)
+- refactor: :recycle: Enhance LayersManager and LayersPopupBox integration, update event handling and menu interactions [`c610bc7`](https://github.com/thkruz/keeptrack.space/commit/c610bc70f162782dec3a4ef03274d0ffe84617f4)
+- feat: :sparkles: add engine-ui.css for draggable box styles and import in draggable-box.ts [`20c5f68`](https://github.com/thkruz/keeptrack.space/commit/20c5f68b0e3282d1ef8caa1ca063fe6ed2867ad5)
+- feat: :sparkles: enhance bottom menu functionality and settings management [`ec47ed5`](https://github.com/thkruz/keeptrack.space/commit/ec47ed55e9a3c98738c33154f680b53da7a07dba)
+- feat: :sparkles: add satellite info boxes to mobile settings manager [`5037709`](https://github.com/thkruz/keeptrack.space/commit/5037709992557137592eed127c700ae18b38b318)
+- feat: :sparkles: Add TimeSlider plugin [`96276dd`](https://github.com/thkruz/keeptrack.space/commit/96276dd0a5de7c21924444bca1ff555aa7e573b5)
+- feat: :zap: async loading of textures to unblock main thread [`b527235`](https://github.com/thkruz/keeptrack.space/commit/b52723568c0142357011ba92fec4ea6124a361b5)
+- OrbitGuard menu with static data [`5907dba`](https://github.com/thkruz/keeptrack.space/commit/5907dba48300ae709492e82f58b1c16f8732d8b0)
+- fix: :bug: refactor build pipeline and add Node.js setup action for improved dependency management [`9f00de4`](https://github.com/thkruz/keeptrack.space/commit/9f00de4a4d7bf5111687db79befed91ad4beab8a)
+- feat: :sparkles: implement TooltipsPlugin with tooltip creation and positioning logic [`4cf2bf4`](https://github.com/thkruz/keeptrack.space/commit/4cf2bf4ee7f993546549496ccd0109605ae23ccc)
+- refactor: :zap: enhance Godrays shader performance and add randomness to sun rendering [`1cbcbe2`](https://github.com/thkruz/keeptrack.space/commit/1cbcbe27761d0d7478469cced6ff68dd33af21b7)
+- feat: :sparkles: add draco encoder/decoder for future support [`43d6479`](https://github.com/thkruz/keeptrack.space/commit/43d6479a2eecad6f828c491d970d4a28105b06be)
+- feat: :globe_with_meridians: Update localization for satellite info box in Japanese, Korean, and Ukrainian [`9f380f5`](https://github.com/thkruz/keeptrack.space/commit/9f380f53ecc943801e632560f5677f64fb036e71)
+- feat: :zap: optimize sound management by loading on demand [`697faef`](https://github.com/thkruz/keeptrack.space/commit/697faefd24f92d96f7bbcacf84af062e55561300)
+- refactor: :recycle: Replace keepTrackApi.glsl with glsl function for shader code formatting consistency [`284fe77`](https://github.com/thkruz/keeptrack.space/commit/284fe77f328c51578ea4b7bae3c2dc8567fb3227)
+- ci: :construction_worker: update issue templates for better clarity and usability [`d2252ba`](https://github.com/thkruz/keeptrack.space/commit/d2252ba563f9f3fb9b2c672ce10cd5e4296ec994)
+- Refactor and enhance test coverage across multiple modules [`9056a85`](https://github.com/thkruz/keeptrack.space/commit/9056a85ef7b21dfa49b4b819e11eee51fdfc9f37)
+- feat: :sparkles: add translation generation tasks and update mergeLocales method for improved locale management [`d6ca83c`](https://github.com/thkruz/keeptrack.space/commit/d6ca83c4ab1dfe06b60b4318ae8932c5cf52ecaa)
+- refactor: :truck: move datetime UI logic out of TimeManager into DateTimeManager [`3fa59c2`](https://github.com/thkruz/keeptrack.space/commit/3fa59c26ec0e08a4a4b2901070420542c168fe69)
+- refactor: :recycle: Consolidate Earth texture quality enums into a single module and update imports across the codebase [`eade826`](https://github.com/thkruz/keeptrack.space/commit/eade826aa67314794cde15103a48cbd27c07431c)
+- feat: :sparkles: implement sorting of sphere geometry faces for transparency rendering [`2a5d563`](https://github.com/thkruz/keeptrack.space/commit/2a5d563b6130cb4a51b959b105b86fee08a1e26e)
+- refactor(camera/rendering): switch to earth-centered camera positions & dynamic sun sizing [`73478db`](https://github.com/thkruz/keeptrack.space/commit/73478db875214abf6d23a7bd609ee55c39a4f212)
+- fix: :bug: update styles for ui-datepicker and copyright notice, adjust mobile settings handling in SplashScreen and SettingsManager [`0a1317a`](https://github.com/thkruz/keeptrack.space/commit/0a1317a74647ce965d1b5d53d964340e6a961202)
+- refactor: :recycle: introduce CameraZoomState class to manage zoom state in Camera [`368fd1b`](https://github.com/thkruz/keeptrack.space/commit/368fd1b3f28fb8cf82ce156f1b20928867224a05)
+- feat: :sparkles: add size determination logic for dots based on search results and selection [`47d289c`](https://github.com/thkruz/keeptrack.space/commit/47d289c9bbf101a26eaf7021788c47f246708baa)
+- fix: :bug: update settings to enable JSC catalog, manage night mode display, and handle dots parameter in UrlManager [`109b421`](https://github.com/thkruz/keeptrack.space/commit/109b4214361d056666b102c3189129107dc9155c)
+- refactor: :zap: optimize Godrays shader and improve performance [`2cb8f35`](https://github.com/thkruz/keeptrack.space/commit/2cb8f35e6057b0aceac60d17f6d28e4ad215e592)
+- chore: :globe_with_meridians: add filter-menu translations and scenario-management locale files; bump plugins-pro submodule [`b7e0c4d`](https://github.com/thkruz/keeptrack.space/commit/b7e0c4d45b93337ea9f54ba4851d56816e9d25ab)
+- feat: :sparkles: update environment configuration and remove SupabaseManager; adjust plugin settings for better control [`5669005`](https://github.com/thkruz/keeptrack.space/commit/566900587812a1b2a85923342685153a24e423f2)
+- refactor: :recycle: disable unnecessary plugins and clean up settings for improved readability [`a34ad7f`](https://github.com/thkruz/keeptrack.space/commit/a34ad7fcbef38acbec4afd8a20553dbe3759311f)
+- refactor(rendering): cache J2000, prevent duplicate orbit paths, and optimize orbit path updates [`5153800`](https://github.com/thkruz/keeptrack.space/commit/5153800720101ef1fdd61938b5bbcc1b07f65571)
+- feat: :sparkles: enhance color scheme management with enable/disable setting [`b18b3ca`](https://github.com/thkruz/keeptrack.space/commit/b18b3cac40ab0adda83154f6139302abcbe4ed2f)
+- feat: :sparkles: add Reentry Risk color scheme and integrate into color scheme manager [`18a1c5c`](https://github.com/thkruz/keeptrack.space/commit/18a1c5c31f37ebb733dbaca179c46858500522f5)
+- build: :coffin: remove old toml files [`2c4fd4c`](https://github.com/thkruz/keeptrack.space/commit/2c4fd4c5e40dc05c9453c6ee3a75cd4a5bcf7da9)
+- feat: :sparkles: add legendUpdated event and update legend handling in color schemes [`51e5ff1`](https://github.com/thkruz/keeptrack.space/commit/51e5ff109a98a8a73e689018c82c978bfbecd110)
+- refactor: :sparkles: Update celestial body classes to use Body type for getName and adjust RADIUS visibility [`6add03a`](https://github.com/thkruz/keeptrack.space/commit/6add03a710d71cd17ff4bd263d7ff285df8b01a1)
+- fix: :bug: update build pipeline for improved YAML linting, NPM audit, and Node.js setup [`f010d85`](https://github.com/thkruz/keeptrack.space/commit/f010d857afe387a498fcca3d724bbe961ef5e073)
+- refactor: :recycle: update time management and URL handling for improved simulation time and rate management [`5731c0e`](https://github.com/thkruz/keeptrack.space/commit/5731c0e2652524bbbc67c550a7ed321b86ef95c7)
+- feat(telemetry/build): add open-source telemetry stub, register plugin, and ensure submodules in prebuild [`636e89a`](https://github.com/thkruz/keeptrack.space/commit/636e89a252a3385f078eb0dd0fe44a48353bb6af)
+- refactor: :recycle: move splash screen images to SplashScreen class [`ff40506`](https://github.com/thkruz/keeptrack.space/commit/ff40506fc30da415681de15284cd02e56c9ec2ee)
+- feat: :sparkles: enhance calendar input handling with text input option [`9a39813`](https://github.com/thkruz/keeptrack.space/commit/9a39813be162ac7611c573e7c333428be46d87fa)
+- feat: :sparkles: implement legend popup menu with responsive behavior and z-index adjustments [`f02a4a2`](https://github.com/thkruz/keeptrack.space/commit/f02a4a27e76a175f02310426ef43bdf9eb005c1a)
+- feat: :sparkles: add Elektro-L 2 satellite image retrieval and display functionality [`5dda4ee`](https://github.com/thkruz/keeptrack.space/commit/5dda4eedccdb7e46908579c08e2dc59a0ca97470)
+- feat: add loading screen start button translations and settings for ads and auto start [`b6af7e7`](https://github.com/thkruz/keeptrack.space/commit/b6af7e724faf4732509544d597696b0a95fcad54)
+- fix: :bug: use AEHF as default OEM satellite model; refresh time-slider on staticOffsetChange and expose updateSliderPosition; add 'planets' URL param to toggle planets; bump plugins-pro submodule [`9679523`](https://github.com/thkruz/keeptrack.space/commit/96795230c77053e9333771d141ba647217201fcd)
+- test: :white_check_mark: fix tests that were broken due to new engine updates [`83bd36e`](https://github.com/thkruz/keeptrack.space/commit/83bd36e2bfa192b89c54a4d5f77d2bcad9e80f58)
+- feat: :sparkles: update ESLint configuration to allow process.env usage and integrate dotenv-webpack for environment variable management [`2ac5a4c`](https://github.com/thkruz/keeptrack.space/commit/2ac5a4ce091cfa7a00f34d9a69acdc24688ad1cc)
+- feat: :sparkles: enable custom language files for pro users [`05c8586`](https://github.com/thkruz/keeptrack.space/commit/05c8586ad85784dee0a5075878a69463fc31b8cb)
+- perf: :zap: performance tweaks to reduce dom interaction and utilize idlecallback [`fca0c98`](https://github.com/thkruz/keeptrack.space/commit/fca0c98db0e227b7fc784a27750884df578ca931)
+- refactor: :recycle: remove unused properties from various color scheme classes [`6da7954`](https://github.com/thkruz/keeptrack.space/commit/6da795468e05d89d3817ad045c93c89f72a1dd27)
+- refactor: :recycle: Update tooltip attributes and styles across multiple plugins for consistency and improved usability [`e2700a6`](https://github.com/thkruz/keeptrack.space/commit/e2700a6895998ed254461ca9e52095690d73e411)
+- test: :white_check_mark: add mobile and desktop tests for LegendManager class functionality [`1d57214`](https://github.com/thkruz/keeptrack.space/commit/1d57214fbc5776396c5a97a481e7baa1ec1a047a)
+- chore: :fire: remove Cypress configuration and test files [`6f76e85`](https://github.com/thkruz/keeptrack.space/commit/6f76e85cbbdc644f9f8b18c35e25b357f24c6ae3)
+- refactor: :alien: update celestrak version [`4bd58c4`](https://github.com/thkruz/keeptrack.space/commit/4bd58c4db99a1fa8825ddcf5d6a149d4c0fa3daa)
+- fix: :bug: use optional chaining for sound manager calls to prevent errors [`39868e5`](https://github.com/thkruz/keeptrack.space/commit/39868e5d6329847f7a375e7ace6bbe391ef805ec)
+- feat: :sparkles: enhance keyboard input handling for iframe communication and improve mouse input iframe detection [`c8f2e5c`](https://github.com/thkruz/keeptrack.space/commit/c8f2e5ccfd8597507cf156f4242b7e11b312fade)
+- feat: :sparkles: enhance build process with optional directory copying and remove deprecated example HTML files [`5d04350`](https://github.com/thkruz/keeptrack.space/commit/5d043503c5bf80e66493b992550f7be2fdf96ca3)
+- refactor: :sparkles: Introduce Milky Way texture quality settings and streamline skybox initialization [`e21ac63`](https://github.com/thkruz/keeptrack.space/commit/e21ac633d3058f541b0a6cc544a3b0a3622017d2)
+- refactor: :recycle: sync dark-clouds preset with original version [`e7293cf`](https://github.com/thkruz/keeptrack.space/commit/e7293cfcffc746a9b05437041f9eb6caae9544f2)
+- refactor(ui): replace ISS wallpaper, normalize keyboard handling, and tidy CSS [`3877862`](https://github.com/thkruz/keeptrack.space/commit/387786276ee8c8eadc14ea917b9ede936a51f4bd)
+- refactor: :recycle: split LayersPopupBox class into own file [`8d992ad`](https://github.com/thkruz/keeptrack.space/commit/8d992adc926000274f9e11bde16287cc63f35c54)
+- test: :white_check_mark: fix all failing tests [`62db94f`](https://github.com/thkruz/keeptrack.space/commit/62db94f56263acd436071fcbcea36b311443fbb1)
+- fix: :bug: cap covariance radii to prevent excessive bubble sizes, enable Jday usage in settings, and update bottom menu visibility handling [`d677b37`](https://github.com/thkruz/keeptrack.space/commit/d677b37731887d994119852a11b998ef4a622cce)
+- refactor: :children_crossing: Enhance VCR plugin with improved tooltip handling and event management for play, pause, rewind, and fast forward actions [`ae419ab`](https://github.com/thkruz/keeptrack.space/commit/ae419ab45292fc3157c41a4f918363ddc62eeb32)
+- feat: :sparkles: add isWatchlistTopMenuNotification flag and update settings persistence for offline mode [`104c263`](https://github.com/thkruz/keeptrack.space/commit/104c2635657d0a203ed3c80c035167305996c670)
+- feat: :sparkles: enhance Gaussian blur function with variable blur amount and optimize performance by early exits [`d8847c5`](https://github.com/thkruz/keeptrack.space/commit/d8847c5df162c37d26ae1207e5837df7f243bbca)
+- fix: :bug: correct OEM satellite orbit segment & history positioning; always update OEM orbit data [`bc00540`](https://github.com/thkruz/keeptrack.space/commit/bc0054032354a45e927865b8d1464821025fd2e1)
+- feat: :sparkles: enhance SensorManager to support offline mode and load sensor JSON [`f4fb6dd`](https://github.com/thkruz/keeptrack.space/commit/f4fb6dd3117ea1aedc00c5dfebae70a94dda1601)
+- refactor(settings): enhance type safety for texture quality properties and update imports [`eee1bb2`](https://github.com/thkruz/keeptrack.space/commit/eee1bb2363102558feb77a7da969e4558496e76a)
+- feat: :zap: optimize mesh management by loading on demand [`07c9d91`](https://github.com/thkruz/keeptrack.space/commit/07c9d91937fd335fcfcb3557f0307e55224d51bf)
+- refactor: :recycle: cache orbit buffers, rename updateOrbitData -&gt; alignOrbitSelectedObject, and simplify GPU updates [`ce492b0`](https://github.com/thkruz/keeptrack.space/commit/ce492b0eacd95d7c1c000141fdd622df96f3617c)
+- fix: :bug: update build-manager to copy examples directory and adjust settings manager for static offset handling [`45b9fa9`](https://github.com/thkruz/keeptrack.space/commit/45b9fa9ff8ce301029466a4d548b1c455d7a486b)
+- refactor: streamline texture loading and splash behavior [`d6ef1ae`](https://github.com/thkruz/keeptrack.space/commit/d6ef1ae4c9aa91df1f3982d0a0674333814ecdfb)
+- refactor: :recycle: streamline watchlist creation and clear functionality in WatchlistPlugin [`b7bb9d0`](https://github.com/thkruz/keeptrack.space/commit/b7bb9d0ea186c2489987adf59fe4f70d05355343)
+- feat: :sparkles: Add launch site selection functionality to NewLaunch plugin [`99fde1d`](https://github.com/thkruz/keeptrack.space/commit/99fde1dc3b2f7805cd77ba4236d4954d0954cd8e)
+- refactor: :children_crossing: update embed settings to reflect new plugins and options [`cc944e9`](https://github.com/thkruz/keeptrack.space/commit/cc944e983b159de2169dae9f5809cbf229dbb519)
+- fix: :bug: fix time management with delayed enabling of time changes [`2c2604b`](https://github.com/thkruz/keeptrack.space/commit/2c2604bfa4d68b6b20e1c49d09f507f72a95b9c5)
+- feat: :sparkles: Add filters for vLEO and xGEO satellites, update ColorSchemeManager and WebGLRenderer integration [`a89d6f4`](https://github.com/thkruz/keeptrack.space/commit/a89d6f4d8ac87214b6d7d6b1688ac617aaac5639)
+- feat: :sparkles: enhance WatchlistPlugin with top menu notifications and update StorageKey enum for better organization [`f1f6c45`](https://github.com/thkruz/keeptrack.space/commit/f1f6c456a337e8e45a88ec214bc1eaf30ddba304)
+- refactor: :recycle: rename CameraType.DEFAULT to FIXED_TO_EARTH and update usages [`4c7836f`](https://github.com/thkruz/keeptrack.space/commit/4c7836f8e570502ce7e465a09e244ab6b73f73b7)
+- fix: :bug: Adjust maxRng values for sensors to improve range accuracy [`4f9fd81`](https://github.com/thkruz/keeptrack.space/commit/4f9fd81f40a0214dfdc7c91b7241eae30a41428c)
+- refactor: :truck: move the camera class to new folder to enable refactoring [`af7bce6`](https://github.com/thkruz/keeptrack.space/commit/af7bce614fda0577750f2a7a961cd53600c16e19)
+- docs: :loud_sound: update CHANGELOG with new features, fixes, and enhancements for v10.8.0 [`e28bc2a`](https://github.com/thkruz/keeptrack.space/commit/e28bc2aec8fbee697eaf92085fcb9967b6562ece)
+- feat: :sparkles: add stem environment preset and integrate into parseGetVariables [`ef4a313`](https://github.com/thkruz/keeptrack.space/commit/ef4a313b9fb0b89c483ad74e96934ed7def81daf)
+- fix: :bug: correct night mode toggle logic in NightToggle plugin [`1d38b95`](https://github.com/thkruz/keeptrack.space/commit/1d38b958d5e61682a91c8409309300e96e1b0784)
+- fix: :bug: update cache action version and streamline SSH setup in build pipeline [`a0082f3`](https://github.com/thkruz/keeptrack.space/commit/a0082f31c0d866d5c85e9a97a74abf56bc9976d1)
+- feat: :sparkles: add userAccountChange event and update searchUpdated event parameters [`997d1eb`](https://github.com/thkruz/keeptrack.space/commit/997d1eb17e5e19b2bbb5910556c8254f2ef35037)
+- fix: :bug: add !important to nav-bar-height and refactor settings override loading in SettingsManager [`7f2c8a1`](https://github.com/thkruz/keeptrack.space/commit/7f2c8a11d14bca1fcba73e719e75c0d9ed2ce989)
+- fix: :bug: handle potential null values in look angles download and improve data display [`6736583`](https://github.com/thkruz/keeptrack.space/commit/6736583841f18a0ade89c1843df1971004bdd02b)
+- refactor: :fire: remove unused isShowDistance property [`e2195b9`](https://github.com/thkruz/keeptrack.space/commit/e2195b96283e1b4eeebf8a22233e79fe34636fef)
+- refactor: update StarlinkColorScheme to differentiate operational and other statuses [`fd99840`](https://github.com/thkruz/keeptrack.space/commit/fd998408db6f1ff633af2d83833a1eb544522f6a)
+- refactor: :recycle: refactor watchlist serialization and deserialization methods for improved clarity and error handling [`e671d7f`](https://github.com/thkruz/keeptrack.space/commit/e671d7f83135bac6080ed638bf53249ff1b360e8)
+- refactor: :label: add type definitions for various managers and update service locator methods for improved type safety [`eb34ffd`](https://github.com/thkruz/keeptrack.space/commit/eb34ffdff65ad6c7883451279485cd74cc6a0fc3)
+- feat: :sparkles: add version management to PersistenceManager with validation and storage [`8870309`](https://github.com/thkruz/keeptrack.space/commit/8870309f11f13fed72671a91907539c0df30f7ce)
+- refactor: :recycle: update WebpackManager to use BuildConfig and remove deprecated dotenv usage; clean up CSS filters [`b0f68ca`](https://github.com/thkruz/keeptrack.space/commit/b0f68ca89c4a2d17d92db7f5efc12969ed365939)
+- refactor(settings): update imports to use new module paths and clean up code [`0719e4d`](https://github.com/thkruz/keeptrack.space/commit/0719e4df2ef16f747840d8a223621385e1f79086)
+- fix: :bug: handle potential null values in filter settings saving to ensure defaults are applied [`ed8c95c`](https://github.com/thkruz/keeptrack.space/commit/ed8c95c1a5a96182f3d91f73dec8a4575b767ddf)
+- feat: :sparkles: update occlusion drawing logic to handle different center bodies [`0463984`](https://github.com/thkruz/keeptrack.space/commit/04639845f50ac7f6d72f384a85b5c83772049a42)
+- refactor: :recycle: switch to declarative kt-tooltip and remove TooltipsPlugin usage [`32bdd16`](https://github.com/thkruz/keeptrack.space/commit/32bdd16b2aa20c9c4d178f2591cc79179246de9e)
+- feat: :sparkles: integrate SupabaseManager for environment variable handling and add Supabase dependencies [`424b9d0`](https://github.com/thkruz/keeptrack.space/commit/424b9d044e8794ab299551bf0450ef8f64be9d92)
+- fix: :bug: handle potential null values for primary satellite covariance matrix in SelectSatManager [`1a47050`](https://github.com/thkruz/keeptrack.space/commit/1a470500e5c988a063781fe174f234feb1575a12)
+- fix: :bug: update class method references to use optional chaining for safer DOM manipulation [`07a7350`](https://github.com/thkruz/keeptrack.space/commit/07a7350ad6c3e64bf9caa8be03e5d44b48358cd1)
+- fix: :bug: update getEl calls to include the 'true' parameter for titleSpan and optimize array initialization in tests [`6bd14e7`](https://github.com/thkruz/keeptrack.space/commit/6bd14e764c85fdba7deeee0480fe42e2fcfc8b0b)
+- refactor(oem-satellite): rename stateVectors → ephemeris, wire LagrangeInterpolator, clean imports; bump plugins-pro submodule [`25f7d25`](https://github.com/thkruz/keeptrack.space/commit/25f7d256f470b7bd8970f9e0dfbf049c952a7a59)
+- feat: :sparkles: Add maneuver data handling to satellite info box [`2a47bdb`](https://github.com/thkruz/keeptrack.space/commit/2a47bdb9993785c42dff17caedb34941638101ea)
+- refactor: :recycle: replace getCameraDistanceFromEarth/getCameraPosition with calcDistanceBasedOnZoom/getDistFromEarth, compute target distance directly, and make snap instantaneous when chaseSpeed_ == 1.0 [`a87f2ff`](https://github.com/thkruz/keeptrack.space/commit/a87f2ffffb13091fac479275149a83b9fc842906)
+- feat: :sparkles: implement deepMerge method for recursive object merging in settings management [`9d27886`](https://github.com/thkruz/keeptrack.space/commit/9d278863e12dc36ded0e63f59e89c50f5114d17c)
+- feat: :sparkles: Add locale file compilation method to FileSystemManager [`d35d00e`](https://github.com/thkruz/keeptrack.space/commit/d35d00e373a6fe3e466d693b597223b2e3919534)
+- feat: :sparkles: Add locale file compilation method to FileSystemManager [`ea8dad1`](https://github.com/thkruz/keeptrack.space/commit/ea8dad1e56cbab324b00d4a389336382339d1945)
+- fix: :bug: move SSH setup for deploy key to appropriate steps and ensure submodules are updated [`2e885fc`](https://github.com/thkruz/keeptrack.space/commit/2e885fc45cddb5b4c14232c4771715bdad951f62)
+- fix: :bug: simplify godrays occlusion drawing using planets map; keep Earth/Moon special-cases [`66130d6`](https://github.com/thkruz/keeptrack.space/commit/66130d679c5dd202ab26218ed098038f43941eb2)
+- fix: :bug: color-schemes: handle OEM-import sats, preserve planet color, adjust zoom behavior; bump plugins-pro submodule [`46bf561`](https://github.com/thkruz/keeptrack.space/commit/46bf561e02fbc360e7cc551f6b85292a38d9815b)
+- refactor: :recycle: remove unused showLoading calls and improve link type assignment in SatLinkManager [`86b5400`](https://github.com/thkruz/keeptrack.space/commit/86b54002acc21242aac1f0cab331e83db6667f97)
+- refactor: :recycle: replace global keepTrackApi with ServiceLocator/EventBus in UiManager and rename file [`7d398df`](https://github.com/thkruz/keeptrack.space/commit/7d398dfe8c864d64e3dfdf91f85f10c5a7944dbb)
+- feat: :sparkles: refactor orbit type handling to use updateOrbitType method in OrbitManager [`dac386b`](https://github.com/thkruz/keeptrack.space/commit/dac386b6329a4415e5a75e5aaf6ec042db6213c7)
+- fix: update loading screen button styles and add pulsate animation for better visibility [`bdcae96`](https://github.com/thkruz/keeptrack.space/commit/bdcae9614666655dadfaf2c158ad4e2ce28fd8e9)
+- test: :white_check_mark: update WatchlistPlugin to conditionally enable top-menu elements [`e8c9e0e`](https://github.com/thkruz/keeptrack.space/commit/e8c9e0efcd00c8033274a6a1061f6af038cb627a)
+- feat: :sparkles: add HOLDARC sensor details and update coordinates for existing sensors [`c50849a`](https://github.com/thkruz/keeptrack.space/commit/c50849a23728bc54b20304c31c00ec837c8cc22b)
+- ci: :green_heart: make mergeLocales accept optional proDir and use for non-pro builds [`74f4348`](https://github.com/thkruz/keeptrack.space/commit/74f4348a6bf0fcbce617d4563e64cacb098d8cbf)
+- feat: :sparkles: Add LinkedInLinkPlugin to top menu and update configuration [`18c6de8`](https://github.com/thkruz/keeptrack.space/commit/18c6de88b97e74d757612885d71eb9c342b56d1d)
+- fix: :bug: fix J2000 vs TEME [`860c7ce`](https://github.com/thkruz/keeptrack.space/commit/860c7ce2f38de52e7e9fdd7ecad1594bb3c8b082)
+- fix: :bug: smooth satShader.minSize scaling based on camera distance [`ead7731`](https://github.com/thkruz/keeptrack.space/commit/ead7731f0f56b735c3198b52252b8b32514ca9a2)
+- refactor: :children_crossing: Improve tooltip sizing and positioning logic — use maxWidth, separate vertical/horizontal direction selection, and fix placement math [`4e7e2e5`](https://github.com/thkruz/keeptrack.space/commit/4e7e2e5ecbc5a5d40733e0e88cb9fc44255b3167)
+- feat: :sparkles: Update satellite info box sections to be collapsed by default with a new order [`773e791`](https://github.com/thkruz/keeptrack.space/commit/773e79112d6baf80b08a078370468c2a3e5ae5c7)
+- feat: :sparkles: add Long Range Discrimination Radar (LRDR) sensor and fix LEOLABS enum value [`5303cf5`](https://github.com/thkruz/keeptrack.space/commit/5303cf554ffc37702f31974ad4cd53adf2a38276)
+- feat: :sparkles: Enhance darkClouds preset with improved camera settings and UI adjustments [`ed40fe8`](https://github.com/thkruz/keeptrack.space/commit/ed40fe8cf4265982fa8cc569b84b2f7effd788c8)
+- fix: :bug: use texture resolution settings independent of mobile settings [`e3d2755`](https://github.com/thkruz/keeptrack.space/commit/e3d2755182991a1f0f4a908d980b1e67c2f67e2c)
+- fix: :bug: Refactor container usage in setupStandardEnvironment to use Container.getInstance for consistency [`df36942`](https://github.com/thkruz/keeptrack.space/commit/df36942f96da340cb070c93b4cf151a6f1ea76e1)
+- feat: :sparkles: add epfl env [`1a63346`](https://github.com/thkruz/keeptrack.space/commit/1a633467faa250f6052f0a8aa738ace9230c9f6a)
+- refactor: :sparkles: Enhance celestial bodies menu with additional dwarf planets and improved tooltip handling [`289fd25`](https://github.com/thkruz/keeptrack.space/commit/289fd25b3af94fbc1e0cacaff7feb054a20780a6)
+- refactor: :recycle: rename offline property to offlineMode [`59ff4de`](https://github.com/thkruz/keeptrack.space/commit/59ff4de0a6a9181628a9a31f55d7b338176ecac4)
+- feat: :sparkles: Add ManeuverPlugin with configuration and localization support [`85b322c`](https://github.com/thkruz/keeptrack.space/commit/85b322ce3b31dba51efc5360b5c8815f7f9999a4)
+- fix: :bug: remove IIFE for Safari support [`859a8f1`](https://github.com/thkruz/keeptrack.space/commit/859a8f10d4397d6ab913a0f5c06a98e694cd3fad)
+- chore: switch local dev port to 5544 in configs, settings and tests [`747735c`](https://github.com/thkruz/keeptrack.space/commit/747735ca1ff2713d04c6f8aa3cfbfe50d963fe4a)
+- feat: :sparkles: add optional radius to getAlt and new getPositionFromCenterBody helper [`c2aa581`](https://github.com/thkruz/keeptrack.space/commit/c2aa5814c6d50155b3a45657f6f512fe395c147b)
+- refactor: :zap: simplify shader calculations in DotsManager [`7a569ec`](https://github.com/thkruz/keeptrack.space/commit/7a569ec7d0a9f0fc2e7e8d91496e7824b1a17a17)
+- fix: :bug: wrap file copy operations in try-catch to handle errors gracefully [`05e546c`](https://github.com/thkruz/keeptrack.space/commit/05e546c822fc64c50b10a69f3fc6c34e3837fc9f)
+- fix: :bug: night mode toggle logic in NightToggle plugin [`b16418b`](https://github.com/thkruz/keeptrack.space/commit/b16418b826064aea632f14820ccaf26838f162c7)
+- fix: :bug: adjust godrays exposure value and blur kernel size for improved rendering [`577cbad`](https://github.com/thkruz/keeptrack.space/commit/577cbad9ccd0891a0fcf76c6ac38e23573da0362)
+- fix: :bug: Remove Safari support check and redirect logic from main initialization [`6ff63f4`](https://github.com/thkruz/keeptrack.space/commit/6ff63f4e8389b5dd080d303d22749d0526568b17)
+- fix: :bug: implement Moon.update to apply world shift and respect center/selection [`50f05ae`](https://github.com/thkruz/keeptrack.space/commit/50f05ae186d9717e9cdf3bd2fc06bd4fb0e80bfb)
+- feat: :sparkles: add SatInfoBoxOrbital configuration and update default plugins for improved settings management [`c6f2847`](https://github.com/thkruz/keeptrack.space/commit/c6f2847efabf9dd1489ce08a6f204efacb8d7883)
+- refactor: :recycle: replace direct plugin imports with getPluginByName calls in SensorListPlugin, CustomSensorPlugin, and SensorManager [`20dae63`](https://github.com/thkruz/keeptrack.space/commit/20dae639b7586482601817e4cc129f79583a1a01)
+- feat: :sparkles: update satellite record handling in orbit cruncher for better ecf handling [`f4f9647`](https://github.com/thkruz/keeptrack.space/commit/f4f96471f2cbd19a93cbdc834137c54935fda46e)
+- feat: :sparkles: add data cleaning method to remove duplicate channel entries [`b7e3721`](https://github.com/thkruz/keeptrack.space/commit/b7e37217fb11c9d834fc957e817c28c4e61e0307)
+- fix: :bug: refactor showLoading call to only fire if a time change happens [`6e09f34`](https://github.com/thkruz/keeptrack.space/commit/6e09f3414bf812516cefa3e19f95deda40117b7e)
+- build: :recycle: replace opener with custom openFile function for cross-platform compatibility [`7c72aa9`](https://github.com/thkruz/keeptrack.space/commit/7c72aa9424b756ac69369c31ea361bc464b4faa2)
+- refactor: :recycle: Update plugin imports to use 'plugins-pro' [`2978644`](https://github.com/thkruz/keeptrack.space/commit/29786441138cbf9cab66d763341f5ffe8e6151d3)
+- fix: :bug: refactor visibility logic for secondary satellite info in SatInfoBoxObject [`0e8a624`](https://github.com/thkruz/keeptrack.space/commit/0e8a624bddf343088f9cb3903583f82ad03e011e)
+- fix: :bug: replace SSH setup script with webfactory/ssh-agent action for deploy key [`49a12b7`](https://github.com/thkruz/keeptrack.space/commit/49a12b7c41b4e77b3b871fe1c18d408b7c32233c)
+- feat: :sparkles: compute relativeSatPos and pass worldOffset to celestial-body shaders [`584ceb0`](https://github.com/thkruz/keeptrack.space/commit/584ceb0f45605d6c58e84a90453a4905a9e86825)
+- fix: :bug: revert star changes and rename shader attribute from a_star to a_size for clarity [`56047b3`](https://github.com/thkruz/keeptrack.space/commit/56047b3522dd4d8158ac6dfc1c093a26088f94dc)
+- feat: :sparkles: add TooltipsPlugin and UserAccountPlugin configurations to KeepTrackPluginsConfiguration [`c7d657a`](https://github.com/thkruz/keeptrack.space/commit/c7d657a3b18c998b794181678acf6c1ac13c63c9)
+- refactor: :recycle: remove obsolete test files for Astronomy and Planetarium plugins [`f090eab`](https://github.com/thkruz/keeptrack.space/commit/f090eabdee48e5d66b340fb4a6293f6117a611bc)
+- docs: :memo: minor documentation changes [`1575e4d`](https://github.com/thkruz/keeptrack.space/commit/1575e4d2f424d44c2d22446b1efc320e65ac5417)
+- refactor: :recycle: init planets in loadScene and remove low-priority loader [`694931f`](https://github.com/thkruz/keeptrack.space/commit/694931fddc4143b9e2141cc0ed71ef2714770ee4)
+- feat: :sparkles: add low priority scene loading and event listener for KeepTrack readiness [`f7d5583`](https://github.com/thkruz/keeptrack.space/commit/f7d5583924ad3980bbc984d304386faef0769208)
+- feat: :sparkles: enhance stem environment with BottomMenu integration and event handling [`4448aa9`](https://github.com/thkruz/keeptrack.space/commit/4448aa97b17abdbb663d50a05f297170b9fda5a0)
+- fix: :bug: fix setCurrentModel method to reset rotation only when model name changes [`cf077a2`](https://github.com/thkruz/keeptrack.space/commit/cf077a2cb7b82f7b44e04c3a68bb518ede7f8ac2)
+- chore: :bookmark: update version to 10.8.3 in README, CHANGELOG, and version.js [`fc510a8`](https://github.com/thkruz/keeptrack.space/commit/fc510a8b662baee8c821623a9555934cb1d8e478)
+- feat: :sparkles: update celestial bodies list and enhance zoom distance settings for Sun and Earth [`f10c8e0`](https://github.com/thkruz/keeptrack.space/commit/f10c8e0cb223eb1b556ab4611668a7efdefbccbd)
+- feat: :sparkles: update darkClouds preset with new longitude and settingsOverride structure [`26418f3`](https://github.com/thkruz/keeptrack.space/commit/26418f38ffbcdc8b6ec1c000886c401f557078ab)
+- fix: :bug: update SelectSatManager import type and adjust parseGetVariables calls in tests to include settingsManager [`ea909a4`](https://github.com/thkruz/keeptrack.space/commit/ea909a49b6d3e7f9bd5577cd289fcc2f0c2731f3)
+- fix: :bug: update sensor-selected-container display logic and reset sensor button state [`c2cd614`](https://github.com/thkruz/keeptrack.space/commit/c2cd6148d717aac13a7f1dc86d144c0060090f8d)
+- fix: :bug: compute altitude for non-Earth-centered objects by resolving centerBody [`021f8ce`](https://github.com/thkruz/keeptrack.space/commit/021f8cefd13d0101163d9841e04cca5aaff16650)
+- refactor: :recycle: streamline localization handling by replacing Localization instance with t7e function calls [`d8dae92`](https://github.com/thkruz/keeptrack.space/commit/d8dae920f7b4166e9f4d15ca297b2dae1914cdbe)
+- build: :construction_worker: Add setenv script to configure environment variables [`73aee97`](https://github.com/thkruz/keeptrack.space/commit/73aee97ecd7d7693c4d06ff5355ab7629f808469)
+- fix: :bug: update copyright notice handling for official website [`5980b80`](https://github.com/thkruz/keeptrack.space/commit/5980b8081154116e35a4ae20fd5404a6fcdec645)
+- chore: :technologist: add deepsource.toml to enable JavaScript analysis and set test/exclude patterns [`c6a79d9`](https://github.com/thkruz/keeptrack.space/commit/c6a79d999e0ef69a25c78afb9fe94faad3b94823)
+- feat: :sparkles: add alternate nasa satellite image map originally seen on https://nadir.space [`0ebb707`](https://github.com/thkruz/keeptrack.space/commit/0ebb7075c0e7e72f454d25ad68120b8acad4ed2d)
+- fix: :bug: VCR plugin - use ScenarioManagementPlugin.scenario for end-time checks and handle staticOffsetChange to refresh play/pause UI [`164d200`](https://github.com/thkruz/keeptrack.space/commit/164d200aa5c6bdca91ac22745c64250d86ba8d56)
+- fix: :bug: simplify camera distance checks and enforce minimum distance in CameraState [`ec9496c`](https://github.com/thkruz/keeptrack.space/commit/ec9496cbaea45881998e82a0d044a5440d65b8e6)
+- fix: :bug: add validation for eccentricity, epoch year, and epoch day formats in createNominalSat_ [`aa1506d`](https://github.com/thkruz/keeptrack.space/commit/aa1506dec7d75dc94d12578e9425f057a183cd1a)
+- fix: :bug: handle potential null values in audio playback and error logging [`f4b7afa`](https://github.com/thkruz/keeptrack.space/commit/f4b7afac110976ce7e461da948b7b313d2a9eb53)
+- fix: :bug: ensure open button is defined before setting onclick handler in colorbox [`f53d692`](https://github.com/thkruz/keeptrack.space/commit/f53d692c23545c978cad22453a9ad133b65cc249)
+- refactor: :recycle: improve audio element validation in SoundManager [`cfc3209`](https://github.com/thkruz/keeptrack.space/commit/cfc320956e4bcaf5696ecbef3a0b04672690e195)
+- docs: standardize SECURITY.md headings and update disclosure contact [`a1c78ad`](https://github.com/thkruz/keeptrack.space/commit/a1c78add266e6f94926d78caecd5251375e36fe0)
+- refactor: :recycle: remove TooltipsPlugin dependency & tooltip creation; avoid auto-resuming audio context; lazily load speech voices in speak [`1682406`](https://github.com/thkruz/keeptrack.space/commit/168240682d6359e2d19529dd35ff61b81652af66)
+- docs: :loud_sound: update CHANGELOG for v10.8.2 with new features and bug fixes [`8174d45`](https://github.com/thkruz/keeptrack.space/commit/8174d45202f388e6fd65baabd522ddb870967378)
+- fix: :bug: move auth-config.js writing logic to ensure proper file handling after directory creation [`4ef2a35`](https://github.com/thkruz/keeptrack.space/commit/4ef2a356a94ca3e6e1fc8dbd63f3801e131284c5)
+- refactor: :recycle: remove unused .lftp_ignore file [`854c72a`](https://github.com/thkruz/keeptrack.space/commit/854c72a394716a109162159ef09ba110fe796dda)
+- fix(settings): add interface declaration for TypeScript property type checking [`fb38f32`](https://github.com/thkruz/keeptrack.space/commit/fb38f32ec8efb690aceb4fbf074fa4082863d205)
+- chore(debug): convert buffer-size validation to commented debugging block in LineManager [`a000572`](https://github.com/thkruz/keeptrack.space/commit/a000572428b7096d67f89e6b39b33ebd3a371f67)
+- refactor: :alembic: comment out Moon planet creation and assignments for now [`2e7c184`](https://github.com/thkruz/keeptrack.space/commit/2e7c184f5d61728e90c93ce6614ac93069483d7a)
+- fix: :bug: enable more camera distance checks for satellite shader minimum size [`c396c76`](https://github.com/thkruz/keeptrack.space/commit/c396c763affa151ee16acde22f3b930a8bde490c)
+- fix: :bug: handle invalid covariance matrix in selectSatObject_ method and set default radii [`ac8587c`](https://github.com/thkruz/keeptrack.space/commit/ac8587ccd63fbef9d85030de704af6bda80eb7ba)
+- refactor: :recycle: chane isAudioElement to private since it's only used internally within SoundManager [`6e36d2f`](https://github.com/thkruz/keeptrack.space/commit/6e36d2f34740478456db14589cf382f5961a1fb2)
+- feat: :art: Update texture quality settings and disable night mode in mobile manager [`b4d258d`](https://github.com/thkruz/keeptrack.space/commit/b4d258d97197f659226e27e80893fa0930052369)
+- refactor: :recycle: remove mat4 dependency and use mainCamera.matrixWorldInverse in unProject; fix indentation for clear-lines submenu [`32b3493`](https://github.com/thkruz/keeptrack.space/commit/32b3493a1a564147721af55bff884316a22656f8)
+- feat: :sparkles: Add "Draw Moon Orbit Path" button to Planets menu and wire click handler to invoke moon.drawOrbitPath() [`13b6fb1`](https://github.com/thkruz/keeptrack.space/commit/13b6fb18f652eb309596a6de9ce6df657aa85fe0)
+- fix: :bug: use optional chaining for model mesh access to prevent runtime errors [`7cf6fcd`](https://github.com/thkruz/keeptrack.space/commit/7cf6fcd607edac8790edcfb9eff662fc035a405e)
+- fix: :bug: update default values for godraysSamples and isDrawAtmosphere settings [`093d0f7`](https://github.com/thkruz/keeptrack.space/commit/093d0f7ae1bb659ea05a2f2e28c010472c74e9d6)
+- feat: :sparkles: add keyboard event handling for elements with 'keyboard-priority' class [`7aa45c7`](https://github.com/thkruz/keeptrack.space/commit/7aa45c7689350aeb4e2248c47d45d21bbb726cdc)
+- fix: :bug: enhance visibility of menu items based on satellite type in ViewInfoRmbPlugin [`860c912`](https://github.com/thkruz/keeptrack.space/commit/860c9125aede4496233c8680e059126d5f723b51)
+- refactor: :recycle: update the variable names for getBufferSubDataAsync to be easier to understand [`14bd27a`](https://github.com/thkruz/keeptrack.space/commit/14bd27a739f63d7fc87a286197d9ee4cfc93fa66)
+- refactor(planets-menu): normalize Home key handling; support Shift+Home vs Home [`c080c1e`](https://github.com/thkruz/keeptrack.space/commit/c080c1e986bac953c0d60b3c1d513c9ce31f13ee)
+- fix: :bug: update layers menu icon classes for consistent styling [`d945960`](https://github.com/thkruz/keeptrack.space/commit/d945960ffd63817feeb0ec8519a14f4ab0e1e3df)
+- fix: :bug: handle null mesh cases in MeshModel and applyAttributePointers_ [`8aab9d5`](https://github.com/thkruz/keeptrack.space/commit/8aab9d5243c7d0fc101c58321aa736285dfa0fd4)
+- feat: :sparkles: add canvas visibility toggle in settings manager [`152d20b`](https://github.com/thkruz/keeptrack.space/commit/152d20b0423857b6520fb828b944d8666800337c)
+- fix: :bug: Correct texture quality string casing and standardize resolution handling [`14f65cd`](https://github.com/thkruz/keeptrack.space/commit/14f65cd88e7967fadb5ff9ee768769f5fb6496ab)
+- fix: :bug: standardize earth texture quality values to lowercase [`619a64e`](https://github.com/thkruz/keeptrack.space/commit/619a64e9b90d95ee11e88377097b07405172a265)
+- fix: :bug: standardize texture quality values to lowercase in MobileManager [`95d0ae1`](https://github.com/thkruz/keeptrack.space/commit/95d0ae1aa4d2ecbe47e6c070dbbb3927e43da1f0)
+- fix: :bug: update build pipeline to set up SSH for deploy key using webfactory/ssh-agent action [`b5ffbe1`](https://github.com/thkruz/keeptrack.space/commit/b5ffbe1885bce0bdfca5239613f310797cdbc354)
+- feat: :sparkles: refactor Astronomy and Planetarium plugins to extend KeepTrackPlugin and initialize dependencies [`c59a887`](https://github.com/thkruz/keeptrack.space/commit/c59a88758975c35db623b03c4911649b3205a53f)
+- fix: :bug: update legend HTML to correct source order and display for data sources [`fbe557b`](https://github.com/thkruz/keeptrack.space/commit/fbe557b2d6ce65d67e87b78e5b3fdb15928d97c5)
+- fix: :bug: update event listener bindings in BottomMenu to use class method references [`279536e`](https://github.com/thkruz/keeptrack.space/commit/279536e4b8465079ab9cb70130f1bb354b22ae5d)
+- chore: :package: add ootk engine submodule (src/engine/ootk) [`49083d7`](https://github.com/thkruz/keeptrack.space/commit/49083d76c769984a421d6d9b789f206e6b6892fb)
+- chore: :wrench: update default plugins - enable VcrPlugin, add TimeSlider, relocate TooltipsPlugin to non-menu [`7e1c46a`](https://github.com/thkruz/keeptrack.space/commit/7e1c46aee0dcc8cb8f2bdab3c782f1af2680e04b)
+- refactor: :sparkles: Update tooltip handling to use dynamic tooltipTag for attribute selection [`4676937`](https://github.com/thkruz/keeptrack.space/commit/4676937a29bb6715a94aa3232492b12ff41d6698)
+- fix: :bug: improve error handling in ScreenRecorder and StreamManager to prevent crashes when media recorder is not initialized [`be92fad`](https://github.com/thkruz/keeptrack.space/commit/be92fad0291393fb89dbd143b49f2b3fa743de7a)
+- fix: :bug: update build pipeline to set up SSH for deploy key and remove submodule checkout [`23e61e7`](https://github.com/thkruz/keeptrack.space/commit/23e61e73b886c1ea3e8d4875ef66ed4b606355d9)
+- fix: :bug: update godraysSamples values to use numeric constants instead of GodraySamples enum [`8739c1a`](https://github.com/thkruz/keeptrack.space/commit/8739c1a576e006dd5bf46c732565537629fae583)
+- fix: handle potential undefined values in watchlist updates [`241d9e6`](https://github.com/thkruz/keeptrack.space/commit/241d9e67026999cb2bad4924dee469d095d7a4ed)
+- fix: :bug: tune sound defaults — lower click volume, use SoundNames for loading/export, add volumes for beeps and menu button [`3b6dbb2`](https://github.com/thkruz/keeptrack.space/commit/3b6dbb2dd9f029e415435046d9dbef9979b871fc)
+- build: :green_heart: normalize __dirname for Windows/POSIX and allow reassignment [`2902a60`](https://github.com/thkruz/keeptrack.space/commit/2902a605087f0d6ce76c77d40a699088a3be1c68)
+- feat: :sparkles: add Home key handler to center camera on Earth [`c7b321d`](https://github.com/thkruz/keeptrack.space/commit/c7b321df2731c4d7f0c58b9363d761c8b78de86d)
+- feat: :sparkles: enhance tooltip dimensions and support HTML content [`aa90091`](https://github.com/thkruz/keeptrack.space/commit/aa90091c361e7b026e0418493fc9ab98802530d3)
+- fix: :bug: add localization import and initialize early in KeepTrack class [`82ab2df`](https://github.com/thkruz/keeptrack.space/commit/82ab2df141c8d5f81b5ccb571a62699da27d3402)
+- chore: :bookmark: update CHANGELOG for v10.8.4 with new features and fixes [`202372b`](https://github.com/thkruz/keeptrack.space/commit/202372be57bb2e6899a21d350783eeb0ffb089bb)
+- fix: :bug: update Electro-L 2 timestamp format and adjust time buffer for closest satellite image retrieval [`b09f917`](https://github.com/thkruz/keeptrack.space/commit/b09f91795e120f737f4a14ce01bb3571c4ee36f2)
+- chore: :bookmark: update version number to 10.6.2 in package.json [`d190a28`](https://github.com/thkruz/keeptrack.space/commit/d190a280aae71c0731321de00055f45b749dce33)
+- fix: :bug: Prevent Safari from bouncing by setting body overflow to hidden [`a486838`](https://github.com/thkruz/keeptrack.space/commit/a4868386747fa638cdcfbe72ec32990d8ed480c6)
+- refactor: :recycle: remove unused CopyRspackPlugin from webpack configuration [`f763f9c`](https://github.com/thkruz/keeptrack.space/commit/f763f9cae3d6c73f9211eee48cd9d1e4117bc60e)
+- fix: :bug: add SSH setup for deploy key in build pipeline steps [`d45abc4`](https://github.com/thkruz/keeptrack.space/commit/d45abc4335307e72e3d8f30f7ee617f4d73a672d)
+- fix: :bug: update build pipeline to initialize git submodules during checkout [`fad976e`](https://github.com/thkruz/keeptrack.space/commit/fad976e0ac70aca9bdcf13e0fb62150ae6903e81)
+- fix: clean up imports in darkClouds preset file [`23f5db4`](https://github.com/thkruz/keeptrack.space/commit/23f5db4bec67f6b4fcf0c6488e4e5226230efd44)
+- docs: :memo: add v11.0.1 "Copernicus" release notes to CHANGELOG.md [`9ec38e4`](https://github.com/thkruz/keeptrack.space/commit/9ec38e475da7e5befea0183e6831adb5328c861e)
+- refactor(rendering/skybox): use camera position directly for worldOffset; remove unused imports and dead code [`544b7f1`](https://github.com/thkruz/keeptrack.space/commit/544b7f1c0fa41e05880f2e19817dd582c4e76b6b)
+- fix: :bug: fix incorrect matrix being used for unprojection [`3516078`](https://github.com/thkruz/keeptrack.space/commit/3516078ccd1894fa29014ac40a0410128cd137db)
+- feat: :globe_with_meridians: Add English locale for Video Director plugin [`761311d`](https://github.com/thkruz/keeptrack.space/commit/761311d15c798d1f05e4d7fef328d88265215940)
+- refactor: :recycle: clean up imports and improve jday existence check in DateTimeManager [`6b56f56`](https://github.com/thkruz/keeptrack.space/commit/6b56f563eea45f83bd559b500ec04c31df3101b9)
+- fix: :bug: ensure HTML is ready before updating header data in SatInfoBox [`106cc38`](https://github.com/thkruz/keeptrack.space/commit/106cc385c87e2adb3a635ab6b03286b16e45f993)
+- fix: :bug: improve null checks for current mesh object to prevent errors during rendering [`278ccd2`](https://github.com/thkruz/keeptrack.space/commit/278ccd2da1f44f5897d58a5ea19b598ff30853f7)
+- fix: :bug: add null check for unregistering callbacks in KeepTrackApi [`081f992`](https://github.com/thkruz/keeptrack.space/commit/081f992da4711fb5bf959db26fd3b64e7ca28214)
+- fix: :zap: update TypeScript target version to ES2023 in tsconfig [`0da489d`](https://github.com/thkruz/keeptrack.space/commit/0da489dda6d818cf2f10f67d3b8bfa4035778b0e)
+- feat: :sparkles: add UserAccountPlugin with initialization error handling [`980c998`](https://github.com/thkruz/keeptrack.space/commit/980c9980ad90c77864179e65b42b6ae06c486c12)
+- fix: :bug: update satellite record creation to prevent caching of old TLEs [`7f01a89`](https://github.com/thkruz/keeptrack.space/commit/7f01a890f59f4dd1d563319838ccb3a38ba079bf)
+- fix: :bug: include WebGL error code in vertex/fragment shader creation errors [`6715f32`](https://github.com/thkruz/keeptrack.space/commit/6715f32bf5943d66aedabfbbf624139aca7ac44a)
+- refactor(build/webpack-manager): only generate and push auth webpack config when isPro [`14ec0ab`](https://github.com/thkruz/keeptrack.space/commit/14ec0ab20f2122d8bbb11ddcfb9457cb70aadda7)
+- refactor: :recycle: simplify alt2zoom — remove MIN_ZOOM_LEVEL/MAX_ZOOM_LEVEL and normalize output to [0,1] with 0.5 fallback [`b739c19`](https://github.com/thkruz/keeptrack.space/commit/b739c19857781ac7c594ec0e17a40f7f372232bc)
+- fix: :bug: scale sun size when zoomed out very far [`da19898`](https://github.com/thkruz/keeptrack.space/commit/da19898c232b6cc9d0d69f3c1530789992487f61)
+- ci: :green_heart: generate translation files before build and unit tests [`5665386`](https://github.com/thkruz/keeptrack.space/commit/5665386263369a51c43225c1137b6256daf6e09a)
+- feat: :sparkles: accept worldOffset in occlusion uniformSetup and use it [`7fe7a5a`](https://github.com/thkruz/keeptrack.space/commit/7fe7a5a92c890ce6fd9e7abfbd42c4f7865ce744)
+- feat: :sparkles: add onLinesCleared, selectedDateChange and calculateSimulationTime events to EventBus and update EngineEventMap types [`24c025b`](https://github.com/thkruz/keeptrack.space/commit/24c025b3d39414a026c95da3fc85c3cf9137bdf6)
+- fix: :bug: validate planet selection in changePlanet method to prevent invalid inputs [`b4ba336`](https://github.com/thkruz/keeptrack.space/commit/b4ba336721520a26afbf02dd7d787d12634727e4)
+- fix: :bug: validate selected planet before setting zoom distances in PlanetsMenuPlugin [`f3d79cb`](https://github.com/thkruz/keeptrack.space/commit/f3d79cb551c914c80ea4cf5c817d6ed9b51bfca1)
+- chore: :recycle: move maxSize property in shader settings for improved object sizing [`4f5332a`](https://github.com/thkruz/keeptrack.space/commit/4f5332a95a767170ec503a9a376c5b34eef01013)
+- feat: :sparkles: Integrate DepthManager into ConeMesh for log depth buffer support [`982ca09`](https://github.com/thkruz/keeptrack.space/commit/982ca0946caadad3572cb8d9a84fb317eed8c3ac)
+- fix: remove unnecessary cases from setInstallDirectory_ method for cleaner code [`c57612f`](https://github.com/thkruz/keeptrack.space/commit/c57612f21f87975060147c159e643e8752e78361)
+- fix: :bug: add sensor existence check before accessing sensor info in viewSensorInfoRmb [`0e7ffa2`](https://github.com/thkruz/keeptrack.space/commit/0e7ffa2ef2d08cf6e70768eb117327e63fb96440)
+- docs: :loud_sound: add v10.8.1 section to CHANGELOG with updates for new features and fixes [`4925a48`](https://github.com/thkruz/keeptrack.space/commit/4925a485f74a1f73e7c349cf2a02c6517a52dc57)
+- feat: :sparkles: add userLogin and userLogout events to KeepTrackApiEvents [`401adbf`](https://github.com/thkruz/keeptrack.space/commit/401adbfd0bececce793cc961f16e790e36a89a50)
+- chore: :fire: remove wrangler configuration file as part of cleanup [`1604834`](https://github.com/thkruz/keeptrack.space/commit/1604834bf74e4f04f71da9b198f1e4a9c268e78f)
+- feat: :sparkles: add initial wrangler configuration for deployment setup [`afc7743`](https://github.com/thkruz/keeptrack.space/commit/afc774325e965039e053793313a0d05c67b453ac)
+- feat: :sparkles: add functionality to open image in new tab from colorbox [`12b4218`](https://github.com/thkruz/keeptrack.space/commit/12b4218432167ae43b403d34c5ad94674c093f94)
+- chore: :bookmark: update version to 10.7.1 in README, package.json, and version.js [`b667fb2`](https://github.com/thkruz/keeptrack.space/commit/b667fb2b64e0cba41312b0c52cdb6aa9c65c6c48)
+- chore: :construction_worker: hide unused files [`f150a57`](https://github.com/thkruz/keeptrack.space/commit/f150a57fe7fc5e2d7defe3893c492ced2a6db5f6)
+- chore: :arrow_up: update version to 10.6.1 in package.json and splash-screen [`07ad8af`](https://github.com/thkruz/keeptrack.space/commit/07ad8af4451f0fe85fa11de261332bc75830e0b9)
+- feat: :art: adjust night color intensity and apply diffuse factor to political and clouds textures [`345a765`](https://github.com/thkruz/keeptrack.space/commit/345a765be0d1bb553ac87d2ea839106d331132e6)
+- feat: :sparkles: Add SpinLaunch launch site details to launchSites catalog [`181008a`](https://github.com/thkruz/keeptrack.space/commit/181008a517795fa22be69f2f474ca21ce556aefe)
+- refactor: :truck: rename all locale files [`7f46a82`](https://github.com/thkruz/keeptrack.space/commit/7f46a8232c2e66fdf9c647170ca430d782658ba2)
+- fix: :bug: update texture quality settings to 'off' for better performance in embed mode [`ba48e4f`](https://github.com/thkruz/keeptrack.space/commit/ba48e4f27585e3d84f7a0ea83ad8873e09412927)
+- fix: :bug: correct typo in comment and prevent search results animation in embed mode [`b42dfc5`](https://github.com/thkruz/keeptrack.space/commit/b42dfc5496740173fafe1be658683252740a9a34)
+- fix: :bug: eagerly initialize LayersPopupBox, simplify popup selection and move currentLayer assignment [`04bbd8b`](https://github.com/thkruz/keeptrack.space/commit/04bbd8bb9eaf0cc86646d36e03ef4080e18c873a)
+- fix: :bug: remove keeptrack.space hostname guard so UserAccountPlugin can load on local/other hosts [`395dcf4`](https://github.com/thkruz/keeptrack.space/commit/395dcf40349b4e06ee4042772e27bced6ea9747f)
+- fix: :bug: clamp gl_Position.w in log-depth vertex shader to avoid NaNs/Infs for extreme coordinates [`160b6bf`](https://github.com/thkruz/keeptrack.space/commit/160b6bf5ffd956eb11108d28bdc9319579c50110)
+- feat: :sparkles: add FilterMenuPlugin English locale entries to filter-menu en.src.json [`4f4e70f`](https://github.com/thkruz/keeptrack.space/commit/4f4e70f9cce19ae9155fd3119459c8ffdf32ad34)
+- fix: :bug: throttle updateURL to avoid browser hangs by debouncing history updates (skip calls within 250ms) and add lastUpdateTime_ [`730ead4`](https://github.com/thkruz/keeptrack.space/commit/730ead4f29e795645e3cdf22a630ec992632a795)
+- fix: :bug: Enable depth testing in SensorFovMesh to improve rendering accuracy [`cbf8544`](https://github.com/thkruz/keeptrack.space/commit/cbf85442e3c426fb5d67994c764fcbcb5a8cb166)
+- refactor: :recycle: replace magic numbers with constants for long audio cooldown and chatter repeat delay [`ad05a59`](https://github.com/thkruz/keeptrack.space/commit/ad05a59acb20a4c61f85e2e7db1e88dceded37ab)
+- fix: :bug: clear styling from nav-wrapper in DateTimeManager initialization [`6c36f5e`](https://github.com/thkruz/keeptrack.space/commit/6c36f5e76dff7838c681a83f1998365279aa39b9)
+- fix: :bug: update version display in splash screen to reflect current version number [`896b7b4`](https://github.com/thkruz/keeptrack.space/commit/896b7b4c7a9422221a887c857a6ee87cad78f95c)
+- fix: :bug: fix Safari only error related to rgba parsing [`9863c22`](https://github.com/thkruz/keeptrack.space/commit/9863c22c2a95d93893badb32ba6dca4867c84465)
+- fix: :bug: add SSH setup and submodule update steps before installing dependencies in build pipeline [`4f6cd1b`](https://github.com/thkruz/keeptrack.space/commit/4f6cd1bb23d4f16f8519e69d190cb477699e50e8)
+- fix: :lock: close benign security issue with cross origin of keyboard event [`65e7708`](https://github.com/thkruz/keeptrack.space/commit/65e7708a6c017431049006cc735b3dab4afba128)
+- refactor: :recycle: rename updatePositionBuffer -&gt; update and rebind EventBus handler [`d717a74`](https://github.com/thkruz/keeptrack.space/commit/d717a74ef991155f06e8daf345eae5b1d61e5622)
+- fix: :bug: avoid forcing Earth center for OEM satellites [`c844599`](https://github.com/thkruz/keeptrack.space/commit/c844599d37ee831b33c4a75a44d1e1c5386d8514)
+- refactor: :recycle: Replace SatMath.j200ToTemeMatrix with getTemeToJ2000Matrix and tidy imports [`70a7d12`](https://github.com/thkruz/keeptrack.space/commit/70a7d12cbebfb7dc9b286b2dad3d3a594376e915)
+- test: :white_check_mark: update Jest snapshot for moon position calculation in drawManager [`0aff4b3`](https://github.com/thkruz/keeptrack.space/commit/0aff4b341e900ce0d55b83bfc7fe831beb032950)
+- fix: :bug: adjust depth test handling for Earth based on camera zoom level [`a597b64`](https://github.com/thkruz/keeptrack.space/commit/a597b64b406bd9a65419f7332d633f52f054492c)
+- refactor: :recycle: Update Earth class to use glsl import and conditionally disable depth test [`54c8e58`](https://github.com/thkruz/keeptrack.space/commit/54c8e58ad54e30a7882320e043ab9d55f5aa6d6a)
+- fix: :bug: Update fieldOfView and fieldOfViewMax to use Radians for improved clarity [`f69e53e`](https://github.com/thkruz/keeptrack.space/commit/f69e53e52bde78fa95585704d663370f32f6c0f8)
+- fix: :bug: update icon paths in web manifest for consistency [`e9f0c04`](https://github.com/thkruz/keeptrack.space/commit/e9f0c0433f442022a8bfb5bb90bb92c35527d33f)
+- chore: update version to 11.0.0.0 in README, package.json, and version.js [`f076b20`](https://github.com/thkruz/keeptrack.space/commit/f076b201d6a0571346c39ad3219c189df68dad3d)
+- chore: :bookmark: update version to 10.8.0 and refine Create Satellite help description [`9be8de2`](https://github.com/thkruz/keeptrack.space/commit/9be8de24304e0ff87a42b8a87832b3b41893df27)
+- fix: :bug: correct plugin assignment order and enable splash screen visibility [`9aed55f`](https://github.com/thkruz/keeptrack.space/commit/9aed55f3b9cb6c89e2be57837c3b58a4525493d7)
+- build: :lock: fix all open npm audit findings [`08fd1a6`](https://github.com/thkruz/keeptrack.space/commit/08fd1a6df3cf1cd1f16cba711f50f4c828384b9e)
+- feat: :sparkles: Optimize mouse satellite ID retrieval with update time check [`b0263f8`](https://github.com/thkruz/keeptrack.space/commit/b0263f8ef980f5b4898e739d2849c3b32df92566)
+- fix: :bug: update logo image path and format URLs in installation instructions for consistency [`215276e`](https://github.com/thkruz/keeptrack.space/commit/215276e33b1f12e9ad8349215573072521b8fb42)
+- fix: :bug: remove Vimpel satellites setting and replace with JSC catalog enable flag [`fba7a05`](https://github.com/thkruz/keeptrack.space/commit/fba7a0561cd75e7658f0289904dad9a186e770f8)
+- fix: :bug: correct YAML lint file path and enhance build summary message [`0b1433f`](https://github.com/thkruz/keeptrack.space/commit/0b1433f7dcda490bb6b448c67d8076b7f076e776)
+- feat: :sparkles: add loading hints toggle to settings and update splash screen behavior [`e9d1c64`](https://github.com/thkruz/keeptrack.space/commit/e9d1c64b29376d88030ae3d89072e59128903e82)
+- fix: subscribe to events via EventBus in OrbitGuardMenuPlugin [`3ae5851`](https://github.com/thkruz/keeptrack.space/commit/3ae5851695b67ea4ae1351bb8c796c66926f18d3)
+- fix: :art: fix unnecessary br [`d870263`](https://github.com/thkruz/keeptrack.space/commit/d8702635aca3d8a9b9b4e149ff8f7e14502915fe)
+- chore(build): add TypeScript declaration for clean-terminal-webpack-plugin [`8e5759c`](https://github.com/thkruz/keeptrack.space/commit/8e5759cccaf58bf9d144f72e4fcced72851cc0ed)
+- fix: :bug: stop overwriting Sun.position with ECI (account for worldShift) [`fb2b268`](https://github.com/thkruz/keeptrack.space/commit/fb2b2685d581cd1a1604d01035f7c0168cbbb4f2)
+- fix: :bug: only load user-account pro plugin on keeptrack.space subdomains [`d4c9a11`](https://github.com/thkruz/keeptrack.space/commit/d4c9a11bf009446484fef8fd45f493ffc9eb4d95)
+- fix: :bug: avoid recalculating simulation time [`972cab7`](https://github.com/thkruz/keeptrack.space/commit/972cab79f79576ed39a25414f936e3d4218d18a3)
+- refactor: :recycle: improve cloud densitiy [`17a7958`](https://github.com/thkruz/keeptrack.space/commit/17a7958ce1def4e7018df71cfcbe656f9435eb7f)
+- feat: add new achievement and icon images; update subproject reference [`b18a2d6`](https://github.com/thkruz/keeptrack.space/commit/b18a2d64b35b0e262dc0807ea836eb48e6a2e347)
+- fix: :bug: add validation for satellite data before updating DOM elements [`86c0a71`](https://github.com/thkruz/keeptrack.space/commit/86c0a71e816b266b4a558aca2c66e528d574c0c4)
+- fix: :bug: update camera position any time mouse button released [`a69641e`](https://github.com/thkruz/keeptrack.space/commit/a69641e27306bc818840085e1ee79b21a75d3a94)
+- fix: :bug: fix no sound playing on Safari [`faeb2e6`](https://github.com/thkruz/keeptrack.space/commit/faeb2e6b72e83b2a056b4f363d4ebdc0ba420d58)
+- feat: :sparkles: Update loadPlugins to support asynchronous plugin initialization [`294c721`](https://github.com/thkruz/keeptrack.space/commit/294c721025ff951334bdfebf1640896c5d114c22)
+- feat: :sparkles: Add ManeuverPlugin menu and help text for satellite maneuvers [`e8b6a99`](https://github.com/thkruz/keeptrack.space/commit/e8b6a99b7e37557da9b7db9a8d430f49d361dd9c)
+- feat: :sparkles: Add ManeuverPlugin settings and disable toast notifications [`c60d03d`](https://github.com/thkruz/keeptrack.space/commit/c60d03d4eeff36109df87cd8221c63d18624db02)
+- Update src/settings/camera-settings.ts [`8c0afed`](https://github.com/thkruz/keeptrack.space/commit/8c0afed5fa04bb88a578a29a50d128d0d19f5bc7)
+- chore: :wrench: bump submodules [`af70b09`](https://github.com/thkruz/keeptrack.space/commit/af70b09918c027b1755a091ee7a0a264000b6a75)
+- fix: :bug: remove unnecessary exports creating circular reference [`13f155f`](https://github.com/thkruz/keeptrack.space/commit/13f155ff24f8ef971a3512d988e21a98b2eca626)
+- fix: :bug: update logic on how screen size changes are handled [`2d3fd46`](https://github.com/thkruz/keeptrack.space/commit/2d3fd4655686851cc82da133187da30e1398fa4f)
+- fix: :zap: dont load the sun texture if it will never get used [`14dd93b`](https://github.com/thkruz/keeptrack.space/commit/14dd93b6009e889c8df9d625641ba1984a3c386c)
+- chore: :arrow_up: update src/engine/ootk and src/plugins-pro submodule pointers [`9f37628`](https://github.com/thkruz/keeptrack.space/commit/9f376282c183ba8c3362ca23e4bdaa697b193563)
+- build: :construction_worker: add user-account plugin mapping to plugin manager [`1503ab9`](https://github.com/thkruz/keeptrack.space/commit/1503ab9ab2bb9ba8bf3dc37096b1a10451508561)
+- fix: :bug: fix incorrect onKeyDown handler [`de13a15`](https://github.com/thkruz/keeptrack.space/commit/de13a15895cc26d3954416fdb051b309c73a470b)
+- fix: :bug: move SplashScreen.hideSplashScreen() to postStart_ [`56887fd`](https://github.com/thkruz/keeptrack.space/commit/56887fda35e08c1882086200cc25ee21f2c95172)
+- fix: :bug: scale screenshot watermark logo height with hiResWidth and reorder imports [`517bf26`](https://github.com/thkruz/keeptrack.space/commit/517bf26b4a0d8c615d9f3d8e0c3a6626692f1f54)
+- fix: :bug: add no-op calculateRelativeSatPos override to Moon class [`f8939b6`](https://github.com/thkruz/keeptrack.space/commit/f8939b61d171862fcbf56c5cea8328ff3a81c6a2)
+- feat: :sparkles: include vimpel=false in generated URL when JSC catalog is disabled [`0ed5260`](https://github.com/thkruz/keeptrack.space/commit/0ed52605e23a2843efbc830e5e87005f175baaf5)
+- fix: :bug: initialize ScenarioManagementPlugin earlier (before TopMenu/TimeSlider) and hoist VcrPlugin import [`7ee07ff`](https://github.com/thkruz/keeptrack.space/commit/7ee07ffe654b3508dad9a353345be36bbebd02f9)
+- fix: :bug: remove unnecessary whitespace in top menu item HTML structure [`5486b92`](https://github.com/thkruz/keeptrack.space/commit/5486b922c6ea8086f44c9f14d7af31f369f7ff41)
+- chore: :arrow_up: update @typescript-eslint/typescript-estree and cypress dependencies to latest versions [`f406e01`](https://github.com/thkruz/keeptrack.space/commit/f406e01fd0f3129d8d298d60436ce187a596d81d)
+- chore: :heavy_minus_sign: remove unused dependencies from package.json [`e5b7ccc`](https://github.com/thkruz/keeptrack.space/commit/e5b7cccf5a06c031c9fc6e1b84ffa7c2155791ca)
+- fix: :bug: update lint script to target the src directory for improved code quality checks [`cc5d5d0`](https://github.com/thkruz/keeptrack.space/commit/cc5d5d0258ba04ae183817b0686e3e0ec7d00625)
+- feat: :sparkles: add Mars wallpaper and update splash screen image list [`9b2f291`](https://github.com/thkruz/keeptrack.space/commit/9b2f291d2a48518f4c9be11cd0d5530b41293be5)
+- refactor: :recycle: Update drag options dimensions for improved usability [`a646ea8`](https://github.com/thkruz/keeptrack.space/commit/a646ea82ebc9d194c2986a327a832945af18efae)
+- build: :hammer: update lcov script to use tsx for consistency [`938acd6`](https://github.com/thkruz/keeptrack.space/commit/938acd659c12879b1481b617eae0c90f4a7608de)
+- fix: adjust loading screen positioning for better visibility and layout [`7c0a38d`](https://github.com/thkruz/keeptrack.space/commit/7c0a38d9ac6019afa3b8386238accd91215deb85)
+- chore: :bookmark: update version to 10.8.4 in README and version.js [`9646d1d`](https://github.com/thkruz/keeptrack.space/commit/9646d1d71548e26009d285717e8ab023585bafb1)
+- feat: :sparkles: add new achievement images for ISS and Vanguard [`195337e`](https://github.com/thkruz/keeptrack.space/commit/195337e9607d284ddc982fc627f5f253a4df7d13)
+- chore: :bookmark: update version to 10.8.2 in README and version.js [`0dbff0b`](https://github.com/thkruz/keeptrack.space/commit/0dbff0b241a043bae1e1f851b063a20468336c76)
+- feat: :sparkles: add onWatchlistAdd and onWatchlistRemove events to KeepTrackApiEvents [`0ad4c29`](https://github.com/thkruz/keeptrack.space/commit/0ad4c29279f24ec0b7f5d629b5b3ac37f16b5cda)
+- fix: :bug: update environment variable keys for Supabase configuration to match naming conventions [`fa1f8e5`](https://github.com/thkruz/keeptrack.space/commit/fa1f8e5d8344f2205b81b6c7d0d043ba30743697)
+- fix: :bug: replace console warning with error logging for unregister callback not found [`cb1c3ce`](https://github.com/thkruz/keeptrack.space/commit/cb1c3ce443fae8dd6a51b56295dedda0bd980ccd)
+- test: :white_check_mark: add TopMenu import and initialization in CountriesMenu tests [`76fd03f`](https://github.com/thkruz/keeptrack.space/commit/76fd03f6cf71a144d358731099e8682889a5edfe)
+- fix: :bug: use optional chaining for transparent color fallback in color schemes [`6b6360f`](https://github.com/thkruz/keeptrack.space/commit/6b6360fdf0fcb31d73b26c7cf10d666cad9d1e43)
+- fix: :bug: update version badge to 10.7.2 and update subproject commit reference [`4da40c0`](https://github.com/thkruz/keeptrack.space/commit/4da40c0893fc62216f12daf65d52fef1efdc857a)
+- fix: :bug: ensure splash screen images are filtered only when splashScreenList is defined [`43b0dc9`](https://github.com/thkruz/keeptrack.space/commit/43b0dc9f363ad8473f840d5281e00fdf27d9c748)
+- fix: :bug: update settings to correctly show ECF drawing enabled by default [`962e67e`](https://github.com/thkruz/keeptrack.space/commit/962e67ec329a616ff102a1568b6c34fef53b7541)
+- fix: :bug: replace toSorted with sort for consistent array ordering in SatInfoBox [`4944a7a`](https://github.com/thkruz/keeptrack.space/commit/4944a7ad68417b6258b0bc495af6413cf3d7794e)
+- test: :white_check_mark: mock validation method to always return false in CreateSat tests [`3a9afb7`](https://github.com/thkruz/keeptrack.space/commit/3a9afb786017c45e15cbb05ad19355a5163e2aab)
+- fix: :bug: update background and theme colors in manifest.webmanifest [`a4f56e9`](https://github.com/thkruz/keeptrack.space/commit/a4f56e9379ab6936b7d465264b7ff799aae720bb)
+- chore: :arrow_up: update cypress dependency to version 13.17.0 [`8965dac`](https://github.com/thkruz/keeptrack.space/commit/8965daca713477b28ee850d96a204e3d14ca8b63)
+- chore: :sparkles: add Cypress testing files to .gitignore [`10eb51d`](https://github.com/thkruz/keeptrack.space/commit/10eb51d38bc8a1ac8a643164fb6292c4071ccfca)
+- fix: :truck: rename epfl wallpaper due to case-sensitive issue [`f4d6c8f`](https://github.com/thkruz/keeptrack.space/commit/f4d6c8fb256d9e012bde45ae2e80336624c97aa8)
+- fix: :bug: Add explicit error when WebGL context lost during program creation [`ff6cce5`](https://github.com/thkruz/keeptrack.space/commit/ff6cce52a8194ecc7c966032ce63ec4ce193e3d4)
+- docs: :memo: add README for locales JSON files [`ae16040`](https://github.com/thkruz/keeptrack.space/commit/ae1604015dd07e3eda434a1d85228d2a0887c194)
+- docs: :memo: update comment to clarify settings overrides for embedded version [`08e4ce2`](https://github.com/thkruz/keeptrack.space/commit/08e4ce2fcf49768f44c48343152fa23c57546531)
+- fix: :bug: improve copyright notice handling for official website by using a trusted domains list [`178e43d`](https://github.com/thkruz/keeptrack.space/commit/178e43d22070c1c04262232bccef5f2052eeaf81)
+- fix: :bug: update test and build steps to initialize git submodules before execution [`85f0e66`](https://github.com/thkruz/keeptrack.space/commit/85f0e66a5fd41038dc3c9ddcc659d85b4ad3335c)
+- fix: :bug: update UrlManager to set isSupplementExternal and disable isMissionDataEnabled for external TLEs [`7408939`](https://github.com/thkruz/keeptrack.space/commit/74089393de7fa25c9005d2ca2dd8871ca409b65c)
+- chore: :arrow_up: update version to 10.6.0 in README.md and version.js [`615a0d8`](https://github.com/thkruz/keeptrack.space/commit/615a0d82ec0d61351db1b709532f13952fdd027f)
+- chore: :wrench: explicitly disable OemReaderPlugin in celestrak settings [`e7d8e4f`](https://github.com/thkruz/keeptrack.space/commit/e7d8e4f0d7d245654b591488456aa3a43be21dae)
+- chore: :wrench: add Volta node toolchain config (node 25.0.0) to package.json [`13b7847`](https://github.com/thkruz/keeptrack.space/commit/13b78479d7b1559078c39aa351f8ba36c62d89e1)
+- feat: :crescent_moon: add Moon entry to planets RMB submenu after Earth [`009eefb`](https://github.com/thkruz/keeptrack.space/commit/009eefbe1f0c4853358bea9c88d31768a04b880e)
+- chore: :heavy_minus_sign: remove path-to-regexp dependency from package.json [`6a8be0b`](https://github.com/thkruz/keeptrack.space/commit/6a8be0b98eaaff8bbc18d9506f4d0fe06ab8e1ca)
+- feat: :sparkles: add world shift calculation for Sun in WebGLRenderer [`8cc9f76`](https://github.com/thkruz/keeptrack.space/commit/8cc9f76b14113f59c9d1830dee674e7ed74be2d2)
+- fix: :bug: Update fragment shader code for log depth calculation to recover original gl_Position.w [`60e6da0`](https://github.com/thkruz/keeptrack.space/commit/60e6da0f63e2d8c5c26bb420d6701558eedb859d)
+- fix: :bug: Adjust z-index for sidenav-trigger to prevent popups from blocking view [`7fbb800`](https://github.com/thkruz/keeptrack.space/commit/7fbb800ddf0726747b76f06fde95286bab7668d3)
+- build: :label: add @types/opener dependency for TypeScript support [`81f541f`](https://github.com/thkruz/keeptrack.space/commit/81f541f8dbbe753a27c897666ec3e212ebedbaba)
+- feat: add adsense placeholder to loading screen for improved ad integration [`2d5a5a2`](https://github.com/thkruz/keeptrack.space/commit/2d5a5a27ff4935494e043afe31869ce85a9c1c74)
+- Update src/static/splash-screen.ts [`886d0cf`](https://github.com/thkruz/keeptrack.space/commit/886d0cff4bc613a9890e739d79d5dac085399d7f)
+- Update src/plugins/new-launch/new-launch.ts [`81589ce`](https://github.com/thkruz/keeptrack.space/commit/81589ce35c95947073b3f5273a89efec05b6d78d)
+- fix: :bug: add TopMenu as a dependency for CountriesMenu plugin [`0381624`](https://github.com/thkruz/keeptrack.space/commit/038162438a6fa9d94538e4b40d61c2c9fa8dbc3c)
+- feat: :sparkles: add new wallpaper [`3411dba`](https://github.com/thkruz/keeptrack.space/commit/3411dba6d7f717e8b052bcd87be04dea60987091)
+- feat: :sparkles: add ops2 wallpaper to splash screen image list [`50e966b`](https://github.com/thkruz/keeptrack.space/commit/50e966be8ade6685cf22507eca4cc307922deacf)
+- refactor: :recycle: Use DEFAULT_RESOLUTION for texture source resolution fallback [`43c5ce7`](https://github.com/thkruz/keeptrack.space/commit/43c5ce7b9e0244516137c27d37402a0b98d0e908)
+- refactor: :recycle: integrate localization for country extraction fallback [`e5f243f`](https://github.com/thkruz/keeptrack.space/commit/e5f243f5567294e4810e2c49ad896b067584dbd0)
+- fix: :bug: add support for Vimpel satellites in settings manager [`711ad9f`](https://github.com/thkruz/keeptrack.space/commit/711ad9ffae6bbd8c2264edd9bddd4cdebe3f797d)
+- fix: :bug: add npm ci step for installing dependencies in build pipeline [`410dfff`](https://github.com/thkruz/keeptrack.space/commit/410dfff66b2b205428bfb35646cf84e345d5df50)
+- chore: update subproject commit reference in plugins-pro [`f4ca4b0`](https://github.com/thkruz/keeptrack.space/commit/f4ca4b0be3e15682ddb9a40785bd62aa84ddda9c)
+- Update src/settings/ui-settings.ts [`4e881a2`](https://github.com/thkruz/keeptrack.space/commit/4e881a2797827762813b11c51176ce3ff0cc482b)
+- Update src/settings/camera-settings.ts [`d26bfbf`](https://github.com/thkruz/keeptrack.space/commit/d26bfbf1709d60d1f19269e3a7cb4cce23cfda57)
+- Update src/settings/ui-settings.ts [`703f376`](https://github.com/thkruz/keeptrack.space/commit/703f3768fd9d95df182d33d029005f1a80f22443)
+- Update src/settings/ui-settings.ts [`3dfec1a`](https://github.com/thkruz/keeptrack.space/commit/3dfec1a70aff45dc2661fd2602495a1573885e6a)
+- Update README.md [`629f14f`](https://github.com/thkruz/keeptrack.space/commit/629f14fcbb81d3257fa199823cc3523d3d5a2540)
+- Update README.md [`89d74d4`](https://github.com/thkruz/keeptrack.space/commit/89d74d4e1e738e7f701b6aa27b37f9c65809d153)
+- chore: :technologist: update diagram.svg [`9f0ccce`](https://github.com/thkruz/keeptrack.space/commit/9f0cccecb9396ecc23675364751ff7c349960d18)
+- ci: :construction_worker: switch ESLint step to use `npm run lint` in build pipeline [`1f71a84`](https://github.com/thkruz/keeptrack.space/commit/1f71a8484ab6720e90154cb427a526d6b6fdb9bb)
+- fix: snap camYaw instantly when chaseSpeed_ == 1.0 [`c80287b`](https://github.com/thkruz/keeptrack.space/commit/c80287b89d625aeec21156cb8e8c854124bfd939)
+- refactor(scenario-management): remove BASIC from menuMode; limit plugin to ADVANCED, SETTINGS, ALL [`e3eb312`](https://github.com/thkruz/keeptrack.space/commit/e3eb312a5bc7f996b08c52a1f34e0d4b8d585b8c)
+- fix: :bug: resize renderer canvas in UiManager.postStart (add ServiceLocator import & call) [`d50c166`](https://github.com/thkruz/keeptrack.space/commit/d50c1664dbce87d4f8d940ba3a49a48b7161f98f)
+- chore: :arrow_up: update plugins-pro submodule to 95675218 [`ad92c43`](https://github.com/thkruz/keeptrack.space/commit/ad92c43eb0ad55f0a84a54059f4f5ebea62d9b90)
+- fix: :bug: use errorManager.log for external ASCII catalog processing instead of info [`723cbbd`](https://github.com/thkruz/keeptrack.space/commit/723cbbd839c682cc08975662650b1cf7f3d47a05)
+- chore: :arrow_up: update plugins-pro submodule to aee63320 [`9d5949d`](https://github.com/thkruz/keeptrack.space/commit/9d5949d2900e0417d1bbfa106b0ad5638938ae00)
+- fix: :bug: increase drawPosition normalization divisor to 1e11 to avoid zero coords breaking mat4.targetTo [`b1a862f`](https://github.com/thkruz/keeptrack.space/commit/b1a862f4c6925cad19305152f424fffec5e00ef2)
+- refactor: :recycle: add radius and position to earth [`8d4145d`](https://github.com/thkruz/keeptrack.space/commit/8d4145d3f8f57d8ee29d9637c4489b9d4f7cdd4c)
+- fix: :bug: refresh ScenarioManagementPlugin.scenario before time slider calculations [`ddd7fca`](https://github.com/thkruz/keeptrack.space/commit/ddd7fca79d83949e2b63b950e4bee722bb4000bf)
+- fix: :bug: disable VCR plugin by default for improved user experience [`ae4b978`](https://github.com/thkruz/keeptrack.space/commit/ae4b9789a91710591b2f27c4ca614864f575f904)
+- fix: :bug: update draggable box background color to use CSS variable for consistency [`3ef8844`](https://github.com/thkruz/keeptrack.space/commit/3ef8844193335d0f5294aee8aca78de229affb8f)
+- ci: :construction_worker: set branch to 'diagram' for repo-visualizer workflow [`494695e`](https://github.com/thkruz/keeptrack.space/commit/494695e7795ab7f8605c5ffee5c9a29ff50dae8b)
+- ci: :construction_worker: add artifact_name to repo-visualizer workflow [`b84dcdd`](https://github.com/thkruz/keeptrack.space/commit/b84dcdde5dae078633e3ad489b6db40be41a5a2e)
+- fix: :zap: disable planets on celestrak version [`b992245`](https://github.com/thkruz/keeptrack.space/commit/b992245faa67afddc73a773fd85271a50028adb6)
+- fix: :bug: enable isAutoStart in embedded settingsOverride [`e178224`](https://github.com/thkruz/keeptrack.space/commit/e178224ffcb816f26e1450ca0122c85b09497d22)
+- chore: :truck: fix deepsource name [`34f2bb5`](https://github.com/thkruz/keeptrack.space/commit/34f2bb5906ce0de4d1298fadcace2e681113b835)
+- Merge branches 'develop' and 'develop' of https://github.com/thkruz/keeptrack.space into develop [`9514959`](https://github.com/thkruz/keeptrack.space/commit/9514959074df0812a51643fcd39db0260b56a1b8)
+- fix: :bug: fix failure when no internet connection [`9675975`](https://github.com/thkruz/keeptrack.space/commit/96759754cb18dd9879262392631d0ebc24ef40cf)
+- feat: :technologist: new build system [`8770539`](https://github.com/thkruz/keeptrack.space/commit/87705394fede4c957a4832176e19084888f71cd7)
+- refactor: :recycle: make colorschemes modular [`f37be12`](https://github.com/thkruz/keeptrack.space/commit/f37be1253a4b60bb3f8e2c2fbaae7b83b5cf722e)
+- test: :white_check_mark: add jest tests to ensure this continues working as intended [`a95160c`](https://github.com/thkruz/keeptrack.space/commit/a95160c6ba538145ae9959520e3cfe9a00cbf085)
+- feat: :sparkles: add telemetry server integration for error troubleshooting [`34708b7`](https://github.com/thkruz/keeptrack.space/commit/34708b7f4218c285aac73791cec7e2ee205ab6c6)
+- fix: resolve leftover conflict markers in version files [`6379068`](https://github.com/thkruz/keeptrack.space/commit/6379068e6da1c42c7f505694fa724c9d15f2fab5)
+- fix: :bug: remove unused normalMatrix that was causing errors on init [`e84a05d`](https://github.com/thkruz/keeptrack.space/commit/e84a05d631a6ae02a3c4a9bd28808833e4217551)
+- fix: :bug: remove unused normalMatrix that was causing errors on init [`c12834f`](https://github.com/thkruz/keeptrack.space/commit/c12834f2a101017e5a672727ca8bb08a500de58e)
+- fix: :bug: fix filters being improperly applied on mobile [`5c9d306`](https://github.com/thkruz/keeptrack.space/commit/5c9d3067652b5f6c467a3d6101507d6f2b2507a0)
+- feat: :sparkles: add newtab utility for future work exporting information to a new tab [`59941ea`](https://github.com/thkruz/keeptrack.space/commit/59941ea61bab34b6bd165865ce8e0b9e585f3880)
+- Bug: 🐛Fixed issue with plotted pass not corresponding to displayed time if the calculations were not done starting at a full hour [`66b1a5c`](https://github.com/thkruz/keeptrack.space/commit/66b1a5cc6031e3223a396ec2fa95030714a59866)
+- fix: :bug: force set legend menu at init [`bdd2ac0`](https://github.com/thkruz/keeptrack.space/commit/bdd2ac0f280cd2949d8dcc933bca5d2b87002895)
+- fix: :bug: ensure dots are updated on mobile [`bf01054`](https://github.com/thkruz/keeptrack.space/commit/bf010549bacba916592378a6b08f70ef3f56d2be)
+- fix: :bug: explicitly allow tutorial button to be missing during testing [`9d31855`](https://github.com/thkruz/keeptrack.space/commit/9d318554e5681be0b2984cea4edefa2be9ce39cd)
+- fix: :bug: explicitly allow tutorial button to be missing during testing [`709e913`](https://github.com/thkruz/keeptrack.space/commit/709e9139946b621e38c78e879a89816592a7f486)
+- fix: :lipstick: fix mismatch in styling for full screen icon [`477d98a`](https://github.com/thkruz/keeptrack.space/commit/477d98a20a4824285d5435db618bea11f30bb2fa)
+- refactor: :recycle: hide altName and altId independently [`e319d78`](https://github.com/thkruz/keeptrack.space/commit/e319d783a8d52e3dc5a1e9484c846f85656dd160)
+- refactor: :recycle: rename defaultColorScheme and set Celestrak to default [`c109ceb`](https://github.com/thkruz/keeptrack.space/commit/c109ceb4c50c32fa6f281ac933aa3a137044fce9)
+- fix: :bug: default help button to disabled [`32a70e3`](https://github.com/thkruz/keeptrack.space/commit/32a70e3d42785f94c3ad5b1067e3141f0b63d378)
+- fix: :bug: ensure confidence levels are completely hidden if disabled [`bd6fb9d`](https://github.com/thkruz/keeptrack.space/commit/bd6fb9d1c5807d2670c625776bdd25440d8cb31c)
+- fix: :bug: show help button disabled until side menu is open [`c3f5f39`](https://github.com/thkruz/keeptrack.space/commit/c3f5f39fef903ff60d9d805bbaebe30ed96b3723)
+- refactor: :recycle: use first color scheme instead of "default" color scheme [`14cb1f7`](https://github.com/thkruz/keeptrack.space/commit/14cb1f7c20a1014a7e5983e9ad19fa12905c92e5)
+- fix: :bug: fix bug when surviellance plugin is disabled [`b3cd864`](https://github.com/thkruz/keeptrack.space/commit/b3cd864d5458b0de534aa6703e5250833ae0ee82)
+- fix: :iphone: fix size of sat-info-box title [`6eeb48f`](https://github.com/thkruz/keeptrack.space/commit/6eeb48fd23670d0c95002a6080a36762d76debf7)
+- feat: :sparkles: disable unused filters in bottom menu [`8abaac7`](https://github.com/thkruz/keeptrack.space/commit/8abaac71e5462c3f4ec7c3f5664f513e4b6a9083)
+- refactor: :recycle: refactor to merge with celestrak changes [`fb3905c`](https://github.com/thkruz/keeptrack.space/commit/fb3905c79f4d9a25ef79e750c8bc82077167f6d2)
+- fix: :label: fix type [`34f035c`](https://github.com/thkruz/keeptrack.space/commit/34f035c9d6ae45483609670ef2b0f52ee764f2e9)
+- test: :white_check_mark: increase test coverage [`00aacc3`](https://github.com/thkruz/keeptrack.space/commit/00aacc3f3d7cc42f05ffa110bedb0656172863f2)
+- feature: new sateliot satellite model [`c6b85a9`](https://github.com/thkruz/keeptrack.space/commit/c6b85a9e72f89fb6d2b88aef4c12008c592071f4)
+- ci: :green_heart: prevent overwriting production files when deploying [`10a9118`](https://github.com/thkruz/keeptrack.space/commit/10a9118029dc535746e2e86fb02dd78a22b42dfe)
+- feat: :sparkles: add localization for spanish and german [`1e3af92`](https://github.com/thkruz/keeptrack.space/commit/1e3af921968b5a428d7948a1738006f3fb36f86c)
+- feat: :sparkles: add collapsable sections in the sat-infobox [`fe56b56`](https://github.com/thkruz/keeptrack.space/commit/fe56b5640c3fede33e1872a27aed38fe81024d55)
+- feature: created a new satellite model based on a s6u with solar pannels. [`231b78a`](https://github.com/thkruz/keeptrack.space/commit/231b78a619ac5b45b36072f887ff45afdfe792c3)
+- refactor: :fire: remove jquery! [`8efb490`](https://github.com/thkruz/keeptrack.space/commit/8efb490986b25607917b8a96b4f713769a3c6fd4)
+- fix: :bug: fix styling issues with sat-infobox and search drop down [`efc7028`](https://github.com/thkruz/keeptrack.space/commit/efc702888a6b482e6b5eb1ce139c0dab1fe969ac)
+- feat: :sparkles: update new calendar component [`5e84df0`](https://github.com/thkruz/keeptrack.space/commit/5e84df0b77a3487ec0775dd5b3d9ce80b6254ec5)
+- refactor: :recycle: improve typing and fix eslint errors/warnings [`6c8e52c`](https://github.com/thkruz/keeptrack.space/commit/6c8e52cd85ee1d03168c0850e9e01321b859e2b2)
+- refactor: :recycle: improve typing and fix eslint errors/warnings [`5b21047`](https://github.com/thkruz/keeptrack.space/commit/5b210472b20d29332e4c1b1b10a1d27ab5c337c9)
+- fix: :bug: fix sorting of the tracking and impact prediction plugin [`702e8f8`](https://github.com/thkruz/keeptrack.space/commit/702e8f8f3d8ab21ec8adbc81be5361f09bb8fe68)
+- feat: :sparkles: update earth and sun rendering [`89760aa`](https://github.com/thkruz/keeptrack.space/commit/89760aa0bb3fb113efac9363341434fddbb5675f)
+- refactor: :recycle: abstract text from plugins [`76624f8`](https://github.com/thkruz/keeptrack.space/commit/76624f8d8b5fa906fa3c72b5e69f299dc1b260d3)
+- feat: :sparkles: add new TIP message plugin [`5916fd0`](https://github.com/thkruz/keeptrack.space/commit/5916fd08c97e92a27c3678f8a486cf57d1428593)
+- refactor: :recycle: convert register and runEvent to on and emit syntax [`114fe49`](https://github.com/thkruz/keeptrack.space/commit/114fe49bcf3c939201cfcfd76bb2dbab280008cf)
+- feat: :sparkles: add new bottom menu categories [`bec39e0`](https://github.com/thkruz/keeptrack.space/commit/bec39e0ef4b4ad870175ba5f14289800242163d1)
+- refactor: :recycle: refactor lineManager into separate classes [`861e1df`](https://github.com/thkruz/keeptrack.space/commit/861e1df55d62d8e0e03ceae9ae8653617763cf29)
+- test: :white_check_mark: fix outdated snapshots [`51ee061`](https://github.com/thkruz/keeptrack.space/commit/51ee06100096a0b8b5eb722947684921fc0c6585)
+- fix: :bug: fix all open issues with rpo-calculator (now proximity-ops) [`edbf917`](https://github.com/thkruz/keeptrack.space/commit/edbf917f3b9c961fc1a10ee810103aff94c9572b)
+- feat: :sparkles: add new languages to localization [`041e7c5`](https://github.com/thkruz/keeptrack.space/commit/041e7c5782baf45cdccdddc608c552d14cf91891)
+- feat: :sparkles: add additonal features to Remote Proximity Operations plugin [`3a74d70`](https://github.com/thkruz/keeptrack.space/commit/3a74d70007ee30af9e37136f43409ee62d4834da)
+- feat: :construction: first attempt at providing localization [`9880840`](https://github.com/thkruz/keeptrack.space/commit/9880840b7af577cf1c84ff2122e6b24842aefe4d)
+- feat: :technologist: add strict i18n key validation and korean support [`74e6642`](https://github.com/thkruz/keeptrack.space/commit/74e664225df96c5479c46a90a9631e8b502ce4bc)
+- feat: :technologist: add strict i18n key validation and korean support [`8f55085`](https://github.com/thkruz/keeptrack.space/commit/8f55085efecc0e9d64aeff1bd3ea82dff900657f)
+- refactor: :fire: remove unused fonts [`babc3fc`](https://github.com/thkruz/keeptrack.space/commit/babc3fc528ed2dfbc43ef5d7ca4646490da9e05b)
+- feat: :sparkles: add new filter menu [`f5168e3`](https://github.com/thkruz/keeptrack.space/commit/f5168e37f223258ab990d4d50228a701dac57697)
+- feat: :lipstick: new ui [`8aad151`](https://github.com/thkruz/keeptrack.space/commit/8aad1511a4b0c2c1748a31f6d5f4b5caf26d7886)
+- ✨ updating sensor-timeline to show visibility from optical sensors [`bbad755`](https://github.com/thkruz/keeptrack.space/commit/bbad75565692fcacca6c26844066dd877276e280)
+- feat: :closed_lock_with_key: move non-agpl code out of public repo [`4a8b1c7`](https://github.com/thkruz/keeptrack.space/commit/4a8b1c755c6253f56ba24db417e93bf1519da4b6)
+- feat: 🔥 Plotting changes to make it cleaner and refactor code to make it more readable [`bf43bd6`](https://github.com/thkruz/keeptrack.space/commit/bf43bd6d7ddd9b48a4b12c3adc4bbe420c558ffc)
+- feat: Enhance keyboard input handling and add debug keyboard overlay [`1912ec8`](https://github.com/thkruz/keeptrack.space/commit/1912ec85a8d8c655f9eb096d03ec9b047eba7195)
+- 📈 Updated plot-analysis plugin. Added a lat2lon plot, and updated hover data [`41bdbad`](https://github.com/thkruz/keeptrack.space/commit/41bdbadacfd537b27a5cf7eae6013be6c009577d)
+- fix: :bug: fix dependency checking logic for plugins [`2a86450`](https://github.com/thkruz/keeptrack.space/commit/2a8645046a3a5e197e9d9d365b3d4072de29a490)
+- feat: :sparkles: add graphics menu and update shaders [`39c58a2`](https://github.com/thkruz/keeptrack.space/commit/39c58a2dc5014fd0bd37154c96a261c7918c7f7e)
+- feat: :sparkles: add satellite-timeline plugin [`ebb60e1`](https://github.com/thkruz/keeptrack.space/commit/ebb60e1f0cb047f8be0afd84701ec0ac27fa49b3)
+- feat: :sparkles: add timeline feature [`5e35216`](https://github.com/thkruz/keeptrack.space/commit/5e352166a6cb4faf7095733ba2948a6f3b45ddca)
+- refactor: :recycle: abstract away common elements of sesnor-fov-mesh/factory [`f4fc171`](https://github.com/thkruz/keeptrack.space/commit/f4fc17103987462b66c18829dc2a966b4a5f2c47)
+- feat: :sparkles: add new color schemes for orbital density [`a24a903`](https://github.com/thkruz/keeptrack.space/commit/a24a903747b86396b2b82db89730be43e51b3cc8)
+- feat: :heavy_minus_sign: remove jquery-ui-bundle dependencies for calendar [`c023b53`](https://github.com/thkruz/keeptrack.space/commit/c023b53ef843512c8260f06c2638b23f5423972b)
+- feat: :sparkles: add caclulator plugin [`1c16fff`](https://github.com/thkruz/keeptrack.space/commit/1c16fff0dd7ce6bc104b3a5fe2e00d2d590bad21)
+- feat: 🔥 Inital commit for find RPO plugin [`dbb0dad`](https://github.com/thkruz/keeptrack.space/commit/dbb0dadd24c41f4685a6a0ad4140805bc732a6d9)
+- feat: 🔥 Inital commit for find RPO plugin [`a626489`](https://github.com/thkruz/keeptrack.space/commit/a626489258ca524aaa13f0b22afef545664384c5)
+- feat: :sparkles: implement covariance ellipsoids [`e83739c`](https://github.com/thkruz/keeptrack.space/commit/e83739c19c74de6fa19267ad235b7c3e661727a8)
+- feat: :sparkles: add more translations [`1f4eede`](https://github.com/thkruz/keeptrack.space/commit/1f4eede75f55702d860be86dad4476030640c598)
+- feat: :sparkles: update satellite fov menu [`a68da91`](https://github.com/thkruz/keeptrack.space/commit/a68da91cdd285bbcf07fb18109193c4a4acfdf67)
+- refactor: :recycle: refactor data out of sensorList and multisiteLookangles [`f20ef4c`](https://github.com/thkruz/keeptrack.space/commit/f20ef4c2fd8a34d6f67913019d1a71ffa5f28a76)
+- feat: :sparkles: add EarthPresetsPlugin, DrawLinesPlugin, and ViewInfoRmbPlugin with context menu integration [`8b4136e`](https://github.com/thkruz/keeptrack.space/commit/8b4136e5ba47efaa63e70a45afc1b1ba6c6ad5e2)
+- docs: :memo: update readme and release notes [`1c3803b`](https://github.com/thkruz/keeptrack.space/commit/1c3803bc35cca4dc2123d368529836e947d70aaa)
+- feat: :sparkles: add ability to push to npm again [`6243ec6`](https://github.com/thkruz/keeptrack.space/commit/6243ec6ee7b07d2e208efecbe12127c6712bfd19)
+- feat: :sparkles: add radar domes [`40b61a9`](https://github.com/thkruz/keeptrack.space/commit/40b61a974a385c527ab0b0ffde5582512af69c1f)
+- test: :white_check_mark: add more testing of color-scheme-manager [`4548ca8`](https://github.com/thkruz/keeptrack.space/commit/4548ca869c65f13eb79ef5bf19e51c50e70dd974)
+- feat: :sparkles: step 1 of merging celestrak version with main version [`ed5d9a0`](https://github.com/thkruz/keeptrack.space/commit/ed5d9a0f0bc6038a7bb825340bf92afa72ad344d)
+- refactor: :recycle: replace inline plugin configuration with defaultPlugins import for cleaner settings management [`de7385b`](https://github.com/thkruz/keeptrack.space/commit/de7385bd58a53bb92592f4a5dcba5757caa5f902)
+- feat: :sparkles: add multiple launch sites with detailed information including coordinates and country [`9bfb078`](https://github.com/thkruz/keeptrack.space/commit/9bfb078a2fec5b03e8c55b8614e247e8226c1e2b)
+- refactor: :goal_net: add better handling for null events [`f513126`](https://github.com/thkruz/keeptrack.space/commit/f5131267faac917b52d3f6eafbaa871c1109e033)
+- test: :white_check_mark: increase test coverage [`40f30ef`](https://github.com/thkruz/keeptrack.space/commit/40f30effa0a559e103542fb0697c1e643692591c)
+- test: :white_check_mark: increase test coverage [`934c9d9`](https://github.com/thkruz/keeptrack.space/commit/934c9d95396b6f316d177ce31b21b6fddd5cd949)
+- refactor: :recycle: refactor sat-info-box to account for null better [`268579a`](https://github.com/thkruz/keeptrack.space/commit/268579a3fc600eba33e4620e1861fa76a7865135)
+- refactor: :rotating_light: fix linting errors [`a9ab81a`](https://github.com/thkruz/keeptrack.space/commit/a9ab81a2b821ed7219f0682a88b4ac377f80929d)
+- refactor: :lipstick: update styling for new theme [`bd285c3`](https://github.com/thkruz/keeptrack.space/commit/bd285c3cae5a81472646177e8a6a15eb8c580a31)
+- feat: :sparkles: add launch site management with detailed site information and update UI for launch facility selection [`52d14fe`](https://github.com/thkruz/keeptrack.space/commit/52d14fe06513d2b916dcd193b1edc7c5dddc02a4)
+- feat: :sparkles: add settings and download buttons to look-angles and multi-site-looks [`6f0f53c`](https://github.com/thkruz/keeptrack.space/commit/6f0f53c91870c41078904cd31f718e2770855106)
+- refactor: :recycle: enhance settings persistence management and streamline URL parameter handling [`0b8a0e2`](https://github.com/thkruz/keeptrack.space/commit/0b8a0e2e1b848ff5ef9a3e05d15939a0630a5cea)
+- refactor: :recycle: rename css variables to match home page [`77e9f9b`](https://github.com/thkruz/keeptrack.space/commit/77e9f9b47c2eeb8a0888e7f13e1df1df5d5f7604)
+- refactor: :recycle: implement parseGetVariables function for enhanced settings management from URL parameters [`c7cb0dd`](https://github.com/thkruz/keeptrack.space/commit/c7cb0dd7ecd03de31c8fdb27f2db2091a1ee5fb1)
+- feat: Refactor keyboard input handling to use unified event system and add new key bindings [`cc0c39d`](https://github.com/thkruz/keeptrack.space/commit/cc0c39d00f5e0f43ac188ddddfd8b9529b1fa9d9)
+- refactor: :recycle: cleanup create-sat code for production [`c16533f`](https://github.com/thkruz/keeptrack.space/commit/c16533fb9a234f015e37c76404e8dfe471562cba)
+- feat: :sparkles: add telemetry server integration for error troubleshooting [`c4047e2`](https://github.com/thkruz/keeptrack.space/commit/c4047e2dfd5015b8d22098b2c7bba415fab71d07)
+- refactor: :recycle: fix linter errors [`dd1a830`](https://github.com/thkruz/keeptrack.space/commit/dd1a830262c3005b1ef29fb6270a2346aeb56784)
+- test: :rotating_light: fix linter errors in Jest test [`9b4c854`](https://github.com/thkruz/keeptrack.space/commit/9b4c854c898b6486cce9474dc12738d810023380)
+- refactor: :fire: remove markers for sensor fov and surv [`1ef8159`](https://github.com/thkruz/keeptrack.space/commit/1ef8159116c89bebad90180db256627982940534)
+- refactor: :recycle: split methods in SensorFovMesh class [`3a84395`](https://github.com/thkruz/keeptrack.space/commit/3a84395ccb6756cf8aa32d63583e48b8ac39ac5d)
+- feat: :sparkles: improve sensor management and menus to incorporate radarDomes [`e8ccd17`](https://github.com/thkruz/keeptrack.space/commit/e8ccd177f8d6548630d013c4fa3d83b00bbd7f77)
+- refactor: :recycle: refactor all toast types to an enum [`49b65cd`](https://github.com/thkruz/keeptrack.space/commit/49b65cdea51747b8f6bd7a2b473c09c30ae5dd04)
+- feat: :sparkles: add flags [`a37e1a1`](https://github.com/thkruz/keeptrack.space/commit/a37e1a12e2576c3eff7b1e0db92731e4e78b3a57)
+- feat: 🔥Added option to take into account the weather forecast when finding observable transits for optical sensors [`5d52ada`](https://github.com/thkruz/keeptrack.space/commit/5d52ada088b4f89bdd1d6e7400f1d19f004d6a21)
+- 🛰️  New plugin to create a sat from its keplerian elements [`412e9bf`](https://github.com/thkruz/keeptrack.space/commit/412e9bffd8d3ba9a221ecac2981461c219aaa8d0)
+- refactor: :recycle: move keyboard events to their class instead of keyboard manager [`19eeb2a`](https://github.com/thkruz/keeptrack.space/commit/19eeb2a3d1af1581fbb1a3f94166b34246b0eb5e)
+- fix: :recycle: make color scheme changes more consistent [`83f00dd`](https://github.com/thkruz/keeptrack.space/commit/83f00dde3bef7d1bb78be5389449c9ba32b3fec6)
+- feat: :sparkles: add new mission color scheme [`a87025d`](https://github.com/thkruz/keeptrack.space/commit/a87025d175770a0d3578a8d12f87f349c84347e1)
+- feat: :construction: add cone mesh and coneFactory [`9c6c152`](https://github.com/thkruz/keeptrack.space/commit/9c6c1522bf16127be14ba6acfd452479f3fa53bf)
+- feat: :sparkles: add earth texture quality options to graphics menu [`e0841f5`](https://github.com/thkruz/keeptrack.space/commit/e0841f51706cc7b42c90212b2178f9365012e320)
+- feat: :sparkles: add wikipedia urls to launch sites [`761fa6c`](https://github.com/thkruz/keeptrack.space/commit/761fa6cd261e0dcd2197cff3f326c62a8c3202c4)
+- feat: :sparkles: add new camera widget in eci coordinates [`95c619f`](https://github.com/thkruz/keeptrack.space/commit/95c619f25fa11e232c2f7da3a184aec6b14705d1)
+- chore: :card_file_box: update data [`e61106a`](https://github.com/thkruz/keeptrack.space/commit/e61106a5bb7a15aded2c59670041e17074375652)
+- refactor: :bug: fix class name error caused by minification [`db6ef63`](https://github.com/thkruz/keeptrack.space/commit/db6ef63233df6b21d6fc9400f00c4596d2e91925)
+- refactor: :recycle: move graphics settings into graphics menu [`2aa3658`](https://github.com/thkruz/keeptrack.space/commit/2aa3658f14348e0a7cb560b1eff6d14666d3b068)
+- fix: :technologist: fix linter and formatter conflict [`2e41b8d`](https://github.com/thkruz/keeptrack.space/commit/2e41b8d7edcc24b119c29f8a5e205d37f0c9a85f)
+- feat: :wastebasket: deprecate marker logic [`a5bf4ed`](https://github.com/thkruz/keeptrack.space/commit/a5bf4ed06501f1b97c273c8ce20a9bd0566db223)
+- refactor: :recycle: reduce unnecessary API calls, utilize enums, fix linter errors, add optimizations [`85692f6`](https://github.com/thkruz/keeptrack.space/commit/85692f67e5aa6805fb25302293ff4b96120b9e9b)
+- feat: :sparkles: add new quick reports [`da4049b`](https://github.com/thkruz/keeptrack.space/commit/da4049b24cffed2a07536e706e4db470c2063554)
+- fix: :bug: fix cone mesh only hitting surface of earth [`5b72447`](https://github.com/thkruz/keeptrack.space/commit/5b724477c42b480f7b633096f622706093806f91)
+- test: :white_check_mark: fix all tests [`b583466`](https://github.com/thkruz/keeptrack.space/commit/b583466959293872c879ec9d14be1914aaf2bffe)
+- chore: :card_file_box: update databases [`29ff124`](https://github.com/thkruz/keeptrack.space/commit/29ff124c3a38f3fd70194f484920b369ba20f7a0)
+- build: :green_heart: fix build hanging [`57ccc34`](https://github.com/thkruz/keeptrack.space/commit/57ccc34cb6f7c196409d44b848f02decdfa81cb2)
+- chore: :art: update logos [`27949f7`](https://github.com/thkruz/keeptrack.space/commit/27949f74e63adb4480d37baf7b9c655423e58ba9)
+- feat: :sparkles: add color scheme for data source [`df45e6a`](https://github.com/thkruz/keeptrack.space/commit/df45e6a37c87e5a055f00407e476a90f107f4394)
+- feat: :sparkles: add settings menu to multi-site looks [`e007372`](https://github.com/thkruz/keeptrack.space/commit/e0073725a55578af4de5cca7952e74ae30596ae1)
+- docs: :page_facing_up: transfer copyright to Kruczek Labs LLC [`b9e9ba0`](https://github.com/thkruz/keeptrack.space/commit/b9e9ba0d1be43b46a9b051d14848350c13c75e6a)
+- fix: :bug: remove more images from lfs [`227d66b`](https://github.com/thkruz/keeptrack.space/commit/227d66bb0e6fdce98e2d407c4843c8d5dbc6283c)
+- refactor: :recycle: streamline URL parameter handling and remove unused satellite selection logic [`31bba16`](https://github.com/thkruz/keeptrack.space/commit/31bba166c23796436cb19e008bc157b48efbe612)
+- feat: :sparkles: expand features of tip plugin and fix bug with fetch source [`a4b44a7`](https://github.com/thkruz/keeptrack.space/commit/a4b44a79173993538892ef274bee2d852a844188)
+- feat: :sparkles: reupload images [`3eb6cc5`](https://github.com/thkruz/keeptrack.space/commit/3eb6cc5c3f0ac95311aa48de7e261b2684b3092d)
+- chore: :card_file_box: update databases [`2cf60ff`](https://github.com/thkruz/keeptrack.space/commit/2cf60ffaf7950ff9859af11ae7cb14e1a19326f7)
+- refactor: :technologist: standardize plugin naming to PascalCase and update related configurations for consistency [`1758ac6`](https://github.com/thkruz/keeptrack.space/commit/1758ac6b282240d9d3e7150b8ed289bd92f98d03)
+- chore: :card_file_box: update databases [`3347070`](https://github.com/thkruz/keeptrack.space/commit/33470706a220162c797fb02dc816775cfa800539)
+- feat: :sparkles: add settings sub-menu to plugins [`ca80d41`](https://github.com/thkruz/keeptrack.space/commit/ca80d41c6b75a55c902bd3f31e45dabc6fed58d7)
+- chore: :card_file_box: update database [`fcf0d9d`](https://github.com/thkruz/keeptrack.space/commit/fcf0d9ded822d1b8de5f25912c55e38c57306501)
+- test: :white_check_mark: update tests to match new plugin architecture [`d32b52c`](https://github.com/thkruz/keeptrack.space/commit/d32b52c1a73af6d3eaa2ebcdb28fdab1f471627b)
+- refactor: :recycle: refactor sensor-fov-mesh-factory to remove duplication and deprecated methods [`67246fc`](https://github.com/thkruz/keeptrack.space/commit/67246fc1ed44db783fa6d7bd2231ae6f1e2f005e)
+- feat: :children_crossing: improve layout of sensor timeline [`20672c0`](https://github.com/thkruz/keeptrack.space/commit/20672c041b0e40d7924634e3bbb6fe76800a0643)
+- fix: :bug: fixes to orbit-finder [`adaec57`](https://github.com/thkruz/keeptrack.space/commit/adaec57cba777a9dbf8ce2ee61d94de33c9172c3)
+- feat: :sparkles: add startalk preset [`df5e5c0`](https://github.com/thkruz/keeptrack.space/commit/df5e5c0cdd6a934af0154d4036146063a219af45)
+- refactor: :recycle: move common math functions to ootk [`556c6a2`](https://github.com/thkruz/keeptrack.space/commit/556c6a22dffe4bac13793ddc4df5b6c64bb2a5ee)
+- test: :white_check_mark: add testing foro create-sat.ts [`820e6d0`](https://github.com/thkruz/keeptrack.space/commit/820e6d0a72accb449bcb29dfd99d6c7d5ee5a0d8)
+- fix: :bug: fix type in .gitignore [`b76853f`](https://github.com/thkruz/keeptrack.space/commit/b76853fdeafa64387f6de85175a594f1e317fd91)
+- build: :fire: remove old deployment pipeline [`877fcca`](https://github.com/thkruz/keeptrack.space/commit/877fcca50ad995e59de2128567459976df1b83ae)
+- refactor: :recycle: split default color settings for improved visual customization [`dd92760`](https://github.com/thkruz/keeptrack.space/commit/dd92760deb29fe5201668d4553a21cf2f64820e2)
+- 🏗️  Updating settings, interfaces, packages for code building [`aa9a8b3`](https://github.com/thkruz/keeptrack.space/commit/aa9a8b325f98496b91a57b28cc6631f795577bd5)
+- feat: :sparkles: update bottom menu icons [`cb7b03a`](https://github.com/thkruz/keeptrack.space/commit/cb7b03a56aedf3b3f31923dbf7b5f73e7d38d63a)
+- feat: :sparkles: new launches now use nominal satellites [`4518664`](https://github.com/thkruz/keeptrack.space/commit/45186647560ca923c30524781c7eb9edf22a1a9c)
+- feat: :sparkles: update keyboard shortcuts to align with kerbal [`dada912`](https://github.com/thkruz/keeptrack.space/commit/dada91272b1aa04b6bf7c835cee57c2bc656b526)
+- fix: :lipstick: fix ui issues caused by input-field not having margin [`e25de70`](https://github.com/thkruz/keeptrack.space/commit/e25de70828b50f083d791471267b7ae7674122b3)
+- feat: :speech_balloon: add translation support for proximity ops [`df0e004`](https://github.com/thkruz/keeptrack.space/commit/df0e004a8a41b7c59a97e197c47eb63972fee515)
+- refactor: :recycle: refactor catalog-search to move new functions to satMath class [`796e57f`](https://github.com/thkruz/keeptrack.space/commit/796e57f51eaa47cd3c8fd8677df4785a84f74aa8)
+- fix: 🐛 Fixed bugs with input values and plot [`b909baa`](https://github.com/thkruz/keeptrack.space/commit/b909baa7c2747965039ece4bc3e6cc376476c9c7)
+- feat: :globe_with_meridians: add localization to calendar for es and de [`61ede50`](https://github.com/thkruz/keeptrack.space/commit/61ede501f4bc24ac0ad98b74bf14aa0f31cc136c)
+- refactor: :recycle: replace custom day of year calculations with TimeManager methods and streamline related logic [`be3ef8f`](https://github.com/thkruz/keeptrack.space/commit/be3ef8f9df780a2b716bd668098f4ba124036bdc)
+- refactor: :recycle: standardize plugin naming conventions across the codebase [`3dee8c8`](https://github.com/thkruz/keeptrack.space/commit/3dee8c8fed494d2c44a31efbd4d1feb6f8523399)
+- fix: :bug: fix external TLEs not loading [`e8b3cd8`](https://github.com/thkruz/keeptrack.space/commit/e8b3cd8d02b958ee1042bf55d30a4ad434103687)
+- refactor: :technologist: standardize plugin names to PascalCase and update related configurations for consistency [`330e921`](https://github.com/thkruz/keeptrack.space/commit/330e921f7e412d78ebbb21896b05e3c2373ccde3)
+- refactor: :recycle: update event names and streamline URL management across components [`30cad91`](https://github.com/thkruz/keeptrack.space/commit/30cad91d3ec16154a6d8ea7f5a76a25c5219b229)
+- fix: :zap: fix long loop through markers looking for satellites [`53f1f3d`](https://github.com/thkruz/keeptrack.space/commit/53f1f3dd03382b2ac06cac08f8511f6b32ddb2b7)
+- fix: :bug: fix filtering in planetarium view [`23b646e`](https://github.com/thkruz/keeptrack.space/commit/23b646ecf9a8b7cd7022c20d40735c7a4b1cd205)
+- feat: :sparkles: add sun angle to bestpass report [`f1668cb`](https://github.com/thkruz/keeptrack.space/commit/f1668cbb65a8bd317342410cab875030844be028)
+- chore: :memo: update copyright dates [`3b34b0a`](https://github.com/thkruz/keeptrack.space/commit/3b34b0a302b37c8de99b8fe69014e4d0a537f5d1)
+- build: :arrow_up: add compatibility with ootk 5 [`7a92ccd`](https://github.com/thkruz/keeptrack.space/commit/7a92ccd2c8ae72d7b5cd90bc30a3257c03414f05)
+- refactor: :recycle: standardize plugin naming conventions and menu modes across multiple plugins [`bb8b924`](https://github.com/thkruz/keeptrack.space/commit/bb8b9248472b344a22511528dc6697425f7d38d7)
+- refactor: :recycle: change Old GP colorscheme [`8401f5f`](https://github.com/thkruz/keeptrack.space/commit/8401f5f428c282a68d203cb78807fb2c5d0b809d)
+- docs: :memo: update changelog [`205ea92`](https://github.com/thkruz/keeptrack.space/commit/205ea9246992e600a8a2a189bd2c9934bfef978d)
+- feat: :sparkles: update camera keyboard controls to match kerbal [`d9e8411`](https://github.com/thkruz/keeptrack.space/commit/d9e8411ab0e0834bbfcc5fe98b2fb779b2774dab)
+- 🎯 Polar plot minor update [`7318248`](https://github.com/thkruz/keeptrack.space/commit/731824816557a0b247852298b6ef83b031efed4d)
+- fix: :rotating_light: fix linter error on comment style [`c80c6a1`](https://github.com/thkruz/keeptrack.space/commit/c80c6a1a3f7ec85cf6be3792d53065b84d7d6f85)
+- feat: :sparkles: add sateliot preset [`a740e58`](https://github.com/thkruz/keeptrack.space/commit/a740e5860561932b0ccec7db5d1094f8681bb61d)
+- feat: :sparkles: add OWL-Net sensors [`6f26b7e`](https://github.com/thkruz/keeptrack.space/commit/6f26b7e3576ce827857112634c54b93ef1c64eb2)
+- feat: :sparkles: add OWL-Net sensors [`afc9fe3`](https://github.com/thkruz/keeptrack.space/commit/afc9fe3d9b1ed950bc1a18d1797744d4b2bdaa5c)
+- refactor: :truck: rename clickDragOptions [`f068cc0`](https://github.com/thkruz/keeptrack.space/commit/f068cc0382f052bfb5e43f16e776571e6bbddd7d)
+- refactor: :rotating_light: remove linter errors [`d06172a`](https://github.com/thkruz/keeptrack.space/commit/d06172ab790e444ee15e7b4b1df2dd456350cd9b)
+- feat: :art: update icons and logos [`f7748f4`](https://github.com/thkruz/keeptrack.space/commit/f7748f475c52c4360453defb3001c12f963d9d96)
+- build: :building_construction: disable settings in settingsOverride by default [`2f8c24b`](https://github.com/thkruz/keeptrack.space/commit/2f8c24bcb30808c69ae9ddd7f60635285198f0fe)
+- feat: :sparkles: add scc num and time to polar plots [`a165f6e`](https://github.com/thkruz/keeptrack.space/commit/a165f6eacf9782b4bbd0b7a70be13738efd12cb1)
+- feat: :sparkles: add satellite overflight feature to analysis [`d8989c1`](https://github.com/thkruz/keeptrack.space/commit/d8989c1b197139c05d6243e7ae5e4ce19f0e9fb8)
+- build: :construction_worker: remove auto version date due to merge conflicts and add version to readme [`1ba8166`](https://github.com/thkruz/keeptrack.space/commit/1ba81665d136eb093ff03ffffcbe7c30ffd4cebe)
+- ci: :fire: remove old ci/cd actions [`cc42231`](https://github.com/thkruz/keeptrack.space/commit/cc422318e09c2ad5627d7c4b6aed4089691a1aa1)
+- feat: 🔥 Add changes to enable RPO plugin & add temporary icon [`16a84d5`](https://github.com/thkruz/keeptrack.space/commit/16a84d51394b5509384efa2ec6b33e7b1c013010)
+- feat: 🔥 Add changes to enable RPO plugin & add temporary icon [`902a376`](https://github.com/thkruz/keeptrack.space/commit/902a3766d3960c3e39ae0c2686cd108932f9cb5f)
+- refactor: :recycle: refactor to merge with celestrak changes [`d8b91df`](https://github.com/thkruz/keeptrack.space/commit/d8b91df82cf5e74742c028408b882a0f7708d62b)
+- refactor: :recycle: refactor to merge with celestrak changes [`9ddfc7b`](https://github.com/thkruz/keeptrack.space/commit/9ddfc7be9a6636574acc6a4c825c5b73059b0948)
+- feat: :sparkles: add primary and secondary logo paths to configuration and update build process to handle new logos [`b4fdebd`](https://github.com/thkruz/keeptrack.space/commit/b4fdebdb7de4d134b8b191203a48a022b7fc0eb8)
+- fix: :pencil2: fix Collisions spelling [`abccd23`](https://github.com/thkruz/keeptrack.space/commit/abccd238e0e12ab5dd3fd4e355445bcaa84c94c6)
+- fix: :pencil2: fix Collisions spelling [`052f223`](https://github.com/thkruz/keeptrack.space/commit/052f223dfc65808ad1d482825c03f3b99a1257aa)
+- feat: :sparkles: update icons and improve create satellite plugin [`4e74d8b`](https://github.com/thkruz/keeptrack.space/commit/4e74d8bc4da1d4c789e25f6cdda1e9545109cdb9)
+- refactor: :zap: eliminate loading extra satellites when using limitSat [`d0a9fcf`](https://github.com/thkruz/keeptrack.space/commit/d0a9fcf209378b6778e1ae78de1b369be4e2f0a1)
+- feat: :sparkles: add satellite status [`9b23a96`](https://github.com/thkruz/keeptrack.space/commit/9b23a96f9a11d3de378f46f8af648b677654d99d)
+- fix: :bug: force new persistence cache [`54b26fc`](https://github.com/thkruz/keeptrack.space/commit/54b26fc4c0779be5bb9d197a668da4da77211484)
+- refactor: :goal_net: add more defensive code to watchlist.ts [`dbe925f`](https://github.com/thkruz/keeptrack.space/commit/dbe925f13a1b14332e3be03ee857ba95c9a9542e)
+- refactor: :recycle: standardize plugin naming conventions for consistency across configuration and initialization [`0f60875`](https://github.com/thkruz/keeptrack.space/commit/0f608754a4519d38229247c87c29d748b17217c5)
+- refactor: :goal_net: add more defensive code to KeepTrackPlugin.ts [`c0fb244`](https://github.com/thkruz/keeptrack.space/commit/c0fb244f79b3cc4c43fb74729b3a80a6b233516f)
+- fix: :bug: fix cone's not lining up prefectly with a satellite [`f7adf9c`](https://github.com/thkruz/keeptrack.space/commit/f7adf9c724d07500a3223049b149b295b451c7be)
+- refactor: :recycle: replace SatMath calculations with keepTrackApi time manager for consistency across plugins [`98d5bcb`](https://github.com/thkruz/keeptrack.space/commit/98d5bcbe7a18c1e2f4b26b9845ed9076fb25a921)
+- 🎚️  Propagation slider added to the calendar plugin [`97d98e1`](https://github.com/thkruz/keeptrack.space/commit/97d98e1169431274c5fd70675873966a05e7f35a)
+- refactor: :alien: update collisions plugin to use new KeepTrack API V2 [`24842f1`](https://github.com/thkruz/keeptrack.space/commit/24842f1715a0a099620f58e1f707e9d87fac2507)
+- fix: :bug: fix math for age of elset calculations [`43be637`](https://github.com/thkruz/keeptrack.space/commit/43be63760e118806c0284a872a39c5a33442b9b0)
+- refactor: :recycle: move sync settings to settingsManager [`c285a03`](https://github.com/thkruz/keeptrack.space/commit/c285a03b3408ded1eb1f3032815fea99fd96ca0d)
+- perf: :stethoscope: add throttle for telemetry reporting [`8ff2d46`](https://github.com/thkruz/keeptrack.space/commit/8ff2d46f753431100c1fbc8bc294672533776512)
+- refactor: :recycle: update launch site mapping [`970bde4`](https://github.com/thkruz/keeptrack.space/commit/970bde413eccbdacfde4662529c7d199c691471a)
+- feat: :sparkles: update look angles logic and add type column [`8a3fd3d`](https://github.com/thkruz/keeptrack.space/commit/8a3fd3d08ed88ece0ff58c944a071d6bf6dc579e)
+- fix: :bug: sync keyboard commands with calendar plugin [`1f37b0a`](https://github.com/thkruz/keeptrack.space/commit/1f37b0a99b11e37424e47b6e51968d51697de39c)
+- fix: :rotating_light: fix typescript errors [`a80a081`](https://github.com/thkruz/keeptrack.space/commit/a80a0817b7675630d50c54aec0ecb338859f9839)
+- 👀 find-sat plugin updated to add more options: search by data source, or by TLE age [`ef5bb18`](https://github.com/thkruz/keeptrack.space/commit/ef5bb18cb444cb232bceb8c92383018302b619b3)
+- refactor: :recycle: extract is visible to sensor logic [`449009f`](https://github.com/thkruz/keeptrack.space/commit/449009f150b2114709c73fb2b242bcaf4ed499b8)
+- refactor: :truck: rename customMeshFactory to sensorFovMeshFactory [`6419304`](https://github.com/thkruz/keeptrack.space/commit/6419304f54de3ec680c4cf6b434f22e7442b88ce)
+- 🗺️  updating stereo-map to shwo all selected sensors [`423a4e1`](https://github.com/thkruz/keeptrack.space/commit/423a4e1634a572b2efc095642f7a27e1f8fb98ea)
+- fix: :bug: fix typescript syntax errors [`27e1aa6`](https://github.com/thkruz/keeptrack.space/commit/27e1aa62534b6ff1fec9554e9228db32d76db38d)
+- feat: :monocle_face: add basic telemtry to determine which features should be prioritized [`2d7b3b2`](https://github.com/thkruz/keeptrack.space/commit/2d7b3b227c1cb55a68c8c2a16951bb4e3aef1649)
+- fix: :bug: fix linter errors with telemetry [`1d984a3`](https://github.com/thkruz/keeptrack.space/commit/1d984a35e5dde6ded06998d979a076ab28546769)
+- fix: :bug: fix linter errors with telemetry [`24649f7`](https://github.com/thkruz/keeptrack.space/commit/24649f7f16bda7665ce92f8141b2ebc3fff1dfaa)
+- refactor: :recycle: consolidate selectsat manager logic [`8d03c91`](https://github.com/thkruz/keeptrack.space/commit/8d03c91b653acb8617722968e021719d498b586b)
+- fix: :art: update logo and add version/copyright information to splash screen [`4b3d814`](https://github.com/thkruz/keeptrack.space/commit/4b3d81479af01c9ba31e7e79a59df80305b7f7f9)
+- refactor: :recycle: typecast SelectSatManager since KeepTrackPlugin constructor validates dependencies [`a5f62a3`](https://github.com/thkruz/keeptrack.space/commit/a5f62a35bcf5188fc735b9da52127de2135ce09c)
+- feat: :sparkles: add SETTINGS mode to MenuMode enum and update related plugins for enhanced menu functionality [`4a0e0ff`](https://github.com/thkruz/keeptrack.space/commit/4a0e0ffa1ee3ee1081912ac400f90d1e5d18f145)
+- fix: :lipstick: fix stf menu ui [`30cf58d`](https://github.com/thkruz/keeptrack.space/commit/30cf58d9bb8a72531a71a600e43734de8f386f9e)
+- fix: :bug: fix ui issues with missile objects [`222cef7`](https://github.com/thkruz/keeptrack.space/commit/222cef761decbedbbf28b384253da0b307f0ca17)
+- feat: :sparkles: improve radarDomes [`e518b61`](https://github.com/thkruz/keeptrack.space/commit/e518b61c57738e36c904bb3206ac2c148c1f483d)
+- refactor: :wastebasket: remove deprecated style code [`ae65e20`](https://github.com/thkruz/keeptrack.space/commit/ae65e2026c70f4ece51b59e165dc4e6ae9fa5f32)
+- fix: :bug: fix countries menu for new cloudflare backend [`2c35122`](https://github.com/thkruz/keeptrack.space/commit/2c35122d858b95526f650d496f9754b5439d25b6)
+- fix: :bug: catch edge case where some plugins not loaded [`0db9fd0`](https://github.com/thkruz/keeptrack.space/commit/0db9fd061e0adf90c3965db429277f06aea4459d)
+- feat: :sparkles: streamline satellite selection handling and enhance settings for hover overlay and focus on satellite [`c62308a`](https://github.com/thkruz/keeptrack.space/commit/c62308a2775d606f313c6a7922b77f9ceccc0e59)
+- fix: :ambulance: fix sensor name not resetting in top menu [`0c730cb`](https://github.com/thkruz/keeptrack.space/commit/0c730cbee7085cf6ad2e323a8accb02b5d734baa)
+- refactor: :recycle: migrate to storage.keeptrack.space [`00e30a7`](https://github.com/thkruz/keeptrack.space/commit/00e30a7cffce8af5d5933b241e4d856e0329a082)
+- test: :white_check_mark: fix all broken tests [`8a41592`](https://github.com/thkruz/keeptrack.space/commit/8a4159233577007abd0f2261b5e4231046a37a21)
+- feat: :sparkles: add camera reset function [`4aaca31`](https://github.com/thkruz/keeptrack.space/commit/4aaca318a9bf707abac3f604bc1aba2c58ff2d37)
+- feat: :art: replace all icons [`388c87a`](https://github.com/thkruz/keeptrack.space/commit/388c87abf31d8ba8364168b6ef7a5365946c4ff4)
+- refactor: :recycle: update settings methods to identify private funcs [`3fe6110`](https://github.com/thkruz/keeptrack.space/commit/3fe6110ea7ad616b7fa8327c40a75c8f30b8c0ed)
+- fix: :bug: fix filters being improperly applied on mobile [`5eed0b9`](https://github.com/thkruz/keeptrack.space/commit/5eed0b9f48325419bcbff9f14aa85644d2dc9b07)
+- feat: :sparkles: update keyboard shortcuts for sensor-list [`ea219dc`](https://github.com/thkruz/keeptrack.space/commit/ea219dcbfe6af443d873c1728a38e0fe9e835f10)
+- feat: :sparkles: add math for new look angles logic [`f5cb4e6`](https://github.com/thkruz/keeptrack.space/commit/f5cb4e640756ccf1ef50caadd7c7f307a8cb827b)
+- feat: :sparkles: add newtab utility for future work exporting information to a new tab [`958b035`](https://github.com/thkruz/keeptrack.space/commit/958b035e0835ae50517b8b4fba9a51399cea5966)
+- refactor: :rotating_light: fix typescript lint errors [`48bcdaa`](https://github.com/thkruz/keeptrack.space/commit/48bcdaaeae5b7dfd677c9cb5ed2b3c0b5c3256cd)
+- fix: :bug: fix issue with classification colors [`450d1f4`](https://github.com/thkruz/keeptrack.space/commit/450d1f4180cd66f9b0ff60a45d159a9d07529193)
+- feat: :sparkles: add tv satellites to constellations plugin [`f383f79`](https://github.com/thkruz/keeptrack.space/commit/f383f79dcb1f370b5f42c5a561d22be7d979a9da)
+- feat: :sparkles: add visible field to lookangles plugin [`356bb46`](https://github.com/thkruz/keeptrack.space/commit/356bb468731a6e1d1b8dd977cd93b309ac557801)
+- feat: :sparkles: add colorbox header [`47f9fd7`](https://github.com/thkruz/keeptrack.space/commit/47f9fd7c78585eccc34a70d84f23f1431e21a517)
+- fix: :bug: fix issues with new color scheme system [`bb7f110`](https://github.com/thkruz/keeptrack.space/commit/bb7f11009387fb2387366d1d73cdf6822315eff0)
+- feat: :sparkles: add links to satellite owner websites [`e87a748`](https://github.com/thkruz/keeptrack.space/commit/e87a748a08b43194ca74014dd0f671ff158a11ff)
+- refactor: :recycle: rename defaultColorScheme and set Celestrak to default [`3b8c0a9`](https://github.com/thkruz/keeptrack.space/commit/3b8c0a990228b973eb5ef0fecbe5365b780847ab)
+- refactor: :recycle: rename defaultColorScheme and set Celestrak to default [`46735f9`](https://github.com/thkruz/keeptrack.space/commit/46735f919438a500a7d3828565b2f7cdf8191d49)
+- fix: :bug: fix resizing of timeline window [`d492a8d`](https://github.com/thkruz/keeptrack.space/commit/d492a8d5a6a84e4c896ac11bfcae85733c50cd0d)
+- feat: :sparkles: add searching by alt name [`4bd803e`](https://github.com/thkruz/keeptrack.space/commit/4bd803e2143b5de09f8a6358c40662682970dd31)
+- fix: :bug: fix issues with nodal precession [`57ed3ce`](https://github.com/thkruz/keeptrack.space/commit/57ed3ce2c319198713801d5dd2e289a5773851bd)
+- feat: :sparkles: add ability to increase number of ECF orbits drawn [`7df7c21`](https://github.com/thkruz/keeptrack.space/commit/7df7c21815e6eba59c4cef50b3e74ffde0118936)
+- feat: :sparkles: disable unused filters in bottom menu [`81fc42d`](https://github.com/thkruz/keeptrack.space/commit/81fc42de1e6fd365dba484cea8585a45c377ca93)
+- feat: :sparkles: disable unused filters in bottom menu [`79f0e59`](https://github.com/thkruz/keeptrack.space/commit/79f0e59f79bcf1c28717a0b3ded5bf51d7546969)
+- build: :construction_worker: remove codecov from cicd [`1071170`](https://github.com/thkruz/keeptrack.space/commit/1071170a99ff5a81fbda94ee7e1e943743543a7b)
+- fix: :bug: fix known satellites failing with ascii catalog [`df65408`](https://github.com/thkruz/keeptrack.space/commit/df654082173e9180fd409ebe1f188ceab9c15c1e)
+- refactor: :technologist: update to use DebugMenuPlugin and SensorListPlugin for sorting [`fceb794`](https://github.com/thkruz/keeptrack.space/commit/fceb7947fb7c1423f4a49a2c4d9bc2ba3ff91464)
+- refactor: :coffin: disable satelliteFov until I have a working mesh solution instead of markers [`607661f`](https://github.com/thkruz/keeptrack.space/commit/607661f9656f6470b8742d82cdb086d1831237bc)
+- fix: :bug: fix age of elset calculation [`305cbe7`](https://github.com/thkruz/keeptrack.space/commit/305cbe7be48dc85e763691769189559fedf8fab7)
+- 🖼️  Aldoria version first commit. Updated public/ data and folder [`fea6bc6`](https://github.com/thkruz/keeptrack.space/commit/fea6bc62abd0752c931aedd082bd554ef0b2cf90)
+- refactor: :recycle: remove deprecated settings and names [`f515cdd`](https://github.com/thkruz/keeptrack.space/commit/f515cdd7244f8391730341e5968883e79ebabdb3)
+- chore: :goal_net: catch and log invalid velocity [`e494d97`](https://github.com/thkruz/keeptrack.space/commit/e494d979138d4256bebe02340a8ab4c9b7a0f8dd)
+- feat: :sparkles: update keyboard shortcuts for sat-info-box [`5fcdb6b`](https://github.com/thkruz/keeptrack.space/commit/5fcdb6b66c98ccdf91f1d39915fae06154385015)
+- feat: :sparkles: add new logo always on [`3c2e3cd`](https://github.com/thkruz/keeptrack.space/commit/3c2e3cd2ec9242562fe03807dc55872c1633dfe2)
+- feat: :sparkles: add createRadarDome calls [`efc50a8`](https://github.com/thkruz/keeptrack.space/commit/efc50a8b509b8d98af62b3ca1e53e47c6109833b)
+- feat: :sparkles: add ctrl+b to toggle bottom menu open/close [`a32e24f`](https://github.com/thkruz/keeptrack.space/commit/a32e24f29cc3f5bc62c125fc433655094c140505)
+- chore: :card_file_box: update sensors paramaters [`1ed6b2d`](https://github.com/thkruz/keeptrack.space/commit/1ed6b2dc8a1931a455998ec14268854be3d7dcf8)
+- fix: :bug: fix missing decimal place [`4e1fbad`](https://github.com/thkruz/keeptrack.space/commit/4e1fbada6c83840dcb9d95189f55423eaccbfddd)
+- fix: :bug: fix export function of transponders plugin [`a2a18c0`](https://github.com/thkruz/keeptrack.space/commit/a2a18c09b6c8a57f4f55c3ba78ce86a9133dd9f2)
+- refactor: :lipstick: more color updates [`588cc81`](https://github.com/thkruz/keeptrack.space/commit/588cc81a75773f77abb6d15fb29c8c3575fceffb)
+- 🚀 minor updates to watchlist plugin, and classification bar [`d6e1e66`](https://github.com/thkruz/keeptrack.space/commit/d6e1e661d3858cc0cc37b0d881e971991b57b39b)
+- refactor: :technologist: add better control over sensor plugins [`f1524ec`](https://github.com/thkruz/keeptrack.space/commit/f1524ec08dcd15860d780e6a4ed8f43dd351f20c)
+- refactor: :recycle: use first color scheme instead of "default" color scheme [`254d530`](https://github.com/thkruz/keeptrack.space/commit/254d53005bc1bafd40ef3a56ad87c37d65356eff)
+- refactor: :recycle: use first color scheme instead of "default" color scheme [`3794eea`](https://github.com/thkruz/keeptrack.space/commit/3794eea17aaef5df79e9628a4dd0136095c8d6a3)
+- docs: :memo: update changelog [`589020e`](https://github.com/thkruz/keeptrack.space/commit/589020edd37dd5d929d58b7c7e82f11214e97084)
+- refactor: :rotating_light: fix sonarqube findings [`194bfdf`](https://github.com/thkruz/keeptrack.space/commit/194bfdf826d123f356c493eb9e7f0765708c95e5)
+- refactor: :rotating_light: fix linting errors in moon.ts [`4ac1f2f`](https://github.com/thkruz/keeptrack.space/commit/4ac1f2fe669cd02c63ddbc033fbc0e129a23bd20)
+- refactor: :recycle: refactor findObjsByOrbit [`e741e14`](https://github.com/thkruz/keeptrack.space/commit/e741e14e76f94cc279c23ac36a0f2b96ad310a01)
+- refactor: :technologist: rename watchlist to WatchlistPlugin and update related configurations for consistency [`1a7cb4d`](https://github.com/thkruz/keeptrack.space/commit/1a7cb4d35827ed2f99a5024c512029adc8f140b7)
+- feat: :sparkles: add ability to reload last selected sensors [`ddfa21d`](https://github.com/thkruz/keeptrack.space/commit/ddfa21d5e3fe774746c29d8d03492e169793d26e)
+- fix: :ambulance: fix color schemes relying on class name that change during production build [`792073b`](https://github.com/thkruz/keeptrack.space/commit/792073b6bef12a2b7b60cece3decf8c336cb91b0)
+- refactor: :goal_net: add more defensive code to new-launbch.ts [`e077f37`](https://github.com/thkruz/keeptrack.space/commit/e077f373f4c4d5e8e67290460530dab9baaff1ec)
+- feat: :sparkles: update screenshot to use new logo instead of text [`020d686`](https://github.com/thkruz/keeptrack.space/commit/020d6866f2d320e6c7631343842e2497eb220b40)
+- refactor: :technologist: standardize plugin naming to PascalCase for consistency [`8f5b1b0`](https://github.com/thkruz/keeptrack.space/commit/8f5b1b0b8a67867e53bf7605d1e202b636d75b26)
+- fix: :bug: fix colors [`84a13b7`](https://github.com/thkruz/keeptrack.space/commit/84a13b7ccf69d9c98d538a3e3ef0a7beb92c53ac)
+- feat: :sparkles: add keyboard shortcut for satelltie FOV cones [`7e9b715`](https://github.com/thkruz/keeptrack.space/commit/7e9b7150fcf66f99adb3eed3c479030c154588c3)
+- fix: :bug: update keyboard_ property to readonly and remove unused right-click menu elements [`2bd5f6e`](https://github.com/thkruz/keeptrack.space/commit/2bd5f6e2ecd67d423bf1bcb95921b9e777c8031d)
+- fix: :children_crossing: make it clear ECF orbits only work on GEO satellites [`8f930c4`](https://github.com/thkruz/keeptrack.space/commit/8f930c4d808f9ea61e193b67daa5b15cf1f50dbf)
+- ⌨️  New shortcut to switch from ECI to ECF: 'E' [`3cb05f7`](https://github.com/thkruz/keeptrack.space/commit/3cb05f7cd4d9c9a0bf2aa83e9129274bd4414517)
+- fix: :bug: ensure confidence levels are completely hidden if disabled [`dffa5cc`](https://github.com/thkruz/keeptrack.space/commit/dffa5cc051459a8e136e895e292f0e6906ea0d28)
+- fix: :bug: ensure confidence levels are completely hidden if disabled [`7908895`](https://github.com/thkruz/keeptrack.space/commit/7908895e141a700dc18fc907d2286f0dc7de79b6)
+- refactor: :rotating_light: remove linter errors [`e305941`](https://github.com/thkruz/keeptrack.space/commit/e30594186787b127587aa0884159a2d33023df74)
+- fix: :bug: convert legacy missile sims into new missileObject class [`58ff44a`](https://github.com/thkruz/keeptrack.space/commit/58ff44ab4993d5cb89b916b8ed68eb4909f8630a)
+- feat: :sparkles: add settings to enable/disable launch sites and sensors via URL parameters [`4a1e005`](https://github.com/thkruz/keeptrack.space/commit/4a1e005fb8f92693c27f5c4e54a49fa6c75edba9)
+- feat: :sparkles: add jsc vimpel filter [`25ecdf6`](https://github.com/thkruz/keeptrack.space/commit/25ecdf69d65459619bcd15b882fa173717af37a8)
+- feat: :sparkles: add clear message when no lookangles correctly displayed [`5a52479`](https://github.com/thkruz/keeptrack.space/commit/5a524797969dd8df7133c96412ef86ebb9c6269d)
+- fix: :bug: fix satellite view not being enabled [`a83defe`](https://github.com/thkruz/keeptrack.space/commit/a83defedc5cc1ad11d7ee0feb4c321799782db40)
+- fix: :bug: fix black earth not loading [`3ca3088`](https://github.com/thkruz/keeptrack.space/commit/3ca3088b8ae9681fea83d9ca3fee3315a6ec457a)
+- chore: :memo: update package number [`2487ae1`](https://github.com/thkruz/keeptrack.space/commit/2487ae136aba7da4243ba7d665add38a007604f3)
+- refactor: :rotating_light: fix linter errors in get-el.ts [`8a25bf8`](https://github.com/thkruz/keeptrack.space/commit/8a25bf8c28aecc2ac90287d81804221269ae72f1)
+- refactor: :recycle: change polar plot design [`d5bfa1b`](https://github.com/thkruz/keeptrack.space/commit/d5bfa1bf722b777710ade5f89efb888149cde318)
+- fix: :pencil2: fix typo in import [`2249dab`](https://github.com/thkruz/keeptrack.space/commit/2249dab8c738c3b53710625fb8c9209c1345afd9)
+- refactor: :recycle: rename ELSET to GP [`cf4d526`](https://github.com/thkruz/keeptrack.space/commit/cf4d5265213ab8301e7429a27113dcc5d6df329f)
+- feat: :sparkles: add different logic for rotation reset vs full camera reset [`5d71775`](https://github.com/thkruz/keeptrack.space/commit/5d71775b9d6cb34dcba0ddd098607571515fa33b)
+- feat: :sparkles: update keyboard shortcuts for stereo map [`06f71e2`](https://github.com/thkruz/keeptrack.space/commit/06f71e242ad7bb00040f2ff09d5ea2de09cabd92)
+- fix: :bug: fix polar plot overwriting canvas [`cd4431f`](https://github.com/thkruz/keeptrack.space/commit/cd4431ffdb5345ad075127e78f25b2392df4bf6d)
+- refactor: :rotating_light: fix sonarqube findings in sun.ts [`d02355f`](https://github.com/thkruz/keeptrack.space/commit/d02355fde3dfaff4c1e0cb077cc5f9e071d9f793)
+- feat: :sparkles: add save button to polar plots [`590763b`](https://github.com/thkruz/keeptrack.space/commit/590763b50fed9dcd4bb44014724f60850a0e7b07)
+- fix: :bug: update waitForCruncher parameters to skip messages and count passes for improved synchronization [`07f80a6`](https://github.com/thkruz/keeptrack.space/commit/07f80a695f8607acfb5cd3ba718a39849d1f9ea4)
+- fix: :bug: add error catching when drawing map and context lost to canvs [`ee189d8`](https://github.com/thkruz/keeptrack.space/commit/ee189d82c64b195577b079987191747cf8245440)
+- fix: :bug: fix resizing needed after start but before loading is finished [`aecb380`](https://github.com/thkruz/keeptrack.space/commit/aecb38030f8ec032c125e7213c74ab0b91bc7b94)
+- fix: :bug: add missing launch sites [`652e720`](https://github.com/thkruz/keeptrack.space/commit/652e720e3654eebacdcaf76ee1af310e71615ac4)
+- fix: :bug: fix linter and tests [`5a782fb`](https://github.com/thkruz/keeptrack.space/commit/5a782fbe38b853aca6452de8c45ea5858d7d31ea)
+- feat: :sparkles: update keyboard shortcuts for polar plot [`a4d0f99`](https://github.com/thkruz/keeptrack.space/commit/a4d0f99ffaedb65869834f3b9bbbd863c9d90868)
+- feat: :sparkles: update keyboard shortcuts for debug menu [`56bd408`](https://github.com/thkruz/keeptrack.space/commit/56bd40850dec5b2da9020b781e702dc6c4718ecd)
+- feat: :sparkles: add sorting functionality for bottom icons in UiManager [`03a16cf`](https://github.com/thkruz/keeptrack.space/commit/03a16cf1a0ee120834e618ba66452eb3008fee84)
+- refactor: :recycle: refactor eruda toggle to standalone method [`db1b180`](https://github.com/thkruz/keeptrack.space/commit/db1b18044727ee5ed001bc014e7f69f293e8cd20)
+- refactor: :recycle: standardize error handling in slide.ts [`bac640f`](https://github.com/thkruz/keeptrack.space/commit/bac640ff6f03eee9d4a8d2ec329977c28aba9e6a)
+- fix: :bug: fix bug caused by satellite that propagates into the earth [`65ee211`](https://github.com/thkruz/keeptrack.space/commit/65ee21142ea970f20feb3f9fed1d8abd62e0dd82)
+- feat: :sparkles: remove markers changed cb from sensor fov and surv [`43876b7`](https://github.com/thkruz/keeptrack.space/commit/43876b7100f62ba097f5e5fc964c32a72c23100a)
+- feat: :sparkles: add MAX_BOTTOM_ICON_ORDER constant for consistent bottom icon sorting [`8d19e64`](https://github.com/thkruz/keeptrack.space/commit/8d19e64170d5abd534fcb4115c5f4dbee191ba9c)
+- fix: :bug: Improve Safari detection logic for better browser compatibility [`e3dcd89`](https://github.com/thkruz/keeptrack.space/commit/e3dcd89b8f173793ba3ce7b82ab3f5ca6ca05ad8)
+- fix: :bug: Improve Safari detection logic for better browser compatibility [`77bb79e`](https://github.com/thkruz/keeptrack.space/commit/77bb79e77bc9562a3a911fe2a0578aa721c02bce)
+- fix: :children_crossing: provide feedback when fov bubble enabled but not valid [`5ba4421`](https://github.com/thkruz/keeptrack.space/commit/5ba442136ed341a81fdd836b2f445a4b333c352a)
+- fix: :children_crossing: provide feedback when fov bubble enabled but not valid [`8c4a54e`](https://github.com/thkruz/keeptrack.space/commit/8c4a54e3a7896be51d5f1bb111a081951bcf5b75)
+- refactor: :rotating_light: fix sonarqube findings [`13903d4`](https://github.com/thkruz/keeptrack.space/commit/13903d4dfa59c13d689a8fb663aeb98e25ae2004)
+- fix: :bug: remove unnecessary resizeCanvas method [`e73a0cd`](https://github.com/thkruz/keeptrack.space/commit/e73a0cd136f257560c55423971af613453706344)
+- refactor: :recycle: enhance ECF settings handling and update URL parameter management [`e28aecf`](https://github.com/thkruz/keeptrack.space/commit/e28aecf9419f4e39e2fb5550ac7dfed82f114179)
+- fix: :bug: adjust dropdown content max-height and style scrollbar for better usability [`1db43cc`](https://github.com/thkruz/keeptrack.space/commit/1db43ccd3bc6769034d9f64a9cc725b4d6d536c7)
+- fix: :bug: fix missilesInUse count [`2845144`](https://github.com/thkruz/keeptrack.space/commit/2845144354ffbba7113a98e8f707669e29adb8b4)
+- fix: :bug: fix image loading in colorbox with callback for better display control [`42a07df`](https://github.com/thkruz/keeptrack.space/commit/42a07df0ebf9f8fce7c285a74b21e7e5035b080b)
+- fix: :bug: show help button disabled until side menu is open [`4836362`](https://github.com/thkruz/keeptrack.space/commit/48363621ac16d92bcf28a8d5b8b1aaa249e103b8)
+- fix: :bug: show help button disabled until side menu is open [`5628eb8`](https://github.com/thkruz/keeptrack.space/commit/5628eb866dc60fbcb29e882621c57f3e15c39f7d)
+- fix: :bug: fix bug where satellite timeline only visible if watchlist sats [`e83ad2b`](https://github.com/thkruz/keeptrack.space/commit/e83ad2b388704c855171a85997891f6e0dadf407)
+- fix: :bug: fix missiles causing search errors [`37fcdc2`](https://github.com/thkruz/keeptrack.space/commit/37fcdc295e1e0b4b26aeaf0b74ebd931c42daea4)
+- refactor: :children_crossing: set godrays to off by default due to reports of performance issues [`b2a8b99`](https://github.com/thkruz/keeptrack.space/commit/b2a8b99aa24531390be34887a777ebe57122feb5)
+- feat: :sparkles: add slow shrink/grow to sun geometry [`d1ec198`](https://github.com/thkruz/keeptrack.space/commit/d1ec1986a3f6e58972a7cf94eebc657795adbbf2)
+- refactor: :lipstick: more changes to ui color [`1599330`](https://github.com/thkruz/keeptrack.space/commit/159933071d784ea28742d95d1a2dd75d7d2b2af2)
+- fix: :bug: fix camera trying to go inside the earth [`09e4b62`](https://github.com/thkruz/keeptrack.space/commit/09e4b627f768ed2cca67653c51685fcc898252cc)
+- refactor: :technologist: rename aboutManager to AboutMenuPlugin for consistency across plugins [`456e1f3`](https://github.com/thkruz/keeptrack.space/commit/456e1f320daa0b562b6dc060b483b0b30b51c973)
+- refactor: :recycle: use getDayOfYear in ootk [`b2dac90`](https://github.com/thkruz/keeptrack.space/commit/b2dac9059056970db92b1a2bc1f853ce681f7d7b)
+- refactor: :rotating_light: fix linter errors [`2dcb443`](https://github.com/thkruz/keeptrack.space/commit/2dcb4438509be757afa1477435e9073066564e42)
+- refactor: :recycle: add typing and remove unnecessary checks in sunAngle [`839720f`](https://github.com/thkruz/keeptrack.space/commit/839720f7c04b5436d5853daf41267bdeb1a021af)
+- fix: :bug: update routes [`8f7ddd2`](https://github.com/thkruz/keeptrack.space/commit/8f7ddd2c32743c271cd6289f28df23fbfc183d3d)
+- fix: :lipstick: add absolute positioning to nav for improved layout [`1a1878a`](https://github.com/thkruz/keeptrack.space/commit/1a1878a2571d1cd9adb20c6ea3692cabcb8fcca9)
+- fix: :bug: update context loss handling in WebGLRenderer and SelectSatManager for improved stability [`7336e33`](https://github.com/thkruz/keeptrack.space/commit/7336e33baf487ddf0326aaa532ab07a7051c6efd)
+- fix: :goal_net: add Safari browser support warning and redirect [`8636b86`](https://github.com/thkruz/keeptrack.space/commit/8636b86ceed4d102efc8f36317a1613006394fb2)
+- fix: :bug: fix bug where alt is null in inc2alt plots [`9a8859d`](https://github.com/thkruz/keeptrack.space/commit/9a8859d810937cae4879706baf438729272f0998)
+- refactor: :recycle: improve type handling and null checks in select-sat-manager [`dc86675`](https://github.com/thkruz/keeptrack.space/commit/dc86675fc0bac0bbbdf98e176672e4388eb5d570)
+- refactor: :recycle: improve type handling and null checks in select-sat-manager [`09f5792`](https://github.com/thkruz/keeptrack.space/commit/09f5792d62c934d16d79a1595fe1b1b1445d2a02)
+- fix: :ambulance: fix color schemes relying on class name that change during production build [`19fed80`](https://github.com/thkruz/keeptrack.space/commit/19fed802b8ab8df3d956e9e1c6da9c3aba64de5d)
+- fix: :bug: fix color of buttons in multi-site lookangles settings [`e6c0225`](https://github.com/thkruz/keeptrack.space/commit/e6c0225164ac976a48e7d6ccf83d7861e94cd112)
+- fix: :bug: fix bug where some plugins reenable in mobile mode [`eee3c4a`](https://github.com/thkruz/keeptrack.space/commit/eee3c4af12fe3aa6f2bc4e40fe2f12f18a16dc48)
+- docs: :memo: add a citation file [`3716070`](https://github.com/thkruz/keeptrack.space/commit/37160701c494a509d4125d7f48a55d06d03f6a55)
+- feat: :sparkles: update keyboard shortcuts for night toggle [`33c9447`](https://github.com/thkruz/keeptrack.space/commit/33c9447c468526d3245ff918d5d3023201667b13)
+- fix: :bug: avoid crashing production server even when there is a uniform issue in WebGl [`b541398`](https://github.com/thkruz/keeptrack.space/commit/b541398f8ed8f096fd2b23a3830605120322fcd6)
+- feat: :sparkles: add callback option to clickAndDragWidth [`0d22331`](https://github.com/thkruz/keeptrack.space/commit/0d22331b9dbd1b0df1f9b56f3aadb3a8a2257d7e)
+- ci: :construction_worker: update sonar-project settings [`3f9d52a`](https://github.com/thkruz/keeptrack.space/commit/3f9d52ab862e56002c1b8a4066b3cd7b9940a227)
+- fix: :bug: fix bug in processLimitedSats_ that caused duplicated ids [`1e52b2f`](https://github.com/thkruz/keeptrack.space/commit/1e52b2fcc1cae490f7a79c01cc741447e1b44467)
+- fix: :zap: fix lag when selecting satellites [`52a0126`](https://github.com/thkruz/keeptrack.space/commit/52a012687523ab3ba72eb0ed9fcae7a153fae7c5)
+- test: :white_check_mark: fix testing environment [`69b53ca`](https://github.com/thkruz/keeptrack.space/commit/69b53cad41327178303898061e896ae6f9ceb8a1)
+- fix: :bug: reorder experimental menu item to maintain consistent menu structure [`1eedd2f`](https://github.com/thkruz/keeptrack.space/commit/1eedd2fe895055b00f3b7eff6ee0be4caeb945b8)
+- fix: :bug: remove git lfs [`f6573a8`](https://github.com/thkruz/keeptrack.space/commit/f6573a89e64edc28e86d319d7c3887e62a6d82dd)
+- fix: :bug: remove git lfs [`39218cd`](https://github.com/thkruz/keeptrack.space/commit/39218cd183610ee264c46e015e41289efa97a2b0)
+- fix: :bug: fix scrolling gamepad errors [`f46daae`](https://github.com/thkruz/keeptrack.space/commit/f46daaef4b595c5a62de1f628ecafa81dd95bac4)
+- build: :building_construction: update husky [`f128086`](https://github.com/thkruz/keeptrack.space/commit/f12808613a234e49fc4477a3140a7b7a0d8c33af)
+- refactor: :recycle: refactor the satellite cone mesh distance from earth to settings [`6b52f82`](https://github.com/thkruz/keeptrack.space/commit/6b52f825783988d9f638f181b533c5c4e3cb9155)
+- build: :construction_worker: remove unnecessary artifacts [`febbd5b`](https://github.com/thkruz/keeptrack.space/commit/febbd5b28200027628d267f9026285de994e01dd)
+- fix: :zap: prevent multiple resize events firing back to back [`e348142`](https://github.com/thkruz/keeptrack.space/commit/e348142c8f3d4fc3894fb2e25f8c17d94b2923a7)
+- fix: :bug: fix proprate label not updating when slider moved [`e414141`](https://github.com/thkruz/keeptrack.space/commit/e414141f5c04e8c78bb4e5488b98437ded6035fe)
+- fix: :bug: disable eruda popping up on global error [`6cbb7ff`](https://github.com/thkruz/keeptrack.space/commit/6cbb7ff07ffd7265e777c9d86caac6455da8273d)
+- fix: :bug: fix side menu sub menu width override not working [`ed2b896`](https://github.com/thkruz/keeptrack.space/commit/ed2b89618aff34064429e3e2bc116d765061694a)
+- fix: :bug: remove unnecessary type assertions for position and rotation arrays [`3b316d4`](https://github.com/thkruz/keeptrack.space/commit/3b316d4bcc0abfb03e062784ab4a329620685065)
+- fix: :bug: update loadOverridesFromUrl_ to handle query strings correctly when a hash is present [`8ee6805`](https://github.com/thkruz/keeptrack.space/commit/8ee680562f2b4f682893373d904ab93eb23d3dab)
+- docs: :wastebasket: remove deprecated references to github page [`91b17f5`](https://github.com/thkruz/keeptrack.space/commit/91b17f594248ccddf65e511184e9a18dede4002e)
+- fix: :white_check_mark: fix tests [`ed28589`](https://github.com/thkruz/keeptrack.space/commit/ed2858928077781df8e2f8285131043e32d199be)
+- refactor: :rewind: remove Aldoria specific code from main repo [`a61e8a1`](https://github.com/thkruz/keeptrack.space/commit/a61e8a15f0b39e365779f95479ea9a11f054bb2f)
+- fix: :ambulance: fix single bad TLE breaking sccIndex and cosparIndex [`df0fcb5`](https://github.com/thkruz/keeptrack.space/commit/df0fcb5d376f3c38e655a1afbb383889d019306d)
+- fix: :poop: move mock date to test not live code [`9ce354e`](https://github.com/thkruz/keeptrack.space/commit/9ce354e2a96aa71357b2f9bb007c09f4846f0fdb)
+- docs: :memo: update CHANGELOG [`1cf8348`](https://github.com/thkruz/keeptrack.space/commit/1cf8348f22bc995c443332e83b454445f7071903)
+- fix: :lipstick: fix collapsing sat-infobox on mobile [`9c7efa0`](https://github.com/thkruz/keeptrack.space/commit/9c7efa0d47555994ebe58a882ad31fdf01b25baa)
+- fix: :lipstick: fix duplicate shadow effect [`ccdd349`](https://github.com/thkruz/keeptrack.space/commit/ccdd3494920d7ba1aede4a6c307ec246d62abc31)
+- fix: :bug: fix bug with shift being tracked as down after window loses focus [`48a1b0f`](https://github.com/thkruz/keeptrack.space/commit/48a1b0f04f61c39d6b85695c23128efca81ca5e9)
+- fix: :bug: fix missing id parameters [`a849e73`](https://github.com/thkruz/keeptrack.space/commit/a849e732e6dbe094c0325c3556b498ad2a85bce2)
+- build: :heavy_minus_sign: remove old dependencies [`8d864dd`](https://github.com/thkruz/keeptrack.space/commit/8d864dd64f0e6a4db45e995138c37ec7f293c8fa)
+- docs: :memo: update changelog [`d3b4862`](https://github.com/thkruz/keeptrack.space/commit/d3b486278a84722ad9229a58a97a870ae74b5f1d)
+- build: :arrow_up: bump dependencies [`5d0fecb`](https://github.com/thkruz/keeptrack.space/commit/5d0fecb929a012f3c5c3872d18619b1e4eddea65)
+- fix: :bug: update picking dot size and adjust draw size calculations to reduce flickering [`9fa04ed`](https://github.com/thkruz/keeptrack.space/commit/9fa04ed8a50f34ecdd9baa00eaa8a19dbc43df42)
+- refactor: :recycle: change bottom menu categories [`9d714b0`](https://github.com/thkruz/keeptrack.space/commit/9d714b0dbbff57c760c8e7e7d539301e4e5d707f)
+- test: :technologist: fix issue with vscode debug not working with jest [`fd54dd6`](https://github.com/thkruz/keeptrack.space/commit/fd54dd6724e05b23e8350257e461e89e9c99d24e)
+- refactor: :recycle: hide altName and altId independently [`14ca34a`](https://github.com/thkruz/keeptrack.space/commit/14ca34a1ce69d3018ebf31498b577a4274a5325d)
+- refactor: :recycle: hide altName and altId independently [`f05db65`](https://github.com/thkruz/keeptrack.space/commit/f05db65ae1a351bc07ad04ac4bc07a545080be05)
+- feat: :sparkles: add gp url param option [`7f94c9f`](https://github.com/thkruz/keeptrack.space/commit/7f94c9fdd94e8ef162c2f85f26184d7fe490ea73)
+- fix: :bug: add iss flag [`2eca240`](https://github.com/thkruz/keeptrack.space/commit/2eca2402790eec7171f60ff4ffd0f793dccbc7a3)
+- build: :building_construction: update .gitattributes to stop uploading binaries [`5299a8b`](https://github.com/thkruz/keeptrack.space/commit/5299a8b3ef5b3c98bbc2165485e9b405bafb653c)
+- refactor: :recycle: replace Localization instance with t7e function for country label localization [`9b89da6`](https://github.com/thkruz/keeptrack.space/commit/9b89da67f94bd18fee3959a8c075e655106348d3)
+- fix: :bug: add missing styles for colorbox title to fix layout [`4f3669a`](https://github.com/thkruz/keeptrack.space/commit/4f3669a707fee3807e6fd222ce304fa61fd57c94)
+- refactor: :recycle: remove unnecessary eslint-disable comments for class methods across multiple files [`3aaa459`](https://github.com/thkruz/keeptrack.space/commit/3aaa45929d05d635c08228117dc5cc5cba822717)
+- fix: :bug: Replace throw error with console.error in pro plugin initialization methods [`97fd800`](https://github.com/thkruz/keeptrack.space/commit/97fd800b0bfc5c45e741b074b4296d9f1552b519)
+- Update src/static/gl-utils.ts [`62c4a07`](https://github.com/thkruz/keeptrack.space/commit/62c4a0761c409372ed83e2c4e028401feff4f81e)
+- fix: :bug: fix resizing not firing correctly [`0d41f46`](https://github.com/thkruz/keeptrack.space/commit/0d41f4626c08e8fa5e23c360b697d2a2e59701fc)
+- build: :truck: change default port to 5544 to match CORS exception [`40d486c`](https://github.com/thkruz/keeptrack.space/commit/40d486cf0f2feadcde43e3ef44cb14d563f7b5a5)
+- fix: :bug: prevent attempting to export a find result before running a find [`a5df404`](https://github.com/thkruz/keeptrack.space/commit/a5df4043fcbef953d20acce53aa242d135a15d36)
+- fix: :bug: fix bug where logo wasn't hidden with settingsManager [`dded174`](https://github.com/thkruz/keeptrack.space/commit/dded174a146fc1c08f9e33c34aad66bd07342aa8)
+- docs: :memo: update changelog [`29e908f`](https://github.com/thkruz/keeptrack.space/commit/29e908fd4562209b3cba02fc972d705f22325ff9)
+- feat: :sparkles: add new splash screens [`62538c0`](https://github.com/thkruz/keeptrack.space/commit/62538c0b2f6ba3971d8d9a1d28d6ebd67513ee0d)
+- fix: :bug: fix missing rmb items [`d025544`](https://github.com/thkruz/keeptrack.space/commit/d02554477e0c1863a66c194feafc5df3b99c80d9)
+- fix: :rotating_light: fix typescript linter errors [`16d1a14`](https://github.com/thkruz/keeptrack.space/commit/16d1a14b4b18e62bdda0aa48ee1b47bd7b1e2dac)
+- feat: :sparkles: add compatibility with ALDORIA CONFIDENTIAL setting [`7ce2b94`](https://github.com/thkruz/keeptrack.space/commit/7ce2b94b355918bcb9e0d4c2b2404268c4f8ded6)
+- fix: :bug: fix keyEvents not firing [`a78e8fd`](https://github.com/thkruz/keeptrack.space/commit/a78e8fd7a8096df277bba206ac4cbf9b8d059164)
+- docs: :bookmark: bump version [`acc31c0`](https://github.com/thkruz/keeptrack.space/commit/acc31c0a63be6ee076c54da4d999354c7a7a582a)
+- test: :white_check_mark: fix broken test [`67e218a`](https://github.com/thkruz/keeptrack.space/commit/67e218aefeb94deab53dd1dd23766f52f5ded08e)
+- fix: :beers: used the wrong word for RPO [`c4613bc`](https://github.com/thkruz/keeptrack.space/commit/c4613bc55c7c8d745b179fc000267aa5a342824d)
+- fix: :rotating_light: fix linter error [`74e171e`](https://github.com/thkruz/keeptrack.space/commit/74e171eb9e20921cc68652976467c34519f090e1)
+- fix: :rotating_light: fix linter error [`4cf2824`](https://github.com/thkruz/keeptrack.space/commit/4cf282452ca6eb88106479f11c2b5b172e37593a)
+- fix: :bug: use launch year data if available [`1632376`](https://github.com/thkruz/keeptrack.space/commit/1632376050e963e3491ff717cf519a7dabe1b917)
+- fix: :bug: fix new launch showing error even when it works [`ba1d98c`](https://github.com/thkruz/keeptrack.space/commit/ba1d98c833693cdf33d8eb113185bf359cf06893)
+- refactor: :lipstick: change color of polar plot to match new theme [`9bfa33f`](https://github.com/thkruz/keeptrack.space/commit/9bfa33f4c170b5d8f8c655dbbc8858863ca8c493)
+- feat: :lipstick: shrink sat-info-box when multiple menus are collapsed [`876c13b`](https://github.com/thkruz/keeptrack.space/commit/876c13b95622a8db2cc4cbb8b517fed76555bd17)
+- fix: :bug: fix dark-clouds preset [`d8a6121`](https://github.com/thkruz/keeptrack.space/commit/d8a61217260b06bbc6076e29ef17a83b8025bd00)
+- refactor: :children_crossing: increase zoom speed [`c7d1b2b`](https://github.com/thkruz/keeptrack.space/commit/c7d1b2ba13301594026471f5135295054f209617)
+- fix: :goal_net: add try/catch for bad plugins [`50d7b43`](https://github.com/thkruz/keeptrack.space/commit/50d7b438cc2d88ab8fb8d975f0f61c867c587ec6)
+- fix: :bug: fix bug with depth test when milkyway is disabled [`fbf9b7a`](https://github.com/thkruz/keeptrack.space/commit/fbf9b7ad433a04d5b3c4907a7866fb0a5c8c6919)
+- fix: :bug: reenable satelliteFOV plugin [`e11dab6`](https://github.com/thkruz/keeptrack.space/commit/e11dab6d4a200b06de844735828448fbe9d571b6)
+- refactor: :recycle: refactor camera logic out of mouse input [`2dff2da`](https://github.com/thkruz/keeptrack.space/commit/2dff2da99bee1527909afde62242b1911a0e9177)
+- feat: :sparkles: add uuid to custom and stf sensor objNames to differentiate them [`9e22f63`](https://github.com/thkruz/keeptrack.space/commit/9e22f638b6010227eadcfcb329fe1a53d06921fd)
+- build: :arrow_up: bump ootk to v5 [`85e5234`](https://github.com/thkruz/keeptrack.space/commit/85e5234dc894419dbfdf91dc211c54be68009f51)
+- fix: :bug: fix bug where no references availalbe for historical RCS est [`a206781`](https://github.com/thkruz/keeptrack.space/commit/a206781bdde67d6fc14aefa18dc89d3ace525f13)
+- refactor: :heavy_minus_sign: remove unused dependencies [`79c0348`](https://github.com/thkruz/keeptrack.space/commit/79c0348a68eaaf6d63e89ac962c07a63c8edcd0a)
+- refactor: :recycle: type settingsSideMenu in multi-site-look-angles [`324eff2`](https://github.com/thkruz/keeptrack.space/commit/324eff2a9da7158d6873a890dda9355e43b9859d)
+- feat: :sparkles: update splash screens [`20c838a`](https://github.com/thkruz/keeptrack.space/commit/20c838a41c0328471f86a4dc5afbbd6d035c1e2b)
+- chore: :bookmark: bump patch version [`02c8b24`](https://github.com/thkruz/keeptrack.space/commit/02c8b242b548012165e57c8f700ece431ebb0659)
+- fix: :bug: fix race condition with soundManager loading after being called [`e82452d`](https://github.com/thkruz/keeptrack.space/commit/e82452d9597944699289b8306d42ac72190f8693)
+- fix: :bug: fix issue with sound firing before initialization [`ef304aa`](https://github.com/thkruz/keeptrack.space/commit/ef304aa619514eb43cedf966bdc59f5f5edc98dc)
+- build: :arrow_up: bump ootk [`843407a`](https://github.com/thkruz/keeptrack.space/commit/843407aae4ad8208b83868dcf0b1531a69894d95)
+- ci: :bug: fix lint-yml checking other files [`f8b876e`](https://github.com/thkruz/keeptrack.space/commit/f8b876ebfe900992fcb1378553b47bde1438d91a)
+- fix: :ambulance: calendar incorrectly adding 1 to jday [`1489185`](https://github.com/thkruz/keeptrack.space/commit/1489185b1f1358b79cd93b205da9192778f5f590)
+- fix: :poop: remove console.log [`9fb5bbe`](https://github.com/thkruz/keeptrack.space/commit/9fb5bbe533513868cad888344a968ef7454f2a7b)
+- fix: :bug: fix broken ui icons [`e27e8ee`](https://github.com/thkruz/keeptrack.space/commit/e27e8ee388391c3c2e26e43d8302e25fa4be1563)
+- Resloved conflicts between fixes and new feature branch [`89fb343`](https://github.com/thkruz/keeptrack.space/commit/89fb343ff304f7cd6c08f92bbd348cef59c669cd)
+- feat: :sparkles: add 2030 catalog tools and 3d cone draft [`9c7ee83`](https://github.com/thkruz/keeptrack.space/commit/9c7ee837be7d2bb58835f7339d5e5b26f925d8ea)
+- feat: :fire: Convert to class based system for code part 1 [`150fd34`](https://github.com/thkruz/keeptrack.space/commit/150fd34014c57c8dabcb9813cad74554e00a4ae4)
+- ci: :sparkles: add visualizer workflow [`7f60090`](https://github.com/thkruz/keeptrack.space/commit/7f60090b10f6f6e48408599d3e99af9af9aa3cf6)
+- feat: :sparkles: improve scaling of mesh models [`7d17925`](https://github.com/thkruz/keeptrack.space/commit/7d1792538493231f9a44fb370ab7658c25903930)
+- feat(multiple): merging with the current github code base [`0a1b0b4`](https://github.com/thkruz/keeptrack.space/commit/0a1b0b4b9c1ab8153eaea14bcc20cb875dcc771d)
+- added new  catalog loader [`d391366`](https://github.com/thkruz/keeptrack.space/commit/d39136637c30ca528d0cd279ec9e407c01c895ae)
+- fix: :rotating_light: fixed multiple sonarqube findings [`a8c0bea`](https://github.com/thkruz/keeptrack.space/commit/a8c0beaeee15c39a8e415570152fd6266d74b4fa)
+- docs: :memo: changelog bump [`f82d5c4`](https://github.com/thkruz/keeptrack.space/commit/f82d5c4b29c7dcac3384b94fd5c6312805db81a1)
+- feat: :children_crossing: better feedback on 404/500 errors [`bd6ad83`](https://github.com/thkruz/keeptrack.space/commit/bd6ad83d123d581c24b2f4cd6c261aab8e853b93)
+- refactor: :fire: removed duplicate code [`c78e097`](https://github.com/thkruz/keeptrack.space/commit/c78e097ada1e0bed6ca26c02bf6807932070d4bb)
+- fix: :bug: fixed bugs related to legacy end of world json sims [`1ecc6fe`](https://github.com/thkruz/keeptrack.space/commit/1ecc6fe5f18d8dd94c7f8dafb6156832db8bae88)
+- fix: :rotating_light: extra file breaking linter [`6925556`](https://github.com/thkruz/keeptrack.space/commit/6925556dea00726ee8871f41a3c9c700d3f1a9e2)
+- test: :white_check_mark: added testing to positionCruncher [`85b81b8`](https://github.com/thkruz/keeptrack.space/commit/85b81b87651332f1bde935168ecc2f6f0863f65f)
+- fix: :bug: new launch now displays error if no sat selected [`1389d00`](https://github.com/thkruz/keeptrack.space/commit/1389d0062a8d1db62e42a73abb71d533cb0f0be0)
+- test: :white_check_mark: increased satSet test coverage [`5f0c04c`](https://github.com/thkruz/keeptrack.space/commit/5f0c04cedf323bdceecfdf15b333ab60b2fedc4c)
+- docs: :memo: updated readme and contributing guidelines [`f0fe73d`](https://github.com/thkruz/keeptrack.space/commit/f0fe73d34deba7b0961f4a85aa9575eeb379ee15)
+- test: :white_check_mark: increased test coverage on menuController [`4bf14d1`](https://github.com/thkruz/keeptrack.space/commit/4bf14d17c5810a05c0aa98ac7e07f3422073be0c)
+- refactor: :rotating_light: fixed sonarqube findings [`f3d1218`](https://github.com/thkruz/keeptrack.space/commit/f3d12188dd9dda1c0ca40ee77fd04fe175e4ad5d)
+- build: :construction_worker: sonarcloud fixes and deploy pipeline [`61b877f`](https://github.com/thkruz/keeptrack.space/commit/61b877f9fcae8526feaf07d9eef63e79124cc493)
+- refactor: :coffin: removed WIP radarDataManager [`500ab68`](https://github.com/thkruz/keeptrack.space/commit/500ab68b18faca02508d1b572559573b5699f025)
+- ci: :construction_worker: new deployment pipeline [`9b8f7d5`](https://github.com/thkruz/keeptrack.space/commit/9b8f7d57e41eb74559e7254d83acf47f8a4f3499)
+- perf: :lock: addressed multiple sonarqube findings [`088d03e`](https://github.com/thkruz/keeptrack.space/commit/088d03e545c6c51a846b50d88ad87d968533ddf3)
+- test: :coffin: removed obsolete jest snapshots [`7f9f90d`](https://github.com/thkruz/keeptrack.space/commit/7f9f90d9b5af1d91ff1b673f424eec839dde01dd)
+- ci: :white_check_mark: generate code coverage for sonarcloud [`f438f7c`](https://github.com/thkruz/keeptrack.space/commit/f438f7c9bb4ec7c6bd873f419423e2b473376d9a)
+- build: :wastebasket: removed unnecessary build calls [`fbb9a1d`](https://github.com/thkruz/keeptrack.space/commit/fbb9a1d9a59b495a2c6f352f96dd8f0ab73baac2)
+- test: :adhesive_bandage: make tests pass [`2c0c2a1`](https://github.com/thkruz/keeptrack.space/commit/2c0c2a144883ad4b02a3cef4bb008d1be4abe24d)
+- fix: :art: minor changes to redundant css code [`ba274bf`](https://github.com/thkruz/keeptrack.space/commit/ba274bfaabee19d94ffc81af1d0b76c3e19f1ebe)
+- build: :lock: add sonarcube scans to master on push [`924349a`](https://github.com/thkruz/keeptrack.space/commit/924349ad52209c5755d93faf94d8a15afd34f9ec)
+- test: :bug: fixed jest tests [`ef09d54`](https://github.com/thkruz/keeptrack.space/commit/ef09d54d3885f239a6a9d730956fd918302c78e1)
+- build: :rotating_light: addressed yaml lint findings [`e38a916`](https://github.com/thkruz/keeptrack.space/commit/e38a9168cb2a8e1e97dde1d4b7150a7d3cc31cdd)
+- fix: :bug: fixed bug where 404 was always displayed [`87c570b`](https://github.com/thkruz/keeptrack.space/commit/87c570bc3f6ae7c410cad5cd6e8c06f273de6c9d)
+- fix: :lipstick: fixed bug in materialize.css [`17437db`](https://github.com/thkruz/keeptrack.space/commit/17437dba19df95643cc828666826d628da231f74)
+- build: :bug: webpack ignores catalog admin files [`a9e87bb`](https://github.com/thkruz/keeptrack.space/commit/a9e87bb4b3e26cc0d2af47e9a09907a18cd088c7)
+- fix: :pencil2: error page now redirects back to home page [`fa2b7a3`](https://github.com/thkruz/keeptrack.space/commit/fa2b7a3120e9f0f082c1ac5befda1419dfbfaedf)
+- test: :bug: fixed test running after jest teardown [`15341d7`](https://github.com/thkruz/keeptrack.space/commit/15341d7c224c725245b68f8a173b457d0a121845)
+- chore: :coffin: removed unused images [`f52c8be`](https://github.com/thkruz/keeptrack.space/commit/f52c8be4d6a15c790c07d5ff4a6de4208f29ff87)
+- refactor: :label: type incorrect [`e1bf8bd`](https://github.com/thkruz/keeptrack.space/commit/e1bf8bdff074a938294804ea73d0a15a9ab45e10)
+- ci: :pencil2: fixed port for ftp deployment [`0d9f6fd`](https://github.com/thkruz/keeptrack.space/commit/0d9f6fd3a17b909794482b48b7ef92339f48fe93)
+- Update deploy-pipeline.yml [`05df0c0`](https://github.com/thkruz/keeptrack.space/commit/05df0c02d7809e06307b3c0ba5240c218400b111)
+- build: :coffin: removed duplicate test script [`a026cf7`](https://github.com/thkruz/keeptrack.space/commit/a026cf768689911a6fc1c6d52044a55f0f7a3f89)
+- Merge branches 'master' and 'master' of https://code.il4.dso.mil/spacecamp/delta4/darts/keeptrack-space [`8c61027`](https://github.com/thkruz/keeptrack.space/commit/8c61027d80f1c13f3bb50cbbdf74083511afe976)
+- Version 5 [`4eb1368`](https://github.com/thkruz/keeptrack.space/commit/4eb1368b11d0369a6ab16588e97816582cea1bfa)
+- chore: :card_file_box: update database [`21932f1`](https://github.com/thkruz/keeptrack.space/commit/21932f1db12fc70d83ffe5d2f2e148d860f48ec4)
+- feat: :sparkles: add external catalog loader [`d67955f`](https://github.com/thkruz/keeptrack.space/commit/d67955f03913f781982566a441f6876e3839bcae)
+- feat(meshes): added new meshes [`a506641`](https://github.com/thkruz/keeptrack.space/commit/a50664110dac12c07c92e7ddc5be751b1964b743)
+- feat: :sparkles: add improvements for JSC Vimpel data [`970b259`](https://github.com/thkruz/keeptrack.space/commit/970b259f79e08001083f1125a2f43de307d1c060)
+- chore: :card_file_box: update TLE databases [`e1dc51d`](https://github.com/thkruz/keeptrack.space/commit/e1dc51d6e0a7254d605851ae56d83c261789b7a8)
+- feat: :sparkles: add ses satellite mesh [`690f56d`](https://github.com/thkruz/keeptrack.space/commit/690f56d4d8d5cb4abdd17dd99940450402fde4c3)
+- chore: :fire: remove old tle files [`eb93ccb`](https://github.com/thkruz/keeptrack.space/commit/eb93ccb475850e82dc6141d579bd7d0d5c2f3604)
+- refactor: :heavy_minus_sign: remove locally hosted dependencies [`ec799f1`](https://github.com/thkruz/keeptrack.space/commit/ec799f17bbbd864e6a7e42a67b68adbfa14599f2)
+- refactor: :recycle: refactor uiManager.ts to look cleaner [`d41fb97`](https://github.com/thkruz/keeptrack.space/commit/d41fb973979bda65aceaa58a879e0413a9a31360)
+- chore: :fire: remove unused meshes [`a1dce95`](https://github.com/thkruz/keeptrack.space/commit/a1dce95585b8dcf363d2e17b70011e8ff23890b1)
+- feat: :sparkles: ootk v4 integration [`36a172e`](https://github.com/thkruz/keeptrack.space/commit/36a172eed897604abd054410b07ca01ba99c74a7)
+- refactor: :art: put catalog loader in class for more clear loading [`5d9be75`](https://github.com/thkruz/keeptrack.space/commit/5d9be750b8a9dddf9b39885640fd4ff2874825b5)
+- feat: :sparkles: add glonass meshes [`6b3ef68`](https://github.com/thkruz/keeptrack.space/commit/6b3ef68c1391eb6d37857d78173a21e42e663735)
+- feat(keeptrack): complete overhaul to TypeScript and implement KeepTrackApi [`dc7c26e`](https://github.com/thkruz/keeptrack.space/commit/dc7c26ed778a92faca7416efa2ed9d96c568dc2b)
+- feat(astroux): implemented astroux css and soundManager [`3a0b6a2`](https://github.com/thkruz/keeptrack.space/commit/3a0b6a2eb1969409f8f32e68e7bc1df0f75a05bd)
+- chore: :card_file_box: update satellite databases [`a9c7973`](https://github.com/thkruz/keeptrack.space/commit/a9c7973b4a06b19c08bfac78820027ac0b945ebe)
+- refactor: :rotating_light: migrate to eslint for formatting [`f5c0c61`](https://github.com/thkruz/keeptrack.space/commit/f5c0c613d550cefe9c185f2fccd0f0037ff60095)
+- feat(satvmagmanager): expanded sunlight color scheme, fixed propagation speed code and line to sat [`6604b8d`](https://github.com/thkruz/keeptrack.space/commit/6604b8d4fc628f141a989fe53de44bcda1e34d0d)
+- fix: :bug: fix time machine showing vimpel objects in 1958 [`029294a`](https://github.com/thkruz/keeptrack.space/commit/029294aa94b27f5d5cf1b88b4546c525045dbd6b)
+- chore: :card_file_box: update database files [`1137dd7`](https://github.com/thkruz/keeptrack.space/commit/1137dd730ea58d0c4ae9e3951d433198fea4180a)
+- refactor: :heavy_minus_sign: remove materialize.js in favor of npm package [`73626bc`](https://github.com/thkruz/keeptrack.space/commit/73626bcc5593154ed1bc48f744a5bf9d23bb5133)
+- refactor: :heavy_minus_sign: reduce dependencies [`56523f8`](https://github.com/thkruz/keeptrack.space/commit/56523f8066e5f2c8eda6968a21d950695514e1c7)
+- test(multiple): a lot of ponicode created unit tests [`8252451`](https://github.com/thkruz/keeptrack.space/commit/8252451b33b1840937a875383e00444bf484b7e4)
+- feat: :bento: add flock, lemur, oneweb, spacebee and search by bus [`f7ca5f7`](https://github.com/thkruz/keeptrack.space/commit/f7ca5f7f27746336726c033b60678e543a0d465c)
+- feat: :sparkles: add confidence color scheme [`6ff07c1`](https://github.com/thkruz/keeptrack.space/commit/6ff07c1f5f6c9df63c1852ac426535396f2f65d4)
+- chore: :card_file_box: update json databases [`35f2338`](https://github.com/thkruz/keeptrack.space/commit/35f2338bb20009bc20eff0e9eb3e75d2029caaf1)
+- fix(multiple): improved code to allow more unit tests and catch async errors [`18bc080`](https://github.com/thkruz/keeptrack.space/commit/18bc0800437a52d0565279d90604cfd4675694d4)
+- refactor: :recycle: split SatMath into pieces [`5a300c3`](https://github.com/thkruz/keeptrack.space/commit/5a300c3c72a1199cc15dabd299a23c65b8dc7109)
+- fix: :bug: streamline and fix mesh manager [`cb6188d`](https://github.com/thkruz/keeptrack.space/commit/cb6188d37862139c5ac48444ef589259e2db6105)
+- fix(timemanager): improved time sync between satCruncher orbitCruncher and main thread [`85b8083`](https://github.com/thkruz/keeptrack.space/commit/85b80833e51dc122e01c107c1d5615a90e411a34)
+- fix: :zap: remove jquery and fix open bugs [`d5e1f46`](https://github.com/thkruz/keeptrack.space/commit/d5e1f461a6cdda278eecb301c839391c664b349e)
+- fix: :zap: remove jquery and fix open bugs [`b33004d`](https://github.com/thkruz/keeptrack.space/commit/b33004d985510a0ea4158214f11b3e3deba666c9)
+- refactor: :fire: removed old php scripts that are no longer used [`1e39d6c`](https://github.com/thkruz/keeptrack.space/commit/1e39d6cbda18fe861e56d9d1ed17ab9e1ffdc271)
+- feat: :sparkles: add eci ecf ric inc2lon and time2lon plots [`373eff6`](https://github.com/thkruz/keeptrack.space/commit/373eff6b41a99fcd791cb8f67e4c6449f1c8693a)
+- feat: :sparkles: add eci ecf ric inc2lon and time2lon plots [`81171f7`](https://github.com/thkruz/keeptrack.space/commit/81171f71d4a3b0d338c401f59b8cc48340cc779a)
+- refactor: :recycle: refactor hoverbox code out of drawManager [`bede8e0`](https://github.com/thkruz/keeptrack.space/commit/bede8e0671843b04aa42eee2b1190eb07f008f11)
+- fix: :bug: fix testing bugs [`db24617`](https://github.com/thkruz/keeptrack.space/commit/db24617f7198ba53c430e19a98460a38bf69648c)
+- refactor: :recycle: split missileManager.ts and convert to classes [`8cee957`](https://github.com/thkruz/keeptrack.space/commit/8cee957099a20600ee759593848882e2a76d58dc)
+- refactor(camera): migrated camera to typescript [`8efff95`](https://github.com/thkruz/keeptrack.space/commit/8efff95004a9a61cc315de971d736d083b5b3d61)
+- refactor: :zap: remove jquery [`e1f93e6`](https://github.com/thkruz/keeptrack.space/commit/e1f93e6251291196c3df88398deb0844b7520be5)
+- refactor: :zap: remove jquery [`49580d9`](https://github.com/thkruz/keeptrack.space/commit/49580d97c5bbac679204d00ce2b616286b4c0960)
+- feat: :sparkles: add satellite search on control site clicked [`6eb24c3`](https://github.com/thkruz/keeptrack.space/commit/6eb24c38030ed14522a42b9643584a306cf92632)
+- feat: :sparkles: add satellite search on control site clicked [`13ad826`](https://github.com/thkruz/keeptrack.space/commit/13ad826ec44c899bbf364ea0314d6acd3901e3a6)
+- refactor: :recycle: rewrite of sensors [`e12bbf1`](https://github.com/thkruz/keeptrack.space/commit/e12bbf19fdbf4215690259f52d06e8dda2f160d8)
+- fix(ui-input.ts): migrated ui-input to typescript. fixed on click and create sensor/observer bugs [`03175c7`](https://github.com/thkruz/keeptrack.space/commit/03175c7943e0724d85cb5959384f6207b154242a)
+- style: :art: replace all camelCase files with hyphens for better git detection [`fe08125`](https://github.com/thkruz/keeptrack.space/commit/fe08125751529b16d6f8c7a7e3280de768d75114)
+- style: :art: replace all camelCase files with hyphens for better git detection [`772493c`](https://github.com/thkruz/keeptrack.space/commit/772493cd0b685c6c720e2561d9b3ea04b8ace911)
+- refactor(settingsmanager): converted settingsmanager from js to ts [`2f55ca8`](https://github.com/thkruz/keeptrack.space/commit/2f55ca8d39643e66fd8d646cf32b664504389e9f)
+- feat(multiple): improved error detection and reporting for webgl issues [`f1c5794`](https://github.com/thkruz/keeptrack.space/commit/f1c5794bf3049819cbb36c4a713453873adb3819)
+- refactor: :recycle: move all plot plugins to class based design [`fb2a63a`](https://github.com/thkruz/keeptrack.space/commit/fb2a63a5fc335829ff726cdb7eab6a1bb6888378)
+- feat: :sparkles: add scenario-creator scaffold [`ce949c4`](https://github.com/thkruz/keeptrack.space/commit/ce949c468e468582c09ed269e5c0a78b461927f8)
+- feat: :sparkles: add scenario-creator scaffold [`2cecc65`](https://github.com/thkruz/keeptrack.space/commit/2cecc657426d59206b5beb847043ed7248d34725)
+- refactor: :recycle: reduce dependencies by using keepTrackApi more [`ce4bc64`](https://github.com/thkruz/keeptrack.space/commit/ce4bc646764a82689089c3c2d28fa83b40369673)
+- refactor: :truck: reorganize source code [`58f0818`](https://github.com/thkruz/keeptrack.space/commit/58f0818c6886c23a8343ef10068e0bd0f12f5570)
+- test(multiple): added many new Jest tests [`edd1248`](https://github.com/thkruz/keeptrack.space/commit/edd1248ae614723721f6a4341bb694649194e406)
+- fix(get_data.php): patched vulnerability [`58a5ca6`](https://github.com/thkruz/keeptrack.space/commit/58a5ca685ab8e4535c85b66be6cb648a56104ee6)
+- build(configs): updated configuration settings [`1b25bf8`](https://github.com/thkruz/keeptrack.space/commit/1b25bf85a1f457710ecf9866d2dd91f758999b7d)
+- feat: :technologist: convert settingsManager to a class [`23858cf`](https://github.com/thkruz/keeptrack.space/commit/23858cff6f238c1761043066f71a299e1f2be07c)
+- refactor: :truck: split uiManager into smaller pieces [`c900d59`](https://github.com/thkruz/keeptrack.space/commit/c900d5983beb7b055a5f3f01bed7b9ac965c6e2c)
+- refactor: :recycle: refactor meshes [`41644a8`](https://github.com/thkruz/keeptrack.space/commit/41644a8b7383442247614d3a9d96da980e473dbf)
+- refactor: :truck: reorganize source code [`f8ff708`](https://github.com/thkruz/keeptrack.space/commit/f8ff7082f01a121fa91b12725242ea8ae41d6fed)
+- refactor: :recycle: refactor to allow use as a react component [`fe583e4`](https://github.com/thkruz/keeptrack.space/commit/fe583e4bed7b3141e34830d74d13abb4765b3878)
+- feat: :sparkles: add responsive design [`43a23ca`](https://github.com/thkruz/keeptrack.space/commit/43a23ca33aa1d7593e5468515547013f0c99ff2a)
+- refactor: :recycle: refactor drawing code [`8347dc1`](https://github.com/thkruz/keeptrack.space/commit/8347dc16b93fea60a0029831e09e18c35f658eab)
+- refactor: :poop: refactored to isolate plugins [`e7cbbb5`](https://github.com/thkruz/keeptrack.space/commit/e7cbbb5b75d79027c16a98e8dc9bb643ac40f942)
+- feat: :sparkles: add skeleton for new help menus [`ae84ec2`](https://github.com/thkruz/keeptrack.space/commit/ae84ec26e06a675c04b8d371bf11cb8c50b8d9a0)
+- fix: :bug: fixed some sonarqube findings [`e6fe67f`](https://github.com/thkruz/keeptrack.space/commit/e6fe67f549b2f9cd328fa93fddd2f2b31e233039)
+- refactor(satset): cleaned up satSet code [`4fb7ca3`](https://github.com/thkruz/keeptrack.space/commit/4fb7ca387aa22282967ba32189ebca9f698f8b3f)
+- refactor: :label: improve type support [`8c8d1ba`](https://github.com/thkruz/keeptrack.space/commit/8c8d1ba2d7b28860d66b44162efe09cebc9bf76f)
+- docs: :page_facing_up: clear AGPL notice [`d8cba2f`](https://github.com/thkruz/keeptrack.space/commit/d8cba2f6bafc4ebe28101205fa9d4d79e99be093)
+- docs: :page_facing_up: clear AGPL notice [`fd66305`](https://github.com/thkruz/keeptrack.space/commit/fd66305b7a4de10e4124f1b2b9df6c632ff1ca0d)
+- refactor: :heavy_minus_sign: replace suncalc with ootk [`6dc3770`](https://github.com/thkruz/keeptrack.space/commit/6dc37706225b9492896388e2b8d07aabad454f31)
+- style: :rotating_light: code cleanup to fix sonarqube findings [`76025ca`](https://github.com/thkruz/keeptrack.space/commit/76025ca3479c03d5d7ddecff34ce6afb0886a7ac)
+- build: :truck: update public folder [`171d407`](https://github.com/thkruz/keeptrack.space/commit/171d4075496f4f51180026e55744711420119bda)
+- fix(nextlaunchmanager): upgraded to launch library 2 api [`0c4e9f8`](https://github.com/thkruz/keeptrack.space/commit/0c4e9f8f5cf8b8aa42e2e25c7dc8d3ecc3273b99)
+- refactor: :label: add better type checking [`45bf246`](https://github.com/thkruz/keeptrack.space/commit/45bf246812e62a98e54312cd435518e39f303a99)
+- refactor: :label: improve type support for KeepTrackApi callbacks [`c2d9b17`](https://github.com/thkruz/keeptrack.space/commit/c2d9b170fe4af154990ca23813971009d209eb25)
+- feat: :sparkles: add 2nd sat selection + update selectbox [`dad175a`](https://github.com/thkruz/keeptrack.space/commit/dad175ad545ed16914644512c95fd68bced446d5)
+- feat: :sparkles: add 2nd sat selection + update selectbox [`cde15d4`](https://github.com/thkruz/keeptrack.space/commit/cde15d4ab279febff30ab2777d8f098f525072ab)
+- refactor: :recycle: separate satellite selection from catalog management [`11de729`](https://github.com/thkruz/keeptrack.space/commit/11de729ea8d18437675223c3cb905a247542450b)
+- refactor: :recycle: refactor analysis menu into class structure [`2627151`](https://github.com/thkruz/keeptrack.space/commit/262715163e367e7bdbb3dc6de3c197a7f56b4afe)
+- refactor: :recycle: condense drawing code to align with three.js [`ea5b197`](https://github.com/thkruz/keeptrack.space/commit/ea5b19706835dcde11a2b5c0b746cc4d77a45ae4)
+- refactor(sun): implement vao and move to typescript [`b40b0c3`](https://github.com/thkruz/keeptrack.space/commit/b40b0c384e36a4557c9ce33cf9389ffc4072df2a)
+- test: :white_check_mark: fixed test dependencies and use of SatObject [`42e75ea`](https://github.com/thkruz/keeptrack.space/commit/42e75ea0d1521186df7f40cac2e08777d10f703d)
+- feat: :sparkles: improved lineManager class [`a8f843e`](https://github.com/thkruz/keeptrack.space/commit/a8f843e53ac55e96d66c5f169607eba65e0f6a41)
+- refactor(uimanager): ui-input converted to ts and uiManager updated to be more dynamic [`3098853`](https://github.com/thkruz/keeptrack.space/commit/30988533d261bcf9e1532c9eff71cfc67227edbf)
+- refactor: :truck: split satSet into multiple files [`5bdb43a`](https://github.com/thkruz/keeptrack.space/commit/5bdb43af5f3268c43e36dd300d4d0bf803e2cdaa)
+- fix: :bug: fix countries plugin [`2b03fd8`](https://github.com/thkruz/keeptrack.space/commit/2b03fd8c90b7b761bc54b909701dcee5a39216a6)
+- test: :white_check_mark: increase test coverage of uiInput [`c9f5028`](https://github.com/thkruz/keeptrack.space/commit/c9f50284bb3f7e79723759926605a01bda8971eb)
+- refactor: :recycle: split satMath [`aae50ec`](https://github.com/thkruz/keeptrack.space/commit/aae50ec3d483d0572cbc2e1b0a8e8b1206e31c97)
+- refactor: :recycle: split watchlist plugin and convert to classes for better modularity [`bc2ae79`](https://github.com/thkruz/keeptrack.space/commit/bc2ae794d3986da992f908be60638e748a810b03)
+- refactor: :recycle: refactor legend change code [`c0f46bf`](https://github.com/thkruz/keeptrack.space/commit/c0f46bf89e34b4411e3f66431f1ba34836ca857e)
+- feat: :sparkles: update loading screens [`4493cf2`](https://github.com/thkruz/keeptrack.space/commit/4493cf25697d2686d9c6e428eeebdc46b0ecf0c2)
+- refactor: :recycle: refactor camera.ts [`cb04077`](https://github.com/thkruz/keeptrack.space/commit/cb040772acf10c6273e0bf32946a8ad031160a59)
+- perf: :zap: improve color calculation speed [`a7c7f3e`](https://github.com/thkruz/keeptrack.space/commit/a7c7f3e01dd792d3868935149b365d458e9d2346)
+- fix: :bug: fix and refactor meshes [`9046689`](https://github.com/thkruz/keeptrack.space/commit/9046689b069011b39d7ee066739562de81064a12)
+- test(multiple): increased code coverage [`2862397`](https://github.com/thkruz/keeptrack.space/commit/2862397f99c5e34b4e81757d11c9f0b68a08a4d3)
+- fix: :lock: remove security false postives [`45df8f1`](https://github.com/thkruz/keeptrack.space/commit/45df8f151c7762a0a04cc5a5040979729a75e85d)
+- refactor: :recycle: convert dots to classes and implement vao [`4b77b9b`](https://github.com/thkruz/keeptrack.space/commit/4b77b9b756a95a593b380984c41e9556e74ad0e1)
+- refactor: :recycle: move ECI and ECF plots to stand-alone plugins [`5b7e095`](https://github.com/thkruz/keeptrack.space/commit/5b7e095996bf6f9e8a3907d8007b39f5a51920ed)
+- test: :zap: improve jest speed and reliability [`a677fa8`](https://github.com/thkruz/keeptrack.space/commit/a677fa8563c66890ca188e61dc7f030a84dc1a44)
+- style: :rotating_light: reformat to reduce sonarqube code smells [`ebf0eba`](https://github.com/thkruz/keeptrack.space/commit/ebf0eba1d6c1d04b0f941c8bd33f44b4d881fb00)
+- feat: :sparkles: add new gray political map and color scheme [`d79f4d5`](https://github.com/thkruz/keeptrack.space/commit/d79f4d55d43c199f7dcdd15b1fb2b7a6f0a78fe7)
+- feat: :sparkles: add more search filters and minor bug fixes [`5e9ff07`](https://github.com/thkruz/keeptrack.space/commit/5e9ff074dc2635f30a7b953fd31a0e02b40b0a5c)
+- feat(satinfoboxcore): refactored satInfoBox as plugin [`eff0c50`](https://github.com/thkruz/keeptrack.space/commit/eff0c503457abbd9871c5f79eb51de4f34e60087)
+- fix: :rotating_light: fix sonarcube findings [`1c2d33d`](https://github.com/thkruz/keeptrack.space/commit/1c2d33d7afd840e498319d37f88354a663a96596)
+- fix: :rotating_light: fix sonarcube findings [`785c9ec`](https://github.com/thkruz/keeptrack.space/commit/785c9ecba08a0291235ec3f750e76b18ea5f86c0)
+- chore(contributing.md): removed contributing.md file [`d6f0ed5`](https://github.com/thkruz/keeptrack.space/commit/d6f0ed5340129d48921aadea325088bfc3c30ee8)
+- refactor(moon): add vao and move to typescript [`e9dc76c`](https://github.com/thkruz/keeptrack.space/commit/e9dc76c83a72531290bd3f75c84ea12615d55455)
+- feat(extra.json): better offline catalog management [`b96648b`](https://github.com/thkruz/keeptrack.space/commit/b96648b50df88fd14d7a9a1e2ce7d2d75ae683ca)
+- chore: :card_file_box: update databases [`cfd0c22`](https://github.com/thkruz/keeptrack.space/commit/cfd0c2232d673e635b0bced850528568c535a9ff)
+- fix(multiple): implemented Snyk and fixed multiple minor errors [`3a7cd43`](https://github.com/thkruz/keeptrack.space/commit/3a7cd43041d4fedad61e60b9f2238747bd65a67b)
+- style: :art: add more granular prettier ignore directives [`8e81022`](https://github.com/thkruz/keeptrack.space/commit/8e810229fd0bbb6bb87f588adf723ef410956f27)
+- refactor(camera): renamed cameraManager to setup future multi camera modes [`5db45d2`](https://github.com/thkruz/keeptrack.space/commit/5db45d2f37b0537e7b93debd1b6cd15a5ff3f8cf)
+- fix: :bug: add installDirectory settings for staging.dso.mil [`b9179aa`](https://github.com/thkruz/keeptrack.space/commit/b9179aa56121d8a16f92fc2760558dbe56027c08)
+- test: :white_check_mark: fix all broken tests [`09e0166`](https://github.com/thkruz/keeptrack.space/commit/09e0166f483170b3c50e9a40651a7d1cde8b9531)
+- fix: :bug: fix mobile controls [`aed60cc`](https://github.com/thkruz/keeptrack.space/commit/aed60cca9aa454138353294db0c942ad1cbed958)
+- build(embed): created an embedable version of KeepTrack [`31c07bd`](https://github.com/thkruz/keeptrack.space/commit/31c07bdce925a61d7fd9fbf87d6590ebf375b47e)
+- feat: :sparkles: add ECI plots [`d309ba7`](https://github.com/thkruz/keeptrack.space/commit/d309ba7c29fd8bb98b40794a2736944738639dad)
+- feat: :sparkles: add ECI plots [`b2029fd`](https://github.com/thkruz/keeptrack.space/commit/b2029fd31ef3ea469a527dea4a348ec2eb155148)
+- test: :white_check_mark: update tests to work with ootk [`f2be30e`](https://github.com/thkruz/keeptrack.space/commit/f2be30e6d1c8e3d43066e977a4d8a4f36523fb34)
+- fix: :bug: refactor and fix webgl issues [`3ef5311`](https://github.com/thkruz/keeptrack.space/commit/3ef5311dc3d62f7609336e32ee4ab9e0eb8f7a1f)
+- test: :white_check_mark: improved coverage of default ruleSet [`c0c567f`](https://github.com/thkruz/keeptrack.space/commit/c0c567f2141667c9d2de50c6efb8e41e13557b6c)
+- style: :art: fix minor formatting and linter errors [`e9d6989`](https://github.com/thkruz/keeptrack.space/commit/e9d69892dd8ece22cfdc8c54f79da6a842cbd1b6)
+- refactor: :zap: remove more jquery [`ec5897d`](https://github.com/thkruz/keeptrack.space/commit/ec5897d800306bf25a8919e14e09344d9ecae223)
+- refactor: :zap: remove more jquery [`3cdde12`](https://github.com/thkruz/keeptrack.space/commit/3cdde128b26c6548c71676686151ad86e57a5e65)
+- feat(settingsmanager.js): settings.js now compiles separate from other files for easy offline edits [`e7edb46`](https://github.com/thkruz/keeptrack.space/commit/e7edb4681f6f1d568a9b22102529c6d32b45c8e7)
+- fix: :bug: fix stereo map [`21daa39`](https://github.com/thkruz/keeptrack.space/commit/21daa391198045b73a2389fdd8673fd75e731032)
+- fix: :zap: reduce complexity of legend color code [`922e11c`](https://github.com/thkruz/keeptrack.space/commit/922e11ce42843d605ba512846b8190a859941714)
+- fix: :zap: reduce complexity of legend color code [`5649650`](https://github.com/thkruz/keeptrack.space/commit/5649650229aa6d7c0c227690370678d27e8ebfdf)
+- refactor: :beers: merge update-select-box with satinfoboxCore [`830957a`](https://github.com/thkruz/keeptrack.space/commit/830957a608dc143ff9d0d6003da886987f92cd70)
+- test: :white_check_mark: improve test coverage [`ff65493`](https://github.com/thkruz/keeptrack.space/commit/ff65493f27b3fa7f9d94ce6fc072b1aded52bc7c)
+- feat: :sparkles: add better embeded support [`252b682`](https://github.com/thkruz/keeptrack.space/commit/252b6829fe9f143fff44df52e30dacbb5bc2d395)
+- ci: :fire: remove github actions from develop branch [`bf6e9b4`](https://github.com/thkruz/keeptrack.space/commit/bf6e9b4e1909811981db5a272da39002610bcea3)
+- refactor(multiple): standardized use of lat, lon, alt vs lat, long, obshei [`74f3b3f`](https://github.com/thkruz/keeptrack.space/commit/74f3b3faa2349576935f8b2d1c3bf512c05903a4)
+- refactor: :technologist: add version number to error handler for easier debugging [`50ff5ef`](https://github.com/thkruz/keeptrack.space/commit/50ff5efdede14110d6086eadc4a499831f1097c6)
+- refactor: :recycle: integrate with ootk v4 [`605be74`](https://github.com/thkruz/keeptrack.space/commit/605be74af9578ed8737681b5f63c927fffd9ef1e)
+- feat: :zap: improve performance on mobile [`2c9f271`](https://github.com/thkruz/keeptrack.space/commit/2c9f271666537935836db54c3dc2c1a803158953)
+- fix: :bug: fix satinfobox issues [`d0d5428`](https://github.com/thkruz/keeptrack.space/commit/d0d5428858a9c67d73619eb000d71cf4c2a54655)
+- feat: :sparkles: add code for extended catalog [`4271c49`](https://github.com/thkruz/keeptrack.space/commit/4271c49b950dd0b22b355a5b7e308685bb256683)
+- refactor(selectsatmanager): refactored selectSatManager as a plugin to keeptrackApi [`7a5a789`](https://github.com/thkruz/keeptrack.space/commit/7a5a789414d9018349147c540feb15ebeeb6ca4d)
+- refactor: :truck: refactor presets [`4890389`](https://github.com/thkruz/keeptrack.space/commit/4890389410696910af99507fb736f9f02c00cd64)
+- fix: :bug: fix satinfobox crashing with missiles [`c71e076`](https://github.com/thkruz/keeptrack.space/commit/c71e076e8171115cb2d6c36bb49c9af4b3bdc75e)
+- feat: :sparkles: switch to css only tooltip for faster ui [`452cc12`](https://github.com/thkruz/keeptrack.space/commit/452cc1242f7cab71b25c241e4f1612c1a2a355ea)
+- feat(gamepad): initial gamepad support [`56ccd1a`](https://github.com/thkruz/keeptrack.space/commit/56ccd1a9c20898c5f1b84b44e5ed1ff61469516c)
+- chore: :card_file_box: update data [`e317478`](https://github.com/thkruz/keeptrack.space/commit/e31747838267f25f688484a175c7be2a26d0fb0e)
+- fix: :bug: complete country matching code [`78447bf`](https://github.com/thkruz/keeptrack.space/commit/78447bfc22ffe3d2de19f9c4ab56e182e6ad2276)
+- test: :white_check_mark: update tests [`16d50ce`](https://github.com/thkruz/keeptrack.space/commit/16d50ce318557a37aa073210c982597457df48b2)
+- refactor: :recycle: cleanup satinfobox design [`96e4cea`](https://github.com/thkruz/keeptrack.space/commit/96e4cea0c76832e3e25261ee21fe52bdb9365999)
+- feat: :children_crossing: add improved debug menu [`fcffd35`](https://github.com/thkruz/keeptrack.space/commit/fcffd35939c2fad49446a98ac41fd41c7cf8fa11)
+- docs: :memo: new changelog for 5.2 [`7ae49a9`](https://github.com/thkruz/keeptrack.space/commit/7ae49a9805cae2c8fa1f9fcf1d71ea9794df4659)
+- build: :see_no_evil: add npmignore for lib builds [`bc1ea64`](https://github.com/thkruz/keeptrack.space/commit/bc1ea64d1fa1885f69402c820635459537312d72)
+- refactor: :recycle: refactor sat-info-box [`328f1fe`](https://github.com/thkruz/keeptrack.space/commit/328f1fefb969117f2459fcbc604aa40cbce595ba)
+- refactor: :heavy_minus_sign: migrate from satellite.js to ootk for all orbital math [`6306aa8`](https://github.com/thkruz/keeptrack.space/commit/6306aa8ff9dcdbba65df611daf4b7f1ba7535296)
+- test: :camera_flash: snapshots updated to UTC timezone [`66ff944`](https://github.com/thkruz/keeptrack.space/commit/66ff944bba96bca614b0a656311a75f5933ab95f)
+- refactor: :wastebasket: deprecate socrates html file [`a7b4d9c`](https://github.com/thkruz/keeptrack.space/commit/a7b4d9c0a3838661bc029dfd4045ab42b10307fc)
+- chore: :card_file_box: update tle catalogs [`8cc2752`](https://github.com/thkruz/keeptrack.space/commit/8cc275280886d427ed1f6ec3e51962a171c5c9a6)
+- style: :art: fixed sonarqube findings [`2cb8a3d`](https://github.com/thkruz/keeptrack.space/commit/2cb8a3d564a7af79da2669251d30e607791b4ee6)
+- feat: :children_crossing: improved camera controls [`d8294ed`](https://github.com/thkruz/keeptrack.space/commit/d8294ed544b1d99dd035df76034e80a7bac8b8e8)
+- test(multiple): fixed tests [`7d6ddef`](https://github.com/thkruz/keeptrack.space/commit/7d6ddefe44db1b33c3b482bb7be492b2560c780c)
+- refactor: :recycle: refactor screenshot code [`4a273dd`](https://github.com/thkruz/keeptrack.space/commit/4a273dd5ac86a0c0dede4f113ce37c4099fd6680)
+- test(multiple): fixed failing tests [`cf4f91f`](https://github.com/thkruz/keeptrack.space/commit/cf4f91fc8de634cce0fa29ddb0a65769d77db70f)
+- build: :lock: add explicit ignore for incorrect trufflehog warnings [`8b8b8a7`](https://github.com/thkruz/keeptrack.space/commit/8b8b8a7d134688496196e3be163220fe646c6633)
+- feat: :sparkles: add polar plots [`fc83c2c`](https://github.com/thkruz/keeptrack.space/commit/fc83c2c6b4d54b8fd486f1d2f485963426d615a0)
+- fix: :bug: align mesh, orbits, and dots positions [`ede3965`](https://github.com/thkruz/keeptrack.space/commit/ede396534e337f1f82b47bbc78e26ad9c7724bfe)
+- test: :white_check_mark: increase test coverage in satMath [`1fb1a97`](https://github.com/thkruz/keeptrack.space/commit/1fb1a972b7a951710d57237981b2b6e177e6ca11)
+- feat(settingsmanager.js): add passing of URI with settings overrides [`9ceaeec`](https://github.com/thkruz/keeptrack.space/commit/9ceaeec2ce9793185e6465a306938639897227a0)
+- refactor(helpers.ts): migrated helper module to typescript [`34cc7f5`](https://github.com/thkruz/keeptrack.space/commit/34cc7f5118961b7a07a0ce1ef06ef1d8af233467)
+- feat: :zap: optimize cruncher loops [`373bb1d`](https://github.com/thkruz/keeptrack.space/commit/373bb1d12e96f5d9440506531f2a5a37980de507)
+- refactor: :truck: reorganize source code [`fb41672`](https://github.com/thkruz/keeptrack.space/commit/fb41672eb91be8db4eaa8436424412ed00294564)
+- refactor(camera): refactor cameraTypes to be like enums [`51282a7`](https://github.com/thkruz/keeptrack.space/commit/51282a72f7b6f4ea2ce510ee33963c1852c0d185)
+- update settingsManager to not be a module [`5d984ef`](https://github.com/thkruz/keeptrack.space/commit/5d984efb614c9be6372024497e4fcd4def1e711c)
+- test: :white_check_mark: replace all js tests with ts [`2a5bb34`](https://github.com/thkruz/keeptrack.space/commit/2a5bb3464f89b259df400b52c4484c8dff8cdc62)
+- feat: :sparkles: add video director menu [`c0b5744`](https://github.com/thkruz/keeptrack.space/commit/c0b574415a2213d9f89ff6909182d76cff1feb53)
+- fix: :ambulance: deprecate plot code that is loading out of order [`f627e3d`](https://github.com/thkruz/keeptrack.space/commit/f627e3dda2c40942252aeed762f2401675a5ebe1)
+- feat: :sparkles: add inc vs alt plots [`6b8e1ed`](https://github.com/thkruz/keeptrack.space/commit/6b8e1ed9cca94cb92f85c86f666096aeb9b98222)
+- refactor(timemanager): consolidated all propRate propOffset and satCruncher time communication [`f7cefae`](https://github.com/thkruz/keeptrack.space/commit/f7cefaed10208faecbd0decb76c43c25b73b38e3)
+- test(apimocks.ts): consolidated mocks for jest testing [`c8bb3d7`](https://github.com/thkruz/keeptrack.space/commit/c8bb3d79db9288462daa321a49e1207e321a10f9)
+- refactor: :recycle: refactor select sat manager functions out of webgl-renderer [`713a81f`](https://github.com/thkruz/keeptrack.space/commit/713a81f42537091b0dc68b9bd7fe20bf0c356e47)
+- build: :construction_worker: add google cloud support [`76f94cd`](https://github.com/thkruz/keeptrack.space/commit/76f94cd12d17f6675e3dccfc169666b4b470bedd)
+- build: :construction_worker: add google cloud support [`ef9fdc7`](https://github.com/thkruz/keeptrack.space/commit/ef9fdc7c4789f411940577c4a10ca70d95e6c432)
+- feat: :sparkles: allow multiple STFs to be created [`12d6a2c`](https://github.com/thkruz/keeptrack.space/commit/12d6a2cd6ec449e6376a20566b8321a1cfd28125)
+- fix: :bug: fix loading + legend + add more settings [`95a543f`](https://github.com/thkruz/keeptrack.space/commit/95a543f74cfd568ce22edd441cb5a64327ee4c9c)
+- fix: :bug: fix loading + legend + add more settings [`140d627`](https://github.com/thkruz/keeptrack.space/commit/140d627f0a81a94507a9e0c9cda204727d4d26da)
+- build: :hammer: implemented five-server (live-server) and webpack --watch [`fe67f9b`](https://github.com/thkruz/keeptrack.space/commit/fe67f9bbbaea9cfc70058731209ac0e801662c15)
+- refactor: :zap: remove jquery from adviceManager [`1a8b659`](https://github.com/thkruz/keeptrack.space/commit/1a8b6591786d082cc2abfb910d3f35888bb37ad5)
+- refactor: :zap: remove jquery from adviceManager [`83b488a`](https://github.com/thkruz/keeptrack.space/commit/83b488a878065e812a7208f9c0cdbb31dd3a4e57)
+- refactor: :recycle: standardize plugins [`53859fe`](https://github.com/thkruz/keeptrack.space/commit/53859fea2d7cc532f3cda939823d597a5e8f84fa)
+- test: :white_check_mark: increased code coverage [`e387fd6`](https://github.com/thkruz/keeptrack.space/commit/e387fd612cfb331dc1e744e62f74354d107f8d06)
+- refactor: :recycle: split analysis into components [`efa47c9`](https://github.com/thkruz/keeptrack.space/commit/efa47c9283c020c24cd90c9307d54c86ce3fe471)
+- fix: :bug: fix lookangles/multi-site lookangles not enabling/disabling correctly [`8526fe1`](https://github.com/thkruz/keeptrack.space/commit/8526fe1117fecfb6c1ff6e888825552d6681345e)
+- feat: :sparkles: add new optional settings [`6673c7b`](https://github.com/thkruz/keeptrack.space/commit/6673c7b8af5e8957ad7453ee4f34bb53ed9f716b)
+- test(integration tests): updated integration tests to support keeptrackApi [`27e3538`](https://github.com/thkruz/keeptrack.space/commit/27e3538ffc860ed03f51916c42b35fc9dd4e0e91)
+- test: :white_check_mark: increase test coverage of uiInput [`629cac6`](https://github.com/thkruz/keeptrack.space/commit/629cac619b87d30366a0067af150038404e430a9)
+- refactor: :technologist: update catalog searches [`b9ffba2`](https://github.com/thkruz/keeptrack.space/commit/b9ffba259e9806a05b3c2cd5e7ed87eadf420cce)
+- style: :art: sonarqube findings fixed [`f9e8281`](https://github.com/thkruz/keeptrack.space/commit/f9e828160445b08416ace37c22d08d202df4805e)
+- test: :white_check_mark: expand testing of uiInput.ts [`9e4220d`](https://github.com/thkruz/keeptrack.space/commit/9e4220d256c158e2787a66f2cc4958a065181c20)
+- style: :art: removed unused code [`85f3320`](https://github.com/thkruz/keeptrack.space/commit/85f33202db28f94e0b841691dd1c31b177a98a8e)
+- build: :arrow_up: bump ootk [`61c93d3`](https://github.com/thkruz/keeptrack.space/commit/61c93d3a7a6a44f964bd1755a6cd2a5c3c4019ed)
+- fix: :bug: fixed bug with ignoring trufflehog and added sonarqube fixes [`562045c`](https://github.com/thkruz/keeptrack.space/commit/562045cf697c4aa918ff1d9dd2592ee14c68f496)
+- test: :white_check_mark: add testing for colorSchemeChangeAlerts [`4dd50bb`](https://github.com/thkruz/keeptrack.space/commit/4dd50bbefdbdf08732ef14c384fdf9ceff35e276)
+- fix(positioncruncher): fixed issue with full FOV not working with fence update [`6a817a5`](https://github.com/thkruz/keeptrack.space/commit/6a817a59409d3a99d5d57f1a2b8e56326aff4b7f)
+- feat: :sparkles: convert SpaceObjectType enum to string [`048fe93`](https://github.com/thkruz/keeptrack.space/commit/048fe93231467b506854af4fe1237985bff22275)
+- docs: :rotating_light: explicitly identify intentionally high complexity functions [`5f420f9`](https://github.com/thkruz/keeptrack.space/commit/5f420f93d51f6fb2179dcbf8a190666af519766a)
+- refactor: :rotating_light: fixed eslint warnings [`f31e300`](https://github.com/thkruz/keeptrack.space/commit/f31e30041f9589fe32047e5ef5b285a1e6335d6b)
+- fix: :bug: fix edit satellite plugin [`c5421fc`](https://github.com/thkruz/keeptrack.space/commit/c5421fc904f163a2cd469e1b91b6d02a71cb0b3a)
+- refactor: :recycle: consolidate right click menu [`b1155bf`](https://github.com/thkruz/keeptrack.space/commit/b1155bf54a521af552c1dd9411c6c80103b068b3)
+- fix: :rotating_light: fixed minor css sonarqube findings [`a9fe53e`](https://github.com/thkruz/keeptrack.space/commit/a9fe53e88a8ac0abf72e34c5ce7c451064aa700e)
+- test(settingsmanager): improved settingsManager testing [`5aacd24`](https://github.com/thkruz/keeptrack.space/commit/5aacd24623fd26633c0f31e7645d52ed32527dcc)
+- feat: :sparkles: add preset functions to settings [`73f4d7b`](https://github.com/thkruz/keeptrack.space/commit/73f4d7b317988a1e962706e667edba6d7160a005)
+- feat: :sparkles: fix issues on mobile devices [`79aff6a`](https://github.com/thkruz/keeptrack.space/commit/79aff6a20a868eecbbdc9a78336af0da178ca8f1)
+- fix: :bug: fix css on mobile [`6ab1585`](https://github.com/thkruz/keeptrack.space/commit/6ab1585c19d020693eacb3a6daab2f6ecf11e189)
+- refactor: :recycle: simplify zoomlevel functions [`edcdb68`](https://github.com/thkruz/keeptrack.space/commit/edcdb68cb4216eeeafb5637e786512eb01653d5b)
+- fix: :bug: update select sat manager [`93d37b7`](https://github.com/thkruz/keeptrack.space/commit/93d37b7692fcd756a436d08f0521ba2beb9ff82b)
+- feat(externalapi): implemented API for external plugins [`27ed24e`](https://github.com/thkruz/keeptrack.space/commit/27ed24e57849ca3eec8bcbf63ac4330d99ea54a6)
+- test: :white_check_mark: increase coverage of calculations.ts [`20cf11e`](https://github.com/thkruz/keeptrack.space/commit/20cf11e3a6a5288f1058d7716af4a660ef2cccc2)
+- test: :white_check_mark: replaced js test with ts [`8942a4e`](https://github.com/thkruz/keeptrack.space/commit/8942a4e23cc9ed682b7b0e846f4629d361e91a90)
+- refactor: :recycle: reduce complexity [`ba32611`](https://github.com/thkruz/keeptrack.space/commit/ba3261161f7e9a74a10586e770fa83cc341e7292)
+- docs: :memo: update changelog [`78a4d42`](https://github.com/thkruz/keeptrack.space/commit/78a4d42a1ba26d662ae192c47406dfe473f447fe)
+- test: :heavy_plus_sign: added missing imports [`d2aa217`](https://github.com/thkruz/keeptrack.space/commit/d2aa2176739bb4bc6450a874a2dd738389a473f7)
+- fix: :arrow_up: integrate latest ootk version [`482a3ad`](https://github.com/thkruz/keeptrack.space/commit/482a3ad0fee9cc02eee5f6b63f1a4403f19fb722)
+- test: :white_check_mark: fix all failing tests [`d10c4a9`](https://github.com/thkruz/keeptrack.space/commit/d10c4a95f9b9ac81061fca014813b8d3e2070d14)
+- test: :white_check_mark: fix all failing tests [`7686acb`](https://github.com/thkruz/keeptrack.space/commit/7686acba28ff81b3f09e2687e21e5fb2bafcac10)
+- refactor: :recycle: refactor format-tle class for standardization [`bb94ee8`](https://github.com/thkruz/keeptrack.space/commit/bb94ee859141f137140b1800c8eac623c015093d)
+- feat: :sparkles: add sun/moon toggle and export sats in fov [`b07a57b`](https://github.com/thkruz/keeptrack.space/commit/b07a57b3c05f5f02112395e40d8df82adeacfc58)
+- refactor: :recycle: refactor editsat [`f9bddea`](https://github.com/thkruz/keeptrack.space/commit/f9bddeadeaad606cff3b0cf2d340b72a10b4f5a7)
+- feat: :sparkles: add persistanceManager for localStorage management [`b08f32c`](https://github.com/thkruz/keeptrack.space/commit/b08f32caa75fd67bdb923c76eb553c7c4b9a8161)
+- fix: :zap: improve loading times [`e19c4e4`](https://github.com/thkruz/keeptrack.space/commit/e19c4e4452432a34aaa8effb9b5efe9ee8567b23)
+- fix: :zap: improve loading times [`8c59b86`](https://github.com/thkruz/keeptrack.space/commit/8c59b863e508b887736042b01fa70990ecefb02a)
+- refactor: :recycle: remove unnecessary interfaces [`184ad2c`](https://github.com/thkruz/keeptrack.space/commit/184ad2c00c5d77f1e2a9a01a499736a298b8d01c)
+- fix: :bug: fix lookangles plugin [`21de08e`](https://github.com/thkruz/keeptrack.space/commit/21de08e8e39b6cd3ebc9278f70551d521efd8162)
+- test(multiple): added additional unit tests [`616ed40`](https://github.com/thkruz/keeptrack.space/commit/616ed40078f444ce5c0db0d51cd6ac6a68d9eb18)
+- fix: :bug: safeguard functions against bad values [`9c7b039`](https://github.com/thkruz/keeptrack.space/commit/9c7b039d72ce4deca2b97e31a87471076df8ed5c)
+- style: :rotating_light: fixed sonarqube findings [`9a4b31a`](https://github.com/thkruz/keeptrack.space/commit/9a4b31aa7118d6aeb9fca8ffc5ddabfbe177fe65)
+- fix: :bug: fix logic on waitForCruncher [`889811b`](https://github.com/thkruz/keeptrack.space/commit/889811ba08dc67baf25c8ff173ec8a8c509d9d2e)
+- fix: :bug: fix string extractor [`07ef81b`](https://github.com/thkruz/keeptrack.space/commit/07ef81b76f43f827b5683fb644a31ba8b7e838bd)
+- feat: :sparkles: add settings to hide agency dots [`2363e90`](https://github.com/thkruz/keeptrack.space/commit/2363e904fe5a9bfe71b4cddcb190ecfdb2ad6c1a)
+- feat: :sparkles: add aer report [`75dcb20`](https://github.com/thkruz/keeptrack.space/commit/75dcb205e464efa0c5fb8ba37d45fef2809f8752)
+- style: :zap: reduce unnecessary missileManager actions [`c32c5b6`](https://github.com/thkruz/keeptrack.space/commit/c32c5b6fc69b27d5ae95e29f87e90b0df9608739)
+- test: :white_check_mark: improved main.ts tests [`66bdeec`](https://github.com/thkruz/keeptrack.space/commit/66bdeecbb41b264b9d2738ffa0267e950888478a)
+- feat: :sparkles: add debug menu [`1cbb422`](https://github.com/thkruz/keeptrack.space/commit/1cbb422c03cdbd4955a87814eed867a2fc687d8e)
+- refactor: :recycle: remove code no handled in ootk [`df2d5b8`](https://github.com/thkruz/keeptrack.space/commit/df2d5b8a8f8b1050126abf193770114fd6fea5fa)
+- test(ui-input.ts): improved ui-input testing and error catching [`705779f`](https://github.com/thkruz/keeptrack.space/commit/705779f1b7846e3cd650463e290e2d6038bec765)
+- refactor: :fire: remove old interfaces [`45c3a2a`](https://github.com/thkruz/keeptrack.space/commit/45c3a2a0506fb73ead9003a92f8bf3df1ca2c342)
+- fix: :bug: fix contries and constellations menus [`76cb3f8`](https://github.com/thkruz/keeptrack.space/commit/76cb3f81a804c9149bba78533b01c325d3810422)
+- feat: :sparkles: persist settings across sessions [`fe882e9`](https://github.com/thkruz/keeptrack.space/commit/fe882e96535dc5adea460556c4b753fcf5f908e7)
+- refactor: :recycle: refactor search manager functions out of ui manager [`d2208df`](https://github.com/thkruz/keeptrack.space/commit/d2208dfa98f057fab4f811aee8d24cb3438338b2)
+- fix: :zap: add better number only searching [`03d708e`](https://github.com/thkruz/keeptrack.space/commit/03d708e9f2d74f8ed5bb4ad7a1e7648f65bae36c)
+- feat: :sparkles: add new sensors [`e27ae1b`](https://github.com/thkruz/keeptrack.space/commit/e27ae1b137446d162d00ad8ebd5a5cd66f047024)
+- ci: :construction_worker: split cd pipeline into stage and deploy [`2ba8abf`](https://github.com/thkruz/keeptrack.space/commit/2ba8abf34b73fdf8b4ee70d7adccd0d377628b1d)
+- chore: :coffin: remove old files [`818d773`](https://github.com/thkruz/keeptrack.space/commit/818d77319c9c8d74ea21aa0ba05fcc519d6a95dc)
+- refactor: :truck: migrate more scripts to TypeScript [`f8af26a`](https://github.com/thkruz/keeptrack.space/commit/f8af26aa572a8ad5dfc15a9d3deb9b825cb9b9f2)
+- feat: :sparkles: add toggles for starlink and notional sats [`d9c4dbd`](https://github.com/thkruz/keeptrack.space/commit/d9c4dbdd891c92e98f9de066d0daac8452637a75)
+- test: :white_check_mark: increase test coverage of positionCruncher [`0bfa401`](https://github.com/thkruz/keeptrack.space/commit/0bfa401bf7d74ed2fb4f57be9ada79024250fd0b)
+- fix: :adhesive_bandage: fixed sonarqube issues [`d08290f`](https://github.com/thkruz/keeptrack.space/commit/d08290f8d8eca53f61caa29e7be8f6bf37fd206f)
+- chore(changelog): updated changelog [`374715f`](https://github.com/thkruz/keeptrack.space/commit/374715f9fb0eb2ebc9e49c27fee4c799ac50743b)
+- fix: :rotating_light: fix sonarcloud findings [`844b62b`](https://github.com/thkruz/keeptrack.space/commit/844b62b07a265ea7d80dcb05ca910f062689ea40)
+- refactor: :label: add clear difference between catalog objects and sat objects [`215078c`](https://github.com/thkruz/keeptrack.space/commit/215078cc3d6fb2bc596fc7f209c1c0eb85d94fa3)
+- feat: :sparkles: add RIC frame 3D scatter plots [`857a35f`](https://github.com/thkruz/keeptrack.space/commit/857a35f96b84891bbfa5416444c6dd28884d74a3)
+- feat: :sparkles: add RIC frame 3D scatter plots [`912ad0d`](https://github.com/thkruz/keeptrack.space/commit/912ad0df18e080b95fb5f7a451e8897ab0587174)
+- refactor: :zap: change base64 images to delayedsrc images [`1b70a5f`](https://github.com/thkruz/keeptrack.space/commit/1b70a5f5b2419821dc67f7ab42606595b3a3b101)
+- refactor: :zap: change base64 images to delayedsrc images [`8253964`](https://github.com/thkruz/keeptrack.space/commit/82539646b959e0f900828e680f1cc7466ad32fa5)
+- fix: :bug: fix camera key not working [`a09f878`](https://github.com/thkruz/keeptrack.space/commit/a09f878d941fb58030c93e64934cd8a47db22df9)
+- test: :bug: fix broken tests [`2f4b6b1`](https://github.com/thkruz/keeptrack.space/commit/2f4b6b19360e833bd8e463f14ca626b1be4838d1)
+- test(externalapi): added new stub file for tests [`7871f20`](https://github.com/thkruz/keeptrack.space/commit/7871f20f4127596864709084a2267dfeae77ed5d)
+- fix: :bug: fix bugs caused by splitting velocity updates [`13c3092`](https://github.com/thkruz/keeptrack.space/commit/13c3092373fae697c0a47477af877810772091a6)
+- fix: :bug: fix search bar toggle and slide in animations [`c58c860`](https://github.com/thkruz/keeptrack.space/commit/c58c860ad37d7666d8ba1b73c1896cdddb17261c)
+- feat: :sparkles: add starlink toggle [`e8d5042`](https://github.com/thkruz/keeptrack.space/commit/e8d50422115b4eeb5b14a9e65b8ee5150b525680)
+- refactor: :boom: migrate to new selectsatmanager plugin [`879c0cc`](https://github.com/thkruz/keeptrack.space/commit/879c0cce3d028c4ae29bbb1ce3162f6de28d3377)
+- fix: :bug: fix search issues [`f94776d`](https://github.com/thkruz/keeptrack.space/commit/f94776d1639e9c6d18b1983ad24a3c51cc5e358d)
+- test: :white_check_mark: add better tests for tleformater [`62c0a31`](https://github.com/thkruz/keeptrack.space/commit/62c0a319ed7eb74192da39f6c77bbaf925720825)
+- feat: :sparkles: update socrates to json input [`d1e10f6`](https://github.com/thkruz/keeptrack.space/commit/d1e10f679a021871122345c01a6dcce1e8b21699)
+- ci: :construction_worker: add dev site to ci/cd pipeline [`36a072a`](https://github.com/thkruz/keeptrack.space/commit/36a072a561343fec4ff2211657d577c8daf5cd35)
+- refactor: :recycle: integrate with ootk v4 [`87db05b`](https://github.com/thkruz/keeptrack.space/commit/87db05be34174caec33e5bcb32809cc98d803604)
+- feat: :sparkles: update color scheme menus [`ecba249`](https://github.com/thkruz/keeptrack.space/commit/ecba249eda6741f22d856e58171b983a22a77bcf)
+- fix: :bug: fix touch controls [`b81bb4b`](https://github.com/thkruz/keeptrack.space/commit/b81bb4bb7ede381ea3e3a9d5482d9069aa87de5f)
+- feat: :sparkles: add ecf analysis plot [`46a6317`](https://github.com/thkruz/keeptrack.space/commit/46a631701a8e1a1840781a0d6a437c80f0e8168c)
+- feat: :sparkles: add ecf analysis plot [`d79959d`](https://github.com/thkruz/keeptrack.space/commit/d79959dc5466e89cc7946a0d41d2922ddbd79814)
+- test(moon): added test for the moon [`2235689`](https://github.com/thkruz/keeptrack.space/commit/22356892beb758c0011e987e7fabdfa3fd860452)
+- test: :white_check_mark: code coverage for group ruleset [`83251bc`](https://github.com/thkruz/keeptrack.space/commit/83251bc74c255b67f3e2484316a5381733c991d2)
+- refactor(timemanager/transforms.ts): refactored time conversion functions out of timeManager.ts [`852a281`](https://github.com/thkruz/keeptrack.space/commit/852a2813cc6b3b79bcbf659c0056fa1e2204658b)
+- feat(line-factory.js): added lines for showing scanning by satellite or ground sensor [`5ef2d31`](https://github.com/thkruz/keeptrack.space/commit/5ef2d316fa9cc6f8fc3ee1162bd7941bc5e8e47c)
+- feat(main): updated main.js to use keeptrackApi [`b3296cc`](https://github.com/thkruz/keeptrack.space/commit/b3296cc020af641e9d382c934fa08bf3dfc33fdb)
+- fix: :bug: fix tle exporters [`3e71c4a`](https://github.com/thkruz/keeptrack.space/commit/3e71c4a00bdec34400a5c95b1c9fc40ceb05b9df)
+- refactor(nextlaunchmanager.ts): fixed typing errors during build [`1a16244`](https://github.com/thkruz/keeptrack.space/commit/1a16244a84cc13691f8f96d8dea0081c1ad56dbe)
+- fix: :bug: fix bug when creating sensor or observer from rmb [`01a4d65`](https://github.com/thkruz/keeptrack.space/commit/01a4d65fb47e042f18d570a74cefc0924f07eef5)
+- feat(multiple): implemented keeptrackApi instead of passing variables to functions [`d54e04a`](https://github.com/thkruz/keeptrack.space/commit/d54e04a918a41b8fe3286898d75f0f630321446f)
+- test: :adhesive_bandage: fix testing issue causing jest to fail on github [`061d4eb`](https://github.com/thkruz/keeptrack.space/commit/061d4eb2c998539c446c9e24b3b8f7d2c8d61785)
+- fix: :bug: fix time not moving at correct speed [`3edab93`](https://github.com/thkruz/keeptrack.space/commit/3edab935b0d9f2e7835f91179d8e84bdfd631df3)
+- fix: :bug: fix time not moving at correct speed [`b92c1ce`](https://github.com/thkruz/keeptrack.space/commit/b92c1ce2835c1c9fe43484d9f8c9953e0f0f9f4f)
+- feat: :sparkles: add neighbors color scheme for orbit density [`5d397d9`](https://github.com/thkruz/keeptrack.space/commit/5d397d9a91bd9bbd3ddbe28c8b2676c14334986c)
+- refactor: :label: created &lt;KeepTrackPrograms&gt; interface to reduce use of &lt;any&gt; [`0ea35d2`](https://github.com/thkruz/keeptrack.space/commit/0ea35d2e0936bcbcc581559f67cfe39f05972077)
+- build: :technologist: update vscode tasks [`0eeaf61`](https://github.com/thkruz/keeptrack.space/commit/0eeaf618c6320ebc1f0ae98cc243f3233893b397)
+- docs: :memo: update changelog [`006f72d`](https://github.com/thkruz/keeptrack.space/commit/006f72d27c908463d010a8c1ce28480ed9be7576)
+- test: :white_check_mark: increase test coverage [`e220d8d`](https://github.com/thkruz/keeptrack.space/commit/e220d8de6fb4b123aeb1d0c3a931b126f84859b1)
+- feat(ui-input.ts): added political maps and upgraded surveillance fence view [`123f7b4`](https://github.com/thkruz/keeptrack.space/commit/123f7b49bc7a36e80e2c7325e9ca3cd97f9f2026)
+- feat: :sparkles: add better breakup logic [`86b9648`](https://github.com/thkruz/keeptrack.space/commit/86b96481441b24355bf51726e59b6cb538e7a712)
+- feat: :sparkles: add better breakup logic [`abcb805`](https://github.com/thkruz/keeptrack.space/commit/abcb805ed7dbc0fb9147aa3409c12cace38fca1e)
+- refactor: :heavy_minus_sign: removed some @app references [`1fc539d`](https://github.com/thkruz/keeptrack.space/commit/1fc539d89bfc79f2315f56c2253102e6c40cbf41)
+- refactor: :fire: removed old cypress e2e tools [`10b4d2f`](https://github.com/thkruz/keeptrack.space/commit/10b4d2fa8456165121a52a3a285a73f4aac9db2f)
+- test(multiple): improved code coverage [`9cf6039`](https://github.com/thkruz/keeptrack.space/commit/9cf6039375aad8ab3484587990893ad4845877d7)
+- feat: :sparkles: add sensors help menu [`3158ad0`](https://github.com/thkruz/keeptrack.space/commit/3158ad018859ce4c2a33630cebff154597ff8b83)
+- fix: :bug: fix custom sensor errors [`9f39215`](https://github.com/thkruz/keeptrack.space/commit/9f39215fff8cc68afa721d33b71fc4a12e9a8eee)
+- feat: :sparkles: add support for external TLE files [`5e5e60a`](https://github.com/thkruz/keeptrack.space/commit/5e5e60a9293a0315e3e8c6ac34d1b33f95c0f4be)
+- fix: :bug: fix errors when plugins disabled [`15cbcae`](https://github.com/thkruz/keeptrack.space/commit/15cbcae7fdb8313aafcd8f4941bb62cb71ede8c0)
+- perf: :zap: add caching of satrec object [`51035a3`](https://github.com/thkruz/keeptrack.space/commit/51035a39233c21eb5ea33890abc6d6e37ac9e0ff)
+- feat: :sparkles: add filter settings for various orbits [`57d4544`](https://github.com/thkruz/keeptrack.space/commit/57d45445992ea298262fbd4a0e9e939e9a10c2d8)
+- fix: :bug: fix show sensors with fov link not working [`63571c2`](https://github.com/thkruz/keeptrack.space/commit/63571c29b5f0cdd228ed74c50bc3792e0b9d141e)
+- style: :art: format saveVariable.ts [`26aaead`](https://github.com/thkruz/keeptrack.space/commit/26aaead324f8a0d20285e01d6fb85027016f3549)
+- feat: :zap: optimize find close objects code [`d774c9a`](https://github.com/thkruz/keeptrack.space/commit/d774c9aad39ac4da284dea114ca927eb9f76bbbb)
+- fix: :rotating_light: fix minor sonarcube findings [`7793b96`](https://github.com/thkruz/keeptrack.space/commit/7793b96e2b243f477e18569ad43f6e4410943184)
+- fix: :rotating_light: fix minor sonarcube findings [`b61aab2`](https://github.com/thkruz/keeptrack.space/commit/b61aab236c1f0c120294d190391198be27b6af6b)
+- fix: :rotating_light: fix minor sonarcube findings [`39435a6`](https://github.com/thkruz/keeptrack.space/commit/39435a6ad75947b052e8022fafdc2f556eb70d0b)
+- test(multiple): increase code coverage [`a567060`](https://github.com/thkruz/keeptrack.space/commit/a5670609cc9ec9b1778fa08ce4da08f7f7a14827)
+- feat: :zap: improve standard magnitude estimates [`548bd19`](https://github.com/thkruz/keeptrack.space/commit/548bd19680606a6c77a52a382bde968363b965ba)
+- refactor: :truck: rename satInfoBoxCore to satInfoBox [`fee2fc2`](https://github.com/thkruz/keeptrack.space/commit/fee2fc2d4242cf345524a085e73361d772c1b1e1)
+- fix: :bug: add error checking to new launch plugin [`43f6006`](https://github.com/thkruz/keeptrack.space/commit/43f6006fc1796d4506741efd68d6e8749a573792)
+- refactor: :fire: remove uiLimited code [`5453a3b`](https://github.com/thkruz/keeptrack.space/commit/5453a3b9f52c38ef8cf6a6c10d0415a7dbdc9f7d)
+- refactor: :recycle: make sccNum vs Id more explicit [`b8f740e`](https://github.com/thkruz/keeptrack.space/commit/b8f740e01c2f501065e6701307255640c3947519)
+- test: :white_check_mark: increase test coverage [`cc90629`](https://github.com/thkruz/keeptrack.space/commit/cc90629093126d4db1bf881a582ce7f6c5bb05c7)
+- test: :white_check_mark: add tests for cruncherInteractions.ts [`4214472`](https://github.com/thkruz/keeptrack.space/commit/42144721570b9e7957a5aac976592e979e506d12)
+- style: :rotating_light: remove unnecessary comments [`40050f2`](https://github.com/thkruz/keeptrack.space/commit/40050f25b315482a3ab23a248f209d48866a53b8)
+- feat: :sparkles: enable legend functions for orbit density scheme [`b320a9a`](https://github.com/thkruz/keeptrack.space/commit/b320a9a19fef2a8cea5194d148076d97fa4108d9)
+- build: :coffin: removed old scripts that are no longer needed [`c290aad`](https://github.com/thkruz/keeptrack.space/commit/c290aadbce8f7ca86f20c1f1950da6d4a0a8a633)
+- refactor: :recycle: cleanup collisions plugin [`225f6eb`](https://github.com/thkruz/keeptrack.space/commit/225f6eb4eeb07d24495d41412d181ddf9134282b)
+- ci: :construction_worker: add checkout of code to each job [`1785a82`](https://github.com/thkruz/keeptrack.space/commit/1785a8292b9dc08a4787b41af9cb50ee5a9ccb44)
+- build: :rotating_light: yaml linting [`56533a6`](https://github.com/thkruz/keeptrack.space/commit/56533a667d6d905ae2ad1d01878ba7d664905801)
+- test(integration1): increased code coverage [`b4096c3`](https://github.com/thkruz/keeptrack.space/commit/b4096c3d7368ec71755eda356118800088deb18e)
+- fix(satinfoboxcore): only show sensor info if a sensor is selected [`95986a6`](https://github.com/thkruz/keeptrack.space/commit/95986a6c818ff933877b72f56e43b8b7c8d11a20)
+- feat: :sparkles: million-year presets [`fe16df1`](https://github.com/thkruz/keeptrack.space/commit/fe16df1a15c035d9e9fb71939048f82f45bf7ebc)
+- build(typescript): updated types and lint rules [`dcccb6e`](https://github.com/thkruz/keeptrack.space/commit/dcccb6e4959ea1f3f2b577b0fb7d2cec0334b145)
+- test: :white_check_mark: 100% coverage in countries colorscheme [`8b93c02`](https://github.com/thkruz/keeptrack.space/commit/8b93c0246d438b480a8149e1c69e8844d773bfba)
+- chore: :technologist: update changelog [`b669455`](https://github.com/thkruz/keeptrack.space/commit/b669455608ae32e71b74e295f6e135a117baabe8)
+- fix: :bug: fix edit sat menu [`a167ac4`](https://github.com/thkruz/keeptrack.space/commit/a167ac4305453e85d87b14f474921f3bc421744a)
+- feat: :sparkles: update to setting defaults [`a90cbe9`](https://github.com/thkruz/keeptrack.space/commit/a90cbe9369fdaa023aefe293500fece7b4eca124)
+- feat: :sparkles: add group countries color scheme [`c3344dc`](https://github.com/thkruz/keeptrack.space/commit/c3344dc160b8f351e110e1fdf775473a0634da5e)
+- ci: :rocket: add cypress testing [`00ddfd5`](https://github.com/thkruz/keeptrack.space/commit/00ddfd577c1a1e20bd3da87f2a588fed4742f585)
+- feat: :lipstick: update site manifest and favicons [`25c2751`](https://github.com/thkruz/keeptrack.space/commit/25c2751bf05d7e25fe721ff7af518c06b711b4ff)
+- feat: :zap: improve notional debris logic [`00c8255`](https://github.com/thkruz/keeptrack.space/commit/00c82553b4699c9b793444f10633f3d0a82c6321)
+- build: :green_heart: add missing tsconfig file [`f0fd5d4`](https://github.com/thkruz/keeptrack.space/commit/f0fd5d4a07e304c1fd7bfdafb911a520503371b7)
+- test: :white_check_mark: set time using UTC to ensure standardized timezone settings [`a6228b4`](https://github.com/thkruz/keeptrack.space/commit/a6228b4cf47f42dca4cb1fc99a76de8df2251e1d)
+- test: :white_check_mark: increase test coverage of orbitCruncher [`649873c`](https://github.com/thkruz/keeptrack.space/commit/649873c454c3ab76d9c291a31da0941b8f5cc40e)
+- test: :white_check_mark: convert js tests to ts [`b7d9d02`](https://github.com/thkruz/keeptrack.space/commit/b7d9d02ddba831a569241e5746768fac15fc52aa)
+- refactor: :zap: remove jquery [`b6e10be`](https://github.com/thkruz/keeptrack.space/commit/b6e10be154ef748ceb2e584f82d3cdfbc55a1ecc)
+- refactor: :zap: remove jquery [`27f3391`](https://github.com/thkruz/keeptrack.space/commit/27f339137ba4bde44d8794529fa4e549a0a1ddfd)
+- refactor: :recycle: refactor enum to ootk [`6e119a7`](https://github.com/thkruz/keeptrack.space/commit/6e119a72f1494627acc3889e2bd1b2d7ec38203f)
+- feat: :sparkles: improve mobile experience [`e284794`](https://github.com/thkruz/keeptrack.space/commit/e28479412dfd23191d235441fd34f4041861b5fa)
+- refactor: :label: add more typing to colorSchemeManager [`3b5af91`](https://github.com/thkruz/keeptrack.space/commit/3b5af9189d464a6db451304d5fdc993707590572)
+- build: :wastebasket: deprecate build embed [`ab2bba4`](https://github.com/thkruz/keeptrack.space/commit/ab2bba488b3278ca06475a197b446a2172c8d9d6)
+- build: :arrow_up: bump dependencies [`4df3488`](https://github.com/thkruz/keeptrack.space/commit/4df3488b966bd40382bf8d29ca6e03169af55833)
+- refactor: :recycle: add skip when mesh can't be seen anyway [`ef8f145`](https://github.com/thkruz/keeptrack.space/commit/ef8f145ed8c07ffcd99990bc571486866b8771b7)
+- build: :construction_worker: update github pipeline to use modern node versions [`14efc9e`](https://github.com/thkruz/keeptrack.space/commit/14efc9e9947db57d6a3c7b9164f17a04e96a6b5b)
+- feat: :sparkles: update orbit manager [`864ba16`](https://github.com/thkruz/keeptrack.space/commit/864ba16b1e955ae8c4ad669eaba18cce82793099)
+- test: :white_check_mark: added code coverage to main.ts and embed.ts [`8c01a51`](https://github.com/thkruz/keeptrack.space/commit/8c01a51b2eaba6350bc0a394e9b5fe27f549fce8)
+- fix: :adhesive_bandage: fix sensors appearing selected when not selected [`f209661`](https://github.com/thkruz/keeptrack.space/commit/f209661189466912e9f6349555115cd50bfc4ffb)
+- feat(settingsoverride): added an override so that settings stay consistent after updates [`3a97412`](https://github.com/thkruz/keeptrack.space/commit/3a97412a06ba680113a06526580b9cac391aa50a)
+- fix: :bug: fix watchlist with vimpel objects [`4500f24`](https://github.com/thkruz/keeptrack.space/commit/4500f242608432d8b510e2fd0feaa44c86de5281)
+- test: :white_check_mark: increase test coverage of classification.ts [`c5b60f4`](https://github.com/thkruz/keeptrack.space/commit/c5b60f4505e5072c2968d3c7473a05b7841b27fd)
+- Delete codesee-arch-diagram.yml [`50c2e8f`](https://github.com/thkruz/keeptrack.space/commit/50c2e8f236c2a8de84a9bce6b5451e8b22992d52)
+- docs(changelog.md): version bump [`024569e`](https://github.com/thkruz/keeptrack.space/commit/024569e83b4efd3a2746b2152b14503418a15969)
+- refactor: :label: update camera typing [`d3db643`](https://github.com/thkruz/keeptrack.space/commit/d3db6438f9c4dada1f20bdd6e4ca060fd0dcab9a)
+- feat: :sparkles: add error reporting feature [`ff7223e`](https://github.com/thkruz/keeptrack.space/commit/ff7223e2219e7c9ae060a494b8e224064f833fc7)
+- build: :construction_worker: update dependencies [`dd27a21`](https://github.com/thkruz/keeptrack.space/commit/dd27a21564b296ac6765518e014f8413fea9f636)
+- feat: :sparkles: add auto rotate pan and zoom settings [`bc7a469`](https://github.com/thkruz/keeptrack.space/commit/bc7a469b90d4d1e76e008757e23b7e613fdc570b)
+- refactor: :recycle: update embeded example [`28a5fc6`](https://github.com/thkruz/keeptrack.space/commit/28a5fc63fface14595160fed8318daa993c1bfe2)
+- test: :white_check_mark: increase test coverage of findSat and positionCruncher [`6b4476f`](https://github.com/thkruz/keeptrack.space/commit/6b4476fd7cd1c04ffca7d4d82f3264a13db6f106)
+- refactor: :fire: remove duplicate code [`e05a9a8`](https://github.com/thkruz/keeptrack.space/commit/e05a9a8d283ec6677a63f8df0f450e08468634ee)
+- fix: :bug: add fixes for multi-site lookangles plugin [`bc26615`](https://github.com/thkruz/keeptrack.space/commit/bc26615a309275222a7bfd1e5b25519fdf2e4b68)
+- fix: :zap: fix minor issues with stf menu [`26badc5`](https://github.com/thkruz/keeptrack.space/commit/26badc5ac2f1fe1ed513aeafea59c88545451ba2)
+- fix: :zap: fix minor issues with stf menu [`4039b0c`](https://github.com/thkruz/keeptrack.space/commit/4039b0c5155d2ad2a0e26111f8a3d615aca3214d)
+- build: :construction_worker: fix build env and update dependencies [`6019ecf`](https://github.com/thkruz/keeptrack.space/commit/6019ecfb173073a88d502735d556c0bdf87dae73)
+- feat: :sparkles: add search for star and panToStar functionality [`399c289`](https://github.com/thkruz/keeptrack.space/commit/399c289cc58340e4c4faf81a19771389c4b4110c)
+- docs: :memo: update changelog [`1838e74`](https://github.com/thkruz/keeptrack.space/commit/1838e7499e104f8fd39d6f42e5b05db5fe8e9199)
+- feat: :sparkles: add orbit density color scheme [`020f6c5`](https://github.com/thkruz/keeptrack.space/commit/020f6c57397d797f7ac73a8c249e8165dd655f8e)
+- refactor: :recycle: cleaned up breakup code [`5c399f7`](https://github.com/thkruz/keeptrack.space/commit/5c399f7427efa83872a57d392bb346e811f5c1a6)
+- feat: :children_crossing: update to address #803 [`9ab8730`](https://github.com/thkruz/keeptrack.space/commit/9ab87304a5312a32cc380e92ecd02744c746969c)
+- feat: :sparkles: force presets for facsat2 [`343b3f8`](https://github.com/thkruz/keeptrack.space/commit/343b3f8d4cc445dc3c80bb2a7b6916432e682ebf)
+- fix: :bug: fix multisite lookangles [`d0e2e18`](https://github.com/thkruz/keeptrack.space/commit/d0e2e1822a3994a8be85d6fee534c299d4ec0818)
+- Update issue templates [`fd7eef2`](https://github.com/thkruz/keeptrack.space/commit/fd7eef2948fd4bf0cbc0d92b93cc2901d9baabee)
+- test(multiple): fixed tests for no EST test servers [`f055ad0`](https://github.com/thkruz/keeptrack.space/commit/f055ad08eca50188469e692df529befd52029ff6)
+- build: :green_heart: changed build pipeline order [`06cba28`](https://github.com/thkruz/keeptrack.space/commit/06cba28d8f71a542c753e62329e54d1c6842c779)
+- fix: :children_crossing: improve missile mesh orientation [`93094dc`](https://github.com/thkruz/keeptrack.space/commit/93094dc9a2bc4ceb2a6595bd5d3f2f02f56d1182)
+- test: :camera_flash: update snapshots for testing [`2bf16bf`](https://github.com/thkruz/keeptrack.space/commit/2bf16bf97cd7b2da4b2612be1fb1d8871b5f96b5)
+- feat: :sparkles: add stf az el ext in kilometers [`6579cfe`](https://github.com/thkruz/keeptrack.space/commit/6579cfe929f0f8b0b197a1ffa4478dfcc2e33d9d)
+- refactor: :zap: optimize age of elset color scheme [`731706d`](https://github.com/thkruz/keeptrack.space/commit/731706dabf2ce0a4bb48ab281996189cf9ee7847)
+- fix: :coffin: hide show agencies until it is fixed [`4d65c45`](https://github.com/thkruz/keeptrack.space/commit/4d65c452a95afa2aa7f22a3ae77dc0c59ac5c7f7)
+- fix: :bug: fix leo and geo color schemes [`851c843`](https://github.com/thkruz/keeptrack.space/commit/851c84393480a848f979fec16f87826d5c13ca77)
+- docs: :memo: update changelog [`8bc4216`](https://github.com/thkruz/keeptrack.space/commit/8bc4216f333efb0e7d029ab77c52e82cb31632b4)
+- refactor: :recycle: refactor selectsat manager [`cb96dc7`](https://github.com/thkruz/keeptrack.space/commit/cb96dc7922b227b9d8322715892f62128ec99b95)
+- refactor: :recycle: simplify tle formatting [`f1f071d`](https://github.com/thkruz/keeptrack.space/commit/f1f071dec585ce080d12962ce19dba5f246335e5)
+- refactor: :lock: use separate func for keyboardEvt [`e5184b6`](https://github.com/thkruz/keeptrack.space/commit/e5184b6376047139785aeeecf06014b806779f43)
+- fix(uimanager): shift f to find and shift h to hide UI [`01d5790`](https://github.com/thkruz/keeptrack.space/commit/01d57905cc77a60a84cfc97132be34f3c20a39fe)
+- docs: :page_facing_up: fix missing word public from license [`0ae912d`](https://github.com/thkruz/keeptrack.space/commit/0ae912df8f44c7b891818e84c98b4f2ecacd7e53)
+- docs: :memo: update changelog [`134fc04`](https://github.com/thkruz/keeptrack.space/commit/134fc0414f2954dfccabf8fd286477311d315460)
+- feat: :sparkles: add vismag calculations to satbox [`dcd83a4`](https://github.com/thkruz/keeptrack.space/commit/dcd83a4435057cdf38abb542d9efbfbfbcff5887)
+- fix: :children_crossing: removed extra spacing when sat-infobox is dragged [`f1af9d3`](https://github.com/thkruz/keeptrack.space/commit/f1af9d362077adf459f6217c356148c97bb3e3e0)
+- fix: :bug: fix hovermanager not available in KeepTrackApi [`7d92168`](https://github.com/thkruz/keeptrack.space/commit/7d9216829467a5093953866e5bab38f91ba50f67)
+- feat: :sparkles: replace google analytics [`f80d9e0`](https://github.com/thkruz/keeptrack.space/commit/f80d9e0b885454c3390a55b36e42d823043151cc)
+- chore: :children_crossing: feature request template [`821143e`](https://github.com/thkruz/keeptrack.space/commit/821143e2147201bb06984c58238bc5597fb3f7ed)
+- feat: :sparkles: add presets for facsat2 [`bef435c`](https://github.com/thkruz/keeptrack.space/commit/bef435c4d44d7e50913cc1485155a18ab1e6cf09)
+- refactor: :label: update settings type [`fefa4a5`](https://github.com/thkruz/keeptrack.space/commit/fefa4a5e2baf6406b4a2edb2dd3b1d266854db23)
+- feat: :sparkles: enable toggles for orbital regime independent of color scheme [`0c7e556`](https://github.com/thkruz/keeptrack.space/commit/0c7e5563381cf3e85c608139696aaa6cb7d70d6f)
+- docs: :page_facing_up: update copyright dates [`6365848`](https://github.com/thkruz/keeptrack.space/commit/63658486cbf6c4e9ad6124cb74d1ade3889e3c0d)
+- test: :white_check_mark: tests are now timezone agnostic [`34e30e4`](https://github.com/thkruz/keeptrack.space/commit/34e30e40f0a23092fd0415bf5d3e2665468ab323)
+- test: :white_check_mark: expand code coverage on positionCruncher [`0edb766`](https://github.com/thkruz/keeptrack.space/commit/0edb76612b41e910f0a7d6714dff0f3e8231f30b)
+- feat(main.js): added more visible error checking to the loading screen [`42830df`](https://github.com/thkruz/keeptrack.space/commit/42830df9eaa52aac0a72c84481a9960a719c761f)
+- fix: :bug: fix new launch plugin [`0b6b5ab`](https://github.com/thkruz/keeptrack.space/commit/0b6b5abfba7495d6cb781790e52f99fea6d1bce4)
+- chore: :rotating_light: added explicit ignores for sonarqube [`ae9857c`](https://github.com/thkruz/keeptrack.space/commit/ae9857c3724a0cc36adcd071d40df42190a54752)
+- feat: :lipstick: warn/prevent user trying non-circular orbits for breakups [`3c1851a`](https://github.com/thkruz/keeptrack.space/commit/3c1851a42ce5271086b4b56bcbd370dc9c22e239)
+- ci: :arrow_up: update ci/cd pipeline dependencies [`a6e2a93`](https://github.com/thkruz/keeptrack.space/commit/a6e2a93f99a6cd563850c5564bca3365baa1eea1)
+- docs: :memo: update changelog [`32d411a`](https://github.com/thkruz/keeptrack.space/commit/32d411acf54f472874e8780b75b506f6a6020db4)
+- docs: :memo: update changelog [`21362ab`](https://github.com/thkruz/keeptrack.space/commit/21362ab70d70c3732f225c325a6ccfbdd06b4263)
+- test: :white_check_mark: add more test coverage to satInfoboxCore [`d948bd1`](https://github.com/thkruz/keeptrack.space/commit/d948bd1a8de26b5cf78873b75b9ef791dd58fdcb)
+- build: :art: cleaned up build files [`1a5d349`](https://github.com/thkruz/keeptrack.space/commit/1a5d34960fc6c6c91b5f40d575ce3d255a47f7c2)
+- feat: :zap: add more dynamic reference orbit satellites [`67188bc`](https://github.com/thkruz/keeptrack.space/commit/67188bc48eb573f5c47419a78ba4aa53677e74cf)
+- fix: :bug: move analytics to html [`e8e23a9`](https://github.com/thkruz/keeptrack.space/commit/e8e23a91c44659f0bd773140db9dd60d02967a54)
+- docs: :memo: update changelog [`30242ba`](https://github.com/thkruz/keeptrack.space/commit/30242ba9851143e21e097980c5f72b06350764fd)
+- refactor: :recycle: update sat group class [`cf7c51e`](https://github.com/thkruz/keeptrack.space/commit/cf7c51e180bd82887b4f08af4bad293d1bf3de7f)
+- fix: :bug: fix breakup icon color in bottom menu [`068383b`](https://github.com/thkruz/keeptrack.space/commit/068383b2c9122597fd01be71c99db05830b587b1)
+- fix: :bug: fix css issue on tablets [`400e7b1`](https://github.com/thkruz/keeptrack.space/commit/400e7b1e660a0169aa07a4251b01cb1447f6df13)
+- fix: :zap: reduce impact of godrays on performance [`1c480a0`](https://github.com/thkruz/keeptrack.space/commit/1c480a0fcc6f17aee7cccec9ec15d200bdbca727)
+- refactor: :recycle: organize breakup plugin [`47262e6`](https://github.com/thkruz/keeptrack.space/commit/47262e6387769ee611387a73f20eadab4717b648)
+- feat: :sparkles: add help to plot menus [`505ead7`](https://github.com/thkruz/keeptrack.space/commit/505ead72ee922c0bd8e4c099a7eac3b12784b5ac)
+- docs: :memo: update changelog [`daf4dab`](https://github.com/thkruz/keeptrack.space/commit/daf4dab9ae94b0947e7a9d939e25a4747726f940)
+- fix: :lock: addressed sonarqube security findings [`456e0f7`](https://github.com/thkruz/keeptrack.space/commit/456e0f78de38bf360abf1ef3fe7fb458eb410ac8)
+- test: :camera_flash: update snapshots [`f80dcce`](https://github.com/thkruz/keeptrack.space/commit/f80dcce7854b39ec9ffb018e639fecaed2ed3035)
+- refactor: :recycle: add helpers for hide/show dom elements [`6e7481d`](https://github.com/thkruz/keeptrack.space/commit/6e7481d568047e28d68134c593c0c9c848958402)
+- feat: :sparkles: add labels to watchlist items in fov [`a01888a`](https://github.com/thkruz/keeptrack.space/commit/a01888a032892c52b6ce95d5bc61b8afa6aab7f7)
+- test: :bug: move analytics to fix jest hanging [`5c04cf9`](https://github.com/thkruz/keeptrack.space/commit/5c04cf9513050e1a7d1516622c6323c3df357cd3)
+- feat: :sparkles: add bulk add/remove to watchlist [`3c90e2c`](https://github.com/thkruz/keeptrack.space/commit/3c90e2c1c09e2b442847a549bb9ef40201adc788)
+- fix: :beers: start fixing trend analysis menu [`d9930bc`](https://github.com/thkruz/keeptrack.space/commit/d9930bc1feeb58c24afdd8838dcf6c60c016ff0f)
+- fix: :bug: fix lookangles menu [`b1eef24`](https://github.com/thkruz/keeptrack.space/commit/b1eef24b95c4efd3135d822e481ff82f301d08aa)
+- fix: :beers: start fixing trend analysis menu [`fa67c1a`](https://github.com/thkruz/keeptrack.space/commit/fa67c1a5912af4b90cbec23e362441ad44d270e6)
+- fix: :bug: fix lookangles menu [`d84851f`](https://github.com/thkruz/keeptrack.space/commit/d84851f822008a5e33818fab9084ebec7947b968)
+- feat: :sparkles: add basic sounds [`543944d`](https://github.com/thkruz/keeptrack.space/commit/543944d9d4835f1af485c60adc4f2a7e59391386)
+- build: :lock: removed vulnerabilities in devdependencies [`60814e4`](https://github.com/thkruz/keeptrack.space/commit/60814e4d3fc2bf2431385d24cd38e20c86d44c2e)
+- fix(satset): getTEARR now works on missile objects [`4e7a5b0`](https://github.com/thkruz/keeptrack.space/commit/4e7a5b05650cae8fb96dba8664d6c91cd9673251)
+- fix: :bug: fix conflict between custom sensors and normal sensors [`188b3f7`](https://github.com/thkruz/keeptrack.space/commit/188b3f7a824e6892a676dd2847e937e9ddcf0fa8)
+- fix: :bug: add checks for missing data in satInfoboxCore [`f3d221d`](https://github.com/thkruz/keeptrack.space/commit/f3d221d134b511092c74538fd692fe4c6e20cc4f)
+- feat: :sparkles: add main help menu [`5765f8a`](https://github.com/thkruz/keeptrack.space/commit/5765f8ad9837a9910bfce651abb8bae3c27c7d3d)
+- feat: :sparkles: add new splash screen wallpapers [`717c196`](https://github.com/thkruz/keeptrack.space/commit/717c19602ba8b539b6aaa7a813d8e91baf12047b)
+- test: :white_check_mark: fix failing jest tests [`385b09b`](https://github.com/thkruz/keeptrack.space/commit/385b09ba5bbb7cbc863c9e6dbf029c1a37409fcc)
+- fix: :bug: fix constellations [`04118a7`](https://github.com/thkruz/keeptrack.space/commit/04118a75d9dc5eaedb14bb73d94b5e3309ecc2cd)
+- fix: :bug: fix analytics error [`8d6e6c3`](https://github.com/thkruz/keeptrack.space/commit/8d6e6c39c018fba7f3d43b02aa0ae39d682389e5)
+- refactor: :art: use constant for key pressed [`7ad33ed`](https://github.com/thkruz/keeptrack.space/commit/7ad33ed32f0de514fd82c23204404f7367dd5ef6)
+- test: :bug: add consistent time when testing in different timezones [`bb14384`](https://github.com/thkruz/keeptrack.space/commit/bb14384d3ac9b767d1e96135e4fa5941f8d1217f)
+- test: :bug: fix catalog test [`ceb0c1d`](https://github.com/thkruz/keeptrack.space/commit/ceb0c1ddef4b06e0af50f4834ae2220ee405062b)
+- feat: :sparkles: add more sensor info [`6d4562e`](https://github.com/thkruz/keeptrack.space/commit/6d4562ee89bb049ef378113b00698e70713767fe)
+- feat: :sparkles: add find reentries function [`e5b20e2`](https://github.com/thkruz/keeptrack.space/commit/e5b20e297be2bb69e79ace1c1955a28cb3e85561)
+- feat: :sparkles: add find reentries function [`6a5f773`](https://github.com/thkruz/keeptrack.space/commit/6a5f773437c8075b4942008cc75ebc86bf04fbe5)
+- build: :arrow_up: upgraded multiple dependencies [`3417cea`](https://github.com/thkruz/keeptrack.space/commit/3417cea8cd7a0c2afefdfc9d30dc63788bd89c38)
+- fix(uimanager): fixed find objects in this orbit and orbit remaining after watchlist item removed [`e0a79b4`](https://github.com/thkruz/keeptrack.space/commit/e0a79b4969f9ed1d6507efe451d75cd00e37dc01)
+- build: :goal_net: update husky pre-commit to be more extensible [`9eab326`](https://github.com/thkruz/keeptrack.space/commit/9eab3269e0fb6f417858874deb7e959d5b7aad06)
+- ci: :pencil2: added missing "run" command [`2a29331`](https://github.com/thkruz/keeptrack.space/commit/2a29331d4c08d14ca8d9987a9e56a2297673b2fa)
+- refactor: :rotating_light: Use // @ts-expect-error over // @ts-ignore [`3f5169b`](https://github.com/thkruz/keeptrack.space/commit/3f5169b959bbafbf5410305c9751b5ac3739dc8b)
+- test: :white_check_mark: add manual jest inline testing for debugging on github [`46e72c6`](https://github.com/thkruz/keeptrack.space/commit/46e72c63b9342be21ddf06cb3b34d8090138dfd1)
+- fix: :adhesive_bandage: fix find near orbit when raan 350+ [`5891654`](https://github.com/thkruz/keeptrack.space/commit/58916543c253f1d12e277c2db344f5d064c43d4d)
+- test(main.js): removed unnecessary console statements and improved testing [`077668a`](https://github.com/thkruz/keeptrack.space/commit/077668a4193b53bcd2131531cb4fc4a19e2a2262)
+- feat: :sparkles: filter out objects that appear to have reentered [`233b28d`](https://github.com/thkruz/keeptrack.space/commit/233b28d9610d9cb26a6b567abef5f832d8fb8eb2)
+- feat: :triangular_flag_on_post: modify breakup options to be more realistic [`203c229`](https://github.com/thkruz/keeptrack.space/commit/203c229e8abe1097491376180f8ac044ca12d5cc)
+- feat: :triangular_flag_on_post: modify breakup options to be more realistic [`e07817d`](https://github.com/thkruz/keeptrack.space/commit/e07817d79feb24cbb99f79ac87d1b99349b5d4fc)
+- refactor: :heavy_minus_sign: remove perfect-scrollbar [`1f01377`](https://github.com/thkruz/keeptrack.space/commit/1f013776379925c24d47e1e5417381ffca673560)
+- fix: :bug: fix position cruncher not calculating star positions [`1ce8a57`](https://github.com/thkruz/keeptrack.space/commit/1ce8a576aa9f9bb13efd63fc4052a1772d618e73)
+- docs: update changelog [`9aa41f4`](https://github.com/thkruz/keeptrack.space/commit/9aa41f46d146847013597fb7127cae3a4b514cc9)
+- fix(initialorbit): creating an analyst satellite automatically searches for it now [`8e6fc22`](https://github.com/thkruz/keeptrack.space/commit/8e6fc22d731a665e4242387146e2bd509b6e51da)
+- feat: :sparkles: add alternate names and notional TLEs [`373d9fb`](https://github.com/thkruz/keeptrack.space/commit/373d9fb052c754cbfda5531fea8e863f486c8594)
+- feat: :sparkles: add help to edit sat menu [`1233b8e`](https://github.com/thkruz/keeptrack.space/commit/1233b8e24d2db4320bd32c0b383d7b31b92641d9)
+- fix: :zap: add limits to all searches with findSat [`2290764`](https://github.com/thkruz/keeptrack.space/commit/2290764af693efd8b21f7a79c15607219cd53a77)
+- feat: :children_crossing: provide feedback on getorbitbylatlon errors to user [`f6dc69f`](https://github.com/thkruz/keeptrack.space/commit/f6dc69f4cd45cd6d7a9d81fc096b3ff1a53d2e46)
+- fix: :bug: fix missile crunching without sensor selected [`b0c1f64`](https://github.com/thkruz/keeptrack.space/commit/b0c1f64d552bf87f4dad2ec464d67af2740883af)
+- build: :construction_worker: clean up build pipeline [`7579e78`](https://github.com/thkruz/keeptrack.space/commit/7579e7889cabcbe2885a581a017cf60ed6db0d19)
+- feat: :label: update types [`a867ba1`](https://github.com/thkruz/keeptrack.space/commit/a867ba12db897b29aee1ded57498bb5d585653da)
+- fix: :bug: fix ray casting on earth functionality [`b5cb2e2`](https://github.com/thkruz/keeptrack.space/commit/b5cb2e238e8579cc0ffa3ed4f6b5ee9b318a14f1)
+- fix: :bug: fix ray casting on earth functionality [`a0d1f3c`](https://github.com/thkruz/keeptrack.space/commit/a0d1f3ccf5b2287cce9da1dce02c6c5144ea2837)
+- Create bug.md [`d25166b`](https://github.com/thkruz/keeptrack.space/commit/d25166bc188b46fc7e4be7e02a930de2220aa812)
+- Delete feature-request.md [`93ebc08`](https://github.com/thkruz/keeptrack.space/commit/93ebc08dbb1b363a92e9667762daed94df86bc5a)
+- Delete .gitlab-ci.yml [`5dd41e6`](https://github.com/thkruz/keeptrack.space/commit/5dd41e6abefee896020ec7b4813572bffdbe1c1b)
+- Update .gitlab-ci.yml file [`b9a80a7`](https://github.com/thkruz/keeptrack.space/commit/b9a80a71ce46e825e963c6f21d692fbf52579d5f)
+- feat: :sparkles: add additional tle export options [`6c11a92`](https://github.com/thkruz/keeptrack.space/commit/6c11a923b5e7b8e84630522a2bcfbbd92a479c8e)
+- ascii catalog edits [`7963c72`](https://github.com/thkruz/keeptrack.space/commit/7963c725348781eedac9e0967bb118e82d51bafa)
+- fix(nextlaunchmanager.ts): fixed type error [`95deee4`](https://github.com/thkruz/keeptrack.space/commit/95deee49257b6de422d21cf6e2d1a96fcc774e2e)
+- fix: :bug: fix breakup not updating satellite [`ee6fbed`](https://github.com/thkruz/keeptrack.space/commit/ee6fbedc30ae592af1f506c914497ae0b9ece0b9)
+- refactor: :wastebasket: deprecate stringPad class [`50ca6df`](https://github.com/thkruz/keeptrack.space/commit/50ca6df0504c2b461beb040cd2401794b4e3b79c)
+- refactor: :recycle: use KeepTrackApiEvents instead of strings [`9b87435`](https://github.com/thkruz/keeptrack.space/commit/9b87435a51c1ca36b99376a51fc706cc7a821b86)
+- fix: :bug: trap bug when satInSun cant be calculated [`615b02b`](https://github.com/thkruz/keeptrack.space/commit/615b02b3406f2548c61f05d6238fab029e010d16)
+- refactor: :wastebasket: remove old keepTrackApi.programs object [`6b150c0`](https://github.com/thkruz/keeptrack.space/commit/6b150c0dbeeca564487a13d0c55a8cdd0f84349f)
+- fix: :bug: replace getFullYear with getUTCFullYear [`a4f4868`](https://github.com/thkruz/keeptrack.space/commit/a4f4868c092c298d0fd25d380d1ba761a3b15f98)
+- feat: :sparkles: add start-stop clock button to context menu [`61491aa`](https://github.com/thkruz/keeptrack.space/commit/61491aa7ed4e05f10197bb124d38912121657b65)
+- feat: :sparkles: add hires skybox and have skybox follow camera [`b436864`](https://github.com/thkruz/keeptrack.space/commit/b436864a67c6d20935a16a36f16b3e853d2dc477)
+- fix: :sparkles: add color scheme for notional debris [`b56ceca`](https://github.com/thkruz/keeptrack.space/commit/b56ceca0b79df149fc49f75df010cc0d986d186a)
+- feat: :heavy_minus_sign: migrate from satellite.js to ootk [`9355308`](https://github.com/thkruz/keeptrack.space/commit/93553088e5d0f5caf537c6759e3067964c450e97)
+- refactor: :recycle: refactor line manager code out of selectsat manager [`df88f0d`](https://github.com/thkruz/keeptrack.space/commit/df88f0d8fbd3047aa28c5cefeaaf97bd7d1059d8)
+- fix: :bug: add fixes to position cruncher for VIMPEL objects [`7c95420`](https://github.com/thkruz/keeptrack.space/commit/7c95420198e2ce927159ca4915c955ce4b86c5d8)
+- fix: :bug: update year or less logic to make large fragmentation events match date it occurred [`6eb535b`](https://github.com/thkruz/keeptrack.space/commit/6eb535bac591ead19309c7f5dd656237caeebdf7)
+- feat: :wrench: update default settings [`3ba1f83`](https://github.com/thkruz/keeptrack.space/commit/3ba1f836ab2f1daaf4b21e402db109352354a66f)
+- fix(starmanager): fixed bug where webGl lags hard after highlighting certain stars [`87e8308`](https://github.com/thkruz/keeptrack.space/commit/87e83084601db22e553218614fee4ca399380a13)
+- fix: :bug: add callbacks for sensor dot selected [`0132396`](https://github.com/thkruz/keeptrack.space/commit/01323967307abd967944c5ecb27915a84f0418c8)
+- fix: :bug: fix initial orbits menu [`63cbe6f`](https://github.com/thkruz/keeptrack.space/commit/63cbe6f3f97fa657906bd04f454b77c68e0c9983)
+- fix: :bug: fix breakup creator [`bd44e50`](https://github.com/thkruz/keeptrack.space/commit/bd44e5008ba9ca4de0cdf4e8af863b50fab0a001)
+- refactor: :recycle: reduce unnecessary code in meshManager [`9b4f57b`](https://github.com/thkruz/keeptrack.space/commit/9b4f57b29d8f9aaecf240be9334e4747d1bac6c8)
+- feat: :sparkles: new loading screen [`2649a2a`](https://github.com/thkruz/keeptrack.space/commit/2649a2aa41f8c7b03b2d0b7a2cd3f70a87933a54)
+- feat: :sparkles: new loading screen [`b1bc959`](https://github.com/thkruz/keeptrack.space/commit/b1bc9593df59eef1ce2f7e3f8fbbb4a35a1483ad)
+- feat(settingsmanager): added new settings for overriding defaults to support making movies [`cc49a20`](https://github.com/thkruz/keeptrack.space/commit/cc49a209be47ad855d1ccaab808a261b4e0aa412)
+- fix(satset.js): added more descriptive error messages [`1c6fe12`](https://github.com/thkruz/keeptrack.space/commit/1c6fe12a4adf99011974b9fe5734d167a13d320d)
+- fix: :adhesive_bandage: fix minor PWA errors [`719bb8c`](https://github.com/thkruz/keeptrack.space/commit/719bb8caf7ab492f5bb1937cb91d13e3b920d07d)
+- feat: :sparkles: add mute button [`d05e720`](https://github.com/thkruz/keeptrack.space/commit/d05e7204f1333f579c68b5ffefff41f4c29a0eb7)
+- fix: :bug: fix search logic [`f59d20e`](https://github.com/thkruz/keeptrack.space/commit/f59d20e55366e091f14977c525713fe035c4630f)
+- fix: :bug: fix premature filtering in findsat [`2aba28b`](https://github.com/thkruz/keeptrack.space/commit/2aba28b9eb912e69bfb329ae7ef28efe09dcb1b1)
+- fix: :bug: fix premature filtering in findsat [`4d649b9`](https://github.com/thkruz/keeptrack.space/commit/4d649b9540519507cc4d6766f8101d01c3a38a58)
+- ci: :rotating_light: fixed linting errors in yml files [`ee123ed`](https://github.com/thkruz/keeptrack.space/commit/ee123ed688b61476b58579f397dbd93b0010b357)
+- feat(meshmanager.js): added new meshes, mesh rotation settings, sbirs options, and mesh overrides [`11e5aaa`](https://github.com/thkruz/keeptrack.space/commit/11e5aaa6c8cb44207fe2c7d86fd53f3c000a74a9)
+- feat: :sparkles: add more options to constellations plugin [`136c689`](https://github.com/thkruz/keeptrack.space/commit/136c689481be1c2d097759627af1554f85507339)
+- fix: :bug: add defensive code to block infinite loops [`1a80423`](https://github.com/thkruz/keeptrack.space/commit/1a804236aa6f1226e86ff999d29c3b2b30f62b0a)
+- SH: added dockerfile, added npm install to build script (not functional yet) [`4dc91a8`](https://github.com/thkruz/keeptrack.space/commit/4dc91a841be011daf56d1af41426850c1df732d3)
+- fix: :bug: fix hover not showing launch year [`a6d8936`](https://github.com/thkruz/keeptrack.space/commit/a6d8936cf51ad861a8e1f7957a4abe1b5bbd2731)
+- fix: :bug: fix for #827 [`03d02bb`](https://github.com/thkruz/keeptrack.space/commit/03d02bbb7bbb3ce43eda19872915ae13366434cb)
+- Create SECURITY.md [`092396c`](https://github.com/thkruz/keeptrack.space/commit/092396c463daae2f59e5cbfed68aff259f49d820)
+- docs: :memo: update changelog [`6fb804b`](https://github.com/thkruz/keeptrack.space/commit/6fb804b1c9a3145215a3720a5a0d69f4d98acd74)
+- feat: :goal_net: add TLE validation when creating TLEs [`cb7c114`](https://github.com/thkruz/keeptrack.space/commit/cb7c1144971a4a7cc46e1c88bf633759c30f7ba2)
+- 403 error fix: changed htm files to html files to address 403 error. Updated fiveserver, package.json, and build.mjs [`609eff5`](https://github.com/thkruz/keeptrack.space/commit/609eff55595270dcb1d61e5045f65e820b447eb3)
+- Update user-story.md [`d245276`](https://github.com/thkruz/keeptrack.space/commit/d2452766e1f76fc179ab962500ac24fcd08bec07)
+- feat(sensormanager.js): added drawFov function for animating radars surveillance fences [`592aaa8`](https://github.com/thkruz/keeptrack.space/commit/592aaa819808120707a7f6f8eb591b44271bdf31)
+- fix: :bug: fix select sat on plugins [`84fcc6c`](https://github.com/thkruz/keeptrack.space/commit/84fcc6c33dece7e16495591cd84f41f84514f5a3)
+- ci: :pencil2: fix typo in ci/cd pipeline [`301f6d9`](https://github.com/thkruz/keeptrack.space/commit/301f6d9cc453af4a84b51742bbf0af62ba985812)
+- feat: :sparkles: maintain sensor filter and rerun on satellite change for multisite lookangles [`61f5d65`](https://github.com/thkruz/keeptrack.space/commit/61f5d65fe9b17a4c394abde41e03c551a8724511)
+- build: :lock: fix security issue [`a6182ba`](https://github.com/thkruz/keeptrack.space/commit/a6182ba4bed12a4dde6f36e8106add822009487e)
+- fix: :bug: fix bug where search results dont respond [`23a7655`](https://github.com/thkruz/keeptrack.space/commit/23a765539157ca3c9b487b90cdd4b7643e727494)
+- feat: :sparkles: add ability to use ECF for satellite orbits [`4b8c123`](https://github.com/thkruz/keeptrack.space/commit/4b8c12388a8c97fa266a6f8713827d814e750693)
+- feat: :sparkles: add ability to use ECF for satellite orbits [`113fd8d`](https://github.com/thkruz/keeptrack.space/commit/113fd8def3f020ddf8eb8b45e8b33ce5edf5fae1)
+- docs: :memo: update changelog [`641c8c7`](https://github.com/thkruz/keeptrack.space/commit/641c8c7a22bab8657e754786b34f3a70d52ad32e)
+- build: :lock: update all unsecure dependencies [`e86c866`](https://github.com/thkruz/keeptrack.space/commit/e86c86621b37351be8b444180d5ea1cade68cb59)
+- fix: :bug: fix bug new launch time mismatch [`1f40215`](https://github.com/thkruz/keeptrack.space/commit/1f402154398836b0d330c76519dbe99814ebc8b5)
+- fix(color-scheme-factory.js): show stars when searching for objects [`08c7671`](https://github.com/thkruz/keeptrack.space/commit/08c76717c429bf839cf184cf5fd79f9e6eeff54f)
+- feat: :sparkles: add new altitudes settings and disable stars by default [`3655a02`](https://github.com/thkruz/keeptrack.space/commit/3655a023475bb7d81bdef787b4a5609e92a42916)
+- chore: :bookmark: update to version 5.4 [`8d0f7ad`](https://github.com/thkruz/keeptrack.space/commit/8d0f7ad0b3af333c21105f5baa0876bf1cc025fa)
+- fix: :bug: fix socrates [`a9c4416`](https://github.com/thkruz/keeptrack.space/commit/a9c4416994f07db9c02b14dfe115a66d33734382)
+- chore: :bookmark: update to version 5.4 [`de81632`](https://github.com/thkruz/keeptrack.space/commit/de81632a2cc795e0793e7de40832f358f9ff39f5)
+- fix: :bug: fix socrates [`fcc5103`](https://github.com/thkruz/keeptrack.space/commit/fcc51034e6b8e679d6be341239a8909f0a4e66ae)
+- feat(camera.js): added autopan, zoom speed settings, and zooming on missiles [`3fc9cc2`](https://github.com/thkruz/keeptrack.space/commit/3fc9cc29470c8c42b3024908b8492bfeab7f3a1f)
+- ci: :construction_worker: remove cypress for now [`7348850`](https://github.com/thkruz/keeptrack.space/commit/734885077dfc0fb60dbd982f315eb808066b4360)
+- fix: :white_check_mark: fix failing catalog-loader testing [`f7aa6dc`](https://github.com/thkruz/keeptrack.space/commit/f7aa6dc08e306cc961622bebdbf1a8ce04f363e9)
+- fix: :lipstick: fix bug with sat-infobox being sluggish [`cbf2e4e`](https://github.com/thkruz/keeptrack.space/commit/cbf2e4e2c09b87865b68325a96812c711374516a)
+- feat: :sparkles: add new logo and loading screen [`81c8117`](https://github.com/thkruz/keeptrack.space/commit/81c8117d01023065162379ed3ea206a0bcbee980)
+- chore: :technologist: add task to open github page [`2695723`](https://github.com/thkruz/keeptrack.space/commit/2695723a5df584ed5a0186f097bad93f9c7a02d3)
+- fix: :bug: ensure consistency between constellations [`033341d`](https://github.com/thkruz/keeptrack.space/commit/033341d6f44b288646b4c5129d9afbd9ea0636a9)
+- chore: :label: add typing to crunchers [`7a53747`](https://github.com/thkruz/keeptrack.space/commit/7a53747cd888009f3b70319af39538610348614e)
+- feat: :sparkles: scale dots during auto zoom out [`7be9f61`](https://github.com/thkruz/keeptrack.space/commit/7be9f6199aa505a95282a955b5381414c13c253b)
+- feat: :sparkles: add sound effects [`00156c1`](https://github.com/thkruz/keeptrack.space/commit/00156c14de19c0cb58f1a6f546de70e87ff8b199)
+- feat: :sparkles: update time machine [`d99dc8c`](https://github.com/thkruz/keeptrack.space/commit/d99dc8c41fd69d2b34fb72db98abf358d611b4f6)
+- feat: :sparkles: update group color scheme [`7815052`](https://github.com/thkruz/keeptrack.space/commit/7815052a35b305daf0c0401577eba204027e7b03)
+- ci: :camera_flash: remove snapshot tripping trufflehog [`715ede3`](https://github.com/thkruz/keeptrack.space/commit/715ede3180d0f93a9511df8e782940b5e74ee806)
+- fix: :bug: fix reference orbits not updating correctly [`e294bc0`](https://github.com/thkruz/keeptrack.space/commit/e294bc03a7038b69c07b3486340031c5e3c60df8)
+- fix: :bug: fix bug in demo-mode logic [`b2d4a64`](https://github.com/thkruz/keeptrack.space/commit/b2d4a64ef8c61dd4507418b7fb763a9f828e9202)
+- fix: :label: fix type issue [`4f3e4f7`](https://github.com/thkruz/keeptrack.space/commit/4f3e4f75a51ad1b74e786977cd21f2ce76114e37)
+- refactor: :recycle: change default lookangles to 2 days from 7 [`f731972`](https://github.com/thkruz/keeptrack.space/commit/f731972ef2e691e0050edf6327b8c5353be30367)
+- feat: :sparkles: update sounds [`d70ebac`](https://github.com/thkruz/keeptrack.space/commit/d70ebac00f607c56d6a6808fdbc71ee9b75de681)
+- feat: :children_crossing: change collision time to slightly before event [`f4b6af6`](https://github.com/thkruz/keeptrack.space/commit/f4b6af699ec391e4408c5d5aecd9ed9723345ff5)
+- fix(shorttermfences.ts): fixed scoping issue with one time only flag [`1654439`](https://github.com/thkruz/keeptrack.space/commit/1654439d934b1b7a1384e8fa7c8e7317c0b9bcf4)
+- build(settings.js): enabled offline version [`ee37d48`](https://github.com/thkruz/keeptrack.space/commit/ee37d489d2cae7eeaa8b14f37216022c54a17313)
+- test(integration1.test.js): increased lookangles code coverage [`a4888bf`](https://github.com/thkruz/keeptrack.space/commit/a4888bfdae4511f538114845957d06872d4bdac1)
+- test: :bug: fix failing tests [`db2e038`](https://github.com/thkruz/keeptrack.space/commit/db2e0381cc9116c83c78327a068afe42bdcc6e53)
+- refactor: remove jquery get request [`2602864`](https://github.com/thkruz/keeptrack.space/commit/260286482e0bc097c357a1a47753a60397fc7363)
+- refactor: :label: add typing of findBestPass [`e0abdb6`](https://github.com/thkruz/keeptrack.space/commit/e0abdb62b6c8cee8b7d76c83f1f6bd6fd8c7501f)
+- fix: :ambulance: fix typo breaking drawManager [`27af728`](https://github.com/thkruz/keeptrack.space/commit/27af7281de6e1d86e042c51e3f2ff521552d72b4)
+- build(dockerfile): reworked dependencies to get docker working [`4c0ae15`](https://github.com/thkruz/keeptrack.space/commit/4c0ae154949bd7042c3e1fce15c725006e5951db)
+- fix(satinfoboxcore): hide sunlight status if no sensor [`b486075`](https://github.com/thkruz/keeptrack.space/commit/b4860755bc93de8cdc03cc0011151eea58025fe1)
+- fix: :bug: fix issues with legend [`6d7dcb7`](https://github.com/thkruz/keeptrack.space/commit/6d7dcb73c6ed41cfcda7fd1a11f5b4394505a8a5)
+- fix: :bug: fix limitsat functionality [`3d41a02`](https://github.com/thkruz/keeptrack.space/commit/3d41a02d8e63501a57bd30acfe8483120b72e9cd)
+- feat: :sparkles: add meanmo to period conversions on edit sat [`950e458`](https://github.com/thkruz/keeptrack.space/commit/950e458d48b17f0f7309bbeec5bdb0a7c010c803)
+- feat: :sparkles: add help to constellations menu and fix constellation search code [`c0d3448`](https://github.com/thkruz/keeptrack.space/commit/c0d344810d22a8e5e3b4dbc0f2289c0a20199746)
+- feat: :sparkles: add sensors help [`f53ea38`](https://github.com/thkruz/keeptrack.space/commit/f53ea38c4dbf01bb362cdc5e8c91393f124277ad)
+- refactor: :rotating_light: address sonarqube findings [`7bc69db`](https://github.com/thkruz/keeptrack.space/commit/7bc69dbe56108422c157c762aa73845c615333d0)
+- build: :construction_worker: linting build-pipeline.yml [`7d1f1d8`](https://github.com/thkruz/keeptrack.space/commit/7d1f1d8a07434e3dea6bb465dd5afb16c31f0a52)
+- fix: :bug: analyst satellites were not defaulting with correct SpaceObjectType [`10c5425`](https://github.com/thkruz/keeptrack.space/commit/10c5425615adb2a46a13a145c8d6420e3a53d5cb)
+- test: :white_check_mark: add test to ensure moon is in right position [`1ed164b`](https://github.com/thkruz/keeptrack.space/commit/1ed164b8c1f28651bfc75fa2c3f6fa475d8db0e5)
+- refactor: :label: add better type support for catalog [`56e5141`](https://github.com/thkruz/keeptrack.space/commit/56e5141960526462208e3328ab9f22a12d0707d9)
+- fix: :bug: fix issue with sun colorscheme [`da04325`](https://github.com/thkruz/keeptrack.space/commit/da04325d4ddc8343c714fa92fc2596585d04d3a4)
+- feat: :sparkles: add help for breakup menu [`8aaf6dc`](https://github.com/thkruz/keeptrack.space/commit/8aaf6dc4f3dae89d82b9cf365c6b39edfbbf7db2)
+- feat: :sparkles: add help menu to colors menu [`47d6ca2`](https://github.com/thkruz/keeptrack.space/commit/47d6ca20c832d3ff61232f80254566db90dea6cc)
+- fix(watchlist): load watchlist now calls the correct function [`6424758`](https://github.com/thkruz/keeptrack.space/commit/642475805e78a09b42ca30b190c89623cdd7047b)
+- changelog [`a446ad8`](https://github.com/thkruz/keeptrack.space/commit/a446ad866ff15abb87083e61077c371cc5913305)
+- docs(changelog): version officially bumped to 4.0 [`aadb753`](https://github.com/thkruz/keeptrack.space/commit/aadb753b3d5ff6738f094b26e010d84c88217c30)
+- fix: :bug: fix line to sun/moon in sensor info for custom sensors [`06099d4`](https://github.com/thkruz/keeptrack.space/commit/06099d4844bb0a52f4bb0e16d8b00e03972fb415)
+- fix: :lipstick: fix incorrect icon color [`a0d82e9`](https://github.com/thkruz/keeptrack.space/commit/a0d82e99ac1264ca521cbe34fe3600d460c78354)
+- fix: :bug: fix to #809 [`927b7eb`](https://github.com/thkruz/keeptrack.space/commit/927b7eb470b2eaf057f4bcb03a8bf06c7b8b9f72)
+- fix: :bug: fix bug where lookangles enabled with no sensor [`082e3a0`](https://github.com/thkruz/keeptrack.space/commit/082e3a0b1107bafb8b3823e8accdc2a25c008729)
+- feat: :sparkles: add analysis help menu [`3efb529`](https://github.com/thkruz/keeptrack.space/commit/3efb529aea320281ea817aa0322e761326a8f2f0)
+- fix: :arrow_up: upgarde critical dependencies to fix build issue [`69baee8`](https://github.com/thkruz/keeptrack.space/commit/69baee80ce0d25607be9061c84aa7eb20bb600cd)
+- fix: :bug: fix countries filters [`1b78dd3`](https://github.com/thkruz/keeptrack.space/commit/1b78dd34f37d7f713ae070e6a46d55c6de561ce2)
+- fix: :bug: fix countries filters [`a7e22a1`](https://github.com/thkruz/keeptrack.space/commit/a7e22a17445be286d51d1c1f702289c2f769111d)
+- fix: :bug: fix race condition in findSat plugin [`a25d24f`](https://github.com/thkruz/keeptrack.space/commit/a25d24f8745817211ae31bbc7fab590379400f56)
+- build(package.json): improved npm scripts [`e69d7c0`](https://github.com/thkruz/keeptrack.space/commit/e69d7c0620426c108b3e070d68eac4cb53fd32ae)
+- fix(sensorlist.js): removed cobra danes secondary sensor [`22bc685`](https://github.com/thkruz/keeptrack.space/commit/22bc68545a78846818eb8f89e7ae4ee460c0ec7f)
+- refactor: :bug: move conditional back to renderer [`b686e98`](https://github.com/thkruz/keeptrack.space/commit/b686e9888dc0b5d301de7c32c1948e187bdb1295)
+- fix: :bug: fix bug where low resolution menu not visible [`8ef7d91`](https://github.com/thkruz/keeptrack.space/commit/8ef7d917913fa6800f91f543d9e6672a1e897eb4)
+- feat: :sparkles: add iframe example [`f0ec68d`](https://github.com/thkruz/keeptrack.space/commit/f0ec68d5150859a792eedbe092a7d1f1fbd1c8b1)
+- feat: :sparkles: update lookangles on time change [`507a309`](https://github.com/thkruz/keeptrack.space/commit/507a309e83ada18246e3f881f301c28836cd2460)
+- refactor: :recycle: migrate setting to stereo-map plugin [`73196d5`](https://github.com/thkruz/keeptrack.space/commit/73196d59e9dc8b6ce407b38242eed81f3f930778)
+- fix: :bug: fix tests [`eea1729`](https://github.com/thkruz/keeptrack.space/commit/eea1729115d40fb3c404fa1c108d83d51536d2c4)
+- feat: :heavy_minus_sign: migrate from satellite.js to ootk [`f462e23`](https://github.com/thkruz/keeptrack.space/commit/f462e23c1d3f0595ca1c5a0b0fb731d166ab049a)
+- test: :camera_flash: update snapshots [`4240fb5`](https://github.com/thkruz/keeptrack.space/commit/4240fb5d14a7886c2d2b5a5144d5cb03b509a342)
+- build: :construction_worker: run on push OR pull not both [`aeae618`](https://github.com/thkruz/keeptrack.space/commit/aeae6180109a5c2a2f490862bdbbfe5b901fb431)
+- fix: :bug: fix sound playing before user interacts with page [`6675468`](https://github.com/thkruz/keeptrack.space/commit/6675468d87e6f9d2db9821b3b3bf987c9382bc37)
+- fix: :bug: add fixes to presets [`efa3c44`](https://github.com/thkruz/keeptrack.space/commit/efa3c44a8e49635efc6685e1c0a021a35873b559)
+- chore: :card_file_box: update sensor information [`fb04863`](https://github.com/thkruz/keeptrack.space/commit/fb04863a72e8393012c6e22104b2155106c6b3cf)
+- ci: :green_heart: move sonarcloud scan to a github app instead [`bdef28a`](https://github.com/thkruz/keeptrack.space/commit/bdef28a7d64db51c651cc09133371b3bc7579b70)
+- refactor: :recycle: refactor to reduce code [`83ae0d1`](https://github.com/thkruz/keeptrack.space/commit/83ae0d15df9341e808f8163e836d409bcbbde690)
+- fix: :bug: fixed notional satellites being found in search [`72b6628`](https://github.com/thkruz/keeptrack.space/commit/72b66282f122440e5e38c8798846c1a0aa4c1683)
+- ci: :construction_worker: fix ci/cd directory names [`2a6c64a`](https://github.com/thkruz/keeptrack.space/commit/2a6c64a7f99c324e16fbf52ca31994aec5b3eaa5)
+- fix: :bug: fix ecentricity formatting [`6f6b66b`](https://github.com/thkruz/keeptrack.space/commit/6f6b66b611ba8254333e67ed8c9e325d089db633)
+- chore: :memo: update version number [`cc26157`](https://github.com/thkruz/keeptrack.space/commit/cc2615755cd058f02f0eaf6a8404ab3887c31d72)
+- test: :camera_flash: update snapshots [`bccd3ee`](https://github.com/thkruz/keeptrack.space/commit/bccd3ee7ed80193f28a26a275eba1d616a285d40)
+- test: :lock: false positive for secret [`dd60b65`](https://github.com/thkruz/keeptrack.space/commit/dd60b65ba4198234d985dbb4ea34df36d0552c10)
+- build(package): upgraded jsdom [`a9a20e7`](https://github.com/thkruz/keeptrack.space/commit/a9a20e7170026838df65a85b7554a4f3d572cae6)
+- fix(webgl-obj-loader.js): migrated fetch to $.get for offline support [`ae98985`](https://github.com/thkruz/keeptrack.space/commit/ae9898575174712d35415027324b35d09f5208a8)
+- fix: :art: fix icon flickering when resizing bottom menu [`1c60fee`](https://github.com/thkruz/keeptrack.space/commit/1c60fee44625c6da55e51eb7439e16d504e010e4)
+- fix: :bug: dont use orbit manager if it isn't available [`1e00e1c`](https://github.com/thkruz/keeptrack.space/commit/1e00e1c8aa300ff561083aa47a1b58c3509e5fba)
+- style: :art: remove trailing spaces [`a7ef683`](https://github.com/thkruz/keeptrack.space/commit/a7ef683dccf91942407c7c4dd29a0dd0b6e14f8f)
+- fix: :bug: fix incorrect lookangles caused by caching satrec [`f8ed5a5`](https://github.com/thkruz/keeptrack.space/commit/f8ed5a5577cce0509f54be80bbd04bc5c6c0070e)
+- feat: :sparkles: add help to new launch menu [`f5c0bf8`](https://github.com/thkruz/keeptrack.space/commit/f5c0bf882c86dc532f0b7d8288b6e1b1ed5115b9)
+- feat: :sparkles: add help to missile menu [`5dc0e25`](https://github.com/thkruz/keeptrack.space/commit/5dc0e25f1b517d4dc16dd655e782c9670f3b641b)
+- feat: :sparkles: add help to dop menu [`e9eaad1`](https://github.com/thkruz/keeptrack.space/commit/e9eaad11bf6d73f1ba4c5c7761d2600f02547592)
+- feat: :sparkles: add watchlist help menu [`b446014`](https://github.com/thkruz/keeptrack.space/commit/b4460148d799b13d091aecc613e4ab942ff20eac)
+- fix: :bug: fix watchlist line to satellite [`1731a9b`](https://github.com/thkruz/keeptrack.space/commit/1731a9b8e1456da63688e40ed2e28e91ae269ae3)
+- fix(package.json): fixed http-server issue with new default ip address [`6535892`](https://github.com/thkruz/keeptrack.space/commit/6535892f445e006ddeff8ae99c6522a2fb58c161)
+- feat(atmosphere.ts): allow mesh to be moved with a position override [`c57b88f`](https://github.com/thkruz/keeptrack.space/commit/c57b88fa5b70952364353e08b1927710c716474b)
+- chore(tsconfig.json): updated tsconfig rules [`d5a901f`](https://github.com/thkruz/keeptrack.space/commit/d5a901f895932e622eb3eade8fc5a694afe83706)
+- fix: :bug: fix switch in custom sensor [`b36431a`](https://github.com/thkruz/keeptrack.space/commit/b36431ae85f142a4c82984a95329d5b8089e179d)
+- chore: :technologist: minor tweaks to tasks.json [`2171736`](https://github.com/thkruz/keeptrack.space/commit/21717369aa1a4618ea3953a8efca7be4ff1873fa)
+- ci: :construction_worker: update sonarcloud scan [`cc07879`](https://github.com/thkruz/keeptrack.space/commit/cc0787929a2c92d836f08f550409403b6fb32acb)
+- fix: :bug: fix bug with legend menu showing empty [`21fd42e`](https://github.com/thkruz/keeptrack.space/commit/21fd42ed8f1955dcca2ccb178b1b9ac587171fe4)
+- test: :bug: make getEl optional for select-sat-manager tests [`028e821`](https://github.com/thkruz/keeptrack.space/commit/028e821c1ca4f4fb831cb4e6a6a77c4b6949670f)
+- fix: :zap: better camera zooming controls [`d9d2a6d`](https://github.com/thkruz/keeptrack.space/commit/d9d2a6d1c34036ca44fe08cde19e027770a30a9e)
+- docs: :memo: update readme [`bfc64d7`](https://github.com/thkruz/keeptrack.space/commit/bfc64d777ab1bba30a0f958256f874d0554124b6)
+- fix(selectsatmanager): fixed bug where search box was displayed empty and updated political map [`01d2170`](https://github.com/thkruz/keeptrack.space/commit/01d2170cd45c15cb65070e99f8004b20b35be82b)
+- build(uimanager.js): fixed import to use new typescript file [`fedf20f`](https://github.com/thkruz/keeptrack.space/commit/fedf20fab697b5ffb9f616d762da2d95f3a33dc8)
+- refactor: :recycle: move stereo map plugin code out of select sat manager [`ed4863f`](https://github.com/thkruz/keeptrack.space/commit/ed4863f0e603551e3e94392833308ddc761e4785)
+- fix: :adhesive_bandage: add logic for when primary and secondary sat are the same [`da92668`](https://github.com/thkruz/keeptrack.space/commit/da926685ca874c9d2817c9108334d9a8b758a160)
+- fix: :bug: fix hover color showing on selected sats [`91db8ba`](https://github.com/thkruz/keeptrack.space/commit/91db8bad3444abf78ea81d58c2efc9c7af34fee9)
+- ci: :bug: fix yaml format [`d0476cb`](https://github.com/thkruz/keeptrack.space/commit/d0476cbee9b895e23f88ae9c9b15c9e70087bd52)
+- fix: :bug: fix star index calculations [`54a9c58`](https://github.com/thkruz/keeptrack.space/commit/54a9c584a26f6d188bb525bbdfee3577e7534af7)
+- feat: :sparkles: add help to initial orbit menu [`b4dfa47`](https://github.com/thkruz/keeptrack.space/commit/b4dfa47bb9d86c180022aec8687fd6cfc34743a7)
+- feat: :sparkles: add help to find sat menu [`bea60c2`](https://github.com/thkruz/keeptrack.space/commit/bea60c21cea793b2e63a68ff1bf7ed0e0c04fa89)
+- fix: :bug: update apogee when edit sat in positionCruncher [`a263c6c`](https://github.com/thkruz/keeptrack.space/commit/a263c6c96a2979dd796e1ce7a796eb2f9a3180df)
+- feat: :sparkles: add sounds to settings menu [`4db0bb8`](https://github.com/thkruz/keeptrack.space/commit/4db0bb887800fa0274ddfb8a5df139342b50974e)
+- fix: :bug: update default colorscheme to catch unknown types [`9930049`](https://github.com/thkruz/keeptrack.space/commit/9930049dc72edb6cfb68ae1877792baab5d976a1)
+- ci: :construction_worker: update github pipeline [`a2b9126`](https://github.com/thkruz/keeptrack.space/commit/a2b91261fccb48f6cf34f465ccdb4c942888cee3)
+- fix: :bug: fix sun/moon line [`ea8f6d4`](https://github.com/thkruz/keeptrack.space/commit/ea8f6d495df73288e38cebdd33ad5f3f01d5c3e8)
+- refactor: :rotating_light: remove use of banned type [`a5e63c9`](https://github.com/thkruz/keeptrack.space/commit/a5e63c97a577a107ba64d7dd82950ed9aead32fd)
+- fix: :bug: fix edit-sat [`589380f`](https://github.com/thkruz/keeptrack.space/commit/589380fb1d0cc958e8a044162a0d112cc1d6667b)
+- fix: :bug: fix short term fence and watchlist plugins [`a81fc0c`](https://github.com/thkruz/keeptrack.space/commit/a81fc0cf26762a5e68261d7c41d9993015fdf3e0)
+- fix: :bug: better zoom out experience [`4f876c4`](https://github.com/thkruz/keeptrack.space/commit/4f876c4c89517b5c46dc62a5108a68a7e2ab83ad)
+- fix: :bug: consolidate imports [`c0ea570`](https://github.com/thkruz/keeptrack.space/commit/c0ea570045f42de7ae9977155dd822ae81adb982)
+- feat: :sparkles: add iframe check [`e0cc5b5`](https://github.com/thkruz/keeptrack.space/commit/e0cc5b55725c4a88b613f025400aa499f6ef4b7b)
+- ci: :rotating_light: fix formatting on ci/cd pipe [`6446b10`](https://github.com/thkruz/keeptrack.space/commit/6446b10c89a778e7692275701c66f2d224e239e9)
+- style: :art: remove trailing spaces [`3e4691e`](https://github.com/thkruz/keeptrack.space/commit/3e4691e625498fd34cb313922e89ca756b963a22)
+- fix: :bug: fix error calculating meanA in non-circular orbits [`9900c2e`](https://github.com/thkruz/keeptrack.space/commit/9900c2ec5c4489f5a4bc3a7021531f9931b190d7)
+- build: :art: fix yaml formatting [`0cdb5e8`](https://github.com/thkruz/keeptrack.space/commit/0cdb5e89157ab7cda28b053da6c8451128806421)
+- fix: :label: better typing [`9578e08`](https://github.com/thkruz/keeptrack.space/commit/9578e083b4eb1793f8c9666613e2e5ea7ae55d68)
+- feat: :sparkles: add help to debug menu [`f8fb904`](https://github.com/thkruz/keeptrack.space/commit/f8fb9045015217983f37353100c6f983a0cd7a9b)
+- test: :camera_flash: update snapshots [`fa9100c`](https://github.com/thkruz/keeptrack.space/commit/fa9100cc0c0977bf957905c57ca95530620b1cb6)
+- test: :camera_flash: update snapshots [`0541134`](https://github.com/thkruz/keeptrack.space/commit/054113492b85360621a97b5c03230d662765d5d1)
+- fix: :adhesive_bandage: fix searching by orbit near 359 raan [`f20334e`](https://github.com/thkruz/keeptrack.space/commit/f20334eb65663d8f8bcd5d6d7375d909b9e1de4d)
+- refactor: :rotating_light: address sonarqube findings [`5f099b7`](https://github.com/thkruz/keeptrack.space/commit/5f099b76bc831785b80ca2b50a1d69d5a58fe336)
+- ci: :construction_worker: fix cypress pipeline [`9b13e5c`](https://github.com/thkruz/keeptrack.space/commit/9b13e5cffbfe33f9d86dcf93f394757fb744a8e1)
+- test: :camera_flash: update snapshots [`17a8b3e`](https://github.com/thkruz/keeptrack.space/commit/17a8b3ebaab2d0057ee63f46eca32299e6013429)
+- fix(satinfoboxcore): fixed bug when selecting a missile [`cfb19a6`](https://github.com/thkruz/keeptrack.space/commit/cfb19a63d9f31859615733d71a06a25f45999da5)
+- test(test-env): migrated from require to import [`6bfd3d3`](https://github.com/thkruz/keeptrack.space/commit/6bfd3d30e66dc1ed2da5f4dbd7e123bf86c68a47)
+- Autofix issues in 2 files [`b84ff87`](https://github.com/thkruz/keeptrack.space/commit/b84ff8731f9fa4b88781259cf87dd74bc9f49be2)
+- feat: :sparkles: update readme splash screen and meta data [`2984b5c`](https://github.com/thkruz/keeptrack.space/commit/2984b5c2a225798df1187e8fcbd7f1f48591c0ca)
+- build: :wrench: update vscode settings [`40fe24a`](https://github.com/thkruz/keeptrack.space/commit/40fe24a78e7161a73ef40adf84a52072752d28a0)
+- ci: :bug: update yml [`03ca4a2`](https://github.com/thkruz/keeptrack.space/commit/03ca4a23b34e0863c703cd7eaffc66abf41c4595)
+- feat: :sparkles: add help to stf menu [`651b85c`](https://github.com/thkruz/keeptrack.space/commit/651b85ca39c4e652ec0bee35651de6b1a52b7797)
+- feat: :sparkles: add help to satellite photo menu [`fcb5566`](https://github.com/thkruz/keeptrack.space/commit/fcb556692779d94db22325cf012eae50b44064f9)
+- feat: :sparkles: add help for collisions menu [`59d5003`](https://github.com/thkruz/keeptrack.space/commit/59d5003ec223c12925516f22c9bacf1bbb1c3af8)
+- test: :white_check_mark: fix broken watchlist tests [`3e79ebe`](https://github.com/thkruz/keeptrack.space/commit/3e79ebee6e89567451adad1a225cc3cc38e8d9d4)
+- build: :ambulance: watch command is locking up build in CI [`ecdaf1e`](https://github.com/thkruz/keeptrack.space/commit/ecdaf1e961ee873473bbcf6721b903cc2f1d7993)
+- build: :arrow_up: requiring node 17 to mitigate bug in node 16 [`56dacfa`](https://github.com/thkruz/keeptrack.space/commit/56dacfad689536f4b8347e2048b8a5ad36c38089)
+- build(package.json): added test:unit [`33e4b89`](https://github.com/thkruz/keeptrack.space/commit/33e4b894c6720e9afbc6dc245f93e3ffca0a1f68)
+- fix(satmath): fixed issue with ecf calculations breaking sun and moon [`44c071a`](https://github.com/thkruz/keeptrack.space/commit/44c071a41ba6eefe1030071f8db659e4ba4a37c7)
+- chore(changelog): updated changelog [`2ab055e`](https://github.com/thkruz/keeptrack.space/commit/2ab055ebb1525c1ee69a3672ff74ad8b2e5b4afa)
+- chore: :wastebasket: cleanup vscode settings.json file [`a9f0e11`](https://github.com/thkruz/keeptrack.space/commit/a9f0e11fa146c7e665fd36ebd6747624e231b24f)
+- fix: :bug: fix ISS chatter not playing [`b44aa2c`](https://github.com/thkruz/keeptrack.space/commit/b44aa2ca61ab1e7ee22a3795abb8a1dd2b26f541)
+- feat: :sparkles: add setting for delay between time machine loops [`053e0a2`](https://github.com/thkruz/keeptrack.space/commit/053e0a2b6a34c0f5cfa4b36ae23367a5fcc4e219)
+- refactor: :fire: remove duplicate code [`d9ad8da`](https://github.com/thkruz/keeptrack.space/commit/d9ad8dab247c87bbde65d8014e524545fbfbb9ec)
+- fix: :bug: fix selected dot missing when zoomed out [`8f42131`](https://github.com/thkruz/keeptrack.space/commit/8f42131cf6ec95e64a21bae02376742489152802)
+- test: :white_check_mark: fix broken test [`d272858`](https://github.com/thkruz/keeptrack.space/commit/d272858517448455252e4be492ec39d10ff24a59)
+- fix: :bug: fix time machine not stopping correctly [`628b9dd`](https://github.com/thkruz/keeptrack.space/commit/628b9dd49c13a73a87bff040d03c197958276d19)
+- feat: :fire: remove old license text [`b0ada26`](https://github.com/thkruz/keeptrack.space/commit/b0ada26ac95e559b748af940c5fd6c2826c06bf6)
+- docs: :memo: add better notes on how dot interpolation works [`f969261`](https://github.com/thkruz/keeptrack.space/commit/f96926153ea684c113866d61579dcc2597e0d315)
+- fix: :bug: add error logging for possible bug #635 [`b8c4127`](https://github.com/thkruz/keeptrack.space/commit/b8c412775a4dd664c2e7c8e90fc98bb86592531b)
+- docs: :memo: update readme [`eeaa3c0`](https://github.com/thkruz/keeptrack.space/commit/eeaa3c0af1cc505baeef1cb2c666fc3e93567981)
+- fix: :goal_net: add defensive code to satCalculate [`e34897a`](https://github.com/thkruz/keeptrack.space/commit/e34897acdb70262fd5b4abb5cf3b5226bfdcf9ca)
+- build: :arrow_up: update all dependencies [`bc74e54`](https://github.com/thkruz/keeptrack.space/commit/bc74e54bdc11235f5de56ebd9135daabcba6d075)
+- build: :arrow_up: bump dependencies [`3a91eee`](https://github.com/thkruz/keeptrack.space/commit/3a91eeeb844d2f268afe78222335dedfc1f791c9)
+- fix: :adhesive_bandage: align three buttons in custom sensor [`9bffd5d`](https://github.com/thkruz/keeptrack.space/commit/9bffd5d4c7942fa72976ad0a1c780cbc3c9ae888)
+- feat: :children_crossing: provide user feedback on editsat failures [`c5bbdfc`](https://github.com/thkruz/keeptrack.space/commit/c5bbdfc8fa1af7d4fd12ed0a09dd365103e30da6)
+- refactor(multiple): minor ts errors fixed or hidden [`79c2f38`](https://github.com/thkruz/keeptrack.space/commit/79c2f3801e7134539f8d9417e43dcde80a882bde)
+- Update README.md [`e474df3`](https://github.com/thkruz/keeptrack.space/commit/e474df3cb0d315f30ae12e38097187596811bc7f)
+- fix: :bug: fix country color scheme [`850af59`](https://github.com/thkruz/keeptrack.space/commit/850af593c9501dddea8e7bdf8aea5e166ab15436)
+- fix: :bug: fix debug menu throwing errors when disabled [`ccec902`](https://github.com/thkruz/keeptrack.space/commit/ccec902e961a9dde4a2bcd2dd21e61658b10ec95)
+- fix: :bug: fix country color scheme and legend [`567e184`](https://github.com/thkruz/keeptrack.space/commit/567e184a77f47e45a0849179474ad88557473052)
+- fix: :bug: fix countries option in find sat plugin [`9f2bb51`](https://github.com/thkruz/keeptrack.space/commit/9f2bb5155b6a7ee0fb1c3b95f94d4dc4affe2cb4)
+- ci: :construction_worker: fix sonarlint [`0aec10c`](https://github.com/thkruz/keeptrack.space/commit/0aec10c879d1eb89ee9cd21dd217e72225d43a1a)
+- docs: :memo: update main.ts docs [`438aa55`](https://github.com/thkruz/keeptrack.space/commit/438aa55d5873bb0086fdc665af72755c92bb4a22)
+- fix: :bug: better handling of prop rate on load [`8df7b04`](https://github.com/thkruz/keeptrack.space/commit/8df7b0492e8c8e37d323acf29148b022606e5b2b)
+- feat: :sparkles: update notional debris coloring [`0e195f9`](https://github.com/thkruz/keeptrack.space/commit/0e195f971376588079ee60003319bd11f8c67239)
+- test: :clown_face: add missing mock data to tests [`f048f48`](https://github.com/thkruz/keeptrack.space/commit/f048f48ce1846f76da1596e6726b7f9201ca3904)
+- feat: :sparkles: add help to twitter menu [`1232bab`](https://github.com/thkruz/keeptrack.space/commit/1232bab335ff9e6981dd5942f2ea4905999da42e)
+- feat: :sparkles: add help to next launch menu [`0466fe7`](https://github.com/thkruz/keeptrack.space/commit/0466fe75599dfdfb122ef2775ff6d899bec026ba)
+- feat: :sparkles: add help to external source [`7b774db`](https://github.com/thkruz/keeptrack.space/commit/7b774dbf4f9edc6dc1a4a8ee6212cabeaf15baf0)
+- feat: :sparkles: add help to countries menu [`fcac52a`](https://github.com/thkruz/keeptrack.space/commit/fcac52ad98e59a4f9cb455c96e1d1ee1ecd2947c)
+- fix: :bug: add error trapping for uniformMatrix4fv failure [`2db65d0`](https://github.com/thkruz/keeptrack.space/commit/2db65d0804b69992eacce31d7f0c0b5af367db08)
+- fix: :bug: fix bug in error catching [`fec36c2`](https://github.com/thkruz/keeptrack.space/commit/fec36c2a1252894205a12056c6a0ca2786a03da2)
+- fix: :bug: fix memory leak in line-factory [`da28a5e`](https://github.com/thkruz/keeptrack.space/commit/da28a5ef53facea77c6c70c9f543e60ec59c03c3)
+- fix: :bug: fix bottom menu ui not responding when edges clicked [`ea40b4f`](https://github.com/thkruz/keeptrack.space/commit/ea40b4fabedaa1ae5822360d2cb2ab0166454bfe)
+- fix: :bug: fix next pass time not updating [`aea3270`](https://github.com/thkruz/keeptrack.space/commit/aea3270b935475066fad3911dcfdb21d4e4ce59d)
+- fix: :bug: fix next pass time not updating [`266553c`](https://github.com/thkruz/keeptrack.space/commit/266553c49f110bb35bc863d4bafdd0ed27d27b64)
+- ci: :construction_worker: add alternate http server for cypress testing [`e695a99`](https://github.com/thkruz/keeptrack.space/commit/e695a99d2895ad4f8aa973d9a02d3a39c82e9406)
+- ci: :construction_worker: no node restrictions for better interoperability [`558d667`](https://github.com/thkruz/keeptrack.space/commit/558d6679aba7aabc1cdb25ac89738438411b4e86)
+- changelog [`6dd5d52`](https://github.com/thkruz/keeptrack.space/commit/6dd5d5224d2e282e5c92bada665cfc378d69d32a)
+- fix: :adhesive_bandage: remove unnecessary console logging [`2123f35`](https://github.com/thkruz/keeptrack.space/commit/2123f35e904e3bf2d52c7828a1bdc2ccbeb49c47)
+- refactor: :recycle: remove duplicate imports [`7c2ca62`](https://github.com/thkruz/keeptrack.space/commit/7c2ca622f21242c9d69209ca61ec3f0823d499d3)
+- fix: :bug: fix search dropdown css [`5e0cddc`](https://github.com/thkruz/keeptrack.space/commit/5e0cddc3fc5b6b7ac597529d11749219cb5d93a1)
+- fix: :adhesive_bandage: fix sec-angle-link showing when not usable [`49010ac`](https://github.com/thkruz/keeptrack.space/commit/49010ac1551fc4e4c1cc605c0f76ac934d36a645)
+- ci: :bug: fix build script [`c9238eb`](https://github.com/thkruz/keeptrack.space/commit/c9238ebde61b60ebc378ebb0f70d67af562afec0)
+- docs: :wastebasket: deprecate the about menu [`98f148f`](https://github.com/thkruz/keeptrack.space/commit/98f148f7ff34d83171c2a3eabf457c5c254cf220)
+- fix: :bug: add defensive code for missing satellite or sensor [`7f15463`](https://github.com/thkruz/keeptrack.space/commit/7f15463011f516530a2c8b3a7f29ab459da1d364)
+- test: :white_check_mark: fix test environment [`09d0f76`](https://github.com/thkruz/keeptrack.space/commit/09d0f76199e2c487bf1b4730f9c674e0c3d5ba20)
+- feat: :sparkles: make vimpel catalog available by default [`eaebaa5`](https://github.com/thkruz/keeptrack.space/commit/eaebaa508bb161975d63b1f3fc082878e9743ced)
+- fix: :bug: fix race condition found in #793 [`efd3008`](https://github.com/thkruz/keeptrack.space/commit/efd3008f9544818e5f3a1a327b6ddb66dac6570a)
+- fix: :bug: fix search results [`126c7c0`](https://github.com/thkruz/keeptrack.space/commit/126c7c0784c24eaf419f4d50124d3569358928f5)
+- ci: :construction_worker: update sonarcloud and CodeQL [`a7b53b7`](https://github.com/thkruz/keeptrack.space/commit/a7b53b7c50eb5f767dfd0f957845099d120b19de)
+- ci: :green_heart: fix yaml formatting caused by github [`e2ca388`](https://github.com/thkruz/keeptrack.space/commit/e2ca388cd4a7ee62a7982ed4daee721ef69be5b7)
+- fix: :bug: fix missing ground objects [`a44c4bc`](https://github.com/thkruz/keeptrack.space/commit/a44c4bc58b0070b7503bab70365895fe40fcc32d)
+- feat: :sparkles: add help to map menu [`d1cf363`](https://github.com/thkruz/keeptrack.space/commit/d1cf363bf181aaf5f2af86bee7859ea47301d78e)
+- feat: :sparkles: add help to settings menu [`d616334`](https://github.com/thkruz/keeptrack.space/commit/d616334e065593c6e3cc69a08d8d7c6708f9e79f)
+- docs: :memo: update changelog [`372e378`](https://github.com/thkruz/keeptrack.space/commit/372e378bca98f1778ee22ec04293b03467bfa3b0)
+- feat: :sparkles: update hover manager [`6c6dae2`](https://github.com/thkruz/keeptrack.space/commit/6c6dae25238448936e43cc42fcea899d02a07c4f)
+- fix: :bug: include TBA sats as Special [`9c51b5c`](https://github.com/thkruz/keeptrack.space/commit/9c51b5c1b9979ee0eea46143cd9d23466556d5b0)
+- fix: :bug: include TBA sats as Special [`11effb1`](https://github.com/thkruz/keeptrack.space/commit/11effb15a1055d2f620d29cba68e28778c61ef46)
+- test: fixed failing tests [`c866190`](https://github.com/thkruz/keeptrack.space/commit/c8661904d1e0d5dc66715240c9d2addad8b5aa08)
+- test: :alien: change code coverage directory for sonarcube [`9799608`](https://github.com/thkruz/keeptrack.space/commit/979960873380c697e72069f22022e8420e9d5ea1)
+- docs: :memo: update readme [`755d924`](https://github.com/thkruz/keeptrack.space/commit/755d9242b0ca5175d851eaf1f4ef11ed0909f397)
+- github actions [`4e7546b`](https://github.com/thkruz/keeptrack.space/commit/4e7546bf1c9ec8f88a35139edbad61a2f4c4ff99)
+- feat(moon.js): allow moon position to be modified with an override [`d873635`](https://github.com/thkruz/keeptrack.space/commit/d8736357e2113a9722a443477c091413322cfb75)
+- test(settingsmanager): fixed tests to work with non-module settingsManager [`f694f94`](https://github.com/thkruz/keeptrack.space/commit/f694f940bbcf1bf9a32a45f329670007022528b0)
+- no admin folder required [`8aadff0`](https://github.com/thkruz/keeptrack.space/commit/8aadff041d86e9986bb57d7333224e44b601074f)
+- fix(style.css): bottom menu was hiding some input selection options. changed max-heigh of popups [`6d6d119`](https://github.com/thkruz/keeptrack.space/commit/6d6d119eed60d90472946fc0ade6b36d32f8d397)
+- fix: :bug: force set legend menu at init [`53c218e`](https://github.com/thkruz/keeptrack.space/commit/53c218e8a77736a4dd03a7a850e3cb954ecef4d9)
+- fix: :bug: fix selecting satellite dots [`36c0b60`](https://github.com/thkruz/keeptrack.space/commit/36c0b601eb977f3b6191821cd00292b713e2b785)
+- fix: :bug: fix collision plugin not searching for full satid [`df21d26`](https://github.com/thkruz/keeptrack.space/commit/df21d26d4a4f684cd3670e9e0618e68ea61409c1)
+- fix: :bug: reduce local storage saves [`a7f662d`](https://github.com/thkruz/keeptrack.space/commit/a7f662df40ef19544745c1c88c413ca6da3a7963)
+- feat: :sparkles: expand showEl to allow passing a display value [`23ca7ca`](https://github.com/thkruz/keeptrack.space/commit/23ca7caf827dff9a0dcd5989e5443d3a0e106c6d)
+- build: :wastebasket: simplify build instructions [`acac826`](https://github.com/thkruz/keeptrack.space/commit/acac8269bc26763c35b6ed083af52619058696a5)
+- fix: :bug: fix for velocity being 0 instead of null or an object [`30ccd82`](https://github.com/thkruz/keeptrack.space/commit/30ccd8287f0d493f8678645d24464b44cba98dc7)
+- fix: :bug: fix 16k skybox not loading [`72f1945`](https://github.com/thkruz/keeptrack.space/commit/72f19454501dccae40cab0f4a8d97befb59f03a6)
+- fix: :fire: consolidate imports [`9167b5a`](https://github.com/thkruz/keeptrack.space/commit/9167b5ad6c03fbb19dc4f23e90321d9779f370e1)
+- fix: :zap: remove debug code [`e484271`](https://github.com/thkruz/keeptrack.space/commit/e4842716d17cc1f494550f1d58f81f2cbea80273)
+- fix: :adhesive_bandage: quick fix for TLEs without leading 0s [`ab4f6a4`](https://github.com/thkruz/keeptrack.space/commit/ab4f6a4d2e1f4f2be65c06fd0ae4fb00545794a5)
+- fix: :bug: fix coloring issue with video-director plugin [`10961a0`](https://github.com/thkruz/keeptrack.space/commit/10961a0bc31533f6316522b87a3aae77865d11a9)
+- ci: :construction_worker: update dependabot [`021ca4d`](https://github.com/thkruz/keeptrack.space/commit/021ca4d0055b91db490cd7ef0f3a323d0af5ff7d)
+- feat: :sparkles: resize mesh models to support pizza box 3D model [`a9ce250`](https://github.com/thkruz/keeptrack.space/commit/a9ce250f08889ed8bdb46846bf9ceadb4d910d94)
+- fix: :bug: fix error on loading related to tle4.js [`d19d247`](https://github.com/thkruz/keeptrack.space/commit/d19d247ae59a487510d0bbd2d5d0e8d77ea136d2)
+- fix deploy [`09b0fb5`](https://github.com/thkruz/keeptrack.space/commit/09b0fb595671409c73c77afa22853a243100f991)
+- fix: :bug: fix bug in sat-fov menu when plugins disabled [`7613e0d`](https://github.com/thkruz/keeptrack.space/commit/7613e0d0600680f11e9890e9fe3c115e83e46625)
+- fix: :children_crossing: delay error sound to prevent constant repeats [`ac6bd9b`](https://github.com/thkruz/keeptrack.space/commit/ac6bd9b3abd565b6321df976457e5204e6f10a94)
+- feat: :sparkles: add prefetching of splash screens on initial run [`6b33634`](https://github.com/thkruz/keeptrack.space/commit/6b33634b3e122774810ab24054152393099d33d4)
+- fix: :bug: fix watchlist issues [`33d92ad`](https://github.com/thkruz/keeptrack.space/commit/33d92ad8543f20adbdbe1c95f4afe44db39f210b)
+- chore: :bookmark: change to 6.0.1 [`00f1b80`](https://github.com/thkruz/keeptrack.space/commit/00f1b805b3552f376a853651479a81c89cbbd110)
+- chore: :bookmark: change to 6.0.1 [`b975b17`](https://github.com/thkruz/keeptrack.space/commit/b975b17fef2ef5d429cb8862d3fc98debd5cfb9f)
+- ci: :green_heart: add new york timezone for deployment [`307dec7`](https://github.com/thkruz/keeptrack.space/commit/307dec7c5f38ce55b62013ebe44c175ab7fd9ded)
+- chore(commitizen): added commitizen to package.json [`d0973df`](https://github.com/thkruz/keeptrack.space/commit/d0973df7b567c99495552d0d99838b7ed4d42372)
+- updated dependencies [`c4cec3d`](https://github.com/thkruz/keeptrack.space/commit/c4cec3dc1fda1f9b55b983e11b7e76017115ba59)
+- fix(satinfoboxcore): provided a fix for when isInSun is unavailable (testing only so far) [`7815b9e`](https://github.com/thkruz/keeptrack.space/commit/7815b9ef67ce35d72d6346f03785a1617b646955)
+- fix: :bug: adjust political map rendering order to ensure correct layering with clouds and atmosphere [`f202134`](https://github.com/thkruz/keeptrack.space/commit/f202134b8c1056ce7433a6714b515678bed9ab14)
+- fix: :bug: remove unused hideEl calls for earth-related context menus [`babf0be`](https://github.com/thkruz/keeptrack.space/commit/babf0becf2433bdfba3f401885fe5ecb5488ef9f)
+- feat: :sparkles: add toast method to KeepTrackApi for displaying notifications [`08ec09e`](https://github.com/thkruz/keeptrack.space/commit/08ec09e4f520675bc69e1f5de79005fc0ca21fae)
+- refactor: :art: update color settings version and adjust facility color values [`7e6b193`](https://github.com/thkruz/keeptrack.space/commit/7e6b193e77242ad1c70dbe95efb1924925c5ad00)
+- feat: :sparkles: add clear method to PersistenceManager for removing all stored items [`9ecf4ac`](https://github.com/thkruz/keeptrack.space/commit/9ecf4aca4a833286f63b40e64718c853378a43ee)
+- refactor: :wastebasket: remove sensor plugin and replace with setting [`1583ea9`](https://github.com/thkruz/keeptrack.space/commit/1583ea934526ec4baf050a3cbc928c89167b527b)
+- refactor: :technologist: replace height with max-height for input focus to improve layout consistency [`9175e3e`](https://github.com/thkruz/keeptrack.space/commit/9175e3e784f57600ba0c1e91262df284eadf1781)
+- fix: :bug: Handle null or undefined values in saveItem method by removing the item [`bf231e5`](https://github.com/thkruz/keeptrack.space/commit/bf231e57324d2f1398ab537a8c80cbbd79954c79)
+- fix: :bug: fix canvas resizing issue on mobile [`62e8839`](https://github.com/thkruz/keeptrack.space/commit/62e88399992e428509e0109dce642bc8dc984b81)
+- fix: :bug: fix webgl issue with large images on small devices [`1d2283b`](https://github.com/thkruz/keeptrack.space/commit/1d2283b857e71ce5d8b19c7daee88a061946c5ef)
+- refactor: :recycle: add additional catalog sources [`6e051ed`](https://github.com/thkruz/keeptrack.space/commit/6e051ed1262766b574a531a3e65dfc265885e8dd)
+- chore: :rotating_light: fix linter error in settings.json [`a418b67`](https://github.com/thkruz/keeptrack.space/commit/a418b678196936c115b3f1d1051fe1e711cc7b20)
+- fix: :bug: fix wrong decayed objects be deactivated [`f50945e`](https://github.com/thkruz/keeptrack.space/commit/f50945ea9a25006a18c70690ad2c57fe33527522)
+- fix: :bug: fix excessive xmlserialize calls [`3c39dba`](https://github.com/thkruz/keeptrack.space/commit/3c39dba381f2d80729709ac6f05171749f13a03d)
+- fix: :bug: fix keyboard events not working [`ca1f0ff`](https://github.com/thkruz/keeptrack.space/commit/ca1f0ffa74ceec6377aff100d4c90e59c23af2f9)
+- fix: :bug: better fix to resizeCanvas [`14cc4a8`](https://github.com/thkruz/keeptrack.space/commit/14cc4a81af8c4d42375027afccbdb1900c50a109)
+- fix: :zap: only reinitialize impacted components for better performance [`c96af23`](https://github.com/thkruz/keeptrack.space/commit/c96af23c5447ac09a9b914bb722b6c8f8948aef7)
+- fix: :green_heart: fix build error [`21dfddf`](https://github.com/thkruz/keeptrack.space/commit/21dfddf281b6a988e50cbd81242c9e4cc57a91de)
+- refactor: :recycle: use sputnik as extra satellite [`22b482c`](https://github.com/thkruz/keeptrack.space/commit/22b482c443d9673136668edda6c68ac38b6ba0de)
+- feat: :sparkles: improve errorManager logic for easier offline testing [`43abdc3`](https://github.com/thkruz/keeptrack.space/commit/43abdc32f3c00db27fd925a0236069e83a3d37d3)
+- fix: :bug: catch setHover errors where index is null [`c07cb6f`](https://github.com/thkruz/keeptrack.space/commit/c07cb6f59a493a63c2143ab5fb84f5e8a37613f2)
+- test: :white_check_mark: improve tests [`d8d27cd`](https://github.com/thkruz/keeptrack.space/commit/d8d27cd6d0d8439a9c019052e0849ed0e74fe320)
+- feat: :sparkles: add close side menu to KeepTrackPlugin class [`d9eb49d`](https://github.com/thkruz/keeptrack.space/commit/d9eb49dc463fcab2fc774a8789e3c24c66f3220a)
+- ci: :rotating_light: fix linter issue [`6b3f6b9`](https://github.com/thkruz/keeptrack.space/commit/6b3f6b9f3e52913a3585ef73a41d1719aa2ac7f8)
+- feat: :sparkles: update about page [`c2c3b12`](https://github.com/thkruz/keeptrack.space/commit/c2c3b12d6ff236c383c8950f240a054691ba0548)
+- fix: :bug: fix bug caused by depricated fov text [`b5ce5d1`](https://github.com/thkruz/keeptrack.space/commit/b5ce5d147c4b22a85e5d1387e9377822e4cf9799)
+- build: :arrow_up: update ootk [`1950616`](https://github.com/thkruz/keeptrack.space/commit/195061678decae75c00d4310b38c245672e4cb90)
+- fix: :sparkles: update object manager [`3f8a45b`](https://github.com/thkruz/keeptrack.space/commit/3f8a45befd0bfde871453d1258d7ac1ce0b77ff1)
+- fix: :sparkles: update SRP FOV [`8d9f0df`](https://github.com/thkruz/keeptrack.space/commit/8d9f0df5454ad3568bba47611d943093caf2d545)
+- fix: :sparkles: update SRP FOV [`61c1265`](https://github.com/thkruz/keeptrack.space/commit/61c12658586d3b8e539aeb8f343c5ef082daefe3)
+- refactor: :rotating_light: address sonarqube finding [`22adc2d`](https://github.com/thkruz/keeptrack.space/commit/22adc2da0931196e8f0632efe03251ef9bc7109d)
+- test: :rotating_light: fix trufflehog finding [`52899d0`](https://github.com/thkruz/keeptrack.space/commit/52899d0b5bb5a5b821bc51902a706ed89881debe)
+- test: :white_check_mark: standardize time in colorschememanager [`4475d4f`](https://github.com/thkruz/keeptrack.space/commit/4475d4fc07833351e96cfa17c5e6d572a81368bb)
+- build: :rotating_light: second try at addressing yaml lint issues [`27c7100`](https://github.com/thkruz/keeptrack.space/commit/27c7100955f518875778a961e130364939492f65)
+- fix: :lock: address sonarqube finding for client-side redirection [`99c931c`](https://github.com/thkruz/keeptrack.space/commit/99c931c73cd2462e28ae7d3616d4c0ef95a3be49)
+- fix(sensor): sensor reset button now sets the sensor back to defaults [`9aade41`](https://github.com/thkruz/keeptrack.space/commit/9aade4135e381f24acab439ab4e03cd484b18ce6)
+- Update node-ci.yml [`2c4db38`](https://github.com/thkruz/keeptrack.space/commit/2c4db381210e922381fed6c0ba4d513f9036d010)
+- chore(tle): updated TLEs [`09b691f`](https://github.com/thkruz/keeptrack.space/commit/09b691fa93c0f1d4c66a7ea13672b9e6881cdf35)
+- build(package.json): updated version npm scripts to include git tag [`ac16981`](https://github.com/thkruz/keeptrack.space/commit/ac1698195d65c52771305814372ec1af47c8f257)
+- fix(nextlaunchmanager): removed race condition involving launchList [`357ea3c`](https://github.com/thkruz/keeptrack.space/commit/357ea3c174e849a9edb1d8d6ffb7c7d7abbc20b5)
+- build: :bug: update submodule configuration for src/plugins-pro [`8757cd9`](https://github.com/thkruz/keeptrack.space/commit/8757cd9b01e1cc828157b41db9d3d2a92ee04b29)
+- build: :bug: remove submodule from .gitignore [`b99ec3a`](https://github.com/thkruz/keeptrack.space/commit/b99ec3a69205cb4fb43047b901dddfae2d35ea45)
+- fix: :bug: throttle multiple error requests to open github [`f30f8b3`](https://github.com/thkruz/keeptrack.space/commit/f30f8b3f5d3add4dc563fccb37a11ceefe98733a)
+- fix: :bug: fix uv attribute bug in godrays [`328170d`](https://github.com/thkruz/keeptrack.space/commit/328170dfd2c2d19cfe62f4446250d075907a069f)
+- test: :white_check_mark: skip failing test for now [`635656a`](https://github.com/thkruz/keeptrack.space/commit/635656aec9b18236622fb5f2be33f902a48bc8aa)
+- refactor: :wastebasket: remove debug code [`80e3808`](https://github.com/thkruz/keeptrack.space/commit/80e3808ee6d01996108f9c01bf1ad67aa50f5955)
+- test: :white_check_mark: fix dependency errors on tests [`48f457b`](https://github.com/thkruz/keeptrack.space/commit/48f457b72cbb01679269f04685e4cc7f81ecf6f0)
+- feat: :sparkles: rerun search when opening search bar [`57f3175`](https://github.com/thkruz/keeptrack.space/commit/57f317505ec0da98b090615a7b40fd817c942a34)
+- fix: :bug: fix bug on mobile [`1db5ba0`](https://github.com/thkruz/keeptrack.space/commit/1db5ba0ffb96b97b768ab819bbb2f57b6f3e2cab)
+- feat: :sparkles: add faster searching [`f457dfe`](https://github.com/thkruz/keeptrack.space/commit/f457dfe48ca898bfcd554eccc32ecd21ef3e469e)
+- fix: :bug: fix breakup menu [`2e36b56`](https://github.com/thkruz/keeptrack.space/commit/2e36b5629e3b6fd18e44ff273a650218cb9b54e5)
+- docs: :memo: added a link on cognitive complexity [`1a1da78`](https://github.com/thkruz/keeptrack.space/commit/1a1da7805e9722319ab8163eb7a56a2b5c0e4613)
+- build: :bug: CI now relies on previous step [`b92b446`](https://github.com/thkruz/keeptrack.space/commit/b92b4466f169f16642ce132835421635b76e903f)
+- build: :arrow_up: bump @types/node [`7dbeef2`](https://github.com/thkruz/keeptrack.space/commit/7dbeef2f0a26d073156d38019ea5642a8fd432ce)
+- fix: :bug: add 'start-hidden' class to keeptrack header and show it on loading screen [`86f8cf5`](https://github.com/thkruz/keeptrack.space/commit/86f8cf5a1f2f0415d7285c7304f0e29b54fc2522)
+- refactor: :recycle: Specify array types for combinedArray and index in SphereGeometry [`42ee2a3`](https://github.com/thkruz/keeptrack.space/commit/42ee2a3a7c5b2a0641f123b934868576b64fcb1a)
+- fix: :label: fix incorrect type [`c9a701f`](https://github.com/thkruz/keeptrack.space/commit/c9a701f9915005dca46af8c69d43536f50adb731)
+- fix: :bug: prevent errors when plugins are disabled [`709d0ec`](https://github.com/thkruz/keeptrack.space/commit/709d0ecf1b4a5c71db4eddfa90279c2e925196bd)
+- fix: :bug: prevent errors when plugins are disabled [`6cbb3b1`](https://github.com/thkruz/keeptrack.space/commit/6cbb3b122fcb8ff0704164a4275e2d6c77756db9)
+- fix: :bug: ensure dots are updated on mobile [`669a927`](https://github.com/thkruz/keeptrack.space/commit/669a927e21033fe25aebcca0d3b1febaa1f85101)
+- fix: :bug: fix bug when surviellance plugin is disabled [`23b6226`](https://github.com/thkruz/keeptrack.space/commit/23b622612c11208d8f24cb289f27ddafe3b4380b)
+- fix: :bug: fix bug when surviellance plugin is disabled [`719da1d`](https://github.com/thkruz/keeptrack.space/commit/719da1da1750b7f7fa88a76f9f620e00dfcfa9ed)
+- feat: :sparkles: add ussr flag [`3e60d42`](https://github.com/thkruz/keeptrack.space/commit/3e60d4229e709e195af317a34ba9bfaa0d802ca3)
+- refactor: :recycle: update color settings version number [`ecd1359`](https://github.com/thkruz/keeptrack.space/commit/ecd135977bbfafcb635eed9c05bd7f6182df30fe)
+- fix: :bug: fix invalid locale string [`cb8bab4`](https://github.com/thkruz/keeptrack.space/commit/cb8bab425ba82588f80789f6f5e05133154ed041)
+- fix: :bug: hide default eruda btn [`f463b1b`](https://github.com/thkruz/keeptrack.space/commit/f463b1b81a0b8868f239c0df6a264491c78b05cd)
+- fix: :bug: fix plugin settings menu not loading [`754e92c`](https://github.com/thkruz/keeptrack.space/commit/754e92c9a714c38dd76831d77d563ae2c98ab089)
+- fix: :arrow_up: adjust isimp to work with new ootk version [`7c6b1b0`](https://github.com/thkruz/keeptrack.space/commit/7c6b1b014c122c7160dee3a876b4b71e1a8a5349)
+- build: :arrow_up: bump ootk [`9bdb894`](https://github.com/thkruz/keeptrack.space/commit/9bdb89432a998910d40452d261682629ac8d2cfa)
+- fix: :bug: fix auto rotation up/down being backwards [`bc201cc`](https://github.com/thkruz/keeptrack.space/commit/bc201cc788136772c15a72e5ecd90bd41a0697a0)
+- fix: :bug: fix mismatch between D1 database and app [`6b0a231`](https://github.com/thkruz/keeptrack.space/commit/6b0a231b6a0571592bdcd99a2a90f00f1d5590a2)
+- fix: :bug: fix bug when pitch and yaw is exactly 0 [`9744648`](https://github.com/thkruz/keeptrack.space/commit/97446484a1ff4ebae53cc55fc34ddcc15ad0589e)
+- fix: :bug: ignore flag for object with no country [`e59b538`](https://github.com/thkruz/keeptrack.space/commit/e59b538fe31ede52cb0f795127a5dbfe488217e8)
+- ci: :construction_worker: update sonar connected-mode settings [`228c013`](https://github.com/thkruz/keeptrack.space/commit/228c013cdaa42a7fcb73b95bc2d8dc646d6126dd)
+- fix: :bug: make debug toasts standby color [`38e92c6`](https://github.com/thkruz/keeptrack.space/commit/38e92c698f10e7fd4ee025eaf5ad08cc87dd9a8d)
+- fix: :bug: fix missing cis flag [`3e012c4`](https://github.com/thkruz/keeptrack.space/commit/3e012c4e9f381b69d9fb733974082405a940147b)
+- fix: :bug: fix bug where launch year missing 0 [`d1ba487`](https://github.com/thkruz/keeptrack.space/commit/d1ba487cf786b6bf2e52838f93dac08158047030)
+- fix: :zap: disable the camera widget by default since it is for a small number of users [`80b7053`](https://github.com/thkruz/keeptrack.space/commit/80b7053be687577f5817d521cca09792610688b7)
+- test: :white_check_mark: fix colorbox test [`c39273b`](https://github.com/thkruz/keeptrack.space/commit/c39273b0a28fc95b52e21e16a1c8705e0537c6ea)
+- fix: :bug: fix sensor-list side menu size [`31eb09e`](https://github.com/thkruz/keeptrack.space/commit/31eb09e72d2e45cee1239cdf880389e715861768)
+- refactor: :recycle: change default search size [`fe3cb6f`](https://github.com/thkruz/keeptrack.space/commit/fe3cb6fb0bc83f3e2d0bec5f6cf6a423719c9343)
+- feat: :lipstick: add iss flag [`da818f9`](https://github.com/thkruz/keeptrack.space/commit/da818f92be6cbd4451d003421a3ac60d662d271f)
+- fix: :bug: fix bug where polar plot could be opened without a sensor selected [`5b31fc7`](https://github.com/thkruz/keeptrack.space/commit/5b31fc7932174482e20e1508c74ec842d272ba3d)
+- ci: :green_heart: switch trufflehog action [`608f6cf`](https://github.com/thkruz/keeptrack.space/commit/608f6cf0135e9e157c801dcc74d92ec5da3237e1)
+- fix: :bug: fix create sensor from context menu not working [`5b1e3ff`](https://github.com/thkruz/keeptrack.space/commit/5b1e3ff950d684676ae5e1f084bb1306c3641da6)
+- fix: :bug: disable husky [`a66b7ba`](https://github.com/thkruz/keeptrack.space/commit/a66b7bafc682e0378ef6305510d3e2574ea64b0b)
+- fix: :rotating_light: fix linter errors with package.json [`29fffd6`](https://github.com/thkruz/keeptrack.space/commit/29fffd695443b95f2e029a22ada90d5f0af53f54)
+- fix: :bug: fix rmb events firing twice [`45df3aa`](https://github.com/thkruz/keeptrack.space/commit/45df3aa98ba9a433ddd30604e1c2cffd560789ae)
+- refactor: :art: update css to make dividers thicker [`7002bca`](https://github.com/thkruz/keeptrack.space/commit/7002bcacc705ebe2fb33964722d5306b183d853f)
+- fix: :bug: fix hide UI shortcut not working initially [`81523d4`](https://github.com/thkruz/keeptrack.space/commit/81523d49279a7f2418fbf92719edd5d880f6e84b)
+- feat: :sparkles: add resize event [`7bf1d86`](https://github.com/thkruz/keeptrack.space/commit/7bf1d86ae36ea7515ff9aaf6c9c2fb4b95595b2e)
+- fix: :bug: fix default isDraggable settings [`2a629f5`](https://github.com/thkruz/keeptrack.space/commit/2a629f59fe6ad3a89d62925642c47d851e2340b2)
+- build: :arrow_up: bump ootk [`6e2959e`](https://github.com/thkruz/keeptrack.space/commit/6e2959eac5c30f6a76c6f93399519f81a2417483)
+- feat: :sparkles: add inFOV color to group color scheme [`b6a0078`](https://github.com/thkruz/keeptrack.space/commit/b6a0078328e9ccf409c01b8b934519e32a0cb280)
+- fix: :zap: remove unnecessary color buffer update [`a193799`](https://github.com/thkruz/keeptrack.space/commit/a193799110a035daf2ac76b071681f6e156dd7cd)
+- docs: :bookmark: update version to 9.0.0 [`6b578d8`](https://github.com/thkruz/keeptrack.space/commit/6b578d804262c8d61165660c5589c40aa44aff7f)
+- refactor: :label: add readonly to plugin names [`3462992`](https://github.com/thkruz/keeptrack.space/commit/346299206037e713854f20acc78e0a02df146dd4)
+- refactor: :children_crossing: slow auto zoom and chase speeds [`5573ebf`](https://github.com/thkruz/keeptrack.space/commit/5573ebf793e6247bd213f5bd3064b302392ef2cc)
+- perf: :zap: use RegExp#test for true/false tests [`91d6565`](https://github.com/thkruz/keeptrack.space/commit/91d6565b14619e51a51dcf5c2a466577cd8285f6)
+- refactor: :recycle: create larger font for altitudes presentation [`503cfdb`](https://github.com/thkruz/keeptrack.space/commit/503cfdbb9487936b751437217489273bbe1ae127)
+- test: :white_check_mark: fix broken test [`18e3e30`](https://github.com/thkruz/keeptrack.space/commit/18e3e3072930e4c97e32f995eba028f1d6aef328)
+- fix: :bug: fix for #759 [`b6f7cda`](https://github.com/thkruz/keeptrack.space/commit/b6f7cda35d82562467d215705dae7bdc6139312f)
+- refactor: :recycle: refactor for better type support [`82ddb04`](https://github.com/thkruz/keeptrack.space/commit/82ddb041c3e2e792d5e2d4e0e40fd21bf851f3f7)
+- feat: :sparkles: allow disabling the moon [`bfb84b2`](https://github.com/thkruz/keeptrack.space/commit/bfb84b257aa5e79931a086e8d46b12115a8c4e0f)
+- refactor: :coffin: remove old reference [`0e6e101`](https://github.com/thkruz/keeptrack.space/commit/0e6e101e3cc98b0501859f569cceaec0ffddc2b0)
+- fix: :bug: fix Right Click &gt; Create Sensor Here error #772 [`4368548`](https://github.com/thkruz/keeptrack.space/commit/43685486faae046f538b0875a89925cb8057bf75)
+- refactor: :recycle: make use of keepTrackApi [`6886a7a`](https://github.com/thkruz/keeptrack.space/commit/6886a7aaec4eb10acb4e3e79ff7697e9d9fa2701)
+- fix: :bug: fix mesh shaders turning white [`ed41ceb`](https://github.com/thkruz/keeptrack.space/commit/ed41ceb7b05af73eeda642c3772569665cb0b260)
+- fix: :bug: fix bug in settings for new url [`db33583`](https://github.com/thkruz/keeptrack.space/commit/db33583ab2754470b673d42910f71595971e1bbe)
+- ci: :construction_worker: update ci dependencies [`147ee3a`](https://github.com/thkruz/keeptrack.space/commit/147ee3a64b052acdf1ed4dc877ab9694ef92f88f)
+- feat: :sparkles: add getHoverManager to keepTrackApi [`b0cac62`](https://github.com/thkruz/keeptrack.space/commit/b0cac62f8e5b60b4b6b1090c11b7f398370e314f)
+- ci: :green_heart: remove watch from npm test [`b6fa869`](https://github.com/thkruz/keeptrack.space/commit/b6fa8692bd289715eb275ec25de80c0b92d514b0)
+- Update SECURITY.md [`a88247a`](https://github.com/thkruz/keeptrack.space/commit/a88247a2d55c1ca00014e3d29712d3b9f072aa95)
+- ci: :bug: update yml [`de10f17`](https://github.com/thkruz/keeptrack.space/commit/de10f17c4cba18f36301bbea951cf370b4c54971)
+- ci: :bug: update yml [`0e5b9f1`](https://github.com/thkruz/keeptrack.space/commit/0e5b9f1b37014b82d5271eb7887efa7113eaf7a9)
+- build: :lock: fix npm security issues [`c228451`](https://github.com/thkruz/keeptrack.space/commit/c22845187a565fdfd41fb0ccef11425db60c378e)
+- fix: :bug: fix new launch menu [`38b783f`](https://github.com/thkruz/keeptrack.space/commit/38b783f3759c4df99d3413c9607f26bb9cbbc7fe)
+- fix: :bug: correct tle formatting in orbitReferencesLinkClick [`ac678e2`](https://github.com/thkruz/keeptrack.space/commit/ac678e2962edbea7b57512876c60b08fcbf0889c)
+- fix: :bug: fix missing top menu icons [`5b5e48c`](https://github.com/thkruz/keeptrack.space/commit/5b5e48c8615d5f279da9fa48b3a04dd2db3b5bcd)
+- fix: :bug: fix umbral not showing [`457035f`](https://github.com/thkruz/keeptrack.space/commit/457035f0617add02c7a1be24ce85cf48e1a1b0b3)
+- fix: :bug: fix missing top menu icons [`544f0ae`](https://github.com/thkruz/keeptrack.space/commit/544f0ae66770bba3896fd90d075d4d91ecefda82)
+- fix: :bug: fix umbral not showing [`bbc9564`](https://github.com/thkruz/keeptrack.space/commit/bbc9564c2cbc04d4a5c369f53fe6ec493993b817)
+- ci: :truck: rename master to main [`510b135`](https://github.com/thkruz/keeptrack.space/commit/510b13575ec967721d4b0f75241e0503bac2c486)
+- test: :camera_flash: remove obsolute snapshots [`29b4c6a`](https://github.com/thkruz/keeptrack.space/commit/29b4c6a3f6585aefc4bed0b55f18f5177cdce5ef)
+- ci: :heavy_plus_sign: add husky to package [`a803eb6`](https://github.com/thkruz/keeptrack.space/commit/a803eb62bd8c92557a3f361955e0de15b0a6c3bb)
+- ci: :white_check_mark: added run lint on commit [`027b6a4`](https://github.com/thkruz/keeptrack.space/commit/027b6a4526790310876f1f732b319324eb3c884d)
+- ci: :green_heart: add github token [`2c14d15`](https://github.com/thkruz/keeptrack.space/commit/2c14d15591caa2735ab3f528cc82c45a54e55dd0)
+- ci: :green_heart: use different method for changing timezone [`047a129`](https://github.com/thkruz/keeptrack.space/commit/047a129d9606593591c62ca45bc81783c535f208)
+- ci: :construction_worker: changed npm-audit-action [`045201b`](https://github.com/thkruz/keeptrack.space/commit/045201b78d82dbfecfb9e9a984e5c83c3b09c41c)
+- build: :green_heart: yml issue [`3ab6f3d`](https://github.com/thkruz/keeptrack.space/commit/3ab6f3d1005f46491d302df954c555fdf5126913)
+- feat(ui-input.ts): added override to allow zooming while auto rotate is on [`f7728ea`](https://github.com/thkruz/keeptrack.space/commit/f7728ea9b38bf0a3fe7ad93d430d4fd3af311b6a)
+- build(tsconfig.json): build to es3 [`0594294`](https://github.com/thkruz/keeptrack.space/commit/0594294405e37acc37ef7fc71050d5892f595eea)
+- fix(tle.js): fixed missing export call in offline TLEs [`2efdb66`](https://github.com/thkruz/keeptrack.space/commit/2efdb662e905796d939ffabdaa61a30e9dbd3b8f)
+- build(helper.ts): fixed type error [`85c83d1`](https://github.com/thkruz/keeptrack.space/commit/85c83d1d495d24e0022d21f764579521d62e72b9)
+- chore(package.json): bumped version number [`0d52ce5`](https://github.com/thkruz/keeptrack.space/commit/0d52ce551dae48e50adcd1435671220ed5e5149f)
+- chore: :sparkles: add generated locale files to .gitignore [`a00cb81`](https://github.com/thkruz/keeptrack.space/commit/a00cb817b0feae3918674a7813c0052289b7bdbc)
+- feat: :sparkles: add settings preservation on orbit line and ECI/ECF toggles [`6fd356b`](https://github.com/thkruz/keeptrack.space/commit/6fd356baf0fd6189b102546093605a8a7ed2ece0)
+- build: :bug: add missing .gitmodules file [`e14502c`](https://github.com/thkruz/keeptrack.space/commit/e14502cb24e9dd81783ffb8bf2c09d44d27ff318)
+- fix: :ambulance: fix typo in typing breaking build [`dc8bdb8`](https://github.com/thkruz/keeptrack.space/commit/dc8bdb8509e9f6ffcfdca3238236bc1152e34f97)
+- refactor: :recycle: remove extra line [`20c1bc5`](https://github.com/thkruz/keeptrack.space/commit/20c1bc5ecaeb3de9c143cfe5b2ef332d8d089a5e)
+- build: :see_no_evil: update gitignore [`1c0a670`](https://github.com/thkruz/keeptrack.space/commit/1c0a6700e551998c0d0adc5b9856d58a63c94756)
+- fix: :bug: fix camera widget ignoring settings [`bfed4ec`](https://github.com/thkruz/keeptrack.space/commit/bfed4ec1cd3cda9a3ca23f3fc68300c879bb210f)
+- feat: :sparkles: add payload status [`70a7834`](https://github.com/thkruz/keeptrack.space/commit/70a78348cfccfac9a68dcc6a3fbebf1e67dbca07)
+- fix: :bug: fix search bar being clipped when sat-infobox moved [`c1799bd`](https://github.com/thkruz/keeptrack.space/commit/c1799bd47dd6816debf93ee97ab2343363818e59)
+- fix: :lock: fix security issue in dependencies [`732b2cf`](https://github.com/thkruz/keeptrack.space/commit/732b2cfe1a6dcfdd9cd2cbaaced686bd8ef132d5)
+- ci: :rotating_light: fix linter error [`f21ecec`](https://github.com/thkruz/keeptrack.space/commit/f21ecec63876c762a2a8f0764754bd13bcd72ed4)
+- build: :label: add more type support [`ef9b2d8`](https://github.com/thkruz/keeptrack.space/commit/ef9b2d8881410520caff0c6456db8d2200d47949)
+- refactor: :heavy_plus_sign: add dependencies for refactored meshes [`2f82fba`](https://github.com/thkruz/keeptrack.space/commit/2f82fba797dca298eb0f89cfbaaff994d5b8ac50)
+- refactor: :recycle: update cruncher interfaces [`a61cb11`](https://github.com/thkruz/keeptrack.space/commit/a61cb11b542fdc48fc34658f1552dff18249ca7e)
+- fix: :bug: fix crash caused by sat-sun being missing [`8a7ab62`](https://github.com/thkruz/keeptrack.space/commit/8a7ab62be4c0a17369588d7c50db677bd0efa7ef)
+- ci: :construction_worker: reduce unnecessary visaulizer runs [`ec88557`](https://github.com/thkruz/keeptrack.space/commit/ec885578847321a417897c30054b23856f824932)
+- fix: :bug: fix splash screen not showing up [`ff184f5`](https://github.com/thkruz/keeptrack.space/commit/ff184f5028ab0d075811f171816b940dd71a68f6)
+- fix: :pencil2: fix bug in test due to typo [`dd01ee7`](https://github.com/thkruz/keeptrack.space/commit/dd01ee7efa2d766e86ff4ee4e0b6ae0aff73faff)
+- fix: :bug: fix bug with color menu plugin being disabled [`3124ba6`](https://github.com/thkruz/keeptrack.space/commit/3124ba6c44212ef50374206c01cf99baf22b6ac5)
+- refactor: :recycle: simplify help menu code [`0c0bba0`](https://github.com/thkruz/keeptrack.space/commit/0c0bba06fefa78ca9174b5ce43de3ce900fcef02)
+- fix: :bug: fix earth becoming background [`1651cc4`](https://github.com/thkruz/keeptrack.space/commit/1651cc4fa6c5431758b620c60b9d2d9931a7eabe)
+- fix: :adhesive_bandage: fix alignment of rows in sensor lists [`465fb6b`](https://github.com/thkruz/keeptrack.space/commit/465fb6b1366a090636a901bd1e9dd4fb1b8ab14d)
+- build: :lock: added trufflehog regex [`98c5099`](https://github.com/thkruz/keeptrack.space/commit/98c50996c83709ff31bbe82e96640576af418006)
+- refactor: :rotating_light: reduce complexity in getters.ts [`e82fa6a`](https://github.com/thkruz/keeptrack.space/commit/e82fa6a9dc962bbbe2ae8643aefc0973aebbc442)
+- fixing deployment: updating dockerfile to more closely match frontend. [`7d8de2b`](https://github.com/thkruz/keeptrack.space/commit/7d8de2b8bef3d600f18f26dd814992c1ffc4fd75)
+- build: :green_heart: use New York timezone [`d3690d4`](https://github.com/thkruz/keeptrack.space/commit/d3690d49760f773c51615ba7b84e690f0af2c5d8)
+- fix: :bug: fix bug where object id 0 has no orbit [`10c6067`](https://github.com/thkruz/keeptrack.space/commit/10c6067aa0ed38606dc672e26ea11056b68c74e1)
+- ci: :pencil2: removed extra - [`aaf3465`](https://github.com/thkruz/keeptrack.space/commit/aaf346535df7b6858b65aaecaa875e57591493a0)
+- build: :green_heart: wrong yaml path [`7914bdb`](https://github.com/thkruz/keeptrack.space/commit/7914bdb0368cddb6deb199efc3fc153c3f4c3509)
+- Update Dockerfile per MDO request (may need to double check npm i removal) [`dfeaad2`](https://github.com/thkruz/keeptrack.space/commit/dfeaad2dbc6acfe340cd17bf2f45dfed88523124)
+- fix: :bug: enabled local testing without https [`3cf2177`](https://github.com/thkruz/keeptrack.space/commit/3cf2177cd222273fee5d190b82a6787c521fbf70)
+- test(camera.test.ts): unneeded import [`4454bd0`](https://github.com/thkruz/keeptrack.space/commit/4454bd03389410114dfd8d60df8fca8da6c5f42b)
+- settingsManager fixed [`7276e7e`](https://github.com/thkruz/keeptrack.space/commit/7276e7e0afaf7724c90064528e73ee50709091c1)
+- fix(ui-input.ts): fixed DOP calculation bug [`56808d3`](https://github.com/thkruz/keeptrack.space/commit/56808d37cd58532f856c9c79cc7bd9c03138e8f5)
+- build(auto-changelog): added changelog dependency [`9d83296`](https://github.com/thkruz/keeptrack.space/commit/9d83296a8e3d2b4d4e16b6a27c6edd8cb81a8ff5)
+- feat: :sparkles: Add new icon assets (event-note, input, landscape*) and update plugins-pro submodule [`45ee2b4`](https://github.com/thkruz/keeptrack.space/commit/45ee2b4db49b952a30aefc803074afcd39fe64ca)
+- fix: :bug: adjust zoom value bounds for validation in UrlManager [`4044b1c`](https://github.com/thkruz/keeptrack.space/commit/4044b1c7a789d5e7f24b1b461b9260046d0aed66)
+- fix: :bug: disable multiline-comment-style rule in ESLint configuration [`1372152`](https://github.com/thkruz/keeptrack.space/commit/1372152cdae59878e7c1805b6af225987e9fc145)
+- chore: :package: update subproject commit reference in plugins-pro [`fbf65a9`](https://github.com/thkruz/keeptrack.space/commit/fbf65a9436f2568cbe75d64f9a2f89e78b048999)
+- fix: :bug: correct reference to Moon position in updateVertBuf method [`ba7b5fe`](https://github.com/thkruz/keeptrack.space/commit/ba7b5fe944c077955441fb499db5d66e5821dc88)
+- ci: :green_heart: update ESLint command to target the src directory [`1123e5f`](https://github.com/thkruz/keeptrack.space/commit/1123e5fe10baf96d9bd3d392578f37d551ad1c85)
+- build: :arrow_up: update gl-matrix dependency to version 3.4.4 [`13486ec`](https://github.com/thkruz/keeptrack.space/commit/13486ec8e8ca95669eb2e9b7c600803453171eaa)
+- chore: :arrow_up: update Node.js version in .nvmrc to 24 [`c0d6d8a`](https://github.com/thkruz/keeptrack.space/commit/c0d6d8ad7a63b82e87a35af154e63a9855873231)
+- chore: :arrow_up: update typescript dependency to version 5.9.3 [`ef36a07`](https://github.com/thkruz/keeptrack.space/commit/ef36a073383975ddd54b016fc51415e4c5905ce1)
+- build: :arrow_up: update prettier-plugin-organize-imports to version 4.3.0 [`dc69363`](https://github.com/thkruz/keeptrack.space/commit/dc693637d8d03ef98fc65b4a9cb19b45294ec64a)
+- chore: :arrow_up: update subproject commit reference in plugins-pro [`c01fcb0`](https://github.com/thkruz/keeptrack.space/commit/c01fcb029ba2d525188236b2d98f30a652d4bae8)
+- chore: :package: Update subproject commit reference in plugins-pro [`a3cb2d2`](https://github.com/thkruz/keeptrack.space/commit/a3cb2d28d5918483e7ad1e8d31bf0e9e35126caa)
+- fix: :bug: Remove dead satellite IDs from DSCS constellation array [`3d50d08`](https://github.com/thkruz/keeptrack.space/commit/3d50d08711f2d9935dfaefa4456de85d48c82b34)
+- fix: :bug: Add missing satellite ID to AEHF constellation array [`839f8c0`](https://github.com/thkruz/keeptrack.space/commit/839f8c06d3164e9894713b27441b4151ced36a11)
+- chore: :package: update subproject commit reference in plugins-pro [`7a52129`](https://github.com/thkruz/keeptrack.space/commit/7a52129adef8de5e27bea2ab56db292f457e4c09)
+- fix: :bug: update close button markup for consistency in draggable modal [`3aeb683`](https://github.com/thkruz/keeptrack.space/commit/3aeb683018ad1ae36e3e6090a3bcf186728f173d)
+- chore: :package: update subproject commit reference [`d9672f7`](https://github.com/thkruz/keeptrack.space/commit/d9672f78d1bf964e234c87e40deeae85855098da)
+- chore: update subproject commit reference in plugins-pro [`99b9b8e`](https://github.com/thkruz/keeptrack.space/commit/99b9b8ee730e90d4a4bceb4c9c7e553da6324732)
+- Update src/static/splash-screen.ts [`bf8fcd3`](https://github.com/thkruz/keeptrack.space/commit/bf8fcd385ff48b9563ad0a48f6be9972dcfed290)
+- chore: :bookmark: update subproject commit reference in src/plugins-pro [`a4b7602`](https://github.com/thkruz/keeptrack.space/commit/a4b76029d7d801965d6edef09d610d97f51f8b5a)
+- fix: :bug: add color scheme validation before updating last satellite color [`8a3d2bf`](https://github.com/thkruz/keeptrack.space/commit/8a3d2bf80692e627e1fbc18d3e3dc3a7ad776828)
+- fix: :bug: adjust cloud color intensity calculation for improved visual quality [`0050ccf`](https://github.com/thkruz/keeptrack.space/commit/0050ccf92a1be95ff04c5cf80c016ec2a5830909)
+- feat: :sparkles: enhance helpBody description for Create Satellite menu with detailed usage instructions [`5c13907`](https://github.com/thkruz/keeptrack.space/commit/5c13907645c589b40fff9a1ef1d75a62a0b04018)
+- feat: :sparkles: add account-circle icon to public assets [`e85ce6f`](https://github.com/thkruz/keeptrack.space/commit/e85ce6f1e1e1d75aaf2a7650e40ee7716d793deb)
+- Update src/plugins/select-sat-manager/select-sat-manager.ts [`d41e88e`](https://github.com/thkruz/keeptrack.space/commit/d41e88e8c0ac8268f5fba00cb10fc1a352be656d)
+- chore: :heavy_plus_sign: update subproject commit reference in plugins-pro [`ffe415a`](https://github.com/thkruz/keeptrack.space/commit/ffe415abf8f526231e177a1d69a585247b80fb7c)
+- fix: :bug: ensure mesh initialization only occurs if model name is defined [`8d4a086`](https://github.com/thkruz/keeptrack.space/commit/8d4a086a4296ce1bde37123246d568cb89fcc6ce)
+- fix: :bug: update color settings version check to use defaultColorSettings.version [`2471511`](https://github.com/thkruz/keeptrack.space/commit/247151139502fd2558f318e26ea2fa3d3e2fc0e6)
+- fix: :bug: ensure loading indicator is hidden on image and iframe load errors [`659e201`](https://github.com/thkruz/keeptrack.space/commit/659e2013a64f87bffe6a8aed339667b4633d01f1)
+- Update src/static/splash-screen.ts [`fb0bd30`](https://github.com/thkruz/keeptrack.space/commit/fb0bd3071c052600378425e0a4a04626e0ffcf5a)
+- fix: :bug: update nav-wrapper style to use flexbox for better alignment [`b88e1cd`](https://github.com/thkruz/keeptrack.space/commit/b88e1cd44832fd939f60bf73bb17bc977190d606)
+- fix: :bug: correct splash screen identifiers to use hyphens for consistency [`348675f`](https://github.com/thkruz/keeptrack.space/commit/348675f690fc0033c85cb13ef43c39ef882791ce)
+- fix: :bug: adjust polygon offset calculation for atmosphere rendering based on camera zoom level [`b2d1d00`](https://github.com/thkruz/keeptrack.space/commit/b2d1d00315e4b6797053e419c306f9dbe839fde8)
+- test: :white_check_mark: update expected output for valid country name test to include full name [`d64147d`](https://github.com/thkruz/keeptrack.space/commit/d64147d2549e6b8a6c1e93b75aa65edf23ef0176)
+- fix: :bug: simplify null check for current mesh object in MeshManager [`fd4ec56`](https://github.com/thkruz/keeptrack.space/commit/fd4ec56ba7b773c7c4b2c70881fdd4dfae936490)
+- fix: :bug: remove unnecessary sorting of atmosphere mesh faces to optimize rendering [`8a62be7`](https://github.com/thkruz/keeptrack.space/commit/8a62be7877c80a4f116b3593ba1f4b6dedd31daa)
+- fix: :bug: ensure GraphicsMenuPlugin is enabled before setting texture quality defaults [`af38d59`](https://github.com/thkruz/keeptrack.space/commit/af38d59a4218fd14b8975bb3d1f5baeadb1b5df9)
+- test: :white_check_mark: update snapshot to reflect changes in weather API test [`4b0baa3`](https://github.com/thkruz/keeptrack.space/commit/4b0baa3b37a1e6563a0606952a4db06cb0b52afb)
+- feat: :sparkles: update eruda dependency from 2.5.0 to 3.4.3 [`adbd4f8`](https://github.com/thkruz/keeptrack.space/commit/adbd4f8c1a55837c19edb0a492fec8977c141c41)
+- feat: :sparkles: add USER_ACCOUNT key to StorageKey enum in PersistenceManager [`2170f0b`](https://github.com/thkruz/keeptrack.space/commit/2170f0bcd11bac28723d07f6e29a1327450c3e67)
+- chore: :arrow_up: update version to 10.6.1 in README.md [`f4b5480`](https://github.com/thkruz/keeptrack.space/commit/f4b548006705696477edbb1b776fc3f000b31776)
+- fix: :bug: add optional chaining to prevent errors when accessing touches length [`939788f`](https://github.com/thkruz/keeptrack.space/commit/939788fd31833038ba79fdff996fc5e588bc6a9f)
+- fix: :recycle: move register uiManagerFinal event listener in SatInfoBox constructor [`01ec2a8`](https://github.com/thkruz/keeptrack.space/commit/01ec2a8b3faa47609f2d537a030003109efbfa51)
+- test: :white_check_mark: Skip error messages display test on loading screen [`de1858e`](https://github.com/thkruz/keeptrack.space/commit/de1858e0b9b6aafb83db28107f625bfc17b683c0)
+- fix: :bug: Correctly reference the second parameter in getEl function for proximity ops type select [`f2ca404`](https://github.com/thkruz/keeptrack.space/commit/f2ca404997df5132b6a762c4812e86fa76461544)
+- chore: :package: Update subproject commit reference in plugins-pro [`952519e`](https://github.com/thkruz/keeptrack.space/commit/952519e248fcffe63c48e9bbd449f358287fc2ab)
+- chore: :package: Update subproject commit reference in plugins-pro [`dd9ee3b`](https://github.com/thkruz/keeptrack.space/commit/dd9ee3bc642394d4b5fd5ae0adf01087c12ca0f0)
+- chore: :package: Mark subproject as dirty in plugins-pro [`1aefbc7`](https://github.com/thkruz/keeptrack.space/commit/1aefbc763794c7e78814b66b649b4ee84dc5573f)
+- chore: :package: update subproject commit reference in plugins-pro [`16e1d30`](https://github.com/thkruz/keeptrack.space/commit/16e1d30b9831c08ed80c7290150d48cfa9d82151)
+- chore: :package: update subproject commit reference in plugins-pro [`88144c7`](https://github.com/thkruz/keeptrack.space/commit/88144c7e5e0951440b768f139bf0163b4be0415d)
+- refactor: :recycle: change zoomLevel_ to public in Camera class [`ca7e246`](https://github.com/thkruz/keeptrack.space/commit/ca7e246ef5a45318d118e7d1a012a432aec82461)
+- chore: :package: update subproject commit reference in plugins-pro [`05041ec`](https://github.com/thkruz/keeptrack.space/commit/05041ecdaed6f10939aba4b68446eee9e0e16654)
+- chore: :package: update subproject commit reference in plugins-pro [`31bd80d`](https://github.com/thkruz/keeptrack.space/commit/31bd80dc924471a23d127720660e3f0b3bf2d459)
+- fix: :bug: fix broken og image [`1eb32d2`](https://github.com/thkruz/keeptrack.space/commit/1eb32d29a0e910f27202ec3dcffee626e3c9bfb2)
+- fix: :bug: add MODE environment variable for development mode [`af6933c`](https://github.com/thkruz/keeptrack.space/commit/af6933c1df826ebb793e1f39b7f6b0463cf47c5d)
+- fix: :bug: ensure MODE is loaded from environment variables in config manager [`396383a`](https://github.com/thkruz/keeptrack.space/commit/396383a8db4dfd2b94cbdff420f8a131212747c5)
+- fix: :bug: update WebpackManager configuration to use the full config object instead of mode [`f063d9d`](https://github.com/thkruz/keeptrack.space/commit/f063d9d063835b3a5535bb930e24f792a742c6e8)
+- fix: :bug: update .env file header to reflect correct environment for embed.keeptrack.space [`e91554a`](https://github.com/thkruz/keeptrack.space/commit/e91554aab41e01f507a703366cb004b3bb1ae0ec)
+- fix: :bug: update submodule URL to use SSH instead of HTTPS [`5ad000e`](https://github.com/thkruz/keeptrack.space/commit/5ad000ed78ea237552f32db14683e790ff39b700)
+- chore: :arrow_up: bump version to 10.6.0 in package.json [`64dc150`](https://github.com/thkruz/keeptrack.space/commit/64dc15025b5344ad5ca1c4ed09f4ba9987d0c8df)
+- fix: :bug: update regex for TLE data source to include optional Celestrak path [`2becd97`](https://github.com/thkruz/keeptrack.space/commit/2becd97a815f2c4be94e198477caa30d71850030)
+- chore: :arrow_up: update subproject commit reference in plugins-pro [`e9b0eb6`](https://github.com/thkruz/keeptrack.space/commit/e9b0eb64e34df6c27eb2ad499a2824346ce13990)
+- chore: :package: update subproject commit reference in plugins-pro [`8e2da2c`](https://github.com/thkruz/keeptrack.space/commit/8e2da2c9a66e243a12aa30a2b2fa22ee3a73fe31)
+- fix: :bug: correct textureLod parameter for political map rendering [`f3cc043`](https://github.com/thkruz/keeptrack.space/commit/f3cc043da8c495f06a9a768abe11f2631cff17f0)
+- chore: :technologist: update subproject commit reference in plugins-pro [`38608da`](https://github.com/thkruz/keeptrack.space/commit/38608daff4371d2ce145fc6b5693bb599d9b89c7)
+- fix: :bug: fix line addition logic in createRef2Ref method [`f1f9bc2`](https://github.com/thkruz/keeptrack.space/commit/f1f9bc2cc817738c7922b34d6d9f525dd6e15e41)
+- chore: :package: update subproject commit reference in plugins-pro [`4d56077`](https://github.com/thkruz/keeptrack.space/commit/4d5607792b2f5b4f0eac737310c527808039c597)
+- fix: :bug: Hide copyright notice and version text on splash screen [`4a2177f`](https://github.com/thkruz/keeptrack.space/commit/4a2177f30f59938906abad94ec9571ac95efc098)
+- build: :bug: update subproject commit for src/plugins-pro [`d61fe86`](https://github.com/thkruz/keeptrack.space/commit/d61fe86e58b7fe4538b455cf06063a213fe0fe19)
+- fix: :twisted_rightwards_arrows: fix merge issue [`637d6f8`](https://github.com/thkruz/keeptrack.space/commit/637d6f8f2703cb76511e82c54afdafc94648dff6)
+- fix: :twisted_rightwards_arrows: fix merge issue [`36964ad`](https://github.com/thkruz/keeptrack.space/commit/36964adf18bb3b4504ca5c3b7a74a49278e1b07c)
+- fix: :label: fix typo in filter [`8366516`](https://github.com/thkruz/keeptrack.space/commit/836651665763e75f328e8622dcd867ec1f901cd3)
+- test: :white_check_mark: fix test to match new logic [`9f5846d`](https://github.com/thkruz/keeptrack.space/commit/9f5846d93e4a474acd9d0ad352194a4eeabf9708)
+- fix: :label: fix typo in filter [`04de53a`](https://github.com/thkruz/keeptrack.space/commit/04de53a7ed379f41652027f3c426ff118ee00268)
+- test: :white_check_mark: fix test to match new logic [`7d9a710`](https://github.com/thkruz/keeptrack.space/commit/7d9a71066be539b9fb0ee8aa48cc8765248582ac)
+- fix: :bug: default help button to disabled [`d9e961b`](https://github.com/thkruz/keeptrack.space/commit/d9e961b368a81bd1387b4418833d88f3c1806fe4)
+- fix: :bug: update earth texture dropdown after hitting reset [`9c7e530`](https://github.com/thkruz/keeptrack.space/commit/9c7e530f97bcf5aa6788e60d1889561caa800d32)
+- fix: :bug: default help button to disabled [`7fd4ed7`](https://github.com/thkruz/keeptrack.space/commit/7fd4ed753503e45e9c65acd49e26f13846668145)
+- fix: :bug: update earth texture dropdown after hitting reset [`364db4b`](https://github.com/thkruz/keeptrack.space/commit/364db4b7070419e41783479dfbc4f84490844e29)
+- fix: :label: fix type [`a06a1d5`](https://github.com/thkruz/keeptrack.space/commit/a06a1d55e4fdf5beedf6a451f78a7b8458153d7e)
+- fix: :label: fix type [`3919dff`](https://github.com/thkruz/keeptrack.space/commit/3919dff5be25d806f790ce42c16f1ff8555dbad8)
+- test: :white_check_mark: update test to match new code [`a4b22e2`](https://github.com/thkruz/keeptrack.space/commit/a4b22e284b0d7bdc6b0c390b4fef7adebcb98f56)
+- docs: :memo: update readme with build tutorial [`5509cd9`](https://github.com/thkruz/keeptrack.space/commit/5509cd9f0bc4c1706a2dbb843dcd2847f63fa9c1)
+- chore: :memo: add note about issue #1018 [`8787011`](https://github.com/thkruz/keeptrack.space/commit/8787011a82359450b8ad328e1cafc3b961e77636)
+- refactor: :recycle: link to live api server [`91ddee7`](https://github.com/thkruz/keeptrack.space/commit/91ddee758adef30992cebc76d60fef6bd345e7be)
+- test: :white_check_mark: explicitly allow missing element [`4b60b92`](https://github.com/thkruz/keeptrack.space/commit/4b60b920f6cd536ac2aa3610dc4ce1683470f252)
+- build: :arrow_up: bump ootk [`8d90615`](https://github.com/thkruz/keeptrack.space/commit/8d906152236504fd24976211f36632049b7b1bf4)
+- build: :rotating_light: disable callback-return rule in eslint [`e6c2191`](https://github.com/thkruz/keeptrack.space/commit/e6c2191ceaf269d4d6fc7ca705f65965c5288bd9)
+- feat: :sparkles: add compatibility with ALDORIA CONFIDENTIAL setting [`75d2594`](https://github.com/thkruz/keeptrack.space/commit/75d25942814c2818435c035ca0572e22d22ec4eb)
+- fix: :bug: filter out 270000 analyst satellites [`c7adf9f`](https://github.com/thkruz/keeptrack.space/commit/c7adf9f792a553998668cf926f818aba5c6b8471)
+- fix: :zap: smooth loading of colors during later years of time machine [`5192cf5`](https://github.com/thkruz/keeptrack.space/commit/5192cf545995ef86f22d187a5f099730b4b50ed9)
+- fix: :bug: fix incorrect date calculation in ootk-core dependency [`bd21fbe`](https://github.com/thkruz/keeptrack.space/commit/bd21fbe6d21f15dfeaf1f19506edc362a3657ae3)
+- refactor: :zap: eliminate loading extra satellites when using limitSats [`ca53bf3`](https://github.com/thkruz/keeptrack.space/commit/ca53bf30ddb465eb95137dd92d2c3fec560f6f76)
+- test: :white_check_mark: fix test [`ac80694`](https://github.com/thkruz/keeptrack.space/commit/ac80694878a878ce8498a1be35f1855c4aafceb1)
+- fix: :bug: fix bug where CIS flag shown instead of RU [`8ee1986`](https://github.com/thkruz/keeptrack.space/commit/8ee19861d336bdda72b1af56d00e6ae370b5868f)
+- fix: :bug: fix confidence logic [`951d9e5`](https://github.com/thkruz/keeptrack.space/commit/951d9e50f2d18d990735d0ece544b46909a1d85f)
+- chore: :memo: update version date [`d5c187e`](https://github.com/thkruz/keeptrack.space/commit/d5c187e3747bf1d1292c9d5c2bfc13a1f97f4123)
+- fix: :arrow_up: bump ootk to fix leap year errors [`3db1475`](https://github.com/thkruz/keeptrack.space/commit/3db1475090bb15b78a4bd8e5039757c35d130a6f)
+- feat: :sparkles: allow spaces in watchlist entry [`acda00f`](https://github.com/thkruz/keeptrack.space/commit/acda00f45e2686cf7997f48befd454981ef695b9)
+- fix: :bug: fix unknown countries showing up as Grenada [`d34171f`](https://github.com/thkruz/keeptrack.space/commit/d34171f91a17774e81500478fd5afd06c3807d91)
+- refactor: :recycle: allow closer zoom on satellite models [`3c853bd`](https://github.com/thkruz/keeptrack.space/commit/3c853bd3e588a8145b84d83f77bebf3ceb9c586b)
+- fix: :bug: fix typo in locales.ts [`1e41051`](https://github.com/thkruz/keeptrack.space/commit/1e410518f4022d1f40b45fe454f450ca1c381bbc)
+- fix: :bug: fix getSensorList logic [`6289e52`](https://github.com/thkruz/keeptrack.space/commit/6289e52e5b792c709a1cba52909b13ba78c3c505)
+- fix: :bug: dont draw FOV lines to missiles [`ebb947f`](https://github.com/thkruz/keeptrack.space/commit/ebb947f27bfdf6b8b6e7c1183ed0a384cccc75a9)
+- build: :arrow_up: upgrade materializecss [`0203cbb`](https://github.com/thkruz/keeptrack.space/commit/0203cbbe01a1dbca68c09400b3415bfadf08ed3d)
+- fix: :bug: fix bug where search results were shown even if no results [`dfbb9b7`](https://github.com/thkruz/keeptrack.space/commit/dfbb9b7dd9c3c3316b0f3477622372ea59028038)
+- refactor: :truck: rename SensorFovMeshFactory filename [`6126095`](https://github.com/thkruz/keeptrack.space/commit/6126095e4e5f7d84a797399b4ab9e854da6b481c)
+- fix: :bug: fix wathlist overlay being enabled incorrectly [`5d51ce8`](https://github.com/thkruz/keeptrack.space/commit/5d51ce8c36cab1dfed74bbbe98ff3a2bbb465647)
+- fix: :art: fix logo being oversized [`f7dc844`](https://github.com/thkruz/keeptrack.space/commit/f7dc8448b82abac23821768a0da8064629431a40)
+- fix: :bug: fix how isSensorSelected works [`a38f2bd`](https://github.com/thkruz/keeptrack.space/commit/a38f2bd3bb6b4a556e139afe8d236f5c9629420a)
+- fix: :lipstick: fix resize cursor icon on draggable menus [`bb7e6be`](https://github.com/thkruz/keeptrack.space/commit/bb7e6be02c0a66d8887f6980fa6fa17a50486fdb)
+- build: :arrow_up: bump ootk [`e056e07`](https://github.com/thkruz/keeptrack.space/commit/e056e07ef1c87ec2ff7414071197d760abee5d8f)
+- fix: :ambulance: fix bug where lastPropRate not previously assigned [`e4e1f62`](https://github.com/thkruz/keeptrack.space/commit/e4e1f627af5bf630fb2de7d9ee39218854c7f5bf)
+- fix: :fire: remove tooltip that blocked clock [`fd7695e`](https://github.com/thkruz/keeptrack.space/commit/fd7695e96661b10f6db99ef279f2c334b5ddf057)
+- ci: :rotating_light: fix linter error [`6dd2c0b`](https://github.com/thkruz/keeptrack.space/commit/6dd2c0ba4fc75ac579426b5e22dd276ac6bae4a5)
+- ci: :green_heart: add only build for staging after approval [`0e23ee5`](https://github.com/thkruz/keeptrack.space/commit/0e23ee54d6f812a4aee5b7470d9b775a1ccd2086)
+- fix: :bug: fix search finding land objects [`8d40120`](https://github.com/thkruz/keeptrack.space/commit/8d40120bed1950f8f500e34b102cc625c2112c1f)
+- build: :arrow_up: bump serve [`f00c5cf`](https://github.com/thkruz/keeptrack.space/commit/f00c5cfc1576ffc0f7cda7d0090eda3f4cb67a0e)
+- fix: :bug: fix watchlist plugin [`0ee215e`](https://github.com/thkruz/keeptrack.space/commit/0ee215e24d215540c194896ae6ddde1a4134711d)
+- ci: :rotating_light: update sonar ignores [`3eba4e7`](https://github.com/thkruz/keeptrack.space/commit/3eba4e79d564ef1874b8ec27fb837e2956a78a16)
+- fix: :bug: fix resizeCanvas [`ea2a4f0`](https://github.com/thkruz/keeptrack.space/commit/ea2a4f0243c9d21d1d251e3e194dae5ecffa076e)
+- fix: :bug: fix broken godrays [`b8d4d47`](https://github.com/thkruz/keeptrack.space/commit/b8d4d470e148a816e06177ce34fa3763066ca43a)
+- fix: :white_check_mark: fix broken test [`a70816e`](https://github.com/thkruz/keeptrack.space/commit/a70816ed4175e33a2e062e547680a91c782d6a37)
+- docs: :memo: explain DISCOVR differences [`fdd4ca4`](https://github.com/thkruz/keeptrack.space/commit/fdd4ca4a3898aa383d21fdc329a36aece08f1aa8)
+- fix: :bug: fix time machine showing VIMPEL [`d5bfc9d`](https://github.com/thkruz/keeptrack.space/commit/d5bfc9d123865c360eb0d500c08093a24f62dc60)
+- ci: :construction_worker: migrate to automatic sonarcloud analysis [`c825210`](https://github.com/thkruz/keeptrack.space/commit/c8252109c1b98d62689500edaaba8d296067d3ee)
+- build: :lock: fix security issue [`45bb2f6`](https://github.com/thkruz/keeptrack.space/commit/45bb2f6740daafd7941b13342a45fcbc3950184a)
+- ci: :construction_worker: update sonarcloud scan [`565b9ac`](https://github.com/thkruz/keeptrack.space/commit/565b9ac249d7015d5b998dbfea3be4768dd2b7b4)
+- Update README.md [`b08d627`](https://github.com/thkruz/keeptrack.space/commit/b08d62798fdf5636e42fe2d61c1ac0af159ebad3)
+- Update README.md [`67acad7`](https://github.com/thkruz/keeptrack.space/commit/67acad757dcf63bbb7f77e399e318a8cf59909c7)
+- fix: :bug: fix issue w/ 2nd gamepad but no 1st gamepad [`18ceb01`](https://github.com/thkruz/keeptrack.space/commit/18ceb011c458299c4c6c044f60182edbd8956bb3)
+- chore: :card_file_box: update TLE2.json [`b9636e3`](https://github.com/thkruz/keeptrack.space/commit/b9636e318c769f61c2becff76490842ed046b801)
+- fix: :adhesive_bandage: remove debugger [`70a6512`](https://github.com/thkruz/keeptrack.space/commit/70a65126423c8d353108e26b723940416bc86f52)
+- fix: :bug: reduce unnecessary logging in default settings [`dc5a7cb`](https://github.com/thkruz/keeptrack.space/commit/dc5a7cb9c317d91558a827d7bed533fdfa564476)
+- docs: :memo: update version date [`40aed7b`](https://github.com/thkruz/keeptrack.space/commit/40aed7b28bbf698325b6b845b7ba0e4cc5985aac)
+- fix: :recycle: update texture url for hires earth [`1af0ce2`](https://github.com/thkruz/keeptrack.space/commit/1af0ce2f6733532cb617c8e69a3ad095ebbe9462)
+- fix: :pencil2: fix typo in star indexs [`55b5786`](https://github.com/thkruz/keeptrack.space/commit/55b5786afaf53987a84c45431640f4942e8dc77d)
+- fix: :bug: fix satinfobox appearing on first static object clicked [`01ead9f`](https://github.com/thkruz/keeptrack.space/commit/01ead9fed808eea43e7d8ec7f8f03285fefbe25b)
+- chore: :card_file_box: update default catalog [`e187dbc`](https://github.com/thkruz/keeptrack.space/commit/e187dbc6bed2d846a0c4eedf7b590f5dba1a02ca)
+- refactor: :coffin: hide debug only code [`1354dc0`](https://github.com/thkruz/keeptrack.space/commit/1354dc03a69ad428d7a346cfc1cabd47dbd817b9)
+- refactor: :recycle: move event listener for keyboard to document level [`cf198e9`](https://github.com/thkruz/keeptrack.space/commit/cf198e9cd5fd489f0c6b6fd9c35275508ca060db)
+- fix: :bug: reduce scrolling errors [`42b81fe`](https://github.com/thkruz/keeptrack.space/commit/42b81fef018e7994bfd17f85486e1fd48018ec67)
+- refactor: :card_file_box: update default settingsOverride [`a539994`](https://github.com/thkruz/keeptrack.space/commit/a5399946ad8cfdd6e2dcfe29fe620c3ae264e182)
+- docs: :memo: update build date [`2a8d477`](https://github.com/thkruz/keeptrack.space/commit/2a8d477ed437d1a98b22e6c50e81db73a7546458)
+- fix: :bug: fix hover id error caused by id 0 [`b82685a`](https://github.com/thkruz/keeptrack.space/commit/b82685a547a303b63abeb03ff5ed3ea79ad7d14d)
+- fix: :bug: dont overwrite dist/settings/settingsOverride.js [`191faba`](https://github.com/thkruz/keeptrack.space/commit/191faba8ef866a4cb04de915b54ec47b4d724458)
+- ci: :pencil2: fix typo in ci/cd [`603df5f`](https://github.com/thkruz/keeptrack.space/commit/603df5f312c0d8721c1d52b9999a6a5d1163be39)
+- fix: :adhesive_bandage: fix build script [`0beb56b`](https://github.com/thkruz/keeptrack.space/commit/0beb56b3e07ab20729caa0c8d896e9681fa6ba1c)
+- chore: fixing tags [`b88f308`](https://github.com/thkruz/keeptrack.space/commit/b88f308defa925cf422d30562f2d501af7afc378)
+- fix: :bug: fix search dropdown not showing when search icon clicked [`f73ae14`](https://github.com/thkruz/keeptrack.space/commit/f73ae14103716c8a51a6a7d34a8324a2526b7e04)
+- build: :arrow_up: upgrade Orbital Object Toolkit (ootk) [`b011b53`](https://github.com/thkruz/keeptrack.space/commit/b011b535878f230a86f04946278b59d980e431a7)
+- ci: :adhesive_bandage: fix typo in yaml [`d76f555`](https://github.com/thkruz/keeptrack.space/commit/d76f55557290197cf62e940bc6578a507c135743)
+- Update visualizer.yml [`41629c3`](https://github.com/thkruz/keeptrack.space/commit/41629c3943a641781189eaff99ee1dcd9878c462)
+- ci: :green_heart: reduce unnecessary automatic PRs [`28677d1`](https://github.com/thkruz/keeptrack.space/commit/28677d17613514b3a2e85a7473c2de2adc49a2eb)
+- Repo visualizer: update diagram [`1b816d1`](https://github.com/thkruz/keeptrack.space/commit/1b816d16c9cb1a92bc3783eab27959371d971e65)
+- Repo visualizer: update diagram [`2534d41`](https://github.com/thkruz/keeptrack.space/commit/2534d41639f342352b35cea7b65f63bd3be84665)
+- Repo visualizer: update diagram [`8e0d4dc`](https://github.com/thkruz/keeptrack.space/commit/8e0d4dc948a34fb7560957abdf03ad1e305a04af)
+- Repo visualizer: update diagram [`4a35dc3`](https://github.com/thkruz/keeptrack.space/commit/4a35dc382dbc430eaea0067713ff9efd36bd9bea)
+- Repo visualizer: update diagram [`02260fd`](https://github.com/thkruz/keeptrack.space/commit/02260fdf9c490f4bf703251bc680770eaaf293a8)
+- Repo visualizer: update diagram [`28cdb3a`](https://github.com/thkruz/keeptrack.space/commit/28cdb3a5e8e67ef1c762b28308c8343d2c6316c1)
+- Update SECURITY.md [`1e01af6`](https://github.com/thkruz/keeptrack.space/commit/1e01af64799f4af0891115d322d037e639e857c2)
+- Repo visualizer: update diagram [`c7cf4e4`](https://github.com/thkruz/keeptrack.space/commit/c7cf4e40262a4a3e42a67bc1d5c28ffb758c6241)
+- Repo visualizer: update diagram [`112b3ae`](https://github.com/thkruz/keeptrack.space/commit/112b3ae4139d978f744c7229f93f54f693771e8f)
+- Update visualizer.yml [`2a45c41`](https://github.com/thkruz/keeptrack.space/commit/2a45c412a05605a4a4e41f0856e8a4547e005c7c)
+- Update visualizer.yml [`56d4211`](https://github.com/thkruz/keeptrack.space/commit/56d4211de6c0829f67df7aa179a1a833b10d6873)
+- Update deploy-pipeline.yml [`1c160ae`](https://github.com/thkruz/keeptrack.space/commit/1c160aea4becbd41905d5bb03eae4ca8d1801db9)
+- fix: :bug: fix bug with sat url param not being found [`bf5a5dc`](https://github.com/thkruz/keeptrack.space/commit/bf5a5dc488c344b894af803221e2b58ba0e58ef9)
+- fix: :bug: fix texture issue after undoing black earth [`9758ded`](https://github.com/thkruz/keeptrack.space/commit/9758ded0e971bc6d60ce807ca3236d21bc5dba54)
+- feat: :sparkles: add about page help menu [`f50ca87`](https://github.com/thkruz/keeptrack.space/commit/f50ca87ef2cfea14df91059472962e2a250563e0)
+- test: :white_check_mark: update how jest is run [`5d2d03f`](https://github.com/thkruz/keeptrack.space/commit/5d2d03f54af5187b8c66be67d8f5213734858b54)
+- fix: :bug: fix screenshot resolution [`17e7cd5`](https://github.com/thkruz/keeptrack.space/commit/17e7cd56f98ab42b9d10e4d1e146412339d9572c)
+- build: :arrow_up: upgrade serve [`edecc95`](https://github.com/thkruz/keeptrack.space/commit/edecc951cf0fbee55761ee8fe97bdb620c404b60)
+- fix: :bug: fix TLE formatting bug in getOrbitByLatLon [`f2c3f3a`](https://github.com/thkruz/keeptrack.space/commit/f2c3f3af204afd19a6ead04c6bffc04111ca20fb)
+- fix: :goal_net: add defensive code to setSelectedSat [`403701e`](https://github.com/thkruz/keeptrack.space/commit/403701eebbb2d1be2be06e8c5b1a3a0c24465900)
+- fix: :goal_net: add defensive code to snapToSat [`f6d27b3`](https://github.com/thkruz/keeptrack.space/commit/f6d27b3142149d288571eebf4cf028de6bce7e2f)
+- chore: :card_file_box: update SOCRATES example [`56cadd2`](https://github.com/thkruz/keeptrack.space/commit/56cadd289810cfbe7807dad041682c3098fa9ab3)
+- fix: :bug: fix typo in stfOnObjectLinkClick [`2fc3dff`](https://github.com/thkruz/keeptrack.space/commit/2fc3dffe073915a975bd2150a60a7dc836488128)
+- fix: :adhesive_bandage: remove debugger call [`92844bb`](https://github.com/thkruz/keeptrack.space/commit/92844bbd73a4ff308861eabceb234853ac54b0df)
+- fix: :adhesive_bandage: remove unnecessary logging [`bc198ce`](https://github.com/thkruz/keeptrack.space/commit/bc198ce71d4f5a3e01a7228bcaabc8eb2df9e6e3)
+- fix: :pencil2: fix capitialization issue with constellations.ts [`8cfa7e3`](https://github.com/thkruz/keeptrack.space/commit/8cfa7e32332f487c3b24e4d024588e39c5207d63)
+- fix: :pencil2: fix capitialization issue with constellations.ts [`a78927a`](https://github.com/thkruz/keeptrack.space/commit/a78927ad4e7eaeea77d61613ce74adcb762de666)
+- fix: :bug: fix searches in URL not working on load [`5b4f02c`](https://github.com/thkruz/keeptrack.space/commit/5b4f02c51011ffa622ad6144257f8a52cd0b5184)
+- ci: :pencil2: add "npm run" to build pipeline [`33aad27`](https://github.com/thkruz/keeptrack.space/commit/33aad2725658e5131b419895316a142993464b45)
+- fix: :adhesive_bandage: remove duplicate css [`91c11fb`](https://github.com/thkruz/keeptrack.space/commit/91c11fbe6ca893817f78609544e9783cf6d62638)
+- fix: :bug: fix right mouse click not working [`e7e5c5a`](https://github.com/thkruz/keeptrack.space/commit/e7e5c5a755659d09adaedc63663608970c8e7b58)
+- test: :camera_flash: remove obsolete snapshots [`4c35c15`](https://github.com/thkruz/keeptrack.space/commit/4c35c153d79793ae36e18f6b7d90f254bad66386)
+- ci: :adhesive_bandage: reverted change to sonar key [`5a9d581`](https://github.com/thkruz/keeptrack.space/commit/5a9d581e96795a32d46bcce72a75896c5ca69790)
+- ci: :green_heart: use with vs env [`fb20157`](https://github.com/thkruz/keeptrack.space/commit/fb201576439d0200b539046590312ddb8922acea)
+- ci: :pencil2: lowercase github token [`4f27793`](https://github.com/thkruz/keeptrack.space/commit/4f27793098559d9998d809a105a61d1aefb3cb73)
+- chore: :children_crossing: update bat file for index.html [`728197d`](https://github.com/thkruz/keeptrack.space/commit/728197d3ae6dc74e41f46df22f9eb70f2ac79853)
+- ci: :wrench: update babel config [`39e3984`](https://github.com/thkruz/keeptrack.space/commit/39e3984be48d47e5ac58768bf8bf1c1aec44905a)
+- fix: :bug: fix reference orbits having wrong rasc [`746ff9f`](https://github.com/thkruz/keeptrack.space/commit/746ff9fb14fb44c071e875f60d68409aeca5f753)
+- ci: :construction_worker: clarify pipeline order [`28af172`](https://github.com/thkruz/keeptrack.space/commit/28af172644c0282705de94c60e976913d54170c0)
+- build: :construction_worker: wrong yml filename [`b93710c`](https://github.com/thkruz/keeptrack.space/commit/b93710c16b62da8205feb616a72939057e78fc4c)
+- build: :pencil2: yml not yaml [`35edc51`](https://github.com/thkruz/keeptrack.space/commit/35edc517a09388c9f6363dc026ada6c6225fe8c5)
+- build: :green_heart: workspace directory "fixed" again [`2aae698`](https://github.com/thkruz/keeptrack.space/commit/2aae698679d16c2f09502571bdb3d86e728c4553)
+- ci: :green_heart: added package-lock.json back in for pipelines npm ci [`0b88e90`](https://github.com/thkruz/keeptrack.space/commit/0b88e90e849693b4ea194e5b1a9bfee86ce89f70)
+- SH: updated dockerfile to look at output dist instead of build [`d368956`](https://github.com/thkruz/keeptrack.space/commit/d368956b5bdc07e33895046473437d0f097326a7)
+- refactor(timemanager.ts): changed warning to debug to reduce unecessary messages in the console [`5262833`](https://github.com/thkruz/keeptrack.space/commit/5262833dff2d48b67d0ee53ed7bdaf11a8e0c447)
+- fix(lookangles.js): fixed dop calculation bug [`86654ad`](https://github.com/thkruz/keeptrack.space/commit/86654add1d020826111049d2989c77827e616047)
+- build(package.json): changed jest testing to stop on first failure [`f666e4b`](https://github.com/thkruz/keeptrack.space/commit/f666e4ba0956b79f71ae06cc7c7f279185d19fe5)
+- ci(deepsource): fixed exclude to ignore external libraries [`0ad6ba8`](https://github.com/thkruz/keeptrack.space/commit/0ad6ba8efee563b3a22865cc817f748c6278d666)
+- chore: :heavy_minus_sign: remove ts-node dependency from package.json [`5ce277d`](https://github.com/thkruz/keeptrack.space/commit/5ce277dd32c6e398e4a6b857b0ebeb8f197bdb5f)
+- chore: :heavy_minus_sign: remove download-file dependency from package.json [`3b9e94c`](https://github.com/thkruz/keeptrack.space/commit/3b9e94c4d1e381c8e9941fcfedbd41196e12622e)
+- build: :fire: remove child_process [`a3c0ef2`](https://github.com/thkruz/keeptrack.space/commit/a3c0ef2593f5fecc5f11f239a0abdfcc72038c4f)
+- chore: :heavy_minus_sign: remove retire dependency from package.json [`06d15c9`](https://github.com/thkruz/keeptrack.space/commit/06d15c9d1575b4cc81b103cf53aa555e9d37110c)
+- fix: :bug: add .vscode to .eslintignore to prevent linting of VS Code settings [`a3082ba`](https://github.com/thkruz/keeptrack.space/commit/a3082bac98b71980283cc2d48aa6a259ebbcb9d0)
+- fix: :bug: add padding to nav for improved layout [`2c666c2`](https://github.com/thkruz/keeptrack.space/commit/2c666c2c596969d2e16bc576ca3e0e348d7e172c)
+- feat: add adsbygoogle interface to global declaration for improved type support [`be4945f`](https://github.com/thkruz/keeptrack.space/commit/be4945f68e631d8682b73b14ea728b0b2defa907)
+- fix: :rotating_light: fix linter error [`cdd74ee`](https://github.com/thkruz/keeptrack.space/commit/cdd74ee25c532acbc7028d9417fe7a58e284eadd)
+- fix: :bug: remove redundant updateModel call in MeshManager [`d58a47f`](https://github.com/thkruz/keeptrack.space/commit/d58a47fa2cce4bd2e94d9e065b3be3244011db2a)
+- fix: :bug: remove splash screen visibility setting from loadPresetFacSat2 [`f2709d3`](https://github.com/thkruz/keeptrack.space/commit/f2709d36ae94564650803dea50c31a4b885c2e68)
+- fix: :bug: remove unnecessary flag setting for parsed variables in UrlManager [`0686bcb`](https://github.com/thkruz/keeptrack.space/commit/0686bcb97f0c0347dfc0780e037d93711fa02097)
+- feat: :sparkles: add user account button image to top menu [`522060d`](https://github.com/thkruz/keeptrack.space/commit/522060dd77d4fcb75e0f806fdd9a12bab9a17840)
+- fix: :bug: Ensure isContextLost method returns false in glMock for accurate context state [`22471dd`](https://github.com/thkruz/keeptrack.space/commit/22471ddf180c412541a9dd85be6bd4eb46ace760)
+- refactor: :art: remove empty line before the return statement for better code consistency [`35fb4e5`](https://github.com/thkruz/keeptrack.space/commit/35fb4e54915b3adc3c3e11c823f406316c61c50c)
+- fix: :bug: ensure YAML lint step continues on error for better pipeline resilience [`1e1f3b3`](https://github.com/thkruz/keeptrack.space/commit/1e1f3b310f9c0cf4260a09636453fd80956ff712)
+- fix: :bug: add isUseJdayOnTopMenu setting to control Jday display in top menu [`f90a285`](https://github.com/thkruz/keeptrack.space/commit/f90a28506d7175f64cb12bb7ca4e51ffff06b84b)
+- feat: :sparkles: add attribution for collision data source in the UI [`f883ef9`](https://github.com/thkruz/keeptrack.space/commit/f883ef981d367c241e5d1b2b6243531ce34a0889)
+- fix: :bug: set max-width for input focus to ensure proper layout of bottom icons [`66b048a`](https://github.com/thkruz/keeptrack.space/commit/66b048a5647951b46634674e068b6984d5354745)
+- feat: 🔥Add openmeteo dependecy to package.json [`428dfb2`](https://github.com/thkruz/keeptrack.space/commit/428dfb2094858defaa84b87534dc086f9df40353)
+- fix: :lipstick: fix mismatch in styling for full screen icon [`1e5b3a7`](https://github.com/thkruz/keeptrack.space/commit/1e5b3a7ff9a39a082ad0663ebe32e2e7d7fd2e80)
+- fix: :iphone: fix size of sat-info-box title [`1227150`](https://github.com/thkruz/keeptrack.space/commit/122715047ac85087374f4dd3089eaaf25230353b)
+- fix: :iphone: fix size of sat-info-box title [`995981d`](https://github.com/thkruz/keeptrack.space/commit/995981d8a56d818d1cf443186ffab92db0e501d5)
+- fix: :bug: add missing import [`b3f18d7`](https://github.com/thkruz/keeptrack.space/commit/b3f18d7fd1907654f3c5615a8ce2bfb4715aec51)
+- fix: :bug: fix missing form element from change listener [`88372ef`](https://github.com/thkruz/keeptrack.space/commit/88372ef2cb01629c26297d563915e97df1820d14)
+- refactor: :recycle: remove extra empty line [`0a5c16e`](https://github.com/thkruz/keeptrack.space/commit/0a5c16ec30e8f0df0a5c42fedb92e72a31f1a2ec)
+- chore: :memo: add todo for creating a new setting [`e929089`](https://github.com/thkruz/keeptrack.space/commit/e929089b2b646365dd83bfc943d3443521541245)
+- refactor: :memo: update comment for bottomIconElementName [`770369e`](https://github.com/thkruz/keeptrack.space/commit/770369e6c3fee5319d18fd2564ff356dd8ae2a2f)
+- test: :white_check_mark: update test environment [`5eb6f3e`](https://github.com/thkruz/keeptrack.space/commit/5eb6f3e2f97ac13b5f8368eb295a393180601351)
+- feat: :sparkles: update logo image [`fe65abe`](https://github.com/thkruz/keeptrack.space/commit/fe65abef4385b16b6b3c4cc34715b527a5ab5f04)
+- fix: :lipstick: fix custom sensor plugin menu width [`e122005`](https://github.com/thkruz/keeptrack.space/commit/e122005e1a31461ba065cc2935f4e940e95c0809)
+- fix: :lipstick: fix missing nav-bar-height on mobile [`1031a8c`](https://github.com/thkruz/keeptrack.space/commit/1031a8c06a03d132e5b379cb4ee38b8277124401)
+- fix: :bug: fix duplicate listeners on search box [`3b95d59`](https://github.com/thkruz/keeptrack.space/commit/3b95d5924435791b5b38dfe8db9872c46d4e4aa9)
+- docs: :memo: add description of searchBox scene object [`79586e4`](https://github.com/thkruz/keeptrack.space/commit/79586e45592dbdeba1cdb95c1852484f02edeb55)
+- fix: :bug: fix bug where satinfobox disappears on rmb [`ea3daf3`](https://github.com/thkruz/keeptrack.space/commit/ea3daf3d95e54f014413f249941f8e26e3f3a9c5)
+- fix: :lipstick: fix wrong icon color [`c73c143`](https://github.com/thkruz/keeptrack.space/commit/c73c143495af26713b4c69f35775a84ca1bc80d5)
+- ci: :pencil2: remove extra line from build yml [`c2c940b`](https://github.com/thkruz/keeptrack.space/commit/c2c940bb6789d351e4836201464a43e22c81cd33)
+- fix: :white_check_mark: fix test issue caused by new settingsManager [`9d0fde5`](https://github.com/thkruz/keeptrack.space/commit/9d0fde55cc0adbfa485f7fb1ad66a415381990b4)
+- ci: :construction_worker: rebuild on PR from dependabot [`0ec8ebf`](https://github.com/thkruz/keeptrack.space/commit/0ec8ebf7725b1d080d8b4c94e41f1b827b7e0f3d)
+- ci: :bug: fix gh-pages deployment [`c5ca0b6`](https://github.com/thkruz/keeptrack.space/commit/c5ca0b65035113d6c37d31eef130f60efdcfae06)
+- fix: :bug: fix colorscheme when limitedsats in effect [`b996b3e`](https://github.com/thkruz/keeptrack.space/commit/b996b3e39be07cc708676a46761905f811af0483)
+- Delete .github/workflows/build.workflow [`ed2ee37`](https://github.com/thkruz/keeptrack.space/commit/ed2ee37f9473ed6d9d328eba4c27c5d2925a5459)
+- Create build.workflow [`35a0a56`](https://github.com/thkruz/keeptrack.space/commit/35a0a56e0494aa83051dc424251cbdb9e7d00382)
+- feat: :sparkles: add staticOffsetChange keepTrackApi callback [`dbd0aa3`](https://github.com/thkruz/keeptrack.space/commit/dbd0aa32154c6e039a7a0cbd6c6eb02c54022ce5)
+- Repo visualizer: update diagram [`32fcd80`](https://github.com/thkruz/keeptrack.space/commit/32fcd80a16e72efc0d2a9d15208d841f9af55bf9)
+- test: :white_check_mark: fix api mocks [`24966f2`](https://github.com/thkruz/keeptrack.space/commit/24966f2ee22e40636e77655a9a85f87934b71d30)
+- test: :bug: fix settingsmenu tests [`b68fdb3`](https://github.com/thkruz/keeptrack.space/commit/b68fdb3ebc06d66147add79a6ddd98424447b14e)
+- chore: :lock: add gpg signing [`bdc15a7`](https://github.com/thkruz/keeptrack.space/commit/bdc15a78ca3232046334a7948a5b88402307305d)
+- test: :bug: fix settingsmenu tests [`4a0a95f`](https://github.com/thkruz/keeptrack.space/commit/4a0a95f386ed6723e138660934662491980ef747)
+- chore: :lock: add gpg signing [`fa218be`](https://github.com/thkruz/keeptrack.space/commit/fa218be5b8ba94f4bd75748b58a5e30de3ef7fde)
+- ci: :package: add placeholder for e2e tests [`ea7a127`](https://github.com/thkruz/keeptrack.space/commit/ea7a127ad4b9ba9fbe6e14a68af0f9b80148a5f5)
+- test: :adhesive_bandage: fix moon tests [`8cc710b`](https://github.com/thkruz/keeptrack.space/commit/8cc710b8b7c6cfcd2782dad924738f119411c727)
+- build: :heavy_minus_sign: remove five-server until security update is made [`4c367d9`](https://github.com/thkruz/keeptrack.space/commit/4c367d9f9dc89b99a5ef1464a5650877b465f526)
+- refactor: :rotating_light: fix sonar lint error [`fd82980`](https://github.com/thkruz/keeptrack.space/commit/fd82980ab4ba9ccd9e586a0ac519a1fe7a74552d)
+- build(.gitignore): added embed folder [`ac7b00c`](https://github.com/thkruz/keeptrack.space/commit/ac7b00c7d8248b4ec0ef10ee600840355145cfe6)
+- fix(catalogloader.ts): give static dots an id property [`631f0ab`](https://github.com/thkruz/keeptrack.space/commit/631f0ab374c6b07de7193fc4fbde534454798e8d)
+- fix(index.htm): removed modernizr since it provided no value [`dcce887`](https://github.com/thkruz/keeptrack.space/commit/dcce8872286b756e38cdc805b9ad6947ed041637)
+- fix jest to use jsdom [`a05f22d`](https://github.com/thkruz/keeptrack.space/commit/a05f22d385218a11ad9d77a5f4b4744c629e94a7)
+- chore(launch.json): changed vscode config for debugging [`c6fbb11`](https://github.com/thkruz/keeptrack.space/commit/c6fbb1126dea69c372c80ae20240050e997d972f)
+- chore(declaration.d.ts): enabled css for typescript [`743bff7`](https://github.com/thkruz/keeptrack.space/commit/743bff7eb0a1e7d071024cb237b99d7fd6a01557)
+- chore(.eslintrc): removed no-explicit-any rule [`c1426ef`](https://github.com/thkruz/keeptrack.space/commit/c1426efa225a02c774344af1247d86542b3ae0d9)
+- chore: :art: Update Saturn & Uranus ring textures to multiple of 2 [`15ea127`](https://github.com/thkruz/keeptrack.space/commit/15ea12707e83be6e4bdcdb0b94db18a4117dbb0e)
+- chore: :arrow_up: update package-lock.json to reflect dependency changes [`b7d95c6`](https://github.com/thkruz/keeptrack.space/commit/b7d95c68f9f3c8e2c758083b807e554edfed1f0c)
+- feat: :sparkles: add high-resolution textures for celestial bodies [`bf7dff8`](https://github.com/thkruz/keeptrack.space/commit/bf7dff85f86d543f8f943c7e99848153ecf4166d)
+- feat: :sparkles: add facebook-white icon to the public image assets [`6c0cf0e`](https://github.com/thkruz/keeptrack.space/commit/6c0cf0e975b8010b962618bb5db8d79461daa5f0)
+- feat: :sparkles: update night and day Earth map textures for improved visuals [`b3d9e62`](https://github.com/thkruz/keeptrack.space/commit/b3d9e62f6b22f5d495d5c82f3c58d29c4166fe3d)
+- feat: :sparkles: add new icon images for globe, orbit, etc [`131a275`](https://github.com/thkruz/keeptrack.space/commit/131a275b3cb497ad88d2b55d7fbf4f81396787da)
+- fix: :zap: compress moonmap textures for improved performance [`74e3eb5`](https://github.com/thkruz/keeptrack.space/commit/74e3eb563c7ee49186cf6196fcdd67853196dd3c)
+- feat: :sparkles: add lock and login icons to the public image assets [`162eb13`](https://github.com/thkruz/keeptrack.space/commit/162eb13cc472be776a6fb0c9a958955cb492a519)
+- feat: :sparkles: Add earthspec2k texture for enhanced visual fidelity [`dc47e28`](https://github.com/thkruz/keeptrack.space/commit/dc47e282aaf779beb67a68277bcf2103491b3545)
+- refactor: :truck: fix typo [`8665b71`](https://github.com/thkruz/keeptrack.space/commit/8665b710e60d4f28bf5fa58fe3f9740fe31917a1)
+- fix: :bug: fix broken flag images [`71c6b13`](https://github.com/thkruz/keeptrack.space/commit/71c6b1377ba798cd54685f3552e822c03c84ae60)
+- feat: :art: reupload images [`ec1c61f`](https://github.com/thkruz/keeptrack.space/commit/ec1c61f6690a5b7223b8367d99af8e732c8bf595)
+- build: :lock: fix npm security issues [`ba825ce`](https://github.com/thkruz/keeptrack.space/commit/ba825ce445d7c281a969cb1f8f3b12bfa348bb13)
+- fix: :lock: fix security issues in dependencies [`670f57d`](https://github.com/thkruz/keeptrack.space/commit/670f57d440da442714d460a76eb4c40cccd5425d)
+- feat: :sparkles: update logos [`9bfd0ba`](https://github.com/thkruz/keeptrack.space/commit/9bfd0badd9673d92c82c2ea6f30751c49da42db8)
+- refactor: :lock: fix security issue with dependencies [`c07bb3c`](https://github.com/thkruz/keeptrack.space/commit/c07bb3c720da0a98b25bca8d19e1dfa3856dd6a6)
+- build: :lock: fix security issue in dependencies [`38fcc0b`](https://github.com/thkruz/keeptrack.space/commit/38fcc0b3d7595ca64a24e8b9b62cb177fa230c83)
+- build: :lock: fix security issues [`ef03db2`](https://github.com/thkruz/keeptrack.space/commit/ef03db2ee332557376ba3c4b96fe56373d030143)
+- build: :lock: fix audit issues [`96a0254`](https://github.com/thkruz/keeptrack.space/commit/96a0254378d442ce5f67c9133bffa27aca218e09)
+- build: :lock: update npm packages [`80c2842`](https://github.com/thkruz/keeptrack.space/commit/80c28429ed29f4647c507b01c4dbdad44b3c0fdd)
+- fix: :lock: fix security issue [`06635d3`](https://github.com/thkruz/keeptrack.space/commit/06635d3bfcf11b1aaca8a44234a6afb39b9aac15)
+- fix: :lock: remove vulnerability [`e9555bb`](https://github.com/thkruz/keeptrack.space/commit/e9555bb9a5626dac67a95511952ce544357e3909)
+- fix: :lock: update node-fetch [`1b6b70b`](https://github.com/thkruz/keeptrack.space/commit/1b6b70b81e986bac3c9924d69fb04a599da2dc48)
+- build(deps-dev): bump @babel/plugin-proposal-private-methods [`82ebcfd`](https://github.com/thkruz/keeptrack.space/commit/82ebcfd10ed36dc41e59f9c11a5aeeceb01742aa)
+- fix: :lock: bump async [`f43ab1d`](https://github.com/thkruz/keeptrack.space/commit/f43ab1db2a8b15fa530f0e80c134b0f8ab5bc040)
+- fix: :lock: bump async [`64899b8`](https://github.com/thkruz/keeptrack.space/commit/64899b86376f3f3c30224e8aa4281f3f232c775f)
+- build: :package: updated npm packages [`de32944`](https://github.com/thkruz/keeptrack.space/commit/de32944bc6156bb2dc4b7ec1234f8cd5b815a87a)
+- build: :arrow_up: remove vulnerability [`5c82215`](https://github.com/thkruz/keeptrack.space/commit/5c82215e191a4c1170935dfb6fcc5a4d30b461e4)
+- build: :arrow_up: security fix [`b39853d`](https://github.com/thkruz/keeptrack.space/commit/b39853dea866546b2d92814c6bde4d153a9ce1d9)
+- build: :lock: fix vulnerability [`ef27ae1`](https://github.com/thkruz/keeptrack.space/commit/ef27ae1d8a3dd7e3f16c1b5ac4329ddef8481990)
+- build(deps-dev): bump @typescript-eslint/eslint-plugin [`565b3c9`](https://github.com/thkruz/keeptrack.space/commit/565b3c9893dc8f1d4c71ec20d9fe92fc2e0b3ad9)
+- build(deps-dev): bump @babel/plugin-proposal-private-methods [`9382f35`](https://github.com/thkruz/keeptrack.space/commit/9382f3527c35396940bc2b9b81b0552b49ca46b9)
+
+#### [v3.2.0](https://github.com/thkruz/keeptrack.space/compare/v3.1.3...v3.2.0)
+
+>  
+
+- feat(uimanager.js): improved alerts for watchlist items entering/exit… [`#256`](https://github.com/thkruz/keeptrack.space/pull/256)
+- build(release.yml): fixed github publishing reference [`#255`](https://github.com/thkruz/keeptrack.space/pull/255)
+- chore(package.json): version bump [`#254`](https://github.com/thkruz/keeptrack.space/pull/254)
+- fix(uimanager): fixes issues #223 and #237 [`#252`](https://github.com/thkruz/keeptrack.space/pull/252)
+- ci(github workflows): updated to match package.json new script names [`#251`](https://github.com/thkruz/keeptrack.space/pull/251)
+- feat(photomanager.js): added on orbit imagery to close #14 [`#14`](https://github.com/thkruz/keeptrack.space/issues/14)
+- test(integration tests): split integration testing into 3 files [`e31966a`](https://github.com/thkruz/keeptrack.space/commit/e31966a7cb6601082cea70e9b88d4b196d4181f9)
+- feat(ui-input.js): added draw sat to sun line feature [`315e17c`](https://github.com/thkruz/keeptrack.space/commit/315e17cf50bd6e6eee2be23da2e171dd9b33bfe6)
+- test(integration1.test.js): added menu-sat-photo testing [`43e7ffc`](https://github.com/thkruz/keeptrack.space/commit/43e7ffcab8326ca8297fb5855ec68df2e40830df)
+
+#### [v3.1.3](https://github.com/thkruz/keeptrack.space/compare/v3.1.2...v3.1.3)
+
+>  
+
+- feat(uimanager.js): improved alerts for watchlist items entering/exiting fov [`09ea302`](https://github.com/thkruz/keeptrack.space/commit/09ea30239dd37bf0c6e4704caabfaffc8d04f6a0)
+- fix(satset.js): fixed color of overlay icon when loading saved watchlist [`3ae4701`](https://github.com/thkruz/keeptrack.space/commit/3ae4701c4c0cd19a2bf7f2f99b521c16f1215d2f)
+
+#### [v3.1.2](https://github.com/thkruz/keeptrack.space/compare/v3.1.1...v3.1.2)
+
+- build(release.yml): fixed github publishing reference [`#255`](https://github.com/thkruz/keeptrack.space/pull/255)
+
+#### [v3.1.1](https://github.com/thkruz/keeptrack.space/compare/v3.1.0...v3.1.1)
+
+- chore(package.json): version bump [`#254`](https://github.com/thkruz/keeptrack.space/pull/254)
+
+#### [v3.1.0](https://github.com/thkruz/keeptrack.space/compare/v3.0.4...v3.1.0)
+
+>  
+
+- fix(uimanager): fixes issues #223 and #237 [`#252`](https://github.com/thkruz/keeptrack.space/pull/252)
+- ci(github workflows): updated to match package.json new script names [`#251`](https://github.com/thkruz/keeptrack.space/pull/251)
+- build(deps-dev): bump jest from 26.6.3 to 27.0.1 [`#250`](https://github.com/thkruz/keeptrack.space/pull/250)
+- build(deps-dev): bump imports-loader from 2.0.0 to 3.0.0 [`#248`](https://github.com/thkruz/keeptrack.space/pull/248)
+- Develop [`#249`](https://github.com/thkruz/keeptrack.space/pull/249)
+- Develop [`#247`](https://github.com/thkruz/keeptrack.space/pull/247)
+- develop [`#246`](https://github.com/thkruz/keeptrack.space/pull/246)
+- test(color-scheme.unit.test.js): increased code coverage [`#245`](https://github.com/thkruz/keeptrack.space/pull/245)
+- test(dots.unit.test.js): increased test coverage [`#244`](https://github.com/thkruz/keeptrack.space/pull/244)
+- Develop [`#243`](https://github.com/thkruz/keeptrack.space/pull/243)
+- perf(drawmanager.js): removed extra meshManager.draw calls and fixed … [`#242`](https://github.com/thkruz/keeptrack.space/pull/242)
+- perf(positioncruncher.js): longer time between propagation loops [`#241`](https://github.com/thkruz/keeptrack.space/pull/241)
+- Develop [`#240`](https://github.com/thkruz/keeptrack.space/pull/240)
+- test(integration.test.js): increased test coverage [`#238`](https://github.com/thkruz/keeptrack.space/pull/238)
+- Develop [`#236`](https://github.com/thkruz/keeptrack.space/pull/236)
+- test(search-box): add 90% code coverage [`#235`](https://github.com/thkruz/keeptrack.space/pull/235)
+- Develop [`#234`](https://github.com/thkruz/keeptrack.space/pull/234)
+- Develop [`#233`](https://github.com/thkruz/keeptrack.space/pull/233)
+- Bump imports-loader from 1.2.0 to 2.0.0 [`#232`](https://github.com/thkruz/keeptrack.space/pull/232)
+- Ootk [`#231`](https://github.com/thkruz/keeptrack.space/pull/231)
+- feat(ootk): integrated ootk to replace satellite.js [`#230`](https://github.com/thkruz/keeptrack.space/pull/230)
+- Develop [`#229`](https://github.com/thkruz/keeptrack.space/pull/229)
+- Version bump [`#228`](https://github.com/thkruz/keeptrack.space/pull/228)
+- Twgl [`#227`](https://github.com/thkruz/keeptrack.space/pull/227)
+- Develop [`#226`](https://github.com/thkruz/keeptrack.space/pull/226)
+- Twgl [`#225`](https://github.com/thkruz/keeptrack.space/pull/225)
+- Added getSunPosition and Fixed getStarPosition [`#224`](https://github.com/thkruz/keeptrack.space/pull/224)
+- Color factory [`#220`](https://github.com/thkruz/keeptrack.space/pull/220)
+- Private variables in camera [`#218`](https://github.com/thkruz/keeptrack.space/pull/218)
+- Clear entry point [`#219`](https://github.com/thkruz/keeptrack.space/pull/219)
+- Clear entry point [`#216`](https://github.com/thkruz/keeptrack.space/pull/216)
+- Class extraction [`#215`](https://github.com/thkruz/keeptrack.space/pull/215)
+- Development [`#213`](https://github.com/thkruz/keeptrack.space/pull/213)
+- Update version number [`#210`](https://github.com/thkruz/keeptrack.space/pull/210)
+- Private Methods and Fields added [`#211`](https://github.com/thkruz/keeptrack.space/pull/211)
+- Create Camera Class [`#208`](https://github.com/thkruz/keeptrack.space/pull/208)
+- fix(uimanager): fixes issues #223 and #237 [`#223`](https://github.com/thkruz/keeptrack.space/issues/223) [`#237`](https://github.com/thkruz/keeptrack.space/issues/237)
+- Fixed #217 [`#217`](https://github.com/thkruz/keeptrack.space/issues/217)
+- README Update [`#200`](https://github.com/thkruz/keeptrack.space/issues/200)
+- test(cypress): added cypress E2E testing [`96250fb`](https://github.com/thkruz/keeptrack.space/commit/96250fb38c29f8fcc8ef94fbb1fc53ffec796f7b)
+- chore(out.json): remove unneded output [`81ce7dc`](https://github.com/thkruz/keeptrack.space/commit/81ce7dc2a865036bb0a158d152edc8d80189b405)
+- fix(ui): various bugfixes to UI menus [`1d9c9e3`](https://github.com/thkruz/keeptrack.space/commit/1d9c9e328048e4e2310622fdae547a5f1baf383f)
+- Offline fixes for Firefox 52 [`1a214bc`](https://github.com/thkruz/keeptrack.space/commit/1a214bc8d241fb4bc9730b148916fd5ca3f2f6d6)
+- test(integration.js): increased code coverage [`9f25244`](https://github.com/thkruz/keeptrack.space/commit/9f252440b503dfec74663190fc848526d7750cfd)
+- refactor(uimanager.js): consolidated sensor selection code [`8f060c9`](https://github.com/thkruz/keeptrack.space/commit/8f060c9aaad655a4194d814e7c185d414f69f3ef)
+- feat(analysis): added analysis features and move ootk to a separate location [`0edba5f`](https://github.com/thkruz/keeptrack.space/commit/0edba5f079fd178d93a53d166978935119a70a04)
+- fix(orbitmanager.js): fixed orbit not updating on new launch generation [`47884a4`](https://github.com/thkruz/keeptrack.space/commit/47884a413ba5ea521c8c729fba3ba901eedb808c)
+- test(integration.js): raised to 80% code coverage [`6bdac8a`](https://github.com/thkruz/keeptrack.space/commit/6bdac8aced2aae232c6d6dd379ca6e65cb13d546)
+- fix(graphics): reduced use of framebuffers and overall number of drawing calls [`5040222`](https://github.com/thkruz/keeptrack.space/commit/504022246243bc3b328843fe810477c72486ebe4)
+- chore(package.json): version bump [`5681609`](https://github.com/thkruz/keeptrack.space/commit/5681609acee4d16f4930f9788acf8a32480e1db2)
+- Reorganize Files [`25af676`](https://github.com/thkruz/keeptrack.space/commit/25af6765447473f5fccfda5ed4b4549949d5331b)
+- test(integration.test.js): added integration testing to increase code coverage [`c6dea63`](https://github.com/thkruz/keeptrack.space/commit/c6dea63a111899dfaeb23e6bc1b9a8d5bf04c23d)
+- fix(babel.config.js): cleaned up minor errors that had no impact on code [`2ee2d2f`](https://github.com/thkruz/keeptrack.space/commit/2ee2d2f4c9b7b44638b04fb930379bae20eb6438)
+- feat(webgl): upgrade to webgl2 [`b0b1c51`](https://github.com/thkruz/keeptrack.space/commit/b0b1c5155cdc5e77c3620586cb2e38e2eab15a99)
+- refactor(multiple): increased code coverage and fixed fringe cases [`13eb800`](https://github.com/thkruz/keeptrack.space/commit/13eb800db340c5c5795a4a04ae6c232986673d1e)
+- test(integration.test.js): increased code coverage [`299e16f`](https://github.com/thkruz/keeptrack.space/commit/299e16fc41854fd231d055306e90cd381681699a)
+- Ocular Occlusion for Earth [`32fbca6`](https://github.com/thkruz/keeptrack.space/commit/32fbca62796f7f6a2f4ec613f86e95a66c320055)
+- feat(ui): resizeable menus added [`dbce88c`](https://github.com/thkruz/keeptrack.space/commit/dbce88c6d0950245cffa713243bd0cc08097cddc)
+- Added ocular occlusion for mesh models [`33a4802`](https://github.com/thkruz/keeptrack.space/commit/33a48020b5a9f313eb1eab7aa223185b4f60d07c)
+- refactor(sidemenumanager.js): consolidated side menu code from uiManager [`f331a0d`](https://github.com/thkruz/keeptrack.space/commit/f331a0dd6accc670ef875849c4e7f755c7fa4004)
+- meshManager fixes [`4ebcd69`](https://github.com/thkruz/keeptrack.space/commit/4ebcd69989a5d39ac1eceb01f723986952e66907)
+- dlManager updated [`bb5d6d1`](https://github.com/thkruz/keeptrack.space/commit/bb5d6d121569bc9c6dce6875db3996c23f0aa7af)
+- library separated internal vs external [`74d6057`](https://github.com/thkruz/keeptrack.space/commit/74d6057815131d2abfcde3407181465eba27bd36)
+- Renamed dlManager drawManager [`61b2b6e`](https://github.com/thkruz/keeptrack.space/commit/61b2b6e20003033b7719bcf758297ca7a84e3164)
+- refactor(helpers.js): extracted color parsing and conversion functions [`6eb4594`](https://github.com/thkruz/keeptrack.space/commit/6eb45948062527545194b08f54bc157ca699cde7)
+- Moved webworkers [`e935dfc`](https://github.com/thkruz/keeptrack.space/commit/e935dfc03221393e323149ad2970adcfac5c4d1a)
+- Godrays [`90b933d`](https://github.com/thkruz/keeptrack.space/commit/90b933dcf0eebdb119e90ff488a0cbc2150d1238)
+- test(all): added working jest support for doms, webworkers, and canvas [`ba66463`](https://github.com/thkruz/keeptrack.space/commit/ba66463d1ede9535a56cd3c712480563ed9b79fb)
+- Consolidated constants [`b6616f6`](https://github.com/thkruz/keeptrack.space/commit/b6616f6ca2a4a05c4dcaa2d0060f0a7de144d534)
+- Consolidated sceneManager and Removed jQuery [`122165c`](https://github.com/thkruz/keeptrack.space/commit/122165c45060f49632681dc2147a9a3064d1acda)
+- feat(post-processing): added FXAA support [`cd4ea08`](https://github.com/thkruz/keeptrack.space/commit/cd4ea0819e91af21326c64dc8be91c48d6fc7bde)
+- Made mapManager part of uiManager [`375b603`](https://github.com/thkruz/keeptrack.space/commit/375b6038b70ad86442d5e5ddfac1459fd6e9bab1)
+- Fixes for offfline tles, atmosphere, camera, meshes [`3396c64`](https://github.com/thkruz/keeptrack.space/commit/3396c646e52b045332321ef9db778396ff4f989b)
+- Post Processing Resize Fix [`14e2223`](https://github.com/thkruz/keeptrack.space/commit/14e22239750dae9394695b2326aad89a251499bc)
+- refactor(ui-validation): extracted validation jquery code from uiManager [`dd106a8`](https://github.com/thkruz/keeptrack.space/commit/dd106a8b3f381e44a0e987858f8760b783b39b6a)
+- fix(sidemenumanager): fixed references to depricated sMM functions [`454d26c`](https://github.com/thkruz/keeptrack.space/commit/454d26c47b3cd152b0c922319fa4f8246c6a251c)
+- perf(drawloop): reduced GPU commands [`51784d1`](https://github.com/thkruz/keeptrack.space/commit/51784d17622f4b03edb8a259496dddfdf9b2b0af)
+- perf(dots.js): reduced number of dots in buffer to speed up readpixel calls [`7c11be1`](https://github.com/thkruz/keeptrack.space/commit/7c11be155b267ca4d98f91322f7bad6479a951d7)
+- build(package.json): automatic version and build date scripts added [`0c174d9`](https://github.com/thkruz/keeptrack.space/commit/0c174d986f5300bba4727d4cc3333fabcc549c68)
+- Reduce readPixel calls [`f809105`](https://github.com/thkruz/keeptrack.space/commit/f809105d99573702fb821487768f98e5b253155c)
+- Remove unused libraries [`cbb0537`](https://github.com/thkruz/keeptrack.space/commit/cbb05371a5e182119c5eed0b80599bd0f7313bb4)
+- Screenshots, timepicker, and sat-hoverbox bugfixes [`f2cf24d`](https://github.com/thkruz/keeptrack.space/commit/f2cf24d1722db6ca2994f31b012d2e12f30af50a)
+- build(npm scripts): cleaned up npm scripts naming [`ada59ad`](https://github.com/thkruz/keeptrack.space/commit/ada59ad53e96d66037f2c6529d7f611c17eec1ce)
+- Fixed meshManager webgl error [`165b64c`](https://github.com/thkruz/keeptrack.space/commit/165b64c6d6f32b5f283f461e7aab35a0e43215ad)
+- fix(camera.js): fixed issue where reseting camera could get stuck spinning in a circle [`61230ca`](https://github.com/thkruz/keeptrack.space/commit/61230ca7c950ed14fba932960906067ca4847eaf)
+- build(cypress.yml): removed cypress github action [`2989292`](https://github.com/thkruz/keeptrack.space/commit/298929253bca54d7372e8f8f3239e44dc45bf823)
+- Depricated modules folder [`db27955`](https://github.com/thkruz/keeptrack.space/commit/db2795582c319a1c39b2f18770859beaf3347288)
+- test(cypress.yml): remove firefox testing [`be583bf`](https://github.com/thkruz/keeptrack.space/commit/be583bfd14ef84cf2b4909e53d6db638ed9fd643)
+- fix(dots.js): moved mat4 multiplication from vert shader to js [`07900c0`](https://github.com/thkruz/keeptrack.space/commit/07900c0e74670d8a18fbe51915ad2379e240b07b)
+- build(startup.js): simplified cypress testing [`ade5895`](https://github.com/thkruz/keeptrack.space/commit/ade589524923cbc669b831aab4cede812cb91415)
+- build(e2e.js): disable e2e for now [`3d8f262`](https://github.com/thkruz/keeptrack.space/commit/3d8f2628985dae4ab9357cfd752eeee5564d067f)
+- build(webworker): disable webworkers during testing [`6e88d43`](https://github.com/thkruz/keeptrack.space/commit/6e88d43ecb6ce069a4f6c8ea1124ff19aab9f6a0)
+- Libraries merged into lib folder [`276d8e2`](https://github.com/thkruz/keeptrack.space/commit/276d8e2c4a3d50dd6a3fe92ee336c39b79ef7549)
+- build(package.json): added start-server-and-test [`705a980`](https://github.com/thkruz/keeptrack.space/commit/705a98084a99d16ceb6d6b54c017f149f9f59603)
+- build(package.json): added npm-run-all [`d278cf0`](https://github.com/thkruz/keeptrack.space/commit/d278cf04f30cb8887bc352fc6c1f4b92957170ea)
+- build(package.json): downgraded jest [`981ec87`](https://github.com/thkruz/keeptrack.space/commit/981ec879051d33d0fcb9460575167c9ef71fb3b4)
+- selectSatManager moved to drawManager [`de8ef42`](https://github.com/thkruz/keeptrack.space/commit/de8ef4234dff6608c72ab5fd361de56654702c7c)
+- Improved desktop performance [`4b7bc87`](https://github.com/thkruz/keeptrack.space/commit/4b7bc87843d40f7f349a7b288ca3e6cfc7e5e7ea)
+- build(webworkers): skip workers when in CI mode on github [`36d3554`](https://github.com/thkruz/keeptrack.space/commit/36d355458618483bab3d6aaf4ed486a1120b1a15)
+- search-box moved [`9095c8a`](https://github.com/thkruz/keeptrack.space/commit/9095c8abfaf5d897b3351c72ee3f07aa177d2a32)
+- Fixed hover and select colors [`0fdcd12`](https://github.com/thkruz/keeptrack.space/commit/0fdcd1260447fe409f8265957bf4d16d569a3072)
+- test(cypress.yml): fixed spacing issue [`dfe6e20`](https://github.com/thkruz/keeptrack.space/commit/dfe6e20c534772831ef68519291e292986af1011)
+- test(cypress.yml): fixed formatting [`c3655d6`](https://github.com/thkruz/keeptrack.space/commit/c3655d6e1f24a0fb5d3367472fc5bb47ddaad106)
+- Enabled mipmaps [`7d0ed69`](https://github.com/thkruz/keeptrack.space/commit/7d0ed692288724948f3f0b7ba1a3a88d701981d2)
+- test(package.json): added http-server [`547eb47`](https://github.com/thkruz/keeptrack.space/commit/547eb47b105a7e6c11df05adfc80cb41cca4f7a8)
+- test(cypress.yml): remove last firefox test [`1ea5b51`](https://github.com/thkruz/keeptrack.space/commit/1ea5b51e034a98d5b3b765b503b4123442d8a7f6)
+- fix(materialize-local.css): fixed load order of colors [`6bbc0bc`](https://github.com/thkruz/keeptrack.space/commit/6bbc0bc73ae97419cac2b2d21ae88684dc5ec1dd)
+- test(startup.js): simplified cypress test [`27d4c58`](https://github.com/thkruz/keeptrack.space/commit/27d4c5850c55cec0ff3a7daaf6e8e31e677d1a8c)
+- fix(startup.js): removed redundant global variable references [`d1108a4`](https://github.com/thkruz/keeptrack.space/commit/d1108a4de2d0dbc63085b6f0b5ad8d2824ac08ba)
+- fix(drawmanager.js): fixed resizing from small screen to big screen that caused gpupicking to break [`c3d18fd`](https://github.com/thkruz/keeptrack.space/commit/c3d18fd2020a2f65f0e45271287ef11b1e08d219)
+- test(startup.js): added error handling [`deeec91`](https://github.com/thkruz/keeptrack.space/commit/deeec91a9570a67f4b67df4ec8cecb950d5d45a8)
+- test(cypress.yml): updated working-directory [`bedb9a2`](https://github.com/thkruz/keeptrack.space/commit/bedb9a28a02e7c0edb2d8e97ce1c434d9798ce02)
+- build(github actions): typo in build command [`f2e05a4`](https://github.com/thkruz/keeptrack.space/commit/f2e05a4f1ccec0fe4fe6306b7784c6811cc715ff)
+- perf(drawmanager.js): removed extra meshManager.draw calls and fixed earthBumpMap [`e72b571`](https://github.com/thkruz/keeptrack.space/commit/e72b57133561e946c007a93dcabc5ae6c75a9a6c)
+- test(missilemananger.unit.test.js): removed unnecessary test [`5b86170`](https://github.com/thkruz/keeptrack.space/commit/5b86170c1742342e4af8e57be0d9a71135327d88)
+- Reduce DOM Lookups [`96c85ab`](https://github.com/thkruz/keeptrack.space/commit/96c85ab0fb54be37779d50f14d6e466364dd6b61)
+- fix(tle.js): added export for offline TLEs [`bd3b509`](https://github.com/thkruz/keeptrack.space/commit/bd3b509a35a85d3f18e8fbd5a4c108e9baeaa46b)
+- build(gpr.js): reenabled linter [`a3a48f3`](https://github.com/thkruz/keeptrack.space/commit/a3a48f3375198fbbe08434525ab21f214e98af5f)
+- build(node-ci.yml): simplified node-ci [`65b79d8`](https://github.com/thkruz/keeptrack.space/commit/65b79d845f8ae20e769cafb939acea0112a7f90a)
+- test(node-ci.yml): removed cypress from node-ci [`ca32f10`](https://github.com/thkruz/keeptrack.space/commit/ca32f10211662da47aa072fe3d5c889686f6e20c)
+- orbitManager moved [`7cb7136`](https://github.com/thkruz/keeptrack.space/commit/7cb71369294b1f6bc4c403710bf6f67dd83b4eb3)
+- build(package.json): use start-server-and-test for jest [`1f45dbf`](https://github.com/thkruz/keeptrack.space/commit/1f45dbf96a5f73b3dcb37e5a5500aac1f489d524)
+- chore(package.json): bumped version number [`be40903`](https://github.com/thkruz/keeptrack.space/commit/be409034aaa51b26adc892906079b095c713902c)
+- build(cypress.yml): made cypress run headless [`cde89ba`](https://github.com/thkruz/keeptrack.space/commit/cde89ba7d41e34bd854ae5065bb1c947197e9c1e)
+- build(node-ci.yml): node version bump [`9a60ec1`](https://github.com/thkruz/keeptrack.space/commit/9a60ec1fbecdfe6de874abb800ea54f01ede81dc)
+- chore(package.json): update version number [`13a9828`](https://github.com/thkruz/keeptrack.space/commit/13a982834e445380824efe58df22bff54aa1cfcb)
+- sideMenuManager moved to uiManager [`504b8bf`](https://github.com/thkruz/keeptrack.space/commit/504b8bf688c49fc965b2460689a7ec10a613254e)
+- readpixels throttle [`f1b173e`](https://github.com/thkruz/keeptrack.space/commit/f1b173e55b0aa5d3d3671ac4bd927a5725187fe5)
+- build(node-ci): added build:dev [`ba5123c`](https://github.com/thkruz/keeptrack.space/commit/ba5123cf1dc22e0bc26716b377631ca180b93667)
+- build(node-ci.yml): fix gl issue [`d60a238`](https://github.com/thkruz/keeptrack.space/commit/d60a238a29c26e0aa683d8f7df353dfdced0ce7b)
+- build(node-ci.yml): remove CI variable [`9a37091`](https://github.com/thkruz/keeptrack.space/commit/9a370916b1cccd30fd0098d940186e5d21df7d22)
+- test(meshmanager.js): removed testing of meshManager init [`9371400`](https://github.com/thkruz/keeptrack.space/commit/93714005c3b71852a84840e035e4cb0dc44a3875)
+- build(package.json): fixed issue with jest [`ebcd53a`](https://github.com/thkruz/keeptrack.space/commit/ebcd53a1b06b555712ac6ec60b7f019b69011043)
+- chore(version.js): bump version number [`88a727b`](https://github.com/thkruz/keeptrack.space/commit/88a727b2ab4a0554a407ec21a9fe406a20911468)
+- test(startup.js): increase wait to 10s [`94ae5ef`](https://github.com/thkruz/keeptrack.space/commit/94ae5ef24aed1117ad09a91b2703ca091824906d)
+- chore(package.json): updated version number [`b7fe2e4`](https://github.com/thkruz/keeptrack.space/commit/b7fe2e44cd03887a3ac3a9431b983bd667df9db5)
+- docs(settingsmanager): updated version number [`b2e4485`](https://github.com/thkruz/keeptrack.space/commit/b2e44852a71ed0aa903442c5443f7f5972e97e87)
+- build(node-ci.yml): fixed typo [`9547471`](https://github.com/thkruz/keeptrack.space/commit/954747116873a7e3dbc95612e76981f39d0e2b0e)
+- fix(babel.config.js): bugs found in deepsource removed [`8a1bf9b`](https://github.com/thkruz/keeptrack.space/commit/8a1bf9be99aaa9fc7228caccb06212935f6f12c9)
+- fix(sidemenumanager.js): fixed issue when less than 20 collision events [`d26a0ff`](https://github.com/thkruz/keeptrack.space/commit/d26a0ff4be2fe73d253eab3a667f1e2211c9ef5a)
+- ci(package.json): removed outdated package [`6c8e8d5`](https://github.com/thkruz/keeptrack.space/commit/6c8e8d5389ba19c4fa5d3aae21a0489ecebb5d01)
+- build(webworker): changed to array [`6433f7f`](https://github.com/thkruz/keeptrack.space/commit/6433f7fda877341e52045db7afbd7662cdf02a28)
+- build(node-ci.yml): convert node-ci to windows runner [`54c359f`](https://github.com/thkruz/keeptrack.space/commit/54c359f0f1277ac574dea16e75c9b5e83851077f)
+- build(node-ci.yml): fixed typo [`60cbe01`](https://github.com/thkruz/keeptrack.space/commit/60cbe01b39f6b41086bf8e6d4ef68d1f334b7f66)
+- test(startup.js): increased waiting to 30s [`e939a1a`](https://github.com/thkruz/keeptrack.space/commit/e939a1af8c272b4981bddd7541585108a1f86594)
+- test(cypress.yml): fixed typo [`969376f`](https://github.com/thkruz/keeptrack.space/commit/969376f4eb4a3a6d02d3679906779dbf16b2887b)
+- fix(satset.js): fixed calculation on how many dots to draw [`41e138a`](https://github.com/thkruz/keeptrack.space/commit/41e138a23aeb165d7c3bcff130a72da78d44fd7e)
+- Update node-ci.yml [`3b1b767`](https://github.com/thkruz/keeptrack.space/commit/3b1b767f38295c65e2471b1440f0bcde09e17512)
+- fix(drawmanager.js): typo removed [`31e98db`](https://github.com/thkruz/keeptrack.space/commit/31e98db8597caeecf7440906dfb5ffbc77a8a925)
+- Update is-website-vulnerable.yml [`cf5c39d`](https://github.com/thkruz/keeptrack.space/commit/cf5c39d014dd9278fcce08c9ca03a609becc05e8)
+- fix(sidemenumanager.js): dOM text reinterpreted as HTML [`a878496`](https://github.com/thkruz/keeptrack.space/commit/a87849675bf78a7a3e52883e6a215caf14da9926)
+- Update README.md [`9ddaeb3`](https://github.com/thkruz/keeptrack.space/commit/9ddaeb329673e3ee814b9a29959bffbeb15e359a)
+- build(node-ci.yml): added local server [`97af077`](https://github.com/thkruz/keeptrack.space/commit/97af0770f436b80bd5ef0790f871f758706e6985)
+- test(package.json): added cypress [`a3734d9`](https://github.com/thkruz/keeptrack.space/commit/a3734d9088d953375f052d7005903a9317fa3e33)
+- test(cypress.yml): fixed typo [`39d4478`](https://github.com/thkruz/keeptrack.space/commit/39d4478b11a7976b2bc16a7925c5270c7df209ff)
+- build(package.json): created a script for starting a test server on localhost [`664a9c1`](https://github.com/thkruz/keeptrack.space/commit/664a9c1f65054c37c8650fa5ef601c583942d628)
+- merge conflicts [`1d18a34`](https://github.com/thkruz/keeptrack.space/commit/1d18a3466edda9a8c5f7778bc03735ac281d920a)
+- Revert "Revert "Fix DOMContentLoaded issue"" [`fdadcc4`](https://github.com/thkruz/keeptrack.space/commit/fdadcc407d17cbf42c65d07d4a0c9d6f9891ec14)
+- Revert "Fix DOMContentLoaded issue" [`c8e74e9`](https://github.com/thkruz/keeptrack.space/commit/c8e74e9bf40b804192c873c89fa023ff16307012)
+- Fix DOMContentLoaded issue [`30086c7`](https://github.com/thkruz/keeptrack.space/commit/30086c7e2d1b35e625f3c189810a20889a19cfb5)
+- Extracted starManager and Made LineFactory [`b10ddb7`](https://github.com/thkruz/keeptrack.space/commit/b10ddb758fa94382328cd393806e70058aec883d)
+- Extracted SunCalc and More Explicit Start Order [`5481c12`](https://github.com/thkruz/keeptrack.space/commit/5481c121172c44c7e4992597f8698aba4ede81a2)
+- Refactored main.js [`1433181`](https://github.com/thkruz/keeptrack.space/commit/1433181cd9d95e9bc71a83b27b81fdae98f6511a)
+- No ColorScheme Globals and Fixed Sunlight Status [`a709194`](https://github.com/thkruz/keeptrack.space/commit/a709194effe401c1f6daf879a544d7ec241f7575)
+- ColorSchemeFactory [`6aa39bc`](https://github.com/thkruz/keeptrack.space/commit/6aa39bcfc791bcefe20c3e89bbe0bd73a06d991d)
+- Automatic ES6 Conversion [`a1bcbeb`](https://github.com/thkruz/keeptrack.space/commit/a1bcbeb95f3429b1ac91050a9cc5e1fee4e8aa5b)
+- dots class created [`592ff99`](https://github.com/thkruz/keeptrack.space/commit/592ff9919ebbdbce7686a1139903b53bc0025b24)
+- keeptrack-head renammed settings [`99740d8`](https://github.com/thkruz/keeptrack.space/commit/99740d8d633672080022d52a566fa941abfdf16a)
+- Established Clear Loading Order [`498498c`](https://github.com/thkruz/keeptrack.space/commit/498498c65bbf1540e0e090e7f3a15965d872da5a)
+- Smarter dots buffer use [`1f3dc01`](https://github.com/thkruz/keeptrack.space/commit/1f3dc01882fef976dec409bb618e24ac15ab6a57)
+- Decoupled parseCatalog [`e18db79`](https://github.com/thkruz/keeptrack.space/commit/e18db79b04dbb79816c594db1c458e1f235bbea1)
+- twgl for Moon [`68a73ad`](https://github.com/thkruz/keeptrack.space/commit/68a73ad5f8c4e93817865b7f075fbace2bde393e)
+- Moon and Atmosphere Switched to TWGL [`837a20d`](https://github.com/thkruz/keeptrack.space/commit/837a20dbc1f0d91983028cd693de0350eaf55a2d)
+- Cleanup SatSet.init [`4e3b52b`](https://github.com/thkruz/keeptrack.space/commit/4e3b52b1e4d00a8ea8367c4769c08194d2acbf2b)
+- Fixed pMatrix Not Updating [`ac79905`](https://github.com/thkruz/keeptrack.space/commit/ac7990534e87398e6e742a88594c9eb55a293462)
+- Class for Satellite gl Actions [`1c3c002`](https://github.com/thkruz/keeptrack.space/commit/1c3c0020bcd093fc0c28abba3299e455960d1077)
+- Reduce Dependencies [`5549172`](https://github.com/thkruz/keeptrack.space/commit/55491725c9d2c30a2a94fbcccfa8d3b0cd5c89e8)
+- Fixed bug with appending hoverbox [`bb1585a`](https://github.com/thkruz/keeptrack.space/commit/bb1585a55ba41ec253a3852e67ddf198be75fa97)
+- Separated Update Draw and Drawpicking [`52a8315`](https://github.com/thkruz/keeptrack.space/commit/52a8315ee7418e3395bd7b1ecc27cd57141efbea)
+- Fix Star Sizes [`e47206c`](https://github.com/thkruz/keeptrack.space/commit/e47206cb3134f871b16016c03dd649f8def4b9f8)
+- Private Fields Removed [`e5205ca`](https://github.com/thkruz/keeptrack.space/commit/e5205caac1db08ece7d6bdeca156ed9756742575)
+- Stable SunCalc [`04db0c7`](https://github.com/thkruz/keeptrack.space/commit/04db0c7bc5bc028e19334acfbdbc1d3a7ec05b64)
+- Removed jQuery from main.js [`62baf5b`](https://github.com/thkruz/keeptrack.space/commit/62baf5b40b8447dab3c1c692c4350f3bad9b9971)
+- Separate Picking from Positions [`5747480`](https://github.com/thkruz/keeptrack.space/commit/574748025e5bba04ac5c190d59ad3d1986b82439)
+- Revert "Private variables in camera" [`61ce939`](https://github.com/thkruz/keeptrack.space/commit/61ce93952463c50cfbd611b31e0b1d54327ad512)
+- Clean main.js [`8c25049`](https://github.com/thkruz/keeptrack.space/commit/8c250491c990f0dba479514b102131f1d369a17a)
+- Separate catalog loading [`16f5f1c`](https://github.com/thkruz/keeptrack.space/commit/16f5f1c909320e349cf2e36b73b6358d4a19d8d4)
+- Separated gpu buffer setup [`6b65f3f`](https://github.com/thkruz/keeptrack.space/commit/6b65f3f6258aacaa8c52f0ff356614d6308e141c)
+- Reduce Dependencies [`091c7db`](https://github.com/thkruz/keeptrack.space/commit/091c7db9e8727ed3bf41f68bfa5df6a941c52251)
+- Fixed daysold calculations [`940dc5d`](https://github.com/thkruz/keeptrack.space/commit/940dc5db5d6b6626fd79eb27e75453f716dd62a7)
+- Added gl.DYNAMIC_DRAW [`c11b255`](https://github.com/thkruz/keeptrack.space/commit/c11b2550516bb6217393792c48d12c1cfa5adaf3)
+- Moved webworkers to own folder [`328d553`](https://github.com/thkruz/keeptrack.space/commit/328d553f2efddcd67d82b757add3ce07fbc38721)
+- Fixed raycasting bug when clicking earth [`c2c4402`](https://github.com/thkruz/keeptrack.space/commit/c2c44027bf47a78657ce56c225da62afaf36141f)
+- Revert "Lint fix for camera.js" [`a49dbec`](https://github.com/thkruz/keeptrack.space/commit/a49dbec324bc5757deec910d7724916b0c33c4fb)
+- Lint fix for camera.js [`999e6cb`](https://github.com/thkruz/keeptrack.space/commit/999e6cb9e1f3e6141e5817d449d6266c6ad1df90)
+- satVmag moved [`16b49ad`](https://github.com/thkruz/keeptrack.space/commit/16b49add6981bd7b93ea63a6237fa664558bc85c)
+- Archived unused js code [`beaad64`](https://github.com/thkruz/keeptrack.space/commit/beaad647f052f6a1ede75aa0fcc6c5c3152ebc9d)
+
+#### [v3.0.4](https://github.com/thkruz/keeptrack.space/compare/v3.0.3...v3.0.4)
+
+>  
+
+- Fix .gitattributes Issue [`#206`](https://github.com/thkruz/keeptrack.space/pull/206)
+- Include All Req Image [`#205`](https://github.com/thkruz/keeptrack.space/pull/205)
+- Remove unused files from deepsource [`#204`](https://github.com/thkruz/keeptrack.space/pull/204)
+- Development [`#203`](https://github.com/thkruz/keeptrack.space/pull/203)
+- Github Packages fix [`#202`](https://github.com/thkruz/keeptrack.space/pull/202)
+- Create codeql-analysis.yml [`6edac80`](https://github.com/thkruz/keeptrack.space/commit/6edac80be5f154cd0554fb95b6acea910ce111b0)
+- Create release.yml [`a743d22`](https://github.com/thkruz/keeptrack.space/commit/a743d22c38b514ab6aee6d6cff2c3f07f9016de9)
+- Delete npm-publish.yml [`675db45`](https://github.com/thkruz/keeptrack.space/commit/675db459d1156c9091392ea4106dd2a9d99246b7)
+- Create deploy-ghpages.yml [`c599437`](https://github.com/thkruz/keeptrack.space/commit/c599437cd04346596614cbfba709d8819a2410c7)
+- Create .deepsource.toml [`d0d6913`](https://github.com/thkruz/keeptrack.space/commit/d0d69137bfd9b52f65408d01d0c830aa0cbc4151)
+- Fix codecov [`6836c2f`](https://github.com/thkruz/keeptrack.space/commit/6836c2fe2d1f48ec9e84699efaf1d6e1812b09d2)
+- Update release.yml [`4edcd4f`](https://github.com/thkruz/keeptrack.space/commit/4edcd4f9db8b9def92bc1a65a23e492e86966f54)
+- Fix coverage [`318e414`](https://github.com/thkruz/keeptrack.space/commit/318e41435db431f0b95fa058dd6f37e9eb4c8578)
+- Update .deepsource.toml [`bd61b96`](https://github.com/thkruz/keeptrack.space/commit/bd61b96db6377505f812828b5fc6fcf003d5f61b)
+- Add codecov [`75eb1fe`](https://github.com/thkruz/keeptrack.space/commit/75eb1fe9ee38561e7e6ea36850c3ceb717f4fb55)
+- Update README.md [`9272854`](https://github.com/thkruz/keeptrack.space/commit/9272854ea1224598edd9d82563572139c079ee93)
+- Update node-ci.yml [`5f1ee34`](https://github.com/thkruz/keeptrack.space/commit/5f1ee34e7e773dfb31a87264aefbb0bfeda6cb6c)
+- Delete npm.yml [`2316039`](https://github.com/thkruz/keeptrack.space/commit/23160398ef33014c6a59e029ac8907201ef39ea7)
+- Create npm.yml [`2ea763e`](https://github.com/thkruz/keeptrack.space/commit/2ea763ebb79de50b25063b81c0776dd4ad37db77)
+- Update node-ci.yml [`6680443`](https://github.com/thkruz/keeptrack.space/commit/6680443acff11b55dcb436d7d3f224f12256fe3f)
+- Add coverage to package [`e6f6494`](https://github.com/thkruz/keeptrack.space/commit/e6f64941194801aa2cbb519a97302b7b0270a85a)
+
+#### [v3.0.3](https://github.com/thkruz/keeptrack.space/compare/v3.0.2...v3.0.3)
+
+>  
+
+- Development [`#198`](https://github.com/thkruz/keeptrack.space/pull/198)
+- Create CONTRIBUTING.md [`ddfbb28`](https://github.com/thkruz/keeptrack.space/commit/ddfbb285eed4f124b70330d14256d5f6c1eccf58)
+- Fixed Gitattributes [`62821aa`](https://github.com/thkruz/keeptrack.space/commit/62821aa4a78d160d423cff0c0a563ca575e3e08e)
+- Update README.md [`ae338ce`](https://github.com/thkruz/keeptrack.space/commit/ae338ce51884baa0d99a8fe22bd18115c3c51a1b)
+- .gitignore Update [`3c9ec3d`](https://github.com/thkruz/keeptrack.space/commit/3c9ec3d2f7145abb8544a708cc3f0e09bad9e432)
+- Update README.md [`5ab5866`](https://github.com/thkruz/keeptrack.space/commit/5ab58661eb2c994d806746e05c3d2c72507b7ac3)
+- Example automatic todo [`c419ea0`](https://github.com/thkruz/keeptrack.space/commit/c419ea0593caf677e68f75b74bd0df3820fdd2ba)
+- Fix Images [`d78687a`](https://github.com/thkruz/keeptrack.space/commit/d78687a85e15de91721af546cdc4dac13061bc7c)
+- Update README.md [`f386bda`](https://github.com/thkruz/keeptrack.space/commit/f386bda7be238f4d62c9721343d2bbc79e2d1151)
+- Update README.md [`1bcbcce`](https://github.com/thkruz/keeptrack.space/commit/1bcbcce521ce98f754e93a6e758da4053551d0e9)
+- Update npm-publish.yml [`772e11c`](https://github.com/thkruz/keeptrack.space/commit/772e11c7f26c79e4972aa2f53443e98be6c9ccfa)
+- Update npm-publish.yml [`de0e7a8`](https://github.com/thkruz/keeptrack.space/commit/de0e7a86b731b24a73ac0deb3f9f2c4930f6f981)
+- Update npm-publish.yml [`2e627fd`](https://github.com/thkruz/keeptrack.space/commit/2e627fda77efee1719f377a3782a4e5e608afe70)
+- Update npm-publish.yml [`59ae773`](https://github.com/thkruz/keeptrack.space/commit/59ae773752f493e854165eba5486e58d539db049)
+- Bump to 3.0.3 [`b48646b`](https://github.com/thkruz/keeptrack.space/commit/b48646b6a448d8ecb1926697ea0f94054b53372e)
+- Update npm-publish.yml [`8e9ff17`](https://github.com/thkruz/keeptrack.space/commit/8e9ff1775b8e17f0311ff65ca8ce2ca6299797f6)
+- Update npm-publish.yml [`17d991b`](https://github.com/thkruz/keeptrack.space/commit/17d991b3e1cc49d9061390ccb2b1be21b9c211f2)
+- Update npm-publish.yml [`fa71b4f`](https://github.com/thkruz/keeptrack.space/commit/fa71b4fd9afc1662ed91924685e6e4dc2e23b293)
+- Update node-ci.yml [`7463dd1`](https://github.com/thkruz/keeptrack.space/commit/7463dd1bf76d111b244f4eb0881c71d0445fefd0)
+- Update README.md [`451a7be`](https://github.com/thkruz/keeptrack.space/commit/451a7be112bd9339e72ce617ecfda4e38a15585e)
+- Update npm-publish.yml [`d39d7b0`](https://github.com/thkruz/keeptrack.space/commit/d39d7b06db38a9e3d4a349c2b1bd84b664dd1148)
+- Update README.md [`ceed013`](https://github.com/thkruz/keeptrack.space/commit/ceed013306ac4ec0b9124c1984de7fb5db76f792)
+
+#### [v3.0.2](https://github.com/thkruz/keeptrack.space/compare/v3.0.1...v3.0.2)
+
+>  
+
+- cameraManager testing added [`#195`](https://github.com/thkruz/keeptrack.space/pull/195)
+- Development [`#194`](https://github.com/thkruz/keeptrack.space/pull/194)
+- Refactor main.js [`2e34d1f`](https://github.com/thkruz/keeptrack.space/commit/2e34d1fe183ebd353835f08f7fdbe88f10f89f7a)
+- Fixed loading screen issues [`9059c72`](https://github.com/thkruz/keeptrack.space/commit/9059c724f0fd85171b360fb1614523ac10f1c531)
+- Update and rename npm.yml to npm-publish.yml [`0b9e93b`](https://github.com/thkruz/keeptrack.space/commit/0b9e93bb75fd2b44c014eb02d671a9867268ca4b)
+- Update and rename lint.yml to node-ci.yml [`b47d8cd`](https://github.com/thkruz/keeptrack.space/commit/b47d8cdce874378c6ed196f8bf3427df7a91d21d)
+- Fixed tests [`10b51f3`](https://github.com/thkruz/keeptrack.space/commit/10b51f3ecf3dd4dbcfb7cb59f79c7275fa6c5b26)
+- Create npm.yml [`d9f0f52`](https://github.com/thkruz/keeptrack.space/commit/d9f0f5239a9ca18571b538b5e272d7490e3288c6)
+- Configured for CI [`e1babe6`](https://github.com/thkruz/keeptrack.space/commit/e1babe6bcd42cb497aacd879774c9d2c0921a92f)
+- Update node-ci.yml [`582e7c1`](https://github.com/thkruz/keeptrack.space/commit/582e7c19ad309f0e60cf202c5a5fc76418c76245)
+- Update node-ci.yml [`03cea2b`](https://github.com/thkruz/keeptrack.space/commit/03cea2b462cf0c2bdc17311593f38e4453dfac22)
+- Update node-ci.yml [`916e879`](https://github.com/thkruz/keeptrack.space/commit/916e8792060e0e214f066093a4c0d40114c0a53d)
+- Update lint.yml [`58d06b5`](https://github.com/thkruz/keeptrack.space/commit/58d06b5226fc179a3d6c038b94e81880adfdc41b)
+- Update node-ci.yml [`533b077`](https://github.com/thkruz/keeptrack.space/commit/533b07727def6cf1b53040c32be1a86af84cc296)
+- Update lint.yml [`cfcf56b`](https://github.com/thkruz/keeptrack.space/commit/cfcf56bb4f9ce8025b18b18ae0fb84477e943159)
+- Ignore coverage [`19c082f`](https://github.com/thkruz/keeptrack.space/commit/19c082f7d3022baeceefc583aedb59b430aa44ec)
+- Update npm.yml [`2522b14`](https://github.com/thkruz/keeptrack.space/commit/2522b146bdbdaf534d771472bcb74fea65f4a5d1)
+- Update is-website-vulnerable.yml [`5549425`](https://github.com/thkruz/keeptrack.space/commit/5549425dbfe5999027a6f777787e105d473c96eb)
+
+#### [v3.0.1](https://github.com/thkruz/keeptrack.space/compare/v3.0.0...v3.0.1)
+
+>  
+
+- updateRadarData script [`e08bc9f`](https://github.com/thkruz/keeptrack.space/commit/e08bc9ff410ee031eed9017f821ee943f02df842)
+- Remove highres images [`86cffdc`](https://github.com/thkruz/keeptrack.space/commit/86cffdc3e1254c15274c64a35f746b2b834b614d)
+- Remove radar data [`37160d2`](https://github.com/thkruz/keeptrack.space/commit/37160d2d44cf2492c2e346028eb43ccbfa16b0ed)
+- Remove radar data [`75504ef`](https://github.com/thkruz/keeptrack.space/commit/75504ef94209c8f2419781196dd79f4af9169eb5)
+- Remove 8k images [`5e1c4e0`](https://github.com/thkruz/keeptrack.space/commit/5e1c4e0f36a6e065e99b36efc24905435e619352)
+- Remove highres images [`dfff3ef`](https://github.com/thkruz/keeptrack.space/commit/dfff3ef86cfd5d938e884df454012e337936d559)
+- Remove 8k images [`51be69d`](https://github.com/thkruz/keeptrack.space/commit/51be69d83f2992a8df18794b5ebbca59b77b2a20)
+
+### [v3.0.0](https://github.com/thkruz/keeptrack.space/compare/v2.8.1...v3.0.0)
+
+>  
+
+- Bump mkdirp from 0.5.5 to 1.0.4 [`#193`](https://github.com/thkruz/keeptrack.space/pull/193)
+- Upgrade to ES6+ [`f41ac76`](https://github.com/thkruz/keeptrack.space/commit/f41ac7630a77457a7920d5637650181670ff4ba0)
+- eslint rename [`66ab9a7`](https://github.com/thkruz/keeptrack.space/commit/66ab9a7de8414607d110521c2a9bef41c45bc3e9)
+- npm publishing [`4a499b3`](https://github.com/thkruz/keeptrack.space/commit/4a499b3a06d3701f5e73c865f186ac17fa80b5e3)
+- Create dependabot.yml [`e43656d`](https://github.com/thkruz/keeptrack.space/commit/e43656dd505f4807f665972cf2078ddd60b0ab94)
+- Update lint.yml [`bbba28d`](https://github.com/thkruz/keeptrack.space/commit/bbba28dd8d3ba3b7e21c978aa194e6996d6091b3)
+- gitignore [`0c339c2`](https://github.com/thkruz/keeptrack.space/commit/0c339c24e6d6f08a1787b020abbf326720f33415)
+- Remove hires images [`44e0201`](https://github.com/thkruz/keeptrack.space/commit/44e0201ef2dd7f082b750079949c1a1790d6d40e)
+- Rm package-lock.json [`8e902da`](https://github.com/thkruz/keeptrack.space/commit/8e902da68d84569ab8ff77f7c54077293b338dfa)
+
+#### [v2.8.1](https://github.com/thkruz/keeptrack.space/compare/v2.8.0...v2.8.1)
+
+>  
+
+- satellite.js to 4.1.3 [`f278e8b`](https://github.com/thkruz/keeptrack.space/commit/f278e8bcae058f7a4312d21c78bb7405acd78cd3)
+- Implement npm [`f172cda`](https://github.com/thkruz/keeptrack.space/commit/f172cda3e34182fa4cad21315474507699e54f44)
+- PropRate 0 bugfix. [`6a75cbb`](https://github.com/thkruz/keeptrack.space/commit/6a75cbb9762167aa45dfa63fe6cc789414e4e182)
+- Package update [`334aa9c`](https://github.com/thkruz/keeptrack.space/commit/334aa9c717581a321f5b4cd98c4ef9aa7a43467e)
+
+#### [v2.8.0](https://github.com/thkruz/keeptrack.space/compare/v2.7.5...v2.8.0)
+
+>  
+
+- Missile bugfixes. Error toasts. New loading messages. [`11addbf`](https://github.com/thkruz/keeptrack.space/commit/11addbf4d2c43137e6d60abab3e77de2b716b3f9)
+
+#### [v2.7.5](https://github.com/thkruz/keeptrack.space/compare/v2.7.4...v2.7.5)
+
+>  
+
+- Better orbit lines. Mobile scrolling bufix. [`9f2fe75`](https://github.com/thkruz/keeptrack.space/commit/9f2fe7524feec396d6b69171e41f64a295acd05e)
+
+#### [v2.7.4](https://github.com/thkruz/keeptrack.space/compare/v2.7.3...v2.7.4)
+
+>  
+
+- Fixed to Satellite camera mode bugfixes [`b552b68`](https://github.com/thkruz/keeptrack.space/commit/b552b68221559ebd1577a186d9076a022a49b431)
+
+#### [v2.7.3](https://github.com/thkruz/keeptrack.space/compare/v2.7.2...v2.7.3)
+
+>  
+
+- Reduce memory leaks [`e8e1baa`](https://github.com/thkruz/keeptrack.space/commit/e8e1baa642ab70e24d9c691e53960a9826a7de18)
+
+#### [v2.7.2](https://github.com/thkruz/keeptrack.space/compare/v2.7.1...v2.7.2)
+
+>  
+
+- Selected dot color fix [`22bbbb3`](https://github.com/thkruz/keeptrack.space/commit/22bbbb392a55ce42489fc7b449892855f8b64afe)
+
+#### [v2.7.1](https://github.com/thkruz/keeptrack.space/compare/v2.5.1...v2.7.1)
+
+>  
+
+- Initial Orbit Determination [`ae744f9`](https://github.com/thkruz/keeptrack.space/commit/ae744f9c46d6a759770a42dc1a771f3e1b7b7a3a)
+- Numerous bugfixes. [`111c008`](https://github.com/thkruz/keeptrack.space/commit/111c008ea2fd1eecec84443ccbd3962c49f5d823)
+- 16K images and satellite fixed camera [`f025e4e`](https://github.com/thkruz/keeptrack.space/commit/f025e4e20e39c6b77408698ec620eea44279e36c)
+- Astronomy and Planetarium fixes. Shader updates. [`c854eaa`](https://github.com/thkruz/keeptrack.space/commit/c854eaabc79575b4d1cabef5fda89b914893e3ad)
+- Time propagation bug fixes. [`aca6f42`](https://github.com/thkruz/keeptrack.space/commit/aca6f4243413ec6e63783dd19b94a9cdd4f071f7)
+- Version updated [`a22e1ff`](https://github.com/thkruz/keeptrack.space/commit/a22e1ff5a97560e558ea521dd0c18bc138750e4d)
+- Mobile webgl fixes [`8ef38bd`](https://github.com/thkruz/keeptrack.space/commit/8ef38bd13a254ea903e3fa7a5716dbb93de701ee)
+
+#### [v2.5.1](https://github.com/thkruz/keeptrack.space/compare/v2.4.0...v2.5.1)
+
+>  
+
+- RadarData toggle [`65a78d2`](https://github.com/thkruz/keeptrack.space/commit/65a78d2f7cd4f40bb8c11a1062e0f435a28e3ce8)
+- Performance fixes [`55d9629`](https://github.com/thkruz/keeptrack.space/commit/55d9629598f8aa9da906cf4e9ca786848429d4bd)
+- Mobile fixes. [`af3ef7c`](https://github.com/thkruz/keeptrack.space/commit/af3ef7cfc226afd2c698d434480fe3ffa7de6ca2)
+- frag depth extension fixes [`8c7db7b`](https://github.com/thkruz/keeptrack.space/commit/8c7db7ba21abc20dc399b4c3c870d3252f5d6e4f)
+- radarData auto-import [`1894b07`](https://github.com/thkruz/keeptrack.space/commit/1894b072c2a91e343670f7c4b9f09a3de73544fa)
+- Console Toggle [`4dda570`](https://github.com/thkruz/keeptrack.space/commit/4dda5700f8f235d17730081abb85d0d0d5ee944d)
+
+#### [v2.4.0](https://github.com/thkruz/keeptrack.space/compare/v2.3.0...v2.4.0)
+
+>  
+
+- Create LICENSE [`183057b`](https://github.com/thkruz/keeptrack.space/commit/183057bff2f4e60ad30e3a242c6f86708f5f1484)
+- Faster indexing and more radarData colors. [`367933d`](https://github.com/thkruz/keeptrack.space/commit/367933daac836ba185a48305e5f9bb68d059bafd)
+- GNU GPL copyright update [`161d798`](https://github.com/thkruz/keeptrack.space/commit/161d798f3d2519ea5a5f263277f87eed55d7d457)
+- Update README.md [`e766ca5`](https://github.com/thkruz/keeptrack.space/commit/e766ca5a5ffa0c2058c9604161776c53b0e1c2a0)
+- Bugfixes [`b5d53e6`](https://github.com/thkruz/keeptrack.space/commit/b5d53e6d28aa8152624c47973eb1902ad0bc6b9f)
+- Update README.md [`25675e1`](https://github.com/thkruz/keeptrack.space/commit/25675e1c6d09b4cd9e6fab5f0155a6d95ce94729)
+- Update README.md [`01c374f`](https://github.com/thkruz/keeptrack.space/commit/01c374f760f2c4ae0938284dc21629ffa29aa080)
+- license folder rename [`b53a5bf`](https://github.com/thkruz/keeptrack.space/commit/b53a5bfdddec7d59fa62b5763957ba89d239ca09)
+
+#### [v2.3.0](https://github.com/thkruz/keeptrack.space/compare/v2.2.0...v2.3.0)
+
+>  
+
+- Moon fixed. GS database added. [`e51e941`](https://github.com/thkruz/keeptrack.space/commit/e51e94193db21254906af5081dafee02817357e1)
+- radarData module updates [`5aaa5d2`](https://github.com/thkruz/keeptrack.space/commit/5aaa5d2874dbe14dee09e1282a1d50863166bea2)
+
+#### [v2.2.0](https://github.com/thkruz/keeptrack.space/compare/v2.1.0...v2.2.0)
+
+>  
+
+- RadarData module updated [`d29783b`](https://github.com/thkruz/keeptrack.space/commit/d29783b134fb8003dc31f39d44990be5477d43cb)
+
+#### [v2.1.0](https://github.com/thkruz/keeptrack.space/compare/v2.0.0...v2.1.0)
+
+>  
+
+- Offline fixes and rmManager [`ec4d89f`](https://github.com/thkruz/keeptrack.space/commit/ec4d89fe9bd47db5fb6ee31402f72a32f3a4e447)
+
+### [v2.0.0](https://github.com/thkruz/keeptrack.space/compare/v1.20.12...v2.0.0)
+
+>  
+
+- Feature locks and bugfixes [`88d9afa`](https://github.com/thkruz/keeptrack.space/commit/88d9afa1b73589de3f9224bdb8827de07608d4f9)
+- Fixed running without webserver [`56d7171`](https://github.com/thkruz/keeptrack.space/commit/56d71715b7a7522f23c74c6ab14cf0699025832c)
+- Right click menu color fix [`409f442`](https://github.com/thkruz/keeptrack.space/commit/409f44291140cbbe91cda49de9191037251254bf)
+
+#### [v1.20.12](https://github.com/thkruz/keeptrack.space/compare/v1.20.11...v1.20.12)
+
+>  
+
+- Relative velocity added [`d09a627`](https://github.com/thkruz/keeptrack.space/commit/d09a627667744cdec528d4baaed6c0216cdc86a5)
+
+#### [v1.20.11](https://github.com/thkruz/keeptrack.space/compare/v1.20.10...v1.20.11)
+
+>  
+
+- Fix line to satellite from sensor [`54258b2`](https://github.com/thkruz/keeptrack.space/commit/54258b214c0fa20fa80969bee99beaefc2aa8008)
+
+#### [v1.20.10](https://github.com/thkruz/keeptrack.space/compare/v1.20.9...v1.20.10)
+
+>  
+
+- External data fix [`1181cbd`](https://github.com/thkruz/keeptrack.space/commit/1181cbd0e13d7eee91ed49b11ac7e5aa9094b6bb)
+- Fixed edit satellite menu [`181214d`](https://github.com/thkruz/keeptrack.space/commit/181214d7a6cda00d0e342384e96abda9021c9da1)
+
+#### [v1.20.9](https://github.com/thkruz/keeptrack.space/compare/v1.20.8...v1.20.9)
+
+>  
+
+- External data fix [`5718d49`](https://github.com/thkruz/keeptrack.space/commit/5718d49bbad3585b85c1209e5d16ab519f4474e6)
+
+#### [v1.20.8](https://github.com/thkruz/keeptrack.space/compare/v1.20.7...v1.20.8)
+
+>  
+
+- Show sensor to satellite link. Fix external sensor requests. [`fab9ba2`](https://github.com/thkruz/keeptrack.space/commit/fab9ba28918eee2342089b75dfae4bf02f07918d)
+- Missing min files [`519aad3`](https://github.com/thkruz/keeptrack.space/commit/519aad3e49938e5c6f0b7c713feba76bafab48c8)
+
+#### [v1.20.7](https://github.com/thkruz/keeptrack.space/compare/v1.20.1...v1.20.7)
+
+>  
+
+- Zoom more friendly. Fixes #182 [`#182`](https://github.com/thkruz/keeptrack.space/issues/182)
+- Multisite lookangles fix [`7e26ed0`](https://github.com/thkruz/keeptrack.space/commit/7e26ed0f543bf701debdfec45ee7965eeb7aba52)
+- Starlink control sites [`9fb0669`](https://github.com/thkruz/keeptrack.space/commit/9fb066998f4b3057c058ca405d5caba4f361cffd)
+- Fixed timeRate handling, missile events, and colorbox issues [`e73605b`](https://github.com/thkruz/keeptrack.space/commit/e73605bdaa69f3cbcb43ecc0a5bb5a9538bb3dee)
+- Galileo satLinkManager [`ee03f65`](https://github.com/thkruz/keeptrack.space/commit/ee03f651b3122896e26944dc74eee3a1de5f08f3)
+- External Sources menu [`7555952`](https://github.com/thkruz/keeptrack.space/commit/75559525f565d2a3c50c02d8b09f94f19d007bd2)
+- Sub 1 Second Loading [`e7b470e`](https://github.com/thkruz/keeptrack.space/commit/e7b470e3d74ca7bbc2208aa7d937d658c470a9a6)
+- Lighthouse Report fixes [`f9b750b`](https://github.com/thkruz/keeptrack.space/commit/f9b750b5139fea747892526829e9cabe71e36b81)
+- PWA update [`5c8eb64`](https://github.com/thkruz/keeptrack.space/commit/5c8eb64063d7894afbbea6b68d36877af1c0b8d4)
+- Version Number Update [`28157fb`](https://github.com/thkruz/keeptrack.space/commit/28157fba9d5b65f86be83316533e30bd48f0e7c6)
+- Service worker update. [`ae7503c`](https://github.com/thkruz/keeptrack.space/commit/ae7503cb2be4c63ad250139190fcf67f842a3a9e)
+- Fix which assets preloaded [`6abd71b`](https://github.com/thkruz/keeptrack.space/commit/6abd71bee1d4a5ed7a20fe59122841c2ee4314fc)
+- Fixed toasts for limitedUI without all the extras of materialize [`57a438e`](https://github.com/thkruz/keeptrack.space/commit/57a438e192b6649dce6fb2e014db94041af5ae15)
+- Progressive Web App test [`cdcac80`](https://github.com/thkruz/keeptrack.space/commit/cdcac8047449ce80763a3b9b893d3dd22f3c18a6)
+- Improved PWA [`348ff2c`](https://github.com/thkruz/keeptrack.space/commit/348ff2c702cf564c130fd031cfaffe29aa06fbc9)
+- Thinner orbit lines when the UI is disabled [`fc14b4a`](https://github.com/thkruz/keeptrack.space/commit/fc14b4a89b0eb868ed257ec3c5a42d22dba69f0d)
+- Increased visibility when searching for satellites [`e65e414`](https://github.com/thkruz/keeptrack.space/commit/e65e414f3b9558c910cdb107a17d7c7685289a92)
+- Better search menu handling [`e295a08`](https://github.com/thkruz/keeptrack.space/commit/e295a08916b00b365074d425781730149189546b)
+- PWA bugfix [`71b671c`](https://github.com/thkruz/keeptrack.space/commit/71b671c3508fdf5c020e222f1403b800a910400f)
+- Ensure a default earth texture loads [`1519f8f`](https://github.com/thkruz/keeptrack.space/commit/1519f8fda494a1d3f55249b915fe81776095a6ac)
+- Manifest files [`58ca021`](https://github.com/thkruz/keeptrack.space/commit/58ca02166ccc6a75b6161fd6a07be212c4bb9a72)
+- Fix duplicate suns #185 [`886f698`](https://github.com/thkruz/keeptrack.space/commit/886f698273d171bf1cec9ef65d470cee16ec6e45)
+- Service worker installed first [`8196a2d`](https://github.com/thkruz/keeptrack.space/commit/8196a2d101e962e1e1bd9afa06d75eaa988f29b0)
+- Prevent zoom NaN errors [`e7245e8`](https://github.com/thkruz/keeptrack.space/commit/e7245e8713fa2f6d92e0677a779e1f7416a075e5)
+- Clear lines too when the screen is cleared [`7f5af83`](https://github.com/thkruz/keeptrack.space/commit/7f5af83d56984a90ad409c9983cab9fa5ce5f5c5)
+- Search list dropdown fix [`a8c9bfa`](https://github.com/thkruz/keeptrack.space/commit/a8c9bfa5339b315456c9d90e9f0698c44403025c)
+- Breakup generator fixes [`186c4d0`](https://github.com/thkruz/keeptrack.space/commit/186c4d0122298f94a02e25106fdc3e832241ffbf)
+- PWA update [`1b27e85`](https://github.com/thkruz/keeptrack.space/commit/1b27e85ab45a80cb3b09ca92d85cef78cf1923b7)
+- Add license file template [`d999fc0`](https://github.com/thkruz/keeptrack.space/commit/d999fc018e3cce354818a6aeab8490b08bab8341)
+- Missile manager updated to use new timeManager [`7a131d0`](https://github.com/thkruz/keeptrack.space/commit/7a131d0a7cb58241f4b6d8663575e80b256e3016)
+- PWA fix [`55c7f69`](https://github.com/thkruz/keeptrack.space/commit/55c7f69a125b346bf20d382371190d97aa352af5)
+- Multisite Lookangles fixed with new timeManager [`8f2dd7d`](https://github.com/thkruz/keeptrack.space/commit/8f2dd7d82aad47276dbbd4537deb2376397ae1c2)
+- https redirect [`d219115`](https://github.com/thkruz/keeptrack.space/commit/d219115c59a39591b8992d1c2688198cfecde59f)
+- Alpha settings in webgl off [`ddeb0e0`](https://github.com/thkruz/keeptrack.space/commit/ddeb0e05794b628aadf32a9cca67cfd6bebaa7d6)
+- Provide a valid apple-touch-icon [`37a8640`](https://github.com/thkruz/keeptrack.space/commit/37a8640e264e795c7ec0ab554f3cfec0cf6dfdb2)
+- webmanifest update [`8acf96e`](https://github.com/thkruz/keeptrack.space/commit/8acf96e54afd2d245ade7f3a1f5e5fdadeb65f82)
+- PWA update [`8462fd0`](https://github.com/thkruz/keeptrack.space/commit/8462fd059e7bc85f2607fe00dfb3e422a3d6941f)
+- PWA fix [`ef407d8`](https://github.com/thkruz/keeptrack.space/commit/ef407d870e9a18dee2c15fb8b7b6b688896db922)
+- PWA remove extra file [`d2ea5e2`](https://github.com/thkruz/keeptrack.space/commit/d2ea5e2913018fb0c2ee4a14641530a9d4063003)
+- Unecessary CSS in limitedUI mode is overriding other websites CSS files [`70c196c`](https://github.com/thkruz/keeptrack.space/commit/70c196c921f8e194a1626df756d64131a105c966)
+- Multisite lookangles fix 2 [`f8bb8dc`](https://github.com/thkruz/keeptrack.space/commit/f8bb8dcea4222404999bb9693be033940ea47d1c)
+- Charset declaration earlier in page load [`b6edcbe`](https://github.com/thkruz/keeptrack.space/commit/b6edcbeef7763e824482af2f5b3ddfa73c38f4a0)
+- Fullscreen PWA [`11640c7`](https://github.com/thkruz/keeptrack.space/commit/11640c7bfec18ffe1f76dc323b831a1968e53b38)
+- Bugfix on manifest [`eb664f9`](https://github.com/thkruz/keeptrack.space/commit/eb664f9c6e0c4f97642ae62db9231b8742fd010c)
+- Favorite icon update [`e8afa58`](https://github.com/thkruz/keeptrack.space/commit/e8afa588f7c65dff07e2c73a9bbfbbf5a08e6caa)
+- Add an Apple touch icon [`83209f2`](https://github.com/thkruz/keeptrack.space/commit/83209f217127a76b2301a57d7680df55e1af54f2)
+- Add a theme-color meta tag [`45c7e5e`](https://github.com/thkruz/keeptrack.space/commit/45c7e5ebcf071b580e1681da28302e7208a4c8f1)
+- Better Apple Touch icon [`8890438`](https://github.com/thkruz/keeptrack.space/commit/88904384e2b996c9a4068fe70eba76db60aa794b)
+
+#### [v1.20.1](https://github.com/thkruz/keeptrack.space/compare/v1.19.10...v1.20.1)
+
+>  
+
+- Pr/179 [`#180`](https://github.com/thkruz/keeptrack.space/pull/180)
+- Merge Le-Roi Changes [`#178`](https://github.com/thkruz/keeptrack.space/pull/178)
+- Constellations [`#176`](https://github.com/thkruz/keeptrack.space/pull/176)
+- Footer Nav Style Updates [`#175`](https://github.com/thkruz/keeptrack.space/pull/175)
+- format update [`36cf4ba`](https://github.com/thkruz/keeptrack.space/commit/36cf4ba46960bab207e7c3359a9e6285af36516c)
+- code formatting [`49b2394`](https://github.com/thkruz/keeptrack.space/commit/49b23942949ad8a36e7eeed8a8168aa1c18d5061)
+- format update [`f9b024d`](https://github.com/thkruz/keeptrack.space/commit/f9b024dfbbccd4c41915a99700cc727dfd049cec)
+- Repo Update [`4a98c8a`](https://github.com/thkruz/keeptrack.space/commit/4a98c8a9d3219e7c6620f3b0a5e90615b84bd0f8)
+- Fixed formatter issues. [`4139559`](https://github.com/thkruz/keeptrack.space/commit/4139559ff602c31a8364ed08a7de1854491208b6)
+- Latest From Master [`2cc55ba`](https://github.com/thkruz/keeptrack.space/commit/2cc55baeadd7e8efd3f7bfcc7a85298a1667abdd)
+- working on code format [`97a8b25`](https://github.com/thkruz/keeptrack.space/commit/97a8b250afdac0e14fc9df032560f64bb67792fb)
+- Minimize loading times and add prettier [`95d3028`](https://github.com/thkruz/keeptrack.space/commit/95d30286f926fe130133d827b85156d7efd81ea4)
+- CSS issues and response.html [`e1e0faa`](https://github.com/thkruz/keeptrack.space/commit/e1e0faa801a3b6281f2de7b627080572e94ebd8b)
+- O3b and debris [`67bc689`](https://github.com/thkruz/keeptrack.space/commit/67bc689c25898935cb17ac96d1abf913d86ae8e1)
+- AEHF and auto face Nadir [`4dd6720`](https://github.com/thkruz/keeptrack.space/commit/4dd672024c5ee76d9b33fa6f2c193cd9eb970fc8)
+- Minified js loading [`6dfac3f`](https://github.com/thkruz/keeptrack.space/commit/6dfac3f79a75133feef28b21e403b7d48db58564)
+- Bugfixes [`7bdf05d`](https://github.com/thkruz/keeptrack.space/commit/7bdf05de3e89040bd732b1955cc4c51c18c7487a)
+- Galileo satellite added [`8184a8b`](https://github.com/thkruz/keeptrack.space/commit/8184a8bf285e9ab0cd56fd2b42f49e5f43d69960)
+- Gps satellite model added [`c5770b8`](https://github.com/thkruz/keeptrack.space/commit/c5770b8145eebde8e87399775bd3f552938e2282)
+- Add orbcomm and globalstar constellations [`36daa06`](https://github.com/thkruz/keeptrack.space/commit/36daa062b48ed6034f95a44fdeff5dcb8a3cc847)
+- Added PNames to stars HR3 to HR1003 [`da092f7`](https://github.com/thkruz/keeptrack.space/commit/da092f74cd1c3366412aa65dc8f4c240856a826e)
+- Javascript standard style. [`e06b119`](https://github.com/thkruz/keeptrack.space/commit/e06b1190c7d5edb7f193cddbea15d1c43a9dc024)
+- Added additional constellations [`94cdd47`](https://github.com/thkruz/keeptrack.space/commit/94cdd470a476429626e44939b6229f16c93c8527)
+- Add sensors and fix sun [`6c13c34`](https://github.com/thkruz/keeptrack.space/commit/6c13c34e2c21562ce596affb148a2dbc248ea2a1)
+- Embed testing and image preloading [`fb508be`](https://github.com/thkruz/keeptrack.space/commit/fb508bee133e3c8ff73a3fa9070e08b0870a7842)
+- Bugfixes [`10f95bb`](https://github.com/thkruz/keeptrack.space/commit/10f95bbd235512aa195a978d9bd91db8c4dcb32c)
+- Enable draw-less setting [`d3984b3`](https://github.com/thkruz/keeptrack.space/commit/d3984b339b89e1afd53c154b4d507a20e4fabe5b)
+- Refactor sensorManager attributes [`b78a1df`](https://github.com/thkruz/keeptrack.space/commit/b78a1dfd3f87f778b565c8648b32e2d4be5c65db)
+- Update checker-script.js [`69a94f3`](https://github.com/thkruz/keeptrack.space/commit/69a94f39670671722b0054b0f5a7a3478e9f99ac)
+- Updates [`b6c5be5`](https://github.com/thkruz/keeptrack.space/commit/b6c5be511b24a36a74c56206f94092aff882b005)
+- Reverted json loading [`8f11870`](https://github.com/thkruz/keeptrack.space/commit/8f118707d0a830611595d28a55c013df80a52c94)
+- pre-multiplied alphas disabled for firefox compatibility [`fc96c93`](https://github.com/thkruz/keeptrack.space/commit/fc96c93f4891b907ab927835ddc3b7f140888285)
+- Better loading order [`a67c868`](https://github.com/thkruz/keeptrack.space/commit/a67c8683cf686e6722e0827f901157c80570a33e)
+- working on sensor manager [`43f53aa`](https://github.com/thkruz/keeptrack.space/commit/43f53aaa904d8727f886d447eb4e77f45466ce4d)
+- Fixed css and time [`b663b50`](https://github.com/thkruz/keeptrack.space/commit/b663b500dd62ec36c80ffe8328f6269a207928b7)
+- json updates [`e03bcf1`](https://github.com/thkruz/keeptrack.space/commit/e03bcf174c9e5c1312702cc4270295cf301d4a94)
+- Fix bug from merge [`f212282`](https://github.com/thkruz/keeptrack.space/commit/f21228264b56d0eb9c6406f7da1fbbd436092db0)
+- Folder Cleanup [`6627316`](https://github.com/thkruz/keeptrack.space/commit/6627316fb0cbf845d7849d98e77e34595acb16ae)
+- footer nav tweaks [`5400caa`](https://github.com/thkruz/keeptrack.space/commit/5400caa709eed9593669ec7e42475a53b2c7d8ab)
+- Update checker-script.js [`75ad233`](https://github.com/thkruz/keeptrack.space/commit/75ad233604a710389164c46b9a08c83fb833df5c)
+- Improved atmosphere shader [`5a70c03`](https://github.com/thkruz/keeptrack.space/commit/5a70c033fdf9fb63f7600693299dec10dec37ffa)
+- Working on embeded.htnl [`e5a84e8`](https://github.com/thkruz/keeptrack.space/commit/e5a84e80745c16dbe8accf8f58ba0a33e805a024)
+- Skip minified version of satSet [`fdf3303`](https://github.com/thkruz/keeptrack.space/commit/fdf3303405c8a01c73da91b4802d96db1c9857f5)
+- Update sensorManager.js [`007cb24`](https://github.com/thkruz/keeptrack.space/commit/007cb245494ad59a698be42ad516859e1d9eac37)
+- typo [`e99c98a`](https://github.com/thkruz/keeptrack.space/commit/e99c98a3cac3614a163e5fb574e59919014ad45f)
+- Typo [`f4ab560`](https://github.com/thkruz/keeptrack.space/commit/f4ab560c84355326c68cb2486571e76f6e19697b)
+- Missing semicolon [`db4b9c3`](https://github.com/thkruz/keeptrack.space/commit/db4b9c36d10dd0cc5229708af36230864fcdb240)
+- Missing missileManager icon [`421a9e3`](https://github.com/thkruz/keeptrack.space/commit/421a9e3a6ec673088c5070c2f382d5a04c37c242)
+- Fix conflicts. We need to fix your linter. [`342650d`](https://github.com/thkruz/keeptrack.space/commit/342650db83d8b57f2920ef02d1cdd1709f8c8781)
+- Update style.css [`568f826`](https://github.com/thkruz/keeptrack.space/commit/568f82674c6391418c4dca1af6210ded89e48d95)
+
+#### [v1.19.10](https://github.com/thkruz/keeptrack.space/compare/v1.19.7...v1.19.10)
+
+>  
+
+- Fixed mobile clock and unlinked datestring to close #169 and #170 [`#169`](https://github.com/thkruz/keeptrack.space/issues/169)
+- More 3D models [`26357b5`](https://github.com/thkruz/keeptrack.space/commit/26357b5c323755f0f7ad678d91ab8940c347c36f)
+- More meshes and improved camera controls [`01b0571`](https://github.com/thkruz/keeptrack.space/commit/01b0571b10bf55c0e8fb9191ab97bdce67e00876)
+- Colored Meshes [`4327db5`](https://github.com/thkruz/keeptrack.space/commit/4327db5ee1d574148aa371e9c102e5bf4ef1b777)
+- Astro Space UXDS update [`4ebf233`](https://github.com/thkruz/keeptrack.space/commit/4ebf2336e80a9138d91722efdc3df5122ebab7c0)
+- Fixed bug [`80bc53b`](https://github.com/thkruz/keeptrack.space/commit/80bc53bbe418c7a981f6844f57ee6cdbbfa0db67)
+- Case sensitive Satellite.obj (rename later). [`ede37f0`](https://github.com/thkruz/keeptrack.space/commit/ede37f092264a59fd66afc8def59d692954d40af)
+- Bugfixes [`53a6dc5`](https://github.com/thkruz/keeptrack.space/commit/53a6dc52aaa514da3692586cc3a469a3efed2a3b)
+- Color fixes [`59fa6b3`](https://github.com/thkruz/keeptrack.space/commit/59fa6b3c378af50b3efabc06cd448ba61fb6cbf5)
+
+#### [v1.19.7](https://github.com/thkruz/keeptrack.space/compare/v1.19.3...v1.19.7)
+
+>  
+
+- After loading updated with readystate function [`#167`](https://github.com/thkruz/keeptrack.space/pull/167)
+- 17-08-2020 keeptrack.space response and compatibility update. [`#158`](https://github.com/thkruz/keeptrack.space/pull/158)
+- Updated UI colors. Close #166 [`#166`](https://github.com/thkruz/keeptrack.space/issues/166)
+- Added right click menu on mobile to close #132 [`#132`](https://github.com/thkruz/keeptrack.space/issues/132)
+- Close #150 [`#150`](https://github.com/thkruz/keeptrack.space/issues/150)
+- revert?? [`48f53b0`](https://github.com/thkruz/keeptrack.space/commit/48f53b030aa414966c9c7f5e7e9c4e0293c6a7d4)
+- update [`a23f6ab`](https://github.com/thkruz/keeptrack.space/commit/a23f6abdf828068e2a081c6de3e036af722acee5)
+- loading update [`81b75ca`](https://github.com/thkruz/keeptrack.space/commit/81b75cad3331d8dcac850e98e6eeccab12274561)
+- response and compatibility update [`eea3f6f`](https://github.com/thkruz/keeptrack.space/commit/eea3f6f923693211f2521c4c8d5e0a1321a05693)
+- Update index.htm [`cd98c34`](https://github.com/thkruz/keeptrack.space/commit/cd98c347c9f4973a327ce346bd5930cee152904c)
+- response update [`793b9f3`](https://github.com/thkruz/keeptrack.space/commit/793b9f3d7457842d659fa8d607191f946f06f037)
+- Improved camera controls [`56fe518`](https://github.com/thkruz/keeptrack.space/commit/56fe518a06a334f0a30e646b2bb0a4a4afa423e4)
+- testing error scripts [`c2ec4a0`](https://github.com/thkruz/keeptrack.space/commit/c2ec4a0bd290161b41435b6aa3122d85df1e4e71)
+- Working on content loaded [`2dc1504`](https://github.com/thkruz/keeptrack.space/commit/2dc150432c0a94b144f2e74272fd5f5289933eaf)
+- Fixed rest of #132 [`9ce50cc`](https://github.com/thkruz/keeptrack.space/commit/9ce50cccd457161f3729c1f6cbe9f5b2cfa1ea89)
+- response updates [`08182d9`](https://github.com/thkruz/keeptrack.space/commit/08182d9777dde617790f3192003fdfe356444b09)
+- Look for an essential file rather than the index.htm [`26f5c5b`](https://github.com/thkruz/keeptrack.space/commit/26f5c5b3101e0708dba37aa63cec496e80d70e6a)
+- Merged changes. Hides analytics and adds https requirement. [`6f511eb`](https://github.com/thkruz/keeptrack.space/commit/6f511eb9a676e761995d28ce6bc878cc1892f04c)
+- some tweaks [`66b3251`](https://github.com/thkruz/keeptrack.space/commit/66b3251712ee205bf9a4b83432f2efbf963b9e83)
+- trail and error [`3bd01bb`](https://github.com/thkruz/keeptrack.space/commit/3bd01bb3ea01e69b08e7c897e39defe667ed29c2)
+- Performance update for limitedUI mode. [`9eff50e`](https://github.com/thkruz/keeptrack.space/commit/9eff50ef9772e4c702ecd7d4d4d8df254c4bef2a)
+- Combined Ignores [`4873b5c`](https://github.com/thkruz/keeptrack.space/commit/4873b5cbafef878600ec8b80976b7e328ac37ed8)
+- My ignores [`89cad39`](https://github.com/thkruz/keeptrack.space/commit/89cad39e8f57ab6dd4a3338f8b0cecad0710204e)
+- footer menu fix (SEE LINE COMMENT 2148 UI.JS ) [`72988b2`](https://github.com/thkruz/keeptrack.space/commit/72988b270be032fb071f790ff94b1f07bce8c157)
+- Fixed github.io [`5b29a7c`](https://github.com/thkruz/keeptrack.space/commit/5b29a7c76943bb18e6460754ed11446259e35b92)
+
+#### [v1.19.3](https://github.com/thkruz/keeptrack.space/compare/v1.18.3...v1.19.3)
+
+>  
+
+- mesh cleanup [`1de8689`](https://github.com/thkruz/keeptrack.space/commit/1de868915024a95ff432cc3b9cf902d45d6c80dd)
+- Merged sun.js and earth.js [`a92e8c7`](https://github.com/thkruz/keeptrack.space/commit/a92e8c725f652fed6fb77f58ee38c7732536604c)
+- meshManager implemented! [`45c54bf`](https://github.com/thkruz/keeptrack.space/commit/45c54bf7a85a5bf834411c670a5e2e6c019d9165)
+- Updates for limitedUI [`b1b851f`](https://github.com/thkruz/keeptrack.space/commit/b1b851ff6d8dd5f46d1f1ec429493ccd6b89212e)
+- Mobile resizing and width calculation ignoring scroll bar fixed [`f8435ca`](https://github.com/thkruz/keeptrack.space/commit/f8435ca7540d9097f7c290e98568052d8c4107f7)
+- Better mobile device detection and canvas resize locking #154 [`40c5d47`](https://github.com/thkruz/keeptrack.space/commit/40c5d47e7ab736ac9e28c65ebbbc95f163c68629)
+- Remove debug comments [`b9398f4`](https://github.com/thkruz/keeptrack.space/commit/b9398f41719a63f02714540024077fe47411c18b)
+- Update README.md [`118ff77`](https://github.com/thkruz/keeptrack.space/commit/118ff776f78781e988757679e92610b1c883c16f)
+- Updated preview image. [`7f139ce`](https://github.com/thkruz/keeptrack.space/commit/7f139ce74501a5daf386e4e788e4371d7ae70a40)
+- Fixed issue with satellite shaders too small until zoom changes [`b0c8b1c`](https://github.com/thkruz/keeptrack.space/commit/b0c8b1c42a5f933dc5b771fb46b8275cd4fd6d15)
+- Fixed bug that kept reloading previous sensor even after clearing it [`ca923f4`](https://github.com/thkruz/keeptrack.space/commit/ca923f406648a6e8f6930467f8b4b09afb131576)
+- Update README.md [`502b3c5`](https://github.com/thkruz/keeptrack.space/commit/502b3c51087ccd0d18ecbef0e8abfef94c45674a)
+- Update README.md [`f6e8e79`](https://github.com/thkruz/keeptrack.space/commit/f6e8e7962d00f6aab7b4304bafdaa4d96338831b)
+- timeManager file rename [`7e992bf`](https://github.com/thkruz/keeptrack.space/commit/7e992bfc655bafbfdc00280bb7b6766660c4511a)
+
+#### [v1.18.3](https://github.com/thkruz/keeptrack.space/compare/v1.17.0...v1.18.3)
+
+>  
+
+- Added constellations [`#151`](https://github.com/thkruz/keeptrack.space/pull/151)
+- meshManager added with 3d satellite [`9adda07`](https://github.com/thkruz/keeptrack.space/commit/9adda0709e41481edb8a19fd69cb70739599248e)
+- Panning controls implemented [`2b5e84d`](https://github.com/thkruz/keeptrack.space/commit/2b5e84d7e912d2d3b68da2e0b5979e17987b2119)
+- Cleaned up settings manager [`c317dff`](https://github.com/thkruz/keeptrack.space/commit/c317dff37ccf8ab51fa4712366bcaf6905efc7de)
+- Shader improvements, bump maps, specular lighting [`15d0da6`](https://github.com/thkruz/keeptrack.space/commit/15d0da667dca342baed48bddbb07e9f3f7afa7bf)
+- Update index.htm [`f9924b8`](https://github.com/thkruz/keeptrack.space/commit/f9924b885290de544d6f8ef25f2c3ee942a4359c)
+- response update [`4935833`](https://github.com/thkruz/keeptrack.space/commit/4935833f9e9ee64bd18fb8662b02e1a818ffb17f)
+- Limited UI Enhancements [`680a00c`](https://github.com/thkruz/keeptrack.space/commit/680a00c3153af5c0ff4e8f1074d04be54047cdf8)
+- response updates [`383bf71`](https://github.com/thkruz/keeptrack.space/commit/383bf7167525233a413ce8187ef16d761b8579f1)
+- Made analytics only turn on when on keeptrack.space #141 [`bc0ec6c`](https://github.com/thkruz/keeptrack.space/commit/bc0ec6c66b7f6eba069a9c4dbd241a3827d4d0a4)
+- Local rotation implemented [`914981a`](https://github.com/thkruz/keeptrack.space/commit/914981af8caf04f8af98293d8dc7d6e2a90a8098)
+- Removed background forced coloring [`eed7a72`](https://github.com/thkruz/keeptrack.space/commit/eed7a72c3115390d903b372c58f2c593216043d6)
+- Github Version [`4a8ff78`](https://github.com/thkruz/keeptrack.space/commit/4a8ff788a935e66fb126f3c1cabf5eabf07c1b1c)
+- footer menu fix (SEE LINE COMMENT 2148 UI.JS ) [`fbf5bf4`](https://github.com/thkruz/keeptrack.space/commit/fbf5bf4df5391bd7467078f75ca1fe47d08abdf4)
+- Typos in constellations [`3c713e6`](https://github.com/thkruz/keeptrack.space/commit/3c713e6e92363c6884e1d285411a1cbf6bdb6ae1)
+- Typos in constellations [`5c0ade7`](https://github.com/thkruz/keeptrack.space/commit/5c0ade7980f182286cc3a94a273964a68e5a3f86)
+- Fixed bug with time drifting backwards. [`03b301f`](https://github.com/thkruz/keeptrack.space/commit/03b301fa4f0ab42195aec8f16630630627ea568e)
+- Fixed typo [`f3c8bdc`](https://github.com/thkruz/keeptrack.space/commit/f3c8bdcc808f0214a2c2dc09cb72677d16cd97f5)
+- Removed comma [`8243d0a`](https://github.com/thkruz/keeptrack.space/commit/8243d0ab709a15b3ca8e1af6cb27ceefaa266ae6)
+
+#### [v1.17.0](https://github.com/thkruz/keeptrack.space/compare/v1.11.2...v1.17.0)
+
+>  
+
+- Atmosphere, performance improvements, and embed support. [`ab10303`](https://github.com/thkruz/keeptrack.space/commit/ab1030354d96c123e0241ef3fc4856b7de4ebe6b)
+- Atmosphere, Time Machine, and Optional Modules System [`dffd8b7`](https://github.com/thkruz/keeptrack.space/commit/dffd8b77961f54faa9d9a36aae68094bdfa1b643)
+- Added Sun, Moon, and install directory settings [`43f0b45`](https://github.com/thkruz/keeptrack.space/commit/43f0b45a708e1840570b7f548cdcbe7a0e5602bc)
+- Remove Sat Class. Add French SLBM. Fix TruSat Map. [`ddfde20`](https://github.com/thkruz/keeptrack.space/commit/ddfde20f12099c23cb05ef8b3184a194d69fb1f3)
+- Better shaders [`cff48d8`](https://github.com/thkruz/keeptrack.space/commit/cff48d801bb704c0a0631d74755ef25b08431cfd)
+- Better shaders [`97b7ab0`](https://github.com/thkruz/keeptrack.space/commit/97b7ab0fe3789e37ec81f079415e27d3efde196c)
+- Search and Socrates bug fixes. [`96c9e86`](https://github.com/thkruz/keeptrack.space/commit/96c9e8615b6dfd2dd34b2b5454c81e943a27fdf9)
+- Local to utc fixed in lookangles formatting [`279fc89`](https://github.com/thkruz/keeptrack.space/commit/279fc894eb9cc48d69b8121753a66f38739df02d)
+- updateURL overhaul [`4b29954`](https://github.com/thkruz/keeptrack.space/commit/4b29954ba7ea9ad2eda6dab168d0e79789104d8a)
+- Fixed install directory code [`eef18e0`](https://github.com/thkruz/keeptrack.space/commit/eef18e03b9059a70da008639d7584b7c6d3b8d18)
+- Hi-Res Screenshots [`700acb4`](https://github.com/thkruz/keeptrack.space/commit/700acb4083c8ebc6555a48b0a13f9f3f01528382)
+- Submarine settings in MissileManager [`7d575ea`](https://github.com/thkruz/keeptrack.space/commit/7d575ead32d8f48d1ab1167e67cd32fc8c76b17f)
+- satellite.satSensorFOV [`017a192`](https://github.com/thkruz/keeptrack.space/commit/017a192dbace2da7b2f01e33e2ed6a4616fb66b1)
+- get parameters updated to use date variable [`cd93c4c`](https://github.com/thkruz/keeptrack.space/commit/cd93c4c211e1637ea8eeaeed7cda1ad577a4cb52)
+- sat-cruncher error catching [`0f3ceb5`](https://github.com/thkruz/keeptrack.space/commit/0f3ceb5ba0e8bb9008c2621e758f0030dcc3eefc)
+- Notify of color scheme changes [`1a59807`](https://github.com/thkruz/keeptrack.space/commit/1a5980734272cb4a34e0cb1efd4e286aa9ecda9b)
+- github.io Compatibility [`b35a9c4`](https://github.com/thkruz/keeptrack.space/commit/b35a9c4fb92115a25ba0868afa36db7372416b85)
+- Dynamic missile apogee added. [`6326af7`](https://github.com/thkruz/keeptrack.space/commit/6326af7dd7af8aefbce5b99f5ca75c45425a7e83)
+- MissileManager updates [`bde5007`](https://github.com/thkruz/keeptrack.space/commit/bde5007967334a34bd3acf8f4a1a18a069f0d161)
+- Dynamic install location code. [`19a8d6f`](https://github.com/thkruz/keeptrack.space/commit/19a8d6f4deead908b6ded9322ab64df07a0e3228)
+- Debris only and photo button [`2468787`](https://github.com/thkruz/keeptrack.space/commit/2468787b62e93b537e4f56c6d1448077b3781bd2)
+- Match protocol for colorbox [`452fa38`](https://github.com/thkruz/keeptrack.space/commit/452fa387f9a0b7a897bc2fe4b472be1a387443d1)
+- TruSat Correction [`ee1dbe2`](https://github.com/thkruz/keeptrack.space/commit/ee1dbe260fc753b23d03760ae407566cb1ef8eab)
+- Remove logging [`4e99664`](https://github.com/thkruz/keeptrack.space/commit/4e996645389f0e843bee28bd053ffe3c7883b230)
+- Remove .min reference [`fca4f57`](https://github.com/thkruz/keeptrack.space/commit/fca4f572b387352ccba233e74164871c46a47888)
+
+#### [v1.11.2](https://github.com/thkruz/keeptrack.space/compare/v1.10.1...v1.11.2)
+
+>  
+
+- Bugfixes and persistent sensor. Fixes #138 [`#138`](https://github.com/thkruz/keeptrack.space/issues/138)
+- CSO Search added. Group colorscheme fixed. [`9cc7137`](https://github.com/thkruz/keeptrack.space/commit/9cc7137bad65f245881364ba1fa85e9903600938)
+- lookangles.js reorganized [`dfae3e8`](https://github.com/thkruz/keeptrack.space/commit/dfae3e882483cca662f4a3cac07c7381571fbdf9)
+- Code cleanup [`fcc8d20`](https://github.com/thkruz/keeptrack.space/commit/fcc8d2079c4a20141ba849e6ab490a419ec0ac42)
+- Best pass times calculator [`dc91b13`](https://github.com/thkruz/keeptrack.space/commit/dc91b133fe1b42c9d8b1d686c41410e25e41d95e)
+- Fix issue #137 [`0a0e853`](https://github.com/thkruz/keeptrack.space/commit/0a0e853102579f13fd276c19598ce6acba912c74)
+- Age of Elset colorscheme added [`e56a537`](https://github.com/thkruz/keeptrack.space/commit/e56a537e579f2a37404bc1a83f80a032e59b063d)
+- Fix screen recorder and rise/set lookangles [`53b0bcf`](https://github.com/thkruz/keeptrack.space/commit/53b0bcfe57d1d0f5adbf9d01a1c1f69a2c85c954)
+- Search slider update [`671cea9`](https://github.com/thkruz/keeptrack.space/commit/671cea9df5948fe0f9ba0590b1e5b84aa81791f2)
+- Delete todo-issues.yml [`4304ccb`](https://github.com/thkruz/keeptrack.space/commit/4304ccbf484a4eeecab50c878bef4be342dd6a87)
+- Create todo-issues.yml [`e85749c`](https://github.com/thkruz/keeptrack.space/commit/e85749cc107ff3afe01defa87c78e9a435e98c80)
+- Test todo bot [`c4e1ecf`](https://github.com/thkruz/keeptrack.space/commit/c4e1ecf2e54173ad34d8b600369b49050eb1ac78)
+- Delete to-do-to-issues.yml [`e8067fb`](https://github.com/thkruz/keeptrack.space/commit/e8067fb1640e2f6ffc32e838cbbf7cc2f09c5496)
+- Update todo-issues.yml [`8a7c4f2`](https://github.com/thkruz/keeptrack.space/commit/8a7c4f277f11d6d36c38d0b43096740051aabb29)
+
+#### [v1.10.1](https://github.com/thkruz/keeptrack.space/compare/v1.9.3...v1.10.1)
+
+>  
+
+- jQuery update and removed depricated references [`ae42ec3`](https://github.com/thkruz/keeptrack.space/commit/ae42ec337dbc00955ce351eb42c85893ff8c48a2)
+- Next Launch Manager added to solve #97 [`6c23270`](https://github.com/thkruz/keeptrack.space/commit/6c23270bf895ffd6ea3f73e27509f135b34caf23)
+- Cleanup TODO comments [`8ba0601`](https://github.com/thkruz/keeptrack.space/commit/8ba06019d44a842a248d50b427685bc9ea290995)
+- Decayed satellite checks [`2892497`](https://github.com/thkruz/keeptrack.space/commit/289249763205f24b66fef6a926531ca1c629d5a1)
+- Create Linter [`fa2d075`](https://github.com/thkruz/keeptrack.space/commit/fa2d07506b1a8b5caa66a39180ddf4a254411628)
+- is-website-vulnerable [`53741a6`](https://github.com/thkruz/keeptrack.space/commit/53741a6a5b2500d1632884b830e72913ab5befbd)
+- Create to-do-to-issues.yml [`f99be8f`](https://github.com/thkruz/keeptrack.space/commit/f99be8f5e7c72fd2058f6321d27b0c9c600094f1)
+- jQquery 3.5.1 update [`829d391`](https://github.com/thkruz/keeptrack.space/commit/829d391cfe3673f465b514a215ca1aae6a2515f7)
+- Update README.md [`7b28b01`](https://github.com/thkruz/keeptrack.space/commit/7b28b01975df4e367a9dcc20cf3e2abbabfea0c1)
+- Update README.md [`cc5f808`](https://github.com/thkruz/keeptrack.space/commit/cc5f808575431e9e5130848deadb5a021c67c8e3)
+
+#### [v1.9.3](https://github.com/thkruz/keeptrack.space/compare/v1.8.0...v1.9.3)
+
+>  
+
+- Red theme fixes #125 [`#125`](https://github.com/thkruz/keeptrack.space/issues/125)
+- Dynamic object colors and color picker in settings [`f252b6a`](https://github.com/thkruz/keeptrack.space/commit/f252b6ae5d7b51fc23e608f4c3313dbd7f13d169)
+- SatChng Menu and fixed multiple TODOs [`db79766`](https://github.com/thkruz/keeptrack.space/commit/db79766fb5852a2f80be9b172b758b53dedf81d4)
+- Clean lookangles and multisitelooks. Add catalog exports. [`be6e622`](https://github.com/thkruz/keeptrack.space/commit/be6e6226281ae18daf78c10823e9b9de571d5281)
+- Cleanup file organization [`0ae278f`](https://github.com/thkruz/keeptrack.space/commit/0ae278f186c5c34b11f4774e7ea78ef85955a602)
+- Cleanup file organization [`dc1fd67`](https://github.com/thkruz/keeptrack.space/commit/dc1fd6772de28685f4ac9864bb50e6bfdae378c3)
+- Cleanup minor syntax errors [`a663560`](https://github.com/thkruz/keeptrack.space/commit/a663560394d5a44f0551b9cb741a534aff93ce05)
+- Add debugging mode [`14851c7`](https://github.com/thkruz/keeptrack.space/commit/14851c79cc5bbce7e7c052a494f81ea6917f03a7)
+- Dynamic mobile mode [`0918261`](https://github.com/thkruz/keeptrack.space/commit/0918261d92b8db5fe2b08c4a473a269b68705981)
+- Force Cache Refresh [`f83b351`](https://github.com/thkruz/keeptrack.space/commit/f83b351c16727a5c2692a1e259588f1fa4469ba3)
+- Analyst Satellite Fixes [`ed9c228`](https://github.com/thkruz/keeptrack.space/commit/ed9c2288cc5b5ce62653a11eb353cdee4aadc8ce)
+- Update README.md [`d33a697`](https://github.com/thkruz/keeptrack.space/commit/d33a6978f6ea3cf87a7ab2e4515429108acacbfb)
+- Sensor parameter fixes. [`bafd7e4`](https://github.com/thkruz/keeptrack.space/commit/bafd7e4ed51a3c67c821f532bdc170eae6ceacea)
+- Merge [`b6a92e3`](https://github.com/thkruz/keeptrack.space/commit/b6a92e33a8510a5f9a37175b8afbee661330e545)
+- Update README.md [`e6eecea`](https://github.com/thkruz/keeptrack.space/commit/e6eeceae392280788eb96c097c4946251b15b7a0)
+- Update README.md [`7e90c2f`](https://github.com/thkruz/keeptrack.space/commit/7e90c2f16d71b164bf2d670d7afdabfe26174dcc)
+- Update README.md [`65add89`](https://github.com/thkruz/keeptrack.space/commit/65add89ecd37c0821f7cab3382a292049f428e2d)
+- Update README.md [`f2cd64a`](https://github.com/thkruz/keeptrack.space/commit/f2cd64a01611b01451f3801f4cec3504ab090c44)
+
+#### [v1.8.0](https://github.com/thkruz/keeptrack.space/compare/v1.5.1...v1.8.0)
+
+>  
+
+- fix JS math expression [`#123`](https://github.com/thkruz/keeptrack.space/pull/123)
+- Bug fixes. [`56f8ba4`](https://github.com/thkruz/keeptrack.space/commit/56f8ba4304621e08a1ac6c4c00a5c33a615b4cf9)
+- Visual Magnitudes for satellites. Right Click Menu Changes. [`970a12a`](https://github.com/thkruz/keeptrack.space/commit/970a12a72d54034087c4352541710d8265686e3c)
+- Dynamic object colors and color picker in settings [`cfd7749`](https://github.com/thkruz/keeptrack.space/commit/cfd774976930c63efb81579fa5c5b7cbfe9e2479)
+- Stars Updates, Earth Map Adds, and Breakup/New Launch Fixes [`375b743`](https://github.com/thkruz/keeptrack.space/commit/375b743545683564873eb86837cf119b2f79412e)
+- Additional Map options from the right click menu. [`63de5cd`](https://github.com/thkruz/keeptrack.space/commit/63de5cd614693b075b44d396f1c91b577d13dfa1)
+- TruSat tie-in [`0794955`](https://github.com/thkruz/keeptrack.space/commit/07949554e9e59a8578434917e99c898e820a1ef6)
+- TruSat Integration Update [`2d6dce2`](https://github.com/thkruz/keeptrack.space/commit/2d6dce2a8a86adae3259b260401436ae47e25a55)
+- Keep last map settings on reload. [`7c19566`](https://github.com/thkruz/keeptrack.space/commit/7c195662f361dd31050cd29ed9f60ba6b54ef456)
+
+#### [v1.5.1](https://github.com/thkruz/keeptrack.space/compare/v1.2.6...v1.5.1)
+
+>  
+
+- Updated video recording (now includes UI) and added sunlight view [`d642002`](https://github.com/thkruz/keeptrack.space/commit/d64200274db9b72adee5ef8e64a08c161ac5fcde)
+- Added Video Recorder [`583a912`](https://github.com/thkruz/keeptrack.space/commit/583a91277b2d719a7d4bf7f3cc20e326590bb8bd)
+- IE bug fixes [`86757e2`](https://github.com/thkruz/keeptrack.space/commit/86757e254ddce2a62319c6f99ccb4330f2f85047)
+- Reduced position calculations. [`b2a2293`](https://github.com/thkruz/keeptrack.space/commit/b2a2293044cfacab2ecee8303c5765ce8ba32bbd)
+
+#### [v1.2.6](https://github.com/thkruz/keeptrack.space/compare/v1.2.4...v1.2.6)
+
+>  
+
+- Reorganized Files [`0264b78`](https://github.com/thkruz/keeptrack.space/commit/0264b7892a9e938bca42296f13bf35b786aebada)
+- Improved Responsive UI/CSS [`af8b526`](https://github.com/thkruz/keeptrack.space/commit/af8b52683aeb6b52b93d96a95d13591ada1e2cb7)
+- Added Launch Sites [`905675d`](https://github.com/thkruz/keeptrack.space/commit/905675d28daa53831f05dbf980aa2b1cb0f7699b)
+- Updated social links. [`3526d27`](https://github.com/thkruz/keeptrack.space/commit/3526d2778b941bae00370580db994edc2c0e0baa)
+
+#### [v1.2.4](https://github.com/thkruz/keeptrack.space/compare/v1.2.2...v1.2.4)
+
+>  
+
+- Added Constellations [`2ece33a`](https://github.com/thkruz/keeptrack.space/commit/2ece33adae5231160d180fc42d28cda5c015486f)
+- drawLoop Fix [`dd2470e`](https://github.com/thkruz/keeptrack.space/commit/dd2470e0fb67a7714f29a148e4cda08de47b9664)
+- drawLoop Fix [`8cc76ac`](https://github.com/thkruz/keeptrack.space/commit/8cc76ac55e459cd0ea3ce7c185d43d8e49c89c71)
+
+#### [v1.2.2](https://github.com/thkruz/keeptrack.space/compare/v1.1.1...v1.2.2)
+
+>  
+
+- Improved Stars and Constellations [`a54785b`](https://github.com/thkruz/keeptrack.space/commit/a54785b6a018ce5c6e782553f4872603d95e05f6)
+- Stars and Constellations [`27ece8f`](https://github.com/thkruz/keeptrack.space/commit/27ece8f690e5b23f38f9a29d267048ecdaa36264)
+- Astronomy View Improvements [`6d9c7cc`](https://github.com/thkruz/keeptrack.space/commit/6d9c7cc143945eb60b4dec6f62ed760132e539eb)
+
+#### [v1.1.1](https://github.com/thkruz/keeptrack.space/compare/v1.0.0...v1.1.1)
+
+>  
+
+- Fixes for offline mode. [`6290320`](https://github.com/thkruz/keeptrack.space/commit/6290320ece7af06e23351e073cbfc88694876e6c)
+- Support for Mike McCant's TLEs [`b45a583`](https://github.com/thkruz/keeptrack.space/commit/b45a583ef791ea2e53ed5c375ee6bcb2a316ac89)
+- Delete .gitignore [`287a5f7`](https://github.com/thkruz/keeptrack.space/commit/287a5f71c19568145f3b99301d3f2a1b32f8d8f4)
+- Delete .htaccess [`dadb66a`](https://github.com/thkruz/keeptrack.space/commit/dadb66a9e524da3589006aeb4621ca567a8686e5)
+- Cross-browser support for satbox-info [`06b7f61`](https://github.com/thkruz/keeptrack.space/commit/06b7f61a1a0fe257d1d2ad01f76a0d71a239dcb4)
+- Delete .gitattributes [`b150a40`](https://github.com/thkruz/keeptrack.space/commit/b150a4017ddb282ffa65386a38e82b54b2211f14)
+- Offline bugfix [`24b2015`](https://github.com/thkruz/keeptrack.space/commit/24b201570af636d856037933cf0b55bea9aea5ca)
+- License Typo [`20a42fa`](https://github.com/thkruz/keeptrack.space/commit/20a42fa878edd8a2acfa77c764586da822a2b6c9)
+- Remove some files. [`8c5410c`](https://github.com/thkruz/keeptrack.space/commit/8c5410cded10cb90b3ffc5a601ce39bf42565bf6)
+- Delete .jshintrc [`246ef1e`](https://github.com/thkruz/keeptrack.space/commit/246ef1ef065b3d05e45d7cef48cd418e64443fed)
+- License Typo [`d6d488f`](https://github.com/thkruz/keeptrack.space/commit/d6d488f3782bfe8eb294cb87227320a5dbb446c6)
+
+### [v1.0.0](https://github.com/thkruz/keeptrack.space/compare/v0.48.2...v1.0.0)
+
+>  
+
+- License System Implemented [`b013779`](https://github.com/thkruz/keeptrack.space/commit/b0137792f09c6b68077dc5bf43d06bc2ea7a9396)
+- DOP Table Added [`f5f0bb8`](https://github.com/thkruz/keeptrack.space/commit/f5f0bb890d99e4eba3ab76d3828972121acd2691)
+- Small Bugfixes [`80c5b32`](https://github.com/thkruz/keeptrack.space/commit/80c5b3288b9fe34a9b5f655ca862bd1ff554140f)
+- Update README.md [`7acee49`](https://github.com/thkruz/keeptrack.space/commit/7acee490aba4bedff5b9bf829d78ebaf7ffa9a4d)
+- Removed offline scripts. [`97511ae`](https://github.com/thkruz/keeptrack.space/commit/97511ae21ac69a3feed20df17b7e5bc1fcea1bb4)
+- Delete keeptrackPreview.jpg [`de79e02`](https://github.com/thkruz/keeptrack.space/commit/de79e02e9bb36fa9e915f85881c96ca9a5addc36)
+- Delete dayearth-10800.jpg [`bcb0793`](https://github.com/thkruz/keeptrack.space/commit/bcb0793eaa55fc38775e744c6946c279e50c6ca4)
+- Delete dayearth-43200.jpg [`118adb8`](https://github.com/thkruz/keeptrack.space/commit/118adb8a0559f86d934e88317521efc29a127613)
+- Delete 6_night_16k.jpg [`b94030e`](https://github.com/thkruz/keeptrack.space/commit/b94030e7705aaba5358bce073f29a40c23f1cd7d)
+- Delete 2_earth_16k.jpg [`92de683`](https://github.com/thkruz/keeptrack.space/commit/92de6836b258a65606b34dd9d0ae7dab8bdd95c5)
+
+#### [v0.48.2](https://github.com/thkruz/keeptrack.space/compare/v0.48.1...v0.48.2)
+
+>  
+
+- PDOP function finished [`41ed04a`](https://github.com/thkruz/keeptrack.space/commit/41ed04af20155c7580d3757b4a76087d3159c31c)
+- Started PDOP Calculator [`be0eeda`](https://github.com/thkruz/keeptrack.space/commit/be0eeda1a0ebcb33319c5713386a7da6b76f7da0)
+
+#### [v0.48.1](https://github.com/thkruz/keeptrack.space/compare/v0.42.7...v0.48.1)
+
+>  
+
+- Surveillance and FOV Bubble modes. [`a69043b`](https://github.com/thkruz/keeptrack.space/commit/a69043b7d8a68afb6f2eb51ad4b25cb115f4a190)
+- Right Click Menu Added [`b78eead`](https://github.com/thkruz/keeptrack.space/commit/b78eead2a58f681782abce92c16816d4098094c7)
+- Enabled multisat satoverfly mode. Minor UI fixes. [`6539209`](https://github.com/thkruz/keeptrack.space/commit/65392098542990c2d852f4fb1787cd1d368959ff)
+- Partial undo of IE11 Fix. [`00e02be`](https://github.com/thkruz/keeptrack.space/commit/00e02beca370e972b681d694b2919a4a090c4e13)
+
+#### [v0.42.7](https://github.com/thkruz/keeptrack.space/compare/v0.36.1...v0.42.7)
+
+>  
+
+- Performance Updates [`b6e952b`](https://github.com/thkruz/keeptrack.space/commit/b6e952b61627d79e754c07ded18988cb5933511b)
+- Bug Fixes [`f253a5c`](https://github.com/thkruz/keeptrack.space/commit/f253a5cc4f23d0f74e89814cb7b3dbf130f30687)
+- Updated Libraries. [`bf2cac7`](https://github.com/thkruz/keeptrack.space/commit/bf2cac7e365d47f62756d5d5ebd9de5fdeb055d2)
+- Moved group creation to a web worker and drastically increased load time [`f357888`](https://github.com/thkruz/keeptrack.space/commit/f357888134408792e936d7def9596a74d9a48e25)
+- More Performance Updates [`c32c473`](https://github.com/thkruz/keeptrack.space/commit/c32c4732a16fc2d6a17a10028771e071f14af97c)
+- Fixed group creation and coloring. [`d7cf34d`](https://github.com/thkruz/keeptrack.space/commit/d7cf34d8b2ff6b638360bd111e5ff98780ecadb7)
+- Fixed group-cruncher bugs + added performance scaling for sat-cruncher. [`78d8000`](https://github.com/thkruz/keeptrack.space/commit/78d80005db66e13a28b2f729eda587bfe79d9ab0)
+- Performance Improvements [`6b7aa37`](https://github.com/thkruz/keeptrack.space/commit/6b7aa37bd017591957ccd077cdd90b5263f2bdcf)
+- Performance Improvements [`e6b5e45`](https://github.com/thkruz/keeptrack.space/commit/e6b5e45242301750264ddc8f8222b620d9a6cadc)
+- Planetarium view bug fixes. [`3b5c915`](https://github.com/thkruz/keeptrack.space/commit/3b5c9152a793e0e4b43c76d8b4254b840885cfce)
+- Added satellite overfly options. [`8447c66`](https://github.com/thkruz/keeptrack.space/commit/8447c66735a11acbf37166367afb76b88b84600f)
+- Added satellite overfly options. [`693c3de`](https://github.com/thkruz/keeptrack.space/commit/693c3de27176f1e25b93723c594ba5dea4fecc33)
+- Fixed infinite loop in mobile.hidesearch [`f9a7fe0`](https://github.com/thkruz/keeptrack.space/commit/f9a7fe0e195eb3dbf81d75332076781794b425e0)
+- Low Performance Mode [`b9e27c6`](https://github.com/thkruz/keeptrack.space/commit/b9e27c6f4a171de3a13775a0e2e028b2ce2b1ccf)
+- Reducing performance hit on recoloring [`74fedf5`](https://github.com/thkruz/keeptrack.space/commit/74fedf5e4d6588ca72c7d0c8c71297768f5da934)
+- Fixed missile conflicts with new markers [`b9626c5`](https://github.com/thkruz/keeptrack.space/commit/b9626c5203d622dd58b3b0eef303776099b01f99)
+- Downgraded unneeded Float32Array to Int8Array [`b6329e4`](https://github.com/thkruz/keeptrack.space/commit/b6329e4ccefb3c2a9305d20072c60430f4c8b9d0)
+- Fixed issue with single click on mobile. [`b90a2ba`](https://github.com/thkruz/keeptrack.space/commit/b90a2ba781cd938ae7a04a5dc5aa39220b383e59)
+- Less DOM Creation [`d514437`](https://github.com/thkruz/keeptrack.space/commit/d514437c150e19b41a4405eff4ad3e6e6b5e8f74)
+- Fixed bug in satcruncher related to satellite overfly. [`f097d4b`](https://github.com/thkruz/keeptrack.space/commit/f097d4bb464e4e1d6816429b3099048ba813c2e2)
+- IE11 Bugfix. [`3ddcf53`](https://github.com/thkruz/keeptrack.space/commit/3ddcf53f959ad17a5af874131d36412ec605fff1)
+- Bugfix for mobile. [`fc3d862`](https://github.com/thkruz/keeptrack.space/commit/fc3d8629908e66b2f3c23ff747f1a154381e451b)
+- Update version number [`53ae857`](https://github.com/thkruz/keeptrack.space/commit/53ae85791997d3d758a014bf680b6f57620ddfb4)
+- SatCruncher ignore markers unless enabled. [`8809b4e`](https://github.com/thkruz/keeptrack.space/commit/8809b4e2614c4e06a4e472340ebe41a0a43179cf)
+- Ignore markers unless enabled during satSet.draw [`d71623a`](https://github.com/thkruz/keeptrack.space/commit/d71623a243cc0ead7eb194caf9c10c9631ff861d)
+- Canvas bugfix. [`6665358`](https://github.com/thkruz/keeptrack.space/commit/666535840ede09c15cd49bbf97e5f718cf907c6e)
+- Update Version [`cf59961`](https://github.com/thkruz/keeptrack.space/commit/cf599611cf4ff9e529540dd7f4cd376e529520ea)
+
+#### [v0.36.1](https://github.com/thkruz/keeptrack.space/compare/v0.34.0...v0.36.1)
+
+>  
+
+- Reworked mobile controls and consolidated html files. [`e7b427a`](https://github.com/thkruz/keeptrack.space/commit/e7b427ad73367330380b9ab561e59fb8b51677bc)
+- Reworked mobile controls and consolidated html files. [`42bf145`](https://github.com/thkruz/keeptrack.space/commit/42bf145f07a8e94d64e0b38a26a35b8e5de736e2)
+- SOCRATES fixed. Border added to menus. [`9933643`](https://github.com/thkruz/keeptrack.space/commit/993364308cba7d6b8199f11bedb52001eb760412)
+- ESA sensors added. Mobile CSS improved. [`e2e4658`](https://github.com/thkruz/keeptrack.space/commit/e2e465898dc4e2430e86f65c2e9fc620889ca1e2)
+- Improved mobile UI [`b3fe464`](https://github.com/thkruz/keeptrack.space/commit/b3fe464ed31019194c183633cb02f8caeba22651)
+- Sat Label and Demo Modes added. New HiRes images. [`69938ab`](https://github.com/thkruz/keeptrack.space/commit/69938abd31b37d0391f8ec0460eccf28dab9a018)
+- Moved colorscheme to a side menu. [`459d024`](https://github.com/thkruz/keeptrack.space/commit/459d0245e9d8a83056b88d92be5a45cdf624a8c6)
+- Added Sensor FOV Bubbles [`f8b947d`](https://github.com/thkruz/keeptrack.space/commit/f8b947d4c56ff957469b843b177a59568ddf621a)
+- Countries color scheme added. [`e99ceea`](https://github.com/thkruz/keeptrack.space/commit/e99ceea17ce0cc56ae4be0a60432277ca0d0a815)
+- Consolidated legend menu changes. [`1258164`](https://github.com/thkruz/keeptrack.space/commit/12581648fa17013cc54ca6d93c15b30c5499f000)
+- Moved colors from color-scheme to settingsManager. [`e141d59`](https://github.com/thkruz/keeptrack.space/commit/e141d592b3d4ce64f8f68d1378131cdad027d9f9)
+- Consolidated files. [`c4d361e`](https://github.com/thkruz/keeptrack.space/commit/c4d361eb09fe97b2404417f6eb113ed28dfc4f7e)
+- New loading screen, slimmer ui, and mobile controls. [`0be3067`](https://github.com/thkruz/keeptrack.space/commit/0be3067725350d163f8fee5afe1dd3bf796084f5)
+- Fullscreen mobile interface. [`5b15f3f`](https://github.com/thkruz/keeptrack.space/commit/5b15f3f9c057cef26b2ed6ad600b2fc0e50f45d4)
+- Fixes to date picker and mobile menus. [`f5a212e`](https://github.com/thkruz/keeptrack.space/commit/f5a212e6bb90253f1dd4f27dcc96d15b9787d142)
+- Fixed bugs in satinfobox menu. [`5812b37`](https://github.com/thkruz/keeptrack.space/commit/5812b37393586d86f3ee4ce5aa22e29800378049)
+- Fixed minor UI issues with Multi Sensor menu. [`1b4bd0e`](https://github.com/thkruz/keeptrack.space/commit/1b4bd0e51afe70e5b1136a18815fd77c29446f9c)
+- Fixed bug with 2D map resizing on mobile. [`70d4e46`](https://github.com/thkruz/keeptrack.space/commit/70d4e46db0fcdcb3161e5a76019e591fb248d67c)
+- UI Updates [`9957d83`](https://github.com/thkruz/keeptrack.space/commit/9957d83eaa12d100c8bb1ec81012cd6cea43e0e3)
+- Fixed bug with bottom menu. [`59d0565`](https://github.com/thkruz/keeptrack.space/commit/59d0565b9dda189ab641c6fa3298071f4c3ea22e)
+- Fixed mobile touch sensitivity. [`8baac10`](https://github.com/thkruz/keeptrack.space/commit/8baac10a46b7da908c35d7e33141ae31ee345c78)
+- Fixed desktop movement and legend color toggles. [`ad04257`](https://github.com/thkruz/keeptrack.space/commit/ad0425764313038d7ad21187a9e7d639e4182bf4)
+- Fixed bug with launch facilities not displaying full names. [`90f244a`](https://github.com/thkruz/keeptrack.space/commit/90f244a78ee9ce572c5f1fea883b2e0272f5753e)
+- Better caching prevention. [`b54e0d0`](https://github.com/thkruz/keeptrack.space/commit/b54e0d0b2986389918bba26194d0c88f9b96213d)
+- Fixed scroll on bottom icons when mobile. [`f95e773`](https://github.com/thkruz/keeptrack.space/commit/f95e7733c470515614e94d901ad93c2a3048cf36)
+- Variable sized fragment shaders [`4eff43b`](https://github.com/thkruz/keeptrack.space/commit/4eff43b2c86079863e4f888412c622b8342de2f8)
+- Better hires images. [`a15bf29`](https://github.com/thkruz/keeptrack.space/commit/a15bf29646066d1eec3a0ab9b5cf7a7409eb4ba5)
+- Fixed bug that crashes multitouch on mobile. [`5733aec`](https://github.com/thkruz/keeptrack.space/commit/5733aec384a94f6ec424b2cd9bbc1d5c042fac4d)
+
+#### [v0.34.0](https://github.com/thkruz/keeptrack.space/compare/v0.33.0...v0.34.0)
+
+>  
+
+- Fixed #89 and #90 [`#89`](https://github.com/thkruz/keeptrack.space/issues/89)
+- Fixed #89 and #90 [`#89`](https://github.com/thkruz/keeptrack.space/issues/89)
+- Changes to Planetarium Camera Mode. Fixed #83. [`#83`](https://github.com/thkruz/keeptrack.space/issues/83)
+- Changes to Planetarium Camera Mode. Fixed #83. [`#83`](https://github.com/thkruz/keeptrack.space/issues/83)
+- Fixed #81. Map settings needed updated on load. [`#81`](https://github.com/thkruz/keeptrack.space/issues/81)
+- Downgraded satcruncher from satellite.js 2.0.2 to 1.3 for better speed [`13a83f7`](https://github.com/thkruz/keeptrack.space/commit/13a83f7e6db8dd4184aaaaeed4560bde85fe86bf)
+- Vertex Shader can now be changed realtime. [`d2cb8e3`](https://github.com/thkruz/keeptrack.space/commit/d2cb8e3a40405ac11102203cdbdcee7a2ef4a0a7)
+- Legend UI is now a toggle for satellite visibility. [`52c96c9`](https://github.com/thkruz/keeptrack.space/commit/52c96c907f99648c4d19a627d7a46c2cddc1e934)
+- Added geolocation options when using https. [`d2167cb`](https://github.com/thkruz/keeptrack.space/commit/d2167cbdc56dd228ce859452ee084a4fef1599b5)
+- Added license info from James Yoder/thingsinspace. [`37e722f`](https://github.com/thkruz/keeptrack.space/commit/37e722f72f1df4b1143f5abafd07ae0d5e95a55f)
+- Add hires option from GET variable. [`24a3d57`](https://github.com/thkruz/keeptrack.space/commit/24a3d570c5855c3fc0a364365e769f2535b5f81d)
+- Adjusted cameraType.SATELLITE movement. Q and E for rotation. [`07601d4`](https://github.com/thkruz/keeptrack.space/commit/07601d48ec54bef5aed4aaa6a5bbd9428cc09964)
+- Allow passing mw, retro, vec, etc via GET instead of different filenames [`4c0b81a`](https://github.com/thkruz/keeptrack.space/commit/4c0b81ab4f4c09fbd2e8e1a29566055f4c356583)
+- Update .igtignore [`09365cf`](https://github.com/thkruz/keeptrack.space/commit/09365cff6f81a36838c849e3576da7d7f8231547)
+- Harder to deselect selectedsat when in satellite camera view. [`698b496`](https://github.com/thkruz/keeptrack.space/commit/698b496d16f34e6f40e742359203be415c6c1c80)
+- Fixed fieldOfView code. [`54ef4c0`](https://github.com/thkruz/keeptrack.space/commit/54ef4c020f59fc9d0ca773ad082f7c3f3466ba3c)
+- Fixed fieldOfView code. [`2b6708e`](https://github.com/thkruz/keeptrack.space/commit/2b6708ea64abe9787fd1157fbd9dd18ee3d0f6d6)
+- Fixed fieldOfView code. [`28886d3`](https://github.com/thkruz/keeptrack.space/commit/28886d3550811c0f7afb68ea8c2b2b215c234f41)
+
+#### [v0.33.0](https://github.com/thkruz/keeptrack.space/compare/v0.32.0...v0.33.0)
+
+>  
+
+- Added planetarium and satellite camera views [`4ebf859`](https://github.com/thkruz/keeptrack.space/commit/4ebf859e9be34850e5b913a8ea8adf2e0b520c6a)
+
+#### [v0.32.0](https://github.com/thkruz/keeptrack.space/compare/v0.30.7...v0.32.0)
+
+>  
+
+- Minor fixes. [`e9ad616`](https://github.com/thkruz/keeptrack.space/commit/e9ad6161a8f6a2b9944a2a9f3977d2ee9d1b905b)
+- Added an vector version of the offline version. [`30ed52c`](https://github.com/thkruz/keeptrack.space/commit/30ed52c4fd756f03224d3d8b8b87997ceb0daa53)
+- Added vector image. [`4f4c4a6`](https://github.com/thkruz/keeptrack.space/commit/4f4c4a6c8ab6e2795839183a93ee2f7b5eb55a99)
+- Added vector image. [`fbf7dd1`](https://github.com/thkruz/keeptrack.space/commit/fbf7dd18c014d7f332ce42c911728d3734d2d0ce)
+- Fixed bug in view sats in FOV. Started multithreading SGP4. [`25518a8`](https://github.com/thkruz/keeptrack.space/commit/25518a811c0e7a113c6cbb483e8d46857aea9d30)
+- Fixed timeManager.now errors and added Editor.htm [`04ed851`](https://github.com/thkruz/keeptrack.space/commit/04ed851a33058add9c74c6f2f34b1ecd2fdb482f)
+- Changed offline satbox update interval. Added more optional information for offline versions. [`9669950`](https://github.com/thkruz/keeptrack.space/commit/9669950c94aa6913c8ccfe49543eaa5abf0df030)
+- Planetarium Camera View Added [`5a02430`](https://github.com/thkruz/keeptrack.space/commit/5a0243015b3cc56f1da8787937cea2fff5e9b282)
+- Fixed error in offline only version due to load order. [`a9fff1f`](https://github.com/thkruz/keeptrack.space/commit/a9fff1f4173a7986cb6491d1c4622ef2e929131f)
+- Corrected date error in settings. [`b730de7`](https://github.com/thkruz/keeptrack.space/commit/b730de75afb7f6cca27208d7d4e39fed44762c9a)
+
+#### [v0.30.7](https://github.com/thkruz/keeptrack.space/compare/v0.30.6...v0.30.7)
+
+>  
+
+- Updated merging function for offline use. [`f665259`](https://github.com/thkruz/keeptrack.space/commit/f665259a7c0ae8edcf92400e1b5c2d749df0fc90)
+
+#### [v0.30.6](https://github.com/thkruz/keeptrack.space/compare/v0.30.5...v0.30.6)
+
+>  
+
+- Separated UI from main.js [`2295adb`](https://github.com/thkruz/keeptrack.space/commit/2295adbddb28b32134106bbf803aaf94ce4356f8)
+- InView for all SSN sensors added. [`acd9da8`](https://github.com/thkruz/keeptrack.space/commit/acd9da8df57c89f987eef71b610630051ade553c)
+- Fixed performance issue with sat-cruncher and overlay. [`8a59742`](https://github.com/thkruz/keeptrack.space/commit/8a59742b056f9fd3c573a14beab46aace057c1a0)
+- Overlay updated to recalculate times when needed. [`cc50520`](https://github.com/thkruz/keeptrack.space/commit/cc505200f07ed3fcd51732c4374a8c9247465cdd)
+- _updateOverlay causes jittering [`a051152`](https://github.com/thkruz/keeptrack.space/commit/a0511529daf113a9ad9bc665bcd2740b1175056b)
+- Reduce garbage collection in sat-cruncher.js [`1a9a6eb`](https://github.com/thkruz/keeptrack.space/commit/1a9a6ebeffcd076552a0dcf7e8213d3ab9d29681)
+- Fixed theme problems [`a3e93c1`](https://github.com/thkruz/keeptrack.space/commit/a3e93c1c2286a161b97bb2ac2930a9de0d3991db)
+- In default view only calculate colors if inview changes. [`2a37f21`](https://github.com/thkruz/keeptrack.space/commit/2a37f2167d7b8b36c52c577fe2882a0a186381c1)
+- Fixed bug with legend reseting colorscheme [`a9c8363`](https://github.com/thkruz/keeptrack.space/commit/a9c8363138e3b1881e5197c0ec381e087aab3a0b)
+
+#### [v0.30.5](https://github.com/thkruz/keeptrack.space/compare/v0.10.0...v0.30.5)
+
+>  
+
+- Develop [`#52`](https://github.com/thkruz/keeptrack.space/pull/52)
+- Develop [`#50`](https://github.com/thkruz/keeptrack.space/pull/50)
+- Develop [`#49`](https://github.com/thkruz/keeptrack.space/pull/49)
+- Develop [`#48`](https://github.com/thkruz/keeptrack.space/pull/48)
+- Develop [`#46`](https://github.com/thkruz/keeptrack.space/pull/46)
+- Develop [`#43`](https://github.com/thkruz/keeptrack.space/pull/43)
+- Develop [`#40`](https://github.com/thkruz/keeptrack.space/pull/40)
+- Rise Set Lookangle Times [`8a1ab55`](https://github.com/thkruz/keeptrack.space/commit/8a1ab5584de5066701239d62309c7af84683ec8b)
+- Organize [`12dcc31`](https://github.com/thkruz/keeptrack.space/commit/12dcc3125a57d4a9ebd3dc5acd815943d316116b)
+- Upgraded to satellite.js 1.4.0 [`b13b232`](https://github.com/thkruz/keeptrack.space/commit/b13b2329717adc17e30932c6a457660b5bae239b)
+- Separated main functions into separate files. Trying to reduce global variables and optimize each of the main functions. [`f2c7598`](https://github.com/thkruz/keeptrack.space/commit/f2c7598cc473f3db827985648ff67e9e97be4d39)
+- Remove admin folder. [`1094b76`](https://github.com/thkruz/keeptrack.space/commit/1094b76f9c99b3d3a11462fc180b7bb970347b21)
+- Replacing strings with single references in variable.js. Addresses issue #72 [`1426ce8`](https://github.com/thkruz/keeptrack.space/commit/1426ce8898187a66cd33926c7bd00c84f0152289)
+- Fixed multisite propagation and added Cobra Dane [`61289f0`](https://github.com/thkruz/keeptrack.space/commit/61289f09e7ce10d8f82919cc985c281b435e6e49)
+- Missile Generator added. [`7b67458`](https://github.com/thkruz/keeptrack.space/commit/7b674583f3947784abbd1757ece7213f9849ce39)
+- Renamed internal functions. [`f2cf679`](https://github.com/thkruz/keeptrack.space/commit/f2cf679fe279d86255daf33783294a564fcc6d36)
+- Minor Changes [`c9c6dff`](https://github.com/thkruz/keeptrack.space/commit/c9c6dff5208fb84637d131453e2827b7214d9845)
+- Fixed some red theme problems. [`1b26f77`](https://github.com/thkruz/keeptrack.space/commit/1b26f771575e7a4c0218e3fe124ff0631b0b9dbf)
+- Added Offline Version [`46ec933`](https://github.com/thkruz/keeptrack.space/commit/46ec9330c0995c7c8ce6181c349e405ca5cbfada)
+- Added a retro version set to March 13, 2000. Fixed a few incorrect launch sites. [`f8f366a`](https://github.com/thkruz/keeptrack.space/commit/f8f366a8ae2f8722ee4ebe1d33547a17e9303f09)
+- Added MW page to display only missiles. [`55b968f`](https://github.com/thkruz/keeptrack.space/commit/55b968fe22b5840272cd70ac1f87715014162274)
+- No External Sources [`83c5c23`](https://github.com/thkruz/keeptrack.space/commit/83c5c23dc27bb4f83afd71d0ada39963c5294525)
+- Material Font, SSN Lookangles, and Custom Sensors [`c61409d`](https://github.com/thkruz/keeptrack.space/commit/c61409da638e888e70dceca1c34dc229da74f96b)
+- Updated ballistic missiles. [`e6a39b9`](https://github.com/thkruz/keeptrack.space/commit/e6a39b966951fc64e99f65127a9b1214cd8c9a4f)
+- Added mini loading screen and touch controls for date/time picker. [`acf6972`](https://github.com/thkruz/keeptrack.space/commit/acf6972b06976ae52cfe3df4d9eea585562003d8)
+- Stereographic Map and Telescopes [`ededb41`](https://github.com/thkruz/keeptrack.space/commit/ededb412a54478a9e074176af082239d5b51e207)
+- Integrated lookangles.js with satellite.js. [`229ffb2`](https://github.com/thkruz/keeptrack.space/commit/229ffb23395788fe23eea8906d003ffb876a6c9d)
+- Standardize variable names. [`61adacd`](https://github.com/thkruz/keeptrack.space/commit/61adacd71a326d1c785c762c2e746e2e5e884c95)
+- Created timeManager and reduced jQuery calls during drawLoop. [`51d3f2d`](https://github.com/thkruz/keeptrack.space/commit/51d3f2d1fc5cf6a35e21aca1736783a73f2ba6a0)
+- About Author Icon [`e7d2d91`](https://github.com/thkruz/keeptrack.space/commit/e7d2d910937c09e40b3c874278301cce5c7574f3)
+- Optimizations to reduce garbage collection. Ugly code. [`aaed2bf`](https://github.com/thkruz/keeptrack.space/commit/aaed2bf7c6160dccbd88828ab86b99efa11d4706)
+- timeManager organized and unnecessary public functions and variables hidden [`ad78954`](https://github.com/thkruz/keeptrack.space/commit/ad7895466c47ad4af5fb4f4b4d088a6bb62de9bb)
+- Cleaned up extra satellite functions. [`fc20364`](https://github.com/thkruz/keeptrack.space/commit/fc20364461d7122db9f65cf08f40e60e55bec557)
+- Updated editor to allow additional satellite information and a URL to be added. [`5c43e82`](https://github.com/thkruz/keeptrack.space/commit/5c43e824c75555a89b770ab83aa1443ac4cbb2f7)
+- New Interface Finished [`eae6e54`](https://github.com/thkruz/keeptrack.space/commit/eae6e541b47834010631b0f7a2ca2c6a31203ef4)
+- Reduced need for garbage collection on loops. [`8c77a81`](https://github.com/thkruz/keeptrack.space/commit/8c77a815559a00f91b409783782cb864a58e992b)
+- Created custom objects with static variable to display launch sites [`c5bdf4d`](https://github.com/thkruz/keeptrack.space/commit/c5bdf4d3be19100d7329bdc5f9a3082df6c901d7)
+- Added overlay for watchlist items and yellow highlighting for inview watchlist items. [`39fa773`](https://github.com/thkruz/keeptrack.space/commit/39fa7730cf4a049b36837e4c5f29ed9446f26670)
+- Mobile Version [`20f01b3`](https://github.com/thkruz/keeptrack.space/commit/20f01b36eae23f1fd26c97381a14844c98e0bd95)
+- Added more launch sites for nominal creator and fixed some styling problems on side menus where bottom 50px were cutoff. [`0057b35`](https://github.com/thkruz/keeptrack.space/commit/0057b35d55fd61c6a292d0749143ff80645ac4d9)
+- Fixed nominal creator functions. Main error was caused by converting string to a number - leftover from old version. [`b620290`](https://github.com/thkruz/keeptrack.space/commit/b62029097d3d55b5e51964bc44802fca74868d48)
+- Optimized the search function. Remove a lot of unnecessary extra variables. [`a4a55a2`](https://github.com/thkruz/keeptrack.space/commit/a4a55a219ae60e15f14ee3cf8f886f8f863923c1)
+- Add three camera modes (default, offset, FPS). [`01c68f5`](https://github.com/thkruz/keeptrack.space/commit/01c68f53f5c6e3fc6e74793bb47d34650b1884ea)
+- Reduced unnecessary variables in lookangles methods. [`928ec71`](https://github.com/thkruz/keeptrack.space/commit/928ec712e2d184f9247fba1c55908bda9ca57515)
+- Few bugfixes where proprealtime was off by a few milliseconds. [`46c844f`](https://github.com/thkruz/keeptrack.space/commit/46c844fed1d6354d6ab50345937eb921ca391295)
+- Added limitSats GET variable to filter out extra satellites [`e53a566`](https://github.com/thkruz/keeptrack.space/commit/e53a56661122e8dc913f9459dcc02aae5a3f989e)
+- Added ability to have additional satellites in a local file for offline mode. [`6ab627c`](https://github.com/thkruz/keeptrack.space/commit/6ab627c4142fc250db13b4a1059188d4ea8626d9)
+- Added mobile controls [`347a425`](https://github.com/thkruz/keeptrack.space/commit/347a4256e245f53662bd31ddd5015395b0bcb531)
+- Added legend to the top right to address issue "Legend for Colors". [`2604efa`](https://github.com/thkruz/keeptrack.space/commit/2604efa154975cfdb83df9f48635ce3c9c94c0f2)
+- Added legend to the top right to address issue #23 (Legend for Colors). [`1b2f8b5`](https://github.com/thkruz/keeptrack.space/commit/1b2f8b50ee6724372a9828c36139ef76a04c8504)
+- Organized braun.js and renammed mapper. [`76343d4`](https://github.com/thkruz/keeptrack.space/commit/76343d408991834a94b10766fbeb93accfde7b46)
+- Custom Sensor Menu [`643cd61`](https://github.com/thkruz/keeptrack.space/commit/643cd614c53dc086ffbe075483e277d3d83c6924)
+- Removed Changelog. Pulled drawLoop variables to global scope. Fixed altitude check for calculating zoom. [`1b8770c`](https://github.com/thkruz/keeptrack.space/commit/1b8770c90def8ba4a957c56b844de6cab02f7832)
+- Custom Sensor Menu [`ba29d2f`](https://github.com/thkruz/keeptrack.space/commit/ba29d2f667c7a1949e7d6cd209788f389ebd99e4)
+- Combined FOV-bubble.js and line.js into drawLoop-shapes.js [`fb66ee4`](https://github.com/thkruz/keeptrack.space/commit/fb66ee420ac88b552145e82f623c396275d228d4)
+- Fixed orbit search. Added watchlist red theme when inview. [`282e53e`](https://github.com/thkruz/keeptrack.space/commit/282e53ea6c08957c44dd01781364f5c5f398a016)
+- TLE saving and loading added. [`f447b70`](https://github.com/thkruz/keeptrack.space/commit/f447b7060e0d234cebb8fa400f5fb6547784398a)
+- Progress on Breakup Simulator [`be41087`](https://github.com/thkruz/keeptrack.space/commit/be410874a460275aa385083507208c037fd25182)
+- Fixed map for IE 9 & 10. [`1ad61bf`](https://github.com/thkruz/keeptrack.space/commit/1ad61bf6bdeb287dd248fbec7b73e3f21a4b2b68)
+- Add watchlist menu. [`987ef6b`](https://github.com/thkruz/keeptrack.space/commit/987ef6b18a8b73264157044478be3c1027cba933)
+- Missile creation page updated to add premade list of targets. [`d69c84a`](https://github.com/thkruz/keeptrack.space/commit/d69c84a31523deedeeb1a875ee6ce451bb6bfc9f)
+- Added show distance on hover feature and fixed jday calculation glitch in elset age. [`06b4738`](https://github.com/thkruz/keeptrack.space/commit/06b4738cf7249267eba398c50e302d208a0c1065)
+- Mobile controls tapandhold functionality added. [`2ee7039`](https://github.com/thkruz/keeptrack.space/commit/2ee7039720f9d4259d7cd5acd5ffe770969293b8)
+- Code cleanup [`a669adf`](https://github.com/thkruz/keeptrack.space/commit/a669adf9a46201fe275fc2565878e341c41321fe)
+- North or South Option on Nominals [`a31f886`](https://github.com/thkruz/keeptrack.space/commit/a31f886d6b34aa77b39bb08f8cd871910887a529)
+- Error Checking on Satellite Edit [`5fb5fd4`](https://github.com/thkruz/keeptrack.space/commit/5fb5fd489280a8c280f63529f16dfee37bbd39bd)
+- Added setting to increase sharpness of satellties [`3d0fdda`](https://github.com/thkruz/keeptrack.space/commit/3d0fddafe448dec51603067174a64fe51fcf91f4)
+- Optimized search time and groups.js code. Related to issue #10 [`915e462`](https://github.com/thkruz/keeptrack.space/commit/915e462064239a7034c35064c02025418b117338)
+- Deconflict with Master Branch [`3000e36`](https://github.com/thkruz/keeptrack.space/commit/3000e36f33ab9741c9c88cb6efb5e39a3bc79561)
+- Added different legends depending on the current colorscheme [`c56377d`](https://github.com/thkruz/keeptrack.space/commit/c56377dc693f6b523b3cbe652abbdc48c9f36ba7)
+- Enabled bottom menus when sensor is selected from the map. [`df796ab`](https://github.com/thkruz/keeptrack.space/commit/df796ab84c2854c0c0c4f93db5f768649310f68d)
+- Added License Key for Offline Only users. [`350f56c`](https://github.com/thkruz/keeptrack.space/commit/350f56c9e8012b850da7116f20c183803723c931)
+- Updated About Info [`f9c2c1d`](https://github.com/thkruz/keeptrack.space/commit/f9c2c1d3ecaf29caed1f2acd7fee8a8b07b31106)
+- Socrates optimization. [`9e88030`](https://github.com/thkruz/keeptrack.space/commit/9e8803073b4aad4ba95e2dc70352ddc234e8e7a1)
+- Removed Ligatures for IE Compatibility [`08b91aa`](https://github.com/thkruz/keeptrack.space/commit/08b91aa3db62792b8bd3f7984bc2d32bf722f025)
+- Added watchlist save and load buttons. [`89944ae`](https://github.com/thkruz/keeptrack.space/commit/89944ae7470e1fe3a54c3e9f716b2e5579d15230)
+- Fixed glitch preventing launches to the north. [`31388be`](https://github.com/thkruz/keeptrack.space/commit/31388bead679efb73ab4581ba19ed603a41a7603)
+- Added filter options to the settings menu for convienence. [`b71ae3e`](https://github.com/thkruz/keeptrack.space/commit/b71ae3e5005aea7b3767506116f250e4ba21b97b)
+- Added JDAY to the top left. [`1989c90`](https://github.com/thkruz/keeptrack.space/commit/1989c90ff2751ae4db1728243e142f8cff2efebc)
+- Reorganized js libraries to a separate folder. [`7aab201`](https://github.com/thkruz/keeptrack.space/commit/7aab20124d69e2d1c2dc2a37b703112928b002bf)
+- search-box.js reorganized. [`acdfeb2`](https://github.com/thkruz/keeptrack.space/commit/acdfeb2d1528dcd041b8517a423c3064e78606fc)
+- Text Highlighting Fixed [`aabca08`](https://github.com/thkruz/keeptrack.space/commit/aabca08275d69d3d111b7b04fe4f7997af5d8ddb)
+- Cleaned up settings menu. [`011a9c8`](https://github.com/thkruz/keeptrack.space/commit/011a9c8a92e6c240c763768fcfe116d47cc2fbbf)
+- Added alert text when camera mode changed. [`63d2fa5`](https://github.com/thkruz/keeptrack.space/commit/63d2fa5b16637206cc47b03f0d4e10e043a5c15b)
+- Optimized syncing mechanism for multiple catalogues. [`83976f0`](https://github.com/thkruz/keeptrack.space/commit/83976f00c575ef6d602f9b6b736564afed33fe94)
+- Formatted sun.js like other functions. [`4d1e4fb`](https://github.com/thkruz/keeptrack.space/commit/4d1e4fbeaf0377af1db047e70115d9c4c23d16be)
+- Updated version number. [`aa39fa7`](https://github.com/thkruz/keeptrack.space/commit/aa39fa75e182eb7749aa08934deff82801f43a70)
+- Removed multiple declarations of the current time "now" that were causing incorrect values in the satbox when proprate was not 1. [`7558bee`](https://github.com/thkruz/keeptrack.space/commit/7558bee55c2a6b6dfb325fd0d4abfaf48a7d7dc8)
+- SensorSelected Variable [`c99df75`](https://github.com/thkruz/keeptrack.space/commit/c99df7513350b60522e12055cf3098bca22bb000)
+- Added current time check to nominal creator. Solves issue #67. [`d1a38f2`](https://github.com/thkruz/keeptrack.space/commit/d1a38f2db2aff6c31458d8de4a83e7f63d5da030)
+- Removed admin folder from github. [`34d2f2e`](https://github.com/thkruz/keeptrack.space/commit/34d2f2e895c8c891c22a3b97b36196bb2b5e03d6)
+- Show Next Pass in Sat Box [`067c3ad`](https://github.com/thkruz/keeptrack.space/commit/067c3ade8add45983e03c76f578556f6cacafdd7)
+- More Launch Sites [`d95ea87`](https://github.com/thkruz/keeptrack.space/commit/d95ea8710c7e4e2c168d73b49ef9407892ced4a4)
+- Fixed sun exclusion times. [`6623d1d`](https://github.com/thkruz/keeptrack.space/commit/6623d1d7329a428182d61da5697301df5a0a17d1)
+- Cleanup main folder. [`500b1fd`](https://github.com/thkruz/keeptrack.space/commit/500b1fd16f53a18d2e412ac505da750431fb1f2a)
+- Removed unnecessary getSatIdFromCoord calls from drawloop. [`603cbc3`](https://github.com/thkruz/keeptrack.space/commit/603cbc38bdbba0330e034c5cbb2ea4d2a2e3d306)
+- Fixed edit satellite function. [`df75981`](https://github.com/thkruz/keeptrack.space/commit/df7598105647fe8895e4f91f596f411439b9ec81)
+- Social Media Links [`0a58a14`](https://github.com/thkruz/keeptrack.space/commit/0a58a14b8c77000ebccf441d23b84be629bb9ff6)
+- Updated about page. [`2860759`](https://github.com/thkruz/keeptrack.space/commit/286075949cb32a422cf154810fbe4503155bc5dc)
+- Made show distance default [`3f087a9`](https://github.com/thkruz/keeptrack.space/commit/3f087a9ac3d093c98dd7113e1a27eb452c0e9f0f)
+- Reorganized settingsManager. [`b447b0e`](https://github.com/thkruz/keeptrack.space/commit/b447b0ee150b2f19ff1eb5ce79816c15176aeabe)
+- Moved simulations to cleanup main folder. [`e163030`](https://github.com/thkruz/keeptrack.space/commit/e16303064a02538fa790d59206f26d71bb919b10)
+- Less choppy mobile controls [`ab4ffed`](https://github.com/thkruz/keeptrack.space/commit/ab4ffed6398788399f64a300eba9bac324b4309c)
+- Removing duplicate jday functions. [`9a402e2`](https://github.com/thkruz/keeptrack.space/commit/9a402e20a2a0e90c1fab61266ef1cad38f09f4e2)
+- Fixed 2d map. [`408634d`](https://github.com/thkruz/keeptrack.space/commit/408634d72cf8734f0d22853f4d2b65af12a36e06)
+- Fixed multisensorlookangles [`d0226cc`](https://github.com/thkruz/keeptrack.space/commit/d0226cc99886a15bfea1864c0debd707baf48cc2)
+- Updated gitignore [`d9b037d`](https://github.com/thkruz/keeptrack.space/commit/d9b037dfdf1669d1610a50519ae8a5d43f0262f9)
+- Fixed bug where all dropdown menus had extra bottom padding [`b18b04a`](https://github.com/thkruz/keeptrack.space/commit/b18b04acf83eb4108d5acc48938d7cef79943ca2)
+- Fixed map update override. [`e6db5a2`](https://github.com/thkruz/keeptrack.space/commit/e6db5a27d6d238c993e86039667f51838dc1b99b)
+- Added check to hide SOCRATES menu if the limitSats filter is on. [`0e13cf8`](https://github.com/thkruz/keeptrack.space/commit/0e13cf81f405bf01d42785ab0da9d43019408acd)
+- Fixed error message in timeManager that was in the wrong spot. [`d4e91c2`](https://github.com/thkruz/keeptrack.space/commit/d4e91c2fb1bab8fd4db0eed79a30b3e502254b9d)
+- RCS color display fixed to account for actual RCS values not size groups [`4774e58`](https://github.com/thkruz/keeptrack.space/commit/4774e584bd438a38bfd1adc19fa4d0360fb4326c)
+- Readd satData copy to searchBox.init [`dc9de13`](https://github.com/thkruz/keeptrack.space/commit/dc9de13c13bfbaf036f9f25d3407af64adfb9c41)
+- Fixed mobile sliders color and prevented default keyboard popup. [`f7a6aab`](https://github.com/thkruz/keeptrack.space/commit/f7a6aab41a51eb612fca1f1b74bc897274b4cb0a)
+- Right Mouse Click Fixed [`0246292`](https://github.com/thkruz/keeptrack.space/commit/0246292569d59a99ebe16093f091ccd1341494c1)
+- Red theme removed if last object from watchlist is removed while inview. [`d0c749f`](https://github.com/thkruz/keeptrack.space/commit/d0c749ff70ffca0f86709694bc0ef0c69cdf23fa)
+- Update version number. [`5385218`](https://github.com/thkruz/keeptrack.space/commit/5385218fc8e8bcd2805e0781eb8ec1c7e5ddae9c)
+- Added public github link. [`142ec27`](https://github.com/thkruz/keeptrack.space/commit/142ec2778ca0b00231240450e036ceffce21be79)
+- Adjusted RCS check in colorscheme so that Small Satellites now display correctly. [`5e10b41`](https://github.com/thkruz/keeptrack.space/commit/5e10b413b15d39f4cb385ac223a6234b7fa81a68)
+- Updated index Date [`6edab9f`](https://github.com/thkruz/keeptrack.space/commit/6edab9f25b74a6df93d1421e02cc09d142a9bab4)
+- Updated gitignore [`f452ba8`](https://github.com/thkruz/keeptrack.space/commit/f452ba8ff7a7e1db65a9d806a2fb49e078bc1f00)
+- Version Fixed [`f4fa941`](https://github.com/thkruz/keeptrack.space/commit/f4fa941ce169e4e901e27e26e7533ce7d76ea87c)
+- Fixed bug on index.htm where side menus were missing. [`b3b2d4d`](https://github.com/thkruz/keeptrack.space/commit/b3b2d4dca19cd9fe863085b7030d2f204596e203)
+- This should fix issue #70. [`7915a75`](https://github.com/thkruz/keeptrack.space/commit/7915a7521e422a75e8f65bb1338e2fc668b629b1)
+- Updated version number. [`7231c97`](https://github.com/thkruz/keeptrack.space/commit/7231c978bc07b4d5117b3ab83bb4962d995470bf)
+- Increment version number [`8f339a4`](https://github.com/thkruz/keeptrack.space/commit/8f339a48854c66c7845313c44a6f267bb289bf8e)
+- Updated version number. [`56fd23e`](https://github.com/thkruz/keeptrack.space/commit/56fd23e8ce66196100d8dd684e0ebf91d4bba30f)
+- Shortened option description in settings menu. [`4c7e9aa`](https://github.com/thkruz/keeptrack.space/commit/4c7e9aae13ac6d356908c07393b1b91c1284e5ce)
+- Updated version number [`a0618d2`](https://github.com/thkruz/keeptrack.space/commit/a0618d2014734b9b40fa29c7a982c9a2660f280a)
+- Updated version number [`c1700e8`](https://github.com/thkruz/keeptrack.space/commit/c1700e8e1a1ba2fa13762ddce59431c4d2deb0cc)
+- Updated version number. [`6e4727d`](https://github.com/thkruz/keeptrack.space/commit/6e4727d4ad91f91279f6877a20cc7a16a3b8f422)
+- Version number updated. [`8af1af9`](https://github.com/thkruz/keeptrack.space/commit/8af1af9506f6dddc9333ef09e40e060fadb49a6c)
+- Cleanup github [`a35b86c`](https://github.com/thkruz/keeptrack.space/commit/a35b86cdc64d46d73c35be90d9301db716e22e08)
+- Fixed glitch caused by static objects in satcache. [`90082f1`](https://github.com/thkruz/keeptrack.space/commit/90082f187ed1baa9b82d24b6e846a258b658d4d7)
+- Right Mouse Click Fixed [`e7e82a8`](https://github.com/thkruz/keeptrack.space/commit/e7e82a814734e89dafe0d99fa3c3fb4c97c61cb0)
+
+#### [v0.10.0](https://github.com/thkruz/keeptrack.space/compare/v0.9.2...v0.10.0)
+
+>  
+
+- Develop [`#39`](https://github.com/thkruz/keeptrack.space/pull/39)
+- Develop [`#38`](https://github.com/thkruz/keeptrack.space/pull/38)
+- UI Overhaul [`286b580`](https://github.com/thkruz/keeptrack.space/commit/286b58092d67467e9e2e385106f4d7e21b2acb21)
+- TLE Minification [`1045201`](https://github.com/thkruz/keeptrack.space/commit/104520168e500b83813521b4c03bd47a50c6ac7f)
+- UI Overhaul [`2b771b5`](https://github.com/thkruz/keeptrack.space/commit/2b771b5ebbe0e23f4ef0fb3fb46182306aa46a1e)
+- Only FOV Option [`26c2cff`](https://github.com/thkruz/keeptrack.space/commit/26c2cff3dc9feaf19ddc31e3ea94ce7f9791e00b)
+- Optional Show Next Pass [`27aee7e`](https://github.com/thkruz/keeptrack.space/commit/27aee7e1672e8c3e554e412f01f29dd962e67e4b)
+
+#### [v0.9.2](https://github.com/thkruz/keeptrack.space/compare/v0.5.2...v0.9.2)
+
+>  
+
+- Develop [`#35`](https://github.com/thkruz/keeptrack.space/pull/35)
+- TLE Update [`350e4de`](https://github.com/thkruz/keeptrack.space/commit/350e4de4f9f873b8649c32d98792dd279e919aac)
+- Satellite Editor [`15d13fd`](https://github.com/thkruz/keeptrack.space/commit/15d13fd43bb42ee7472dc5b262497578a51bebd1)
+- Fixed iframes [`fb96a92`](https://github.com/thkruz/keeptrack.space/commit/fb96a922762ebe7e3f3980f9e6c401ca7cbe0568)
+- Alternate Launch Menu [`8655468`](https://github.com/thkruz/keeptrack.space/commit/8655468664918f900a1bc27206abff55ed98484e)
+- Edit Satellites [`322776e`](https://github.com/thkruz/keeptrack.space/commit/322776eee88c1bd7f468b785e7e953728e696001)
+- ISS Stream, Launch Updater, and Socrates Improvements [`2d4e442`](https://github.com/thkruz/keeptrack.space/commit/2d4e442b68493deb684a694f893504e5614ed7a1)
+- MultiSite Lookangles [`8f117dd`](https://github.com/thkruz/keeptrack.space/commit/8f117ddc7ad80b72d485eb4607d9b3f572bdcb90)
+- sat-cruncher Semi-Standard [`67821ed`](https://github.com/thkruz/keeptrack.space/commit/67821ed7f5359c31fc913af52f42ee7b8300b7bd)
+- Improved Multi Site Lookangles [`fe28ebe`](https://github.com/thkruz/keeptrack.space/commit/fe28ebeebb6ec515d62e6173f553d70042f72435)
+- Disable Bottom Icons Initially [`eda4158`](https://github.com/thkruz/keeptrack.space/commit/eda4158fcc07b07f74b5c2d51ba578e86f554960)
+- Country Menu Improved [`b85bfea`](https://github.com/thkruz/keeptrack.space/commit/b85bfea9d1365a99f7ce7da4c9354820a8e486a2)
+- Variable Cleanup [`7dba8d4`](https://github.com/thkruz/keeptrack.space/commit/7dba8d438c0acd8b4385a282ef758602a45b590e)
+- Settings Menu [`8ca15fc`](https://github.com/thkruz/keeptrack.space/commit/8ca15fc5a8d9a2ad1a2f15e2e5b0eac9b5f91ee2)
+- Settings Menu Update [`3a5febc`](https://github.com/thkruz/keeptrack.space/commit/3a5febc93951336db394d72f63f5bff8ba3668ef)
+- Future Next Pass Feature and Removed Memory Leak [`a8c9f31`](https://github.com/thkruz/keeptrack.space/commit/a8c9f31353bcccdeaec560d369e2cc1811d5894d)
+- TAGs Updated [`eb5c7b6`](https://github.com/thkruz/keeptrack.space/commit/eb5c7b63214408a66e46122ef7eb83916e2ca1b3)
+- Version Number Menu [`d5626f5`](https://github.com/thkruz/keeptrack.space/commit/d5626f5524f5d2ab9240802952b7f0ecabcd8cd7)
+- Socrates Menu Functionality [`08b81c3`](https://github.com/thkruz/keeptrack.space/commit/08b81c32263bc1ff9cabb8c99a8ba1beec0e312e)
+- Default Messages Changed\nChanged the default messages to make them more obvious if there is a js error. [`f7b2b41`](https://github.com/thkruz/keeptrack.space/commit/f7b2b41eb38d1478f3709b21625ec5bb94c4b2bb)
+- Prevent Shake Effect Failures [`b6d70e5`](https://github.com/thkruz/keeptrack.space/commit/b6d70e59e138ff921799d40ff997b206ff087727)
+- Fixed Tooltips [`65e1d65`](https://github.com/thkruz/keeptrack.space/commit/65e1d65d7ac846993c23058ef113c05d62378a11)
+- NORAD Number Search [`040336f`](https://github.com/thkruz/keeptrack.space/commit/040336f3d79b8e6f64d9165fa6aa058130284877)
+- Find Near Objects Fixed [`bae37d2`](https://github.com/thkruz/keeptrack.space/commit/bae37d2f1e71fa790b022e1582bdb2d585275f53)
+- Disable Look Angles Until Sensor Selected [`c62f9c9`](https://github.com/thkruz/keeptrack.space/commit/c62f9c969b1a8dc2f893df7f663d73c057e17cb0)
+- Proprate Fixed [`3a3f7ab`](https://github.com/thkruz/keeptrack.space/commit/3a3f7ab01877c10113a09dd869f7e4074823471f)
+- Links and Version Number Box [`63242a6`](https://github.com/thkruz/keeptrack.space/commit/63242a6f5633802259d0cf6f923827a5398e0c4b)
+- Disable Weather if No Weather Maps [`a2b87a6`](https://github.com/thkruz/keeptrack.space/commit/a2b87a60e1fb988084a523a96fedc87ec8b8986a)
+- Variables Optional [`3bec372`](https://github.com/thkruz/keeptrack.space/commit/3bec372df4e187664097708842beb3c149c8211d)
+- Version Number Updated [`123f7e1`](https://github.com/thkruz/keeptrack.space/commit/123f7e1d710f95b7a599b1b24e0fe1c91659eb9a)
+- Updated Ignore [`523f6ca`](https://github.com/thkruz/keeptrack.space/commit/523f6ca8bdac57900ad90faa536c8903333b62e9)
+- Updated Ignore File [`211addb`](https://github.com/thkruz/keeptrack.space/commit/211addb28043441ca4639fccb803589970bd7109)
+- Fixed Index.htm [`9d24e20`](https://github.com/thkruz/keeptrack.space/commit/9d24e2068c1cfd9924f8c1e5f4c34051b1dcb491)
+- Testing Git Commit [`8e37cdb`](https://github.com/thkruz/keeptrack.space/commit/8e37cdb3d7ec0e3e15ce1f973e4404ba627dd5f7)
+- Version Box Fixed [`d1ab85b`](https://github.com/thkruz/keeptrack.space/commit/d1ab85b1fb93f82f9dd714bc1db59ab795c46cab)
+- Version Box Updated [`2d96846`](https://github.com/thkruz/keeptrack.space/commit/2d96846bb6efdb4093031b7bfc869b6138fc56d1)
+- Reduced Max Orbits [`48f8515`](https://github.com/thkruz/keeptrack.space/commit/48f85154822b806dfebba6e9341266b5a96da256)
+- Default Messages Changed [`3905b80`](https://github.com/thkruz/keeptrack.space/commit/3905b8039b63f40306624a75d804337e7afde9da)
+- Default Messages Changed" -m "Changed the default messages to make them more obvious if there is a js error. [`5ecfcdb`](https://github.com/thkruz/keeptrack.space/commit/5ecfcdbbbcf606d83d0c7f19e4a28e60b8268901)
+- FIxed ELSET Parser [`3bd96f7`](https://github.com/thkruz/keeptrack.space/commit/3bd96f7d746107062fa843bce3c57b5a9275c924)
+- Renamed Images [`8758965`](https://github.com/thkruz/keeptrack.space/commit/8758965d51b76225e5d218ae5ced3a1f960724d3)
+
+#### [v0.5.2](https://github.com/thkruz/keeptrack.space/compare/v0.5.1...v0.5.2)
+
+>  
+
+- Fixed Open Issues [`5ac84bc`](https://github.com/thkruz/keeptrack.space/commit/5ac84bc38a336e44f204a4618eed5e583fb4d8db)
+
+#### [v0.5.1](https://github.com/thkruz/keeptrack.space/compare/v0.5.0...v0.5.1)
+
+>  
+
+- Admin Section Added [`51855bd`](https://github.com/thkruz/keeptrack.space/commit/51855bd9cb9a141da505d43f2016b1779a0362f3)
+- Updated README for v0.5.0 [`1b972f2`](https://github.com/thkruz/keeptrack.space/commit/1b972f2c76b55384c77a34e098d02b48a441c0d7)
+
+#### [v0.5.0](https://github.com/thkruz/keeptrack.space/compare/v0.4.0...v0.5.0)
+
+>  
+
+- Revert "Javascript Semi-Standard Compliant" [`8288258`](https://github.com/thkruz/keeptrack.space/commit/8288258dd96be79d362d2b04d4616ceee8e1ec81)
+- Revert "SOCRATES" [`2702ca4`](https://github.com/thkruz/keeptrack.space/commit/2702ca4c2d0692f9897252f9be28deb27812f36e)
+- SOCRATES [`a87aea3`](https://github.com/thkruz/keeptrack.space/commit/a87aea373fcd25bc5f76dc11e59f21a641c958c2)
+- SOCRATES [`1931cfc`](https://github.com/thkruz/keeptrack.space/commit/1931cfc2a35a4c20f95b53171ceccf6b9e510974)
+- Remove Old Files [`cebd8d1`](https://github.com/thkruz/keeptrack.space/commit/cebd8d190a928028b9b63af3a1287199701eb820)
+
+#### [v0.4.0](https://github.com/thkruz/keeptrack.space/compare/v0.3.0...v0.4.0)
+
+>  
+
+- Javascript Semi-Standard Compliant [`7681f65`](https://github.com/thkruz/keeptrack.space/commit/7681f655571d6a2030a6fdd5d82795790e925c12)
+- Create README.md [`fad74a3`](https://github.com/thkruz/keeptrack.space/commit/fad74a32786f09c8320a36f40fb91c50f32e739b)
+- Update README.md [`bea73af`](https://github.com/thkruz/keeptrack.space/commit/bea73af86955decdf66eb08e8b61634c7d82a5b2)
 
 #### v0.3.0
 
 >  
 
-- 12 October 2016
-- 21 December 2016
-- 7 December 2016
-- 20 December 2016
-- :neckbeard: Added .gitattributes & .gitignore files
-- Delete dot-blue.png
+- 12 October 2016 [`e6df11c`](https://github.com/thkruz/keeptrack.space/commit/e6df11c2b2d0a433338b6a1f4f9db5040c692fe3)
+- 21 December 2016 [`8a58715`](https://github.com/thkruz/keeptrack.space/commit/8a58715cab410026d017f3cd8ac91bdecd7c5d83)
+- 7 December 2016 [`133e919`](https://github.com/thkruz/keeptrack.space/commit/133e919bf8672c89ccd8bca9179cc67e2e49b62e)
+- 20 December 2016 [`468a1ff`](https://github.com/thkruz/keeptrack.space/commit/468a1ffa2057849cfe9c3461ee138f84e8781b98)
+- :neckbeard: Added .gitattributes & .gitignore files [`b5c0df8`](https://github.com/thkruz/keeptrack.space/commit/b5c0df8b6619f9bb27ffba78f0011c44d79d44b1)
+- Delete dot-blue.png [`afad161`](https://github.com/thkruz/keeptrack.space/commit/afad16136e8b4e36370bbc4776871df06e2ce9de)

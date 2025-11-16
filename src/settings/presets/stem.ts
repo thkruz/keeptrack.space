@@ -2,7 +2,9 @@ import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality, EarthSpecTextureQuality } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import {
+  EarthBumpTextureQuality, EarthCloudTextureQuality, EarthDayTextureQuality, EarthNightTextureQuality, EarthPoliticalTextureQuality, EarthSpecTextureQuality,
+} from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { getEl } from '@app/engine/utils/get-el';
 import { SettingsManager } from '../settings';
 

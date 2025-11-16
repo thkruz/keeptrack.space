@@ -23,6 +23,7 @@ import { DebrisScreening } from './debris-screening/debris-screening';
 import { DopsPlugin } from './dops/dops';
 import { DrawLinesPlugin } from './draw-lines/draw-lines';
 import { EarthPresetsPlugin } from './earth-presets/earth-presets';
+import { EclipseSolarAnalysis } from './eclipse-solar-analysis/eclipse-solar-analysis';
 import { EditSat } from './edit-sat/edit-sat';
 import { FilterMenuPlugin } from './filter-menu/filter-menu';
 import { GamepadPlugin } from './gamepad/gamepad';
@@ -232,6 +233,7 @@ export class PluginManager {
         { init: () => new SatellitePhotos().init(), config: plugins.SatellitePhotos },
         { init: () => new ScreenRecorder().init(), config: plugins.ScreenRecorder },
         { init: () => new AnalysisMenu().init(), config: plugins.AnalysisMenu },
+        { init: () => new EclipseSolarAnalysis().init(), config: plugins.EclipseSolarAnalysis },
         {
           init: async () => {
             const proPlugin = await import('../plugins-pro/maneuver/maneuver');

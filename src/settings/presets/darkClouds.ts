@@ -10,7 +10,7 @@ import i18next from 'i18next';
 import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
-import { KeepTrack } from '@app/keeptrack';
+import { EarthDayTextureQuality, EarthNightTextureQuality, EarthSpecTextureQuality, EarthBumpTextureQuality, EarthPoliticalTextureQuality, EarthCloudTextureQuality } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 
 export const darkClouds = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>0; // NOTE: 0 will make the geosynchronous satellites more apparent
@@ -28,12 +28,12 @@ export const darkClouds = (settingsManager: SettingsManager) => {
 
   settingsManager.isEnableJscCatalog = false;
 
-  settingsManager.earthDayTextureQuality = '16k';
-  settingsManager.earthNightTextureQuality = '16k';
-  settingsManager.earthSpecTextureQuality = '8k';
-  settingsManager.earthBumpTextureQuality = '8k';
-  settingsManager.earthPoliticalTextureQuality = 'off';
-  settingsManager.earthCloudTextureQuality = '8k';
+  settingsManager.earthDayTextureQuality = '16k' as EarthDayTextureQuality;
+  settingsManager.earthNightTextureQuality = '16k' as EarthNightTextureQuality;
+  settingsManager.earthSpecTextureQuality = '8k' as EarthSpecTextureQuality;
+  settingsManager.earthBumpTextureQuality = '8k' as EarthBumpTextureQuality;
+  settingsManager.earthPoliticalTextureQuality = 'off' as EarthPoliticalTextureQuality;
+  settingsManager.earthCloudTextureQuality = '8k' as EarthCloudTextureQuality;
 
   settingsManager.disableCameraControls = true;
 

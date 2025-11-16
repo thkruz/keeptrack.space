@@ -1,5 +1,6 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
-import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { keepTrackApi } from '@app/keepTrackApi';
 import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
@@ -89,8 +90,8 @@ export const parseGetVariables = (params: string[], settingsManager: SettingsMan
         settingsManager.zFar = 250000.0;
         settingsManager.noMeshManager = true;
         settingsManager.maxFieldOfViewMarkers = 1;
-        settingsManager.earthDayTextureQuality = '512';
-        settingsManager.earthNightTextureQuality = '512';
+        settingsManager.earthDayTextureQuality = '512' as EarthDayTextureQuality;
+        settingsManager.earthNightTextureQuality = '512' as EarthNightTextureQuality;
         break;
       case 'hires':
         settingsManager.earthNumLatSegs = 128;

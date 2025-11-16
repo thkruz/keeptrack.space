@@ -1,23 +1,23 @@
+/* eslint-disable camelcase */
 /**
  * Link Budget Plugin
  * Provides RF link budget analysis for satellite-ground station communications
  */
 
-import { KeepTrackPlugin, ClickDragOptions } from '@app/engine/plugins/base-plugin';
+import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { ClickDragOptions, KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { DetailedSatellite, DetailedSensor, Degrees, EciVec3, EpochUTC, Kilometers } from '@ootk/src/main';
+import { Degrees, DetailedSatellite, DetailedSensor, eci2rae, EpochUTC, Seconds } from '@ootk/src/main';
 import satcomPng from '@public/img/icons/satcom.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { SensorMath } from '@app/app/sensors/sensor-math';
-import { eci2rae } from '@ootk/src/main';
 import {
   calculateLinkBudget,
   DEFAULT_PARAMS,
@@ -132,7 +132,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
       </div>
 
       <div class="row center-align" style="margin-top: 15px;">
-        <button id="link-calc-btn" class="btn btn-ui waves-effect waves-light" type="submit">
+        <button id="link-calc-btn" class="btn btn-ui waves-effect waves-light" type="button">
           Calculate Link Budget &#9658;
         </button>
         <button id="link-pass-btn" class="btn btn-ui waves-effect waves-light" type="button" style="margin-left: 10px;">
@@ -446,33 +446,40 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
     super.addJs();
 
     // Form submission handler
-    getEl('link-params-form')?.addEventListener('submit', (e: Event) => {
-      e.preventDefault();
-      this.updateLinkBudget_();
-    });
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      getEl('link-params-form')?.addEventListener('submit', (e: Event) => {
+        e.preventDefault();
+        this.updateLinkBudget_();
+      });
 
-    // Pass analysis button
-    getEl('link-pass-btn')?.addEventListener('click', () => {
-      this.analyzeNextPass_();
-    });
+      getEl('link-calc-btn')?.addEventListener('click', (e: Event) => {
+        e.preventDefault();
+        this.updateLinkBudget_();
+      });
 
-    // Export pass data button
-    getEl('pass-export-btn')?.addEventListener('click', () => {
-      this.exportPassData_();
-    });
+      // Pass analysis button
+      getEl('link-pass-btn')?.addEventListener('click', () => {
+        this.analyzeNextPass_();
+      });
 
-    // Auto-update toggle
-    getEl('link-auto-update')?.addEventListener('change', (e: Event) => {
-      this.isAutoUpdate_ = (e.target as HTMLInputElement).checked;
-    });
+      // Export pass data button
+      getEl('pass-export-btn')?.addEventListener('click', () => {
+        this.exportPassData_();
+      });
 
-    // Preset buttons
-    getEl('link-preset-uhf')?.addEventListener('click', () => this.applyPreset_('UHF'));
-    getEl('link-preset-s')?.addEventListener('click', () => this.applyPreset_('S'));
-    getEl('link-preset-x')?.addEventListener('click', () => this.applyPreset_('X'));
+      // Auto-update toggle
+      getEl('link-auto-update')?.addEventListener('change', (e: Event) => {
+        this.isAutoUpdate_ = (e.target as HTMLInputElement).checked;
+      });
+
+      // Preset buttons
+      getEl('link-preset-uhf')?.addEventListener('click', () => this.applyPreset_('UHF'));
+      getEl('link-preset-s')?.addEventListener('click', () => this.applyPreset_('S'));
+      getEl('link-preset-x')?.addEventListener('click', () => this.applyPreset_('X'));
+    });
 
     // Listen for time updates
-    EventBus.getInstance().on(EventBusEvent.timeManagerTick, () => {
+    EventBus.getInstance().on(EventBusEvent.update, () => {
       if (this.isAutoUpdate_ && this.isMenuButtonActive) {
         this.updateLinkBudget_();
       }
@@ -486,7 +493,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
     });
 
     // Listen for sensor changes
-    EventBus.getInstance().on(EventBusEvent.sensorChange, () => {
+    EventBus.getInstance().on(EventBusEvent.setSensor, () => {
       if (this.isMenuButtonActive) {
         this.updateSensorName_();
       }
@@ -533,7 +540,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
   private updateSatelliteName_(): void {
     const sat = this.selectSatManager_.getSelectedSat();
 
-    if (sat) {
+    if (sat && !(sat instanceof MissileObject)) {
       const nameEl = getEl('link-sat-name');
 
       if (nameEl) {
@@ -564,7 +571,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
     const sat = this.selectSatManager_.getSelectedSat();
     const sensor = ServiceLocator.getSensorManager().getSensor();
 
-    if (!sat || !sensor) {
+    if (!sat || !sensor || sat instanceof MissileObject) {
       return;
     }
 
@@ -577,16 +584,20 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
 
     // Get current time
     const timeManager = ServiceLocator.getTimeManager();
-    const simulationTime = timeManager.getSimulationTime();
+    const simulationTime = timeManager.simulationTimeObj;
 
     // Get satellite position
-    const eci = sat.getEci(simulationTime);
+    const eci = sat.eci(simulationTime);
+
+    if (!eci) {
+      return;
+    }
 
     // Calculate range, azimuth, elevation
     const rae = eci2rae(simulationTime, eci.position, sensor);
-    const range = rae.rng as Kilometers;
-    const elevation = rae.el as Degrees;
-    const azimuth = rae.az as Degrees;
+    const range = rae.rng;
+    const elevation = rae.el;
+    const azimuth = rae.az;
 
     // Calculate link budget
     this.currentResult_ = calculateLinkBudget(range, elevation, azimuth, this.params_);
@@ -621,13 +632,15 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
     this.setElText_('link-dl-cno', `${result.downlink.cno.toFixed(1)} dB-Hz`);
 
     const dlMarginEl = getEl('link-dl-margin');
+
     if (dlMarginEl) {
       const marginText = `${result.downlink.linkMargin.toFixed(1)} dB`;
-      const statusIcon = result.downlink.linkMargin > 3 ? ' ✓' :
-                         result.downlink.linkMargin > 0 ? ' ⚠' : ' ✗';
+      const statusIcon = result.downlink.linkMargin > 3 ? ' ✓'
+        : result.downlink.linkMargin > 0 ? ' ⚠' : ' ✗';
+
       dlMarginEl.textContent = marginText + statusIcon;
-      dlMarginEl.style.color = result.downlink.linkMargin > 3 ? '#4CAF50' :
-                                result.downlink.linkMargin > 0 ? '#FFC107' : '#F44336';
+      dlMarginEl.style.color = result.downlink.linkMargin > 3 ? '#4CAF50'
+        : result.downlink.linkMargin > 0 ? '#FFC107' : '#F44336';
     }
 
     this.setElText_('link-dl-datarate', `${result.downlink.dataRate.toFixed(3)} Mbps`);
@@ -641,27 +654,33 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
     this.setElText_('link-ul-cno', `${result.uplink.cno.toFixed(1)} dB-Hz`);
 
     const ulMarginEl = getEl('link-ul-margin');
+
     if (ulMarginEl) {
       const marginText = `${result.uplink.linkMargin.toFixed(1)} dB`;
-      const statusIcon = result.uplink.linkMargin > 3 ? ' ✓' :
-                         result.uplink.linkMargin > 0 ? ' ⚠' : ' ✗';
+      const statusIcon = result.uplink.linkMargin > 3 ? ' ✓'
+        : result.uplink.linkMargin > 0 ? ' ⚠' : ' ✗';
+
       ulMarginEl.textContent = marginText + statusIcon;
-      ulMarginEl.style.color = result.uplink.linkMargin > 3 ? '#4CAF50' :
-                                result.uplink.linkMargin > 0 ? '#FFC107' : '#F44336';
+      ulMarginEl.style.color = result.uplink.linkMargin > 3 ? '#4CAF50'
+        : result.uplink.linkMargin > 0 ? '#FFC107' : '#F44336';
     }
 
     // Update section titles with status
     const dlTitleEl = getEl('link-downlink-title');
+
     if (dlTitleEl) {
       const status = result.isViable && result.downlink.linkMargin > 0 ? '✓ ' : '✗ ';
-      dlTitleEl.textContent = status + 'Downlink Budget';
+
+      dlTitleEl.textContent = `${status}Downlink Budget`;
       dlTitleEl.style.color = result.isViable && result.downlink.linkMargin > 0 ? '#4CAF50' : '#F44336';
     }
 
     const ulTitleEl = getEl('link-uplink-title');
+
     if (ulTitleEl) {
       const status = result.isViable && result.uplink.linkMargin > 0 ? '✓ ' : '✗ ';
-      ulTitleEl.textContent = status + 'Uplink Budget';
+
+      ulTitleEl.textContent = `${status}Uplink Budget`;
       ulTitleEl.style.color = result.isViable && result.uplink.linkMargin > 0 ? '#4CAF50' : '#F44336';
     }
   }
@@ -669,11 +688,12 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
   /**
    * Analyze next pass and calculate data volume
    */
+  // eslint-disable-next-line require-await
   private async analyzeNextPass_(): Promise<void> {
     const sat = this.selectSatManager_.getSelectedSat();
     const sensor = ServiceLocator.getSensorManager().getSensor();
 
-    if (!sat || !sensor) {
+    if (!sat || !sensor || sat instanceof MissileObject) {
       return;
     }
 
@@ -681,13 +701,19 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
       this.readParamsFromUI_();
 
       const timeManager = ServiceLocator.getTimeManager();
-      const currentTime = timeManager.getSimulationTime();
+      const currentTime = timeManager.simulationTimeObj;
 
       // Find next pass (simple algorithm - look forward in time)
-      const passData = this.findNextPass_(sat, sensor, currentTime);
+      const passData = this.findNextPass_(sat, sensor, new EpochUTC(currentTime.getTime() / 1000 as Seconds));
 
       if (!passData) {
-        getEl('link-pass-analysis')!.innerHTML = '<div class="row"><div class="col s12 center-align" style="color: #F44336; padding: 20px;">No pass found in next 24 hours</div></div>';
+        getEl('link-pass-analysis')!.innerHTML = html`
+          <div class="row">
+            <div class="col s12 center-align" style="color: #F44336; padding: 20px;">
+              No pass found in next 24 hours
+            </div>
+          </div>
+        `;
         getEl('link-pass-analysis')!.style.display = 'block';
 
         return;
@@ -721,15 +747,19 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
 
     // Scan forward in time
     for (let t = 0; t < maxLookAhead; t += dt) {
-      const time = startTime.roll(t * 1000 as Milliseconds);
-      const eci = sat.getEci(time);
-      const rae = eci2rae(time, eci.position, sensor);
+      const time = startTime.roll(t as Seconds);
+      const eci = sat.eci(time.toDateTime());
+
+      if (!eci) {
+        continue;
+      }
+      const rae = eci2rae(time.toDateTime(), eci.position, sensor);
 
       const isVisible = (rae.el as number) >= (minElevation as number);
 
       if (isVisible && !inPass) {
         // Pass start
-        passStartTime = time.toDate();
+        passStartTime = time.toDateTime();
         inPass = true;
       }
 
@@ -738,7 +768,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
         const result = calculateLinkBudget(rae.rng, rae.el, rae.az, this.params_);
 
         samples.push({
-          time: time.toDate(),
+          time: time.toDateTime(),
           elevation: rae.el as number,
           range: rae.rng as number,
           dataRate: result.downlink.dataRate,
@@ -751,7 +781,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
 
       if (!isVisible && inPass) {
         // Pass end
-        passEndTime = time.toDate();
+        passEndTime = time.toDateTime();
 
         break;
       }
@@ -784,7 +814,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
     }
 
     // Convert from Mb to MB
-    totalDataVolume = totalDataVolume / 8;
+    totalDataVolume /= 8;
 
     return {
       startTime: passStartTime,
@@ -803,7 +833,7 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
    */
   private displayPassAnalysis_(pass: PassAnalysis): void {
     // Format start time
-    const startTimeStr = pass.startTime.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+    const startTimeStr = `${pass.startTime.toISOString().replace('T', ' ').substring(0, 19)} UTC`;
 
     // Format duration
     const minutes = Math.floor(pass.duration / 60);
@@ -829,19 +859,20 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
     const sat = this.selectSatManager_.getSelectedSat();
     const sensor = ServiceLocator.getSensorManager().getSensor();
 
-    // Build CSV data
-    let csv = 'Time (UTC),Elevation (deg),Range (km),Data Rate (Mbps),Link Margin (dB),Link Viable\n';
+    // Build CSV data as array of records expected by saveCsv
+    const items: Array<Record<string, unknown>> = this.passAnalysis_.samples.map((sample) => ({
+      Time_UTC: sample.time.toISOString(),
+      Elevation_deg: Number(sample.elevation.toFixed(2)),
+      Range_km: Number(sample.range.toFixed(1)),
+      Data_Rate_Mbps: Number(sample.dataRate.toFixed(3)),
+      Link_Margin_dB: Number(sample.linkMargin.toFixed(1)),
+      Link_Viable: sample.isViable ? 'Yes' : 'No',
+    }));
 
-    for (const sample of this.passAnalysis_.samples) {
-      const timeStr = sample.time.toISOString();
+    // Filename (saveCsv will append .csv if needed)
+    const filename = `link-budget-${sat?.name || 'sat'}-${sensor?.objName || 'sensor'}-${this.passAnalysis_.startTime.toISOString().substring(0, 10)}`;
 
-      csv += `${timeStr},${sample.elevation.toFixed(2)},${sample.range.toFixed(1)},${sample.dataRate.toFixed(3)},${sample.linkMargin.toFixed(1)},${sample.isViable ? 'Yes' : 'No'}\n`;
-    }
-
-    // Save CSV
-    const filename = `link-budget-${sat?.name || 'sat'}-${sensor?.objName || 'sensor'}-${this.passAnalysis_.startTime.toISOString().substring(0, 10)}.csv`;
-
-    saveCsv(csv, filename);
+    saveCsv(items, filename);
   }
 
   /**
@@ -864,6 +895,8 @@ export class LinkBudgetPlugin extends KeepTrackPlugin {
         freqDown = 8400;
         freqUp = 7900;
         break;
+      default:
+        return;
     }
 
     (getEl('link-freq-down') as HTMLInputElement).value = freqDown.toString();

@@ -120,6 +120,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 92,
   },
+  LinkBudgetPlugin: {
+    enabled: true,
+    order: 94,
+  },
   StereoMap: {
     enabled: true,
     order: 150,

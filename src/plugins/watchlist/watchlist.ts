@@ -387,7 +387,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     for (let i = 0; i < this.watchlistList.length; i++) {
-      sat = catalogManagerInstance.sccNum2Sat(this.watchlistList[i].id);
+      sat = catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);
       if (sat === null) {
         this.watchlistList.splice(i, 1);
       } else {

@@ -220,6 +220,18 @@ export class CatalogManager {
     return sat as DetailedSatellite;
   }
 
+  a52Sat(sccNum: string): DetailedSatellite | null {
+    const sat = this.getObject(this.sccNum2Id(sccNum.padStart(5, '0')));
+
+    if (!sat?.isSatellite()) {
+      errorManagerInstance.debug(`Object ${sccNum} is not a satellite!`);
+
+      return null;
+    }
+
+    return sat as DetailedSatellite;
+  }
+
   /**
    * @deprecated - Stars are not currently working
    *

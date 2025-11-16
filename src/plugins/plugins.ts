@@ -63,6 +63,7 @@ import { SensorFov } from './sensor-fov/sensor-fov';
 import { SensorListPlugin } from './sensor-list/sensor-list';
 import { SensorSurvFence } from './sensor-surv/sensor-surv-fence';
 import { CustomSensorPlugin } from './sensor/custom-sensor-plugin';
+import { LinkBudgetPlugin } from './link-budget/link-budget';
 import { LookAnglesPlugin } from './sensor/look-angles-plugin';
 import { MultiSiteLookAnglesPlugin } from './sensor/multi-site-look-angles-plugin';
 import { SensorInfoPlugin } from './sensor/sensor-info-plugin';
@@ -175,6 +176,7 @@ export class PluginManager {
         { init: () => new SensorSurvFence().init(), config: plugins.SensorSurvFence },
         { init: () => new ShortTermFences().init(), config: plugins.ShortTermFences },
         { init: () => new LookAnglesPlugin().init(), config: plugins.LookAnglesPlugin },
+        { init: () => new LinkBudgetPlugin().init(), config: plugins.LinkBudgetPlugin },
         { init: () => new MultiSiteLookAnglesPlugin().init(), config: plugins.MultiSiteLookAnglesPlugin },
         { init: () => new SensorTimeline().init(), config: plugins.SensorTimeline },
         { init: () => new SatelliteTimeline().init(), config: plugins.SatelliteTimeline },

@@ -121,7 +121,7 @@ export class WatchlistOverlay extends KeepTrackPlugin {
     const inView = ServiceLocator.getDotsManager().inViewData[sat.id];
     const uiManagerInstance = ServiceLocator.getUiManager();
     const idx = this.watchlistPlugin_.watchlistList.findIndex((el) => el.id === sat.id);
-    const inViewListVal = this.watchlistPlugin_.watchlistList[idx].inView;
+    const inViewListVal = this.watchlistPlugin_.watchlistList[idx]?.inView ?? false;
 
     if (inView === 1 && inViewListVal === false) {
       // Is inview and wasn't previously

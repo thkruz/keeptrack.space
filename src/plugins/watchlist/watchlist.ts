@@ -387,7 +387,7 @@ export class WatchlistPlugin extends KeepTrackPlugin {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     for (let i = 0; i < this.watchlistList.length; i++) {
-      sat = catalogManagerInstance.getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);
+      sat = catalogManagerInstance.sccNum2Sat(this.watchlistList[i].id);
       if (sat === null) {
         this.watchlistList.splice(i, 1);
       } else {
@@ -671,6 +671,12 @@ export class WatchlistPlugin extends KeepTrackPlugin {
 
   serialize() {
     const satIds: string[] = [];
+
+    this.watchlistList = this.watchlistList.filter(({ id }) => {
+      const sat = ServiceLocator.getCatalogManager().getSat(id, GetSatType.EXTRA_ONLY);
+
+      return sat !== null;
+    });
 
     for (let i = 0; i < this.watchlistList.length; i++) {
       const sat = ServiceLocator.getCatalogManager().getSat(this.watchlistList[i].id, GetSatType.EXTRA_ONLY);

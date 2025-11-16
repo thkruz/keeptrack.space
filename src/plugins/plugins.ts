@@ -24,6 +24,7 @@ import { DopsPlugin } from './dops/dops';
 import { DrawLinesPlugin } from './draw-lines/draw-lines';
 import { EarthPresetsPlugin } from './earth-presets/earth-presets';
 import { EditSat } from './edit-sat/edit-sat';
+import { StkeReaderPlugin } from './stke-reader/stke-reader';
 import { FilterMenuPlugin } from './filter-menu/filter-menu';
 import { GamepadPlugin } from './gamepad/gamepad';
 import { GithubLinkPlugin } from './github-link/github-link';
@@ -200,6 +201,7 @@ export class PluginManager {
             new proPlugin.OemReaderPlugin().init();
           }, config: plugins.OemReaderPlugin,
         },
+        { init: () => new StkeReaderPlugin().init(), config: plugins.StkeReaderPlugin },
         { init: () => new EditSat().init(), config: plugins.EditSat },
         { init: () => new NewLaunch().init(), config: plugins.NewLaunch },
         { init: () => new MissilePlugin().init(), config: plugins.MissilePlugin },

@@ -2,13 +2,17 @@
 /* eslint-disable no-process-exit */
 import { MultiCompiler, MultiRspackOptions, MultiStats, rspack } from '@rspack/core';
 import { BuildError, ConsoleStyles, ErrorCodes, handleBuildError, logWithStyle } from './lib/build-error';
+import { BUILD_DIRS, DEFAULT_PATHS, RESOURCE_DIRS } from './lib/build-constants';
+import { BuildStats } from './lib/build-stats';
+import { BuildValidator } from './lib/build-validator';
 import { ConfigManager } from './lib/config-manager';
 import { FileSystemManager } from './lib/filesystem-manager';
 import { PluginManager } from './lib/plugin-manager';
 import { VersionManager } from './lib/version-manager';
-import { WebpackManager } from './webpack-manager';
+import { RspackManager } from './rspack-manager';
 
 class BuildManager {
+  private static buildStats: BuildStats;
   /**
    * Main build process
    */
@@ -23,42 +27,46 @@ class BuildManager {
       const pluginManager = new PluginManager(fileManager);
       const versionManager = new VersionManager(fileManager);
 
+      // Load configuration first to initialize build stats
+      const config = configManager.loadConfig(process.argv.slice(2));
+
+      // Initialize build statistics
+      this.buildStats = new BuildStats(config.mode, config.isWatch);
+
       // Check for .env file - if it is missing copy from .env.example
-      if (!fileManager.fileExists('./.env')) {
-        fileManager.copyFile('./.env.example', './.env', { force: false });
+      if (!fileManager.fileExists(DEFAULT_PATHS.ENV_FILE)) {
+        fileManager.copyFile(DEFAULT_PATHS.ENV_EXAMPLE, DEFAULT_PATHS.ENV_FILE, { force: false });
         logWithStyle('.env file not found, copied from .env.example', ConsoleStyles.WARNING);
       }
 
-      // Load configuration
-      const config = configManager.loadConfig(process.argv.slice(2));
+      // Validate build configuration
+      BuildValidator.validateOrThrow(config);
 
       // Prepare build directory
-      fileManager.prepareBuildDirectory('./dist');
+      fileManager.prepareBuildDirectory(`./${BUILD_DIRS.DIST}`);
 
       // Copy static files
       logWithStyle('Copying static files', ConsoleStyles.DEBUG);
-      fileManager.copyTopLevelFiles('./public', './dist');
+      fileManager.copyTopLevelFiles(`./${BUILD_DIRS.PUBLIC}`, `./${BUILD_DIRS.DIST}`);
 
       // Copy resource directories
-      const resourceDirs = ['img/favicons', 'img/pwa', 'img/achievements', 'data', 'meshes', 'res', 'simulation', 'textures', 'tle'];
-
-      resourceDirs.forEach((dir) => {
-        fileManager.copyDirectory(`public/${dir}`, `dist/${dir}`, { recursive: true });
+      RESOURCE_DIRS.forEach((dir) => {
+        fileManager.copyDirectory(`${BUILD_DIRS.PUBLIC}/${dir}`, `${BUILD_DIRS.DIST}/${dir}`, { recursive: true });
       });
 
       // Apply custom configurations
-      fileManager.copyDirectory('src/plugins-pro/examples', 'dist/examples', { isOptional: true, recursive: true });
+      fileManager.copyDirectory(`${BUILD_DIRS.PLUGINS_PRO}/examples`, `${BUILD_DIRS.DIST}/examples`, { isOptional: true, recursive: true });
 
-      // Apply custom configurations
+      // Apply custom logo configurations
       if (config.textLogoPath) {
-        fileManager.copyFile(config.textLogoPath, './dist/img/logo.png', { force: true });
+        fileManager.copyFile(config.textLogoPath, `./${BUILD_DIRS.DIST}/img/logo.png`, { force: true });
       }
       if (config.primaryLogoPath) {
-        fileManager.copyFile(config.primaryLogoPath, './dist/img/logo-primary.png', { force: true });
+        fileManager.copyFile(config.primaryLogoPath, `./${BUILD_DIRS.DIST}/img/logo-primary.png`, { force: true });
       }
 
       if (config.secondaryLogoPath) {
-        fileManager.copyFile(config.secondaryLogoPath, './dist/img/logo-secondary.png', { force: true });
+        fileManager.copyFile(config.secondaryLogoPath, `./${BUILD_DIRS.DIST}/img/logo-secondary.png`, { force: true });
       }
 
       if (config.styleCssPath) {
@@ -76,31 +84,31 @@ class BuildManager {
       }
 
       if (config.favIconPath) {
-        fileManager.copyFile(config.favIconPath, './dist/img/favicons/favicon.ico', { force: true });
+        fileManager.copyFile(config.favIconPath, `./${BUILD_DIRS.DIST}/img/favicons/favicon.ico`, { force: true });
       }
 
       if (config.settingsPath) {
-        fileManager.copyFile(config.settingsPath, './dist/settings/settingsOverride.js', { force: true });
+        fileManager.copyFile(config.settingsPath, `./${BUILD_DIRS.DIST}/settings/settingsOverride.js`, { force: true });
       }
 
       if (config.isPro) {
         // Merge locales files
-        fileManager.mergeLocales('src', 'src/plugins-pro');
+        fileManager.mergeLocales(BUILD_DIRS.SOURCE, BUILD_DIRS.PLUGINS_PRO);
       } else {
-        fileManager.compileLocales('src');
+        fileManager.compileLocales(BUILD_DIRS.SOURCE);
       }
 
       // Configure plugins
       pluginManager.configurePlugins(config.isPro);
 
       // Update version information
-      versionManager.generateVersionFile('./package.json', 'src/settings/version.js');
+      versionManager.generateVersionFile(DEFAULT_PATHS.PACKAGE_JSON, DEFAULT_PATHS.VERSION_FILE);
 
-      // Generate webpack configuration
-      const webpackConfig = WebpackManager.createConfig(config) as MultiRspackOptions;
+      // Generate rspack configuration
+      const rspackConfig = RspackManager.createConfig(config) as MultiRspackOptions;
 
       // Create compiler
-      const compiler = rspack(webpackConfig);
+      const compiler = rspack(rspackConfig);
 
       if (!compiler) {
         throw new BuildError('Failed to create compiler', ErrorCodes.COMPILER_CREATION);
@@ -121,8 +129,11 @@ class BuildManager {
 
   /**
    * Handles compiler results
+   * @param err Error if any
+   * @param stats Compiler statistics
+   * @param isComplete Whether this is the final build (not watch mode)
    */
-  static handleCompilerResults(err: Error | null, stats?: MultiStats) {
+  static handleCompilerResults(err: Error | null, stats?: MultiStats, isComplete = false) {
     if (err) {
       handleBuildError(err, false);
 
@@ -153,6 +164,17 @@ class BuildManager {
         }),
       );
     }
+
+    // Update build stats
+    if (this.buildStats && stats) {
+      this.buildStats.updateFromCompilerStats(stats);
+    }
+
+    // Print summary for complete builds (not watch mode iterations)
+    if (isComplete && this.buildStats) {
+      this.buildStats.complete();
+      this.buildStats.printSummary();
+    }
   }
 
   /**
@@ -172,7 +194,7 @@ class BuildManager {
    */
   static runCompilers(compilers: MultiCompiler) {
     compilers.run((err: Error | null, stats?: MultiStats) => {
-      BuildManager.handleCompilerResults(err, stats);
+      BuildManager.handleCompilerResults(err, stats, true);
 
       // Close the compiler to let the process exit
       compilers.close((closeErr: Error | null) => {

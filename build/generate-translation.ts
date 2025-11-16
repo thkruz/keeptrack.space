@@ -1,6 +1,9 @@
 import path from 'path';
+import { ConsoleStyles, logWithStyle } from './lib/build-error';
 import { mergeAllLocales } from './utils/generate-translation-json';
 import { generateKeysFile } from './utils/generate-translation-keys';
+
+logWithStyle('Generating translation files', ConsoleStyles.INFO);
 
 mergeAllLocales();
 
@@ -11,13 +14,13 @@ mergeAllLocales();
  */
 let __dirname = path.dirname(new URL(import.meta.url).pathname).replace(/^\/+/u, '');
 
-console.log(__dirname);
+logWithStyle(`Working directory: ${__dirname}`, ConsoleStyles.DEBUG);
 
 // Check if __dirname is a Windows path
 if ((/^[a-zA-Z]:/u).test(__dirname)) {
-  console.log('Windows path detected');
+  logWithStyle('Windows path detected', ConsoleStyles.DEBUG);
 } else {
-  console.log('POSIX path detected');
+  logWithStyle('POSIX path detected', ConsoleStyles.DEBUG);
   __dirname = `/${__dirname}`;
 }
 
@@ -25,3 +28,5 @@ generateKeysFile(
   `${__dirname}/../src/*`,
   `${__dirname}/../src/locales/keys.ts`,
 );
+
+logWithStyle('Translation files generated successfully', ConsoleStyles.SUCCESS);

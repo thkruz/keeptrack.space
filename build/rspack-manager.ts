@@ -4,102 +4,120 @@ import DotEnv from 'dotenv-webpack';
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import WebpackBar from 'webpackbar/rspack';
+import { ConsoleStyles, logWithStyle } from './lib/build-error';
+import {
+  BUILD_MODES,
+  CACHE_CONFIG,
+  DEFAULT_PATHS,
+  DEVTOOL_CONFIG,
+  ENTRY_POINTS,
+  FILE_EXTENSIONS,
+  OUTPUT_PATTERNS,
+  WATCH_CONFIG,
+} from './lib/build-constants';
 import { BuildConfig } from './lib/config-manager';
-export class WebpackManager {
-  static readonly DEFAULT_MODE = 'development';
+
+/**
+ * Manages Rspack configuration and bundling
+ */
+export class RspackManager {
+  static readonly DEFAULT_MODE = BUILD_MODES.DEVELOPMENT;
   static readonly DEFAULT_WATCH = false;
   private static config: BuildConfig;
 
+  /**
+   * Creates Rspack configuration for all entry points
+   * @param config Build configuration
+   * @param isWatch Whether to enable watch mode (deprecated - use config.isWatch instead)
+   * @returns Array of Rspack configurations
+   */
   static createConfig(config: BuildConfig, isWatch: boolean = false): Configuration[] {
     this.config = config;
     const fileName = fileURLToPath(import.meta.url);
     const dirName = dirname(fileName);
-    const webpackConfig = [] as Configuration[];
+    const rspackConfigs = [] as Configuration[];
     let baseConfig = this.createBaseConfig_(dirName);
     const mode: 'development' | 'production' | 'none' = config.mode ?? 'development';
 
-    switch (mode) {
-      case 'development':
-      case 'production':
-      default:
-        baseConfig = this.createNonEmbedConfig_(baseConfig, mode);
-    }
+    // Apply mode-specific configuration
+    baseConfig = this.createNonEmbedConfig_(baseConfig, mode);
 
-    if (isWatch) {
+    // Enable watch mode if specified (prefer config.isWatch over isWatch parameter)
+    const shouldWatch = config.isWatch || isWatch;
+    if (shouldWatch) {
       baseConfig.watch = true;
       baseConfig.watchOptions = {
-        aggregateTimeout: 300,
-        poll: 1000,
+        aggregateTimeout: WATCH_CONFIG.AGGREGATE_TIMEOUT,
+        poll: WATCH_CONFIG.POLL_INTERVAL,
         ignored: /node_modules/u,
       };
     }
 
-    // Add source map if in these modes
-    if (mode === 'development') {
+    // Development mode optimizations
+    if (mode === BUILD_MODES.DEVELOPMENT) {
       baseConfig = {
         ...baseConfig,
-        ...{
-          cache: true,
-          devtool: 'source-map',
-          // devtool: 'eval-source-map',
-          optimization: {
-            minimize: false,
-          },
+        cache: CACHE_CONFIG.ENABLED_IN_DEV,
+        devtool: DEVTOOL_CONFIG.DEVELOPMENT,
+        optimization: {
+          minimize: false,
         },
       };
     }
 
-    // Minimize if in these modes
-    if (mode === 'production') {
+    // Production mode optimizations
+    if (mode === BUILD_MODES.PRODUCTION) {
       baseConfig = {
         ...baseConfig,
-        ...{
-          optimization: {
-            minimizer: [
-              new SwcJsMinimizerRspackPlugin({
-                // JS minimizer configuration
-              }),
-              new LightningCssMinimizerRspackPlugin({
-                // CSS minimizer configuration
-              }),
-            ],
-          },
+        cache: CACHE_CONFIG.ENABLED_IN_PROD,
+        devtool: DEVTOOL_CONFIG.PRODUCTION,
+        optimization: {
+          minimizer: [
+            new SwcJsMinimizerRspackPlugin({
+              // JS minimizer configuration
+            }),
+            new LightningCssMinimizerRspackPlugin({
+              // CSS minimizer configuration
+            }),
+          ],
         },
       };
     }
 
-    // split entry points of main and webworkers
+    // Create configurations for different entry points
     const mainConfig = this.createMainConfig_(baseConfig, dirName, 'dist');
     const webWorkerConfig = this.createWorkerConfig_(baseConfig, dirName, 'dist', '');
 
-    webpackConfig.push(mainConfig);
-    webpackConfig.push(webWorkerConfig);
+    rspackConfigs.push(mainConfig);
+    rspackConfigs.push(webWorkerConfig);
 
+    // Add auth configuration for pro builds
     if (this.config.isPro) {
       const authConfig = this.createAuthConfig_(baseConfig, dirName, 'dist', 'auth/');
-
-      webpackConfig.push(authConfig);
+      rspackConfigs.push(authConfig);
     }
 
-    // Modify the resolve configuration to handle web worker imports
+    // Configure worker imports fallback
     baseConfig.resolve!.fallback = {
       ...baseConfig.resolve!.fallback,
       worker: false,
     };
 
-    return webpackConfig;
+    return rspackConfigs;
   }
 
   /**
-   * Returns the base configuration for webpack.
+   * Returns the base configuration for rspack
+   * @param dirName The directory name
+   * @returns Base Rspack configuration
    */
   private static createBaseConfig_(dirName: string): Configuration {
-    console.log(`styleCssPath: ${this.config.styleCssPath}`);
-    console.log(`loadingScreenCssPath: ${this.config.loadingScreenCssPath}`);
+    logWithStyle(`Style CSS path: ${this.config.styleCssPath}`, ConsoleStyles.DEBUG);
+    logWithStyle(`Loading screen CSS path: ${this.config.loadingScreenCssPath}`, ConsoleStyles.DEBUG);
 
     return {
       resolve: {
-        extensions: ['.ts', '.js'],
+        extensions: [...FILE_EXTENSIONS.TYPESCRIPT, ...FILE_EXTENSIONS.JAVASCRIPT],
         alias: {
           '@app': `${dirName}/../src`,
           '@engine': `${dirName}/../src/engine`,
@@ -183,7 +201,10 @@ export class WebpackManager {
   }
 
   /**
-   * Returns a modified webpack configuration object for non-embed mode.
+   * Returns a modified rspack configuration object for non-embed mode
+   * @param baseConfig Base configuration
+   * @param mode Build mode
+   * @returns Modified configuration
    */
   private static createNonEmbedConfig_(baseConfig: Configuration, mode: 'none' | 'development' | 'production'): Configuration {
     baseConfig.mode = mode;
@@ -210,7 +231,12 @@ export class WebpackManager {
   }
 
   /**
-   * Returns the main configuration object for webpack.
+   * Returns the main configuration object for rspack
+   * @param baseConfig Base configuration
+   * @param dirName Directory name
+   * @param subFolder Subfolder for output
+   * @param pubPath Public path
+   * @returns Main app configuration
    */
   private static createMainConfig_(baseConfig: Configuration, dirName: string, subFolder: string, pubPath = '') {
     return <Configuration>({
@@ -218,11 +244,11 @@ export class WebpackManager {
       ...{
         name: 'MainFiles',
         entry: {
-          main: ['./src/main.ts'],
+          main: [ENTRY_POINTS.MAIN],
         },
         output: {
-          // Add hash to the end of the file name if not embeded
-          filename: `[name]${subFolder === 'dist' ? '.[contenthash]' : ''}.js`,
+          // Add hash to the end of the file name for cache busting
+          filename: subFolder === 'dist' ? OUTPUT_PATTERNS.MAIN_JS : '[name].js',
           path: `${dirName}/../${subFolder}/js`,
           publicPath: `./${pubPath}js/`,
         },
@@ -232,7 +258,7 @@ export class WebpackManager {
           }),
           new HtmlRspackPlugin({
             filename: '../index.html',
-            template: './public/index.html',
+            template: DEFAULT_PATHS.INDEX_HTML,
           }),
           new DotEnv({
             systemvars: true,
@@ -252,7 +278,12 @@ export class WebpackManager {
   }
 
   /**
-   * Returns the auth configuration object for webpack.
+   * Returns the auth configuration object for rspack
+   * @param baseConfig Base configuration
+   * @param dirName Directory name
+   * @param subFolder Subfolder for output
+   * @param pubPath Public path
+   * @returns Auth app configuration
    */
   private static createAuthConfig_(baseConfig: Configuration, dirName: string, subFolder: string, pubPath = '') {
     return <Configuration>({
@@ -260,18 +291,18 @@ export class WebpackManager {
       ...{
         name: 'AuthFiles',
         entry: {
-          'popup-callback': ['./src/plugins-pro/user-account/popup-callback.ts'],
+          'popup-callback': [ENTRY_POINTS.AUTH_CALLBACK],
         },
         output: {
-          // Add hash to the end of the file name if not embeded
-          filename: `[name]${subFolder === 'dist' ? '.[contenthash]' : ''}.js`,
+          // Add hash to the end of the file name for cache busting
+          filename: subFolder === 'dist' ? OUTPUT_PATTERNS.AUTH_JS : '[name].js',
           path: `${dirName}/../${subFolder}/auth`,
           publicPath: `../${pubPath}`,
         },
         plugins: [
           new HtmlRspackPlugin({
             filename: '../auth/callback.html',
-            template: './src/plugins-pro/user-account/callback.html',
+            template: DEFAULT_PATHS.AUTH_CALLBACK_HTML,
           }),
           new DotEnv({
             systemvars: true,
@@ -291,7 +322,12 @@ export class WebpackManager {
   }
 
   /**
-   * Returns the WebWorker configuration object.
+   * Returns the WebWorker configuration object
+   * @param baseConfig Base configuration
+   * @param dirName Directory name
+   * @param subFolder Subfolder for output
+   * @param pubPath Public path
+   * @returns WebWorker configuration
    */
   private static createWorkerConfig_(baseConfig: Configuration, dirName: string, subFolder: string, pubPath: string) {
     return ({
@@ -299,11 +335,11 @@ export class WebpackManager {
       ...{
         name: 'WebWorkers',
         entry: {
-          positionCruncher: ['./src/webworker/positionCruncher.ts'],
-          orbitCruncher: ['./src/webworker/orbitCruncher.ts'],
+          positionCruncher: [ENTRY_POINTS.POSITION_WORKER],
+          orbitCruncher: [ENTRY_POINTS.ORBIT_WORKER],
         },
         output: {
-          filename: '[name].js',
+          filename: OUTPUT_PATTERNS.WORKER_JS,
           path: `${dirName}/../${subFolder}/js`,
           publicPath: `./${pubPath}js/`,
         },

@@ -391,7 +391,7 @@ export class FileSystemManager {
 
     const mergedJson = { ...srcJson, ...pluginJson, ...{ plugins: { ...srcJson.plugins, ...pluginJson.plugins } } };
 
-    console.log(`Merged locale files: ${srcPath} + ${pluginPath}`);
+    logWithStyle(`Merged locale files: ${srcPath} + ${pluginPath}`, ConsoleStyles.DEBUG);
 
     return JSON.stringify(mergedJson, null, 2);
   }

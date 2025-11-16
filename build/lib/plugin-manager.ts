@@ -28,23 +28,47 @@ export class PluginManager {
    * **Add new Pro plugins here to make them available in the application.**
    */
   private readonly pluginPaths: Record<string, PluginPathMapping> = {
-    'telemetry': {
-      openSourcePath: '../plugins/telemetry/telemetry',
-      proPath: '../plugins-pro/telemetry/telemetry',
-    },
-    'user-account': {
-      openSourcePath: '../plugins/user-account/user-account',
-      proPath: '../plugins-pro/user-account/user-account',
-    },
     'about-menu': {
       openSourcePath: '../plugins/about-menu/about-menu',
       proPath: '../plugins-pro/about-menu/about-menu',
+    },
+    astronomy: {
+      openSourcePath: '../plugins/astronomy/astronomy',
+      proPath: '../plugins-pro/astronomy/astronomy',
+    },
+    debug: {
+      openSourcePath: '../plugins/debug/debug',
+      proPath: '../plugins-pro/debug/debug',
+    },
+    'earth-atmosphere': {
+      openSourcePath: '../plugins/earth-atmosphere/earth-atmosphere',
+      proPath: '../plugins-pro/earth-atmosphere/earth-atmosphere',
+    },
+    'graphics-menu': {
+      openSourcePath: '../plugins/graphics-menu/graphics-menu',
+      proPath: '../plugins-pro/graphics-menu/graphics-menu',
+    },
+    'initial-orbit': {
+      openSourcePath: '../plugins/initial-orbit/initial-orbit',
+      proPath: '../plugins-pro/initial-orbit/initial-orbit',
+    },
+    maneuver: {
+      openSourcePath: '../plugins/maneuver/maneuver',
+      proPath: '../plugins-pro/maneuver/maneuver',
+    },
+    'oem-reader': {
+      openSourcePath: '../plugins/oem-reader/oem-reader',
+      proPath: '../plugins-pro/oem-reader/oem-reader',
+    },
+    planetarium: {
+      openSourcePath: '../plugins/planetarium/planetarium',
+      proPath: '../plugins-pro/planetarium/planetarium',
     },
     'sat-info-box-actions': {
       openSourcePath: '../plugins/sat-info-box-actions/sat-info-box-actions',
       proPath: '../plugins-pro/sat-info-box-actions/sat-info-box-actions',
     },
-    'sat-inno-box-links': {
+    'sat-info-box-links': {
       openSourcePath: '../plugins/sat-info-box-links/sat-info-box-links',
       proPath: '../plugins-pro/sat-info-box-links/sat-info-box-links',
     },
@@ -52,45 +76,13 @@ export class PluginManager {
       openSourcePath: '../plugins/sat-info-box-mission/sat-info-box-mission',
       proPath: '../plugins-pro/sat-info-box-mission/sat-info-box-mission',
     },
-    'initial-orbit': {
-      openSourcePath: '../plugins/initial-orbit/initial-orbit',
-      proPath: '../plugins-pro/initial-orbit/initial-orbit',
-    },
-    'earth-atmosphere': {
-      openSourcePath: '../plugins/earth-atmosphere/earth-atmosphere',
-      proPath: '../plugins-pro/earth-atmosphere/earth-atmosphere',
-    },
-    debug: {
-      openSourcePath: '../plugins/debug/debug',
-      proPath: '../plugins-pro/debug/debug',
-    },
-    astronomy: {
-      openSourcePath: '../plugins/astronomy/astronomy',
-      proPath: '../plugins-pro/astronomy/astronomy',
-    },
-    planetarium: {
-      openSourcePath: '../plugins/planetarium/planetarium',
-      proPath: '../plugins-pro/planetarium/planetarium',
-    },
-    maneuver: {
-      openSourcePath: '../plugins/maneuver/maneuver',
-      proPath: '../plugins-pro/maneuver/maneuver',
-    },
-    'graphics-menu': {
-      openSourcePath: '../plugins/graphics-menu/graphics-menu',
-      proPath: '../plugins-pro/graphics-menu/graphics-menu',
-    },
-    'oem-reader': {
-      openSourcePath: '../plugins/oem-reader/oem-reader',
-      proPath: '../plugins-pro/oem-reader/oem-reader',
+    telemetry: {
+      openSourcePath: '../plugins/telemetry/telemetry',
+      proPath: '../plugins-pro/telemetry/telemetry',
     },
     'user-account': {
       openSourcePath: '../plugins/user-account/user-account',
       proPath: '../plugins-pro/user-account/user-account',
-    },
-    'telemetry': {
-      openSourcePath: '../plugins/telemetry/telemetry',
-      proPath: '../plugins-pro/telemetry/telemetry',
     },
   };
 

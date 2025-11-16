@@ -120,6 +120,10 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 92,
   },
+  EclipseSolarAnalysis: {
+    enabled: true,
+    order: 93,
+  },
   StereoMap: {
     enabled: true,
     order: 150,

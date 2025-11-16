@@ -22,7 +22,7 @@
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { Degrees, DetailedSatellite, EciVec3, Kilometers, Milliseconds, RAD2DEG, Sgp4 } from '@ootk/src/main';
+import { Degrees, DetailedSatellite, EciVec3, Kilometers, Milliseconds, RAD2DEG, StateVectorSgp4 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import {
   BetaAngleDataPoint,
@@ -69,7 +69,7 @@ export class EclipseCalculations {
       // Get satellite position at this time
       const posvel = SatMath.getEci(satellite, currentTime);
 
-      if (!posvel || !posvel.position) {
+      if (!posvel?.position) {
         continue;
       }
 
@@ -82,7 +82,7 @@ export class EclipseCalculations {
       };
 
       // Check eclipse status
-      const status = SatMath.calculateIsInSun({ position: posvel.position }, sunEciVec);
+      const status = SatMath.calculateIsInSun({ position: posvel.position } as StateVectorSgp4, sunEciVec);
 
       // Detect transitions
       if (previousStatus !== SunStatus.UNKNOWN && status !== previousStatus) {
@@ -137,7 +137,7 @@ export class EclipseCalculations {
             time: currentTime,
             orbitNumber,
           });
-          if (currentPeriod && currentPeriod.isUmbral) {
+          if (currentPeriod?.isUmbral) {
             periods.push({
               startTime: currentPeriod.startTime!,
               endTime: currentTime,
@@ -173,7 +173,7 @@ export class EclipseCalculations {
             time: currentTime,
             orbitNumber,
           });
-          if (currentPeriod && currentPeriod.isUmbral) {
+          if (currentPeriod?.isUmbral) {
             periods.push({
               startTime: currentPeriod.startTime!,
               endTime: currentTime,
@@ -191,10 +191,10 @@ export class EclipseCalculations {
     }
 
     // Close any open period at the end
-    if (currentPeriod && currentPeriod.startTime) {
+    if (currentPeriod?.startTime) {
       periods.push({
         startTime: currentPeriod.startTime,
-        endTime: endTime,
+        endTime,
         duration: (endTime.getTime() - currentPeriod.startTime.getTime()) as Milliseconds,
         orbitNumber: currentPeriod.orbitNumber!,
         isUmbral: currentPeriod.isUmbral!,
@@ -212,7 +212,7 @@ export class EclipseCalculations {
     // Get satellite position and velocity
     const posvel = SatMath.getEci(satellite, time);
 
-    if (!posvel || !posvel.position || !posvel.velocity) {
+    if (!posvel?.position || !posvel.velocity) {
       return 0 as Degrees;
     }
 
@@ -272,7 +272,7 @@ export class EclipseCalculations {
     // Get satellite position
     const posvel = SatMath.getEci(satellite, time);
 
-    if (!posvel || !posvel.position) {
+    if (!posvel?.position) {
       return {
         phaseAngle: 0 as Degrees,
         sunElevation: 0 as Degrees,
@@ -331,8 +331,8 @@ export class EclipseCalculations {
       z: sunEci[2] as Kilometers,
     };
 
-    const isSatelliteIlluminated = SatMath.calculateIsInSun({ position: posvel.position }, sunEciVec) === SunStatus.SUN;
-    const isTargetIlluminated = SatMath.calculateIsInSun({ position: targetPosition }, sunEciVec) === SunStatus.SUN;
+    const isSatelliteIlluminated = SatMath.calculateIsInSun({ position: posvel.position } as StateVectorSgp4, sunEciVec) === SunStatus.SUN;
+    const isTargetIlluminated = SatMath.calculateIsInSun({ position: targetPosition } as StateVectorSgp4, sunEciVec) === SunStatus.SUN;
 
     return {
       phaseAngle,
@@ -418,7 +418,7 @@ export class EclipseCalculations {
   static getCurrentEclipseStatus(satellite: DetailedSatellite, time: Date): SunStatus {
     const posvel = SatMath.getEci(satellite, time);
 
-    if (!posvel || !posvel.position) {
+    if (!posvel?.position) {
       return SunStatus.UNKNOWN;
     }
 
@@ -429,7 +429,7 @@ export class EclipseCalculations {
       z: sunEci[2] as Kilometers,
     };
 
-    return SatMath.calculateIsInSun({ position: posvel.position }, sunEciVec);
+    return SatMath.calculateIsInSun({ position: posvel.position } as StateVectorSgp4, sunEciVec);
   }
 
   /**

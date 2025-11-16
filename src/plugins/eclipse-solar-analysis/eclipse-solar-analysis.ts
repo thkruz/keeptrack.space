@@ -21,11 +21,10 @@
  */
 
 import { SunStatus } from '@app/app/analysis/sat-math';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { MenuMode } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { BaseObject, DetailedSatellite, Milliseconds } from '@ootk/src/main';
@@ -33,12 +32,11 @@ import dayNightPng from '@public/img/icons/day-night.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EclipseCalculations } from './eclipse-calculations';
-import { EclipseEventType, EclipsePeriod, EclipsePredictionConfig } from './eclipse-types';
+import { EclipseEvent, EclipseEventType, EclipsePeriod, EclipsePredictionConfig } from './eclipse-types';
 
 export class EclipseSolarAnalysis extends KeepTrackPlugin {
   readonly id = 'EclipseSolarAnalysis';
   dependencies_: string[] = [SelectSatManager.name];
-  private readonly selectSatManager_: SelectSatManager;
 
   isRequireSatelliteSelected = true;
   isIconDisabled = true;
@@ -151,13 +149,8 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
   private currentSatellite_: DetailedSatellite | null = null;
   private currentEclipsePeriods_: EclipsePeriod[] = [];
   private updateInterval_: NodeJS.Timeout | null = null;
-  private stateStartTime_: Date | null = null;
+  private stateStartTime_: number | null = null;
   private currentStatus_: SunStatus = SunStatus.UNKNOWN;
-
-  constructor() {
-    super();
-    this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager;
-  }
 
   bottomIconCallback = () => {
     if (this.isMenuButtonActive) {
@@ -188,7 +181,7 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
     });
 
     // Listen for time changes
-    EventBus.getInstance().on(EventBusEvent.timeManagerTick, () => {
+    EventBus.getInstance().on(EventBusEvent.update, () => {
       if (this.isMenuButtonActive && this.currentSatellite_) {
         this.updateRealTimeStatus_();
       }
@@ -251,12 +244,12 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
           break;
         case SunStatus.PENUMBRAL:
           statusText = 'Penumbral Shadow';
-          statusColor = '#888';
           break;
         case SunStatus.UMBRAL:
           statusText = 'Umbral Shadow (Full Eclipse)';
           statusColor = '#444';
           break;
+        default:
       }
 
       (<HTMLInputElement>statusEl).value = statusText;
@@ -266,13 +259,13 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
 
     // Track state changes to calculate time in current state
     if (status !== this.currentStatus_) {
-      this.stateStartTime_ = currentTime;
+      this.stateStartTime_ = currentTime.getTime();
       this.currentStatus_ = status;
     }
 
     // Update time in current state
     if (this.stateStartTime_) {
-      const timeInState = currentTime.getTime() - this.stateStartTime_.getTime();
+      const timeInState = currentTime.getTime() - this.stateStartTime_;
       const hours = Math.floor(timeInState / 3600000);
       const minutes = Math.floor((timeInState % 3600000) / 60000);
       const seconds = Math.floor((timeInState % 60000) / 1000);
@@ -344,7 +337,7 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
 
     // Display results
     this.displayEclipseEvents_(events);
-    this.displayEclipseStatistics_(periods, config.predictionDurationHours * 3600 * 1000);
+    this.displayEclipseStatistics_(periods, config.predictionDurationHours * 3600 * 1000 as Milliseconds);
 
     // Enable export button
     const exportBtn = getEl('export-eclipse-data-btn');
@@ -357,7 +350,7 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
   /**
    * Display eclipse events in the UI
    */
-  private displayEclipseEvents_(events: any[]): void {
+  private displayEclipseEvents_(events: EclipseEvent[]): void {
     const container = getEl('eclipse-events-container');
 
     if (!container) {
@@ -392,6 +385,8 @@ export class EclipseSolarAnalysis extends KeepTrackPlugin {
         case EclipseEventType.EXIT_PENUMBRA:
           eventStr = '← Exit Penumbra';
           break;
+        default:
+          eventStr = 'Unknown Event';
       }
 
       html += `<tr><td>${timeStr}</td><td>${eventStr}</td><td>${event.orbitNumber}</td></tr>`;

@@ -21,6 +21,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { Earth } from '@app/engine/rendering/draw-manager/earth';
 import {
@@ -59,7 +60,6 @@ import { DISTANCE_TO_SUN, RADIUS_OF_EARTH, RADIUS_OF_SUN } from '../../engine/ut
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { jday, lon2yaw } from '../../engine/utils/transforms';
 import { CoordinateTransforms } from './coordinate-transforms';
-import { ServiceLocator } from '@app/engine/core/service-locator';
 
 if (!global) {
   window._numeric = numeric; // numeric will break if it is not available globally
@@ -190,7 +190,7 @@ export abstract class SatMath {
     }
 
 
-    if (obj instanceof BaseObject) {
+    if (obj instanceof BaseObject || !(obj.position instanceof Boolean)) {
       if (!obj?.position) {
         return SunStatus.UNKNOWN;
       }
@@ -215,9 +215,9 @@ export abstract class SatMath {
         typeof obj.velocity.z === 'number'
       )) && typeof obj.position !== 'boolean') {
 
-      x = obj.position.x as Kilometers;
-      y = obj.position.y as Kilometers;
-      z = obj.position.z as Kilometers;
+      x = obj.position.x;
+      y = obj.position.y;
+      z = obj.position.z;
     } else {
       return SunStatus.UNKNOWN;
     }

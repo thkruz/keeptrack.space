@@ -1,3 +1,5 @@
+import { GroupType } from '@app/app/data/object-group';
+import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -7,6 +9,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import landscape3Png from '@public/img/icons/landscape3.png';
+import { DetailedSatellite } from '@ootk/src/main';
 import { saveAs } from 'file-saver';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
@@ -44,6 +47,8 @@ export interface ScenarioData {
   description: string;
   startTime: Date | null;
   endTime: Date | null;
+  satellites?: string[]; // Array of satellite identifiers (sccNum or object names)
+  sensors?: string[]; // Array of sensor names
 }
 
 interface ScenarioFile {
@@ -51,6 +56,8 @@ interface ScenarioFile {
   description?: string;
   startTime?: string;
   endTime?: string;
+  satellites?: string[]; // Array of satellite identifiers (sccNum or object names)
+  sensors?: string[]; // Array of sensor names
 }
 
 export class ScenarioManagementPlugin extends KeepTrackPlugin {
@@ -122,6 +129,8 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
     description: this.defaultScenarioDescription,
     startTime: null,
     endTime: null,
+    satellites: [],
+    sensors: [],
   };
 
   addHtml(): void {
@@ -324,12 +333,25 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
   private onSave_(evt: Event): void {
     this.onSubmit_();
     ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+
+    // Collect current satellites and sensors
+    const visibleSatellites = this.collectVisibleSatellites_();
+    const activeSensors = this.collectActiveSensors_();
+
+    // Update scenario with current satellites and sensors
+    this.scenario.satellites = visibleSatellites;
+    this.scenario.sensors = activeSensors;
+
     const blob = new Blob([JSON.stringify(this.scenario, null, 2)], {
       type: 'text/plain;charset=utf-8',
     });
 
     try {
       saveAs(blob, `keeptrack-scenario-${this.scenario.name}.json`);
+      ServiceLocator.getUiManager().toast(
+        `Saved scenario with ${visibleSatellites.length} satellite(s) and ${activeSensors.length} sensor(s)`,
+        ToastMsgType.normal,
+      );
     } catch (e) {
       if (!isThisNode()) {
         errorManagerInstance.error(e, 'scenario-management.ts', 'Error saving scenario!');
@@ -361,9 +383,19 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
                 description: scenarioFile.description || '',
                 startTime: scenarioFile.startTime ? new Date(scenarioFile.startTime) : null,
                 endTime: scenarioFile.endTime ? new Date(scenarioFile.endTime) : null,
+                satellites: scenarioFile.satellites || [],
+                sensors: scenarioFile.sensors || [],
               };
 
               if (this.updateScenario(scenarioData)) {
+                // Apply satellite and sensor filters
+                if (scenarioData.satellites && scenarioData.satellites.length > 0) {
+                  this.applySatelliteFilter_(scenarioData.satellites);
+                }
+                if (scenarioData.sensors && scenarioData.sensors.length > 0) {
+                  this.applySensorFilter_(scenarioData.sensors);
+                }
+
                 ServiceLocator.getUiManager().toast('Scenario loaded successfully!', ToastMsgType.normal);
               }
             } catch (error) {
@@ -376,5 +408,154 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
     };
 
     input.click();
+  }
+
+  /**
+   * Collects all currently visible satellites from the catalog
+   * @returns Array of satellite identifiers (sccNum for DetailedSatellites, name for OemSatellites)
+   */
+  private collectVisibleSatellites_(): string[] {
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const satellites: string[] = [];
+
+    // Iterate through all objects in the catalog
+    for (const obj of catalogManager.objectCache) {
+      if (!obj) {
+        continue;
+      }
+
+      // Check if it's a DetailedSatellite
+      if (obj instanceof DetailedSatellite) {
+        if (obj.sccNum) {
+          satellites.push(obj.sccNum);
+        }
+      }
+      // Check if it's an OemSatellite
+      else if (obj instanceof OemSatellite) {
+        if (obj.name) {
+          satellites.push(obj.name);
+        }
+      }
+    }
+
+    return satellites;
+  }
+
+  /**
+   * Collects all currently active sensors
+   * @returns Array of sensor names
+   */
+  private collectActiveSensors_(): string[] {
+    const sensorManager = ServiceLocator.getSensorManager();
+    const sensors: string[] = [];
+
+    // Collect all current sensors
+    for (const sensor of sensorManager.currentSensors) {
+      if (sensor?.objName) {
+        sensors.push(sensor.objName);
+      }
+    }
+
+    // Collect all secondary sensors
+    for (const sensor of sensorManager.secondarySensors) {
+      if (sensor?.objName) {
+        sensors.push(sensor.objName);
+      }
+    }
+
+    return sensors;
+  }
+
+  /**
+   * Filters satellites to only show those in the scenario
+   * @param satelliteIds Array of satellite identifiers to show
+   */
+  private applySatelliteFilter_(satelliteIds: string[]): void {
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const groupsManager = ServiceLocator.getGroupsManager();
+
+    if (!satelliteIds || satelliteIds.length === 0) {
+      // No filter specified, clear any existing group selection
+      groupsManager.clearSelect();
+
+      return;
+    }
+
+    // Create a Set for faster lookup
+    const satelliteSet = new Set(satelliteIds);
+    const matchingIds: number[] = [];
+
+    // Iterate through all objects and find those in the scenario
+    for (let i = 0; i < catalogManager.objectCache.length; i++) {
+      const obj = catalogManager.objectCache[i];
+
+      if (!obj) {
+        continue;
+      }
+
+      let shouldInclude = false;
+
+      // Check if it's a DetailedSatellite
+      if (obj instanceof DetailedSatellite) {
+        shouldInclude = obj.sccNum ? satelliteSet.has(obj.sccNum) : false;
+      }
+      // Check if it's an OemSatellite
+      else if (obj instanceof OemSatellite) {
+        shouldInclude = obj.name ? satelliteSet.has(obj.name) : false;
+      }
+
+      // Add to the group if it matches
+      if (shouldInclude) {
+        matchingIds.push(i);
+      }
+    }
+
+    // Create a group with the matching satellites
+    const scenarioGroup = groupsManager.createGroup(GroupType.ID_LIST, { ids: matchingIds });
+
+    groupsManager.selectGroup(scenarioGroup);
+
+    ServiceLocator.getUiManager().toast(
+      `Filtered to ${matchingIds.length} satellite(s) from scenario`,
+      ToastMsgType.normal,
+    );
+  }
+
+  /**
+   * Sets the active sensors from the scenario
+   * @param sensorNames Array of sensor names to activate
+   */
+  private applySensorFilter_(sensorNames: string[]): void {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    if (!sensorNames || sensorNames.length === 0) {
+      // No sensors specified, clear all sensors
+      sensorManager.currentSensors = [];
+      sensorManager.secondarySensors = [];
+
+      return;
+    }
+
+    // Clear current sensors
+    sensorManager.currentSensors = [];
+    sensorManager.secondarySensors = [];
+
+    // Set sensors from the scenario
+    for (const sensorName of sensorNames) {
+      const sensor = sensorManager.getSensorByObjName(sensorName);
+
+      if (sensor) {
+        sensorManager.addSecondarySensor(sensor);
+      } else {
+        errorManagerInstance.warn(`Sensor ${sensorName} not found in catalog`);
+      }
+    }
+
+    if (sensorNames.length > 0) {
+      ServiceLocator.getUiManager().toast(
+        `Loaded ${sensorNames.length} sensor(s)`,
+        ToastMsgType.normal,
+      );
+    }
   }
 }

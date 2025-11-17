@@ -9,7 +9,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { getUnique } from '@app/engine/utils/get-unique';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
-import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, RaeVec, eci2rae } from '@ootk/src/main';
+import { BaseObject, Degrees, DetailedSatellite, Hours, Kilometers, Minutes, RaeVec3, eci2rae } from '@ootk/src/main';
 import findSatPng from '@public/img/icons/database-search.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 
@@ -81,16 +81,16 @@ const isValidNumber = (value: number): boolean => !isNaN(value) && isFinite(valu
 /**
  * Parses a float input value and returns it if valid, otherwise returns the default
  */
-const parseFloatOrDefault = (value: string, defaultValue: number): number => {
-  const parsed = parseFloat(value);
+// const parseFloatOrDefault = (value: string, defaultValue: number): number => {
+//   const parsed = parseFloat(value);
 
-  return isValidNumber(parsed) ? parsed : defaultValue;
-};
+//   return isValidNumber(parsed) ? parsed : defaultValue;
+// };
 
 /**
  * Gets satellite position and converts to RAE coordinates
  */
-const getSatelliteRae = (sat: DetailedSatellite): RaeVec | null => {
+const getSatelliteRae = (sat: DetailedSatellite): RaeVec3 | null => {
   if (!sat.isSatellite() && !sat.isMissile()) {
     return null;
   }

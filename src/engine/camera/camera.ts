@@ -25,7 +25,7 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import {
-  BaseObject, DEG2RAD, Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, MILLISECONDS_TO_DAYS, Milliseconds, Radians, Sgp4, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
+  BaseObject, Degrees, EciVec3, GreenwichMeanSiderealTime, Kilometers, MILLISECONDS_TO_DAYS, Milliseconds, Radians, Sgp4, SpaceObjectType, Star, TAU, ZoomValue, eci2lla,
 } from '@ootk/src/main';
 import { mat4, vec3 } from 'gl-matrix';
 import { keepTrackApi } from '../../keepTrackApi';

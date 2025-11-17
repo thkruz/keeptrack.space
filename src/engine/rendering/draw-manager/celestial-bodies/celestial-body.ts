@@ -1,7 +1,6 @@
 /**
  * Base class for rendering non-Earth celestial bodies (Moon, Mars, etc.)
  */
-import { SatMath } from '@app/app/analysis/sat-math';
 import { Planet } from '@app/app/objects/planet';
 import { EciArr3, SolarBody, rgbaArray } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -406,7 +405,12 @@ export abstract class CelestialBody {
     this.relativeSatPos = { x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers };
 
     if (selectedSatPos) {
-      this.relativeSatPos = SatMath.getPositionFromCenterBody(selectedSatPos, this);
+      // Calculate position relative to this celestial body
+      this.relativeSatPos = {
+        x: selectedSatPos.x - this.position[0] as Kilometers,
+        y: selectedSatPos.y - this.position[1] as Kilometers,
+        z: selectedSatPos.z - this.position[2] as Kilometers,
+      };
     }
   }
 }

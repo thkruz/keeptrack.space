@@ -1,4 +1,3 @@
-import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -642,11 +641,15 @@ export class WebGLRenderer {
 
         // Now we can fix this draw call
         const firstPointOut = keepTrackApi.getDotsManager().getPositionArray(this.selectSatManager_.primarySatObj.id);
-        const firstRelativePointOut = SatMath.getPositionFromCenterBody({
-          x: firstPointOut[0] as Kilometers,
-          y: firstPointOut[1] as Kilometers,
-          z: firstPointOut[2] as Kilometers,
-        });
+
+        // Calculate position relative to center body
+        const centerBody = keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!;
+        const centerBodyPosition = centerBody.position;
+        const firstRelativePointOut = {
+          x: firstPointOut[0] - centerBodyPosition[0] as Kilometers,
+          y: firstPointOut[1] - centerBodyPosition[1] as Kilometers,
+          z: firstPointOut[2] - centerBodyPosition[2] as Kilometers,
+        };
 
         if (primarySat instanceof DetailedSatellite) {
           keepTrackApi.getOrbitManager().alignOrbitSelectedObject(

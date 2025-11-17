@@ -174,9 +174,6 @@ export class CameraInputHandler {
         uiManagerInstance.toast('Earth Centered Camera Mode', ToastMsgType.standby);
         this.camera.state.zoomTarget = 0.5;
         break;
-      case CameraType.OFFSET:
-        uiManagerInstance.toast('Offset Camera Mode', ToastMsgType.standby);
-        break;
       case CameraType.FIXED_TO_SAT:
         uiManagerInstance.toast('Fixed to Satellite Camera Mode', ToastMsgType.standby);
         break;

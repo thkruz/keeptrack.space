@@ -2,6 +2,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { BaseObject, CatalogSource, DetailedSatellite, GreenwichMeanSiderealTime, Kilometers, Milliseconds } from '@ootk/src/main';
@@ -21,7 +22,6 @@ import { DepthManager } from './depth-manager';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
 import { MeshManager } from './mesh-manager';
-import { KeepTrack } from '@app/keeptrack';
 
 export class WebGLRenderer {
   private hoverBoxOnSatMiniElements_: HTMLElement | null = null;

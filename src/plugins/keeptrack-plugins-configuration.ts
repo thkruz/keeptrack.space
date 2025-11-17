@@ -100,4 +100,5 @@ export type KeepTrackPluginsConfiguration = {
   VcrPlugin?: PluginConfiguration;
   TimeSlider?: PluginConfiguration;
   OemReaderPlugin?: PluginConfiguration;
+  EclipseSolarAnalysis?: PluginConfiguration;
 };

@@ -392,7 +392,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
         const header = `Visibility Windows Report\n-------------------------------\n${this.createHeader_(sat, sensor)}`;
         let body = 'Pass #,Rise Time (UTC),Set Time (UTC),Duration (min),Max Elevation(°),Max Elevation Time (UTC)\n';
         const durationInSeconds = 7 * 24 * 60 * 60; // 7 days
-        let time = new Date(startTime.getTime());
+        let time: Date;
         let passNumber = 0;
         let inPass = false;
         let riseTime: Date | null = null;

@@ -1,5 +1,6 @@
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { Kilometers, Radians } from '@app/engine/ootk/src/main';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { SettingsManager } from '@app/settings/settings';
@@ -52,19 +53,22 @@ export class CameraMenuPlugin extends KeepTrackPlugin {
           <h5 class="center-align">View Settings</h5>
           <div class="row">
             <div class="input-field col s12">
-              <input value="0.6" id="camera-fieldOfView" type="number" step="0.05" min="0.04" max="1.2" data-position="top" data-delay="50" data-tooltip="Camera field of view (radians)" />
+              <input value="0.6" id="camera-fieldOfView" type="number" step="0.05" min="0.04" max="1.2" data-position="top" data-delay="50"
+              data-tooltip="Camera field of view (radians)" />
               <label for="camera-fieldOfView" class="active">Field of View</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input value="0.003" id="camera-movementSpeed" type="number" step="0.001" min="0.001" max="0.1" data-position="top" data-delay="50" data-tooltip="Camera movement speed" />
+              <input value="0.003" id="camera-movementSpeed" type="number" step="0.001" min="0.001" max="0.1" data-position="top" data-delay="50"
+              data-tooltip="Camera movement speed" />
               <label for="camera-movementSpeed" class="active">Movement Speed</label>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input value="5" id="camera-decayFactor" type="number" step="1" min="1" max="20" data-position="top" data-delay="50" data-tooltip="Camera decay factor (lower = more momentum)" />
+              <input value="5" id="camera-decayFactor" type="number" step="1" min="1" max="20" data-position="top" data-delay="50"
+              data-tooltip="Camera decay factor (lower = more momentum)" />
               <label for="camera-decayFactor" class="active">Decay Factor</label>
             </div>
           </div>
@@ -86,7 +90,8 @@ export class CameraMenuPlugin extends KeepTrackPlugin {
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input value="1200000" id="camera-maxZoomDistance" type="number" step="100000" min="100000" max="10000000" data-position="top" data-delay="50" data-tooltip="Max zoom distance (km)" />
+              <input value="1200000" id="camera-maxZoomDistance" type="number" step="100000" min="100000" max="10000000" data-position="top" data-delay="50"
+              data-tooltip="Max zoom distance (km)" />
               <label for="camera-maxZoomDistance" class="active">Max Zoom Distance (km)</label>
             </div>
           </div>
@@ -121,7 +126,8 @@ export class CameraMenuPlugin extends KeepTrackPlugin {
           </div>
           <div class="row">
             <div class="input-field col s12">
-              <input value="0.000075" id="camera-autoRotateSpeed" type="number" step="0.00001" min="0.00001" max="0.001" data-position="top" data-delay="50" data-tooltip="Auto rotate speed" />
+              <input value="0.000075" id="camera-autoRotateSpeed" type="number" step="0.00001" min="0.00001" max="0.001" data-position="top" data-delay="50"
+              data-tooltip="Auto rotate speed" />
               <label for="camera-autoRotateSpeed" class="active">Auto Rotate Speed</label>
             </div>
           </div>
@@ -301,13 +307,13 @@ export class CameraMenuPlugin extends KeepTrackPlugin {
   static resetToDefaults() {
     ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
-    settingsManager.fieldOfView = 0.6;
+    settingsManager.fieldOfView = 0.6 as Radians;
     settingsManager.cameraMovementSpeed = 0.003;
     settingsManager.cameraDecayFactor = 5;
     settingsManager.disableCameraControls = false;
     settingsManager.zoomSpeed = 0.005;
-    settingsManager.maxZoomDistance = 1200000;
-    settingsManager.nearZoomLevel = 25;
+    settingsManager.maxZoomDistance = 1200000 as Kilometers;
+    settingsManager.nearZoomLevel = 25 as Kilometers;
     settingsManager.isZoomStopsRotation = true;
     settingsManager.isZoomStopsSnappedOnSat = false;
     settingsManager.autoPanSpeed = 1;
@@ -323,6 +329,7 @@ export class CameraMenuPlugin extends KeepTrackPlugin {
     CameraMenuPlugin.syncOnLoad();
   }
 
+  // eslint-disable-next-line complexity
   private static onSubmit_(e: SubmitEvent) {
     e.preventDefault();
 
@@ -337,7 +344,7 @@ export class CameraMenuPlugin extends KeepTrackPlugin {
     const fieldOfView = parseFloat((<HTMLInputElement>getEl('camera-fieldOfView')).value);
 
     if (!isNaN(fieldOfView) && fieldOfView >= 0.04 && fieldOfView <= 1.2) {
-      settingsManager.fieldOfView = fieldOfView;
+      settingsManager.fieldOfView = fieldOfView as Radians;
     }
 
     const movementSpeed = parseFloat((<HTMLInputElement>getEl('camera-movementSpeed')).value);
@@ -361,13 +368,13 @@ export class CameraMenuPlugin extends KeepTrackPlugin {
     const maxZoomDistance = parseFloat((<HTMLInputElement>getEl('camera-maxZoomDistance')).value);
 
     if (!isNaN(maxZoomDistance) && maxZoomDistance >= 100000 && maxZoomDistance <= 10000000) {
-      settingsManager.maxZoomDistance = maxZoomDistance;
+      settingsManager.maxZoomDistance = maxZoomDistance as Kilometers;
     }
 
     const nearZoomLevel = parseFloat((<HTMLInputElement>getEl('camera-nearZoomLevel')).value);
 
     if (!isNaN(nearZoomLevel) && nearZoomLevel >= 1 && nearZoomLevel <= 100) {
-      settingsManager.nearZoomLevel = nearZoomLevel;
+      settingsManager.nearZoomLevel = nearZoomLevel as Kilometers;
     }
 
     const autoPanSpeed = parseFloat((<HTMLInputElement>getEl('camera-autoPanSpeed')).value);

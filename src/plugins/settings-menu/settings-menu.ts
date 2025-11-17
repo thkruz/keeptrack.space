@@ -4,6 +4,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { Kilometers } from '@app/engine/ootk/src/main';
 import { ColorPick } from '@app/engine/utils/color-pick';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl } from '@app/engine/utils/get-el';
@@ -11,11 +12,11 @@ import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-ma
 import { parseRgba } from '@app/engine/utils/rgba';
 import { rgbCss } from '@app/engine/utils/rgbCss';
 import { SettingsManager } from '@app/settings/settings';
+import { OrbitCruncherMsgType } from '@app/webworker/orbit-cruncher-interfaces';
 import settingsPng from '@public/img/icons/settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SoundNames } from '../sounds/sounds';
 import { TimeMachine } from '../time-machine/time-machine';
-import { OrbitCruncherMsgType } from '@app/webworker/orbit-cruncher-interfaces';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -282,25 +283,29 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
             <div class="row">
               <div class="input-field col s12">
-                <input value="15" id="settings-coneDistanceFromEarth" type="number" step="1" min="-100" max="1000" data-position="top" data-delay="50" data-tooltip="Distance the FOV cone is drawn from Earth (km)" />
+                <input value="15" id="settings-coneDistanceFromEarth" type="number" step="1" min="-100" max="1000" data-position="top" data-delay="50"
+                data-tooltip="Distance the FOV cone is drawn from Earth (km)" />
                 <label for="settings-coneDistanceFromEarth" class="active">Cone Distance from Earth (km)</label>
               </div>
             </div>
             <div class="row">
               <div class="input-field col s12">
-                <input value="255" id="settings-orbitSegments" type="number" step="1" min="32" max="512" data-position="top" data-delay="50" data-tooltip="Number of line segments in orbit (higher = smoother)" />
+                <input value="255" id="settings-orbitSegments" type="number" step="1" min="32" max="512" data-position="top" data-delay="50"
+                data-tooltip="Number of line segments in orbit (higher = smoother)" />
                 <label for="settings-orbitSegments" class="active">Orbit Segments</label>
               </div>
             </div>
             <div class="row">
               <div class="input-field col s12">
-                <input value="0.6" id="settings-orbitFadeFactor" type="number" step="0.1" min="0.0" max="1.0" data-position="top" data-delay="50" data-tooltip="How much orbits fade over time (0.0 = invisible, 1.0 = no fade)" />
+                <input value="0.6" id="settings-orbitFadeFactor" type="number" step="0.1" min="0.0" max="1.0" data-position="top" data-delay="50"
+                data-tooltip="How much orbits fade over time (0.0 = invisible, 1.0 = no fade)" />
                 <label for="settings-orbitFadeFactor" class="active">Orbit Fade Factor</label>
               </div>
             </div>
             <div class="row">
               <div class="input-field col s12">
-                <input value="5" id="settings-lineScanMinEl" type="number" step="1" min="0" max="90" data-position="top" data-delay="50" data-tooltip="Minimum elevation for line scan" />
+                <input value="5" id="settings-lineScanMinEl" type="number" step="1" min="0" max="90" data-position="top" data-delay="50"
+                data-tooltip="Minimum elevation for line scan" />
                 <label for="settings-lineScanMinEl" class="active">Line Scan Min Elevation (°)</label>
               </div>
             </div>
@@ -345,13 +350,15 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
             </div>
             <div class="row">
               <div class="input-field col s12">
-                <input value="800" id="settings-mapWidth" type="number" step="100" min="400" max="4000" data-position="top" data-delay="50" data-tooltip="Map width resolution (affects performance)" />
+                <input value="800" id="settings-mapWidth" type="number" step="100" min="400" max="4000" data-position="top" data-delay="50"
+                  data-tooltip="Map width resolution (affects performance)" />
                 <label for="settings-mapWidth" class="active">Map Width (px)</label>
               </div>
             </div>
             <div class="row">
               <div class="input-field col s12">
-                <input value="600" id="settings-mapHeight" type="number" step="100" min="300" max="3000" data-position="top" data-delay="50" data-tooltip="Map height resolution (affects performance)" />
+                <input value="600" id="settings-mapHeight" type="number" step="100" min="300" max="3000" data-position="top" data-delay="50"
+                  data-tooltip="Map height resolution (affects performance)" />
                 <label for="settings-mapHeight" class="active">Map Height (px)</label>
               </div>
             </div>
@@ -698,7 +705,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
 
     // Advanced Orbital Settings
     settingsManager.covarianceConfidenceLevel = 2;
-    settingsManager.coneDistanceFromEarth = 15;
+    settingsManager.coneDistanceFromEarth = 15 as Kilometers;
     settingsManager.orbitSegments = 255;
     settingsManager.orbitFadeFactor = 0.6;
     settingsManager.lineScanMinEl = 5;
@@ -826,7 +833,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     const coneDistanceFromEarth = parseFloat((<HTMLInputElement>getEl('settings-coneDistanceFromEarth')).value);
 
     if (!isNaN(coneDistanceFromEarth)) {
-      settingsManager.coneDistanceFromEarth = coneDistanceFromEarth;
+      settingsManager.coneDistanceFromEarth = coneDistanceFromEarth as Kilometers;
     }
 
     const orbitSegments = parseInt((<HTMLInputElement>getEl('settings-orbitSegments')).value);

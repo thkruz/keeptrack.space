@@ -1,10 +1,9 @@
 // app/keeptrack/camera/camera-state.ts
-import { SatMath } from '@app/app/analysis/sat-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { alt2zoom } from '@app/engine/utils/transforms';
+import { alt2zoom, jday } from '@app/engine/utils/transforms';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Degrees, Kilometers, Radians } from '@ootk/src/main';
+import { Degrees, Kilometers, MILLISECONDS_TO_DAYS, Radians, Sgp4 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 
 /**
@@ -238,7 +237,10 @@ export class CameraState {
       const target = selectSatManagerInstance?.getSelectedSat();
 
       if (target) {
-        const satAlt = SatMath.getAlt(target.position, SatMath.calculateTimeVariables(ServiceLocator.getTimeManager().simulationTimeObj).gmst);
+        // Calculate satellite altitude: distance from center minus radius
+        const distanceFromCenter = Math.sqrt(target.position.x ** 2 + target.position.y ** 2 + target.position.z ** 2);
+        const centerBody = keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!;
+        const satAlt = <Kilometers>(distanceFromCenter - (centerBody.RADIUS as Kilometers));
         const curMinZoomLevel = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);
 
         if (this.zoomTarget < this.zoomLevel && this.zoomTarget < curMinZoomLevel) {

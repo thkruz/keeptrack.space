@@ -20,15 +20,15 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { Milliseconds, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, GreenwichMeanSiderealTime, Kilometers, MILLISECONDS_TO_DAYS, Milliseconds, Sgp4, SpaceObjectType } from '@ootk/src/main';
 import { mat4, vec3 } from 'gl-matrix';
-import { SatMath } from '@app/app/analysis/sat-math';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import { alt2zoom } from '@app/engine/utils/transforms';
+import { alt2zoom, jday } from '@app/engine/utils/transforms';
 import { normalizeAngle } from '@app/engine/utils/transforms';
+import { keepTrackApi } from '@app/keepTrackApi';
+import { settingsManager } from '@app/settings/settings';
 import { BaseCameraBehavior } from './BaseCameraBehavior';
 import type { SensorPosition } from './ICameraBehavior';
-import type { BaseObject } from '@ootk/src/main';
 
 /**
  * Fixed-to-Satellite camera behavior.
@@ -57,8 +57,37 @@ export class FixedToSatBehavior extends BaseCameraBehavior {
     }
 
     // Ensure we don't zoom in too close to the satellite
-    const gmst = sensorPos?.gmst ?? SatMath.calculateTimeVariables(new Date()).gmst;
-    const satAlt = SatMath.getAlt(SatMath.getPositionFromCenterBody(target.position), gmst);
+    let gmst: GreenwichMeanSiderealTime;
+
+    if (sensorPos?.gmst) {
+      gmst = sensorPos.gmst;
+    } else {
+      // Calculate gmst from current time
+      const now = new Date();
+      const j = jday(
+        now.getUTCFullYear(),
+        now.getUTCMonth() + 1,
+        now.getUTCDate(),
+        now.getUTCHours(),
+        now.getUTCMinutes(),
+        now.getUTCSeconds(),
+      ) + now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
+
+      gmst = Sgp4.gstime(j);
+    }
+
+    // Get position relative to center body
+    const centerBody = keepTrackApi.getScene().getBodyById(settingsManager.centerBody)!;
+    const centerBodyPosition = centerBody.position;
+    const relativePosition = {
+      x: target.position.x - centerBodyPosition[0] as Kilometers,
+      y: target.position.y - centerBodyPosition[1] as Kilometers,
+      z: target.position.z - centerBodyPosition[2] as Kilometers,
+    };
+
+    // Calculate satellite altitude: distance from center minus radius
+    const distanceFromCenter = Math.sqrt(relativePosition.x ** 2 + relativePosition.y ** 2 + relativePosition.z ** 2);
+    const satAlt = <Kilometers>(distanceFromCenter - (centerBody.RADIUS as Kilometers));
 
     if (this.calcDistanceBasedOnZoom() < satAlt + RADIUS_OF_EARTH + settingsManager.minDistanceFromSatellite) {
       this.state.zoomTarget = alt2zoom(satAlt, settingsManager.minZoomDistance, settingsManager.maxZoomDistance, settingsManager.minDistanceFromSatellite);

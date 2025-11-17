@@ -20,6 +20,7 @@ export type KeepTrackPluginsConfiguration = {
   SensorInfoPlugin?: PluginConfiguration;
   CustomSensorPlugin?: PluginConfiguration;
   LookAnglesPlugin?: PluginConfiguration;
+  LinkBudgetPlugin?: PluginConfiguration;
   MultiSiteLookAnglesPlugin?: PluginConfiguration;
   FilterMenuPlugin?: PluginConfiguration;
   transponderChannelData?: PluginConfiguration;

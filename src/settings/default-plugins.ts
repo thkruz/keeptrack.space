@@ -120,6 +120,9 @@ export const defaultPlugins = <KeepTrackPluginsConfiguration>{
     enabled: true,
     order: 92,
   },
+  LinkBudgetPlugin: {
+    enabled: true,
+    order: 94,
   EclipseSolarAnalysis: {
     enabled: true,
     order: 93,
